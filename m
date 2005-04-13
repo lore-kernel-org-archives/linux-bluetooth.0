@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----_=_NextPart_001_01C54045.C04F75E2"
-Message-ID: <F09C7DEB2116B64E81782DA92231F1ED7E3A@insexch01.intellinetservices.net>
-From: "Manuel A. Harnisch" <Manuel_Harnisch@intellinetservices.net>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] 2.6.11-mh2, HID report mode protocol patch breakout
+Subject: Re: [Bluez-devel] Patch for L2CAP (kernel<->userspace)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <loom.20050413T154320-783@post.gmane.org>
+References: <loom.20050413T154320-783@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1113401980.9061.34.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,103 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 13 Apr 2005 12:23:36 -0400
+Date: Wed, 13 Apr 2005 16:19:40 +0200
 
-This is a multi-part message in MIME format.
+Hi Matthias,
 
-------_=_NextPart_001_01C54045.C04F75E2
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+> The solution is, that "a patch for that problem is needed so that for commands  
+> from the RAW socket no responses are send."  ("However I looked at the code  
+> and it seems that the the kernel respond to packets with all idents. It should  
+> not do that, because they are shared between the kernel and the userspace.")  
+>   
+> Since iam a noob programmer i want to ask, if the problem is already fixed in  
+> a newer patch or is the problem still existent.  
 
-Hi,
-=20
-I am hoping Marcel could help me out here... or someone else. I am not =
-really a programmer, otherwise I would do this myself.
-I would need a patch file from the latest mh1 to mh2 that addresses only =
-the HID boot protocol reenablement.
-The gentoo developers are considering to merge it into their kernel, but =
-the whole mh2 patch is too big.
-http://bugs.gentoo.org/show_bug.cgi?id=3D85792 =
-<http://bugs.gentoo.org/show_bug.cgi?id=3D85792>=20
-=20
-I would really appreciate if someone could take a look at that.
-=20
-Manuel
+I thought about fixing this, but at the moment it isn't done. Feel free
+to send in a patch for it, because I am busy with other stuff and the
+whole SCM/Bitkeeper/GIT thing is not really helping right now.
 
-------_=_NextPart_001_01C54045.C04F75E2
-Content-Type: application/ms-tnef;
-	name="winmail.dat"
-Content-Transfer-Encoding: base64
+Regards
 
-eJ8+IjoQAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAA5AQAAAAAAADoAAEIgAcAGAAAAElQTS5NaWNy
-b3NvZnQgTWFpbC5Ob3RlADEIAQ2ABAACAAAAAgACAAEEgAEANAAAADIuNi4xMS1taDIsIEhJRCBy
-ZXBvcnQgbW9kZSBwcm90b2NvbCBwYXRjaCBicmVha291dAA7EQEFgAMADgAAANUHBAANAAwAFwAk
-AAMANwEBIIADAA4AAADVBwQADQAMABsAOQADAFABAQmAAQAhAAAANTU4QzVGNEM4QjI3Qjg0Rjg1
-QkJFNzdFNDcwNjZFREUAbAcBA5AGAHwNAAA3AAAAAwA2AAAAAABAADkAKmmhJEVAxQEeAD0AAQAA
-AAEAAAAAAAAAAgFHAAEAAAA5AAAAYz1VUzthPSA7cD1JbnRlbGxpbmV0IFNlcnZpO2w9SU5TRVhD
-SDAxLTA1MDQxMzE2Mjc1N1otMTEAAAAAHgBJAAEAAAAzAAAAW0JsdWV6LWRldmVsXSBQYXRjaCBm
-b3IgTDJDQVAgKGtlcm5lbDwtPnVzZXJzcGFjZSkAAEAATgCAddY9MEDFAR4AWgABAAAAKAAAAGJs
-dWV6LWRldmVsLWFkbWluQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAACAVsAAQAAAG0AAAAAAAAAgSsf
-pL6jEBmdbgDdAQ9UAgAAAABibHVlei1kZXZlbC1hZG1pbkBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQA
-U01UUABibHVlei1kZXZlbC1hZG1pbkBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQAAAAAAgFcAAEAAAAt
-AAAAU01UUDpCTFVFWi1ERVZFTC1BRE1JTkBMSVNUUy5TT1VSQ0VGT1JHRS5ORVQAAAAAHgBdAAEA
-AAAJAAAATWF0dGhpYXMAAAAAAgFeAAEAAAA7AAAAAAAAAIErH6S+oxAZnW4A3QEPVAIAAAAATWF0
-dGhpYXMAU01UUABtYXR0aGlhc2JydW5lQGdteC5kZQAAAgFfAAEAAAAaAAAAU01UUDpNQVRUSElB
-U0JSVU5FQEdNWC5ERQAAAB4AZgABAAAABQAAAFNNVFAAAAAAHgBnAAEAAAAoAAAAYmx1ZXotZGV2
-ZWwtYWRtaW5AbGlzdHMuc291cmNlZm9yZ2UubmV0AB4AaAABAAAABQAAAFNNVFAAAAAAHgBpAAEA
-AAAVAAAAbWF0dGhpYXNicnVuZUBnbXguZGUAAAAAHgBwAAEAAAA0AAAAMi42LjExLW1oMiwgSElE
-IHJlcG9ydCBtb2RlIHByb3RvY29sIHBhdGNoIGJyZWFrb3V0AAIBcQABAAAAGwAAAAHFQDUuwDoF
-w1BuSUmXiQRHVziUYKwAA/14JQAeAHQAAQAAACIAAABibHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vm
-b3JnZS5uZXQAAAAeABoMAQAAABMAAABNYW51ZWwgQS4gSGFybmlzY2gAAB4AHQ4BAAAANAAAADIu
-Ni4xMS1taDIsIEhJRCByZXBvcnQgbW9kZSBwcm90b2NvbCBwYXRjaCBicmVha291dAACAQkQAQAA
-AOEFAADdBQAA2hMAAExaRnXI/oqoAwAKAHJjcGcxMjWCMgNDaHRtbDEDMD8BAwH3CoACpAPjAgBj
-aMEKwHNldDAgBxMCgP8QAwBQBFYIVQeyEdUOUQMB3RDXMgYABsMR1TMERhDZbxLrEeMI7wn3OxjP
-DjA1OxHSDGBjAFALCQFkMzaTEWALpTQgEAIqXA6yvQGQZxTwCqMR4x3oNBTwADwhRE9DVFlQAEUg
-SFRNTCBQAFVCTElDICItIC8vVzNDIYBEVCJEIJQzLjIhgEVOnCI+Hu0ejyPBMTgf8G8goiMPJB8m
-kDMdgCVwRXxBRCXNDvEm7ylvJPQ2QQ7wPE1FVEEHsEExLGA9IkcJ8ASQYXRFBbAiEtBPTlQi0FQT
-LPAF4UV4EPFuZ2U9BlJ2EzEvQQCQAiAgNgAuNS42OTQ0Lk4wIv4qzyUDNzcf8FRQSVRMRSXONA7w
-WzJCCkF6LQEAL0BsXTcg4C1gEPAgAhAFwEwywENBUCAoawSRNWBCJiZwOy0mZzcwdUcRMBEgCrBj
-ZSkkbjX9H/AvM08xfyZFNJE5YChPCyafPTQ1EWA8Qk9Ejlk8rRzxPc9nOTYf8IBESVYgaWQ9QiAg
-T1dBUmULUHlUJGV4FOA5MzMQZGl0cj09UHI8oD0TACEgnwAAQ8EKsUSyEPBccQMh/0QlEWA/j0Cf
-QaZDj0SfRaq5POk2NEmKRd8k9DQlUQpGLdEgAJB6ZT0yR0l7C+JFuUhpLCR8Nf1BsS9PIkl5SYdL
-ywHASYfvCqJT6AqAJHwwKBEh4EHw/1M/Tb9HL0g/SU9KX1QfTH//WT9On0+vULxRz1LfWQ89JeI4
-HYAmbmI34AKAXOf4XCdhAUBer1UfVi9XP/9YT2dfWm9bf1yPXZ9qD1+/D28vYd9i71CtSSBhbdAg
-aG9wC4BnBdAKwMc4EAMgBaB1bGR7IDVg9HAgB4AgCGAFQHxwGNC+Ln1wfOAFwDtMcJVzA3B+ZQIg
-LvA1YBEwfZB6424+bwVAGNAHQELQevAgcE8DYAnAewAHgHIsfOB0L30xA/Eu8Hrgd3wjZG+eIIIA
-BAB933CzbXkRMPhsZi5k72X/U+9q/2wP/20fbi9233BPcV9yb3N/dI//dZ92r3e/eM9534KWLTAJ
-gP+BAjW0AxAu8ANSgzEu8Atg/nQHkAVADqAO8C1wmwEU8J+Dn45SggAtYHrwZGQY0J8EEAeRAiCA
-4ZpiSEkiEP8G4IBxgTEtcBhBgJEJ8AGg/5ngB4ACMIVPhl+Hb4h/iY//ip+Lr5Rfjc+O34/vkP+S
-D5+TH5QvlT+WT5dfIFSacf8u4AIwnuCrADVCe0AvkXrw/xjQfAEAgQSBe2KbUgSQLuG+aQVAC4Cb
-UZvPnNRlqyC2IDa0gdBifQGaYnd7MB+Z4ZuCmWSDYbQSYmln/6B/oY+in6OvpL+lz6bfr4//qP+q
-D6sfrC+tP65Pr19oCWo8LJBoGNBmLPAOsHSMcDohgLlAZ3Mus+QiLgWwZy9zezB3X8HNAS5jZ2k/
-QiE5MPg3OTIi8bIKCJB8QDziTmZ8QAuAmuB7SCBhUvkhIE5LIVDMn82vzrkX4P8B8XxAESA9UBgw
-AEF8MGQ//7B/CqOxj7Kf0f/TD864u39/vI+9md7P39/WP0GBH+Ev/kE8oL5Pv1/Ab8F/4a/Dn//E
-r8W/xs/H38jvyf/Wn7Ev/9kP8D/d7+fvZ79oz2nf5C//5T/mT+df9m/pf+qP65/sr//tv+7P79/w
-7/H/8w+Ch4Cm8nCBMGVjEaCawEIQApA/fzZ8FP+QNrCZMRhgb2v/tw//850xnRK7b/UvvY/6L//7
-P/xP/V8GD/9/AI8BnwKv/wO/BM8F3wbvB/8JD/QfEG//Fp/3T/hfHG8S3xPvFP8kD/8lHxgvGT8a
-TxtfJ88dfyzvzx+fIK8hu3ugbnXQUCKP/yOfEY8onymvKr8rzzR/Pq9fP78tTy5fRF8OEzU14S/w
-Qk9EWc9gROu6QEXfhUhhN+NxSFRNTM9gAn1KkAAAAB4ANRABAAAASAAAADxGMDlDN0RFQjIxMTZC
-NjRFODE3ODJEQTkyMjMxRjFFRDdFM0FAaW5zZXhjaDAxLmludGVsbGluZXRzZXJ2aWNlcy5uZXQ+
-AB4ARxABAAAADwAAAG1lc3NhZ2UvcmZjODIyAAALAPIQAQAAAB8A8xABAAAAcAAAADIALgA2AC4A
-MQAxAC0AbQBoADIALAAgAEgASQBEACAAcgBlAHAAbwByAHQAIABtAG8AZABlACAAcAByAG8AdABv
-AGMAbwBsACAAcABhAHQAYwBoACAAYgByAGUAYQBrAG8AdQB0AC4ARQBNAEwAAAALAPYQAAAAAEAA
-BzAqaaEkRUDFAUAACDDidU/ARUDFAQMA3j+vbwAAAwDxPwkEAAAeAPg/AQAAABMAAABNYW51ZWwg
-QS4gSGFybmlzY2gAAAIB+T8BAAAAawAAAAAAAADcp0DIwEIQGrS5CAArL+GCAQAAAAAAAAAvTz1J
-TlRFTExJTkVUIFNFUlZJQ0VTL09VPUZJUlNUIEFETUlOSVNUUkFUSVZFIEdST1VQL0NOPVJFQ0lQ
-SUVOVFMvQ049TUhBUk5JU0MAAB4A+j8BAAAAFQAAAFN5c3RlbSBBZG1pbmlzdHJhdG9yAAAAAAIB
-+z8BAAAAHgAAAAAAAADcp0DIwEIQGrS5CAArL+GCAQAAAAAAAAAuAAAAAwD9P+QEAAADABlAAAAA
-AAMAGkAAAAAAAwAdQAAAAAADAB5AAAAAAB4AMEABAAAACQAAAE1IQVJOSVNDAAAAAB4AMUABAAAA
-CQAAAE1IQVJOSVNDAAAAAB4AMkABAAAAKAAAAGJsdWV6LWRldmVsLWFkbWluQGxpc3RzLnNvdXJj
-ZWZvcmdlLm5ldAAeADNAAQAAABUAAABtYXR0aGlhc2JydW5lQGdteC5kZQAAAAAeADhAAQAAAAkA
-AABNSEFSTklTQwAAAAAeADlAAQAAAAIAAAAuAAAAAwB2QP////8LACkAAAAAAAsAIwAAAAAAAwAG
-EJP3YykDAAcQmwEAAAMAEBAAAAAAAwAREAAAAAAeAAgQAQAAAGUAAABISSxJQU1IT1BJTkdNQVJD
-RUxDT1VMREhFTFBNRU9VVEhFUkVPUlNPTUVPTkVFTFNFSUFNTk9UUkVBTExZQVBST0dSQU1NRVIs
-T1RIRVJXSVNFSVdPVUxERE9USElTTVlTRUxGAAAAAAIBfwABAAAASAAAADxGMDlDN0RFQjIxMTZC
-NjRFODE3ODJEQTkyMjMxRjFFRDdFM0FAaW5zZXhjaDAxLmludGVsbGluZXRzZXJ2aWNlcy5uZXQ+
-AFok
+Marcel
 
-------_=_NextPart_001_01C54045.C04F75E2--
+
 
 
 -------------------------------------------------------
