@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <425D8196.2090608@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Re: bluetooth 1.2 - how do I know it's working?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] dongles won't initialize
+In-Reply-To: <pan.2005.04.13.19.52.58.815123@wingnet.net>
+References: <pan.2005.04.13.14.52.16.599459@wingnet.net>
+	 <1113405322.9061.36.camel@pegasus>
+	 <pan.2005.04.13.19.52.58.815123@wingnet.net>
+Content-Type: text/plain
+Message-Id: <1113423981.15359.0.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,37 +20,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Apr 2005 22:31:18 +0200
+Date: Wed, 13 Apr 2005 22:26:21 +0200
 
-Hello everybody
+Hi Jesse,
 
-maybe someone has an idea:
+> >> # hcitool afh 00:0D:44:36:E6:F4
+> >> AFH map: 0xffffffffffffffffff7f
+> >> 
+> >> Does this indicate that both devices are using AFH correctly?
+> > 
+> > monitor the "hcitool afh" call and if the value changes then AFH is
+> > working.
+> 
+> No, they don't change. Even after a reboot it yields the same result.
+> 
+> What should I do to get it working?
 
-On my PC, I have:
-Kernel 2.6.8-24.14-default
-bluez-utils and bluez-libs 2.15
+it is working, but you need to get heavy data transmission on your
+wireless LAN and place the two devices near by.
 
-this is exactly the same setup as on my laptop where everything works 
-perfectly fine.
-the same dongle(s) used in the laptop refuse to work with the pc.
+Regards
 
-I made several (>20) tries with reboot and hcid reload.
-hcitool dev and hciconfig -a:
-- mostly showed nothing (no devices)
-- about two times showed the dongles correctly but hciconfig -a failed with 
-a timeout (hciconfig hci0 revision as well)
-- once, the dongle wasn't up. doing hciconfig hci0 up freezed
-- lsusb [-b] freezed
-- dmesg, /var/log/messages didn't get any entries
-
-I strongly assume this has something to to with the usb port. maybee it's 
-broken or i'm missing something important (software)...
+Marcel
 
 
-any ideas/help very appreciated
-
-regards
-Marco
 
 
 -------------------------------------------------------
