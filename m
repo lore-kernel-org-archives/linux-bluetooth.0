@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <BAY20-F36757559FB4EF0ADA8D4B185340@phx.gbl>
-From: "Martin Rolsted Jensen" <mrj_ing@hotmail.com>
+Subject: Re: [Bluez-devel] 2.6.11-mh2, HID report mode protocol patch
+	breakout
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <F09C7DEB2116B64E81782DA92231F1ED7E3A@insexch01.intellinetservices.net>
+References: 
+	 <F09C7DEB2116B64E81782DA92231F1ED7E3A@insexch01.intellinetservices.net>
+Content-Type: text/plain
+Message-Id: <1113411351.9061.44.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Subject: [Bluez-devel] Missing library libgcc_s.so.1 when using hciattach etc.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,35 +20,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 13 Apr 2005 18:25:36 +0000
+Date: Wed, 13 Apr 2005 18:55:51 +0200
 
-Hello everybody!
+Hi Manuel,
 
-I am trying to implement a UART bluetooth module on my Triton (PXA255) 
-board.
-I have compiled the necessary files in Scratchbox and made a new file 
-system.
-When I try to execute for example hciattach then I got the message:
+> I am hoping Marcel could help me out here... or someone else. I am not really a programmer, otherwise I would do this myself.
+> I would need a patch file from the latest mh1 to mh2 that addresses only the HID boot protocol reenablement.
+> The gentoo developers are considering to merge it into their kernel, but the whole mh2 patch is too big.
+> http://bugs.gentoo.org/show_bug.cgi?id=85792 <http://bugs.gentoo.org/show_bug.cgi?id=85792> 
+>  
+> I would really appreciate if someone could take a look at that.
 
-root@triton1:/usr/sbin# hciattach
-hciattach: error while loading shared libraries: libgcc_s.so.1: cannot open 
-shared object file:
-No such file or directory
-root@triton1:/usr/sbin# ldd hciattach
-   libbluetooth.so.1 => /usr/lib/libbluetooth.so.1 (0x40020000)
-   libc.so.6 => /lib/libc.so.6 (0x40035000)
-   /lib/ld-linux.so.2 => /lib/ld-linux.so.1 (0x40000000)
-   libgcc_s.so.1 => not found
+this stuff was actually not meant for inclusion into any distribution
+kernel. And the HIDP report mode support is the big part of -mh2:
 
-I have searched with the find command and there is no such library file in 
-the file system.
-Is it possible to naively include it in my file system, for example in /lib 
-or /usr/lib?
-If so, were can I find that missing library.
+ net/bluetooth/hidp/Makefile |    2 
+ net/bluetooth/hidp/core.c   |  112 ++
+ net/bluetooth/hidp/hid.c    | 1682 ++++++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hidp/hid.h    |  350 +++++++++
+ net/bluetooth/hidp/hidp.h   |    5 
+ 5 files changed, 2142 insertions(+), 9 deletions(-)
 
-Best Regards
+Due the current Bitkeeper problematic the work on the generic HID parser
+has been stalled. One of my concerns was to keep the revision history of
+the old HID code and at the moment I have no idea how to do that.
 
-Martin Rolsted Jensen
+Regards
+
+Marcel
 
 
 
