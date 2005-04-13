@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <425D2BA0.8010002@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Congratulation to qualification
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: Motorola HS-850 and btsco
-References: <m24qehv3n1.fsf@tnuctip.rychter.com> <m2k6n72pez.fsf@tnuctip.rychter.com>
-In-Reply-To: <m2k6n72pez.fsf@tnuctip.rychter.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <200504122317.36423.cijoml@volny.cz>
+References: <200504122317.36423.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1113401810.9061.31.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,86 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Apr 2005 08:24:32 -0600
+Date: Wed, 13 Apr 2005 16:16:50 +0200
 
-Jan,
+Hi Michal,
 
-I have seen alsamixer fail to grok our audio device. I don't think we're 
-doing anything wrong though. I know gnome-volume-control can deal with 
-it properly.
+> It is great to have BlueZ qualificated. How did you do it, that company paid 
+> it? How expensive was it? Why only these two profiles and not others? Why not 
+> 1.2?
 
-I think the reason you haven't gotten a reply is because everything 
-you've showed us looks right.
+this is correct. TomTom paid the listing fee for the qualification and
+thus it is also listed under their name. The price for an adopter member
+is 10,000 USD and I will not talk about any other expenses.
 
-Brad
+The qualification of GAP and SPP and Bluetooth 1.1 only are because this
+is what was needed to make it re-useable. Companies can now take this
+listing and don't have to re-qualify the lower layers. A Bluetooth 1.2
+or 2.0 qualification would have been nice, but actually there was no
+time for it.
 
-Jan Rychter wrote:
-> I wrote:
-> 
->>I've been trying to get my Motorola HS-850 headset to work with btsco,
->>using two different USB adapters.
->>
->>It seems I'm getting quite far: I can pair the devices, btsco can
->>connect, and it can detect button presses:
->>
->># btsco -v 00:07:A4:5C:39:F7 1
->>btsco v0.4
->>Device is 1:0
->>Voice setting: 0x0060
->>RFCOMM channel 1 connected
->>recieved AT+CKPD=200
->>recieved AT+CKPD=200
->>
->>The headset reports as:
->>
->># hcitool info 00:07:A4:5C:39:F7
->>Requesting information ...
->>        BD Address:  00:07:A4:5C:39:F7
->>        Device Name: Motorola HS850
->>        LMP Version: 1.2 (0x2) LMP Subversion: 0x5dd
->>        Manufacturer: Cambridge Silicon Radio (10)
->>        Features: 0xfc 0xff 0x8b 0xf8 0x18 0x18 0x00 0x80
->>                <encryption> <slot offset> <timing accuracy> <role switch> 
->>                <hold mode> <sniff mode> <park state> <RSSI> <channel quality> 
->>                <SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log> 
->>                <CVSD> <paging scheme> <transparent SCO> <broadcast encrypt> 
->>                <enhanced iscan> <interlaced iscan> <interlaced pscan> 
->>                <inquiry with RSSI> <extended SCO> <AFH cap. slave> 
->>                <AFH class. slave> <AFH cap. master> <AFH class. master> 
->>                <extended features> 
->>
->>The problem is that I don't get audio. When I try audio playback or
->>recording, I do get a static hiss in the headset and lots of SCO packets
->>appear on the link (checked with hcidump).
->>
->>I also checked that the volumes are set to max using "alsamixer -c1 -V
->>all". Tried aplay/arecord, sox, xmms with output to plughw:Headset, all
->>produce exactly the same effect.
->>
->>Kernel 2.6.11, two different USB dongles (one BCM2033-based, one an
->>IOGear GBU-311 (thanks, Marcel!)). Same results.
->>
->>What else there is to try?
-> 
-> 
-> [...several days of silence...]
-> 
-> Any other information I can provide, or should I just give up?
-> 
-> thanks,
-> --J.
-> 
-> 
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
