@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <425BD0F8.80403@potchin.co.uk>
-From: Jeff <jeff@potchin.co.uk>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] NAP prob with FC3 & WinXP
+From: Jan Rychter <jan@rychter.com>
+Message-ID: <m2k6n72pez.fsf@tnuctip.rychter.com>
+References: <m24qehv3n1.fsf@tnuctip.rychter.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: Motorola HS-850 and btsco
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,110 +17,60 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 12 Apr 2005 14:45:28 +0100
+Date: Wed, 13 Apr 2005 14:53:24 +0900
 
-Hi All,
+I wrote:
+> I've been trying to get my Motorola HS-850 headset to work with btsco,
+> using two different USB adapters.
+> 
+> It seems I'm getting quite far: I can pair the devices, btsco can
+> connect, and it can detect button presses:
+> 
+> # btsco -v 00:07:A4:5C:39:F7 1
+> btsco v0.4
+> Device is 1:0
+> Voice setting: 0x0060
+> RFCOMM channel 1 connected
+> recieved AT+CKPD=200
+> recieved AT+CKPD=200
+> 
+> The headset reports as:
+> 
+> # hcitool info 00:07:A4:5C:39:F7
+> Requesting information ...
+>         BD Address:  00:07:A4:5C:39:F7
+>         Device Name: Motorola HS850
+>         LMP Version: 1.2 (0x2) LMP Subversion: 0x5dd
+>         Manufacturer: Cambridge Silicon Radio (10)
+>         Features: 0xfc 0xff 0x8b 0xf8 0x18 0x18 0x00 0x80
+>                 <encryption> <slot offset> <timing accuracy> <role switch> 
+>                 <hold mode> <sniff mode> <park state> <RSSI> <channel quality> 
+>                 <SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log> 
+>                 <CVSD> <paging scheme> <transparent SCO> <broadcast encrypt> 
+>                 <enhanced iscan> <interlaced iscan> <interlaced pscan> 
+>                 <inquiry with RSSI> <extended SCO> <AFH cap. slave> 
+>                 <AFH class. slave> <AFH cap. master> <AFH class. master> 
+>                 <extended features> 
+> 
+> The problem is that I don't get audio. When I try audio playback or
+> recording, I do get a static hiss in the headset and lots of SCO packets
+> appear on the link (checked with hcidump).
+> 
+> I also checked that the volumes are set to max using "alsamixer -c1 -V
+> all". Tried aplay/arecord, sox, xmms with output to plughw:Headset, all
+> produce exactly the same effect.
+> 
+> Kernel 2.6.11, two different USB dongles (one BCM2033-based, one an
+> IOGear GBU-311 (thanks, Marcel!)). Same results.
+> 
+> What else there is to try?
 
-I having a few probs setting up a BT NAP access point. I'm running...
+[...several days of silence...]
 
-Fedor Core 3 w/ kernel 2.6.9-1.667 (Bluetooth built into the kernel)
+Any other information I can provide, or should I just give up?
 
-$ rpm -qa | grep  blue
-bluez-pin-0.23-3
-bluez-hcidump-1.11-1
-bluez-utils-2.10-2
-bluez-libs-2.10-2
-bluez-bluefw-1.0-6
-
-/etc/bluetooth/hcid.conf....
-
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        pin_helper /usr/bin/bluepin;
-}
-device {
-        name "potchin";
-        class 0x120104;
-        iscan enable; pscan enable;
-        lm accept;
-        lp rswitch,hold,sniff,park;
-}
-
-
-
-with a usb-tech usb BT dongle 
-(http://www.usbtech.co.uk/catalog/product_info.php/products_id/266)
-
-The physical layer seems to be up - i can perform an l2ping to the other 
-device and get a response. The client machine (Win XP SP2) detects the 
-Linux box and can see some of the sdp services I add (serial port for 
-example) but cannot detect the NAP services.
-
-I'm running pand with "pand --listen --role=NAP" and it registers the 
-NAP service with sdp...
-
-$ sdptool browse local
-Browsing FF:FF:FF:00:00:00 ...
-Service Name: Public Browse Group Root
-Service Description: Root of public browse hierarchy
-Service Provider: BlueZ
-Service RecHandle: 0xf81f9008
-Service Class ID List:
-  "Browse Group Descriptor" (0x1001)
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-
-Service Name: Network Access Point
-Service RecHandle: 0xf81f96f0
-Service Class ID List:
-  "Network access point" (0x1116)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 15
-  "BNEP" (0x000f)
-    Version: 0x0100
-    SEQ16: 800 806
-Profile Descriptor List:
-  "PAN access point" (0x1116)
-    Version: 0x0100
-
-Service Name: SDP Server
-Service Description: Bluetooth service discovery server
-Service Provider: BlueZ
-Service RecHandle: 0x0
-Service Class ID List:
-  "SDP Server" (0x1000)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 1
-    Version: 0x0001
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-
-
-
-
-
-Can anyone help - should windows pick up a PAN from the NAP service (Im 
-using the standard M$ drivers)?
-
-
-Have I missed something? Has anyone got a URL for a HOWTO on FC3 - I've 
-set this up from various FAQs that seem a bit old or partly irrelevant 
-(i.e. they talk about installing kernel modules or are debian orientated).
-
-Also, where can I get a full list of sdp services and their 
-appriviations for sdptool?
-
-
-Thanks in advance
-Jeff
+thanks,
+--J.
 
 
 
