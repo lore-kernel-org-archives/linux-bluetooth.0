@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <f54d86405041222462d20258e@mail.gmail.com>
+From: Benny <bennyvasanth@gmail.com>
 To: bluez-users@lists.sourceforge.net
-From: Jan Rychter <jan@rychter.com>
-Message-ID: <m2k6n72pez.fsf@tnuctip.rychter.com>
-References: <m24qehv3n1.fsf@tnuctip.rychter.com>
+Subject: Re: [Bluez-users] BT Headset - snd-bt-sco - Mic operation not working
+In-Reply-To: <424D7BDB.1040408@xmission.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Motorola HS-850 and btsco
+Content-Type: text/plain; charset=ISO-8859-1
+References: <f54d864050401035565d0acd6@mail.gmail.com>
+	 <424D7BDB.1040408@xmission.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,61 +19,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Apr 2005 14:53:24 +0900
+Date: Wed, 13 Apr 2005 11:16:53 +0530
 
-I wrote:
-> I've been trying to get my Motorola HS-850 headset to work with btsco,
-> using two different USB adapters.
-> 
-> It seems I'm getting quite far: I can pair the devices, btsco can
-> connect, and it can detect button presses:
-> 
-> # btsco -v 00:07:A4:5C:39:F7 1
-> btsco v0.4
-> Device is 1:0
-> Voice setting: 0x0060
-> RFCOMM channel 1 connected
-> recieved AT+CKPD=200
-> recieved AT+CKPD=200
-> 
-> The headset reports as:
-> 
-> # hcitool info 00:07:A4:5C:39:F7
-> Requesting information ...
->         BD Address:  00:07:A4:5C:39:F7
->         Device Name: Motorola HS850
->         LMP Version: 1.2 (0x2) LMP Subversion: 0x5dd
->         Manufacturer: Cambridge Silicon Radio (10)
->         Features: 0xfc 0xff 0x8b 0xf8 0x18 0x18 0x00 0x80
->                 <encryption> <slot offset> <timing accuracy> <role switch> 
->                 <hold mode> <sniff mode> <park state> <RSSI> <channel quality> 
->                 <SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log> 
->                 <CVSD> <paging scheme> <transparent SCO> <broadcast encrypt> 
->                 <enhanced iscan> <interlaced iscan> <interlaced pscan> 
->                 <inquiry with RSSI> <extended SCO> <AFH cap. slave> 
->                 <AFH class. slave> <AFH cap. master> <AFH class. master> 
->                 <extended features> 
-> 
-> The problem is that I don't get audio. When I try audio playback or
-> recording, I do get a static hiss in the headset and lots of SCO packets
-> appear on the link (checked with hcidump).
-> 
-> I also checked that the volumes are set to max using "alsamixer -c1 -V
-> all". Tried aplay/arecord, sox, xmms with output to plughw:Headset, all
-> produce exactly the same effect.
-> 
-> Kernel 2.6.11, two different USB dongles (one BCM2033-based, one an
-> IOGear GBU-311 (thanks, Marcel!)). Same results.
-> 
-> What else there is to try?
+Dear Brad Midgley,
 
-[...several days of silence...]
+Thanks for your immediate response and sorry for my late reply.
 
-Any other information I can provide, or should I just give up?
+My problem is I am not able to test the Sound recorder
+functionality(ie) No action on pressing the record button.
 
-thanks,
---J.
+I was getting the loop back(tested using Alsa Mixer unmute loopback)=20
+working with the old "btsco". But with the latest "btsco" daemon I am
+not able to hear the "loop back".
 
+The SCO connection is opened only when I press "play" for the xmms and
+it closes when I stop the song. Whether I can test the mic
+functionality separately.
+
+Please advice of the setting I need to make.
+
+Thanks & Regards,
+Benny
+
+
+On 4/1/05, Brad Midgley <bmidgley@xmission.com> wrote:
+> what kind of failure? can you use a mixer app or the headset to turn up
+> the record volume and unmute the mic?
+>=20
+> Benny wrote:
+> > Dear all,
+> >
+> > I am using a USB BT Dongle(CSR based) on a Linux PC(2.6.9) installed
+> > with the latest snd-bt-sco driver taken from CVS.
+> >
+> > I have established a bluetooth connection to a BT Mono headset using
+> > the btsco application. It is working fine for Audio(xmms playing a
+> > .wav file) SCO connection from PC to the BT headset(speaker).
+> >
+> > But fails when I tried to test the headset MIC operation by carrying
+> > out a recording operation using the sound recorder application on PC.
+> >
+> > Please advice.
+> >
+> > Thanks & Regards,
+> > Benny
 
 
 -------------------------------------------------------
