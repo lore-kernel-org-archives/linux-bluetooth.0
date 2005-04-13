@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth ans Scripts
-From: Stephen Crane <steve.crane@rococosoft.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <425C3612.9030609@gmx.ch>
-References: <200504121820.11615.lists@naasa.net>  <425C3612.9030609@gmx.ch>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-3KXtxPz16F0JGyoIrDqP"
-Message-Id: <1113397947.10329.123.camel@baroque.rococosoft.com>
+From: Thomas Nemeth <thomas.nemeth@betatech.fr>
+Message-ID: <loom.20050413T144754-221@post.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Logitech MX900 and hid2hci/hidp
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,57 +16,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Apr 2005 14:12:27 +0100
+Date: Wed, 13 Apr 2005 13:03:40 +0000 (UTC)
 
-
---=-3KXtxPz16F0JGyoIrDqP
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, 2005-04-12 at 22:56 +0200, Marco Trudel wrote:
-> Joerg Platte wrote:
-> > Hi!
-> >=20
-> > Currently I'm doing some Bluetooth connection and performance tests. I =
-want to=20
-> > create connections, park them and transfer data and so on.
->=20
-> As much as I know, you won't find bluetooth hardware that supports parkin=
-g.
-> respectively, you might park devices, but you won't be able to have up to=
-=20
-> 248 parked and 7 active devices...
-> the limit of 7 stays...
->=20
-> > I could write a C=20
-> > program doing all this stuff, but this may take a long time and is not=20
-> > flexible. Does anyone know a Bluez-"frontend" written in a high level=20
-> > (Script) language which is capable of doing all kind of connection hand=
-ling=20
-> > and data transfer?
->=20
-> java, jsr82?
-
-Or even a Groovy version of JSR82?
-
-Steve
---=20
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
-
---=-3KXtxPz16F0JGyoIrDqP
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQBCXRq7lgMqgVzLyWcRAiZIAJ4zyrj1nIEjYOyRpao4Yn0EuYLSOgCgjNgQ
-bcx9Cle0J+352QawzhR3Q2Y=
-=JNcC
------END PGP SIGNATURE-----
-
---=-3KXtxPz16F0JGyoIrDqP--
+Hi ! 
+ 
+I've got a quite big problem. I need to make a logitech mouse MX900 work 
+with a 2.4.20 kernel (because my customer ask me to : he don't want to 
+change the kernel because of validation his company has made). 
+ 
+I got the 2.4.20 sources and the config used by my customer, applyed the 
+-mh18 patch to it, selected all bluetooth drivers and input core, usb stuff... 
+Compiled it, installed it and its modules, all went ok. 
+ 
+When I modprobe hidp (after all other needed modules), all seems ok. I run 
+hid2hci and it reports to have successfully switched device 046d:c705 to HCI 
+mode. 
+ 
+Anyway, hcid does not report hci0 (I only have 1 bluetooth device by now) 
+beeing seen neither configured. hcitool scan reports : 
+"Device is not available: Success" witch is a bit strange. 
+ 
+I have all the /dev stuff needed (I think) : 
+/dev/usb/hiddev* 
+/dev/input/uinput (just in case) 
+(can't remember if I created some other device) 
+ 
+I mounted /proc/bus/usb too... 
+ 
+I looked at the hcitool sources, bluetooth library and found that the 
+HCIGETDEVLIST ioctl command gave no results. So the problem seems to be 
+between hidp, hcid and hid2hci... 
+ 
+Is there any mean to make this mouse work with a 2.4.20 ? 
+Did I miss something ? 
+ 
+Thank you in advance... 
 
 
 
