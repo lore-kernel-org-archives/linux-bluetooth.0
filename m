@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Patch for L2CAP (kernel<->userspace)
+Subject: Re: [Bluez-devel] Uart transport driver (aka H5)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <loom.20050413T154320-783@post.gmane.org>
-References: <loom.20050413T154320-783@post.gmane.org>
+In-Reply-To: <BAY10-F41EDBEAF69947BE39E4096CE340@phx.gbl>
+References: <BAY10-F41EDBEAF69947BE39E4096CE340@phx.gbl>
 Content-Type: text/plain
-Message-Id: <1113401980.9061.34.camel@pegasus>
+Message-Id: <1113401373.9061.23.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,21 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 13 Apr 2005 16:19:40 +0200
+Date: Wed, 13 Apr 2005 16:09:33 +0200
 
-Hi Matthias,
+Hi Ernst,
 
-> The solution is, that "a patch for that problem is needed so that for commands  
-> from the RAW socket no responses are send."  ("However I looked at the code  
-> and it seems that the the kernel respond to packets with all idents. It should  
-> not do that, because they are shared between the kernel and the userspace.")  
->   
-> Since iam a noob programmer i want to ask, if the problem is already fixed in  
-> a newer patch or is the problem still existent.  
+> I'm looking for a Uart transport (aka H5) driver for linux. I can see that 
+> it is on the BlueZ TODO list. Does anyone know if it is available soon? Is 
+> anyone developing it right now for the BlueZ project?
 
-I thought about fixing this, but at the moment it isn't done. Feel free
-to send in a patch for it, because I am busy with other stuff and the
-whole SCM/Bitkeeper/GIT thing is not really helping right now.
+there are plans for the 3-Wire UART driver (aka H:5), but as far as I
+know, nobody started it.
 
 Regards
 
