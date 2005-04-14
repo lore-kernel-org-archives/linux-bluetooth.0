@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] BlueZ investigation
-From: Charles Bueche <charles@bueche.ch>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <425E9118.7040101@palmsource.com>
-References: <425E9118.7040101@palmsource.com>
-Content-Type: text/plain
-Message-Id: <1113510010.11953.13.camel@bluez.bueche.ch>
-Mime-Version: 1.0
+From: Peter Wippich <pewi@gw-instruments.de>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] first(?) bc4 module
+In-Reply-To: <1113500184.8989.65.camel@pegasus>
+Message-ID: <Pine.LNX.4.33.0504142021450.29800-100000@redbean.intranet.gw-instruments.de>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,35 +17,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 14 Apr 2005 22:20:10 +0200
+Date: Thu, 14 Apr 2005 20:22:35 +0200 (CEST)
 
-Hi Fred,
 
-you would be wise to use bluez for at least the following 2 reasons :
+Hi Marcel,
 
-- it's delivered with the stock kernel, so you won't depend on a vendor
-for updates
-- my T5 crashes too often while I do Bluetooth operations. Don't know
-what you have been used until now in PalmOs, but Bluez is magnitudes
-better in stability.
+> you will really need a BlueCore4 with DSP for it, because otherwise you
+> don't know what to do with all the data ;)
 
-my 2ct worth.
-Charles
+That's for sure ;-)
 
-On jeu, 2005-04-14 at 17:49 +0200, Frederic Danis wrote:
-> Hi,
-> 
-> In our move to Linux, we are investigating different Bluetooth stacks 
-> (proprietary or free).
-> About BlueZ, I am asked about interoperability issues: do you know if 
-> there are companies attending the unplugged fests to test their 
-> BlueZ-based products? Do you have info about commercial devices 
-> interoperating with BlueZ?
-> Please, send me any comments that can help me to decide my managment.
-> 
-> Thanks!
-> 
-> Fred
+Regards,
+
+Peter
+
+
+
+|	Peter Wippich 			Voice: +49 30 46776411		|
+|	G&W Instruments GmbH		fax:   +49 30 46776419		|
+|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
+|	D-13355 Berlin  / Germany					|
 
 
 
