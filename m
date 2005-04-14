@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <425E7F8D.9060701@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Pavel Ruzicka <pavouk@pavouk.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] compilation errors for btsco
-References: <E73D9A5BC4A2D711BBC600065BF3595F1C66D029@il06exm10>
-In-Reply-To: <E73D9A5BC4A2D711BBC600065BF3595F1C66D029@il06exm10>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-users] btsco - headset profile activated but no sco packets transmitted ???
+References: <20050404194542.GA7640@lsweb.de> <200504042322.17493.pavouk@pavouk.org> <f54d86405041222381e9da934@mail.gmail.com>
+In-Reply-To: <f54d86405041222381e9da934@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200504141632.49910.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,99 +19,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Apr 2005 08:34:53 -0600
+Date: Thu, 14 Apr 2005 16:32:49 +0200
 
-it looks like this is safe for other distros too so I committed it.
+Hello,
 
-Mandalia Hiren-AHM047 wrote:
-> Thanks Brad. But I figured out what the problem was. The bootstrap script somehow did not check in the right directories for the alsa.m4 file that had the AM_PATH_ALSA macro. So I manually edited the script. I added the option with 'aclocal' like this
-> 
-> aclocal -I /usr/share/aclocal && ...
-> 
-> it compiled fine. I'm also able to use btsco (I tried aplay and it worked)
-> 
-> Regards,
-> Hiren 
-> 
-> 
->>-----Original Message-----
->>From: bluez-users-admin@lists.sourceforge.net [mailto:bluez-users-
->>admin@lists.sourceforge.net] On Behalf Of Brad Midgley
->>Sent: Thursday, April 14, 2005 2:19 AM
->>To: bluez-users@lists.sourceforge.net
->>Subject: Re: [Bluez-users] compilation errors for btsco
->>
->>Hey
->>
->>I think others have had trouble with fedora but I haven't heard any
->>success stories. See the bluetooth-alsa bug list/support lists on
->>sourceforge to see if anyone has followed up with any tips.
->>
->>Brad
->>
->>Mandalia Hiren-AHM047 wrote:
->>
->>>Hello,
->>>
->>>I'm trying to compile btsco on a FC3 (Kernel 2.6.10). I think I have all
->>
->>the packages that I need.
->>
->>>The alsa packages I have are:
->>>
->>>alsa-lib-devel-1.0.6-7.FC3
->>>alsa-utils-1.0.6-3
->>>alsa-lib-1.0.6-7.FC3
->>>
->>>I have already installed the bluez-libs-2.15 package so that should take
->>
->>care about libbluetooth-dev (correct me if I'm wrong here)
->>
->>>when I do a
->>>%./bootstrap
->>>aclocal: configure.in 21: macro 'AM_PATH_ALSA' not found in library
->>>
->>>I was reading the archives which made me check if I had the file
->>
->>/usr/share/aclocal/alsa.m4 and I do have that file. I don't know why do I
->>get this error. Will renaming of packages help? If yes how do I rename
->>them? Please help..
->>
->>>Regards,
->>>Hiren
->>>
->>>
->>>
->>>
->>>
->>>------------------------------------------------------------------------
->>>
->>>alsa-lib-devel-1.0.6-7.FC3
->>>alsa-utils-1.0.6-3
->>>alsa-lib-1.0.6-7.FC3
->>
->>
->>-------------------------------------------------------
->>SF email is sponsored by - The IT Product Guide
->>Read honest & candid reviews on hundreds of IT Products from real users.
->>Discover which products truly live up to the hype. Start reading now.
->>http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
->>_______________________________________________
->>Bluez-users mailing list
->>Bluez-users@lists.sourceforge.net
->>https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
-> 
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> I have taken the latest CVS "btsco" files and compiled. Fedora 3(linux
+> kernel 2.6.9-1.667) runs on my host PC. I have taken the latest Bluez
+> libraries and utilities from the bluez site.
+
+you can try latest kernel 2.6.11.x
+This works for me.
+
+> The SCO connection is opened
+> only when I press "play" for the xmms and it closes when I stop the
+> song. Whether I can test the mic functionality separately.
+
+For me is SCO connection opened from xmms or from mic
+"cat </dev/dsp1 >/dev/dsp0".
+Both works simultaneously.
+
+> But my target application is a chat application with the usage of
+> Speaker and mic working simultaneosly.
+>
+> Please advice of the setting I need to make.
+
+I don't know what other I can tell you. For me it's working.
+
+Best regards,
+
+Pavel Ruzicka
 
 
 -------------------------------------------------------
