@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Dimitry Andric <dimitry@andric.com>
-Message-ID: <217023065.20050414175221@andric.com>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Message-ID: <425E9118.7040101@palmsource.com>
+From: Frederic Danis <frederic.danis@palmsource.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg="pgp-sha1";
-  boundary="----------1D1172102D819918"
-Subject: [Bluez-devel] Qualified :)
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] BlueZ investigation
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,29 +16,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 14 Apr 2005 17:52:21 +0200
+Date: Thu, 14 Apr 2005 17:49:44 +0200
 
-------------1D1172102D819918
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Thanks to Marcel and my employer:
+In our move to Linux, we are investigating different Bluetooth stacks 
+(proprietary or free).
+About BlueZ, I am asked about interoperability issues: do you know if 
+there are companies attending the unplugged fests to test their 
+BlueZ-based products? Do you have info about commercial devices 
+interoperating with BlueZ?
+Please, send me any comments that can help me to decide my managment.
 
-http://qualweb.bluetooth.org/Template2.cfm?LinkQualified=3DQualifiedProduct=
-s&Details=3DYes&ProductID=3D2379
+Thanks!
 
-------------1D1172102D819918
-Content-Type: application/pgp-signature
+Fred
 
------BEGIN PGP MESSAGE-----
-Version: GnuPG v1.4.0 (MingW32)
-
-iD8DBQFCXpG1sF6jCi4glqMRArXvAJwJqZcPE28+QwUCArEVJ+Oi1EiplwCgoE34
-l+Ec4gXbzE1zr91Ux8rNbDk=
-=JsOL
------END PGP MESSAGE-----
-
-------------1D1172102D819918--
+-- 
+-----------------------------------------------
+Danis Frederic            PalmSource Europe
+Software engineer
+Mail : mailto:frederic.danis@palmsource.com
+-----------------------------------------------
 
 
 
