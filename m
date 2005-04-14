@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <66d811d805041406024fffcfe8@mail.gmail.com>
-From: Mike Zhou <netdream1981@gmail.com>
+Subject: Re: [Bluez-users] Exactly how the sockets are being used in
+	between the user space and kernel?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth-alsa no sound
-In-Reply-To: <425E18B1.106@xmission.com>
+In-Reply-To: <20050414102914.4371.qmail@webmail17.rediffmail.com>
+References: <20050414102914.4371.qmail@webmail17.rediffmail.com>
+Content-Type: text/plain
+Message-Id: <1113475099.8989.8.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <66d811d805041312521f5d6cf4@mail.gmail.com>
-	 <425E18B1.106@xmission.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,140 +19,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Apr 2005 14:02:16 +0100
+Date: Thu, 14 Apr 2005 12:38:19 +0200
 
-Dear  Brad:
-Thanks for your help. I think the bluetooth-alsa may be work
-correctly. But when I use strace aplay --verbose -D hw:1,0 test2.wav,
-I got this error at the end:
+Hi Vaishali,
 
-ioctl(4, 0x400c4150, 0xbffff910)        =3D -1 EIO (Input/output error)
-write(2, "aplay: pcm_write:1146: ", 23aplay: pcm_write:1146: ) =3D 23
-write(2, "write error: Input/output error", 31write error:
-Input/output error) =3D 31
-write(2, "\n", 1
-)                       =3D 1
-exit_group(1)                           =3D ?
+> Thanks for replying to my question.Can u please explain me how the
+> socket communication is going on between the user space and kernel
+> space?
+> I can find out the code defining new address familiy AF_BLUETOOTH.then
+> new protocols for L2CAP,HCI and RFCOMM.
+> in bluez utilities i can find that in files like l2test.c the calls
+> are being made to socket functions.
+> But i m unable to find out exactly how the other side i mean the
+> kernel handles the socket calls.
+> If u can provide a sample code just expalining the socket concept i
+> would be grateful to u.
 
-Do you think I should reinstall the bluetooth-alsa with CVS version?
-Thanks a lot!
+this mailing list (or any other BlueZ related list) is not for educating
+you in how sockets work. Get yourself a book about that topic. For
+example Linux Device Drivers.
 
-Regards!
+Regards
 
-Mike
+Marcel
 
-On 4/14/05, Brad Midgley <bmidgley@xmission.com> wrote:
-> Mike,
->=20
-> bluetooth-alsa is a pretty fast-moving target. If it's not working, you
-> should get the latest from cvs and build it from scratch (see the
-> instructions at bluetooth-alsa.sf.net)
->=20
-> Brad
->=20
-> Mike Zhou wrote:
-> > Hi,
-> >
-> > I am new guy of Linux. Now, I am dealing with Bluetooth-alsa. But
-> > after I installed all packet, there is no sound.
-> >
-> > I used 2.6.11 kernel with patch-2.6.11-mh2.gz. I also installed the
-> > newest BLueZ.  I installed the .deb pakage from
-> > http://cgi.sfu.ca/~jdbates/moin/moin.cgi/Bluetooth%26ALSA?action=3Ddiff
-> >
-> > It seems the snd-bt-sco should be worked. After btsco command, I got:
-> > lab509-8:/home/z0410016# btsco 00:03:89:00:45:ec
-> > Device is 1:0
-> > Voice setting: 0x0060
-> > RFCOMM channel 1 connected
-> > speaker volume: 11 mic volume: 0
-> >
-> > But I can't get any thing after I enter: aplay --verbose -D
-> > plughw:Headset test2.wav.
-> > And the software will not stop unless I kill it.
-> >
-> > The result of --verbose is:
-> > lab509-8:/home/z0410016# aplay --verbose -D plughw:Headset test2.wav
-> > Playing WAVE 'test2.wav' : Signed 16 bit Little Endian, Rate 22050 Hz, =
-Mono
-> > Plug PCM: Rate conversion PCM (8000, sformat=3DS16_LE)
-> > Its setup is:
-> > stream       : PLAYBACK
-> > access       : RW_INTERLEAVED
-> > format       : S16_LE
-> > subformat    : STD
-> > channels     : 1
-> > rate         : 22050
-> > exact rate   : 22050 (22050/1)
-> > msbits       : 16
-> > buffer_size  : 11025
-> > period_size  : 2756
-> > period_time  : 125000
-> > tick_time    : 1000
-> > tstamp_mode  : NONE
-> > period_step  : 1
-> > sleep_min    : 0
-> > avail_min    : 2756
-> > xfer_align   : 2756
-> > start_threshold  : 11024
-> > stop_threshold   : 11025
-> > silence_threshold: 0
-> > silence_size : 0
-> > boundary     : 1445068800
-> > Slave: Hardware PCM card 1 'BT Headset' device 0 subdevice 0
-> >
-> > Its setup is:
-> > stream       : PLAYBACK
-> > access       : MMAP_INTERLEAVED
-> > format       : S16_LE
-> > subformat    : STD
-> > channels     : 1
-> > rate         : 8000
-> > exact rate   : 8000 (8000/1)
-> > msbits       : 16
-> > buffer_size  : 4000
-> > period_size  : 1000
-> > period_time  : 125000
-> > tick_time    : 1000
-> > tstamp_mode  : NONE
-> > period_step  : 1
-> > sleep_min    : 0
-> > avail_min    : 1000
-> > xfer_align   : 1000
-> > start_threshold  : 4000
-> > stop_threshold   : 4000
-> > silence_threshold: 0
-> > silence_size : 0
-> > boundary     : 2097152000
-> >
-> > It is the same when I try to use arecord.  How can I fix it?
-> >
-> > Regards!
-> >
-> > Mike
-> >
-> >
-> > -------------------------------------------------------
-> > SF email is sponsored by - The IT Product Guide
-> > Read honest & candid reviews on hundreds of IT Products from real users=
-.
-> > Discover which products truly live up to the hype. Start reading now.
-> > http://ads.osdn.com/?ad_ide95&alloc_id=14396&op=3Dclick
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
->=20
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+
 
 
 -------------------------------------------------------
