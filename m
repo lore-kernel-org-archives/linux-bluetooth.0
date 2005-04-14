@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Qualified :)
+Subject: Re: [Bluez-devel] BlueZ investigation
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <217023065.20050414175221@andric.com>
-References: <217023065.20050414175221@andric.com>
+In-Reply-To: <425E9118.7040101@palmsource.com>
+References: <425E9118.7040101@palmsource.com>
 Content-Type: text/plain
-Message-Id: <1113495802.8989.41.camel@pegasus>
+Message-Id: <1113495727.8989.38.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,18 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 14 Apr 2005 18:23:22 +0200
+Date: Thu, 14 Apr 2005 18:22:07 +0200
 
-Hi Dimitry,
+Hi Fred,
 
-> Thanks to Marcel and my employer:
-> 
-> http://qualweb.bluetooth.org/Template2.cfm?LinkQualified=QualifiedProducts&Details=Yes&ProductID=2379
+> In our move to Linux, we are investigating different Bluetooth stacks 
+> (proprietary or free).
+> About BlueZ, I am asked about interoperability issues: do you know if 
+> there are companies attending the unplugged fests to test their 
+> BlueZ-based products? Do you have info about commercial devices 
+> interoperating with BlueZ?
+> Please, send me any comments that can help me to decide my managment.
 
-lets spread the word ... BlueZ is qualified :)
+I can't answer your question about the UnPlugFest tests, because I think
+it is in direct violation of its NDA. However with WideRay and TomTom
+you got two companies that successfully used BlueZ in their products and
+both products are qualified. I also think that Motorola is using BlueZ
+in their Bluetooth enabled Linux phone, but since I haven't got a demo
+unit, I can't tell you for sure.
 
-However the funny thing is that your Tom Tom GO is Bluetooth 1.2
-qualified and BlueZ only 1.1 even if they reuse the BlueZ listing.
+Since Monday BlueZ itself is qualified and if you wanna test against
+BlueZ at the UPF-21 in Singapore, I think we can arrange something,
+because I will be there at the security table.
+
+Talking about interoperability is always a little bit complex. However I
+think that BlueZ has the best interoperability with different commercial
+products. We dealt with so many wrong implementation in the past and in
+most cases BlueZ works fine. Be more specific about your concerns or
+with your questions.
 
 Regards
 
