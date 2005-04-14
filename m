@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] btsco - headset profile activated but no sco packets transmitted ???
-References: <20050404194542.GA7640@lsweb.de> <200504042322.17493.pavouk@pavouk.org> <f54d86405041222381e9da934@mail.gmail.com>
-In-Reply-To: <f54d86405041222381e9da934@mail.gmail.com>
+Message-ID: <425E7AC3.7090303@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200504141632.49910.pavouk@pavouk.org>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Bluetooth-alsa no sound
+References: <66d811d805041312521f5d6cf4@mail.gmail.com>	 <425E18B1.106@xmission.com>	 <66d811d805041406024fffcfe8@mail.gmail.com> <66d811d805041406467ea8f9c1@mail.gmail.com>
+In-Reply-To: <66d811d805041406467ea8f9c1@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,35 +18,61 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Apr 2005 16:32:49 +0200
+Date: Thu, 14 Apr 2005 08:14:27 -0600
 
-Hello,
+Mike
 
-> I have taken the latest CVS "btsco" files and compiled. Fedora 3(linux
-> kernel 2.6.9-1.667) runs on my host PC. I have taken the latest Bluez
-> libraries and utilities from the bluez site.
+Yes, try it from cvs so we're at least working on the same version if it 
+needs fixes.
 
-you can try latest kernel 2.6.11.x
-This works for me.
+Brad
 
-> The SCO connection is opened
-> only when I press "play" for the xmms and it closes when I stop the
-> song. Whether I can test the mic functionality separately.
-
-For me is SCO connection opened from xmms or from mic
-"cat </dev/dsp1 >/dev/dsp0".
-Both works simultaneously.
-
-> But my target application is a chat application with the usage of
-> Speaker and mic working simultaneosly.
->
-> Please advice of the setting I need to make.
-
-I don't know what other I can tell you. For me it's working.
-
-Best regards,
-
-Pavel Ruzicka
+Mike Zhou wrote:
+>  Dear  Brad:
+> I guess that I got this error because the test2.wav is not 8000Hz.
+> When I use "strace aplay --verbose -Dplughw:1,0 test0.wav", the error
+> is removed. But I still can not hear anything. Do you think I should
+> reinstall the bluetooth-alsa with CVS version?
+> Thanks a lot!
+> 
+> Regards!
+> 
+> Mike
+> 
+> 
+> On 4/14/05, Mike Zhou <netdream1981@gmail.com> wrote:
+> 
+>>Dear  Brad:
+>>Thanks for your help. I think the bluetooth-alsa may be work
+>>correctly. But when I use strace aplay --verbose -D hw:1,0 test2.wav,
+>>I got this error at the end:
+>>
+>>ioctl(4, 0x400c4150, 0xbffff910)        = -1 EIO (Input/output error)
+>>write(2, "aplay: pcm_write:1146: ", 23aplay: pcm_write:1146: ) = 23
+>>write(2, "write error: Input/output error", 31write error:
+>>Input/output error) = 31
+>>write(2, "\n", 1
+>>)                       = 1
+>>exit_group(1)                           = ?
+>>
+>>Do you think I should reinstall the bluetooth-alsa with CVS version?
+>>Thanks a lot!
+>>
+>>Regards!
+>>
+>>Mike
+> 
+> 
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_ide95&alloc_id396&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
