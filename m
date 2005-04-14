@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] NAP prob with FC3 & WinXP
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <425BD0F8.80403@potchin.co.uk>
-References: <425BD0F8.80403@potchin.co.uk>
-Content-Type: text/plain
-Message-Id: <1113498228.8989.59.camel@pegasus>
+From: Jesse Guardiani <jesse@wingnet.net>
+Message-ID: <pan.2005.04.14.16.59.12.288202@wingnet.net>
+References: <pan.2005.04.13.14.52.16.599459@wingnet.net> <1113405322.9061.36.camel@pegasus> <pan.2005.04.13.19.52.58.815123@wingnet.net> <1113423981.15359.0.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Re: Re: bluetooth 1.2 - how do I know it's working?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,106 +17,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Apr 2005 19:03:48 +0200
+Date: Thu, 14 Apr 2005 12:59:13 -0400
 
-Hi Jeff,
+On Wed, 13 Apr 2005 22:26:21 +0200, Marcel Holtmann wrote:
 
-> I having a few probs setting up a BT NAP access point. I'm running...
+> Hi Jesse,
 > 
-> Fedor Core 3 w/ kernel 2.6.9-1.667 (Bluetooth built into the kernel)
+>> >> # hcitool afh 00:0D:44:36:E6:F4
+>> >> AFH map: 0xffffffffffffffffff7f
+>> >> 
+>> >> Does this indicate that both devices are using AFH correctly?
+>> > 
+>> > monitor the "hcitool afh" call and if the value changes then AFH is
+>> > working.
+>> 
+>> No, they don't change. Even after a reboot it yields the same result.
+>> 
+>> What should I do to get it working?
 > 
-> $ rpm -qa | grep  blue
-> bluez-pin-0.23-3
-> bluez-hcidump-1.11-1
-> bluez-utils-2.10-2
-> bluez-libs-2.10-2
-> bluez-bluefw-1.0-6
-> 
-> /etc/bluetooth/hcid.conf....
-> 
-> options {
->         autoinit yes;
->         security auto;
->         pairing multi;
->         pin_helper /usr/bin/bluepin;
-> }
-> device {
->         name "potchin";
->         class 0x120104;
->         iscan enable; pscan enable;
->         lm accept;
->         lp rswitch,hold,sniff,park;
-> }
-> 
-> 
-> 
-> with a usb-tech usb BT dongle 
-> (http://www.usbtech.co.uk/catalog/product_info.php/products_id/266)
-> 
-> The physical layer seems to be up - i can perform an l2ping to the other 
-> device and get a response. The client machine (Win XP SP2) detects the 
-> Linux box and can see some of the sdp services I add (serial port for 
-> example) but cannot detect the NAP services.
-> 
-> I'm running pand with "pand --listen --role=NAP" and it registers the 
-> NAP service with sdp...
-> 
-> $ sdptool browse local
-> Browsing FF:FF:FF:00:00:00 ...
-> Service Name: Public Browse Group Root
-> Service Description: Root of public browse hierarchy
-> Service Provider: BlueZ
-> Service RecHandle: 0xf81f9008
-> Service Class ID List:
->   "Browse Group Descriptor" (0x1001)
-> Language Base Attr List:
->   code_ISO639: 0x656e
->   encoding:    0x6a
->   base_offset: 0x100
-> 
-> Service Name: Network Access Point
-> Service RecHandle: 0xf81f96f0
-> Service Class ID List:
->   "Network access point" (0x1116)
-> Protocol Descriptor List:
->   "L2CAP" (0x0100)
->     PSM: 15
->   "BNEP" (0x000f)
->     Version: 0x0100
->     SEQ16: 800 806
-> Profile Descriptor List:
->   "PAN access point" (0x1116)
->     Version: 0x0100
-> 
-> Service Name: SDP Server
-> Service Description: Bluetooth service discovery server
-> Service Provider: BlueZ
-> Service RecHandle: 0x0
-> Service Class ID List:
->   "SDP Server" (0x1000)
-> Protocol Descriptor List:
->   "L2CAP" (0x0100)
->     PSM: 1
->     Version: 0x0001
-> Language Base Attr List:
->   code_ISO639: 0x656e
->   encoding:    0x6a
->   base_offset: 0x100
-> 
-> 
-> 
-> 
-> 
-> Can anyone help - should windows pick up a PAN from the NAP service (Im 
-> using the standard M$ drivers)?
+> it is working, but you need to get heavy data transmission on your
+> wireless LAN and place the two devices near by.
 
-run "hcidump -X -V" as root and see what the Windows side is looking
-for.
+I'm not so sure it is working. I'm hearing fairly heavy popping and
+cracking over my btsco connection, the 802.11b access point is about
+two feet from my DBT 120 and my headset, and the afh value never
+changes.
 
+Are there different afhmode settings I can try? Can I experiment
+with different afh masks somehow?
 
-Regards
+-- 
+Jesse Guardiani, Systems Administrator
+WingNET Internet Services,
+P.O. Box 2605 // Cleveland, TN 37320-2605
+423-559-LINK (v)  423-559-5145 (f)
+http://www.wingnet.net
 
-Marcel
 
 
 
