@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <425E7AC3.7090303@xmission.com>
+Message-ID: <425E7A47.7070106@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth-alsa no sound
-References: <66d811d805041312521f5d6cf4@mail.gmail.com>	 <425E18B1.106@xmission.com>	 <66d811d805041406024fffcfe8@mail.gmail.com> <66d811d805041406467ea8f9c1@mail.gmail.com>
-In-Reply-To: <66d811d805041406467ea8f9c1@mail.gmail.com>
+Subject: Re: [Bluez-users] compilation errors for btsco
+References: <E73D9A5BC4A2D711BBC600065BF3595F1C66D029@il06exm10>
+In-Reply-To: <E73D9A5BC4A2D711BBC600065BF3595F1C66D029@il06exm10>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,49 +18,92 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Apr 2005 08:14:27 -0600
+Date: Thu, 14 Apr 2005 08:12:23 -0600
 
-Mike
+Hi
 
-Yes, try it from cvs so we're at least working on the same version if it 
-needs fixes.
+Would you mind sending me a patch (use cvs diff -u)
 
+thanks
 Brad
 
-Mike Zhou wrote:
->  Dear  Brad:
-> I guess that I got this error because the test2.wav is not 8000Hz.
-> When I use "strace aplay --verbose -Dplughw:1,0 test0.wav", the error
-> is removed. But I still can not hear anything. Do you think I should
-> reinstall the bluetooth-alsa with CVS version?
-> Thanks a lot!
+Mandalia Hiren-AHM047 wrote:
+> Thanks Brad. But I figured out what the problem was. The bootstrap script somehow did not check in the right directories for the alsa.m4 file that had the AM_PATH_ALSA macro. So I manually edited the script. I added the option with 'aclocal' like this
 > 
-> Regards!
+> aclocal -I /usr/share/aclocal && ...
 > 
-> Mike
+> it compiled fine. I'm also able to use btsco (I tried aplay and it worked)
+> 
+> Regards,
+> Hiren 
 > 
 > 
-> On 4/14/05, Mike Zhou <netdream1981@gmail.com> wrote:
-> 
->>Dear  Brad:
->>Thanks for your help. I think the bluetooth-alsa may be work
->>correctly. But when I use strace aplay --verbose -D hw:1,0 test2.wav,
->>I got this error at the end:
+>>-----Original Message-----
+>>From: bluez-users-admin@lists.sourceforge.net [mailto:bluez-users-
+>>admin@lists.sourceforge.net] On Behalf Of Brad Midgley
+>>Sent: Thursday, April 14, 2005 2:19 AM
+>>To: bluez-users@lists.sourceforge.net
+>>Subject: Re: [Bluez-users] compilation errors for btsco
 >>
->>ioctl(4, 0x400c4150, 0xbffff910)        = -1 EIO (Input/output error)
->>write(2, "aplay: pcm_write:1146: ", 23aplay: pcm_write:1146: ) = 23
->>write(2, "write error: Input/output error", 31write error:
->>Input/output error) = 31
->>write(2, "\n", 1
->>)                       = 1
->>exit_group(1)                           = ?
+>>Hey
 >>
->>Do you think I should reinstall the bluetooth-alsa with CVS version?
->>Thanks a lot!
+>>I think others have had trouble with fedora but I haven't heard any
+>>success stories. See the bluetooth-alsa bug list/support lists on
+>>sourceforge to see if anyone has followed up with any tips.
 >>
->>Regards!
+>>Brad
 >>
->>Mike
+>>Mandalia Hiren-AHM047 wrote:
+>>
+>>>Hello,
+>>>
+>>>I'm trying to compile btsco on a FC3 (Kernel 2.6.10). I think I have all
+>>
+>>the packages that I need.
+>>
+>>>The alsa packages I have are:
+>>>
+>>>alsa-lib-devel-1.0.6-7.FC3
+>>>alsa-utils-1.0.6-3
+>>>alsa-lib-1.0.6-7.FC3
+>>>
+>>>I have already installed the bluez-libs-2.15 package so that should take
+>>
+>>care about libbluetooth-dev (correct me if I'm wrong here)
+>>
+>>>when I do a
+>>>%./bootstrap
+>>>aclocal: configure.in 21: macro 'AM_PATH_ALSA' not found in library
+>>>
+>>>I was reading the archives which made me check if I had the file
+>>
+>>/usr/share/aclocal/alsa.m4 and I do have that file. I don't know why do I
+>>get this error. Will renaming of packages help? If yes how do I rename
+>>them? Please help..
+>>
+>>>Regards,
+>>>Hiren
+>>>
+>>>
+>>>
+>>>
+>>>
+>>>------------------------------------------------------------------------
+>>>
+>>>alsa-lib-devel-1.0.6-7.FC3
+>>>alsa-utils-1.0.6-3
+>>>alsa-lib-1.0.6-7.FC3
+>>
+>>
+>>-------------------------------------------------------
+>>SF email is sponsored by - The IT Product Guide
+>>Read honest & candid reviews on hundreds of IT Products from real users.
+>>Discover which products truly live up to the hype. Start reading now.
+>>http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+>>_______________________________________________
+>>Bluez-users mailing list
+>>Bluez-users@lists.sourceforge.net
+>>https://lists.sourceforge.net/lists/listinfo/bluez-users
 > 
 > 
 > 
@@ -68,7 +111,7 @@ Mike Zhou wrote:
 > SF email is sponsored by - The IT Product Guide
 > Read honest & candid reviews on hundreds of IT Products from real users.
 > Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_ide95&alloc_id396&op=click
+> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
 > _______________________________________________
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
