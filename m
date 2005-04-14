@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] first(?) bc4 module
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <425E895D.7020602@xmission.com>
-References: <425C13CB.1060605@xmission.com>
-	 <1113384669.9061.8.camel@pegasus>  <425E895D.7020602@xmission.com>
-Content-Type: text/plain
-Message-Id: <1113494581.8989.23.camel@pegasus>
-Mime-Version: 1.0
+From: Dimitry Andric <dimitry@andric.com>
+Message-ID: <217023065.20050414175221@andric.com>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg="pgp-sha1";
+  boundary="----------1D1172102D819918"
+Subject: [Bluez-devel] Qualified :)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,20 +17,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 14 Apr 2005 18:03:01 +0200
+Date: Thu, 14 Apr 2005 17:52:21 +0200
 
-Hi Brad,
+------------1D1172102D819918
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 
-> It complicates things a lot for everyone if bc4 hardware has to be wired 
-> in some way other than a uart to make good use of EDR.
+Thanks to Marcel and my employer:
 
-at the moment the only options are USB and the SDIO interfaces. Maybe
-they will also come up with a SPI, but actually I doubt it.
+http://qualweb.bluetooth.org/Template2.cfm?LinkQualified=3DQualifiedProduct=
+s&Details=3DYes&ProductID=3D2379
 
-Regards
+------------1D1172102D819918
+Content-Type: application/pgp-signature
 
-Marcel
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1.4.0 (MingW32)
 
+iD8DBQFCXpG1sF6jCi4glqMRArXvAJwJqZcPE28+QwUCArEVJ+Oi1EiplwCgoE34
+l+Ec4gXbzE1zr91Ux8rNbDk=
+=JsOL
+-----END PGP MESSAGE-----
+
+------------1D1172102D819918--
 
 
 
