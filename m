@@ -1,9 +1,9 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Peter Wippich <pewi@gw-instruments.de>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] first(?) bc4 module
-In-Reply-To: <1113494581.8989.23.camel@pegasus>
-Message-ID: <Pine.LNX.4.33.0504141815580.29800-100000@redbean.intranet.gw-instruments.de>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Qualified :)
+In-Reply-To: <217023065.20050414175221@andric.com>
+Message-ID: <Pine.LNX.4.33.0504141803530.29800-100000@redbean.intranet.gw-instruments.de>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
@@ -17,56 +17,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 14 Apr 2005 18:26:37 +0200 (CEST)
+Date: Thu, 14 Apr 2005 18:13:51 +0200 (CEST)
 
 
-Hi Brad, Hi Marcel,
+Dear Dimitry, Dear All,
 
-well, at least the 2 MBit mode should be usable over the UART interface.
-The BC04 UART supports 1.5 MBit, but this is "Full Duplex". So if you have
-bi-directioal data transfer that is 3 MBit total. For mostly
-uni-directional traffic even 1.5 MBit is a very good transfer rate over a
-2 MBit air link because at best you can get around 1.5 MBit user data
-transferred. There is still some HCI overhead on the UART, but I think
-this is only around 1..2% and can be neglected for a first estimate.
+hhmmm. First it is nice to here that BlueZ is qualified (even if this does
+not mean that it doesn't have bugs ;-). The question is if and how this
+qualification can be used for other qualifications as a pre-qualified
+component ??
 
-However, for a 3 MBit connection with mostly uni-directional traffic the
-UART interface is not sufficient anymore.
+On one hand BlueZ itself is GPL software, and as such can be used by
+anybody as long as the GPL is respected. On the other hand the
+qualification and listing has been payed by a company and I was wondering
+if they could have any control if some other company references their
+listing in their own product listing. Or are they just generous and don't
+care ??
 
-Things again look very different if you use a BC04 with internal SCO
-routing (e.g. for a A2DP headset). But this is a diffrent story.
-
-Ciao,
+Just some thoughts... ,
 
 Peter
 
+On Thu, 14 Apr 2005, Dimitry Andric wrote:
 
-On Thu, 14 Apr 2005, Marcel Holtmann wrote:
-
-> Hi Brad,
+> Thanks to Marcel and my employer:
 >
-> > It complicates things a lot for everyone if bc4 hardware has to be wired
-> > in some way other than a uart to make good use of EDR.
->
-> at the moment the only options are USB and the SDIO interfaces. Maybe
-> they will also come up with a SPI, but actually I doubt it.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> http://qualweb.bluetooth.org/Template2.cfm?LinkQualified=QualifiedProducts&Details=Yes&ProductID=2379
 >
 
 |	Peter Wippich 			Voice: +49 30 46776411		|
