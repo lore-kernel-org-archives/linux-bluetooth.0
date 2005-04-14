@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <425E895D.7020602@xmission.com>
+Message-ID: <425E2712.4080900@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] first(?) bc4 module
-References: <425C13CB.1060605@xmission.com> <1113384669.9061.8.camel@pegasus>
-In-Reply-To: <1113384669.9061.8.camel@pegasus>
+Subject: Re: [Bluez-devel] a2dp timing
+References: <20050414080451.74261.qmail@web8305.mail.in.yahoo.com>
+In-Reply-To: <20050414080451.74261.qmail@web8305.mail.in.yahoo.com>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,45 +18,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 14 Apr 2005 09:16:45 -0600
+Date: Thu, 14 Apr 2005 02:17:22 -0600
 
-Marcel,
+Mayank,
 
-Socket is not even answering email asking for sample *pricing* currently.
+do you have a helper app like a2play that negotiates the avdtp protocol?
 
-It complicates things a lot for everyone if bc4 hardware has to be wired 
-in some way other than a uart to make good use of EDR.
+i would like to, yes. if you're willing to make it GPL, can you send the 
+source to me directly and i'll put it in cvs?
 
-I want to wait to find something with AFH/EDR and class 1 together. 
-Taiyo yuden only has class 2 modules...
+are you using a2play or one of the dongles to test your sink? i don't 
+have access to a dongle any more.
 
-Brad
+brad
 
-Marcel Holtmann wrote:
+Mayank Batra wrote:
 > Hi Brad,
 > 
 > 
->>socketcom is claiming their bc4 (class 1) module is shipping this month. 
->>it's a good sign for eventually getting it in consumer gear.
+>>I suppose we could implement a2dp sink as well, but
+>>I don't think 
+>>connections can be initiated by a sink--it has to
+>>listen for the source 
+>>to make the connection.
 > 
 > 
-> may you also wanna look at Taiyo Yuden, because according to the
-> qualification listing they also have a BlueCore4 based module.
+> I am working on the A2DP sink. Ofcourse the connection
+> has to be initiated by the source.
+> Right now the sound quality is not good.
+> Can you help me out in improving the sound quality ?
+>  
+> Mayank
 > 
-> 
->>if samples aren't too hard to come by, i'll try to wire one up to a 
->>gumstix. (gumstix is sending me a sample)
-> 
-> 
-> Try to convince them to donate one to me, then I can try that out with
-> attaching a Casira to it. However in general the UARTs are too slow for
-> the EDR transfer rates.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+> ________________________________________________________________________
+> Yahoo! India Matrimony: Find your life partner online
+> Go to: http://yahoo.shaadi.com/india-matrimony
 > 
 > 
 > -------------------------------------------------------
