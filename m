@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Peter Wippich <pewi@gw-instruments.de>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Qualified :)
-In-Reply-To: <217023065.20050414175221@andric.com>
-Message-ID: <Pine.LNX.4.33.0504141803530.29800-100000@redbean.intranet.gw-instruments.de>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Bluez-devel] first(?) bc4 module
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <425E895D.7020602@xmission.com>
+References: <425C13CB.1060605@xmission.com>
+	 <1113384669.9061.8.camel@pegasus>  <425E895D.7020602@xmission.com>
+Content-Type: text/plain
+Message-Id: <1113494581.8989.23.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,38 +19,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 14 Apr 2005 18:13:51 +0200 (CEST)
+Date: Thu, 14 Apr 2005 18:03:01 +0200
 
+Hi Brad,
 
-Dear Dimitry, Dear All,
+> It complicates things a lot for everyone if bc4 hardware has to be wired 
+> in some way other than a uart to make good use of EDR.
 
-hhmmm. First it is nice to here that BlueZ is qualified (even if this does
-not mean that it doesn't have bugs ;-). The question is if and how this
-qualification can be used for other qualifications as a pre-qualified
-component ??
+at the moment the only options are USB and the SDIO interfaces. Maybe
+they will also come up with a SPI, but actually I doubt it.
 
-On one hand BlueZ itself is GPL software, and as such can be used by
-anybody as long as the GPL is respected. On the other hand the
-qualification and listing has been payed by a company and I was wondering
-if they could have any control if some other company references their
-listing in their own product listing. Or are they just generous and don't
-care ??
+Regards
 
-Just some thoughts... ,
-
-Peter
-
-On Thu, 14 Apr 2005, Dimitry Andric wrote:
-
-> Thanks to Marcel and my employer:
->
-> http://qualweb.bluetooth.org/Template2.cfm?LinkQualified=QualifiedProducts&Details=Yes&ProductID=2379
->
-
-|	Peter Wippich 			Voice: +49 30 46776411		|
-|	G&W Instruments GmbH		fax:   +49 30 46776419		|
-|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
-|	D-13355 Berlin  / Germany					|
+Marcel
 
 
 
