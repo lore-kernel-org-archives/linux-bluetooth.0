@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Qualified :)
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <425E9054.10808@superbug.co.uk>
+From: James Courtier-Dutton <James@superbug.co.uk>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <425E9054.10808@superbug.co.uk>
-References: 
-	 <Pine.LNX.4.33.0504141803530.29800-100000@redbean.intranet.gw-instruments.de>
-	 <1113496342.8989.50.camel@pegasus>  <425E9054.10808@superbug.co.uk>
-Content-Type: text/plain
-Message-Id: <1113497824.8989.53.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Qualified :)
+References: <Pine.LNX.4.33.0504141803530.29800-100000@redbean.intranet.gw-instruments.de> <1113496342.8989.50.camel@pegasus>
+In-Reply-To: <1113496342.8989.50.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,25 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 14 Apr 2005 18:57:04 +0200
+Date: Thu, 14 Apr 2005 16:46:28 +0100
 
-Hi James,
-
-> > The only option that I see to get this really clean is to create a
-> > non-profit organization that takes care of such things. However I don't
-> > really have time for this paperwork, but if someone wants to go this
-> > way, I am in.
+Marcel Holtmann wrote:
 > 
-> Isn't that what the FSF is for?
+> The only option that I see to get this really clean is to create a
+> non-profit organization that takes care of such things. However I don't
+> really have time for this paperwork, but if someone wants to go this
+> way, I am in.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-I don't know. However I am open to everything as long as I don't have to
-do stupid paperwork, because I am a programmer and not a manager.
-
-Regards
-
-Marcel
-
-
+Isn't that what the FSF is for?
 
 
 -------------------------------------------------------
