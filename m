@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] DBT 120 dongle defaulting to HID mode
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <pan.2005.04.14.18.57.06.661056@wingnet.net>
-References: <pan.2005.04.14.18.57.06.661056@wingnet.net>
-Content-Type: text/plain
-Message-Id: <1113507101.8989.71.camel@pegasus>
+From: Jesse Guardiani <jesse@wingnet.net>
+Message-ID: <pan.2005.04.14.18.57.06.661056@wingnet.net>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] DBT 120 dongle defaulting to HID mode
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +16,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Apr 2005 21:31:41 +0200
+Date: Thu, 14 Apr 2005 14:57:09 -0400
 
-Hi Jesse,
+Hello,
 
-> Ever since the firmware upgrade to BT 1.2, my DBT 120
-> has been defaulting to HID mode. I only use HCI mode
-> currently, so it freaked me out the first time this
-> happened! I thought my dongle was dead! But then I
-> remembered hid2hci.
-> 
-> Is there a way to change the default mode of this dongle
-> back to HCI without downgrading the firmware?
+Ever since the firmware upgrade to BT 1.2, my DBT 120
+has been defaulting to HID mode. I only use HCI mode
+currently, so it freaked me out the first time this
+happened! I thought my dongle was dead! But then I
+remembered hid2hci.
 
-yes, it is. You have to change the PS key for the boot mode.
+Is there a way to change the default mode of this dongle
+back to HCI without downgrading the firmware?
 
-Regards
+-- 
+Jesse Guardiani, Systems Administrator
+WingNET Internet Services,
+P.O. Box 2605 // Cleveland, TN 37320-2605
+423-559-LINK (v)  423-559-5145 (f)
+http://www.wingnet.net
 
-Marcel
 
 
 
