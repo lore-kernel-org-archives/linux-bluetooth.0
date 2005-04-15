@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SonyEricsson K700i and HID
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Stefan Jonasson <sjond00@student.vxu.se>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4c513c4c7893.4c78934c513c@vxu.se>
-References: <4c513c4c7893.4c78934c513c@vxu.se>
-Content-Type: text/plain
-Message-Id: <1113565314.16433.17.camel@pegasus>
-Mime-Version: 1.0
+Message-id: <4c513c4c7893.4c78934c513c@vxu.se>
+MIME-version: 1.0
+Content-type: text/plain; charset=windows-1252
+Subject: [Bluez-devel] SonyEricsson K700i and HID
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,37 +16,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 15 Apr 2005 13:41:54 +0200
+Date: Fri, 15 Apr 2005 13:26:20 +0200
 
-Hi Stefan,
+Hi all!
 
-> I just bought an SonyEricsson K700i and it have support for bluetooth HID.
-> After researching a bit I realized that there probably isent any way to make it work in linux atm..
-> 
-> I tyred to use it as a keyboard/ mouse with hidd. The phone and computer can connect to each other the phone shows the input map ( just as it does in windows when you use this function). And hidd dosent report any failures...
-> 
-> Now I want hidd to do something useful like creating a mouse device and a keyboard!
-> 
-> A list of questions:
-> 
-> Which implementations do I need to chage?
-> How to I make hidd k700i aware?
-> Shoud I create an new application that uses the hidp module directly?
-> How do I inspect the traffic?
-> It there anyway to make hidd print debug info?
-> Is this possible to do?
-> Wich specifications do I need, where can I get them?
-> I found a nice document on ericssons dev site http://developer.sonyericsson.com/getDocument.do?docId=66147 will it help?
+I just bought an SonyEricsson K700i and it have support for bluetooth HID=
+=2E
+After researching a bit I realized that there probably isent any way to m=
+ake it work in linux atm=2E=2E
 
-the problem with the K700i is that it only supports two L2CAP
-connections at the same, but for our implementation we will need
-actually three of them. Otherwise we can't get the HID descriptor and
-thus we can only do boot. However I successfully used a K700i with the
---nosdp option.
+I tyred to use it as a keyboard/ mouse with hidd=2E The phone and compute=
+r can connect to each other the phone shows the input map ( just as it do=
+es in windows when you use this function)=2E And hidd dosent report any f=
+ailures=2E=2E=2E
 
-Regards
+Now I want hidd to do something useful like creating a mouse device and a=
+ keyboard!
 
-Marcel
+A list of questions=3A
+
+Which implementations do I need to chage=3F
+How to I make hidd k700i aware=3F
+Shoud I create an new application that uses the hidp module directly=3F
+How do I inspect the traffic=3F
+It there anyway to make hidd print debug info=3F
+Is this possible to do=3F
+Wich specifications do I need=2C where can I get them=3F
+I found a nice document on ericssons dev site http=3A//developer=2Esonyer=
+icsson=2Ecom/getDocument=2Edo=3FdocId=3D66147 will it help=3F
+
+-- =
+
+-----------------------
+Stefan Jonasson
+
+Wipmind AB
+Storgatan 4
+352 52 V=E4xj=F6
+
+Tel=3A 0470-74 95 00
+Fax=3A 0470-74 95 01
+-----------------------
 
 
 
