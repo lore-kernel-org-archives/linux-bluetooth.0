@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 To: bluez-users@lists.sourceforge.net
 From: Jesse Guardiani <jesse@wingnet.net>
-Message-ID: <pan.2005.04.15.13.26.00.874309@wingnet.net>
-References: <pan.2005.04.14.18.57.06.661056@wingnet.net> <1113507101.8989.71.camel@pegasus>
+Message-ID: <pan.2005.04.15.13.18.16.696230@wingnet.net>
+References: <pan.2005.04.13.14.52.16.599459@wingnet.net> <1113405322.9061.36.camel@pegasus> <pan.2005.04.13.19.52.58.815123@wingnet.net> <1113423981.15359.0.camel@pegasus> <pan.2005.04.14.16.59.12.288202@wingnet.net> <1113498461.8989.63.camel@pegasus> <pan.2005.04.14.17.44.50.965548@wingnet.net> <1113502910.8989.68.camel@pegasus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Re: DBT 120 dongle defaulting to HID mode
+Subject: [Bluez-users] Re: Re: Re: Re: bluetooth 1.2 - how do I know	it's	working?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,25 +17,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 15 Apr 2005 09:26:03 -0400
+Date: Fri, 15 Apr 2005 09:18:20 -0400
 
-On Thu, 14 Apr 2005 21:31:41 +0200, Marcel Holtmann wrote:
+On Thu, 14 Apr 2005 20:21:50 +0200, Marcel Holtmann wrote:
 
 > Hi Jesse,
 > 
->> Ever since the firmware upgrade to BT 1.2, my DBT 120
->> has been defaulting to HID mode. I only use HCI mode
->> currently, so it freaked me out the first time this
->> happened! I thought my dongle was dead! But then I
->> remembered hid2hci.
+>> >> > it is working, but you need to get heavy data transmission on your
+>> >> > wireless LAN and place the two devices near by.
+>> >> 
+>> >> I'm not so sure it is working. I'm hearing fairly heavy popping and
+>> >> cracking over my btsco connection, the 802.11b access point is about
+>> >> two feet from my DBT 120 and my headset, and the afh value never
+>> >> changes.
+>> >> 
+>> >> Are there different afhmode settings I can try? Can I experiment
+>> >> with different afh masks somehow?
+>> > 
+>> > there exists a HCI command to influence the classification. So if you
+>> > know what frequency is used by your access point, you can block these
+>> > channels. Some time ago I thought about writing support for it, but I
+>> > never really started it. Feel free to provide a patch.
 >> 
->> Is there a way to change the default mode of this dongle
->> back to HCI without downgrading the firmware?
+>> OK. So custom code is the only way to specify it. What does the
+>> afhmode command do then?
 > 
-> yes, it is. You have to change the PS key for the boot mode.
+> switch it on and off.
 
-OK. Has anyone written a program capable of changing arbitrary
-PS key settings yet? Or do I have to write my own?
+Ah. I see now. Well, I turned it on and off before starting my btsco
+deamon, and the `hcitool afh ...` output didn't change, so I think
+*something* is broken. Whether it's my headset, the BT dongle, or bluez, I
+don't know. But it doesn't seem to be doing AFH properly.
+
+Marcel, have you personally tested AFH with a DBT 120 dongle, upgraded
+to the 1.2 firmware? What remote device did you test it with?
+
+Thanks!
 
 -- 
 Jesse Guardiani, Systems Administrator
