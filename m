@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <313624802.29794@eyou.net>
-From: "Jin Pu" <jpu@emails.bjpu.edu.cn>
-To: "bluez-users@lists.sourceforge.ne" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] reconnect if a remote device quits
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <4260015E.1090104@gmx.ch>
+References: <4260015E.1090104@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1113607275.16433.44.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain;
-      charset="GB2312"
-Subject: [Bluez-users] inquiry,connect and connect timeout
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,40 +18,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 16 Apr 2005 12:9:34 +0800
+Date: Sat, 16 Apr 2005 01:21:15 +0200
 
-hello,
-   
-    I'm programming with BlueZ,but now there are three questions.
-    1.How to inquiry with CoD?
-      I use  hci_inquiry(...) to achieve the inquiry procedure ,and now I want to filter the inquiry responses with CoD directly,instead of by the return value of inquiry_info. 
-    2.How to connect with clock offset?
-      I use the RFCOMM socket to connect the remote device,and I have gotten the remote clock offset through the previous inquiry procedure.I want to accelerate the connect procedure, but I don't know  where I should cache the clock offset so that the later connect procedure will use it automatically . In a word, I would like to know the correct methods to accelerate the connect procedure.
-   3. timeout of the connect procedure.
-      I want to make it clear What the default value of timeout is, when I use  the connect(...) of RFCOMM socket to setup connection with the remote device.What's more , I want to know whether I could modify the value of timeout and how.
-      
-      Thanks in advance.
-      Jin Pu
+Hi Marco,
 
+> I connect from a PC to another like this:
+> sock = socket(...)
+> bind(sock, ...)
+> connect(sock, ...)
+> // here the data is exchanged
+> 
+> 
+> I now wish to automatic reconnect if the other PC closes the connection 
+> (reboot for example), so I do:
+> 
+> while(true)
+> {
+> 	sock = socket(...)
+> 	bind(sock, ...)
+> 	connect(sock, ...)
+> 	// here the data is exchanged until the remote device quits
+> 	sleep(a little);
+> }
+> 
+> this works fine. but actually i expected this to be enough:
+> 
+> sock = socket(...)
+> bind(sock, ...)
+> while(true)
+> {
+> 	connect(sock, ...)
+> 	// here the data is exchanged
+> 	sleep(a little);
+> }
+> 
+> but this won't reconnect...
+> why is socket() and bind() required again? don't they stay the same if I 
+> try to connect to the same bluetooth device again?
 
+you need to do the full stuff, because close() means closed.
 
+Regards
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-
+Marcel
 
 
 
