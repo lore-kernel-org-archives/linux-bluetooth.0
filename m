@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050415094147.10035.qmail@web8307.mail.in.yahoo.com>
-From: Mayank Batra <mayankbatra@yahoo.co.in>
-Subject: Re: [Bluez-devel] a2dp timing
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: 6667
+Message-ID: <425F3FE5.5070404@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] A2DP BC02 UART
+References: <20050415035841.69304.qmail@web40721.mail.yahoo.com>
+In-Reply-To: <20050415035841.69304.qmail@web40721.mail.yahoo.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,41 +18,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 15 Apr 2005 10:41:46 +0100 (BST)
+Date: Thu, 14 Apr 2005 22:15:33 -0600
 
-Brad,
- 
-> do you have a helper app like a2play that negotiates
-> the avdtp protocol?
+KrAnTi
 
-Yes I am using a2play application as well as a Windows
- application BlueSoleil by IVT Corporation to
-negotiate the avdtp protocol. The connection is
-working alright. The problem is just the sound
-quality.
+>  I am new to this mailing list, not sure if anyone
+> else posted this. Will A2DP work with CSR BC02
+> connected to a host controller with a UART? 
 
- 
-> i would like to, yes. if you're willing to make it
-> GPL, can you send the 
-> source to me directly and i'll put it in cvs?
+yes
 
-I am not sure right now about the GPL part.
-Will tell you in a few days.
+> the recomended baud rate?
 
+921kbps if you can do it.
 
-> are you using a2play or one of the dongles to test
-> your sink? i don't 
-> have access to a dongle any more.
+> mechanism on the host? Any sample code? Which
+> processor is used with BC02 to verify this?
 
-I am using dongles. :-(
+we do have sample code. build and run a2play from the 
+bluetooth-alsa.sf.net cvs.
 
+so far it has only been done with desktop cpus. i am interested in 
+trying it myself with a pxa255, but i am concerned about all of the 
+double-precision floating point ops in the current implementation.
 
+it could and should be converted to integer ops.
 
-Mayank
-
-________________________________________________________________________
-Yahoo! India Matrimony: Find your life partner online
-Go to: http://yahoo.shaadi.com/india-matrimony
+Brad
 
 
 -------------------------------------------------------
