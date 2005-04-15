@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <425FFF54.6000701@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] error on connect
+Subject: Re: [Bluez-users] Re: DBT 120 dongle defaulting to HID mode
+References: <pan.2005.04.14.18.57.06.661056@wingnet.net> <1113573802.16433.31.camel@pegasus> <200504151800.45412.pavouk@pavouk.org>
+In-Reply-To: <200504151800.45412.pavouk@pavouk.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200504151808.29228.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +19,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 15 Apr 2005 19:52:20 +0200
+Date: Fri, 15 Apr 2005 18:08:28 +0200
 
-Hello everybody
+Search Casira on peer-to-peer network :)
 
-When I connect from a pc to another (both running bluez, own programs), I 
-get sometimes this error:
-hci_acldata_packet: hci0 ACL packet for unknown connection handle 6
+Michal
 
-I can't reproduce it. sometimes it happen, sometimes not.
-If the error occures, the connection breaks down else it works fine...
-
-What means this error?
-
-
-regards
-Marco
+Dne p=E1 15. dubna 2005 18:00 Pavel Ruzicka napsal(a):
+> pstool csr
 
 
 -------------------------------------------------------
