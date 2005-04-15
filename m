@@ -1,21 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Re: Re: Re: bluetooth 1.2 - how do I
-	know	it's	working?
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <pan.2005.04.15.13.18.16.696230@wingnet.net>
-References: <pan.2005.04.13.14.52.16.599459@wingnet.net>
-	 <1113405322.9061.36.camel@pegasus>
-	 <pan.2005.04.13.19.52.58.815123@wingnet.net>
-	 <1113423981.15359.0.camel@pegasus>
-	 <pan.2005.04.14.16.59.12.288202@wingnet.net>
-	 <1113498461.8989.63.camel@pegasus>
-	 <pan.2005.04.14.17.44.50.965548@wingnet.net>
-	 <1113502910.8989.68.camel@pegasus>
-	 <pan.2005.04.15.13.18.16.696230@wingnet.net>
-Content-Type: text/plain
-Message-Id: <1113572690.16433.23.camel@pegasus>
+From: Jesse Guardiani <jesse@wingnet.net>
+Message-ID: <pan.2005.04.15.13.26.00.874309@wingnet.net>
+References: <pan.2005.04.14.18.57.06.661056@wingnet.net> <1113507101.8989.71.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Re: DBT 120 dongle defaulting to HID mode
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -27,29 +17,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 15 Apr 2005 15:44:50 +0200
+Date: Fri, 15 Apr 2005 09:26:03 -0400
 
-Hi Jesse,
+On Thu, 14 Apr 2005 21:31:41 +0200, Marcel Holtmann wrote:
 
-> >> OK. So custom code is the only way to specify it. What does the
-> >> afhmode command do then?
-> > 
-> > switch it on and off.
+> Hi Jesse,
 > 
-> Ah. I see now. Well, I turned it on and off before starting my btsco
-> deamon, and the `hcitool afh ...` output didn't change, so I think
-> *something* is broken. Whether it's my headset, the BT dongle, or bluez, I
-> don't know. But it doesn't seem to be doing AFH properly.
+>> Ever since the firmware upgrade to BT 1.2, my DBT 120
+>> has been defaulting to HID mode. I only use HCI mode
+>> currently, so it freaked me out the first time this
+>> happened! I thought my dongle was dead! But then I
+>> remembered hid2hci.
+>> 
+>> Is there a way to change the default mode of this dongle
+>> back to HCI without downgrading the firmware?
 > 
-> Marcel, have you personally tested AFH with a DBT 120 dongle, upgraded
-> to the 1.2 firmware? What remote device did you test it with?
+> yes, it is. You have to change the PS key for the boot mode.
 
-I tested it some time ago and actually I think it was with a BlueCore02
-module in a Casira, but I can't remember any details.
+OK. Has anyone written a program capable of changing arbitrary
+PS key settings yet? Or do I have to write my own?
 
-Regards
+-- 
+Jesse Guardiani, Systems Administrator
+WingNET Internet Services,
+P.O. Box 2605 // Cleveland, TN 37320-2605
+423-559-LINK (v)  423-559-5145 (f)
+http://www.wingnet.net
 
-Marcel
 
 
 
