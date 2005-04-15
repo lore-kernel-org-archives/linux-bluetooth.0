@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <425F3FE5.5070404@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <20050415035841.69304.qmail@web40721.mail.yahoo.com>
+From: KrAnTi KaMbHaMpAtI <krantik@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] A2DP BC02 UART
-References: <20050415035841.69304.qmail@web40721.mail.yahoo.com>
-In-Reply-To: <20050415035841.69304.qmail@web40721.mail.yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] A2DP BC02 UART
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,33 +16,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 14 Apr 2005 22:15:33 -0600
+Date: Thu, 14 Apr 2005 20:58:41 -0700 (PDT)
 
-KrAnTi
+Hello,
+ I am new to this mailing list, not sure if anyone
+else posted this. Will A2DP work with CSR BC02
+connected to a host controller with a UART? What is
+the recomended baud rate? Any recomended buffering
+mechanism on the host? Any sample code? Which
+processor is used with BC02 to verify this?
 
->  I am new to this mailing list, not sure if anyone
-> else posted this. Will A2DP work with CSR BC02
-> connected to a host controller with a UART? 
+Thanks,
 
-yes
 
-> the recomended baud rate?
-
-921kbps if you can do it.
-
-> mechanism on the host? Any sample code? Which
-> processor is used with BC02 to verify this?
-
-we do have sample code. build and run a2play from the 
-bluetooth-alsa.sf.net cvs.
-
-so far it has only been done with desktop cpus. i am interested in 
-trying it myself with a pxa255, but i am concerned about all of the 
-double-precision floating point ops in the current implementation.
-
-it could and should be converted to integer ops.
-
-Brad
+		
+__________________________________ 
+Yahoo! Mail Mobile 
+Take Yahoo! Mail with you! Check email on your mobile phone. 
+http://mobile.yahoo.com/learn/mail 
 
 
 -------------------------------------------------------
