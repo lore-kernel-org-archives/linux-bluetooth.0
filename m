@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Re: DBT 120 dongle defaulting to HID mode
-References: <pan.2005.04.14.18.57.06.661056@wingnet.net> <425FC7F1.2000508@gmx.ch> <1113573802.16433.31.camel@pegasus>
-In-Reply-To: <1113573802.16433.31.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200504151800.45412.pavouk@pavouk.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <425FC7F1.2000508@gmx.ch>
+References: <pan.2005.04.14.18.57.06.661056@wingnet.net>
+	 <1113507101.8989.71.camel@pegasus>
+	 <pan.2005.04.15.13.26.00.874309@wingnet.net>
+	 <1113572820.16433.26.camel@pegasus>  <425FC7F1.2000508@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1113573802.16433.31.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,18 +21,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 15 Apr 2005 18:00:45 +0200
+Date: Fri, 15 Apr 2005 16:03:22 +0200
 
-Hello,
+Hi Marco,
 
-> > what's the name of the windows one?
-> > I'm unable to find anything on google...
+> what's the name of the windows one?
+> I'm unable to find anything on google...
 
-Try to find it with Google "pstool csr".
+it is called pstool (or PS Tool), but it is CSR specific and you won't
+find it on the Internet.
 
-Best regards,
+Regards
 
-Pavel Ruzicka
+Marcel
+
+
 
 
 -------------------------------------------------------
