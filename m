@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SonyEricsson K700i and HID
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4ca6094ca1c0.4ca1c04ca609@vxu.se>
-References: <4ca6094ca1c0.4ca1c04ca609@vxu.se>
-Content-Type: text/plain
-Message-Id: <1113567708.16433.20.camel@pegasus>
+From: Lars Steinke <sf@lsweb.de>
+To: bluez-users@lists.sourceforge.net
+Cc: bluez-devel@lists.sourceforge.net
+Message-ID: <20050415121633.GA4265@lsweb.de>
+References: <20050404194542.GA7640@lsweb.de> <20050404195007.GA8373@lsweb.de> <20050415111207.GA4885@lsweb.de>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20050415111207.GA4885@lsweb.de>
+Subject: [Bluez-devel] Re: btsco - headset profile activated but no sco packets transmitted ???
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,26 +19,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 15 Apr 2005 14:21:48 +0200
+Date: Fri, 15 Apr 2005 14:16:33 +0200
 
-Hi Stefan,
+Phew, got it finally,
 
-> How exactly did you get it to work .. just by starting hidd with --nosdp,  and then it worked out if the box?
+it was the bloody ehci_hcd audio problem others have come across:
+http://sourceforge.net/mailarchive/message.php?msg_id=11431438
 
-you should start the "hidd --server" also with "--nosdp" if you plan to
-connect from your phone to the PC, but in general yes, a connect with
-"--nosdp" is enough to make your phone act as a HID.
+Using ohci_hcd, btsco works a treat in recording and playing, thanks for 
+the good work !!!
 
-> How did you connect the mouse decive to X? I don't think that there are any appropriate mouse protocols / keyboard layouts for the k700 phone !? 
+PS: Should others have trouble using the BT110, keep in mind it has very
+stringent power saving and thus will turn off very soon after the last
+audio packets have been transmitted (the confimation tone will notify you
+of that) - btsco will then quit with "RFCOMM channel lost"... 
 
-Everything goes through the input subsystem and as long as you are
-using /dev/input/mice you don't have to do anything else.
-
-Regards
-
-Marcel
-
-
+Regards,
+Lars
 
 
 -------------------------------------------------------
