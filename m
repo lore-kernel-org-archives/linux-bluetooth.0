@@ -2,11 +2,12 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Using ASCII based files for link key storage
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200504161932.39416.bluez-devel@schaettgen.de>
+In-Reply-To: <200504162001.57955.bluez-devel@schaettgen.de>
 References: <1113668583.16433.76.camel@pegasus>
 	 <200504161932.39416.bluez-devel@schaettgen.de>
+	 <200504162001.57955.bluez-devel@schaettgen.de>
 Content-Type: text/plain
-Message-Id: <1113678271.16433.85.camel@pegasus>
+Message-Id: <1113676428.16433.80.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,28 +20,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 16 Apr 2005 21:04:31 +0200
+Date: Sat, 16 Apr 2005 20:33:48 +0200
 
 Hi Fred,
 
-> > And second, The format of the link key file will be very simple:
+> > > So first the new place for runtime things like link keys, names etc. I
+> > > decided to use "/var/cache/bluetooth/<bdaddr>/" as the base directory
+> > > and then use the file "linkkeys" for the actual link keys. And we will
+> > > use "names" for the device name cache. The "bdaddr" is the address of
+> > > the local adapter.
 > >
-> > 	<bdaddr> <hex-linkkey> <type>
+> > According to the file hierarchy standard, /var/cache is for files which
+> > "can be deleted without data loss". For cached device names it's probably
+> > fine. They can't be recomputed if a device isn't in reach, but if it is,
+> > the device name can be fetched again automatically. But I'm not if this
+> > should include link keys. They can't be regenerated automatically without
+> > bothering the user. Deleting them might even break at setup, where the peer
+> > device isn't reachable easiliy after initial setup. Maybe /var/lib..? I'm
+> > not really an expert in this area.
 > 
-> This means that we will still be unable to list the devices for which a link 
-> key exists without root privileges, is this correct? If yes, is this 
-> intentional?
+> After thinking about it a little longer, I would even put the device name 
+> cache under /var/lib/bluetooth. /var/cache is intended for files with the 
+> purpose to reduce the load on any kind of resource, be it cpu, memory or 
+> network. But that's not why bluez is caching device names. It's because we 
+> want a reliable offline lookup capability. Caches should be completely 
+> transparent, but this wouldn't be the case here. If the cache is gone, then 
+> applications could not display a user friendly name, no matter how hard they 
+> try. It's the same difference as the difference between a browser cache and a 
+> proxy for offline browsing.
 
-there is no other way, because we must store the link keys as secure as
-possible.
-
-> Anyway, I for myself don't care much about where the data goes, as long as the 
-> location and the file formats stay stable, because the link key manager of 
-> kdebluetooth has to be changed each time.
-
-In the long term I like to make the place totally configurable, but for
-now I think going with /var/lib/bluetooth and ASCII based files is a
-good think.
+I am fine with it to put it under the /var/lib/bluetooth/ directory. The
+code in the CVS has been changed now.
 
 Regards
 
