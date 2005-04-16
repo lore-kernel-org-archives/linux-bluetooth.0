@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4260BF73.1040001@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] removing libao requirement (btsco)
+Subject: Re: [Bluez-devel] Baseband Packets
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <12a241ad050415175936c651a1@mail.gmail.com>
+References: <12a241ad050415175936c651a1@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1113623792.16433.49.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,19 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 16 Apr 2005 01:32:03 -0600
+Date: Sat, 16 Apr 2005 05:56:32 +0200
 
-Hi
+Hi Bruno,
 
-Can I get some help with the autoconf/make/acinclude stuff?
+> now that I know that bluez supports all types of packets,
+> i'm just wondering if it changes the packet type according to the
+> sender/receiver devices supported packets  info, and if it does, if it
+> automatically selects the best packet type according to the
+> enviroment, like in a file transfer, for example, according to the BER
+> or other error factors. (e.g: DH5 when BER < 10^(-5), or DM1 when BER
+> > 10^(-2)).
 
-I'd like to make building sbcdec optional and drop the requirement on 
-libao for everyone who doesn't need it--most users don't need sbcdec 
-(it's only used in sbc-codec and a2dp-sink development)
+this is the job of the link manager and it is part of the Bluetooth chip
+and not a host stack like BlueZ.
 
-I've dug around in this stuff and I'm not making any headway...
+Regards
 
-Brad
+Marcel
+
+
 
 
 -------------------------------------------------------
