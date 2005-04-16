@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+Subject: Re: [Bluez-devel] Using ASCII based files for link key storage
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] a2dp timing
-Message-Id: <20050416223249.7e058869.henryk@ploetzli.ch>
-In-Reply-To: <20050415094147.10035.qmail@web8307.mail.in.yahoo.com>
-References: <20050415094147.10035.qmail@web8307.mail.in.yahoo.com>
+In-Reply-To: <200504161932.39416.bluez-devel@schaettgen.de>
+References: <1113668583.16433.76.camel@pegasus>
+	 <200504161932.39416.bluez-devel@schaettgen.de>
+Content-Type: text/plain
+Message-Id: <1113678271.16433.85.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Sat__16_Apr_2005_22_32_49_+0200_1njVA1U0XzRhaBF3"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,42 +19,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 16 Apr 2005 22:32:49 +0200
+Date: Sat, 16 Apr 2005 21:04:31 +0200
 
---Signature=_Sat__16_Apr_2005_22_32_49_+0200_1njVA1U0XzRhaBF3
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Fred,
 
-Moin,
+> > And second, The format of the link key file will be very simple:
+> >
+> > 	<bdaddr> <hex-linkkey> <type>
+> 
+> This means that we will still be unable to list the devices for which a link 
+> key exists without root privileges, is this correct? If yes, is this 
+> intentional?
 
-Am Fri, 15 Apr 2005 10:41:46 +0100 (BST) schrieb Mayank Batra:
+there is no other way, because we must store the link keys as secure as
+possible.
 
-> negotiate the avdtp protocol. The connection is
-> working alright. The problem is just the sound
-> quality.
+> Anyway, I for myself don't care much about where the data goes, as long as the 
+> location and the file formats stay stable, because the link key manager of 
+> kdebluetooth has to be changed each time.
 
-I'd be very interested in helping with this code, too. And I also still
-have the audio dongle from my headset, so I could test with that.
+In the long term I like to make the place totally configurable, but for
+now I think going with /var/lib/bluetooth and ASCII based files is a
+good think.
 
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+Regards
 
---Signature=_Sat__16_Apr_2005_22_32_49_+0200_1njVA1U0XzRhaBF3
-Content-Type: application/pgp-signature
+Marcel
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
 
-iD8DBQFCYXZ5IjWgKE0OA2gRAvdsAKDrbYS2j1NxJAXZy1tSESQ8/1GBbACfTMW3
-JmJFIL8/fVCRy+xKIHPONNk=
-=juxp
------END PGP SIGNATURE-----
-
---Signature=_Sat__16_Apr_2005_22_32_49_+0200_1njVA1U0XzRhaBF3--
 
 
 -------------------------------------------------------
