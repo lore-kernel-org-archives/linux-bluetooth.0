@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: inquiry,connect and connect timeout
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <313639339.09001@eyou.net>
-References: <313639339.09001@eyou.net>
-Content-Type: text/plain
-Message-Id: <1113653654.16433.59.camel@pegasus>
+Message-ID: <313639339.09001@eyou.net>
+From: "Jin Pu" <jpu@emails.bjpu.edu.cn>
+To: "bluez-users@lists.sourceforge.ne" <bluez-users@lists.sourceforge.net>
 Mime-Version: 1.0
+Content-Type: text/plain;
+      charset="GB2312"
+Subject: [Bluez-users] Re: inquiry,connect and connect timeout
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,18 +17,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 16 Apr 2005 14:14:14 +0200
+Date: Sat, 16 Apr 2005 16:11:50 +0800
 
-Hi,
-
->     About the first question, I know there exists a HCI_Set_Event_Filter command in the specification , but if I would like to try the command in my program, which API should I use to achieve it?
-
-there is no easy command for using it. You must deal with the HCI raw
-socket for it.
-
-Regards
-
-Marcel
+    Hi, Marcel
+    Thanks for your prompt reply.
+    About the first question, I know there exists a HCI_Set_Event_Filter command in the specification , but if I would like to try the command in my program, which API should I use to achieve it?
+    
+    Jin Pu
+	
+   
 
 
 
