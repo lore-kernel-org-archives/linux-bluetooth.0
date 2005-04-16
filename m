@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4260BF73.1040001@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1113668583.16433.76.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Using ASCII based files for link key storage
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] removing libao requirement (btsco)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,36 +16,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 16 Apr 2005 18:23:03 +0200
+Date: Sat, 16 Apr 2005 01:32:03 -0600
 
-Hi Folks,
+Hi
 
-currently the link keys are stored in a binary format and they are
-stored under the "/etc/bluetooth/" directory. Both things are not very
-handy and we should start doing something to change this.
+Can I get some help with the autoconf/make/acinclude stuff?
 
-So first the new place for runtime things like link keys, names etc. I
-decided to use "/var/cache/bluetooth/<bdaddr>/" as the base directory
-and then use the file "linkkeys" for the actual link keys. And we will
-use "names" for the device name cache. The "bdaddr" is the address of
-the local adapter.
+I'd like to make building sbcdec optional and drop the requirement on 
+libao for everyone who doesn't need it--most users don't need sbcdec 
+(it's only used in sbc-codec and a2dp-sink development)
 
-And second, The format of the link key file will be very simple:
+I've dug around in this stuff and I'm not making any headway...
 
-	<bdaddr> <hex-linkkey> <type>
-
-All the framework around these stuff is already committed to the BlueZ
-utils CVS and we need only to fill in the functions for writing and
-reading the link keys from the files. Both can be found as some kind of
-prototypes in hcid/storage.c and I would be very happy if someone fills
-these function with actual code, because I am quite busy with some other
-stuff.
-
-Regards
-
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
