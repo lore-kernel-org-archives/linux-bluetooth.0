@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?UTF-8?B?SmVzw7pz?= Cano Navarro <jesuscanonavarro@yahoo.es>
-To: Bluez <bluez-users@lists.sourceforge.net>
-Message-Id: <20050417205450.653f7567.jesuscanonavarro@yahoo.es>
-Mime-Version: 1.0
+Message-ID: <426237CF.5060604@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] error on connect
+References: <425FFF54.6000701@gmx.ch> <1113607202.16433.42.camel@pegasus>	 <42616275.1090103@gmx.ch> <1113682195.18450.0.camel@pegasus>	 <4261BCFB.8040204@gmx.ch> <1113702363.18450.26.camel@pegasus>
+In-Reply-To: <1113702363.18450.26.camel@pegasus>
 Content-Type: multipart/mixed;
- boundary="Multipart=_Sun__17_Apr_2005_20_54_50_+0200_IQs6IePignmyGbj9"
-Subject: [Bluez-users] Can't connect to a keyboard
+ boundary="------------060709050601070507090801"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,253 +19,386 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 17 Apr 2005 20:54:50 +0200
+Date: Sun, 17 Apr 2005 12:17:51 +0200
 
 This is a multi-part message in MIME format.
-
---Multipart=_Sun__17_Apr_2005_20_54_50_+0200_IQs6IePignmyGbj9
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-Hi everybody,
-
-First of all, thank you very much for reading the message and spending a little of your time helping me. I'm new in this "blue field", hope i can help people with this some day.
-
-Ok. I had an Apple Wireless Keyboard for xmas, since then, i haven't been able to use it on my GNU/Linux, a minimalistic Debian testing (in Compaq Deskpro EN series old workstation, P2 350Mhz, 256MB, 8GB; it runs so fine ;).
-
-I read Marcel's pages about bluez and bluetooth in GNU/Linux (great job man!) to get a right dongle (a 3com USB Bluetooth adapter) and get the first contact to bluetooth in GNU/Linux. I couldn't understand that pages very well since i don't know much more about the bluetooth hw, protocol, stack... Perhaps, the answer is right in front of my nose but i cann't see it. Actually, someone seemed to have the same problem in the list archives time ago, but i can't imagine what do i have to do.
-
-So, i installed "bluez-utils" pakage. And i've been trying things; the info i know i can give you by now, is:
-
--I need to restart /etc/init.d/bluez-utils, after booting to make it work.
--I have no problem to detect the dongle on boot or with hotplug.
--I have tried some steps to connect with the keyboard i found in the documentation i difficultly read:
-
-http://www.hpl.hp.com/personal/Jean_Tourrilhes/bt/Brainboxes.html
-http://pinsa.escomposlinux.org/sromero/linux/bluetooth_ht.php
-http://www.linuca.org/body.phtml?nIdNoticia=299
-http://www.holtmann.org/linux/bluetooth/
-http://www.holtmann.org/linux/bluetooth/usb.html
-http://dmnet.bitacoras.com/index.php?id=2997
-http://tuxmobil.org/bluetooth_linux.html
-http://usefulinc.com/edd/blog/contents/2004/05/26-bluez/read
-http://www.holtmann.org/linux/kernel/debian.html
-http://www.asturlinux.org/~alvaro/noticias/docs/bthowto/adjuntos/bluetooth.howto.htm
-
-I'm attaching all the outputs i could collect for you.
-
-I have no idea. All you are wellcome.
-
-Thank you very much!.
-
--- 
-Por favor, NUNCA reveles esta dirrección de correo electrónico a ninguna persona o entidad.
-Te estaría muy agradecido si respetases que sólo quiero recibir aquí, correo exclusivamente dirigido a mi persona (nada de mensajes cadena, o "de reenviar" o como quieras llamarlos).
-Muchísimas gracias.
-
-Please, NEVER give my e-mail address to anyone.
-I would be very thankful if you respect that I only want to receive here totally directed to my person post (no chain messages, or "to foward messages" or whatever you want to call them).
-Thank you very much.
-
-Jesús Cano Navarro <jesuscanonavarro@yahoo.es>
-
---Multipart=_Sun__17_Apr_2005_20_54_50_+0200_IQs6IePignmyGbj9
-Content-Type: text/plain;
- name="hciconfig-a.txt"
-Content-Disposition: attachment;
- filename="hciconfig-a.txt"
+--------------060709050601070507090801
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 
-hci0:	Type: USB
-	BD Address: 00:0B:AC:EB:C8:9F ACL MTU: 192:8  SCO MTU: 64:8
-	UP RUNNING PSCAN ISCAN 
-	RX bytes:393 acl:0 sco:0 events:19 errors:0
-	TX bytes:317 acl:0 sco:0 commands:17 errors:0
-	Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-	Link policy: RSWITCH HOLD SNIFF PARK 
-	Link mode: SLAVE ACCEPT 
-	Name: 'herzeleid-0'
-	Class: 0x000100
-	Service Classes: Unspecified
-	Device Class: Computer, Uncategorized
-	HCI Ver: 1.1 (0x1) HCI Rev: 0x20e LMP Ver: 1.1 (0x1) LMP Subver: 0x20e
-	Manufacturer: Cambridge Silicon Radio (10)
+Marcel Holtmann wrote:
+> Hi Marco,
+> 
+> 
+>>>>Yes. Broadcom dongles cause the problem.
+>>>>Actually it's only the slave (listening dongle).
+>>>
+>>>what kind of Broadcom dongle is this?
+>>
+>>I sent you pretty exactly one week ago the data from two broadcom 1.2 
+>>dongles (ednet and acer). Inform me if you need the informations again.
+>>both dongles now make the problem...
+> 
+> 
+> include them again, because my mailboxes are a little bit bigger ;)
+
+here we go:
+the file acer and ednet. my hcidump was from the acer.
+
+>>>>I tested all combinations with a minimal slave and master (only 
+>>>>connects/accept connection and quit directly again).
+>>>>the master (connecting one) doesn't care, csr and broadcom worked fine.
+>>>>
+>>>>but the listening one gives the mentioned error (on more than 50% of the 
+>>>>tries) I tried with a acer and ednet broadcom dongle.
+>>>>A csr works just perfectly fine...
+>>>>
+>>>>after the error, the dongle keeps waiting for a slave but won't access any 
+>>>>more connections. so, basically the dongle is completly freezed.
+>>>
+>>>
+>>>Send in the "hcidump -X -V" for it.
+>>
+>>I attached a successfull and a failed attemp from the listening acer dongle.
+>>Hope they are informative...
+> 
+> 
+> These dumps gives no information about why you should receive a data
+> packet with an invalid connection handle. However maybe the change of
+> the packet types confuses the Broadcom dongle.
+
+change of packet type? i'm not doing anything like these intentionally.
+
+> With what programs do you tested these things? I must try to reproduce
+> it reliable.
+
+gallerie-connect.cpp and arm-listen.cpp
+please note these are quick and dirty pasts of a c++ project. another thing 
+to mention is that you have to edit the macaddresses because I hardcoded 
+them (the pc's have multiple dongles).
+
+thanks a lot!
 
 
---Multipart=_Sun__17_Apr_2005_20_54_50_+0200_IQs6IePignmyGbj9
+regards
+Marco
+
+--------------060709050601070507090801
 Content-Type: text/plain;
- name="hcid.conf.txt"
-Content-Disposition: attachment;
- filename="hcid.conf.txt"
+ name="acer"
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="acer"
 
-#
-# HCI daemon configuration file.
-#
-# $Id: hcid.conf,v 1.4 2004/04/29 20:14:21 holtmann Exp $
-#
+hci0:   Type: USB
+        BD Address: 00:02:72:C3:26:F5 ACL MTU: 377:10 SCO MTU: 16:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:390 acl:0 sco:0 events:17 errors:0
+        TX bytes:311 acl:0 sco:0 commands:17 errors:0
+        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: MASTER
+        Name: 'BlueZ (0)'
+        Class: 0x3e0100
+        Service Classes: Networking, Rendering, Capturing
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.2 (0x2) HCI Rev: 0xa LMP Ver: 1.2 (0x2) LMP Subver: 0x309
+        Manufacturer: Broadcom Corporation (15)
 
-# HCId options
-options {
-	# Automatically initialize new devices
-	autoinit yes;
+T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
+B:  Alloc= 46/900 us ( 5%), #Int=  2, #Iso=  0
+D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=0000 ProdID=0000 Rev= 0.00
+S:  Product=USB OHCI Root Hub
+S:  SerialNumber=c5056000
+C:* #Ifs= 1 Cfg#= 1 Atr=40 MxPwr=  0mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
+T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0a12 ProdID=0001 Rev=15.86
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 2 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
+T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  3 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0a5c ProdID=200a Rev= 0.01
+S:  Manufacturer=Broadcom
+S:  Product=CCBT2035BDGP23-1
+S:  SerialNumber=000272C326F5
+C:* #Ifs= 3 Cfg#= 1 Atr=a0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+--------------060709050601070507090801
+Content-Type: text/plain;
+ name="ednet"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="ednet"
 
-	# Security Manager mode
-	#   none - Security manager disabled
-	#   auto - Use local PIN for incoming connections
-	#   user - Always ask user for a PIN
-	#
-	security auto;
+hci0:   Type: USB
+        BD Address: 00:02:72:C3:F2:10 ACL MTU: 377:10  SCO MTU: 16:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:526 acl:0 sco:0 events:42 errors:0
+        TX bytes:323 acl:0 sco:0 commands:19 errors:0
+        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: ACCEPT MASTER
+        Name: 'btLapi'
+        Class: 0x100100
+        Service Classes:
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x14 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
+        Manufacturer: Broadcom Corporation (15)
 
-	# Pairing mode
-	#   none  - Pairing disabled
-	#   multi - Allow pairing with already paired devices
-	#   once  - Pair once and deny successive attempts
-	pairing multi;
 
-	# PIN helper
-	pin_helper /usr/bin/bluez-pin;
+T:  Bus=04 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480 MxCh= 6
+B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
+D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS= 8 #Cfgs=  1
+P:  Vendor=0000 ProdID=0000 Rev= 2.06
+S:  Manufacturer=Linux 2.6.8-24.14-default ehci_hcd
+S:  Product=EHCI Host Controller
+S:  SerialNumber=0000:00:1d.7
+C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=256ms
 
-	# D-Bus PIN helper
-	#dbus_pin_helper;
+T:  Bus=03 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
+B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
+D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=0000 ProdID=0000 Rev= 2.06
+S:  Manufacturer=Linux 2.6.8-24.14-default uhci_hcd
+S:  Product=UHCI Host Controller
+S:  SerialNumber=0000:00:1d.2
+C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
+
+T:  Bus=02 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
+B:  Alloc= 23/900 us ( 3%), #Int=  1, #Iso=  0
+D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=0000 ProdID=0000 Rev= 2.06
+S:  Manufacturer=Linux 2.6.8-24.14-default uhci_hcd
+S:  Product=UHCI Host Controller
+S:  SerialNumber=0000:00:1d.1
+C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
+
+T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#= 16 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0a5c ProdID=200a Rev= 0.01
+S:  Manufacturer=Broadcom
+S:  Product=CCBT2035BDGP23-2
+S:  SerialNumber=000272C3F210
+C:* #Ifs= 3 Cfg#= 1 Atr=a0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+
+T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
+B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
+D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=0000 ProdID=0000 Rev= 2.06
+S:  Manufacturer=Linux 2.6.8-24.14-default uhci_hcd
+S:  Product=UHCI Host Controller
+S:  SerialNumber=0000:00:1d.0
+C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
+
+--------------060709050601070507090801
+Content-Type: text/plain;
+ name="gallerie-connect.cpp"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="gallerie-connect.cpp"
+
+// g++ -O2 -lbluetooth gallerie-connect.cpp -o gallerie-connect
+
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/poll.h>
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/rfcomm.h>
+#include <bluetooth/hci.h>
+#include <bluetooth/hci_lib.h>
+#include <unistd.h>
+
+#include <iostream>
+
+using namespace std;
+
+
+int main()
+{
+	struct sockaddr_rc laddr, raddr;
+	int sock;
+
+	str2ba("00:02:72:C3:F2:10", &laddr.rc_bdaddr);
+	laddr.rc_family = AF_BLUETOOTH;
+	laddr.rc_channel = 1;
+
+	str2ba("00:02:72:C3:26:F5", &raddr.rc_bdaddr);
+	raddr.rc_family = AF_BLUETOOTH;
+	raddr.rc_channel = 5;
+
+	if((sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)) < 0)
+	{
+		cout << "Can't create RFCOMM socket" << endl;
+		exit(1);
+	}
+
+	if(bind(sock, (struct sockaddr *)&laddr, sizeof(laddr)) < 0)
+	{
+		cout << "Can't bind RFCOMM socket" << endl;
+		close(sock);
+		exit(1);
+	}
+
+	if(connect(sock, (struct sockaddr *)&raddr, sizeof(raddr)) < 0)
+	{
+		cout << "Can't connect RFCOMM socket" << endl;
+		close(sock);
+		exit(1);
+	}
+
+	cout << "connected" << endl;
+
+	close(sock);
 }
 
-# Default settings for HCI devices
-device {
-	# Local device name
-	#   %d - device id
-	#   %h - host name
-	name "%h-%d";
+--------------060709050601070507090801
+Content-Type: text/plain;
+ name="arm-listen.cpp"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="arm-listen.cpp"
 
-	# Local device class
-	class 0x100;
+// arm-linux-g++ -O2 -lbluetooth arm-listen.cpp -o arm-listen
 
-	# Default packet type
-	#pkt_type DH1,DM1,HV1;
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/poll.h>
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/rfcomm.h>
+#include <bluetooth/hci.h>
+#include <bluetooth/hci_lib.h>
+#include <unistd.h>
 
-	# Inquiry and Page scan
-	iscan enable; pscan enable;
+#include <iostream>
 
-	# Default link mode
-	#   none   - no specific policy 
-	#   accept - always accept incoming connections
-	#   master - become master on incoming connections,
-	#            deny role switch on outgoing connections
-	#
-	#lm accept,master;
-	#
-	lm accept;
+using namespace std;
 
-	# Default link policy
-	#   none    - no specific policy
-	#   rswitch - allow role switch
-	#   hold    - allow hold mode
-	#   sniff   - allow sniff mode
-	#   park    - allow park mode
-	#
-	#lp hold,sniff;
-	#
-	lp rswitch,hold,sniff,park;
 
-	# Authentication and Encryption
-	#auth enable;
-	#encrypt enable;
+int main()
+{
+	int sock, client;
+	socklen_t alen;
+	struct sockaddr_rc addr;
+
+	str2ba("00:02:72:C3:26:F5", &addr.rc_bdaddr);
+	addr.rc_family = AF_BLUETOOTH;
+	addr.rc_channel = 5;
+	alen = sizeof(addr);
+
+	if((sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)) < 0)
+	{
+		cout << "clientService: socket(...) failed" << endl;
+		exit(1);
+	}
+
+	if(bind(sock, (struct sockaddr *)&addr, alen) < 0)
+	{
+		cout << "clientService: bind(...) failed" << endl;
+		close(sock);
+		exit(1);
+	}
+
+	if(listen(sock, 1) < 0)
+	{
+		cout << "clientService: listen(...) failed\n" << endl;
+		exit(1);
+	}
+
+	client = accept(sock, (struct sockaddr *)&addr, &alen);
+	cout << "connection here" << endl;
+	close(client);
+
+	close(sock);
+
+	return 0;
 }
 
---Multipart=_Sun__17_Apr_2005_20_54_50_+0200_IQs6IePignmyGbj9
-Content-Type: text/plain;
- name="hcitool-dev.txt"
-Content-Disposition: attachment;
- filename="hcitool-dev.txt"
-Content-Transfer-Encoding: 7bit
-
-Devices:
-	hci0	00:0B:AC:EB:C8:9F
-
---Multipart=_Sun__17_Apr_2005_20_54_50_+0200_IQs6IePignmyGbj9
-Content-Type: text/plain;
- name="hcitool-info.txt"
-Content-Disposition: attachment;
- filename="hcitool-info.txt"
-Content-Transfer-Encoding: 7bit
-
-Requesting information ...
-
---Multipart=_Sun__17_Apr_2005_20_54_50_+0200_IQs6IePignmyGbj9
-Content-Type: text/plain;
- name="hcitool-inq.txt"
-Content-Disposition: attachment;
- filename="hcitool-inq.txt"
-Content-Transfer-Encoding: 7bit
-
-Inquiring ...
-	00:0A:95:3D:EB:EC	clock offset: 0x7474	class: 0x002540
-
---Multipart=_Sun__17_Apr_2005_20_54_50_+0200_IQs6IePignmyGbj9
-Content-Type: text/plain;
- name="hcitool-scan.txt"
-Content-Disposition: attachment;
- filename="hcitool-scan.txt"
-Content-Transfer-Encoding: 7bit
-
-Scanning ...
-	00:0A:95:3D:EB:EC	n/a
-
---Multipart=_Sun__17_Apr_2005_20_54_50_+0200_IQs6IePignmyGbj9
-Content-Type: text/plain;
- name="lsmod.txt"
-Content-Disposition: attachment;
- filename="lsmod.txt"
-Content-Transfer-Encoding: 7bit
-
-Module                  Size  Used by
-hidp                   15488  2 
-rfcomm                 39420  0 
-l2cap                  25796  8 hidp,rfcomm
-ipv6                  264644  8 
-pcspkr                  3592  0 
-floppy                 61200  0 
-parport_pc             36900  0 
-parport                41800  1 parport_pc
-pci_hotplug            34640  0 
-intel_agp              22816  1 
-hci_usb                13888  0 
-bluetooth              49604  4 hidp,rfcomm,l2cap,hci_usb
-tsdev                   7392  0 
-mousedev               10476  1 
-joydev                  9984  0 
-evdev                   9600  0 
-usbhid                 32224  0 
-uhci_hcd               33136  0 
-usbcore               119012  5 hci_usb,usbhid,uhci_hcd
-3c59x                  39368  0 
-agpgart                34664  1 intel_agp
-capability              4520  0 
-commoncap               7232  1 capability
-psmouse                20360  0 
-ide_cd                 42656  0 
-cdrom                  40732  1 ide_cd
-genrtc                  9588  0 
-jfs                   185576  2 
-ide_generic             1408  0 
-piix                   13440  1 
-ide_disk               19296  4 
-ide_core              139940  4 ide_cd,ide_generic,piix,ide_disk
-sd_mod                 21728  0 
-ata_piix                8132  0 
-libata                 41700  1 ata_piix
-scsi_mod              125228  2 sd_mod,libata
-unix                   28756  76 
-font                    8320  0 
-vesafb                  6656  0 
-cfbcopyarea             3872  1 vesafb
-cfbimgblt               3040  1 vesafb
-cfbfillrect             3776  1 vesafb
-
---Multipart=_Sun__17_Apr_2005_20_54_50_+0200_IQs6IePignmyGbj9--
-
-
+--------------060709050601070507090801--
 
 
 -------------------------------------------------------
