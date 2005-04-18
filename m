@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Socket rev. F with 2.6 kernel
-References: <200504172343.51763.pavouk@pavouk.org> <1113776422.16233.83.camel@pegasus> <426305F5.8010506@xmission.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
 In-Reply-To: <426305F5.8010506@xmission.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200504180945.29010.pavouk@pavouk.org>
+References: <200504172343.51763.pavouk@pavouk.org>
+	 <1113776422.16233.83.camel@pegasus>  <426305F5.8010506@xmission.com>
+Content-Type: text/plain
+Message-Id: <1113790239.16233.85.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,17 +19,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 18 Apr 2005 09:45:28 +0200
+Date: Mon, 18 Apr 2005 04:10:39 +0200
 
-Hi,
+Hi Brad,
 
-probably you have revision G of this card and you use serial_cs.
-This is not my case, I have revision F nokia based and like Marcel
-says, I must use dtl1_cs.
+> I had the same card and it would not work with 2.6 until I applied this 
+> patch. (posted to the mailing list about a month ago)
+> 
+> Even then I couldn't get the rev f to do audio stuff though.
 
-Best regards,
+the revision F card is still Nokia based and thus the dtl1_cs must be
+used.
 
-Pavel Ruzicka
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
