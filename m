@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Baseband Packets
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <d1f423d305041815331d2e6698@mail.gmail.com>
+From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <d1f423d305041815331d2e6698@mail.gmail.com>
+Subject: Re: [Bluez-devel] Baseband Packets
+In-Reply-To: <1113623792.16433.49.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 References: <12a241ad050415175936c651a1@mail.gmail.com>
 	 <1113623792.16433.49.camel@pegasus>
-	 <d1f423d305041815331d2e6698@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1113864236.16233.148.camel@pegasus>
-Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,31 +19,57 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 19 Apr 2005 00:43:56 +0200
+Date: Mon, 18 Apr 2005 18:33:18 -0400
 
-Hi Anderson,
+Hi,
 
-> The spec says that: "Quality measurements in the receiver of one
-> device can be used to dynamically control the packet type transmitted
-> from the remote device for optimization of the data throughput."
-> 
-> The question is, is it done automatically or not? May we assume that
-> LM is smart enough to measure the RF channel and based on it changes
-> automatically the packet type ?
+The spec says that: "Quality measurements in the receiver of one
+device can be used to dynamically control the packet type transmitted
+from the remote device for optimization of the data throughput."
 
-the link manager should be smart enough, but choosing the right packet
-type is a science by itself.
+The question is, is it done automatically or not? May we assume that
+LM is smart enough to measure the RF channel and based on it changes
+automatically the packet type ?
 
-> If not, is there any point in bluez that we can talk with LM?
+If not, is there any point in bluez that we can talk with LM?
 
-We can only limit available packet types, but this makes no sense at all
-and should never be done.
+Regards,
 
-Regards
+On 4/15/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Bruno,
+>=20
+> > now that I know that bluez supports all types of packets,
+> > i'm just wondering if it changes the packet type according to the
+> > sender/receiver devices supported packets  info, and if it does, if it
+> > automatically selects the best packet type according to the
+> > enviroment, like in a file transfer, for example, according to the BER
+> > or other error factors. (e.g: DH5 when BER < 10^(-5), or DM1 when BER
+> > > 10^(-2)).
+>=20
+> this is the job of the link manager and it is part of the Bluetooth chip
+> and not a host stack like BlueZ.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>=20
 
-Marcel
 
-
+--=20
+Anderson Clayton B. Rodrigues
+Eng. de Software
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
