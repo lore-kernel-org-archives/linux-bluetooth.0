@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v619.2)
-In-Reply-To: <1113607333.16433.46.camel@pegasus>
-References: <805b11d45747c1dc166defb93f587cf1@pepper.com> <1113607333.16433.46.camel@pegasus>
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Message-Id: <a0b3fcf839d24cc684e86db701108bb6@pepper.com>
-From: Michael Frey <mfrey@pepper.com>
-Subject: Re: [Bluez-devel] hcitool scan while hidd connection..
+Subject: Re: [Bluez-devel] Using ASCII based files for link key storage
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1113676428.16433.80.camel@pegasus>
+References: <1113668583.16433.76.camel@pegasus>
+	 <200504161932.39416.bluez-devel@schaettgen.de>
+	 <200504162001.57955.bluez-devel@schaettgen.de>
+	 <1113676428.16433.80.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1113824107.16233.93.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,30 +21,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 18 Apr 2005 10:51:15 -0400
+Date: Mon, 18 Apr 2005 13:35:07 +0200
 
-Marcel,
+Hi Fred,
 
-Here is the dump when trying to scan while a dvice is connected.
+> > > > So first the new place for runtime things like link keys, names etc. I
+> > > > decided to use "/var/cache/bluetooth/<bdaddr>/" as the base directory
+> > > > and then use the file "linkkeys" for the actual link keys. And we will
+> > > > use "names" for the device name cache. The "bdaddr" is the address of
+> > > > the local adapter.
+> > >
+> > > According to the file hierarchy standard, /var/cache is for files which
+> > > "can be deleted without data loss". For cached device names it's probably
+> > > fine. They can't be recomputed if a device isn't in reach, but if it is,
+> > > the device name can be fetched again automatically. But I'm not if this
+> > > should include link keys. They can't be regenerated automatically without
+> > > bothering the user. Deleting them might even break at setup, where the peer
+> > > device isn't reachable easiliy after initial setup. Maybe /var/lib..? I'm
+> > > not really an expert in this area.
+> > 
+> > After thinking about it a little longer, I would even put the device name 
+> > cache under /var/lib/bluetooth. /var/cache is intended for files with the 
+> > purpose to reduce the load on any kind of resource, be it cpu, memory or 
+> > network. But that's not why bluez is caching device names. It's because we 
+> > want a reliable offline lookup capability. Caches should be completely 
+> > transparent, but this wouldn't be the case here. If the cache is gone, then 
+> > applications could not display a user friendly name, no matter how hard they 
+> > try. It's the same difference as the difference between a browser cache and a 
+> > proxy for offline browsing.
+> 
+> I am fine with it to put it under the /var/lib/bluetooth/ directory. The
+> code in the CVS has been changed now.
 
-root@(none):~# hcitool scan
-Scanning ...
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-   0000: 33 8b 9e 08 64                                    3...d
- > HCI Event: Command Status (0x0f) plen 4
-   0000: 00 07 01 04                                       ....
- > HCI Event: Inquiry Complete (0x01) plen 1
-   0000: 00                                                .
- > HCI Event: Command Status (0x0f) plen 4
-   0000: 00 08 00 00                                       ....
+actually I have everything working like it should be. The code for
+dealing with the ASCII files is not the best, but it seems to work fine
+for this case. So does everybody agree to store all Bluetooth related
+files under /var/lib/bluetooth/ or should we put them somewhere else. It
+would be great if people comment on this and test the code, because I
+wanna release it as bluez-libs-2.16 and bluez-utils-2.16.
 
-Does this give you any clue?
+Regards
 
-Michael
+Marcel
 
-On Apr 15, 2005, at 7:22 PM, Marcel Holtmann wrote:
-
-> hcidump -X -V
 
 
 
