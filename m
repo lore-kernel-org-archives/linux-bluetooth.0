@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050419050546.7885.qmail@web52410.mail.yahoo.com>
-From: jose <twblr@yahoo.com>
+Subject: Re: [Bluez-devel] Baseband Packets
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] PC to PC file transfer
+In-Reply-To: <d1f423d30504181634cdd0a46@mail.gmail.com>
+References: <12a241ad050415175936c651a1@mail.gmail.com>
+	 <1113623792.16433.49.camel@pegasus>
+	 <d1f423d305041815331d2e6698@mail.gmail.com>
+	 <1113864236.16233.148.camel@pegasus>
+	 <d1f423d30504181634cdd0a46@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1113868546.16233.153.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,28 +22,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 18 Apr 2005 22:05:46 -0700 (PDT)
+Date: Tue, 19 Apr 2005 01:55:46 +0200
 
-hi,
+Hi Anderson,
 
-i have two PCs with linux, with bluetooth capability
-on both(using BlueZ).
+> I understand your arguments. But is It possible to interact with the
+> LM by software? I mean, send PDUs ... Probably you have faced many
+> many problems in order to build Bluez, and probably you have gained a
+> huge experience and even you dont intend to implement it you have an
+> idea of how i could start of doing it for academic porposes. Any help
+> would be very welcome.
 
-i want to transfer a file (any file)between them.
-Could be command-line transfer or any other way.
+it is not possible to interact directly with the link manager. The only
+way is over HCI.
 
-how to go about?
+Regards
 
-rgds,
-Jose.
-
+Marcel
 
 
-		
-__________________________________ 
-Yahoo! Mail Mobile 
-Take Yahoo! Mail with you! Check email on your mobile phone. 
-http://mobile.yahoo.com/learn/mail 
 
 
 -------------------------------------------------------
