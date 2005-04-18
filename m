@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Using ASCII based files for link key storage
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Hilzinger <marcel@hilzinger.hu>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1113676428.16433.80.camel@pegasus>
-References: <1113668583.16433.76.camel@pegasus>
-	 <200504161932.39416.bluez-devel@schaettgen.de>
-	 <200504162001.57955.bluez-devel@schaettgen.de>
-	 <1113676428.16433.80.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1113824107.16233.93.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] SonyEricsson K700i and HID
+Cc: Stefan Jonasson <sjond00@student.vxu.se>
+References: <4c513c4c7893.4c78934c513c@vxu.se>
+In-Reply-To: <4c513c4c7893.4c78934c513c@vxu.se>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="windows-1252"
+Message-Id: <200504181112.54672.marcel@hilzinger.hu>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,50 +20,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 18 Apr 2005 13:35:07 +0200
+Date: Mon, 18 Apr 2005 11:12:54 +0200
 
-Hi Fred,
+Am Freitag, 15. April 2005 13:26 schrieb Stefan Jonasson:
+> Hi all!
+>
+> I just bought an SonyEricsson K700i and it have support for bluetooth HID.
+> After researching a bit I realized that there probably isent any way to
+> make it work in linux atm..
+>
+> I tyred to use it as a keyboard/ mouse with hidd. The phone and computer
+> can connect to each other the phone shows the input map ( just as it does
+> in windows when you use this function). And hidd dosent report any
+> failures...
 
-> > > > So first the new place for runtime things like link keys, names etc. I
-> > > > decided to use "/var/cache/bluetooth/<bdaddr>/" as the base directory
-> > > > and then use the file "linkkeys" for the actual link keys. And we will
-> > > > use "names" for the device name cache. The "bdaddr" is the address of
-> > > > the local adapter.
-> > >
-> > > According to the file hierarchy standard, /var/cache is for files which
-> > > "can be deleted without data loss". For cached device names it's probably
-> > > fine. They can't be recomputed if a device isn't in reach, but if it is,
-> > > the device name can be fetched again automatically. But I'm not if this
-> > > should include link keys. They can't be regenerated automatically without
-> > > bothering the user. Deleting them might even break at setup, where the peer
-> > > device isn't reachable easiliy after initial setup. Maybe /var/lib..? I'm
-> > > not really an expert in this area.
-> > 
-> > After thinking about it a little longer, I would even put the device name 
-> > cache under /var/lib/bluetooth. /var/cache is intended for files with the 
-> > purpose to reduce the load on any kind of resource, be it cpu, memory or 
-> > network. But that's not why bluez is caching device names. It's because we 
-> > want a reliable offline lookup capability. Caches should be completely 
-> > transparent, but this wouldn't be the case here. If the cache is gone, then 
-> > applications could not display a user friendly name, no matter how hard they 
-> > try. It's the same difference as the difference between a browser cache and a 
-> > proxy for offline browsing.
-> 
-> I am fine with it to put it under the /var/lib/bluetooth/ directory. The
-> code in the CVS has been changed now.
+You might have a look at bluemote. It makes a remote control  of your phone:
 
-actually I have everything working like it should be. The code for
-dealing with the ASCII files is not the best, but it seems to work fine
-for this case. So does everybody agree to store all Bluetooth related
-files under /var/lib/bluetooth/ or should we put them somewhere else. It
-would be great if people comment on this and test the code, because I
-wanna release it as bluez-libs-2.16 and bluez-utils-2.16.
+http://www.geocities.com/saravkrish/progs/bluemote/index.html
 
-Regards
-
-Marcel
-
-
+=2D-=20
+=DCdv=F6zlettel -- Mit freundlichen Gr=FCssen,
+Marcel Hilzinger
 
 
 -------------------------------------------------------
