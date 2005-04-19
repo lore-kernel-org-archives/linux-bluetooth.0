@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb05041913007eacbf88@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
-To: bluez-users@lists.sourceforge.net, bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] PC to PC file transfer
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <4264E2F8.8020307@kernelconcepts.de>
+References: <20050419050546.7885.qmail@web52410.mail.yahoo.com>
+	 <1113907452.16233.169.camel@pegasus>  <4264E2F8.8020307@kernelconcepts.de>
+Content-Type: text/plain
+Message-Id: <1113915617.16233.182.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] DBUS service support
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,28 +19,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 19 Apr 2005 17:00:04 -0300
+Date: Tue, 19 Apr 2005 15:00:17 +0200
 
-Hi folks,
+Hi Nils,
+
+> >>i have two PCs with linux, with bluetooth capability
+> >>on both(using BlueZ).
+> >>i want to transfer a file (any file)between them.
+> >>Could be command-line transfer or any other way.
+> > the easiest way is to create a PAN with pand between your two machines
+> > and then use tools like ftp or scp.
+> 
+> But in general I think it would be nice to have a some more ad-hoc file
+> transfer tool. Would maybe OBEX be suitable for that?
+> 
+> We have for example that situation quite often that you sit together
+> with some people and their notebooks or other prtable devices but you do
+> not have a common network or simply do not want that (imagine a business
+> meeting). But you want to share some docs, files, etc.. Mostly small
+> stuff, not whole movies ;)
+> Last time I was in a meeting guess what happened: They tucked out a
+> floppy disk!
+> 
+> For those purposes something like
+> 	bt-receive-file (waiting)
+> 	bt-send-file <BD-ADDR> <file>
+> would be nice.
+
+there are some programs for that job, but actually I like an obextool
+merged into bluez-utils that is capable of doing things like this, but I
+never finally finished it. Feel free to send me patches to add such a
+tool.
+
+Regards
+
+Marcel
 
 
-I would like to know if are there plans to develop a=20
-library/application to integrate bluez and dbus service=20
-to control bluetooth connections?
-
-BlueZ provides tools to enable setup Bluetooth PANs. However,=20
-an user mode application is not able to control Bluetooth=20
-connections (connect, disconnect, assign IP, ...)
-
-I found the Network Manager application, developed by Red Hat.=20
-There is comments to bluetooth support, however it is not=20
-supported at the moment.
-http://people.redhat.com/dcbw/NetworkManager/
-
-Is this topic useful for this project?=20
-If yes, how can I contribute?
-
-Claudio Takahasi.
 
 
 -------------------------------------------------------
