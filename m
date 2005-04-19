@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42651A2E.2080601@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Bluetooth dongle fails to dial in via AVM AP-X
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] error on connect
-References: <425FFF54.6000701@gmx.ch> <1113607202.16433.42.camel@pegasus>	 <42616275.1090103@gmx.ch> <1113682195.18450.0.camel@pegasus>	 <4261BCFB.8040204@gmx.ch> <1113702363.18450.26.camel@pegasus>	 <426237CF.5060604@gmx.ch>  <4263F8DF.1040400@gmx.ch> <1113849662.16233.118.camel@pegasus>
-In-Reply-To: <1113849662.16233.118.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <E1DNs9Q-00043x-00@mrelayng.kundenserver.de>
+References: <E1DNs9Q-00043x-00@mrelayng.kundenserver.de>
+Content-Type: text/plain
+Message-Id: <1113915398.16233.179.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,59 +18,95 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 19 Apr 2005 16:48:14 +0200
+Date: Tue, 19 Apr 2005 14:56:38 +0200
 
-Hello Marcel
+Hi Jens-Uwe,
 
-> I don't had the time to search my Broadcom dongles.
- > Maybe you should try to get yourself some CSR based dongles.
+> On my Fujitsu Siemens Lifebook running Debian Sarge, i cant suceed to dial 
+> and connect with my "AVM APX ISDN Bluetooth Modem" via bluetooth-dongle 
+> (Mitsumi).
+> So far, I have kernel, hcid, pin and pinhelper set up and running. The dongle 
+> is running and i can perform a "hcitool scan" to list up the AP-X.
+> "rfcomm connect 0" succeeds. But when i try to dial in with pon or wvdial, 
+> there is some problem with pppd or rfcomm to connect.
+> The Mitsumi-Dongle seems to work.
+> 
+> lifebook:/home/jens# tail -f /var/log/messages
+> Apr 18 14:32:12 localhost kernel: Bluetooth: Core ver 2.6
+> Apr 18 14:32:12 localhost kernel: NET: Registered protocol family 31
+> Apr 18 14:32:12 localhost kernel: Bluetooth: HCI device and connection 
+> manager initialized
+> Apr 18 14:32:12 localhost kernel: Bluetooth: HCI socket layer initialized
+> Apr 18 14:32:12 localhost kernel: Bluetooth: L2CAP ver 2.3
+> Apr 18 14:32:12 localhost kernel: Bluetooth: L2CAP socket layer initialized
+> Apr 18 14:32:13 localhost Xprt_64: No matching visual for __GLcontextMode 
+> with visual class = 0 (32775), nplanes = 8
+> Apr 18 14:32:13 localhost kernel: Bluetooth: RFCOMM ver 1.3
+> Apr 18 14:32:13 localhost kernel: Bluetooth: RFCOMM socket layer initialized
+> Apr 18 14:32:13 localhost kernel: Bluetooth: RFCOMM TTY layer initialized
+> Apr 18 14:34:21 localhost kernel: usb 1-1: new full speed USB device using 
+> address 3
+> Apr 18 14:34:25 localhost usb.agent[2532]:      hci_usb: loaded successfully
+> Apr 18 14:34:25 localhost usb.agent[2551]:      hci_usb: loaded successfully
+> Apr 18 14:34:25 localhost kernel: Bluetooth: HCI USB driver ver 2.7
+> Apr 18 14:34:25 localhost kernel: usbcore: registered new driver hci_usb
+> Apr 18 14:34:26 localhost usb.agent[2541]:      hci_usb: loaded successfully
+> 
+> 
+> lifebook:/home/jens# rfcomm connect 0
+> Connected /dev/rfcomm0 to 00:04:0E:86:A6:D7 on channel 1
+> Press CTRL-C for hangup
+> 
+> pon fails!
+> 
+> Apr 17 14:38:19 localhost pppd[2733]: pppd 2.4.2 started by root, uid 0
+> Apr 17 14:38:20 localhost chat[2734]: abort on (BUSY)
+> Apr 17 14:38:20 localhost chat[2734]: abort on (NO CARRIApr 17 14:38:20 
+> localhost chat[2734]: abort on (VOICE)
+> Apr 17 14:38:20 localhost chat[2734]: abort on (NO DIALTONE)
+> Apr 17 14:38:20 localhost chat[2734]: abort on (NO DIAL TONE)
+> Apr 17 14:38:20 localhost chat[2734]: abort on (NO ANSWER)
+> Apr 17 14:38:20 localhost chat[2734]: abort on (DELAYED)
+> Apr 17 14:38:20 localhost chat[2734]: send (ATZ^M)
+> Apr 17 14:38:20 localhost chat[2734]: expect (OK)
+> Apr 17 14:38:20 localhost chat[2734]: ATZ^M^M
+> Apr 17 14:38:20 localhost chat[2734]: OK
+> Apr 17 14:38:20 localhost chat[2734]:  -- got it 
+> Apr 17 14:38:20 localhost chat[2734]: send (ATDT019102345^M)
+> Apr 17 14:38:21 localhost chat[2734]: expect (CONNECT)
+> Apr 17 14:38:21 localhost chat[2734]: ^M
+> Apr 17 14:38:23 localhost chat[2734]: ATDT019102345^M^M
+> Apr 17 14:38:23 localhost chat[2734]: CONNECT
+> Apr 17 14:38:23 localhost chat[2734]:  -- got it 
+> Apr 17 14:38:23 localhost chat[2734]: send (\d)
+> Apr 17 14:38:24 localhost pppd[2733]: Serial connection established.
+> Apr 17 14:38:24 localhost pppd[2733]: Using interface ppp0
+> Apr 17 14:38:24 localhost pppd[2733]: Connect: ppp0 <--> /dev/rfcomm0
+> Apr 17 14:38:55 localhost pppd[2733]: LCP: timeout sending Config-Requests 
+> Apr 17 14:38:55 localhost pppd[2733]: Connection terminated.
+> 
+> wvdial fails !
+> 
+> lifebook:/etc/bluetooth# wvdial
+> --> WvDial: Internet dialer version 1.54.0
+> --> Cannot open /dev/rfcomm0: Cannot get information for serial port.
+> --> Cannot open /dev/rfcomm0: Cannot get information for serial port.
+> --> Cannot open /dev/rfcomm0: Cannot get information for serial port.
+> 
+> Apr 17 14:38:56 localhost pppd[2733]: Exit.
+> 
+> Seems to be that i forgot to install / set up something?!
 
-Unfortunately I'm bound to the broadcom dongles for multipe reasons, so I'd 
-be very grateful if you could take a look at the problem.
+I never really got the dialup via RFCOMM working correctly with the AVM
+products. You need to tweak the PPP options for it. However all of their
+devices support CIP and so you better user CAPI over Bluetooth for your
+dialin.
 
-I did some hcidump tests and I think I figured out the source of the 
-problem. Please forgive me that this email contains some information I 
-already postet, it's just to give a whole picture...
-This is the start of a successfull connection (please note my added #N#):
+Regards
 
- > HCI Event: Connect Request (0x04) plen 10
-     bdaddr 00:02:72:C3:F2:10 class 0x3e0100 type ACL
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-     bdaddr 00:02:72:C3:F2:10 role 0x01
-     Role: Slave
- > HCI Event: Command Status (0x0f) plen 4
-     Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
-#1#
-#1#
- > HCI Event: Connect Complete (0x03) plen 11
-     status 0x00 handle 7 bdaddr 00:02:72:C3:F2:10 type ACL encrypt 0x00
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-     handle 7 policy 0x0f
-     Link policy: RSWITCH HOLD SNIFF PARK
- > HCI Event: Command Complete (0x0e) plen 6
-     Write Link Policy Settings (0x02|0x000d) ncmd 1
-     status 0x00 handle 7
-< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
-     handle 7 ptype 0xcc18
-     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-#2# > ACL data: handle 7 flags 0x02 dlen 12
-#2#     L2CAP(s): Connect req: psm 3 scid 0x0040
+Marcel
 
 
-If a broadcom dongle is listening, sometimes the ACL packet marked with #2# 
-is received where the #1# lines are. Actually, looking at the hcidump of 
-the sending dongle, that's the time the packet is sent (alway, dongle 
-independant).
-It looks like this too early packet now causes the (sensefull) 
-"hci_acldata_packet: hci1 ACL packet for unknown connection handle 6" 
-kernel error message. The dongle then waits for this acl package and thinks 
-this connection is in etablishing phase, so it is blocked.
-
-The question now is, who is responsible for holding this packed back? The 
-kernel? The dongle itself?
-
-regards
-Marco
 
 
 -------------------------------------------------------
