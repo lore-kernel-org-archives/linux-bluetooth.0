@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Can the current dongles support the switching
-	function in scatternet?
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <2e973d2e0504191326364ba9d1@mail.gmail.com>
+From: WEI LI <mail.wli@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <2e973d2e0504191326364ba9d1@mail.gmail.com>
-References: <2e973d2e0504191326364ba9d1@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1113943038.2469.61.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Can the current dongles support the switching function in scatternet?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,23 +16,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 19 Apr 2005 22:37:18 +0200
+Date: Tue, 19 Apr 2005 13:26:19 -0700
 
-Hi Wei,
+Hi, I am trying to set up a scatternet using the usb dongles. The
+environment is SUSE linux 9.2 with BlueZ. The dongles are D-link
+Blutooth DBT-120. Can this dongle support the switching function in a
+piconet to be a bridge?
+Thank u very much!
 
-> I am trying to set up a scatternet using the usb dongles. The
-> environment is SUSE linux 9.2 with BlueZ. The dongles are D-link
-> Blutooth DBT-120. Can this dongle support the switching function in a
-> piconet to be a bridge?
-
-what has the switching in a piconet to do with a bridge. I think you are
-mixing things here or using the wrong terms.
-
-Regards
-
-Marcel
-
-
+WEI
 
 
 -------------------------------------------------------
