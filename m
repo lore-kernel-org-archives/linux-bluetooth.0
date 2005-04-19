@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] PC to PC file transfer
+Subject: Re: [Bluez-devel] BCM2035 BROKEN_ISOC?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050419050546.7885.qmail@web52410.mail.yahoo.com>
-References: <20050419050546.7885.qmail@web52410.mail.yahoo.com>
+In-Reply-To: <006a01c544a7$30c262c0$89fe650a@ZBOX>
+References: <006a01c544a7$30c262c0$89fe650a@ZBOX>
 Content-Type: text/plain
-Message-Id: <1113907452.16233.169.camel@pegasus>
+Message-Id: <1113907225.16233.164.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,18 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 19 Apr 2005 12:44:12 +0200
+Date: Tue, 19 Apr 2005 12:40:25 +0200
 
-Hi Jose,
+Hi Suriyan,
 
-> i have two PCs with linux, with bluetooth capability
-> on both(using BlueZ).
-> 
-> i want to transfer a file (any file)between them.
-> Could be command-line transfer or any other way.
+> Does anyone known what is the source for problems that make Broadcom BCM2035 
+> (VID=0x0a5c, PID=0x200a) based Bluetooth USB adapter was added to 
+> HCI_BROKEN_ISOC blacklist?
 
-the easiest way is to create a PAN with pand between your two machines
-and then use tools like ftp or scp.
+it was not working with ISOC transfers (or our way of using them) and so
+I blacklisted it.
+
+> Have the way to work-around?
+
+Try to get information from Broadcom ;)
 
 Regards
 
