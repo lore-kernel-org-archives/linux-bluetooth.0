@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sf.net
-MIME-Version: 1.0
-Message-ID: <OF086CF807.6E44B0DD-ON48256FE8.003D235D-48256FE8.003CC699@zte.com.cn>
-From: gao.yingbin@zte.com.cn
-Content-Type: multipart/alternative; boundary="=_alternative 003CC68948256FE8_="
-Subject: [Bluez-devel] i hope to join in bluez-devel mail listing
+Subject: Re: [Bluez-devel] DBUS service support
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb0504191448357f24da@mail.gmail.com>
+References: <e1effdeb05041913007eacbf88@mail.gmail.com>
+	 <1113943613.2469.65.camel@pegasus>
+	 <e1effdeb0504191448357f24da@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1113948294.2469.77.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,57 +20,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 19 Apr 2005 19:09:52 +0800
+Date: Wed, 20 Apr 2005 00:04:54 +0200
 
-This is a multipart message in MIME format.
---=_alternative 003CC68948256FE8_=
-Content-Type: text/plain; charset="US-ASCII"
+Hi Claudio,
 
-now i'm developing CTP based on bluez.
+> Sorry, I was not my objective provoke this discussion. I posted in both list
+> to try reach all bluez community members and figure out who are researching this
+> topic in order to share information.
 
---------------------------------------------
+the developer mailing list if for the development of BlueZ and the users
+mailing list is for user questions and problems. Quite easy.
+
+> I will contact the Network Manager developers to verify if a bluetooth
+> dbus service support can be useful.
+> 
+> At BlueZ side,  search, connect, disconnect, security and IP configuration 
+> functions have be provided by a library. I developed a initial library and 
+> it is working fine. BlueZ does not need provide a DBUS service, only interfaces 
+> for a DBUS service daemon are required. The DBUS service 
+> daemon must control all media(bluetooth, WLAN, ETH, ...)  
+> This is my idea of how DBUS and Bluetooth can work together providing
+> seamless connections.
+
+Start working on it, but I think you will need an integration into the
+existing BlueZ daemons.
+
+Regards
+
+Marcel
 
 
-***********************************************
-信息安全声明：本邮件包含信息归ZTE所有，
-ZTE对该邮件拥有所有权利。请接收者注意
-保密，未经发件人书面许可，不得向任何第
-三方组织和个人透露本邮件所含信息的全部
-或部分。以上声明仅适用于工作邮件。
-Information Security  Notice：
-The information contained in this mail is
-solely property of  ZTE Corporation. 
-This mail communication is confidential.
-Recipients named above are obligated to
-maintain secrecy and are not permitted to
-disclose the contents of this communication
-to others.
-***********************************************
-
---=_alternative 003CC68948256FE8_=
-Content-Type: text/html; charset="US-ASCII"
-
-
-<br><font size=2 face="sans-serif">now i'm developing CTP based on bluez.</font>
-<br><font size=2 face="sans-serif"><br>
---------------------------------------------</font><br><br><br>
-***********************************************<br>
-信息安全声明：本邮件包含信息归ZTE所有，<br>
-ZTE对该邮件拥有所有权利。请接收者注意<br>
-保密，未经发件人书面许可，不得向任何第<br>
-三方组织和个人透露本邮件所含信息的全部<br>
-或部分。以上声明仅适用于工作邮件。<br>
-Information&nbsp;Security&nbsp;&nbsp;Notice：<br>
-The&nbsp;information&nbsp;contained&nbsp;in&nbsp;this&nbsp;mail&nbsp;is<br>
-solely&nbsp;property&nbsp;of&nbsp;&nbsp;ZTE&nbsp;Corporation.&nbsp;<br>
-This&nbsp;mail&nbsp;communication&nbsp;is&nbsp;confidential.<br>
-Recipients&nbsp;named&nbsp;above&nbsp;are&nbsp;obligated&nbsp;to<br>
-maintain&nbsp;secrecy&nbsp;and&nbsp;are&nbsp;not&nbsp;permitted&nbsp;to<br>
-disclose&nbsp;the&nbsp;contents&nbsp;of&nbsp;this&nbsp;communication<br>
-to&nbsp;others.<br>
-***********************************************<br>
-
---=_alternative 003CC68948256FE8_=--
 
 
 -------------------------------------------------------
