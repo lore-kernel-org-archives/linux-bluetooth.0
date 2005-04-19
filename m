@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Jens-Uwe Dahl" <dahl@onlinehome.de>
+Subject: Re: [Bluez-users] Apple BT Keyboard and Ubuntu Linux
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset="ISO-8859-1";
-MIME-Version: 1.0
-Message-Id: <E1DNs9Q-00043x-00@mrelayng.kundenserver.de>
-Subject: [Bluez-users] Bluetooth dongle fails to dial in via AVM AP-X
+In-Reply-To: <42649E3C.1080608@metalan.net>
+References: <42649E3C.1080608@metalan.net>
+Content-Type: text/plain
+Message-Id: <1113907413.16233.167.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,85 +18,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 19 Apr 2005 14:53:22 +0200
+Date: Tue, 19 Apr 2005 12:43:33 +0200
 
-Hi bluetooth fans!
-On my Fujitsu Siemens Lifebook running Debian Sarge, i cant suceed to dial 
-and connect with my "AVM APX ISDN Bluetooth Modem" via bluetooth-dongle 
-(Mitsumi).
-So far, I have kernel, hcid, pin and pinhelper set up and running. The dongle 
-is running and i can perform a "hcitool scan" to list up the AP-X.
-"rfcomm connect 0" succeeds. But when i try to dial in with pon or wvdial, 
-there is some problem with pppd or rfcomm to connect.
-The Mitsumi-Dongle seems to work.
+Hi Andre,
 
-lifebook:/home/jens# tail -f /var/log/messages
-Apr 18 14:32:12 localhost kernel: Bluetooth: Core ver 2.6
-Apr 18 14:32:12 localhost kernel: NET: Registered protocol family 31
-Apr 18 14:32:12 localhost kernel: Bluetooth: HCI device and connection 
-manager initialized
-Apr 18 14:32:12 localhost kernel: Bluetooth: HCI socket layer initialized
-Apr 18 14:32:12 localhost kernel: Bluetooth: L2CAP ver 2.3
-Apr 18 14:32:12 localhost kernel: Bluetooth: L2CAP socket layer initialized
-Apr 18 14:32:13 localhost Xprt_64: No matching visual for __GLcontextMode 
-with visual class = 0 (32775), nplanes = 8
-Apr 18 14:32:13 localhost kernel: Bluetooth: RFCOMM ver 1.3
-Apr 18 14:32:13 localhost kernel: Bluetooth: RFCOMM socket layer initialized
-Apr 18 14:32:13 localhost kernel: Bluetooth: RFCOMM TTY layer initialized
-Apr 18 14:34:21 localhost kernel: usb 1-1: new full speed USB device using 
-address 3
-Apr 18 14:34:25 localhost usb.agent[2532]:      hci_usb: loaded successfully
-Apr 18 14:34:25 localhost usb.agent[2551]:      hci_usb: loaded successfully
-Apr 18 14:34:25 localhost kernel: Bluetooth: HCI USB driver ver 2.7
-Apr 18 14:34:25 localhost kernel: usbcore: registered new driver hci_usb
-Apr 18 14:34:26 localhost usb.agent[2541]:      hci_usb: loaded successfully
+> Ok, this is probably something this list deals with on a regular basis; 
+> I tried searching online, even on Marcel's site but I can't seem to find 
+> the solution to my problem.
+> 
+> First off, some specs:
+> 
+> Ubuntu Linux
+> 2.6.11 Kernel w/mh2 patch
+> Latest BlueZ Utiles (that available from the ubuntu sources)
+> Generic USB Bluetooth Adapter
+> Apple Bluetooth Keyboard
+> 
+> This setup works just fine to syncronize my T68 through Multisync but 
+> when I try to connect to my keyboard here's what happens:
+> 
+>   lampshade:/home/andre# hidd --conn 00:0A:95:3E:CC:74
+>   Can't create HID control channel: Function not implemented
+>   lampshade:/home/andre# hidd --conn 00:0A:95:3E:CC:74
+>   Can't create HID control channel: Connection timed out
+>   lampshade:/home/andre# hidd --conn 00:0A:95:3E:CC:74
+>   Can't create HID control channel: Device or resource busy
+> 
+> and if I try to search for my keyboard:
+> 
+>   lampshade:/home/andre# hidd --search
+>   Searching ...
+>         Connecting to device 00:0A:95:3E:CC:74
+>   Can't create HID control channel: Function not implemented
+> 
+> Now, I'm sure there is something that I forgot to do or don't know to do.
+> 
+> I'd appreciate any help, even one pointing me to a how to (I have a 
+> feeling this keyboard may be a little special, so I'd love a specific 
+> howto) If you need any more information I'll be glad to provide it.
 
+the Apple keeping is using security mode 3, which it should not, but ...
 
-lifebook:/home/jens# rfcomm connect 0
-Connected /dev/rfcomm0 to 00:04:0E:86:A6:D7 on channel 1
-Press CTRL-C for hangup
+Run "hcidump -X -V" as root and show us the dump while you are trying to
+connect. Try to input "0000" on your numeric pad and then press enter or
+call "hciconfig hci0 auth" before you connect for the first time.
 
-pon fails!
+Regards
 
-Apr 17 14:38:19 localhost pppd[2733]: pppd 2.4.2 started by root, uid 0
-Apr 17 14:38:20 localhost chat[2734]: abort on (BUSY)
-Apr 17 14:38:20 localhost chat[2734]: abort on (NO CARRIApr 17 14:38:20 
-localhost chat[2734]: abort on (VOICE)
-Apr 17 14:38:20 localhost chat[2734]: abort on (NO DIALTONE)
-Apr 17 14:38:20 localhost chat[2734]: abort on (NO DIAL TONE)
-Apr 17 14:38:20 localhost chat[2734]: abort on (NO ANSWER)
-Apr 17 14:38:20 localhost chat[2734]: abort on (DELAYED)
-Apr 17 14:38:20 localhost chat[2734]: send (ATZ^M)
-Apr 17 14:38:20 localhost chat[2734]: expect (OK)
-Apr 17 14:38:20 localhost chat[2734]: ATZ^M^M
-Apr 17 14:38:20 localhost chat[2734]: OK
-Apr 17 14:38:20 localhost chat[2734]:  -- got it 
-Apr 17 14:38:20 localhost chat[2734]: send (ATDT019102345^M)
-Apr 17 14:38:21 localhost chat[2734]: expect (CONNECT)
-Apr 17 14:38:21 localhost chat[2734]: ^M
-Apr 17 14:38:23 localhost chat[2734]: ATDT019102345^M^M
-Apr 17 14:38:23 localhost chat[2734]: CONNECT
-Apr 17 14:38:23 localhost chat[2734]:  -- got it 
-Apr 17 14:38:23 localhost chat[2734]: send (\d)
-Apr 17 14:38:24 localhost pppd[2733]: Serial connection established.
-Apr 17 14:38:24 localhost pppd[2733]: Using interface ppp0
-Apr 17 14:38:24 localhost pppd[2733]: Connect: ppp0 <--> /dev/rfcomm0
-Apr 17 14:38:55 localhost pppd[2733]: LCP: timeout sending Config-Requests 
-Apr 17 14:38:55 localhost pppd[2733]: Connection terminated.
+Marcel
 
-wvdial fails !
-
-lifebook:/etc/bluetooth# wvdial
---> WvDial: Internet dialer version 1.54.0
---> Cannot open /dev/rfcomm0: Cannot get information for serial port.
---> Cannot open /dev/rfcomm0: Cannot get information for serial port.
---> Cannot open /dev/rfcomm0: Cannot get information for serial port.
-
-Apr 17 14:38:56 localhost pppd[2733]: Exit.
-
-Seems to be that i forgot to install / set up something?!
-
-Any help welcome!
 
 
 
