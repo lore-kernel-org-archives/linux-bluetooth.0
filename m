@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Apple BT Keyboard and Ubuntu Linux
+Subject: Re: [Bluez-users] cannot build up piconet by using hciemu,
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <42649E3C.1080608@metalan.net>
-References: <42649E3C.1080608@metalan.net>
+In-Reply-To: <BAY20-F2876483DF0D5348217036BC82A0@phx.gbl>
+References: <BAY20-F2876483DF0D5348217036BC82A0@phx.gbl>
 Content-Type: text/plain
-Message-Id: <1113907413.16233.167.camel@pegasus>
+Message-Id: <1113907142.16233.161.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,50 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 19 Apr 2005 12:43:33 +0200
+Date: Tue, 19 Apr 2005 12:39:02 +0200
 
-Hi Andre,
+Hi Parm,
 
-> Ok, this is probably something this list deals with on a regular basis; 
-> I tried searching online, even on Marcel's site but I can't seem to find 
-> the solution to my problem.
-> 
-> First off, some specs:
-> 
-> Ubuntu Linux
-> 2.6.11 Kernel w/mh2 patch
-> Latest BlueZ Utiles (that available from the ubuntu sources)
-> Generic USB Bluetooth Adapter
-> Apple Bluetooth Keyboard
-> 
-> This setup works just fine to syncronize my T68 through Multisync but 
-> when I try to connect to my keyboard here's what happens:
-> 
->   lampshade:/home/andre# hidd --conn 00:0A:95:3E:CC:74
->   Can't create HID control channel: Function not implemented
->   lampshade:/home/andre# hidd --conn 00:0A:95:3E:CC:74
->   Can't create HID control channel: Connection timed out
->   lampshade:/home/andre# hidd --conn 00:0A:95:3E:CC:74
->   Can't create HID control channel: Device or resource busy
-> 
-> and if I try to search for my keyboard:
-> 
->   lampshade:/home/andre# hidd --search
->   Searching ...
->         Connecting to device 00:0A:95:3E:CC:74
->   Can't create HID control channel: Function not implemented
-> 
-> Now, I'm sure there is something that I forgot to do or don't know to do.
-> 
-> I'd appreciate any help, even one pointing me to a how to (I have a 
-> feeling this keyboard may be a little special, so I'd love a specific 
-> howto) If you need any more information I'll be glad to provide it.
+stop sending the same message again and again. Otherwise I am going to
+block your posts to the BlueZ mailing lists. Read this first:
 
-the Apple keeping is using security mode 3, which it should not, but ...
+	http://www.catb.org/~esr/faqs/smart-questions.html
 
-Run "hcidump -X -V" as root and show us the dump while you are trying to
-connect. Try to input "0000" on your numeric pad and then press enter or
-call "hciconfig hci0 auth" before you connect for the first time.
+>     I am doing a coure project on piconet formation and routing. I am using 
+> hciemu. After I create some nodes, I cannot build a multipoint connection. 
+> For example, I have three nodes, A,B and C.  After I create the connection 
+> between A(master) and B,  and when I want to create the connection between A 
+> and C, it  always fails. The error in file 'message ' is : File already 
+> exists.
+
+The hciemu was never written to support scatternet or multipoint
+scenarios. It may simply don't work. However you have the source code
+and if you really wanna use hciemu then try to fix it, because I never
+used it. Actually it was only for testing purpose when the Bluetooth
+dongles were expensive.
 
 Regards
 
