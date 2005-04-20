@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SBC Decoder code
+Subject: Re: [Bluez-devel] Question regarding a new profile
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050420093743.64179.qmail@web8309.mail.in.yahoo.com>
-References: <20050420093743.64179.qmail@web8309.mail.in.yahoo.com>
+In-Reply-To: <20050420093351.49076.qmail@web8310.mail.in.yahoo.com>
+References: <20050420093351.49076.qmail@web8310.mail.in.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1113990204.2469.102.camel@pegasus>
+Message-Id: <1113990120.2469.100.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,19 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 20 Apr 2005 11:43:24 +0200
+Date: Wed, 20 Apr 2005 11:42:00 +0200
 
 Hi Mayank,
 
-> I just wanted to find out whether the SBC Decoder code
-> available on the Sourceforge site is tested or not.
+> I have developed a new Bluetooth Profile which
+> basically tries to standardize ad-hoc chat rooms over
+> Bluetooth.
 > 
-> This is because I was using it to decode an SBC file
-> and  playing the pcm samples thus obtained on the
-> /dev/audio file, but the output was very poor.
+> I want to send it to the Bluetooth SIG for further
+> review.
+> 
+> Can u tell me how to go about it.
+> 
+> Right now the profile is only on paper.
 
-the SBC decoder is working fine. However most times we used the encoder
-by now. Feel free to improve it. Patches are always welcome.
+if you are not part of any Bluetooth member company, I think there is no
+chance. However send it to me and I can try to get their attention on
+this topic.
 
 Regards
 
