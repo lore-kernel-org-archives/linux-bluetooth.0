@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4266DAE6.3060101@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Comment about bdaddr and pskey tools
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SBC Decoder code
-References: <20050420093743.64179.qmail@web8309.mail.in.yahoo.com>
-In-Reply-To: <20050420093743.64179.qmail@web8309.mail.in.yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <Pine.LNX.4.33.0504201958090.20806-100000@redbean.intranet.gw-instruments.de>
+References: 
+	 <Pine.LNX.4.33.0504201958090.20806-100000@redbean.intranet.gw-instruments.de>
+Content-Type: text/plain
+Message-Id: <1114023064.13803.10.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,50 +19,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 20 Apr 2005 16:42:46 -0600
+Date: Wed, 20 Apr 2005 20:51:04 +0200
 
-Mayank,
+Hi Peter,
 
-It sounds like you are working on a commercial product and can't show us 
-what you're working on.
+> only have  a 6310 without the (i) and it has a pretty bugy BT
+> implementation ;-). But still using it from time to time to verify that our
+> code is stable ............. When I do not need it anymore I will remember
+> you.
 
-I suggest you either try to produce code that is a very simple test case 
-that you could let everyone look at or talk to developers off-list about 
-contracting them for professional services. Henryk is most comfortable 
-with the sbc code.
+this would be great. Thanks.
 
-There are a lot of variations of healthy relationships between 
-commercial and open-source groups and benefits to both sides. Everyone 
-would benefit from fixes to libsbc for example.
+> Anyway, I'm not quite sure if it is a good idea to give out code to change
+> the bluetooth address of a device to the public domain. If somebody do so
+> she/he should realy know what she/he is doing. And I'm afraid not
+> everybody who may get this code knows that. And most of the people who
+> know what they are doing have the right tools and knowledge anyway........
 
-Brad
+The information on how to do it are in the public for a long time now,
+but nobody put them together and made them usable with BlueZ. Of course
+you can do bad things with this tool, but for some it will be useful.
 
-Mayank Batra wrote:
-> Marcel,
-> 
-> I just wanted to find out whether the SBC Decoder code
-> available on the Sourceforge site is tested or not.
-> 
-> This is because I was using it to decode an SBC file
-> and  playing the pcm samples thus obtained on the
-> /dev/audio file, but the output was very poor.
-> 
-> Mayank
-> 
-> ________________________________________________________________________
-> Yahoo! India Matrimony: Find your life partner online
-> Go to: http://yahoo.shaadi.com/india-matrimony
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: New Crystal Reports XI.
-> Version 11 adds new functionality designed to reduce time involved in
-> creating, integrating, and deploying reporting solutions. Free runtime info,
-> new features, or free trial, at: http://www.businessobjects.com/devxi/728
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
