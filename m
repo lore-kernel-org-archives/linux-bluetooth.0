@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] i hope to join in bluez-devel mail listing
+Subject: Re: [Bluez-devel] Documentation for development
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Cc: bluez-devel@lists.sf.net
-In-Reply-To: <OF086CF807.6E44B0DD-ON48256FE8.003D235D-48256FE8.003CC699@zte.com.cn>
-References: 
-	 <OF086CF807.6E44B0DD-ON48256FE8.003D235D-48256FE8.003CC699@zte.com.cn>
+In-Reply-To: <200504192237.53314.alan-bluez@mizrahi.com.ve>
+References: <200504192237.53314.alan-bluez@mizrahi.com.ve>
 Content-Type: text/plain
-Message-Id: <1113989448.2469.97.camel@pegasus>
+Message-Id: <1113989398.2469.95.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,14 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 20 Apr 2005 11:30:48 +0200
+Date: Wed, 20 Apr 2005 11:29:58 +0200
 
-Hi,
+Hi Alan,
 
-> now i'm developing CTP based on bluez. 
+> I want to make a program that communicates with my cellphone through 
+> bluetooth.
+> 
+> I already installed and configured the bluez packages, but I can't find the 
+> developers documentation, can anybody point me to the right place?
 
-this is a good idea. Post any code to the developer mailing list for
-review.
+the question is what kind of communication do you mean?
 
 Regards
 
