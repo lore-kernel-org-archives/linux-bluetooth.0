@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42663B80.6070309@nokia.com>
-From: =?ISO-8859-1?Q?Timo_Ter=E4s?= <ext-timo.teras@nokia.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Strange problem with sdp and Motorola E398
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: multipart/mixed;
- boundary="------------040902000801090008010706"
-Subject: [Bluez-devel] [PATCH] RFCOMM does not call tty_hangup() when DCD is de-asserted
+In-Reply-To: <20050420105952.90278.qmail@web41311.mail.yahoo.com>
+References: <20050420105952.90278.qmail@web41311.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1113995272.2469.119.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,60 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 20 Apr 2005 14:22:40 +0300
+Date: Wed, 20 Apr 2005 13:07:52 +0200
 
-This is a multi-part message in MIME format.
---------------040902000801090008010706
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Alex,
 
-Hi all,
+> I've checked out libs2 from sf cvs and ran sdptest -
+> I've attached the results, though they are not
+> exciting (no other strings - only arabic).
 
-It seems that RFCOMM does not handle properly the de-assertation of CD 
-signal. It should call tty_hangup() to work properly.
+please redo it with "sdptest records" and also include the output of
+"hcitool info" (as root) for this phone.
 
-One side effect is that data calls that are hanged up from remote side 
-are not detected as being hanged up.
+> Does it
+> means that I have to write to motorola people - this
+> seems as a firmware bug after all. 
 
-I've made a very quick patch for this. In my case this patch enabled the 
-detection carried detect signal de-assertation. But since I'm not an 
-expert on RFCOMM stuff there might be some cases where tty_hangup() 
-should not be called. In serial side the DCD change is handled by 
-uart_handle_dcd_change() defined in include/linux/serial_core.h and it 
-has some extra checks there as well.
+Check again with "hcidump -X -V" and post the dump, but I really think
+that these attributes are missing.
 
-So could some one wiser there check what actually has to be done for the 
-hangup mechanism to work properly. Or if my patch looks good enough feel 
-free to commit it.
+Write to the Motorola people and see what they tell you about it.
 
-Thanks,
-   Timo
+Regards
 
---------------040902000801090008010706
-Content-Type: text/plain;
- name="bluez-dcd-fix.diff"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="bluez-dcd-fix.diff"
+Marcel
 
-===== net/bluetooth/rfcomm/tty.c 1.36 vs edited =====
---- 1.36/net/bluetooth/rfcomm/tty.c	2005-04-13 15:55:20 +03:00
-+++ edited/net/bluetooth/rfcomm/tty.c	2005-04-20 14:13:45 +03:00
-@@ -531,6 +531,12 @@ static void rfcomm_dev_modem_status(stru
- 	
- 	BT_DBG("dlc %p dev %p v24_sig 0x%02x", dlc, dev, v24_sig);
- 
-+	if ((dev->modem_status & TIOCM_CD) &&
-+	    !(v24_sig & RFCOMM_V24_DV)) {
-+		if (dev->tty)
-+			tty_hangup(dev->tty);
-+	}
-+
- 	dev->modem_status = 
- 		((v24_sig & RFCOMM_V24_RTC) ? (TIOCM_DSR | TIOCM_DTR) : 0) |
- 		((v24_sig & RFCOMM_V24_RTR) ? (TIOCM_RTS | TIOCM_CTS) : 0) |
 
---------------040902000801090008010706--
 
 
 -------------------------------------------------------
