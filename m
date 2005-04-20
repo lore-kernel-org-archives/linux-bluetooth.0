@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f54d86405042023175b73f5c6@mail.gmail.com>
-From: Benny <bennyvasanth@gmail.com>
+Subject: Re: [Bluez-users] Bluez + 6630 rfcomm was working, suddenly died.
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Accessing "/dev/rfcomm0" regarding
-In-Reply-To: <1114008769.2469.177.camel@pegasus>
+In-Reply-To: <e9a6e82b0504200915563ed0a0@mail.gmail.com>
+References: <e9a6e82b050420074245382ddd@mail.gmail.com>
+	 <1114008711.2469.175.camel@pegasus>
+	 <e9a6e82b0504200915563ed0a0@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1114013959.2469.189.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <f54d864050420060454c6aa76@mail.gmail.com>
-	 <1114008769.2469.177.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,50 +20,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 21 Apr 2005 11:47:19 +0530
+Date: Wed, 20 Apr 2005 18:19:19 +0200
 
-Dear Marcel,
-Thanks for your continued support.
+Hi Stefan,
 
-Yes it is working. We have modified our code based on attest.c.
-Previously we have not chosen the "raw" mode.
+> looks like the version of hcidump (1.1.2) is too old for -V, but
+> here's what I get for -X
 
-Thanks & Regards,
-Benny
+then install a new one, because I am not going to decode the HCI parts
+any time again by hand.
 
-On 4/20/05, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Benjamin,
->=20
-> > We are testing for the bidirectional data transfer between 2 PCs over B=
-luetooth.
-> >
-> > The setup is as follows:
-> >     i) Host PC(Fedora 3-Linux kernel 2.6.9) with USB Bluetooth
-> > dongle(CSR Chipset). We have used the Bluez utilities(rfcomm
-> > application) to connect the device and send data through the device
-> > handle "/dev/rfcomm0".
-> >     ii) Device PC(Linux/Windows) hyperterminal(COM1/"/dev/ttyS0"). The
-> > BT-SPP  module is connected to the Device PC.
-> >
-> > We using the commands in the following sequence on the Host PC:
-> > i) hcid
-> > ii) sdpd
-> > iii) sdptool add --channel=3D1 SP
-> > iv) rfcomm connect 0 <BDADDR> 1
-> > v) ls -l > /dev/rfcomm0 - for sending the data, working fine
-> > vi) cat /dev/rfcomm0 - for reading the data, working fine.
-> >
-> > We have written a simple program which opens "/dev/rfcomm0" using
-> > "open("/dev/rfcomm0",O_RDWR)". We are able to send data using the
-> > system call "write()". But we are not able recieve data using the
-> > system call "read()". But the "hcidump -x" utility is showing the
-> > recieved data.
->=20
-> this is working. Check the attest program from bluez-utils.
->=20
-> Regards
->=20
-> Marcel
+> is there a repository I should be adding to sources.list to pull a newer one? 
+
+The source is available.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
