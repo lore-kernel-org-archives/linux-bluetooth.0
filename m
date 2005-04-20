@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Comment about bdaddr and pskey tools
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <42669484.1060609@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <42669484.1060609@xmission.com>
+Subject: Re: [Bluez-devel] Comment about bdaddr and pskey tools
 References: <1114018227.2469.206.camel@pegasus>
-	 <42669484.1060609@xmission.com>
-Content-Type: text/plain
-Message-Id: <1114019929.13803.5.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <1114018227.2469.206.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,24 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 20 Apr 2005 19:58:49 +0200
+Date: Wed, 20 Apr 2005 11:42:28 -0600
 
-Hi Brad,
+thanks Marcel and Marco.
 
-> > The bluez-utils CVS contains now a tool called pskey. This tool is
-> > capable of reading and writing the SCO mapping value and the value of
-> > the boot mode. Be careful, because you can render your device useless.
-> 
-> ok, I referenced this in the btsco docs.
+> The bluez-utils CVS contains now a tool called pskey. This tool is
+> capable of reading and writing the SCO mapping value and the value of
+> the boot mode. Be careful, because you can render your device useless.
 
-actually I forgot to mention that you need a 2.6.12-rc2 kernel or later
-if you wanna use it with the BCSP transport of the HCI UART driver.
+ok, I referenced this in the btsco docs.
 
-Regards
-
-Marcel
-
-
+brad
 
 
 -------------------------------------------------------
