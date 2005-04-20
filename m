@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050420093743.64179.qmail@web8309.mail.in.yahoo.com>
+Message-ID: <20050420093553.53536.qmail@web8308.mail.in.yahoo.com>
 From: Mayank Batra <mayankbatra@yahoo.co.in>
-To: BLUEZ DEVELOPERS LIST <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] PC to PC file transfer
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: 6667
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] SBC Decoder code
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,16 +17,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 20 Apr 2005 10:37:43 +0100 (BST)
+Date: Wed, 20 Apr 2005 10:35:53 +0100 (BST)
 
-Marcel,
+Jose, 
+> i have two PCs with linux, with bluetooth capability
+> on both(using BlueZ).
+> 
+> i want to transfer a file (any file)between them.
+> Could be command-line transfer or any other way.
+> 
+> how to go about?
 
-I just wanted to find out whether the SBC Decoder code
-available on the Sourceforge site is tested or not.
+Try using the application blueobex (ussp-push). You
+can find it from a Google Search.
 
-This is because I was using it to decode an SBC file
-and  playing the pcm samples thus obtained on the
-/dev/audio file, but the output was very poor.
+First form the rfcomm channel and then use the
+application ussp-push to transfer the file.
+On the receiving side u will nedd the application
+obexserver which again u will find on google.
 
 Mayank
 
