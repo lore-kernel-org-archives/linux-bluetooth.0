@@ -1,20 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] error on connect
+Subject: Re: [Bluez-users] headerfile depencies
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <42664856.3050502@gmx.ch>
-References: <425FFF54.6000701@gmx.ch> <1113607202.16433.42.camel@pegasus>
-	 <42616275.1090103@gmx.ch> <1113682195.18450.0.camel@pegasus>
-	 <4261BCFB.8040204@gmx.ch> <1113702363.18450.26.camel@pegasus>
-	 <426237CF.5060604@gmx.ch>  <4263F8DF.1040400@gmx.ch>
-	 <1113849662.16233.118.camel@pegasus>  <42651A2E.2080601@gmx.ch>
-	 <1113923580.2469.7.camel@pegasus>  <426522C6.10700@gmx.ch>
-	 <1113925620.2469.26.camel@pegasus>  <42652B35.7060803@gmx.ch>
-	 <1113927187.2469.40.camel@pegasus>  <4265329A.3030100@gmx.ch>
-	 <1113929462.2469.52.camel@pegasus>  <4265820A.2000400@gmx.ch>
-	 <1113949928.2469.88.camel@pegasus>  <42664856.3050502@gmx.ch>
+In-Reply-To: <426649B8.1070203@gmx.ch>
+References: <426649B8.1070203@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1114000346.2469.162.camel@pegasus>
+Message-Id: <1114000197.2469.159.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -27,24 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 20 Apr 2005 14:32:26 +0200
+Date: Wed, 20 Apr 2005 14:29:57 +0200
 
 Hi Marco,
 
-> >>- I made a try with windows. it played the listening part with the 
-> >>broadcom dongle. Unfortunately i haven't a hcidump here, but from more 
-> >>than 100 connection tries, every single one worked...
-> >>but as I said, this is not reliable because I don't know what windows is 
-> >>doing in background...
-> > 
-> > If this is the Widcomm stack you can look at it with Spylite. For the XP
-> > stack I have no idea how to do that without an USB sniffer.
+>  From hluez-libs 2.15 to bluez-libs 2.16, bluetooth.h doesn't anymore 
+> include the stdio.h (or changes where made and stdio.h went forgotten).
 > 
-> It's a widcomm. But I think I can live with the timeout and will not check 
-> what windows is exactly doing...
+> So the user has to include it in his own program, even if he doesn't need it.
+> This might be more a c specific question, but aren't header files supposed 
+> to handle their requirements themselve?
+> Please note that I'm not a c expert. This is a question, not a accusation...
 
-try to get the HCI only log with Spylite. I am really interested in what
-they are doing.
+I already fixed it in the CVS. I always include stdio.h in my C files
+and so this slipped through my eyes.
 
 Regards
 
