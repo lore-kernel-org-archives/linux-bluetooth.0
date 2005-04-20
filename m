@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1114018227.2469.206.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Comment about bdaddr and pskey tools
+Message-ID: <4266587D.9030806@nokia.com>
+From: =?ISO-8859-1?Q?Timo_Ter=E4s?= <ext-timo.teras@nokia.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [PATCH] RFCOMM does not call tty_hangup() when
+ DCD is de-asserted
+References: <42663B80.6070309@nokia.com> <1114000772.2469.168.camel@pegasus>
+In-Reply-To: <1114000772.2469.168.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,41 +19,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 20 Apr 2005 19:30:27 +0200
+Date: Wed, 20 Apr 2005 16:26:21 +0300
 
-Hi Folks,
+Hi Marcel,
 
-today Marco Trudel convinced me to write a tool for changing the boot
-mode of CSR based HID proxy dongles. For example the D-Link DBT-120 with
-the Apple firmware update. Actually he offered me money for it and now I
-can go and buy myself another Bluetooth toy :)
+ext Marcel Holtmann wrote:
+> from my part this patch looks fine, but I don't like the modem emulatio=
+n
+> part of RFCOMM in general. For me it is only a stream. Nothing less and
+> nothing more. So if this patch is useful I am going to apply it.
 
-Speaking of which, it is always possible to make donations. It must not
-be money, because I also like to get my hands on old Bluetooth devices
-and especially phones. For example if you have a Nokia 6310i or an Sony
-Ericsson T610 that you don't need/use anymore I am happy to play with
-it. Contact me or take a look at this page:
+PPP relies on this behaviour to detect when remote side has hang up the
+call. So PPP will be broken without this patch.
 
-	http://www.bluez.org/sponsors.html
+>>+	if ((dev->modem_status & TIOCM_CD) &&
+>>+	    !(v24_sig & RFCOMM_V24_DV)) {
+>=20
+> You must comply with the coding style here. So change it into
+>=20
+> 	if ((dev->modem_status & TIOCM_CD) && !(v24_sig & RFCOMM_V24_DV)) {
 
-Now back to the tools ...
+Fixed. I also added check for CLOCAL being unset. If it is set modem cont=
+rol
+lines should be ignored (also the uart code check for this).
 
-The bluez-utils CVS contains now a tool called pskey. This tool is
-capable of reading and writing the SCO mapping value and the value of
-the boot mode. Be careful, because you can render your device useless.
+Cheers,
+   Timo
 
-And while I was at coding CSR based stuff, I added support for changing
-the BD_ADDR for these devices to bdaddr.
+Signed-off-by: Timo Ter=E4s <ext-timo.teras@nokia.com>
 
-Both utilities are marked with noinst and this is how it should be,
-because they are development tools and none of them should end up in any
-distribution. Developers know how to deal with source code.
+=3D=3D=3D=3D=3D net/bluetooth/rfcomm/tty.c 1.36 vs edited =3D=3D=3D=3D=3D
+--- 1.36/net/bluetooth/rfcomm/tty.c     2005-04-13 15:55:20 +03:00
++++ edited/net/bluetooth/rfcomm/tty.c   2005-04-20 15:56:31 +03:00
+@@ -531,6 +531,11 @@ static void rfcomm_dev_modem_status(stru
 
-Regards
+         BT_DBG("dlc %p dev %p v24_sig 0x%02x", dlc, dev, v24_sig);
 
-Marcel
-
-
++       if ((dev->modem_status & TIOCM_CD) && !(v24_sig & RFCOMM_V24_DV))=
+ {
++               if (dev->tty && !C_CLOCAL(dev->tty))
++                       tty_hangup(dev->tty);
++       }
++
+         dev->modem_status =3D
+                 ((v24_sig & RFCOMM_V24_RTC) ? (TIOCM_DSR | TIOCM_DTR) : =
+0) |
+                 ((v24_sig & RFCOMM_V24_RTR) ? (TIOCM_RTS | TIOCM_CTS) : =
+0) |
 
 
 -------------------------------------------------------
