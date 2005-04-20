@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050420105952.90278.qmail@web41311.mail.yahoo.com>
-From: Alex Dubov <oakad@yahoo.com>
 Subject: Re: [Bluez-devel] Strange problem with sdp and Motorola E398
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: 6667
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="0-1236117676-1113994791=:89046"
+In-Reply-To: <20050420102807.86485.qmail@web41305.mail.yahoo.com>
+References: <20050420102807.86485.qmail@web41305.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1113993877.2469.116.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,336 +18,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 20 Apr 2005 03:59:51 -0700 (PDT)
+Date: Wed, 20 Apr 2005 12:44:37 +0200
 
---0-1236117676-1113994791=:89046
-Content-Type: text/plain; charset=us-ascii
-Content-Id: 
-Content-Disposition: inline
+Hi Alex,
 
-I've checked out libs2 from sf cvs and ran sdptest -
-I've attached the results, though they are not
-exciting (no other strings - only arabic). Does it
-means that I have to write to motorola people - this
-seems as a firmware bug after all. 
+> I have a Motorola E398 bt enabled device (with 7
+> languages pack installed). The problem is as
+> following: attribute 0x100 (service description) bears
+> encoding 'ar' (and it is really in arabic). There is
+> also a 7-entry internationalization table for each
+> service (with attributes 0xd800, 0xd803, etc for other
+> languages, including 'en'). Yet all my attempts to dig
+> these strings out with sdp_data_get were in vain. Fred
+> Schaettgen, whom I asked for help (as I saw a problem
+> in his kbluetoothd problem first), advised me to go to
+> this list for help.
+> I would like to attach a short sdptool dump to this
+> message, for illustration.
+> I've tried my chances with hcidump - it seems like
+> attributes 0xd800 and such are never fetched or not present.
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
---0-1236117676-1113994791=:89046
-Content-Type: text/plain; name="sdt2.txt"
-Content-Description: sdt2.txt
-Content-Disposition: inline; filename="sdt2.txt"
+see my answer to Fred's email.
 
-Sequence
-	Attribute 0x0000 - Service record handle
-		UINT32 0x00000000
-	Attribute 0x0001 - Service class ID list
-		Sequence
-			UUID16 0x1000 - Service Discovery Service
-	Attribute 0x0002 - Service record state
-		UINT32 0x00000001
-	Attribute 0x0004 - Protocol descriptor list
-		Sequence
-			Sequence
-				UUID16 0x0100 - L2CAP
-			Sequence
-				UUID16 0x0001 - SDP
-	Attribute 0x0005 - Browse group list
-		Sequence
-			UUID16 0x1002 - Public Browse Group
-	Attribute 0x0009 - Bluetooth profile descriptor list
-		Sequence
-			Sequence
-				UUID16 0x1000 - Service Discovery Service
-				UINT16 0x0100
-	Attribute 0x0200
-		Sequence
-			UINT16 0x1000
-	Attribute 0x0201
-		UINT32 0x00000001
-Sequence
-	Attribute 0x0000 - Service record handle
-		UINT32 0x00010001
-	Attribute 0x0001 - Service class ID list
-		Sequence
-			UUID16 0x1103 - Dialup Networking
-	Attribute 0x0002 - Service record state
-		UINT32 0x00000001
-	Attribute 0x0004 - Protocol descriptor list
-		Sequence
-			Sequence
-				UUID16 0x0100 - L2CAP
-			Sequence
-				UUID16 0x0003 - RFCOMM
-				UINT8 0x01
-	Attribute 0x0005 - Browse group list
-		Sequence
-			UUID16 0x1002 - Public Browse Group
-	Attribute 0x0006 - Language base attribute ID list
-		Sequence
-			UINT16 0x6172
-			UINT16 0x006a
-			UINT16 0x0100
-			UINT16 0x6865
-			UINT16 0x006a
-			UINT16 0xd800
-			UINT16 0x7275
-			UINT16 0x006a
-			UINT16 0xd803
-			UINT16 0x656e
-			UINT16 0x006a
-			UINT16 0xd806
-			UINT16 0x6672
-			UINT16 0x006a
-			UINT16 0xd809
-			UINT16 0x6573
-			UINT16 0x006a
-			UINT16 0xd80c
-			UINT16 0x7472
-			UINT16 0x006a
-			UINT16 0xd80f
-	Attribute 0x0009 - Bluetooth profile descriptor list
-		Sequence
-			Sequence
-				UUID16 0x1103 - Dialup Networking
-				UINT16 0x0100
-	Attribute 0x0100
-		String منفذ اتصا
-	Attribute 0x0101
-		String منفذ اتصا
-	Attribute 0x0102
-		String Motorola
-	Attribute 0x0201
-		Sequence
-			UINT16 0x3002
-	Attribute 0x0202
-		Sequence
-			UINT16 0x22b8
-Sequence
-	Attribute 0x0000 - Service record handle
-		UINT32 0x00010003
-	Attribute 0x0001 - Service class ID list
-		Sequence
-			UUID16 0x1112 - Headset Audio Gateway
-			UUID16 0x1203 - Generic Audio
-	Attribute 0x0002 - Service record state
-		UINT32 0x00000001
-	Attribute 0x0004 - Protocol descriptor list
-		Sequence
-			Sequence
-				UUID16 0x0100 - L2CAP
-			Sequence
-				UUID16 0x0003 - RFCOMM
-				UINT8 0x03
-	Attribute 0x0005 - Browse group list
-		Sequence
-			UUID16 0x1002 - Public Browse Group
-	Attribute 0x0006 - Language base attribute ID list
-		Sequence
-			UINT16 0x6172
-			UINT16 0x006a
-			UINT16 0x0100
-			UINT16 0x6865
-			UINT16 0x006a
-			UINT16 0xd800
-			UINT16 0x7275
-			UINT16 0x006a
-			UINT16 0xd803
-			UINT16 0x656e
-			UINT16 0x006a
-			UINT16 0xd806
-			UINT16 0x6672
-			UINT16 0x006a
-			UINT16 0xd809
-			UINT16 0x6573
-			UINT16 0x006a
-			UINT16 0xd80c
-			UINT16 0x7472
-			UINT16 0x006a
-			UINT16 0xd80f
-	Attribute 0x0009 - Bluetooth profile descriptor list
-		Sequence
-			Sequence
-				UUID16 0x1108 - Headset
-				UINT16 0x0100
-	Attribute 0x0100
-		String المنفذ 
-	Attribute 0x0101
-		String منفذ سماع
-	Attribute 0x0102
-		String Motorola
-Sequence
-	Attribute 0x0000 - Service record handle
-		UINT32 0x00010007
-	Attribute 0x0001 - Service class ID list
-		Sequence
-			UUID16 0x111f - Handsfree Audio Gateway
-			UUID16 0x1203 - Generic Audio
-	Attribute 0x0002 - Service record state
-		UINT32 0x00000001
-	Attribute 0x0004 - Protocol descriptor list
-		Sequence
-			Sequence
-				UUID16 0x0100 - L2CAP
-			Sequence
-				UUID16 0x0003 - RFCOMM
-				UINT8 0x07
-	Attribute 0x0005 - Browse group list
-		Sequence
-			UUID16 0x1002 - Public Browse Group
-	Attribute 0x0006 - Language base attribute ID list
-		Sequence
-			UINT16 0x6172
-			UINT16 0x006a
-			UINT16 0x0100
-			UINT16 0x6865
-			UINT16 0x006a
-			UINT16 0xd800
-			UINT16 0x7275
-			UINT16 0x006a
-			UINT16 0xd803
-			UINT16 0x656e
-			UINT16 0x006a
-			UINT16 0xd806
-			UINT16 0x6672
-			UINT16 0x006a
-			UINT16 0xd809
-			UINT16 0x6573
-			UINT16 0x006a
-			UINT16 0xd80c
-			UINT16 0x7472
-			UINT16 0x006a
-			UINT16 0xd80f
-	Attribute 0x0009 - Bluetooth profile descriptor list
-		Sequence
-			Sequence
-				UUID16 0x111e - Handsfree
-				UINT16 0x0101
-	Attribute 0x0100
-		String منفذ الصوت 
-	Attribute 0x0101
-		String منفذ الصوت 
-	Attribute 0x0102
-		String Motorola
-	Attribute 0x0301
-		UINT8 0x01
-	Attribute 0x0311
-		UINT16 0x001f
-Sequence
-	Attribute 0x0000 - Service record handle
-		UINT32 0x00010008
-	Attribute 0x0001 - Service class ID list
-		Sequence
-			UUID16 0x1105 - OBEX Object Push
-	Attribute 0x0002 - Service record state
-		UINT32 0x00000001
-	Attribute 0x0004 - Protocol descriptor list
-		Sequence
-			Sequence
-				UUID16 0x0100 - L2CAP
-			Sequence
-				UUID16 0x0003 - RFCOMM
-				UINT8 0x08
-			Sequence
-				UUID16 0x0008 - OBEX
-	Attribute 0x0005 - Browse group list
-		Sequence
-			UUID16 0x1002 - Public Browse Group
-	Attribute 0x0006 - Language base attribute ID list
-		Sequence
-			UINT16 0x6172
-			UINT16 0x006a
-			UINT16 0x0100
-			UINT16 0x6865
-			UINT16 0x006a
-			UINT16 0xd800
-			UINT16 0x7275
-			UINT16 0x006a
-			UINT16 0xd803
-			UINT16 0x656e
-			UINT16 0x006a
-			UINT16 0xd806
-			UINT16 0x6672
-			UINT16 0x006a
-			UINT16 0xd809
-			UINT16 0x6573
-			UINT16 0x006a
-			UINT16 0xd80c
-			UINT16 0x7472
-			UINT16 0x006a
-			UINT16 0xd80f
-	Attribute 0x0009 - Bluetooth profile descriptor list
-		Sequence
-			Sequence
-				UUID16 0x1105 - OBEX Object Push
-				UINT16 0x0100
-	Attribute 0x0100
-		String تبادل العناص
-	Attribute 0x0101
-		String تبادل العناص
-	Attribute 0x0102
-		String Motorola
-	Attribute 0x0303
-		Sequence
-			UINT8 0xff
-Sequence
-	Attribute 0x0000 - Service record handle
-		UINT32 0x00010009
-	Attribute 0x0001 - Service class ID list
-		Sequence
-			UUID16 0x1106 - OBEX File Transfer
-	Attribute 0x0002 - Service record state
-		UINT32 0x00000001
-	Attribute 0x0004 - Protocol descriptor list
-		Sequence
-			Sequence
-				UUID16 0x0100 - L2CAP
-			Sequence
-				UUID16 0x0003 - RFCOMM
-				UINT8 0x09
-			Sequence
-				UUID16 0x0008 - OBEX
-	Attribute 0x0005 - Browse group list
-		Sequence
-			UUID16 0x1002 - Public Browse Group
-	Attribute 0x0006 - Language base attribute ID list
-		Sequence
-			UINT16 0x6172
-			UINT16 0x006a
-			UINT16 0x0100
-			UINT16 0x6865
-			UINT16 0x006a
-			UINT16 0xd800
-			UINT16 0x7275
-			UINT16 0x006a
-			UINT16 0xd803
-			UINT16 0x656e
-			UINT16 0x006a
-			UINT16 0xd806
-			UINT16 0x6672
-			UINT16 0x006a
-			UINT16 0xd809
-			UINT16 0x6573
-			UINT16 0x006a
-			UINT16 0xd80c
-			UINT16 0x7472
-			UINT16 0x006a
-			UINT16 0xd80f
-	Attribute 0x0009 - Bluetooth profile descriptor list
-		Sequence
-			Sequence
-				UUID16 0x1106 - OBEX File Transfer
-				UINT16 0x0100
-	Attribute 0x0100
-		String تم نقل مل
-	Attribute 0x0101
-		String تم نقل مل
-	Attribute 0x0102
-		String Motorola
+However this device seems to be qualified:
 
---0-1236117676-1113994791=:89046--
+http://qualweb.bluetooth.org/Template2.cfm?LinkQualified=QualifiedProducts&Details=Yes&ProductID=1409
+
+This actually should mean that the SDP records should have been verified
+to match the Bluetooth specification.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
