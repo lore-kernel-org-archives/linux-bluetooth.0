@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050420093351.49076.qmail@web8310.mail.in.yahoo.com>
-From: Mayank Batra <mayankbatra@yahoo.co.in>
-To: BLUEZ DEVELOPERS LIST <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] Question regarding a new profile
+Subject: Re: [Bluez-devel] i hope to join in bluez-devel mail listing
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+Cc: bluez-devel@lists.sf.net
+In-Reply-To: <OF086CF807.6E44B0DD-ON48256FE8.003D235D-48256FE8.003CC699@zte.com.cn>
+References: 
+	 <OF086CF807.6E44B0DD-ON48256FE8.003D235D-48256FE8.003CC699@zte.com.cn>
+Content-Type: text/plain
+Message-Id: <1113989448.2469.97.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,26 +20,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 20 Apr 2005 10:33:51 +0100 (BST)
+Date: Wed, 20 Apr 2005 11:30:48 +0200
 
-Hi guys,
+Hi,
 
-I have developed a new Bluetooth Profile which
-basically tries to standardize ad-hoc chat rooms over
-Bluetooth.
+> now i'm developing CTP based on bluez. 
 
-I want to send it to the Bluetooth SIG for further
+this is a good idea. Post any code to the developer mailing list for
 review.
 
-Can u tell me how to go about it.
+Regards
 
-Right now the profile is only on paper.
+Marcel
 
-Mayank
 
-________________________________________________________________________
-Yahoo! India Matrimony: Find your life partner online
-Go to: http://yahoo.shaadi.com/india-matrimony
 
 
 -------------------------------------------------------
