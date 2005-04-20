@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050420093553.53536.qmail@web8308.mail.in.yahoo.com>
+Message-ID: <20050420093351.49076.qmail@web8310.mail.in.yahoo.com>
 From: Mayank Batra <mayankbatra@yahoo.co.in>
-Subject: Re: [Bluez-devel] PC to PC file transfer
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: 6667
+To: BLUEZ DEVELOPERS LIST <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-devel] Question regarding a new profile
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,24 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 20 Apr 2005 10:35:53 +0100 (BST)
+Date: Wed, 20 Apr 2005 10:33:51 +0100 (BST)
 
-Jose, 
-> i have two PCs with linux, with bluetooth capability
-> on both(using BlueZ).
-> 
-> i want to transfer a file (any file)between them.
-> Could be command-line transfer or any other way.
-> 
-> how to go about?
+Hi guys,
 
-Try using the application blueobex (ussp-push). You
-can find it from a Google Search.
+I have developed a new Bluetooth Profile which
+basically tries to standardize ad-hoc chat rooms over
+Bluetooth.
 
-First form the rfcomm channel and then use the
-application ussp-push to transfer the file.
-On the receiving side u will nedd the application
-obexserver which again u will find on google.
+I want to send it to the Bluetooth SIG for further
+review.
+
+Can u tell me how to go about it.
+
+Right now the profile is only on paper.
 
 Mayank
 
