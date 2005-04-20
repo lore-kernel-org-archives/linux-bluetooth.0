@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f54d864050420060454c6aa76@mail.gmail.com>
-From: Benny <bennyvasanth@gmail.com>
+Subject: Re: [Bluez-users] headerfile depencies
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <42664E2B.8040005@gmx.ch>
+References: <426649B8.1070203@gmx.ch> <1114000197.2469.159.camel@pegasus>
+	 <42664E2B.8040005@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1114001162.2469.169.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Accessing "/dev/rfcomm0" regarding
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,39 +19,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 20 Apr 2005 18:34:51 +0530
+Date: Wed, 20 Apr 2005 14:46:02 +0200
 
-Dear all,
+Hi Marco,
 
-We are testing for the bidirectional data transfer between 2 PCs over Bluet=
-ooth.
+> Actually I already stumbled about depencies like this, but I don't remember 
+> them. I'll inform you if I find them again...
 
-The setup is as follows:
-    i) Host PC(Fedora 3-Linux kernel 2.6.9) with USB Bluetooth
-dongle(CSR Chipset). We have used the Bluez utilities(rfcomm
-application) to connect the device and send data through the device
-handle "/dev/rfcomm0".
-    ii) Device PC(Linux/Windows) hyperterminal(COM1/"/dev/ttyS0"). The
-BT-SPP  module is connected to the Device PC.
+keep posting them and I also like to know of any changes we might need
+for the GCC 4.0 support in the future.
 
-We using the commands in the following sequence on the Host PC:
-i) hcid
-ii) sdpd
-iii) sdptool add --channel=3D1 SP
-iv) rfcomm connect 0 <BDADDR> 1
-v) ls -l > /dev/rfcomm0 - for sending the data, working fine
-vi) cat /dev/rfcomm0 - for reading the data, working fine.
+Regards
 
-We have written a simple program which opens "/dev/rfcomm0" using
-"open("/dev/rfcomm0",O_RDWR)". We are able to send data using the
-system call "write()". But we are not able recieve data using the
-system call "read()". But the "hcidump -x" utility is showing the
-recieved data.
+Marcel
 
-Please advice.
 
-Thanks & Regards,
-Benjamin
 
 
 -------------------------------------------------------
