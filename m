@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] headerfile depencies
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <426649B8.1070203@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <426649B8.1070203@gmx.ch>
-References: <426649B8.1070203@gmx.ch>
-Content-Type: text/plain
-Message-Id: <1114000197.2469.159.camel@pegasus>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] headerfile depencies
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +16,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 20 Apr 2005 14:29:57 +0200
+Date: Wed, 20 Apr 2005 14:23:20 +0200
 
-Hi Marco,
+Hello all
 
->  From hluez-libs 2.15 to bluez-libs 2.16, bluetooth.h doesn't anymore 
-> include the stdio.h (or changes where made and stdio.h went forgotten).
-> 
-> So the user has to include it in his own program, even if he doesn't need it.
-> This might be more a c specific question, but aren't header files supposed 
-> to handle their requirements themselve?
-> Please note that I'm not a c expert. This is a question, not a accusation...
+ From hluez-libs 2.15 to bluez-libs 2.16, bluetooth.h doesn't anymore 
+include the stdio.h (or changes where made and stdio.h went forgotten).
 
-I already fixed it in the CVS. I always include stdio.h in my C files
-and so this slipped through my eyes.
+So the user has to include it in his own program, even if he doesn't need it.
+This might be more a c specific question, but aren't header files supposed 
+to handle their requirements themselve?
+Please note that I'm not a c expert. This is a question, not a accusation...
 
-Regards
-
-Marcel
-
-
+regards
+Marco
 
 
 -------------------------------------------------------
