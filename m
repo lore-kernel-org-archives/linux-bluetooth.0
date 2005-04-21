@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 To: bluez-users@lists.sourceforge.net
-From: "William M. Quarles" <walrus@bellsouth.net>
-Message-ID: <d49842$5o6$1@sea.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Beginner with PAND
+Subject: Re: [Bluez-users] connecting linux laptop to a three-wire RS232 device via bluetooth
+References: <86mzrv7f6a.fsf@coulee.tdb.com>
+	<1113872979.16233.156.camel@pegasus>
+From: Russell Senior <seniorr@aracnet.com>
+In-Reply-To: <1113872979.16233.156.camel@pegasus>
+Message-ID: <86wtqvzz3d.fsf@coulee.tdb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +19,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 21 Apr 2005 18:10:29 -0400
+Date: 21 Apr 2005 12:52:54 -0700
 
-(everybody on this list seems to be an expert, so there are plenty of
-people who should be able to help me out with this :-))
+>>>>> "Marcel" == Marcel Holtmann <marcel@holtmann.org> writes:
 
-Hi,
+Russell> I'd like recommendations on both parts.  I think we'll need
+Russell> Class 1 devices for the range.
 
-I am trying to set up one of my computers to work as an Internet router
-for other bluetooth devices.  I'm trying to use pand, and I notice that
-it has this -e flag.  I use it to designate the ethernet device name
-that I want to give to my bluetooth stack/dongle (someone correct me if
-I am not understanding this correctly).  Well, ifconfig doesn't reveal
-another device when pand is running.  I can't network to a device that
-doesn't exist.  So what do I do?
+Marcel> [...] but for the laptop equipment you should really get a CSR
+Marcel> based USB dongle. You may simply go with the D-Link DBT-120,
+Marcel> because this is known to be upgradable to the Bluetooth 1.2
+Marcel> standard.
 
-Thanks,
-William
+Turns out (a couple just arrived) these are Class 2 devices.  Can you
+point me at a Class 1 (100m) USB device?
 
+BTW, how do the features hex decode on
+<http://www.holtmann.org/linux/bluetooth/features.html>
+
+Thanks!
+
+
+-- 
+Russell Senior         ``I have nine fingers; you have ten.''
+seniorr@aracnet.com
 
 
 -------------------------------------------------------
