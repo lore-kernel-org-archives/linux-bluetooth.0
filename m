@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050422050216.50183.qmail@web8303.mail.in.yahoo.com>
-From: Mayank Batra <mayankbatra@yahoo.co.in>
-To: BLUEZ DEVELOPERS LIST <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
+From: Guylhem Aznar <bluez-devel@externe.net>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20050421220305.GA28534@externe.net>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] a2play code not according to the specifications
+Subject: [Bluez-devel] fixing hidp keycodes
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,72 +16,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 22 Apr 2005 06:02:16 +0100 (BST)
+Date: Thu, 21 Apr 2005 18:03:05 -0400
 
-Hi Brad,
+Hello
 
-Your a2play code on the CVS is not 'exactly' according
-to the specifications.
+I'm trying to replace hidp keycodes for a dell axim bluetooth keyboard
+with has conflicting keycodes with my zaurus internal keys.
 
-The specifications demand that the source encodes the
-media payload into an appropriate format (SBC in this
-case) and then stream the packet to the sink. The sink
-then decodes the packet and plays the stream.
+I tried to change the keycodes in hidp/core.c - However looks like my
+modifications are only half applied, certainly due to a stupid
+mistake.
 
-But in your code, you are sending an already encoded
-file instead of streaming a simple PCM file by
-encoding the file into SBC frames in a real time
-manner.
+How could I easily syslog the keycode from hidp_keycodes[] array being
+sent to the input layer ?
 
-Infact there is no use of storing SBC files at the
-source. The source should read the PCM file (for
-example a .wav or .snd file), encode the data into SBC
-and then form the A2DP packet. 
+--=20
+Bien =E0 vous - Best regards,
+Guylhem P. Aznar
 
-And who the hell has .sbc files on his system ??
-
-I improved your code to fulfill the above
-requirements. My code does exactly what a2play code
-does. The only difference is that my code reads a pcm
-format file(.snd file which is Sun/NeXT format), it
-converts the file to SBC packets during the streaming
-process.
-
-So the source need not keep .sbc file on his system. 
-
-A .snd file can be listened to using the Linux
-application called 'play'.
-
-I am using the SBC codec library from the CVS.
-
-I have tested my code with the help of Dongles with
-various stacks:
-
-1)   BlueZ stacks on both source and sink.
-2)   BlueZ stack on source and IVT Corporation's
-BlueSoleil on the sink side (Windows)
-
-My code is working fine in all cases.
-
-Please tell me if you would like to update the CVS
-with my code.
-
-Also, I am ready to put up the A2DP sink code on the
-CVS.
-
-Please tell if you would like to put it on the CVS as
-well.
-
-And please, I intended no offence to anyone. I was
-just waiting to get over with certain formalities.
-
-Thanks and Regards,
-
-Mayank
-
-________________________________________________________________________
-Yahoo! India Matrimony: Find your life partner online
-Go to: http://yahoo.shaadi.com/india-matrimony
+--=20
+*@externe.net                                            http://externe.n=
+et
+P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
+un.org
+GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
+ey
 
 
 -------------------------------------------------------
