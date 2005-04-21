@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Beginner with PAND
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <d49842$5o6$1@sea.gmane.org>
-References: <d49842$5o6$1@sea.gmane.org>
-Content-Type: text/plain
-Message-Id: <1114165056.32265.56.camel@pegasus>
+From: "William M. Quarles" <walrus@bellsouth.net>
+Message-ID: <d49842$5o6$1@sea.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] Beginner with PAND
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 22 Apr 2005 12:17:36 +0200
+Date: Thu, 21 Apr 2005 18:10:29 -0400
 
-Hi William,
+(everybody on this list seems to be an expert, so there are plenty of
+people who should be able to help me out with this :-))
 
-> I am trying to set up one of my computers to work as an Internet router
-> for other bluetooth devices.  I'm trying to use pand, and I notice that
-> it has this -e flag.  I use it to designate the ethernet device name
-> that I want to give to my bluetooth stack/dongle (someone correct me if
-> I am not understanding this correctly).  Well, ifconfig doesn't reveal
-> another device when pand is running.  I can't network to a device that
-> doesn't exist.  So what do I do?
+Hi,
 
-the bnep0 device is only created when you actually created the BNEP
-connection. To set the IP before the connection you must use a Bridge on
-top the bnepX interfaces. Check the PAN howto for details.
+I am trying to set up one of my computers to work as an Internet router
+for other bluetooth devices.  I'm trying to use pand, and I notice that
+it has this -e flag.  I use it to designate the ethernet device name
+that I want to give to my bluetooth stack/dongle (someone correct me if
+I am not understanding this correctly).  Well, ifconfig doesn't reveal
+another device when pand is running.  I can't network to a device that
+doesn't exist.  So what do I do?
 
-Regards
-
-Marcel
-
+Thanks,
+William
 
 
 
