@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <e9a6e82b0504210458a0ba170@mail.gmail.com>
+From: Stefan Magdalinski <smagdali@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] connecting linux laptop to a three-wire RS232 device via bluetooth
-References: <86mzrv7f6a.fsf@coulee.tdb.com>
-	<1113872979.16233.156.camel@pegasus>
-From: Russell Senior <seniorr@aracnet.com>
-In-Reply-To: <1113872979.16233.156.camel@pegasus>
-Message-ID: <86wtqvzz3d.fsf@coulee.tdb.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Bluez-users] Bluez + 6630 rfcomm was working, suddenly died.
+In-Reply-To: <1114013959.2469.189.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <e9a6e82b050420074245382ddd@mail.gmail.com>
+	 <1114008711.2469.175.camel@pegasus>
+	 <e9a6e82b0504200915563ed0a0@mail.gmail.com>
+	 <1114013959.2469.189.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,37 +21,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 21 Apr 2005 12:52:54 -0700
+Date: Thu, 21 Apr 2005 12:58:33 +0100
 
->>>>> "Marcel" == Marcel Holtmann <marcel@holtmann.org> writes:
+On 4/20/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Stefan,
+>=20
+> > looks like the version of hcidump (1.1.2) is too old for -V, but
+> > here's what I get for -X
+>=20
+> then install a new one, because I am not going to decode the HCI parts
+> any time again by hand.
 
-Russell> I'd like recommendations on both parts.  I think we'll need
-Russell> Class 1 devices for the range.
+fair enough.
 
-Marcel> [...] but for the laptop equipment you should really get a CSR
-Marcel> based USB dongle. You may simply go with the D-Link DBT-120,
-Marcel> because this is known to be upgradable to the Bluetooth 1.2
-Marcel> standard.
+so I rebuilt everything from the latest sources, was running 'hcidump
+-X -V', and when I tried to connect this time, it was working again,
+and I can pair the devices ok.
 
-Turns out (a couple just arrived) these are Class 2 devices.  Can you
-point me at a Class 1 (100m) USB device?
+so thanks for your help. I'll see how it goes over the next few days.
 
-BTW, how do the features hex decode on
-<http://www.holtmann.org/linux/bluetooth/features.html>
-
-Thanks!
-
-
--- 
-Russell Senior         ``I have nine fingers; you have ten.''
-seniorr@aracnet.com
+>=20
+> > is there a repository I should be adding to sources.list to pull a newe=
+r one?
+>=20
+> The source is available.
 
 
 -------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+This SF.Net email is sponsored by: New Crystal Reports XI.
+Version 11 adds new functionality designed to reduce time involved in
+creating, integrating, and deploying reporting solutions. Free runtime info,
+new features, or free trial, at: http://www.businessobjects.com/devxi/728
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
