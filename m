@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Acer BT900 Headset profile
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <42695D2D.8000109@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <42695D2D.8000109@xmission.com>
-References: <13e9886105042209171edb0fba@mail.gmail.com>
-	 <1114197531.32265.77.camel@pegasus>  <42695D2D.8000109@xmission.com>
-Content-Type: text/plain
-Message-Id: <1114205788.10706.6.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Acer BT900 Headset profile
+References: <13e9886105042209171edb0fba@mail.gmail.com> <1114197531.32265.77.camel@pegasus>
+In-Reply-To: <1114197531.32265.77.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,26 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 22 Apr 2005 23:36:28 +0200
-
-Hi Brad,
-
-> > I marked the ISOC support for this dongle as broken and so you don't get
-> > any SCO data on the USB bus. So no headset connection possible.
-> 
-> Is there a way to see, like in a device query that isoc is not supported 
-> on the adapter?
-
-this is again a stupid Broadcom dongle. The descriptors tell that they
-support the ISOC endpoints, but it is broken or our they only don't like
-our way of dealing with ISOC transfers. Feel free to fix the hci_usb
-driver to deal correctly with these dongles.
-
-Regards
+Date: Fri, 22 Apr 2005 14:23:09 -0600
 
 Marcel
 
+> I marked the ISOC support for this dongle as broken and so you don't get
+> any SCO data on the USB bus. So no headset connection possible.
 
+Is there a way to see, like in a device query that isoc is not supported 
+on the adapter?
+
+Brad
 
 
 -------------------------------------------------------
