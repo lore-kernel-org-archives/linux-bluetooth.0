@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] auto pairing between client & server
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-From: "William M. Quarles" <quarlewm@jmu.edu>
-Message-ID: <d4c15f$evq$1@sea.gmane.org>
-References: <d49842$5o6$1@sea.gmane.org> <1114165056.32265.56.camel@pegasus>
+In-Reply-To: <2621d9af05042213064d0df1dc@mail.gmail.com>
+References: <2621d9af05042213064d0df1dc@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1114205889.10706.9.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-In-Reply-To: <1114165056.32265.56.camel@pegasus>
-Subject: [Bluez-users] Re: Beginner with PAND
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,34 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 22 Apr 2005 19:30:17 -0400
+Date: Fri, 22 Apr 2005 23:38:09 +0200
 
-Marcel Holtmann wrote:
-> Hi William,
+Hi,
+
+> I have a laptop which runs my application as server, and another
+> cellphone as client. Both of them communicate to each other using
+> Bluetooth (Bluez implementation).
 > 
+> What should I do in order to perform automatic pairing between these 2
+> devices (knowing the BD_ADDR) inside my application?
+
+there is no such thing than automatic pairing.
+
+> How can I detect if the pairing had been done between these
+> client-server devices inside my application? And from that, how to do
+> pairing using the "givepin" script?
 > 
->>I am trying to set up one of my computers to work as an Internet router
->>for other bluetooth devices.  I'm trying to use pand, and I notice that
->>it has this -e flag.  I use it to designate the ethernet device name
->>that I want to give to my bluetooth stack/dongle (someone correct me if
->>I am not understanding this correctly).  Well, ifconfig doesn't reveal
->>another device when pand is running.  I can't network to a device that
->>doesn't exist.  So what do I do?
-> 
-> 
-> the bnep0 device is only created when you actually created the BNEP
-> connection. To set the IP before the connection you must use a Bridge on
-> top the bnepX interfaces. Check the PAN howto for details.
+> I want to avoid the pop-ups window asking for entering the PIN.
 
-Marcel,
+Write your own PIN helper shell script that uses a fixed PIN. Check the
+link key file for the current state of the pairing.
 
-I guess you mean the How-Tos on your website, holtmann.org (now that I 
-look around)?
+Regards
 
-Wow, you have GUI on there?  I didn't see that advertised on the BlueZ 
-site.  It should be.
+Marcel
 
-William
 
 
 
