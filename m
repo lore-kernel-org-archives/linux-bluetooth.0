@@ -1,17 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Acer BT900 Headset profile
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Support for stored link keys
-References: <1114094787.32265.11.camel@pegasus>
-	<Pine.LNX.4.61.0504211721020.15599@cherokee.spacecom.si>
-	<1114099644.32265.31.camel@pegasus>
-	<Pine.LNX.4.61.0504211823390.16740@cherokee.spacecom.si>
-	<1114101950.32265.40.camel@pegasus>
-From: Scott W Gifford <gifford@umich.edu>
-In-Reply-To: <1114101950.32265.40.camel@pegasus> (Marcel Holtmann's message
- of "Thu, 21 Apr 2005 18:45:50 +0200")
-Message-ID: <qszfyxila6v.fsf@timepilot.gpcc.itd.umich.edu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <42695D2D.8000109@xmission.com>
+References: <13e9886105042209171edb0fba@mail.gmail.com>
+	 <1114197531.32265.77.camel@pegasus>  <42695D2D.8000109@xmission.com>
+Content-Type: text/plain
+Message-Id: <1114205788.10706.6.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -23,19 +19,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 22 Apr 2005 18:26:48 -0400
+Date: Fri, 22 Apr 2005 23:36:28 +0200
 
-Marcel Holtmann <marcel@holtmann.org> writes:
+Hi Brad,
 
-[...]
+> > I marked the ISOC support for this dongle as broken and so you don't get
+> > any SCO data on the USB bus. So no headset connection possible.
+> 
+> Is there a way to see, like in a device query that isoc is not supported 
+> on the adapter?
 
-> Exists any tool or library that allows to read the Windows registry
-> directly from Linux if the filesystem is mounted?
+this is again a stupid Broadcom dongle. The descriptors tell that they
+support the ISOC endpoints, but it is broken or our they only don't like
+our way of dealing with ISOC transfers. Feel free to fix the hci_usb
+driver to deal correctly with these dongles.
 
-If anybody has this working, it's the WINE folks.  That would be the
-place to ask.
+Regards
 
----ScottG.
+Marcel
+
+
 
 
 -------------------------------------------------------
