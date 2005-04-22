@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Guylhem Aznar <bluez-devel@externe.net>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] fixing hidp keycodes
-Message-ID: <20050422105609.GA16313@externe.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050421220305.GA28534@externe.net>
+References: <20050421220305.GA28534@externe.net>
+Content-Type: text/plain
+Message-Id: <1114164987.32265.53.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,48 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 22 Apr 2005 06:56:09 -0400
+Date: Fri, 22 Apr 2005 12:16:27 +0200
 
-Hello
+Hi Guylhem,
 
-Yes I did apply mh patches. I can put a copy of the kernel online if
-you want to see it.
+> I'm trying to replace hidp keycodes for a dell axim bluetooth keyboard
+> with has conflicting keycodes with my zaurus internal keys.
+> 
+> I tried to change the keycodes in hidp/core.c - However looks like my
+> modifications are only half applied, certainly due to a stupid
+> mistake.
 
-I'm not sure I understand the "report mode". Pressing on a keyboard
-key after hidd --connect make the key work in applications. It's not
-simply reporting.
+do you applied the -mh patch? If yes, then you device may run in report
+mode and thus hidp_keycodes[] is not used, because it is boot mode only.
 
-hidp_keycode is declared locally in core.c and never used elsewhere.
-input_report_key seems to send hidp_keycode[keys[i]] to the input
-layer. If I printk this, I only see 0.=20
+> How could I easily syslog the keycode from hidp_keycodes[] array being
+> sent to the input layer ?
 
-What I want to do on my strange keyboard is :
-swap tab and capslock
-swap capslock and esc
+Use things like printk() or BT_ERR().
 
-So I swapped 15 and 58, then 58 and 1 in the hidp_keycodes, but this
-only gets me multiple esc. However, replacing keycodes 65 and 66 by 0
-which where incorrectly send when pressing on a special keyboard
-modifier key worked, as did swapping keycode 30 and 125 (some library
-has keycode 30=3Dmodfier hardcoded in, so I had to do a workaround and
-remap the a key to 125 and change the keyboard map accordingly)
+Regards
 
-This suggest that my approach should work. I don't understand why it's
-not working with tab/capslock/esc.
+Marcel
 
-I'm puzzled. Any suggestion is welcome.
 
---=20
-Bien =E0 vous - Best regards,
-Guylhem P. Aznar
-
---=20
-*@externe.net                                            http://externe.n=
-et
-P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
-un.org
-GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
-ey
 
 
 -------------------------------------------------------
