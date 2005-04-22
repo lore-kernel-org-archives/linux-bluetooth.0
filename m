@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2621d9af05042212085b635558@mail.gmail.com>
-From: "N. I." <neutralidea@gmail.com>
+Subject: Re: [Bluez-users] missing <linux/limits.h> include in
+	storage.c	and hcitool.c
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <4268E475.8060807@gmx.ch>
+References: <4268DD2A.40604@gmx.ch> <1114168962.32265.66.camel@pegasus>
+	 <4268E475.8060807@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1114170813.32265.68.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] bluez scatternet
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,39 +20,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 22 Apr 2005 15:08:45 -0400
+Date: Fri, 22 Apr 2005 13:53:33 +0200
 
-I'm new to Bluetooth, as well as scatternet type of network.
+Hi Marco,
 
-I'm trying to create a scatternet network as followed:
+> > this can't be, because we don't include header files from the kernel and
+> > so <linux/*> and <asm/*> are taboo.
+> 
+> I'm sorry. I should have mentioned that PATH_MAX is missing.
+> that would have been helpful...
 
-Piconet 1:
-Master A
-Slave B, C, D
+actually I thought that I addressed that :(
 
-Piconet 2:
-Master C (slave in piconet 1)
-Slave M, N, Q.
+> > Does simply including <limits.h> is also working?
+> 
+> I checked the available headers. looks like sys/param.h is the choice.
+> (But just because it includes <linux/limits.h>)
 
-My questions:
+Patch for it is now in the CVS.
 
-1) What are the steps to create this type of scatternet?
-  What should be done to configure master/slave C to play this role
-in the network?
+Regards
 
-2) Assuming that the scatternet is created succesfully. If
-Master/Slave C dies, how can slaves M, N and Q be able to route
-messages to Master A?
+Marcel
 
-3) For this current configuration of network, what should I consider
-in pairing devices in sunny situation (Master/Slave C up and running)
-and when master/slave C dies (rainy condition)?
 
-Please help,
-
-Thanks
-
-N.I.
 
 
 -------------------------------------------------------
