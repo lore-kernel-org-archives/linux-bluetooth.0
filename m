@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluez scatternet
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <2621d9af05042212085b635558@mail.gmail.com>
+From: "N. I." <neutralidea@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <2621d9af05042212085b635558@mail.gmail.com>
-References: <2621d9af05042212085b635558@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1114197456.32265.74.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] bluez scatternet
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,51 +16,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 22 Apr 2005 21:17:36 +0200
+Date: Fri, 22 Apr 2005 15:08:45 -0400
 
-Hi,
+I'm new to Bluetooth, as well as scatternet type of network.
 
-> I'm new to Bluetooth, as well as scatternet type of network.
-> 
-> I'm trying to create a scatternet network as followed:
-> 
-> Piconet 1:
-> Master A
-> Slave B, C, D
-> 
-> Piconet 2:
-> Master C (slave in piconet 1)
-> Slave M, N, Q.
-> 
-> My questions:
-> 
-> 1) What are the steps to create this type of scatternet?
->   What should be done to configure master/slave C to play this role
-> in the network?
+I'm trying to create a scatternet network as followed:
 
-create ACL links from A to B, C and D. Then use C and create ACL links
-to M, N, Q.
+Piconet 1:
+Master A
+Slave B, C, D
 
-> 2) Assuming that the scatternet is created succesfully. If
-> Master/Slave C dies, how can slaves M, N and Q be able to route
-> messages to Master A?
+Piconet 2:
+Master C (slave in piconet 1)
+Slave M, N, Q.
 
-They can't. If Master/Slave C dies, the piconet with M, N, Q dies also.
-Remember that the hopping sequence of the master defines the piconet. No
-master means no piconet and in your case no scatternet anymore.
+My questions:
 
-> 3) For this current configuration of network, what should I consider
-> in pairing devices in sunny situation (Master/Slave C up and running)
-> and when master/slave C dies (rainy condition)?
+1) What are the steps to create this type of scatternet?
+  What should be done to configure master/slave C to play this role
+in the network?
 
-I have no idea what you are talking about and what the weather has to do
-with it ;)
+2) Assuming that the scatternet is created succesfully. If
+Master/Slave C dies, how can slaves M, N and Q be able to route
+messages to Master A?
 
-Regards
+3) For this current configuration of network, what should I consider
+in pairing devices in sunny situation (Master/Slave C up and running)
+and when master/slave C dies (rainy condition)?
 
-Marcel
+Please help,
 
+Thanks
 
+N.I.
 
 
 -------------------------------------------------------
