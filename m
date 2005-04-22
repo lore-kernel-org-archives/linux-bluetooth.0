@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <312a181605042212245acad558@mail.gmail.com>
-From: =?ISO-8859-1?Q?=C1lvaro_Lopes?= <alvieboy@gmail.com>
+Subject: Re: [Bluez-users] bluez scatternet
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <2621d9af05042212085b635558@mail.gmail.com>
+References: <2621d9af05042212085b635558@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1114197456.32265.74.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Multicast over BNET
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,38 +18,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 22 Apr 2005 20:24:07 +0100
+Date: Fri, 22 Apr 2005 21:17:36 +0200
 
-Hello list
+Hi,
 
-I'm having a problem with multicast filters. When BNEP multicast
-filters are activated in the kernel (2.6.11, also in others) I cannot
-send multicast packets over the interface.
+> I'm new to Bluetooth, as well as scatternet type of network.
+> 
+> I'm trying to create a scatternet network as followed:
+> 
+> Piconet 1:
+> Master A
+> Slave B, C, D
+> 
+> Piconet 2:
+> Master C (slave in piconet 1)
+> Slave M, N, Q.
+> 
+> My questions:
+> 
+> 1) What are the steps to create this type of scatternet?
+>   What should be done to configure master/slave C to play this role
+> in the network?
 
-If I do a "tcpdump -i bnep0" the packets I am sending (to 224.0.0.133)
-show up, but they aren't actually sent over the "air" (in fact, a
-hcidump shows no activity).
+create ACL links from A to B, C and D. Then use C and create ACL links
+to M, N, Q.
 
-I've set up a route for the interface (eg, route add -net 224.0.0.0
-netmask 240.0.0.0 dev bnep0).
+> 2) Assuming that the scatternet is created succesfully. If
+> Master/Slave C dies, how can slaves M, N and Q be able to route
+> messages to Master A?
 
-I am not a member of that group. Even if I join the MC group (using
-only setsockopt, not using SIOCADDMULTI ioctl), it still doesn't
-transmit the packets.
+They can't. If Master/Slave C dies, the piconet with M, N, Q dies also.
+Remember that the hopping sequence of the master defines the piconet. No
+master means no piconet and in your case no scatternet anymore.
 
-If I disable the multicast filters, all goes OK. The packets are
-really sent and received by my peer.
+> 3) For this current configuration of network, what should I consider
+> in pairing devices in sunny situation (Master/Slave C up and running)
+> and when master/slave C dies (rainy condition)?
 
-The box receives all multicast traffic OK, just those packets I wish
-to send do not reach my peer.
+I have no idea what you are talking about and what the weather has to do
+with it ;)
 
-My question: Is there a way (simple) to get around this w/o
-recompiling the kernel? I also have another problem because the
-application we're using is Java(tm) based...
+Regards
 
-Thanks in advance for any pointers/help on this.
+Marcel
 
-=C1lvaro Lopes
+
 
 
 -------------------------------------------------------
