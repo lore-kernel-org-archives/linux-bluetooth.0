@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] missing <linux/limits.h> include in storage.c
-	and hcitool.c
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4268DD2A.40604@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4268DD2A.40604@gmx.ch>
-References: <4268DD2A.40604@gmx.ch>
-Content-Type: text/plain
-Message-Id: <1114168962.32265.66.camel@pegasus>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] missing <linux/limits.h> include in storage.c and hcitool.c
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,22 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 22 Apr 2005 13:22:42 +0200
+Date: Fri, 22 Apr 2005 13:16:58 +0200
 
-Hi Marco,
+Hello Marcel
 
-> The include <linux/limits.h> in storage.c and hcitool.c are missing. My 
-> crosscompiler needs it.
-
-this can't be, because we don't include header files from the kernel and
-so <linux/*> and <asm/*> are taboo. Does simply including <limits.h> is
-also working?
-
-Regards
-
-Marcel
+The include <linux/limits.h> in storage.c and hcitool.c are missing. My 
+crosscompiler needs it.
 
 
+regards
+Marco
 
 
 -------------------------------------------------------
