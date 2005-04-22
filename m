@@ -1,7 +1,7 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 To: bluez-users@lists.sourceforge.net
 From: "William M. Quarles" <quarlewm@jmu.edu>
-Message-ID: <d4c6it$hjp$1@sea.gmane.org>
+Message-ID: <d4c15f$evq$1@sea.gmane.org>
 References: <d49842$5o6$1@sea.gmane.org> <1114165056.32265.56.camel@pegasus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
@@ -18,7 +18,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 22 Apr 2005 21:02:53 -0400
+Date: Fri, 22 Apr 2005 19:30:17 -0400
 
 Marcel Holtmann wrote:
 > Hi William,
@@ -37,9 +37,13 @@ Marcel Holtmann wrote:
 > connection. To set the IP before the connection you must use a Bridge on
 > top the bnepX interfaces. Check the PAN howto for details.
 
-Why do I need a bridge?  I don't have to create a bridge in MS Windows 
-XP to set this up.  I don't really want a bridge either.  Are you sure 
-that there isn't another way?
+Marcel,
+
+I guess you mean the How-Tos on your website, holtmann.org (now that I 
+look around)?
+
+Wow, you have GUI on there?  I didn't see that advertised on the BlueZ 
+site.  It should be.
 
 William
 
