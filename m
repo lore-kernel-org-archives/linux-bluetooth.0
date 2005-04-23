@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY5-F758FC622E7F5FB2C4DF95892E0@phx.gbl>
-From: "Wind Ho" <wind_ho@msn.com>
+Subject: Re: [Bluez-users] Re: Beginner with PAND
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <d4c6it$hjp$1@sea.gmane.org>
+References: <d49842$5o6$1@sea.gmane.org>
+	 <1114165056.32265.56.camel@pegasus>  <d4c6it$hjp$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1114252765.10706.16.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Subject: [Bluez-users] how can i send a picture from linux pc to T68i
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,13 +19,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 23 Apr 2005 16:57:48 +0000
+Date: Sat, 23 Apr 2005 12:39:25 +0200
 
-would some one help me, tell me the detail? i
+Hi William,
 
-_________________________________________________________________
-Don't just search. Find. Check out the new MSN Search! 
-http://search.msn.com/
+> >>I am trying to set up one of my computers to work as an Internet router
+> >>for other bluetooth devices.  I'm trying to use pand, and I notice that
+> >>it has this -e flag.  I use it to designate the ethernet device name
+> >>that I want to give to my bluetooth stack/dongle (someone correct me if
+> >>I am not understanding this correctly).  Well, ifconfig doesn't reveal
+> >>another device when pand is running.  I can't network to a device that
+> >>doesn't exist.  So what do I do?
+> > 
+> > the bnep0 device is only created when you actually created the BNEP
+> > connection. To set the IP before the connection you must use a Bridge on
+> > top the bnepX interfaces. Check the PAN howto for details.
+> 
+> Why do I need a bridge?  I don't have to create a bridge in MS Windows 
+> XP to set this up.  I don't really want a bridge either.  Are you sure 
+> that there isn't another way?
+
+this is not Windows, period.
+
+However you can do it without a bridge, but then you have to deal with
+the IP assignment over the hotplug or your distribution specific
+methods. The bnep0 is only available when the connection is established
+and it will go away when the connection terminates.
+
+Regards
+
+Marcel
+
 
 
 
