@@ -1,10 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4269FA9A.6000308@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] btsco on gumstix/infineon
+Subject: Re: [Bluez-devel] Support for stored link keys
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050423005546.2fd4b266.henryk@ploetzli.ch>
+References: <1114094787.32265.11.camel@pegasus>
+	 <Pine.LNX.4.61.0504211721020.15599@cherokee.spacecom.si>
+	 <1114099644.32265.31.camel@pegasus>
+	 <Pine.LNX.4.61.0504211823390.16740@cherokee.spacecom.si>
+	 <1114101950.32265.40.camel@pegasus>
+	 <qszfyxila6v.fsf@timepilot.gpcc.itd.umich.edu>
+	 <20050423005546.2fd4b266.henryk@ploetzli.ch>
+Content-Type: text/plain
+Message-Id: <1114214410.10706.13.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,42 +24,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 23 Apr 2005 01:34:50 -0600
+Date: Sat, 23 Apr 2005 02:00:10 +0200
 
-Hi
+Hi Henryk,
 
-I have been making changes to our btsco daemon, build scripts, and my 
-copy of the gumstix buildroot to cross-compile btsco for arm. I've got 
-everything built on the gumstix. I have a couple of things to clean up 
-in the build process, but with some manual tweaking it's good enough to 
-run the daemon and establish the control connection to the headset. For 
-some reason, examining the headset to discover the channel with sdp 
-fails, so I have to specify the channel number:
+> > > Exists any tool or library that allows to read the Windows registry
+> > > directly from Linux if the filesystem is mounted?
+> > 
+> > If anybody has this working, it's the WINE folks.  That would be the
+> > place to ask.
+> 
+> Actually a quick google turns up two sets of code: editreg from samba
+> for the newer windows systems (as used by kregedit, for example) and a
+> perl hack called readreg95 for windows 95, 98 and millennium edition.
 
-# btsco -v 00:03:89:77:9A:E9 1
-btsco v0.4a
-Device is 0:0
-Voice setting: 0x0060
-RFCOMM channel 1 connected
+they write something about a regedit library. It would be cool to have a
+tool that can read/write link keys from the Widcomm and the XP Bluetooth
+stack. Anyone volunteering for this job?
 
-When I try to send audio using madplay, I get:
+Regards
 
-speaker volume: 0 mic volume: 0
-driver is in use
-Can't connect SCO audio channel
-: Device or resource busy
+Marcel
 
-Does this mean bluez won't do sco on infineon?
 
-My stereo set is still on backorder. Floating point is done in software 
-on arm... as long as the cpu doesn't melt down, it should be able to do 
-stereo encoding/transmission I think.
-
-I had to switch lm from accept to accept,master but now gumstix won't 
-connect to my bluetooth access point. argh... have to plug it in to my 
-machine to reach it :)
-
-Brad
 
 
 -------------------------------------------------------
