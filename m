@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <426A2354.8010804@mi-consultants.com>
-From: "Michael J. Pawlowsky" <mikep@mi-consultants.com>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] FC3 Internet Gateway for BT enabled PDA
+From: "William M. Quarles" <quarlewm@jmu.edu>
+Message-ID: <d4c6it$hjp$1@sea.gmane.org>
+References: <d49842$5o6$1@sea.gmane.org> <1114165056.32265.56.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <1114165056.32265.56.camel@pegasus>
+Subject: [Bluez-users] Re: Beginner with PAND
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,28 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 23 Apr 2005 06:28:36 -0400
+Date: Fri, 22 Apr 2005 21:02:53 -0400
 
-I've read several HOWTO's on this and they all seem to be different.
+Marcel Holtmann wrote:
+> Hi William,
+> 
+> 
+>>I am trying to set up one of my computers to work as an Internet router
+>>for other bluetooth devices.  I'm trying to use pand, and I notice that
+>>it has this -e flag.  I use it to designate the ethernet device name
+>>that I want to give to my bluetooth stack/dongle (someone correct me if
+>>I am not understanding this correctly).  Well, ifconfig doesn't reveal
+>>another device when pand is running.  I can't network to a device that
+>>doesn't exist.  So what do I do?
+> 
+> 
+> the bnep0 device is only created when you actually created the BNEP
+> connection. To set the IP before the connection you must use a Bridge on
+> top the bnepX interfaces. Check the PAN howto for details.
 
-Basically what I would like to do is have my USB BT dongle on the Linux
-box, and be able to browse the net and pick up email through BT on my PDA.
+Why do I need a bridge?  I don't have to create a bridge in MS Windows 
+XP to set this up.  I don't really want a bridge either.  Are you sure 
+that there isn't another way?
 
-So the Linux box will act as a BT to Internet  Gateway.
-Can someone point me to the a recent HOWTO for this.
-
-I've seen one in German, wich I can kind of follow...
-And the most recent one in english I have found is from 2002.
-
-I looked at the FAQ but this does not seem to be in there.
-
-
-Thanks,
-Mike
-
-
-
-
+William
 
 
 
