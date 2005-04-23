@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Microsoft Intellimouse Explorer
-From: Marcel Holtmann <marcel@holtmann.org>
+From: "mlists@tdbnetworks.org" <mlists@tdbnetworks.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1114275541.6610.5.camel@hellontoast>
-References: <1114275541.6610.5.camel@hellontoast>
 Content-Type: text/plain
-Message-Id: <1114276885.10706.31.camel@pegasus>
+Message-Id: <1114275541.6610.5.camel@hellontoast>
 Mime-Version: 1.0
+Subject: [Bluez-users] Microsoft Intellimouse Explorer
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,22 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 23 Apr 2005 19:21:25 +0200
+Date: Sat, 23 Apr 2005 17:59:00 +0100
 
-Hi Richard,
+Ok,
+So I've just rather stupidly gone out and bought one of these for my
+laptop. Does anyone have any experience in configuring these to use
+Bluez on FC3 as I don't have the foggiest where to start.
 
-> So I've just rather stupidly gone out and bought one of these for my
-> laptop. Does anyone have any experience in configuring these to use
-> Bluez on FC3 as I don't have the foggiest where to start.
+Thanks in advance
 
-with Debian Sid, SuSE 9.2/9.3 and Fedora Core 4 it should work out of
-the box. For Fedora Core 3 it depends on your bluez-utils version and
-your running kernel.
-
-Regards
-
-Marcel
-
+Richard 
 
 
 
