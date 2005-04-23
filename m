@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "mlists@tdbnetworks.org" <mlists@tdbnetworks.org>
+Message-ID: <BAY5-F758FC622E7F5FB2C4DF95892E0@phx.gbl>
+From: "Wind Ho" <wind_ho@msn.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1114275541.6610.5.camel@hellontoast>
 Mime-Version: 1.0
-Subject: [Bluez-users] Microsoft Intellimouse Explorer
+Content-Type: text/plain; format=flowed
+Subject: [Bluez-users] how can i send a picture from linux pc to T68i
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,16 +16,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 23 Apr 2005 17:59:00 +0100
+Date: Sat, 23 Apr 2005 16:57:48 +0000
 
-Ok,
-So I've just rather stupidly gone out and bought one of these for my
-laptop. Does anyone have any experience in configuring these to use
-Bluez on FC3 as I don't have the foggiest where to start.
+would some one help me, tell me the detail? i
 
-Thanks in advance
-
-Richard 
+_________________________________________________________________
+Don't just search. Find. Check out the new MSN Search! 
+http://search.msn.com/
 
 
 
