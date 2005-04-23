@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050425013050.76433.qmail@web20927.mail.yahoo.com>
-From: Arch Sayo <a12chi@yahoo.com>
+From: Oliver <urnen@vodafone.es>
+Message-Id: <20050424004443.31751.8@@vodafone.es>
+Mime-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1864222659-1114392650=:75482"
-Subject: [Bluez-devel] Adding services in the Service Class ID list
+Content-Type: text/plain;
+ charset="iso-8859-15"
+Subject: [Bluez-devel] hci_request
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,49 +17,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 24 Apr 2005 18:30:50 -0700 (PDT)
+Date: Sun, 24 Apr 2005 00:44:43 +0200
 
---0-1864222659-1114392650=:75482
-Content-Type: text/plain; charset=us-ascii
+Hi all in list
 
-Hi,
- 
-I have been trying to add services in the Service Class ID list like as shown below:
- 
-Attribute Identifier : 0x1 - ServiceClassIDList
-  Data Sequence
-    UUID16 : 0x1112 - HeadsetAudioGateway
-    UUID16 : 0x1203 - GenericAudio
- 
-It seemed that the 2 services have been added successfully.
-However, when I use sdptool to browse for the services, only the last service is the one reflected in the service and not both.
- 
-Please advice as on how I can successfully add the 2 services in the service class ID list.
- 
-Thanks,
-Arch
+Well I am trying to understand the full blueZ Stack,
+and i stopped in in hci_core.c the function " __hci_request(...) " line 121
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
---0-1864222659-1114392650=:75482
-Content-Type: text/html; charset=us-ascii
+In this portion of code
 
-<DIV>Hi,</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>I have been trying to add services in the Service Class ID list like as shown below:</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Attribute Identifier : 0x1 - ServiceClassIDList<BR>&nbsp; Data Sequence<BR>&nbsp;&nbsp;&nbsp; UUID16 : 0x1112 - HeadsetAudioGateway<BR>&nbsp;&nbsp;&nbsp; UUID16 : 0x1203 - GenericAudio</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>It seemed that the 2 services have been added successfully.</DIV>
-<DIV>However, when I use sdptool to browse for the services, only the last service is the one reflected in the service and not both.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Please advice as on how I can successfully add the 2 services in the service class ID list.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Thanks,</DIV>
-<DIV>Arch</DIV><p>__________________________________________________<br>Do You Yahoo!?<br>Tired of spam?  Yahoo! Mail has the best spam protection around <br>http://mail.yahoo.com 
---0-1864222659-1114392650=:75482--
+#####
+	DECLARE_WAITQUEUE(wait, current);
+	int err = 0;
+
+	BT_DBG("%s start", hdev->name);
+
+	hdev->req_status = HCI_REQ_PEND;
+
+	add_wait_queue(&hdev->req_wait_q, &wait);
+	set_current_state(TASK_INTERRUPTIBLE);
+
+	req(hdev, opt);
+	schedule_timeout(timeout);
+
+	remove_wait_queue(&hdev->req_wait_q, &wait);
+
+	if (signal_pending(current))
+		return -EINTR;
+######
+
+So:
+
+The task who calls the hci_request keeps blocked in add_wait_queue(..) call.
+Which is unblocked by the hci_req_complete() call which is calling when 
+processing an event.
+
+After unblocking req() call proceeds and awaits at least the timeout 
+specified schedule_timeout() ... after that the tast is removed form the 
+device queue.
+
+Is my mind as mixed as i think? am i right? did i understand it well?
+
+Then what is checking signal_pending(current) call ? 
+
+Thanks in advance, and begging for corrections
+
+Oliver
+
+
 
 
 -------------------------------------------------------
