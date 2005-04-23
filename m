@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] LMP test mode
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Sergei Koveshnikov <acrobat@eurocom.od.ua>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200504240040.44535.acrobat@eurocom.od.ua>
-References: <200504240040.44535.acrobat@eurocom.od.ua>
-Content-Type: text/plain
-Message-Id: <1114294561.10706.33.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200504240040.44535.acrobat@eurocom.od.ua>
+Subject: [Bluez-users] LMP test mode
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,29 +17,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 24 Apr 2005 00:16:01 +0200
+Date: Sun, 24 Apr 2005 00:40:44 +0300
 
-Hi Sergei,
+Hello,
+  I am trying to use LMP test mode witch described in the Bluetooth 
+specification, however as it turned out I can't control test process via the 
+air interface! :-(
+  I have read intently Bluetooth specification and look through the
+source code of BlueZ protocol stack, however I didn't find any way to
+send PDU with the LMP_test_activate (opcode 56) or LMP_test_control
+(opcode 57)!
 
->   I am trying to use LMP test mode witch described in the Bluetooth 
-> specification, however as it turned out I can't control test process via the 
-> air interface! :-(
->   I have read intently Bluetooth specification and look through the
-> source code of BlueZ protocol stack, however I didn't find any way to
-> send PDU with the LMP_test_activate (opcode 56) or LMP_test_control
-> (opcode 57)!
-> 
-> Could you say to me how I can make these LMP PDU's with help of the
-> HCI interface?
+Could you say to me how I can make these LMP PDU's with help of the
+HCI interface?
 
-there is no interaction with the link manager. You can only do what the
-HCI specification allows you to do.
+Thank you very much for your replies!
 
-Regards
-
-Marcel
-
-
+-- 
+Sergei Koveshnikov.
 
 
 -------------------------------------------------------
