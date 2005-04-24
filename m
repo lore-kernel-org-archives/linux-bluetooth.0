@@ -1,10 +1,22 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050425014245.12337.qmail@web20926.mail.yahoo.com>
-From: Arch Sayo <a12chi@yahoo.com>
+Subject: Re: [Bluez-users] error on connect
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1084189507-1114393365=:11858"
-Subject: [Bluez-users] How to NOT initialize newly attached Bluetooth dongles
+In-Reply-To: <426B96C7.3070103@gmx.ch>
+References: <425FFF54.6000701@gmx.ch> <1113607202.16433.42.camel@pegasus>
+	 <42616275.1090103@gmx.ch> <1113682195.18450.0.camel@pegasus>
+	 <4261BCFB.8040204@gmx.ch> <1113702363.18450.26.camel@pegasus>
+	 <426237CF.5060604@gmx.ch>  <4263F8DF.1040400@gmx.ch>
+	 <1113849662.16233.118.camel@pegasus>  <42651A2E.2080601@gmx.ch>
+	 <1113923580.2469.7.camel@pegasus>  <426522C6.10700@gmx.ch>
+	 <1113925620.2469.26.camel@pegasus>  <42652B35.7060803@gmx.ch>
+	 <1113927187.2469.40.camel@pegasus>  <4265329A.3030100@gmx.ch>
+	 <1113929462.2469.52.camel@pegasus>  <4265820A.2000400@gmx.ch>
+	 <1113949928.2469.88.camel@pegasus>  <42664856.3050502@gmx.ch>
+	 <1114000346.2469.162.camel@pegasus>  <426B96C7.3070103@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1114354113.10706.68.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,56 +28,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 24 Apr 2005 18:42:45 -0700 (PDT)
+Date: Sun, 24 Apr 2005 16:48:33 +0200
 
---0-1084189507-1114393365=:11858
-Content-Type: text/plain; charset=us-ascii
+Hi Marco,
 
-Hi,
- 
-I have been using hcid in handling initialization of my Bluetooth dongle.
- 
-I have this issue with regards to me not wanting to initialize newly attached Bluetooth dongles.
-Here is the scenario:
-1. I let hcid initialize my attached Bluetooth dongle.
-2. Then I configure the dongle to be in the OFF state/mode (hciconfig hci0 down).
-3. When I detach the dongle and re-attach it, it comes back to UP and Running mode.
- 
-Since I put the dongle in OFF mode, I would like to keep this mode when I detach and re-attach the dongle.
- 
-My question then is how will I make it not being automatically initialized by hcid.
-I have been trying to play with the hcid configuration file but to no avail.
- 
-Thanks,
-Arch
- 
+> Unfortunately spylite isn't supplied with my widcomm driver cd as mentioned 
+> on http://www.broadcom.com/products/bluetooth_faq_btw.php#_server and I'm 
+> not able to find it on widcom.com/broadcom.com...
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
---0-1084189507-1114393365=:11858
-Content-Type: text/html; charset=us-ascii
+I think that I have a CD with it somewhere, but actually I have no idea
+where to search. Most times I simply throw the CD away when I get myself
+another dongle. Sorry.
 
-<DIV>Hi,</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>I have been using hcid in handling initialization of my Bluetooth dongle.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>I have this issue with regards to me not wanting to initialize newly attached Bluetooth dongles.</DIV>
-<DIV>Here is the scenario:</DIV>
-<DIV>1. I let hcid initialize my attached Bluetooth dongle.</DIV>
-<DIV>2. Then I configure the dongle to be in the OFF state/mode (hciconfig hci0 down).</DIV>
-<DIV>3. When I detach the dongle and re-attach it, it comes back to UP and Running mode.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Since I put the&nbsp;dongle&nbsp;in OFF mode, I would like to keep this mode when I detach and re-attach the dongle.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>My question then is how will I make it not being automatically initialized by hcid.</DIV>
-<DIV>I have been trying to play with the hcid configuration file but to no avail.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Thanks,</DIV>
-<DIV>Arch</DIV>
-<DIV>&nbsp;</DIV><p>__________________________________________________<br>Do You Yahoo!?<br>Tired of spam?  Yahoo! Mail has the best spam protection around <br>http://mail.yahoo.com 
---0-1084189507-1114393365=:11858--
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
