@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Gaufer <Andreas.Gaufer@blue-cell-networks.com>
+Subject: Re: [Bluez-users] auto pairing between client & server
+From: Fredy P <digitalfredy@debiancolombia.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] file transfer from phone to PC
-Message-Id: <20050425162336.6e3448af.Andreas.Gaufer@blue-cell-networks.com>
-In-Reply-To: <20050330174856.17375.qmail@web8505.mail.in.yahoo.com>
-References: <20050330174856.17375.qmail@web8505.mail.in.yahoo.com>
+In-Reply-To: <1114205889.10706.9.camel@pegasus>
+References: <2621d9af05042213064d0df1dc@mail.gmail.com>
+	<1114205889.10706.9.camel@pegasus>
+Content-Type: text/plain;
+	charset=iso-8859-1
+Message-Id: <1114359474.3926.13.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,45 +20,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 25 Apr 2005 16:23:36 +0200
+Date: Sun, 24 Apr 2005 11:17:54 -0500
 
-Hi Maha,
+El vie, 22-04-2005 a las 23:38 +0200, Marcel Holtmann escribi=F3:
+> Hi,
+>=20
+> > I have a laptop which runs my application as server, and another
+> > cellphone as client. Both of them communicate to each other using
+> > Bluetooth (Bluez implementation).
+> >=20
+> > What should I do in order to perform automatic pairing between these 2
+> > devices (knowing the BD_ADDR) inside my application?
+>=20
+> there is no such thing than automatic pairing.
+>=20
+> > How can I detect if the pairing had been done between these
+> > client-server devices inside my application? And from that, how to do
+> > pairing using the "givepin" script?
+> >=20
+> > I want to avoid the pop-ups window asking for entering the PIN.
+>=20
+> Write your own PIN helper shell script that uses a fixed PIN. Check the
+> link key file for the current state of the pairing.
+/usr/local/bin/bluez-localpin:
+#!/bin/sh
+echo "PIN":$(cat /etc/bluetooth/pin)
 
-I guess you want to get opd (object push daemon), install it, start hcid
-and sdpd then start "opd --mode OBEX --channel 10 --sdp --path ."
-
-Then you can send files from your mobile by selecting it on the mobile
-and seach the context options for something like send file -> via
-Bluetooth.
-
-Greetings
-
-Andy
-
-On Wed, 30 Mar 2005 18:48:56 +0100 (BST)
-mahabaleshwara k <mahabaleshwara_k@yahoo.co.in> wrote:
-
-> Hi all,
-> I am trying for file transfer between PC and MOTOROLA
-> mobile-E398 over bluetooth.I am having linux-2.4.20
-> kernel with blueZ libs, utilis,openobex and obexftp
-> compiled. I am able to transfer(put) images from PC to
-> mobile using obexftp but NOT FROM MOBILE TO PC. Can
-> any one suggest me solution or where I went wrong?
-> Regards,
-> Maha.
-> 
-> 
-> _____________________________________________________________________
-> ___ Yahoo! India Matrimony: Find your life partner online
-> Go to: http://yahoo.shaadi.com/india-matrimony
-> 
-> 
+and put in /etc/bluetooth/hcid.conf:
+pin_helper /usr/local/bin/bluez-localpin;=20
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
+>=20
 > -------------------------------------------------------
 > SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real
-> users. Discover which products truly live up to the hype. Start
-> reading now. http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
 > _______________________________________________
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
