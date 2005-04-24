@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <426BAD24.1030507@xmission.com>
+Message-ID: <426BA787.9060202@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Comments about the Logitech/HP stereo headphones
-References: <1114345112.10706.64.camel@pegasus> <20050424134746.GA31151@externe.net>
-In-Reply-To: <20050424134746.GA31151@externe.net>
+References: <1114345112.10706.64.camel@pegasus>
+In-Reply-To: <1114345112.10706.64.camel@pegasus>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,42 +18,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 24 Apr 2005 08:28:52 -0600
+Date: Sun, 24 Apr 2005 08:04:55 -0600
 
-Guylhem
+Marcel
 
-> IMHO a2dp will be mostly useful for embedded system or in specific
-> applications on desktop systems (xmms, etc). Having to use alsa is at
-> best useless and at worse a potential showstopper.
+This all sounds very good and I feel like a dope for getting rid of my 
+bluetake headset when I had only ordered, but not received, a 
+replacement. I'm still waiting for my itech. :(
 
-we will keep and update the standalone streamer. it doesn't integrate 
-well with other apps but you can deal with that when embedding.
+> So what I have done so far is that I extended the pcm_a2dp ALSA plugin
+> in the utils CVS repository with the ability to cache the connection.
 
-> - on desktop systems a2dp could also be managed by a standalone
-> application, which could be an audio out plugin for xmms/mplayer etc.
-> This plugin would also manage sbc encoding and a2dp streaming until
-> some dedicated tool manage a2dp streaming.
+btsco now fires up the connection on demand and drops it immediately 
+after the close. we are going to need caching too. I noticed my phone 
+holds the connection open for about 3-5 seconds after it uses it.
 
-We can write one plugin for alsa and get support for 
-xmms/mplayer/xine/etc. if someone else wants native plugins for all 
-those apps, that's great.
+> To fully support all A2DP headphones (including Logitech/HP) this plugin
+> needs a AVDTP implementation. I have a hacked one on my development
+> system and it works fine with the GCT headphones. The code is a little
+> bit messy, but in general it works. It is fully event driven and so it
+> deprecates the idea of the AVDTP library. It is a lot easier to do it
+> directly inside the plugin. I need to cleanup the code and submit it to
+> the CVS when there is a little bit more time.
 
-> So my suggestion, at least until a good strategy has been defined, would
-> be to use a2play as a work base, and add mp3/ogg decoding - the "all
-> in one" approach. Quite easy to test, enhance, fix, finetune, etc -
-> better IMHO that separate tools for the moment.
+I am excited to see this!
 
-i think this could be an attractive utility for embedded work, but i 
-would be careful how you add mp3 decode. my gumstix has analog audio 
-out. I wouldn't want to use the space for an app that can decode mp3 
-(new a2play) but can't also send it to analog out.
+> all about the timing. The perfect thing now would be if we can tell ALSA
+> to time everything for us. Problem is that I am not an audio expert and
+> also not an ALSA expert. Maybe the SBC encoder should return/store the
+> time the SBC frame is encoded for.
 
-> Later on, like rfcomm manages rfcomm0 etc. entries, some a2dp tool
-> could bind a2dp peripherals to /dev/a2dpN where SBC audio would be
-> expected and streamed to the a2dp peripheral bound there.
+I think alsa should help us out here. If I have to learn more about the 
+alsa api to help, I will do it.
 
-managing connections is kind of a pain. it can't be done entirely in 
-kernel space. you can see how this gets spread into the btsco daemon.
+Doing a2dp inside an alsa plugin is clearly the right way. Thomas was 
+saying that requiring alsa-lib was not good for embedded. I'm working on 
+an xscale board now and I do have to use a precious 700k of limited 
+flash for alsa-lib, but the alternative is to write something into the 
+kernel that would never be accepted by Linus.
 
 Brad
 
