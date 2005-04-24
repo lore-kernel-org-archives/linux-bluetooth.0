@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Guylhem Aznar <bluez-devel@externe.net>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Comments about the Logitech/HP stereo headphones
-Message-ID: <20050424134746.GA31151@externe.net>
-References: <1114345112.10706.64.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1114345112.10706.64.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1114345112.10706.64.camel@pegasus>
+Subject: [Bluez-devel] Comments about the Logitech/HP stereo headphones
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,85 +16,63 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 24 Apr 2005 09:47:47 -0400
+Date: Sun, 24 Apr 2005 14:18:32 +0200
 
-On Sunday, 24 April 2005 at 14:18:32 (+0200), Marcel Holtmann wrote:
-> I also got first results with the HP headphone by adding an usleep(2500=
-)
-> for every SBC frame. It is also needed to pack as most SBC frames into
-> an AVDTP frame as possible. In my case this was up to eight. So this is
-> all about the timing. The perfect thing now would be if we can tell ALS=
-A
-> to time everything for us. Problem is that I am not an audio expert and
-> also not an ALSA expert. Maybe the SBC encoder should return/store the
-> time the SBC frame is encoded for.
->
-> Comments? Ideas?
+Hi Folks,
 
-(A question first - did you add the usleep to Mayank code? I'll then
-take it and try to optimise it for ARM. Last time I just made it
-barely compile :-)
+since the progress on the A2DP support stalled and because the problems
+with the Logitech/HP headphones still exists, I thought that it is time
+to buy one of these by myself. I now have the Aiptek, Bluewalker and the
+HP headphones at home for testing. The first two are GCT based and the
+last one is Zeevo based.
 
-Then my rant- why everyone wants an alsa plugin? It's ugly!
+All GCT based headphones are working fine and they have the nice SBC
+over RFCOMM support for testing. They are not picky about any timing
+related transfers and they cache the SBC stream. To deal with the Zeevo
+based headphones you can only talk AVDTP and you need to get the timing
+right. Otherwise the sound is messed up.
 
-IMHO a2dp will be mostly useful for embedded system or in specific
-applications on desktop systems (xmms, etc). Having to use alsa is at
-best useless and at worse a potential showstopper.
+So what I have done so far is that I extended the pcm_a2dp ALSA plugin
+in the utils CVS repository with the ability to cache the connection.
+This is needed, because players like xmms and bmp close the PCM every
+time they change the track. If we close the AVDTP channel it results
+into closing the ACL link and this is not what we want. The only problem
+at the moment is that this plugin only supports SBC over RFCOMM and it
+doesn't care about the timing. This means that if you change a track it
+can take 1 or 2 seconds before the headphones reacts, because parts are
+already cached. This is a problem (or feature) of the GCT based devices.
 
-- on most embedded systems resources are scarce. Having to include
-alsa for what can be currently done from the command line is a bad idea
+To fully support all A2DP headphones (including Logitech/HP) this plugin
+needs a AVDTP implementation. I have a hacked one on my development
+system and it works fine with the GCT headphones. The code is a little
+bit messy, but in general it works. It is fully event driven and so it
+deprecates the idea of the AVDTP library. It is a lot easier to do it
+directly inside the plugin. I need to cleanup the code and submit it to
+the CVS when there is a little bit more time.
 
-- I think ideally a standalone application would be best suited for
-this. The standalone application could be built over mpg321, some ogg
-player, whatever, and do the mp3/ogg decoding, sbc encoding and a2dp
-streaming until some dedicated tool manage a2dp streaming.
-It would be much easier to optimise for embedded systems - most don't
-have a FPU, so minimizing floating point operation is very important
+I also got first results with the HP headphone by adding an usleep(2500)
+for every SBC frame. It is also needed to pack as most SBC frames into
+an AVDTP frame as possible. In my case this was up to eight. So this is
+all about the timing. The perfect thing now would be if we can tell ALSA
+to time everything for us. Problem is that I am not an audio expert and
+also not an ALSA expert. Maybe the SBC encoder should return/store the
+time the SBC frame is encoded for.
 
-- on desktop systems a2dp could also be managed by a standalone
-application, which could be an audio out plugin for xmms/mplayer etc.
-This plugin would also manage sbc encoding and a2dp streaming until
-some dedicated tool manage a2dp streaming.
+Comments? Ideas?
 
-- for kernel integration, linus &co may not be interested in a
-kernel-side sbc decoder- they will certainly ask for a /dev/ entry
-taking the native format - in that case already encoded sbc. Remember
-the mono/stereo and 48 kHz rants:
-http://lists.arm.linux.org.uk/pipermail/linux-arm-kernel/2001-July/003997=
-.html
-http://www.uwsg.indiana.edu/hypermail/linux/kernel/0105.3/0324.html
+And btw for testing the pcm_a2dp plugin you need ALSA 1.0.9-rc2 and
+an .asoundrc config file like this:
 
-So my suggestion, at least until a good strategy has been defined, would
-be to use a2play as a work base, and add mp3/ogg decoding - the "all
-in one" approach. Quite easy to test, enhance, fix, finetune, etc -
-better IMHO that separate tools for the moment.
+	pcm.bluewalker {
+	        type a2dp
+	        bdaddr "00:0B:0D:xx:xx:xx"
+	}
 
-Later on, like rfcomm manages rfcomm0 etc. entries, some a2dp tool
-could bind a2dp peripherals to /dev/a2dpN where SBC audio would be
-expected and streamed to the a2dp peripheral bound there.
+Regards
 
-Then, applications would simply write to that device in sbc encoded
-format. A first candidate application would be a2play [if it follows
-the "all in one" approach], which would simply have to be stripped of
-its current main function [sbcencoding, a2dp streaming], to become a
-mp3/ogg to sbc decoder writting to /dev/a2dpN [that's why I advocate a
-all-in-one approach]
+Marcel
 
-Please don't take that personally, I just want to offer my opinion on
-the right way to do that. I fear an alsa plugin will cause immediate
-problems (to me on ARM systems) then later or for kernel integration.
 
---=20
-Bien =E0 vous - Best regards,
-Guylhem P. Aznar
-
---=20
-*@externe.net                                            http://externe.n=
-et
-P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
-un.org
-GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
-ey
 
 
 -------------------------------------------------------
