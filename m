@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050424181253.52478.qmail@web88108.mail.re2.yahoo.com>
-From: Krishna Bhoutika <kkbhoutika@yahoo.ca>
-To: BLUEZ Devel Mailing List <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1674547832-1114366373=:52417"
-Subject: [Bluez-devel] Multi slot packets
+Subject: Re: [Bluez-devel] Comments about the Logitech/HP stereo headphones
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050424181947.4a2f1656.henryk@ploetzli.ch>
+References: <1114345112.10706.64.camel@pegasus>
+	 <20050424134746.GA31151@externe.net>
+	 <20050424181947.4a2f1656.henryk@ploetzli.ch>
+Content-Type: text/plain
+Message-Id: <1114366370.10706.120.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,28 +20,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 24 Apr 2005 14:12:53 -0400 (EDT)
+Date: Sun, 24 Apr 2005 20:12:50 +0200
 
---0-1674547832-1114366373=:52417
-Content-Type: text/plain; charset=us-ascii
+Hi Henryk,
 
-Can we have a 5-slot packet in direction of master-to-slave followed by a 5-slot packet in slave-to-master direction.
- 
-Or, It is always 6 slots both directions combined. i.e. 5-slot packet in direction of master-to-slave followed by a 1-slot packet in slave-to-master direction
- 
-Thank you for your time.
---Krishna
+> > - for kernel integration, linus &co may not be interested in a
+> > kernel-side sbc decoder- they will certainly ask for a /dev/ entry
+> > taking the native format - in that case already encoded sbc. 
+> 
+> and
+> 
+> > Later on, like rfcomm manages rfcomm0 etc. entries, some a2dp tool
+> > could bind a2dp peripherals to /dev/a2dpN where SBC audio would be
+> > expected and streamed to the a2dp peripheral bound there.
+> 
+> My 0.02EUR: There is a problem here. Mayank turned up a very valid point
+> in his "a2play code not according to the specifications" posting: Having
+> the SBC encoding decoupled from the AVDTP negotiation is not a good
+> thing. One of the primary problems of the current pipe approach (and
+> expecting applications to stream SBC into a socket/device/whatever is
+> not different in this regard) is that the format of the SBC stream
+> (sample rate, channel mode, etc.) will have to depend on the
+> capabilities of the receiver, but there is no feedback to the encoder
+> about that.
+> 
+> Therefore the best implementation would be to put the actual encoding
+> into the same layer of code that does the negotiation, or at least put
+> the control over the encoder there. Otherwise you wouldn't have the
+> simple "open and write something into it" semantics most other devices
+> have, but would need to have something along the lines of "open the
+> device, offer it some audio formats, let it do the negotation, read back
+> the audio format that is to be used, encode the audio stream into that
+> format". 
 
---0-1674547832-1114366373=:52417
-Content-Type: text/html; charset=us-ascii
+if we do the kernel AVDTP socket interface then it will do something
+like that. However this not only about A2DP, because in the future we
+may wanna use it also for VDP.
 
-<DIV>Can we have&nbsp;a 5-slot packet in direction of master-to-slave followed by a 5-slot packet in slave-to-master direction.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Or, It is always 6 slots both directions combined. i.e. 5-slot packet in direction of master-to-slave followed by a 1-slot packet in slave-to-master direction</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Thank you for your time.</DIV>
-<DIV>--Krishna</DIV>
---0-1674547832-1114366373=:52417--
+> And also coupling /dev/a2dpN tightly to SBC format would make it even
+> harder (or impossible) to support other audio formats as A2DP does.
+
+Don't worry about /dev/*whatever*, because it will be socket based and
+not character devices.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
