@@ -1,15 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+Message-ID: <20050425045446.72720.qmail@web30302.mail.mud.yahoo.com>
+From: Ka Fai Lau <iamkafai2002@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] A2DP sink code finally
-Message-Id: <20050425080812.41cf1fab.henryk@ploetzli.ch>
-In-Reply-To: <426C62D4.80009@xmission.com>
-References: <20050424150930.71134.qmail@web8308.mail.in.yahoo.com>
-	<426C62D4.80009@xmission.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Mon__25_Apr_2005_08_08_12_+0200_gXRlJ0DzgG41velB"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] supporting HID report mode?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,51 +16,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 25 Apr 2005 08:08:12 +0200
+Date: Sun, 24 Apr 2005 21:54:46 -0700 (PDT)
 
---Signature=_Mon__25_Apr_2005_08_08_12_+0200_gXRlJ0DzgG41velB
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The extra keys on my keyboard is not being reported.  It looks like the current
+core.c in 2.6.11 is using BOOT mode only.
 
-Moin,
+I read a few previous post that REPORT mode is added to mh patch? will 
+patch-2.6.11-mh2.gz do the trick?  If yes, I would like to try it out.
 
-Am Sun, 24 Apr 2005 21:24:04 -0600 schrieb Brad Midgley:
+do I need the latest utils though?
 
-> Thanks for the submission. I corrected some warnings, disabled unused=20
-> functions, and added it to Makefile.am.
+Many thanks
 
-Ah, thanks.
+--Martin
 
-> We definitely need to do a lot of cleanup (eg now that a2play and
-> a2snk  have so much duplication), but first off we need to see why
-> audio is  being distorted...
 
-Hmm, how do I test that? I can't seem to get my audio dongle to connect.
-Is there anything else I've got to do apart from=20
-| hciconfig hci0 class 0x200404
-| sdptool add A2SNK
-| ./a2snk
-?
-
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
-
---Signature=_Mon__25_Apr_2005_08_08_12_+0200_gXRlJ0DzgG41velB
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQFCbIlQIjWgKE0OA2gRAhGUAKDIycUjHniSgisIKhwfWnE2GPdXEgCfUMv9
-4mhgc7gG4ldoIGKBq5cz93A=
-=/hse
------END PGP SIGNATURE-----
-
---Signature=_Mon__25_Apr_2005_08_08_12_+0200_gXRlJ0DzgG41velB--
+		
+__________________________________ 
+Do you Yahoo!? 
+Make Yahoo! your home page 
+http://www.yahoo.com/r/hs
 
 
 -------------------------------------------------------
