@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] supporting HID report mode?
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <426D2B36.9040009@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050425045446.72720.qmail@web30302.mail.mud.yahoo.com>
-References: <20050425045446.72720.qmail@web30302.mail.mud.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1114515291.10706.210.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Comments about the Logitech/HP stereo headphones
+References: <1114345112.10706.64.camel@pegasus>	 <426BA787.9060202@xmission.com> <1114356659.10706.105.camel@pegasus>
+In-Reply-To: <1114356659.10706.105.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,28 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 26 Apr 2005 13:34:51 +0200
-
-Hi Martin,
-
-> The extra keys on my keyboard is not being reported.  It looks like the current
-> core.c in 2.6.11 is using BOOT mode only.
-
-that is correct.
-
-> I read a few previous post that REPORT mode is added to mh patch? will 
-> patch-2.6.11-mh2.gz do the trick?  If yes, I would like to try it out.
-
-The -mh2 will add the report protocol mode.
-
-> do I need the latest utils though?
-
-Not necessary, but it is always a good idea.
-
-Regards
+Date: Mon, 25 Apr 2005 11:39:02 -0600
 
 Marcel
 
+>>This all sounds very good and I feel like a dope for getting rid of my 
+>>bluetake headset when I had only ordered, but not received, a 
+>>replacement. I'm still waiting for my itech. :(
+> 
+> if people start to donate some money, then I can buy you one of the HP
+> headphones to work with.
+
+I think I'll just order the HP set myself and get back into things. The 
+other set is taking too long.
+
+Brad
 
 
 
