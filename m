@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <426D0162.4070500@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] A2DP sink code finally
-References: <20050424150930.71134.qmail@web8308.mail.in.yahoo.com>	<426C62D4.80009@xmission.com> <20050425080812.41cf1fab.henryk@ploetzli.ch>
-In-Reply-To: <20050425080812.41cf1fab.henryk@ploetzli.ch>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Message-Id: <20050425080812.41cf1fab.henryk@ploetzli.ch>
+In-Reply-To: <426C62D4.80009@xmission.com>
+References: <20050424150930.71134.qmail@web8308.mail.in.yahoo.com>
+	<426C62D4.80009@xmission.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Mon__25_Apr_2005_08_08_12_+0200_gXRlJ0DzgG41velB"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,41 +21,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 25 Apr 2005 08:40:34 -0600
+Date: Mon, 25 Apr 2005 08:08:12 +0200
 
-Henryk,
+--Signature=_Mon__25_Apr_2005_08_08_12_+0200_gXRlJ0DzgG41velB
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'm not sure anyone has used the dongle yet. (Mayank?)
+Moin,
 
-I'll be trying it once I have another machine set up to run a2play.
+Am Sun, 24 Apr 2005 21:24:04 -0600 schrieb Brad Midgley:
 
-Brad
+> Thanks for the submission. I corrected some warnings, disabled unused=20
+> functions, and added it to Makefile.am.
 
-Henryk Plötz wrote:
-> Moin,
-> 
-> Am Sun, 24 Apr 2005 21:24:04 -0600 schrieb Brad Midgley:
-> 
-> 
->>Thanks for the submission. I corrected some warnings, disabled unused 
->>functions, and added it to Makefile.am.
-> 
-> 
-> Ah, thanks.
-> 
-> 
->>We definitely need to do a lot of cleanup (eg now that a2play and
->>a2snk  have so much duplication), but first off we need to see why
->>audio is  being distorted...
-> 
-> 
-> Hmm, how do I test that? I can't seem to get my audio dongle to connect.
-> Is there anything else I've got to do apart from 
-> | hciconfig hci0 class 0x200404
-> | sdptool add A2SNK
-> | ./a2snk
-> ?
-> 
+Ah, thanks.
+
+> We definitely need to do a lot of cleanup (eg now that a2play and
+> a2snk  have so much duplication), but first off we need to see why
+> audio is  being distorted...
+
+Hmm, how do I test that? I can't seem to get my audio dongle to connect.
+Is there anything else I've got to do apart from=20
+| hciconfig hci0 class 0x200404
+| sdptool add A2SNK
+| ./a2snk
+?
+
+--=20
+Henryk Pl=F6tz
+Gr=FC=DFe aus Berlin
+~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
+~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+
+--Signature=_Mon__25_Apr_2005_08_08_12_+0200_gXRlJ0DzgG41velB
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFCbIlQIjWgKE0OA2gRAhGUAKDIycUjHniSgisIKhwfWnE2GPdXEgCfUMv9
+4mhgc7gG4ldoIGKBq5cz93A=
+=/hse
+-----END PGP SIGNATURE-----
+
+--Signature=_Mon__25_Apr_2005_08_08_12_+0200_gXRlJ0DzgG41velB--
 
 
 -------------------------------------------------------
