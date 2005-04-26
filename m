@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050426122316.47651.qmail@web8310.mail.in.yahoo.com>
+Message-ID: <20050426122127.57962.qmail@web8302.mail.in.yahoo.com>
 From: Mayank Batra <mayankbatra@yahoo.co.in>
-Subject: Re: [Bluez-devel] A2DP sink code finally
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <426C62D4.80009@xmission.com>
+To: BLUEZ DEVELOPERS LIST <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <426C05D9.6090100@xmission.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-devel] Re: a2play code that is working
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,52 +17,77 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 26 Apr 2005 13:23:16 +0100 (BST)
+Date: Tue, 26 Apr 2005 13:21:27 +0100 (BST)
 
 Brad,
 
-> Thanks for the submission. I corrected some
-> warnings, disabled unused 
-> functions, and added it to Makefile.am.
+> There is sometimes a delay before cvs gets updated
+> by sourceforge. I had 
+> made those changes to sbc.h
 
-Great!
- 
-> We definitely need to do a lot of cleanup (eg now
-> that a2play and a2snk 
-> have so much duplication), but first off we need to
-> see why audio is 
-> being distorted...
+Are you sure it will be ok if we change the sbc.h and
+sbc.c files ?
+Because then the other applications making use of the
+sbc encoder will also have to change accordingly...??
 
-Exactly. Once the audio part is ok then we can take
-care of the duplication part.
+I mean it is ok for a2dp applications, but what about
+others...??
 
 
 Mayank
 
+
+ 
 > Mayank Batra wrote:
-> > Hi Brad,
+> > Brad,
 > > 
-> > This is the code for the A2DP sink application.
+> > I tried the code from the CVS.
 > > 
-> > Compilation:
+> > It was not compiling.
 > > 
-> > gcc -o a2snk a2snk.c -lbluetooth
+> > Reason is that you have changed the no. of
+> parameters
+> > being passed through sbc_encode(). But in sbc.h
+> the
+> > declaration is different.
 > > 
-> > Running the application:
+> > So I have made a new file called sbc_a2dp.h which
+> now
+> > contains the new declaration.
 > > 
-> > ./a2snk
+> > Also we will have to include the file sbc_a2dp.c
+> > because the sbc.c file contains the old definition
+> of
+> > sbc_encode(). Now since the definintion has
+> changed I
+> > have made a new file called sbc_a2dp.c which we
+> will
+> > have to include in the a2play.c file. I know that
+> it
+> > is not good to include .c files in the code... but
+> > can't help it.
 > > 
-> > Right now the following bugs exist:
+> > If you have a better way out, please tell me.
 > > 
-> > 1)   Poor sound quality.
+> > Put the sbc_a2play.h and sbc_a2play.c files in the
+> > sbc/ folder.
 > > 
-> > 2)   Unclean disconnection.
+> > After making the above files and including
+> sbc_a2dp.h
+> > and sbc_a2dp.c files in the a2play.c file, then
+> the
+> > compilation is taking place fine.
 > > 
-> > Help me improve the above areas.
+> > Please note that after including the sbc_a2dp.h
+> and
+> > sbc_a2dp.c files in the a2play.c file you should
+> not
+> > give -lsbc during compilation.
 > > 
-> > Please add this code to the CVS.
+> > I am not sending the patch once again. Please bear
+> > with me.
 > > 
-> > Thanks and Regards,
+> > Thanks.
 > > 
 > > Mayank
 > > 
@@ -79,12 +104,17 @@ ________________________________________________________________________
 ------------------------------------------------------------------------
 > > 
 > > /*
-> >  * a2snk.c
-> >  * This program functions as an A2DP sink
-> >  * (Emulation of an A2DP headset)
-> >  * Mayank Batra  <mayankbatra@yahoo.co.in>
+> >  * a2play.c
+> >  * experimenting with sending a2dp audio to a
+> headset
+> >  * Brad Midgley
+> >  *
+>
+*************************************************************************************
+> >  * Mayank Batra <mayankbatra@yahoo.co.in> (Added
+> real time SBC encoding while streaming)
 > >  * Abhinav Mathur <abhinavpmathur@yahoo.com>
-> >  * 
+> >  *
 > >  *   This program is free software; you can
 > redistribute it and/or modify
 > >  *   it under the terms of the GNU General Public
@@ -123,11 +153,6 @@ ________________________________________________________________________
 > > #include <signal.h>
 > > #include <string.h>
 > > #include <sys/socket.h>
-> > #include <sys/stat.h>
-> > #include <sys/soundcard.h>	//To play the sound on
-> the sound card
-> > 
-> > #include "sbc/sbc.h"
 > > 
 > > #include <bluetooth/bluetooth.h>
 > > #include <bluetooth/hci.h>
@@ -138,14 +163,24 @@ ________________________________________________________________________
 > > 
 > > #include <netinet/in.h>
 > > 
+> > /* This is because we have changed the declaration
+> of sbc_encode */
+> > #include "sbc/sbc_a2dp.h"	
+> > /* This is because we have changed the definition
+> of sbc_encode */
+> > #include "sbc/sbc_a2dp.c"	//Even though it is not
+> good to do so
+> > /* So, we do not want to use the sbc.h and sbc.c
+> files as they contain the old definition and
+> declaration */
+> > 
 > > /* AVDTP structures */
 > > 
 > > /* packet components */
 > > 
 > > struct avdtp_header {
-> > 	//uint8_t packet_type:2;
-> > 	uint8_t message_type:2;
 > > 	uint8_t packet_type:2;
+> > 	uint8_t message_type:2;
 > > 	uint8_t transaction_label:4;
 > > 	uint8_t signal_id:6;
 > > 	uint8_t rfa0:2;
@@ -171,8 +206,7 @@ ________________________________________________________________________
 > > 	uint8_t max_bitpool;
 > > } __attribute__ ((packed));
 > > 
-> > #define MAX_ADDITIONAL_CODEC 0	//Right now only
-> SBC is supported
+> > #define MAX_ADDITIONAL_CODEC 4
 > > #define MAX_ADDITIONAL_CODEC_OCTETS
 > (MAX_ADDITIONAL_CODEC*sizeof(struct acp_seid_info))
 > > 
@@ -190,44 +224,6 @@ ________________________________________________________________________
 > > 
 > > struct getcap_req {
 > > 	struct avdtp_header header;
-> > 	uint8_t rfa1:2;
-> > 	uint8_t acp_seid:6;
-> > } __attribute__ ((packed));
-> > 
-> > struct getcap_resp {
-> > 	struct avdtp_header header;
-> > 
-> > 	uint8_t serv_cap;
-> > 	uint8_t serv_cap_len;
-> > 
-> > 	uint8_t cap_type;
-> > 	uint8_t length;
-> > 	uint8_t media_type;
-> > 	uint8_t media_codec_type;
-> > 
-> > 	struct sbc_codec_specific_elements sbc_elements;
-> > 
-> > } __attribute__ ((packed));
-> > 
-> > struct set_config {
-> > 	struct avdtp_header header;
-> > 
-> > 	uint8_t rfa0:2;
-> > 	uint8_t acp_seid:6;
-> > 	uint8_t rfa1:2;
-> > 	uint8_t int_seid:6;
-> > 
-> > 	uint8_t serv_cap;
-> > 	uint8_t serv_cap_len;
-> > 
-> > 	uint8_t cap_type;
-> > 	uint8_t length;
-> > 	uint8_t media_type;
-> > 	uint8_t media_codec_type;
-> > 
-> > 	struct sbc_codec_specific_elements sbc_elements;
-> > 
-> > } __attribute__ ((packed));
 > 
 === message truncated === 
 
