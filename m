@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] auto pairing between client & server
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-From: Russell Senior <seniorr@aracnet.com>
-Message-ID: <86oec12tkz.fsf@coulee.tdb.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] connecting to a serial dongle with a PIN
+In-Reply-To: <426E8A1F.7070707@gmx.ch>
+References: <2621d9af05042213064d0df1dc@mail.gmail.com>
+	 <426ABEBD.5060701@gmx.ch> <2621d9af0504250729e34a2aa@mail.gmail.com>
+	 <426D00CB.7060508@gmx.ch>  <2621d9af0504260302e1c13c7@mail.gmail.com>
+	 <1114515066.10706.204.camel@pegasus>  <426E7C67.30902@gmx.ch>
+	 <1114537612.10706.325.camel@pegasus>  <426E8A1F.7070707@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1114542256.10706.329.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,45 +22,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 26 Apr 2005 13:04:12 -0700
+Date: Tue, 26 Apr 2005 21:04:16 +0200
+
+Hi Marco,
+
+>  > the PIN helper is a program with specific parameters and it must return
+>  > on standard output "PIN:1234" for example or "ERR".
+> 
+> Yes, I know. But you wrote in that email that prior to 2.16 this was 
+> needed. That let's me assume that now it's possible to use the pin file for 
+> outgoing connections too.
+
+this is correct. With 2.16 you can create a pincodes file.
+
+Regards
+
+Marcel
 
 
-Could someone please explain to me how I connect from a USB bluetooth
-dongle to a bluetooth serial dongle that uses a PIN.  I try this:
-
-  # l2ping 00:0B:CE:00:7A:8F
-  Can't connect: Permission denied
-
-A simultaneous hcidump shows:
-
-  # hcidump -V
-  HCI sniffer - Bluetooth packet analyzer ver 1.17
-  device: hci0 snap_len: 1028 filter: 0xffffffff
-  < HCI Command: Create Connection (0x01|0x0005) plen 13
-  > HCI Event: Command Status (0x0f) plen 4
-      Create Connection (0x01|0x0005) status 0x00 ncmd 1
-  > HCI Event: PIN Code Request (0x16) plen 6
-  < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
-  > HCI Event: Command Complete (0x0e) plen 10
-      PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
-  > HCI Event: Connect Complete (0x03) plen 11
-      status 0x18 handle 41 bdaddr 00:0B:CE:00:7A:8F type ACL encrypt 0x00
-      Error: Unknown LMP PDU
-
-This is on a Debian/unstable system with:
-
-   bluez-hcidump  1.17-1
-   bluez-pin      0.25-1
-   bluez-utils    2.15-1
-
-installed.  Linux kernel v2.6.11.7.
-
-Thanks!
-
-
--- 
-Russell Senior         ``I have nine fingers; you have ten.''
-seniorr@aracnet.com
 
 
 -------------------------------------------------------
