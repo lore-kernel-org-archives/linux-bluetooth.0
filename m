@@ -1,10 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <2621d9af05042615314d248399@mail.gmail.com>
+From: "N. I." <neutralidea@gmail.com>
 To: bluez-users@lists.sourceforge.net
-From: Phil Stopford <philstopford@hotmail.com>
-Message-ID: <loom.20050427T005347-298@post.gmane.org>
+Subject: Re: [Bluez-users] auto pairing between client & server
+In-Reply-To: <1114542256.10706.329.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Belkin F8T002 PCMCIA - how to get working?
+Content-Type: text/plain; charset=ISO-8859-1
+References: <2621d9af05042213064d0df1dc@mail.gmail.com>
+	 <426ABEBD.5060701@gmx.ch> <2621d9af0504250729e34a2aa@mail.gmail.com>
+	 <426D00CB.7060508@gmx.ch> <2621d9af0504260302e1c13c7@mail.gmail.com>
+	 <1114515066.10706.204.camel@pegasus> <426E7C67.30902@gmx.ch>
+	 <1114537612.10706.325.camel@pegasus> <426E8A1F.7070707@gmx.ch>
+	 <1114542256.10706.329.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,43 +23,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 26 Apr 2005 23:07:13 +0000 (UTC)
+Date: Tue, 26 Apr 2005 18:31:37 -0400
 
-I'm new to this and, having done a lot of search on google (this list could
-really use a .mbox archive :) ), it seems that there is no documented way of
-getting this card up and running. I'm hoping someone in here might be able to
-help. I'm running an updated, but otherwise stock, SUSE 9.3 Pro. Naturally the
-card works fine under Windows and I'm trying to avoid dumping what, outwardly,
-is a perfectly functional bit of hardware. I had hoped that serial_cs and
-hci_uart might be workable, but so far it's proving fairly futile.
+Thanks for replying to my message.
 
-cardctl ident provides :
+I'm not quite following the discussion about the pincode file.
+Can you please put me in the context of using it?
+And also I tol solve my problem with version 2.16?
 
-Socket 0:
-  product info: "OXSEMI", "OXCB950", "Rev A"
-  manfid: 0x0279, 0x0001
-  function: 2 (serial)
-
-dmesg only shows the following on inserting the card :
-
-PCI: Enabling device 0000:02:00.0 (0000 -> 0003)
-
-It shows up a great list of information in hal-device-manager, but I'm not going
-to post this in case it is of limited value.
-
-Comments would be welcome, assuming that this card can be made to work, on how
-to automate the setup. Failing that, a recommendation of a device that will work
-without causing me even more frustration would be welcome.
-
-BTW, there appears to be no end-user documentation for BlueZ. As a new user, I
-had hoped to find a hand-holding guide to help me through finding out whether
-the device would work....there's nothing in the package documentation or on the
-BlueZ web site that appears to do the job.
-
-Thanks for any and all assistance,
-
-Phil Stopford.
-
+N.I.
 
 
 -------------------------------------------------------
