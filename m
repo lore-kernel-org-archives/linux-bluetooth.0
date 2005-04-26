@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Fred Schaettgen <bluez-user@schaettgen.de>
+Subject: Re: [Bluez-users] How to NOT initialize newly attached Bluetooth
+	dongles
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] implementing security mode 2 or 3
-References: <426E0C5A.8060203@gmx.ch>
-In-Reply-To: <426E0C5A.8060203@gmx.ch>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200504261153.08434.bluez-user@schaettgen.de>
+In-Reply-To: <20050425014245.12337.qmail@web20926.mail.yahoo.com>
+References: <20050425014245.12337.qmail@web20926.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1114515461.10706.213.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,37 +19,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 26 Apr 2005 11:53:08 +0200
+Date: Tue, 26 Apr 2005 13:37:41 +0200
 
-On Tuesday, 26. April 2005 11:39, Marco Trudel wrote:
-> I've two rfcomm service running on different channels.
-> I wish to have one channel authenticated/encrypted, the other
-> unathenticated(unencrypted).
->
-> As much as I know, that means that security mode 3 won't work, security
-> mode 2 has to be used and I've to program this myself.
->
-> Does this mean that I've to request authentication/encryption on incoming
-> connections? 
+Hi Arch,
 
-Yes.
+> I have been using hcid in handling initialization of my Bluetooth
+> dongle.
+>  
+> I have this issue with regards to me not wanting to initialize newly
+> attached Bluetooth dongles.
+> Here is the scenario:
+> 1. I let hcid initialize my attached Bluetooth dongle.
+> 2. Then I configure the dongle to be in the OFF state/mode (hciconfig
+> hci0 down).
+> 3. When I detach the dongle and re-attach it, it comes back to UP and
+> Running mode.
+>  
+> Since I put the dongle in OFF mode, I would like to keep this mode
+> when I detach and re-attach the dongle.
+>  
+> My question then is how will I make it not being automatically
+> initialized by hcid.
+> I have been trying to play with the hcid configuration file but to no
+> avail.
 
-> How can I do that using bluez? 
+the hcid is not storing the current mode of a device. The only thing you
+can do right now is to disable the autoinit feature completely and do
+everything by yourself.
 
-int opt = RFCOMM_LM_AUTH | RFCOMM_LM_ENCRYPT;
-setsockopt(s, SOL_RFCOMM, RFCOMM_LM, &opt, sizeof(opt));
+Regards
 
-> Will this provide less security/encryption than using security mode 3?
+Marcel
 
-No, but you will need a recent kernel. For older kernels it will simply not 
-work, and IIRC the call even failed silently without reporting an error in 
-one kernel version. Can't remember which one it was though. 2.6.8 or 9 maybe?
 
-Fred
-
--- 
-Fred Schaettgen
-bluez-devel@schaettgen.de
 
 
 -------------------------------------------------------
