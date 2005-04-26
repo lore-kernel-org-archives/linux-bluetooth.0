@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <426E7C67.30902@gmx.ch>
+Message-ID: <426E7B12.6040602@gmx.ch>
 From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] auto pairing between client & server
-References: <2621d9af05042213064d0df1dc@mail.gmail.com>	 <426ABEBD.5060701@gmx.ch> <2621d9af0504250729e34a2aa@mail.gmail.com>	 <426D00CB.7060508@gmx.ch>  <2621d9af0504260302e1c13c7@mail.gmail.com> <1114515066.10706.204.camel@pegasus>
-In-Reply-To: <1114515066.10706.204.camel@pegasus>
+Subject: Re: [Bluez-users] implementing security mode 2 or 3
+References: <426E0C5A.8060203@gmx.ch>	 <200504261153.08434.bluez-user@schaettgen.de>  <426E5CCC.2030108@gmx.ch>	 <1114530540.10706.301.camel@pegasus>  <426E6516.3010403@gmx.ch>	 <1114532376.10706.310.camel@pegasus>  <426E6F60.2020000@gmx.ch> <1114534837.10706.320.camel@pegasus>
+In-Reply-To: <1114534837.10706.320.camel@pegasus>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,46 +18,52 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 26 Apr 2005 19:37:43 +0200
-
-
+Date: Tue, 26 Apr 2005 19:32:02 +0200
 
 Marcel Holtmann wrote:
-> Hi,
+> Hi Marco,
 > 
 > 
->>I ran a test with the new configuration and found out the bluetooth
->>devices which has this config modified accepted any device coming. The
->>pairing window is not poped up anymore, but the link_key is not
->>updated (still 0 byte).
+>>>>>the 2.6.7 will fail. The needed security hooks are introduced with
+>>>>>2.6.10 and the RFCOMM service level security with 2.6.11 according to my
+>>>>>patch logs.
+>>>>>
+>>>>>
+>>>>>>If not, which part of the kernel has to be fixed? Is it a part of bluez?
+>>>>>
+>>>>>It is inside the BlueZ core and the RFCOMM layer.
+>>>>
+>>>>How long would you have to backport that to kernel 2.6.7?
+>>>>Maybe we can arrainge something with a donation...
+>>>
+>>>tell me what interfaces are you going to use. Is it always USB? What
+>>>kernel layers are involved? RFCOMM, BNEP, CMTP, HIDP?
 >>
->>As my understanding, this config ignores the pairing and pin code. It
->>accepts all devices connecting to my device, no authentication. Is
->>that it?
+>>always USB. RFCOMM services.
+>>
+>>authentication/encryption enabled as suggested on the list:
+>>    int opt = RFCOMM_LM_AUTH|RFCOMM_LM_ENCRYPT;
+>>    setsockopt(sock, SOL_RFCOMM, RFCOMM_LM, &opt, sizeof(opt));
 > 
 > 
-> check the Bluetooth specification and understand the differences between
-> the security modes. Use only security mode 3 if you really know what you
-> are doing. Otherwise use the service level security features of L2CAP
-> and RFCOMM.
-> 
-> 
->>What I want is to avoid the pin popup for certain bluetooth devices
->>(know specific BD_ADDR). When those allowed devices connect to my
->>device, then I will try to provide "silently" the PIN (no popups) and
->>the pairing should be done from there. If other device which BD_ADDR
->>does not belong to the list of addresses that my device has, it should
->>not be rejected.
-> 
-> 
-> If you wanna do that with the bluez-utils prior 2.16 you need to write
-> your own PIN helper program. With 2.16 you can use a pincodes file for
-> these task.
+> this means HCI, L2CAP, RFCOMM and hci_usb driver updates up to
+> 2.6.12-rc2 should be included.
 
-If I understand you right, it's possible to replace the pinhelper so that 
-etc/bluetooth/pin is read for outgoing connections?
-what's the configuration parameter?
-pin_helper auto/file; ?
+sounds reasonable...
+
+>>>You will need more than this two patches for a 2.6.7 based kernel,
+>>>because there are some serious problems, too.
+>>
+>>actually I never run into problems with the 2.4 kernel. But I think it 
+>>would definitely make sense to have this things fixed too...
+> 
+> 
+> Some of them were hard to trigger and there is still one RFCOMM thing
+> that is unresolved. Btw do you need a SMP or HT kernel?
+
+No. I don't think so.
+I work with an arm SBC with one processor and a very minimal redhat. not 
+much fancy stuff...
 
 regards
 Marco
