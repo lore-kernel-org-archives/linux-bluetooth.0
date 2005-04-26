@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <426E6857.6010204@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] A2DP sink code finally
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: a2play code that is working
-References: <20050426122127.57962.qmail@web8302.mail.in.yahoo.com> <1114527365.10706.288.camel@pegasus>
-In-Reply-To: <1114527365.10706.288.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <426E3DBE.2000905@xmission.com>
+References: <20050426123559.59825.qmail@web8302.mail.in.yahoo.com>
+	 <426E3DBE.2000905@xmission.com>
+Content-Type: text/plain
+Message-Id: <1114530608.10706.303.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,23 +19,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 26 Apr 2005 10:12:07 -0600
+Date: Tue, 26 Apr 2005 17:50:08 +0200
+
+Hi Brad,
+
+> The term is overloaded. Henryk is trying to use the little box from 
+> bluetake that runs as an a2dp source. It only has one button on it, so 
+> it has to be able to find the sink using only sdp.
+
+I tried the box from my Aiptek headphone once and it was not really
+working, because I think all GCT devices expect a role switch at some
+time.
+
+Regards
 
 Marcel
 
-> Now commenting on the change itself. The "struct sbc_frame_header"
-> should not placed inside the sbc.h header file. This is the API
-> interface and we don't need a definition of the SBC file format there.
-> If you wanna modify the additional SBC parameters add them to sbc_struct
-> and set them there. Please fix this.
-> 
-> Also a library should not use printf() at all. Remove them and improve
-> the return values to match -ENOMEM etc.
 
-I will clean this up (I was being lazy and rolling in submissions 
-without reworking them enough)
-
-Brad
 
 
 -------------------------------------------------------
