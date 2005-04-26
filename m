@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] List of supported devices
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <2621d9af0504260302e1c13c7@mail.gmail.com>
+From: "N. I." <neutralidea@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200504261142.42922.cijoml@volny.cz>
-References: <200504261142.42922.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1114515234.10706.208.camel@pegasus>
+Subject: Re: [Bluez-users] auto pairing between client & server
+In-Reply-To: <426D00CB.7060508@gmx.ch>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <2621d9af05042213064d0df1dc@mail.gmail.com>
+	 <426ABEBD.5060701@gmx.ch> <2621d9af0504250729e34a2aa@mail.gmail.com>
+	 <426D00CB.7060508@gmx.ch>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +20,139 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 26 Apr 2005 13:33:54 +0200
+Date: Tue, 26 Apr 2005 06:02:50 -0400
 
-Hi Michal,
+Hi Marco,
 
-> Can you start for now list of Bluez-supported devices again? We are now 
-> cerfitied :)
+I ran a test with the new configuration and found out the bluetooth
+devices which has this config modified accepted any device coming. The
+pairing window is not poped up anymore, but the link_key is not
+updated (still 0 byte).
 
-I am not sure if I can, because the argument (not that I understand it)
-was that all devices in this list are not qualified with BlueZ. This
-means that even if BlueZ is qualified, these devices are only qualified
-with the stack (Widcomm, Windows XP etc.) they ship.
+As my understanding, this config ignores the pairing and pin code. It
+accepts all devices connecting to my device, no authentication. Is
+that it?
 
-On the other hand you can use the features page and if the HCI version
-field is filled, then this device is working with BlueZ.
+What I want is to avoid the pin popup for certain bluetooth devices
+(know specific BD_ADDR). When those allowed devices connect to my
+device, then I will try to provide "silently" the PIN (no popups) and
+the pairing should be done from there. If other device which BD_ADDR
+does not belong to the list of addresses that my device has, it should
+not be rejected.
 
-Regards
+Any help please?
 
-Marcel
+N.I.
 
-
+On 4/25/05, Marco Trudel <mtrudel@gmx.ch> wrote:
+> change to security mode 1. that means to comment out:
+> #auth enable;
+> #encrypt enable;
+>=20
+> you can keep "security auto".
+>=20
+> regards
+> Marco
+>=20
+>=20
+> N. I. wrote:
+> > In the hcid.conf file, I have:
+> > security auto;
+> > auth enable;
+> >
+> > Is that what you meant I should change to be off?
+> >
+> >
+> >
+> > On 4/23/05, Marco Trudel <mtrudel@gmx.ch> wrote:
+> >
+> >>N. I. wrote:
+> >>
+> >>>I have a laptop which runs my application as server, and another
+> >>>cellphone as client. Both of them communicate to each other using
+> >>>Bluetooth (Bluez implementation).
+> >>
+> >>do you really mean the mobile phone is using bluez?
+> >>what for a mobilephone is this?
+> >>
+> >>
+> >>>What should I do in order to perform automatic pairing between these 2
+> >>>devices (knowing the BD_ADDR) inside my application?
+> >>>
+> >>>How can I detect if the pairing had been done between these
+> >>>client-server devices inside my application? And from that, how to do
+> >>>pairing using the "givepin" script?
+> >>>
+> >>>I want to avoid the pop-ups window asking for entering the PIN.
+> >>
+> >>disable authentication/encryption. you won't be asked for a pin because=
+ no
+> >>one is needed. you haven't to change the default bluez configuration to
+> >>reach this.
+> >>if you use java on your mobile phone, be shure to program the security
+> >>correctly.
+> >>
+> >>regards
+> >>Marco
+> >>
+> >>
+> >>>Please help,
+> >>>
+> >>>Thanks
+> >>>
+> >>>N.I.
+> >>>
+> >>>
+> >>>-------------------------------------------------------
+> >>>SF email is sponsored by - The IT Product Guide
+> >>>Read honest & candid reviews on hundreds of IT Products from real user=
+s.
+> >>>Discover which products truly live up to the hype. Start reading now.
+> >>>http://ads.osdn.com/?ad_ide95&alloc_id=14396&op=3Dclick
+> >>>_______________________________________________
+> >>>Bluez-users mailing list
+> >>>Bluez-users@lists.sourceforge.net
+> >>>https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >>>
+> >>>
+> >>
+> >>-------------------------------------------------------
+> >>SF email is sponsored by - The IT Product Guide
+> >>Read honest & candid reviews on hundreds of IT Products from real users=
+.
+> >>Discover which products truly live up to the hype. Start reading now.
+> >>http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
+> >>_______________________________________________
+> >>Bluez-users mailing list
+> >>Bluez-users@lists.sourceforge.net
+> >>https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >>
+> >
+> >
+> >
+> > -------------------------------------------------------
+> > SF email is sponsored by - The IT Product Guide
+> > Read honest & candid reviews on hundreds of IT Products from real users=
+.
+> > Discover which products truly live up to the hype. Start reading now.
+> > http://ads.osdn.com/?ad_ide95&alloc_id=14396&op=3Dclick
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >
+> >
+>=20
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
