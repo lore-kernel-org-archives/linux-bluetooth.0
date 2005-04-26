@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <426E5CCC.2030108@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] auto pairing between client & server
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] implementing security mode 2 or 3
-References: <426E0C5A.8060203@gmx.ch> <200504261153.08434.bluez-user@schaettgen.de>
-In-Reply-To: <200504261153.08434.bluez-user@schaettgen.de>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <2621d9af0504260302e1c13c7@mail.gmail.com>
+References: <2621d9af05042213064d0df1dc@mail.gmail.com>
+	 <426ABEBD.5060701@gmx.ch> <2621d9af0504250729e34a2aa@mail.gmail.com>
+	 <426D00CB.7060508@gmx.ch>  <2621d9af0504260302e1c13c7@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1114515066.10706.204.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,58 +20,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 26 Apr 2005 17:22:52 +0200
+Date: Tue, 26 Apr 2005 13:31:06 +0200
 
-Thank you, this works great with a 2.6.11 kernel.
-Unfortunately I'm bound to kernel 2.4.26 or 2.6.7.
-2.4.26 doesn't work. It just let's remote devices connect...
-Do you know if 2.6.7 will?
+Hi,
 
-If not, which part of the kernel has to be fixed? Is it a part of bluez?
-Can this encryption be reached in another way?
+> I ran a test with the new configuration and found out the bluetooth
+> devices which has this config modified accepted any device coming. The
+> pairing window is not poped up anymore, but the link_key is not
+> updated (still 0 byte).
+> 
+> As my understanding, this config ignores the pairing and pin code. It
+> accepts all devices connecting to my device, no authentication. Is
+> that it?
 
-Where are the link keys saved? I'm unable to find them.
+check the Bluetooth specification and understand the differences between
+the security modes. Use only security mode 3 if you really know what you
+are doing. Otherwise use the service level security features of L2CAP
+and RFCOMM.
 
-Is there something that has to be paid attention to if I do encryption like 
-this? Does the password/Dongle/... influence the encryption strength?
+> What I want is to avoid the pin popup for certain bluetooth devices
+> (know specific BD_ADDR). When those allowed devices connect to my
+> device, then I will try to provide "silently" the PIN (no popups) and
+> the pairing should be done from there. If other device which BD_ADDR
+> does not belong to the list of addresses that my device has, it should
+> not be rejected.
 
-regards
-Marco
+If you wanna do that with the bluez-utils prior 2.16 you need to write
+your own PIN helper program. With 2.16 you can use a pincodes file for
+these task.
+
+Regards
+
+Marcel
 
 
-Fred Schaettgen wrote:
-> On Tuesday, 26. April 2005 11:39, Marco Trudel wrote:
-> 
->>I've two rfcomm service running on different channels.
->>I wish to have one channel authenticated/encrypted, the other
->>unathenticated(unencrypted).
->>
->>As much as I know, that means that security mode 3 won't work, security
->>mode 2 has to be used and I've to program this myself.
->>
->>Does this mean that I've to request authentication/encryption on incoming
->>connections? 
-> 
-> 
-> Yes.
-> 
-> 
->>How can I do that using bluez? 
-> 
-> 
-> int opt = RFCOMM_LM_AUTH | RFCOMM_LM_ENCRYPT;
-> setsockopt(s, SOL_RFCOMM, RFCOMM_LM, &opt, sizeof(opt));
-> 
-> 
->>Will this provide less security/encryption than using security mode 3?
-> 
-> 
-> No, but you will need a recent kernel. For older kernels it will simply not 
-> work, and IIRC the call even failed silently without reporting an error in 
-> one kernel version. Can't remember which one it was though. 2.6.8 or 9 maybe?
-> 
-> Fred
-> 
 
 
 -------------------------------------------------------
