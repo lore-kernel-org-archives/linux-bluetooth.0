@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Power Management
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <d1f423d30504260825eb0c231@mail.gmail.com>
+From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <d1f423d30504260825eb0c231@mail.gmail.com>
-References: <d1f423d30504260825eb0c231@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1114530103.10706.294.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Power Management
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 26 Apr 2005 17:41:43 +0200
+Date: Tue, 26 Apr 2005 11:25:00 -0400
 
-Hi Anderson,
-
-> is there a way to control power management using bluez? I know
-> "hcitool tpl" shows me the actual transmit power level and I would
-> like to know if i can change it.
-
-no, because this is the job of the link manager.
-
-Regards
-
-Marcel
+Hi folks,
 
 
+is there a way to control power management using bluez? I know
+"hcitool tpl" shows me the actual transmit power level and I would
+like to know if i can change it.
+
+regards,
+
+--=20
+Anderson Clayton B. Rodrigues
+Eng. de Software
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
