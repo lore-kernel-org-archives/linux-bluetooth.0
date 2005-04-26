@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
+Subject: Re: [Bluez-users] Encryption Mode Not Acceptable
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] List of supported devices
-References: <200504261142.42922.cijoml@volny.cz> <1114515234.10706.208.camel@pegasus>
-In-Reply-To: <1114515234.10706.208.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200504261451.38213.cijoml@volny.cz>
+In-Reply-To: <200504262235.43441.monetr@web.de>
+References: <200504262235.43441.monetr@web.de>
+Content-Type: text/plain
+Message-Id: <1114548547.10706.336.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,55 +18,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 26 Apr 2005 14:51:37 +0200
+Date: Tue, 26 Apr 2005 22:49:07 +0200
 
-Hmmm...
+Hi Rainer,
 
-Bluetooth qualification means that every qualified device can work with oth=
-er=20
-with same profile...
+> i am trying to connect my zaurus (2.4.18-rmk7-pxa3-embedix  + dtl1_cs) with my 
+> linux host (2.6.11 hci_usb).
+> The zaurus says
+> ZAURUS# hcitool cc XXX
+> Can't create connection: Connection timeout
+> HOST# hcidump -a -V -x
+> HCI sniffer - Bluetooth packet analyzer ver 1.17
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> > HCI Event: Connect Request (0x04) plen 10
+>     bdaddr 00:E0:03:25:0B:EF class 0x000000 type ACL
+> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+> > HCI Event: Command Status (0x0f) plen 4
+>     Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x24 handle 41 bdaddr 00:E0:03:25:0B:EF type ACL encrypt 0x00
+>     Error: Encryption Mode Not Acceptable
 
-So I think we can now use this list again. If you don't want, I can provide=
-=20
-space on my server.
+update hcidump to version 1.20 and try again with "hcidump -X -V" as
+root.
 
-Michal
+If you plan to use BNEP then use pand for testing and not "hcitool cc".
 
-Dne =FAt 26. dubna 2005 13:33 Marcel Holtmann napsal(a):
-> Hi Michal,
->
-> > Can you start for now list of Bluez-supported devices again? We are now
-> > cerfitied :)
->
-> I am not sure if I can, because the argument (not that I understand it)
-> was that all devices in this list are not qualified with BlueZ. This
-> means that even if BlueZ is qualified, these devices are only qualified
-> with the stack (Widcomm, Windows XP etc.) they ship.
->
-> On the other hand you can use the features page and if the HCI version
-> field is filled, then this device is working with BlueZ.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+Regards
 
-=2D-=20
-S pozdravem
+Marcel
 
-Michal Semler
 
 
 
