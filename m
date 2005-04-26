@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Adding services in the Service Class ID list
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20050426123559.59825.qmail@web8302.mail.in.yahoo.com>
+From: Mayank Batra <mayankbatra@yahoo.co.in>
+Subject: Re: [Bluez-devel] A2DP sink code finally
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050425013050.76433.qmail@web20927.mail.yahoo.com>
-References: <20050425013050.76433.qmail@web20927.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1114515608.10706.217.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: 6667
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,32 +17,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 26 Apr 2005 13:40:08 +0200
+Date: Tue, 26 Apr 2005 13:35:59 +0100 (BST)
 
-Hi Arch,
+Brad,
 
-> I have been trying to add services in the Service Class ID list like
-> as shown below:
->  
-> Attribute Identifier : 0x1 - ServiceClassIDList
->   Data Sequence
->     UUID16 : 0x1112 - HeadsetAudioGateway
->     UUID16 : 0x1203 - GenericAudio
->  
-> It seemed that the 2 services have been added successfully.
-> However, when I use sdptool to browse for the services, only the last
-> service is the one reflected in the service and not both.
->  
-> Please advice as on how I can successfully add the 2 services in the
-> service class ID list.
+> I'm not sure anyone has used the dongle yet.
+> (Mayank?)
+> 
 
-show us the source code you are using.
+Yes I have definitely used dongles (Simple USB Dongle,
+I don't know what does an audio dongle mean. I hope
+there is not much of a difference)
 
-Regards
+Mayank
 
-Marcel
+Mayank Batra
 
 
+Whether you think you can or whether you think you can't, you are right. -Henry Ford.
+
+________________________________________________________________________
+Yahoo! India Matrimony: Find your life partner online
+Go to: http://yahoo.shaadi.com/india-matrimony
 
 
 -------------------------------------------------------
