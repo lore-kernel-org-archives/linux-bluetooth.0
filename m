@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Deresch <aderesch@fs.tum.de>
-To: bluez-users@lists.sourceforge.net, Wind Ho <wind_ho@msn.com>
-Subject: Re: [Bluez-users] how can i send a picture from linux pc to T68i
-In-Reply-To: <BAY5-F758FC622E7F5FB2C4DF95892E0@phx.gbl>
-Message-ID: <Pine.LNX.4.62.0504261433490.10343@Magrathea>
-References: <BAY5-F758FC622E7F5FB2C4DF95892E0@phx.gbl>
+Message-ID: <426E0C5A.8060203@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] implementing security mode 2 or 3
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,23 +16,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 26 Apr 2005 14:42:10 +0200 (CEST)
+Date: Tue, 26 Apr 2005 11:39:38 +0200
 
-On Sat, 23 Apr 2005, Wind Ho wrote:
+Sorry for double-posting. I sent this email already but it seems it never 
+reached the list...
 
-> Subject: [Bluez-users] how can i send a picture from linux pc to T68i
-> 
-> would some one help me, tell me the detail? i
-Does your distribution provide tsemgr?
-That would probably be the easiest way.
 
-Otherwise depending on your preferred GUI you might use gnome-bluetooth or
-kde-bluetooth. Unless I'm mistaken both provide OBEX send functionality.
+Hello
 
-If that is not detailed enough for you, you should explain what you've tried
-so far.
+I've two rfcomm service running on different channels.
+I wish to have one channel authenticated/encrypted, the other
+unathenticated(unencrypted).
 
-ad
+As much as I know, that means that security mode 3 won't work, security
+mode 2 has to be used and I've to program this myself.
+
+Does this mean that I've to request authentication/encryption on incoming
+connections? How can I do that using bluez?
+Will this provide less security/encryption than using security mode 3?
+
+regards
+Marco
 
 
 -------------------------------------------------------
