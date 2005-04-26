@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050426122943.20997.qmail@web8304.mail.in.yahoo.com>
-From: Mayank Batra <mayankbatra@yahoo.co.in>
-Subject: Re: [Bluez-devel] A2DP sink code finally
+Subject: Re: [Bluez-devel] Re: a2play code that is working
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: 6667
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20050426122127.57962.qmail@web8302.mail.in.yahoo.com>
+References: <20050426122127.57962.qmail@web8302.mail.in.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1114527365.10706.288.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,46 +18,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 26 Apr 2005 13:29:43 +0100 (BST)
+Date: Tue, 26 Apr 2005 16:56:04 +0200
 
-Brad,
- 
-> I suspect the distortion could be happening if the
-> read() gets an sbc 
-> frame fragment at the end... it would be discarded
-> by the decoder if 
-> that happens.
- 
-Well, I did printf()s whenever each sbc frame was
-being deoded and it turned out that the no. of sbc
-frames being decoded from the a2dp packet were EXACTLY
-the no. present in the packet.
+Hi Mayank,
 
-If mtu is 676 then there are approx 8 sbc frames, and
-exactly 8 were getting decoded.
-Also, the sound produced(whatever that was being
-produced) was similar to the original music.
+> > There is sometimes a delay before cvs gets updated
+> > by sourceforge. I had 
+> > made those changes to sbc.h
+> 
+> Are you sure it will be ok if we change the sbc.h and
+> sbc.c files ?
+> Because then the other applications making use of the
+> sbc encoder will also have to change accordingly...??
 
-Just the fact that it is not exactly same.
-It means two things:
+there is no official SBC library release yet and so there is no problem
+at all. For the pcm_a2dp plugin I copied the SBC code.
 
-1) Either we are not configuring the sound card
-properly.
+However I don't agree with these changes and you should never do a
+library change together with the application change. Always make it two
+different change sets. This is easier for tracking and I actually missed
+that you changed the SBC library.
 
-2) Or our SBC decoder is not working properly. Henryk,
-what do you say about this possibility. Is it possible
-?
+Now commenting on the change itself. The "struct sbc_frame_header"
+should not placed inside the sbc.h header file. This is the API
+interface and we don't need a definition of the SBC file format there.
+If you wanna modify the additional SBC parameters add them to sbc_struct
+and set them there. Please fix this.
 
-Mayank
+Also a library should not use printf() at all. Remove them and improve
+the return values to match -ENOMEM etc.
 
-Mayank Batra
+Regards
+
+Marcel
 
 
-Whether you think you can or whether you think you can't, you are right. -Henry Ford.
-
-________________________________________________________________________
-Yahoo! India Matrimony: Find your life partner online
-Go to: http://yahoo.shaadi.com/india-matrimony
 
 
 -------------------------------------------------------
