@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5256d0b05042604372879b077@mail.gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
+Subject: Re: [Bluez-devel] hci_request
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] motorola HS820 headset doesn't work
-In-Reply-To: <1114435410.8571.3.camel@localhost>
+In-Reply-To: <20050424004443.31751.8@@vodafone.es>
+References: <20050424004443.31751.8@@vodafone.es>
+Content-Type: text/plain
+Message-Id: <1114516247.10706.224.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <1114435410.8571.3.camel@localhost>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,29 +18,66 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 26 Apr 2005 12:37:18 +0100
+Date: Tue, 26 Apr 2005 13:50:47 +0200
 
-> Hi,
-> if I do
->=20
-> > modprobe snd_bt_sco
-> > esdctl stop
-> > hciconfig hci0 voice 0x0060
-> > btsco <address_of_my_headset>
-> > aplay -B 1000000 -D plughw:Headset <some wav file>
->=20
-> I can't hear anything else than a bip in my headset,
-> that is properly paired (I checked with 'hcitool con')
-> 'dmesg' gives me what follows:
+Hi Oliver,
 
-When you type in btsco addr do you then hit the connect button on your
-headset this was the problem I was having with the motorola headsets
-I've tested (HS-810 and HS-850).
-I wasn't using aplay but rather just using gnomemeeting and the
-headset just came up in the list of devices.
+do you really think that reposting the same email makes it more likely
+that you get an answer. Please read this first:
+
+http://www.catb.org/~esr/faqs/smart-questions.html
+
+> Well I am trying to understand the full blueZ Stack,
+> and i stopped in in hci_core.c the function " __hci_request(...) " line 121
+> 
+> In this portion of code
+> 
+> #####
+> 	DECLARE_WAITQUEUE(wait, current);
+> 	int err = 0;
+> 
+> 	BT_DBG("%s start", hdev->name);
+> 
+> 	hdev->req_status = HCI_REQ_PEND;
+> 
+> 	add_wait_queue(&hdev->req_wait_q, &wait);
+> 	set_current_state(TASK_INTERRUPTIBLE);
+> 
+> 	req(hdev, opt);
+> 	schedule_timeout(timeout);
+> 
+> 	remove_wait_queue(&hdev->req_wait_q, &wait);
+> 
+> 	if (signal_pending(current))
+> 		return -EINTR;
+> ######
+> 
+> So:
+
+The book Linux Device Drivers would be a good thing to read first.
+
+> The task who calls the hci_request keeps blocked in add_wait_queue(..) call.
+> Which is unblocked by the hci_req_complete() call which is calling when 
+> processing an event.
+
+Who said that? This is not blocking.
+
+> After unblocking req() call proceeds and awaits at least the timeout 
+> specified schedule_timeout() ... after that the tast is removed form the 
+> device queue.
+
+The req() is also not blocking. Only schedule_timeout() is blocking
+until hci_req_complete().
+
+> Then what is checking signal_pending(current) call ? 
+
+It checks for pending signals.
 
 Regards
-Peter
+
+Marcel
+
+
 
 
 -------------------------------------------------------
