@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <426E3DBE.2000905@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <20050426123412.48950.qmail@web8310.mail.in.yahoo.com>
+From: Mayank Batra <mayankbatra@yahoo.co.in>
 Subject: Re: [Bluez-devel] A2DP sink code finally
-References: <20050426123559.59825.qmail@web8302.mail.in.yahoo.com>
-In-Reply-To: <20050426123559.59825.qmail@web8302.mail.in.yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: 6667
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,50 +17,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 26 Apr 2005 07:10:22 -0600
+Date: Tue, 26 Apr 2005 13:34:12 +0100 (BST)
 
-Mayank,
+Henryk,
 
-The term is overloaded. Henryk is trying to use the little box from 
-bluetake that runs as an a2dp source. It only has one button on it, so 
-it has to be able to find the sink using only sdp.
+> Hmm, how do I test that? I can't seem to get my
+> audio dongle to connect.
+> Is there anything else I've got to do apart from 
+> | hciconfig hci0 class 0x200404
 
-Brad
+Don't know whether this is required...?
 
-Mayank Batra wrote:
-> Brad,
-> 
-> 
->>I'm not sure anyone has used the dongle yet.
->>(Mayank?)
->>
-> 
-> 
-> Yes I have definitely used dongles (Simple USB Dongle,
-> I don't know what does an audio dongle mean. I hope
-> there is not much of a difference)
-> 
-> Mayank
-> 
-> Mayank Batra
-> 
-> 
-> Whether you think you can or whether you think you can't, you are right. -Henry Ford.
-> 
-> ________________________________________________________________________
-> Yahoo! India Matrimony: Find your life partner online
-> Go to: http://yahoo.shaadi.com/india-matrimony
-> 
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> | sdptool add A2SNK
+> | ./a2snk
+> ?
+
+I think this is sufficient.
+
+Are u sure that the a2play code is correct?
+Because I've used exactly this code to connect with
+BlueSoleil, and the connection takes place very well.
+
+Otherwise, BlueSoleil is a very clumsy sw and it sends
+disconnect even if we skip or mix a step.
+So, this means that maybe u r making some mistake.
+
+Mayank
+
+________________________________________________________________________
+Yahoo! India Matrimony: Find your life partner online
+Go to: http://yahoo.shaadi.com/india-matrimony
 
 
 -------------------------------------------------------
