@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <426D2B36.9040009@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <5256d0b05042604372879b077@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Comments about the Logitech/HP stereo headphones
-References: <1114345112.10706.64.camel@pegasus>	 <426BA787.9060202@xmission.com> <1114356659.10706.105.camel@pegasus>
-In-Reply-To: <1114356659.10706.105.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] motorola HS820 headset doesn't work
+In-Reply-To: <1114435410.8571.3.camel@localhost>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1114435410.8571.3.camel@localhost>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,22 +18,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 25 Apr 2005 11:39:02 -0600
+Date: Tue, 26 Apr 2005 12:37:18 +0100
 
-Marcel
+> Hi,
+> if I do
+>=20
+> > modprobe snd_bt_sco
+> > esdctl stop
+> > hciconfig hci0 voice 0x0060
+> > btsco <address_of_my_headset>
+> > aplay -B 1000000 -D plughw:Headset <some wav file>
+>=20
+> I can't hear anything else than a bip in my headset,
+> that is properly paired (I checked with 'hcitool con')
+> 'dmesg' gives me what follows:
 
->>This all sounds very good and I feel like a dope for getting rid of my 
->>bluetake headset when I had only ordered, but not received, a 
->>replacement. I'm still waiting for my itech. :(
-> 
-> if people start to donate some money, then I can buy you one of the HP
-> headphones to work with.
+When you type in btsco addr do you then hit the connect button on your
+headset this was the problem I was having with the motorola headsets
+I've tested (HS-810 and HS-850).
+I wasn't using aplay but rather just using gnomemeeting and the
+headset just came up in the list of devices.
 
-I think I'll just order the HP set myself and get back into things. The 
-other set is taking too long.
-
-Brad
-
+Regards
+Peter
 
 
 -------------------------------------------------------
