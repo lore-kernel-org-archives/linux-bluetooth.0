@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <426F5352.9000707@gmx.ch>
+Message-ID: <426F539B.4030701@gmx.ch>
 From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] auto pairing between client & server
-References: <2621d9af05042213064d0df1dc@mail.gmail.com>	 <426ABEBD.5060701@gmx.ch> <2621d9af0504250729e34a2aa@mail.gmail.com>	 <426D00CB.7060508@gmx.ch>  <2621d9af0504260302e1c13c7@mail.gmail.com>	 <1114515066.10706.204.camel@pegasus>  <426E7C67.30902@gmx.ch>	 <1114537612.10706.325.camel@pegasus>  <426E8A1F.7070707@gmx.ch>	 <1114542256.10706.329.camel@pegasus>  <426F50F9.8090208@gmx.ch> <1114591814.10706.339.camel@pegasus>
-In-Reply-To: <1114591814.10706.339.camel@pegasus>
+Subject: Re: [Bluez-users] implementing security mode 2 or 3
+References: <426E0C5A.8060203@gmx.ch>	 <200504261153.08434.bluez-user@schaettgen.de>  <426E5CCC.2030108@gmx.ch>	 <1114530540.10706.301.camel@pegasus>  <426E6516.3010403@gmx.ch>	 <1114532376.10706.310.camel@pegasus>  <426E6F60.2020000@gmx.ch> <1114534837.10706.320.camel@pegasus> <426E7B12.6040602@gmx.ch>
+In-Reply-To: <426E7B12.6040602@gmx.ch>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,43 +18,77 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 27 Apr 2005 10:54:42 +0200
+Date: Wed, 27 Apr 2005 10:55:55 +0200
 
-nice... thanks!
+Hello Marcel
+
+what's the state? interested in doing that?
+
 
 regards
 Marco
 
-Marcel Holtmann wrote:
-> Hi Marco,
+
+Marco Trudel wrote:
+> Marcel Holtmann wrote:
 > 
-> 
->>I'm not sure if we talk about the same thing.
-> 
-> 
-> we are talking about the same thing.
-> 
-> 
->>On outgoing connections, when encryption is demanded, the pin_helper, 
->>specified in hcid.conf is called and the output has to be like "PIN:1234".
+>> Hi Marco,
 >>
->>If I wan't to use /etc/bluetooth/pin as this pin, I've to write a little 
->>pin_helper that outputs this pin.
->>My question now is: is it with the bluez packages >= 2.16 possible to avoid 
->>writing an own pin_helper? is hcid.conf configurable so that 
->>/etc/bluetooth/pin is automatically used for outgoing connections?
+>>
+>>>>>> the 2.6.7 will fail. The needed security hooks are introduced with
+>>>>>> 2.6.10 and the RFCOMM service level security with 2.6.11 according 
+>>>>>> to my
+>>>>>> patch logs.
+>>>>>>
+>>>>>>
+>>>>>>> If not, which part of the kernel has to be fixed? Is it a part of 
+>>>>>>> bluez?
+>>>>>>
+>>>>>>
+>>>>>> It is inside the BlueZ core and the RFCOMM layer.
+>>>>>
+>>>>>
+>>>>> How long would you have to backport that to kernel 2.6.7?
+>>>>> Maybe we can arrainge something with a donation...
+>>>>
+>>>>
+>>>> tell me what interfaces are you going to use. Is it always USB? What
+>>>> kernel layers are involved? RFCOMM, BNEP, CMTP, HIDP?
+>>>
+>>>
+>>> always USB. RFCOMM services.
+>>>
+>>> authentication/encryption enabled as suggested on the list:
+>>>    int opt = RFCOMM_LM_AUTH|RFCOMM_LM_ENCRYPT;
+>>>    setsockopt(sock, SOL_RFCOMM, RFCOMM_LM, &opt, sizeof(opt));
+>>
+>>
+>>
+>> this means HCI, L2CAP, RFCOMM and hci_usb driver updates up to
+>> 2.6.12-rc2 should be included.
 > 
 > 
-> You need to enter them in /var/lib/bluetooth/*/pincodes where you can
-> specify them like "<bdaddr> <pincode>" per line.
+> sounds reasonable...
 > 
-> A general /etc/bluetooth/pincodes is maybe coming in the next release.
+>>>> You will need more than this two patches for a 2.6.7 based kernel,
+>>>> because there are some serious problems, too.
+>>>
+>>>
+>>> actually I never run into problems with the 2.4 kernel. But I think 
+>>> it would definitely make sense to have this things fixed too...
+>>
+>>
+>>
+>> Some of them were hard to trigger and there is still one RFCOMM thing
+>> that is unresolved. Btw do you need a SMP or HT kernel?
 > 
-> Regards
 > 
-> Marcel
+> No. I don't think so.
+> I work with an arm SBC with one processor and a very minimal redhat. not 
+> much fancy stuff...
 > 
-> 
+> regards
+> Marco
 > 
 > 
 > -------------------------------------------------------
