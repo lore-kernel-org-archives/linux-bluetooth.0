@@ -1,13 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] headerfile depencies
+Subject: Re: [Bluez-users] implementing security mode 2 or 3
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <426F6A7D.7000300@gmx.ch>
-References: <426649B8.1070203@gmx.ch> <1114000197.2469.159.camel@pegasus>
-	 <42664E2B.8040005@gmx.ch> <1114001162.2469.169.camel@pegasus>
-	 <426F6A7D.7000300@gmx.ch>
+In-Reply-To: <426F539B.4030701@gmx.ch>
+References: <426E0C5A.8060203@gmx.ch>
+	 <200504261153.08434.bluez-user@schaettgen.de>  <426E5CCC.2030108@gmx.ch>
+	 <1114530540.10706.301.camel@pegasus>  <426E6516.3010403@gmx.ch>
+	 <1114532376.10706.310.camel@pegasus>  <426E6F60.2020000@gmx.ch>
+	 <1114534837.10706.320.camel@pegasus> <426E7B12.6040602@gmx.ch>
+	 <426F539B.4030701@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1114599025.10706.398.camel@pegasus>
+Message-Id: <1114598471.10706.397.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,13 +23,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 27 Apr 2005 12:50:24 +0200
+Date: Wed, 27 Apr 2005 12:41:11 +0200
 
 Hi Marco,
 
-> I think hci.h needs sys/socket.h because of sa_family_t.
+> what's the state? interested in doing that?
 
-also added to l2cap.h and rfcomm.h.
+I am away until the weekend, but I am taking my patches with me and put
+them together when I have some idle time.
 
 Regards
 
