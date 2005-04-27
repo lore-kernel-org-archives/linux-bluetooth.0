@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <1670369538@web.de>
+Message-ID: <426F84B9.8090804@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
-From: "Mariusz Dziuba" <m.dziuba@web.de>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset="iso-8859-1"
-Subject: [Bluez-users] hciconfig problems
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] hcid.conf option explanation
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,64 +16,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 27 Apr 2005 16:07:45 +0200
+Date: Wed, 27 Apr 2005 14:25:29 +0200
 
-Hello,
+Hello all
 
-I'm using Redhat with kernel 2.4.20-18.9. I use an Acer USB Bluetooth Dongle (ID 0b7a:07d0). I habe installed the latest bluez-libs followed by bluez-utils with no problem.
+Can someone clarify the following options for me?
 
-In my /etc/modules.conf i added:
-alias net-pf-31 bluez
-alias bt-proto-0 l2cap
-alias bt-proto-2 sco
-alias bt-proto-3 rfcomm
-alias bt-proto-4 bnep
-alias bt-proto-5 cmtp
-alias tty-ldisc-15 hci_uart
+pairing none/multi/once;
+Does this control if a device can be connected twice or more at at the same 
+time or is it about succcessive connections if the device already 
+disconnected (older pairings)?
 
-After a restart of my linux i load the hci_usb:
->modprobe hci_usb
+what mean these three link policy settings:
+#   hold    - allow hold mode
+#   sniff   - allow sniff mode
+#   park    - allow park mode
 
-Start of the Host Controller:
->hcid
-
-hciconfig returns:
-hci0:   Type: USB
-        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
-        DOWN RUNNING
-        RX bytes:0 acl:0 sco:0 events:0 errors:0
-        TX bytes:0 acl:0 sco:0 commands:0 errors:0
-
-lsmod returns:
-Module                  Size  Used by    Tainted: PF
-hci_usb                 9752   1
-bluez                  40260   9  [hci_usb]
-...
-..
-.
-
-When i try to start hci0, then hciconfig hangsup or i get an "Speicherzugriffsfehler" (segmentation fault):
->hciconfig hci0 up
-
-In the Processlist i see:
- 4221 pts/1    D      0:00 hciconfig hci0 up
-
-And hciconfig still returns:
-hci0:   Type: USB
-        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
-        DOWN RUNNING
-        RX bytes:0 acl:0 sco:0 events:0 errors:0
-        TX bytes:0 acl:0 sco:0 commands:0 errors:0
-
-
-can some one help me with this problem. I'm really desperate.
-
-Thanx.
-Marius
-______________________________________________________________
-Verschicken Sie romantische, coole und witzige Bilder per SMS!
-Jetzt bei WEB.DE FreeMail: http://f.web.de/?mc=021193
-
+regards
+Marco
 
 
 -------------------------------------------------------
