@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <426FBD8A.8020006@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Re: Adding services in the Service Class ID list
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] A2DP sink code finally
-References: <20050426123412.48950.qmail@web8310.mail.in.yahoo.com>
-In-Reply-To: <20050426123412.48950.qmail@web8310.mail.in.yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <20050427015939.86545.qmail@web20921.mail.yahoo.com>
+References: <20050427015939.86545.qmail@web20921.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1114598097.10706.390.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,25 +18,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 27 Apr 2005 10:27:54 -0600
+Date: Wed, 27 Apr 2005 12:34:57 +0200
 
-Guys,
+Hi Arch,
 
-I updated the docs to reflect the new a2play usage and basic a2snk 
-operation.
+> Thanks for the immediate response.
+> I appreciate your looking into the concern/issue
+> that I have.
+> 
+> Here is the part of code where I add the services
+> in the Service Class ID list.
+> 
+> 
+> ==========================================
+> sdp_uuid16_create(&headsetaudiogateway_uuid,
+> HEADSET_AGW_SVCLASS_ID);
+> svclass_id[0] = sdp_list_append(0,
+> &headsetaudiogateway_uuid);
+> scseq = sdp_list_append(0, svclass_id[0]);
+>    
+> sdp_uuid16_create(&genericaudio_uuid,
+> GENERIC_AUDIO_SVCLASS_ID);
+> svclass_id[1] = sdp_list_append(0,
+> &genericaudio_uuid);
+> scseq = sdp_list_append(scseq, svclass_id[1]);
+>    
+> servclasses = sdp_list_append(0, scseq);
+> sdp_set_service_classes(&record, servclasses);
+> ===========================================
+> 
+> is this the right way of adding the services in
+> the service class id list?
 
-I think the best effort spent on a2play now would be to:
+looks good so far. Send the whole code so that I can test it on my
+systems. Do you use the latest library and utils?
 
-  - use the real-time clock for timing
-  - optionally open and perform ioctls on /dev/dsp to operate directly on it
+Regards
 
-Both of these should make live streaming tighter.
+Marcel
 
-Timing improvements include both inserting delays and throwing out data 
-when the link doesn't accept it fast enough (or to take up delay), but 
-you only need the latter for live streaming.
 
-Brad
 
 
 -------------------------------------------------------
