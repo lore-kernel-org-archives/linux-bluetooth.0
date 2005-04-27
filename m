@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050428042021.9217.qmail@web8503.mail.in.yahoo.com>
-From: mahabaleshwara k <mahabaleshwara_k@yahoo.co.in>
+Message-ID: <2621d9af050427113054b8cf82@mail.gmail.com>
+From: "N. I." <neutralidea@gmail.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Can linux-2.4.20 have bluetooth audio support?
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] training or books?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,28 +16,10 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 28 Apr 2005 05:20:21 +0100 (BST)
+Date: Wed, 27 Apr 2005 14:30:16 -0400
 
-Hi all,
-I have linux-2.4.20 kernel with applied
-patch2.4.20-mh8. I have blueZ libs,utilis,openobex
-libs and apps up and running on this kernel. I am
-using D-Link DBT-120 usb dongle with 16.4 firmware.
-Can I have bluetooth audio support over this setup? or
-what minimum version of kernel required for audio
-support? If possible how i can setup communication
-between bluetooth headset and PC? In the kernel
-configuration there is option of SCO(voice)support.
-Only that much enough or any sound drivers are
-required?
-Please clarify my doubts and guide me.
-Thanking you all in advance.
-Regards,
-Maha.    
-
-________________________________________________________________________
-Yahoo! India Matrimony: Find your life partner online
-Go to: http://yahoo.shaadi.com/india-matrimony
+Is there any training courses/seminars or books on BlueZ available now?
+I mean information specically on BlueZ, not the Bluetooth Spec in general.
 
 
 -------------------------------------------------------
