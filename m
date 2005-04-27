@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <426F84B9.8090804@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Re: Belkin F8T002 PCMCIA - how to get working?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] hcid.conf option explanation
+In-Reply-To: <loom.20050427T142840-221@post.gmane.org>
+References: <loom.20050427T005347-298@post.gmane.org>
+	 <1114598331.10706.392.camel@pegasus>
+	 <loom.20050427T142840-221@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1114606563.8836.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +20,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 27 Apr 2005 14:25:29 +0200
+Date: Wed, 27 Apr 2005 14:56:03 +0200
 
-Hello all
+Hi Phil,
 
-Can someone clarify the following options for me?
+> > is this a PCMCIA, Compact Flash or CardBus card? Do you see another ttyS
+> > device when calling dmesg?
+> > 
+> 
+> Cardbus. A quick search on the dmesg
+> output, after inserting the card, for 'serial' turned up this :
+> 
+> serio: i8042 AUX port at 0x60,0x64 irq 12
+> serio: i8042 KBD port at 0x60,0x64 irq 1
+> Serial: 8250/16550 driver $Revision: 1.90 $ 48 ports, IRQ sharing enabled
+> PCI: Found IRQ 11 for device 0000:00:03.1
+> PCI: Sharing IRQ 11 with 0000:00:03.0
+> 
+> Searching for ttyS doesn't turn up anything in the dmesg output at all.
 
-pairing none/multi/once;
-Does this control if a device can be connected twice or more at at the same 
-time or is it about succcessive connections if the device already 
-disconnected (older pairings)?
+since it is a CardBus card, what does lspci say? What modules are
+loaded?
 
-what mean these three link policy settings:
-#   hold    - allow hold mode
-#   sniff   - allow sniff mode
-#   park    - allow park mode
+Regards
 
-regards
-Marco
+Marcel
+
+
 
 
 -------------------------------------------------------
