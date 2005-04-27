@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2621d9af050427113054b8cf82@mail.gmail.com>
+Message-ID: <2621d9af05042711245fa28aa9@mail.gmail.com>
 From: "N. I." <neutralidea@gmail.com>
 To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] training or books?
+Subject: [Bluez-users] /etc/bluetooth/pin
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,10 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 27 Apr 2005 14:30:16 -0400
+Date: Wed, 27 Apr 2005 14:24:56 -0400
 
-Is there any training courses/seminars or books on BlueZ available now?
-I mean information specically on BlueZ, not the Bluetooth Spec in general.
+My device uses the fault pin as 1234.
+I want to change it to something else, e.g. 55113.
+
+What I did was to modify the /etc/bluetooth/pin file to have the
+content only of 55113.
+My pin_helper has something like:
+
+#!/bin/sh
+echo "PIN:"$(cat /etc/bluetooth/pin)
+
+When I try to use l2ping to other device, my initiating l2ping device
+fails right away with message: "Can't connect.: Permission denied"
+
+Is there anything missing that I can do in order for "NOT" using the
+default pin?
+
+N.I
 
 
 -------------------------------------------------------
