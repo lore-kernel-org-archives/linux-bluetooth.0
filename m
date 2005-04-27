@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <426F6A7D.7000300@gmx.ch>
+Message-ID: <426F5352.9000707@gmx.ch>
 From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] headerfile depencies
-References: <426649B8.1070203@gmx.ch> <1114000197.2469.159.camel@pegasus>	 <42664E2B.8040005@gmx.ch> <1114001162.2469.169.camel@pegasus>
-In-Reply-To: <1114001162.2469.169.camel@pegasus>
+Subject: Re: [Bluez-users] auto pairing between client & server
+References: <2621d9af05042213064d0df1dc@mail.gmail.com>	 <426ABEBD.5060701@gmx.ch> <2621d9af0504250729e34a2aa@mail.gmail.com>	 <426D00CB.7060508@gmx.ch>  <2621d9af0504260302e1c13c7@mail.gmail.com>	 <1114515066.10706.204.camel@pegasus>  <426E7C67.30902@gmx.ch>	 <1114537612.10706.325.camel@pegasus>  <426E8A1F.7070707@gmx.ch>	 <1114542256.10706.329.camel@pegasus>  <426F50F9.8090208@gmx.ch> <1114591814.10706.339.camel@pegasus>
+In-Reply-To: <1114591814.10706.339.camel@pegasus>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,12 +18,9 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 27 Apr 2005 12:33:33 +0200
+Date: Wed, 27 Apr 2005 10:54:42 +0200
 
-Hello Marcel
-
-I think hci.h needs sys/socket.h because of sa_family_t.
-
+nice... thanks!
 
 regards
 Marco
@@ -32,12 +29,26 @@ Marcel Holtmann wrote:
 > Hi Marco,
 > 
 > 
->>Actually I already stumbled about depencies like this, but I don't remember 
->>them. I'll inform you if I find them again...
+>>I'm not sure if we talk about the same thing.
 > 
 > 
-> keep posting them and I also like to know of any changes we might need
-> for the GCC 4.0 support in the future.
+> we are talking about the same thing.
+> 
+> 
+>>On outgoing connections, when encryption is demanded, the pin_helper, 
+>>specified in hcid.conf is called and the output has to be like "PIN:1234".
+>>
+>>If I wan't to use /etc/bluetooth/pin as this pin, I've to write a little 
+>>pin_helper that outputs this pin.
+>>My question now is: is it with the bluez packages >= 2.16 possible to avoid 
+>>writing an own pin_helper? is hcid.conf configurable so that 
+>>/etc/bluetooth/pin is automatically used for outgoing connections?
+> 
+> 
+> You need to enter them in /var/lib/bluetooth/*/pincodes where you can
+> specify them like "<bdaddr> <pincode>" per line.
+> 
+> A general /etc/bluetooth/pincodes is maybe coming in the next release.
 > 
 > Regards
 > 
@@ -47,10 +58,10 @@ Marcel Holtmann wrote:
 > 
 > 
 > -------------------------------------------------------
-> This SF.Net email is sponsored by: New Crystal Reports XI.
-> Version 11 adds new functionality designed to reduce time involved in
-> creating, integrating, and deploying reporting solutions. Free runtime info,
-> new features, or free trial, at: http://www.businessobjects.com/devxi/728
+> SF.Net email is sponsored by: Tell us your software development plans!
+> Take this survey and enter to win a one-year sub to SourceForge.net
+> Plus IDC's 2005 look-ahead and a copy of this survey
+> Click here to start!  http://www.idcswdc.com/cgi-bin/survey?id=105hix
 > _______________________________________________
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
