@@ -1,15 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <50183.213.86.139.177.1114605149.squirrel@sockthing.tdbnetworks.org>
-In-Reply-To: <1114598379.10706.394.camel@pegasus>
-References: <1114275541.6610.5.camel@hellontoast>
-    <1114276885.10706.31.camel@pegasus>
-    <1114579747.5602.5.camel@hellontoast>
-    <1114598379.10706.394.camel@pegasus>
-Subject: Re: [Bluez-users] Microsoft Intellimouse Explorer
-From: mlists@tdbnetworks.org
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+From: Phil Stopford <philstopford@hotmail.com>
+Message-ID: <loom.20050427T165103-193@post.gmane.org>
+References: <loom.20050427T005347-298@post.gmane.org> <1114606563.8836.1.camel@pegasus> <loom.20050427T153844-482@post.gmane.org> <200504271607.30208.cijoml@volny.cz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: Belkin F8T002 PCMCIA - how to get working?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,49 +17,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 27 Apr 2005 13:32:29 +0100 (BST)
+Date: Wed, 27 Apr 2005 15:08:04 +0000 (UTC)
 
-Marcel,
-These are the latest versions available as part of FC3, do you know of a
-repository that I could use instead which holds a preferred version? what
-version should I look for as a minimum?
+Michal Semler <cijoml <at> volny.cz> writes:
 
-Thanks
+> 
+> Dne st 27. dubna 2005 15:46 Phil Stopford napsal(a):
+> > Marcel Holtmann <marcel <at> holtmann.org> writes:
+> > > Hi Phil,
+> > >
 
-Richard
+<snip to satisfy gmane.org>
 
-> Hi Richard,
->
->> I'm currently running 2.6.11-1.14_FC3 as my kernel and have the
->> following
->> bluez packages installed at the moment.
->>
->> [root@hellontoast ~]# rpm -qa |grep bluez
->> bluez-libs-2.10-2
->> bluez-utils-2.10-2
->> bluez-pin-0.23-3
->> bluez-hcidump-1.11-1
->> bluez-bluefw-1.0-6
->
-> I think you should update them to the latest versions.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> SF.Net email is sponsored by: Tell us your software development plans!
-> Take this survey and enter to win a one-year sub to SourceForge.net
-> Plus IDC's 2005 look-ahead and a copy of this survey
-> Click here to start!  http://www.idcswdc.com/cgi-bin/survey?id=105hix
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+> >   Serial controller: Oxford Semiconductor Ltd OXCB950 Cardbus 16950 UART
+> 
+> ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> It is UART - hciattach with proper parameters should work for you
+> 
+> List back the conference to find them
+> 
+> Michal
+
+Really? Excellent. From the sourceforge.net search interface, I am aware of the
+hciattach program, but trying 'any' with it simply reports an 'illegal seek', so
+I'm a little uncertain how to proceed. From the sourceforge.net search interface
+for this list, I've just come across :
+
+http://sourceforge.net/mailarchive/message.php?msg_id=10557173
+
+and wonder if this might be a way to proceed. I'll give it a whirl.
+
+Comments would be welcome as always :)
+
+Phil.
+
+<snip>
 
 
 
