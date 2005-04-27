@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Belkin F8T002 PCMCIA - how to get working?
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <426F6A7D.7000300@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <loom.20050427T005347-298@post.gmane.org>
-References: <loom.20050427T005347-298@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1114598331.10706.392.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] headerfile depencies
+References: <426649B8.1070203@gmx.ch> <1114000197.2469.159.camel@pegasus>	 <42664E2B.8040005@gmx.ch> <1114001162.2469.169.camel@pegasus>
+In-Reply-To: <1114001162.2469.169.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,37 +18,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 27 Apr 2005 12:38:51 +0200
+Date: Wed, 27 Apr 2005 12:33:33 +0200
 
-Hi Phil,
+Hello Marcel
 
-> I'm new to this and, having done a lot of search on google (this list could
-> really use a .mbox archive :) ), it seems that there is no documented way of
-> getting this card up and running. I'm hoping someone in here might be able to
-> help. I'm running an updated, but otherwise stock, SUSE 9.3 Pro. Naturally the
-> card works fine under Windows and I'm trying to avoid dumping what, outwardly,
-> is a perfectly functional bit of hardware. I had hoped that serial_cs and
-> hci_uart might be workable, but so far it's proving fairly futile.
+I think hci.h needs sys/socket.h because of sa_family_t.
+
+
+regards
+Marco
+
+Marcel Holtmann wrote:
+> Hi Marco,
 > 
-> cardctl ident provides :
 > 
-> Socket 0:
->   product info: "OXSEMI", "OXCB950", "Rev A"
->   manfid: 0x0279, 0x0001
->   function: 2 (serial)
+>>Actually I already stumbled about depencies like this, but I don't remember 
+>>them. I'll inform you if I find them again...
 > 
-> dmesg only shows the following on inserting the card :
 > 
-> PCI: Enabling device 0000:02:00.0 (0000 -> 0003)
-
-is this a PCMCIA, Compact Flash or CardBus card? Do you see another ttyS
-device when calling dmesg?
-
-Regards
-
-Marcel
-
-
+> keep posting them and I also like to know of any changes we might need
+> for the GCC 4.0 support in the future.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: New Crystal Reports XI.
+> Version 11 adds new functionality designed to reduce time involved in
+> creating, integrating, and deploying reporting solutions. Free runtime info,
+> new features, or free trial, at: http://www.businessobjects.com/devxi/728
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+> 
 
 
 -------------------------------------------------------
