@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42707C83.2030207@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <1687ed8405042723003ae1da8e@mail.gmail.com>
+From: Michal Nowikowski <godfryd@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Can linux-2.4.20 have bluetooth audio support?
-References: <20050428042021.9217.qmail@web8503.mail.in.yahoo.com>
-In-Reply-To: <20050428042021.9217.qmail@web8503.mail.in.yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] access restrictions after passing PIN
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,46 +16,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 28 Apr 2005 00:02:43 -0600
+Date: Thu, 28 Apr 2005 08:00:50 +0200
 
-Maha
+Hello
 
-You'll need a very recent kernel like 2.6.11.7. see bluetooth-alsa.sf.net
+I've got a question. Is there any restriction of accessing services
+after passing the pairing procedure? I think about situation when both
+devices are paired and I suppose that now there is no restriction of
+use of any services like serial port or any other. So is there a
+danger of overuse of these services (i.e. in mobile phones it is
+possible to manage them seemlessly through serial port from PC)?
 
-Brad
-
-mahabaleshwara k wrote:
-> Hi all,
-> I have linux-2.4.20 kernel with applied
-> patch2.4.20-mh8. I have blueZ libs,utilis,openobex
-> libs and apps up and running on this kernel. I am
-> using D-Link DBT-120 usb dongle with 16.4 firmware.
-> Can I have bluetooth audio support over this setup? or
-> what minimum version of kernel required for audio
-> support? If possible how i can setup communication
-> between bluetooth headset and PC? In the kernel
-> configuration there is option of SCO(voice)support.
-> Only that much enough or any sound drivers are
-> required?
-> Please clarify my doubts and guide me.
-> Thanking you all in advance.
-> Regards,
-> Maha.    
-> 
-> ________________________________________________________________________
-> Yahoo! India Matrimony: Find your life partner online
-> Go to: http://yahoo.shaadi.com/india-matrimony
-> 
-> 
-> -------------------------------------------------------
-> SF.Net email is sponsored by: Tell us your software development plans!
-> Take this survey and enter to win a one-year sub to SourceForge.net
-> Plus IDC's 2005 look-ahead and a copy of this survey
-> Click here to start!  http://www.idcswdc.com/cgi-bin/survey?id=105hix
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+Thanks in advance
+Godfryd
 
 
 -------------------------------------------------------
