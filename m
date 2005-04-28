@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050428123527.83451.qmail@web8304.mail.in.yahoo.com>
+Message-ID: <20050428123014.50396.qmail@web8307.mail.in.yahoo.com>
 From: Mayank Batra <mayankbatra@yahoo.co.in>
 To: BLUEZ DEVELOPERS LIST <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] A small test for sbc decoder
+Subject: [Bluez-devel] mpg123 to the rescue of a2snk.c
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,32 +16,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 28 Apr 2005 13:35:27 +0100 (BST)
+Date: Thu, 28 Apr 2005 13:30:14 +0100 (BST)
 
-Henryk,
+Guys,
 
-Can we test our sbc decoder code in the following
-manner...
+Can we make use of mpg123 in a similar way as we used
+it in the a2play application earlier on ??
 
-In the sbcdec.c file, can we put the decoded samples
-of an sbc file on /dev/dsp ???
+I mean, if we decode the sbc packets and put them
+somewhere, for instance stdout, and then make mpg123
+play those decoded samples, will it be more audible ?
 
-If this works, then our a2snk application is almost
-done (ofcourse i am not considering the timing right
-now cause that is a whole big problem).
-
-I tried the above mentioned thing, but again, i could
-faintly hear the music (the actual one) and a LOT of
-noise.
-
-But on the contrary I feel that since the encoder code
-is working fine, then intuition says that decoder
-should be correct. 
-
-So I feel that we are not able to handle the decoded
-samples properly.
-
-Mayank.
+Mayank
 
 ________________________________________________________________________
 Yahoo! India Matrimony: Find your life partner online
