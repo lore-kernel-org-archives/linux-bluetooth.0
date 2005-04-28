@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1687ed8405042723003ae1da8e@mail.gmail.com>
-From: Michal Nowikowski <godfryd@gmail.com>
+Message-ID: <20050428042021.9217.qmail@web8503.mail.in.yahoo.com>
+From: mahabaleshwara k <mahabaleshwara_k@yahoo.co.in>
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] access restrictions after passing PIN
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Can linux-2.4.20 have bluetooth audio support?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +16,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 28 Apr 2005 08:00:50 +0200
+Date: Thu, 28 Apr 2005 05:20:21 +0100 (BST)
 
-Hello
+Hi all,
+I have linux-2.4.20 kernel with applied
+patch2.4.20-mh8. I have blueZ libs,utilis,openobex
+libs and apps up and running on this kernel. I am
+using D-Link DBT-120 usb dongle with 16.4 firmware.
+Can I have bluetooth audio support over this setup? or
+what minimum version of kernel required for audio
+support? If possible how i can setup communication
+between bluetooth headset and PC? In the kernel
+configuration there is option of SCO(voice)support.
+Only that much enough or any sound drivers are
+required?
+Please clarify my doubts and guide me.
+Thanking you all in advance.
+Regards,
+Maha.    
 
-I've got a question. Is there any restriction of accessing services
-after passing the pairing procedure? I think about situation when both
-devices are paired and I suppose that now there is no restriction of
-use of any services like serial port or any other. So is there a
-danger of overuse of these services (i.e. in mobile phones it is
-possible to manage them seemlessly through serial port from PC)?
-
-Thanks in advance
-Godfryd
+________________________________________________________________________
+Yahoo! India Matrimony: Find your life partner online
+Go to: http://yahoo.shaadi.com/india-matrimony
 
 
 -------------------------------------------------------
