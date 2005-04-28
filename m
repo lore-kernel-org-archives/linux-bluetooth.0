@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
+Message-ID: <7aa80ced05042807167abd7376@mail.gmail.com>
+From: Mohan K <kmohangda@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] How to test the mic functionality in Bluez?
-References: <7aa80ced05042807167abd7376@mail.gmail.com>
-In-Reply-To: <7aa80ced05042807167abd7376@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200504281734.06880.pavouk@pavouk.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] How to test the mic functionality in Bluez?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,21 +16,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 28 Apr 2005 17:34:06 +0200
+Date: Thu, 28 Apr 2005 19:46:57 +0530
 
-Hi,
+Hi all,
+       I am using linux 2.6.9 with bluez on the host side. The host
+machine contains standard CSR bluetooth dongle. I am having a
+bluetooth headset on the remote side. I have tested the working of
+headset speaker by running "xmms player" on the host machine. The
+speaker is working over bluetooth.
+       I want test the working of headset mic over bluetooth. Can
+anybody tell me how to test this on the linux side?
 
->        I want test the working of headset mic over bluetooth. Can
-> anybody tell me how to test this on the linux side?
-
-I use this simle shell command:
-"cat </dev/dsp1 >/dev/dsp0"
-
-My normal sound card is on /dev/dsp0 and BT headset on /dev/dsp1.
-
-Best regards,
-
-Pavel Ruzicka
+Thanks & regards,
+Mohan
 
 
 -------------------------------------------------------
