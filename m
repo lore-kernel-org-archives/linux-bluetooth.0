@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?GB2312?B?tcvWvs/p?= <zhixiang_deng@yahoo.com.cn>
+Subject: Re: [Bluez-users] Something strange with minicom
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20050430151036.04f20b12.zhixiang_deng@yahoo.com.cn>
-In-Reply-To: <200501261244.47898.jschindele@arcor.de>
-References: <200501261244.47898.jschindele@arcor.de>
+In-Reply-To: <200504300003.22570@ByZsA>
+References: <200504300003.22570@ByZsA>
+Content-Type: text/plain
+Message-Id: <1114818982.8836.116.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] RFCOMM connecting problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,9 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 30 Apr 2005 15:10:36 +0800
+Date: Sat, 30 Apr 2005 01:56:22 +0200
 
-Hello all , when I tried to establish an RFCOMM connection between two bluetooth devices by typing the commands : rfcomm bind 0 <btaddr> 0 ,rfcomm listen 0 0 on one side , it gave the following message : Waiting for connection on channel 0 .However ,on the other side ,when I type the commands : rfcomm bind 0 <btaddr> 0 ,rfcomm connect 0 <remote btaddr> 0 , it gave the message : Can't create RFCOMM socket : invalid argument . What should I do to create the rfcomm connection correctly? Thanks very much .
+Hi Attila,
+
+> > Make sure that you grep the initial HCI and L2CAP connection setup,
+> >  because otherwise hcidump is not able to decode RFCOMM. Or specific
+> > the --psm=3 option on the command line.
+> 
+> Here is a new dump with --psm=3:
+
+use "hcidump -X -V --psm=3" so I don't have to decode everything by
+myself.
+
+> I don't see any echoed characters at the end, only the "ERROR" message. 
+> But ATZ is a very common modem command and as I wrote earlier, it works 
+> with windows hyperterminal. I noticed that I enter only "AT", I got an 
+> OK. But any other AT commands don't work.
+
+The echoing must not be on by default. Enter "ATE1" and see happens.
+
+> I'm sorry but I'm a newbe and don't know how to "grep the initial HCI 
+> and L2CAP connection setup".
+
+Start hcidump earlier so it can decode the whole connection setup.
+
+Regards
+
+Marcel
 
 
 
