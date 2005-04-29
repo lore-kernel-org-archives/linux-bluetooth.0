@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Attila Zsigmond <mail@backend-wizard.com>
+From: Fred Schaettgen <bluez-user@schaettgen.de>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Transfer link key from/to windows
-References: <200504291858.19965@ByZsA> <200504292010.42625.bluez-user@schaettgen.de>
-In-Reply-To: <200504292010.42625.bluez-user@schaettgen.de>
+References: <200504291858.19965@ByZsA>
+In-Reply-To: <200504291858.19965@ByZsA>
+Cc: Attila Zsigmond <mail@backend-wizard.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200504292307.25245@ByZsA>
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_iincCAgPaM5aFDQ"
+Message-Id: <200504292010.42625.bluez-user@schaettgen.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,53 +20,172 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 29 Apr 2005 23:07:24 +0200
+Date: Fri, 29 Apr 2005 20:10:42 +0200
 
->the link key is always 16 bytes / 128 bits long. Even Windows can"t
-> change this.
-> 
-> Regards
-> 
-> Marcel
+--Boundary-00=_iincCAgPaM5aFDQ
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Hmmm... Thank you, Marcel. I know that this list is not about MS windows 
-but maybe somebody can help. Here is the link key exported from XP 
-registry:
+On Friday, 29. April 2005 18:58, Attila Zsigmond wrote:
+> Hello,
+>
+> I have a dual boot PC and I want to connect it to my mobile phone via
+> bluetooth. Currently I need enter the pin code each time if I boot the
+> other operating system. I know where the link key is in my linux and
+> could export link key from windows registry. But I cannot replace them
+> each other because they have different length. On linux key is 16 bytes
+> length while on windows it is 128. Can bluez be configured to create
+> longer link keys? Any other idea?
 
-Windows Registry Editor Version 5.00
+Maybe you can use the attached script as a starting point, which I just 
+rescued from the deepest depths of my harddisk. It's supposed to transfer 
+link keys from Linux to Windows.
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Widcomm\BTConfig\Devices\08:00:1f:51:d1:e9]
-"Name"=hex:57,69,6c,64,72,6f,73,65,00
-"DevClass"=hex:50,02,04
-"Features"=hex:ef,ff,0b,00,00,00,00,00
-"TimeStamp"=dword:0000329d
-"FTPAuthorizationExpires"=hex:00
-"OPPAuthorizationExpires"=hex:00
-"TrustedMask"=dword:00000000
-"LinkKey"=hex:80,00,00,00,4c,00,00,00,01,02,00,00,02,66,00,00,00,a4,00,00,84,
-\
-  e1,7a,fe,7f,da,a6,51,87,b1,b7,1e,19,cc,cd,ea,fe,f7,b5,88,57,33,15,27,91,f8,
-\
-  c9,db,74,00,59,64,ff,9f,8b,3c,a0,fb,01,ba,52,7c,f3,28,94,b1,54,52,a4,30,42,
-\
-  6a,90,9f,55,40,a8,62,af,5c,60,7e,1f,92,28,00,00,00,15,86,a6,99,9b,53,e6,6c,
-\
-  a3,8e,06,77,c5,4d,3e,9a,17,70,8d,6b,06,40,19,88,fb,6b,d6,9f,8f,ef,77,3d,23,
-\
-  0f,99,cc,c7,d0,1d,cb
+It's highly unlikely that it works as is, and I didn't touch it since quite a 
+while since I don't have a windows installation atm. At least one problem I 
+remember was that the acl of some registry key had to be changed manually 
+before applying the inf-file, because not even an admin can change (or even 
+see?) it by default. I'm quite sure that it's possible to change this with 
+some inf-file magic, but I didn't feel motivated enough to investiagte 
+further and finally abandoned the whole thing in an unknown state.
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Widcomm\BTConfig\Devices\08:00:1f:51:d1:e9\0]
-"ServiceNameUTF8"=hex:53,65,72,69,61,6c,20,50,6f,72,74,00
-"ServiceNameNative"=hex:53,65,72,69,61,6c,20,50,6f,72,74,00
-"UUID"=dword:00001101
-"Security"=dword:00000000
-"DefaultConnection"=dword:00000000
+All I can promise is that it generates some sort of inf file from the 
+link_keys file which you can apply under windows. I even can't remember if it 
+ever worked. It's for the XP stack, not for Widcomm btw. Maybe you or someone 
+else is motivated enough to make this work. 
 
-How can it be 16 bytes long? How can it be decoded or which part should 
-I use?
+Fred
 
-Attila
+-- 
+Fred Schaettgen
+bluez-devel@schaettgen.de
 
+--Boundary-00=_iincCAgPaM5aFDQ
+Content-Type: application/x-python;
+  name="bt_export_linkkeys"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="bt_export_linkkeys"
+
+#!/usr/bin/python
+#
+# This script extracts the Bluetooth link keys
+# from BlueZ's link key file /etc/bluetooth/link_key
+# and creates a Windows .inf-file in the current
+# directory. This inf-file will install the link keys
+# under windows (right click -> install).
+#
+# By sharing the keys between the MS-Stack and BlueZ
+# you avoid the problem that devices have to be pair
+# every time you switch the OS while using the same
+# Bluetooth dongle.
+#
+# Copyright 2004 by Fred Schaettgen <bluez.sch@ttgen.net>
+
+import sys
+
+outFileName = "bluez_keys.inf"
+keyFileName = "/etc/bluetooth/link_key"
+
+def printError(msg):
+    print "ERROR: "+msg
+    sys.exit(1)
+
+def toRevHexStr(s, separator):
+    ret = ""
+    sep = ""
+    for c in s:
+        ret = hex(int(ord(c))+0x100)[3:6] + sep + ret
+        sep = separator
+    return ret
+
+def toDosStr(s):
+    ret = ""
+    for c in s:
+        if c=="\n":
+            ret = ret + "\r\n"
+        else:
+            ret = ret + c
+    return ret
+
+def writeOut(s):
+    global outFile
+    outFile.write(toDosStr(s))
+
+keyFile = open(keyFileName, "r")
+keyRecordsRaw = []
+
+outFile = open(outFileName, "w")
+
+recordSize = 36
+record = keyFile.read(recordSize)
+while len(record) == recordSize:
+    keyRecordsRaw.append(record)
+    record = keyFile.read(recordSize)
+if len(record) != 0:
+    printError("Unexpected end of link key file!")
+
+keyList = []
+for record in keyRecordsRaw:
+    d = dict()
+    d["if"] = toRevHexStr(record[0:6], "")
+    d["dev"] = toRevHexStr(record[6:12], "")
+    d["key"] = toRevHexStr(record[12:28], ",")
+    keyList.append(d)
+
+
+writeOut("""\
+[Version]
+Signature=\"$CHICAGO$\"
+AdvancedINF=2.5
+
+; This file will install Bluetooth link keys for
+; the Microsoft Bluetooth stack.
+;
+; Edit this file to suit your needs, then save it,
+; right-click the file icon and select \"Install\".
+;
+; The following lines specify for which device/adapter pair
+; a link key is installed.
+; Simply remove the lines of the link keys that you don't
+; want to import.
+
+[DefaultInstall.NT]
+AddReg=BaseKeyTree
+
+""")
+
+for inf in keyList:
+    writeOut("AddReg=DEV-"+inf["dev"]+"-"+inf["if"]+"\n")
+
+writeOut("""\
+
+; ----------- End of user modifiable section -------------
+
+
+[BaseKeyTree]
+HKLM,%bthport%\Keys,,,,
+
+[BaseKeyTree.security]
+"D:AR(A;CI;GRGW;;;PU)(A;CI;GRGW;;;LS)"
+
+[Strings]
+bthport="SYSTEM\CurrentControlSet\Services\BTHPORT\Parameters"
+
+""")
+
+for inf in keyList:
+    writeOut("[DEV-" + inf["dev"] + "-" + inf["if"] + "]\n")
+    writeOut("HKLM,%bthport%\\Keys\\" + inf["if"])
+    writeOut(",\"" + inf["dev"] + "\",0x00000001," + inf["key"] + "\n\n")
+
+outFile.close()
+print "BlueZ link keys exported to "+outFileName
+
+
+--Boundary-00=_iincCAgPaM5aFDQ--
 
 
 -------------------------------------------------------
