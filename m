@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] DBUS service support - Initial library
+Subject: Re: [Bluez-devel] Help with L2CAP sockets
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb05042813004f4609a6@mail.gmail.com>
-References: <e1effdeb05042813004f4609a6@mail.gmail.com>
+In-Reply-To: <4271D1F8.4000307@impulsesoft.com>
+References: <4271D1F8.4000307@impulsesoft.com>
 Content-Type: text/plain
-Message-Id: <1114768038.8836.42.camel@pegasus>
+Message-Id: <1114767565.8836.37.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,34 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 29 Apr 2005 11:47:18 +0200
+Date: Fri, 29 Apr 2005 11:39:25 +0200
 
-Hi Claudio,
+Hi Mayank,
 
-> I wrote the skeleton of the library. Please verify if I 
-> am following the BlueZ principles. 
-> At the moment, the code is not fully integrated 
-> with BlueZ daemons and applications. Some functions 
-> shall be changed due function outputs: the result 
-> should be returned instead of displayed on the 
-> screen.
-> 
-> It is only a initial draft. The idea is provide a 
-> library to user mode application controls bluetooth 
-> connections. Please validate my suggestions before 
-> I start coding and verify if this library can be 
-> useful for BlueZ community. I know that some features
-> of this library are provided by "pand", but I need
-> control connections from a user mode application 
-> or DBUS application.
+>   I am developing an application using the L2CAP sockets provided by 
+> BlueZ. I am creating a pool of sockets and listening to all of them 
+> simultaneously. To avoid spawning of a thread for each socket, i tried 
+> using the async capabilities of the socket. I set the FASYNC flag using 
+> the ioctl to the socket, and set my pid to it. Thereafter i get a SIGIO 
+> whenever data is available on any of the socket. Everything seems fine 
+> except for disconnection. When an L2CAP socket is disconnected from the 
+> remote device, i do not get any SIGIO. Hence i am not able to do get the 
+> disconnection indication since i am not doing a read on the socket. I do 
+> a read only when i receive a SIGIO.
+>   I want to know if there is a way i can add code to the L2CAP file of 
+> bluez to send a sigio whenever it receives a disconnection indication. 
 
-don't move anything around the utils directories. It is easier to do
-that later on when it is clear what to do. If you need some stuff that
-is not in the Bluetooth library duplicate the code for now.
-
-Since this is all about pand. Extend it with your functionality and put
-everything in the pand directory. I don't see any need for another
-library especially when you start talking about D-Bus integration.
+I have no idea, but I never used FASYNC with BlueZ. Use select()/poll()
+and write an event loop.
 
 Regards
 
