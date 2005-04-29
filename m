@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] training or books?
+Subject: Re: [Bluez-users] access restrictions after passing PIN
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <2621d9af050427113054b8cf82@mail.gmail.com>
-References: <2621d9af050427113054b8cf82@mail.gmail.com>
+In-Reply-To: <1687ed8405042723003ae1da8e@mail.gmail.com>
+References: <1687ed8405042723003ae1da8e@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1114768557.8836.56.camel@pegasus>
+Message-Id: <1114768375.8836.52.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,24 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 29 Apr 2005 11:55:57 +0200
+Date: Fri, 29 Apr 2005 11:52:55 +0200
 
-Hi,
+Hi Godfryd,
 
-> Is there any training courses/seminars or books on BlueZ available now?
-> I mean information specically on BlueZ, not the Bluetooth Spec in general.
+> I've got a question. Is there any restriction of accessing services
+> after passing the pairing procedure? I think about situation when both
+> devices are paired and I suppose that now there is no restriction of
+> use of any services like serial port or any other. So is there a
+> danger of overuse of these services (i.e. in mobile phones it is
+> possible to manage them seemlessly through serial port from PC)?
 
-you can take at the Linux Unwired book:
-
-	http://www.bluez.org/books.html
-
-I also gave a lot of talks about BlueZ / Bluetooth in the past:
-
-	http://www.bluez.org/talks.html
-
-We can talk about a training course, but this depends on what the topic
-will be and how much money you are willing to spent. BlueZ in general
-became a quite large area.
+this depends on if the device implements a policy manager or not. If it
+uses a simple trust model based on the link key and the device address
+then there are no other restrictions.
 
 Regards
 
