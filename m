@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] access restrictions after passing PIN
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <1687ed84050429030628301d30@mail.gmail.com>
+From: Michal Nowikowski <godfryd@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1687ed84050429030628301d30@mail.gmail.com>
+Subject: Re: [Bluez-users] access restrictions after passing PIN
+In-Reply-To: <1114768375.8836.52.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 References: <1687ed8405042723003ae1da8e@mail.gmail.com>
 	 <1114768375.8836.52.camel@pegasus>
-	 <1687ed84050429030628301d30@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1114769565.8836.63.camel@pegasus>
-Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,33 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 29 Apr 2005 12:12:45 +0200
+Date: Fri, 29 Apr 2005 12:06:40 +0200
 
-Hi Godfryd,
+On 29/04/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Godfryd,
+>=20
+> > I've got a question. Is there any restriction of accessing services
+> > after passing the pairing procedure? I think about situation when both
+> > devices are paired and I suppose that now there is no restriction of
+> > use of any services like serial port or any other. So is there a
+> > danger of overuse of these services (i.e. in mobile phones it is
+> > possible to manage them seemlessly through serial port from PC)?
+>=20
+> this depends on if the device implements a policy manager or not. If it
+> uses a simple trust model based on the link key and the device address
+> then there are no other restrictions.
 
-> > > I've got a question. Is there any restriction of accessing services
-> > > after passing the pairing procedure? I think about situation when both
-> > > devices are paired and I suppose that now there is no restriction of
-> > > use of any services like serial port or any other. So is there a
-> > > danger of overuse of these services (i.e. in mobile phones it is
-> > > possible to manage them seemlessly through serial port from PC)?
-> > 
-> > this depends on if the device implements a policy manager or not. If it
-> > uses a simple trust model based on the link key and the device address
-> > then there are no other restrictions.
-> 
-> Is this "policy manager" specified somehow by Bluetooth SIG? Or is
-> this just a good will of e.g. cell phone manufaturers? I could find
-> anything but security modes (1,2,3) about access restrictions, but it
-> isn't what I need.
+Is this "policy manager" specified somehow by Bluetooth SIG? Or is
+this just a good will of e.g. cell phone manufaturers? I could find
+anything but security modes (1,2,3) about access restrictions, but it
+isn't what I need.
 
-read the Bluetooth security whitepaper.
-
-Regards
-
-Marcel
-
-
+Godfryd
 
 
 -------------------------------------------------------
