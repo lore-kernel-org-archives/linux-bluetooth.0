@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Help with L2CAP sockets
+Subject: Re: [Bluez-devel] Support for stored link keys
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4271D1F8.4000307@impulsesoft.com>
-References: <4271D1F8.4000307@impulsesoft.com>
+In-Reply-To: <1114712900.12012.365.camel@baythorne.infradead.org>
+References: <1114094787.32265.11.camel@pegasus>
+	 <1114712900.12012.365.camel@baythorne.infradead.org>
 Content-Type: text/plain
-Message-Id: <1114767565.8836.37.camel@pegasus>
+Message-Id: <1114767430.8836.34.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,25 +19,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 29 Apr 2005 11:39:25 +0200
+Date: Fri, 29 Apr 2005 11:37:10 +0200
 
-Hi Mayank,
+Hi David,
 
->   I am developing an application using the L2CAP sockets provided by 
-> BlueZ. I am creating a pool of sockets and listening to all of them 
-> simultaneously. To avoid spawning of a thread for each socket, i tried 
-> using the async capabilities of the socket. I set the FASYNC flag using 
-> the ioctl to the socket, and set my pid to it. Thereafter i get a SIGIO 
-> whenever data is available on any of the socket. Everything seems fine 
-> except for disconnection. When an L2CAP socket is disconnected from the 
-> remote device, i do not get any SIGIO. Hence i am not able to do get the 
-> disconnection indication since i am not doing a read on the socket. I do 
-> a read only when i receive a SIGIO.
->   I want to know if there is a way i can add code to the L2CAP file of 
-> bluez to send a sigio whenever it receives a disconnection indication. 
+> > Another thing is if we should use /var/lib64/bluetooth on 64-bit
+> > platforms? What is the deal for the /var directory on these
+> > architectures?
+> 
+> Only arch-specific binary stuff which is 64-bit should go in lib64.
+> Since none of that should be in /var anyway, I think there is
+> no /var/lib64.
 
-I have no idea, but I never used FASYNC with BlueZ. Use select()/poll()
-and write an event loop.
+so using /var/lib/bluetooth or ${localstatedir}/lib/bluetooth is okay
+for storing the link keys and other information?
 
 Regards
 
