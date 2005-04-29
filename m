@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1687ed84050429030628301d30@mail.gmail.com>
-From: Michal Nowikowski <godfryd@gmail.com>
+Subject: Re: [Bluez-users] hcid.conf option explanation
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] access restrictions after passing PIN
-In-Reply-To: <1114768375.8836.52.camel@pegasus>
+In-Reply-To: <426F84B9.8090804@gmx.ch>
+References: <426F84B9.8090804@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1114768777.8836.62.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <1687ed8405042723003ae1da8e@mail.gmail.com>
-	 <1114768375.8836.52.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,28 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 29 Apr 2005 12:06:40 +0200
+Date: Fri, 29 Apr 2005 11:59:37 +0200
 
-On 29/04/05, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Godfryd,
->=20
-> > I've got a question. Is there any restriction of accessing services
-> > after passing the pairing procedure? I think about situation when both
-> > devices are paired and I suppose that now there is no restriction of
-> > use of any services like serial port or any other. So is there a
-> > danger of overuse of these services (i.e. in mobile phones it is
-> > possible to manage them seemlessly through serial port from PC)?
->=20
-> this depends on if the device implements a policy manager or not. If it
-> uses a simple trust model based on the link key and the device address
-> then there are no other restrictions.
+Hi Marco,
 
-Is this "policy manager" specified somehow by Bluetooth SIG? Or is
-this just a good will of e.g. cell phone manufaturers? I could find
-anything but security modes (1,2,3) about access restrictions, but it
-isn't what I need.
+> Can someone clarify the following options for me?
+> 
+> pairing none/multi/once;
+> Does this control if a device can be connected twice or more at at the same 
+> time or is it about succcessive connections if the device already 
+> disconnected (older pairings)?
 
-Godfryd
+if we are already paired and another pin code request shows up, we
+ignore not in "once" mode. In "none" mode we always send the negative
+reply and "multi" allows repairing.
+
+> what mean these three link policy settings:
+> #   hold    - allow hold mode
+> #   sniff   - allow sniff mode
+> #   park    - allow park mode
+
+This switches the possible for the three power modes on and off. Leave
+them on otherwise some devices won't work.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
