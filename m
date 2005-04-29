@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Comments about the Logitech/HP stereo headphones
+Subject: Re: [Bluez-devel] mpg123 to the rescue of a2snk.c
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050428121002.81723.qmail@web8309.mail.in.yahoo.com>
-References: <20050428121002.81723.qmail@web8309.mail.in.yahoo.com>
+In-Reply-To: <20050428123014.50396.qmail@web8307.mail.in.yahoo.com>
+References: <20050428123014.50396.qmail@web8307.mail.in.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1114768274.8836.50.camel@pegasus>
+Message-Id: <1114768235.8836.48.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,26 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 29 Apr 2005 11:51:14 +0200
+Date: Fri, 29 Apr 2005 11:50:35 +0200
 
 Hi Mayank,
 
-> > Maybe we should change the SBC encoding routines so
-> > that it times how
-> > long it needed to encode the resulting SBC frame.
-> > Together with the
-> > known time of the PCM data the SBC frame is encoded
-> > for, we can
-> > calculate the actual time for the usleep() in
-> > a2play.
+> Can we make use of mpg123 in a similar way as we used
+> it in the a2play application earlier on ??
 > 
-> I think this is the best idea. But again some timing
-> mismatch is bound to take place because of different
-> CPU speeds. For instance the CPU on which we calculate
-> the time taken for the encoding, may be different on
-> which we are running our a2play application...
+> I mean, if we decode the sbc packets and put them
+> somewhere, for instance stdout, and then make mpg123
+> play those decoded samples, will it be more audible ?
 
-the best idea would be to use RTC as timing source.
+how should this work? The mpg123 reads MP3 files and not PCM streams.
 
 Regards
 
