@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Transfer link key from/to windows
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Attila Zsigmond <mail@backend-wizard.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200504291858.19965@ByZsA>
-References: <200504291858.19965@ByZsA>
-Content-Type: text/plain
-Message-Id: <1114794862.8836.103.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200504291858.19965@ByZsA>
+Subject: [Bluez-users] Transfer link key from/to windows
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +17,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 29 Apr 2005 19:14:22 +0200
+Date: Fri, 29 Apr 2005 18:58:17 +0200
 
-Hi Attila,
+Hello,
 
-> I have a dual boot PC and I want to connect it to my mobile phone via 
-> bluetooth. Currently I need enter the pin code each time if I boot the 
-> other operating system. I know where the link key is in my linux and 
-> could export link key from windows registry. But I cannot replace them 
-> each other because they have different length. On linux key is 16 bytes 
-> length while on windows it is 128. Can bluez be configured to create 
-> longer link keys? Any other idea?
+I have a dual boot PC and I want to connect it to my mobile phone via 
+bluetooth. Currently I need enter the pin code each time if I boot the 
+other operating system. I know where the link key is in my linux and 
+could export link key from windows registry. But I cannot replace them 
+each other because they have different length. On linux key is 16 bytes 
+length while on windows it is 128. Can bluez be configured to create 
+longer link keys? Any other idea?
 
-the link key is always 16 bytes / 128 bits long. Even Windows can't
-change this.
-
-Regards
-
-Marcel
-
-
+Attila
 
 
 -------------------------------------------------------
