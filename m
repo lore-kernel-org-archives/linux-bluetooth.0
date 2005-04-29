@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Attila Zsigmond <mail@backend-wizard.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Something strange with minicom
+Subject: Re: [Bluez-users] Transfer link key from/to windows
+References: <200504291858.19965@ByZsA> <200504292010.42625.bluez-user@schaettgen.de>
+In-Reply-To: <200504292010.42625.bluez-user@schaettgen.de>
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200504300003.22570@ByZsA>
+Message-Id: <200504292307.25245@ByZsA>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,102 +19,53 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 30 Apr 2005 00:03:21 +0200
+Date: Fri, 29 Apr 2005 23:07:24 +0200
 
-> are you sure that you wanna be in security mode 3. Using auth and
->  encrypt is not advisable.
+>the link key is always 16 bytes / 128 bits long. Even Windows can"t
+> change this.
+> 
+> Regards
+> 
+> Marcel
 
-I turned off but it makes no difference...
+Hmmm... Thank you, Marcel. I know that this list is not about MS windows 
+but maybe somebody can help. Here is the link key exported from XP 
+registry:
 
-> Make sure that you grep the initial HCI and L2CAP connection setup,
->  because otherwise hcidump is not able to decode RFCOMM. Or specific
-> the --psm=3 option on the command line.
+Windows Registry Editor Version 5.00
 
-Here is a new dump with --psm=3:
+[HKEY_LOCAL_MACHINE\SOFTWARE\Widcomm\BTConfig\Devices\08:00:1f:51:d1:e9]
+"Name"=hex:57,69,6c,64,72,6f,73,65,00
+"DevClass"=hex:50,02,04
+"Features"=hex:ef,ff,0b,00,00,00,00,00
+"TimeStamp"=dword:0000329d
+"FTPAuthorizationExpires"=hex:00
+"OPPAuthorizationExpires"=hex:00
+"TrustedMask"=dword:00000000
+"LinkKey"=hex:80,00,00,00,4c,00,00,00,01,02,00,00,02,66,00,00,00,a4,00,00,84,
+\
+  e1,7a,fe,7f,da,a6,51,87,b1,b7,1e,19,cc,cd,ea,fe,f7,b5,88,57,33,15,27,91,f8,
+\
+  c9,db,74,00,59,64,ff,9f,8b,3c,a0,fb,01,ba,52,7c,f3,28,94,b1,54,52,a4,30,42,
+\
+  6a,90,9f,55,40,a8,62,af,5c,60,7e,1f,92,28,00,00,00,15,86,a6,99,9b,53,e6,6c,
+\
+  a3,8e,06,77,c5,4d,3e,9a,17,70,8d,6b,06,40,19,88,fb,6b,d6,9f,8f,ef,77,3d,23,
+\
+  0f,99,cc,c7,d0,1d,cb
 
-HCI sniffer - Bluetooth packet analyzer ver 1.20
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< ACL data: handle 42 flags 0x02 dlen 9
-    L2CAP(d): cid 0x0041 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 1 fcs 0x9a
-      61
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 2A 00 01 00
-> ACL data: handle 42 flags 0x02 dlen 9
-    L2CAP(d): cid 0x0040 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 1
-< ACL data: handle 42 flags 0x02 dlen 9
-    L2CAP(d): cid 0x0041 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 1 fcs 0x9a
-      74
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 2A 00 01 00
-> ACL data: handle 42 flags 0x02 dlen 9
-    L2CAP(d): cid 0x0040 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 1
-< ACL data: handle 42 flags 0x02 dlen 9
-    L2CAP(d): cid 0x0041 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 1 fcs 0x9a
-      7A
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 2A 00 01 00
-> ACL data: handle 42 flags 0x02 dlen 9
-    L2CAP(d): cid 0x0040 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 1
-< ACL data: handle 42 flags 0x02 dlen 9
-    L2CAP(d): cid 0x0041 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 1 fcs 0x9a
-      0D
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 2A 00 01 00
-> ACL data: handle 42 flags 0x02 dlen 9
-    L2CAP(d): cid 0x0040 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 1
-> ACL data: handle 42 flags 0x02 dlen 17
-    L2CAP(d): cid 0x0040 len 13 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 0 ilen 9 fcs 0x40
-      0D 0A 45 52 52 4F 52 0D 0A
+[HKEY_LOCAL_MACHINE\SOFTWARE\Widcomm\BTConfig\Devices\08:00:1f:51:d1:e9\0]
+"ServiceNameUTF8"=hex:53,65,72,69,61,6c,20,50,6f,72,74,00
+"ServiceNameNative"=hex:53,65,72,69,61,6c,20,50,6f,72,74,00
+"UUID"=dword:00001101
+"Security"=dword:00000000
+"DefaultConnection"=dword:00000000
 
-I don't see any echoed characters at the end, only the "ERROR" message. 
-But ATZ is a very common modem command and as I wrote earlier, it works 
-with windows hyperterminal. I noticed that I enter only "AT", I got an 
-OK. But any other AT commands don't work.
-
-I'm sorry but I'm a newbe and don't know how to "grep the initial HCI 
-and L2CAP connection setup". Here is my hcid.conf file:
-
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        pin_helper /bin/bluepin;
-}
-device {
-        name "Cornflower";
-        class 0x3e0100;
-        iscan enable; pscan enable;
-        lm master;
-        lp rswitch,hold,sniff,park;
-}
-
-My mobile is a sharp gx15. Here is its "hcitool info" output, maybe it 
-can help:
-
-Requesting information ...
-        BD Address:  08:00:1F:51:D1:E9
-        Device Name: Wildrose
-        LMP Version: 1.1 (0x1) LMP Subversion: 0x460
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features: 0xef 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
-        <3-slot packets> <5-slot packets> <encryption> <slot offset>
-        <role switch> <hold mode> <sniff mode> <park state> <RSSI>
-        <channel quality> <SCO link> <HV2 packets> <HV3 packets>
-        <u-law log> <A-law log> <CVSD> <paging scheme>
-        <transparent SCO>
-
-Please tell me if you need any other info...
+How can it be 16 bytes long? How can it be decoded or which part should 
+I use?
 
 Attila
+
 
 
 -------------------------------------------------------
