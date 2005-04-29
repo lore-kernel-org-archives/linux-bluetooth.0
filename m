@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] A small test for sbc decoder
+Subject: Re: [Bluez-devel] Comments about the Logitech/HP stereo headphones
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050428123527.83451.qmail@web8304.mail.in.yahoo.com>
-References: <20050428123527.83451.qmail@web8304.mail.in.yahoo.com>
+In-Reply-To: <20050428121002.81723.qmail@web8309.mail.in.yahoo.com>
+References: <20050428121002.81723.qmail@web8309.mail.in.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1114768174.8836.46.camel@pegasus>
+Message-Id: <1114768274.8836.50.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,18 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 29 Apr 2005 11:49:34 +0200
+Date: Fri, 29 Apr 2005 11:51:14 +0200
 
 Hi Mayank,
 
-> Can we test our sbc decoder code in the following
-> manner...
+> > Maybe we should change the SBC encoding routines so
+> > that it times how
+> > long it needed to encode the resulting SBC frame.
+> > Together with the
+> > known time of the PCM data the SBC frame is encoded
+> > for, we can
+> > calculate the actual time for the usleep() in
+> > a2play.
 > 
-> In the sbcdec.c file, can we put the decoded samples
-> of an sbc file on /dev/dsp ???
+> I think this is the best idea. But again some timing
+> mismatch is bound to take place because of different
+> CPU speeds. For instance the CPU on which we calculate
+> the time taken for the encoding, may be different on
+> which we are running our a2play application...
 
-at the moment it is using the AO library for output, but you can send me
-a patch to allow direct using of /dev/dsp.
+the best idea would be to use RTC as timing source.
 
 Regards
 
