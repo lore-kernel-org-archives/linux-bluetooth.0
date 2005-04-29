@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
+Subject: Re: [Bluez-users] Timeouts
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] How to test the mic functionality in Bluez?
-References: <7aa80ced05042807167abd7376@mail.gmail.com> <200504281734.06880.pavouk@pavouk.org> <7aa80ced05042822097559adc4@mail.gmail.com>
-In-Reply-To: <7aa80ced05042822097559adc4@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200504291626.35311.pavouk@pavouk.org>
+In-Reply-To: <4272363F.30502@futurlink.com>
+References: <1687ed8405042723003ae1da8e@mail.gmail.com>
+	 <4272363F.30502@futurlink.com>
+Content-Type: text/plain
+Message-Id: <1114782143.8836.91.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,20 +19,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 29 Apr 2005 16:26:35 +0200
+Date: Fri, 29 Apr 2005 15:42:23 +0200
 
-Hello,
+Hi Pedro,
 
->            Though it is working with gnomemeeting, i can't able to
-> record the voice using gnome recorder under linux. Could u please tell
-> me how to do this?
+> I am having some trouble with the timeouts of connections under Bluetooth.
+> 
+> My first concern is the initial connection timeout. I try to send a file 
+> to a mobile phone using OpenOBEX (I use the BtOBEX_TransportConnect()). 
+> If the owner of the mobile phone ignores the message that appears in the 
+> mobile's screen (asking him/her whether to accept the connection), after 
+> 30 seconds the connection fails with "Resource temporarily unavailable" 
+> (errno=11). How can I modify this 30 seconds?
 
-I can't test it now, but probably you must setup mixer for recording
-right input.
+you need to integrate a connect timeout (SABM timeout) into the RFCOMM
+kernel code.
 
-Best regards,
+> I can control the page timeout issuing "hciconfig hci0 pageto 8192", 
+> that will limit the time for (correct me if I am wrong) completing the 
+> HCI connection to about 5 seconds. But my problem is at a higher level 
+> (RFCOMM), since the device is whithin range and the HCI connection is 
+> done correctly. Is there any specific command in the bluez API to change 
+> the overall connect() timeout? Or is this a Linux issue (something like 
+> setsockopt())?
 
-Pavel Ruzicka
+The page timeout is only for the underlaying ACL links. The RFCOMM stuff
+is not configurable at the moment.
+
+> The other problem is with the call sdp_service_search_attr_req(). There 
+> is one mobile that I am testing, that does not always respond (I am 
+> trying to track down the reason). This call takes about 2 minutes to 
+> give up so, in the previous scenario, it means that other clients are 
+> waiting for two minutes, something unacceptable. Is there a way to 
+> reduce this 2 minutes timeout?
+
+I have no idea. I need the phone to play with it.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
