@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Fred Schaettgen <bluez-user@schaettgen.de>
+From: Alexandre Boeglin <alex@nexedi.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Transfer link key from/to windows
-References: <200504291858.19965@ByZsA> <200504292010.42625.bluez-user@schaettgen.de> <200504292307.25245@ByZsA>
-In-Reply-To: <200504292307.25245@ByZsA>
-Cc: Attila Zsigmond <mail@backend-wizard.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200504300128.41156.bluez-user@schaettgen.de>
+  charset="us-ascii"
+Message-Id: <200504292235.51740.alex@nexedi.com>
+Subject: [Bluez-users] Stowaway Thinkoutside / Dell axim keyboard
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,48 +17,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 30 Apr 2005 01:28:40 +0200
+Date: Fri, 29 Apr 2005 22:35:51 +0000
 
-On Friday, 29. April 2005 23:07, Attila Zsigmond wrote:
-...
-> Hmmm... Thank you, Marcel. I know that this list is not about MS windows
-> but maybe somebody can help. Here is the link key exported from XP
-> registry:
->
-> Windows Registry Editor Version 5.00
->
-> [HKEY_LOCAL_MACHINE\SOFTWARE\Widcomm\BTConfig\Devices\08:00:1f:51:d1:e9]
-> "Name"=hex:57,69,6c,64,72,6f,73,65,00
-> "DevClass"=hex:50,02,04
-> "Features"=hex:ef,ff,0b,00,00,00,00,00
-> "TimeStamp"=dword:0000329d
-> "FTPAuthorizationExpires"=hex:00
-> "OPPAuthorizationExpires"=hex:00
-> "TrustedMask"=dword:00000000
-> "LinkKey"=hex:80,00,00,00,4c,00,00,00,01,02,00,00,02,66,00,00,00,a4,00,00,84
-> e1,7a,fe,7f,da,a6,51,87,b1,b7,1e,19,cc,cd,ea,fe,f7,b5,88,57,33,15,27,91,f8,
-> c9,db,74,00,59,64,ff,9f,8b,3c,a0,fb,01,ba,52,7c,f3,28,94,b1,54,52,a4,30,42,
-> 6a,90,9f,55,40,a8,62,af,5c,60,7e,1f,92,28,00,00,00,15,86,a6,99,9b,53,e6,6c,
-> a3,8e,06,77,c5,4d,3e,9a,17,70,8d,6b,06,40,19,88,fb,6b,d6,9f,8f,ef,77,3d,23,
->  0f,99,cc,c7,d0,1d,cb
-...
-> How can it be 16 bytes long? How can it be decoded or which part should
-> I use?
+Hello,
 
-I guess the "LinkKey" registry key contains simply a little bit more than just 
-the link key itself. If you have both a windows and a linux system you might 
-try pairing the windows box with the linux system. Then have a look at the 
-link_keys file with a hex editor to find matching parts. The beginning of the 
-"LinkKey" doesn't look very linkkey-like.
-Is 08:00:1f:51:d1:e9 the adaptor's adress or is it the address of the peer 
-device? In any case, where is the other address stored? Or does the Widcomm 
-stack support only a single adaptor?
+I just tested my Dell Axim bluetooth keyboard under linux/x86, and it
+worked fine !
 
-Fred
+FYI, the dell keyboard is exactly the same as the stowaway
+Thinkoutside, the only differences are that it has dell written on it,
+and that it's sold $40 cheaper than thinkoutside.
 
--- 
-Fred Schaettgen
-bluez-devel@schaettgen.de
+[root@alex-laptop bluetooth]# hcitool inq
+Inquiring ...
+        00:03:C9:57:12:36       clock offset: 0x2352    class: 0x002540
+
+[root@alex-laptop bluetooth]# hcitool info 00:03:C9:57:12:36
+Requesting information ...
+        BD Address:  00:03:C9:57:12:36
+        Device Name: Think Outside Keyboard
+        LMP Version: 1.2 (0x2) LMP Subversion: 0x4100
+        Manufacturer: Broadcom Corporation (15)
+        Features: 0xbc 0x02 0x04 0x28 0x08 0x08 0x00 0x00
+                <encryption> <slot offset> <timing accuracy> <role switch>
+                <sniff mode> <RSSI> <power control> <enhanced iscan>
+                <interlaced pscan> <AFH cap. slave> <AFH cap. master>
+
+Apr 29 21:55:01 alex-laptop hidd: New HID device 00:03:C9:57:12:36 (Broadcom Corp. Keyboard)
+
+It the french/azerty version, and some of the keycodes (there are two
+function keys for extended characters) seem to be wrongly assigned ...
+Where should I look for if I want to try to fix these ?
+
+Please no not hesitate to ask if you want me to fetch more usefull
+information from the keyboard.
+
+Regard,
+Alex
 
 
 -------------------------------------------------------
