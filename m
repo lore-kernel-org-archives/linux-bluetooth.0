@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] access restrictions after passing PIN
+Subject: Re: [Bluez-users] device suggestion
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1687ed8405042723003ae1da8e@mail.gmail.com>
-References: <1687ed8405042723003ae1da8e@mail.gmail.com>
+In-Reply-To: <43668e3005042810367c457ee4@mail.gmail.com>
+References: <43668e3005042810367c457ee4@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1114768375.8836.52.camel@pegasus>
+Message-Id: <1114768089.8836.44.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,20 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 29 Apr 2005 11:52:55 +0200
+Date: Fri, 29 Apr 2005 11:48:09 +0200
 
-Hi Godfryd,
+Hi Gabriel,
 
-> I've got a question. Is there any restriction of accessing services
-> after passing the pairing procedure? I think about situation when both
-> devices are paired and I suppose that now there is no restriction of
-> use of any services like serial port or any other. So is there a
-> danger of overuse of these services (i.e. in mobile phones it is
-> possible to manage them seemlessly through serial port from PC)?
+> I'm a total foreigner here, cause I'm using Window and J2SE, but I
+> need to solve a problem  concerning bluetooth hardware and I believe
+> you know better than anyone what device can solve my problem.
 
-this depends on if the device implements a policy manager or not. If it
-uses a simple trust model based on the link key and the device address
-then there are no other restrictions.
+this mailing list is about Bluetooth and Linux.
 
 Regards
 
