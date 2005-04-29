@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] mpg123 to the rescue of a2snk.c
+Subject: Re: [Bluez-devel] DBUS service support - Initial library
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050428123014.50396.qmail@web8307.mail.in.yahoo.com>
-References: <20050428123014.50396.qmail@web8307.mail.in.yahoo.com>
+In-Reply-To: <e1effdeb05042813004f4609a6@mail.gmail.com>
+References: <e1effdeb05042813004f4609a6@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1114768235.8836.48.camel@pegasus>
+Message-Id: <1114768038.8836.42.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,18 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 29 Apr 2005 11:50:35 +0200
+Date: Fri, 29 Apr 2005 11:47:18 +0200
 
-Hi Mayank,
+Hi Claudio,
 
-> Can we make use of mpg123 in a similar way as we used
-> it in the a2play application earlier on ??
+> I wrote the skeleton of the library. Please verify if I 
+> am following the BlueZ principles. 
+> At the moment, the code is not fully integrated 
+> with BlueZ daemons and applications. Some functions 
+> shall be changed due function outputs: the result 
+> should be returned instead of displayed on the 
+> screen.
 > 
-> I mean, if we decode the sbc packets and put them
-> somewhere, for instance stdout, and then make mpg123
-> play those decoded samples, will it be more audible ?
+> It is only a initial draft. The idea is provide a 
+> library to user mode application controls bluetooth 
+> connections. Please validate my suggestions before 
+> I start coding and verify if this library can be 
+> useful for BlueZ community. I know that some features
+> of this library are provided by "pand", but I need
+> control connections from a user mode application 
+> or DBUS application.
 
-how should this work? The mpg123 reads MP3 files and not PCM streams.
+don't move anything around the utils directories. It is easier to do
+that later on when it is clear what to do. If you need some stuff that
+is not in the Bluetooth library duplicate the code for now.
+
+Since this is all about pand. Extend it with your functionality and put
+everything in the pand directory. I don't see any need for another
+library especially when you start talking about D-Bus integration.
 
 Regards
 
