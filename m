@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Guylhem Aznar <bluez-devel@externe.net>
+Subject: Re: [Bluez-devel] DBUS service support - Initial library
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050430020331.GA32110@externe.net>
+In-Reply-To: <e1effdeb0504291520167b9bb8@mail.gmail.com>
+References: <e1effdeb05042813004f4609a6@mail.gmail.com>
+	 <1114768038.8836.42.camel@pegasus>
+	 <e1effdeb05042905267bc91413@mail.gmail.com>
+	 <1114778617.8836.88.camel@pegasus>
+	 <e1effdeb0504291520167b9bb8@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1114819470.8836.124.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] curious problem with a socket 1.0b card
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,118 +22,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 29 Apr 2005 22:03:31 -0400
+Date: Sat, 30 Apr 2005 02:04:30 +0200
 
-Hello
+Hi Claudio,
 
-I'm using a Socket CF+ Rev E (Nokia chipset, hci v. 1.0b) in a Zaurus
-called "collie" running bluez 2.11 to get network connection from a PC
-NAP called "ebox" running bluez 2.10 with a USB dongle (CSR hci v1.1,
-but similar problems happens with a ISSC hci v1.1)
+> My application will provide a DBUS service and
+> APIs to alows user mode applications interact
+> with diferent types of Wireless/Wired connections.
+> This is the reason to create a BlueZ library based
+> on pand and hcitool functions. My application should
+> the able to retrieve bluetooth device information,
+> including establish connection, disconnect, link
+> status, new devices/services, ...
+> The DBUS service will not be provided at BlueZ level.
+> 
+> The current DBUS message in the hcid is used to handle
+> security/authentication issues. This message has a
+> different proposal. Therefore, use the same macro
+> "--enable-dbus" to enable/disable is not a good ideia.
+> 
+> Another important information is: the user mode
+> application doesn't need root privileges to create
+> a bluetooth connection, because it will request using
+> APIs and DBUS service.
+> 
+> Can I create a library in the pand directory and
+> reuse the common codes?
+> I suggest a directive like "--enable-panz" because
+> this library aims provide functions to hide connection
+> details.
 
-Here is the strange problem I have. The devices see eachother in
-hcitool scan, but l2ping from collie to ebox doesn't work. ebox can
-l2ping collie. If ebox l2ping collie, during this I can l2ping
-from collie to ebox, use pan, sdptool etc. (why ?!?)
+I think you get the whole idea of D-Bus wrong and this is not about the
+current D-Bus support of hcid for the PIN helper.
 
-If I press ctrl-c on either ebox or collie, the other one stops
-l2pinging with a "Connection reset by peer".
+As I said if you wanna control something from your application via D-Bus
+then make sure there is a D-Bus enabled pand service is running. If you
+wanna do it at another level, then I don't see any benefit from it. Why
+should we create another library only to help your special D-Bus daemon
+if it is not Bluetooth only. In that case you should simply duplicate
+the code and integrate it into your daemon directly. There is no need to
+make things more complicate.
 
-Collie report "Protocol error" when I try to l2ping ebox without
-running l2ping from ebox to collie. If I use the ISSC dongle (keyspan
-bt-2a) it then simply says "Connection timed out".
+For me the only thing that makes sense if you enhance the pand with
+D-Bus support and then you use that D-Bus interface in your application.
 
-If before pressing ctrl-c I have a pand connected, then they can
-l2ping eachother as much as they want.
+Regards
 
-The problem of course is pand sdptool etc. doesn't work either.
-Any suggestion ? I tried to change master\slave roles with hciconfig
-hciN lm, but it didn't help
-
-I'm sure this comes from the hci v 1.0b card from collie because other
-devices work fine (they can l2ping, sdptool browse and pan connect to
-ebox) while collie refuses to l2ping any other device (they can l2ping
-collie !) but my cellphone.
-
-hcid.conf from the server ebox:
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        pin_helper /etc/bluetooth/givepin;
-}
-device {
-        name "ebox.externe.net";
-        class 0x020100;
-        iscan enable; pscan enable;
-        lm accept,master;
-        lp hold,sniff,park,rswitch;
-        auth enable;
-        encrypt enable;
-}
+Marcel
 
 
-hcid.conf from the client collie:
-
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        pin_helper /etc/bluetooth/givepin;
-}
-device {
-        name "collie.externe.net";
-        class 0x120114;
-        iscan enable; pscan enable;
-        lm accept;
-        lp hold,sniff,park;
-        auth enable;
-        encrypt enable;
-}
-
-
-Even more bizzare : Collie can ping my s65 cellphone (after I type its
-pin on the S65) so pin/l2ping should be fine.
-
-root@collie:/etc/bluetooth# l2ping aa:aa:aa:aa:aa:aa
-Ping: aa:aa:aa:aa:aa:aa from bb:bb:bb:bb:bb:bb (data size 20) ...
-0 bytes from aa:aa:aa:aa:aa:aa id 0 time 79.80ms
-0 bytes from aa:aa:aa:aa:aa:aa id 1 time 84.97ms
-2 sent, 2 received, 0% loss
-root@collie:/etc/bluetooth# l2ping cc:cc:cc:cc:cc:cc
-Can't connect.: Protocol error
-
-My S65 is aa, colie is bb, ebox is cc. Of course, ebox can l2ping the
-S65
-
-Collie is a Zaurus using bluez 2.11, ebox is a PC using bluez 2.10.
-Another Zaurus with a CSR hci v.1. can do everything fine.
-
-The only workaround I've found is :
-. leaving a l2ping to collie running in the background, launched by
-cron. Collie can then use pan, l2ping, sdptool etc.  normally
-
-. using my reflashed dbt-120 dongle (hci v1.2) to which collie can
-perfectly l2ping, using the very same hcid.conf files (!) - only the
-btaddr is changing. Of course I can't leave my dbt-120 there - I need
-it on another machine for its advanced hid features (boottime support
-for mouse etc.
-
-Any better solution or workaround would be appreciated. But I'd be
-even more interested if someone could help me understand why all this
-is happening. So far all my googling gave me no result.
-
---=20
-Bien =E0 vous - Best regards,
-Guylhem P. Aznar
-
---=20
-*@externe.net                                            http://externe.n=
-et
-P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
-un.org
-GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
-ey
 
 
 -------------------------------------------------------
