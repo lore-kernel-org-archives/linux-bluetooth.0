@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] RFCOMM connecting problem
-From: Marcel Holtmann <marcel@holtmann.org>
+From: =?GB2312?B?tcvWvs/p?= <zhixiang_deng@yahoo.com.cn>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050430151036.04f20b12.zhixiang_deng@yahoo.com.cn>
+Message-Id: <20050430151036.04f20b12.zhixiang_deng@yahoo.com.cn>
+In-Reply-To: <200501261244.47898.jschindele@arcor.de>
 References: <200501261244.47898.jschindele@arcor.de>
-	 <20050430151036.04f20b12.zhixiang_deng@yahoo.com.cn>
-Content-Type: text/plain
-Message-Id: <1114856606.8836.126.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] RFCOMM connecting problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,17 +18,9 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 30 Apr 2005 12:23:26 +0200
+Date: Sat, 30 Apr 2005 15:10:36 +0800
 
-Hi,
-
-> when I tried to establish an RFCOMM connection between two bluetooth devices by typing the commands : rfcomm bind 0 <btaddr> 0 ,rfcomm listen 0 0 on one side , it gave the following message : Waiting for connection on channel 0 .However ,on the other side ,when I type the commands : rfcomm bind 0 <btaddr> 0 ,rfcomm connect 0 <remote btaddr> 0 , it gave the message : Can't create RFCOMM socket : invalid argument . What should I do to create the rfcomm connection correctly? Thanks very much .
-
-the RFCOMM channel 0 is not a valid channel.
-
-Regards
-
-Marcel
+Hello all , when I tried to establish an RFCOMM connection between two bluetooth devices by typing the commands : rfcomm bind 0 <btaddr> 0 ,rfcomm listen 0 0 on one side , it gave the following message : Waiting for connection on channel 0 .However ,on the other side ,when I type the commands : rfcomm bind 0 <btaddr> 0 ,rfcomm connect 0 <remote btaddr> 0 , it gave the message : Can't create RFCOMM socket : invalid argument . What should I do to create the rfcomm connection correctly? Thanks very much .
 
 
 
