@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Joshua Davis <crossbox@stealth.kirenet.com>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <Pine.LNX.4.30.0505010935320.13642-100000@stealth.kirenet.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] BlueZ: Accepting incoming traffic
+Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050501124348.24307.qmail@web8310.mail.in.yahoo.com>
+References: <20050501124348.24307.qmail@web8310.mail.in.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1114952271.21785.13.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,33 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 1 May 2005 09:38:15 -0400 (EDT)
+Date: Sun, 01 May 2005 14:57:51 +0200
 
+Hi Mayank,
 
-   Hi!  I've been working on a nice little Linux app using bluez.  To
-finalize it, I need to create a routine that listens for devices searching
-for other devices.  I've tried reading hcid source, but couldn't ffigure
-out how it does this.  I've also gone through the bluez-lib source and
-couldn't find any routine designed for this.  I've also tried opening a
-sock_raw hci socket, and that doesn't work either (reading from it simply
-blocks; probing for listening devices with my pda, my computer sees this
-but doesn't pass it to my program).
+> This is the improved version for the sbcdec.c file
+> which you asked for.
+> 
+> It uses /dev/dsp to play the decoded samples.
+> 
+> The output is pretty well if we incorporate the proper
+> endian type.
+> 
+> I suggest that you keep it as a separate file incase
+> someone wants to use the AO Libraries.
 
-   Any thoughts?
+I will move the version using AO to sbcdec_ao and use your version
+instead. However first I must cleanup your coding style a litte bit.
 
-   Thanks.
+And we should also change sbcdec to accept inputs from standard input
+instead of files only.
 
+Regards
 
-   ----
-   Joshua Davis
-   Transient Infrastructure Security Solutions
-
-
-  /"\
-  \ /    ASCII Ribbon Campaign
-   X   against HTML email & vCards
-  / \
-
+Marcel
 
 
 
