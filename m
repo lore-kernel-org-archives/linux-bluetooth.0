@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] A2DP sink code finally
-Message-Id: <20050501171637.412450f8.henryk@ploetzli.ch>
-In-Reply-To: <20050426123412.48950.qmail@web8310.mail.in.yahoo.com>
-References: <20050426123412.48950.qmail@web8310.mail.in.yahoo.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Sun__1_May_2005_17_16_37_+0200_U.hh+h_pH9he2R0p"
+From: Joshua Davis <crossbox@stealth.kirenet.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] BlueZ: Accepting incoming traffic
+In-Reply-To: <1114959364.21785.18.camel@pegasus>
+Message-ID: <Pine.LNX.4.30.0505011109330.22819-100000@stealth.kirenet.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,54 +17,58 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 1 May 2005 17:16:37 +0200
+Date: Sun, 1 May 2005 11:13:03 -0400 (EDT)
 
---Signature=_Sun__1_May_2005_17_16_37_+0200_U.hh+h_pH9he2R0p
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-Moin,
+  I see.  So when we tell it not to respond to probes, we are just setting
+a bit in the chip?  There is memory in the chip to store the name, then?
+THis is correct?
 
-Am Tue, 26 Apr 2005 13:34:12 +0100 (BST) schrieb Mayank Batra:
+ Thanks :)
 
-> > Hmm, how do I test that? I can't seem to get my
-> > audio dongle to connect.
 
-Ah, stupid me. I forgot to enable pairing mode on the audio dongle.
+   ----
+   Joshua Davis
+   Transient Infrastructure Security Solutions
 
-> > Is there anything else I've got to do apart from=20
-> > | hciconfig hci0 class 0x200404
->=20
-> Don't know whether this is required...?
 
-Seems so. After doing
+  /"\
+  \ /    ASCII Ribbon Campaign
+   X   against HTML email & vCards
+  / \
 
-> > | sdptool add A2SNK
-> > | ./a2snk
 
-_and_ enabling pairing on the audio dongle nothing happened. But as soon
-as I changed my device class the audio dongle started a connection. Now
-a2snk stalls after "Sent Stream End Point Discovery Response".
 
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+On Sun, 1 May 2005, Marcel Holtmann wrote:
 
---Signature=_Sun__1_May_2005_17_16_37_+0200_U.hh+h_pH9he2R0p
-Content-Type: application/pgp-signature
+> Hi Joshua,
+>
+> >   This is an impossibility?  I know that using hciconfigure and hcid I can
+> > set what name my computer uses to respond to probes.  Something on my
+> > computer is thus hearing these probes.  Is this just taking place in the
+> > kernel?
+>
+> it is taking place inside the Bluetooth chip itself. No further
+> interaction with the host stack is needed.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: NEC IT Guy Games.
+> Get your fingers limbered up and give it your best shot. 4 great events, 4
+> opportunities to win big! Highest score wins.NEC IT Guy Games. Play to
+> win an NEC 61 plasma display. Visit http://www.necitguy.com/?r=20
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQFCdPLYIjWgKE0OA2gRArDdAKCyqxFm5hKXRajM5JZlRqhY0uxBJACcDfyD
-/orr2fXEFrfyB2stySbMc6g=
-=uHN5
------END PGP SIGNATURE-----
-
---Signature=_Sun__1_May_2005_17_16_37_+0200_U.hh+h_pH9he2R0p--
 
 
 -------------------------------------------------------
