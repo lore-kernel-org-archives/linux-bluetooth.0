@@ -1,13 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] authentication problem - link_key prevents from
-	pairing
+Subject: Re: [Bluez-devel] DBUS service support - Initial library
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200505012210.59716.RJenster@web.de>
-References: <Pine.LNX.4.30.0505011025590.18702-100000@stealth.kirenet.com>
-	 <1114959364.21785.18.camel@pegasus>  <200505012210.59716.RJenster@web.de>
+In-Reply-To: <e1effdeb050501141626c62c35@mail.gmail.com>
+References: <e1effdeb05042813004f4609a6@mail.gmail.com>
+	 <1114768038.8836.42.camel@pegasus>
+	 <e1effdeb05042905267bc91413@mail.gmail.com>
+	 <1114778617.8836.88.camel@pegasus>
+	 <e1effdeb0504291520167b9bb8@mail.gmail.com>
+	 <1114819470.8836.124.camel@pegasus>
+	 <e1effdeb050501141626c62c35@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1114989560.21785.82.camel@pegasus>
+Message-Id: <1114989490.21785.80.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,19 +24,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 02 May 2005 01:19:20 +0200
+Date: Mon, 02 May 2005 01:18:10 +0200
 
-Hi Ruben,
+Hi Claudio,
 
-> I've a really enerving problem.
-> 
-> On my desktop I'm not able to pair my headset without 
-> deleting /etc/bluetooth/link_key. After deleting the link_key
-> the pinhelper pops up and asks for the pin. I insert them and 
-> I'm able to connect.
+> I suggested provide a DBUS message service in another
+> level because I will try contribute with NetworkManager
+> project:
+> http://people.redhat.com/dcbw/NetworkManager/index.html
 
-use the latest BlueZ utilities and run "hcidump -X -V" as root, so we
-can see what is going on.
+then this is not about D-Bus integration. What you need is to make the
+NetworkManager daemon capable of dealing with Bluetooth PAN connections.
+
+> I will analyze these two approachs and define the most
+> interesting solution for my project.
+
+Both parts are fine with me, but the NetworkManager thing should be done
+outside of the BlueZ utilities.
 
 Regards
 
