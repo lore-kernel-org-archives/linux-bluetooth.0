@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4275103E.3040208@citromail.hu>
-From: =?ISO-8859-2?Q?Szil=E1gyi_Szilveszter?= <sszilveszter@citromail.hu>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] BT-Barcode-Scanner, /dev/rfcommX
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Can't connect RFCOMM socket: Resource temporarily unavailable
+In-Reply-To: <42750833.8010908@gmx.de>
+References: <42750833.8010908@gmx.de>
+Content-Type: text/plain
+Message-Id: <1114967866.21785.74.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,30 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 01 May 2005 19:22:06 +0200
+Date: Sun, 01 May 2005 19:17:46 +0200
 
-Hi all,
-i cannot connect my SonyEricsson T68 on bluetooth (i tried with a Z600 
-as well, same problem)
-on google there is no solution
-root:~# rfcomm connect 0 00:09:D9:26:70:46 2
-(((on my phone accept and enter the pin:1111)))
-Can't connect RFCOMM socket: Resource temporarily unavailable
-root:~# (((I tried it as rfcomm connect 0 00:09:D9:26:70:46 1 as well)))
-any ideas?
+Hi Volker,
 
-more info:
-the process
-http://sszilveszter.uw.hu/blue/theprocess.log
-logs and settings in /etc
-http://sszilveszter.uw.hu/blue/1
-http://sszilveszter.uw.hu/blue/2
-http://sszilveszter.uw.hu/blue/hcid.conf
-http://sszilveszter.uw.hu/blue/hcidump-x
-http://sszilveszter.uw.hu/blue/hcidump-X.1
-http://sszilveszter.uw.hu/blue/pin
-http://sszilveszter.uw.hu/blue/rfcomm.conf
-http://sszilveszter.uw.hu/blue/sdptool
+> I have a problem with reading and writing of /dev/rfcommX for others,
+> on Suse Linux Prof. 9.2.
+> 
+> I'm using the command
+> 
+> rfcomm bind ...
+> 
+> for connecting a BT-Barcode-Scanner with the system. All works fine.
+> 
+> But every time, you run this command, the rights for the file /dev/rfcommX
+> change to read and write only for root. But I need although read and write
+> for others.
+
+the device nodes are created on demand. Look at udev for details.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
