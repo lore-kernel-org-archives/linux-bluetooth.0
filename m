@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
+Subject: Re: [Bluez-devel] BlueZ: Accepting incoming traffic
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1114952271.21785.13.camel@pegasus>
-References: <20050501124348.24307.qmail@web8310.mail.in.yahoo.com>
-	 <1114952271.21785.13.camel@pegasus>
+In-Reply-To: <Pine.LNX.4.30.0505011140570.26270-100000@stealth.kirenet.com>
+References: <Pine.LNX.4.30.0505011140570.26270-100000@stealth.kirenet.com>
 Content-Type: text/plain
-Message-Id: <1114965624.21785.71.camel@pegasus>
+Message-Id: <1114962524.21785.53.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,26 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 01 May 2005 18:40:24 +0200
+Date: Sun, 01 May 2005 17:48:44 +0200
 
-Hi Mayank,
+Hi Joshua,
 
-> > This is the improved version for the sbcdec.c file
-> > which you asked for.
-> > 
-> > It uses /dev/dsp to play the decoded samples.
-> > 
-> > The output is pretty well if we incorporate the proper
-> > endian type.
-> > 
-> > I suggest that you keep it as a separate file incase
-> > someone wants to use the AO Libraries.
-> 
-> I will move the version using AO to sbcdec_ao and use your version
-> instead. However first I must cleanup your coding style a litte bit.
+>   Is this spec? Would you ever expect to see software-controlled versions
+> of this funcitonality in the future?
 
-I had to change a lot more and so I started over. Please take a look at
-the end result in the CVS.
+the HCI separates the host stack from the link manager, baseband and
+radio inside the Bluetooth chip. This is how Bluetooth was designed and
+I doubt that there will be any software-controlled version. However you
+might wanna look at the GNU radio project and build up your own
+Bluetooth chip based on it.
 
 Regards
 
