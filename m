@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
+Subject: Re: [Bluez-devel] SBC ISO documents
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050501124348.24307.qmail@web8310.mail.in.yahoo.com>
-References: <20050501124348.24307.qmail@web8310.mail.in.yahoo.com>
+In-Reply-To: <20050501124633.62729.qmail@web8301.mail.in.yahoo.com>
+References: <20050501124633.62729.qmail@web8301.mail.in.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1114952271.21785.13.camel@pegasus>
+Message-Id: <1114951834.21785.6.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,26 +18,14 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 01 May 2005 14:57:51 +0200
+Date: Sun, 01 May 2005 14:50:34 +0200
 
 Hi Mayank,
 
-> This is the improved version for the sbcdec.c file
-> which you asked for.
-> 
-> It uses /dev/dsp to play the decoded samples.
-> 
-> The output is pretty well if we incorporate the proper
-> endian type.
-> 
-> I suggest that you keep it as a separate file incase
-> someone wants to use the AO Libraries.
+> If anyone has the ISO documents for SBC
+> specifications, please forward them to me at my id
 
-I will move the version using AO to sbcdec_ao and use your version
-instead. However first I must cleanup your coding style a litte bit.
-
-And we should also change sbcdec to accept inputs from standard input
-instead of files only.
+what are the SBC ISO documents?
 
 Regards
 
