@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
-Message-Id: <20050501172156.0ab4ad2a.henryk@ploetzli.ch>
-In-Reply-To: <20050501124348.24307.qmail@web8310.mail.in.yahoo.com>
-References: <20050501124348.24307.qmail@web8310.mail.in.yahoo.com>
+Subject: Re: [Bluez-devel] A2DP sink code finally
+Message-Id: <20050501171637.412450f8.henryk@ploetzli.ch>
+In-Reply-To: <20050426123412.48950.qmail@web8310.mail.in.yahoo.com>
+References: <20050426123412.48950.qmail@web8310.mail.in.yahoo.com>
 Mime-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pgp-signature";
  micalg="PGP-SHA1";
- boundary="Signature=_Sun__1_May_2005_17_21_56_+0200_CIJjcu6mYMpZOhI5"
+ boundary="Signature=_Sun__1_May_2005_17_16_37_+0200_U.hh+h_pH9he2R0p"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,25 +20,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 1 May 2005 17:21:56 +0200
+Date: Sun, 1 May 2005 17:16:37 +0200
 
---Signature=_Sun__1_May_2005_17_21_56_+0200_CIJjcu6mYMpZOhI5
+--Signature=_Sun__1_May_2005_17_16_37_+0200_U.hh+h_pH9he2R0p
 Content-Type: text/plain; charset=ISO-8859-15
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Moin,
 
-Am Sun, 1 May 2005 13:43:48 +0100 (BST) schrieb Mayank Batra:
+Am Tue, 26 Apr 2005 13:34:12 +0100 (BST) schrieb Mayank Batra:
 
-> The output is pretty well if we incorporate the proper
-> endian type.
+> > Hmm, how do I test that? I can't seem to get my
+> > audio dongle to connect.
 
-Ahh, so it works for you now? (I was not able to test it yet ...)
+Ah, stupid me. I forgot to enable pairing mode on the audio dongle.
 
-I hadn't thought of endianess all the way long. I was using big endian
-for the .au file input (don't remember why) in the encoder and then
-mostly consequently everywhere from there on.
+> > Is there anything else I've got to do apart from=20
+> > | hciconfig hci0 class 0x200404
+>=20
+> Don't know whether this is required...?
+
+Seems so. After doing
+
+> > | sdptool add A2SNK
+> > | ./a2snk
+
+_and_ enabling pairing on the audio dongle nothing happened. But as soon
+as I changed my device class the audio dongle started a connection. Now
+a2snk stalls after "Sent Stream End Point Discovery Response".
 
 --=20
 Henryk Pl=F6tz
@@ -46,18 +56,18 @@ Gr=FC=DFe aus Berlin
 ~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
 ~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
 
---Signature=_Sun__1_May_2005_17_21_56_+0200_CIJjcu6mYMpZOhI5
+--Signature=_Sun__1_May_2005_17_16_37_+0200_U.hh+h_pH9he2R0p
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.1 (GNU/Linux)
 
-iD8DBQFCdPQXIjWgKE0OA2gRAgoYAKDqNxx5f0pV2cOIk3SwHrEfI0K7MgCeKSH0
-THzkwBjpMGJyd6VX0UhBAcc=
-=ipVk
+iD8DBQFCdPLYIjWgKE0OA2gRArDdAKCyqxFm5hKXRajM5JZlRqhY0uxBJACcDfyD
+/orr2fXEFrfyB2stySbMc6g=
+=uHN5
 -----END PGP SIGNATURE-----
 
---Signature=_Sun__1_May_2005_17_21_56_+0200_CIJjcu6mYMpZOhI5--
+--Signature=_Sun__1_May_2005_17_16_37_+0200_U.hh+h_pH9he2R0p--
 
 
 -------------------------------------------------------
