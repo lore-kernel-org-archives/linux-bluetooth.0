@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4275D372.8050503@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Is there anyone working with cordless telephony
- profile?
-References: <20050502122149.713295404.durai@isofttech.com>
-In-Reply-To: <20050502122149.713295404.durai@isofttech.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+From: "durai" <durai@isofttech.com>
+Content-Type: multipart/alternative;
+	boundary="Pachymail_boundary_1115016709390_Part_1"
+Mime-Version: 1.0
+Message-Id: <20050502122149.713295404.durai@isofttech.com>
+Subject: [Bluez-devel] Is there anyone working with cordless telephony profile?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,34 +17,66 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 02 May 2005 01:14:58 -0600
+Date: Mon, 2 May 2005 12:21:49 +0530
 
-Hi
 
-I think there would be a lot of interest once some handsets could use 
-CTP. It doesn't even really help for someone to come along and make a 
-CTP-only handset because the interesting application is a phone that can 
-wander between CTP and traditional cells.
 
-One big complication is the radio. Phones can get away with 
-single-connection class 2 radios now but the radio will have to support 
-multiple simultaneous connections (headset, CTP base) *and* class 1 in 
-order to work well.
+This is a multipart message
 
-Maybe a third party will come along and add CTP to one of the PDA 
-phones. Call forwarding etc wouldn't be seamless though. Is there even a 
-way to get class 1 for a treo/ppc?
 
-Brad
+--Pachymail_boundary_1115016709390_Part_1
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-durai wrote:
-> Hi,
-> Is there anyone working on implementing Bluetooth cordless telephony 
-> profile? If someone knows
-> more information about the implementation, please share your 
-> experiences/guidelines about it.
-> regards
-> durai
+Hi,=0D
+Is there anyone working on implementing Bluetooth cordless telephony profil=
+e? If someone knows=0D
+more information about the implementation, please share your experiences/gu=
+idelines about it.=0D
+regards=0D
+durai
+
+--Pachymail_boundary_1115016709390_Part_1
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dunicode">
+<STYLE type=3Dtext/css>
+body { margin: 5px;
+       font-size:10pt;
+       font-family:"Arial";
+       color: black;
+	   scrollbar-base-color: #d4d4d4;
+	   scrollbar-arrow-color: #020202;
+	   scrollbar-darkshadow-color: #4f4f4f;
+	   scrollbar-face-color: #c2c2c2;
+	   scrollbar-highlight-color: #ececec;
+	   scrollbar-shadow-color: #878787;
+	   scrollbar-track-color: #d4d4d4;}
+ol  { margin-top: 5px;
+      margin-bottom: 5px;}
+ul  { margin-top: 5px;
+      margin-bottom: 5px;}
+blockquote  { margin-top: 5px;
+      margin-bottom: 5px;}
+</STYLE>
+
+<META content=3D"MSHTML 6.00.2900.2180" name=3DGENERATOR></HEAD>
+<BODY bgColor=3Dwhite>
+<DIV>Hi,</DIV>
+<DIV>Is there anyone working on implementing Bluetooth cordless telephony =
+
+profile? If someone knows</DIV>
+<DIV>more information about the implementation, please share your =
+
+experiences/guidelines&nbsp;about it.</DIV>
+<DIV>regards</DIV>
+<DIV>durai</DIV></BODY></HTML>
+
+--Pachymail_boundary_1115016709390_Part_1--
+
 
 
 -------------------------------------------------------
