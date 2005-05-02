@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4275D372.8050503@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4275CBF6.9070300@xmission.com>
-References: <20050501124348.24307.qmail@web8310.mail.in.yahoo.com>
-	 <1114952271.21785.13.camel@pegasus> <1114965624.21785.71.camel@pegasus>
-	 <4275CBF6.9070300@xmission.com>
-Content-Type: text/plain
-Message-Id: <1115027766.21785.97.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Is there anyone working with cordless telephony
+ profile?
+References: <20050502122149.713295404.durai@isofttech.com>
+In-Reply-To: <20050502122149.713295404.durai@isofttech.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,34 +19,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 02 May 2005 11:56:06 +0200
+Date: Mon, 02 May 2005 01:14:58 -0600
 
-Hi Brad,
+Hi
 
-> Thanks for also cleaning up the stuff I did to make libao optional.
+I think there would be a lot of interest once some handsets could use 
+CTP. It doesn't even really help for someone to come along and make a 
+CTP-only handset because the interesting application is a phone that can 
+wander between CTP and traditional cells.
 
-you are welcome.
+One big complication is the radio. Phones can get away with 
+single-connection class 2 radios now but the radio will have to support 
+multiple simultaneous connections (headset, CTP base) *and* class 1 in 
+order to work well.
 
-> Is a2snk working now then? Can I factor out the common stuff in 
-> a2snk/a2play without messing up changes anyone is holding onto?
+Maybe a third party will come along and add CTP to one of the PDA 
+phones. Call forwarding etc wouldn't be seamless though. Is there even a 
+way to get class 1 for a treo/ppc?
 
-The sbcdec does not accept input from standard input at the moment and I
-think we should implement the soundcard access over /dev/dsp directly
-into a2snk. And for a2play we may wanna add support to read its input
-from the soundcard.
+Brad
 
-And btw we should rename a2snk to a2recv.
-
-> Any suggestions for the name of the new header file that a2snk/a2play 
-> will include? avdtp.h seems like a poor choice...
-
-Simply name the common code a2dp.c and a2dp.h.
-
-Regards
-
-Marcel
-
-
+durai wrote:
+> Hi,
+> Is there anyone working on implementing Bluetooth cordless telephony 
+> profile? If someone knows
+> more information about the implementation, please share your 
+> experiences/guidelines about it.
+> regards
+> durai
 
 
 -------------------------------------------------------
