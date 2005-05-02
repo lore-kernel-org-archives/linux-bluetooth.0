@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4276DAB1.1020601@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
-References: <20050501124348.24307.qmail@web8310.mail.in.yahoo.com>	 <1114952271.21785.13.camel@pegasus> <1114965624.21785.71.camel@pegasus>	 <4275CBF6.9070300@xmission.com> <1115027766.21785.97.camel@pegasus>	 <4276469B.5050401@xmission.com> <1115059379.21785.147.camel@pegasus>
-In-Reply-To: <1115059379.21785.147.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <4276469B.5050401@xmission.com>
+References: <20050501124348.24307.qmail@web8310.mail.in.yahoo.com>
+	 <1114952271.21785.13.camel@pegasus> <1114965624.21785.71.camel@pegasus>
+	 <4275CBF6.9070300@xmission.com> <1115027766.21785.97.camel@pegasus>
+	 <4276469B.5050401@xmission.com>
+Content-Type: text/plain
+Message-Id: <1115059379.21785.147.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,35 +21,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 02 May 2005 19:58:09 -0600
+Date: Mon, 02 May 2005 20:42:59 +0200
+
+Hi Brad,
+
+> FYI, I factored out a2dp.h and renamed a2snk to a2recv. I'm going to 
+> wait to create an a2dp.c with common code since there isn't much currently.
+
+I think that we should move the complete AVDTP handling into a2dp.c and
+make a2play and a2recv only contain the soundcard/file setup and the
+main event loop.
+
+This sounds a little sketchy, but the current problem with a2play is
+that it is not fully event driven. It is more a sequential approach and
+we should really change it.
+
+First question is if we ever wanna allow a2play and a2recv to output SBC
+files or should it always be a soundcard or a PCM file? If we skip that
+SBC part, we can integrate the SBC processing directly into the a2dp.c
+file and hide it. This will makes things a lot easier.
+
+Regards
 
 Marcel
 
-> I think that we should move the complete AVDTP handling into a2dp.c and
-> make a2play and a2recv only contain the soundcard/file setup and the
-> main event loop.
 
-agreed. The alsa-lib driver will be event-driven from the start, so I 
-will probably want to work on the alsa-lib driver next and once that's 
-done, I will have a better idea of how to implement the new model for 
-a2dp.c.
-
-my headsets are "in the mail" so I'll be back on it soon. You had done 
-some avdtp alsa-lib work I think and if that's a good starting point, I 
-would like to work from that. If it's not fleshed out enough, I'll just 
-start from your rfcomm alsa-lib code.
-
-> First question is if we ever wanna allow a2play and a2recv to output SBC
-> files or should it always be a soundcard or a PCM file? If we skip that
-> SBC part, we can integrate the SBC processing directly into the a2dp.c
-> file and hide it. This will makes things a lot easier.
-
-I don't think we will need the sbc streams. I don't think I'd use them 
-even for debugging. We will want a way to have the use of /dev/dsp be 
-optional (ie optionally read and write audio files) but that shouldn't 
-complicate things much.
-
-Brad
 
 
 -------------------------------------------------------
