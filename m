@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4276469B.5050401@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] authentication problem - link_key prevents from
+	pairing
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
-References: <20050501124348.24307.qmail@web8310.mail.in.yahoo.com>	 <1114952271.21785.13.camel@pegasus> <1114965624.21785.71.camel@pegasus>	 <4275CBF6.9070300@xmission.com> <1115027766.21785.97.camel@pegasus>
-In-Reply-To: <1115027766.21785.97.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <200505021327.04496.RJenster@web.de>
+References: <Pine.LNX.4.30.0505011025590.18702-100000@stealth.kirenet.com>
+	 <200505012210.59716.RJenster@web.de> <1114989560.21785.82.camel@pegasus>
+	 <200505021327.04496.RJenster@web.de>
+Content-Type: text/plain
+Message-Id: <1115035517.21785.112.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,14 +21,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 02 May 2005 09:26:19 -0600
+Date: Mon, 02 May 2005 14:05:17 +0200
 
-Guys,
+Hi Ruben,
 
-FYI, I factored out a2dp.h and renamed a2snk to a2recv. I'm going to 
-wait to create an a2dp.c with common code since there isn't much currently.
+> > > I've a really enerving problem.
+> > >
+> > > On my desktop I'm not able to pair my headset without
+> > > deleting /etc/bluetooth/link_key. After deleting the link_key
+> > > the pinhelper pops up and asks for the pin. I insert them and
+> > > I'm able to connect.
+> >
+> > use the latest BlueZ utilities and run "hcidump -X -V" as root, so we
+> > can see what is going on.
+> 
+> Ok, I've attached the hcidump output 
+> 
+> test sequence:
+> deleting link_key (if existent)
+> pair with  headset (btsco2 00:0D:B5:80:21:04 )
+> 	success -> successfull attempt (after having link_key deleted)
+> switching headset off
+> pair with  headset (btsco2 00:0D:B5:80:21:04 )
+> 	failure -> authentication problem (when not having link_key deleted)
 
-Brad
+make sure that only _one_ hcid is running at a time and I don't know
+what else programs are you running, but all this RSSI etc. stuff that
+uses the handle 0 is wrong.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
