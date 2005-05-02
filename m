@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] internal bluetooth on laptop
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4276724C.1070803@kernelconcepts.de>
+From: Nils Faerber <nils.faerber@kernelconcepts.de>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <427670B5.2060708@citromail.hu>
+Subject: Re: [Bluez-users] internal bluetooth on laptop
 References: <427670B5.2060708@citromail.hu>
-Content-Type: text/plain
-Message-Id: <1115058789.21785.137.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <427670B5.2060708@citromail.hu>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,9 +18,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 02 May 2005 20:33:09 +0200
+Date: Mon, 02 May 2005 20:32:44 +0200
 
-Hi Szilagyi,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Szilágyi Szilveszter wrote:
+> hi,
+Hi!
 
 > I have an ibm thinkpad laptop with an internal bluetooth
 > with my external usb-bluetooth key I can use my mobile phone
@@ -31,16 +36,38 @@ Hi Szilagyi,
 > because hciconfig gives error:
 > root:~# hciconfig hci0 up
 > Can't get device info: No such device
+> 
+> (with the external key
+> root:~# hciconfig hci0 up
+> root:~#
+> )
 
-check /proc/bus/usb/devices if the internal Bluetooth module is attached
-to the USB bus. For most notebooks you can switch it on and off. Either
-with a hardware switch or a software switch through ACPI (ibm_acpi).
+Umpf... did you enable the Bluetooth device in your Thinkpad?
 
-Regards
+The Thinkpads contain a USB Bluetooth device but it can be switched on
+and off using the "embedded controller", i.e. usually a hot-key like
+FN-F5, will turn it on and off. You will also see the Bluetooth LED
+backlit Logo on the base of the LCD when the device is active.
 
-Marcel
+If it is not active you will not see it anwhere under Linux - it is
+similar as having pulled it off from the USB port.
 
+CU
+  nils faerber
 
+- --
+kernel concepts          Tel: +49-271-771091-12
+Dreisbachstr. 24         Fax: +49-271-771091-19
+D-57250 Netphen          Mob: +49-176-21024535
+- --
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFCdnJLJXeIURG1qHgRAmpvAKC9fWQcuXXZOg76a/S0BH0uzyPAeQCdGhsa
+BJxzb/7MoO8orP67oKP8Ilo=
+=aJYx
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
