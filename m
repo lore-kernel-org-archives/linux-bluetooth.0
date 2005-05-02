@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <427670B5.2060708@citromail.hu>
-From: =?ISO-8859-2?Q?Szil=E1gyi_Szilveszter?= <sszilveszter@citromail.hu>
-MIME-Version: 1.0
+Message-ID: <43668e3005050208117143065b@mail.gmail.com>
+From: Gabriel Marques <gabriel.agm@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] internal bluetooth on laptop
+Subject: Re: [Bluez-users] device suggestion
+In-Reply-To: <1114768089.8836.44.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <43668e3005042810367c457ee4@mail.gmail.com>
+	 <1114768089.8836.44.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +19,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 02 May 2005 20:25:57 +0200
+Date: Mon, 2 May 2005 12:11:54 -0300
 
-hi,
-I have an ibm thinkpad laptop with an internal bluetooth
-with my external usb-bluetooth key I can use my mobile phone
-but I cannot use my internal bluetooth,
-the hciconfig cannot find my internal bluetooth, so I cannot use
-hciconfig hci0 up && hcitool scan && rfcomm connect 0 00:09:D9:26:70:46 2
+Thanks Russell, but from the JavaBlutooth list: "The free2move looks
+like a BT cable replacement solution. These can't be address by a
+software stack."
 
-because hciconfig gives error:
-root:~# hciconfig hci0 up
-Can't get device info: No such device
+And Marcel, sorry for using this list, I coudn't find no other, but I
+havn't posted a windows question, my doubts are about bluetooth
+hardware, and platform independent :), only used a bad foreword.
 
-(with the external key
-root:~# hciconfig hci0 up
-root:~#
-)
 
+
+2005/4/29, Marcel Holtmann <marcel@holtmann.org>:
+> Hi Gabriel,
+>=20
+> > I'm a total foreigner here, cause I'm using Window and J2SE, but I
+> > need to solve a problem  concerning bluetooth hardware and I believe
+> > you know better than anyone what device can solve my problem.
+>=20
+> this mailing list is about Bluetooth and Linux.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+> -------------------------------------------------------
+> SF.Net email is sponsored by: Tell us your software development plans!
+> Take this survey and enter to win a one-year sub to SourceForge.net
+> Plus IDC's 2005 look-ahead and a copy of this survey
+> Click here to start!  http://www.idcswdc.com/cgi-bin/survey?id=3D105hix
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
