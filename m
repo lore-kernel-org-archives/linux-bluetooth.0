@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42768CD4.9060500@citromail.hu>
-From: =?ISO-8859-1?Q?Szil=E1gyi_Szilveszter?= <sszilveszter@citromail.hu>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] internal bluetooth on laptop
-References: <427670B5.2060708@citromail.hu> <4276724C.1070803@kernelconcepts.de>
-In-Reply-To: <4276724C.1070803@kernelconcepts.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <427670B5.2060708@citromail.hu>
+References: <427670B5.2060708@citromail.hu>
+Content-Type: text/plain
+Message-Id: <1115058789.21785.137.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,32 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 02 May 2005 22:25:56 +0200
+Date: Mon, 02 May 2005 20:33:09 +0200
+
+Hi Szilagyi,
+
+> I have an ibm thinkpad laptop with an internal bluetooth
+> with my external usb-bluetooth key I can use my mobile phone
+> but I cannot use my internal bluetooth,
+> the hciconfig cannot find my internal bluetooth, so I cannot use
+> hciconfig hci0 up && hcitool scan && rfcomm connect 0 00:09:D9:26:70:46 2
+> 
+> because hciconfig gives error:
+> root:~# hciconfig hci0 up
+> Can't get device info: No such device
+
+check /proc/bus/usb/devices if the internal Bluetooth module is attached
+to the USB bus. For most notebooks you can switch it on and off. Either
+with a hardware switch or a software switch through ACPI (ibm_acpi).
+
+Regards
+
+Marcel
 
 
->Umpf... did you enable the Bluetooth device in your Thinkpad?
->  
->
-no, that is the good question :)
-
->The Thinkpads contain a USB Bluetooth device but it can be switched on
->and off using the "embedded controller", 
->
-what is this embedded controller
-
->i.e. usually a hot-key like
->FN-F5, will turn it on and off. You will also see the Bluetooth LED
->backlit Logo on the base of the LCD when the device is active.
->  
->
-I understand, thanks Marcel Holtmann I am working on acpi
-I installed tpb (and xosd as well, but these doesn't work
-Is not fn+F5 just a hotkey, what runs a script?
-If I knew the command, I would start it in a terminal.
-So my corrected question is:
-how to activate my bluetooth device?
-
-thanks
 
 
 -------------------------------------------------------
