@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42779955.6070600@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <20050503132801.13142.qmail@web8312.mail.in.yahoo.com>
+From: Mayank Batra <mayankbatra@yahoo.co.in>
+Subject: Re: [Bluez-devel] What endian type is supported by audio device ?
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: 6667
 MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] nonblocking btsco
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,19 +17,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 03 May 2005 09:31:33 -0600
+Date: Tue, 3 May 2005 14:28:01 +0100 (BST)
 
-Hi
+Marcel,
 
-I'm not totally sure this will work, but here goes:
+> 
+> actually this has nothing to do with the machine
+> type. It depends on the
+> endian format of the input PCM stream. So we should
+> add a flags that
+> tells us about the endian format of the input.
 
-http://sourceforge.net/tracker/index.php?func=detail&aid=1188691&group_id=116589&atid=678258
+But what do i do if the stream was earlier on in big
+endian format and my audio device does not support big
+endian format?
 
-we received a patch on sourceforge so writes to the kernel btsco device 
-wouldn't block. I don't think it's exactly right (see my comment) but it 
-would probably be an improvement once reworked.
+That is why, we should check what endian type is
+supported and decide accordingly.
 
-Brad
+Regards,
+
+Mayank
+
+________________________________________________________________________
+Yahoo! India Matrimony: Find your life partner online
+Go to: http://yahoo.shaadi.com/india-matrimony
 
 
 -------------------------------------------------------
