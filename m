@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050503130909.22723.qmail@web8302.mail.in.yahoo.com>
+Message-ID: <20050503130325.36986.qmail@web8306.mail.in.yahoo.com>
 From: Mayank Batra <mayankbatra@yahoo.co.in>
-To: BLUEZ DEVELOPERS LIST <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: 6667
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] A small query
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,32 +17,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 3 May 2005 14:09:09 +0100 (BST)
+Date: Tue, 3 May 2005 14:03:25 +0100 (BST)
 
-Guys,
+Brad,
 
-Does it matter whether I declare packet_type before or
-after message_type. I am not sure, but if I declare it
-before somehow, the hcidump on the a2recv side is not
-correct. 
-I mean, there is something wrong in the hcidump. It
-considers the commands as 'Cont' command and this is
-when the source sends me a disconnect without
-hesitation.
-What I want to say is that if I declare packet_type
-after message_type, then both the source's and sink's
-dump are ok.
+> Is a2snk working now then? Can I factor out the
+> common stuff in 
+> a2snk/a2play without messing up changes anyone is
+> holding onto?
 
+Thanks for creating a2dp.h file
 
-struct avdtp_header {
-	uint8_t packet_type:2;
-	uint8_t message_type:2;
-	uint8_t transaction_label:4;
-	uint8_t signal_id:6;
-	uint8_t rfa0:2;
-} __attribute__ ((packed));
+And yes, now it is final that a2snk (now a2recv) is
+functioning.
 
+I have tested it by using a2play as well as BlueSoleil
+as the source. And it is working perfectly alright.
 
+But the problem is again the sequential nature of
+a2recv as Marcel pointed out.
+
+But one thing:
+a2recv functions in the following scenario:
+
+1) I use a PCM file (.snd), encoded in little-endian
+format.
+
+2) I use a2play, which encodes it into sbc.
+
+3) I decode the sbc stream with a2recv, open my
+soundcard in little-endian format (My soundcard does
+not support big-endian format). But for this I have to
+patch the sbc.c to produce output in little endian
+format.
+
+After the above steps output is crystal clear.
+And when I say clear, it means absolutely clear.
+ 
+> Any suggestions for the name of the new header file
+> that a2snk/a2play 
+> will include? avdtp.h seems like a poor choice...
+
+a2dp.h is great.
+ 
 
 Mayank
 
