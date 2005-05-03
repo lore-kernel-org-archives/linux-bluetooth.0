@@ -1,15 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
-Message-Id: <20050503193204.3c102fe5.henryk@ploetzli.ch>
-In-Reply-To: <20050503132023.39036.qmail@web8306.mail.in.yahoo.com>
-References: <20050501172156.0ab4ad2a.henryk@ploetzli.ch>
-	<20050503132023.39036.qmail@web8306.mail.in.yahoo.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <4276DAB1.1020601@xmission.com>
+References: <20050501124348.24307.qmail@web8310.mail.in.yahoo.com>
+	 <1114952271.21785.13.camel@pegasus> <1114965624.21785.71.camel@pegasus>
+	 <4275CBF6.9070300@xmission.com> <1115027766.21785.97.camel@pegasus>
+	 <4276469B.5050401@xmission.com> <1115059379.21785.147.camel@pegasus>
+	 <4276DAB1.1020601@xmission.com>
+Content-Type: text/plain
+Message-Id: <1115135192.8206.37.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Tue__3_May_2005_19_32_04_+0200_eExNVgxkZeEDM4Lu"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,52 +22,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 3 May 2005 19:32:04 +0200
+Date: Tue, 03 May 2005 17:46:32 +0200
 
---Signature=_Tue__3_May_2005_19_32_04_+0200_eExNVgxkZeEDM4Lu
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Brad,
 
-Moin,
+> > I think that we should move the complete AVDTP handling into a2dp.c and
+> > make a2play and a2recv only contain the soundcard/file setup and the
+> > main event loop.
+> 
+> agreed. The alsa-lib driver will be event-driven from the start, so I 
+> will probably want to work on the alsa-lib driver next and once that's 
+> done, I will have a better idea of how to implement the new model for 
+> a2dp.c.
 
-Am Tue, 3 May 2005 14:20:23 +0100 (BST) schrieb Mayank Batra:
+maybe I can come up with something. I will see how much free time I get
+for working on A2DP.
 
-> If the source is sending me sbc file encoded from pcm
-> file that was in big endian format, and i have an
-> audio device that supports only little-endian format,
-> then don't u think that i need to patch the sbc.c file
-> when the data field is being filled ?????
+> my headsets are "in the mail" so I'll be back on it soon. You had done 
+> some avdtp alsa-lib work I think and if that's a good starting point, I 
+> would like to work from that. If it's not fleshed out enough, I'll just 
+> start from your rfcomm alsa-lib code.
 
-No. Inside the SBC stream the endianess is clearly defined (as much
-endianess as is left) and as long as the encoder got it right on the
-encoding side you will be fine. The endianess that comes out of the
-decoder has mostly nothing to do with SBC but only with what the
-programmer wants.=20
+A big thing is to get the timing (delays) right and so far I haven't
+managed to find a good timing source. The gettimeofday() and RTC is not
+really working inside the ALSA plugin. And the ALSA guys are a little
+bit silent at the moment :(
 
-So yes, we'd either have to define the interface so that our
-decoder/encoder only generates/accepts big or little endian data and it
-is up to the application to convert as necessary, or that choice must be
-made a runtime configurable parameter of the functions.
+> > First question is if we ever wanna allow a2play and a2recv to output SBC
+> > files or should it always be a soundcard or a PCM file? If we skip that
+> > SBC part, we can integrate the SBC processing directly into the a2dp.c
+> > file and hide it. This will makes things a lot easier.
+> 
+> I don't think we will need the sbc streams. I don't think I'd use them 
+> even for debugging. We will want a way to have the use of /dev/dsp be 
+> optional (ie optionally read and write audio files) but that shouldn't 
+> complicate things much.
 
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+Fine with me, too.
 
---Signature=_Tue__3_May_2005_19_32_04_+0200_eExNVgxkZeEDM4Lu
-Content-Type: application/pgp-signature
+Regards
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
+Marcel
 
-iD8DBQFCd7WZIjWgKE0OA2gRAoPtAJ9fRCHcgsM1rOdjAswmjSczY73LswCfSjuy
-8OFv642omFeMY/gHbK0wgLQ=
-=vAGP
------END PGP SIGNATURE-----
 
---Signature=_Tue__3_May_2005_19_32_04_+0200_eExNVgxkZeEDM4Lu--
 
 
 -------------------------------------------------------
