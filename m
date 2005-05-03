@@ -1,9 +1,9 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050503132023.39036.qmail@web8306.mail.in.yahoo.com>
+Message-ID: <20050503131629.22537.qmail@web8308.mail.in.yahoo.com>
 From: Mayank Batra <mayankbatra@yahoo.co.in>
-Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
+Subject: Re: [Bluez-devel] SBC ISO documents
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050501172156.0ab4ad2a.henryk@ploetzli.ch>
+In-Reply-To: <20050501173526.05b400e4.henryk@ploetzli.ch>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
@@ -17,36 +17,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 3 May 2005 14:20:23 +0100 (BST)
+Date: Tue, 3 May 2005 14:16:29 +0100 (BST)
 
 Henryk,
 
-> 
-> > The output is pretty well if we incorporate the
-> proper
-> > endian type.
-> 
-> Ahh, so it works for you now? (I was not able to
-> test it yet ...)
+> The specification for SBC is part of the A2DP spec,
+> available at
+>
+https://www.bluetooth.org/docman2/ViewProperties.php?group_id=90&document_content_id=8877
 
-It is working PERFECTLY alright. There is absolutely
-no difference b/w .snd file and .sbc file qualities.
+Thanks
 
-> I hadn't thought of endianess all the way long. I
-> was using big endian
-> for the .au file input (don't remember why) in the
-> encoder and then
-> mostly consequently everywhere from there on.
+> If you're instead talking about ISO/IEC 11172-3:1993
+> which is referenced
+> in in the SBC spec then you're mostly out of luck:
+> The ISO documents are
+> not freely available. _But_ there is a draft of this
+> document which is
+> available and did help me somewhat. Unfortunately I
+> can't seem to
+> remember where I got it. A quick google turns up
+>
+http://www.le-hacker.org/hacks/mpeg-drafts/11172-3.pdf
 
-OK, now one question to u and Marcel,
-
-If the source is sending me sbc file encoded from pcm
-file that was in big endian format, and i have an
-audio device that supports only little-endian format,
-then don't u think that i need to patch the sbc.c file
-when the data field is being filled ?????
+I meant the ISO/IEC documents only.
+I am in no mood to buy them, that is why I wanted
+someone to donate them to me. :-(
 
 Mayank
+
+Mayank Batra
+
+
+Whether you think you can or whether you think you can't, you are right. -Henry Ford.
 
 ________________________________________________________________________
 Yahoo! India Matrimony: Find your life partner online
