@@ -1,9 +1,9 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050503131629.22537.qmail@web8308.mail.in.yahoo.com>
+Message-ID: <20050503131203.30254.qmail@web8301.mail.in.yahoo.com>
 From: Mayank Batra <mayankbatra@yahoo.co.in>
-Subject: Re: [Bluez-devel] SBC ISO documents
+Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050501173526.05b400e4.henryk@ploetzli.ch>
+In-Reply-To: 6667
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
@@ -17,39 +17,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 3 May 2005 14:16:29 +0100 (BST)
+Date: Tue, 3 May 2005 14:12:03 +0100 (BST)
 
-Henryk,
+Marcel,
 
-> The specification for SBC is part of the A2DP spec,
-> available at
->
-https://www.bluetooth.org/docman2/ViewProperties.php?group_id=90&document_content_id=8877
+> I had to change a lot more and so I started over.
+> Please take a look at
+> the end result in the CVS.
 
-Thanks
+I saw the end result, it is ok, just i was missing my
+name somewhere. :-)
 
-> If you're instead talking about ISO/IEC 11172-3:1993
-> which is referenced
-> in in the SBC spec then you're mostly out of luck:
-> The ISO documents are
-> not freely available. _But_ there is a draft of this
-> document which is
-> available and did help me somewhat. Unfortunately I
-> can't seem to
-> remember where I got it. A quick google turns up
->
-http://www.le-hacker.org/hacks/mpeg-drafts/11172-3.pdf
-
-I meant the ISO/IEC documents only.
-I am in no mood to buy them, that is why I wanted
-someone to donate them to me. :-(
+Regards,
 
 Mayank
-
-Mayank Batra
-
-
-Whether you think you can or whether you think you can't, you are right. -Henry Ford.
 
 ________________________________________________________________________
 Yahoo! India Matrimony: Find your life partner online
