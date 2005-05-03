@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] dongle manufacturers
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <4277B273.3010706@gmx.ch>
+References: <4277B273.3010706@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1115154764.8496.52.camel@pegasus>
+Message-Id: <1115152035.8496.15.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] The 4th anniversary of BlueZ
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,60 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 03 May 2005 23:12:44 +0200
+Date: Tue, 03 May 2005 22:27:15 +0200
 
-Hi Folks,
+Hi Marco,
 
-the open source version of the BlueZ project is celebrating its 4th
-anniversary. On May, 3rd 2001 Max Krasnyansky announced that Qualcomm
-released the source code under the GPL.
+> I just bought two SiliconWave bt1.2 USB Dongles (Anycom and arp datacon).
+> 
+> What's the supportstate of SiliconWave?
 
-	http://mhonarc.axis.se/bluetooth-dev/msg01881.html
+if it is the ROM version then all of them return the wrong inquiry with
+RSSI event. I have a kernel workaround for that ready, but it is not
+public at the moment.
 
-While the project was running inside Qualcomm for some time before this
-date, I decided to use this one as "birthday" for the official Bluetooth
-protocol stack for Linux. Actually I think only Max knows how old BlueZ
-really is.
+> Are they more like broadcom or more like csr?
 
-For me it is unbelievable that it was almost 4 years ago when I started
-to work on the DTL-1 driver for my unsupported Nokia Bluetooth compact
-flash card. The range of Bluetooth devices was quite small at that time
-and as so often I bought one that was not supported by Linux. The rest
-is already history ;)
-
-The other big event in the BlueZ history was when Max handed the primary
-maintainer role over to me. This was on January, 15th 2004 shortly after
-the first release of the 2.6 kernel series.
-
-	http://article.gmane.org/gmane.linux.bluez.announce/5
-
-I think it is actually hard to give up your "baby" and hand it over to
-someone else if you worked so long on it. So let me thank Max for
-starting this project and for his terrific job in the first years when
-BlueZ made its steps into the open world.
-
-On April, 11th 2005 we reached another big step. The BlueZ got its
-official qualification and is now accepted by the Bluetooth SIG as a
-subsystem. I have to thank TomTom for paying the 10,000 USD listing fee,
-because otherwise this would never had happened.
-
-And I also have to thank everyone who sent in a patch or more over the
-last 4 years and all the people that are using BlueZ day-by-day. I hope
-we made your wireless life a little bit easier and of course with less
-cables in between.
-
-Finally I like to open a call for donations. So if you like what we are
-doing or if you think that it is worth to support BlueZ then please
-consider to make a donation.
-
-	http://www.bluez.org/sponsors.html
-
-I like to use that money for buying unsupported devices and sending them
-to the developers so they can work on it. Also any kind of hardware
-donations are welcome. Nothing must be brand new and the old Bluetooth
-devices are still interesting. At least to me.
-
-Let me say thank you again and don't forget to celebrate :)
+I personally would say something in between. There are problems with the
+SCO support, but all the rest seems to work fine.
 
 Regards
 
