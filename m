@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
+Subject: Re: [Bluez-devel] What endian type is supported by audio device ?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050503131203.30254.qmail@web8301.mail.in.yahoo.com>
-References: <20050503131203.30254.qmail@web8301.mail.in.yahoo.com>
+In-Reply-To: <20050503132801.13142.qmail@web8312.mail.in.yahoo.com>
+References: <20050503132801.13142.qmail@web8312.mail.in.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1115134573.8206.26.camel@notepaq>
+Message-Id: <1115134416.8206.22.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,20 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 03 May 2005 17:36:13 +0200
+Date: Tue, 03 May 2005 17:33:36 +0200
 
 Hi Mayank,
 
-> > I had to change a lot more and so I started over.
-> > Please take a look at
-> > the end result in the CVS.
+> > actually this has nothing to do with the machine
+> > type. It depends on the
+> > endian format of the input PCM stream. So we should
+> > add a flags that
+> > tells us about the endian format of the input.
 > 
-> I saw the end result, it is ok, just i was missing my
-> name somewhere. :-)
+> But what do i do if the stream was earlier on in big
+> endian format and my audio device does not support big
+> endian format?
+> 
+> That is why, we should check what endian type is
+> supported and decide accordingly.
 
-that is because I don't copied your file. Instead I changed all the
-parts by hand and missed your changes for adding your name. Sorry for
-that. Better send diffs next time.
+I think that if you use ALSA it can change the endian format on demand
+inside the library, but for the a2play and a2recv with OSS support we
+can do that inside our own code. It is only byte swapping. And from my
+understand it should be done inside the SBC codec. We simpy tell it what
+input or output endian format we expect and then it should obey to it.
 
 Regards
 
