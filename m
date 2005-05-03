@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4277B273.3010706@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
+From: Pavel Ruzicka <pavouk@pavouk.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] dongle manufacturers
+Subject: Re: [Bluez-users] Compatability
+References: <000001c54f76$46987920$2c95c988@riverrun>
+In-Reply-To: <000001c54f76$46987920$2c95c988@riverrun>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200505031001.32513.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,17 +19,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 03 May 2005 19:18:43 +0200
+Date: Tue, 3 May 2005 10:01:32 +0200
 
-Hello all
+>   Can anyone tell me if Socket CF Bluetooth with PCMCIA Adaptor, sold
+> for example at eXpansys runs well under bluez?
 
-I just bought two SiliconWave bt1.2 USB Dongles (Anycom and arp datacon).
+There are more versions of card. I have revision F, which is old Nokia
+based and works with dtl1 kernel module under kernel 2.4 or 2.6.
 
-What's the supportstate of SiliconWave?
-Are they more like broadcom or more like csr?
+New revision G is CSR based and uses hci_uart and serial.cs.
+There is problem with kernel 2.6. You must use patch for serial.cs which
+solve problem. These problems was discussed in this list before few weeks.
+Some discussions about SOCKET G card and patch is here:
+http://www.summet.com/x31/socket.html
 
-regards
-Marco
+Best regards,
+
+Pavel Ruzicka
 
 
 -------------------------------------------------------
