@@ -1,9 +1,9 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050503132345.24700.qmail@web8302.mail.in.yahoo.com>
+Message-ID: <20050503132023.39036.qmail@web8306.mail.in.yahoo.com>
 From: Mayank Batra <mayankbatra@yahoo.co.in>
-Subject: Re: [Bluez-devel] A2DP sink code finally
+Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050501171637.412450f8.henryk@ploetzli.ch>
+In-Reply-To: <20050501172156.0ab4ad2a.henryk@ploetzli.ch>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
@@ -17,49 +17,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 3 May 2005 14:23:45 +0100 (BST)
+Date: Tue, 3 May 2005 14:20:23 +0100 (BST)
 
 Henryk,
 
-> Ah, stupid me. I forgot to enable pairing mode on
-> the audio dongle.
-
-Never mind. better late than never.
-
-> > > Is there anything else I've got to do apart from
 > 
-> > > | hciconfig hci0 class 0x200404
-> > 
-> > Don't know whether this is required...?
+> > The output is pretty well if we incorporate the
+> proper
+> > endian type.
 > 
-> Seems so. After doing
-> 
-> > > | sdptool add A2SNK
-> > > | ./a2snk
-> 
-> _and_ enabling pairing on the audio dongle nothing
-> happened. But as soon
-> as I changed my device class the audio dongle
-> started a connection. Now
-> a2snk stalls after "Sent Stream End Point Discovery
-> Response".
+> Ahh, so it works for you now? (I was not able to
+> test it yet ...)
 
+It is working PERFECTLY alright. There is absolutely
+no difference b/w .snd file and .sbc file qualities.
 
-I suggest you scan the hcidump and see whether  avdtp
-commands are being exchanged properly. This was the
-problem i faced while coding the a2recv. Please refer
-to my query mail in which i raised the question of
-exchanging the position of packet_type and
-message_type.
+> I hadn't thought of endianess all the way long. I
+> was using big endian
+> for the .au file input (don't remember why) in the
+> encoder and then
+> mostly consequently everywhere from there on.
 
-I interchanged them and it started working.
+OK, now one question to u and Marcel,
 
-If i don't, then the sink sends a cont command which
-the source rejects and sends a disconnection.
-
-Also, do send me a copy of the dump.
-
-Regards,
+If the source is sending me sbc file encoded from pcm
+file that was in big endian format, and i have an
+audio device that supports only little-endian format,
+then don't u think that i need to patch the sbc.c file
+when the data field is being filled ?????
 
 Mayank
 
