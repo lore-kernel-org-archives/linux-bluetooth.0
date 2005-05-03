@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] A small query
+Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050503130909.22723.qmail@web8302.mail.in.yahoo.com>
-References: <20050503130909.22723.qmail@web8302.mail.in.yahoo.com>
+In-Reply-To: <20050503131203.30254.qmail@web8301.mail.in.yahoo.com>
+References: <20050503131203.30254.qmail@web8301.mail.in.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1115134715.8206.29.camel@notepaq>
+Message-Id: <1115134573.8206.26.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,26 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 03 May 2005 17:38:35 +0200
+Date: Tue, 03 May 2005 17:36:13 +0200
 
 Hi Mayank,
 
-> Does it matter whether I declare packet_type before or
-> after message_type. I am not sure, but if I declare it
-> before somehow, the hcidump on the a2recv side is not
-> correct. 
-> I mean, there is something wrong in the hcidump. It
-> considers the commands as 'Cont' command and this is
-> when the source sends me a disconnect without
-> hesitation.
-> What I want to say is that if I declare packet_type
-> after message_type, then both the source's and sink's
-> dump are ok.
+> > I had to change a lot more and so I started over.
+> > Please take a look at
+> > the end result in the CVS.
+> 
+> I saw the end result, it is ok, just i was missing my
+> name somewhere. :-)
 
-I can't follow it right now, but you should not trust hcidump per se. It
-can happen that the AVDTP decoding is wrong. Especially because it uses
-two L2CAP connections on the same PSM and to assigning signal and media
-channel is not an easy task for a decoder.
+that is because I don't copied your file. Instead I changed all the
+parts by hand and missed your changes for adding your name. Sorry for
+that. Better send diffs next time.
 
 Regards
 
