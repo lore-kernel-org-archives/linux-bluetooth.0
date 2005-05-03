@@ -1,9 +1,9 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050503132801.13142.qmail@web8312.mail.in.yahoo.com>
+Message-ID: <20050503132345.24700.qmail@web8302.mail.in.yahoo.com>
 From: Mayank Batra <mayankbatra@yahoo.co.in>
-Subject: Re: [Bluez-devel] What endian type is supported by audio device ?
+Subject: Re: [Bluez-devel] A2DP sink code finally
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: 6667
+In-Reply-To: <20050501171637.412450f8.henryk@ploetzli.ch>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
@@ -17,23 +17,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 3 May 2005 14:28:01 +0100 (BST)
+Date: Tue, 3 May 2005 14:23:45 +0100 (BST)
 
-Marcel,
+Henryk,
 
+> Ah, stupid me. I forgot to enable pairing mode on
+> the audio dongle.
+
+Never mind. better late than never.
+
+> > > Is there anything else I've got to do apart from
 > 
-> actually this has nothing to do with the machine
-> type. It depends on the
-> endian format of the input PCM stream. So we should
-> add a flags that
-> tells us about the endian format of the input.
+> > > | hciconfig hci0 class 0x200404
+> > 
+> > Don't know whether this is required...?
+> 
+> Seems so. After doing
+> 
+> > > | sdptool add A2SNK
+> > > | ./a2snk
+> 
+> _and_ enabling pairing on the audio dongle nothing
+> happened. But as soon
+> as I changed my device class the audio dongle
+> started a connection. Now
+> a2snk stalls after "Sent Stream End Point Discovery
+> Response".
 
-But what do i do if the stream was earlier on in big
-endian format and my audio device does not support big
-endian format?
 
-That is why, we should check what endian type is
-supported and decide accordingly.
+I suggest you scan the hcidump and see whether  avdtp
+commands are being exchanged properly. This was the
+problem i faced while coding the a2recv. Please refer
+to my query mail in which i raised the question of
+exchanging the position of packet_type and
+message_type.
+
+I interchanged them and it started working.
+
+If i don't, then the sink sends a cont command which
+the source rejects and sends a disconnection.
+
+Also, do send me a copy of the dump.
 
 Regards,
 
