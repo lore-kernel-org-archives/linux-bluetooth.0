@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050503130325.36986.qmail@web8306.mail.in.yahoo.com>
-From: Mayank Batra <mayankbatra@yahoo.co.in>
-Subject: Re: [Bluez-devel] SBC Decoder with /dev/dsp
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: 6667
+Message-ID: <4277757D.1000901@palmsource.com>
+From: Frederic Danis <frederic.danis@palmsource.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] eSCO support
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,55 +16,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 3 May 2005 14:03:25 +0100 (BST)
+Date: Tue, 03 May 2005 14:58:37 +0200
 
-Brad,
+Hello,
 
-> Is a2snk working now then? Can I factor out the
-> common stuff in 
-> a2snk/a2play without messing up changes anyone is
-> holding onto?
+Regarding previous emails on this mailing list it seems to me that eSCO 
+is not yet supported by BlueZ. Am I right ?
+Is there any plan or work in progress to support it ?
 
-Thanks for creating a2dp.h file
+Regards
 
-And yes, now it is final that a2snk (now a2recv) is
-functioning.
+Fred
 
-I have tested it by using a2play as well as BlueSoleil
-as the source. And it is working perfectly alright.
-
-But the problem is again the sequential nature of
-a2recv as Marcel pointed out.
-
-But one thing:
-a2recv functions in the following scenario:
-
-1) I use a PCM file (.snd), encoded in little-endian
-format.
-
-2) I use a2play, which encodes it into sbc.
-
-3) I decode the sbc stream with a2recv, open my
-soundcard in little-endian format (My soundcard does
-not support big-endian format). But for this I have to
-patch the sbc.c to produce output in little endian
-format.
-
-After the above steps output is crystal clear.
-And when I say clear, it means absolutely clear.
- 
-> Any suggestions for the name of the new header file
-> that a2snk/a2play 
-> will include? avdtp.h seems like a poor choice...
-
-a2dp.h is great.
- 
-
-Mayank
-
-________________________________________________________________________
-Yahoo! India Matrimony: Find your life partner online
-Go to: http://yahoo.shaadi.com/india-matrimony
+-----------------------------------------------
+Danis Frederic            PalmSource Europe
+Software engineer
+Mail : mailto:frederic.danis@palmsource.com
+-----------------------------------------------
 
 
 -------------------------------------------------------
