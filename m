@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] The 4th anniversary of BlueZ
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-From: Phil Stopford <philstopford@hotmail.com>
-Message-ID: <loom.20050504T013955-956@post.gmane.org>
-References: <loom.20050427T005347-298@post.gmane.org> <1114606563.8836.1.camel@pegasus> <loom.20050427T153844-482@post.gmane.org> <200504271607.30208.cijoml@volny.cz> <loom.20050427T165103-193@post.gmane.org>
+In-Reply-To: <200505032350.23268.cijoml@volny.cz>
+References: <1115154764.8496.52.camel@pegasus>
+	 <200505032322.34888.cijoml@volny.cz> <1115156548.8496.58.camel@pegasus>
+	 <200505032350.23268.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1115157848.8496.69.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Belkin F8T002 PCMCIA - how to get working?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,46 +20,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 3 May 2005 23:44:17 +0000 (UTC)
+Date: Wed, 04 May 2005 00:04:08 +0200
 
-Phil Stopford <philstopford <at> hotmail.com> writes:
+Hi Michal,
 
-> 
-> Michal Semler <cijoml <at> volny.cz> writes:
-> 
- <snip to satisfy gmane.org>
-> 
-> > >   Serial controller: Oxford Semiconductor Ltd OXCB950 Cardbus 16950 UART
-> > 
-> > ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> > It is UART - hciattach with proper parameters should work for you
-> > 
-> > List back the conference to find them
-> > 
-> > Michal
-> 
+> WAU! GREAT! Will we meet and visit some of czech pubs? :))
 
-Having gone through the documentation for SuSE, I came across a suggestion to
-add a section to /etc/pcmcia/config that defines the card and attempts to load
-the module. I added the following based on cardctl ident output :
+we had quite some fun in Frankfurt last year and in Vancouver this year
+and at the moment I am looking forward to Singapore next month.
 
-card "Oxford Semiconductor Ltd OXCB950 Cardbus 16950 UART"
-  manfid 0x0279, 0x0001
-  version "OXSEMI", "OXCB950", "Rev A"
-  bind "serial_cs"
+> Is this fest for others too? I am interested about it.
 
->From /var/log/messages, I get the following error and am somewhat puzzled about
-how to fix the problem :
+It is not a public event and I am only invited, because I am working at
+the security table.
 
-May  3 15:46:35 alfred kernel: PCI: Enabling device 0000:02:00.0 (0000 -> 0003)
-$ Cardbus 16950 UART (not in the WHITELIST)
+Regards
 
-Any ideas or pointers would be welcome, as ever. Meanwhile, I'll see what google
-can turn up.
+Marcel
 
-Thanks,
-
-Philip
 
 
 
