@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] What endian type is supported by audio device ?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050503132801.13142.qmail@web8312.mail.in.yahoo.com>
-References: <20050503132801.13142.qmail@web8312.mail.in.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1115134416.8206.22.camel@notepaq>
-Mime-Version: 1.0
+Message-ID: <42779955.6070600@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] nonblocking btsco
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,34 +16,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 03 May 2005 17:33:36 +0200
+Date: Tue, 03 May 2005 09:31:33 -0600
 
-Hi Mayank,
+Hi
 
-> > actually this has nothing to do with the machine
-> > type. It depends on the
-> > endian format of the input PCM stream. So we should
-> > add a flags that
-> > tells us about the endian format of the input.
-> 
-> But what do i do if the stream was earlier on in big
-> endian format and my audio device does not support big
-> endian format?
-> 
-> That is why, we should check what endian type is
-> supported and decide accordingly.
+I'm not totally sure this will work, but here goes:
 
-I think that if you use ALSA it can change the endian format on demand
-inside the library, but for the a2play and a2recv with OSS support we
-can do that inside our own code. It is only byte swapping. And from my
-understand it should be done inside the SBC codec. We simpy tell it what
-input or output endian format we expect and then it should obey to it.
+http://sourceforge.net/tracker/index.php?func=detail&aid=1188691&group_id=116589&atid=678258
 
-Regards
+we received a patch on sourceforge so writes to the kernel btsco device 
+wouldn't block. I don't think it's exactly right (see my comment) but it 
+would probably be an improvement once reworked.
 
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
