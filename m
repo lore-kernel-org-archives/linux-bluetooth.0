@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] dongle manufacturers
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4277B273.3010706@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4277B273.3010706@gmx.ch>
-References: <4277B273.3010706@gmx.ch>
-Content-Type: text/plain
-Message-Id: <1115152035.8496.15.camel@pegasus>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] dongle manufacturers
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,28 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 03 May 2005 22:27:15 +0200
+Date: Tue, 03 May 2005 19:18:43 +0200
 
-Hi Marco,
+Hello all
 
-> I just bought two SiliconWave bt1.2 USB Dongles (Anycom and arp datacon).
-> 
-> What's the supportstate of SiliconWave?
+I just bought two SiliconWave bt1.2 USB Dongles (Anycom and arp datacon).
 
-if it is the ROM version then all of them return the wrong inquiry with
-RSSI event. I have a kernel workaround for that ready, but it is not
-public at the moment.
+What's the supportstate of SiliconWave?
+Are they more like broadcom or more like csr?
 
-> Are they more like broadcom or more like csr?
-
-I personally would say something in between. There are problems with the
-SCO support, but all the rest seems to work fine.
-
-Regards
-
-Marcel
-
-
+regards
+Marco
 
 
 -------------------------------------------------------
