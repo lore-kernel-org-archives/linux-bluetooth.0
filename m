@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Royaltek BlueGPS
-From: Marcel Holtmann <marcel@holtmann.org>
+From: pratik parekh <pparekh@usc.edu>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050504051342.27003.qmail@web52402.mail.yahoo.com>
-References: <20050504051342.27003.qmail@web52402.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1115191263.8496.71.camel@pegasus>
-Mime-Version: 1.0
+Message-id: <4cfdd218c4c.4277fec2@usc.edu>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] How to run Local SDP Server?!!
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,25 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 04 May 2005 09:21:02 +0200
+Date: Tue, 03 May 2005 22:44:18 -0700
 
-Hi Jose,
+Hello,
+    I am stdent working on a project on Bluetooth. I am usind Rococo on Bluez and using JSR-82. I am trying to set up RFCOMM communication between 2 USB dongles attached to PCs.
+    I cant seem to get the SDP server running. On running sdptool browse local i get the following message --
 
-> Anyone worked/working with Royaltek BlueGPS (Bluetooth
-> GPS Receiver).
-> 
-> I want to know, how to connect the BlueGPS,from Linux,
-> through serial port, and get the data. 
+[root@localhost root]# sdptool browse local
+Failed to connect to SDP server on FF:FF:FF:00:00:00: No such file or directory
 
-run "sdptool search --bdaddr <bdaddr> sp" to find the RFCOMM channel
-that is used by the BlueGPS unit. I expect that it will be channel one.
-Then call "rfcomm bind 0 <bdaddr> 1" and after that point your GPS
-software to /dev/rfcomm0 and you are ready to go.
-
-Regards
-
-Marcel
-
+    I have installed the files hcidump, lib and utils.
+    Do I have to run any command to get SDP running? 
+    Thank-you for your help.
+Regards,
+Pratik Parekh.
 
 
 
