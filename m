@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Error due to  bluetooth/bluetooth.h of
-	bluez-libs-2.16
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <loom.20050504T105747-226@post.gmane.org>
-References: <loom.20050504T105747-226@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1115198562.8496.76.camel@pegasus>
+From: Mubeen <mubeenjukaku@yahoo.com>
+Message-ID: <loom.20050504T105747-226@post.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Error due to  bluetooth/bluetooth.h of bluez-libs-2.16
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,21 +16,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 04 May 2005 11:22:42 +0200
+Date: Wed, 4 May 2005 09:05:11 +0000 (UTC)
 
-Hi Mubeen,
+I think bluetooth.h of bluez-libs-2.16 should include stdio.h, as it
+is using FILE structure at line 134. Because of this many ./configures 
+are failing.
+Please correct me if I am wrong.
 
-> I think bluetooth.h of bluez-libs-2.16 should include stdio.h, as it
-> is using FILE structure at line 134. Because of this many ./configures 
-> are failing.
-> Please correct me if I am wrong.
-
-this is already fixed in the CVS.
-
-Regards
-
-Marcel
-
+Regards,
+Mubeen
 
 
 
