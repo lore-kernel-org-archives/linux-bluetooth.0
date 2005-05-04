@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Fintan McEvoy" <fintan.mcevoy@ul.ie>
-To: <bluez-users@lists.sourceforge.net>
-Message-ID: <002901c55102$01862480$d24bc988@computernetworks>
+From: Pavel Ruzicka <pavouk@pavouk.org>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <200505042338.26439.pavouk@pavouk.org>
-Subject: [Bluez-users] Good PCMCIA card
+  charset="us-ascii"
+Message-Id: <200505042338.26439.pavouk@pavouk.org>
+Subject: [Bluez-users] SOCKET rev.F CF suspend
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,15 +17,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 5 May 2005 00:35:50 +0100
+Date: Wed, 4 May 2005 23:38:26 +0200
 
-Can anyone suggest a good Bluetooth PCMCIA card that is firmware
-upgradeable to bluetooth v1.2 and works well with Bluez? 
+Hi,
 
-Any help Appreciated,
-Rgds,
-Fitnan McEvoy
+I have SOCKET revision F CompactFlash BT card.
+This card is NOKIA based and use DTL1 kernel driver.
 
+After suspend/resume of my Zaurus card doesn't goes up correctly. I must 
+eject/insert card. I use kernel 2.6.11 on Zaurus SL-C860.
+Is suspend supported in a dtl1 driver?
+
+Best regards,
+
+Pavel Ruzicka
 
 
 -------------------------------------------------------
