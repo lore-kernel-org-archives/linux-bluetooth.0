@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: pratik parekh <pparekh@usc.edu>
+Message-ID: <20050504051342.27003.qmail@web52402.mail.yahoo.com>
+From: jose <twblr@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-Message-id: <4cfdd218c4c.4277fec2@usc.edu>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] How to run Local SDP Server?!!
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Royaltek BlueGPS
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,21 +16,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 03 May 2005 22:44:18 -0700
+Date: Tue, 3 May 2005 22:13:42 -0700 (PDT)
 
-Hello,
-    I am stdent working on a project on Bluetooth. I am usind Rococo on Bluez and using JSR-82. I am trying to set up RFCOMM communication between 2 USB dongles attached to PCs.
-    I cant seem to get the SDP server running. On running sdptool browse local i get the following message --
+Hi,
 
-[root@localhost root]# sdptool browse local
-Failed to connect to SDP server on FF:FF:FF:00:00:00: No such file or directory
+Anyone worked/working with Royaltek BlueGPS (Bluetooth
+GPS Receiver).
 
-    I have installed the files hcidump, lib and utils.
-    Do I have to run any command to get SDP running? 
-    Thank-you for your help.
+I want to know, how to connect the BlueGPS,from Linux,
+through serial port, and get the data. 
+
 Regards,
-Pratik Parekh.
+Jose
 
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
