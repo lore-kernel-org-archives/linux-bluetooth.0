@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <42790802.9080009@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200505042338.26439.pavouk@pavouk.org>
-Subject: [Bluez-users] SOCKET rev.F CF suspend
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] bluetooth audio control
+References: <20050504162039.63928.qmail@web54706.mail.yahoo.com>
+In-Reply-To: <20050504162039.63928.qmail@web54706.mail.yahoo.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,20 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 4 May 2005 23:38:26 +0200
+Date: Wed, 04 May 2005 11:36:02 -0600
 
-Hi,
+Hiren,
 
-I have SOCKET revision F CompactFlash BT card.
-This card is NOKIA based and use DTL1 kernel driver.
+This has been missing from the docs. I added it, but here it is as well:
 
-After suspend/resume of my Zaurus card doesn't goes up correctly. I must 
-eject/insert card. I use kernel 2.6.11 on Zaurus SL-C860.
-Is suspend supported in a dtl1 driver?
+     *  Put alternating lines of regexes and shell commands in 
+~/.btscorc and when something that the headset sends matches these 
+regexes, the shell command is run (with any back references replaced). 
+This, of course, is primarily intended to "do stuff" when the headset 
+button(s) are pressed.
+     * Send SIGHUP to the userspace program to make it re-read the 
+config file.
+     * Send SIGUSR1 to the userspace program to make the headset ring.
 
-Best regards,
+If anyone has examples of .btscorc lines that do things like start and 
+stop a recording, I'd like to add it to the docs.
 
-Pavel Ruzicka
+Brad
+
+Hiren Mandalia wrote:
+> hi all,
+> 
+> i have the btsco installed and working with my Motorola headset HS850.
+> I'm able to play audio from a linux machine to the headset. I'm looking
+> for a program that will start/stop audio playback/record only when I
+> press the 'Connect' button on my headset. does handsfree profile
+> implement this functionality?
+> 
+> thanks,
+> hiren
+> 
+> __________________________________________________
+> Do You Yahoo!?
+> Tired of spam? Yahoo! Mail has the best spam protection around
+> http://mail.yahoo.com
+> 
 
 
 -------------------------------------------------------
