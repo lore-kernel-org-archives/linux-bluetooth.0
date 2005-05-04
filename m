@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4278F2BC.4080104@futurlink.com>
-From: Pedro Monjo Florit <pedro.monjo@futurlink.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] connection timeout problems
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] sdptool
+In-Reply-To: <42789AD7.9090507@deis.unibo.it>
+References: <42789AD7.9090507@deis.unibo.it>
+Content-Type: text/plain
+Message-Id: <1115200542.8496.82.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,43 +18,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 04 May 2005 18:05:16 +0200
+Date: Wed, 04 May 2005 11:55:42 +0200
 
-Hi!
+Hi,
 
-I am following the code of sdptool.c and I have a question. I am 
-comparing add_sp() and add_opush() and I have found something that 
-puzzles me. The first part of the code is almost the same, but there are 
-some sdp_list_free() calls in add_opush() that are present in add_sp(). 
-For example:
+> I looked at the hcitool.c source and I have noticed that the "to" 
+> parameter in hci_create_connection is set on 25000.
+> 
+> hci_create_connection(dd, &(info+i)->bdaddr,
+> htobs(di.pkt_type & ACL_PTYPE_MASK),
+> (info+i)->clock_offset | 0x8000,
+> 0x01, &handle, 25000);
+> 
+> /** from hci.h **/
+> hci_create_connection(int dd, const bdaddr_t *bdaddr, uint16_t ptype, 
+> uint16_t clkoffset, uint8_t rswitch, uint16_t *handle, int to)
+> 
+> 
+> Is this parameter a timeout in msec?
+> Is it possible to reduce this value?
+> I need to perform the connection before 10 sec, and I prefer to kill the 
+> connection instead waiting for more time.
+> 
+> I have tryed to reduce this parameter, but after the return of the 
+> connection, It seems that no other connections are possible.
+> 
+> I get :    Can't create connection: Input/output error
+> 
+> and no more connections are possible (also to other devices).
+> I get a similar behaviour also if I kill the connecting process before 
+> the timeout.
 
-static int add_sp(sdp_session_t *session, svc_info_t *si)
-{
-    /* ... */
-    sdp_uuid16_create(&sp_uuid, SERIAL_PORT_SVCLASS_ID);
-    svclass_id = sdp_list_append(0, &sp_uuid);
-    sdp_set_service_classes(&record, svclass_id);
-    sdp_list_free(svclass_id, 0);
-    /* ... */
-}
+this is not the page timeout and you have to reduce the page timeout to
+get the desired effect.
 
-static int add_opush(sdp_session_t *session, svc_info_t *si)
-{
-    /* ... */
-    sdp_uuid16_create(&opush_uuid, OBEX_OBJPUSH_SVCLASS_ID);
-    svclass_id = sdp_list_append(0, &opush_uuid);
-    sdp_set_service_classes(&record, svclass_id);
-    /* ... */
-}
+Regards
 
-Is this correct? Shouldn't there be a call to sdp_list_free(svclass_id, 
-0) in add_opush() too? As I understand it, this means that add_opush() 
-has a memory leak, isn't it? I have found at least three missing calls 
-to sdp_list_free() in add_opush().
+Marcel
 
-Regards,
 
-Pedro Monjo
 
 
 -------------------------------------------------------
