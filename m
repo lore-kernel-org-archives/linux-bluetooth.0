@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050504162039.63928.qmail@web54706.mail.yahoo.com>
-From: Hiren Mandalia <hir100@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4278F2BC.4080104@futurlink.com>
+From: Pedro Monjo Florit <pedro.monjo@futurlink.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-645987531-1115223639=:63643"
-Subject: [Bluez-users] bluetooth audio control
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] sdptool
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,32 +16,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 4 May 2005 09:20:39 -0700 (PDT)
+Date: Wed, 04 May 2005 18:05:16 +0200
 
---0-645987531-1115223639=:63643
-Content-Type: text/plain; charset=us-ascii
+Hi!
 
-hi all,
- 
-i have the btsco installed and working with my Motorola headset HS850. 
-I'm able to play audio from a linux machine to the headset. I'm looking 
-for a program that will start/stop audio playback/record only when I 
-press the 'Connect' button on my headset. does handsfree profile 
-implement this functionality? 
- 
-thanks,
-hiren
+I am following the code of sdptool.c and I have a question. I am 
+comparing add_sp() and add_opush() and I have found something that 
+puzzles me. The first part of the code is almost the same, but there are 
+some sdp_list_free() calls in add_opush() that are present in add_sp(). 
+For example:
 
+static int add_sp(sdp_session_t *session, svc_info_t *si)
+{
+    /* ... */
+    sdp_uuid16_create(&sp_uuid, SERIAL_PORT_SVCLASS_ID);
+    svclass_id = sdp_list_append(0, &sp_uuid);
+    sdp_set_service_classes(&record, svclass_id);
+    sdp_list_free(svclass_id, 0);
+    /* ... */
+}
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
---0-645987531-1115223639=:63643
-Content-Type: text/html; charset=us-ascii
+static int add_opush(sdp_session_t *session, svc_info_t *si)
+{
+    /* ... */
+    sdp_uuid16_create(&opush_uuid, OBEX_OBJPUSH_SVCLASS_ID);
+    svclass_id = sdp_list_append(0, &opush_uuid);
+    sdp_set_service_classes(&record, svclass_id);
+    /* ... */
+}
 
-<DIV>hi all,<BR> <BR>i have the btsco installed and working with my Motorola headset HS850. <BR>I'm able to play audio from a linux machine to the headset. I'm looking <BR>for a program that will start/stop audio playback/record only when I <BR>press the 'Connect' button on my headset. does handsfree profile <BR>implement this functionality? <BR> <BR>thanks,<BR>hiren<BR></DIV><p>__________________________________________________<br>Do You Yahoo!?<br>Tired of spam?  Yahoo! Mail has the best spam protection around <br>http://mail.yahoo.com 
---0-645987531-1115223639=:63643--
+Is this correct? Shouldn't there be a call to sdp_list_free(svclass_id, 
+0) in add_opush() too? As I understand it, this means that add_opush() 
+has a memory leak, isn't it? I have found at least three missing calls 
+to sdp_list_free() in add_opush().
+
+Regards,
+
+Pedro Monjo
 
 
 -------------------------------------------------------
