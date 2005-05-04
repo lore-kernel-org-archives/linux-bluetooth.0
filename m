@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] dongle manufacturers
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <42789AD7.9090507@deis.unibo.it>
+From: db <dbrunelli@deis.unibo.it>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <427898EC.7040200@gmx.ch>
-References: <4277B273.3010706@gmx.ch> <1115152035.8496.15.camel@pegasus>
-	 <427898EC.7040200@gmx.ch>
-Content-Type: text/plain
-Message-Id: <1115200453.8496.80.camel@pegasus>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] connection timeout problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,30 +16,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 04 May 2005 11:54:13 +0200
+Date: Wed, 04 May 2005 11:50:15 +0200
 
-Hi Marco,
 
-> >>I just bought two SiliconWave bt1.2 USB Dongles (Anycom and arp datacon).
-> >>
-> >>What's the supportstate of SiliconWave?
-> > 
-> > if it is the ROM version then all of them return the wrong inquiry with
-> > RSSI event. I have a kernel workaround for that ready, but it is not
-> > public at the moment.
-> 
-> how do I know if it's the rom version?
+Hi all,
 
-what does "hciconfig hci0 version features" tells you.
+I looked at the hcitool.c source and I have noticed that the "to" 
+parameter in hci_create_connection is set on 25000.
 
-> they are pretty new, maybee that's already fixed.
+hci_create_connection(dd, &(info+i)->bdaddr,
+htobs(di.pkt_type & ACL_PTYPE_MASK),
+(info+i)->clock_offset | 0x8000,
+0x01, &handle, 25000);
 
-Actually I doubt it. However you set the inquiry mode to 1 and check by
-yourself the size of the returned inquiry result events.
+/** from hci.h **/
+hci_create_connection(int dd, const bdaddr_t *bdaddr, uint16_t ptype, 
+uint16_t clkoffset, uint8_t rswitch, uint16_t *handle, int to)
 
-Regards
 
-Marcel
+Is this parameter a timeout in msec?
+Is it possible to reduce this value?
+I need to perform the connection before 10 sec, and I prefer to kill the 
+connection instead waiting for more time.
+
+I have tryed to reduce this parameter, but after the return of the 
+connection, It seems that no other connections are possible.
+
+I get :    Can't create connection: Input/output error
+
+and no more connections are possible (also to other devices).
+I get a similar behaviour also if I kill the connecting process before 
+the timeout.
+
+regards
+dB
 
 
 
