@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050505035740.69259.qmail@web21127.mail.yahoo.com>
-From: Vinod <geekvinod@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+From: "Fintan McEvoy" <fintan.mcevoy@ul.ie>
+To: <bluez-users@lists.sourceforge.net>
+Message-ID: <002901c55102$01862480$d24bc988@computernetworks>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] options on an ipaq after installing bluez
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <200505042338.26439.pavouk@pavouk.org>
+Subject: [Bluez-users] Good PCMCIA card
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,28 +18,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 4 May 2005 20:57:40 -0700 (PDT)
+Date: Thu, 5 May 2005 00:35:50 +0100
 
-Hi All. I plan to install bluez on two ipaq's that i
-have and then probably write up some simple
-applications to communicate (like a chat application)
-between them. What options do i have to develop on
-such a linux installation with bluez. Can i use gcc or
-java to write the required communication applications?
-does bluez have API's to interface with both languages
-?
+Can anyone suggest a good Bluetooth PCMCIA card that is firmware
+upgradeable to bluetooth v1.2 and works well with Bluez? 
 
-Any help would be appreciated especially since i am
-only starting out on this.
-
-Thanks,
-Vinod
-
-
-		
-Discover Yahoo! 
-Find restaurants, movies, travel and more fun for the weekend. Check it out! 
-http://discover.yahoo.com/weekend.html 
+Any help Appreciated,
+Rgds,
+Fitnan McEvoy
 
 
 
