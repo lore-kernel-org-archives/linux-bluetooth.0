@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Regarding a2recv
+Subject: Re: [Bluez-devel] A small query
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050505124512.53335.qmail@web8306.mail.in.yahoo.com>
-References: <20050505124512.53335.qmail@web8306.mail.in.yahoo.com>
+In-Reply-To: <20050505122914.45406.qmail@web8303.mail.in.yahoo.com>
+References: <20050505122914.45406.qmail@web8303.mail.in.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1115298846.8496.155.camel@pegasus>
+Message-Id: <1115298786.8496.153.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,41 +18,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 05 May 2005 15:14:06 +0200
+Date: Thu, 05 May 2005 15:13:06 +0200
 
 Hi Mayank,
 
-> Did you try what I suggested you in my mail titled 'A
-> small Query' ?
+> > > I mean, there is something wrong in the hcidump.
+> > It
+> > > considers the commands as 'Cont' command and this
+> > is
+> > > when the source sends me a disconnect without
+> > > hesitation.
+> > > What I want to say is that if I declare
+> > packet_type
+> > > after message_type, then both the source's and
+> > sink's
+> > > dump are ok.
 > 
-> That is, swap the message_type and packet_type fields
-> of the structure
-> 
-> struct avdtp_header {
-> 	uint8_t packet_type:2;
-> 	uint8_t message_type:2;
-> 	uint8_t transaction_label:4;
-> 	uint8_t signal_id:6;
-> 	uint8_t rfa0:2;
-> } __attribute__ ((packed));
-> 
-> in the file a2dp.h
-> 
-> i.e. make it look like the following:
-> struct avdtp_header {
-> 	uint8_t message_type:2;
-> 	uint8_t packet_type:2;
-> 	uint8_t transaction_label:4;
-> 	uint8_t signal_id:6;
-> 	uint8_t rfa0:2;
-> } __attribute__ ((packed));
-> 
-> 
-> Once you swap them, I feel that a2recv will work for
-> you.
+> I did not mean that hcidump is not functioning
+> correctly, I meant that maybe we have not declared the
+> structure correctly.
 
-this is correct. After checking the specs, the message_type are the
-first two bits and then packet_type follows.
+don't put too much trust on hcidump. It must not always be right and I
+had some situations where I trusted it too much.
+
+> Swapping message_type and packet_type makes no
+> difference to a2play but it makes a lot of difference
+> to a2recv.
+
+Why can this be? Doesn't a2play uses message_type and packet_type at
+all?
 
 Regards
 
