@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050505124512.53335.qmail@web8306.mail.in.yahoo.com>
+Message-ID: <20050505123708.92329.qmail@web8307.mail.in.yahoo.com>
 From: Mayank Batra <mayankbatra@yahoo.co.in>
-To: BLUEZ DEVELOPERS LIST <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] What endian type is supported by audio device ?
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: 6667
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] Regarding a2recv
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,41 +17,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 5 May 2005 13:45:12 +0100 (BST)
+Date: Thu, 5 May 2005 13:37:08 +0100 (BST)
 
-Henryk,
-
-Did you try what I suggested you in my mail titled 'A
-small Query' ?
-
-That is, swap the message_type and packet_type fields
-of the structure
-
-struct avdtp_header {
-	uint8_t packet_type:2;
-	uint8_t message_type:2;
-	uint8_t transaction_label:4;
-	uint8_t signal_id:6;
-	uint8_t rfa0:2;
-} __attribute__ ((packed));
-
-in the file a2dp.h
-
-i.e. make it look like the following:
-struct avdtp_header {
-	uint8_t message_type:2;
-	uint8_t packet_type:2;
-	uint8_t transaction_label:4;
-	uint8_t signal_id:6;
-	uint8_t rfa0:2;
-} __attribute__ ((packed));
+Marcel,
 
 
-Once you swap them, I feel that a2recv will work for
-you.
-If it doesn't work, send me a copy of the dump.
+> I think that if you use ALSA it can change the
+> endian format on demand
+> inside the library, but for the a2play and a2recv
+> with OSS support we
+> can do that inside our own code. It is only byte
+> swapping. And from my
+> understand it should be done inside the SBC codec.
+> We simpy tell it what
+> input or output endian format we expect and then it
+> should obey to it.
 
-Regards,
+But this means that we will have to add a flag bit to
+indicate the endian type.
+
+This is ok between a2play and a2recv. But do you mean
+that we are gonna be limited to these two applications
+only?
+
+For instance, I tested a2recv with BlueSoleil and it
+was working perfectly alright, i.e. if I opened the
+audio device in little-endian format, did the byte
+swapping in sbc.c file.
+
+But we can't reprogram a third party s/w to incoporate
+a bit for endian type.
 
 Mayank
 
