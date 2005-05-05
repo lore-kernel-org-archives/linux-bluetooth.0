@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] listening for any packets
-From: Marcel Holtmann <marcel@holtmann.org>
+From: root_teos <viktor.teofanovic@bregenznet.at>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200505051938.25308.viktor.teofanovic@bregenznet.at>
-References: <200505051938.25308.viktor.teofanovic@bregenznet.at>
-Content-Type: text/plain
-Message-Id: <1115316792.8496.182.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200505051938.25308.viktor.teofanovic@bregenznet.at>
+Subject: [Bluez-users] listening for any packets
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,29 +17,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 May 2005 20:13:12 +0200
+Date: Thu, 5 May 2005 19:38:25 +0200
 
-Hi Teos,
+hi, 
+is it possible to expand the BlueZ stack, that it is able to listen for any 
+incoming packtes (even BB_PDU's or LMP_PDU's) from the piconet? 
+I'm going to programm a simple sniffer tool for educational purposes (just 
+listen for packets without any encryption) and thus I should know, if I can 
+do this with the BlueZ stack?
 
-> is it possible to expand the BlueZ stack, that it is able to listen for any 
-> incoming packtes (even BB_PDU's or LMP_PDU's) from the piconet? 
-
-no it is not possible. No baseband or LMP traffic is routed through the
-HCI for access by the host stack.
-
-> I'm going to programm a simple sniffer tool for educational purposes (just 
-> listen for packets without any encryption) and thus I should know, if I can 
-> do this with the BlueZ stack?
-
-First you need Bluetooth hardware that allows you to see the baseband or
-LMP traffic. For example the BPA-100/105 or the CATC/LeCroy or Frontline
-sniffers.
-
-Regards
-
-Marcel
-
-
+thanks and cheers,
+teos
 
 
 -------------------------------------------------------
