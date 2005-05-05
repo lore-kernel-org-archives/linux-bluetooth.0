@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Guylhem Aznar <bluez-devel@externe.net>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] fixing hidp keycodes
-Message-ID: <20050505203257.GA12178@externe.net>
-References: <20050422105609.GA16313@externe.net> <1114168206.32265.62.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1114168206.32265.62.camel@pegasus>
+From: Florian Echtler <echtler@fs.tum.de>
+To: bmidgley@users.sourceforge.net, bluez-devel@lists.sourceforge.net
+Message-ID: <Pine.LNX.4.62.0505052044560.10038@block>
+MIME-Version: 1.0
+Content-Type: MULTIPART/MIXED; BOUNDARY="0-1260567505-1115319494=:10038"
+Subject: [Bluez-devel] some btsco hacks
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,66 +16,125 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 5 May 2005 16:32:57 -0400
+Date: Thu, 5 May 2005 20:58:14 +0200 (CEST)
 
-On Friday, 22 April 2005 at 13:10:06 (+0200), Marcel Holtmann wrote:
-> > This suggest that my approach should work. I don't understand why it'=
-s
-> > not working with tab/capslock/esc.
->=20
-> To make this working in report mode, you must replace the HID descripto=
-r
-> or tell hidd to use the boot mode only. Speaking of which, I just saw
-> that I never added support for pushing a device into boot mode. However
-> the --nosdp option should do the trick.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-It doesn't. Here's the table I'm using in
-kernel/net/bluetooth/hidp/core.c :
+--0-1260567505-1115319494=:10038
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 
-static unsigned char hidp_keycode[256] =3D {
-          0,  0,  0,  0, 125, 48, 46, 32, 18, 33, 34, 35, 23, 36, 37, 38,
-         50, 49, 24, 25, 16, 19, 31, 20, 22, 47, 17, 45, 21, 44,  2,  3,
-          4,  5,  6,  7,  8,  9, 10, 11, 28, 58, 14,  1, 57, 12, 13, 26,
-         27, 43, 43, 39, 40, 41, 51, 52, 53, 15, 59, 60, 61, 62, 63, 64,
-          0,  0, 67, 68, 87, 67, 99, 70,119,110,102,104,111,107,109,106,
-        105,108,103, 69, 98, 55, 74, 78, 96, 79, 80, 81, 75, 76, 77, 71,
-         72, 73, 82, 83, 86,127,116,117,183,184,185,186,187,188,189,190,
-        191,192,193,194,134,138,130,132,128,129,131,137,133,135,136,113,
-        115,114,  0,  0,  0,121,  0, 89, 93,124, 92, 94, 95,  0,  0,  0,
-        122,123, 90, 91, 85,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-          0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-          0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-          0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-          0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-         29, 42, 56, 30, 97, 54,100,126,164,166,165,163,161,115,114,113,
-        150,158,159,128,136,177,178,176,142,152,173,140
-};
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-As you can see, 30/125 1/15/58 have been swapped, and 65/66 have been rem=
-oved. (that's necessary).
+Hello everyone,
 
-Yet it doesn't work. I still even get 65 and 66. I'm using bluez 2.16 (ex=
-cept sdptool - cf other message) with
-the kernel patch. The kernel is on
-http://externe.net/zaurus/kernel/sources/linux-2.4.18-rmk7-pxa3-20050501.=
-tar.gz
+I finally got time to investigate the issues with my headset. Sometimes
+after SCO connection establishment, the microphone produces only noise,
+and a reconnect is necessary to fix this. The attached patch is against
+btsco.c v1.22 from CVS, and does two things:
 
-I first though my ifdef were at fault. I removed everything- I only have =
-this hidp_keycode now. Still doesn't work anyway.
+1. installs a handler for SIGUSR2 which automatically disconnects the
+   SCO channel when connected and reconnects it after a short delay
 
-Would you have a patch for hidd or a suggestion?
+2. allows the command string in .btscorc to contain '%d', which will
+   be replaced with the current SCO connection status (0 or 1) upon
+   command execution.
 
---=20
-Bien =E0 vous - Best regards,
-Guylhem P. Aznar
+1. may be not really useful to most people - as mentioned, my headset
+is obviously somewhat buggy and needs a kind of reset sometimes, which
+this patch provides (actually, I wrote a shell script which samples
+1 second of audio data from the headset, runs it through gzip to determine
+whether it's noise and sends SIGUSR2 accordingly - talk about evil hacks ;)
 
---=20
-*@externe.net                                            http://externe.n=
-et
-P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
-un.org
-GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
-ey
+2. was included because I want certain actions to happen only when
+the connection is established, and not when it's shutting down.
+
+Brad: if you think this could be useful otherwise, then feel free to 
+include the patch into CVS.
+
+Yours, Florian
+- -- 
+Preserve wildlife - pickle a squirrel today!
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFCemzI7CzyshGvatgRArpWAJ4g4j5sgUjj3ulgVwxORICyjYdyHgCg5qpr
+gE4T1Cniprq057+KD2i79kE=
+=jha8
+-----END PGP SIGNATURE-----
+--0-1260567505-1115319494=:10038
+Content-Type: TEXT/PLAIN; charset=US-ASCII; name=diff
+Content-Transfer-Encoding: BASE64
+Content-ID: <Pine.LNX.4.62.0505052058140.10038@block>
+Content-Description: 
+Content-Disposition: attachment; filename=diff
+
+ZGlmZiAtdSAtcjEuMjIgYnRzY28uYw0KLS0tIGJ0c2NvLmMJMyBNYXkgMjAw
+NSAxNTozNzoxMiAtMDAwMAkxLjIyDQorKysgYnRzY28uYwk1IE1heSAyMDA1
+IDE4OjQ2OjE0IC0wMDAwDQpAQCAtODAsNyArODAsNyBAQA0KIAljaGFyICpj
+bWQ7DQogfTsNCiANCi1zdGF0aWMgdm9sYXRpbGUgaW50IHRlcm1pbmF0ZSA9
+IDAsIHJpbmcgPSAwLCBodXBwZWQgPSAwOw0KK3N0YXRpYyB2b2xhdGlsZSBp
+bnQgdGVybWluYXRlID0gMCwgcmluZyA9IDAsIGh1cHBlZCA9IDAsIHJlY29u
+bmVjdCA9IDA7DQogc3RhdGljIGludCB2ZXJib3NlID0gMDsNCiANCiBzdGF0
+aWMgdm9pZCBzaWdfdGVybShpbnQgc2lnKQ0KQEAgLTk4LDYgKzk4LDExIEBA
+DQogCWh1cHBlZCA9IDE7DQogfQ0KIA0KK3N0YXRpYyB2b2lkIHNpZ191c3Io
+aW50IHNpZykNCit7DQorCXJlY29ubmVjdCA9IDE7DQorfQ0KKw0KIHN0YXRp
+YyBpbnQgcmZjb21tX2Nvbm5lY3QoYmRhZGRyX3QgKiBzcmMsIGJkYWRkcl90
+ICogZHN0LCB1aW50OF90IGNoYW5uZWwpDQogew0KIAlzdHJ1Y3Qgc29ja2Fk
+ZHJfcmMgYWRkcjsNCkBAIC01NzMsNiArNTc4LDkgQEANCiAJc2Euc2FfaGFu
+ZGxlciA9IHNpZ19yaW5nOw0KIAlzaWdhY3Rpb24oU0lHVVNSMSwgJnNhLCBO
+VUxMKTsNCiANCisJc2Euc2FfaGFuZGxlciA9IHNpZ191c3I7DQorCXNpZ2Fj
+dGlvbihTSUdVU1IyLCAmc2EsIE5VTEwpOw0KKw0KIAlzYS5zYV9oYW5kbGVy
+ID0gc2lnX2h1cDsNCiAJc2lnYWN0aW9uKFNJR0hVUCwgJnNhLCBOVUxMKTsN
+CiANCkBAIC03MDQsNyArNzEyLDExIEBADQogCQkJCQkJCWludCBzdWJzdGwg
+PSAwOw0KIAkJCQkJCQkNCiAJCQkJCQkJc3Vic3QgPSBOVUxMOw0KLQkJCQkJ
+CQlzeXNidWYgPSBzdHJkdXAoYXJncyk7DQorCQkJCQkJCQ0KKwkJCQkJCQkv
+LyBhZGQgdGhlIGN1cnJlbnQgc2NvIG1vZGUgdG8gdGhlIGNvbW1hbmQgc3Ry
+aW5nDQorCQkJCQkJCXN5c2J1ZiA9IG1hbGxvYyhzdHJsZW4oYXJncykrMSk7
+DQorCQkJCQkJCXNwcmludGYoc3lzYnVmLGFyZ3Msc2NvX21vZGUpOw0KKwkJ
+CQkJCQkNCiAJCQkJCQkJZm9yKGkgPSAwOyBzeXNidWZbaV07IGkrKykgew0K
+IAkJCQkJCQkJaWYoKHN5c2J1ZltpXSA9PSAnXFwnKSAmJiAoc3lzYnVmW2kg
+KyAxXSA+PSAnMCcpICYmIChzeXNidWZbaSArIDFdIDw9ICc5JykpIHsNCiAJ
+CQkJCQkJCQltYXRjaCA9IHN5c2J1ZltpICsgMV0gLSAnMCc7DQpAQCAtODA0
+LDYgKzgxNiw0MCBAQA0KIA0KIAkJfQ0KIA0KKwkJLy8gbWVhbiBsaXR0bGUg
+aGFjayB0byBhbGxvdyBmb3IgYSBzaWduYWwtdHJpZ2dlcmVkIHJlY29ubmVj
+dA0KKwkJLy8gZm9yY2UgZGlzY29ubmVjdGlvbiBvZiB0aGUgY2hhbm5lbCAo
+aWYgY29ubmVjdGVkKQ0KKwkJaWYgKHJlY29ubmVjdCA9PSAxKSB7DQorCQkJ
+aWYgKHNjb19tb2RlID09IENPTk5FQ1RFRCkgew0KKwkJCQlmb3JjZV9zY28g
+PSAgMDsNCisJCQkJcmVjb25uZWN0ID0gLTE7DQorCQkJfSBlbHNlIHJlY29u
+bmVjdCA9IDA7DQorCQl9IA0KKwkJDQorCQlpZigoKCFkcl91c2FnZSAmJiAo
+Zm9yY2Vfc2NvICE9IDEpKSB8fCAoZm9yY2Vfc2NvID09IDApKSAmJiAoc2Nv
+X21vZGUgPT0gQ09OTkVDVEVEKSkgew0KKwkJCWlmKHZlcmJvc2UpIHsNCisJ
+CQkJcHJpbnRmKCJkcml2ZXIgaXMgbm90IGluIHVzZVxuIik7DQorCQkJCWZm
+bHVzaChzdGRvdXQpOw0KKwkJCX0NCisJCQkvKiBjbG9zZSBidF9zY28gYXVk
+aW8gaGFuZGxlICovDQorCQkJYnRfc2NvX3NldF9mZChoYW5kbGUsIC0xKTsN
+CisJCQkvKiBkaXNjb25uZWN0IFNDTyBzdHJlYW0gKi8NCisJCQljbG9zZShz
+ZCk7DQorCQkJaWYodmVyYm9zZSkgew0KKwkJCQlwcmludGYoImRpc2Nvbm5l
+Y3RlZCBTQ08gY2hhbm5lbFxuIik7DQorCQkJCWZmbHVzaChzdGRvdXQpOw0K
+KwkJCX0NCisJCQkNCisJCQlzY29fbW9kZSA9IE5PVF9DT05ORUNURUQ7DQor
+CQl9DQorDQorCQkvLyBpZiBhIHJlY29ubmVjdCBoYXMgYmVlbiByZXF1ZXN0
+ZWQsIGZvcmNlIA0KKwkJLy8gdGhlIHNjbyBjaGFubmVsIHRvIGJlIGFjcXVp
+cmVkIGFnYWluDQorCQlpZiAocmVjb25uZWN0ID09IC0xKSB7DQorCQkJZm9y
+Y2Vfc2NvID0gMTsNCisJCQlyZWNvbm5lY3QgPSAwOw0KKwkJCXNsZWVwKDMp
+Ow0KKwkJfQ0KKw0KIAkJaWYoKChkcl91c2FnZSAmJiAoZm9yY2Vfc2NvICE9
+IDApKSB8fCAoZm9yY2Vfc2NvID09IDEpKSAmJiAoc2NvX21vZGUgPT0gTk9U
+X0NPTk5FQ1RFRCkpIHsNCiAJCQlpZih2ZXJib3NlKSB7DQogCQkJCXByaW50
+ZigiZHJpdmVyIGlzIGluIHVzZVxuIik7DQpAQCAtODI1LDI0ICs4NzEsNiBA
+QA0KIAkJCQl9DQogCQkJCXNjb19tb2RlID0gQ09OTkVDVEVEOw0KIAkJCX0N
+Ci0JCQkNCi0JCX0NCi0JCWlmKCgoIWRyX3VzYWdlICYmIChmb3JjZV9zY28g
+IT0gMSkpIHx8IChmb3JjZV9zY28gPT0gMCkpICYmIChzY29fbW9kZSA9PSBD
+T05ORUNURUQpKSB7DQotCQkJaWYodmVyYm9zZSkgew0KLQkJCQlwcmludGYo
+ImRyaXZlciBpcyBub3QgaW4gdXNlXG4iKTsNCi0JCQkJZmZsdXNoKHN0ZG91
+dCk7DQotCQkJfQ0KLQkJCS8qIGNsb3NlIGJ0X3NjbyBhdWRpbyBoYW5kbGUg
+Ki8NCi0JCQlidF9zY29fc2V0X2ZkKGhhbmRsZSwgLTEpOw0KLQkJCS8qIGRp
+c2Nvbm5lY3QgU0NPIHN0cmVhbSAqLw0KLQkJCWNsb3NlKHNkKTsNCi0JCQlp
+Zih2ZXJib3NlKSB7DQotCQkJCXByaW50ZigiZGlzY29ubmVjdGVkIFNDTyBj
+aGFubmVsXG4iKTsNCi0JCQkJZmZsdXNoKHN0ZG91dCk7DQotCQkJfQ0KLQkJ
+CQ0KLQkJCXNjb19tb2RlID0gTk9UX0NPTk5FQ1RFRDsNCi0JCQkNCiAJCX0N
+CiAJCQ0KIAkJaWYgKHJpbmcpIHsNCg==
+
+--0-1260567505-1115319494=:10038--
 
 
 -------------------------------------------------------
