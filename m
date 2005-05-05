@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] dongle manufacturers
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <427A6974.5080708@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <427A6875.8060804@gmx.ch>
-References: <4277B273.3010706@gmx.ch> <1115152035.8496.15.camel@pegasus>
-	 <427898EC.7040200@gmx.ch> <1115200453.8496.80.camel@pegasus>
-	 <427A6875.8060804@gmx.ch>
-Content-Type: text/plain
-Message-Id: <1115319935.8496.185.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] options on an ipaq after installing bluez
+References: <20050505035740.69259.qmail@web21127.mail.yahoo.com>
+In-Reply-To: <20050505035740.69259.qmail@web21127.mail.yahoo.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,50 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 May 2005 21:05:35 +0200
+Date: Thu, 05 May 2005 20:44:04 +0200
 
-Hi Marco,
+Hello Vinod
 
-> >>>>I just bought two SiliconWave bt1.2 USB Dongles (Anycom and arp datacon).
-> >>>>
-> >>>>What's the supportstate of SiliconWave?
-> >>>
-> >>>if it is the ROM version then all of them return the wrong inquiry with
-> >>>RSSI event. I have a kernel workaround for that ready, but it is not
-> >>>public at the moment.
-> >>
-> >>how do I know if it's the rom version?
-> > 
-> > what does "hciconfig hci0 version features" tells you.
-> 
-> hci1:   Type: USB
->          BD Address: 00:0B:0D:05:8A:19 ACL MTU: 120:20 SCO MTU: 64:0
->          HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x757
->          Manufacturer: Silicon Wave (11)
-> 
-> 
->          Features: 0xff 0xff 0x05 0x38 0x18 0x18 0x00 0x00
->                  <3-slot packets> <5-slot packets> <encryption> <slot offset>
->                  <timing accuracy> <role switch> <hold mode> <sniff mode>
->                  <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
->                  <HV3 packets> <u-law log> <A-law log> <CVSD> <power control>
->                  <enhanced iscan> <interlaced iscan> <interlaced pscan>
->                  <AFH cap. slave> <AFH class. slave> <AFH cap. master>
->                  <AFH class. master>
+Vinod wrote:
+> What options do i have to develop on
+> such a linux installation with bluez. Can i use gcc or
+> java to write the required communication applications?
 
-this one still has the inquiry with RSSI bug and actually I never saw
-any Silicon Wave 1.2 dongle other than 0x757.
-
-> sorry to ask again, you didn't answer:
-> interested in the hciconfig -a and proc/usb of these two new dongles?
-
-Send them in so they are archived, but I actually have one of these.
-
-Regards
-
-Marcel
+both is possible.
+you can directly work with bluez using c or you can use the avetana jsr82 
+to use java. (The avetana stack uses bluez.)
+Both are GPL.
 
 
+regards
+Marco
 
 
 -------------------------------------------------------
