@@ -1,9 +1,9 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050505123708.92329.qmail@web8307.mail.in.yahoo.com>
+Message-ID: <20050505122914.45406.qmail@web8303.mail.in.yahoo.com>
 From: Mayank Batra <mayankbatra@yahoo.co.in>
-Subject: Re: [Bluez-devel] What endian type is supported by audio device ?
+Subject: Re: [Bluez-devel] A small query
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: 6667
+In-Reply-To: <1115134715.8206.29.camel@notepaq>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
@@ -17,36 +17,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 5 May 2005 13:37:08 +0100 (BST)
+Date: Thu, 5 May 2005 13:29:14 +0100 (BST)
 
 Marcel,
 
+> > I mean, there is something wrong in the hcidump.
+> It
+> > considers the commands as 'Cont' command and this
+> is
+> > when the source sends me a disconnect without
+> > hesitation.
+> > What I want to say is that if I declare
+> packet_type
+> > after message_type, then both the source's and
+> sink's
+> > dump are ok.
 
-> I think that if you use ALSA it can change the
-> endian format on demand
-> inside the library, but for the a2play and a2recv
-> with OSS support we
-> can do that inside our own code. It is only byte
-> swapping. And from my
-> understand it should be done inside the SBC codec.
-> We simpy tell it what
-> input or output endian format we expect and then it
-> should obey to it.
+I did not mean that hcidump is not functioning
+correctly, I meant that maybe we have not declared the
+structure correctly.
 
-But this means that we will have to add a flag bit to
-indicate the endian type.
+Swapping message_type and packet_type makes no
+difference to a2play but it makes a lot of difference
+to a2recv.
 
-This is ok between a2play and a2recv. But do you mean
-that we are gonna be limited to these two applications
-only?
+So I feel there is no harm in swapping the two.
 
-For instance, I tested a2recv with BlueSoleil and it
-was working perfectly alright, i.e. if I opened the
-audio device in little-endian format, did the byte
-swapping in sbc.c file.
 
-But we can't reprogram a third party s/w to incoporate
-a bit for endian type.
 
 Mayank
 
