@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Folkert van Heusden <folkert@vanheusden.com>
+Subject: Re: [Bluez-users] connection problems with pppd and 6630 over bluez
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20050507142120.GT4344@vanheusden.com>
+In-Reply-To: <427B7021.5050302@whitelabel.org>
+References: <427B5DB5.3080304@whitelabel.org>
+	 <1115381691.8862.2.camel@pegasus>  <427B7021.5050302@whitelabel.org>
+Content-Type: text/plain
+Message-Id: <1115386676.8862.7.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] pushing objects
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,26 +19,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 7 May 2005 16:21:25 +0200
+Date: Fri, 06 May 2005 15:37:56 +0200
 
-Hi,
+Hi Stefan,
 
-Are there any tools for pushing a businesscard/vcard (or whatever it
-is called in english) to a bluetooth device?
+> >>I have pppd working over bluetooth, but have a strange problem; I only 
+> >>seem to be able to connect about 1/3 of attempts. If I retry it usually 
+> >>works, but some times it takes 5 or 6 goes.
+> >>
+> >>how can I diagnose and fix the problem. I'm running bluez-2.16
+> > 
+> > use "hcidump -X -V" as root to see what happens on the Bluetooth side.
+> > If that looks fine then use pppdump to see what PPP is doing.
+> 
+> I've attached the results of a two attempts to connect, the first 
+> failed, and the second succeeded. What am I looking for?
+
+this is not a Bluetooth problem. This is your dialer script. In the
+failure case you start PPP without getting the CONNECT response. You
+even start PPP and three frames later your receive an OK. Use a dialer
+like wvdial or check you logs for more details.
+
+Regards
+
+Marcel
 
 
-Folkert van Heusden
-
--- 
-Auto te koop, zie: http://www.vanheusden.com/daihatsu.php
-Op zoek naar een IT of Finance baan? Mail me voor de mogelijkheden.
---------------------------------------------------------------------
- UNIX admin? Then give MultiTail (http://vanheusden.com/multitail/) 
- a try, it brings monitoring logfiles to a different level! See     
- http://vanheusden.com/multitail/features.html for a feature-list.  
---------------------------------------------------------------------
-Phone: +31-6-41278122, PGP-key: 1F28D8AE
-Get your PGP/GPG key signed at www.biglumber.com!
 
 
 -------------------------------------------------------
