@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <427B7021.5050302@whitelabel.org>
-From: Stefan Magdalinski <stefan@whitelabel.org>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] connection problems with pppd and 6630 over bluez
-References: <427B5DB5.3080304@whitelabel.org> <1115381691.8862.2.camel@pegasus>
-In-Reply-To: <1115381691.8862.2.camel@pegasus>
-Content-Type: multipart/mixed;
- boundary="------------050506040107090103090605"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <427B5DB5.3080304@whitelabel.org>
+References: <427B5DB5.3080304@whitelabel.org>
+Content-Type: text/plain
+Message-Id: <1115381691.8862.2.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,155 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 06 May 2005 14:24:49 +0100
+Date: Fri, 06 May 2005 14:14:51 +0200
 
-This is a multi-part message in MIME format.
---------------050506040107090103090605
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Stefan,
 
-Marcel Holtmann wrote:
-> Hi Stefan,
+> I have pppd working over bluetooth, but have a strange problem; I only 
+> seem to be able to connect about 1/3 of attempts. If I retry it usually 
+> works, but some times it takes 5 or 6 goes.
 > 
-> 
->>I have pppd working over bluetooth, but have a strange problem; I only 
->>seem to be able to connect about 1/3 of attempts. If I retry it usually 
->>works, but some times it takes 5 or 6 goes.
->>
->>how can I diagnose and fix the problem. I'm running bluez-2.16
-> 
-> 
-> use "hcidump -X -V" as root to see what happens on the Bluetooth side.
-> If that looks fine then use pppdump to see what PPP is doing.
-> 
+> how can I diagnose and fix the problem. I'm running bluez-2.16
 
-I've attached the results of a two attempts to connect, the first 
-failed, and the second succeeded. What am I looking for?
+use "hcidump -X -V" as root to see what happens on the Bluetooth side.
+If that looks fine then use pppdump to see what PPP is doing.
 
-many thanks
+Regards
 
-stef
+Marcel
 
--- 
-/*
-Stefan Magdalinski
-+447769 666528 (telephone)
-smagdali (IM/flickr.com/etc)
-*/
 
---------------050506040107090103090605
-Content-Type: application/x-gzip;
- name="pppd-hcidump.txt.gz"
-Content-Transfer-Encoding: base64
-Content-Disposition: inline;
- filename="pppd-hcidump.txt.gz"
-
-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
-cgEA
---------------050506040107090103090605--
 
 
 -------------------------------------------------------
