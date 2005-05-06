@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] yes, a2dp timing is whacked
-Message-Id: <20050507031314.548afb03.henryk@ploetzli.ch>
-In-Reply-To: <42792979.90109@xmission.com>
-References: <42792979.90109@xmission.com>
+From: Guylhem Aznar <bluez-devel@externe.net>
+To: Dimitry Andric <dimitry@andric.com>
+Cc: bluez-devel@lists.sourceforge.net, steve.crane@rococosoft.com
+Subject: Re: [Bluez-devel] cross compiling bluez 2.16 for arm (Zaurus)
+Message-ID: <20050506220621.GA21921@externe.net>
+References: <20050505182213.GA22967@externe.net> <35666156.20050506103036@andric.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Sat__7_May_2005_03_13_14_+0200_w2TQ6oEkpKAGqAg."
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <35666156.20050506103036@andric.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,50 +19,69 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 7 May 2005 03:13:14 +0200
+Date: Fri, 6 May 2005 18:06:21 -0400
 
---Signature=_Sat__7_May_2005_03_13_14_+0200_w2TQ6oEkpKAGqAg.
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Friday,  6 May 2005 at 10:30:36 (+0200), Dimitry Andric wrote:
+> This usually means there's something wrong with your toolchain.
+> Please run exactly the same command line, but then with the "-v"
+> option to arm-linux-gcc, and mail us the output.
 
-Moin,
+Seems normal to me. And it could compile everything else. IMHO it's
+more likely a problem with sdptool.
 
-Am Wed, 04 May 2005 13:58:49 -0600 schrieb Brad Midgley:
-
-> Maybe for convenience, libsbc should compute the timeslice for the
-> frame.
-
-It does now. I added a function sbc_time(sbc_t *sbc) which computes the
-microseconds for one frame. I then replaced the fixed value in a2play's
-usleep() call with the time the whole packet should take to play (time
-for one frame times number of frames in the packet) multiplied by
-(arbitrarily chosen) 0.8 to make up for the time lost with computing and
-sending.
-
-> I will start by looking at the rtc interface and trying to find hooks
-> in alsa for timing.
-
-That would be really cool.
+Reading specs from /opt/Embedix/tools/lib/gcc-lib/arm-linux/2.95.2/specs
+gcc version 2.95.2 19991024 (release)
+ /opt/Embedix/tools/lib/gcc-lib/arm-linux/2.95.2/cpp -lang-c -v -I. -I. -=
+I.. -I/home/guylhem/bluez-libs-2.16//include -I/usr/include -D__GNUC__=3D=
+2 -D__GNUC_MINOR__=3D95 -Dunix -Darm -Dlinux -D__ELF__ -Darm_elf -D__unix=
+__ -D__arm__ -D__linux__ -D__ELF__ -D__arm_elf__ -D__unix -D__arm -D__lin=
+ux -D__arm_elf -Asystem(unix) -Asystem(posix) -Acpu(arm) -Amachine(arm) -=
+D__CHAR_UNSIGNED__ -D__OPTIMIZE__ -Wall -D__ARM_ARCH_4__ -D__APCS_32__ -D=
+HAVE_CONFIG_H sdptool.c /tmp/ccHeRuYo.i
+GNU CPP version 2.95.2 19991024 (release) (ARM GNU/Linux with ELF)
+#include "..." search starts here:
+#include <...> search starts here:
+ .
+ ..
+ /home/guylhem/bluez-libs-2.16/include
+ /usr/include
+ /opt/Embedix/tools/lib/gcc-lib/arm-linux/2.95.2/include
+ /opt/Embedix/tools/lib/gcc-lib/arm-linux/2.95.2/../../../../arm-linux/in=
+clude
+End of search list.
+The following default directories have been omitted from the search path:
+ /opt/Embedix/tools/arm-linux/include/g++-3
+ /opt/Embedix/tools/lib/gcc-lib/arm-linux/2.95.2/../../../../arm-linux/sy=
+s-include
+End of omitted list.
+ /opt/Embedix/tools/lib/gcc-lib/arm-linux/2.95.2/cc1 /tmp/ccHeRuYo.i -qui=
+et -dumpbase sdptool.c -O2 -Wall -version -o /tmp/ccwaDwHF.s
+GNU C version 2.95.2 19991024 (release) (arm-linux) compiled by GNU C ver=
+sion 2.95.3 20010315 (release).
+ /opt/Embedix/tools/arm-linux/bin/as -o sdptool.o /tmp/ccwaDwHF.s
+/tmp/ccwaDwHF.s: Assembler messages:
+/tmp/ccwaDwHF.s:1094: Error: bad instruction `rorw $8,r4'
+/tmp/ccwaDwHF.s:1094: Error: bad instruction `rorl $16,r4'
+/tmp/ccwaDwHF.s:1094: Error: bad instruction `rorw $8,r4'
+/tmp/ccwaDwHF.s:1096: Error: bad instruction `rorw $8,r3'
+/tmp/ccwaDwHF.s:1099: Error: bad instruction `rorw $8,r2'
+/tmp/ccwaDwHF.s:1102: Error: bad instruction `rorw $8,r3'
+/tmp/ccwaDwHF.s:1105: Error: bad instruction `rorw $8,r2'
+/tmp/ccwaDwHF.s:1105: Error: bad instruction `rorl $16,r2'
+/tmp/ccwaDwHF.s:1105: Error: bad instruction `rorw $8,r2'
+/tmp/ccwaDwHF.s:1108: Error: bad instruction `rorw $8,r3'
 
 --=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+Bien =E0 vous - Best regards,
+Guylhem P. Aznar
 
---Signature=_Sat__7_May_2005_03_13_14_+0200_w2TQ6oEkpKAGqAg.
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQFCfBYtIjWgKE0OA2gRAsznAJ9cC32DeJu/FM/agfFT0vu02nrE2QCgplms
-VeTfOLDPp9i8EJf6fypnZN8=
-=jqvP
------END PGP SIGNATURE-----
-
---Signature=_Sat__7_May_2005_03_13_14_+0200_w2TQ6oEkpKAGqAg.--
+--=20
+*@externe.net                                            http://externe.n=
+et
+P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
+un.org
+GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
+ey
 
 
 -------------------------------------------------------
