@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Guylhem Aznar <bluez-devel@externe.net>
-To: Dimitry Andric <dimitry@andric.com>
-Cc: bluez-devel@lists.sourceforge.net, steve.crane@rococosoft.com
-Subject: Re: [Bluez-devel] cross compiling bluez 2.16 for arm (Zaurus)
-Message-ID: <20050506220621.GA21921@externe.net>
-References: <20050505182213.GA22967@externe.net> <35666156.20050506103036@andric.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <35666156.20050506103036@andric.com>
+From: Florian Echtler <echtler@fs.tum.de>
+To: bmidgley@xmission.com, bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Re: some btsco hacks
+In-Reply-To: <427A8B7F.1010105@xmission.com>
+Message-ID: <Pine.LNX.4.62.0505062220440.10201@block>
+References: <Pine.LNX.4.62.0505052044560.10038@block> <427A8B7F.1010105@xmission.com>
+MIME-Version: 1.0
+Content-Type: MULTIPART/MIXED; boundary="0-531350743-1115412678=:10201"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,69 +18,90 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 6 May 2005 18:06:21 -0400
+Date: Fri, 6 May 2005 22:52:53 +0200 (CEST)
 
-On Friday,  6 May 2005 at 10:30:36 (+0200), Dimitry Andric wrote:
-> This usually means there's something wrong with your toolchain.
-> Please run exactly the same command line, but then with the "-v"
-> option to arm-linux-gcc, and mail us the output.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Seems normal to me. And it could compile everything else. IMHO it's
-more likely a problem with sdptool.
+--0-531350743-1115412678=:10201
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-ID: <Pine.LNX.4.62.0505062251281.10201@block>
 
-Reading specs from /opt/Embedix/tools/lib/gcc-lib/arm-linux/2.95.2/specs
-gcc version 2.95.2 19991024 (release)
- /opt/Embedix/tools/lib/gcc-lib/arm-linux/2.95.2/cpp -lang-c -v -I. -I. -=
-I.. -I/home/guylhem/bluez-libs-2.16//include -I/usr/include -D__GNUC__=3D=
-2 -D__GNUC_MINOR__=3D95 -Dunix -Darm -Dlinux -D__ELF__ -Darm_elf -D__unix=
-__ -D__arm__ -D__linux__ -D__ELF__ -D__arm_elf__ -D__unix -D__arm -D__lin=
-ux -D__arm_elf -Asystem(unix) -Asystem(posix) -Acpu(arm) -Amachine(arm) -=
-D__CHAR_UNSIGNED__ -D__OPTIMIZE__ -Wall -D__ARM_ARCH_4__ -D__APCS_32__ -D=
-HAVE_CONFIG_H sdptool.c /tmp/ccHeRuYo.i
-GNU CPP version 2.95.2 19991024 (release) (ARM GNU/Linux with ELF)
-#include "..." search starts here:
-#include <...> search starts here:
- .
- ..
- /home/guylhem/bluez-libs-2.16/include
- /usr/include
- /opt/Embedix/tools/lib/gcc-lib/arm-linux/2.95.2/include
- /opt/Embedix/tools/lib/gcc-lib/arm-linux/2.95.2/../../../../arm-linux/in=
-clude
-End of search list.
-The following default directories have been omitted from the search path:
- /opt/Embedix/tools/arm-linux/include/g++-3
- /opt/Embedix/tools/lib/gcc-lib/arm-linux/2.95.2/../../../../arm-linux/sy=
-s-include
-End of omitted list.
- /opt/Embedix/tools/lib/gcc-lib/arm-linux/2.95.2/cc1 /tmp/ccHeRuYo.i -qui=
-et -dumpbase sdptool.c -O2 -Wall -version -o /tmp/ccwaDwHF.s
-GNU C version 2.95.2 19991024 (release) (arm-linux) compiled by GNU C ver=
-sion 2.95.3 20010315 (release).
- /opt/Embedix/tools/arm-linux/bin/as -o sdptool.o /tmp/ccwaDwHF.s
-/tmp/ccwaDwHF.s: Assembler messages:
-/tmp/ccwaDwHF.s:1094: Error: bad instruction `rorw $8,r4'
-/tmp/ccwaDwHF.s:1094: Error: bad instruction `rorl $16,r4'
-/tmp/ccwaDwHF.s:1094: Error: bad instruction `rorw $8,r4'
-/tmp/ccwaDwHF.s:1096: Error: bad instruction `rorw $8,r3'
-/tmp/ccwaDwHF.s:1099: Error: bad instruction `rorw $8,r2'
-/tmp/ccwaDwHF.s:1102: Error: bad instruction `rorw $8,r3'
-/tmp/ccwaDwHF.s:1105: Error: bad instruction `rorw $8,r2'
-/tmp/ccwaDwHF.s:1105: Error: bad instruction `rorl $16,r2'
-/tmp/ccwaDwHF.s:1105: Error: bad instruction `rorw $8,r2'
-/tmp/ccwaDwHF.s:1108: Error: bad instruction `rorw $8,r3'
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
---=20
-Bien =E0 vous - Best regards,
-Guylhem P. Aznar
+Hello Brad,
 
---=20
-*@externe.net                                            http://externe.n=
-et
-P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
-un.org
-GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
-ey
+I noticed that there was a small bug left in my patch (the value of
+force_sco was overwritten when a reconnect was requested). This small
+additional patch should fix that.
+
+> could you give me some examples from your .btscorc?
+
+Well, my .btscorc currently looks like this:
+
+AT\+CKPD=200
+sco-toggle on off
+AT\+CKPD=200
+system /home/echtler/bin/headset %d &
+
+> do you know what the syntax of 'back references' is in .btscorc?
+Back references to what/where?
+
+Yours, Florian
+- -- 
+Preserve wildlife - pickle a squirrel today!
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFCe9ks7CzyshGvatgRAkoxAKDxCwtRZKTHSujGXyrqRdaNEL43/wCfbPjd
+D0q3ebE9/sMYojjLzaZFMug=
+=4Wfl
+-----END PGP SIGNATURE-----
+--0-531350743-1115412678=:10201
+Content-Type: TEXT/PLAIN; charset=us-ascii; name=diff
+Content-Transfer-Encoding: BASE64
+Content-ID: <Pine.LNX.4.62.0505062251180.10201@block>
+Content-Description: 
+Content-Disposition: attachment; filename=diff
+
+ZGlmZiAtdSAtcjEuMjQgYnRzY28uYw0KLS0tIGJ0c2NvLmMJNSBNYXkgMjAw
+NSAyMToxNTozMCAtMDAwMAkxLjI0DQorKysgYnRzY28uYwk2IE1heSAyMDA1
+IDIwOjUwOjIwIC0wMDAwDQpAQCAtNDYwLDcgKzQ2MCw3IEBADQogCXVpbnQx
+Nl90IHNjb19oYW5kbGUsIHNjb19tdHUsIHZzOw0KIAljaGFyIGxpbmVbMTAw
+XTsNCiAJaW50IGxhc3Rfdm9sdW1lc1syXTsNCi0JaW50IGRyX3VzYWdlLCBm
+b3JjZV9zY287DQorCWludCBkcl91c2FnZSwgZm9yY2Vfc2NvLCBmb3JjZV9v
+bGQ7DQogDQogCS8vIHNjb19tb2RlIGlzIG91ciBydW5uaW5nIG1vZGUuIDAg
+PT4gbm90IGNvbm5lY3QsIDEgPT4gY29ubmVjdGVkDQogCS8vIHNlZSBOT1Rf
+Q09OTkVDVEVELENPTk5FQ1RFRCA6KQ0KQEAgLTYyNCw2ICs2MjQsNyBAQA0K
+IAl9DQogCWRyX3VzYWdlID0gaW5mb2J1Zi5wbGF5YmFja19jb3VudCB8fCBp
+bmZvYnVmLmNhcHR1cmVfY291bnQ7DQogCWZvcmNlX3NjbyA9IC0xOw0KKwlm
+b3JjZV9vbGQgPSAtMTsNCiAJDQogCWlmIChmb3JrKQ0KIAkJZGFlbW9uKDAs
+IDApOw0KQEAgLTgxOCwxMiArODE5LDEwIEBADQogDQogCQkvLyBtZWFuIGxp
+dHRsZSBoYWNrIHRvIGFsbG93IGZvciBhIHNpZ25hbC10cmlnZ2VyZWQgcmVj
+b25uZWN0DQogCQkvLyBmb3JjZSBkaXNjb25uZWN0aW9uIG9mIHRoZSBjaGFu
+bmVsIChpZiBjb25uZWN0ZWQpDQotCQlpZiAocmVjb25uZWN0ID09IDEpIHsN
+Ci0JCQlpZiAoc2NvX21vZGUgPT0gQ09OTkVDVEVEKSB7DQotCQkJCWZvcmNl
+X3NjbyA9ICAwOw0KLQkJCQlyZWNvbm5lY3QgPSAtMTsNCi0JCQl9IGVsc2Ug
+cmVjb25uZWN0ID0gMDsNCi0JCX0gDQorCQlpZiAocmVjb25uZWN0ICYmIChz
+Y29fbW9kZSA9PSBDT05ORUNURUQpKSB7DQorCQkJZm9yY2Vfb2xkID0gZm9y
+Y2Vfc2NvOw0KKwkJCWZvcmNlX3NjbyA9IDA7DQorCQl9IGVsc2UgcmVjb25u
+ZWN0ID0gMDsNCiAJCQ0KIAkJaWYoKCghZHJfdXNhZ2UgJiYgKGZvcmNlX3Nj
+byAhPSAxKSkgfHwgKGZvcmNlX3NjbyA9PSAwKSkgJiYgKHNjb19tb2RlID09
+IENPTk5FQ1RFRCkpIHsNCiAJCQlpZih2ZXJib3NlKSB7DQpAQCAtODQ0LDkg
+Kzg0Myw4IEBADQogDQogCQkvLyBpZiBhIHJlY29ubmVjdCBoYXMgYmVlbiBy
+ZXF1ZXN0ZWQsIGZvcmNlIA0KIAkJLy8gdGhlIHNjbyBjaGFubmVsIHRvIGJl
+IGFjcXVpcmVkIGFnYWluDQotCQlpZiAocmVjb25uZWN0ID09IC0xKSB7DQor
+CQlpZiAocmVjb25uZWN0KSB7DQogCQkJZm9yY2Vfc2NvID0gMTsNCi0JCQly
+ZWNvbm5lY3QgPSAwOw0KIAkJCXNsZWVwKDMpOw0KIAkJfQ0KIA0KQEAgLTg3
+Miw2ICs4NzAsMTIgQEANCiAJCQkJc2NvX21vZGUgPSBDT05ORUNURUQ7DQog
+CQkJfQ0KIAkJfQ0KKw0KKwkJLy8gcmVzdG9yZSBvcmlnaW5hbCBwcm9ncmFt
+IHN0YXR1cw0KKwkJaWYgKHJlY29ubmVjdCkgew0KKwkJCWZvcmNlX3NjbyA9
+IGZvcmNlX29sZDsNCisJCQlyZWNvbm5lY3QgPSAwOw0KKwkJfQ0KIAkJDQog
+CQlpZiAocmluZykgew0KIAkJCXdyaXRlKHJkLCAiXHJcblJJTkdcclxuIiwg
+OCk7DQo=
+
+--0-531350743-1115412678=:10201--
 
 
 -------------------------------------------------------
