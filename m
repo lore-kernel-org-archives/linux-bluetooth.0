@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] yes, a2dp timing is whacked
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050507031314.548afb03.henryk@ploetzli.ch>
+Subject: Re: [Bluez-devel] yes, a2dp timing is whacked
+Message-Id: <20050507031314.548afb03.henryk@ploetzli.ch>
+In-Reply-To: <42792979.90109@xmission.com>
 References: <42792979.90109@xmission.com>
-	 <20050507031314.548afb03.henryk@ploetzli.ch>
-Content-Type: text/plain
-Message-Id: <1115429201.9031.5.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Sat__7_May_2005_03_13_14_+0200_w2TQ6oEkpKAGqAg."
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,34 +20,50 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 07 May 2005 03:26:41 +0200
+Date: Sat, 7 May 2005 03:13:14 +0200
 
-Hi Henryk,
+--Signature=_Sat__7_May_2005_03_13_14_+0200_w2TQ6oEkpKAGqAg.
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > Maybe for convenience, libsbc should compute the timeslice for the
-> > frame.
-> 
-> It does now. I added a function sbc_time(sbc_t *sbc) which computes the
-> microseconds for one frame. I then replaced the fixed value in a2play's
-> usleep() call with the time the whole packet should take to play (time
-> for one frame times number of frames in the packet) multiplied by
-> (arbitrarily chosen) 0.8 to make up for the time lost with computing and
-> sending.
+Moin,
 
-the time that is eaten up by encoding or decoding could be measured with
-gettimeofday() and then you can subtract this from the whole time.
+Am Wed, 04 May 2005 13:58:49 -0600 schrieb Brad Midgley:
 
-Since it is a linear operation we can make the SBC library do it all for
-us. Let sbc_encode() and sbc_decode() calculate the processing time and
-then store a sleep value for us inside sbc_t.
+> Maybe for convenience, libsbc should compute the timeslice for the
+> frame.
 
-And the value should be really unsigned long and not int.
+It does now. I added a function sbc_time(sbc_t *sbc) which computes the
+microseconds for one frame. I then replaced the fixed value in a2play's
+usleep() call with the time the whole packet should take to play (time
+for one frame times number of frames in the packet) multiplied by
+(arbitrarily chosen) 0.8 to make up for the time lost with computing and
+sending.
 
-Regards
+> I will start by looking at the rtc interface and trying to find hooks
+> in alsa for timing.
 
-Marcel
+That would be really cool.
 
+--=20
+Henryk Pl=F6tz
+Gr=FC=DFe aus Berlin
+~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
+~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
 
+--Signature=_Sat__7_May_2005_03_13_14_+0200_w2TQ6oEkpKAGqAg.
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFCfBYtIjWgKE0OA2gRAsznAJ9cC32DeJu/FM/agfFT0vu02nrE2QCgplms
+VeTfOLDPp9i8EJf6fypnZN8=
+=jqvP
+-----END PGP SIGNATURE-----
+
+--Signature=_Sat__7_May_2005_03_13_14_+0200_w2TQ6oEkpKAGqAg.--
 
 
 -------------------------------------------------------
