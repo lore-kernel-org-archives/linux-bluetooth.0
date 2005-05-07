@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Folkert van Heusden <folkert@vanheusden.com>
+Message-ID: <427CD50D.2010906@kernelconcepts.de>
+From: Nils Faerber <nils.faerber@kernelconcepts.de>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] pushing objects
-Message-ID: <20050507145140.GU4344@vanheusden.com>
 References: <20050507142120.GT4344@vanheusden.com>
-	<427CD50D.2010906@kernelconcepts.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <427CD50D.2010906@kernelconcepts.de>
+In-Reply-To: <20050507142120.GT4344@vanheusden.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,30 +18,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 7 May 2005 16:51:42 +0200
+Date: Sat, 07 May 2005 16:47:41 +0200
 
-...
-> and you can start your Obex server locally simply by running
-> 	gnome-obex-server
-> and then you can receive objects back.
-> Cool, isn't it ;)
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-It is!
-THanks!
+Folkert van Heusden wrote:
+> Hi,
+Hi!
 
+> Are there any tools for pushing a businesscard/vcard (or whatever it
+> is called in english) to a bluetooth device?
 
-Folkert van Heusden
+The best tool I found by now is the gome-bluetooth package which
+contains a very nicely working bluetooth-obex-server und
+bluetooth-obex-client.
+For Debian use this apt source line
+	deb http://debian.usefulinc.com/gnome ./
+Install the package
+	gnome-bluetooth
 
--- 
-Auto te koop, zie: http://www.vanheusden.com/daihatsu.php
-Op zoek naar een IT of Finance baan? Mail me voor de mogelijkheden.
---------------------------------------------------------------------
- UNIX admin? Then give MultiTail (http://vanheusden.com/multitail/) 
- a try, it brings monitoring logfiles to a different level! See     
- http://vanheusden.com/multitail/features.html for a feature-list.  
---------------------------------------------------------------------
-Phone: +31-6-41278122, PGP-key: 1F28D8AE
-Get your PGP/GPG key signed at www.biglumber.com!
+You should then be able to send a vCard (or any other file object) to a
+bluetooth device using
+	gnome-obex-send -d <bdaddr> <file>
+
+and you can start your Obex server locally simply by running
+	gnome-obex-server
+
+and then you can receive objects back.
+
+Cool, isn't it ;)
+
+> Folkert van Heusden
+CU
+  nils faerber
+
+- --
+kernel concepts          Tel: +49-271-771091-12
+Dreisbachstr. 24         Fax: +49-271-771091-19
+D-57250 Netphen          Mob: +49-176-21024535
+- --
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFCfNUNJXeIURG1qHgRAi1OAKCAmUUqo0dVkr+dRC2bym+NdxYLRACg4BM7
+MTVnc8k0vk90ZSeZBJ4hY5A=
+=ou4H
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
