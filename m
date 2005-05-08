@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] pand seem to ignore any pin configurations
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Rainer Dorsch <rdorsch@web.de>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200505081824.08678.rdorsch@web.de>
-References: <200505072203.45598.rdorsch@web.de>
-	 <200505081727.29246.rdorsch@web.de> <1115567196.9031.113.camel@pegasus>
-	 <200505081824.08678.rdorsch@web.de>
-Content-Type: text/plain
-Message-Id: <1115569889.9031.133.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] pand seem to ignore any pin configurations
+References: <200505072203.45598.rdorsch@web.de> <200505081727.29246.rdorsch@web.de> <1115567196.9031.113.camel@pegasus>
+In-Reply-To: <1115567196.9031.113.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Message-Id: <200505081824.08678.rdorsch@web.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,36 +19,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 08 May 2005 18:31:29 +0200
+Date: Sun, 8 May 2005 18:24:08 +0200
 
-Hi Rainer,
+Hi Marcel,
 
-> > > Not asking for a PIN each time is actually fine (persisten pairing is a
-> > > nice invention;-). I just want to check that the system really wants to
-> > > see a PIN when a new device comes in.
-> > >
-> > > Are you saying when I delete
-> > >
-> > > 	/etc/bluetooth/link_key
-> > >
-> > > on both NAP and PANU I should be askef for a password?
+Am Sonntag, 8. Mai 2005 17:46 schrieb Marcel Holtmann:
+> > Not asking for a PIN each time is actually fine (persisten pairing is a
+> > nice invention;-). I just want to check that the system really wants to
+> > see a PIN when a new device comes in.
 > >
-> > Yes. And with bluez-utils-2.16 the link key storage has been changed.
-> 
-> Worked excellent, thanks. Are the link keys valid forever or do they have an 
-> expiration date? I.e. if is do "security user" may it happen that bluez 
-> simply stops working (because e.g. bluez is started before X and I won't 
-> notice why until I figured out that the link key expired)
+> > Are you saying when I delete
+> >
+> > 	/etc/bluetooth/link_key
+> >
+> > on both NAP and PANU I should be askef for a password?
+>
+> Yes. And with bluez-utils-2.16 the link key storage has been changed.
 
-the link key don't expires. However using --secure with a recent kernel
-you can force a change of the link key every time the connection was
-successful.
+Worked excellent, thanks. Are the link keys valid forever or do they have an 
+expiration date? I.e. if is do "security user" may it happen that bluez 
+simply stops working (because e.g. bluez is started before X and I won't 
+notice why until I figured out that the link key expired)
 
-Regards
+> Check the mailing list archive for more details.
 
-Marcel
+I saw that before, "link key storage" and bluez does not have many hits on 
+google ;-)
 
+Many thanks,
+Rainer
 
+-- 
+Rainer Dorsch
+Alzentalstr. 28
+D-71083 Herrenberg
+07032-919495
+Icq: 32550367
 
 
 -------------------------------------------------------
