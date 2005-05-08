@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Guillermo Menguez Alvarez <phestar@usuarios.retecal.es>
+Subject: Re: [Bluez-users] pand seem to ignore any pin configurations
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20050509115206.7c304470@casa.milicia.net>
+In-Reply-To: <200505081824.08678.rdorsch@web.de>
+References: <200505072203.45598.rdorsch@web.de>
+	 <200505081727.29246.rdorsch@web.de> <1115567196.9031.113.camel@pegasus>
+	 <200505081824.08678.rdorsch@web.de>
+Content-Type: text/plain
+Message-Id: <1115569889.9031.133.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Some doubts about dund
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,73 +20,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 9 May 2005 11:52:06 +0200
+Date: Sun, 08 May 2005 18:31:29 +0200
 
-Hi, 
+Hi Rainer,
 
-I'm trying to get internet on a sony ericsson k700 through bluetooth
-using dund (has anybody done it? There are a lot of tutorials on the
-net about doing it with the P800 and P900, but those phones seem to
-initiate the conection to the pc by themselves), and I have some doubts
-about dund. I hope you could help me.
+> > > Not asking for a PIN each time is actually fine (persisten pairing is a
+> > > nice invention;-). I just want to check that the system really wants to
+> > > see a PIN when a new device comes in.
+> > >
+> > > Are you saying when I delete
+> > >
+> > > 	/etc/bluetooth/link_key
+> > >
+> > > on both NAP and PANU I should be askef for a password?
+> >
+> > Yes. And with bluez-utils-2.16 the link key storage has been changed.
+> 
+> Worked excellent, thanks. Are the link keys valid forever or do they have an 
+> expiration date? I.e. if is do "security user" may it happen that bluez 
+> simply stops working (because e.g. bluez is started before X and I won't 
+> notice why until I figured out that the link key expired)
 
-1. Is pppd started just after dund starts or when dund receives an
-incoming connection?. I'm using:
+the link key don't expires. However using --secure with a recent kernel
+you can force a change of the link key every time the connection was
+successful.
 
-# /usr/bin/dund --nodetach --listen --msdun --persist --channel 3 call
-dun 
-dund[28659]: Bluetooth DUN daemon version 2.16
+Regards
 
-And that's all I get, no message about pppX <> rfcommX or anything else,
-and pppd is not started.
+Marcel
 
-2. Should I start pppd by hand using /dev/rfcomm0 (it's the one I'm
-using) then?
 
-3. Do I have to connect previosly rfcomm0? I currently have it binded
-to my phone bluetooth address, this way:
-
-$ rfcomm
-rfcomm0: 00:0F:DE:C2:D2:50 channel 2 clean
-
-But I can also release the device and use rfcomm connect (I've tried it
-and that way I can send AT commands through /dev/rfcomm0 and the mobile
-does things).
-
-Thanks in advance, and excuse me for my horrible English.
-
-Note: channel 2 is serial port 1 on the phone, channel 3 is local
-serial port on my pc, added with sdptool add --channel=3 SP before
-calling dund, and 00:0F:DE:C2:D2:50 is the bt adress of the phone.
-
-Config files follow:
-
-$ cat /etc/bluetooth/rfcomm.conf
-rfcomm0 {
-        # Automatically bind the device at startup
-        bind yes;
-
-        # Bluetooth address of the device
-        #device 11:22:33:44:55:66;
-        device 00:0F:DE:C2:D2:50;
-
-        # RFCOMM channel for the connection
-        channel 2;
-
-        # Description of the connection
-        comment "Acceso Por Bluetooth";
-}
-
-$ cat /etc/ppp/peers/dun
-noauth
-crtscts
-lock
-proxyarp
-passive
-ipcp-accept-local
-ipcp-accept-remote
-ms-dns 127.0.0.1 # I have a dns-cache, so 127.0.0.1 is correct
-192.168.1.1:192.168.1.2
 
 
 -------------------------------------------------------
