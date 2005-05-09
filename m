@@ -1,12 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <427EE741.5000002@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Regarding a2recv
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] headset neo-507 not working with bluefritz 2.0
-References: <427D5693.6070501@gmx.de>
-In-Reply-To: <427D5693.6070501@gmx.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <20050509033555.12509786.henryk@ploetzli.ch>
+References: <20050506060525.32b209ca.henryk@ploetzli.ch>
+	 <20050508125039.1494.qmail@web8305.mail.in.yahoo.com>
+	 <20050509005413.3787d2d7.henryk@ploetzli.ch>
+	 <1115596897.8949.79.camel@pegasus>
+	 <20050509025805.331c34c7.henryk@ploetzli.ch>
+	 <1115600627.8949.93.camel@pegasus>
+	 <20050509033555.12509786.henryk@ploetzli.ch>
+Content-Type: text/plain
+Message-Id: <1115603053.8949.108.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,38 +24,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 08 May 2005 22:29:53 -0600
+Date: Mon, 09 May 2005 03:44:13 +0200
 
-Michael
+Hi Henryk,
 
-Everything looks right but the bluetooth adapter may not be ideal. We 
-mostly have seen success using CSR based adapters and I'm not sure this 
-one is known to work with btsco.
-
-Brad
-
-> hci0:   Type: USB
->         BD Address: 00:04:0E:89:BC:7F ACL MTU: 120:20  SCO MTU: 64:0
->         UP RUNNING PSCAN ISCAN INQUIRY AUTH
->         RX bytes:128 acl:0 sco:0 events:16 errors:0
->         TX bytes:313 acl:0 sco:0 commands:16 errors:0
->         Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'BlueZ leeloo (0)'
->         Class: 0x100100
->         Service Classes: Object Transfer
->         Device Class: Computer, Uncategorized
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x2005 LMP Ver: 1.1 (0x1) LMP
-> Subver: 0x1805
->         Manufacturer: AVM Berlin (31)
+> > you must do it on the HCI level at the correct time. Look at the
+> > function hci_switch_role() for more details.
 > 
-> 
-> hciconfig hci0 revision:
-> hci0:   Type: USB
->         BD Address: 00:04:0E:89:BC:7F ACL MTU: 120:20  SCO MTU: 64:0
->         Unknown type
+> Ah, thanks, that does it. I copied and adapted the relevant code from
+> hcitool.c and it works like a charm. Problem is: When trying to do the
+> roleswitch the program can only run as root, which is not exactly what
+> I want. I committed it to cvs anyways, but it is #ifdef'd out. Compile
+> with -DROLESWITCH to use it.
+
+I know, but it is meant to be a root only command. Some time ago I had
+the idea of adding an ioctl() to socket to change the role if no other
+part of the HCI core objects. The same goes for the authentication and
+the encryption mode. However I never did it.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
