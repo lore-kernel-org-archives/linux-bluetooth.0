@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] DBUS 0.33 support
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <e1effdeb050509141368b0042a@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb050509141368b0042a@mail.gmail.com>
-References: <e1effdeb050509141368b0042a@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1115852482.18499.1.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] DBUS 0.33 support
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,24 +16,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 12 May 2005 01:01:22 +0200
+Date: Mon, 9 May 2005 18:13:25 -0300
 
-Hi Claudio,
+Hi folks,
 
-> Is there plans to support the new version of dbus?
-> 
-> The current version of hcid is compatible with dbus-0.23.
-> I need marshaling functions of the new dbus library.
-> 
-> Who is responsible for the dbus code of hcid?
+Is there plans to support the new version of dbus?
 
-send me a patch for hcid and we can move to D-Bus 0.33.
+The current version of hcid is compatible with dbus-0.23.
+I need marshaling functions of the new dbus library.
 
-Regards
+Who is responsible for the dbus code of hcid?
 
-Marcel
-
-
+Regards,
+Claudio.
 
 
 -------------------------------------------------------
