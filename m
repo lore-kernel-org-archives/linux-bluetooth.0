@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <427EF21A.7040908@xmission.com>
+Message-ID: <427EE726.8030801@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: Florian Echtler <echtler@fs.tum.de>, bluez-devel@lists.sourceforge.net
-References: <Pine.LNX.4.62.0505052044560.10038@block> <427A8B7F.1010105@xmission.com> <Pine.LNX.4.62.0505062220440.10201@block>
-In-Reply-To: <Pine.LNX.4.62.0505062220440.10201@block>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Regarding a2recv
+References: <20050506060525.32b209ca.henryk@ploetzli.ch>	<20050508125039.1494.qmail@web8305.mail.in.yahoo.com>	<20050509005413.3787d2d7.henryk@ploetzli.ch>	<1115596897.8949.79.camel@pegasus>	<20050509025805.331c34c7.henryk@ploetzli.ch>	<1115600627.8949.93.camel@pegasus> <20050509033555.12509786.henryk@ploetzli.ch>
+In-Reply-To: <20050509033555.12509786.henryk@ploetzli.ch>
 Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: Re: [Bluez-devel] Re: some btsco hacks
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,38 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 08 May 2005 23:16:10 -0600
+Date: Sun, 08 May 2005 22:29:26 -0600
 
-Florian
+Henryk
 
-> I noticed that there was a small bug left in my patch (the value of
-> force_sco was overwritten when a reconnect was requested). This small
-> additional patch should fix that.
+> I want. I committed it to cvs anyways, but it is #ifdef'd out. Compile
+> with -DROLESWITCH to use it.
 
-ok, applied.
+What do you think of making this code always compile in and run but 
+report a warning and continue if the roleswitch call fails?
 
-> Well, my .btscorc currently looks like this:
-> 
-> AT\+CKPD=200
-> sco-toggle on off
-> AT\+CKPD=200
-> system /home/echtler/bin/headset %d &
-> 
->>do you know what the syntax of 'back references' is in .btscorc?
-> 
-> Back references to what/where?
+I think I understand now why the bluetake expects the headset to 
+roleswitch. If the headset's radio can't have mixed slave/master 
+connections open (scatternet?), then it needs the roleswitch in order to 
+talk to a cellphone at the same time as the dongle. Is that right?
 
-backrefs are parts of the regexp surrounded by (). the matching 
-expression is remembered and can be placed in the command string, by \0 
-\1 etc it turns out.
-
-I figured them out & noted in the docs.
-
-In keeping with \0 \1 for backrefs in the regexp and \p for pid, the 
-headset state should be \s instead of %d. Would you be willing to make 
-that change (or I could)?
-
-thanks
 Brad
 
 
