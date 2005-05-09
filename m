@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <427EE734.4030303@xmission.com>
+Message-ID: <427EE741.5000002@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Regarding a2recv
-References: <20050506060525.32b209ca.henryk@ploetzli.ch>	<20050508125039.1494.qmail@web8305.mail.in.yahoo.com> <20050509005413.3787d2d7.henryk@ploetzli.ch>
-In-Reply-To: <20050509005413.3787d2d7.henryk@ploetzli.ch>
+Subject: Re: [Bluez-devel] headset neo-507 not working with bluefritz 2.0
+References: <427D5693.6070501@gmx.de>
+In-Reply-To: <427D5693.6070501@gmx.de>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,31 +18,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 08 May 2005 22:29:40 -0600
+Date: Sun, 08 May 2005 22:29:53 -0600
 
-Henryk
+Michael
 
-> there should only be one struct that includes a struct avdtp_header and
-> a union with all the other optional signalling contents. Then there
-> would have to be specialised read()/write() functions which figure out
-> (based on the header) how long the packet actually is and automatically
-> send/receive that many bytes. However, that would also require
-> modification of a2play so I thought I'd ask first.
-
-I think this part sounds better, especially if Marcel thinks this is 
-closer to what it will look like if/when it's "kernelized" :)
-
-The only tricky part is the MAX_ADDITIONAL_CODEC stuff. Make sure we 
-only try to send one codec when we're reporting our sink's capabilities 
-and accept multiple codecs when we're reading capabilities.
-
-Maybe what you're proposing will clean up the "optional" error codes in 
-places like open_stream_rsp. The header would look different so you 
-could distinguish the error codes and compute the size properly when 
-sending. Be sure we accept the extended size with the error codes when 
-receiving.
+Everything looks right but the bluetooth adapter may not be ideal. We 
+mostly have seen success using CSR based adapters and I'm not sure this 
+one is known to work with btsco.
 
 Brad
+
+> hci0:   Type: USB
+>         BD Address: 00:04:0E:89:BC:7F ACL MTU: 120:20  SCO MTU: 64:0
+>         UP RUNNING PSCAN ISCAN INQUIRY AUTH
+>         RX bytes:128 acl:0 sco:0 events:16 errors:0
+>         TX bytes:313 acl:0 sco:0 commands:16 errors:0
+>         Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'BlueZ leeloo (0)'
+>         Class: 0x100100
+>         Service Classes: Object Transfer
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x2005 LMP Ver: 1.1 (0x1) LMP
+> Subver: 0x1805
+>         Manufacturer: AVM Berlin (31)
+> 
+> 
+> hciconfig hci0 revision:
+> hci0:   Type: USB
+>         BD Address: 00:04:0E:89:BC:7F ACL MTU: 120:20  SCO MTU: 64:0
+>         Unknown type
 
 
 -------------------------------------------------------
