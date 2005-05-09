@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <427FD5BD.7010605@xmission.com>
+Message-ID: <427F8F00.3000407@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-References: <42792979.90109@xmission.com>	 <20050507031314.548afb03.henryk@ploetzli.ch>	 <1115429201.9031.5.camel@pegasus> <1115494053.9031.15.camel@pegasus>	 <20050507222047.430774e9.henryk@ploetzli.ch> <1115498715.9031.24.camel@pegasus> <427F0492.1090007@xmission.com> <427F0F94.3060806@xmission.com>
-In-Reply-To: <427F0F94.3060806@xmission.com>
+References: <20050506060525.32b209ca.henryk@ploetzli.ch>	<20050508125039.1494.qmail@web8305.mail.in.yahoo.com>	<20050509005413.3787d2d7.henryk@ploetzli.ch>	<1115596897.8949.79.camel@pegasus>	<20050509025805.331c34c7.henryk@ploetzli.ch>	<1115600627.8949.93.camel@pegasus>	<20050509033555.12509786.henryk@ploetzli.ch>	<427EE726.8030801@xmission.com> <20050509144808.6deef7fa.henryk@ploetzli.ch>
+In-Reply-To: <20050509144808.6deef7fa.henryk@ploetzli.ch>
 Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: Re: [Bluez-devel] yes, a2dp timing is whacked
+Subject: Re: [Bluez-devel] Regarding a2recv
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,32 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 09 May 2005 15:27:25 -0600
+Date: Mon, 09 May 2005 10:25:36 -0600
 
-guys,
+Henryk,
 
-I wrote up basic itimer/ring buffer support in a2play. It still needed 
-some tuning (eg it uses the frame timespan * .87 to set the itimer)
+>>What do you think of making this code always compile in and run but 
+>>report a warning and continue if the roleswitch call fails?
+> 
+> 
+> Would be fine with me. It's just that I wasn't sure whether a roleswitch
+> would break anything else.
 
-I really just think the HP headset is poorly engineered. Either you are 
-going to send frames too slowly and get a noisy glitch when it hits a 
-dry patch or you are going to send them too quickly and have the 
-occasional pop when it drops a frame. There's no way around it.
-
-I did experiment with ring buffer size and SA_NODEFER option on the 
-signal handler. I was trying to see if one write to the headset could be 
-interrupted by the alarm so that the next frame could get on its way, 
-like if you had a poor connection and wanted to keep the timing more 
-accurate. I finally decided this wasn't the way... a long ring buffer 
-and nodefer enabled meant really fast-playing catch-up periods after the 
-connection was good again.
+Unless Marcel thinks it's a problem, I will make this the default 
+behavior. We could provide a command-line switch to turn it off (or run 
+it as non-root and the other end won't even notice you tried to switch :)
 
 Brad
-
-Brad Midgley wrote:
-> I think my hack introduced timing issues of its own... tomorrow I'll fix 
-> it up with code that uses a ring buffer and bleeds from the ring in the 
-> sighandler.
 
 
 -------------------------------------------------------
