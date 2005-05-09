@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050509233922.17188.qmail@web21127.mail.yahoo.com>
-From: Vinod <geekvinod@yahoo.com>
+Subject: Re: [Bluez-users] Some doubts about dund
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] easiest to configure usb dongles
+In-Reply-To: <20050509115206.7c304470@casa.milicia.net>
+References: <20050509115206.7c304470@casa.milicia.net>
+Content-Type: text/plain
+Message-Id: <1115633044.8949.160.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,28 +18,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 9 May 2005 16:39:21 -0700 (PDT)
+Date: Mon, 09 May 2005 12:04:04 +0200
 
-Could anyone, name me a couple of bluetooth usb
-devices which work well with bluez? I know there is a
-features list out there which has some 100 usb devices
-with the ones with hci field filled, working on bluez.
-what i want to know is which are the ones which work
-most easily with bluez with minimal work from my side.
-i am relatively new to linux and want to make sure i
-can get that thing working as fast as possible and
-take it from there. and since i havent bought them
-yet,  this is a good time to receive some advice. any
-recommendations on whether the 10m or 100m range ones
-are better are most welcome.
+Hi Guillermo,
 
-Vinod
+> I'm trying to get internet on a sony ericsson k700 through bluetooth
+> using dund (has anybody done it? There are a lot of tutorials on the
+> net about doing it with the P800 and P900, but those phones seem to
+> initiate the conection to the pc by themselves), and I have some doubts
+> about dund. I hope you could help me.
+> 
+> 1. Is pppd started just after dund starts or when dund receives an
+> incoming connection?.
 
+only when it receives an incoming connection.
 
-		
-Yahoo! Mail
-Stay connected, organized, and protected. Take the tour:
-http://tour.mail.yahoo.com/mailtour.html
+> 2. Should I start pppd by hand using /dev/rfcomm0 (it's the one I'm
+> using) then?
+
+What about using dund --connect instead. However you might have to fight
+with the mRouter crap. Check the mailing list archive and with Google
+for details.
+
+> 3. Do I have to connect previosly rfcomm0? I currently have it binded
+> to my phone bluetooth address, this way:
+
+No.
+
+Regards
+
+Marcel
+
 
 
 
