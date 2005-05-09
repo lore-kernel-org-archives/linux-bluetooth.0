@@ -1,17 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+Message-ID: <427F0F94.3060806@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Regarding a2recv
-Message-Id: <20050509143856.4a5437c7.henryk@ploetzli.ch>
-In-Reply-To: <427EE734.4030303@xmission.com>
-References: <20050506060525.32b209ca.henryk@ploetzli.ch>
-	<20050508125039.1494.qmail@web8305.mail.in.yahoo.com>
-	<20050509005413.3787d2d7.henryk@ploetzli.ch>
-	<427EE734.4030303@xmission.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Mon__9_May_2005_14_38_56_+0200_JoZ+SF+PxNSiljxj"
+References: <42792979.90109@xmission.com>	 <20050507031314.548afb03.henryk@ploetzli.ch>	 <1115429201.9031.5.camel@pegasus> <1115494053.9031.15.camel@pegasus>	 <20050507222047.430774e9.henryk@ploetzli.ch> <1115498715.9031.24.camel@pegasus> <427F0492.1090007@xmission.com>
+In-Reply-To: <427F0492.1090007@xmission.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] yes, a2dp timing is whacked
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -23,65 +18,131 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 9 May 2005 14:38:56 +0200
+Date: Mon, 09 May 2005 01:21:56 -0600
 
---Signature=_Mon__9_May_2005_14_38_56_+0200_JoZ+SF+PxNSiljxj
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I think my hack introduced timing issues of its own... tomorrow I'll fix 
+it up with code that uses a ring buffer and bleeds from the ring in the 
+sighandler.
 
-Moin,
-
-Am Sun, 08 May 2005 22:29:40 -0600 schrieb Brad Midgley:
-
-> The only tricky part is the MAX_ADDITIONAL_CODEC stuff. Make sure we=20
-> only try to send one codec when we're reporting our sink's
-> capabilities  and accept multiple codecs when we're reading
-> capabilities.
-
-Ugh, yes. It would be possible to simple address infos[] beyond the
-borders that are set by 1 + MAX_ADDITIONAL_CODEC if it is made sure that
-there is that much space assigned. (If I recall correctly that's a
-common technique to get varying length fields in structs.) However, from
-the header it is not clear how many capabilities there will be, which is
-something I don't like. We would have to resort to an all-zero seid_info
-or something like that to denote the end of the packet (the read
-function must than insert that, and the write function would have to
-send up to that border).
-
-> Maybe what you're proposing will clean up the "optional" error codes
-> in places like open_stream_rsp. The header would look different so
-> you could distinguish the error codes and compute the size properly
-> when sending.=20
-
-That was exactly the idea.
-
-> Be sure we accept the extended size with the error codes when
-> receiving.
-
-I'm not accustomed to bluetooth socket programming but I guess what I'm
-doing currently (simply read() up to a maximum (mtu?) size, check the
-returned size and optionally the header and cast the buffer to our
-struct) is fine for that purpose.
-
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
-
---Signature=_Mon__9_May_2005_14_38_56_+0200_JoZ+SF+PxNSiljxj
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQFCf1nmIjWgKE0OA2gRAlT8AJ9QYTPndLbaRQbscYYuo3xn6XYI+QCgu9tQ
-Z5mcOITvsYZXuhKDyFL+RUY=
-=rWmP
------END PGP SIGNATURE-----
-
---Signature=_Mon__9_May_2005_14_38_56_+0200_JoZ+SF+PxNSiljxj--
+Brad Midgley wrote:
+> Guys,
+> 
+> I put a rough proof-of-concept implementation together using setitimer. 
+> (Yes, it's gross and the signal handler doesn't actually do any work, 
+> just indicates that the interval is over)
+> 
+> The music seems to be timed right but it's a very "noisy" signal on the 
+> hp headset. Any ideas?
+> 
+> I didn't commit it because it's so ugly.
+> 
+> Brad
+> 
+> Marcel Holtmann wrote:
+> 
+>> Hi Henryk,
+>>
+>>
+>>>> So the best thing is too encode two or three full AVDTP frames in
+>>>> advance and have them ready to send. The sending can't be controlled
+>>>> be usleep(). We need a time that kicks in every whatever msec and
+>>>> makes us to transmit the next frame.
+>>>
+>>>
+>>> That's what I would favour. According to the libc manual setitimer()
+>>> would be the function of choice, if nobody else has a better idea (RTC,
+>>> anyone?).
+>>
+>>
+>>
+>> so in general the time that a SBC frame is calculated for, is always the
+>> same if we don't change the parameters, right?
+>>
+>> Using the ITIMER_REAL domain may works and since you can setup your
+>> timer in microseconds, then this would be the way to go.
+> 
+> 
+> ------------------------------------------------------------------------
+> 
+> Index: a2play.c
+> ===================================================================
+> RCS file: /cvsroot/bluetooth-alsa/btsco/a2play.c,v
+> retrieving revision 1.64
+> diff -u -b -B -w -p -r1.64 a2play.c
+> --- a2play.c	7 May 2005 02:43:00 -0000	1.64
+> +++ a2play.c	9 May 2005 06:30:36 -0000
+> @@ -56,6 +56,7 @@
+>  #define BUFS 1024
+>  
+>  static volatile int terminate = 0;
+> +static volatile int xmitpause = 0;
+>  static int cmdfd;
+>  
+>  struct sbc_frame_header sbc_info;
+> @@ -102,6 +103,16 @@ static void sig_term(int sig)
+>  	terminate = 1;
+>  }
+>  
+> +static void sig_alrm(int sig)
+> +{
+> +	struct sigaction sa;
+> +	memset(&sa, 0, sizeof(sa));
+> +	sa.sa_flags = SA_NOCLDSTOP;
+> +	sa.sa_handler = sig_alrm;
+> +	sigaction(SIGALRM, &sa, NULL);
+> +	xmitpause = 0;
+> +}
+> +
+>  // Usage
+>  static void usage()
+>  {
+> @@ -404,6 +415,8 @@ s_config was set from sbc_info before:
+>  
+>  int main(int argc, char *argv[])
+>  {
+> +	int timerset = 0;
+> +	struct itimerval itimer;
+>  	struct sigaction sa;
+>  	struct timeval start, end;
+>  	int streamfd;
+> @@ -619,6 +632,8 @@ int main(int argc, char *argv[])
+>  
+>  	timestamp = 0;
+>  
+> +	sig_alrm(0);
+> +
+>  	while (!terminate) {
+>  
+>  		// a2dp headers: avdtp p.45
+> @@ -698,8 +713,18 @@ int main(int argc, char *argv[])
+>  
+>  			memcpy(buf + sizeof(packet_header), &payload_header, sizeof(payload_header));
+>  			write(streamfd, buf, psize);
+> -			//printf("\nSending packet:%d, size %d no. of sbc frames:%d", seq_num, psize, payload_header.frame_count);
+>  
+> +			if(!timerset) {
+> +				timerset = 1;
+> +				itimer.it_interval.tv_sec = itimer.it_value.tv_sec = 0;
+> +				itimer.it_interval.tv_usec = itimer.it_value.tv_usec = (sleeptime*95)/100;
+> +				if(setitimer(ITIMER_REAL, &itimer, NULL)) printf("couldn't setitimer\n");
+> +			}
+> +
+> +			while(xmitpause) usleep(10);
+> +			xmitpause = 1;
+> +#if 0
+> +			//printf("\nSending packet:%d, size %d no. of sbc frames:%d", seq_num, psize, payload_header.frame_count);
+>  			pending++;
+>  
+>  			if (pending > 4) {
+> @@ -717,7 +742,7 @@ int main(int argc, char *argv[])
+>  				sleeptime = 0;
+>  				pending = 0;
+>  			}
+> -
+> +#endif
+>  			/* END: NONSPECAUDIO == FALSE */
+>  		}
+>  
 
 
 -------------------------------------------------------
