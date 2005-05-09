@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: root_teos <viktor.teofanovic@bregenznet.at>
-To: blueZ mailinglist <bluez-users@lists.sourceforge.net>
+Message-ID: <20050509233922.17188.qmail@web21127.mail.yahoo.com>
+From: Vinod <geekvinod@yahoo.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200505101122.58004.viktor.teofanovic@bregenznet.at>
-Subject: [Bluez-users] page response
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] easiest to configure usb dongles
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,25 +16,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 May 2005 11:22:57 +0200
+Date: Mon, 9 May 2005 16:39:21 -0700 (PDT)
 
-Hi,
+Could anyone, name me a couple of bluetooth usb
+devices which work well with bluez? I know there is a
+features list out there which has some 100 usb devices
+with the ones with hci field filled, working on bluez.
+what i want to know is which are the ones which work
+most easily with bluez with minimal work from my side.
+i am relatively new to linux and want to make sure i
+can get that thing working as fast as possible and
+take it from there. and since i havent bought them
+yet,  this is a good time to receive some advice. any
+recommendations on whether the 10m or 100m range ones
+are better are most welcome.
 
-1. is it possible by using the HCI layer to response on page requests from
-other bt-devices?
+Vinod
 
-2. how can I listen for all incoming HCI packets like hcidump is doing it - 
-is there any implemented example for this?
 
-thanks,
-teos
+		
+Yahoo! Mail
+Stay connected, organized, and protected. Take the tour:
+http://tour.mail.yahoo.com/mailtour.html
+
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by Oracle Space Sweepstakes
-Want to be the first software developer in space?
-Enter now for the Oracle Space Sweepstakes!
-http://ads.osdn.com/?ad_id=7393&alloc_id=16281&op=click
+This SF.Net email is sponsored by: NEC IT Guy Games.
+Get your fingers limbered up and give it your best shot. 4 great events, 4
+opportunities to win big! Highest score wins.NEC IT Guy Games. Play to
+win an NEC 61 plasma display. Visit http://www.necitguy.com/?r=20
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
