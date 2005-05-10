@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1115722824.8949.242.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Dealing with the bluez-utils dependencies
+Message-ID: <20050510072005.75813.qmail@web8301.mail.in.yahoo.com>
+From: Mayank Batra <mayankbatra@yahoo.co.in>
+Subject: Re: [Bluez-devel] Regarding a2recv
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050509005413.3787d2d7.henryk@ploetzli.ch>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,63 +17,81 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 May 2005 13:00:24 +0200
+Date: Tue, 10 May 2005 08:20:05 +0100 (BST)
 
-Hi Folks,
+Henryk,
 
-the dependency list of bluez-utils is going to be crazy and I think we
-need to work on some parts. I can't be possible that if you install
-bluez-utils that GTK+ and Python will be installed in some cases.
+> I now completely restructured the a2recv code into
+> something that more
+> closely resembles a socket server application.
+> Basically it is now a
+> giant endless loop that is blocking in select() on
+> the serverfd and
+> optionally the cmdfd and streamfd (should they be
+> open) and as soon as
+> there is data to read or a connection to accept I am
+> reading it.
 
-The base dependency is the C library and bluez-libs or libbluetooth and
-this will not change of course ;)
+Good job!
 
-So lets talk about the other packages we need and use. The first one is
-the USB library that we need. It is used by hid2hci, bcm203x and dfutool
-programs. While bcm203x is only needed for the 2.4 kernel series and
-should be always kept as a separate package, I don't consider this a
-problem. Most modern distributions won't need this tool. The dfutool is
-only needed by developers and people that play with firmware upgrades.
-However it might be handy to create a bluez-devel packages that depends
-on the Bluetooth library header files and gives you special tools for
-the developers. Such a package may also contain the *test applications.
-However I think that people who wants to play with firmware upgrades
-should maybe better compile dfutool by themself. So at least it is not
-that easy to screw a Bluetooth device and then try to blame others. My
-only problematic tool left with USB dependency is hid2hci and this is
-really needed for all of you using HID Proxy dongles. So do you think a
-general dependency on the USB library is fine for a bluez-utils binary
-package?
+> There is also an internal state like that from the
+> AVDTP spec and I'm
+> treating incoming packets based on that state. This
+> will allow any
+> sequence of AVDTP_DISCOVER, AVDTP_GET_CAPABILITIES,
+> AVDTP_OPEN, etc.
+> commands to occur and also makes it possible to have
+> the server handle
+> more than one connection during its lifetime (only
+> one at a time, of
+> course).
+> The code is currently completely lacking any error
+> handling, and simply
+> ignores the offending packet (or exits), so that
+> should be added. I also
+> don't like the structs used for the avdtp signalling
+> packets, I think
+> there should only be one struct that includes a
+> struct avdtp_header and
+> a union with all the other optional signalling
+> contents. Then there
+> would have to be specialised read()/write()
+> functions which figure out
+> (based on the header) how long the packet actually
+> is and automatically
+> send/receive that many bytes. However, that would
+> also require
+> modification of a2play so I thought I'd ask first.
+> 
+> That would make it easier to send rejection messages
+> (which may differ
+> from the acceptance message in length) and do proper
+> error handling.
 
-Next big thing is the D-Bus library. We use D-Bus in hcid and it seems
-that people are working on D-Bus support for pand. Personal I am not a
-big believer in D-Bus anymore, but it gets used and so we can't avoid
-it. So should we leave that a compile time option and by default we
-enable it. The bluez-utils binary package then simply depends on the
-D-Bus library?
+Even I tested a2recv with a2play and BlueSoleil.
+It was working without much trouble, that is why I
+didn't bother much about the error handling part.
+What I needed at that time was a quick fix solution to
+make an A2DP sink.
 
-With configure we also check for OpenOBEX and ALSA. The OpenOBEX part is
-not ready at the moment and still part of its own in the CVS. For ALSA
-we now have the first draft of an A2DP plugin. However I think most
-packages maintainers will create a bluez-alsa package for it and this
-looks like a sane thing to me.
+> 
+> Again, please check that I didn't break your
+> devices. I can only test
+> with a2play. There might also still be some flaws in
+> the state handling
+> since this is slightly more complex than the
+> original straight linear
+> design.
 
-And now the really ugly part. The PIN helper support. This is the real
-pain and we should find a nice solution for it. The original Python
-script is not an option, because it depends on Python and even the GTK
-PIN helper will add the GTK+ libraries. Also the KDE Bluetooth project
-has its own PIN helper. I personal like to go with the SuSE idea to
-provide a general PIN helper script that checks the installed tools and
-then executes the right PIN helper or provides a default PIN (or no PIN)
-if nothing has been setup. We can also add more config options, where we
-provide a list of PIN helpers that will tried one after the other. Maybe
-also a default PIN option would be a good idea. Comments please.
+Well, I haven't tested the restructured code yet. But
+the one before this one was working fine.
+ 
 
-Regards
+Mayank
 
-Marcel
-
-
+________________________________________________________________________
+Yahoo! India Matrimony: Find your life partner online
+Go to: http://yahoo.shaadi.com/india-matrimony
 
 
 -------------------------------------------------------
