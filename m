@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] page response
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200505101122.58004.viktor.teofanovic@bregenznet.at>
-References: <200505101122.58004.viktor.teofanovic@bregenznet.at>
-Content-Type: text/plain
-Message-Id: <1115717279.8949.203.camel@pegasus>
-Mime-Version: 1.0
+From: root_teos <viktor.teofanovic@bregenznet.at>
+To: blueZ mailinglist <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200505101122.58004.viktor.teofanovic@bregenznet.at>
+Subject: [Bluez-users] page response
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,29 +17,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 May 2005 11:27:59 +0200
+Date: Tue, 10 May 2005 11:22:57 +0200
 
-Hi Teos,
+Hi,
 
-> 1. is it possible by using the HCI layer to response on page requests from
-> other bt-devices?
+1. is it possible by using the HCI layer to response on page requests from
+other bt-devices?
 
-on the HCI layer these are connection requests and not page requests.
-The paging stuff happens in the link manager.
+2. how can I listen for all incoming HCI packets like hcidump is doing it - 
+is there any implemented example for this?
 
-> 2. how can I listen for all incoming HCI packets like hcidump is doing it - 
-> is there any implemented example for this?
-
-I don't understand this question. What do you mean by incoming HCI
-packets? Bluetooth is talking LMP on the air and not HCI.
-
-If you wanna do something like hcidump look at its source code.
-
-Regards
-
-Marcel
-
-
+thanks,
+teos
 
 
 -------------------------------------------------------
