@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4280D7E2.70101@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
+Message-ID: <4280B62A.8040005@whitelabel.org>
+From: Stefan Magdalinski <stefan@whitelabel.org>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] easiest to configure usb dongles
-References: <20050509233922.17188.qmail@web21127.mail.yahoo.com>
-In-Reply-To: <20050509233922.17188.qmail@web21127.mail.yahoo.com>
+Subject: Re: [Bluez-users] connection problems with pppd and 6630 over bluez
+References: <427B5DB5.3080304@whitelabel.org>	 <1115381691.8862.2.camel@pegasus>  <427B7021.5050302@whitelabel.org> <1115386676.8862.7.camel@pegasus>
+In-Reply-To: <1115386676.8862.7.camel@pegasus>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,55 +18,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 May 2005 17:48:50 +0200
+Date: Tue, 10 May 2005 14:24:58 +0100
 
-Hello Vinod
+Marcel Holtmann wrote:
+> Hi Stefan,
+> 
+> 
+>>>>I have pppd working over bluetooth, but have a strange problem; I only 
+>>>>seem to be able to connect about 1/3 of attempts. If I retry it usually 
+>>>>works, but some times it takes 5 or 6 goes.
+>>>>
+>>>>how can I diagnose and fix the problem. I'm running bluez-2.16
+>>>
+>>>use "hcidump -X -V" as root to see what happens on the Bluetooth side.
+>>>If that looks fine then use pppdump to see what PPP is doing.
+>>
+>>I've attached the results of a two attempts to connect, the first 
+>>failed, and the second succeeded. What am I looking for?
+> 
+> 
+> this is not a Bluetooth problem. This is your dialer script. In the
+> failure case you start PPP without getting the CONNECT response. You
+> even start PPP and three frames later your receive an OK. Use a dialer
+> like wvdial or check you logs for more details.
 
-I think you'll be best served with a broadcom chip. The rainge doesn't matther.
+thanks for the tip. I've switched to using the wvdial scripts from
 
-The D-Link DBT-120 (10m rainge) or the MSI pc2pc (100m rainge) are 
-absolutely problemless.
+http://julian.coccia.com/blog/index.php?m=200503&more=1
 
+and now everything's working fine.
 
-regards
-Marco
+well almost fine; despite setting noauth in /etc/ppp/peers/gprs, it 
+still wouldn't work without a dummy username and password in
+gprs-wvdial.conf
 
+My provider, Orange, doesn't need authentication, but doesn't seem to 
+mind if you stick some random entries in the file to keep the script happy.
 
-Vinod wrote:
-> Could anyone, name me a couple of bluetooth usb
-> devices which work well with bluez? I know there is a
-> features list out there which has some 100 usb devices
-> with the ones with hci field filled, working on bluez.
-> what i want to know is which are the ones which work
-> most easily with bluez with minimal work from my side.
-> i am relatively new to linux and want to make sure i
-> can get that thing working as fast as possible and
-> take it from there. and since i havent bought them
-> yet,  this is a good time to receive some advice. any
-> recommendations on whether the 10m or 100m range ones
-> are better are most welcome.
-> 
-> Vinod
-> 
-> 
-> 		
-> Yahoo! Mail
-> Stay connected, organized, and protected. Take the tour:
-> http://tour.mail.yahoo.com/mailtour.html
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: NEC IT Guy Games.
-> Get your fingers limbered up and give it your best shot. 4 great events, 4
-> opportunities to win big! Highest score wins.NEC IT Guy Games. Play to
-> win an NEC 61 plasma display. Visit http://www.necitguy.com/?r=20
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
-> 
+stef
+-- 
+/*
+Stefan Magdalinski
++447769 666528 (telephone)
+smagdali (IM/flickr.com/etc)
+*/
 
 
 -------------------------------------------------------
