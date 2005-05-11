@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth-adapter not detected
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4281F811.1080306@gmx.de>
+From: Johannes Engel <j-engel@gmx.de>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4281F811.1080306@gmx.de>
+Subject: Re: [Bluez-users] Bluetooth-adapter not detected
 References: <4281F089.1090404@web.de> <1115812535.11503.77.camel@pegasus>
-	 <4281F811.1080306@gmx.de>
-Content-Type: text/plain
-Message-Id: <1115814650.11503.90.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <1115812535.11503.77.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-15
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,23 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 May 2005 14:30:50 +0200
+Date: Wed, 11 May 2005 14:18:25 +0200
 
-Hi Johannes,
+Marcel Holtmann schrieb:
 
-> >check /proc/bus/usb/devices, but I think you need to activate it somehow
-> >before it will be detected by the USB bus.
-> >  
-> >
-> But how to do that? I do not know any suitable method.
+>check /proc/bus/usb/devices, but I think you need to activate it somehow
+>before it will be detected by the USB bus.
+>  
+>
+But how to do that? I do not know any suitable method.
 
-first check /proc/bus/usb/devices.
-
-Regards
-
-Marcel
-
-
+Greetings, Johannes
 
 
 -------------------------------------------------------
