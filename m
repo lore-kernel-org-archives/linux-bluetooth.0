@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Dealing with the bluez-utils dependencies
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <42814E2F.1030503@xmission.com>
-References: <1115722824.8949.242.camel@pegasus>
-	 <4280D256.1000804@xmission.com> <1115739962.12058.19.camel@pegasus>
-	 <42814E2F.1030503@xmission.com>
-Content-Type: text/plain
-Message-Id: <1115810372.11503.50.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <4281BBE9.5090603@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] a2recv vs. endian
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,29 +16,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 May 2005 13:19:32 +0200
+Date: Wed, 11 May 2005 02:01:45 -0600
 
-Hi Brad,
+Hey
 
-> > It is already an own package called bluez-pin and not maintained by me.
-> > The problem is that for example the Debian bluez-utils package depends
-> > on bluez-pin and thus the dependency chain increases.
-> 
-> it could be changed to a recommendation if things are set up to fall 
-> back to a fixed pin number. it might be a lot of trouble if it's not 
-> required on the user side. i was pleasantly surprised the first time it 
-> "just worked" and ran the gtk pin gui.
+FWIW, an interesting bug on gumstix and maybe other xscale hardware. The 
+ioctl to set the dsp to big-endian succeeds but the audio is just 
+static. I switched to using little-endian and it works. i have to 
+massage the data coming out of sbc_decode of course. they really should 
+just fix their audio driver.
 
-this is nice, but I still want something to satisfy terminal, X11, Gnome
-and KDE users as well. In general it should not be necessary to touch
-hcid.conf or modify the PIN helper. Only install the correct packages or
-be happy with the default PIN.
-
-Regards
-
-Marcel
-
-
+brad
 
 
 -------------------------------------------------------
