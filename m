@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050512164349.94082.qmail@web21122.mail.yahoo.com>
-From: Vinod <geekvinod@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <42823C41.3030605@gmx.de>
+From: Johannes Engel <j-engel@gmx.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] trouble setting up pand
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Bluetooth-adapter not detected
+References: <4281F089.1090404@web.de> <1115812535.11503.77.camel@pegasus>	 <4281F811.1080306@gmx.de> <1115814650.11503.90.camel@pegasus>	 <42820C7A.6030704@gmx.de> <1115830592.23458.59.camel@pegasus>
+In-Reply-To: <1115830592.23458.59.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-15
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,38 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 12 May 2005 09:43:49 -0700 (PDT)
+Date: Wed, 11 May 2005 19:09:21 +0200
 
-Hi all. I am having some trouble setting up my pand
-connection between two ipaq's running familiar 0.8.2.
+Marcel Holtmann schrieb:
 
-bluetooth is active on both devices.I followed the
-pand howto by doing:
-1) modprobe bnep's on both ipaqs
-2) set one as master and confirmed it
-3) pand --listen --role GN on the master
-4) pand --connect 'master-address' which i got from
-hcitool scan
+> I doubt that it is connected otherwise then USB, but check lspci and
+>
+>dmesg for weird entries.
+>
+>Does is have a hardware switch for WiFi/Bluetooth somewhere. Otherwise I
+>think you need a special tool or ACPI module for it. Ask Asus or your
+>manufacturer about it.
+>  
+>
+After two weeks of guessing and trying it works now!!
+There is a switch but under linux it needs half a minute to react. Now
+everything seems to be fine.
+Anyway thanks a lot for your advice!
 
-Then i get the following message
-
-root@h3600:/etc/bluetooth# udhcpc[29501]: udhcpc
-(v0.9.9-pre) started
-udhcpc[29501]: SIOCGIFINDEX failed!: No such device
-
-do i need to load some stuff somewhere? I did not
-follow some of the initial package installations as i
-thought all were now integrated into the linux kernel
-(mine is Linux version 2.4.19-rmk6-pxa1-hh37).
-
-Vinod
-
-
-		
-__________________________________ 
-Yahoo! Mail Mobile 
-Take Yahoo! Mail with you! Check email on your mobile phone. 
-http://mobile.yahoo.com/learn/mail 
+Greetings, Johannes
 
 
 -------------------------------------------------------
