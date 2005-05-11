@@ -1,10 +1,22 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb050509141368b0042a@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+Subject: Re: [Bluez-devel] DBUS service support - Initial library
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb05050914312761aa57@mail.gmail.com>
+References: <e1effdeb05042813004f4609a6@mail.gmail.com>
+	 <1114768038.8836.42.camel@pegasus>
+	 <e1effdeb05042905267bc91413@mail.gmail.com>
+	 <1114778617.8836.88.camel@pegasus>
+	 <e1effdeb0504291520167b9bb8@mail.gmail.com>
+	 <1114819470.8836.124.camel@pegasus>
+	 <e1effdeb050501141626c62c35@mail.gmail.com>
+	 <1114989490.21785.80.camel@pegasus>
+	 <e1effdeb05050208322febd0bf@mail.gmail.com>
+	 <1115051077.21785.133.camel@pegasus>
+	 <e1effdeb05050914312761aa57@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1115836030.23458.80.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] DBUS 0.33 support
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,19 +28,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 9 May 2005 18:13:25 -0300
+Date: Wed, 11 May 2005 20:27:10 +0200
 
-Hi folks,
+Hi Claudio,
 
-Is there plans to support the new version of dbus?
+> According with our last discussion. I will to add DBUS service
+> support in the pand. All code related to DBUS will be added 
+> in a new file.
+> 
+> The dbus service will be enabled using the argument "--dbus".
+> However if this argument is provide with other arguments like
+> "--connect", "--role" or "--listen" a sharing problem will happen.
+> 
+> What is the behaviour that you want?
+> 1. if "--dbus" was informed no other arguments will be accepted
+> 2. support a shared mode, accepting other arguments.
 
-The current version of hcid is compatible with dbus-0.23.
-I need marshaling functions of the new dbus library.
+you should do 1). The rest makes no sense, because if you start it with
+--dbus you want to control everything via a D-Bus application and pand
+acts like a proxy.
 
-Who is responsible for the dbus code of hcid?
+Regards
 
-Regards,
-Claudio.
+Marcel
+
+
 
 
 -------------------------------------------------------
