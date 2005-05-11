@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] easiest to configure usb dongles
+Subject: Re: [Bluez-users] rfcomm - multiple connections to 1 pocketPC from
+	2 seperate bluetooth-dongles
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4280D7E2.70101@gmx.ch>
-References: <20050509233922.17188.qmail@web21127.mail.yahoo.com>
-	 <4280D7E2.70101@gmx.ch>
+In-Reply-To: <003c01c555b5$31b193d0$8300a8c0@priveiqvfluhp9>
+References: <003c01c555b5$31b193d0$8300a8c0@priveiqvfluhp9>
 Content-Type: text/plain
-Message-Id: <1115808870.11503.32.camel@pegasus>
+Message-Id: <1115805412.11503.22.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,13 +19,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 May 2005 12:54:30 +0200
+Date: Wed, 11 May 2005 11:56:52 +0200
 
-Hi Marco,
+Hi Pieter,
 
-> I think you'll be best served with a broadcom chip. The rainge doesn't matther.
+> I'm using rfcomm 2.15 to make a connection from Linux to a 
+> PocketPc(00:04:3E:68:3C:6B). I can do this for one connection. But when I 
+> plug in a second bluetooth-dongle in my linuxPC, I can't establish a second 
+> rfcomm connection with the same PocketPc.
+> 
+> Scenario 1:
+> BT1 ------- PocketPC  : ok
+> channel0
+> 
+> Scenario 2:
+> BT2 ------- PocketPC   : ok
+> channel1
+> 
+> Scenario 3: not ok
+> 
+> channel0
+> BT1 ----------|
+>                        |
+>                     PocketPC
+>                        |
+> BT2 ----------|
+> channel1
+> 
+> Someone tried this?
 
-I hope you meant CSR chips ;)
+first you need to separate the two rfcomm calls and tell them what
+dongle should they use.
+
+	rfcomm -i hci0 connect rfcomm0 <bdaddr> <channel>
+	rfcomm -i hci1 connect rfcomm1 <bdaddr> <channel>
+
+Now you may have the problem that the pocket PC is not capable of
+dealing with scatternets (as Brad said) or you can't connect to the same
+RFCOMM channel twice.
+
+For the scatternet part you should check with "hcitool info" as root
+what kind of chip is in that PocketPC. For the double channel problem,
+there might be no choice if it does not offer two serial profiles. Of
+course you can try to use the dialup profile instead or write your own
+application that runs on the PocketPC and provides you with two RFCOMM
+channels for your special use.
 
 Regards
 
