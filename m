@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4281E9F6.2030408@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] easiest to configure usb dongles
-References: <20050509233922.17188.qmail@web21127.mail.yahoo.com>	 <4280D7E2.70101@gmx.ch> <1115808870.11503.32.camel@pegasus>
-In-Reply-To: <1115808870.11503.32.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <4280D7E2.70101@gmx.ch>
+References: <20050509233922.17188.qmail@web21127.mail.yahoo.com>
+	 <4280D7E2.70101@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1115808870.11503.32.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +19,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 May 2005 13:18:14 +0200
+Date: Wed, 11 May 2005 12:54:30 +0200
+
+Hi Marco,
+
+> I think you'll be best served with a broadcom chip. The rainge doesn't matther.
+
+I hope you meant CSR chips ;)
+
+Regards
+
+Marcel
 
 
-Marcel Holtmann wrote:
-> Hi Marco,
-> 
-> 
->>I think you'll be best served with a broadcom chip. The rainge doesn't matther.
-> 
-> 
-> I hope you meant CSR chips ;)
-
-yes, absoluetly. I was pretty tired when I wrote that email.
-there are for shure CSR chips inside of my two dongle recommendations.
-
-
-regards
-Marco
-
-Content Security by MailMarshal
 
 
 -------------------------------------------------------
