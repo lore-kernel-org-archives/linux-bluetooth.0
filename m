@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4281BBE9.5090603@xmission.com>
+Message-ID: <42814E2F.1030503@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: bluez-devel@lists.sourceforge.net
+References: <1115722824.8949.242.camel@pegasus>	 <4280D256.1000804@xmission.com> <1115739962.12058.19.camel@pegasus>
+In-Reply-To: <1115739962.12058.19.camel@pegasus>
 Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] a2recv vs. endian
+Subject: Re: [Bluez-devel] Dealing with the bluez-utils dependencies
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,15 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 May 2005 02:01:45 -0600
+Date: Tue, 10 May 2005 18:13:35 -0600
 
-Hey
+Marcel
 
-FWIW, an interesting bug on gumstix and maybe other xscale hardware. The 
-ioctl to set the dsp to big-endian succeeds but the audio is just 
-static. I switched to using little-endian and it works. i have to 
-massage the data coming out of sbc_decode of course. they really should 
-just fix their audio driver.
+> So keeping the USB library dependency for a binary package is ok. The
+> embedded people need to recompile with USB support.
+
+if embedded users complain, have them make hid2hci etc building optional.
+
+> All the PIN stuff is also working without D-Bus support.
+
+oh, well that's good.
+
+> It is already an own package called bluez-pin and not maintained by me.
+> The problem is that for example the Debian bluez-utils package depends
+> on bluez-pin and thus the dependency chain increases.
+
+it could be changed to a recommendation if things are set up to fall 
+back to a fixed pin number. it might be a lot of trouble if it's not 
+required on the user side. i was pleasantly surprised the first time it 
+"just worked" and ran the gtk pin gui.
 
 brad
 
