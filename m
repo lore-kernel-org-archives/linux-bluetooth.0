@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4281F811.1080306@gmx.de>
-From: Johannes Engel <j-engel@gmx.de>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Bluetooth-adapter not detected
-References: <4281F089.1090404@web.de> <1115812535.11503.77.camel@pegasus>
-In-Reply-To: <1115812535.11503.77.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-15
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <4281F089.1090404@web.de>
+References: <4281F089.1090404@web.de>
+Content-Type: text/plain
+Message-Id: <1115812535.11503.77.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,17 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 May 2005 14:18:25 +0200
+Date: Wed, 11 May 2005 13:55:35 +0200
 
-Marcel Holtmann schrieb:
+Hi Johannes,
 
->check /proc/bus/usb/devices, but I think you need to activate it somehow
->before it will be detected by the USB bus.
->  
->
-But how to do that? I do not know any suitable method.
+> On my new Asus V6835VLP there is a bluetooth adapter by Toshiba with a
+> CSR-chip. Using M$ WinXP everything works great. Only SuSE does not
+> recognize the availability of the chip, it is just not available for
+> SuSE. What can I do about that?
 
-Greetings, Johannes
+check /proc/bus/usb/devices, but I think you need to activate it somehow
+before it will be detected by the USB bus.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
