@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4281F089.1090404@web.de>
-From: Johannes Engel <j-engel@web.de>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15
-Subject: [Bluez-users] Bluetooth-adapter not detected
+Subject: Re: [Bluez-users] easiest to configure usb dongles 
+In-reply-to: <1115808870.11503.32.camel@pegasus> 
+References: <20050509233922.17188.qmail@web21127.mail.yahoo.com> <4280D7E2.70101@gmx.ch> <1115808870.11503.32.camel@pegasus>
+Message-ID: <8929.1115811691@csr.com>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,16 +16,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 May 2005 13:46:17 +0200
+Date: Wed, 11 May 2005 12:41:31 +0100
 
-Hi!
+Marcel Holtmann wrote:
+> Hi Marco,
+> 
+> > I think you'll be best served with a broadcom chip. The rainge doesn't matt
+> her.
+> 
+> I hope you meant CSR chips ;)
 
-On my new Asus V6835VLP there is a bluetooth adapter by Toshiba with a
-CSR-chip. Using M$ WinXP everything works great. Only SuSE does not
-recognize the availability of the chip, it is just not available for
-SuSE. What can I do about that?
+I didn't want to say anything... :-) :-)
 
-Greetings, Johannes
+pws
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+**********************************************************************
+
 
 
 -------------------------------------------------------
