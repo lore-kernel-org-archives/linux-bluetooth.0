@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] trouble setting up pand
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20050512164349.94082.qmail@web21122.mail.yahoo.com>
+From: Vinod <geekvinod@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050512164349.94082.qmail@web21122.mail.yahoo.com>
-References: <20050512164349.94082.qmail@web21122.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1115916973.18499.56.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] trouble setting up pand
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,44 +16,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 12 May 2005 18:56:13 +0200
+Date: Thu, 12 May 2005 09:43:49 -0700 (PDT)
 
-Hi Vinod,
+Hi all. I am having some trouble setting up my pand
+connection between two ipaq's running familiar 0.8.2.
 
-> I am having some trouble setting up my pand
-> connection between two ipaq's running familiar 0.8.2.
-> 
-> bluetooth is active on both devices.I followed the
-> pand howto by doing:
-> 1) modprobe bnep's on both ipaqs
-> 2) set one as master and confirmed it
-> 3) pand --listen --role GN on the master
-> 4) pand --connect 'master-address' which i got from
-> hcitool scan
+bluetooth is active on both devices.I followed the
+pand howto by doing:
+1) modprobe bnep's on both ipaqs
+2) set one as master and confirmed it
+3) pand --listen --role GN on the master
+4) pand --connect 'master-address' which i got from
+hcitool scan
 
-skip step 2, because it may cause troubles.
+Then i get the following message
 
-> Then i get the following message
-> 
-> root@h3600:/etc/bluetooth# udhcpc[29501]: udhcpc
-> (v0.9.9-pre) started
-> udhcpc[29501]: SIOCGIFINDEX failed!: No such device
+root@h3600:/etc/bluetooth# udhcpc[29501]: udhcpc
+(v0.9.9-pre) started
+udhcpc[29501]: SIOCGIFINDEX failed!: No such device
 
-What else do you see in the syslog. Run "hcidump -X -V" as root to check
-the BNEP connection setup.
+do i need to load some stuff somewhere? I did not
+follow some of the initial package installations as i
+thought all were now integrated into the linux kernel
+(mine is Linux version 2.4.19-rmk6-pxa1-hh37).
 
-> do i need to load some stuff somewhere? I did not
-> follow some of the initial package installations as i
-> thought all were now integrated into the linux kernel
-> (mine is Linux version 2.4.19-rmk6-pxa1-hh37).
-
-Not that I know of. However never version are always better.
-
-Regards
-
-Marcel
+Vinod
 
 
+		
+__________________________________ 
+Yahoo! Mail Mobile 
+Take Yahoo! Mail with you! Check email on your mobile phone. 
+http://mobile.yahoo.com/learn/mail 
 
 
 -------------------------------------------------------
