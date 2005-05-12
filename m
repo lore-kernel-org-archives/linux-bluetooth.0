@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0505120553473405cc@mail.gmail.com>
+Message-ID: <e1effdeb0505120545500a13c9@mail.gmail.com>
 From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Dealing with the bluez-utils dependencies
-In-Reply-To: <1115901638.18499.30.camel@pegasus>
+Subject: Re: [Bluez-devel] DBUS service support - Initial library
+In-Reply-To: <Pine.LNX.4.33.0505121058300.2336-100000@redbean.intranet.gw-instruments.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-References: <1115722824.8949.242.camel@pegasus>
-	 <e1effdeb05051006043be12b4a@mail.gmail.com>
-	 <1115901638.18499.30.camel@pegasus>
+References: <1115836030.23458.80.camel@pegasus>
+	 <Pine.LNX.4.33.0505121058300.2336-100000@redbean.intranet.gw-instruments.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,34 +19,56 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 12 May 2005 09:53:44 -0300
+Date: Thu, 12 May 2005 09:45:47 -0300
 
-Hi Marcel,
+Hi Peter,
 
-I will send as soon as possible. This week is being very tumultuated
-for me.=20
+You can find more information on the references below:
 
-Who is the focal point/contact of hcid? I want contact him for verify
-if this patch will NOT broke something.
+http://www.freedesktop.org/Software/dbus
+http://www-106.ibm.com/developerworks/linux/library/l-dbus.html
+
+
+Basically, DBUS is system for interprocess communication.
+
+Where/Why PAND DBUS service can be usefull:
+- pand required root permission
+- user applications are not allowed to establish connection or control
+ the BT device/connections
+- For embedded devices(cell phones, PDAs,..), applications like
+gamming, UPnP, etc.
+want to control BT connections, search services, ... and there isn't
+API for address this.
+
+Obviously, there is a hard work to do. Bridge creation/control, IP assignme=
+nt,=20
+service name resolution have to be improved too in order to provide seamles=
+s=20
+connections.
 
 Regards,
 Claudio.
 
-On 5/12/05, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Claudio,
+
+
+On 5/12/05, Peter Wippich <pewi@gw-instruments.de> wrote:
 >=20
-> > Regarding D-Bus support for pand and hcid.
-> > DBUS is under development and there is backward compatibility problem.
-> > Some APIs changed, I suggest check the dbus version at build time
-> > and fix the code to support this. The latest version(0.33) is not compa=
-tible
-> > with 0.23.
+> Hi all,
 >=20
-> as I said before, send patches for it.
+> sorry for asking a possible dump question, but:
+> can anybody point me to a source what this D-BUS stuff is ???
+> Think I missed something.
 >=20
-> Regards
+> Thanks a lot,
 >=20
-> Marcel
+> Peter
+>=20
+>=20
+> |       Peter Wippich                   Voice: +49 30 46776411          |
+> |       G&W Instruments GmbH            fax:   +49 30 46776419          |
+> |       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+> |       D-13355 Berlin  / Germany                                       |
+>=20
 >=20
 > -------------------------------------------------------
 > This SF.Net email is sponsored by Oracle Space Sweepstakes
