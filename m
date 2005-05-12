@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] DBUS service support - Initial library
+Subject: Re: [Bluez-devel] Dealing with the bluez-utils dependencies
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.33.0505121058300.2336-100000@redbean.intranet.gw-instruments.de>
-References: 
-	 <Pine.LNX.4.33.0505121058300.2336-100000@redbean.intranet.gw-instruments.de>
+In-Reply-To: <e1effdeb05051006043be12b4a@mail.gmail.com>
+References: <1115722824.8949.242.camel@pegasus>
+	 <e1effdeb05051006043be12b4a@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1115901694.18499.32.camel@pegasus>
+Message-Id: <1115901638.18499.30.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,14 +19,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 12 May 2005 14:41:34 +0200
+Date: Thu, 12 May 2005 14:40:38 +0200
 
-Hi Peter,
+Hi Claudio,
 
-> sorry for asking a possible dump question, but:
-> can anybody point me to a source what this D-BUS stuff is ???
+> Regarding D-Bus support for pand and hcid. 
+> DBUS is under development and there is backward compatibility problem.
+> Some APIs changed, I suggest check the dbus version at build time 
+> and fix the code to support this. The latest version(0.33) is not compatible
+> with 0.23.
 
-look at http://www.freedesktop.org/Software/dbus
+as I said before, send patches for it.
 
 Regards
 
