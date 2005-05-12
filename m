@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <259637e050512083657dcb9d6@mail.gmail.com>
-From: Rui Silva <rukinhas@gmail.com>
+Subject: Re: [Bluez-devel] Dealing with the bluez-utils dependencies
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb0505120553473405cc@mail.gmail.com>
+References: <1115722824.8949.242.camel@pegasus>
+	 <e1effdeb05051006043be12b4a@mail.gmail.com>
+	 <1115901638.18499.30.camel@pegasus>
+	 <e1effdeb0505120553473405cc@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1115903015.18499.34.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] bluez-devel forum??
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,22 +21,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 12 May 2005 15:36:00 +0000
+Date: Thu, 12 May 2005 15:03:35 +0200
 
-hi ppl,
+Hi Claudio,
 
-i'm looking for a forum similar to this list, does anyone know of one?
+> I will send as soon as possible. This week is being very tumultuated
+> for me. 
+> 
+> Who is the focal point/contact of hcid? I want contact him for verify
+> if this patch will NOT broke something.
+
+post it to the mailing list for review. I will do the final decision of
+including it or not.
+
+Regards
+
+Marcel
 
 
-
-
---=20
-Rui Silva
-Powered by Gentoo Linux under :
-CELERON 1000 - Stage1 install with nptl
-Pentium M 1800GHz - Stage1 install with NPTL
-
-http://rukinhas.no-ip.org
 
 
 -------------------------------------------------------
