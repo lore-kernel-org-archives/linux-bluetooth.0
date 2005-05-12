@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050512183747.75536.qmail@web21125.mail.yahoo.com>
-From: Vinod <geekvinod@yahoo.com>
 Subject: Re: [Bluez-users] trouble setting up pand
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: 6667
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20050512164349.94082.qmail@web21122.mail.yahoo.com>
+References: <20050512164349.94082.qmail@web21122.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1115916973.18499.56.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,57 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 12 May 2005 11:37:47 -0700 (PDT)
+Date: Thu, 12 May 2005 18:56:13 +0200
 
+Hi Vinod,
 
-> > 1) modprobe bnep's on both ipaqs
-> > 2) set one as master and confirmed it
-> > 3) pand --listen --role GN on the master
-> > 4) pand --connect 'master-address' which i got
-> from
-> > hcitool scan
+> I am having some trouble setting up my pand
+> connection between two ipaq's running familiar 0.8.2.
 > 
-> skip step 2, because it may cause troubles.
+> bluetooth is active on both devices.I followed the
+> pand howto by doing:
+> 1) modprobe bnep's on both ipaqs
+> 2) set one as master and confirmed it
+> 3) pand --listen --role GN on the master
+> 4) pand --connect 'master-address' which i got from
+> hcitool scan
 
-tried skipping step 2 and set both back as
-slaves,resulting in same error.
- 
-> > Then i get the following message
-> > 
-> > root@h3600:/etc/bluetooth# udhcpc[29501]: udhcpc
-> > (v0.9.9-pre) started
-> > udhcpc[29501]: SIOCGIFINDEX failed!: No such
-> device
+skip step 2, because it may cause troubles.
+
+> Then i get the following message
 > 
-> What else do you see in the syslog. Run "hcidump -X
-> -V" as root to check
-> the BNEP connection setup.
-Unfortunately the latest familiar version(0.8.2),
-which i have, does not have hcidump in its linux
-distribution. And i still havent figured a way out to
-compile with gcc on my ipaq. is there any other other
-way to check bnep0 status? Doing ifconfig bnep0
-returns
+> root@h3600:/etc/bluetooth# udhcpc[29501]: udhcpc
+> (v0.9.9-pre) started
+> udhcpc[29501]: SIOCGIFINDEX failed!: No such device
 
-ifconfig bnep0
-ifconfig: bnep0: error fetching interface information:
-Device not found
+What else do you see in the syslog. Run "hcidump -X -V" as root to check
+the BNEP connection setup.
 
-So i believe bnep connection does not exist.
+> do i need to load some stuff somewhere? I did not
+> follow some of the initial package installations as i
+> thought all were now integrated into the linux kernel
+> (mine is Linux version 2.4.19-rmk6-pxa1-hh37).
 
-would appreciate if you let me know if any other
-workaround exists until i figure out a way to run make
-on my ipaq.
+Not that I know of. However never version are always better.
 
-Vinod
+Regards
 
+Marcel
 
-
-
-		
-Yahoo! Mail
-Stay connected, organized, and protected. Take the tour:
-http://tour.mail.yahoo.com/mailtour.html
 
 
 
