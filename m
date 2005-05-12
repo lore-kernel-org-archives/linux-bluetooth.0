@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Dealing with the bluez-utils dependencies
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb05051006043be12b4a@mail.gmail.com>
-References: <1115722824.8949.242.camel@pegasus>
-	 <e1effdeb05051006043be12b4a@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1115901638.18499.30.camel@pegasus>
-Mime-Version: 1.0
+From: Peter Wippich <pewi@gw-instruments.de>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] DBUS service support - Initial library
+In-Reply-To: <1115836030.23458.80.camel@pegasus>
+Message-ID: <Pine.LNX.4.33.0505121058300.2336-100000@redbean.intranet.gw-instruments.de>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,21 +17,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 12 May 2005 14:40:38 +0200
+Date: Thu, 12 May 2005 11:00:23 +0200 (CEST)
 
-Hi Claudio,
 
-> Regarding D-Bus support for pand and hcid. 
-> DBUS is under development and there is backward compatibility problem.
-> Some APIs changed, I suggest check the dbus version at build time 
-> and fix the code to support this. The latest version(0.33) is not compatible
-> with 0.23.
+Hi all,
 
-as I said before, send patches for it.
+sorry for asking a possible dump question, but:
+can anybody point me to a source what this D-BUS stuff is ???
+Think I missed something.
 
-Regards
+Thanks a lot,
 
-Marcel
+Peter
+
+
+|	Peter Wippich 			Voice: +49 30 46776411		|
+|	G&W Instruments GmbH		fax:   +49 30 46776419		|
+|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
+|	D-13355 Berlin  / Germany					|
 
 
 
