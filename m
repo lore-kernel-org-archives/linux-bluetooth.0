@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5256d0b05051300411819d7f8@mail.gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
+Message-ID: <20050513042049.77241.qmail@web52405.mail.yahoo.com>
+From: jose <twblr@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] PC to PC file transfer
-In-Reply-To: <20050513042049.77241.qmail@web52405.mail.yahoo.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <20050513042049.77241.qmail@web52405.mail.yahoo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] PC to PC file transfer
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,22 +16,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 13 May 2005 08:41:43 +0100
+Date: Thu, 12 May 2005 21:20:49 -0700 (PDT)
 
-> Hi,
->=20
-> I want to be able to transfer a file between two Linux
-> PCs.
->=20
-> I have compiled blueobex(ussp-push), on both my linux
-> PCs.How do I compile obexserver OR what do I do with
-> obexserver?
+Hi,
 
-I know gnome has a obex server (It comes as part of Fedora, not sure
-what other platfoms) that can run as a applet on the taskbar. I've
-played with it quickly getting objects from a phone but not another pc
+I want to be able to transfer a file between two Linux
+PCs. 
 
-Pete
+I have compiled blueobex(ussp-push), on both my linux
+PCs.How do I compile obexserver OR what do I do with
+obexserver?
+
+Also, what exactly are the steps to transfer a file.
+Need help on this, pls. 
+
+It says: ./ussp-push /dev/ttyU0 ./file.gif name.gif:
+where name.gif is the name to transfer the file as and
+file.gif is the actual file, 
+
+can the file be anywhere on the PC, or
+should it be in the current folder where Iam running
+ussp-push from?
+
+mayankbatra, on this list has given the
+inputs(regarding ussp-push),thanks..
+
+Rgds,
+Jose
+
+
+
+		
+__________________________________ 
+Yahoo! Mail Mobile 
+Take Yahoo! Mail with you! Check email on your mobile phone. 
+http://mobile.yahoo.com/learn/mail 
 
 
 -------------------------------------------------------
