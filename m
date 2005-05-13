@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] SNMP & MIB
-From: Marcel Holtmann <marcel@holtmann.org>
+From: =?iso-8859-1?q?I=F1aki_de_la_Fuente?= <ifuente@salleURL.edu>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4284B388.4050903@futurlink.com>
-References: <4284B388.4050903@futurlink.com>
-Content-Type: text/plain
-Message-Id: <1116015566.18499.143.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200505131808.01414.ifuente@salleurl.edu>
+Subject: [Bluez-users] bluetty.c: usb_bluetooth_probe - improper number of endpoints.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,20 +17,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 May 2005 22:19:26 +0200
+Date: Fri, 13 May 2005 18:08:01 +0200
 
-Hi Pedro,
+That's what I obtain when I connect an USB bluetooth:
 
-> Are there any standarized MIBs for Bluetooth in general or BlueZ in 
-> particular? Any agent/subagent for net-snmp?
+	drivers/usb/class/bluetty.c: USB Bluetooth converter detected
+	drivers/usb/class/bluetty.c: Bluetooth converter now attached to ttyUB0 (o=
+r=20
+usb/ttub/0 for devfs)
+	bluetty: probe of 1-2:1.1 failed with error -5
+	bluetty: probe of 1-2:1.2 failed with error -5
 
-not that I know of.
+If I do a dmesg=20
+	usb 1-2: adding 1-2:1.2 (config#1, interface 2)
+	usb 1-2: 1.2 : hotplug
+	bluetty 1-2:1.2 .usb_prove_interface
+	bluetty 1-2:1.2 .usb_prove_interface - got id
+	drivers/usb/class/bluetty.c: usb_bluetooth_probe - improper number of=20
+endpoints.
+	Bluetooth driver not bound.
 
-Regards
-
-Marcel
+Before it says the same with 1-2:1.1
 
 
+
+
+
+=2D------------------------------------------------------------------
+		I=F1aki de la Fuente Cebrian
+       		   ifuente@salleurl.edu
+=2D------------------------------------------------------------------
 
 
 -------------------------------------------------------
