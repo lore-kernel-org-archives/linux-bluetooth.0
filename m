@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5256d0b05051416323a633e2d@mail.gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Bluetooth v2
-In-Reply-To: <1116112975.8886.25.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <5256d0b050514160856c4d194@mail.gmail.com>
 References: <5256d0b050514160856c4d194@mail.gmail.com>
-	 <1116112975.8886.25.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1116112975.8886.25.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,24 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 15 May 2005 00:32:37 +0100
+Date: Sun, 15 May 2005 01:22:55 +0200
 
-Hi Marcel,
+Hi Pete,
 
-> > Was having a bit of a look online for a BT2 dongle of some
-> > description. Does anyone know of a bt2 dongle that works well with the
-> > bluez stack that's readily available? Or aren't they really out yet?
->=20
-> do you mean Bluetooth 2.0 + EDR? No dongle that I know of is available.
-> You can only order Dell or Apple notebooks with CSR BlueCore4 chips.
+> Was having a bit of a look online for a BT2 dongle of some
+> description. Does anyone know of a bt2 dongle that works well with the
+> bluez stack that's readily available? Or aren't they really out yet?
 
-Yes. I knew about the apple, although not of the Dell. I'm looking to
-get a bluetooth dongle and thought seeing as the 2 standard was out
-that I should probably get the latest and greatest but it seems its
-not quite there yet. Any idea when we should start seeing the newer
-ones and is it supported by bluez?
+do you mean Bluetooth 2.0 + EDR? No dongle that I know of is available.
+You can only order Dell or Apple notebooks with CSR BlueCore4 chips.
 
-Pete
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
