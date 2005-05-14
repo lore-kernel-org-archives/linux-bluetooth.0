@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] EDR support?
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Frank Pieczynski <pieczy@web.de>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200505142306.31290.pieczy@web.de>
-References: <200505142306.31290.pieczy@web.de>
-Content-Type: text/plain
-Message-Id: <1116112907.8886.23.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] EDR support?
+References: <200505142306.31290.pieczy@web.de> <200505142319.35417.cijoml@volny.cz>
+In-Reply-To: <200505142319.35417.cijoml@volny.cz>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200505150023.09686.pieczy@web.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,45 +19,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 15 May 2005 01:21:47 +0200
+Date: Sun, 15 May 2005 00:23:09 +0200
 
-Hi Frank,
+On Saturday 14 May 2005 23:19, Michal Semler wrote:
+> > 	Service Classes: Networking, Rendering, Capturing
+> > 	Device Class: Computer, Uncategorized
+> > 	HCI Ver: 1.2 (0x2) HCI Rev: 0x679 LMP Ver: 1.2 (0x2) LMP Subver: 0x679
+>
+> ^^^^^^^^^^^^
+> It is 1.2 device
+>
+> hciconfig hci0 features
+> hciconfig hci0 revision
+>
+> will give you better knowledge about this device
 
-> I just installed a Dell Latitude X1 notebook with Gentoo Linux and BlueZ.
-> A Dell "TrueMobile 350" BT device is built in (lsusb shows this as id 
-> 413c:8103).
-> I was able to successful connect a Blutooth notebook mouse by "hama". But I 
-> wonder if this modul is a real BT 2.0 device with EDR (according to the 
-> Bluetooth database on heise.de it is such device).
-> 
-> This is the output of 'hciconfig -a'
-> hci0:	Type: USB
-> 	BD Address: 00:10:C6:63:03:74 ACL MTU: 384:8 SCO MTU: 64:8
-> 	UP RUNNING PSCAN ISCAN 
-> 	RX bytes:18036 acl:899 sco:0 events:399 errors:0
-> 	TX bytes:3320 acl:118 sco:0 commands:67 errors:0
-> 	Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
-> 	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-> 	Link policy: RSWITCH HOLD SNIFF PARK 
-> 	Link mode: SLAVE ACCEPT 
-> 	Name: 'BlueZ (0)'
-> 	Class: 0x3e0100
-> 	Service Classes: Networking, Rendering, Capturing
-> 	Device Class: Computer, Uncategorized
-> 	HCI Ver: 1.2 (0x2) HCI Rev: 0x679 LMP Ver: 1.2 (0x2) LMP Subver: 0x679
-> 	Manufacturer: Cambridge Silicon Radio (10)
-> 
-> Is that a BT 2.0 capable device?
+hciconfig hci0 revision
+hci0:	Type: USB
+	BD Address: 00:10:C6:63:03:74 ACL MTU: 384:8 SCO MTU: 64:8
+	Build 1657
+	Chip version: BlueCore4-External
+	Max key size: 128 bit
+	SCO mapping:  HCI
 
-this is the EDR firmware. The only odd thing is that it reports itself
-as a Bluetooth 1.2 device. I saw the same problem on an Inspiron 6000
-some days ago.
+The BlueCore4 is a BT2.0 capable chip, right?
+ 
+hciconfig hci0 features
+hci0:	Type: USB
+	BD Address: 00:10:C6:63:03:74 ACL MTU: 384:8 SCO MTU: 64:8
+	Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
+		<3-slot packets> <5-slot packets> <encryption> <slot offset> 
+		<timing accuracy> <role switch> <hold mode> <sniff mode> 
+		<park state> <RSSI> <channel quality> <SCO link> <HV2 packets> 
+		<HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme> 
+		<power control> <transparent SCO> <broadcast encrypt> 
+		<EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan> 
+		<interlaced iscan> <interlaced pscan> <inquiry with RSSI> 
+		<extended SCO> <EV4 packets> <EV5 packets> <AFH cap. slave> 
+		<AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL> 
+		<AFH cap. master> <AFH class. master> <EDR eSCO 2 Mbps> 
+		<EDR eSCO 3 Mbps> <3-slot EDR eSCO> <extended features> 
 
-Regards
+And it supports EDR, nice.
 
-Marcel
-
-
+Thank you for your help,
+Frank
 
 
 -------------------------------------------------------
