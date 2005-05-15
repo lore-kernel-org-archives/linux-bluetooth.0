@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <c1afa04d0505151420720b5bad@mail.gmail.com>
-From: =?ISO-8859-1?Q?Jes=FAs_Cano_Navarro?= <jesuscanonavarro@gmail.com>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Old known, Apple BT Keyboard
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <4287BCAB.8050600@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+References: <20050515145042.70745815.tobias-lang@gmx.de>	<428761F9.7070805@xmission.com>	<20050515192044.659654d3.tobias-lang@gmx.de>	<4287A0A1.80309@xmission.com> <20050515223523.639551bf.tobias-lang@gmx.de>
+In-Reply-To: <20050515223523.639551bf.tobias-lang@gmx.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-users] Hama BT1000 Headset Problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,33 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 15 May 2005 23:20:22 +0200
+Date: Sun, 15 May 2005 15:18:35 -0600
 
-Hi everybody,
+yes, the bluetooth adapter is more often the problem than the headset.
 
-Thank you for reading this message and spending your time helping me
-an the others.
-
-I tried to make the Apple BT Keyboard work with my GNU/Linux and
-Marcel's help (thank you Marcel) but i did not have the tool "hcidump"
-to debug the inquiries and conexions and i was too lost in this field.
-Now i think (hope) i have it all and my goals are:
-
--Make sure i have the right configuration needs for BT use.
--Permanently replace the pc105 keyboard.
--Configure correctly the Apple BT Keyboard.
-
-Would you please help/guide me to get it?, i would really appreciate it!.
-
-I read several people have got it with the Apple keyboard.Somebody
-told about writting a HOWTO, as it's becomeing an usual stuff
-(GNU/Linux-Bluez and BT keyboards), i would be interested in help to
-it.
-
-Thank you all.
-
-Sincerenly
-Jes=FAs Cano Navarro
+Tobias Lang wrote:
+> On Sun, 15 May 2005 13:18:57 -0600
+> Brad Midgley <bmidgley@xmission.com> wrote:
+> 
+> 
+>>Tobias,
+>>
+>>My first guess was the the SCO routing was not right for your adapter, 
+>>but if the audio player is blocking on a write, then it's somewhere else.
+> 
+> 
+> But where are talking about the USB Dongle and not the Headset, are we?
+> 
+> Tobias
 
 
 -------------------------------------------------------
