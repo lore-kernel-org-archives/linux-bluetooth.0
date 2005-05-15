@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+Message-ID: <42869C29.3040001@volantis.com>
+From: Mark Watson <mark@volantis.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Building btsco for Fedora 3
-Message-Id: <20050515030849.266ff800.henryk@ploetzli.ch>
-In-Reply-To: <42869C29.3040001@volantis.com>
-References: <42869C29.3040001@volantis.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Sun__15_May_2005_03_08_49_+0200_DAuAnv6cYg+Qa0id"
+Content-Type: multipart/mixed;
+ boundary="------------010604000700000905020402"
+Subject: [Bluez-devel] Building btsco for Fedora 3
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,58 +17,67 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 15 May 2005 03:08:48 +0200
+Date: Sun, 15 May 2005 01:47:37 +0100
 
---Signature=_Sun__15_May_2005_03_08_49_+0200_DAuAnv6cYg+Qa0id
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This is a multi-part message in MIME format.
+--------------010604000700000905020402
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Moin,
+Hi. Hopefully this is the right list for this question.
 
-Am Sun, 15 May 2005 01:47:37 +0100 schrieb Mark Watson:
+I'm attempting to build btsco and the associated kernel driver for 
+Fedora 3, kernel 2.6.11-1.14_FC3
 
-> > make[2]: Entering directory `/tmp/btsco'
-> > gcc -DHAVE_CONFIG_H -I. -I. -I.    -I/usr/include -Wall -O2 -c
-> > a2recv.c a2recv.c: In function `make_master':
-> > a2recv.c:281: error: incompatible type for argument 2 of
-> > `hci_switch_role'
->=20
-> So, first question, can I get away with commenting out the relevant
-> call?
+With btsco, I get ...
 
-Yes. This is from a2recv which you probably won't need anyways (it's for
-receiving A2DP audio data) and that specific function is only a
-workaround for the behaviour of the iPHONO audio dongle.
+> make[2]: Entering directory `/tmp/btsco'
+> gcc -DHAVE_CONFIG_H -I. -I. -I.    -I/usr/include -Wall -O2 -c a2recv.c
+> a2recv.c: In function `make_master':
+> a2recv.c:281: error: incompatible type for argument 2 of `hci_switch_role'
 
-> > make: *** /lib/modules/2.6.11-1.14_FC3/source: No such file or=20
-> > directory.  Stop.
->=20
-> Turns out no modules source directory was installed with this kernel=20
-> rpm, though it does exist for older kernels.
+So, first question, can I get away with commenting out the relevant call?
 
-Hmm, can't help you with that (I'm mostly always using vanilla kernels
-from kernel.org) but you will probably need the kernel sources to
-compile.
+Second question concerns the kernel driver, and to be frank my inability 
+to keep up with the fedora build process. I get:
 
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+> make: *** /lib/modules/2.6.11-1.14_FC3/source: No such file or 
+> directory.  Stop.
 
---Signature=_Sun__15_May_2005_03_08_49_+0200_DAuAnv6cYg+Qa0id
-Content-Type: application/pgp-signature
+Turns out no modules source directory was installed with this kernel 
+rpm, though it does exist for older kernels. Any tips? I'm guessing this 
+is an issue with the kernel rpm?
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
+Any help appreciated.
 
-iD8DBQFChqEmIjWgKE0OA2gRAqHNAJ4hKd3xqZ6Ur83DFTKkaP5pbNPo4wCggtrQ
-eHfuxIyTkM/XqPRNIMp7ih4=
-=BK9t
------END PGP SIGNATURE-----
+Mark
 
---Signature=_Sun__15_May_2005_03_08_49_+0200_DAuAnv6cYg+Qa0id--
+
+--------------010604000700000905020402
+Content-Type: text/x-vcard; charset=utf-8;
+ name="mark.vcf"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="mark.vcf"
+
+begin:vcard
+fn:Mark Watson
+n:Watson;Mark
+org:Volantis Systems
+adr:Occam Road;;1 Chancellor Court;Guildford;Surrey;GU9 7YT;UK
+email;internet:mark@volantis.com
+title:Co-Founder and Chief Technology Officer
+tel;work:+44 1483 739777
+tel;fax:+44 1483 739739
+tel;cell:+44 771 489 9417
+note:Assistant = Zoe Jones, +44 1483 739773, zoe.jones@volantis.com
+x-mozilla-html:TRUE
+url:http://www.volantis.com
+version:2.1
+end:vcard
+
+
+--------------010604000700000905020402--
 
 
 -------------------------------------------------------
