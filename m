@@ -1,5 +1,5 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <428761F9.7070805@xmission.com>
+Message-ID: <42876108.7040106@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
@@ -18,16 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 15 May 2005 08:51:37 -0600
+Date: Sun, 15 May 2005 08:47:36 -0600
 
 Tobias
 
-> However, when I ignore the fact, that I haven't paired yet
+>>: hciconfig hci0 revision
+> 
+> 	hci0:   Type: USB
+>  	       BD Address: 00:0B:0D:04:BB:98 ACL MTU: 120:20 SCO MTU: 64:0
+>   	      Unsupported manufacturer
 
-this sounds strange. when you click the connect button on the headset, 
-what does btsco print out?
+the docs now state that if you don't see SCO mapping info at all, you 
+may need a different (CSR) adapter.
 
-brad
+the fact that the adapter can pass data to your phone doesn't 
+necessarily mean it's able to pass SCO audio properly.
+
+Brad
 
 
 -------------------------------------------------------
