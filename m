@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050515123339.9981.qmail@web8304.mail.in.yahoo.com>
+Message-ID: <20050515122921.77869.qmail@web8310.mail.in.yahoo.com>
 From: Mayank Batra <mayankbatra@yahoo.co.in>
 To: BLUEZ DEVELOPERS LIST <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] Creating more than one instance of BlueZ
+Subject: [Bluez-devel] BlueZ GUI
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,16 +16,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 15 May 2005 13:33:38 +0100 (BST)
+Date: Sun, 15 May 2005 13:29:21 +0100 (BST)
 
 Guys,
 
-Is it possible to create more than one instance of
-BlueZ on my linux machine.
+Is there a GUI available for BlueZ ?
 
-That is if I have 2 dongles, but do not have a test PC
-and I want to test my code, is it possible to do it
-with one PC ?
+If not, I am interested in building one.
+Can you suggest which tool will be the best?
+
+Tcl/Tk ?
 
 Mayank
 
