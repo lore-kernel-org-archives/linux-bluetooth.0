@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Tamer Higazi <tamer23@myrealbox.com>
+Message-ID: <c1afa04d050516134921746de0@mail.gmail.com>
+From: =?ISO-8859-1?Q?Jes=FAs_Cano_Navarro?= <jesuscanonavarro@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1116313073.10074.8.camel@linux.site>
+Subject: Re: [Bluez-users] Old known, Apple BT Keyboard
+In-Reply-To: <428825B8.2070103@metalan.net>
 Mime-Version: 1.0
-Subject: [Bluez-users] problems syncing with bluetooth on multisync: evolution/blueotooth
- plugin
+Content-Type: multipart/mixed;
+	boundary="----=_Part_4901_24602911.1116276576151"
+References: <c1afa04d0505151420720b5bad@mail.gmail.com> <4287C079.20208@gmx.ch>
+	 <428825B8.2070103@metalan.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,155 +20,106 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 May 2005 08:57:52 +0200
+Date: Mon, 16 May 2005 22:49:36 +0200
 
-Hi! 
-Everytime I want to synchronize with multisync: bluetooth/evolution2
-plugins, the cell phone ask me for a password, i type one and receive a
-error on the screen: "connection failed". 
+------=_Part_4901_24602911.1116276576151
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I use as operating system SuSE Linux 9.3 Pro
+Hi,
 
-Is it perhaps the configuration?! 
+Thank you for your interest!.
 
+My first pair of questions is:
+-I don't know the whole set of tools that bluez-utils brings but i
+found at least two for connexions: the hidd daemon and hcitool, both
+have connexion parameters but:
+1)=BFwhich is the purpose of them?, =BFfor what is every one? i couldn't
+dintinguish which one should i use to connect to a device.
+2)How do i debug the activity with hcidump?, run hcidump alone in a
+console and work in another?, what parameters should i use?, -X -V -w
+<file>?
 
-For any help
+I'm on a Debian GNU/Linux testing, Kernel 2.6.8-2-686. Compaq Deskpro
+EN: Pentium 2 (Deschutes) 350, 256MB.
 
-Thank you 
+Thank you
 
+2005/5/16, Andre Baron <andre@metalan.net>:
+> I echo Marco, however with one caveat; I don't believe you can replace
+[...]
+=20
+> Marco Trudel wrote:
+>=20
+> > If you don't ask specific questions, we can't help you... So what's
+> > the current problem?
+> > It sounds like the last step was that marcel requested a hcidump of
+> > your failing action... So, I suggest to do so...
+> >
+> > regards
+> > Marco
+> >
+> >
+> > Jes=FAs Cano Navarro wrote:
+> >
+> >> Hi everybody,
+> >>
+> >> Thank you for reading this message and spending your time helping me
+> >> an the others.
+> >>
+> >> I tried to make the Apple BT Keyboard work with my GNU/Linux and
+> >> Marcel's help (thank you Marcel) but i did not have the tool "hcidump"
+> >> to debug the inquiries and conexions and i was too lost in this field.
+> >> Now i think (hope) i have it all and my goals are:
+> >>
+> >> -Make sure i have the right configuration needs for BT use.
+> >> -Permanently replace the pc105 keyboard.
+> >> -Configure correctly the Apple BT Keyboard.
+> >>
+> >> Would you please help/guide me to get it?, i would really appreciate
+> >> it!.
+> >>
+> >> I read several people have got it with the Apple keyboard.Somebody
+> >> told about writting a HOWTO, as it's becomeing an usual stuff
+> >> (GNU/Linux-Bluez and BT keyboards), i would be interested in help to
+> >> it.
+> >>
+> >> Thank you all.
 
-SuSE Linux 9.3 preconfigures the configuration like this for rfcomm: 
+Jes=FAs Cano Navarro
 
--f /etc/bluetooth/rfcomm.conf bind all
+------=_Part_4901_24602911.1116276576151
+Content-Type: application/octet-stream; name="hcid.conf"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="hcid.conf"
 
-and inside the rfcomm.conf 
-
-#
-# RFCOMM configuration file.
-#
-# $Id: rfcomm.conf,v 1.1 2002/10/07 05:58:18 maxk Exp $
-#
-
-rfcomm0 {
-        # Automatically bind the device at startup
-        bind no;
-
-        # Bluetooth address of the device
-        device 11:22:33:44:55:66;
-
-        # RFCOMM channel for the connection
-        channel 1;
-
-        # Description of the connection
-        comment "Example Bluetooth device";
-}
-
-the result by quering the phone: 
-
-Browsing 00:E0:03:65:64:94 ...
-Service Name: Hands-Free Audio Gateway
-Service RecHandle: 0x10000
-Service Class ID List:
-  "Handfree Audio Gateway" (0x111f)
-  "Generic Audio" (0x1203)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 1
-Language Base Attr List:
-  code_ISO639: 0x454e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Handfree Audio Gateway" (0x111f)
-    Version: 0x0101
-
-Service Name: OBEX File Transfer
-Service RecHandle: 0x10001
-Service Class ID List:
-  "OBEX File Transfer" (0x1106)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 10
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x454e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "OBEX File Transfer" (0x1106)
-    Version: 0x0100
-
-Service Name: SyncMLClient
-Service RecHandle: 0x10002
-Service Class ID List:
-  "Error: This is UUID-128" (0x00000002-0000-1000-8000-0002ee000002)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 11
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x454e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Error: This is UUID-128" (0x00000002-0000-1000-8000-0002ee000002)
-    Version: 0x0100
-
-Service Name: Nokia OBEX PC Suite Services
-Service RecHandle: 0x10003
-Service Class ID List:
-  "Error: This is UUID-128" (0x00005005-0000-1000-8000-0002ee000001)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 12
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x454e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Error: This is UUID-128" (0x00005005-0000-1000-8000-0002ee000001)
-    Version: 0x0100
-
-Service Name: OBEX Object Push
-Service RecHandle: 0x10004
-Service Class ID List:
-  "OBEX Object Push" (0x1105)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 9
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x454e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "OBEX Object Push" (0x1105)
-    Version: 0x0100
-
-Service Name: Dial-Up Networking
-Service RecHandle: 0x10005
-Service Class ID List:
-  "Dialup Networking" (0x1103)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 2
-Language Base Attr List:
-  code_ISO639: 0x454e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Dialup Networking" (0x1103)
-    Version: 0x0100
-
-
-
+IwojIEhDSSBkYWVtb24gY29uZmlndXJhdGlvbiBmaWxlLgojCiMgJElkOiBoY2lkLmNvbmYsdiAx
+LjcgMjAwNC8xMi8xMyAxNDoxNjowMyBob2x0bWFubiBFeHAgJAojCgojIEhDSWQgb3B0aW9ucwpv
+cHRpb25zIHsKCSMgQXV0b21hdGljYWxseSBpbml0aWFsaXplIG5ldyBkZXZpY2VzCglhdXRvaW5p
+dCB5ZXM7CgoJIyBTZWN1cml0eSBNYW5hZ2VyIG1vZGUKCSMgICBub25lIC0gU2VjdXJpdHkgbWFu
+YWdlciBkaXNhYmxlZAoJIyAgIGF1dG8gLSBVc2UgbG9jYWwgUElOIGZvciBpbmNvbWluZyBjb25u
+ZWN0aW9ucwoJIyAgIHVzZXIgLSBBbHdheXMgYXNrIHVzZXIgZm9yIGEgUElOCgkjCglzZWN1cml0
+eSBhdXRvOwoKCSMgUGFpcmluZyBtb2RlCgkjICAgbm9uZSAgLSBQYWlyaW5nIGRpc2FibGVkCgkj
+ICAgbXVsdGkgLSBBbGxvdyBwYWlyaW5nIHdpdGggYWxyZWFkeSBwYWlyZWQgZGV2aWNlcwoJIyAg
+IG9uY2UgIC0gUGFpciBvbmNlIGFuZCBkZW55IHN1Y2Nlc3NpdmUgYXR0ZW1wdHMKCXBhaXJpbmcg
+bXVsdGk7CgoJIyBQSU4gaGVscGVyCglwaW5faGVscGVyIC91c3IvYmluL2JsdWV6LXBpbjsKCgkj
+IEQtQnVzIFBJTiBoZWxwZXIKCSNkYnVzX3Bpbl9oZWxwZXI7Cn0KCiMgRGVmYXVsdCBzZXR0aW5n
+cyBmb3IgSENJIGRldmljZXMKZGV2aWNlIHsKCSMgTG9jYWwgZGV2aWNlIG5hbWUKCSMgICAlZCAt
+IGRldmljZSBpZAoJIyAgICVoIC0gaG9zdCBuYW1lCgluYW1lICIlaC0lZCI7CgoJIyBMb2NhbCBk
+ZXZpY2UgY2xhc3MKCWNsYXNzIDB4M2UwMTAwOwoKCSMgRGVmYXVsdCBwYWNrZXQgdHlwZQoJI3Br
+dF90eXBlIERIMSxETTEsSFYxOwoKCSMgSW5xdWlyeSBhbmQgUGFnZSBzY2FuCglpc2NhbiBlbmFi
+bGU7IHBzY2FuIGVuYWJsZTsKCgkjIERlZmF1bHQgbGluayBtb2RlCgkjICAgbm9uZSAgIC0gbm8g
+c3BlY2lmaWMgcG9saWN5IAoJIyAgIGFjY2VwdCAtIGFsd2F5cyBhY2NlcHQgaW5jb21pbmcgY29u
+bmVjdGlvbnMKCSMgICBtYXN0ZXIgLSBiZWNvbWUgbWFzdGVyIG9uIGluY29taW5nIGNvbm5lY3Rp
+b25zLAoJIyAgICAgICAgICAgIGRlbnkgcm9sZSBzd2l0Y2ggb24gb3V0Z29pbmcgY29ubmVjdGlv
+bnMKCWxtIGFjY2VwdDsKCgkjIERlZmF1bHQgbGluayBwb2xpY3kKCSMgICBub25lICAgIC0gbm8g
+c3BlY2lmaWMgcG9saWN5CgkjICAgcnN3aXRjaCAtIGFsbG93IHJvbGUgc3dpdGNoCgkjICAgaG9s
+ZCAgICAtIGFsbG93IGhvbGQgbW9kZQoJIyAgIHNuaWZmICAgLSBhbGxvdyBzbmlmZiBtb2RlCgkj
+ICAgcGFyayAgICAtIGFsbG93IHBhcmsgbW9kZQoJbHAgcnN3aXRjaCxob2xkLHNuaWZmLHBhcms7
+CgoJIyBBdXRoZW50aWNhdGlvbiBhbmQgRW5jcnlwdGlvbiAoU2VjdXJpdHkgTW9kZSAzKQoJI2F1
+dGggZW5hYmxlOwoJI2VuY3J5cHQgZW5hYmxlOwp9Cg==
+------=_Part_4901_24602911.1116276576151--
 
 
 -------------------------------------------------------
