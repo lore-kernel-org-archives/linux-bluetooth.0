@@ -1,5 +1,5 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4288F29B.8030108@xmission.com>
+Message-ID: <42882878.2080702@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
@@ -16,12 +16,9 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 16 May 2005 13:20:59 -0600
+Date: Sun, 15 May 2005 22:58:32 -0600
 
-Hey
-
-I sent this once last night but newer stuff is making it through so it 
-must have been dropped...
+Hi
 
 I wrote up the status in the hope that someone feels like jumping in:
 
