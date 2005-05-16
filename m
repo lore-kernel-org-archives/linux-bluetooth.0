@@ -1,10 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42882878.2080702@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] btsco on xscale status
+Subject: Re: [Bluez-devel] Dealing with the bluez-utils dependencies
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb05051610046ddb3671@mail.gmail.com>
+References: <1115722824.8949.242.camel@pegasus>
+	 <e1effdeb05051006043be12b4a@mail.gmail.com>
+	 <1115901638.18499.30.camel@pegasus>
+	 <e1effdeb0505120553473405cc@mail.gmail.com>
+	 <1115903015.18499.34.camel@pegasus>
+	 <e1effdeb05051610046ddb3671@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1116264847.10063.20.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,20 +23,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 15 May 2005 22:58:32 -0600
+Date: Mon, 16 May 2005 19:34:07 +0200
 
-Hi
+Hi Claudio,
 
-I wrote up the status in the hope that someone feels like jumping in:
+> After lost a lot of time trying change the code to support
+> DBUS version 0.33 I was informed that the code for get byte 
+> arrays is broken.
 
-  http://bluetooth-alsa.sourceforge.net/embed.html
+check the bluez-utils CVS. I added a D-Bus patch from the Fedore Core
+packages to workaround some API changes.
 
-basically, we need libsbc implemented without floating point and 
-probably a better bluetooth chip than gumstix provides.
+Regards
 
-Fortunately, my paycheck doesn't depend on this stuff working :)
+Marcel
 
-Brad
+
 
 
 -------------------------------------------------------
