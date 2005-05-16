@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050517063124.90031.qmail@web8308.mail.in.yahoo.com>
-From: Mayank Batra <mayankbatra@yahoo.co.in>
-To: BLUEZ DEVELOPERS LIST <bluez-devel@lists.sourceforge.net>
+Message-ID: <4288F29B.8030108@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] a2play timing is still whacky
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] btsco on xscale status
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,35 +16,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 17 May 2005 07:31:24 +0100 (BST)
+Date: Mon, 16 May 2005 13:20:59 -0600
 
-Brad,
+Hey
 
-I tried the latest version of a2play with BlueSoleil.
-The timing is still not upto the mark.
-I mean, this time, the sound is breking, i.e I feel we
-are putting a greater delay than what is needed.
+I sent this once last night but newer stuff is making it through so it 
+must have been dropped...
 
-len = sbc_encode(&sbc, buf2, size2);//do the encoding
-	sleeptime = sbc.duration;
-	sbc_info.blocks = sbc.blocks;
-	sbc_info.subbands = sbc.subbands;
+I wrote up the status in the hope that someone feels like jumping in:
 
-Here, why are we using the variable sleeptime if we
-are not making use of it later on in the code?
+  http://bluetooth-alsa.sourceforge.net/embed.html
 
-// pause if the ring buffer is full
-while((ring_out + 1) % FRAMEBUF == ring_in)
-usleep(10);
+basically, we need libsbc implemented without floating point and 
+probably a better bluetooth chip than gumstix provides.
 
-Here, why did you choose usleep(10) only?
+Fortunately, my paycheck doesn't depend on this stuff working :)
 
-Mayank.
-        
-
-________________________________________________________________________
-Yahoo! India Matrimony: Find your life partner online
-Go to: http://yahoo.shaadi.com/india-matrimony
+Brad
 
 
 -------------------------------------------------------
