@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-users] 3COM PCMCIA Bluetooth question
+Subject: Re: [Bluez-users] Fwd:
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <B7A120329D087840A54E2A221FCCE8D074732D@PSCMAIL01.rochester.itsphoenix.com>
-References: 
-	 <B7A120329D087840A54E2A221FCCE8D074732D@PSCMAIL01.rochester.itsphoenix.com>
+In-Reply-To: <20050517233518.5844.qmail@web31108.mail.mud.yahoo.com>
+References: <20050517233518.5844.qmail@web31108.mail.mud.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1116373570.10063.151.camel@pegasus>
+Message-Id: <1116373508.10063.149.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,18 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 May 2005 01:46:10 +0200
+Date: Wed, 18 May 2005 01:45:08 +0200
 
-Hi John,
+Hi Jatin,
 
-> When I do the "hciattach ttyS3 3com" the response is "Initialization
-> timed out". I ran the timeout period up to 20 seconds in 5 second incs
-> and same result. 
->  
-> BTW - I very much appreciate your help with this!
+> > I looked thru the avdtp code (bluetooth-alsa), but did not find
+> > support for AVDTP_SUSPEND. Was wondering if anybody has worked to
+> > provide that support and can email me the code (even if it is alpha
+> > or beta).
 
-I can't give you any further help. I don't have this card at home. Feel
-free to donate one to me for testing.
+there is not support for AVDTP_SUSPEND at the moment. We also don't need
+it right now. Maybe the ALSA A2DP plugin would make use of it in the
+future.
 
 Regards
 
