@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <428A8640.3020109@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: RE: [Bluez-users] 3COM PCMCIA Bluetooth question
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Fwd:
-References: <20050517233518.5844.qmail@web31108.mail.mud.yahoo.com>
-In-Reply-To: <20050517233518.5844.qmail@web31108.mail.mud.yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <B7A120329D087840A54E2A221FCCE8D074732D@PSCMAIL01.rochester.itsphoenix.com>
+References: 
+	 <B7A120329D087840A54E2A221FCCE8D074732D@PSCMAIL01.rochester.itsphoenix.com>
+Content-Type: text/plain
+Message-Id: <1116373570.10063.151.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,50 +19,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 May 2005 18:03:12 -0600
+Date: Wed, 18 May 2005 01:46:10 +0200
 
-Jatin,
+Hi John,
 
-We have not implemented suspend in the prototype. Do you want suspend so 
-the headset can use SCO to a different device?
+> When I do the "hciattach ttyS3 3com" the response is "Initialization
+> timed out". I ran the timeout period up to 20 seconds in 5 second incs
+> and same result. 
+>  
+> BTW - I very much appreciate your help with this!
 
-Brad
+I can't give you any further help. I don't have this card at home. Feel
+free to donate one to me for testing.
 
-Jatin Nahar wrote:
-> 
-> 
-> Note: forwarded message attached.
-> 
-> ------------------------------------------------------------------------
-> Yahoo! Mail Mobile
-> Take Yahoo! Mail with you! 
-> <http://us.rd.yahoo.com/mail_us/taglines/mobile/*http://mobile.yahoo.com/learn/mail> 
-> Check email on your mobile phone.
-> ------------------------------------------------------------------------
-> 
-> From:
-> "Jatin Nahar" <jnahar@rfmd.com>
-> Date:
-> Tue, 17 May 2005 09:33:31 -0700
-> To:
-> <jatin_nahar@yahoo.com>
-> 
-> To:
-> <jatin_nahar@yahoo.com>
-> 
-> 
-> To _bluez-users@lists.sourceforge.net_ 
-> <mailto:bluez-users@lists.sourceforge.net>
-> Sub: AVDTP command set
-> 
-> Hi All,
-> I looked thru the avdtp code (bluetooth-alsa), but did not find support 
-> for AVDTP_SUSPEND. Was wondering if anybody has worked to provide that 
-> support and can email me the code (even if it is alpha or beta).
-> 
-> Regards,
-> Jatin
-> 
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
