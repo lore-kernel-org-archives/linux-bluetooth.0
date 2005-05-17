@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] problems syncing with bluetooth on multisync:
-	evolution/blueotooth plugin
+Subject: Re: [Bluez-users] 3COM PCMCIA Bluetooth question
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1116327973.21185.1.camel@linux.site>
-References: <1116313073.10074.8.camel@linux.site>
-	 <4289A32A.1040907@citromail.hu>  <1116327973.21185.1.camel@linux.site>
+In-Reply-To: <B7A120329D087840A54E2A221FCCE8D0747321@PSCMAIL01.rochester.itsphoenix.com>
+References: 
+	 <B7A120329D087840A54E2A221FCCE8D0747321@PSCMAIL01.rochester.itsphoenix.com>
 Content-Type: text/plain
-Message-Id: <1116329361.10063.44.camel@pegasus>
+Message-Id: <1116329290.10063.42.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,15 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 May 2005 13:29:21 +0200
+Date: Tue, 17 May 2005 13:28:10 +0200
 
-Hi Tamer,
+Hi John,
 
-> Thank you for your help. I discovered that 'bluez-pin' was on the system
-> not installed. I downloaded the package, but nothing happened. What
-> could it be that the same error do still exist?!
+> Can anyone provide some insight/directions/help getting the 3COM
+> Bluetooth PCMCIA
+> card ( 3CRWB6096B  ver3 ) to work with Debian Linux at kernel version
+> 2.4.27.vrs1 running
+> on an arm-linux platform (PXA255 Xscale w/ SA1111 I/O processor).
+> Should this device 'just work' at this kernel level provided config
+> files are correct??
 
-make sure that kdebluetooth is installed and running.
+do you see another ttySx device when you call dmesg after you plugged in
+this card? Check your syslog to see what happens.
 
 Regards
 
