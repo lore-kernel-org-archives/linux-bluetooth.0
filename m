@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <428A0F38.5050902@bungtopia.com>
-From: michael <michael@bungtopia.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] btsco on xscale status
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-References: <5256d0b050514160856c4d194@mail.gmail.com>	 <1116112975.8886.25.camel@pegasus>	 <5256d0b05051416323a633e2d@mail.gmail.com> <1116115930.8886.27.camel@pegasus>
-In-Reply-To: <1116115930.8886.27.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] RSSI from rfcomm
+In-Reply-To: <4288F29B.8030108@xmission.com>
+References: <4288F29B.8030108@xmission.com>
+Content-Type: text/plain
+Message-Id: <1116329241.10063.41.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,18 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 18 May 2005 01:05:20 +0930
+Date: Tue, 17 May 2005 13:27:21 +0200
 
-I'm using pretty standard sockets to create a bluetooth connection. I 
-can communicate fine with my J2ME app however I was wondering if it is 
-at all possible to read the RSSI from an RFCOMM layer connection. I can 
-read it fine if I make a lower level connection, but this is not at all 
-suited to my application..
+Hi Brad,
 
-So, how can I read the RSSI when I dont have access to all the data I 
-need to pass to the hci_read_rssi() method??
+> I sent this once last night but newer stuff is making it through so it 
+> must have been dropped...
 
-Thanks.
+sometimes Sourceforge mailing lists have a hic-up and you should give
+them a day or two. I've never seen any email of me that got lost and I
+post on quite a lot of their mailing lists.
+
+Regards
+
+Marcel
+
 
 
 
