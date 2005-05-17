@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Message-ID: <OF9A811F48.3D259B3A-ONC1257004.002BB233-C1257004.002F049A@telemotive.de>
-From: Markus.Heininger@telemotive.de
-Content-Type: multipart/alternative; boundary="=_alternative 002F0494C1257004_="
-Subject: [Bluez-devel] HCI-Uart Driver & Kernel 2.4.25 , Headset/Handsfree Profile
+Message-ID: <OFF94009FD.979DC289-ON48257004.002A9237-48257004.002AFF0D@zte.com.cn>
+From: gao.yingbin@zte.com.cn
+Content-Type: multipart/alternative; boundary="=_alternative 002AFF0848257004_="
+Subject: [Bluez-devel] can not support multiple "Class of Device"?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,130 +16,56 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 17 May 2005 10:33:15 +0200
+Date: Tue, 17 May 2005 15:56:09 +0800
 
-Dies ist eine mehrteilige Nachricht im MIME-Format.
---=_alternative 002F0494C1257004_=
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
+This is a multipart message in MIME format.
+--=_alternative 002AFF0848257004_=
+Content-Type: text/plain; charset="GB2312"
+Content-Transfer-Encoding: base64
 
-Hello,
+SGksDQppbiB0aGUgZmlsZSAiaGNpZC5jb25mIiB3ZSBjYW4gc2V0IHRoZSB2YWx1ZSBvZiAiQ2xh
+c3Mgb2YgRGV2aWNlIi50aGVyZSBpcyANCmEgcXVlc3Rpb246IGlmIEkgd2FudCB0byBydW4gc2V2
+ZXJhbCBwcm9maWxlcyBzaW11bHRhbmVvdXNseSwgc3VjaCBhcyBwYW5kIA0KoaJkdW5koaJmdXR1
+cmUgY3RwZCwgaG93IGNhbiBJIHNldCB0aGUgdmFsdWUgb2YgIkNsYXNzIG9mIERldmljZSI/IGlz
+IGl0IA0KbmVjZXNzYXJ5IHRvIG1vZGlmeSB0aGUgaGNpZCdzIGNvZGUgdG8gZmlndXJlIG91dCB0
+aGUgcXVlc3Rpb24/DQoKCgoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+KioqKioqKgrQxc+isLLIq8n5w/ejurG+08q8/rD8uqzQxc+iuelaVEXL+dPQo6wKWlRFttS4w9PK
+vP7TtdPQy/nT0MiowPuho8frvdPK1dXf16LS4gqxo8Pco6zOtL6tt6K8/sjLyunD5tDtv8mjrLK7
+tcPP8sjOus612grI/be91+nWr7rNuPbIy824wraxvtPKvP7L+bqs0MXPorXEyKuyvwq78rK/t9ah
+o9LUyc/J+cP3vfbKytPD09q5pNf308q8/qGjCkluZm9ybWF0aW9uIFNlY3VyaXR5ICBOb3RpY2Wj
+ugpUaGUgaW5mb3JtYXRpb24gY29udGFpbmVkIGluIHRoaXMgbWFpbCBpcwpzb2xlbHkgcHJvcGVy
+dHkgb2YgIFpURSBDb3Jwb3JhdGlvbi4gClRoaXMgbWFpbCBjb21tdW5pY2F0aW9uIGlzIGNvbmZp
+ZGVudGlhbC4KUmVjaXBpZW50cyBuYW1lZCBhYm92ZSBhcmUgb2JsaWdhdGVkIHRvCm1haW50YWlu
+IHNlY3JlY3kgYW5kIGFyZSBub3QgcGVybWl0dGVkIHRvCmRpc2Nsb3NlIHRoZSBjb250ZW50cyBv
+ZiB0aGlzIGNvbW11bmljYXRpb24KdG8gb3RoZXJzLgoqKioqKioqKioqKioqKioqKioqKioqKioq
+KioqKioqKioqKioqKioqKioqKioqKgo=
+--=_alternative 002AFF0848257004_=
+Content-Type: text/html; charset="GB2312"
+Content-Transfer-Encoding: base64
 
-I=B4m trying to get the Handsfree/Headset-Profile running on an embedded=20
-power pc-platform using the 2.4.25 kernel and a bluetooth module
-which is connected to the host processor via UART-Interface.=20
-
-The strange thing is that all other profiles work fine (OBEX, DUN etc.)
-but when it comes to transfer synchronous data in both directions like the =
-
-handsfree profile does, I got an error message from
-the kernel like "unkown HCI packet type 00 received".
-
-Although there were no additional error messages from the kernel like=20
-buffer overruns of the UART interface, the first thing I thought about=20
-was that there might by something wrong with the hardware handshake of the =
-
-UART interface, but I managed to connect the bluetooth module=20
-via RS232 to a normal PC running linux kernel 2.6 even without RTS and CTS =
-
-lines of the UART interface connected (only RXD & TXD).=20
-Here everything works fine, so the problem is surely not caused by a=20
-missing/buggy hardware handshake.
-
-It would be a hard work to upgrade from kernel 2.4  to 2.6 on our platform =
-
-since we already applied many changes to the kernel (not concerning=20
-bluez),
-so my question is if someone of you did experience the same problems and=20
-perhaps there is a way to patch the linux 2.4 kernel to solve them.
-
-I already applied all available patches to bluez, but I=B4m afraid that the=
-=20
-problem originates on a different place in the linux 2.4 kernel, maybe
-in the higher level - serial/tty drivers or in the communication between=20
-them and the hci uart driver.
-
-Perhaps someone of you can help me,
-
-many thanks and with best regards,
-Markus
-
-
-
-
-
-
---=_alternative 002F0494C1257004_=
-Content-Type: text/html; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-
-<br><font size=3D2 face=3D"sans-serif">Hello,</font>
-<br>
-<br><font size=3D2 face=3D"sans-serif">I=B4m trying to get the Handsfree/He=
-adset-Profile
-running on an embedded power pc-platform using the 2.4.25 kernel and a
-bluetooth module</font>
-<br><font size=3D2 face=3D"sans-serif">which is connected to the host proce=
-ssor
-via UART-Interface. </font>
-<br>
-<br><font size=3D2 face=3D"sans-serif">The strange thing is that all other
-profiles work fine (OBEX, DUN etc.)</font>
-<br><font size=3D2 face=3D"sans-serif">but when it comes to transfer synchr=
-onous
-data in both directions like the handsfree profile does, I got an error
-message from</font>
-<br><font size=3D2 face=3D"sans-serif">the kernel like &quot;unkown HCI pac=
-ket
-type 00 received&quot;.</font>
-<br>
-<br><font size=3D2 face=3D"sans-serif">Although there were no additional er=
-ror
-messages from the kernel like buffer overruns of the UART interface, the
-first thing I thought about </font>
-<br><font size=3D2 face=3D"sans-serif">was that there might by something wr=
-ong
-with the hardware handshake of the UART interface, but I managed to connect
-the bluetooth module </font>
-<br><font size=3D2 face=3D"sans-serif">via RS232 to a normal PC running lin=
-ux
-kernel 2.6 even without RTS and CTS lines of the UART interface connected
-(only RXD &amp; TXD). </font>
-<br><font size=3D2 face=3D"sans-serif">Here everything works fine, so the p=
-roblem
-is surely not caused by a missing/buggy hardware handshake.</font>
-<br>
-<br><font size=3D2 face=3D"sans-serif">It would be a hard work to upgrade f=
-rom
-kernel 2.4 &nbsp;to 2.6 on our platform since we already applied many chang=
-es
-to the kernel (not concerning bluez),</font>
-<br><font size=3D2 face=3D"sans-serif">so my question is if someone of you
-did experience the same problems and perhaps there is a way to patch the
-linux 2.4 kernel to solve them.</font>
-<br>
-<br><font size=3D2 face=3D"sans-serif">I already applied all available patc=
-hes
-to bluez, but I=B4m afraid that the problem originates on a different place
-in the linux 2.4 kernel, maybe</font>
-<br><font size=3D2 face=3D"sans-serif">in the higher level - serial/tty dri=
-vers
-or in the communication between them and the hci uart driver.</font>
-<br>
-<br><font size=3D2 face=3D"sans-serif">Perhaps someone of you can help me,<=
-/font>
-<br>
-<br><font size=3D2 face=3D"sans-serif">many thanks and with best regards,</=
-font>
-<br><font size=3D2 face=3D"sans-serif">Markus</font>
-<br>
-<br>
-<br>
-<br>
-<br><font size=3D2 face=3D"sans-serif"><br>
-</font>
---=_alternative 002F0494C1257004_=--
+DQo8YnI+PGZvbnQgc2l6ZT0yIGZhY2U9InNhbnMtc2VyaWYiPkhpLDwvZm9udD4NCjxicj48Zm9u
+dCBzaXplPTIgZmFjZT0ic2Fucy1zZXJpZiI+aW4gdGhlIGZpbGUgJnF1b3Q7aGNpZC5jb25mJnF1
+b3Q7IHdlDQpjYW4gc2V0IHRoZSB2YWx1ZSBvZiAmcXVvdDtDbGFzcyBvZiBEZXZpY2UmcXVvdDsu
+dGhlcmUgaXMgYSBxdWVzdGlvbjogaWYNCkkgd2FudCB0byBydW4gc2V2ZXJhbCBwcm9maWxlcyBz
+aW11bHRhbmVvdXNseSwgc3VjaCBhcyBwYW5kIKGiZHVuZKGiZnV0dXJlDQpjdHBkLCBob3cgY2Fu
+IEkgc2V0IHRoZSB2YWx1ZSBvZiAmcXVvdDtDbGFzcyBvZiBEZXZpY2UmcXVvdDs/IGlzIGl0IG5l
+Y2Vzc2FyeQ0KdG8gbW9kaWZ5IHRoZSBoY2lkJ3MgY29kZSB0byBmaWd1cmUgb3V0IHRoZSBxdWVz
+dGlvbj88L2ZvbnQ+DQo8YnI+PGJyPjxicj4KKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+KioqKioqKioqKioqKioqKio8YnI+CtDFz6KwssiryfnD96O6sb7Tyrz+sPy6rNDFz6K56VpURcv5
+09CjrDxicj4KWlRFttS4w9PKvP7TtdPQy/nT0MiowPuho8frvdPK1dXf16LS4jxicj4KsaPD3KOs
+zrS+rbeivP7Iy8rpw+bQ7b/Jo6yyu7XDz/LIzrrOtdo8YnI+Csj9t73X6davus249sjLzbjCtrG+
+08q8/sv5uqzQxc+itcTIq7K/PGJyPgq78rK/t9aho9LUyc/J+cP3vfbKytPD09q5pNf308q8/qGj
+PGJyPgpJbmZvcm1hdGlvbiZuYnNwO1NlY3VyaXR5Jm5ic3A7Jm5ic3A7Tm90aWNlo7o8YnI+ClRo
+ZSZuYnNwO2luZm9ybWF0aW9uJm5ic3A7Y29udGFpbmVkJm5ic3A7aW4mbmJzcDt0aGlzJm5ic3A7
+bWFpbCZuYnNwO2lzPGJyPgpzb2xlbHkmbmJzcDtwcm9wZXJ0eSZuYnNwO29mJm5ic3A7Jm5ic3A7
+WlRFJm5ic3A7Q29ycG9yYXRpb24uJm5ic3A7PGJyPgpUaGlzJm5ic3A7bWFpbCZuYnNwO2NvbW11
+bmljYXRpb24mbmJzcDtpcyZuYnNwO2NvbmZpZGVudGlhbC48YnI+ClJlY2lwaWVudHMmbmJzcDtu
+YW1lZCZuYnNwO2Fib3ZlJm5ic3A7YXJlJm5ic3A7b2JsaWdhdGVkJm5ic3A7dG88YnI+Cm1haW50
+YWluJm5ic3A7c2VjcmVjeSZuYnNwO2FuZCZuYnNwO2FyZSZuYnNwO25vdCZuYnNwO3Blcm1pdHRl
+ZCZuYnNwO3RvPGJyPgpkaXNjbG9zZSZuYnNwO3RoZSZuYnNwO2NvbnRlbnRzJm5ic3A7b2YmbmJz
+cDt0aGlzJm5ic3A7Y29tbXVuaWNhdGlvbjxicj4KdG8mbmJzcDtvdGhlcnMuPGJyPgoqKioqKioq
+KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKjxicj4K
+--=_alternative 002AFF0848257004_=--
 
 
 -------------------------------------------------------
