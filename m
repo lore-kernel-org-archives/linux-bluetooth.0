@@ -1,17 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] problems syncing with bluetooth on multisync:
-	evolution/blueotooth plugin
-From: Tamer Higazi <tamer23@myrealbox.com>
+Message-ID: <428AEE59.9070409@whitelabel.org>
+From: Stefan Magdalinski <stefan@whitelabel.org>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1116366743.10063.122.camel@pegasus>
-References: <1116313073.10074.8.camel@linux.site>
-	 <4289A32A.1040907@citromail.hu>  <1116327973.21185.1.camel@linux.site>
-	 <1116329361.10063.44.camel@pegasus>  <1116333932.32701.4.camel@linux.site>
-	 <1116334551.10063.83.camel@pegasus>  <1116359055.8933.6.camel@linux.site>
-	 <1116366743.10063.122.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1116403397.13203.4.camel@linux.site>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] 3COM PCMCIA Bluetooth question
+References: <B7A120329D087840A54E2A221FCCE8D074732D@PSCMAIL01.rochester.itsphoenix.com>
+In-Reply-To: <B7A120329D087840A54E2A221FCCE8D074732D@PSCMAIL01.rochester.itsphoenix.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -23,132 +18,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 May 2005 10:03:17 +0200
+Date: Wed, 18 May 2005 08:27:21 +0100
 
-Dear Marc, 
-With sdptool i quired all services on my phone....
+John G. Moose wrote:
+> Hi Marcel,
+>  
+> When I do the "hciattach ttyS3 3com" the response is "Initialization 
+> timed out". I ran the timeout period up to 20 seconds in 5 second incs 
+> and same result.
+>  
+> BTW - I very much appreciate your help with this!
 
-There are only 4 channels: 
+typo?
 
-1: Hands-Free Audio Gateway
-10: OBEX File Transfer
-11: SyncMLClient
-12: Nokia OBEX PC Suite Services
+try "hciattach ttyS03 3com"
 
-channel "12" is not responding at all...
-while the other do.  I thought 10 "SyncML Client" would do it, this is
-why channel 11. 
+>  
+> John
+> 
+>  >
+>  > Yes, I see two new tty devices:
+>  > 
+>  > ttyS03  at  port  0xF6000000  (irq = 153)  is  a  16C950/954
+>  > ttyS04  at  port  0xF6000008  (irq = 153)  is  a  8250
+> 
+> then use "hciattach ttyS3 3com".
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by Oracle Space Sweepstakes
+> Want to be the first software developer in space?
+> Enter now for the Oracle Space Sweepstakes!
+> http://ads.osdn.com/?ad_id=7412&alloc_id=16344&op=click 
+> <http://ads.osdn.com/?ad_id=7412&alloc_id=16344&op=click>
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
 
-For any help further, thank you 
 
-Tamer
-
-here is the output: 
-
-joker@linux:/> sdptool browse
-Inquiring ...
-Browsing 00:E0:03:65:64:94 ...
-Service Name: Hands-Free Audio Gateway
-Service RecHandle: 0x10000
-Service Class ID List:
-  "Handfree Audio Gateway" (0x111f)
-  "Generic Audio" (0x1203)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 1
-Language Base Attr List:
-  code_ISO639: 0x454e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Handfree Audio Gateway" (0x111f)
-    Version: 0x0101
-
-Service Name: OBEX File Transfer
-Service RecHandle: 0x10001
-Service Class ID List:
-  "OBEX File Transfer" (0x1106)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 10
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x454e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "OBEX File Transfer" (0x1106)
-    Version: 0x0100
-
-Service Name: SyncMLClient
-Service RecHandle: 0x10002
-Service Class ID List:
-  "Error: This is UUID-128" (0x00000002-0000-1000-8000-0002ee000002)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 11
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x454e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Error: This is UUID-128" (0x00000002-0000-1000-8000-0002ee000002)
-    Version: 0x0100
-
-Service Name: Nokia OBEX PC Suite Services
-Service RecHandle: 0x10003
-Service Class ID List:
-  "Error: This is UUID-128" (0x00005005-0000-1000-8000-0002ee000001)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 12
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x454e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Error: This is UUID-128" (0x00005005-0000-1000-8000-0002ee000001)
-    Version: 0x0100
-
-Service Name: OBEX Object Push
-Service RecHandle: 0x10004
-Service Class ID List:
-  "OBEX Object Push" (0x1105)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 9
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x454e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "OBEX Object Push" (0x1105)
-    Version: 0x0100
-
-Service Name: Dial-Up Networking
-Service RecHandle: 0x10005
-Service Class ID List:
-  "Dialup Networking" (0x1103)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 2
-Language Base Attr List:
-  code_ISO639: 0x454e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Dialup Networking" (0x1103)
-    Version: 0x0100
-
+-- 
+/*
+Stefan Magdalinski
++447769 666528 (telephone)
+smagdali (IM/flickr.com/etc)
+*/
 
 
 -------------------------------------------------------
