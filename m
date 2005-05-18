@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <428BD03E.9000307@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed;
- boundary="------------090406060206000709030907"
-Subject: [Bluez-devel] libsbc optimizing
+Message-ID: <C02F8682928AE540A048CD0B1E073C5C01046D04@ES21SNLNT.srn.sandia.gov>
+From: "Mclean, Stephen" <smclean@sandia.gov>
+To: bluez-devel@lists.sourceforge.net
+Content-Type: multipart/alternative;
+ boundary="----_=_NextPart_001_01C55BF2.10D4264B"
+Subject: [Bluez-devel] Rebuild the Kernel?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,95 +17,105 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 18 May 2005 17:31:10 -0600
+Date: Wed, 18 May 2005 15:39:26 -0600
 
 This is a multi-part message in MIME format.
---------------090406060206000709030907
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
 
-Hi,
-
-I have been looking at the problem of libsbc performance on arm. My 
-first pass is on the decoder. I'm trying to cut down deeply nested fp 
-multiply/divide ops.
-
-I originally planned regression tests in the build process for 
-performance/correctness but decided against them:
-
-  - performance may actually go down on x86 where I build when we reduce 
-  fp usage
-  - the character of roundoff errors will change and the lossy stream 
-will probably look different even when it is still "correct"
-
-Anyway, I will need to know the range of certain values in order to make 
-much progress. I tried hunting down how they are calculated but it gets 
-difficult very quickly.
-
-Can I get help with the ranges for bits[ch][sb] in sbc_unpack_frame and 
-the state.* vectors if they're bounded?
-
-How about this first little patch?
-
-Brad
-
---------------090406060206000709030907
+------_=_NextPart_001_01C55BF2.10D4264B
 Content-Type: text/plain;
- name="opt1.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="opt1.patch"
+ charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 
-Index: sbc/sbc.c
-===================================================================
-RCS file: /cvsroot/bluetooth-alsa/btsco/sbc/sbc.c,v
-retrieving revision 1.33
-diff -u -b -B -w -p -r1.33 sbc.c
---- sbc/sbc.c	17 May 2005 06:48:02 -0000	1.33
-+++ sbc/sbc.c	18 May 2005 22:32:13 -0000
-@@ -391,7 +391,6 @@ static int sbc_unpack_frame(const u_int8
- 	int bits[2][8];		/* bits distribution */
- 	int levels[2][8];	/* levels derived from that */
- 
--	double scalefactor[2][8];	/* derived from frame->scale_factors */
- 
- 	if (len < 4)
- 		return -1;
-@@ -525,7 +524,6 @@ static int sbc_unpack_frame(const u_int8
- 	for (ch = 0; ch < frame->channels; ch++) {
- 		for (sb = 0; sb < frame->subbands; sb++) {
- 			levels[ch][sb] = (1 << bits[ch][sb]) - 1;
--			scalefactor[ch][sb] = 2 << frame->scale_factor[ch][sb];
- 		}
- 	}
- 
-@@ -534,8 +532,8 @@ static int sbc_unpack_frame(const u_int8
- 			for (sb = 0; sb < frame->subbands; sb++) {
- 				if (levels[ch][sb] > 0) {
- 					frame->sb_sample[blk][ch][sb] =
--					    scalefactor[ch][sb] * ((frame->audio_sample[blk][ch][sb] * 2.0 + 1.0) /
--								   levels[ch][sb] - 1.0);
-+						(((frame->audio_sample[blk][ch][sb] << 1) | 1) << frame->scale_factor[ch][sb])/(float)levels[ch][sb]
-+						- (1 << frame->scale_factor[ch][sb]);
- 				} else {
- 					frame->sb_sample[blk][ch][sb] = 0;
- 				}
-@@ -547,10 +545,11 @@ static int sbc_unpack_frame(const u_int8
- 		for (blk = 0; blk < frame->blocks; blk++) {
- 			for (sb = 0; sb < frame->subbands; sb++) {
- 				if (frame->join & (0x01 << sb)) {
--					frame->sb_sample[blk][0][sb] =
-+					double temp =
- 					    frame->sb_sample[blk][0][sb] + frame->sb_sample[blk][1][sb];
- 					frame->sb_sample[blk][1][sb] =
--					    frame->sb_sample[blk][0][sb] - 2 * frame->sb_sample[blk][1][sb];
-+					    frame->sb_sample[blk][0][sb] - frame->sb_sample[blk][1][sb];
-+					frame->sb_sample[blk][0][sb] = temp;
- 				}
- 			}
- 		}
+Hello,=20
 
---------------090406060206000709030907--
+I'm using GPE 2.6 for my PDA which is an iPAQ 5400.  I have no idea what
+version of bluetooth comes with GPE 2.6.  Bluetooth starts up properly.
+I wanted to get familiar with the configuration settings (hcid.conf) of
+bluetooth and I edited some configuration settings(I backed up the
+original file to be safe).  I saved the new configuration file and
+rebooted the PDA.  I no longer see the bluetooth icon in GPE anymore.
+So I try to start it manually using "/etc/init.d/bluetooth start".  I
+receive a message saying this:
+
+	Starting Bluetooth subsystem: hcid sdpdCan't open HIDP control
+socket: Invalid argument hidd rfcomm.=20
+
+I tried replaced the modified hcid.conf file with the file that I
+originally backed up.  However, this didn't solve my problem.  I still
+couldn't start the bluetooth service.  I searched the archives for a
+solution and I found this email.
+
+http://sourceforge.net/mailarchive/message.php?msg_id=3D9550822
+
+Does this mean that I need to re-compile the kernel?  Do I just
+re-compile the kernel with the latest patch and then it should work?
+
+Thanks
+
+Stephen
+
+------_=_NextPart_001_01C55BF2.10D4264B
+Content-Type: text/html;
+ charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+6.5.7232.36">
+<TITLE>Rebuild the Kernel?</TITLE>
+</HEAD>
+<BODY>
+<!-- Converted from text/rtf format -->
+
+<P><FONT SIZE=3D2 FACE=3D"Courier New">Hello, </FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Courier New">I'm using GPE 2.6 for my PDA =
+which is an iPAQ 5400.&nbsp; I have no idea what version of bluetooth =
+comes with GPE 2.6.&nbsp; Bluetooth starts up properly.&nbsp; I wanted =
+to get familiar with the configuration settings (hcid.conf) of bluetooth =
+and I edited some configuration settings(I backed up the original file =
+to be safe).&nbsp; I saved the new configuration file and rebooted the =
+PDA.&nbsp; I no longer see the bluetooth icon in GPE anymore.&nbsp; So I =
+try to start it manually using &quot;/etc/init.d/bluetooth =
+start&quot;.&nbsp; I receive a message saying this:</FONT></P>
+
+<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT SIZE=3D2 =
+FACE=3D"Courier New">Starting Bluetooth subsystem: hcid sdpdCan't open =
+HIDP control socket: Invalid argument hidd rfcomm. </FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Courier New">I tried replaced the modified =
+hcid.conf file with the file that I originally backed up.&nbsp; However, =
+this didn't solve my problem.&nbsp; I still couldn't start the bluetooth =
+service.&nbsp; I searched the archives for a solution and I found this =
+email.</FONT></P>
+
+<P><A =
+HREF=3D"http://sourceforge.net/mailarchive/message.php?msg_id=3D9550822">=
+<U><FONT COLOR=3D"#0000FF" SIZE=3D2 FACE=3D"Courier =
+New">http://sourceforge.net/mailarchive/message.php?msg_id=3D9550822</FON=
+T></U></A>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Courier New">Does this mean that I need to =
+re-compile the kernel?&nbsp; Do I just re-compile the kernel with the =
+latest patch and then it should work?</FONT></P>
+
+<P><FONT SIZE=3D2 FACE=3D"Courier New">Thanks</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Courier New">Stephen</FONT>
+</P>
+
+</BODY>
+</HTML>
+------_=_NextPart_001_01C55BF2.10D4264B--
+
 
 
 -------------------------------------------------------
