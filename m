@@ -1,19 +1,19 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Tobias Lang <tobias-lang@gmx.de>
+Subject: Re: [Bluez-users] problems syncing with bluetooth on multisync:
+	evolution/blueotooth plugin
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Hama BT1000 Headset Problems
-Message-ID: <20050518163116.149369f3@localhost.localdomain>
-In-Reply-To: <4287BCAB.8050600@xmission.com>
-References: <20050515145042.70745815.tobias-lang@gmx.de>
-	<428761F9.7070805@xmission.com>
-	<20050515192044.659654d3.tobias-lang@gmx.de>
-	<4287A0A1.80309@xmission.com>
-	<20050515223523.639551bf.tobias-lang@gmx.de>
-	<4287BCAB.8050600@xmission.com>
+In-Reply-To: <1116417991.10287.4.camel@linux.site>
+References: <1116313073.10074.8.camel@linux.site>
+	 <4289A32A.1040907@citromail.hu>  <1116327973.21185.1.camel@linux.site>
+	 <1116329361.10063.44.camel@pegasus>  <1116333932.32701.4.camel@linux.site>
+	 <1116334551.10063.83.camel@pegasus>  <1116359055.8933.6.camel@linux.site>
+	 <1116366743.10063.122.camel@pegasus>  <1116403397.13203.4.camel@linux.site>
+	 <1116407190.10063.181.camel@pegasus> <1116413370.22668.13.camel@linux.site>
+	 <1116414457.10063.216.camel@pegasus>  <1116417991.10287.4.camel@linux.site>
+Content-Type: text/plain
+Message-Id: <1116418487.10063.236.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/signed;
- boundary="Signature_Wed__18_May_2005_16_31_16_+0200_Y/291mKZ0EleDgOy";
- protocol="application/pgp-signature"; micalg=pgp-sha1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -25,63 +25,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 May 2005 16:31:16 +0200
+Date: Wed, 18 May 2005 14:14:47 +0200
 
---Signature_Wed__18_May_2005_16_31_16_+0200_Y/291mKZ0EleDgOy
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Hi Tamer,
 
-On Sun, 15 May 2005 15:18:35 -0600
-Brad Midgley <bmidgley@xmission.com> wrote:
+> However, do you have any idea how SyncML works?! I mean, if the mobile
+> phone has a SyncMLCient. Right?! Multisync has either a syncml plugin.
+> What I am asking myself is, if the client acts the same way as a server
+> does with login and password. That is, what would interist me. If it is
+> the case, we could connect the cell phone mac address with a ipaddress
+> and sync instead with the SyncML client. 
 
-> yes, the bluetooth adapter is more often the problem than the headset.
-> 
+check out www.syncml.org and look at its transports. You can do it over
+TCP/IP and over OBEX. You phone however rejects connections to the
+SyncML over OBEX channel and this looks wrong to me.
 
-Well, I tried the HS with a CSR Dongle:
+> I think I will read about it a bit. Writing a SyncML mobile phone plugin
+> can't be that big hit. 
 
-~$ hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:09:DD:10:75:75 ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:235 acl:0 sco:0 events:28 errors:0
-        TX bytes:393 acl:0 sco:0 commands:22 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ (0)'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver: 0x175
-        Manufacturer: Cambridge Silicon Radio (10)
+Work with OpenSync guys on it.
 
-But now, I am even not able to connect to the HS (both in pairing and normal mode)
+Regards
 
-~$ btsco <headset> -v
-	btsco v0.4b
-	Device is 1:0
-	Error: Failed to connect to SDP server: Permission denied
-	Assuming channel 2
+Marcel
 
-	Voice setting: 0x0060
-	Can't connect RFCOMM channel: Permission denied
 
-Does this mean, the HS is not compatible, or is there anything else really wrong?
-
-Regards, Tobi
---Signature_Wed__18_May_2005_16_31_16_+0200_Y/291mKZ0EleDgOy
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.5 (GNU/Linux)
-
-iD8DBQFCi1G7jxmcDuHlx5oRAm8hAKDL0kdPSzLaeVyUeSFL/CMKPjelEgCggl3m
-kaHG2B6UjE4GQ9m/rwEtLFM=
-=oMMW
------END PGP SIGNATURE-----
-
---Signature_Wed__18_May_2005_16_31_16_+0200_Y/291mKZ0EleDgOy--
 
 
 -------------------------------------------------------
