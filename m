@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: William Pettersson <enigma@strudel-hound.com>
+Message-ID: <20050518181902.75109.qmail@web54702.mail.yahoo.com>
+From: Hiren Mandalia <hir100@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1116475358.32473.9.camel@delta>
-Mime-Version: 1.0
-Subject: [Bluez-users] Lost API? / Creating serial port connection
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-1986832179-1116440342=:68431"
+Subject: [Bluez-users] hstest
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,32 +16,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 May 2005 14:02:38 +1000
+Date: Wed, 18 May 2005 11:19:02 -0700 (PDT)
 
-Ok, I'm working on some Linux drivers to communicate to a Bar Code
-scanner.  It works fine over a regular serial port.  Next task, use
-Bluetooth.  I've just added a Bluetooth module to the bar code scanner,
-and I can communicate with it perfectly fine by using 'hcitool scan' and
-then 'rfcomm connect'.  I then note the serial port, and use that for
-the bar code comms.  However, I wanted to add a GUI type interface to do
-the discovery/connecting part.  Now I can do some simple system calls,
-parsing input and output, but that's dodgy.
+--0-1986832179-1116440342=:68431
+Content-Type: text/plain; charset=us-ascii
 
-So what I wanted to do was basically, run a discovery/inquiry.  Find
-some devices, their names, and possibly classes as well.  And then
-establish a SPP connection to a device.
+hello everyone,
+ 
+i was playing with hstest.c source a little to make it work in a half duplex way i.e. read & write sequentially on the same socket connection. but my machine just freezes when i try to write anythin to the headset. can anyone tell me whats going on? is it not possible to do what I'm trying to do?
+ 
+thanks,
+hiren
 
-But I can't seem to find any sort of programming API for Bluez.  Am I
-just being silly and looking in the wrong places?  I've checked the
-header files, and they're very rudimentary.  I've done the same thing,
-for the same bar code scanner, under PalmOS, and that was, whilst not
-overty simple, not too convoluted.
+		
+---------------------------------
+Yahoo! Mail Mobile
+ Take Yahoo! Mail with you! Check email on your mobile phone.
+--0-1986832179-1116440342=:68431
+Content-Type: text/html; charset=us-ascii
 
-So is there an API out there?
-And is there a simple way to do what I want?
-
-William
-
+<DIV>hello everyone,</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>i was playing with hstest.c source a little to make it work in a&nbsp;half duplex way i.e. read &amp; write sequentially on the same socket connection. but my machine just freezes when i try to write anythin to the headset. can anyone tell me whats going on? is it not possible to do what I'm trying to do?</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>thanks,</DIV>
+<DIV>hiren</DIV><p>
+		<hr size=1>Yahoo! Mail Mobile<br> 
+<a href="http://us.rd.yahoo.com/mail_us/taglines/mobile/*http://mobile.yahoo.com/learn/mail">Take Yahoo! Mail with you!</a> Check email on your mobile phone.
+--0-1986832179-1116440342=:68431--
 
 
 -------------------------------------------------------
