@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] HID Keyboard Emulator enquiry
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1116519017.6838.63.camel@tonyvaio.cregganna.com>
+From: Anthony Jewell <tjewell@cregganna.com>
+To: Bluez Users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1116515326.24921.23.camel@pegasus>
 References: <1116512877.6838.52.camel@tonyvaio.cregganna.com>
 	 <1116515326.24921.23.camel@pegasus>
-	 <1116519017.6838.63.camel@tonyvaio.cregganna.com>
 Content-Type: text/plain
-Message-Id: <1116521849.24921.28.camel@pegasus>
+Message-Id: <1116519017.6838.63.camel@tonyvaio.cregganna.com>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,77 +19,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 May 2005 18:57:28 +0200
+Date: Thu, 19 May 2005 17:10:18 +0100
 
-Hi Anthony,
-
-> > > I'm looking for a HID Bluetooth keyboard emulator for linux so that I
-> > > can type to my Nokia phone from my PC. I tried google but no luck.
-> > 
-> > does your phone support HID-host?
-> > 
-> I believe it does - it supports the Su-8W Bluetooth keyboard.
+On Thu, 2005-05-19 at 16:08, Marcel Holtmann wrote:
+> > I'm looking for a HID Bluetooth keyboard emulator for linux so that I
+> > can type to my Nokia phone from my PC. I tried google but no luck.
 > 
-> http://www.nokia.com/nokia/0,,67021,00.html
+> does your phone support HID-host?
 > 
-> I  have downloaded the phone's Symbian app and its looking for keyboards
-> - I don't understand hcidump output so can't give a definitive answer as
-> to what its looking for - I assume is HID.
+I believe it does - it supports the Su-8W Bluetooth keyboard.
+
+http://www.nokia.com/nokia/0,,67021,00.html
+
+I  have downloaded the phone's Symbian app and its looking for keyboards
+- I don't understand hcidump output so can't give a definitive answer as
+to what its looking for - I assume is HID.
+
+(Can post hcidump output if you would like.)
+
+> > Does anyone know if such a thing already exists. If not I'm willing to
+> > write one.
 > 
-> (Can post hcidump output if you would like.)
+> At the moment nothing like this exists.
 
-I just installed the software on my Nokia 6600 and it is searching for
-the Device ID record and the HID service record.
+Great! Time to write some code! I assume I have to allocate a channel,
+advertise it with sdp, listen for a connection and the rest is just
+application code.....
 
-< ACL data: handle 42 flags 0x02 dlen 24
-    L2CAP(d): cid 0x0067 len 20 [psm 1]
-        SDP SSA Req: tid 0x0 len 0xf
-          pat uuid-16 0x1200 (PNPInfo)
-          max 65535
-          aid(s) 0x0000 - 0xffff
-          cont 00
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 1]
-        SDP SSA Rsp: tid 0x0 len 0x5
-          count 2
-          cont 00
-< ACL data: handle 42 flags 0x02 dlen 24
-    L2CAP(d): cid 0x0067 len 20 [psm 1]
-        SDP SSA Req: tid 0x1 len 0xf
-          pat uuid-16 0x1124 (HID)
-          max 65535
-          aid(s) 0x0000 - 0xffff
-          cont 00
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 1]
-        SDP SSA Rsp: tid 0x1 len 0x5
-          count 2
-          cont 00
+Any pointers to a similar bluez app I can copy the bluetooth stuff
+from..... Any manuals pages for coding to the bluez sdp and socket
+interfaces?
 
-Both service records are not available and thus it fails.
-
-> > > Does anyone know if such a thing already exists. If not I'm willing to
-> > > write one.
-> > 
-> > At the moment nothing like this exists.
-> 
-> Great! Time to write some code! I assume I have to allocate a channel,
-> advertise it with sdp, listen for a connection and the rest is just
-> application code.....
-
-Two channels. L2CAP PSM 17 and PSM 19.
-
-> Any pointers to a similar bluez app I can copy the bluetooth stuff
-> from..... Any manuals pages for coding to the bluez sdp and socket
-> interfaces?
-
-Not really, but this is straight forward socket programming. But you
-need to use HIDP and HID reports and upper protocol.
-
-Regards
-
-Marcel
-
+Anthony
+-- 
+Tony Jewell                             Tony.Jewell@cregganna.com
+Cregganna Computer Consultants Ltd.     http://www.cregganna.com/
 
 
 
