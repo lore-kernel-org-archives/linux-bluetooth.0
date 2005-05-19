@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] HID Keyboard Emulator enquiry
-From: Anthony Jewell <tjewell@cregganna.com>
-To: Bluez Users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1116515326.24921.23.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1116512877.6838.52.camel@tonyvaio.cregganna.com>
 References: <1116512877.6838.52.camel@tonyvaio.cregganna.com>
-	 <1116515326.24921.23.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1116519017.6838.63.camel@tonyvaio.cregganna.com>
+Message-Id: <1116515326.24921.23.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,41 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 May 2005 17:10:18 +0100
+Date: Thu, 19 May 2005 17:08:46 +0200
 
-On Thu, 2005-05-19 at 16:08, Marcel Holtmann wrote:
-> > I'm looking for a HID Bluetooth keyboard emulator for linux so that I
-> > can type to my Nokia phone from my PC. I tried google but no luck.
-> 
-> does your phone support HID-host?
-> 
-I believe it does - it supports the Su-8W Bluetooth keyboard.
+Hi Tony,
 
-http://www.nokia.com/nokia/0,,67021,00.html
+> I'm looking for a HID Bluetooth keyboard emulator for linux so that I
+> can type to my Nokia phone from my PC. I tried google but no luck.
 
-I  have downloaded the phone's Symbian app and its looking for keyboards
-- I don't understand hcidump output so can't give a definitive answer as
-to what its looking for - I assume is HID.
+does your phone support HID-host?
 
-(Can post hcidump output if you would like.)
+> Does anyone know if such a thing already exists. If not I'm willing to
+> write one.
 
-> > Does anyone know if such a thing already exists. If not I'm willing to
-> > write one.
-> 
-> At the moment nothing like this exists.
+At the moment nothing like this exists.
 
-Great! Time to write some code! I assume I have to allocate a channel,
-advertise it with sdp, listen for a connection and the rest is just
-application code.....
+Regards
 
-Any pointers to a similar bluez app I can copy the bluetooth stuff
-from..... Any manuals pages for coding to the bluez sdp and socket
-interfaces?
+Marcel
 
-Anthony
--- 
-Tony Jewell                             Tony.Jewell@cregganna.com
-Cregganna Computer Consultants Ltd.     http://www.cregganna.com/
 
 
 
