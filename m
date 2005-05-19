@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <1710546273@web.de>
-MIME-Version: 1.0
-From: "Mariusz Dziuba" <m.dziuba@web.de>
+Subject: Re: [Bluez-users] hci problems
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset="iso-8859-1"
-Subject: [Bluez-users] RFCOMM Connection Handy to Bluez Application on Linux
+In-Reply-To: <E1DYjP0-00024B-U7@sc8-sf-mx1.sourceforge.net>
+References: <E1DYjP0-00024B-U7@sc8-sf-mx1.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1116505432.24921.13.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,74 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 May 2005 14:07:59 +0200
+Date: Thu, 19 May 2005 14:23:52 +0200
 
-Hello, 
+Hi,
 
-I need some help. I try to connect my Java Handy Application with my Bluez Bluetooth Application on Linux. I will start a serial connection between both devices (RFCOMM).
-For my Test I found this Code for an Bluetooth Server:
+> Here , I want to do the following work : one bluetooth device send the inquiry command (using the hci_inquiry function) and the bluetooth devices who are inquiried of course will return corresponding packets , but how can I know the event that the device is inquiried upon the HCI layer ? Because I have to do some work only if the device is inquired .
 
-	#include <netinet/in.h>
-	#include <arpa/inet.h>
-	#include <sys/types.h>
-	#include <sys/socket.h>
-	
-	#include <bluetooth/bluetooth.h>
-	#include <bluetooth/rfcomm.h>
-	
-	#define CHANNEL 4
-	#define QUEUE 10
-	
-	int main(void)
-	{
-		int sock, client, alen;
-		struct sockaddr_rc addr;
-		
-		sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-		if(sock < 0)
-		{
-			perror("socket");
-			exit(1);
-		}
-		
-		addr.rc_family = AF_BLUETOOTH;
-		bacpy(&addr.rc_bdaddr, BDADDR_ANY);
-		addr.rc_channel = htobs(CHANNEL);
-		alen = sizeof(addr);
-		
-		if(bind(sock, (struct sockaddr *)&addr, alen) < 0)
-		{
-			perror("bind");
-			exit(1);
-		}
-		
-		listen(sock,QUEUE);
-		printf("Waiting for connections...\n\n");
-		
-		while(client = accept(sock, (struct sockaddr *)&addr, &alen))
-		{
-			printf("Got a connection attempt!\n");
-			close(client);
-		}
-		
-		close(sock);
-		return 0;
-	}
+this is not possible.
 
-On my Handy I'm programming the Client in Java unsing JSR 82. In my Application I can find the Linux Device, but if I'm scanning for services (RFCOMM) there will be found no services!
-If I scan my Windows Laptop with the same Application, there are many services. Like this:
-btspp://000B7C59C010:1,encrypt=false;authenticate=false;master=false
-btspp://000B7C59C010:2,encrypt=false;authenticate=false;master=false
-btspp://000B7C59C010:3,encrypt=false;authenticate=false;master=false
-...
+Regards
 
-What I'm doing wrong?!
-Can some one help me with this problem. I'm really desperate.
+Marcel
 
-Thanx Marius
-______________________________________________________________
-Verschicken Sie romantische, coole und witzige Bilder per SMS!
-Jetzt bei WEB.DE FreeMail: http://f.web.de/?mc=021193
 
 
 
