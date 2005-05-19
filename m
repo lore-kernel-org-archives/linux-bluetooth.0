@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Lost API? / Creating serial port connection
-From: Marcel Holtmann <marcel@holtmann.org>
+From: William Pettersson <enigma@strudel-hound.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1116475358.32473.9.camel@delta>
-References: <1116475358.32473.9.camel@delta>
 Content-Type: text/plain
-Message-Id: <1116495294.24921.11.camel@pegasus>
+Message-Id: <1116475358.32473.9.camel@delta>
 Mime-Version: 1.0
+Subject: [Bluez-users] Lost API? / Creating serial port connection
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,40 +16,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 May 2005 11:34:54 +0200
+Date: Thu, 19 May 2005 14:02:38 +1000
 
-Hi William,
+Ok, I'm working on some Linux drivers to communicate to a Bar Code
+scanner.  It works fine over a regular serial port.  Next task, use
+Bluetooth.  I've just added a Bluetooth module to the bar code scanner,
+and I can communicate with it perfectly fine by using 'hcitool scan' and
+then 'rfcomm connect'.  I then note the serial port, and use that for
+the bar code comms.  However, I wanted to add a GUI type interface to do
+the discovery/connecting part.  Now I can do some simple system calls,
+parsing input and output, but that's dodgy.
 
-> I'm working on some Linux drivers to communicate to a Bar Code
-> scanner.  It works fine over a regular serial port.  Next task, use
-> Bluetooth.  I've just added a Bluetooth module to the bar code scanner,
-> and I can communicate with it perfectly fine by using 'hcitool scan' and
-> then 'rfcomm connect'.  I then note the serial port, and use that for
-> the bar code comms.  However, I wanted to add a GUI type interface to do
-> the discovery/connecting part.  Now I can do some simple system calls,
-> parsing input and output, but that's dodgy.
-> 
-> So what I wanted to do was basically, run a discovery/inquiry.  Find
-> some devices, their names, and possibly classes as well.  And then
-> establish a SPP connection to a device.
-> 
-> But I can't seem to find any sort of programming API for Bluez.  Am I
-> just being silly and looking in the wrong places?  I've checked the
-> header files, and they're very rudimentary.  I've done the same thing,
-> for the same bar code scanner, under PalmOS, and that was, whilst not
-> overty simple, not too convoluted.
-> 
-> So is there an API out there?
-> And is there a simple way to do what I want?
+So what I wanted to do was basically, run a discovery/inquiry.  Find
+some devices, their names, and possibly classes as well.  And then
+establish a SPP connection to a device.
 
-since you are using hcitool and rfcomm you might wanna look at the
-source code of these two tools. You can also look at my presentations
-about Bluetooth programming for some examples.
+But I can't seem to find any sort of programming API for Bluez.  Am I
+just being silly and looking in the wrong places?  I've checked the
+header files, and they're very rudimentary.  I've done the same thing,
+for the same bar code scanner, under PalmOS, and that was, whilst not
+overty simple, not too convoluted.
 
-Regards
+So is there an API out there?
+And is there a simple way to do what I want?
 
-Marcel
-
+William
 
 
 
