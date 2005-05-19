@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <428C8D03.5090409@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <20050519120627.77301.qmail@web8303.mail.in.yahoo.com>
+From: Mayank Batra <mayankbatra@yahoo.co.in>
 Subject: Re: [Bluez-devel] Creating more than one instance of BlueZ
-References: <20050519120627.77301.qmail@web8303.mail.in.yahoo.com>
-In-Reply-To: <20050519120627.77301.qmail@web8303.mail.in.yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: 6667
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,86 +17,59 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 19 May 2005 06:56:35 -0600
+Date: Thu, 19 May 2005 13:06:27 +0100 (BST)
 
-Mayank,
+Guys,
 
-I think the best you can expect is for bluez to see hci0 and hci1. then 
-you've got to make sure your apps choose the right adapter.
+I am still looking for a reply...
 
-brad
+This is very necessary since this is the deterrent
+that I am facing during development process.
 
-Mayank Batra wrote:
+Cause I now do not have access to a test PC.
+
+Mayank.
+
+
+
+--- Mayank Batra <mayankbatra@yahoo.co.in> wrote:
 > Guys,
 > 
-> I am still looking for a reply...
+> Is it possible to create more than one instance of
+> BlueZ on my linux machine.
 > 
-> This is very necessary since this is the deterrent
-> that I am facing during development process.
+> That is if I have 2 dongles, but do not have a test
+> PC
+> and I want to test my code, is it possible to do it
+> with one PC ?
 > 
-> Cause I now do not have access to a test PC.
+> Mayank
 > 
-> Mayank.
-> 
-> 
-> 
-> --- Mayank Batra <mayankbatra@yahoo.co.in> wrote:
-> 
->>Guys,
->>
->>Is it possible to create more than one instance of
->>BlueZ on my linux machine.
->>
->>That is if I have 2 dongles, but do not have a test
->>PC
->>and I want to test my code, is it possible to do it
->>with one PC ?
->>
->>Mayank
->>
->>
-> 
-> ________________________________________________________________________
-> 
->>Yahoo! India Matrimony: Find your life partner
->>online
->>Go to: http://yahoo.shaadi.com/india-matrimony
->>
->>
->>
-> 
-> -------------------------------------------------------
-> 
->>This SF.Net email is sponsored by Oracle Space
->>Sweepstakes
->>Want to be the first software developer in space?
->>Enter now for the Oracle Space Sweepstakes!
->>
-> 
-> http://ads.osdn.com/?ad_id=7393&alloc_id=16281&op=click
-> 
->>_______________________________________________
->>Bluez-devel mailing list
->>Bluez-devel@lists.sourceforge.net
->>
-> 
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-> 
-> ________________________________________________________________________
-> Yahoo! India Matrimony: Find your life partner online
+>
+________________________________________________________________________
+> Yahoo! India Matrimony: Find your life partner
+> online
 > Go to: http://yahoo.shaadi.com/india-matrimony
 > 
 > 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by Oracle Space Sweepstakes
+>
+-------------------------------------------------------
+> This SF.Net email is sponsored by Oracle Space
+> Sweepstakes
 > Want to be the first software developer in space?
 > Enter now for the Oracle Space Sweepstakes!
-> http://ads.osdn.com/?ad_id=7412&alloc_id=16344&op=click
+>
+http://ads.osdn.com/?ad_id=7393&alloc_id=16281&op=click
 > _______________________________________________
 > Bluez-devel mailing list
 > Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
+
+________________________________________________________________________
+Yahoo! India Matrimony: Find your life partner online
+Go to: http://yahoo.shaadi.com/india-matrimony
 
 
 -------------------------------------------------------
