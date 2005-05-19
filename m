@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Anthony Jewell <tjewell@cregganna.com>
-To: Bluez Users <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] RFCOMM Connection Handy to Bluez Application on
+	Linux
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1710546273@web.de>
+References: <1710546273@web.de>
 Content-Type: text/plain
-Message-Id: <1116512877.6838.52.camel@tonyvaio.cregganna.com>
+Message-Id: <1116508050.24921.21.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] HID Keyboard Emulator enquiry
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,23 +19,76 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 May 2005 15:27:57 +0100
+Date: Thu, 19 May 2005 15:07:30 +0200
 
-Hi,
+Hi Marius,
 
-Bluez - love it well done to you all!
+> I need some help. I try to connect my Java Handy Application with my Bluez Bluetooth Application on Linux. I will start a serial connection between both devices (RFCOMM).
+> For my Test I found this Code for an Bluetooth Server:
+> 
+> 	#include <netinet/in.h>
+> 	#include <arpa/inet.h>
+> 	#include <sys/types.h>
+> 	#include <sys/socket.h>
+> 	
+> 	#include <bluetooth/bluetooth.h>
+> 	#include <bluetooth/rfcomm.h>
+> 	
+> 	#define CHANNEL 4
+> 	#define QUEUE 10
+> 	
+> 	int main(void)
+> 	{
+> 		int sock, client, alen;
+> 		struct sockaddr_rc addr;
+> 		
+> 		sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+> 		if(sock < 0)
+> 		{
+> 			perror("socket");
+> 			exit(1);
+> 		}
+> 		
+> 		addr.rc_family = AF_BLUETOOTH;
+> 		bacpy(&addr.rc_bdaddr, BDADDR_ANY);
+> 		addr.rc_channel = htobs(CHANNEL);
+> 		alen = sizeof(addr);
+> 		
+> 		if(bind(sock, (struct sockaddr *)&addr, alen) < 0)
+> 		{
+> 			perror("bind");
+> 			exit(1);
+> 		}
+> 		
+> 		listen(sock,QUEUE);
+> 		printf("Waiting for connections...\n\n");
+> 		
+> 		while(client = accept(sock, (struct sockaddr *)&addr, &alen))
+> 		{
+> 			printf("Got a connection attempt!\n");
+> 			close(client);
+> 		}
+> 		
+> 		close(sock);
+> 		return 0;
+> 	}
+> 
+> On my Handy I'm programming the Client in Java unsing JSR 82. In my Application I can find the Linux Device, but if I'm scanning for services (RFCOMM) there will be found no services!
+> If I scan my Windows Laptop with the same Application, there are many services. Like this:
+> btspp://000B7C59C010:1,encrypt=false;authenticate=false;master=false
+> btspp://000B7C59C010:2,encrypt=false;authenticate=false;master=false
+> btspp://000B7C59C010:3,encrypt=false;authenticate=false;master=false
+> ...
+> 
+> What I'm doing wrong?!
 
-I'm looking for a HID Bluetooth keyboard emulator for linux so that I
-can type to my Nokia phone from my PC. I tried google but no luck.
+you need to register a SDP service record for your server. Example for
+this can be found in pand and sdptool.
 
-Does anyone know if such a thing already exists. If not I'm willing to
-write one.
+Regards
 
-Regards,
-	Tony Jewell
--- 
-Tony Jewell                             Tony.Jewell@cregganna.com
-Cregganna Computer Consultants Ltd.     http://www.cregganna.com/
+Marcel
+
 
 
 
