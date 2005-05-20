@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth PCMCIA progress...
+Subject: Re: Re: [Bluez-users] hci problems
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <B7A120329D087840A54E2A221FCCE8D0747334@PSCMAIL01.rochester.itsphoenix.com>
-References: 
-	 <B7A120329D087840A54E2A221FCCE8D0747334@PSCMAIL01.rochester.itsphoenix.com>
+In-Reply-To: <E1DYwg6-0007LC-NP@sc8-sf-mx2.sourceforge.net>
+References: <E1DYwg6-0007LC-NP@sc8-sf-mx2.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1116581734.8970.7.camel@pegasus>
+Message-Id: <1116581686.8970.5.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,22 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 20 May 2005 11:35:34 +0200
+Date: Fri, 20 May 2005 11:34:46 +0200
 
-Hi John,
+Hi,
 
-> I am using the 3COM 3CRWB6096B ver 3 card in a arm-linux system. I
-> insert the card and see two serial ports come online  ttyS03 and
-> ttyS04. When I   "hciattach ttyS3 any" and then "hciconfig -a" I can
-> see that the hci_uart driver has attached as an hci0 device...but the
-> card BD address is all zeros. If I try to "hciattach ttyS3 3com"  the
-> command always returns with "Initialization timed out". Do I need to
-> update/enter a CIS somewhere for this device?   "cardctl ident"
-> returns with correct info for this card.  "hciconfig hci0 up" fails
-> with "Can't init device hci0: Connection timed out (110) "
+> >> Here , I want to do the following work : one bluetooth device send the inquiry command (using the hci_inquiry function) and the bluetooth devices who are inquiried of course will return corresponding packets , but how can I know the event that the device is inquiried upon the HCI layer ? Because I have to do some work only if the device is inquired .
+> >
+> >this is not possible.
+> I have no idea to continue my work without such function ,could you please kindly provide me some alternative methods ?
 
-that is no progress. The "any" method is only dump. What about trying a
-2.6 kernel?
+there exists no alternate method. This stuff is all handled inside the
+baseband and link manager. HCI interaction is not needed.
+
+You need to page (connect) a remote device to make the host stack aware
+of that something happens.
 
 Regards
 
