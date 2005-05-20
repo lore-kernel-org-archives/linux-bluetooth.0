@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: William Pettersson <enigma@strudel-hound.com>
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1116566219.8454.4.camel@delta>
+From: "Cloudshang" <zhixiang_deng@yahoo.com.cn>
+To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+Subject: Re: Re: [Bluez-users] hci problems
 Mime-Version: 1.0
-Subject: [Bluez-users] RFComm library
+Content-Type: text/plain;
+      charset="GB2312"
+Message-ID: <E1DYwg6-0007LC-NP@sc8-sf-mx2.sourceforge.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,29 +17,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 20 May 2005 15:16:58 +1000
+Date: Fri, 20 May 2005 9:54:33 +0800
 
-Ok, so I needed some simple way to use Bluetooth in my application.
-I've basically just done some copying and pasting from the source of the
-tools hcitool and rfcomm, so I can't exactly claim any of this work as
-my own.  It's all under Marcel's GPL still, and will probably stay that
-way.  This is just so far a simple way of doing a bluetooth inquiry/scan
-and getting results back.  I'll take pointers on how to do things
-better/more effectively, but I can't guarantee much.
-What's included is the source for the library, and a sample app.
-The sample app does a bluetooth scan, finds my phone (identified by the
-name 'Will', and then connects to the serial port offered.  The AT+CBC
-that I have in there returns the battery status of my phone, it's just
-my test case.  
-Using the library is explained in the rfcomm-library.h file, and
-hopefully it makes sense.
+Hi , Marcel
 
-This is just to help others who are trying to do what I needed to do,
-hopefully someone will benefit from this.
+Thank you for your quick reply.
+>> Here , I want to do the following work : one bluetooth device=
+ send the inquiry command (using the hci_inquiry function) and=
+ the bluetooth devices who are inquiried of course will return=
+ corresponding packets , but how can I know the event that the=
+ device is inquiried upon the HCI layer ? Because I have to do=
+ some work only if the device is inquired .
+>
+>this is not possible.
+I have no idea to continue my work without such function ,could=
+ you please kindly provide me some alternative methods ?
 
-Will
+The first step of our work is to form a piconet. The master=
+ device is chosen by decreasing a random number to zero. Those=
+ bluetooth devices that have been inquiried by the master in the=
+ piconet should do some work such as stopping the decreasing=
+ process,etc.
 
-http://www.strudel-hound.com/librfcomm.tar.bz2
+Thank you very much for consuming your precious time. 
+=3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D
+Regards,
+        =09=09 
+Cloudshang
+=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1zhixiang_deng@yahoo.com.cn
+=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A12005-05-20
+
+
 
 
 
