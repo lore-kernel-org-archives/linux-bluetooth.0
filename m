@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] mini-pci adapters?
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <428E1B41.7040509@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <428E1B41.7040509@xmission.com>
-References: <428E1B41.7040509@xmission.com>
-Content-Type: text/plain
-Message-Id: <1116610443.8819.29.camel@pegasus>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] mini-pci adapters?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,26 +16,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 20 May 2005 19:34:03 +0200
+Date: Fri, 20 May 2005 11:15:45 -0600
 
-Hi Brad,
+Hey
 
-> Did this ever see the light of day?
-> 
-> http://www.csr.com/pr/pr113.htm
+Did this ever see the light of day?
 
-not that I know of.
+http://www.csr.com/pr/pr113.htm
 
-> It would be a great way to get upgradable internal bluetooth... any idea 
-> how it would look from a bluez driver standpoint?
+It would be a great way to get upgradable internal bluetooth... any idea 
+how it would look from a bluez driver standpoint?
 
-I assume UART or USB.
-
-Regards
-
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
