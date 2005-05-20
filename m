@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: Re: [Bluez-users] hci problems
+Subject: Re: [Bluez-users] RFComm library
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <E1DYwg6-0007LC-NP@sc8-sf-mx2.sourceforge.net>
-References: <E1DYwg6-0007LC-NP@sc8-sf-mx2.sourceforge.net>
+In-Reply-To: <1116566219.8454.4.camel@delta>
+References: <1116566219.8454.4.camel@delta>
 Content-Type: text/plain
-Message-Id: <1116581686.8970.5.camel@pegasus>
+Message-Id: <1116581547.8970.1.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,20 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 20 May 2005 11:34:46 +0200
+Date: Fri, 20 May 2005 11:32:27 +0200
 
-Hi,
+Hi Will,
 
-> >> Here , I want to do the following work : one bluetooth device send the inquiry command (using the hci_inquiry function) and the bluetooth devices who are inquiried of course will return corresponding packets , but how can I know the event that the device is inquiried upon the HCI layer ? Because I have to do some work only if the device is inquired .
-> >
-> >this is not possible.
-> I have no idea to continue my work without such function ,could you please kindly provide me some alternative methods ?
+> Ok, so I needed some simple way to use Bluetooth in my application.
+> I've basically just done some copying and pasting from the source of the
+> tools hcitool and rfcomm, so I can't exactly claim any of this work as
+> my own.  It's all under Marcel's GPL still, and will probably stay that
+> way.  This is just so far a simple way of doing a bluetooth inquiry/scan
+> and getting results back.  I'll take pointers on how to do things
+> better/more effectively, but I can't guarantee much.
+> What's included is the source for the library, and a sample app.
+> The sample app does a bluetooth scan, finds my phone (identified by the
+> name 'Will', and then connects to the serial port offered.  The AT+CBC
+> that I have in there returns the battery status of my phone, it's just
+> my test case.  
+> Using the library is explained in the rfcomm-library.h file, and
+> hopefully it makes sense.
+> 
+> This is just to help others who are trying to do what I needed to do,
+> hopefully someone will benefit from this.
 
-there exists no alternate method. This stuff is all handled inside the
-baseband and link manager. HCI interaction is not needed.
-
-You need to page (connect) a remote device to make the host stack aware
-of that something happens.
+nice stuff, but I think totally unneeded. And in most cases there is no
+need to create a TTY. You can use the RFCOMM socket directly which will
+then result in less code.
 
 Regards
 
