@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] RFComm library
-From: Marcel Holtmann <marcel@holtmann.org>
+From: William Pettersson <enigma@strudel-hound.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1116566219.8454.4.camel@delta>
-References: <1116566219.8454.4.camel@delta>
 Content-Type: text/plain
-Message-Id: <1116581547.8970.1.camel@pegasus>
+Message-Id: <1116566219.8454.4.camel@delta>
 Mime-Version: 1.0
+Subject: [Bluez-users] RFComm library
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,35 +16,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 20 May 2005 11:32:27 +0200
+Date: Fri, 20 May 2005 15:16:58 +1000
 
-Hi Will,
+Ok, so I needed some simple way to use Bluetooth in my application.
+I've basically just done some copying and pasting from the source of the
+tools hcitool and rfcomm, so I can't exactly claim any of this work as
+my own.  It's all under Marcel's GPL still, and will probably stay that
+way.  This is just so far a simple way of doing a bluetooth inquiry/scan
+and getting results back.  I'll take pointers on how to do things
+better/more effectively, but I can't guarantee much.
+What's included is the source for the library, and a sample app.
+The sample app does a bluetooth scan, finds my phone (identified by the
+name 'Will', and then connects to the serial port offered.  The AT+CBC
+that I have in there returns the battery status of my phone, it's just
+my test case.  
+Using the library is explained in the rfcomm-library.h file, and
+hopefully it makes sense.
 
-> Ok, so I needed some simple way to use Bluetooth in my application.
-> I've basically just done some copying and pasting from the source of the
-> tools hcitool and rfcomm, so I can't exactly claim any of this work as
-> my own.  It's all under Marcel's GPL still, and will probably stay that
-> way.  This is just so far a simple way of doing a bluetooth inquiry/scan
-> and getting results back.  I'll take pointers on how to do things
-> better/more effectively, but I can't guarantee much.
-> What's included is the source for the library, and a sample app.
-> The sample app does a bluetooth scan, finds my phone (identified by the
-> name 'Will', and then connects to the serial port offered.  The AT+CBC
-> that I have in there returns the battery status of my phone, it's just
-> my test case.  
-> Using the library is explained in the rfcomm-library.h file, and
-> hopefully it makes sense.
-> 
-> This is just to help others who are trying to do what I needed to do,
-> hopefully someone will benefit from this.
+This is just to help others who are trying to do what I needed to do,
+hopefully someone will benefit from this.
 
-nice stuff, but I think totally unneeded. And in most cases there is no
-need to create a TTY. You can use the RFCOMM socket directly which will
-then result in less code.
+Will
 
-Regards
+http://www.strudel-hound.com/librfcomm.tar.bz2
 
-Marcel
 
 
 
