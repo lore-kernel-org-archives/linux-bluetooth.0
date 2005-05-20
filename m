@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Dick <dm@chello.nl>
+Subject: Re: [Bluez-users] Bluetooth PCMCIA progress...
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Cc: tjewell@cregganna.com
-MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart2456472.i4090Q0uXJ";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Message-Id: <200505201216.17518.dm@chello.nl>
-Subject: [Bluez-users] Re: HID Keyboard Emulator enquiry
+In-Reply-To: <B7A120329D087840A54E2A221FCCE8D0747334@PSCMAIL01.rochester.itsphoenix.com>
+References: 
+	 <B7A120329D087840A54E2A221FCCE8D0747334@PSCMAIL01.rochester.itsphoenix.com>
+Content-Type: text/plain
+Message-Id: <1116581734.8970.7.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,47 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 20 May 2005 12:16:14 +0200
+Date: Fri, 20 May 2005 11:35:34 +0200
 
---nextPart2456472.i4090Q0uXJ
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi John,
 
-> Great! Time to write some code! I assume I have to allocate a channel,
-> advertise it with sdp, listen for a connection and the rest is just
-> application code.....
+> I am using the 3COM 3CRWB6096B ver 3 card in a arm-linux system. I
+> insert the card and see two serial ports come online  ttyS03 and
+> ttyS04. When I   "hciattach ttyS3 any" and then "hciconfig -a" I can
+> see that the hci_uart driver has attached as an hci0 device...but the
+> card BD address is all zeros. If I try to "hciattach ttyS3 3com"  the
+> command always returns with "Initialization timed out". Do I need to
+> update/enter a CIS somewhere for this device?   "cardctl ident"
+> returns with correct info for this card.  "hciconfig hci0 up" fails
+> with "Can't init device hci0: Connection timed out (110) "
 
-Hi Anthony,
+that is no progress. The "any" method is only dump. What about trying a
+2.6 kernel?
 
-I'm also planning on writing a HID keyboard emulator, for fun and reverse=20
-enginering my logitech dinovo mediapad (the bleeping / display stuff)
-It'd be also nice as a bluetooth keyboard / mouse switch.
+Regards
 
-I've already did some SDP stuff, but no L2CAP things yet. I'm kinda scary f=
-or=20
-the HID report protocol ...
+Marcel
 
-Maybe we could work together?
 
-If you are interested please send me a note :)
-
-Greetings,
-Dick
-
---nextPart2456472.i4090Q0uXJ
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQBCjbjx6xLbhaCdQl8RAqfrAJ9lKAzofhDiGMMUyhhh0D5wir2eXACbBgq/
-TkFufOr2HZRA72sIqDToFHs=
-=nMVE
------END PGP SIGNATURE-----
-
---nextPart2456472.i4090Q0uXJ--
 
 
 -------------------------------------------------------
