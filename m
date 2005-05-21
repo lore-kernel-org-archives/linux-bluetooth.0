@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Ruben Jenster <ruben@hotheads.de>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <428EB18C.4010701@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200505211500.37962.ruben@hotheads.de>
-Subject: [Bluez-devel] link_key pairing problem
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] pskey bootmode value
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,26 +16,14 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 21 May 2005 15:00:37 +0200
+Date: Fri, 20 May 2005 21:57:00 -0600
 
-Hi,
+Hi
 
-I hoped to get rid of the pairing problem with my headset but it still exists.
-I had to manually delete the link_key file in /etc/bluetooth. I found a ugly 
-and simple hack: Symlinked /dev/null to /etc/bluetooth/link_key so that 
-everything that gets written to link_key is automatically deleted. This way 
-repairing works but it's not a clean way. I think there is a problem with the 
-pairing mechanism in bluez.  Or could that be a problem of my headset/dongle?
+What bootmode value should I use for hci? I see 0x0001 for hid but I 
+don't want to just "guess" that it's 0...
 
-Actually I'm using bluez-utils /bluez-libs version 2.15. I allready tried 2.16 
-but that doesn't solve  the problem.
-
-Does anyone of you has the same problem?
-
-
-Regards
-
-Ruben
+Brad
 
 
 -------------------------------------------------------
