@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Guylhem Aznar <mutt-ibiblio@externe.net>
+From: Ruben Jenster <ruben@hotheads.de>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050521141350.GA21130@externe.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] btsco client
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200505211500.37962.ruben@hotheads.de>
+Subject: [Bluez-devel] link_key pairing problem
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,26 +17,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 21 May 2005 10:13:50 -0400
+Date: Sat, 21 May 2005 15:00:37 +0200
 
-Hello
+Hi,
 
-IIRC there waere some work on a btsco client, to basically use a PC as
-a BT headset. Any news on that? Anyone using it?
+I hoped to get rid of the pairing problem with my headset but it still exists.
+I had to manually delete the link_key file in /etc/bluetooth. I found a ugly 
+and simple hack: Symlinked /dev/null to /etc/bluetooth/link_key so that 
+everything that gets written to link_key is automatically deleted. This way 
+repairing works but it's not a clean way. I think there is a problem with the 
+pairing mechanism in bluez.  Or could that be a problem of my headset/dongle?
 
-Guylhem
+Actually I'm using bluez-utils /bluez-libs version 2.15. I allready tried 2.16 
+but that doesn't solve  the problem.
 
---=20
-Bien =E0 vous - Best regards,
-Guylhem P. Aznar
+Does anyone of you has the same problem?
 
---=20
-*@externe.net                                            http://externe.n=
-et
-P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
-un.org
-GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
-ey
+
+Regards
+
+Ruben
 
 
 -------------------------------------------------------
