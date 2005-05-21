@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Guylhem Aznar <bluez-devel@externe.net>
+Message-ID: <428F4C12.1030101@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050521160903.GB21130@externe.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] obex ftp server ?
+Subject: Re: [Bluez-devel] btsco client
+References: <20050521141350.GA21130@externe.net>
+In-Reply-To: <20050521141350.GA21130@externe.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,30 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 21 May 2005 12:09:03 -0400
+Date: Sat, 21 May 2005 08:56:18 -0600
 
-Hello
+the only things i'm aware of are linked at the top of bluetooth-alsa.sf.net
 
-I am wondering if any working obex ftp server is available. obexftpd
-doesn't work. I'd be curious to know whether obexapp (freebsd) could
-be compiled. It seems to use openobex and libbsdxml (can't find the
-latter - IIRC it's a fork of libexpat which hopefully will be enough)
+if you find anything else, let me know and i'll add it.
 
-Any clue/suggestion ?
-
-Guylhem
-
---=20
-Bien =E0 vous - Best regards,
-Guylhem P. Aznar
-
---=20
-*@externe.net                                            http://externe.n=
-et
-P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
-un.org
-GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
-ey
+Guylhem Aznar wrote:
+> Hello
+> 
+> IIRC there waere some work on a btsco client, to basically use a PC as
+> a BT headset. Any news on that? Anyone using it?
+> 
+> Guylhem
+> 
 
 
 -------------------------------------------------------
