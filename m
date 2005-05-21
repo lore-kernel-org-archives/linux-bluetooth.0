@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <009f01c55ddf$e8ce1fc0$600a5251@priveiqvfluhp9>
-From: "Pieter De Mil" <mil@pandora.be>
-To: <bluez-users@lists.sourceforge.net>
-References: <1116566219.8454.4.camel@delta> <1116581547.8970.1.camel@pegasus>
+Message-ID: <428EDFCA.5070702@gmail.com>
+From: David Britton <davidpbritton@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
-Subject: [Bluez-users] Link quality
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Early failures with Treo 650
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,24 +16,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 21 May 2005 10:34:31 +0200
+Date: Sat, 21 May 2005 02:14:18 -0500
 
-Hello,
+Hi,
 
-For everyone who is interested in context-aware applications:
-don't use Bluetooth :)
+Having problems even getting past the early stages with connecting my 
+treo 650 to my Kensington.  I did a search through the archives, and I 
+can't seem to find anyone who has been stuck this early.
 
-When you move away from a bluetooth-dongle, the link quality will drop, but 
-it comes back to 255.
-Because Bluetooth wants to keep a good connection, the bluetooth-dongle is 
-going to adjust the send-power.
+Symptoms:
 
-regards,
-Pieter
-
-
+- I can see the PC from my plam (it shows up as a "Device").
+- I have put the treo into "discoverable" mode.
+- I can see the BT USB Dongle using hciconfig
+- I cannot get "hcitool scan" to return any devices
 
 
+Output:
+
+red:/home/dpb# hciconfig
+hci0:   Type: USB
+        BD Address: 00:0C:55:F8:5A:2B ACL MTU: 377:10 SCO MTU: 16:0
+        UP RUNNING PSCAN ISCAN INQUIRY
+        RX bytes:461 acl:0 sco:0 events:73 errors:0
+        TX bytes:3271 acl:0 sco:0 commands:73 errors:0
+red:/home/dpb# hcidump  -x -V &
+HCI sniffer - Bluetooth packet analyzer ver 1.17
+device: hci0 snap_len: 1028 filter: 0xffffffff
+[1] 24217
+red:/home/dpb# hcitool scan
+Scanning ...
+Inquiry failed: Connection timed out
+red:/home/dpb#
+
+
+
+Please let me know if I have not specified enough information here -- I 
+just don't even know where to start.  All FAQ/HOW-TO's that I read sort 
+of assume that this part will work.
+
+TIA.
+
+-- 
+David Britton
 
 
 -------------------------------------------------------
