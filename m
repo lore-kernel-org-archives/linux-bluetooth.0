@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] link_key pairing problem
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <BAY104-F778BA19013D206414147DC10C0@phx.gbl>
+In-Reply-To: <20050520082022.49333.qmail@web8307.mail.in.yahoo.com>
+From: "blookk -" <blookk@hotmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200505211500.37962.ruben@hotheads.de>
-References: <200505211500.37962.ruben@hotheads.de>
-Content-Type: text/plain
-Message-Id: <1116842913.30044.36.camel@pegasus>
+Subject: Re: [Bluez-devel] BlueZ GUI
 Mime-Version: 1.0
+Content-Type: text/html; charset=iso-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,30 +17,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 23 May 2005 12:08:33 +0200
+Date: Mon, 23 May 2005 09:41:58 +0000
 
-Hi Ruben,
-
-> I hoped to get rid of the pairing problem with my headset but it still exists.
-> I had to manually delete the link_key file in /etc/bluetooth. I found a ugly 
-> and simple hack: Symlinked /dev/null to /etc/bluetooth/link_key so that 
-> everything that gets written to link_key is automatically deleted. This way 
-> repairing works but it's not a clean way. I think there is a problem with the 
-> pairing mechanism in bluez.  Or could that be a problem of my headset/dongle?
-> 
-> Actually I'm using bluez-utils /bluez-libs version 2.15. I allready tried 2.16 
-> but that doesn't solve  the problem.
-
-use bluez-utils-2.17 and use a clean start. Don't modify hcid.conf and
-remove the link_key file (new place and file format since 2.16). Run
-"hcidump -X -V" to show what happens.
-
-Maybe your headset is broken.
-
-Regards
-
-Marcel
-
+<html><div style='background-color:'><DIV class=RTE>
+<P>Hi:</P>
+<P>How is going your GUI for BlueZ.&nbsp; Have you started it?</P>
+<P>Perhaps I could help you.</P>
+<P>Regards<BR><BR></P><BR><BR><BR>&gt;From: Mayank Batra &lt;mayankbatra@yahoo.co.in&gt;<BR>&gt;Reply-To: bluez-devel@lists.sourceforge.net<BR>&gt;To: bluez-devel@lists.sourceforge.net<BR>&gt;Subject: Re: [Bluez-devel] BlueZ GUI<BR>&gt;Date: Fri, 20 May 2005 09:20:22 +0100 (BST)<BR>&gt;<BR>&gt;Guys,<BR>&gt;<BR>&gt;No reply for this one either ?<BR>&gt;:-(<BR>&gt;<BR>&gt;<BR>&gt;Mayank.<BR>&gt;<BR>&gt;<BR>&gt;<BR>&gt;<BR>&gt; &gt; Guys,<BR>&gt; &gt;<BR>&gt; &gt; Is there a GUI available for BlueZ ?<BR>&gt; &gt;<BR>&gt; &gt; If not, I am interested in building one.<BR>&gt; &gt; Can you suggest which tool will be the best?<BR>&gt; &gt;<BR>&gt; &gt; Tcl/Tk ?<BR>&gt; &gt;<BR>&gt; &gt; Mayank<BR>&gt; &gt;<BR>&gt; &gt;<BR>&gt;________________________________________________________________________<BR>&gt; &gt; Yahoo! India Matrimony: Find your life partner<BR>&gt; &gt; online<BR>&gt; &gt; Go 
+to: http://yahoo.shaadi.com/india-matrimony<BR>&gt; &gt;<BR>&gt; &gt;<BR>&gt; &gt;<BR>&gt;-------------------------------------------------------<BR>&gt; &gt; This SF.Net email is sponsored by Oracle Space<BR>&gt; &gt; Sweepstakes<BR>&gt; &gt; Want to be the first software developer in space?<BR>&gt; &gt; Enter now for the Oracle Space Sweepstakes!<BR>&gt; &gt;<BR>&gt;http://ads.osdn.com/?ad_id=7393&amp;alloc_id=16281&amp;op=click<BR>&gt; &gt; _______________________________________________<BR>&gt; &gt; Bluez-devel mailing list<BR>&gt; &gt; Bluez-devel@lists.sourceforge.net<BR>&gt; &gt;<BR>&gt;https://lists.sourceforge.net/lists/listinfo/bluez-devel<BR>&gt; &gt;<BR>&gt;<BR>&gt;________________________________________________________________________<BR>&gt;Yahoo! India Matrimony: Find your life partner online<BR>&gt;Go to: 
+http://yahoo.shaadi.com/india-matrimony<BR>&gt;<BR>&gt;<BR>&gt;-------------------------------------------------------<BR>&gt;This SF.Net email is sponsored by Oracle Space Sweepstakes<BR>&gt;Want to be the first software developer in space?<BR>&gt;Enter now for the Oracle Space Sweepstakes!<BR>&gt;http://ads.osdn.com/?ad_id=7412&amp;alloc_id=16344&amp;op=click<BR>&gt;_______________________________________________<BR>&gt;Bluez-devel mailing list<BR>&gt;Bluez-devel@lists.sourceforge.net<BR>&gt;https://lists.sourceforge.net/lists/listinfo/bluez-devel<BR></DIV></div></html>
 
 
 
