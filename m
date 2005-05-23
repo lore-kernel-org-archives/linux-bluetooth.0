@@ -1,54 +1,70 @@
-Return-Path: <rjmx@rjmx.net>
-Message-ID: <429286B4.3030208@rjmx.net>
-Date: Mon, 23 May 2005 21:43:16 -0400
-From: Ron Murray <rjmx@rjmx.net>
-Reply-To: rjmx@rjmx.net
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>, pavouk@pavouk.org
-CC: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Ambicom BT-2000CF doesn't want to work with	kernel
- 2.6.11.8
-References: <4291146C.4000603@rjmx.net>	 <200505230949.01287.pavouk@pavouk.org> <1116843358.30044.47.camel@pegasus>
-In-Reply-To: <1116843358.30044.47.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] 3CRWB6096 PCMCIA card
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <20050523225225.4d95e904.szz@freemail.hu>
+References: <20050523165711.055d97c2.szz@freemail.hu>
+	 <1116857587.30044.84.camel@pegasus>
+	 <20050523195921.07267820.szz@freemail.hu>
+	 <1116871922.30044.126.camel@pegasus>
+	 <20050523225225.4d95e904.szz@freemail.hu>
+Content-Type: text/plain
+Message-Id: <1116878366.30044.128.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 23 May 2005 21:59:26 +0200
 
-Marcel Holtmann wrote:
-> Hi Pavel,
+Hi Zol,
+
+> > > May 23 19:46:38 localhost kernel: bt3c_open: Firmware request failed
+> > > Is there some possibility to find out where pt3c_open is looking for
+> > > the firmware file?
+> > Do you installed hotplug? Does /etc/hotplug/firmware.agent exists?
 > 
+> No, it doesn't. I could find only these:
 > 
->>I don't know, if it is exactly your problem, but some bluetooth
->>PCMCIA (CF) cards have problems with kernel 2.6. Specially
->>New SOCKET or Billionton card.
->>There exists patch for kernel 2.6.11, which resolve problems with
->>these cards. Look at this page for instruction:
->>http://www.summet.com/x31/socket.html
->>
->>Find in archive mail with subject "Billionton(?) CF card - success".
+> /etc$ tree hotplug*
+> hotplug
+> |-- agents
+> |   `-- usb
+> `-- usb
+>     |-- bcm203x
+>     |-- bcm203x.usermap
+>     |-- bluefw
+>     |-- bluefw.usermap
+>     `-- kino-jogshuttle
+> hotplug.d
+> `-- default
+>     |-- 10-udev.hotplug -> /sbin/udevsend
+>     `-- 20-hal.hotplug -> /usr/libexec/hal.hotplug
 > 
-> 
-> Pavel Machek posted the commands to get the Billionton card working to
-> the LKML. I verified it and maybe the same will work the Ambicom.
-> 
-> And depending on if it is a 2000C or 2000E it has a CSR or an Ericsson
-> chip inside. Guess who is who.
+> 3 directories, 8 files
 
-    It's a 2000E, with an Ericsson chip in it. I found that out a year 
-ago when I was playing around with the bt950 driver on my Zaurus.
+so what about installing hotplug?
 
-    Anyway, thanks for the help, folks, but it still doesn't work. 
-Doesn't seem to have made any difference as far as I can see. If 
-nobody's got any more ideas, I'll trace the bt950 driver through and 
-compare it to the current one. Perhaps that'll give me a handle on 
-what's happening.
+Regards
 
-Thanks,
-
-  .....Ron
+Marcel
 
 
--- 
-Ron Murray   (rjmx@rjmx.net)
-http://www.rjmx.net/~ron
-GPG Public Key Fingerprint: F2C1 FC47 5EF7 0317 133C  D66B 8ADA A3C4 
-D86C 74DE
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by Oracle Space Sweepstakes
+Want to be the first software developer in space?
+Enter now for the Oracle Space Sweepstakes!
+http://ads.osdn.com/?ad_id=7412&alloc_id=16344&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
