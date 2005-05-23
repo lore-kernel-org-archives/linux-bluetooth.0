@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problem with rfcomm!!
+Subject: Re: [Bluez-users] Early failures with Treo 650
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Cc: bluez-users@lists.sf.net
-In-Reply-To: <20050521130837.51168.qmail@web42001.mail.yahoo.com>
-References: <20050521130837.51168.qmail@web42001.mail.yahoo.com>
+In-Reply-To: <428EDFCA.5070702@gmail.com>
+References: <428EDFCA.5070702@gmail.com>
 Content-Type: text/plain
-Message-Id: <1116842974.30044.38.camel@pegasus>
+Message-Id: <1116842776.30044.33.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,37 +18,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 May 2005 12:09:34 +0200
+Date: Mon, 23 May 2005 12:06:16 +0200
 
-Hi Neelam,
+Hi David,
 
-> I am working on a project in which I need to send character string via
-> Bluetooth from Linux Box to an application running on an iPAQ.
->  
-> I am using Bluez on Linux for bluetooth support.
->  
-> And for sending the string to the iPAQ i am connecting by rfcomm and
-> then just cat a text file to the rfcomm device.
->  
-> The commands I use are:
->  
-> rfcomm connect /dev/rfcomm0 <dev addr> <channel no>
->  
-> and the in another terminal i do:
->  
-> cat test.txt > /dev/rfcomm0
->  
-> The problem i am facing is with the number of characters my
-> application receives.I have tried it on two kernels viz. 2.6.9 and
-> 2.6.10........
->  
-> it is working perfectly fine with 2.6.9 but in case of 2.6.20 only 19
-> characters are being send.......i just can't understand the
-> reason........
+> Having problems even getting past the early stages with connecting my 
+> treo 650 to my Kensington.  I did a search through the archives, and I 
+> can't seem to find anyone who has been stuck this early.
+> 
+> Symptoms:
+> 
+> - I can see the PC from my plam (it shows up as a "Device").
+> - I have put the treo into "discoverable" mode.
+> - I can see the BT USB Dongle using hciconfig
+> - I cannot get "hcitool scan" to return any devices
+> 
+> 
+> Output:
+> 
+> red:/home/dpb# hciconfig
+> hci0:   Type: USB
+>         BD Address: 00:0C:55:F8:5A:2B ACL MTU: 377:10 SCO MTU: 16:0
+>         UP RUNNING PSCAN ISCAN INQUIRY
+>         RX bytes:461 acl:0 sco:0 events:73 errors:0
+>         TX bytes:3271 acl:0 sco:0 commands:73 errors:0
+> red:/home/dpb# hcidump  -x -V &
+> HCI sniffer - Bluetooth packet analyzer ver 1.17
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> [1] 24217
+> red:/home/dpb# hcitool scan
+> Scanning ...
+> Inquiry failed: Connection timed out
+> red:/home/dpb#
+> 
+> 
+> 
+> Please let me know if I have not specified enough information here -- I 
+> just don't even know where to start.  All FAQ/HOW-TO's that I read sort 
+> of assume that this part will work.
 
-try direct RFCOMM socket programming or use
-
-	rfcomm --raw connect ...
+show us "hciconfig -a" and run "hcidump -X -V" as root while you are
+scanning. Also a "hcitool info" on the Treo would be nice.
 
 Regards
 
