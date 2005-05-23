@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4291D7B2.3070703@lesagepono.be>
-From: Laurent Lesage <laurent@lesagepono.be>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Ambicom BT-2000CF doesn't want to work with
+	kernel 2.6.11.8
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] want to use M3000 bluetooth headset to receive voice calls on PC
+Cc: Ron Murray <rjmx@rjmx.net>
+In-Reply-To: <200505230949.01287.pavouk@pavouk.org>
+References: <4291146C.4000603@rjmx.net>
+	 <200505230949.01287.pavouk@pavouk.org>
+Content-Type: text/plain
+Message-Id: <1116843358.30044.47.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,38 +21,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 May 2005 13:16:34 +0000
+Date: Mon, 23 May 2005 12:15:58 +0200
 
-Hi all,
+Hi Pavel,
 
-I've been looking for hours on the net to see if the Plantronics M3000
-can be used with a bluetooth dongle (DBT-120 seems good? Or Lynksys
-USBBT100, or trendnet TBW-102UB?) under Linux OS
-(I use Debian Sarge). I don't see this headset in the 'features' page Mr
-Holtmann maintains. Does it mean it is not supported? it has the
-advantage to be good quality,, and I can get one for cheap.
+> I don't know, if it is exactly your problem, but some bluetooth
+> PCMCIA (CF) cards have problems with kernel 2.6. Specially
+> New SOCKET or Billionton card.
+> There exists patch for kernel 2.6.11, which resolve problems with
+> these cards. Look at this page for instruction:
+> http://www.summet.com/x31/socket.html
+> 
+> Find in archive mail with subject "Billionton(?) CF card - success".
 
-If not, what model could be used (I want it to use as headset fot PC
-phone, to be able to receive VOIP calls, and more with Asterisk server).
-It seems more difficult to make calls but it is not important for now.
+Pavel Machek posted the commands to get the Billionton card working to
+the LKML. I verified it and maybe the same will work the Ambicom.
 
-Thank you for your attention
+And depending on if it is a 2000C or 2000E it has a CSR or an Ericsson
+chip inside. Guess who is who.
 
+Regards
 
---=20
-Laurent Lesage
-assistant technique APEFE (coop=E9ration belge)
-Responsable coordination DUT T=E9l=E9communications/R=E9seaux
-D=E9partements G=E9nie Informatique/G=E9nie Electrique
-Ecole Sup=E9rieure Polytechnique
-BP 15915 Dakar - S=E9n=E9gal
-Bureau : (+221) 825 75 28 - Cellulaire : (+221) 687 13 75
-email : lesage@ucad.sn - laurent.lesage@apefe.sn
-
-Merci d'=E9viter de m'envoyer des documents Word ou Powerpoint
-(Voir http://www.fsf.org/philosophy/no-word-attachments.fr.html )
-
-
+Marcel
 
 
 
