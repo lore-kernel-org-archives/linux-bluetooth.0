@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4291DFA9.6010401@logicacmg.com>
-From: "Tomas Honzak (WN CZ)" <Tomas.T.Honzak@logicacmg.com>
-MIME-Version: 1.0
+From: =?ISO-8859-2?Q?Szab=F3_Zolt=E1n?= <szz@freemail.hu>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Internal Bluetooth on dell latitude d610?
+Message-Id: <20050523165711.055d97c2.szz@freemail.hu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-2
+Subject: [Bluez-users] 3CRWB6096 PCMCIA card
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,48 +16,100 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 May 2005 15:50:33 +0200
+Date: Mon, 23 May 2005 16:57:11 +0200
 
-Hi gents,
-my company gave me a latitude dell d610 notebook with built-in bluetooth
-(Dell Wireless 350 Bluetooth Module);
-unfortunately, I am not able to get it work under linux.
+I would like to ask you some help to make my 3CRWB6096 PCMCIA card to
+work. According to some documentation
+I use bt3c_cs driver.
+I use this:
+Linux localhost 2.6.9-19 #1 SMP Wed Apr 13 15:09:16 CEST 2005 i686
+UHU-Linux
 
-I have
-- centos 4.0, kernel 2.6.9, all modules load correctly,
-# rpm -qa | grep blue
-bluez-bluefw-1.0-6
-bluez-hcidump-1.11-1
-bluez-libs-2.10-2
-bluez-utils-2.10-2.1
+Here is the output of some events:
+[After insterting the PCMCIA card: ]
+May 23 09:37:49 kernel: cs: memory probe 0xa0000000-0xa0ffffff: clean.
+May 23 09:37:49 cardmgr[2407]: socket 1: 3Com Bluetooth PC Card
+May 23 09:37:49 kernel: Bluetooth: Core ver 2.6
+May 23 09:37:49 kernel: NET: Registered protocol family 31
+May 23 09:37:49 kernel: Bluetooth: HCI device and connection manager
+ initialized
+May 23 09:37:49 kernel: Bluetooth: HCI socket layer initialized
+May 23 09:37:59 kernel: bt3c_open: Firmware request failed
+May 23 09:37:59 kernel: bt3c_interrupt: Call of irq 3 for unknown device
+May 23 09:38:00 cardmgr[2407]: get dev info on socket 1 failed: Resource
+temporarily unavailable
 
-/etc/init.d/bluetooth start even makes BT led lid ;) BUT
+[A part of the dmesg output:]
+cs: memory probe 0xa0000000-0xa0ffffff: clean.
+Bluetooth: Core ver 2.6
+NET: Registered protocol family 31
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+bt3c_open: Firmware request failed
+bt3c_interrupt: Call of irq 3 for unknown device
 
-hciconfig -a does nothing, neither hcitool dev (shows empty lines 
-"Devices:") or hciconfig hci0 (Can't get device info: No such device")
+#lsmod|grep bt
+bt3c_cs                15236  0
+firmware_class         11392  1 bt3c_cs
+bluetooth              43268  1 bt3c_cs
+ds                     21124  5 bt3c_cs
+pcmcia_core            62004  4 bt3c_cs,ds,i82092,yenta_socket
 
-google search did not find anything relevant, so I am politely asking 
-here :)
-Does anyone have any ideas, please?
+#modinfo bt3c_cs
+author:         Marcel Holtmann <marcel@holtmann.org>, Jose Orlando
+Pereira <jop@di.uminho.pt>
+description:    Bluetooth driver for the 3Com Bluetooth PCMCIA card
+license:        GPL
+vermagic:       2.6.9-19 SMP 586 gcc-3.3
+depends:        ds,pcmcia_core,bluetooth,firmware_class
 
-Thanks
+# dpkg -l "bluez*"
+||  Name                  Version               Description
+ii  bluez-bluefw          1.0-1.22              Bluetooth firmware
+ii  bluez-hcidump         1.16-1.2              HCI csomag analiz=E1tor
+ii  bluez-hciemu          1.1-1.2               HCI emul=E1ci=F3 a linux
+ii  bluez-libs            2.13-1.2              Bluetooth protokoll
+ii  bluez-libs-dev        2.13-1.2              Bluetooth protokoll
+ii  bluez-pin             0.24-1.2              PIN bek=E9r=F5 BlueTooth
+ii  bluez-utils           2.13-1.2              Bluetooth seg=E9dprogramok
 
--- 
-Tomas Honzak
-Configuration Management
-Wireless Networks
-_________________________________________
-LogicaCMG
-Na Okraji 335/42
-162 00 Praha 6
-Czech Republic
-T: +420 284 020 936 (direct)
-F: +420 284 020 112
-E: Tomas.T.Honzak@logicacmg.com
-www.logicacmg.com
+#ls /dev/rf*
+[nothing]
+
+# /etc/init.d/bluetooth start
+Starting Bluetooth subsystem: hcid sdpd hidd hid2hci rfcomm.
+root@localhost:~# tail /var/log/syslog
+May 23 09:59:08 localhost kernel: [ACPI Debug] String: [0x12]
+"=3D=3D=3D=3D=3DQUERY_42=3D=3D=3D=3D=3D"
+May 23 09:59:18 localhost hcid[3725]: Bluetooth HCI daemon
+May 23 09:59:18 localhost kernel: Bluetooth: L2CAP ver 2.4
+May 23 09:59:18 localhost kernel: Bluetooth: L2CAP socket layer
+initialized
+May 23 09:59:18 localhost sdpd[3727]: Bluetooth SDP daemon
+May 23 09:59:18 localhost kernel: Bluetooth: HIDP (Human Interface
+Emulation) ver 1.0
+May 23 09:59:18 localhost hidd[3733]: Bluetooth HID daemon
+May 23 09:59:18 localhost kernel: Bluetooth: RFCOMM ver 1.3
+May 23 09:59:18 localhost kernel: Bluetooth: RFCOMM socket layer
+initialized
+May 23 09:59:18 localhost kernel: Bluetooth: RFCOMM TTY layer
+initialized
+
+#ls /dev/rf*
+[nothing]
+
+# hciconfig
+[nothing]
+# hcidump
+HCIDump - HCI packet analyzer ver 1.16
+Can't attach to device hci0. No such device(19)
+
+---
+Could you please help me?
+Thank you,
+Zol
 
 
-This e-mail and any attachment is for authorised use by the intended recipient(s) only. It may contain proprietary material, confidential information and/or be subject to legal privilege. It should not be copied, disclosed to, retained or used by, any other party. If you are not an intended recipient then please promptly delete this e-mail and any attachment and all copies and inform the sender. Thank you.
 
 
 -------------------------------------------------------
