@@ -1,16 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] 3CRWB6096 PCMCIA card
-From: Marcel Holtmann <marcel@holtmann.org>
+From: =?ISO-8859-2?Q?Szab=F3_Zolt=E1n?= <szz@freemail.hu>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050523225225.4d95e904.szz@freemail.hu>
+Subject: Re: [Bluez-users] 3CRWB6096 PCMCIA card
+Message-Id: <20050523225225.4d95e904.szz@freemail.hu>
+In-Reply-To: <1116871922.30044.126.camel@pegasus>
 References: <20050523165711.055d97c2.szz@freemail.hu>
-	 <1116857587.30044.84.camel@pegasus>
-	 <20050523195921.07267820.szz@freemail.hu>
-	 <1116871922.30044.126.camel@pegasus>
-	 <20050523225225.4d95e904.szz@freemail.hu>
-Content-Type: text/plain
-Message-Id: <1116878366.30044.128.camel@pegasus>
+	<1116857587.30044.84.camel@pegasus>
+	<20050523195921.07267820.szz@freemail.hu>
+	<1116871922.30044.126.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,39 +21,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 May 2005 21:59:26 +0200
+Date: Mon, 23 May 2005 22:52:25 +0200
 
-Hi Zol,
+Hi Marcel,
 
-> > > May 23 19:46:38 localhost kernel: bt3c_open: Firmware request failed
-> > > Is there some possibility to find out where pt3c_open is looking for
-> > > the firmware file?
-> > Do you installed hotplug? Does /etc/hotplug/firmware.agent exists?
-> 
-> No, it doesn't. I could find only these:
-> 
-> /etc$ tree hotplug*
-> hotplug
-> |-- agents
-> |   `-- usb
-> `-- usb
->     |-- bcm203x
->     |-- bcm203x.usermap
->     |-- bluefw
->     |-- bluefw.usermap
->     `-- kino-jogshuttle
-> hotplug.d
-> `-- default
->     |-- 10-udev.hotplug -> /sbin/udevsend
->     `-- 20-hal.hotplug -> /usr/libexec/hal.hotplug
-> 
-> 3 directories, 8 files
+> > May 23 19:46:38 localhost kernel: bt3c_open: Firmware request failed
+> > Is there some possibility to find out where pt3c_open is looking for
+> > the firmware file?
+> Do you installed hotplug? Does /etc/hotplug/firmware.agent exists?
 
-so what about installing hotplug?
+No, it doesn't. I could find only these:
+
+/etc$ tree hotplug*
+hotplug
+|-- agents
+|   `-- usb
+`-- usb
+    |-- bcm203x
+    |-- bcm203x.usermap
+    |-- bluefw
+    |-- bluefw.usermap
+    `-- kino-jogshuttle
+hotplug.d
+`-- default
+    |-- 10-udev.hotplug -> /sbin/udevsend
+    `-- 20-hal.hotplug -> /usr/libexec/hal.hotplug
+
+3 directories, 8 files
+
+So these are only usb things (not pcmcia)
 
 Regards
-
-Marcel
+Zol
 
 
 
