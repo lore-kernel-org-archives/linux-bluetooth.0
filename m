@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4291E789.1000506@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <4291E754.8060100@lesagepono.be>
+From: Laurent Lesage <laurent@lesagepono.be>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] want to use M3000 bluetooth headset to receive
- voice calls on PC
-References: <4291D7B2.3070703@lesagepono.be>
-In-Reply-To: <4291D7B2.3070703@lesagepono.be>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] M3000 bluetooth headset to receive voice calls on PC
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,36 +16,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 May 2005 08:24:09 -0600
+Date: Mon, 23 May 2005 14:23:16 +0000
 
-Laurent,
+Hi all,
 
-I have a list of headsets people have reported success with at 
-http://bluetooth-alsa.sourceforge.net/
+I've been looking for hours on the net to see if the Plantronics M3000
+can be used with a bluetooth dongle (DBT-120 seems good? Or Lynksys=20
+USBBT100, or trendnet TBW-102UB?) under Linux OS
+(I use Debian Sarge). I don't see this headset in the 'features' page Mr=20
+Holtmann maintains. Does it mean it is not supported? it has the=20
+advantage to be good quality,, and I can get one for cheap.
 
-I've used the plantronics m2500 and I imagine the 3000 works the same. 
-The 2500 is a real pain to turn on and off... hopefully they fixed that, 
-or you just leave it on.
+If not, what model could be used (I want it to use as headset fot PC=20
+phone, to be able to receive VOIP calls, and more with Asterisk server).=20
+It seems more difficult to make calls but it is not important for now.
 
-Brad
+Thank you for your attention
 
-Laurent Lesage wrote:
-> Hi all,
-> 
-> I've been looking for hours on the net to see if the Plantronics M3000
-> can be used with a bluetooth dongle (DBT-120 seems good? Or Lynksys
-> USBBT100, or trendnet TBW-102UB?) under Linux OS
-> (I use Debian Sarge). I don't see this headset in the 'features' page Mr
-> Holtmann maintains. Does it mean it is not supported? it has the
-> advantage to be good quality,, and I can get one for cheap.
-> 
-> If not, what model could be used (I want it to use as headset fot PC
-> phone, to be able to receive VOIP calls, and more with Asterisk server).
-> It seems more difficult to make calls but it is not important for now.
-> 
-> Thank you for your attention
-> 
-> 
+
+--=20
+Laurent Lesage
+assistant technique APEFE (coop=E9ration belge)
+Responsable coordination DUT T=E9l=E9communications/R=E9seaux
+D=E9partements G=E9nie Informatique/G=E9nie Electrique
+Ecole Sup=E9rieure Polytechnique
+BP 15915 Dakar - S=E9n=E9gal
+Bureau : (+221) 825 75 28 - Cellulaire : (+221) 687 13 75
+email : lesage@ucad.sn - laurent.lesage@apefe.sn
+
+Merci d'=E9viter de m'envoyer des documents Word ou Powerpoint
+(Voir http://www.fsf.org/philosophy/no-word-attachments.fr.html )
+
+
+
 
 
 -------------------------------------------------------
