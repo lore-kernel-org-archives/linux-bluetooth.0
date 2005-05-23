@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Ambicom BT-2000CF doesn't want to work with
-	kernel 2.6.11.8
+Subject: Re: [Bluez-users] Zire72 ppp connection problem
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Cc: Ron Murray <rjmx@rjmx.net>
-In-Reply-To: <200505230949.01287.pavouk@pavouk.org>
-References: <4291146C.4000603@rjmx.net>
-	 <200505230949.01287.pavouk@pavouk.org>
-Content-Type: text/plain
-Message-Id: <1116843358.30044.47.camel@pegasus>
+In-Reply-To: <42908012.5010103@tiscali.it>
+References: <42908012.5010103@tiscali.it>
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1116843198.30044.43.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,24 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 May 2005 12:15:58 +0200
+Date: Mon, 23 May 2005 12:13:18 +0200
 
-Hi Pavel,
+Hi Luca,
 
-> I don't know, if it is exactly your problem, but some bluetooth
-> PCMCIA (CF) cards have problems with kernel 2.6. Specially
-> New SOCKET or Billionton card.
-> There exists patch for kernel 2.6.11, which resolve problems with
-> these cards. Look at this page for instruction:
-> http://www.summet.com/x31/socket.html
-> 
-> Find in archive mail with subject "Billionton(?) CF card - success".
+> i'm tryng to connect my zire72 to a Logitech hub, the one that comes=20
+> with the Dinovo Desktop Kit Wireless...
+> I'm using Suse9.2, and i have installed all the Bluez pakages that i=20
+> find with Yast.
+> I think that now my hub works fine, my mouse and my Keyboard works fine=
+...
+> My PDA find my desktop, but when i try to connect my pda say "cable=20
+> problems", and Kde Bemused Server log says a lot of messages like:
+> }"=E2=80=A1:... Unknown Command (}"=E2=80=A1:)... done
+> or
+> ~=C2=BF3=08... Unknown Command (~=C2=BF3=08)... done
+> or
+> }"3,... Unknown Command (}"3,)... done
+>=20
+> Is there a difference between the protocols used by the PDA and the des=
+ktop?
+> I can't understand where is the problem, i hope someone can help me...
 
-Pavel Machek posted the commands to get the Billionton card working to
-the LKML. I verified it and maybe the same will work the Ambicom.
-
-And depending on if it is a 2000C or 2000E it has a CSR or an Ericsson
-chip inside. Guess who is who.
+the KDE Bemused Server is not our business. Talk to the KDE Bluetooth
+guys, but you may first update to SuSE 9.3.
 
 Regards
 
