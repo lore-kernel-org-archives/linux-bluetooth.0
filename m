@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Early failures with Treo 650
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Pavel Ruzicka <pavouk@pavouk.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <428EDFCA.5070702@gmail.com>
-References: <428EDFCA.5070702@gmail.com>
-Content-Type: text/plain
-Message-Id: <1116842776.30044.33.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Ambicom BT-2000CF doesn't want to work with kernel 2.6.11.8
+Cc: Ron Murray <rjmx@rjmx.net>
+References: <4291146C.4000603@rjmx.net>
+In-Reply-To: <4291146C.4000603@rjmx.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200505230949.01287.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,53 +20,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 May 2005 12:06:16 +0200
+Date: Mon, 23 May 2005 09:49:01 +0200
 
-Hi David,
+Hello,
 
-> Having problems even getting past the early stages with connecting my 
-> treo 650 to my Kensington.  I did a search through the archives, and I 
-> can't seem to find anyone who has been stuck this early.
-> 
-> Symptoms:
-> 
-> - I can see the PC from my plam (it shows up as a "Device").
-> - I have put the treo into "discoverable" mode.
-> - I can see the BT USB Dongle using hciconfig
-> - I cannot get "hcitool scan" to return any devices
-> 
-> 
-> Output:
-> 
-> red:/home/dpb# hciconfig
-> hci0:   Type: USB
->         BD Address: 00:0C:55:F8:5A:2B ACL MTU: 377:10 SCO MTU: 16:0
->         UP RUNNING PSCAN ISCAN INQUIRY
->         RX bytes:461 acl:0 sco:0 events:73 errors:0
->         TX bytes:3271 acl:0 sco:0 commands:73 errors:0
-> red:/home/dpb# hcidump  -x -V &
-> HCI sniffer - Bluetooth packet analyzer ver 1.17
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> [1] 24217
-> red:/home/dpb# hcitool scan
-> Scanning ...
-> Inquiry failed: Connection timed out
-> red:/home/dpb#
-> 
-> 
-> 
-> Please let me know if I have not specified enough information here -- I 
-> just don't even know where to start.  All FAQ/HOW-TO's that I read sort 
-> of assume that this part will work.
+I don't know, if it is exactly your problem, but some bluetooth
+PCMCIA (CF) cards have problems with kernel 2.6. Specially
+New SOCKET or Billionton card.
+There exists patch for kernel 2.6.11, which resolve problems with
+these cards. Look at this page for instruction:
+http://www.summet.com/x31/socket.html
 
-show us "hciconfig -a" and run "hcidump -X -V" as root while you are
-scanning. Also a "hcitool info" on the Treo would be nice.
+Find in archive mail with subject "Billionton(?) CF card - success".
 
-Regards
+>     I'm running Debian sarge on a Sony PCG-505FX laptop, using a
+> home-built kernel (currently 2.6.11.8 with current bluez patches). I've
 
-Marcel
+Best regards,
 
-
+Pavel Ruzicka
 
 
 -------------------------------------------------------
