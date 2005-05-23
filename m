@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Zire72 ppp connection problem
+Subject: Re: [Bluez-users] Problem with rfcomm!!
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <42908012.5010103@tiscali.it>
-References: <42908012.5010103@tiscali.it>
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1116843198.30044.43.camel@pegasus>
+Cc: bluez-users@lists.sf.net
+In-Reply-To: <20050521130837.51168.qmail@web42001.mail.yahoo.com>
+References: <20050521130837.51168.qmail@web42001.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1116842974.30044.38.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,30 +19,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 May 2005 12:13:18 +0200
+Date: Mon, 23 May 2005 12:09:34 +0200
 
-Hi Luca,
+Hi Neelam,
 
-> i'm tryng to connect my zire72 to a Logitech hub, the one that comes=20
-> with the Dinovo Desktop Kit Wireless...
-> I'm using Suse9.2, and i have installed all the Bluez pakages that i=20
-> find with Yast.
-> I think that now my hub works fine, my mouse and my Keyboard works fine=
-...
-> My PDA find my desktop, but when i try to connect my pda say "cable=20
-> problems", and Kde Bemused Server log says a lot of messages like:
-> }"=E2=80=A1:... Unknown Command (}"=E2=80=A1:)... done
-> or
-> ~=C2=BF3=08... Unknown Command (~=C2=BF3=08)... done
-> or
-> }"3,... Unknown Command (}"3,)... done
->=20
-> Is there a difference between the protocols used by the PDA and the des=
-ktop?
-> I can't understand where is the problem, i hope someone can help me...
+> I am working on a project in which I need to send character string via
+> Bluetooth from Linux Box to an application running on an iPAQ.
+>  
+> I am using Bluez on Linux for bluetooth support.
+>  
+> And for sending the string to the iPAQ i am connecting by rfcomm and
+> then just cat a text file to the rfcomm device.
+>  
+> The commands I use are:
+>  
+> rfcomm connect /dev/rfcomm0 <dev addr> <channel no>
+>  
+> and the in another terminal i do:
+>  
+> cat test.txt > /dev/rfcomm0
+>  
+> The problem i am facing is with the number of characters my
+> application receives.I have tried it on two kernels viz. 2.6.9 and
+> 2.6.10........
+>  
+> it is working perfectly fine with 2.6.9 but in case of 2.6.20 only 19
+> characters are being send.......i just can't understand the
+> reason........
 
-the KDE Bemused Server is not our business. Talk to the KDE Bluetooth
-guys, but you may first update to SuSE 9.3.
+try direct RFCOMM socket programming or use
+
+	rfcomm --raw connect ...
 
 Regards
 
