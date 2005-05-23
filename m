@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Internal Bluetooth on dell latitude d610?
+Subject: Re: [Bluez-users] 3CRWB6096 PCMCIA card
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4291DFA9.6010401@logicacmg.com>
-References: <4291DFA9.6010401@logicacmg.com>
+In-Reply-To: <20050523165711.055d97c2.szz@freemail.hu>
+References: <20050523165711.055d97c2.szz@freemail.hu>
 Content-Type: text/plain
-Message-Id: <1116857742.30044.88.camel@pegasus>
+Message-Id: <1116857587.30044.84.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,43 +18,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 May 2005 16:15:42 +0200
+Date: Mon, 23 May 2005 16:13:07 +0200
 
-Hi Thomas,
+Hi Zol,
 
-> my company gave me a latitude dell d610 notebook with built-in bluetooth
-> (Dell Wireless 350 Bluetooth Module);
-> unfortunately, I am not able to get it work under linux.
+> I would like to ask you some help to make my 3CRWB6096 PCMCIA card to
+> work. According to some documentation
+> I use bt3c_cs driver.
+> I use this:
+> Linux localhost 2.6.9-19 #1 SMP Wed Apr 13 15:09:16 CEST 2005 i686
+> UHU-Linux
 > 
-> I have
-> - centos 4.0, kernel 2.6.9, all modules load correctly,
-> # rpm -qa | grep blue
-> bluez-bluefw-1.0-6
-> bluez-hcidump-1.11-1
-> bluez-libs-2.10-2
-> bluez-utils-2.10-2.1
-> 
-> /etc/init.d/bluetooth start even makes BT led lid ;) BUT
-> 
-> hciconfig -a does nothing, neither hcitool dev (shows empty lines 
-> "Devices:") or hciconfig hci0 (Can't get device info: No such device")
-> 
-> google search did not find anything relevant, so I am politely asking 
-> here :)
-> Does anyone have any ideas, please?
+> Here is the output of some events:
+> [After insterting the PCMCIA card: ]
+> May 23 09:37:49 kernel: cs: memory probe 0xa0000000-0xa0ffffff: clean.
+> May 23 09:37:49 cardmgr[2407]: socket 1: 3Com Bluetooth PC Card
+> May 23 09:37:49 kernel: Bluetooth: Core ver 2.6
+> May 23 09:37:49 kernel: NET: Registered protocol family 31
+> May 23 09:37:49 kernel: Bluetooth: HCI device and connection manager
+>  initialized
+> May 23 09:37:49 kernel: Bluetooth: HCI socket layer initialized
+> May 23 09:37:59 kernel: bt3c_open: Firmware request failed
 
-check /proc/bus/usb/devices, but I assume that the module is switched
-off by default. So you need to activate it, because otherwise it will
-not show up on the USB bus and thus it can't picked up by the hci_usb
-driver.
+do you might think this line could be the problem? You need to install
+the firmware into the right directory.
 
-Most Dell notebooks should have a Fn-F2 switch or an extra BIOS option
-for this. Otherwise the only option is to look for a Dell ACPI module to
-modify the Bluetooth switch.
+	http://www.bluez.org/drivers.html
 
 Regards
 
 Marcel
+
+
 
 
 
