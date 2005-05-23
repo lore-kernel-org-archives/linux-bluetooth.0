@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] some documentation for bluez
+Subject: Re: [Bluez-devel] obex ftp server ?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <ef9938ec0505222244400fe670@mail.gmail.com>
-References: <ef9938ec0505222244400fe670@mail.gmail.com>
+In-Reply-To: <20050521160903.GB21130@externe.net>
+References: <20050521160903.GB21130@externe.net>
 Content-Type: text/plain
-Message-Id: <1116843474.30044.50.camel@pegasus>
+Message-Id: <1116843092.30044.41.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,19 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 23 May 2005 12:17:54 +0200
+Date: Mon, 23 May 2005 12:11:32 +0200
 
-Hi Albert,
+Hi Guylhem,
 
-> Since it has an academic slant, it's nowhere near complete, and puts
-> heavy emphasis on some things that may seem insignificant.  If there's
-> interest, though, I'd consider expanding chapter 4 into something to
-> point beginner developers to.  Corrections and comments are also
-> welcome, as I am quite aware that I am by no means an expert at this
-> yet.
+> I am wondering if any working obex ftp server is available. obexftpd
+> doesn't work. I'd be curious to know whether obexapp (freebsd) could
+> be compiled. It seems to use openobex and libbsdxml (can't find the
+> latter - IIRC it's a fork of libexpat which hopefully will be enough)
 
-go ahead with a BlueZ developer documentation. I like it. If there are
-problems I can fill in the missing parts.
+I never really started with the work on a btftpd. Feel free to do so.
+
+There is no need for a XML library for an OBEX FTP server. You can write
+the XML generator by yourself.
 
 Regards
 
