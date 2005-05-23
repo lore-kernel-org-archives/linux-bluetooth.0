@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?ISO-8859-2?Q?Szab=F3_Zolt=E1n?= <szz@freemail.hu>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] 3CRWB6096 PCMCIA card
-Message-Id: <20050523225225.4d95e904.szz@freemail.hu>
-In-Reply-To: <1116871922.30044.126.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <20050523195921.07267820.szz@freemail.hu>
 References: <20050523165711.055d97c2.szz@freemail.hu>
-	<1116857587.30044.84.camel@pegasus>
-	<20050523195921.07267820.szz@freemail.hu>
-	<1116871922.30044.126.camel@pegasus>
+	 <1116857587.30044.84.camel@pegasus>
+	 <20050523195921.07267820.szz@freemail.hu>
+Content-Type: text/plain
+Message-Id: <1116871922.30044.126.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,38 +20,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 May 2005 22:52:25 +0200
+Date: Mon, 23 May 2005 20:12:02 +0200
 
-Hi Marcel,
+Hi Zol,
 
-> > May 23 19:46:38 localhost kernel: bt3c_open: Firmware request failed
-> > Is there some possibility to find out where pt3c_open is looking for
-> > the firmware file?
-> Do you installed hotplug? Does /etc/hotplug/firmware.agent exists?
+> >> May 23 09:37:59 kernel: bt3c_open: Firmware request failed
+> > do you might think this line could be the problem? You need to install
+> > the firmware into the right directory.
+> > 	http://www.bluez.org/drivers.html
+> 
+> Thank you, now I downloaded and extracted the BT3CPCC.bin file into "the
+> right place on the local file system".
+> According to www.bluez.org/drivers.html "the right place" is
+> /lib/firmware.
+> The bluez-bluefw files of my linux-distribution are in
+> /etc/bluetooth/firmware, so I made a symbolic link to this, too.
 
-No, it doesn't. I could find only these:
+the bluez-bluefw package is outdated.
 
-/etc$ tree hotplug*
-hotplug
-|-- agents
-|   `-- usb
-`-- usb
-    |-- bcm203x
-    |-- bcm203x.usermap
-    |-- bluefw
-    |-- bluefw.usermap
-    `-- kino-jogshuttle
-hotplug.d
-`-- default
-    |-- 10-udev.hotplug -> /sbin/udevsend
-    `-- 20-hal.hotplug -> /usr/libexec/hal.hotplug
+> But /var/log/syslog gives the same result:
+> May 23 19:46:38 localhost kernel: bt3c_open: Firmware request failed
+> 
+> Is there some possibility to find out where pt3c_open is looking for the
+> firmware file?
 
-3 directories, 8 files
-
-So these are only usb things (not pcmcia)
+Do you installed hotplug? Does /etc/hotplug/firmware.agent exists?
 
 Regards
-Zol
+
+Marcel
 
 
 
