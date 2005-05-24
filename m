@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050525193324.22302.qmail@web54604.mail.yahoo.com>
-From: =?iso-8859-1?q?Joel=20Tom=E1s=20Cachioli?= <cachioli@yahoo.com.br>
+Subject: Re: [Bluez-users] 3CRWB6096 PCMCIA card
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] HEEEELP!!!
+In-Reply-To: <20050524194038.35b3ed78.szz@freemail.hu>
+References: <freemail.20050424121317.54568@fm14.freemail.hu>
+	 <1116936381.30044.143.camel@pegasus>
+	 <20050524194038.35b3ed78.szz@freemail.hu>
+Content-Type: text/plain; charset=iso-8859-2
+Message-Id: <1116954260.30044.149.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,30 +20,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 May 2005 16:33:23 -0300 (ART)
+Date: Tue, 24 May 2005 19:04:20 +0200
 
-please,
-i have a lot of palm zire 72 and i need access for
-internet on my linux but when i connect the second
-palm he take the same IP from the first palm.
+Hi Zol,
 
-im using one /dev/rfcomm* to connect
- 
+> > since you used dpkg to show a package list, I assume it is a Debian
+> > based system. In this case "apt-get install hotplug" should do the
+> > job.
+> You are right, it's a Debian based system: UHU-linux.
+>=20
+> # apt-cache search hotplug
+> uhu-hotplug - Eszk=F6zcsere-vez=E9rl=F5 programok
+>=20
+> # apt-get install uhu-hotplug
+> uhu-hotplug is already the newest version.
+>=20
+> But it has only usb and ieee1394 parts:
+> /etc
+> /etc/hotplug
+> /etc/hotplug/agents
+> /etc/hotplug/agents/ieee1394
+> /etc/hotplug/agents/usb
+> /sbin
+> /sbin/hotplug
 
-any one can help me please!?
+don't ask me. Ask the package maintainer.
 
-sorry, my english is bad :(
+Regards
 
-__________________________________________________
-Converse com seus amigos em tempo real com o Yahoo! Messenger 
-http://br.download.yahoo.com/messenger/ 
+Marcel
+
+
 
 
 -------------------------------------------------------
-SF.Net email is sponsored by: GoToMeeting - the easiest way to collaborate
-online with coworkers and clients while avoiding the high cost of travel and
-communications. There is no equipment to buy and you can meet as often as
-you want. Try it free.http://ads.osdn.com/?ad_id=7402&alloc_id=16135&op=click
+This SF.Net email is sponsored by Yahoo.
+Introducing Yahoo! Search Developer Network - Create apps using Yahoo!
+Search APIs Find out how you can build Yahoo! directly into your own
+Applications - visit http://developer.yahoo.net/?fr=offad-ysdn-ostg-q22005
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
