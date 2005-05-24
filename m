@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] libsbc optimizing
+Subject: Re: [Bluez-devel] bluetooth remote control
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <42935C97.4080508@xmission.com>
-References: <428BD03E.9000307@xmission.com>
-	 <20050521000412.1499f11e.henryk@ploetzli.ch>
-	 <428E7D72.3030501@xmission.com> <428E809E.2000208@xmission.com>
-	 <42935C97.4080508@xmission.com>
+In-Reply-To: <429345A5.8080007@xmission.com>
+References: <429345A5.8080007@xmission.com>
 Content-Type: text/plain
-Message-Id: <1116954613.30044.160.camel@pegasus>
+Message-Id: <1116954490.30044.157.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,20 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 May 2005 19:10:13 +0200
+Date: Tue, 24 May 2005 19:08:10 +0200
 
 Hi Brad,
 
-> it's a little bit strange talking about math libraries here :)
+> I've looked at what is out there for using a phone as a remote.
 > 
-> i am going to try using gnu mp. it provides rationals and short floats. 
-> i will make it an autoconf option so we keep the regular floating point 
-> implementation in case that's what you want.
+> Virtually everything requires a Sony/Ericsson. Are the Ericssons using 
+> some kind of standardized protocol for remote control that no one else 
+> has implemented or is it a proprietary thing?
+> 
+> If it's well-documented, the extensible phones (symbian/java) should be 
+> able to load an app to use it (or maybe it's been done)
 
-go ahead, but maybe I repeat myself; we need an integer version of the
-SBC codec. This is where we should head with any optimization. However I
-am the wrong person for this stuff, but I would welcome everyone who
-wants to work on it.
+starting with the K700i you can use HID for the remote. For the older
+ones you need a special AT command set. There are some implementation
+around, but non official that I included in BlueZ.
 
 Regards
 
