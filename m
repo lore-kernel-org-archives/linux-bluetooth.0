@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] 3CRWB6096 PCMCIA card
-From: Marcel Holtmann <marcel@holtmann.org>
+From: =?ISO-8859-2?Q?Szab=F3_Zolt=E1n?= <szz@freemail.hu>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050524194038.35b3ed78.szz@freemail.hu>
+Subject: Re: [Bluez-users] 3CRWB6096 PCMCIA card
+Message-Id: <20050524194038.35b3ed78.szz@freemail.hu>
+In-Reply-To: <1116936381.30044.143.camel@pegasus>
 References: <freemail.20050424121317.54568@fm14.freemail.hu>
-	 <1116936381.30044.143.camel@pegasus>
-	 <20050524194038.35b3ed78.szz@freemail.hu>
-Content-Type: text/plain; charset=iso-8859-2
-Message-Id: <1116954260.30044.149.camel@pegasus>
+	<1116936381.30044.143.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-2
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,37 +19,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 24 May 2005 19:04:20 +0200
+Date: Tue, 24 May 2005 19:40:38 +0200
 
-Hi Zol,
+Hi Marcel,
 
-> > since you used dpkg to show a package list, I assume it is a Debian
-> > based system. In this case "apt-get install hotplug" should do the
-> > job.
-> You are right, it's a Debian based system: UHU-linux.
->=20
-> # apt-cache search hotplug
-> uhu-hotplug - Eszk=F6zcsere-vez=E9rl=F5 programok
->=20
-> # apt-get install uhu-hotplug
-> uhu-hotplug is already the newest version.
->=20
-> But it has only usb and ieee1394 parts:
-> /etc
-> /etc/hotplug
-> /etc/hotplug/agents
-> /etc/hotplug/agents/ieee1394
-> /etc/hotplug/agents/usb
-> /sbin
-> /sbin/hotplug
+> since you used dpkg to show a package list, I assume it is a Debian
+> based system. In this case "apt-get install hotplug" should do the
+> job.
+You are right, it's a Debian based system: UHU-linux.
 
-don't ask me. Ask the package maintainer.
+# apt-cache search hotplug
+uhu-hotplug - Eszk=F6zcsere-vez=E9rl=F5 programok
+
+# apt-get install uhu-hotplug
+uhu-hotplug is already the newest version.
+
+But it has only usb and ieee1394 parts:
+/etc
+/etc/hotplug
+/etc/hotplug/agents
+/etc/hotplug/agents/ieee1394
+/etc/hotplug/agents/usb
+/sbin
+/sbin/hotplug
 
 Regards
 
-Marcel
-
-
+Zol
 
 
 -------------------------------------------------------
