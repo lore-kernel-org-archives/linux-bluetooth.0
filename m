@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Internal Bluetooth on dell latitude d610?
+Subject: Re: [Bluez-users] Early failures with Treo 650
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4292E9B9.7080907@logicacmg.com>
-References: <4291DFA9.6010401@logicacmg.com>
-	 <1116857742.30044.88.camel@pegasus>  <4292E9B9.7080907@logicacmg.com>
+In-Reply-To: <4292938B.2090000@gmail.com>
+References: <428EDFCA.5070702@gmail.com> <1116842776.30044.33.camel@pegasus>
+	 <4292938B.2090000@gmail.com>
 Content-Type: text/plain
-Message-Id: <1116925311.30044.134.camel@pegasus>
+Message-Id: <1116924491.30044.131.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,21 +19,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 24 May 2005 11:01:51 +0200
+Date: Tue, 24 May 2005 10:48:10 +0200
 
-Hi Thomas,
+Hi David,
 
-> Fn+F2 as you suggested really moved me a bit further, unfortunately, 
-> only to another error message:
+> > show us "hciconfig -a" and run "hcidump -X -V" as root while you are
+> > scanning. 
 > 
-> usb 3-1: new full speed USB device using address 2
-> usb 3-1: control timeout on ep0out
+> I have confirmed that this device does work on windows (a friends
+> machine)... for a while I was wondering.
 > 
-> after this message, cat /proc/bus/usb/devices hangs on forever.
-> Hm. Probably a kernel bug / unsupported BT device? I tried to do a 
-> google search, found some similar questions but no answer :/
+> Now on to the infomation requested:
+> 
+> 
+> hcitool/hciconfig output:
+> -------------------------
+> 
+> red:/home/dpb# hcitool scan
+> Scanning ...
+> Inquiry failed: Connection timed out
+> red:/home/dpb#
+> hciconfig -a:
+> red:/home/dpb# hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:0C:55:F8:5A:2B ACL MTU: 377:10 SCO MTU: 16:0
+>         UP RUNNING PSCAN ISCAN INQUIRY AUTH
+>         RX bytes:101 acl:0 sco:0 events:13 errors:0
+>         TX bytes:304 acl:0 sco:0 commands:13 errors:0
+>         Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: HOLD SNIFF PARK
+>         Link mode: ACCEPT MASTER
+>         Name: 'red (0)'
+>         Class: 0x000100
+>         Service Classes: Unspecified
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver:
+> 0x6965
+>         Manufacturer: Broadcom Corporation (15)
+> 
+> red:/home/dpb#
 
-try a 2.6.12-rc4 kernel and you should really update the BlueZ packages.
+what kind of USB dongle is this? What version of kernel and what
+versions of bluez-* packages are installed?
+
+Why do you set "auth" in hcid.conf? Why is "rswitch" not activated in
+hcid.conf?
+
+Show us the content of /proc/bus/usb/devices.
 
 Regards
 
