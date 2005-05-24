@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Raw Sockets
+Subject: Re: [Bluez-devel] RSSI from rfcomm
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <6951a38b0505240932769defa9@mail.gmail.com>
-References: <6951a38b0505240932769defa9@mail.gmail.com>
+In-Reply-To: <4293520A.9010303@bungtopia.com>
+References: <5256d0b050514160856c4d194@mail.gmail.com>
+	 <1116112975.8886.25.camel@pegasus>
+	 <5256d0b05051416323a633e2d@mail.gmail.com>
+	 <1116115930.8886.27.camel@pegasus>  <428A0F38.5050902@bungtopia.com>
+	 <1116366629.10063.119.camel@pegasus>  <4293520A.9010303@bungtopia.com>
 Content-Type: text/plain
-Message-Id: <1116954412.30044.154.camel@pegasus>
+Message-Id: <1116954340.30044.151.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,27 +22,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 May 2005 19:06:52 +0200
+Date: Tue, 24 May 2005 19:05:40 +0200
 
-Hi Nuno,
+Hi Michael,
 
-> I'm writting from Portugal and I'm developing an application with
-> bluez. This application's objective is to develop an program to
-> receive data from several bluetooth devices and create a Data Base
-> with that information. I need to use Raw Sockets, so I can create
-> specific headers for the bluetooth packets.
+> Thanks for that. I think I have code that will work now. This is the 
+> line that I pass to the hci_read_rssi() method: 
+> hci_read_rssi(client_sock, htobs(rfconn.hci_handle), &rssi, 25000)
 > 
-> Rigth now I'm having some problems using this raw sockets... So, I
-> have some questions...
-> 1 - How can I capture bluetooth packets using Raw Sockets?
-> 2 - What kind of structure do I need to use to manage the packets (in
-> sockets tcp/ip we use specific structures to receive/send packets)
-> 3 - Can I capture all the packets or just the packets sent to my
-> bluetooth device??
+> My app doesn't have fancy error messages so I spent ages trying to work 
+> out why it doesnt work, no luck, but  rctest gives the error "Can't get 
+> RFCOMM connection information: Protocol not available (92)"
+> 
+> Do you know what can cause this error, or give me a head start on how to 
+> track it down?
+> 
+> Im using a complete install of fedora core 3
 
-what makes you think that you need raw sockets. I don't see any need for
-it. Write a client/server application that communicates over L2CAP or
-RFCOMM.
+maybe your kernel is too old. I added that feature to RFCOMM very late.
 
 Regards
 
