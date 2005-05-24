@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v730)
-Message-Id: <AC1F8662-8C37-4138-8C33-5E0AAEFE96CA@pepper.com>
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-From: Michael Frey <mfrey@pepper.com>
-Subject: [Bluez-devel] How to turn off Discoverable?
+Message-ID: <429364B3.4010101@egabriel.de>
+From: ligi <ligi@egabriel.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] obex ftp server ?
+References: <20050521160903.GB21130@externe.net>
+In-Reply-To: <20050521160903.GB21130@externe.net>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,13 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 May 2005 13:37:32 -0400
+Date: Tue, 24 May 2005 19:30:27 +0200
 
-Is there an hciconfig command to make my bluetooth module not  
-"Discoverable"?
+Guylhem Aznar wrote:
 
-Thanks,
-Michael
+>Hello
+>
+>I am wondering if any working obex ftp server is available. obexftpd
+>doesn't work. I'd be curious to know whether obexapp (freebsd) could
+>be compiled. It seems to use openobex and libbsdxml (can't find the
+>latter - IIRC it's a fork of libexpat which hopefully will be enough)
+>
+>Any clue/suggestion ?
+>
+>  
+>
+gnome-obex-server works fine.
+
+>Guylhem
+>
+>  
+>
 
 
 
