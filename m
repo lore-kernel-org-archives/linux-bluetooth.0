@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec05052412274f04a335@mail.gmail.com>
-From: Albert Huang <ashuang@gmail.com>
+From: Guylhem Aznar <bluez-devel@externe.net>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] How to turn off Discoverable?
-In-Reply-To: <AC1F8662-8C37-4138-8C33-5E0AAEFE96CA@pepper.com>
+Subject: Re: [Bluez-devel] obex ftp server ?
+Message-ID: <20050524192211.GA18948@externe.net>
+References: <20050521160903.GB21130@externe.net> <429364B3.4010101@egabriel.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <AC1F8662-8C37-4138-8C33-5E0AAEFE96CA@pepper.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <429364B3.4010101@egabriel.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,40 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 May 2005 15:27:58 -0400
+Date: Tue, 24 May 2005 15:22:11 -0400
 
-run as root:
+On Tuesday, 24 May 2005 at 19:30:27 (+0200), ligi wrote:
+> gnome-obex-server works fine.
 
-hciconfig hci0 pscan
+I doubt it will work on the commandline on a machine without X and
+with 64 Mb of Ram :-)
 
-to set it permanently, edit /etc/bluetooth/hcid.conf (or wherever your
-hcid.conf is) and disable inquiry scan.
+The best option ATM is obexapp, a FreeBSD application. I'm trying to
+make it work on linux/bluez without success. Some help would be
+appreciated. (mostly on bluez api part)
 
-This makes it undiscoverable, but still allows pages (other devices to
-connect, if they know your machine's bt address)
+Guylhem
 
--albert
+--=20
+Bien =E0 vous - Best regards,
+Guylhem P. Aznar
 
-On 5/24/05, Michael Frey <mfrey@pepper.com> wrote:
-> Is there an hciconfig command to make my bluetooth module not
-> "Discoverable"?
->=20
-> Thanks,
-> Michael
->=20
->=20
->=20
-> -------------------------------------------------------
-> This SF.Net email is sponsored by Yahoo.
-> Introducing Yahoo! Search Developer Network - Create apps using Yahoo!
-> Search APIs Find out how you can build Yahoo! directly into your own
-> Applications - visit http://developer.yahoo.net/?fr=3Doffad-ysdn-ostg-q22=
-005
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+--=20
+*@externe.net                                            http://externe.n=
+et
+P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
+un.org
+GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
+ey
 
 
 -------------------------------------------------------
