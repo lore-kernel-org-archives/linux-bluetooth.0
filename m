@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42935C97.4080508@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <6951a38b0505240932769defa9@mail.gmail.com>
+From: Nuno Gomes <nunomiguelgomes@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] libsbc optimizing
-References: <428BD03E.9000307@xmission.com> <20050521000412.1499f11e.henryk@ploetzli.ch> <428E7D72.3030501@xmission.com> <428E809E.2000208@xmission.com>
-In-Reply-To: <428E809E.2000208@xmission.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] Raw Sockets
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,43 +16,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 May 2005 10:55:51 -0600
+Date: Tue, 24 May 2005 17:32:51 +0100
 
-guys
+Hello,
+I'm writting from Portugal and I'm developing an application with
+bluez. This application's objective is to develop an program to
+receive data from several bluetooth devices and create a Data Base
+with that information. I need to use Raw Sockets, so I can create
+specific headers for the bluetooth packets.
 
-it's a little bit strange talking about math libraries here :)
+Rigth now I'm having some problems using this raw sockets... So, I
+have some questions...
+1 - How can I capture bluetooth packets using Raw Sockets?
+2 - What kind of structure do I need to use to manage the packets (in
+sockets tcp/ip we use specific structures to receive/send packets)
+3 - Can I capture all the packets or just the packets sent to my
+bluetooth device??
 
-i am going to try using gnu mp. it provides rationals and short floats. 
-i will make it an autoconf option so we keep the regular floating point 
-implementation in case that's what you want.
 
-brad
-
-Brad Midgley wrote:
-> hey
-> 
->> maybe we just need to break floats into two ints. using rationals 
->> (numerator/denominator) is what i was thinking when I saw that first 
->> fp division by bits[][].
-> 
-> 
-> i'm liking this better as i think about it. the precomputed arrays would 
-> be changed into rationals too.
-> 
-> one tricky bit will be how and when to normalize the ratio.
-> 
-> brad
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by Oracle Space Sweepstakes
-> Want to be the first software developer in space?
-> Enter now for the Oracle Space Sweepstakes!
-> http://ads.osdn.com/?ad_id=7412&alloc_id=16344&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Thank You all for the help...=20
+--=20
+Nuno Miguel Gomes
+Has just sent you an E-mail!!!
 
 
 -------------------------------------------------------
