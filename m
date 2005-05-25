@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <6951a38b05052510161e87e507@mail.gmail.com>
-From: Nuno Gomes <nunomiguelgomes@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stephen Crane <steve.crane@rococosoft.com>
+Cc: bluez-devel@lists.sourceforge.net, jim.oleary@rococosoft.com
+In-Reply-To: <1117032099.5854.56.camel@baroque.rococosoft.com>
+References: <1117032099.5854.56.camel@baroque.rococosoft.com>
+Content-Type: text/plain
+Message-Id: <1117036775.30044.238.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Raw Sockets
+Subject: [Bluez-devel] Re: Small fix for L2CAP MTU
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,32 +19,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 25 May 2005 18:16:02 +0100
+Date: Wed, 25 May 2005 17:59:35 +0200
 
-Hello,
-I'm writting from Portugal and I'm developing an application with
-bluez. This application's objective is to develop an program to
-receive data from several bluetooth devices and create a Data Base
-with that information. I need to use Raw Sockets, so I can create
-specific headers for the bluetooth packets.
-=20
-Rigth now I'm having some problems using this raw sockets... So, I
-have some questions...
-1 - How can I capture bluetooth packets using Raw Sockets?
-    I'm declaring sockets like this: socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO=
-_HCI)
-    Should it be diferent???
-2 - What kind of structure do I need to use to manage the packets (in
-sockets tcp/ip we use specific structures to receive/send packets with
-the libpcap)
-3 - Can I use read and write structures to send and receive the packets??
-=20
-Thats all for now...=20
-Thank You all for the help...
+Hi Steve,
 
---=20
-Nuno Miguel Gomes
-Has just sent you an E-mail!!!
+> I've attached a small change to the L2CAP layer which causes it to
+> better adhere to a sender's choice of MTU.
+> 
+> The background is that we have a test here where the client asks for an
+> omtu of 50 and tries to send more than this to the server, which in turn
+> checks that only 50 bytes were sent.
+> 
+> With the current kernel code, the omtu is always returned as the default
+> MTU (672) which causes our test to fail.
+
+I don't get it. Please show me the "hcidump -X -V" for both cases. With
+and without the patch.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
