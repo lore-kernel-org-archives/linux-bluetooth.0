@@ -1,18 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] DBUS service support - Initial library
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <e1effdeb050525152067a5cbd3@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb050525152067a5cbd3@mail.gmail.com>
+Subject: Re: [Bluez-devel] DBUS service support - Initial library
+In-Reply-To: <1116925644.30044.140.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 References: <1115901694.18499.32.camel@pegasus>
 	 <Pine.LNX.4.33.0505121821020.3523-100000@redbean.intranet.gw-instruments.de>
 	 <e1effdeb0505201404d05e818@mail.gmail.com>
 	 <1116844053.30044.59.camel@pegasus>
 	 <e1effdeb050523080216e96744@mail.gmail.com>
 	 <1116925644.30044.140.camel@pegasus>
-	 <e1effdeb050525152067a5cbd3@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1117098491.12036.23.camel@pegasus>
-Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -24,41 +23,94 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 May 2005 11:08:11 +0200
+Date: Wed, 25 May 2005 19:20:34 -0300
 
-Hi Claudio,
+Hi Marcel,
 
-> A new patch is available in the link below:
-> http://www.indt.org.br/maemo/bluez/
-
-lets welcome the Nokia 770 development ;)
-
-> The DBUS.TXT file contains information to run the sample and
-> how configure the service.
-
-We must make sure that we install a default service file, but we can
-sort this out later.
-
-> Suggestions and comments are welcome!
-
-We must really talk about the coding style at some point, but this is
-not important at the moment. We follow the kernel coding style and I
-wanna keep it that way.
-
-While looking through the whole source I realized that you used Glib and
-Pthread. This introduces a dependency chain that I don't wanna take. We
-must be really careful about this, because not all embedded systems can
-deal with it. We had a hard time to remove the Glib dependency from hcid
-and I am not going to introduce it again. For Pthread you might convince
-me, but there must be really good arguments.
-
-What is libbridge? I don't found it on any of my systems.
-
-Regards
-
-Marcel
+A new patch is available in the link below:
+http://www.indt.org.br/maemo/bluez/
 
 
+The DBUS.TXT file contains information to run the sample and
+how configure the service.
+
+Suggestions and comments are welcome!
+
+Regards,
+Claudio.
+
+
+On 5/24/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Claudio,
+>=20
+> > Regarding our suggestion about the service name. I consider the
+> > following basic features essential to establish and control connections=
+:
+> > * Search for a service (provided by sdptool)
+> > * Display local devices (provided by hcitool)
+> > * Switch master/slave role (provided by hcitool)
+> > * Listen for PAN connections (provided by pand)
+> > * Connect (provided by pand)
+> > * Disconnect  (provided by pand)
+> > * Display active connections  (provided by pand)
+> >
+> > According to D-BUS specification  when messages are received over a
+> > D-BUS connection,
+> > they are sent to a specific object, not to the application as a whole.
+> > Each object supports
+> > one or more interfaces.
+> >
+> > We have two options:
+> > 1. define one object with only one interface
+> >     eg:
+> >         object:org.bluez.pand
+> >         interface:org.bluez.pand
+> > 2. define one object with multiple interfaces
+> >     eg:
+> >         object:org.bluez.pand
+> >         interface: org.bluez.pand
+> >         interface: org.bluez.sdp
+> >         interface: org.bluez.hci
+> >
+> > For the both cases, pand will be the daemon responsible for
+> > provide this interfaces/services.
+> > What approach do you preffer?
+> > The last alternative is better because it is possible define more
+> > detailed rules in the dbus configuration file.
+>=20
+> this might be, but until we don't fully understand what functionality we
+> need to provide over D-Bus I like to go with 1). In general the first
+> version of an API sucks and I don't wanna spread it over different
+> interfaces and have to deprecate them.
+>=20
+> > Another point is the header for dbus services, the client application
+> > must know the message format, therefore the header file(dbus_services.h=
+)
+> > will be required. In the future, develop a library hidding D-BUS messag=
+e
+> > details is a better option.
+>=20
+> Then make it dbus.h for the service definitions and move the rest into
+> dbus.c and the function declaration into pand.h. For now copy the dbus.h
+> to the client application and we will sort out the details of it later.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> This SF.Net email is sponsored by Oracle Space Sweepstakes
+> Want to be the first software developer in space?
+> Enter now for the Oracle Space Sweepstakes!
+> http://ads.osdn.com/?ad_id=3D7412&alloc_id=3D16344&op=3Dclick
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 
 -------------------------------------------------------
