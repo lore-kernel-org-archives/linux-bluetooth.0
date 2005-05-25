@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4294DDEA.2070602@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <6951a38b050525115669124e0c@mail.gmail.com>
+From: Nuno Gomes <nunomiguelgomes@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] No sound with Canyon CN-BTH1 and CN-BTU1
-References: <42942431.5040303@planet.nl>
-In-Reply-To: <42942431.5040303@planet.nl>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] Raw Sockets
+In-Reply-To: <1117041739.12036.1.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <6951a38b05052510161e87e507@mail.gmail.com>
+	 <1117041739.12036.1.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,20 +19,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 25 May 2005 14:19:54 -0600
+Date: Wed, 25 May 2005 19:56:47 +0100
 
-Podologie
+Sorry;
+I thought the original messenge didn't reach you...
+Thank you for the help.
+And sorry once more.
 
-> office:/home/achilles # hciconfig hci0 revision
-> hci0:   Type: USB
->         BD Address: 00:0A:94:11:4F:8E ACL MTU: 120:20  SCO MTU: 64:0
->         Unsupported manufacturer
-
-Did you say you had another usb adapter you could try? "Unsupported 
-manufacturer" doesn't look good for voice. (Everything else should work 
-though)
-
-Brad
+--=20
+Nuno Miguel Gomes
+Has just sent you an E-mail!!!
 
 
 -------------------------------------------------------
