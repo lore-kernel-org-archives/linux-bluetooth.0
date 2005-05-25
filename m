@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?ISO-8859-2?Q?Szab=F3_Zolt=E1n?= <szz@freemail.hu>
+Subject: Re: [Bluez-users] HEEEELP!!!
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] 3CRWB6096 PCMCIA card
-Message-Id: <20050525231540.79e3034b.szz@freemail.hu>
-In-Reply-To: <1116871922.30044.126.camel@pegasus>
-References: <20050523165711.055d97c2.szz@freemail.hu>
-	<1116857587.30044.84.camel@pegasus>
-	<20050523195921.07267820.szz@freemail.hu>
-	<1116871922.30044.126.camel@pegasus>
+In-Reply-To: <20050525193324.22302.qmail@web54604.mail.yahoo.com>
+References: <20050525193324.22302.qmail@web54604.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1117050609.12036.4.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,16 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 May 2005 23:15:40 +0200
+Date: Wed, 25 May 2005 21:50:09 +0200
 
-Hi Marcel,
+Hi Joel,
 
-> Do you installed hotplug? Does /etc/hotplug/firmware.agent exists?
-Now /etc/hotplug/firmware.agent exists.
-How should I continue?
+> i have a lot of palm zire 72 and i need access for
+> internet on my linux but when i connect the second
+> palm he take the same IP from the first palm.
+> 
+> im using one /dev/rfcomm* to connect
 
-Thank you:
-Zol
+be more specific in what you are trying to do. I assume that your Linux
+machine should be an access point for multiple Palms and you use the LAN
+access using PPP profile for Internet connection. So tell us how your
+setup is at the moment.
+
+Regards
+
+Marcel
 
 
 
