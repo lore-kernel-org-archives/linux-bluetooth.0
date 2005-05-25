@@ -1,73 +1,83 @@
-Return-Path: <steve.crane@rococosoft.com>
-Subject: Small fix for L2CAP MTU
-From: Stephen Crane <steve.crane@rococosoft.com>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] hcitool cc timeout - change able ?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Cc: marcel@holtmann.org, jim.oleary@rococosoft.com
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-ktXJ5eNPC+hR8y+KCRkt"
-Date: Wed, 25 May 2005 15:41:39 +0100
-Message-Id: <1117032099.5854.56.camel@baroque.rococosoft.com>
-Mime-Version: 1.0
-List-ID: <bluez-devel.lists.sourceforge.net>
-
-
---=-ktXJ5eNPC+hR8y+KCRkt
-Content-Type: multipart/mixed; boundary="=-pzZr5K/9CdE3+qKbVVFQ"
-
-
---=-pzZr5K/9CdE3+qKbVVFQ
+In-Reply-To: <Pine.GSO.4.58.0505251521120.25684@myrtle.ukc.ac.uk>
+References: <Pine.GSO.4.58.0505251442560.25684@myrtle.ukc.ac.uk>
+	 <1117029743.30044.212.camel@pegasus>
+	 <Pine.GSO.4.58.0505251521120.25684@myrtle.ukc.ac.uk>
 Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Message-Id: <1117031469.30044.215.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 25 May 2005 16:31:09 +0200
 
-Hi Marcel,
-I've attached a small change to the L2CAP layer which causes it to
-better adhere to a sender's choice of MTU.
+Hi Phil,
 
-The background is that we have a test here where the client asks for an
-omtu of 50 and tries to send more than this to the server, which in turn
-checks that only 50 bytes were sent.
+> > > could some one please tell me if there is a way to reduce the timeout time
+> > > ? e.g. to 2 ?
+> > >
+> > > I would like to do this, because I like to find out what the link
+> > > quality and rssi of a device is. As
+> > > my bluetooth hardware only supports 1.1 and not 1.2 I have to connect to
+> > > the device first in order to find out the above information. As my list of
+> > > BT devices I would like to find the above info out about is constantly
+> > > growing I have a problem with the hcitool cc timeout, as I do:
+> > >
+> > > hcitool cc BT-address
+> > > hcitool lq BT-address
+> > > hcitool dc BT-address
+> > >
+> > > If the device is in range the three commands are very quick, but if the
+> > > device is not in range the connect command takes a long time till it times
+> > > out.
+> > > So my question is, is there a way to reduce the timeout time ? e.g. to 2
+> > > sec. ?
+> >
+> > you are looking for the page timeout. Look at the manual page of
+> > hciconfig.
+> 
+> 
+> I did look at the manual page, but all I found was:
+> 
+> lst <bdaddr> [value]
+>               With no value, displays link supervision timeout for the
+> 	      connection to the device with Bluetooth address bdaddr.  If  value
+>               is given,  sets the link supervision timeout for that
+>               connection to value slots, or to infinite if value is 0.
+> 
+> But this only sets the timeout for conncetions which are already
+> established. I would like to change the timeout for trying to establish a
+> conncetion, e.g. if the device can't be found within 2 sec. stop trying.
 
-With the current kernel code, the omtu is always returned as the default
-MTU (672) which causes our test to fail.
+you may wanna read my response again. When I say page timeout then I
+mean page timeout and not link supervision timeout. I also said that you
+should look at the manual page of hciconfig and not hcitool. This means
+that the command will be "hciconfig hci0 pageto <slots>".
 
-I've attached a patch against 2.6.11.10 (proposed by my colleague Jim
-O'Leary) which assigns omtu from that proposed by the peer, iff we don't
-care about the omtu.
+Regards
 
-Thanks,
-Steve
---=20
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
-
---=-pzZr5K/9CdE3+qKbVVFQ
-Content-Disposition: attachment; filename=l2cap.patch
-Content-Type: text/x-patch; name=l2cap.patch; charset=ISO-8859-15
-Content-Transfer-Encoding: base64
-
-MTM1OSwxMzY0YzEzNTksMTM2NQ0KPCAJaWYgKHBpLT5jb25mX210dSA8IHBpLT5vbXR1KSB7DQo8
-IAkJbDJjYXBfYWRkX2NvbmZfb3B0KHB0ciwgTDJDQVBfQ09ORl9NVFUsIDIsIHBpLT5vbXR1KTsN
-CjwgCQlyZXN1bHQgPSBMMkNBUF9DT05GX1VOQUNDRVBUOw0KPCAJfSBlbHNlIHsNCjwgCQlwaS0+
-b210dSA9IHBpLT5jb25mX210dTsNCjwgCX0NCi0tLQ0KPiAJaWYgKHBpLT5vbXR1ID09IDApIHsN
-Cj4gCQkvKiBJZiB3ZSBkb24ndCBjYXJlIGFib3V0IHRoZSBNVFUsIHVzZSBwZWVyJ3MgcHJvcG9z
-YWwgKi8NCj4gICAgICAgICAgICAgICAgIHBpLT5vbXR1ID0gcGktPmNvbmZfbXR1Ow0KPiAJfSBl
-bHNlIGlmIChwaS0+Y29uZl9tdHUgPCBwaS0+b210dSkgew0KPiAgICAgICAgICAgICAgICAgbDJj
-YXBfYWRkX2NvbmZfb3B0KHB0ciwgTDJDQVBfQ09ORl9NVFUsIDIsIHBpLT5vbXR1KTsNCj4gICAg
-ICAgICAgICAgICAgIHJlc3VsdCA9IEwyQ0FQX0NPTkZfVU5BQ0NFUFQ7DQo+ICAgICAgICAgfQ0K
+Marcel
 
 
 
---=-pzZr5K/9CdE3+qKbVVFQ--
 
---=-ktXJ5eNPC+hR8y+KCRkt
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQBClI6jlgMqgVzLyWcRApI1AJ9lS0yfQi+Iipb2qJks8aQkE6Gb/QCeIc9e
-eJxvHDs5Ls2AjSLi72D+hGQ=
-=3Hj9
------END PGP SIGNATURE-----
-
---=-ktXJ5eNPC+hR8y+KCRkt--
+-------------------------------------------------------
+SF.Net email is sponsored by: GoToMeeting - the easiest way to collaborate
+online with coworkers and clients while avoiding the high cost of travel and
+communications. There is no equipment to buy and you can meet as often as
+you want. Try it free.http://ads.osdn.com/?ad_id=7402&alloc_id=16135&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
