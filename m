@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] HEEEELP!!!
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20050525193324.22302.qmail@web54604.mail.yahoo.com>
+From: =?iso-8859-1?q?Joel=20Tom=E1s=20Cachioli?= <cachioli@yahoo.com.br>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050525193324.22302.qmail@web54604.mail.yahoo.com>
-References: <20050525193324.22302.qmail@web54604.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1117050609.12036.4.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] HEEEELP!!!
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 May 2005 21:50:09 +0200
+Date: Wed, 25 May 2005 16:33:23 -0300 (ART)
 
-Hi Joel,
+please,
+i have a lot of palm zire 72 and i need access for
+internet on my linux but when i connect the second
+palm he take the same IP from the first palm.
 
-> i have a lot of palm zire 72 and i need access for
-> internet on my linux but when i connect the second
-> palm he take the same IP from the first palm.
-> 
-> im using one /dev/rfcomm* to connect
+im using one /dev/rfcomm* to connect
+ 
 
-be more specific in what you are trying to do. I assume that your Linux
-machine should be an access point for multiple Palms and you use the LAN
-access using PPP profile for Internet connection. So tell us how your
-setup is at the moment.
+any one can help me please!?
 
-Regards
+sorry, my english is bad :(
 
-Marcel
-
-
+__________________________________________________
+Converse com seus amigos em tempo real com o Yahoo! Messenger 
+http://br.download.yahoo.com/messenger/ 
 
 
 -------------------------------------------------------
