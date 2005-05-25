@@ -1,67 +1,89 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Ruben Jenster <RJenster@web.de>
+Return-Path: <steve.crane@rococosoft.com>
+Subject: Re: [Bluez-devel] Re: Small fix for L2CAP MTU
+From: Stephen Crane <steve.crane@rococosoft.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] link_key pairing problem
-References: <200505211500.37962.ruben@hotheads.de> <200505251447.42486.RJenster@web.de> <1117027586.30044.209.camel@pegasus>
-In-Reply-To: <1117027586.30044.209.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200505251724.23452.RJenster@web.de>
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 25 May 2005 17:24:23 +0200
+Cc: jim.oleary@rococosoft.com, marcel@holtmann.org
+In-Reply-To: <1117032403.30044.218.camel@pegasus>
+References: <1117032099.5854.56.camel@baroque.rococosoft.com>
+	 <1117032403.30044.218.camel@pegasus>
+Content-Type: multipart/mixed; boundary="=-O2l1LVuKXDcszbiPA8qk"
+Date: Wed, 25 May 2005 16:02:39 +0100
+Message-Id: <1117033359.5854.62.camel@baroque.rococosoft.com>
+Mime-Version: 1.0
+List-ID: <bluez-devel.lists.sourceforge.net>
 
 
->
-> what does "hciconfig -a" and "hcitool info" say?
+--=-O2l1LVuKXDcszbiPA8qk
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-root@thinkpad [/etc] hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:0C:55:FD:8E:6B ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:306 acl:0 sco:0 events:41 errors:0
-        TX bytes:900 acl:0 sco:0 commands:39 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'Thinkpad (0)'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x33c LMP Ver: 1.1 (0x1) LMP Subver: 0x33c
-        Manufacturer: Cambridge Silicon Radio (10)
+(Oops, mea culpa. diff -Naur attached.)
 
-root@thinkpad [/etc] hcitool info 00:0D:B5:80:21:04
-Requesting information ...
-1       BD Address:  00:0D:B5:80:21:04
-        Device Name: BT808 Headset
-        LMP Version: 1.1 (0x1) LMP Subversion: 0x434
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
-                <power control> <transparent SCO>
+On Wed, 2005-05-25 at 16:46 +0200, Marcel Holtmann wrote:
+> Hi Steve,
+> 
+> > I've attached a small change to the L2CAP layer which causes it to
+> > better adhere to a sender's choice of MTU.
+> > 
+> > The background is that we have a test here where the client asks for an
+> > omtu of 50 and tries to send more than this to the server, which in turn
+> > checks that only 50 bytes were sent.
+> > 
+> > With the current kernel code, the omtu is always returned as the default
+> > MTU (672) which causes our test to fail.
+> > 
+> > I've attached a patch against 2.6.11.10 (proposed by my colleague Jim
+> > O'Leary) which assigns omtu from that proposed by the peer, iff we don't
+> > care about the omtu.
+> 
+> please use unified diff. I am unable to read context diffs.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> SF.Net email is sponsored by: GoToMeeting - the easiest way to collaborate
+> online with coworkers and clients while avoiding the high cost of travel and
+> communications. There is no equipment to buy and you can meet as often as
+> you want. Try it free.http://ads.osdn.com/?ad_id=7402&alloc_id=16135&op=click
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
 
+--=-O2l1LVuKXDcszbiPA8qk
+Content-Disposition: attachment; filename=l2cap.patch
+Content-Type: text/x-patch; name=l2cap.patch; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
 
--------------------------------------------------------
-SF.Net email is sponsored by: GoToMeeting - the easiest way to collaborate
-online with coworkers and clients while avoiding the high cost of travel and
-communications. There is no equipment to buy and you can meet as often as
-you want. Try it free.http://ads.osdn.com/?ad_id=7402&alloc_id=16135&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--- net/bluetooth/l2cap.c-	2005-05-25 15:35:10.000000000 +0100
++++ net/bluetooth/l2cap.c	2005-05-25 15:37:45.000000000 +0100
+@@ -1356,12 +1356,13 @@
+ 
+ 	/* Configure output options and let the other side know
+ 	 * which ones we don't like. */
+-	if (pi->conf_mtu < pi->omtu) {
+-		l2cap_add_conf_opt(ptr, L2CAP_CONF_MTU, 2, pi->omtu);
+-		result = L2CAP_CONF_UNACCEPT;
+-	} else {
+-		pi->omtu = pi->conf_mtu;
+-	}
++	if (pi->omtu == 0) {
++		/* If we don't care about the MTU, use peer's proposal */
++                pi->omtu = pi->conf_mtu;
++	} else if (pi->conf_mtu < pi->omtu) {
++                l2cap_add_conf_opt(ptr, L2CAP_CONF_MTU, 2, pi->omtu);
++                result = L2CAP_CONF_UNACCEPT;
++        }
+ 
+ 	BT_DBG("sk %p result %d", sk, result);
+ 	return result;
+
+--=-O2l1LVuKXDcszbiPA8qk--
