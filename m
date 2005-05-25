@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Philipp H. Mohr" <phm4@kent.ac.uk>
+Subject: Re: [Bluez-devel] link_key pairing problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <Pine.GSO.4.58.0505251442560.25684@myrtle.ukc.ac.uk>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] hcitool cc timeout - change able ?
+In-Reply-To: <200505251447.42486.RJenster@web.de>
+References: <200505211500.37962.ruben@hotheads.de>
+	 <1116842913.30044.36.camel@pegasus>  <200505251447.42486.RJenster@web.de>
+Content-Type: text/plain
+Message-Id: <1117027586.30044.209.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,34 +19,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 25 May 2005 14:49:08 +0100 (BST)
+Date: Wed, 25 May 2005 15:26:26 +0200
 
-Hello,
+Hi Ruben,
 
-could some one please tell me if there is a way to reduce the timeout time
-? e.g. to 2 ?
+> > use bluez-utils-2.17 and use a clean start. Don't modify hcid.conf and
+> > remove the link_key file (new place and file format since 2.16). Run
+> > "hcidump -X -V" to show what happens.
+> >
+> > Maybe your headset is broken.
+> 
+> I think that the headset is not broken rather than the dongle. 
+> I tried to pair the headset multiple times with my new thinkpad that has a 
+> builtin bluetooth device an it works without any problems. 
+> After that I also tried it with the bluetooth dongle on the thinkpad and it 
+> doesn't work. As they are both using the same module 'hci_usb'
+> I assume that it must be the dongle that is causing problems.
+> 
+> Maybe this dongle does not work like other dongles and is not fully or proper 
+> implemented in hci_usb driver. 
+> The dongle is a "Allnet ALL1575" Poor product infos are available on 
+> http://www.allnet.de/product_info_allnet.php?cPath=_&products_id=22844
+> I'v attech the output of lsusb -vvv maybe that helps to track down the 
+> problem.
 
-I would like to do this, because I like to find out what the link
-quality and rssi of a device is. As
-my bluetooth hardware only supports 1.1 and not 1.2 I have to connect to
-the device first in order to find out the above information. As my list of
-BT devices I would like to find the above info out about is constantly
-growing I have a problem with the hcitool cc timeout, as I do:
+what does "hciconfig -a" and "hcitool info" say?
 
-hcitool cc BT-address
-hcitool lq BT-address
-hcitool dc BT-address
+Regards
 
-If the device is in range the three commands are very quick, but if the
-device is not in range the connect command takes a long time till it times
-out.
-So my question is, is there a way to reduce the timeout time ? e.g. to 2
-sec. ?
+Marcel
 
-Thank you very much for your help.
 
-Cheers,
-Phil
 
 
 -------------------------------------------------------
