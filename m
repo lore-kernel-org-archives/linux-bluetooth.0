@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: Stephen Crane <steve.crane@rococosoft.com>
+Cc: bluez-devel@lists.sourceforge.net, jim.oleary@rococosoft.com
+In-Reply-To: <1117032099.5854.56.camel@baroque.rococosoft.com>
+References: <1117032099.5854.56.camel@baroque.rococosoft.com>
 Content-Type: text/plain
-Message-Id: <1117032553.30044.222.camel@pegasus>
+Message-Id: <1117032403.30044.218.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] BlueZ and Nokia 770
+Subject: [Bluez-devel] Re: Small fix for L2CAP MTU
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,15 +19,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 25 May 2005 16:49:13 +0200
+Date: Wed, 25 May 2005 16:46:43 +0200
 
-Hi Folks,
+Hi Steve,
 
-it seems we made it into the Maemo Development Platform from Nokia. This
-platform is the base of the new Nokia 770.
+> I've attached a small change to the L2CAP layer which causes it to
+> better adhere to a sender's choice of MTU.
+> 
+> The background is that we have a test here where the client asks for an
+> omtu of 50 and tries to send more than this to the server, which in turn
+> checks that only 50 bytes were sent.
+> 
+> With the current kernel code, the omtu is always returned as the default
+> MTU (672) which causes our test to fail.
+> 
+> I've attached a patch against 2.6.11.10 (proposed by my colleague Jim
+> O'Leary) which assigns omtu from that proposed by the peer, iff we don't
+> care about the omtu.
 
-http://www.maemo.org/platform/docs/maemo_exec_whitepaper.html
-http://www.nokia.com/nokia/0,,74866,00.html
+please use unified diff. I am unable to read context diffs.
 
 Regards
 
