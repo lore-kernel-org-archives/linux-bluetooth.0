@@ -1,14 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000801c561e0$191b3830$8300a8c0@priveiqvfluhp9>
-From: "Pieter De Mil" <mil@pandora.be>
-To: <bluez-devel@lists.sourceforge.net>
-References: <1117032099.5854.56.camel@baroque.rococosoft.com> <1117036775.30044.238.camel@pegasus> <1117102401.5854.75.camel@baroque.rococosoft.com> <1117103519.12036.35.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
-Subject: [Bluez-devel] Output power
+Subject: Re: [Bluez-devel] Re: Small fix for L2CAP MTU
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stephen Crane <steve.crane@rococosoft.com>
+Cc: bluez-devel@lists.sourceforge.net, jim.oleary@rococosoft.com
+In-Reply-To: <1117102401.5854.75.camel@baroque.rococosoft.com>
+References: <1117032099.5854.56.camel@baroque.rococosoft.com>
+	 <1117036775.30044.238.camel@pegasus>
+	 <1117102401.5854.75.camel@baroque.rococosoft.com>
+Content-Type: text/plain
+Message-Id: <1117103519.12036.35.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,17 +21,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 May 2005 12:45:56 +0200
+Date: Thu, 26 May 2005 12:31:59 +0200
 
-Hello,
+Hi Steve,
 
-Is it possible to know the output power a Bluetooth-dongle is using?
+> I've attached the two dump files. Let me know if you need any more info.
 
-Because the link quality of a connection raises if we go further away, I 
-wanted to know if you can read the used output power.
+I don't see it. No side is asking for a MTU with the size 50 in the
+configuration process of the L2CAP connection setup.
 
-regards,
-Pieter 
+Regards
+
+Marcel
 
 
 
