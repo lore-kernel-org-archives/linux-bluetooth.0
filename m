@@ -1,16 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Output power
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <000801c561e0$191b3830$8300a8c0@priveiqvfluhp9>
-References: <1117032099.5854.56.camel@baroque.rococosoft.com>
-	 <1117036775.30044.238.camel@pegasus>
-	 <1117102401.5854.75.camel@baroque.rococosoft.com>
-	 <1117103519.12036.35.camel@pegasus>
-	 <000801c561e0$191b3830$8300a8c0@priveiqvfluhp9>
-Content-Type: text/plain
-Message-Id: <1117104537.12036.37.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <000801c561e0$191b3830$8300a8c0@priveiqvfluhp9>
+From: "Pieter De Mil" <mil@pandora.be>
+To: <bluez-devel@lists.sourceforge.net>
+References: <1117032099.5854.56.camel@baroque.rococosoft.com> <1117036775.30044.238.camel@pegasus> <1117102401.5854.75.camel@baroque.rococosoft.com> <1117103519.12036.35.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
+Subject: [Bluez-devel] Output power
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,20 +20,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 May 2005 12:48:57 +0200
+Date: Thu, 26 May 2005 12:45:56 +0200
 
-Hi Pieter,
+Hello,
 
-> Is it possible to know the output power a Bluetooth-dongle is using?
-> 
-> Because the link quality of a connection raises if we go further away, I 
-> wanted to know if you can read the used output power.
+Is it possible to know the output power a Bluetooth-dongle is using?
 
-you can read the transmit power level with hcitool.
+Because the link quality of a connection raises if we go further away, I 
+wanted to know if you can read the used output power.
 
-Regards
-
-Marcel
+regards,
+Pieter 
 
 
 
