@@ -1,14 +1,20 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000501c562ea$b4c89240$8200a8c0@priveiqvfluhp9>
-From: "Pieter De Mil" <mil@pandora.be>
-To: <bluez-devel@lists.sourceforge.net>
-References: <1117032099.5854.56.camel@baroque.rococosoft.com> <1117036775.30044.238.camel@pegasus> <1117102401.5854.75.camel@baroque.rococosoft.com> <1117103519.12036.35.camel@pegasus> <000801c561e0$191b3830$8300a8c0@priveiqvfluhp9> <1117104537.12036.37.camel@pegasus>
-Subject: Re: [Bluez-devel] Output power
-MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
+Subject: Re: [Bluez-devel] DBUS service support - Initial library
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb05052614222118e70c@mail.gmail.com>
+References: <1115901694.18499.32.camel@pegasus>
+	 <Pine.LNX.4.33.0505121821020.3523-100000@redbean.intranet.gw-instruments.de>
+	 <e1effdeb0505201404d05e818@mail.gmail.com>
+	 <1116844053.30044.59.camel@pegasus>
+	 <e1effdeb050523080216e96744@mail.gmail.com>
+	 <1116925644.30044.140.camel@pegasus>
+	 <e1effdeb050525152067a5cbd3@mail.gmail.com>
+	 <1117098491.12036.23.camel@pegasus>
+	 <e1effdeb05052614222118e70c@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1117143615.12036.74.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,58 +26,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 27 May 2005 20:34:24 +0200
+Date: Thu, 26 May 2005 23:40:15 +0200
 
-Hello Marcel,
+Hi Claudio,
 
-I measured the transmit power level of a Bluetooth-dongle, but it stays 0 in 
-a range of 10m.
-I'm sure that the link quality raises (from 212 tot 255 on a distance of 
-2m), so I thought it was because the transmit power level is stronger.
+> 1. Glib
+> I will fix it. I found another approach using dbus main loop function.
 
-Do you have experience with the transmit power level indication?
+perfect.
 
-Regards,
-Pieter
+> 2. libbridge
+> It should be removed. It is not being used at the momment.  I will fix
+> the Makefile.am
+> But in the the future, I would suggest provide automatic bridge creation.
+> Using libbridge it's possible create bridge and add bnep interfaces.
 
+I am not against it, but I think we need to make it optional. Does it
+make sense to put that into pand or leave it in the client?
 
+> 3. Coding style
+> sorry, I try do my best. I am not familiar with linux kernel coding style.
 
------ Original Message ----- 
-From: "Marcel Holtmann" <marcel@holtmann.org>
-To: <bluez-devel@lists.sourceforge.net>
-Sent: Thursday, May 26, 2005 12:48 PM
-Subject: Re: [Bluez-devel] Output power
+Maybe you wanna read the paper from Greg KH on the BlueZ page. We will
+sort that out later.
 
+> 4. PThread 
+> I will remove Posix Thread code.
 
-> Hi Pieter,
->
->> Is it possible to know the output power a Bluetooth-dongle is using?
->>
->> Because the link quality of a connection raises if we go further away, I
->> wanted to know if you can read the used output power.
->
-> you can read the transmit power level with hcitool.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> SF.Net email is sponsored by: GoToMeeting - the easiest way to collaborate
-> online with coworkers and clients while avoiding the high cost of travel 
-> and
-> communications. There is no equipment to buy and you can meet as often as
-> you want. Try it 
-> free.http://ads.osdn.com/?ad_id=7402&alloc_id=16135&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-> 
+We don't really need threads.
+
+> I will send another patch until next monday.
+
+Keep up the good work.
+
+Regards
+
+Marcel
 
 
 
