@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Problem to connect hci as non-root
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4295E697.9060802@palmsource.com>
+From: Frederic Danis <frederic.danis@palmsource.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4295E697.9060802@palmsource.com>
-References: <4295E697.9060802@palmsource.com>
-Content-Type: text/plain
-Message-Id: <1117120845.12036.41.camel@pegasus>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] Problem to connect hci as non-root
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,24 +16,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 May 2005 17:20:45 +0200
+Date: Thu, 26 May 2005 17:09:11 +0200
 
-Hi Fred,
+Hello,
 
-> I am trying to write an application that can be used to add or remove 
-> paired devices. But when I try to connect to the remote device (to add 
-> it to the paired devices), I get an error EPERM (when I try it as root, 
-> there is no problem).
-> I can not suid root my application.
-> Is there a way to connect to a device as user, and to be able to do 
-> authentication ?
-
-why don't you connect a L2CAP channel (for example SDP)?
+I am trying to write an application that can be used to add or remove 
+paired devices. But when I try to connect to the remote device (to add 
+it to the paired devices), I get an error EPERM (when I try it as root, 
+there is no problem).
+I can not suid root my application.
+Is there a way to connect to a device as user, and to be able to do 
+authentication ?
 
 Regards
 
-Marcel
+Fred
 
+-- 
+-----------------------------------------------
+It is not by improving the oil lamp that one invents the electric bulb!
+-----------------------------------------------
+Danis Frederic            PalmSource Europe
+Software engineer
+Mail : mailto:frederic.danis@palmsource.com
+-----------------------------------------------
 
 
 
