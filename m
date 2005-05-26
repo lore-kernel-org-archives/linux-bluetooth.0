@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
+Subject: Re: [Bluez-users] Problem with dund and LG 325 phone.
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200505262356.17172.cijoml@volny.cz>
-Subject: [Bluez-users] Fwd: Re: [linux-usb-devel] Re: [linux-pm] potential pitfall? changing configuration while PC in hibernate (fwd)
+In-Reply-To: <42962705.9010902@fnal.gov>
+References: <42962705.9010902@fnal.gov>
+Content-Type: text/plain
+Message-Id: <1117143784.12036.78.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,56 +18,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 May 2005 23:56:16 +0200
+Date: Thu, 26 May 2005 23:43:04 +0200
 
-Marcel, can you pls tell to David Brownell <david-b@pacbell.net>
-where is problem and some info about suspend() method in hci_usb driver?
+Hi Eric,
 
-Thanks
+> I have an LG PM-325 which I am trying to get DUN working with. It works under
+> Windows, but I want to use linux.
+> 
+> I think the two devices are paired since I can do l2ping and get responses,
+> but I still seem to be a few steps away from being able to do DUN.
+> 
+> When I type this, I expect to get a success message back, right? Instead I get 
+> nothing:
+> 
+> [root@a122077 root]# dund -c 08:00:37:13:A1:C7 -n
+> dund[5586]: Bluetooth DUN daemon
+> dund[5586]: Searching for LAP on 08:00:37:13:A1:C7
+> [root@a122077 root]#
+> 
+> I don't have to do anything with rfcomm before this, right? I also don't need 
+> to run pand, right, since my device only supports DUN.
+> 
+> When I try to do a pppd call command, I get this in syslog:
+> May 26 14:43:02 a122077 kernel: PPP generic driver version 2.4.2
+> May 26 14:43:02 a122077 pppd[5708]: pppd 2.4.3 started by root, uid 0
+> May 26 14:43:03 a122077 hcid[3602]: link_key_request (sba=00:10:60:AA:5C:CE, 
+> dba=08:00:37:13:A1:C7)
+> May 26 14:43:03 a122077 pppd[5708]: Failed to open /dev/rfcomm0: Connection 
+> refused
+> May 26 14:43:03 a122077 pppd[5708]: Exit.
+> 
+> which isn't surprising.
 
-Michal
+using dund for Dialup-Networking is the wrong way. The dund is for LAN
+access using PPP. And yes, I know that the name is confusing.
 
-=2D---------  P=F8edan=E1 zpr=E1va  ----------
+What you need is to find the RFCOMM channel number for Dialup-Networking
+with the help of
 
-Subject: Re: [linux-usb-devel] Re: [linux-pm] potential pitfall? changing=20
-configuration while PC in hibernate (fwd)
-Date: =E8t 26. kv=ECtna 2005 19:34
-=46rom: David Brownell <david-b@pacbell.net>
-To: linux-usb-devel@lists.sourceforge.net
-Cc: Andrew Morton <akpm@osdl.org>, cijoml@volny.cz,=20
-linux-kernel@vger.kernel.org
+	sdptool search --bdaddr <bdaddr> dun
 
-On Wednesday 25 May 2005 4:47 pm, Andrew Morton wrote:
-> Michal Semler <cijoml@volny.cz> wrote:
-> > It is real stupid, that Linux kernel freezes when simply during hiberna=
-te
-> > I change Bluetooth dongle to USB mouse in my USB port.
+and then you bind a RFCOMM TTY port to that channel with
 
-That is, you unplug the dongle -- breaking the USB power session -- and then
-plug in a mouse?  And the kernel does something other than disconnecting the
-dongle, and then enumerate a new mouse?  That'd be a bug.  Somewhere.  It'd
-probably help a lot if the bluetooth USB driver had a suspend() method.
+	rfcomm bind 0 <bdaddr> <channel>
 
-It's not clear to me what you mean by "hibernate".  If that's an "everything
-powered off" pseudo-suspend state, then the dongle should always be getting
-disconnected, and USB always re-enumerated by Linux.  Only "real suspend"
-states, like suspend-to-RAM, can normally maintain USB power sessions.  And
-even then, the device drivers need to be prepared to maintain them ... and
-do things like stop active I/O requests, and resume them later.
+After that you can use any dialer (for example wvdial) to setup your
+dialup connection through /dev/rfcomm0.
 
-You said this was an all-Intel system.  So which host controller driver is
-in use here ... UHCI?  EHCI?  With RC5 and CONFIG_USB_DEBUG, what do the
-USB debug messages say is happening?  Does CONFIG_USB_SUSPEND change things?
-Try this with purely modular USB for now.
+Regards
 
-=2D Dave
+Marcel
 
-=2D------------------------------------------------------
 
-=2D-=20
-S pozdravem
-
-Michal Semler
 
 
 -------------------------------------------------------
