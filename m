@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Alejandro Ferrer <aferrer2005@yahoo.com.au>
+Subject: Re: [Bluez-users] Problem with dund and LG 325 phone.
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200505271756.05423.aferrer2005@yahoo.com.au>
-Subject: [Bluez-users] configure.in: 22: macro `AM_PATH_ALSA' not found in library
+In-Reply-To: <42967B9B.2000203@fnal.gov>
+References: <42962705.9010902@fnal.gov> <1117143784.12036.78.camel@pegasus>
+	 <42967B9B.2000203@fnal.gov>
+Content-Type: text/plain
+Message-Id: <1117177674.12036.93.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,19 +19,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 27 May 2005 17:56:05 +0100
+Date: Fri, 27 May 2005 09:07:54 +0200
 
-Hi...
+Hi Eric,
 
-I am new in Linux, I am trying to configure btsco, but when I try to 
-compile ./bootstrap I get the following message " configure.in: 22: macro 
-`AM_PATH_ALSA' not found in library"  and I dont know what can I do.
+> thanks that helped and at one point I got the phone dialing, but not 
+> anymore. I'm still getting "Connection refused" errors. The computer and phone 
+> are definitely paired since I can use kbthandsfree.
+> 
+> If I issue these commands:
+> 
+>    748  echo 1 > /proc/sys/net/ipv4/ip_forward
+>    749  rfcomm bind 0 08:00:37:13:A1:C7 4
+>    750  pppd /dev/rfcomm0 debug nocrtscts novj novjccomp defaultroute connect 
+> 'chat -v -f /root/sprint-chat'
+> 
+> May 26 20:38:12 localhost pppd[4987]: pppd 2.4.3 started by root, uid 0
+> May 26 20:38:13 localhost hcid[3622]: link_key_request (sba=00:10:60:AA:5C:CE, 
+> dba=08:00:37:13:A1:C7)
+> May 26 20:38:13 localhost pppd[4987]: Failed to open /dev/rfcomm0: Connection 
+> refused
+> May 26 20:38:13 localhost pppd[4987]: Exit.
+> 
+> This is what hcidump shows (sorry for the length, but I don't know what's 
+> important)
 
-If somebody can helpme with this I realy appreciate that.
+try to reset/reboot your phone and check the RFCOMM channel number again
+with sdptool. It looks like that this channel is no longer accepting new
+connections.
 
-Thanks and Regards
+Regards
 
-Chombly
+Marcel
+
+
 
 
 -------------------------------------------------------
