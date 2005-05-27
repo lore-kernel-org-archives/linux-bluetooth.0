@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problem with dund and LG 325 phone.
+Subject: Re: [Bluez-users] Early failures with Treo 650
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <42967B9B.2000203@fnal.gov>
-References: <42962705.9010902@fnal.gov> <1117143784.12036.78.camel@pegasus>
-	 <42967B9B.2000203@fnal.gov>
+In-Reply-To: <429682D6.2020800@gmail.com>
+References: <428EDFCA.5070702@gmail.com> <1116842776.30044.33.camel@pegasus>
+	 <4292938B.2090000@gmail.com> <1116924491.30044.131.camel@pegasus>
+	 <429553F1.7020604@gmail.com> <1117095364.12036.14.camel@pegasus>
+	 <429682D6.2020800@gmail.com>
 Content-Type: text/plain
-Message-Id: <1117177674.12036.93.camel@pegasus>
+Message-Id: <1117177537.12036.90.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,34 +21,53 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 27 May 2005 09:07:54 +0200
+Date: Fri, 27 May 2005 09:05:37 +0200
 
-Hi Eric,
+Hi David,
 
-> thanks that helped and at one point I got the phone dialing, but not 
-> anymore. I'm still getting "Connection refused" errors. The computer and phone 
-> are definitely paired since I can use kbthandsfree.
+> >>>what kind of USB dongle is this?
+> >>
+> >>The USB dongle is a "Kensington Bluetooth USB Adapter".
+> > 
+> > be a little bit more specific.
 > 
-> If I issue these commands:
+> I would have been more specific, the only other distinguishing thing on
+> it is the model number:
 > 
->    748  echo 1 > /proc/sys/net/ipv4/ip_forward
->    749  rfcomm bind 0 08:00:37:13:A1:C7 4
->    750  pppd /dev/rfcomm0 debug nocrtscts novj novjccomp defaultroute connect 
-> 'chat -v -f /root/sprint-chat'
+> Kensington Bluetooth USB Adapter
+> Model #33085
 > 
-> May 26 20:38:12 localhost pppd[4987]: pppd 2.4.3 started by root, uid 0
-> May 26 20:38:13 localhost hcid[3622]: link_key_request (sba=00:10:60:AA:5C:CE, 
-> dba=08:00:37:13:A1:C7)
-> May 26 20:38:13 localhost pppd[4987]: Failed to open /dev/rfcomm0: Connection 
-> refused
-> May 26 20:38:13 localhost pppd[4987]: Exit.
-> 
-> This is what hcidump shows (sorry for the length, but I don't know what's 
-> important)
+> Here is the product info page:
+> http://www.kensington.com/html/6397.html
 
-try to reset/reboot your phone and check the RFCOMM channel number again
-with sdptool. It looks like that this channel is no longer accepting new
-connections.
+I hate companies that are not able to clearly name their product. Once
+they build another Bluetooth adapter you can't differentiate between
+them :(
+
+It seems that this dongle is not available in Germany. Does anyone have
+a spare one for me?
+
+> > So here we go. You can first try to load the hci_usb module with the
+> > reset=1 parameter, but I doubt that it helps for this dongle. What you
+> > need will be the attached patch to switch it from HID into HCI mode.
+> 
+> Excellent!  The patch did it (after also loading with the reset=1).  I'm
+> now on my way trying to set up a PPP connection.
+
+So loading with "modprobe hci_usb reset=1" and without the patch doesn't
+make it work? Don't using "reset=1" and applying the patch does also not
+work? Only when you do both things the dongle is working. This is odd,
+because one of my previous Broadcom based dongles like this only needed
+the BCM92035 quirk to switch from HID into HCI mode. Please test all
+possibilities so I can add the correct quirk to the kernel.
+
+If you add HCI_RESET to the line for your device it will have the same
+effect as if you provide "reset=1" on module loading.
+
+> Thanks a lot for the
+> curteous help Marcel.
+
+You are welcome.
 
 Regards
 
