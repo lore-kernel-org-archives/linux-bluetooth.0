@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] add bluez to uClinux
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-From: Nicolas STRANSKY <Nico@neo-lan.net>
-Message-ID: <d79vmv$i2n$1@sea.gmane.org>
+In-Reply-To: <BAY2-DAV86A65907A8E43A1F50F36D4000@phx.gbl>
+References: <BAY2-DAV86A65907A8E43A1F50F36D4000@phx.gbl>
+Content-Type: text/plain
+Message-Id: <1117287913.12036.144.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Latest bluetooth kernel stack
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 28 May 2005 16:39:37 +0200
+Date: Sat, 28 May 2005 15:45:13 +0200
 
-Hi,
+Hi Fahah,
 
-I'm trying to patch my kernel with the latest bluetooth kernel stack in 
-order to have a MS Intellimouse for Bluetooth to function properly.
-The problem is that I'm using a -mm 2.6 kernel and that it seems that 
-the bluetooth stack is not so recent in the -mm branch because it makes 
-the mouse to be detected as "boot protocol device" instead of "Microsoft 
-Five Button Mouse".
-So what is the best way to have both 2.6.11-mm patch and 2.6.11-mh2 ? 
-Applying both of them fails. Will the -mm bluetooth stack be updated 
-soon or is there an better way to do so ?
+> I'm new to this list. I am trying to integrate Bluez into uClinux for
+> a school project. I have read the previous discussion on this topic
+> here (like the fork() and vfork() limitation, exit() and _exit() stuff
+> and the likes). I have made all of those changes to the
+> bluez-utilities. I am using the latest uClinux distro downloaded from
+> the uclinux website (www.uclinux.org) which has the source code for
+> the 2.4 kernel version.
+>  
+> I see bluetooth stuff in it (under drivers>bluetooth and
+> net>bluetooth). When I do make xconfig, I select:
+>  
+> 1) my target architecture type (uCsimm by Arcturus),
+> 2) uClibc as the library,
+> 3) 2.4.x as the kernel version to use and
+> 4) the option to modify kernel configuration which then presents me
+> with a window customise the kernel options.
+>  
+> But my problem is that I can't find any bluetooth related stuff
+> in this kernel configuration window even though the files are present
+> as I mentioned earlier.
+>  
+> I will be grateful if somebody could guide me as to how I can get the
+> bluetooth options in the kernel configuration options. I believe then
+> I should be able to statically compile bluez into uClinux and
+> thereafter get on with cross compiling the utilities.
 
-Thank's in advance !
--- 
-Nico
-Fuyez un ennemi qui sait votre défaut.
-	-+- Pierre Corneille, Polyeucte -+-
+maybe the uClinux architecture does not include the Bluetooth config
+file and thus no config options are presented.
+
+Regards
+
+Marcel
+
 
 
 
