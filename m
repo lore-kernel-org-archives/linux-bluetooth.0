@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <12a241ad05052907591c593c6@mail.gmail.com>
-From: Bruno Abinader <brunoabinader@gmail.com>
-To: Bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Re: Latest bluetooth kernel stack
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <d7ad69$o77$1@sea.gmane.org>
+References: <d79vmv$i2n$1@sea.gmane.org> <1117297956.7072.42.camel@pegasus>
+	 <d7ad69$o77$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1117318966.7072.48.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] bluez-utils-2.17 -- Error compiling dbus.o
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,41 +19,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 29 May 2005 10:59:13 -0400
+Date: Sun, 29 May 2005 00:22:46 +0200
 
-Hi everybody, i recently updated my dbus package and now i'm having
-some problems trying to compile hcid/dbus.o file, the error is the
-follow:
+Hi Nicolas,
 
-gcc -I/usr/include -DDBUS_API_SUBJECT_TO_CHANGE
--I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -DENABLE_DBUS
--DDBUS_API_SUBJECT_TO_CHANGE -Wall -O2 -o hcid main.o security.o
-storage.o lib.o parser.o lexer.o kword.o glib-ectomy.o dbus.o=20
--L/usr/lib /usr/lib/libdbus-1.so /usr/lib/libbluetooth.so
-dbus.o(.text+0x7a): In function `hcid_dbus_request_pin':
-: undefined reference to `dbus_message_append_iter_init'
-dbus.o(.text+0x8b): In function `hcid_dbus_request_pin':
-: undefined reference to `dbus_message_iter_append_boolean'
-dbus.o(.text+0x97): In function `hcid_dbus_request_pin':
-: undefined reference to `dbus_message_iter_append_byte_array'
-dbus.o(.text+0x381): In function `reply_handler_function':
-: undefined reference to `dbus_pending_call_get_reply'
-dbus.o(.text+0x3dd): In function `reply_handler_function':
-: undefined reference to `dbus_message_iter_get_string'
-collect2: ld returned 1 exit status
-make[2]: ** [hcid] Erro 1
-make[2]: Saindo do diret=F3rio `/home/bruno/src/bluez-utils-2.17/hcid'
-make[1]: ** [all-recursive] Erro 1
-make[1]: Saindo do diret=F3rio `/home/bruno/src/bluez-utils-2.17'
-make: ** [all] Erro 2
+> >>I'm trying to patch my kernel with the latest bluetooth kernel stack in 
+> >>order to have a MS Intellimouse for Bluetooth to function properly.
+> >>The problem is that I'm using a -mm 2.6 kernel and that it seems that 
+> >>the bluetooth stack is not so recent in the -mm branch because it makes 
+> >>the mouse to be detected as "boot protocol device" instead of "Microsoft 
+> >>Five Button Mouse".
+> >>So what is the best way to have both 2.6.11-mm patch and 2.6.11-mh2 ? 
+> >>Applying both of them fails. Will the -mm bluetooth stack be updated 
+> >>soon or is there an better way to do so ?
+> > 
+> > when the 2.6.12 kernel is out, I will update my -mh patch for that
+> > kernel. The -mh patch is not meant for development kernels.
+> 
+> I see.. Thank's for the answer !
+> So my question becomes: is the Linus kernel's bluetooth stack far from 
+> the bluez stack or is it going to be integrated in the kernel soon ?
+> I would be happy to have my mouse fully functionnal with a vanilla 
+> kernel, I just wonder if I need to apply the whole bluez patch or if a 
+> single part of it would be enough...
 
-Any help would be appreciated!
+the HID report protocol mode will still take some time, but the rest is
+almost up-to-date.
 
-Thanks in advance,
+Regards
 
---=20
-Bruno de Oliveira Abinader
-GVoIP - INdT/UFAM
+Marcel
+
+
 
 
 -------------------------------------------------------
