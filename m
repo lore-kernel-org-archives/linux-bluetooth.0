@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Richard C. Cox" <conardcox@earthlink.net>
+Subject: Re: [Bluez-users] Latest bluetooth kernel stack
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200505281427.28851.conardcox@earthlink.net>
-Subject: [Bluez-users] hci_usb unresolved symbols
+In-Reply-To: <d79vmv$i2n$1@sea.gmane.org>
+References: <d79vmv$i2n$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1117297956.7072.42.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,30 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 28 May 2005 14:27:28 -0400
+Date: Sat, 28 May 2005 18:32:36 +0200
 
-Hello,
-	I'm using a gentoo kernel (gentoo-sources-2.6.11-r9) and when I load the 
-hci_usb module, I'm getting some unresolved symbols:
+Hi Nicolas,
 
-May 28 14:14:26 kernel: hci_usb: Unknown symbol hci_free_dev
-May 28 14:14:26 kernel: hci_usb: Unknown symbol hci_alloc_dev
-May 28 14:14:26 kernel: hci_usb: Unknown symbol hci_unregister_dev
-May 28 14:14:26 kernel: hci_usb: Unknown symbol hci_register_dev
-May 28 14:14:26 kernel: hci_usb: Unknown symbol hci_free_dev
-May 28 14:14:26 kernel: hci_usb: Unknown symbol hci_alloc_dev
-May 28 14:14:26 kernel: hci_usb: Unknown symbol hci_unregister_dev
-May 28 14:14:26 kernel: hci_usb: Unknown symbol hci_register_dev
-May 28 14:14:26 kernel: Bluetooth: Core ver 2.7
+> I'm trying to patch my kernel with the latest bluetooth kernel stack in 
+> order to have a MS Intellimouse for Bluetooth to function properly.
+> The problem is that I'm using a -mm 2.6 kernel and that it seems that 
+> the bluetooth stack is not so recent in the -mm branch because it makes 
+> the mouse to be detected as "boot protocol device" instead of "Microsoft 
+> Five Button Mouse".
+> So what is the best way to have both 2.6.11-mm patch and 2.6.11-mh2 ? 
+> Applying both of them fails. Will the -mm bluetooth stack be updated 
+> soon or is there an better way to do so ?
 
-The hci_usb modules itself seems to load fine.  Google yields no answers for 
-this one.  I must be doing something uniquely dumb here.
+when the 2.6.12 kernel is out, I will update my -mh patch for that
+kernel. The -mh patch is not meant for development kernels.
 
-Any suggestions would be appreciated.
+Regards
 
-Thanks,
+Marcel
 
-Richard
+
 
 
 -------------------------------------------------------
