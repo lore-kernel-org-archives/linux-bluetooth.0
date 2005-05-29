@@ -1,13 +1,9 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <c43104b305052921125244b7bb@mail.gmail.com>
-From: peng zhihuai <pengzhihuai@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] strange error--/drivers/bluetooth/hci_uart.c
-In-Reply-To: <1117287804.12036.141.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <c43104b305052801374253576b@mail.gmail.com>
-	 <1117287804.12036.141.camel@pegasus>
+From: Miernik <miernik@ffii.org>
+Message-ID: <20050529232848.10F1.0.NOFFLE@localhost.localdomain.local>
+References: <20050529221527.10F1.1.NOFFLE@localhost.localdomain.local> <20050529225647.10F7.0.NOFFLE@localhost.localdomain.local>
+Subject: [Bluez-users] Re: Can't create connection: Input/output error - more info
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,24 +15,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 30 May 2005 12:12:52 +0800
+Date: Mon, 30 May 2005 01:28:48 +0200
 
-Thank you for your reply.
-2005/5/28, Marcel Holtmann <marcel@holtmann.org>:
-> Hi,
->=20
-> >       h4_recv: Unknown HCI packet type 00
-> >       h4_recv: Unknown HCI packet type 34
-> >       these message offen appear
->=20
-> this message means that your UART stream is out of sync. This happen due
-> bit errors on the serial line. What kind of module is this and what
-> kernel are you using?
-My module is broadcom2035 and kernel is 2.4.18.=20
-This case only happened when wlan in the same PCB borad works.
+Miernik <miernik@ffii.org> wrote:
+> Miernik <miernik@ffii.org> wrote:
+>> Follow-up to my post a whle ago, about connecting Aplle Wireless
+>> Keyboard to PCMCIA SPHINX PICO Card.
+> 
+> That post didn't go through, so I am posting again my original post:
+> 
+> I have a PCMCIA SPHINX PICO Card bluetooth adapter, and I want to use
+> the Apple Wireless Keyboard with it.
 
-I want to know why UART stream is out of sync when wlan works.=20
-Any hlep is appreciated.
+hidd --search
+made it magically work. I did not find this anywhere in the
+documentation, I only found this somewhere on this newsgroup.
+I think it should be more clearly documented in HOWTOs.
+
+-- 
+Miernik             _________________________  xmpp:miernik@amessage.info
+___________________/_______________________/      mailto:miernik@ffii.org
+                       Save Europe from Software Patents
+                http://www.gnu.org/philosophy/savingeurope.html
+
 
 
 -------------------------------------------------------
