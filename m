@@ -1,12 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4299F497.5080608@egabriel.de>
-From: ligi <ligi@egabriel.de>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] RSSI from rfcomm
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-References: <4295E697.9060802@palmsource.com>
-In-Reply-To: <4295E697.9060802@palmsource.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] l2ping and timeout
+In-Reply-To: <429996F9.6000700@bungtopia.com>
+References: <5256d0b050514160856c4d194@mail.gmail.com>
+	 <1116112975.8886.25.camel@pegasus>
+	 <5256d0b05051416323a633e2d@mail.gmail.com>
+	 <1116115930.8886.27.camel@pegasus>  <428A0F38.5050902@bungtopia.com>
+	 <1116366629.10063.119.camel@pegasus>  <4293520A.9010303@bungtopia.com>
+	 <1116954340.30044.151.camel@pegasus>  <4293F272.2040504@bungtopia.com>
+	 <1117012660.30044.201.camel@pegasus>  <429996F9.6000700@bungtopia.com>
+Content-Type: text/plain
+Message-Id: <1117362982.7072.57.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,34 +24,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 29 May 2005 18:57:59 +0200
+Date: Sun, 29 May 2005 12:36:22 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Michael,
 
-I am confused about l2ping. The man says:
-           -c count
-              Send count number of packets then exit.
+> I have upgraded to 2.6.11. Now getsockopt() works ok, but I can't call 
+> hci_read_rssi() without errors! It still says protocol not available.Is 
+> there another way to read the RSSI from RFCOMM?
 
-           -c timeout
-              Wait timeout for the response.
+the device descriptor for hci_read_rssi() comes from hci_open_dev().
 
-- -c 1s - my first issue didnt work!
-I need it to determine if a device is in range or out of range or off.
-If anyone has even an better Idea than l2ping this would help me too.
-A fast response when the Device is in range would be cool cuz the
-early my light switches on the less I stumble ...
+Regards
 
+Marcel
 
-ligi
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFCmfSW3NorRo/jFWIRAnSLAKDf6D3eIGA5wQSm5SXa7nO6GZMUYwCguJ03
-wNoaSXPYY14oOnzsWkntumM=
-=86Ig
------END PGP SIGNATURE-----
 
 
 
