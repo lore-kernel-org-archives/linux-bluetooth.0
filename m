@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4299F069.3080703@eridani.co.uk>
-From: Michael McConnell <soruk@eridani.co.uk>
-MIME-Version: 1.0
+Message-ID: <12a241ad050529081764ef7ed1@mail.gmail.com>
+From: Bruno Abinader <brunoabinader@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] BNEP session hangs, can't work out why.
+Subject: Re: [Bluez-users] bluez-utils-2.17 -- Error compiling dbus.o
+In-Reply-To: <1117379509.7072.95.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <12a241ad05052907591c593c6@mail.gmail.com>
+	 <1117379509.7072.95.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,193 +19,75 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 29 May 2005 17:40:09 +0100
+Date: Sun, 29 May 2005 11:17:51 -0400
 
-At machine A I have:
-hci0:   Type: USB
-         BD Address: 00:05:16:58:9D:C1 ACL MTU: 192:8 SCO MTU: 64:8
-         UP RUNNING PSCAN ISCAN
-         RX bytes:269283 acl:1781 sco:0 events:869 errors:0
-         TX bytes:58266 acl:815 sco:0 commands:42 errors:0
-         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: SLAVE ACCEPT
-         Name: 'BlueZ (0)'
-         Class: 0x3e0100
-         Service Classes: Networking, Rendering, Capturing
-         Device Class: Computer, Uncategorized
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
-         Manufacturer: Cambridge Silicon Radio (10)
+Hi Marcel, sorry for not saying the dbus version, it is dbus-0.33.
+I will try the CVS ones and tell you if it works, thanks!
 
-Machine B has:
-hci0:   Type: USB
-         BD Address: 00:0A:94:13:26:7D ACL MTU: 120:20 SCO MTU: 64:0
-         UP RUNNING PSCAN ISCAN
-         RX bytes:72835 acl:1541 sco:0 events:1813 errors:0
-         TX bytes:266197 acl:2713 sco:0 commands:24 errors:0
-         Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: SLAVE ACCEPT
-         Name: 'BlueZ (0)'
-         Class: 0x3e0100
-         Service Classes: Networking, Rendering, Capturing
-         Device Class: Computer, Uncategorized
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x0 LMP Ver: 1.1 (0x1) LMP Subver: 0x757
-         Manufacturer: Silicon Wave (11)
+2005/5/29, Marcel Holtmann <marcel@holtmann.org>:
+> Hi Bruno,
+>=20
+> > i recently updated my dbus package and now i'm having
+> > some problems trying to compile hcid/dbus.o file, the error is the
+> > follow:
+> >
+> > gcc -I/usr/include -DDBUS_API_SUBJECT_TO_CHANGE
+> > -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -DENABLE_DBUS
+> > -DDBUS_API_SUBJECT_TO_CHANGE -Wall -O2 -o hcid main.o security.o
+> > storage.o lib.o parser.o lexer.o kword.o glib-ectomy.o dbus.o
+> > -L/usr/lib /usr/lib/libdbus-1.so /usr/lib/libbluetooth.so
+> > dbus.o(.text+0x7a): In function `hcid_dbus_request_pin':
+> > : undefined reference to `dbus_message_append_iter_init'
+> > dbus.o(.text+0x8b): In function `hcid_dbus_request_pin':
+> > : undefined reference to `dbus_message_iter_append_boolean'
+> > dbus.o(.text+0x97): In function `hcid_dbus_request_pin':
+> > : undefined reference to `dbus_message_iter_append_byte_array'
+> > dbus.o(.text+0x381): In function `reply_handler_function':
+> > : undefined reference to `dbus_pending_call_get_reply'
+> > dbus.o(.text+0x3dd): In function `reply_handler_function':
+> > : undefined reference to `dbus_message_iter_get_string'
+> > collect2: ld returned 1 exit status
+> > make[2]: ** [hcid] Erro 1
+> > make[2]: Saindo do diret=F3rio `/home/bruno/src/bluez-utils-2.17/hcid'
+> > make[1]: ** [all-recursive] Erro 1
+> > make[1]: Saindo do diret=F3rio `/home/bruno/src/bluez-utils-2.17'
+> > make: ** [all] Erro 2
+> >
+> > Any help would be appreciated!
+>=20
+> it would be great if you tell us about what version of D-Bus we are
+> talking about. I am unable read minds ;)
+>=20
+> However it seems that these functions are missing:
+>=20
+>         dbus_message_append_iter_init()
+>         dbus_message_iter_append_boolean()
+>         dbus_message_iter_append_byte_array()
+>         dbus_pending_call_get_reply()
+>         dbus_message_iter_get_string()
+>=20
+> You can try the CVS, because I added the support for newer D-Bus
+> libraries after the 2.17 release was out.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+> -------------------------------------------------------
+> This SF.Net email is sponsored by Yahoo.
+> Introducing Yahoo! Search Developer Network - Create apps using Yahoo!
+> Search APIs Find out how you can build Yahoo! directly into your own
+> Applications - visit http://developer.yahoo.net/?froffad-ysdn-ostg-q22005
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>=20
 
-Everything starts fine, I can get packets flowing.
 
-Then, without warning, the connection stalls.
-
-hcidump on A finishes off with:
-       44.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 41
-       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
-     L2CAP(d): cid 0x0040 len 71 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       44.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 41
-       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
-     L2CAP(d): cid 0x0040 len 71 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       44.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 41
-       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
-     L2CAP(d): cid 0x0040 len 71 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       44.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 41
-       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
-     L2CAP(d): cid 0x0040 len 71 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       44.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 41
-       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
-     L2CAP(d): cid 0x0040 len 71 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       44.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 41
-       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
-     L2CAP(d): cid 0x0040 len 71 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
-     L2CAP(d): cid 0x0040 len 71 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       44.000000 > HCI Event: Disconn Complete (0x05) plen 4
-     status 0x00 handle 41 reason 0x13
-     Reason: Remote User Terminated Connection
-
-Machine B reports:
-       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 2
-       20.000000 > ACL data: handle 2 flags 0x02 dlen 67
-     L2CAP(d): cid 0x0040 len 63 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       20.000000 < ACL data: handle 2 flags 0x02 dlen 59
-     L2CAP(d): cid 0x0040 len 55 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 2
-       20.000000 > ACL data: handle 2 flags 0x02 dlen 67
-     L2CAP(d): cid 0x0040 len 63 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       20.000000 < ACL data: handle 2 flags 0x02 dlen 59
-     L2CAP(d): cid 0x0040 len 55 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 2
-       20.000000 < ACL data: handle 2 flags 0x02 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 24
-     L2CAP(d): cid 0x0040 len 260 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       20.000000 < ACL data: handle 2 flags 0x02 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 9
-     L2CAP(d): cid 0x0040 len 365 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       20.000000 > ACL data: handle 2 flags 0x02 dlen 67
-     L2CAP(d): cid 0x0040 len 63 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       20.000000 < ACL data: handle 2 flags 0x02 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 38
-     L2CAP(d): cid 0x0040 len 274 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 2
-       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 2
-       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 2
-       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 2
-       20.000000 < ACL data: handle 2 flags 0x02 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 94
-     L2CAP(d): cid 0x0040 len 570 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       20.000000 < ACL data: handle 2 flags 0x02 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 73
-     L2CAP(d): cid 0x0040 len 789 [psm 15]
-       BNEP: Compressed(0x02|0)
-         [proto 0x0800]
-       20.000000 < ACL data: handle 2 flags 0x02 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
-       20.000000 < HCI Command: Disconnect (0x01|0x0006) plen 3
-     handle 2 reason 0x13
-     Reason: Remote User Terminated Connection
-       20.000000 > HCI Event: Command Status (0x0f) plen 4
-     Disconnect (0x01|0x0006) status 0x00 ncmd 1
-       20.000000 > HCI Event: Disconn Complete (0x05) plen 4
-     status 0x00 handle 2 reason 0x16
-     Reason: Connection Terminated by Local Host
-
-(Aside: The timestamps in hcidump don't appear to be working right.)
-
-After this, trying 'hcitool info' on each querying the other just results in 
-"Connection timed out".
-
-I can't work out which end is at fault.
-
-Machine A is running an unpatched 2.4.30, machine B 2.4.28. (2.4.29 had USB 
-issues with my DVD burner.) Both are running bluez-libs and bluez-utils 2.17, 
-and bluz-hcidump 1.21.
-
--- 
--- Michael "Soruk" McConnell
-    Eridani Star System
-
-    MailStripper - "The easy spam filter."
-    http://mailstripper.eridani.co.uk/
+--=20
+Bruno de Oliveira Abinader
+GVoIP - INdT/UFAM
 
 
 -------------------------------------------------------
