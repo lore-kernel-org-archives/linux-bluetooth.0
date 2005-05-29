@@ -1,9 +1,8 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 To: bluez-users@lists.sourceforge.net
 From: Miernik <miernik@ffii.org>
-Message-ID: <20050529225647.10F7.0.NOFFLE@localhost.localdomain.local>
-References: <20050529221527.10F1.1.NOFFLE@localhost.localdomain.local>
-Subject: [Bluez-users] Re: Can't create connection: Input/output error - more info
+Message-ID: <20050529221527.10F1.1.NOFFLE@localhost.localdomain.local>
+Subject: [Bluez-users] Can't create connection: Input/output error - more info
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -15,124 +14,129 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 30 May 2005 00:56:47 +0200
+Date: Mon, 30 May 2005 00:15:27 +0200
 
-Miernik <miernik@ffii.org> wrote:
-> Follow-up to my post a whle ago, about connecting Aplle Wireless
-> Keyboard to PCMCIA SPHINX PICO Card.
+Follow-up to my post a whle ago, about connecting Aplle Wireless
+Keyboard to PCMCIA SPHINX PICO Card.
 
-That post didn't go through, so I am posting again my original post:
+l2ping works: when I start it, a GTK window pops up with pin request, I
+type i n a PIN, then the same PIN on the bluetooth keyboard, and then
+the ping starts going as below.
 
-I have a PCMCIA SPHINX PICO Card bluetooth adapter, and I want to use
-the Apple Wireless Keyboard with it.
-
-I use Debian GNU/Linux sid.
-
-The card seems to get configured OK:
-
-szrenica:~# hciconfig -a
-hci0:   Type: UART
-        BD Address: 00:80:37:15:4B:AF ACL MTU: 672:10 SCO MTU: 64:0
-        UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-        RX bytes:7056 acl:0 sco:0 events:172 errors:0
-        TX bytes:1596 acl:0 sco:0 commands:95 errors:0
-        Features: 0x07 0xea 0x31 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'szrenica-0'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0xb LMP Ver: 1.1 (0x1) LMP Subver:
-0x300
-        Manufacturer: Ericsson Technology Licensing (0)
-
-szrenica:~#
-
-When I scan for it, it looks OK:
-
-szrenica:~# hcitool scan --flush
-Scanning ...
-        00:60:57:AC:BA:5B       DonSolvon.com
-        00:0A:95:3E:C4:35       Apple Wireless Keyboard
-szrenica:~# hcitool inq --flush
-Inquiring ...
-        00:60:57:AC:BA:5B       clock offset: 0x6437    class: 0x500204
-        00:0A:95:3E:C4:35       clock offset: 0x57cc    class: 0x002540
+szrenica:~# l2ping 00:0A:95:3E:C4:35
+Ping: 00:0A:95:3E:C4:35 from 00:80:37:15:4B:AF (data size 20) ...
+0 bytes from 00:0A:95:3E:C4:35 id 0 time 12.23ms
+0 bytes from 00:0A:95:3E:C4:35 id 1 time 19.10ms
+0 bytes from 00:0A:95:3E:C4:35 id 2 time 20.13ms
+0 bytes from 00:0A:95:3E:C4:35 id 3 time 18.97ms
+0 bytes from 00:0A:95:3E:C4:35 id 4 time 19.11ms
+0 bytes from 00:0A:95:3E:C4:35 id 5 time 20.14ms
 
 
-Problems start when I try to request info or connect?
+When running hcidump during trying to connect with hcitool, the dumps
+are like this:
 
 
 
-szrenica:~# hcitool info 00:0A:95:3E:C4:35
-Requesting information ...
-Can't create connection: Input/output error
-szrenica:~# hcitool cc 00:0A:95:3E:C4:35
-Can't create connection: Input/output error
 
+szrenica:~# hcidump -V
+HCI sniffer - Bluetooth packet analyzer ver 1.17
+device: hci0 snap_len: 1028 filter: 0xffffffff
 
-The second bluetooth device which lies around here, behaves the same:
+(below while hcitool inq --flush): 
 
-szrenica:~# hcitool info 00:60:57:AC:BA:5B
-Requesting information ...
-Can't create connection: Input/output error
-szrenica:~# hcitool cc 00:60:57:AC:BA:5B
-Can't create connection: Input/output error
-szrenica:~#
-
-
-Am I doing something wrong?
-
-
-
-And after I do a l2ping 00:0A:95:3E:C4:35 and after that press any key
-on the keyboard, and then run hcitool, I get this like below:
-
-szrenica:~# hcitool info 00:0A:95:3E:C4:35
-Requesting information ...
-        BD Address:  00:0A:95:3E:C4:35
-szrenica:~# 
-
-
-And output of hcidump command while runnung the above:
-
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+< HCI Command: Inquiry (0x01|0x0001) plen 5
 > HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+    Inquiry (0x01|0x0001) status 0x00 ncmd 1
+> HCI Event: Inquiry Result (0x02) plen 15
+    bdaddr 00:60:57:AC:BA:5B clkoffset 0x150b class 0x500204
+> HCI Event: Inquiry Result (0x02) plen 15
+    bdaddr 00:0A:95:3E:C4:35 clkoffset 0x177f class 0x002540
+> HCI Event: Inquiry Complete (0x01) plen 1
+    status 0x00
 
 
-(here waits for some time)
+(below while hcitool cc 00:0A:95:3E:C4:35 to the Apple Wireless
+Keyboard):
+
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+> HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x11 ncmd 1
+    Error: Unsupported Feature or Parameter Value
 
 
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x08 bdaddr 00:0A:95:3E:C4:35 name ''
-    Error: Connection Timeout
+(below while hcitool cc 00:60:57:AC:BA:5B to the other bluetooth
+device):
+
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+> HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x11 ncmd 1
+    Error: Unsupported Feature or Parameter Value
+
+
+
+(below while running l2ping 00:0A:95:3E:C4:35, executed a second time,
+so it didn't ask for a PIN this time):
+
+
+
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+> HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> HCI Event: Link Key Request (0x17) plen 6
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+> HCI Event: Command Complete (0x0e) plen 10
+    Link Key Request Reply (0x01|0x000b) ncmd 1
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 1 bdaddr 00:0A:95:3E:C4:35 type ACL encrypt 0x01
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+> HCI Event: Command Complete (0x0e) plen 6
+    Write Link Policy Settings (0x02|0x000d) ncmd 1
+< ACL data: handle 1 flags 0x02 dlen 28
+    L2CAP(s): Echo req: dlen 20
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(s): Echo rsp: dlen 0
+< ACL data: handle 1 flags 0x02 dlen 28
+    L2CAP(s): Echo req: dlen 20
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(s): Echo rsp: dlen 0
+< ACL data: handle 1 flags 0x02 dlen 28
+    L2CAP(s): Echo req: dlen 20
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(s): Echo rsp: dlen 0
+< ACL data: handle 1 flags 0x02 dlen 28
+    L2CAP(s): Echo req: dlen 20
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(s): Echo rsp: dlen 0
+< ACL data: handle 1 flags 0x02 dlen 28
+    L2CAP(s): Echo req: dlen 20
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(s): Echo rsp: dlen 0
+< ACL data: handle 1 flags 0x02 dlen 28
+    L2CAP(s): Echo req: dlen 20
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(s): Echo rsp: dlen 0
+< ACL data: handle 1 flags 0x02 dlen 28
+    L2CAP(s): Echo req: dlen 20
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(s): Echo rsp: dlen 0
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+> HCI Event: Command Status (0x0f) plen 4
+    Disconnect (0x01|0x0006) status 0x00 ncmd 0
 > HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 1 reason 0x08
-    Reason: Connection Timeout
-< HCI Command: Read Remote Version Information (0x01|0x001d) plen 2
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Version Information (0x01|0x001d) status 0x00 ncmd 0
-> HCI Event: Read Remote Ver Info Complete (0x0c) plen 8
-> HCI Event: Command Complete (0x0e) plen 4
-    Unknown (0x00|0x0000) ncmd 1
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
+    status 0x00 handle 1 reason 0x16
+    Reason: Connection Terminated by Local Host
 > HCI Event: Command Complete (0x0e) plen 4
     Unknown (0x00|0x0000) ncmd 1
 
 
-But cc doesn't work even then.
 
 -- 
 Miernik             _________________________  xmpp:miernik@amessage.info
 ___________________/_______________________/      mailto:miernik@ffii.org
-Protect Europe from a legal disaster. Petition against software patents
-http://www.noepatents.org/index_html?LANG=en
+                       Save Europe from Software Patents
+                http://www.gnu.org/philosophy/savingeurope.html
 
 
 
