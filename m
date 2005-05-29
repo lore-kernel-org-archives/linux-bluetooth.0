@@ -1,8 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <4299F069.3080703@eridani.co.uk>
+From: Michael McConnell <soruk@eridani.co.uk>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: Miernik <miernik@ffii.org>
-Message-ID: <20050529221527.10F1.1.NOFFLE@localhost.localdomain.local>
-Subject: [Bluez-users] Can't create connection: Input/output error - more info
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] BNEP session hangs, can't work out why.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -14,130 +16,193 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 30 May 2005 00:15:27 +0200
+Date: Sun, 29 May 2005 17:40:09 +0100
 
-Follow-up to my post a whle ago, about connecting Aplle Wireless
-Keyboard to PCMCIA SPHINX PICO Card.
+At machine A I have:
+hci0:   Type: USB
+         BD Address: 00:05:16:58:9D:C1 ACL MTU: 192:8 SCO MTU: 64:8
+         UP RUNNING PSCAN ISCAN
+         RX bytes:269283 acl:1781 sco:0 events:869 errors:0
+         TX bytes:58266 acl:815 sco:0 commands:42 errors:0
+         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+         Link policy: RSWITCH HOLD SNIFF PARK
+         Link mode: SLAVE ACCEPT
+         Name: 'BlueZ (0)'
+         Class: 0x3e0100
+         Service Classes: Networking, Rendering, Capturing
+         Device Class: Computer, Uncategorized
+         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
+         Manufacturer: Cambridge Silicon Radio (10)
 
-l2ping works: when I start it, a GTK window pops up with pin request, I
-type i n a PIN, then the same PIN on the bluetooth keyboard, and then
-the ping starts going as below.
+Machine B has:
+hci0:   Type: USB
+         BD Address: 00:0A:94:13:26:7D ACL MTU: 120:20 SCO MTU: 64:0
+         UP RUNNING PSCAN ISCAN
+         RX bytes:72835 acl:1541 sco:0 events:1813 errors:0
+         TX bytes:266197 acl:2713 sco:0 commands:24 errors:0
+         Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
+         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+         Link policy: RSWITCH HOLD SNIFF PARK
+         Link mode: SLAVE ACCEPT
+         Name: 'BlueZ (0)'
+         Class: 0x3e0100
+         Service Classes: Networking, Rendering, Capturing
+         Device Class: Computer, Uncategorized
+         HCI Ver: 1.1 (0x1) HCI Rev: 0x0 LMP Ver: 1.1 (0x1) LMP Subver: 0x757
+         Manufacturer: Silicon Wave (11)
 
-szrenica:~# l2ping 00:0A:95:3E:C4:35
-Ping: 00:0A:95:3E:C4:35 from 00:80:37:15:4B:AF (data size 20) ...
-0 bytes from 00:0A:95:3E:C4:35 id 0 time 12.23ms
-0 bytes from 00:0A:95:3E:C4:35 id 1 time 19.10ms
-0 bytes from 00:0A:95:3E:C4:35 id 2 time 20.13ms
-0 bytes from 00:0A:95:3E:C4:35 id 3 time 18.97ms
-0 bytes from 00:0A:95:3E:C4:35 id 4 time 19.11ms
-0 bytes from 00:0A:95:3E:C4:35 id 5 time 20.14ms
+Everything starts fine, I can get packets flowing.
 
+Then, without warning, the connection stalls.
 
-When running hcidump during trying to connect with hcitool, the dumps
-are like this:
+hcidump on A finishes off with:
+       44.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 41
+       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
+     L2CAP(d): cid 0x0040 len 71 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       44.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 41
+       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
+     L2CAP(d): cid 0x0040 len 71 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       44.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 41
+       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
+     L2CAP(d): cid 0x0040 len 71 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       44.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 41
+       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
+     L2CAP(d): cid 0x0040 len 71 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       44.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 41
+       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
+     L2CAP(d): cid 0x0040 len 71 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       44.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 41
+       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
+     L2CAP(d): cid 0x0040 len 71 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       44.000000 < ACL data: handle 41 flags 0x02 dlen 75
+     L2CAP(d): cid 0x0040 len 71 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       44.000000 > HCI Event: Disconn Complete (0x05) plen 4
+     status 0x00 handle 41 reason 0x13
+     Reason: Remote User Terminated Connection
 
+Machine B reports:
+       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 2
+       20.000000 > ACL data: handle 2 flags 0x02 dlen 67
+     L2CAP(d): cid 0x0040 len 63 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       20.000000 < ACL data: handle 2 flags 0x02 dlen 59
+     L2CAP(d): cid 0x0040 len 55 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 2
+       20.000000 > ACL data: handle 2 flags 0x02 dlen 67
+     L2CAP(d): cid 0x0040 len 63 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       20.000000 < ACL data: handle 2 flags 0x02 dlen 59
+     L2CAP(d): cid 0x0040 len 55 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 2
+       20.000000 < ACL data: handle 2 flags 0x02 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 24
+     L2CAP(d): cid 0x0040 len 260 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       20.000000 < ACL data: handle 2 flags 0x02 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 9
+     L2CAP(d): cid 0x0040 len 365 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       20.000000 > ACL data: handle 2 flags 0x02 dlen 67
+     L2CAP(d): cid 0x0040 len 63 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       20.000000 < ACL data: handle 2 flags 0x02 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 38
+     L2CAP(d): cid 0x0040 len 274 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 2
+       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 2
+       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 2
+       20.000000 > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 2
+       20.000000 < ACL data: handle 2 flags 0x02 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 94
+     L2CAP(d): cid 0x0040 len 570 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       20.000000 < ACL data: handle 2 flags 0x02 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 73
+     L2CAP(d): cid 0x0040 len 789 [psm 15]
+       BNEP: Compressed(0x02|0)
+         [proto 0x0800]
+       20.000000 < ACL data: handle 2 flags 0x02 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < ACL data: handle 2 flags 0x01 dlen 120
+       20.000000 < HCI Command: Disconnect (0x01|0x0006) plen 3
+     handle 2 reason 0x13
+     Reason: Remote User Terminated Connection
+       20.000000 > HCI Event: Command Status (0x0f) plen 4
+     Disconnect (0x01|0x0006) status 0x00 ncmd 1
+       20.000000 > HCI Event: Disconn Complete (0x05) plen 4
+     status 0x00 handle 2 reason 0x16
+     Reason: Connection Terminated by Local Host
 
+(Aside: The timestamps in hcidump don't appear to be working right.)
 
+After this, trying 'hcitool info' on each querying the other just results in 
+"Connection timed out".
 
-szrenica:~# hcidump -V
-HCI sniffer - Bluetooth packet analyzer ver 1.17
-device: hci0 snap_len: 1028 filter: 0xffffffff
+I can't work out which end is at fault.
 
-(below while hcitool inq --flush): 
-
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-> HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
-> HCI Event: Inquiry Result (0x02) plen 15
-    bdaddr 00:60:57:AC:BA:5B clkoffset 0x150b class 0x500204
-> HCI Event: Inquiry Result (0x02) plen 15
-    bdaddr 00:0A:95:3E:C4:35 clkoffset 0x177f class 0x002540
-> HCI Event: Inquiry Complete (0x01) plen 1
-    status 0x00
-
-
-(below while hcitool cc 00:0A:95:3E:C4:35 to the Apple Wireless
-Keyboard):
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x11 ncmd 1
-    Error: Unsupported Feature or Parameter Value
-
-
-(below while hcitool cc 00:60:57:AC:BA:5B to the other bluetooth
-device):
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x11 ncmd 1
-    Error: Unsupported Feature or Parameter Value
-
-
-
-(below while running l2ping 00:0A:95:3E:C4:35, executed a second time,
-so it didn't ask for a PIN this time):
-
-
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 1 bdaddr 00:0A:95:3E:C4:35 type ACL encrypt 0x01
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-> HCI Event: Command Complete (0x0e) plen 6
-    Write Link Policy Settings (0x02|0x000d) ncmd 1
-< ACL data: handle 1 flags 0x02 dlen 28
-    L2CAP(s): Echo req: dlen 20
-> ACL data: handle 1 flags 0x02 dlen 8
-    L2CAP(s): Echo rsp: dlen 0
-< ACL data: handle 1 flags 0x02 dlen 28
-    L2CAP(s): Echo req: dlen 20
-> ACL data: handle 1 flags 0x02 dlen 8
-    L2CAP(s): Echo rsp: dlen 0
-< ACL data: handle 1 flags 0x02 dlen 28
-    L2CAP(s): Echo req: dlen 20
-> ACL data: handle 1 flags 0x02 dlen 8
-    L2CAP(s): Echo rsp: dlen 0
-< ACL data: handle 1 flags 0x02 dlen 28
-    L2CAP(s): Echo req: dlen 20
-> ACL data: handle 1 flags 0x02 dlen 8
-    L2CAP(s): Echo rsp: dlen 0
-< ACL data: handle 1 flags 0x02 dlen 28
-    L2CAP(s): Echo req: dlen 20
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 1 flags 0x02 dlen 8
-    L2CAP(s): Echo rsp: dlen 0
-< ACL data: handle 1 flags 0x02 dlen 28
-    L2CAP(s): Echo req: dlen 20
-> ACL data: handle 1 flags 0x02 dlen 8
-    L2CAP(s): Echo rsp: dlen 0
-< ACL data: handle 1 flags 0x02 dlen 28
-    L2CAP(s): Echo req: dlen 20
-> ACL data: handle 1 flags 0x02 dlen 8
-    L2CAP(s): Echo rsp: dlen 0
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-> HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x00 ncmd 0
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 1 reason 0x16
-    Reason: Connection Terminated by Local Host
-> HCI Event: Command Complete (0x0e) plen 4
-    Unknown (0x00|0x0000) ncmd 1
-
-
+Machine A is running an unpatched 2.4.30, machine B 2.4.28. (2.4.29 had USB 
+issues with my DVD burner.) Both are running bluez-libs and bluez-utils 2.17, 
+and bluz-hcidump 1.21.
 
 -- 
-Miernik             _________________________  xmpp:miernik@amessage.info
-___________________/_______________________/      mailto:miernik@ffii.org
-                       Save Europe from Software Patents
-                http://www.gnu.org/philosophy/savingeurope.html
+-- Michael "Soruk" McConnell
+    Eridani Star System
 
+    MailStripper - "The easy spam filter."
+    http://mailstripper.eridani.co.uk/
 
 
 -------------------------------------------------------
