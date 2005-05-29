@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] l2ping and timeout
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4299F497.5080608@egabriel.de>
+From: ligi <ligi@egabriel.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4299F497.5080608@egabriel.de>
-References: <4295E697.9060802@palmsource.com> <4299F497.5080608@egabriel.de>
-Content-Type: text/plain
-Message-Id: <1117390157.7072.98.camel@pegasus>
-Mime-Version: 1.0
+References: <4295E697.9060802@palmsource.com>
+In-Reply-To: <4295E697.9060802@palmsource.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] l2ping and timeout
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 29 May 2005 20:09:17 +0200
+Date: Sun, 29 May 2005 18:57:59 +0200
 
-Hi Ligi,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> I am confused about l2ping. The man says:
->            -c count
->               Send count number of packets then exit.
-> 
->            -c timeout
->               Wait timeout for the response.
+I am confused about l2ping. The man says:
+           -c count
+              Send count number of packets then exit.
 
-no it does not.
+           -c timeout
+              Wait timeout for the response.
 
-> I need it to determine if a device is in range or out of range or off.
-> If anyone has even an better Idea than l2ping this would help me too.
-> A fast response when the Device is in range would be cool cuz the
-> early my light switches on the less I stumble ...
+- -c 1s - my first issue didnt work!
+I need it to determine if a device is in range or out of range or off.
+If anyone has even an better Idea than l2ping this would help me too.
+A fast response when the Device is in range would be cool cuz the
+early my light switches on the less I stumble ...
 
-Use the periodic inquiry feature of Bluetooth through the HCI raw socket
-for this.
 
-Regards
+ligi
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-Marcel
-
+iD8DBQFCmfSW3NorRo/jFWIRAnSLAKDf6D3eIGA5wQSm5SXa7nO6GZMUYwCguJ03
+wNoaSXPYY14oOnzsWkntumM=
+=86Ig
+-----END PGP SIGNATURE-----
 
 
 
