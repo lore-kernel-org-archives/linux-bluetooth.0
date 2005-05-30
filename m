@@ -1,91 +1,84 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Surf-kid20 <surf-kid20@freemail.hu>
-Subject: Re: [Bluez-users] receiving files from the phone
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1111704550.9195.3.camel@pegasus>
-Message-ID: <freemail.20050301124848.97317@fm3.freemail.hu>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; CHARSET=ISO-8859-2
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 1 Apr 2005 12:48:48 +0200 (CEST)
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] DBUS service support - Initial library
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb050530154229f338a2@mail.gmail.com>
+References: <1115901694.18499.32.camel@pegasus>
+	 <Pine.LNX.4.33.0505121821020.3523-100000@redbean.intranet.gw-instruments.de>
+	 <e1effdeb0505201404d05e818@mail.gmail.com>
+	 <1116844053.30044.59.camel@pegasus>
+	 <e1effdeb050523080216e96744@mail.gmail.com>
+	 <1116925644.30044.140.camel@pegasus>
+	 <e1effdeb050525152067a5cbd3@mail.gmail.com>
+	 <1117098491.12036.23.camel@pegasus>
+	 <e1effdeb05052614222118e70c@mail.gmail.com>
+	 <1117143615.12036.74.camel@pegasus>
+	 <e1effdeb050530154229f338a2@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1117494345.7072.235.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 31 May 2005 01:05:45 +0200
 
-Hi,
+Hi Claudio,
 
-> Hi,
+> I am sending a new patch to be evaluated.
+> Regarding glib dependency we need discuss this
+> subject again. If you see the hcid code, there is a
+> file (glib-ectomy.c) that implements the event
+> processing, this code is a partial copy of glib.
 > 
-> > I'd like to transfer files from a nokia phone to the PC. How
-> > can I achieve this?
-> > What are the transfer rates you've experienced?
-> > 
-> > What I've already tried:
-> > 
-> > linux 2.4.28 + affix bluetooth driver + btctl utility's OBEX
-> > FTP commands:
-> > it works, but only with 13-15kbyte/sec receiving speed
-> > 
-> > liunx 2.6.10 + the kernels inbuilt bluez driver and the
-> > following programs:
-> > 
-> > btftp from the bluez CVS (receiving speed about 25kbyte/sec)
-> > KDE's bluetooth utilities which have an obex FTP transfer
-> > utility it could receive
-> > at a rate of 20kbyte/sec.
-> > 
-> > My question is how to debug what makes transfer so slow?
-> > What rates have you exprienced using obex ftp and object
-> > push? (I'm particularly interested in the phone>PC
-direction).
-> > Any other possibilities for file transfer apart from obex
-> > ftp and object push?
-> 
-> I can't tell you anything about the Affix stack, but the
-BlueZ part of
-> RFCOMM is doing quite good. However sometimes the phone is
-the limit
-> here and RFCOMM + OBEX adds a lot of unneeded overhead.
-> 
-> Regards
-> 
-> Marcel
+> What do you prefer? Repeat the glib-ectomy.c code
+> or use glib?
 
-I've also tried the blueZ driver, however the phone>PC
-direction using OBEX was still only max 20kbyte/sec (at a
-distance of 1 meters, DH5 packets were listed at pkg_config).
+the glib-ectomy is only still there, because I was too lazy to replace
+it with a clean main loop using poll() implementation.
 
-How could we debug what is causing this slowdown? (where is
-the narrow part of the channel..)
+> For Maemo, glib is not problem. It is included in
+> the SDK.
 
-Can anyone give some figures for Phone>PC transfer rate
-using OBEX?
+This is not a valid argument. Creating a massive dependency chain is
+always bad. Using Glib inside bluez-utils is no option.
 
-Is there any other (faster) option to transfer files from
-phone to the PC?
+> Regarding pthread I put two versions to be evaluated:
+> 1. using pthread
+>    In my opinion because it save memory.
+>    http://www.indt.org.br/maemo/bluez/bluez-dbus-thread.diff
+>    
+> 2. using fork
+>    In my opinion this is not a feasible approach
+>    because when listening is active two process 
+>    will be running(a listening and another processing
+>    D-Bus messages).
+>    http://www.indt.org.br/maemo/bluez/bluez-dbus-fork.diff
 
-I'd be really grateful also, if you could point me to a
-manufacturer of some _serial_ bluetooth modul (just a
-module, not a complete product), which can do fast OBEX
-transfers...
+Even without looking at the patches, I don't like any of it. I like to
+see a nice main loop and then using poll(). We don't need threads or
+forking out processes.
 
-Best regards,
-Surf
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
-This SF.net email is sponsored by Demarc:
-A global provider of Threat Management Solutions.
-Download our HomeAdmin security software for free today!
-http://www.demarc.com/Info/Sentarus/hamr30
+This SF.Net email is sponsored by Yahoo.
+Introducing Yahoo! Search Developer Network - Create apps using Yahoo!
+Search APIs Find out how you can build Yahoo! directly into your own
+Applications - visit http://developer.yahoo.net/?fr=offad-ysdn-ostg-q22005
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
