@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <429B45FB.6090302@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] about rfcomm tty channel listening
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] trying to connect to a M2500 Plantronics headset
-References: <200505301752.38707.daniela.taubert@physik.uni-muenchen.de>
-In-Reply-To: <200505301752.38707.daniela.taubert@physik.uni-muenchen.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <429B04EE.5070205@avantwave.com>
+References: <429B04EE.5070205@avantwave.com>
+Content-Type: text/plain
+Message-Id: <1117471183.7072.192.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,25 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 30 May 2005 10:57:31 -0600
+Date: Mon, 30 May 2005 18:39:43 +0200
 
-Daniela
+Hi,
 
-> I guess there's a problem with the PIN... from what I read there should be a 
-> window asking me for PIN but I don't get anything like that.
+>     When i bind a rfcomm tty socket, Could i serve mulitple connections
+> at the same time? And how about rfcomm raw socket? if the answer is no,
+> that mean i need to open a new channel to listen.
+>     Also , could i connect the rfcomm channel in the same computer?
 
-Yes, that's what I thought too looking at your results (I am not good at 
-reading the hcidump output though)
+be more specific in what you are trying to do. I can't follow you.
 
-Have you paired with other bluetooth devices ok?
+Regards
 
-On my embedded machine, the pin is read directly from /etc/bluetooth/pin 
-with no user interaction but when I run things as myself from an x 
-session, a window comes up.
+Marcel
 
-I have used this same headset with btsco so it should work well.
 
-Brad
 
 
 -------------------------------------------------------
