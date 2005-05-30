@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
+Message-ID: <c43104b305052921125244b7bb@mail.gmail.com>
+From: peng zhihuai <pengzhihuai@gmail.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200505300632.08717.cijoml@volny.cz>
-Subject: [Bluez-users] hidd sometimes doesn't start
+Subject: Re: [Bluez-users] strange error--/drivers/bluetooth/hci_uart.c
+In-Reply-To: <1117287804.12036.141.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <c43104b305052801374253576b@mail.gmail.com>
+	 <1117287804.12036.141.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,43 +19,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 30 May 2005 06:32:08 +0200
+Date: Mon, 30 May 2005 12:12:52 +0800
 
-Hi Marcel,
+Thank you for your reply.
+2005/5/28, Marcel Holtmann <marcel@holtmann.org>:
+> Hi,
+>=20
+> >       h4_recv: Unknown HCI packet type 00
+> >       h4_recv: Unknown HCI packet type 34
+> >       these message offen appear
+>=20
+> this message means that your UART stream is out of sync. This happen due
+> bit errors on the serial line. What kind of module is this and what
+> kernel are you using?
+My module is broadcom2035 and kernel is 2.4.18.=20
+This case only happened when wlan in the same PCB borad works.
 
-hidd sometimes doesn't start when booting using /etc/default/bluetooth
-
-
-Bluetooth: Core ver 2.7
-NET: Registered protocol family 31
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: L2CAP ver 2.7
-Bluetooth: L2CAP socket layer initialized
-hidp: Unknown symbol l2cap_load
-
-^^^^^
-here
-
-usb 1-2: usbfs: USBDEVFS_CONTROL failed cmd hid2hci rqt 64 rq 0 len 0 ret -84
-usb 1-2: USB disconnect, address 3
-Bluetooth: RFCOMM ver 1.5
-Bluetooth: RFCOMM socket layer initialized
-Bluetooth: RFCOMM TTY layer initialized
-usb 1-2: new full speed USB device using uhci_hcd and address 4
-Bluetooth: HCI USB driver ver 2.8
-usbcore: registered new driver hci_usb
-mtrr: base(0xe8020000) is not aligned on a size(0x300000) boundary
-codec_semaphore: semaphore is not ready [0x1][0x700300]
-codec_read 1: semaphore is not ready for register 0x54
-Bluetooth: HIDP (Human Interface Emulation) ver 1.1
-^^^^^
-
-started by hand
-
-kernel 2.6.12-rc5
-
-Michal
+I want to know why UART stream is out of sync when wlan works.=20
+Any hlep is appreciated.
 
 
 -------------------------------------------------------
