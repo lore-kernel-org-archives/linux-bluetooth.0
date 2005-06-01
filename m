@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <005901c566d3$8c8e0f20$2203a8c0@campos>
-From: "Bruno Campos" <b-campos@criticalsoftware.com>
-To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <429DF4BA.7030300@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="----=_NextPart_000_0056_01C566D3.89611220"
-Subject: [Bluez-devel] Bluetooth problem
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] UART based bluetooth dongle
+References: <429D4256.8080803@isofttech.com>
+In-Reply-To: <429D4256.8080803@isofttech.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,132 +18,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 1 Jun 2005 17:58:37 -0000
+Date: Wed, 01 Jun 2005 11:47:38 -0600
 
-This is a multi-part message in MIME format...
+Durai
 
-------=_NextPart_000_0056_01C566D3.89611220
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+I have been looking for the same thing. Avantwave seems willing to sell 
+samples but I haven't tried ordering one yet. They haven't updated their 
+site yet but they have a bluecore2 module now.
 
-Hello
-I have a IPAQ 5500, with familiar 0.7.2, + bluez, but i have a problem with=
- bueltooth, when i try:
-pand -D --connect 00:09:DD:10:44:84 --role PANU --service GN --persist
-I can do ping on my PDA(169.254.10.119) to PC(169.254.10.117), and ping on =
-my PC to PDA, and it works fine, but after a few minuts, the connection goi=
-ng down, and i can't ping again. So, i don't know what it is. If i try tunr=
- off the bluetooth an turn on again, the connection going up again but afte=
-r a few minuts going down. So anyone knows what problem is??
+http://www.avantwave.com/html/products/btr/html/btrcontent.html
 
-When i do : hcidump:
-=2E
-=2E
-=2E
-> HCI Event: Hardware Error(0x10) plen 1
-> ACL data: handle 0x0001 flags 0x02 dlen 85
-    L2CAP(d): cid 0x40 len 81 [psm 0]
-< ACL data: handle 0x0001 flags 0x02 dlen 113
-    L2CAP(d): cid 0x67 len 109 [psm 0]
-> ACL data: handle 0x0001 flags 0x02 dlen 130
-    L2CAP(d): cid 0x40 len 126 [psm 0]
-> ACL data: handle 0x0001 flags 0x02 dlen 85
-    L2CAP(d): cid 0x40 len 81 [psm 0]
-< ACL data: handle 0x0001 flags 0x02 dlen 113
-    L2CAP(d): cid 0x67 len 109 [psm 0]
-> ACL data: handle 0x0001 flags 0x02 dlen 339
+I started out looking for a class 1 CSR (bluecore3/4) module to attach 
+to a gumstix board's uart. As Marcel pointed out, the bc04 can run 
+faster than the uart can, so it's probably overkill.
 
-Best Regards
-Bruno Campos bmac@student.dei.uc.pt
+Brad
 
-
-DISCLAIMER: This message may contain confidential information or privileged=
- material and is intended only for the individual(s) named. If you are not =
-a named addressee and mistakenly received this message you should not copy =
-or otherwise disseminate it: please delete this e-mail from your system and=
- notify the sender immediately. E-mail transmissions are not guaranteed to =
-be secure or error-free as information could be intercepted, corrupted, los=
-t, destroyed, arrive late or incomplete or contain viruses. Therefore, the =
-sender does not accept liability for any errors or omissions in the content=
-s of this message that arise as a result of e-mail transmissions. Please re=
-quest a hard copy version if verification is required. Critical Software.
-
-
-
-------=_NextPart_000_0056_01C566D3.89611220
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2900.2627" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV>
-<DIV><FONT face=3DArial size=3D2>
-<DIV><FONT face=3DArial size=3D2>Hello</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I have a IPAQ 5500, with familiar 0.7.2, +=
- bluez,=20
-but i have a problem with bueltooth, when i try:</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>pand -D --connect 00:09:DD:10:44:84 --role=
- PANU=20
---service GN --persist</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I can do ping on my PDA(169.254.10.119) to=
-=20
-PC(169.254.10.117), and ping on my PC to PDA, and it works fine, but after =
-a few=20
-minuts, the connection going down, and i can't ping again. So, i don't=20
-know&nbsp;what it is. If i try tunr off the bluetooth an turn on again, the=
-=20
-connection going up again but after a few minuts going down. So&nbsp;anyone=
-=20
-knows what problem is??</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>When i do : hcidump:</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>.</FONT></DIV>
-<DIV><FONT size=3D2><FONT face=3DArial><STRONG>&gt; HCI Event: Hardware Err=
-or(0x10)=20
-plen 1<BR></STRONG>&gt; ACL data: handle 0x0001 flags 0x02 dlen=20
-85<BR>&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x40 len 81 [psm 0]<BR>&lt; ACL data=
-:=20
-handle 0x0001 flags 0x02 dlen 113<BR>&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x67 =
-len=20
-109 [psm 0]<BR>&gt; ACL data: handle 0x0001 flags 0x02 dlen=20
-130<BR>&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x40 len 126 [psm 0]<BR>&gt; ACL da=
-ta:=20
-handle 0x0001 flags 0x02 dlen 85<BR>&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x40 l=
-en 81=20
-[psm 0]<BR>&lt; ACL data: handle 0x0001 flags 0x02 dlen=20
-113<BR>&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x67 len 109 [psm 0]<BR>&gt; ACL da=
-ta:=20
-handle 0x0001 flags 0x02 dlen 339</FONT></DIV></FONT>
-<DIV>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Best Regards</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Bruno Campos</FONT>&nbsp;<FONT face=3DAria=
-l size=3D2><A=20
-href=3D"">bmac@student.dei.uc.pt</A></FONT></DIV></FONT></DIV></DIV><br><br=
-><Font size=3D"1" color=3D"#0000ff">DISCLAIMER: This message may contain co=
-nfidential information or privileged material and is intended only for the =
-individual(s) named. If you are not a named addressee and mistakenly receiv=
-ed this message you should not copy or otherwise dissemenate it: please del=
-ete this e-mail from your system and notify the sender immediately. E-mail =
-transmissions are not guaranteed to be secure or error-free as information =
-could be intercepted, corrupted, lost, destroyed, arrive late or incomplete=
-, or contain viruses. Therefore, the sender does not accept liability for a=
-ny errors or omissions in the contents of this message that arise as a resu=
-lt of e-mail transmissions. Please request a hard-copy version if verificat=
-ion is required. Critical Software.</Font><br><br>
-</BODY></HTML>
-
-------=_NextPart_000_0056_01C566D3.89611220--
+Durai wrote:
+> Hi,
+> I am looking for an UART based bluetooth dongle for my project. From the 
+> bluez features document,
+> I found  this, http://www.digi.com/products/wireless/wavespeeds.jsp . 
+> But this looks like a UART replacement dongle.
+> What I am looking is for is a bluetooth device which can support GAP, 
+> Serial port,LAN, PAN profiles with bluez support, with
+> UART interface. Please help me to find one,
+> regards
+> durai
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by Yahoo.
+> Introducing Yahoo! Search Developer Network - Create apps using Yahoo!
+> Search APIs Find out how you can build Yahoo! directly into your own
+> Applications - visit http://developer.yahoo.net/?fr=offad-ysdn-ostg-q22005
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------
