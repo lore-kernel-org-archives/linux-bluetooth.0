@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <000a01c566cd$e437d400$8200a8c0@priveiqvfluhp9>
-From: "Pieter De Mil" <mil@pandora.be>
-To: <bluez-users@lists.sourceforge.net>
-References: <006e01c566d3$c414b070$2203a8c0@campos> <1117645943.31350.19.camel@pegasus>
 Subject: Re: [Bluez-users] bluetooth problem
-MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <006e01c566d3$c414b070$2203a8c0@campos>
+References: <006e01c566d3$c414b070$2203a8c0@campos>
+Content-Type: text/plain
+Message-Id: <1117645943.31350.19.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,35 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 1 Jun 2005 19:18:13 +0200
+Date: Wed, 01 Jun 2005 19:12:23 +0200
 
+Hi Bruno,
 
------ Original Message ----- 
-From: "Marcel Holtmann" <marcel@holtmann.org>
-To: <bluez-users@lists.sourceforge.net>
-Sent: Wednesday, June 01, 2005 7:12 PM
-Subject: Re: [Bluez-users] bluetooth problem
+> I have a IPAQ 5500, with familiar 0.7.2, + bluez, but i have a problem
+> with bueltooth, when i try:
+> pand -D --connect 00:09:DD:10:44:84 --role PANU --service GN --persist
+> I can do ping on my PDA(169.254.10.119) to PC(169.254.10.117), and
+> ping on my PC to PDA, and it works fine, but after a few minuts, the
+> connection going down, and i can't ping again. So, i don't know what
+> it is. If i try tunr off the bluetooth an turn on again, the
+> connection going up again but after a few minuts going down. So anyone
+> knows what problem is??
 
+do you wanna drive me mad? One posting is enough. Read
 
-> Hi Bruno,
->
+http://www.catb.org/~esr/faqs/smart-questions.html
 
-> do you wanna drive me mad? One posting is enough. Read
->
+to understand how to be polite on mailing lists.
 
-:) the difference was that "> HCI Event: Hardware Error(0x10) plen 1" was in 
-bold now...
+Regards
 
-regards,
-Pieter
-
-
->
-> Regards
->
-> Marcel
->
-
+Marcel
 
 
 
