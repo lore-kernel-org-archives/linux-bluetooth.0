@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <429EF8F9.60002@certi.org.br>
-From: Gabriel Marques <gag@certi.org.br>
-MIME-Version: 1.0
+From: Gabor Fekete <feketga@delfin.unideb.hu>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] Re: UART based bluetooth dongle
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200506012224.12527.feketga@delfin.unideb.hu>
+Subject: [Bluez-devel] Re: IPv6 stateless address autoconf on bnep iface in down state
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,24 +17,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 02 Jun 2005 09:18:01 -0300
+Date: Wed, 1 Jun 2005 22:24:11 +0300
 
-I'm using Brainboxes' BL642, wich works fine with bluez.
-It provides only the HCI layer (H4), so the rest can be implemented as 
-you wish.
-I've bought it at Emulation Technology for U$263,00, its expensive, but 
-I needed it for a special purpose.
-The contact was corey@emulation.com.
+Pete,
 
-One more thing, does anyone heard about an RFCOMM imlementation in Java?
-I'm developping some apps. for transferring files from a Set-top-box to 
-a cell phone.
-The STB runs JavaTV, with no BT stack implementation (no BT hardware 
-too), but I'm managing to attach the serial BT dongle to it and run the 
-JavaBluetooth (javabluetooth.org) stack over it. Currently I'm runing 
-the JavaBT on a PC, but the RFCOMM and other high-level layers were not 
-implemented on this stack, but as it supports L2CAP I just need one more 
-layer :)
+Actually, in IPv6 if I put an iface down then the IPv6 addresses and routes
+belonging to it are automatically deleted.
+In IPv4, the routes are deleted but the IP address stays. But, again,
+I am talking about only IPv6 regarding my problem.
+
+My problem is that on the bnep0 interface, although the IP settings (routes,
+addresses) are deleted when ifdown-ing, it gets regenerated again when
+the node receives an RA through bnep0 even though the interface is down.
+
+Thanks,
+Gabor Fekete
+
+>> Hi,
+>> 
+>> I have a problem with bnepX interfaces.
+>> I use stateless address autoconfiguration to set up the address
+>> on a bnep0 interface. It works fine.
+>> But when I "ip link set bnep0 down" then after seeing the routes
+>> and ip addresses of bnep0 disappear, they appear again.
+>> That is, ip addresses and routes are created for bnep interfaces
+>> even if they are down.
+>> After putting the interface down
+>> o the global ip address appears in "ip -6 addr" for bnep0
+>> o the link-local address does NOT appear
+>> o the prefix routes appear for bnep0 in "ip -6 route"
+>> o the default route for bnep0 appears in "ip -6 route"
+>> This happens only for bnep interfaces. For wired and
+>> WLAN interfaces, the addresses and routes disappear as they should
+>> and never come back unless the interface is put "up" again.
+>> 
+>> Is this the normal behaviour for bnep interfaces or a bug?
+>> This behavious causes a problem for example MIPL2 (MIPv6)
+> 
+> From memory I think this is normal behaviour of network interfaces in
+> general under Linux. I think if you have any sort of network interface
+> in a down state you can still ping the actual IP address on the
+> interface. I seem to remember this being  discussed on lkml. But then
+> my memory may not be correct too.
+> 
 
 
 -------------------------------------------------------
