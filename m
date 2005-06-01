@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
 Subject: RE: [Bluez-users] Linking to BlueZ from non-GPL code
-Message-ID: <EFCD68F7BFDB06468769D4D9EAAA9387077868B0@scsmsx401.amr.corp.intel.com>
-From: "Pering, Trevor" <trevor.pering@intel.com>
-To: <bluez-users@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <EFCD68F7BFDB06468769D4D9EAAA93870774B827@scsmsx401.amr.corp.intel.com>
+References: 
+	 <EFCD68F7BFDB06468769D4D9EAAA93870774B827@scsmsx401.amr.corp.intel.com>
+Content-Type: text/plain
+Message-Id: <1117666086.31350.46.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,42 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 1 Jun 2005 16:43:19 -0700
-
-Ok, then it sounds like we (me and the lawyers and you) are all in
-agreement -- what it comes down to is the source of the *.h files.  If
-they come from the kernel (which wouldn't make sense for BlueZ), then
-things would be ok.  However, trying to use BlueZ user-level *.h files
-with not-GPL would not be allowed.  (I'm just reiterating this for the
-benefit of clarity and consensus).
-
-Cheers,
-	Trevor
-
-=20
-
------Original Message-----
-From: bluez-users-admin@lists.sourceforge.net
-[mailto:bluez-users-admin@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: Wednesday, June 01, 2005 3:48 PM
-To: bluez-users@lists.sourceforge.net
-Subject: RE: [Bluez-users] Linking to BlueZ from non-GPL code
+Date: Thu, 02 Jun 2005 00:48:06 +0200
 
 Hi Trevor,
 
 > As for the non-GPL use of the kernel, I was referring to: (from
 > http://www.kernel.org/pub/linux/kernel/COPYING)
->=20
+> 
 > "NOTE! This copyright does *not* cover user programs that use kernel
->  services by normal system calls - this is merely considered normal
-use
->  of the kernel, and does *not* fall under the heading of "derived
-work".
+>  services by normal system calls - this is merely considered normal use
+>  of the kernel, and does *not* fall under the heading of "derived work".
 >  Also note that the GPL below is copyrighted by the Free Software
 >  Foundation, but the instance of code that it refers to (the linux
 >  kernel) is copyrighted by me and others who actually wrote it."
->=20
+> 
 > But I'm not sure if by "disagree" you meant disagree with the
 > interpretation, or the intent behind it...  I have been advised by our
 > lawyers that this does allow simple use of *.h files to include kernel
@@ -80,18 +60,6 @@ Regards
 Marcel
 
 
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by Yahoo.
-Introducing Yahoo! Search Developer Network - Create apps using Yahoo!
-Search APIs Find out how you can build Yahoo! directly into your own
-Applications - visit
-http://developer.yahoo.net/?fr=3Doffad-ysdn-ostg-q22005
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
