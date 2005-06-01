@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <429E150D.2030308@ex.ac.uk>
+From: George Norton <g.norton@ex.ac.uk>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Message-ID: <EFCD68F7BFDB06468769D4D9EAAA93870774B6D7@scsmsx401.amr.corp.intel.com>
-From: "Pering, Trevor" <trevor.pering@intel.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Linking to BlueZ from non-GPL code
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Plantronics M2500 recording problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,37 +16,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 1 Jun 2005 14:33:33 -0700
+Date: Wed, 01 Jun 2005 21:05:33 +0100
 
-Hello -- I have a question about linking non-GPL code to BlueZ.  This is
-very much along the lines of the previous conversation at=20
-http://thread.gmane.org/gmane.linux.bluez.devel/2444 -- the quick
-summary of which is:=20
-=20
-Marcel: Date: 2004-06-28 14:48:48 GMT: "For the BlueZ library and the
-utilities we can talk about it. Some time ago people asked for a LGPL
-version of the library and actually I tend to agree with that. However
-this can't be decided by me alone, because part of the code is copyright
-by Qualcomm and also by Maxim Krasnyansky himself. For the utilities I
-don't see any need for a different license. I believe in the GPL and
-from my view releasing the Linux Bluetooth library under LGPL is the
-only step I wanna make forward to allow closed source products based on
-BlueZ."
+Hi,
+I have sucessfully used my Plantronics M2500 headset but the Mixer 
+controls don't work, and about half the time when I try to record sound 
+I just get a load of noise (static), even when the microphone is muted. 
+I am using a usb bluetooth dongle with the latest cvs version of 
+snd-bt-sco (although I had the same trouble with version 0.4) and there 
+is no difference in the output of hcidump when it records properly and 
+when I just get noise.
 
-Is this still the current status of GPL/LGPL for the BlueZ libraries
-(libbluetooth.so) -- or has there been an update (I haven't found
-anything more recent on the mailing list about this).
+Any help is appreciated.
 
-What is the recommended way to write a non-GPL application on top of
-BlueZ, or is this not currently allowed...? My understanding is that it
-is OK to use the linux kernel syscall interface from non-GPL code, but
-that this would not extend to libbluetooth.so...
-
-Cheers,
-	Trevor
-
-
-
+-George
 
 
 -------------------------------------------------------
