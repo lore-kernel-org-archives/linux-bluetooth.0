@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Alexandre Boeglin <alex@nexedi.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Nautilus integration with gnome-bluetooth
-References: <12a241ad050602100740aa0d90@mail.gmail.com>
-In-Reply-To: <12a241ad050602100740aa0d90@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200506021718.28176.alex@nexedi.com>
+Message-ID: <12a241ad050602100740aa0d90@mail.gmail.com>
+From: Bruno Abinader <brunoabinader@gmail.com>
+To: Bluez-users@lists.sourceforge.net
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Nautilus integration with gnome-bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,24 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 2 Jun 2005 17:18:28 +0000
+Date: Thu, 2 Jun 2005 13:07:39 -0400
 
-Le Jeudi 02 Juin 2005 17:07, Bruno Abinader a =E9crit=A0:
+I know this is not the right mail-list to ask about it but i've seen
+on the gnome-blueooth website that there is an integration like "send
+to" option to send a file via nautilus to another BT device, but i
+can't see this option in my nautilus, do you guys know a way to enable
+it? Thanks in advance!
 
-> I know this is not the right mail-list to ask about it but i've seen
-> on the gnome-blueooth website that there is an integration like "send
-> to" option to send a file via nautilus to another BT device, but i
-> can't see this option in my nautilus, do you guys know a way to
-> enable it? Thanks in advance!
-
-Which version of gnome do you use ? You may want to check :
-
-http://lists.gnomehack.com/pipermail/gnome-bluetooth/2005-April/000829.ht=
-ml
-
-
-Regards,
-Alex
+--=20
+Bruno de Oliveira Abinader
+10LE/INdT - GVoIP/UFAM
 
 
 -------------------------------------------------------
