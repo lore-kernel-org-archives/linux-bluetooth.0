@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <429F5605.2070705@kernelconcepts.de>
+From: Nils Faerber <nils.faerber@kernelconcepts.de>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: "Christopher J. Bottaro" <cjbottaro@alumni.cs.utexas.edu>
-Message-ID: <d7nnk4$7n4$1@sea.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] newbie: automatic pairing with a mouse
+Subject: Re: [Bluez-users] Linking to BlueZ from non-GPL code
+References: <EFCD68F7BFDB06468769D4D9EAAA93870774B6D7@scsmsx401.amr.corp.int	 el.com> <1117662296.31350.31.camel@pegasus> <1117688464.3908.6.camel@localhost.localdomain>
+In-Reply-To: <1117688464.3908.6.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,33 +18,64 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 02 Jun 2005 14:48:40 -0500
+Date: Thu, 02 Jun 2005 20:55:01 +0200
 
-Hi,
-I have a laptop with internal bluetooth and an IOGear bluetooth mouse.  The
-mouse pairs and works fine after I issue 'hidd --search', but if I reboot
-my computer, I have to issue that command again for the mouse to be paired
-again.  Also, if I don't use my mouse for a few mins, it will de-pair and I
-have to issue another 'hidd --search' to get it working again.
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-My question is how do I get my computer to automatically pair with the mouse
-everytime the mouse is near it and turned on?
+Fredy P wrote:
+> El mié, 01-06-2005 a las 23:44 +0200, Marcel Holtmann escribió:
+[...]
+>>>Is this still the current status of GPL/LGPL for the BlueZ libraries
+>>>(libbluetooth.so) -- or has there been an update (I haven't found
+>>>anything more recent on the mailing list about this).
+>>nothing has changed at the moment. Ask Max for an update of changing the
+>>BlueZ library from GPL to LGPL.
+> For the free software and open source interest is not good idea change
+> GPL to LGPL, can read this:
+> http://www.gnu.org/licenses/why-not-lgpl.html
 
-I am using Fedora Core 3, if that matters.
+This debate is almost as old as the free software movement or the
+introduction of the LGPL respectively.
 
-I have read a few posts about this, but I'm very newb to this whole
-bluetooth thing.  Here is what I've tried so far:
+The question is what you intend to achieve by putting sourcecode under
+the GPL or LGPL.
 
-1) echo "HIDD_ENABLED=1\nHIDD_OPTIONS="--server" > /etc/default/bluez-utils
-2) turning on authentication and encryption in hcid.conf.  This produced a
-link_key file after pairing, but didn't alleviate my problem.
+Concerning libbluetooth I would strongly and also urgently propose to
+put it under LGPL for several reasons.
+First of all is that libbluetooth is part of BlueZ which is the official
+Bluetooth stack for Linux. It should not limit the use of Linux in any
+way. The limiting factor here is that GPL on a library renders all
+programs that use it into GPL. For commercial software vendors this is a
+no-go.
 
-Thank you for the help.
+Yes, in an ideal world we would not care much but our world is far from
+being ideal and currently I would strongly prefer wide use of Linux than
+limiting the use.
 
-P.S.  Yes, I've read the thread titled 'Automatically accepting pairing from
-a mouse?', but the suggested solution didn't work for me (nor made any
-sense to me).
+LGPL on the library itself assures that the lib will remain free and
+that changes to it will be put back into it. For a library there is no
+need to be GPL. It simply limits its use which is not good.
 
+So please yes, try to get hold of Max and ask for his permission...
+
+
+Regards
+  nils faerber
+
+- --
+kernel concepts          Tel: +49-271-771091-12
+Dreisbachstr. 24         Fax: +49-271-771091-19
+D-57250 Netphen          Mob: +49-176-21024535
+- --
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFCn1YFJXeIURG1qHgRArjkAJ9efx3jQrLt9O2Znj46BavwZzK0SQCfU4uL
+fKg+pkeilCsGJKX7BXSkWro=
+=IJkL
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
