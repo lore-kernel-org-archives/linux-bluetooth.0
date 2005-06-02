@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Florian Echtler <echtler@fs.tum.de>
+Subject: Re: [Bluez-users] Linking to BlueZ from non-GPL code
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: Re: Plantronics M2500 recording problem
-In-Reply-To: <429E368C.6020407@xmission.com>
-Message-ID: <Pine.LNX.4.63.0506021220030.10638@block>
-References: <429E3429.6000108@ex.ac.uk> <429E368C.6020407@xmission.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <429ED7F0.2030902@gmx.ch>
+References: 
+	 <EFCD68F7BFDB06468769D4D9EAAA9387077868B0@scsmsx401.amr.corp.intel.com>
+	 <429E4F67.1030104@xmission.com>  <429ED7F0.2030902@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1117707014.31350.71.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,29 +20,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 2 Jun 2005 12:22:44 +0200 (CEST)
+Date: Thu, 02 Jun 2005 12:10:14 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Marco,
 
-> Are you saying the entire recording is bad if it starts out that way? it's not
-> transient like interference?
-I've had the same problem with my B-Speech Elect Headset. I've recently
-swapped it with an old Plantronics M1000, which seems to work fine so far.
-There were other issues, such as reconnection problems with keyboard and
-mouse, when the B-Speech headset was in use. I suspect some kind of
-incompatibility between the BT dongles and the headsets..
+>  > but a technical solution is to write a
+> > GPL shim that links with -lbluetooth and that you use via APIs across 
+> > which the GPL is not required to hold. Again, talk to your lawyer.
+> 
+> can you explain that further? as I understand it:
+> write an own library that includes the bluez .h files and links agains 
+> -lbluetooth
+> -> so the own library has to be gpl too
+> include the own library (.h file(s)) in the not gpl program
+> but because the own library is gpl and you include it again, you program 
+> still has to be gpl, right?
+> the only difference is that you haven't to link against -lbluetooth. but 
+> the header files are gpl too.
 
-Yours, Florian
-- -- 
-Preserve wildlife - pickle a squirrel today!
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
+you go through a self defined Unix Socket API or D-Bus API. Then you
+only have to make the shim layer (the daemon) available under GPL.
 
-iD8DBQFCnt357CzyshGvatgRAqlNAKDGNo6ZaZ9RPCkxDAZP9z6f8IuvmQCfWo5+
-5J+nrYkthYzEHCz2xtZFXTM=
-=jR/S
------END PGP SIGNATURE-----
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
