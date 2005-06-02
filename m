@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <429F5605.2070705@kernelconcepts.de>
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Newbie Question: Setting 2 BT Mice to specific
+	/dev/input/mouse* files
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Linking to BlueZ from non-GPL code
-References: <EFCD68F7BFDB06468769D4D9EAAA93870774B6D7@scsmsx401.amr.corp.int	 el.com> <1117662296.31350.31.camel@pegasus> <1117688464.3908.6.camel@localhost.localdomain>
-In-Reply-To: <1117688464.3908.6.camel@localhost.localdomain>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <20050602164634.85367.qmail@web26108.mail.ukl.yahoo.com>
+References: <20050602164634.85367.qmail@web26108.mail.ukl.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1117735838.13834.18.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,64 +19,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 02 Jun 2005 20:55:01 +0200
+Date: Thu, 02 Jun 2005 20:10:38 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Rodrigo,
 
-Fredy P wrote:
-> El mié, 01-06-2005 a las 23:44 +0200, Marcel Holtmann escribió:
-[...]
->>>Is this still the current status of GPL/LGPL for the BlueZ libraries
->>>(libbluetooth.so) -- or has there been an update (I haven't found
->>>anything more recent on the mailing list about this).
->>nothing has changed at the moment. Ask Max for an update of changing the
->>BlueZ library from GPL to LGPL.
-> For the free software and open source interest is not good idea change
-> GPL to LGPL, can read this:
-> http://www.gnu.org/licenses/why-not-lgpl.html
+> (I'm in a Vanilla kernel, 2.6.11-mh2 patch, with the
+> Logitech DiNovo USB HUB in HCI mode with 2 IOGEAR mini
+> mice)
+> 
+> I'm working on a project that uses 2 BT Mice
+> simultaneously. They don't perform the same functions
+> (core pointer control, ex.) each one has a specific
+> interaction function associated. In order to deal with
+> these two mice separately, I've to write in my
+> XF86Config file like this:
+> 
+>   Option       "Device" "/dev/input/mouse1"
+> and
+>   Option       "Device" "/dev/input/mouse2"
+> 
+> rather than:
+>   Option       "Device" "/dev/input/mice"
+> and
+>   Option       "Device" "/dev/input/mice"
+> 
+> The problem for me is that bluetooth mice seems to
+> behave differently than other mice. They'll not keep
+> on the same /dev/input/mouse* during all the use time,
+> but they will change from the /dev/input/mouse2 to
+> /dev/input/mouse3, for example.
+> 
+> I've searched in this mail list for related problems
+> with no success. I've also read some HOTPLUG tutorials
+> and FAQs but I haven't found anywhere yet containing
+> clues to the way that this dev files are picked.
+> 
+> Does anyone knows some pointer or FAQ to these issues
+> of DEV files or a clue for why BlueZ works like this?
 
-This debate is almost as old as the free software movement or the
-introduction of the LGPL respectively.
-
-The question is what you intend to achieve by putting sourcecode under
-the GPL or LGPL.
-
-Concerning libbluetooth I would strongly and also urgently propose to
-put it under LGPL for several reasons.
-First of all is that libbluetooth is part of BlueZ which is the official
-Bluetooth stack for Linux. It should not limit the use of Linux in any
-way. The limiting factor here is that GPL on a library renders all
-programs that use it into GPL. For commercial software vendors this is a
-no-go.
-
-Yes, in an ideal world we would not care much but our world is far from
-being ideal and currently I would strongly prefer wide use of Linux than
-limiting the use.
-
-LGPL on the library itself assures that the lib will remain free and
-that changes to it will be put back into it. For a library there is no
-need to be GPL. It simply limits its use which is not good.
-
-So please yes, try to get hold of Max and ask for his permission...
-
+they will disconnect and reconnect and then the device nodes might
+change. You may can use udev to get stable device names, but this is a
+question for the input subsystem gurus. I don't know if this is already
+supported.
 
 Regards
-  nils faerber
 
-- --
-kernel concepts          Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          Mob: +49-176-21024535
-- --
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+Marcel
 
-iD8DBQFCn1YFJXeIURG1qHgRArjkAJ9efx3jQrLt9O2Znj46BavwZzK0SQCfU4uL
-fKg+pkeilCsGJKX7BXSkWro=
-=IJkL
------END PGP SIGNATURE-----
+
 
 
 -------------------------------------------------------
