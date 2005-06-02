@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <429EE5B6.8040806@ex.ac.uk>
-From: George Norton <g.norton@ex.ac.uk>
-MIME-Version: 1.0
+From: Florian Echtler <echtler@fs.tum.de>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Re: Plantronics M2500 recording problem
+Subject: Re: [Bluez-users] Re: Re: Plantronics M2500 recording problem
+In-Reply-To: <429E368C.6020407@xmission.com>
+Message-ID: <Pine.LNX.4.63.0506021220030.10638@block>
+References: <429E3429.6000108@ex.ac.uk> <429E368C.6020407@xmission.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,21 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 02 Jun 2005 11:55:50 +0100
+Date: Thu, 2 Jun 2005 12:22:44 +0200 (CEST)
 
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-Hi, Thanks for looking over it.
+> Are you saying the entire recording is bad if it starts out that way? it's not
+> transient like interference?
+I've had the same problem with my B-Speech Elect Headset. I've recently
+swapped it with an old Plantronics M1000, which seems to work fine so far.
+There were other issues, such as reconnection problems with keyboard and
+mouse, when the B-Speech headset was in use. I suspect some kind of
+incompatibility between the BT dongles and the headsets..
 
->Are you saying the entire recording is bad if it starts out that way? 
-> it"s not transient like interference?
+Yours, Florian
+- -- 
+Preserve wildlife - pickle a squirrel today!
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
 
-
-Yeah the enitre recording is bad, i've never had a normal recording 
-suddenly become corrupted. I can sit at my computer pressing record, 
-stop, record, stop ... and about half the time the recordings are just 
-loud noise.
-
--George
+iD8DBQFCnt357CzyshGvatgRAqlNAKDGNo6ZaZ9RPCkxDAZP9z6f8IuvmQCfWo5+
+5J+nrYkthYzEHCz2xtZFXTM=
+=jR/S
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
