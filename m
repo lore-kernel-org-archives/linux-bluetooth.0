@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050602164634.85367.qmail@web26108.mail.ukl.yahoo.com>
-From: Rodrigo Almeida <rodrigoalmeida_fr@yahoo.fr>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <010301c56779$8a0c1ac0$2203a8c0@campos>
+From: "Bruno Campos" <b-campos@criticalsoftware.com>
+To: <bluez-users@lists.sourceforge.net>
+References: <4299F069.3080703@eridani.co.uk> <1117454226.7072.135.camel@pegasus> <429DF908.80808@eridani.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Newbie Question: Setting 2 BT Mice to specific /dev/input/mouse* files
+Content-Type: multipart/alternative; boundary="----=_NextPart_000_0100_01C56779.8709FE50"
+Subject: [Bluez-users] Bluez on Familiar 0.7.2
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,55 +17,92 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 2 Jun 2005 18:46:33 +0200 (CEST)
+Date: Thu, 2 Jun 2005 13:46:50 -0000
 
-Hi
+This is a multi-part message in MIME format...
 
-(I'm in a Vanilla kernel, 2.6.11-mh2 patch, with the
-Logitech DiNovo USB HUB in HCI mode with 2 IOGEAR mini
-mice)
+------=_NextPart_000_0100_01C56779.8709FE50
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I'm working on a project that uses 2 BT Mice
-simultaneously. They don't perform the same functions
-(core pointer control, ex.) each one has a specific
-interaction function associated. In order to deal with
-these two mice separately, I've to write in my
-XF86Config file like this:
+Hi there,
 
-  Option       "Device" "/dev/input/mouse1"
-and
-  Option       "Device" "/dev/input/mouse2"
+I have on ipaq 5500 with:
+  a.. Familiar 0.7.2
+  b.. Blackdown 1.3.1
+And i think that my Blutooth have a problem, because going down after a few=
+ minutes, if a try hcidump gives the follows error:
+HCI Event: Hardware Error(0x10) plen 1
 
-rather than:
-  Option       "Device" "/dev/input/mice"
-and
-  Option       "Device" "/dev/input/mice"
+So anyone knows if is necessary install new packages? Please if anyone have=
+ blutooth on familiar 0.7.2, what packages you intalled.
 
-The problem for me is that bluetooth mice seems to
-behave differently than other mice. They'll not keep
-on the same /dev/input/mouse* during all the use time,
-but they will change from the /dev/input/mouse2 to
-/dev/input/mouse3, for example.
-
-I've searched in this mail list for related problems
-with no success. I've also read some HOTPLUG tutorials
-and FAQs but I haven't found anywhere yet containing
-clues to the way that this dev files are picked.
-
-Does anyone knows some pointer or FAQ to these issues
-of DEV files or a clue for why BlueZ works like this?
-
-Thanks for any help,
-Rodrigo
+Best Regards
 
 
-	
 
-	
-		
-_____________________________________________________________________________ 
-Découvrez le nouveau Yahoo! Mail : 1 Go d'espace de stockage pour vos mails, photos et vidéos ! 
-Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com
+DISCLAIMER: This message may contain confidential information or privileged=
+ material and is intended only for the individual(s) named. If you are not =
+a named addressee and mistakenly received this message you should not copy =
+or otherwise disseminate it: please delete this e-mail from your system and=
+ notify the sender immediately. E-mail transmissions are not guaranteed to =
+be secure or error-free as information could be intercepted, corrupted, los=
+t, destroyed, arrive late or incomplete or contain viruses. Therefore, the =
+sender does not accept liability for any errors or omissions in the content=
+s of this message that arise as a result of e-mail transmissions. Please re=
+quest a hard copy version if verification is required. Critical Software.
+
+
+
+------=_NextPart_000_0100_01C56779.8709FE50
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2627" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY>
+<DIV><FONT face=3DArial size=3D2>Hi there,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I have on ipaq 5500 with:</FONT></DIV>
+<UL>
+  <LI><FONT face=3DArial size=3D2>Familiar 0.7.2</FONT></LI>
+  <LI><FONT face=3DArial size=3D2>Blackdown 1.3.1</FONT></LI></UL>
+<DIV><FONT face=3DArial size=3D2>And i think that my Blutooth have a proble=
+m,=20
+because going down after a few minutes, if a try hcidump gives the follows=
+=20
+error:</FONT></DIV>
+<DIV><STRONG>HCI Event: Hardware Error(0x10) plen 1</STRONG><BR></DIV>
+<DIV><FONT face=3DArial size=3D2>So anyone knows if is necessary install ne=
+w=20
+packages? Please if anyone have blutooth on familiar 0.7.2, what packages y=
+ou=20
+intalled.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Best Regards</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV><br><br><Font size=3D"1=
+" color=3D"#0000ff">DISCLAIMER: This message may contain confidential infor=
+mation or privileged material and is intended only for the individual(s) na=
+med. If you are not a named addressee and mistakenly received this message =
+you should not copy or otherwise dissemenate it: please delete this e-mail =
+from your system and notify the sender immediately. E-mail transmissions ar=
+e not guaranteed to be secure or error-free as information could be interce=
+pted, corrupted, lost, destroyed, arrive late or incomplete, or contain vir=
+uses. Therefore, the sender does not accept liability for any errors or omi=
+ssions in the contents of this message that arise as a result of e-mail tra=
+nsmissions. Please request a hard-copy version if verification is required.=
+ Critical Software.</Font><br><br>
+</BODY></HTML>
+
+------=_NextPart_000_0100_01C56779.8709FE50--
 
 
 -------------------------------------------------------
