@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <429F6E0F.3080805@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] newbie: automatic pairing with a mouse
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: Re: Plantronics M2500 recording problem
-References: <429E3429.6000108@ex.ac.uk>
-In-Reply-To: <429E3429.6000108@ex.ac.uk>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <d7nnk4$7n4$1@sea.gmane.org>
+References: <d7nnk4$7n4$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1117744047.13834.21.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,147 +18,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 02 Jun 2005 14:37:35 -0600
+Date: Thu, 02 Jun 2005 22:27:27 +0200
 
-Guys,
+Hi Christoper,
 
-I created a bug report for this one ([ 1213784 ] noisy sco recordings).
+> I have a laptop with internal bluetooth and an IOGear bluetooth mouse.  The
+> mouse pairs and works fine after I issue 'hidd --search', but if I reboot
+> my computer, I have to issue that command again for the mouse to be paired
+> again.  Also, if I don't use my mouse for a few mins, it will de-pair and I
+> have to issue another 'hidd --search' to get it working again.
+> 
+> My question is how do I get my computer to automatically pair with the mouse
+> everytime the mouse is near it and turned on?
+> 
+> I am using Fedora Core 3, if that matters.
+> 
+> I have read a few posts about this, but I'm very newb to this whole
+> bluetooth thing.  Here is what I've tried so far:
+> 
+> 1) echo "HIDD_ENABLED=1\nHIDD_OPTIONS="--server" > /etc/default/bluez-utils
+> 2) turning on authentication and encryption in hcid.conf.  This produced a
+> link_key file after pairing, but didn't alleviate my problem.
 
-It would be good to know what kernel version and bluez-libs versions you 
-guys are having the problem with and if it's persisting between 
-versions. Email me and I'll keep the bug report up to date.
+you must make sure that "hidd --server" is running as root to accept
+re-connections. I don't know how the Fedore Core init scripts are
+designed, but in general they should support it.
 
-Brad
+Regards
 
-George Norton wrote:
-> Thanks for the quick reply:
-> 
-> george@G0on:~$ hciconfig -a
-> hci0:   Type: USB
->        BD Address: 00:E0:98:D1:B0:5F ACL MTU: 192:8  SCO MTU: 64:8
->        UP RUNNING PSCAN ISCAN
->        RX bytes:101956 acl:25 sco:1980 events:62 errors:0
->        TX bytes:72654 acl:23 sco:1403 commands:29 errors:0
->        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->        Link policy: RSWITCH HOLD SNIFF PARK
->        Link mode: SLAVE ACCEPT
->        Name: 'G0on-0'
->        Class: 0x000100
->        Service Classes: Unspecified
->        Device Class: Computer, Uncategorized
->        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 
-> 0x20d
->        Manufacturer: Cambridge Silicon Radio (10)
-> 
-> george@G0on:~$ hciconfig hci0 revision
-> hci0:   Type: USB
->        BD Address: 00:E0:98:D1:B0:5F ACL MTU: 192:8  SCO MTU: 64:8
->        HCI 16.4
->        Chip version: BlueCore02
->        Max key size: 56 bit
->        SCO mapping:  HCI
-> 
-> george@G0on:~$ hcitool info 00:03:89:B6:0D:F8
-> Requesting information ...
->        BD Address:  00:03:89:B6:0D:F8
->        Device Name: M2500 by Plantronics
->        LMP Version: 1.2 (0x2) LMP Subversion: 0x615
->        Manufacturer: Cambridge Silicon Radio (10)
->        Features: 0xbc 0xe8 0x01 0x00 0x08 0x08 0x00 0x00
->                <encryption> <slot offset> <timing accuracy> <role switch>
->                <sniff mode> <SCO link> <HV3 packets> <u-law log> <A-law 
-> log>
->                <CVSD> <AFH cap. slave> <AFH cap. master>
-> 
-> 
-> // While recording in audacity, first recording is normal:
-> george@G0on:~$ hcidump -X
-> HCIDump - HCI packet analyzer ver 1.12
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> 
->> HCI Event: Command Status (0x0f) plen 4
-> 
->  0000: 00 01 07 04                                       ....
-> 
->> HCI Event: Connect Complete (0x03) plen 11
-> 
->  0000: 00 2c 00 f8 0d b6 89 03  00 00 01                 .,.........
-> 
->> HCI Event: Command Status (0x0f) plen 4
-> 
->  0000: 00 01 06 04                                       ....
-> 
->> HCI Event: Disconn Complete (0x05) plen 4
-> 
->  0000: 00 2c 00 16                                       .,..
-> 
->> HCI Event: Command Status (0x0f) plen 4
-> 
->  0000: 00 01 07 04                                       ....
-> 
->> HCI Event: Connect Complete (0x03) plen 11
-> 
->  0000: 00 30 00 f8 0d b6 89 03  00 00 01                 .0.........
-> 
->> HCI Event: Command Status (0x0f) plen 4
-> 
->  0000: 00 01 06 04                                       ....
-> 
->> HCI Event: Disconn Complete (0x05) plen 4
-> 
->  0000: 00 30 00 16                                       .0..
-> 
-> // A second recording which is corrupted:
-> 
->> HCI Event: Command Status (0x0f) plen 4
-> 
->  0000: 00 01 07 04                                       ....
-> 
->> HCI Event: Connect Complete (0x03) plen 11
-> 
->  0000: 00 2c 00 f8 0d b6 89 03  00 00 01                 .,.........
-> 
->> HCI Event: Command Status (0x0f) plen 4
-> 
->  0000: 00 01 06 04                                       ....
-> 
->> HCI Event: Disconn Complete (0x05) plen 4
-> 
->  0000: 00 2c 00 16                                       .,..
-> 
-> // I attempted to record and got a corrupted recording:
-> george@G0on:~$ btsco -v 00:03:89:B6:0D:F8
-> btsco v0.4c
-> Device is 1:0
-> Voice setting: 0x0060
-> RFCOMM channel 1 connected
-> speaker volume: 7 mic volume: 15
-> i/o needed: connecting sco...
-> connected SCO channel
-> Done setting sco fd
-> recieved AT+VGS=07
-> Sending up speaker change 7
-> speaker volume: 7 mic volume: 15
-> driver is not in use
-> disconnected SCO channel
-> 
-> Kernel Version: 2.6.11.11
-> Distribution: Ubuntu 5.04 (Hoary)
-> 
-> -George
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by Yahoo.
-> Introducing Yahoo! Search Developer Network - Create apps using Yahoo!
-> Search APIs Find out how you can build Yahoo! directly into your own
-> Applications - visit http://developer.yahoo.net/?fr=offad-ysdn-ostg-q22005
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+Marcel
+
+
 
 
 -------------------------------------------------------
