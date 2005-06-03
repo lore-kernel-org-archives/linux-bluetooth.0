@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5256d0b05060303017e9eb38c@mail.gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] First dongle with EDR support
-In-Reply-To: <1117792207.3656.77.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <5256d0b05060302372179e252@mail.gmail.com>
 References: <1117788913.3656.61.camel@pegasus>
 	 <5256d0b05060302372179e252@mail.gmail.com>
-	 <1117792207.3656.77.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1117792207.3656.77.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,21 +19,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 3 Jun 2005 11:01:58 +0100
+Date: Fri, 03 Jun 2005 11:50:07 +0200
 
-Hi Marcel,
+Hi Peter,
 
-> > > I like to get some of these, but so far I haven't found any place tha=
-t
-> > > sells them. Any hints are welcome.
-> >
-> > http://www.cclonline.com/ in the UK
->=20
-> this price looks even better. It must be something around 30 EUR, right?
+> > I like to get some of these, but so far I haven't found any place that
+> > sells them. Any hints are welcome.
+> 
+> http://www.cclonline.com/ in the UK
 
-Yep. I think its around 27 EUR.
+this price looks even better. It must be something around 30 EUR, right?
 
-Pete
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
