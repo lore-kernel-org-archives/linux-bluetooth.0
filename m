@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Mitja Pufic <raveer@section-one.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] First dongle with EDR support
-In-Reply-To: <1117788913.3656.61.camel@pegasus>
-Message-ID: <Pine.LNX.4.61.0506031543050.22318@cherokee.spacecom.si>
-References: <1117788913.3656.61.camel@pegasus>
+Message-ID: <42A05C5C.8000804@certi.org.br>
+From: Gabriel Marques <gag@certi.org.br>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] Re: Re: UART based bluetooth dongle
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,45 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 3 Jun 2005 15:46:26 +0200 (CEST)
+Date: Fri, 03 Jun 2005 10:34:20 -0300
 
-hello marcel,
+Hi Peter, thanks for the suggestion, but one of the project requirements 
+is that the SDP, L2CAP and part of the RFCOMM would be available to the 
+Java applications (accordingly to JSR82).
+I'm not sure if that is possible with dongles with integrated RFCOMM, 
+those are serial cables replacements right?
+I think it would be hard to talk to one of those in a cell phone midlet.
 
-weel i found this while googling: http://www.tecomproduct.com/BT3036.htm 
-it is very small, and the other is ugly  BT-DG07A+ from epox, they claim 
-it is on the market and bluecore 4 external with edr
+And sorry if that is not the appropriate list, but ive already tryed to 
+post this question at 'Sun Java Forums - Bluetooth' and at 
+'Bluetooth.org - RFCOMM' with no answers.
+Do you know any forum that can help me on this?
 
-take care, m
-
-On Fri, 3 Jun 2005, Marcel Holtmann wrote:
-
-> Hi Folks,
-> 
-> it seems that Cellink is building the first EDR dongle. It is qualified
-> and you will find it on their website.
-> 
-> http://www.cellink.com.tw/pro-bta-6030.htm
-> 
-> I like to get some of these, but so far I haven't found any place that
-> sells them. Any hints are welcome.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by Yahoo.
-> Introducing Yahoo! Search Developer Network - Create apps using Yahoo!
-> Search APIs Find out how you can build Yahoo! directly into your own
-> Applications - visit http://developer.yahoo.net/?fr=offad-ysdn-ostg-q22005
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
 
 
 -------------------------------------------------------
