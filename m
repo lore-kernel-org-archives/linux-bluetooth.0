@@ -1,21 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb05060313345fb564a3@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] DBUS service support - poll patch
-In-Reply-To: <1117494345.7072.235.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <1115901694.18499.32.camel@pegasus>
-	 <1116844053.30044.59.camel@pegasus>
-	 <e1effdeb050523080216e96744@mail.gmail.com>
-	 <1116925644.30044.140.camel@pegasus>
-	 <e1effdeb050525152067a5cbd3@mail.gmail.com>
-	 <1117098491.12036.23.camel@pegasus>
-	 <e1effdeb05052614222118e70c@mail.gmail.com>
-	 <1117143615.12036.74.camel@pegasus>
-	 <e1effdeb050530154229f338a2@mail.gmail.com>
-	 <1117494345.7072.235.camel@pegasus>
+From: Mitja Pufic <raveer@section-one.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] First dongle with EDR support
+In-Reply-To: <1117788913.3656.61.camel@pegasus>
+Message-ID: <Pine.LNX.4.61.0506031543050.22318@cherokee.spacecom.si>
+References: <1117788913.3656.61.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -27,87 +18,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 3 Jun 2005 17:34:07 -0300
+Date: Fri, 3 Jun 2005 15:46:26 +0200 (CEST)
 
-Hi Marcel,
+hello marcel,
 
+weel i found this while googling: http://www.tecomproduct.com/BT3036.htm 
+it is very small, and the other is ugly  BT-DG07A+ from epox, they claim 
+it is on the market and bluecore 4 external with edr
 
-A new patch is available using a main loop and poll to wait for some event=
-=20
-on a file descriptor list (D-Bus and Bluetooth).
+take care, m
 
-All Glib and pthread dependencies were remove.
+On Fri, 3 Jun 2005, Marcel Holtmann wrote:
 
-
-http://www.indt.org.br/maemo/bluez/bluez-dbus-poll.diff
-
-
-Regards,
-Claudio.
-
-
-On 5/30/05, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Claudio,
->=20
-> > I am sending a new patch to be evaluated.
-> > Regarding glib dependency we need discuss this
-> > subject again. If you see the hcid code, there is a
-> > file (glib-ectomy.c) that implements the event
-> > processing, this code is a partial copy of glib.
-> >
-> > What do you prefer? Repeat the glib-ectomy.c code
-> > or use glib?
->=20
-> the glib-ectomy is only still there, because I was too lazy to replace
-> it with a clean main loop using poll() implementation.
->=20
-> > For Maemo, glib is not problem. It is included in
-> > the SDK.
->=20
-> This is not a valid argument. Creating a massive dependency chain is
-> always bad. Using Glib inside bluez-utils is no option.
->=20
-> > Regarding pthread I put two versions to be evaluated:
-> > 1. using pthread
-> >    In my opinion because it save memory.
-> >    http://www.indt.org.br/maemo/bluez/bluez-dbus-thread.diff
-> >
-> > 2. using fork
-> >    In my opinion this is not a feasible approach
-> >    because when listening is active two process
-> >    will be running(a listening and another processing
-> >    D-Bus messages).
-> >    http://www.indt.org.br/maemo/bluez/bluez-dbus-fork.diff
->=20
-> Even without looking at the patches, I don't like any of it. I like to
-> see a nice main loop and then using poll(). We don't need threads or
-> forking out processes.
->=20
+> Hi Folks,
+> 
+> it seems that Cellink is building the first EDR dongle. It is qualified
+> and you will find it on their website.
+> 
+> http://www.cellink.com.tw/pro-bta-6030.htm
+> 
+> I like to get some of these, but so far I haven't found any place that
+> sells them. Any hints are welcome.
+> 
 > Regards
->=20
+> 
 > Marcel
->=20
->=20
->=20
->=20
+> 
+> 
+> 
+> 
 > -------------------------------------------------------
 > This SF.Net email is sponsored by Yahoo.
 > Introducing Yahoo! Search Developer Network - Create apps using Yahoo!
 > Search APIs Find out how you can build Yahoo! directly into your own
-> Applications - visit http://developer.yahoo.net/?fr=3Doffad-ysdn-ostg-q22=
-005
+> Applications - visit http://developer.yahoo.net/?fr=offad-ysdn-ostg-q22005
 > _______________________________________________
 > Bluez-devel mailing list
 > Bluez-devel@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+> 
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by: NEC IT Guy Games.  How far can you shotput
-a projector? How fast can you ride your desk chair down the office luge track?
-If you want to score the big prize, get to know the little guy.  
-Play to win an NEC 61" plasma display: http://www.necitguy.com/?r=20
+This SF.Net email is sponsored by Yahoo.
+Introducing Yahoo! Search Developer Network - Create apps using Yahoo!
+Search APIs Find out how you can build Yahoo! directly into your own
+Applications - visit http://developer.yahoo.net/?fr=offad-ysdn-ostg-q22005
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
