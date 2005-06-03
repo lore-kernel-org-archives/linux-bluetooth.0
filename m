@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] DBUS service support - poll patch
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <e1effdeb0506031431159155a@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb05060313345fb564a3@mail.gmail.com>
+Subject: Re: [Bluez-devel] DBUS service support - poll patch
+In-Reply-To: <1117831128.3656.93.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 References: <1115901694.18499.32.camel@pegasus>
-	 <1116844053.30044.59.camel@pegasus>
-	 <e1effdeb050523080216e96744@mail.gmail.com>
 	 <1116925644.30044.140.camel@pegasus>
 	 <e1effdeb050525152067a5cbd3@mail.gmail.com>
 	 <1117098491.12036.23.camel@pegasus>
@@ -14,9 +15,7 @@ References: <1115901694.18499.32.camel@pegasus>
 	 <e1effdeb050530154229f338a2@mail.gmail.com>
 	 <1117494345.7072.235.camel@pegasus>
 	 <e1effdeb05060313345fb564a3@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1117836644.3656.100.camel@pegasus>
-Mime-Version: 1.0
+	 <1117831128.3656.93.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -28,29 +27,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 04 Jun 2005 00:10:44 +0200
+Date: Fri, 3 Jun 2005 18:31:48 -0300
 
-Hi Claudio,
+Sorry,
 
-> A new patch is available using a main loop and poll to wait for some event 
-> on a file descriptor list (D-Bus and Bluetooth).
-> 
-> All Glib and pthread dependencies were remove.
+Now, It is available.
 
-I just had some some time for a quick review. It is not fully what I had
-in mind, but it is something from what we can work onwards. I think it
-is a good idea to include it into release 2.18 and then start on
-improving it.
+Regards,
+Claudio.
 
-Since I am away the next week you might wanna address the coding style
-issues in that time. Read the paper from Greg KH from the OLS 2002. I
-think it gives a very good understanding on it.
-
-Regards
-
-Marcel
-
-
+On 6/3/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Claudio,
+>=20
+> > http://www.indt.org.br/maemo/bluez/bluez-dbus-poll.diff
+>=20
+> this gives me a 404 error.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: NEC IT Guy Games.  How far can you sho=
+tput
+> a projector? How fast can you ride your desk chair down the office luge t=
+rack?
+> If you want to score the big prize, get to know the little guy.
+> Play to win an NEC 61" plasma display: http://www.necitguy.com/?r=3D20
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 
 -------------------------------------------------------
