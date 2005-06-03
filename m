@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] First dongle with EDR support
+Subject: RE: [Bluez-devel] First dongle with EDR support
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <5256d0b05060302372179e252@mail.gmail.com>
-References: <1117788913.3656.61.camel@pegasus>
-	 <5256d0b05060302372179e252@mail.gmail.com>
+In-Reply-To: <C70061B183DE09419568AB2060C52A955C7F1A@arion.intra.local>
+References: <C70061B183DE09419568AB2060C52A955C7F1A@arion.intra.local>
 Content-Type: text/plain
-Message-Id: <1117792207.3656.77.camel@pegasus>
+Message-Id: <1117792013.3656.75.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,16 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 03 Jun 2005 11:50:07 +0200
+Date: Fri, 03 Jun 2005 11:46:53 +0200
 
-Hi Peter,
+Hi Victor,
 
-> > I like to get some of these, but so far I haven't found any place that
-> > sells them. Any hints are welcome.
-> 
-> http://www.cclonline.com/ in the UK
+> http://www.smartphoneshop.nl/product/16447/12456 
 
-this price looks even better. It must be something around 30 EUR, right?
+my Dutch knowledge is almost zero, but paying 69 EUR for two of these
+dongles looks like a fair price to me. However I like to buy them in
+Germany. Or does anyone from the Netherlands wants to buy them for me
+and donate the shipping costs?
 
 Regards
 
