@@ -1,10 +1,22 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Catalin Drula <Catalin.Drula@imag.fr>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <Pine.GSO.4.33.0506051542010.28292-200000@horus.imag.fr>
-MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="-559023410-851401618-1117979476=:28292"
-Subject: [Bluez-devel] [PATCH] hci_send_req: fix for EVT_CMD_STATUS
+Subject: Re: [Bluez-devel] DBUS service support - poll patch
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb05060313345fb564a3@mail.gmail.com>
+References: <1115901694.18499.32.camel@pegasus>
+	 <1116844053.30044.59.camel@pegasus>
+	 <e1effdeb050523080216e96744@mail.gmail.com>
+	 <1116925644.30044.140.camel@pegasus>
+	 <e1effdeb050525152067a5cbd3@mail.gmail.com>
+	 <1117098491.12036.23.camel@pegasus>
+	 <e1effdeb05052614222118e70c@mail.gmail.com>
+	 <1117143615.12036.74.camel@pegasus>
+	 <e1effdeb050530154229f338a2@mail.gmail.com>
+	 <1117494345.7072.235.camel@pegasus>
+	 <e1effdeb05060313345fb564a3@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1117836644.3656.100.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,53 +28,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 5 Jun 2005 15:51:16 +0200 (CEST)
+Date: Sat, 04 Jun 2005 00:10:44 +0200
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-  Send mail to mime@docserver.cac.washington.edu for more info.
+Hi Claudio,
 
----559023410-851401618-1117979476=:28292
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+> A new patch is available using a main loop and poll to wait for some event 
+> on a file descriptor list (D-Bus and Bluetooth).
+> 
+> All Glib and pthread dependencies were remove.
 
-Hi,
+I just had some some time for a quick review. It is not fully what I had
+in mind, but it is something from what we can work onwards. I think it
+is a good idea to include it into release 2.18 and then start on
+improving it.
 
-The attached patch fixes a bug in hci_send_req (bluez-libs-2.17/src/hci.c)
-whereas the requests for commands that generate a "command status" event
-(such as the "inquiry" command), as opposed to a "command complete" event,
-would always fail.
+Since I am away the next week you might wanna address the coding style
+issues in that time. Read the paper from Greg KH from the OLS 2002. I
+think it gives a very good understanding on it.
 
-Regards,
+Regards
 
-Catalin
+Marcel
 
---- bluez-libs-2.17/src/hci.c~	2005-05-09 20:33:24.000000000 +0200
-+++ bluez-libs-2.17/src/hci.c	2005-06-05 15:30:27.000000000 +0200
-@@ -770,7 +770,7 @@
- 				errno = EIO;
- 				goto failed;
- 			}
--			break;
-+			goto done;
 
- 		case EVT_CMD_COMPLETE:
- 			cc = (void *) ptr;
-
----559023410-851401618-1117979476=:28292
-Content-Type: TEXT/PLAIN; charset=US-ASCII; name=patch_hci_send_req
-Content-Transfer-Encoding: BASE64
-Content-ID: <Pine.GSO.4.33.0506051551160.28292@horus.imag.fr>
-Content-Description: 
-Content-Disposition: attachment; filename=patch_hci_send_req
-
-LS0tIGJsdWV6LWxpYnMtMi4xNy9zcmMvaGNpLmN+CTIwMDUtMDUtMDkgMjA6
-MzM6MjQuMDAwMDAwMDAwICswMjAwDQorKysgYmx1ZXotbGlicy0yLjE3L3Ny
-Yy9oY2kuYwkyMDA1LTA2LTA1IDE1OjMwOjI3LjAwMDAwMDAwMCArMDIwMA0K
-QEAgLTc3MCw3ICs3NzAsNyBAQA0KIAkJCQllcnJubyA9IEVJTzsNCiAJCQkJ
-Z290byBmYWlsZWQ7DQogCQkJfQ0KLQkJCWJyZWFrOw0KKwkJCWdvdG8gZG9u
-ZTsNCiANCiAJCWNhc2UgRVZUX0NNRF9DT01QTEVURToNCiAJCQljYyA9ICh2
-b2lkICopIHB0cjsNCg==
----559023410-851401618-1117979476=:28292--
 
 
 -------------------------------------------------------
