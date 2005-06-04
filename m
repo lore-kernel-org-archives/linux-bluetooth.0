@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <42A135D3.9000301@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: Gunter Ohrner <G.Ohrner@post.rwth-aachen.de>
-Message-ID: <d7rlnc$vnb$1@sea.gmane.org>
-References: <d7qmmr$3fc$1@sea.gmane.org> <42A135D3.9000301@xmission.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Re: btsco and Jabra Headset
+Subject: Re: [Bluez-users] btsco and Jabra Headset
+References: <d7qmmr$3fc$1@sea.gmane.org>
+In-Reply-To: <d7qmmr$3fc$1@sea.gmane.org>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,92 +18,143 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 04 Jun 2005 09:40:42 +0200
+Date: Fri, 03 Jun 2005 23:02:11 -0600
 
-Brad Midgley wrote:
->> ***
->> # btsco -v 00:07:A4:05:2E:14
->> btsco v0.4c
->> Device is 2:0
->> Error: Failed to connect to SDP server: Permission denied
->> Assuming channel 2
->> 
->> Voice setting: 0x0060
->> Can't connect RFCOMM channel: Permission denied
->> CoriCelesti:/usr/src#
->> ***
+Gunter,
 
-> sdptool search --bdaddr <bdaddr> 0x1108
->
-> I suspect it will fail but I'm not sure why that would happen. If the
-> *connection* was failing, I'd tell you to try removing
-> /etc/bluetooth/link_key to reset the pairing. But the pairing is
-> irrelevant for sdp queries.
+something fundamental is wrong if you can find the headset using hcitool 
+scan but can't use sdp to examine it. try the command-line sdp scan:
 
-*** (as gunter)
-gunter@CoriCelesti:~$ sdptool search --bdaddr 00:07:A4:05:2E:14 0x1108
-Class 0x1108
-Failed to connect to SDP server on 00:07:A4:05:2E:14: Permission denied
-gunter@CoriCelesti:~$
-*** (as root)
-CoriCelesti:/usr/src/linux-2.6.11.11# sdptool search --bdaddr
-00:07:A4:05:2E:14 0x1108
-Class 0x1108
-Failed to connect to SDP server on 00:07:A4:05:2E:14: Permission denied
-CoriCelesti:/usr/src/linux-2.6.11.11#
-***
+sdptool search --bdaddr <bdaddr> 0x1108
 
-Maybe I made an error when configuring the kernel?
+I suspect it will fail but I'm not sure why that would happen. If the 
+*connection* was failing, I'd tell you to try removing 
+/etc/bluetooth/link_key to reset the pairing. But the pairing is 
+irrelevant for sdp queries.
 
-***
-CONFIG_BT_HCIUSB=m
-CONFIG_BT_HCIUSB_SCO=y
-CONFIG_BT_HCIUART=m
-CONFIG_BT_HCIUART_H4=y
-CONFIG_BT_HCIUART_BCSP=y
-CONFIG_BT_HCIUART_BCSP_TXCRC=y
-# CONFIG_BT_HCIBCM203X is not set
-# CONFIG_BT_HCIBPA10X is not set
-# CONFIG_BT_HCIBFUSB is not set
-# CONFIG_BT_HCIVHCI is not set
-***
+Brad
 
-***
-CoriCelesti:/usr/src/linux-2.6.11.11# lsmod
-Module                  Size  Used by
-snd_bt_sco             14848  0
-snd_hwdep              10336  1 snd_bt_sco
-hci_usb                16264  2
-rfcomm                 42288  0
-l2cap                  25928  5 rfcomm
-bluetooth              53252  7 hci_usb,rfcomm,l2cap
-(...)
-snd_pcm                99020  6
-snd_bt_sco,snd_ca0106,snd_intel8x0,snd_ac97_codec,snd_pcm_oss
-(...)
-snd                    57832  19
-snd_bt_sco,snd_hwdep,snd_ca0106,snd_intel8x0,snd_ac97_codec,snd_pcm_oss,snd_mixer_oss,snd_pcm,snd_timer
-soundcore              11040  1 snd
-snd_page_alloc         11464  4 snd_bt_sco,snd_ca0106,snd_intel8x0,snd_pcm
-ehci_hcd               35080  0
-usbhid                 35776  0
-ohci_hcd               22024  0
-(...)
-CoriCelesti:/usr/src/linux-2.6.11.11#
-***
-
-Thanks for your comments!
-
-Greetings,
-
-  Gunter
-
--- 
-If the Creator had said, "Let there be light" in Ankh-Morpork, he'd 
-have gotten no further because of all the people saying "What colour?"  
-      -- (Terry Pratchett, Men At Arms)
-*** PGP-Verschlüsselung bei eMails erwünscht :-) *** PGP: 0x1128F25F ***
-
+Gunter Ohrner wrote:
+> Hi!
+> 
+> I've had a hard time trying to get my headset working but had no success so
+> far. :-(
+> 
+> I've found single report on the syptoms I get on the net
+> (http://www.linuxforen.de/forums/archive/index.php/t-182494.html), but
+> unfortunately no solution/follow up posting...
+> 
+> I'm also happy abaout RTFMs, maybe I missed something - these are my first
+> steps with bluetooth.
+> 
+> I'm running a vanilla 2.6.11.11 kernel with all those bluetooth drivers
+> compiled as modules. (Further systems details can be found at the end of
+> this mail.) The bluetooth USB stick is recognized and driven by the ohci
+> driver, so it's probably no ehci issue...
+> 
+> These are the symptoms:
+> 
+> ***
+> # btsco -v 00:07:A4:05:2E:14
+> btsco v0.4c
+> Device is 2:0
+> Error: Failed to connect to SDP server: Permission denied
+> Assuming channel 2
+> 
+> Voice setting: 0x0060
+> Can't connect RFCOMM channel: Permission denied
+> CoriCelesti:/usr/src#
+> ***
+> 
+> This happens no matter if I run it as root or my normal user. (which is in
+> group dialup, all the /dev/rfcomm1 belong to group dialup) The btsco is a
+> CVS checkout from yesterday.
+> 
+> The bluetooth dongle:
+> 
+> ***
+> kernel: usb 1-7: new full speed USB device using ohci_hcd and address 10
+> ***
+> 
+> ***
+> CoriCelesti:/usr/src# hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:09:DD:10:62:ED ACL MTU: 192:8 SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:107 acl:0 sco:0 events:14 errors:0
+>         TX bytes:300 acl:0 sco:0 commands:13 errors:0
+>         Features: 0xff 0xff 0x8f 0xf8 0x18 0x18 0x00 0x80
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'CoriCelesti-0'
+>         Class: 0x3e0100
+>         Service Classes: Networking, Rendering, Capturing, Object Transfer,
+> Audio
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x639 LMP Ver: 1.1 (0x1) LMP Subver:
+> 0x639
+>         Manufacturer: Cambridge Silicon Radio (10)
+> 
+> CoriCelesti:/usr/src#
+> ***
+> 
+> Device scan (headset in pairing mode):
+> 
+> ***
+> gunter@CoriCelesti:~$ hcitool scan
+> Scanning ...
+>         00:07:A4:05:2E:14       JABRA BT200
+> gunter@CoriCelesti:~$
+> ***
+> 
+> Info fails:
+> 
+> *** (as gunter)
+> gunter@CoriCelesti:~$ hcitool info 00:07:A4:05:2E:14
+> Requesting information ...
+> Can't create connection: Operation not permitted
+> gunter@CoriCelesti:~$
+> *** (as root)
+> CoriCelesti:/usr/src# hcitool info 00:07:A4:05:2E:14
+> Requesting information ...
+> Can't create connection: Input/output error
+> CoriCelesti:/usr/src#
+> ***
+> 
+> I already tried to delete /etc/bluetooth/pin and to write the default pin
+> into it, to no avail.
+> 
+> strace says btsco fails during a connect call:
+> 
+> ***
+> connect(4, {sa_family=AF_BLUETOOTH, sa_data="\1\0\24
+> \5\244\7\0\0\0\0\0\0\0"}, 10) = -1 EACCES (Permission denied)
+> close(4)                                = 0
+> write(2, "Error: ", 7Error: )                  = 7
+> write(2, "Failed to connect to SDP server:"..., 70Failed to connect to SDP
+> server: Permission denied
+> ***
+> 
+> Are there any obvious mistakes or does anyone have any hints? As I said I'm
+> new to this whole bluetooth technology so maybe I'm missing something
+> really obvious... :-/
+> 
+> I really appreciate any help!
+> 
+> Greetings,
+> 
+>   Gunter
+> 
+> 
+> 
+> System:
+> Athlon64 3000+ at Asus A8N SLI Board, nVidia NForce4 Chipset
+> 
+> Distribution:
+> Debian SID, 'Pure64' platform
+> custom-compiled 2.6.11.11 vanilla kernel
+> 
 
 
 -------------------------------------------------------
