@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Frank Pieczynski <pieczy@web.de>
+Message-ID: <f54d86405060522324f968fdc@mail.gmail.com>
+From: Benny <bennyvasanth@gmail.com>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Mouse and sound in parallel
-References: <200506051936.38116.pieczy@web.de> <42A3DAD4.7060501@xmission.com>
-In-Reply-To: <42A3DAD4.7060501@xmission.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200506062318.06702.pieczy@web.de>
+In-Reply-To: <200506051936.38116.pieczy@web.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <200506051936.38116.pieczy@web.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,29 +18,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 6 Jun 2005 23:18:06 +0200
+Date: Mon, 6 Jun 2005 11:02:01 +0530
 
-On Monday 06 June 2005 07:10, Brad Midgley wrote:
-Brad,
-thanks for your tip.
+Dear Frank,
 
-> This may be different from that conversation, but you need to make sure
-> your computer is not making a scatternet (master to mouse, slave to
-> headset). I believe it can't communicate to both at the same time when
-> this happens.
->
-> So, in /etc/bluetooth/hcid I have the link mode set:
->
-> lm accept,master;
-I added the master to my settings and restarted,
-but its still the same.
+Whether there is a readymade solutions with CSR which supports 7
+connections or is it your custom development?
 
->
-> And for my a2dp+sco headset, I cannot have it connected to the computer
-> and the phone at the same time or the computer goes into scatternet mode.
-I tried only with notebook as single master, no additional devices.
+We also working on a similar setup with SPP+Headset BT device.  We
+face similar problems like data slowness/loss when we just connect the
+BT device for the sco connection(btsco -f <bdaddr> <channel no.>).
+Eventhough we are not playing any audio, just connecting using btsco
+make the data transfer slow/data loss.
 
-Frank
+Please anyone advice.
+
+Thanks & Regards,
+Benny
+
+On 6/5/05, Frank Pieczynski <pieczy@web.de> wrote:
+> Hello,
+> as far as I know a CSR chip (BlueCore4 in my case) supports 7 connections=
+ in
+> parallel and it works.
+> But: If I use btsco to transfer sound to my headset the bluetooth mouse i=
+s
+> damn slow then. It still moves but it's hard to hit something.
+> It comes back to fast movement, if the sound ends.
+> Are there any configuartion hints to get a better quality of service?
+> Thanks
+> Frank
 
 
 -------------------------------------------------------
