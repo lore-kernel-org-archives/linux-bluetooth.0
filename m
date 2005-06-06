@@ -1,12 +1,21 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5256d0b0506070651237c7503@mail.gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
+Message-ID: <e1effdeb050606061850ac0134@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] First dongle with EDR support
-In-Reply-To: <1117788913.3656.61.camel@pegasus>
+Subject: Re: [Bluez-devel] DBUS service support - poll patch
+In-Reply-To: <1117836644.3656.100.camel@pegasus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-References: <1117788913.3656.61.camel@pegasus>
+References: <1115901694.18499.32.camel@pegasus>
+	 <1116925644.30044.140.camel@pegasus>
+	 <e1effdeb050525152067a5cbd3@mail.gmail.com>
+	 <1117098491.12036.23.camel@pegasus>
+	 <e1effdeb05052614222118e70c@mail.gmail.com>
+	 <1117143615.12036.74.camel@pegasus>
+	 <e1effdeb050530154229f338a2@mail.gmail.com>
+	 <1117494345.7072.235.camel@pegasus>
+	 <e1effdeb05060313345fb564a3@mail.gmail.com>
+	 <1117836644.3656.100.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,65 +27,61 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 7 Jun 2005 14:51:54 +0100
+Date: Mon, 6 Jun 2005 10:18:10 -0300
 
-> Hi Folks,
+Hi Marcel,
+
+Probably you are not satisfied with D-Bus watches.  I tryed remove=20
+it, but it is not possible.=20
+According with D-Bus documentation is not allowed read/write directly
+in the file descriptor. DBusWatch must be used for main loop integration.
+
+Another important approach is develop a library for D-Bus function
+hidding. The sample client is just a usage sample and a better idea
+is use a common library for all applications: gamming, UPnP, messenger, ...
+
+Regarding the coding style I will review it.
+
+Regards,
+Claudio.
+
+On 6/3/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Claudio,
 >=20
-> it seems that Cellink is building the first EDR dongle. It is qualified
-> and you will find it on their website.
+> > A new patch is available using a main loop and poll to wait for some ev=
+ent
+> > on a file descriptor list (D-Bus and Bluetooth).
+> >
+> > All Glib and pthread dependencies were remove.
 >=20
-> http://www.cellink.com.tw/pro-bta-6030.htm
-
-Hi Marcel and All,
-
-Well I ordered one of these yesterday, it arrivied today. I plugged it
-in and away it went :-) It seems to work OK but I don't have time at
-the moment to test it out properly but doing a 'sdptool browse' finds
-my phone.
-
-Cheers,
-Pete
-
-Some details:
-
-[root@localhost ~]# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:0A:94:01:8A:3A ACL MTU: 384:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:107 acl:0 sco:0 events:14 errors:0
-        TX bytes:300 acl:0 sco:0 commands:13 errors:0
-        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'localhost.localdomain-0'
-        Class: 0x120104
-        Service Classes: Networking
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x5dc LMP Ver: 1.1 (0x1) LMP Subver: 0x=
-5dc
-        Manufacturer: Cambridge Silicon Radio (10)
-
-And output from dmesg:
-usb 1-6.1: new full speed USB device using ehci_hcd and address 5
-Bluetooth: Core ver 2.7
-NET: Registered protocol family 31
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: HCI USB driver ver 2.8
-usbcore: registered new driver hci_usb
-Bluetooth: L2CAP ver 2.7
-Bluetooth: L2CAP socket layer initialized
-audit(1118151418.791:8): avc:  denied  { read } for  pid=3D5840
-comm=3D"hcid" name=3D[166920] dev=3Dsockfs ino=3D166920
-scontext=3Droot:system_r:bluetooth_t tcontext=3Droot:system_r:bluetooth_t
-tclass=3Dsocket
-audit(1118151418.814:9): avc:  denied  { write } for  pid=3D5851
-comm=3D"hcid" scontext=3Droot:system_r:bluetooth_t
-tcontext=3Droot:system_r:bluetooth_t tclass=3Dsocket
-Bluetooth: RFCOMM ver 1.5
-Bluetooth: RFCOMM socket layer initialized
-Bluetooth: RFCOMM TTY layer initialized
+> I just had some some time for a quick review. It is not fully what I had
+> in mind, but it is something from what we can work onwards. I think it
+> is a good idea to include it into release 2.18 and then start on
+> improving it.
+>=20
+> Since I am away the next week you might wanna address the coding style
+> issues in that time. Read the paper from Greg KH from the OLS 2002. I
+> think it gives a very good understanding on it.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: NEC IT Guy Games.  How far can you sho=
+tput
+> a projector? How fast can you ride your desk chair down the office luge t=
+rack?
+> If you want to score the big prize, get to know the little guy.
+> Play to win an NEC 61" plasma display: http://www.necitguy.com/?r=3D20
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 
 -------------------------------------------------------
