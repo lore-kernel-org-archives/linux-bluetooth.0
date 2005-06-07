@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <001501c56bfe$477592c0$1e1410ac@AL>
-From: "Al Chane" <al_chane@issc.com.tw>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="big5";
-	reply-type=original
-Subject: [Bluez-users] How to use bluez-libs and bluez-utils
+Message-ID: <BAY10-F1137F92B00558B5C3B0850B5FA0@phx.gbl>
+From: "Hui Vzhopu" <huivzhopu@hotmail.com>
+To: bluez-users@lists.sourceforge.net
+Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Subject: [Bluez-users] Status of multimedia keys
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,21 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Jun 2005 15:47:11 +0800
+Date: Tue, 07 Jun 2005 14:31:24 -0300
 
-Hi, there:
+I was wondering what's the status of multimedia key support on BT keyboards. 
+I found lots of archived messages regarding this subject in refernce to 
+2.6.5 and 2.6.8 kernels, however it still does not work in 2.6.11 series 
+kernel. In fact with this kernel, mult. keys are completely ignored (nothing 
+gets generated in system log).
 
-I'm a newbie of blueZ. I'm trying to use bluez-libs/utils with
-kernel 2.6.x on Fedora for a csr dongle. 
-
-How to use bluez-libs and utils after compile and install?
-Is there any simple instruction or documentation on this?
-
-Thanks a lot,
-
-Al
-
-
+_________________________________________________________________
+Don't just search. Find. Check out the new MSN Search! 
+http://search.msn.click-url.com/go/onm00200636ave/direct/01/
 
 
 
