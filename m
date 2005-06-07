@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY10-F1137F92B00558B5C3B0850B5FA0@phx.gbl>
-From: "Hui Vzhopu" <huivzhopu@hotmail.com>
+From: Frank Pieczynski <pieczy@web.de>
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Subject: [Bluez-users] Status of multimedia keys
+Subject: Re: [Bluez-users] Mouse and sound in parallel
+References: <200506051936.38116.pieczy@web.de> <200506062318.06702.pieczy@web.de> <42A4C773.7020200@xmission.com>
+In-Reply-To: <42A4C773.7020200@xmission.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200506071855.09800.pieczy@web.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,18 +19,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 07 Jun 2005 14:31:24 -0300
+Date: Tue, 7 Jun 2005 18:55:09 +0200
 
-I was wondering what's the status of multimedia key support on BT keyboards. 
-I found lots of archived messages regarding this subject in refernce to 
-2.6.5 and 2.6.8 kernels, however it still does not work in 2.6.11 series 
-kernel. In fact with this kernel, mult. keys are completely ignored (nothing 
-gets generated in system log).
+On Tuesday 07 June 2005 00:00, Brad Midgley wrote:
 
-_________________________________________________________________
-Don't just search. Find. Check out the new MSN Search! 
-http://search.msn.click-url.com/go/onm00200636ave/direct/01/
+Brad,
 
+> I couldn't find it, but I think that other discussion was about the link
+> policy. My link policy is:
+>
+>   lp rswitch,hold,sniff,park;
+>
+> what do you have?
+
+That is exactly what is defined here.
+Are there any differences in mouse types?
+Since my is a optical with 800dpi resolution may be its generating more 
+traffic ...
+
+I viewed also trough the messages from end of last year, but don't find 
+anything helpful.
+
+Thanks,
+Frank
 
 
 -------------------------------------------------------
