@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Nelson Murilo <nelson@pangeia.com.br>
+Message-ID: <5256d0b0506070651237c7503@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050607154814.GB17560@pangeia.com.br>
-References: <42038BF3.10003@web.de> <1107529022.6921.33.camel@pegasus>
+Subject: Re: [Bluez-devel] First dongle with EDR support
+In-Reply-To: <1117788913.3656.61.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1107529022.6921.33.camel@pegasus>
-Subject: [Bluez-devel] What is TYPE?
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1117788913.3656.61.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,20 +18,65 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 7 Jun 2005 12:48:40 -0300
+Date: Tue, 7 Jun 2005 14:51:54 +0100
 
+> Hi Folks,
+>=20
+> it seems that Cellink is building the first EDR dongle. It is qualified
+> and you will find it on their website.
+>=20
+> http://www.cellink.com.tw/pro-bta-6030.htm
 
-Hi ,
+Hi Marcel and All,
 
-I wrote a little program for dump in ascii format the link_key database:
-# lk2a 
-804996c 00:10:60:AA:9B:5B 00:60:57:DF:1D:29 804997c Fri May 27 10:58:47 2005
+Well I ordered one of these yesterday, it arrivied today. I plugged it
+in and away it went :-) It seems to work OK but I don't have time at
+the moment to test it out properly but doing a 'sdptool browse' finds
+my phone.
 
-the 4o. field is TYPE, what is this exaclly? 
+Cheers,
+Pete
 
-Thanks in advance,
+Some details:
 
-./nelson -murilo
+[root@localhost ~]# hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:0A:94:01:8A:3A ACL MTU: 384:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:107 acl:0 sco:0 events:14 errors:0
+        TX bytes:300 acl:0 sco:0 commands:13 errors:0
+        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'localhost.localdomain-0'
+        Class: 0x120104
+        Service Classes: Networking
+        Device Class: Computer, Desktop workstation
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x5dc LMP Ver: 1.1 (0x1) LMP Subver: 0x=
+5dc
+        Manufacturer: Cambridge Silicon Radio (10)
+
+And output from dmesg:
+usb 1-6.1: new full speed USB device using ehci_hcd and address 5
+Bluetooth: Core ver 2.7
+NET: Registered protocol family 31
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: HCI USB driver ver 2.8
+usbcore: registered new driver hci_usb
+Bluetooth: L2CAP ver 2.7
+Bluetooth: L2CAP socket layer initialized
+audit(1118151418.791:8): avc:  denied  { read } for  pid=3D5840
+comm=3D"hcid" name=3D[166920] dev=3Dsockfs ino=3D166920
+scontext=3Droot:system_r:bluetooth_t tcontext=3Droot:system_r:bluetooth_t
+tclass=3Dsocket
+audit(1118151418.814:9): avc:  denied  { write } for  pid=3D5851
+comm=3D"hcid" scontext=3Droot:system_r:bluetooth_t
+tcontext=3Droot:system_r:bluetooth_t tclass=3Dsocket
+Bluetooth: RFCOMM ver 1.5
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM TTY layer initialized
 
 
 -------------------------------------------------------
