@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] First dongle with EDR support
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <5256d0b05060801307d5cc1e3@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <5256d0b05060801307d5cc1e3@mail.gmail.com>
-References: <C70061B183DE09419568AB2060C52A95605E57@arion.intra.local>
-	 <5256d0b05060801307d5cc1e3@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1118219894.10148.17.camel@notepaq>
+Subject: Re: [Bluez-devel] First dongle with EDR support
+In-Reply-To: <C70061B183DE09419568AB2060C52A95605E57@arion.intra.local>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <C70061B183DE09419568AB2060C52A95605E57@arion.intra.local>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,23 +18,14 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 08 Jun 2005 10:38:14 +0200
+Date: Wed, 8 Jun 2005 09:30:16 +0100
 
-Hi Pete,
+On 6/8/05, Victor Shcherbatyuk <Victor.Shcherbatyuk@tomtom.com> wrote:
+> Which one is wrong the version 1.1 or the supported features?
 
-> > Which one is wrong the version 1.1 or the supported features?
-> 
-> Its suppose to be a Bluetooth v2+edr dongle.
+Its suppose to be a Bluetooth v2+edr dongle.
 
-actually it is a BlueCore4-External and thus it should tell us that it
-is a Bluetooth 2.0 (or at least 1.2) device. However it shouldn't
-matter, because the feature bits are important for EDR.
-
-Regards
-
-Marcel
-
-
+Pete
 
 
 -------------------------------------------------------
