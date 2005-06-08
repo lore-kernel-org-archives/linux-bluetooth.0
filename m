@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Peter Wippich <pewi@gw-instruments.de>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: Re: UART based bluetooth dongle
-In-Reply-To: <42A05C5C.8000804@certi.org.br>
-Message-ID: <Pine.LNX.4.33.0506080804580.23077-100000@redbean.intranet.gw-instruments.de>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-ID: <5256d0b0506080011258407b8@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] First dongle with EDR support
+In-Reply-To: <1118200713.10148.3.camel@notepaq>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1117788913.3656.61.camel@pegasus>
+	 <5256d0b0506070651237c7503@mail.gmail.com>
+	 <1118200713.10148.3.camel@notepaq>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,57 +20,96 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 8 Jun 2005 08:11:40 +0200 (CEST)
+Date: Wed, 8 Jun 2005 08:11:21 +0100
 
+Hi Marcel,
 
-Hi Gabriel,
+> this is strange. The feature bits say that it supports EDR, but the
+> Bluetooth version still shows 1.1.
+>=20
+> Please do a "hciconfig hci0 version features revision" as root with the
+> latest bluez-utils version. I am also interersted what lsusb shows you
+> and what is the content of /proc/bus/usb/devices.
 
-if you realy need access to L2CAP / SDP and RFCOMM (I don't have any idea
-wy you need L2CAP access ....) you should look at CSR based devices and
-use their DevKits for host applications (its not relay cheap...). This
-will give you access to all layers. You may also use an OnChip application
-and only implement access to the realy required funtions.
+OK,
 
-I don't know if similar DevKits are available from other Chip vendors
-(e.g. Zeevo).
+lsusb gives me:
+[root@localhost btsco]# lsusb
+Bus 004 Device 001: ID 0000:0000
+Bus 003 Device 001: ID 0000:0000
+Bus 002 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+Bluetooth Dongle (HCI mode)
+Bus 002 Device 001: ID 0000:0000
+Bus 001 Device 001: ID 0000:0000
 
-Ciao,
+/proc/bus/usb/devices for that dev gives me:
+T:  Bus=3D02 Lev=3D01 Prnt=3D01 Port=3D00 Cnt=3D01 Dev#=3D  2 Spd=3D12  MxC=
+h=3D 0
+D:  Ver=3D 2.00 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
+P:  Vendor=3D0a12 ProdID=3D0001 Rev=3D15.00
+C:* #Ifs=3D 3 Cfg#=3D 1 Atr=3Dc0 MxPwr=3D  0mA
+I:  If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3Dhci_usb
+E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
+E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
+E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
+I:  If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3Dhci_usb
+E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3Dhci_usb
+E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3Dhci_usb
+E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3Dhci_usb
+E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3Dhci_usb
+E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3Dhci_usb
+E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+I:  If#=3D 2 Alt=3D 0 #EPs=3D 0 Cls=3Dfe(app. ) Sub=3D01 Prot=3D00 Driver=
+=3D(none)
 
-Peter
-
- On Fri, 3 Jun 2005, Gabriel Marques wrote:
-
-> Hi Peter, thanks for the suggestion, but one of the project requirements
-> is that the SDP, L2CAP and part of the RFCOMM would be available to the
-> Java applications (accordingly to JSR82).
-> I'm not sure if that is possible with dongles with integrated RFCOMM,
-> those are serial cables replacements right?
-> I think it would be hard to talk to one of those in a cell phone midlet.
+And the hciconfig for bluez-utils 2.15 (I need to compile 2.17 when i get t=
+ime):
+[root@localhost btsco]# hciconfig hci0 version features revision
+hci0:   Type: USB
+        BD Address: 00:0A:94:01:8A:3A ACL MTU: 384:8 SCO MTU: 64:8
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x5dc LMP Ver: 1.1 (0x1) LMP Subver: 0x=
+5dc
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+                <3-slot packets> <5-slot packets> <encryption> <slot offset=
 >
-> And sorry if that is not the appropriate list, but ive already tryed to
-> post this question at 'Sun Java Forums - Bluetooth' and at
-> 'Bluetooth.org - RFCOMM' with no answers.
-> Do you know any forum that can help me on this?
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park state> <RSSI> <channel quality> <SCO link> <HV2 packe=
+ts>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme=
 >
->
->
-> -------------------------------------------------------
-> This SF.Net email is sponsored by Yahoo.
-> Introducing Yahoo! Search Developer Network - Create apps using Yahoo!
-> Search APIs Find out how you can build Yahoo! directly into your own
-> Applications - visit http://developer.yahoo.net/?fr=offad-ysdn-ostg-q22005
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+                <power control> <transparent SCO> <broadcast encrypt>
+                <EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan>
+                <interlaced iscan> <interlaced pscan> <inquiry with RSSI>
+                <extended SCO> <EV4 packets> <EV5 packets> <AFH cap. slave>
+                <AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL>
+                <AFH cap. master> <AFH class. master> <EDR eSCO 2 Mbps>
+                <EDR eSCO 3 Mbps> <3-slot EDR eSCO> <extended features>
+        Build 1500
+        Chip version: BlueCore4-External
+        Max key size: 56 bit
+        SCO mapping:  HCI
 
-|	Peter Wippich 			Voice: +49 30 46776411		|
-|	G&W Instruments GmbH		fax:   +49 30 46776419		|
-|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
-|	D-13355 Berlin  / Germany					|
-
-
+Regards,
+Pete
 
 
 -------------------------------------------------------
