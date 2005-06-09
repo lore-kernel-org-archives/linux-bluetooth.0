@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <E73D9A5BC4A2D711BBC600065BF3595F21558BFA@il06exm10>
-From: Ma Changxue-ACM012 <Changxue.Ma@motorola.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <42A85B6E.7080106@futurlink.com>
+From: Pedro Monjo Florit <pedro.monjo@futurlink.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C56D06.0AD95EBA"
-Subject: [Bluez-users] What is the easest way to flush the sco buffer?
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] How to use bluez-libs and bluez-utils
+References: <001501c56bfe$477592c0$1e1410ac@AL>
+In-Reply-To: <001501c56bfe$477592c0$1e1410ac@AL>
+Content-Type: text/plain; charset=Big5
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,100 +18,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 9 Jun 2005 10:15:16 -0500
+Date: Thu, 09 Jun 2005 17:08:30 +0200
 
-This message is in MIME format. Since your mail reader does not understand
-this format, some or all of this message may not be legible.
+Hi,
 
-------_=_NextPart_001_01C56D06.0AD95EBA
-Content-Type: text/plain
+As far as I know, there is little or no documentation. All I can suggest
+you is that you try to run the command with no arguments (or with
+"--help" argument) in order to get a hint of what the command does.
+Reading the source code should help you too.
 
-It would be preferable to flush the audio data in the socket buffer in the Bluetooth driver. Does anybody have a simple solution besides restarting the sockets?
+Regards,
 
- 
+Pedro
 
-Changxue Ma
-
-Human Interaction Lab.
-
-Motorola Lab.
-
-Second Floor.
-
-1295 E. Alogonquin Rd.
-
-IL 60196
-
- 
-
- 
-
- 
-
-
-------_=_NextPart_001_01C56D06.0AD95EBA
-Content-Type: text/html
-Content-Transfer-Encoding: base64
-
-PGh0bWwgeG1sbnM6bz0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6b2ZmaWNlIiB4
-bWxuczp3PSJ1cm46c2NoZW1hcy1taWNyb3NvZnQtY29tOm9mZmljZTp3b3JkIiB4bWxuczpzdDE9
-InVybjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOnNtYXJ0dGFncyIgeG1sbnM9Imh0dHA6
-Ly93d3cudzMub3JnL1RSL1JFQy1odG1sNDAiPg0KDQo8aGVhZD4NCjxNRVRBIEhUVFAtRVFVSVY9
-IkNvbnRlbnQtVHlwZSIgQ09OVEVOVD0idGV4dC9odG1sOyBjaGFyc2V0PXVzLWFzY2lpIj4NCg0K
-DQo8bWV0YSBuYW1lPUdlbmVyYXRvciBjb250ZW50PSJNaWNyb3NvZnQgV29yZCAxMSAoZmlsdGVy
-ZWQgbWVkaXVtKSI+DQo8bzpTbWFydFRhZ1R5cGUgbmFtZXNwYWNldXJpPSJ1cm46c2NoZW1hcy1t
-aWNyb3NvZnQtY29tOm9mZmljZTpzbWFydHRhZ3MiDQogbmFtZT0iYWRkcmVzcyIvPg0KPG86U21h
-cnRUYWdUeXBlIG5hbWVzcGFjZXVyaT0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6
-c21hcnR0YWdzIg0KIG5hbWU9IlN0cmVldCIvPg0KPCEtLVtpZiAhbXNvXT4NCjxzdHlsZT4NCnN0
-MVw6KntiZWhhdmlvcjp1cmwoI2RlZmF1bHQjaWVvb3VpKSB9DQo8L3N0eWxlPg0KPCFbZW5kaWZd
-LS0+DQo8c3R5bGU+DQo8IS0tDQogLyogRm9udCBEZWZpbml0aW9ucyAqLw0KIEBmb250LWZhY2UN
-Cgl7Zm9udC1mYW1pbHk6U2ltU3VuOw0KCXBhbm9zZS0xOjIgMSA2IDAgMyAxIDEgMSAxIDE7fQ0K
-QGZvbnQtZmFjZQ0KCXtmb250LWZhbWlseToiXEBTaW1TdW4iOw0KCXBhbm9zZS0xOjIgMSA2IDAg
-MyAxIDEgMSAxIDE7fQ0KIC8qIFN0eWxlIERlZmluaXRpb25zICovDQogcC5Nc29Ob3JtYWwsIGxp
-Lk1zb05vcm1hbCwgZGl2Lk1zb05vcm1hbA0KCXttYXJnaW46MGluOw0KCW1hcmdpbi1ib3R0b206
-LjAwMDFwdDsNCglmb250LXNpemU6MTIuMHB0Ow0KCWZvbnQtZmFtaWx5OiJUaW1lcyBOZXcgUm9t
-YW4iO30NCmE6bGluaywgc3Bhbi5Nc29IeXBlcmxpbmsNCgl7Y29sb3I6Ymx1ZTsNCgl0ZXh0LWRl
-Y29yYXRpb246dW5kZXJsaW5lO30NCmE6dmlzaXRlZCwgc3Bhbi5Nc29IeXBlcmxpbmtGb2xsb3dl
-ZA0KCXtjb2xvcjpwdXJwbGU7DQoJdGV4dC1kZWNvcmF0aW9uOnVuZGVybGluZTt9DQpzcGFuLkVt
-YWlsU3R5bGUxNw0KCXttc28tc3R5bGUtdHlwZTpwZXJzb25hbC1jb21wb3NlOw0KCWZvbnQtZmFt
-aWx5OkFyaWFsOw0KCWNvbG9yOndpbmRvd3RleHQ7fQ0KQHBhZ2UgU2VjdGlvbjENCgl7c2l6ZTo4
-LjVpbiAxMS4waW47DQoJbWFyZ2luOjEuMGluIDEuMjVpbiAxLjBpbiAxLjI1aW47fQ0KZGl2LlNl
-Y3Rpb24xDQoJe3BhZ2U6U2VjdGlvbjE7fQ0KLS0+DQo8L3N0eWxlPg0KDQo8L2hlYWQ+DQoNCjxi
-b2R5IGxhbmc9RU4tVVMgbGluaz1ibHVlIHZsaW5rPXB1cnBsZT4NCg0KPGRpdiBjbGFzcz1TZWN0
-aW9uMT4NCg0KPHAgY2xhc3M9TXNvTm9ybWFsPjxmb250IHNpemU9MiBmYWNlPUFyaWFsPjxzcGFu
-IHN0eWxlPSdmb250LXNpemU6MTAuMHB0Ow0KZm9udC1mYW1pbHk6QXJpYWwnPkl0IHdvdWxkIGJl
-IHByZWZlcmFibGUgdG8gZmx1c2ggdGhlIGF1ZGlvIGRhdGEgaW4gdGhlIHNvY2tldA0KYnVmZmVy
-IGluIHRoZSBCbHVldG9vdGggZHJpdmVyLiBEb2VzIGFueWJvZHkgaGF2ZSBhIHNpbXBsZSBzb2x1
-dGlvbiBiZXNpZGVzIHJlc3RhcnRpbmcNCnRoZSBzb2NrZXRzPzxvOnA+PC9vOnA+PC9zcGFuPjwv
-Zm9udD48L3A+DQoNCjxwIGNsYXNzPU1zb05vcm1hbD48Zm9udCBzaXplPTIgZmFjZT1BcmlhbD48
-c3BhbiBzdHlsZT0nZm9udC1zaXplOjEwLjBwdDsNCmZvbnQtZmFtaWx5OkFyaWFsJz48bzpwPiZu
-YnNwOzwvbzpwPjwvc3Bhbj48L2ZvbnQ+PC9wPg0KDQo8cCBjbGFzcz1Nc29Ob3JtYWw+PGZvbnQg
-c2l6ZT0yIGZhY2U9QXJpYWw+PHNwYW4gc3R5bGU9J2ZvbnQtc2l6ZToxMC4wcHQ7DQpmb250LWZh
-bWlseTpBcmlhbCc+Q2hhbmd4dWUgTWE8L3NwYW4+PC9mb250PjxvOnA+PC9vOnA+PC9wPg0KDQo8
-cCBjbGFzcz1Nc29Ob3JtYWw+PGZvbnQgc2l6ZT0yIGZhY2U9QXJpYWw+PHNwYW4gc3R5bGU9J2Zv
-bnQtc2l6ZToxMC4wcHQ7DQpmb250LWZhbWlseTpBcmlhbCc+SHVtYW4gSW50ZXJhY3Rpb24gTGFi
-Ljwvc3Bhbj48L2ZvbnQ+PG86cD48L286cD48L3A+DQoNCjxwIGNsYXNzPU1zb05vcm1hbD48Zm9u
-dCBzaXplPTIgZmFjZT1BcmlhbD48c3BhbiBzdHlsZT0nZm9udC1zaXplOjEwLjBwdDsNCmZvbnQt
-ZmFtaWx5OkFyaWFsJz5Nb3Rvcm9sYSBMYWIuPC9zcGFuPjwvZm9udD48bzpwPjwvbzpwPjwvcD4N
-Cg0KPHAgY2xhc3M9TXNvTm9ybWFsPjxmb250IHNpemU9MiBmYWNlPUFyaWFsPjxzcGFuIHN0eWxl
-PSdmb250LXNpemU6MTAuMHB0Ow0KZm9udC1mYW1pbHk6QXJpYWwnPlNlY29uZCBGbG9vci48L3Nw
-YW4+PC9mb250PjxvOnA+PC9vOnA+PC9wPg0KDQo8cCBjbGFzcz1Nc29Ob3JtYWw+PHN0MTpTdHJl
-ZXQgdzpzdD0ib24iPjxzdDE6YWRkcmVzcyB3OnN0PSJvbiI+PGZvbnQgc2l6ZT0yDQogIGZhY2U9
-QXJpYWw+PHNwYW4gc3R5bGU9J2ZvbnQtc2l6ZToxMC4wcHQ7Zm9udC1mYW1pbHk6QXJpYWwnPjEy
-OTUgRS4NCiAgQWxvZ29ucXVpbiBSZC48L3NwYW4+PC9mb250Pjwvc3QxOmFkZHJlc3M+PC9zdDE6
-U3RyZWV0PjxvOnA+PC9vOnA+PC9wPg0KDQo8cCBjbGFzcz1Nc29Ob3JtYWw+PGZvbnQgc2l6ZT0y
-IGZhY2U9QXJpYWw+PHNwYW4gc3R5bGU9J2ZvbnQtc2l6ZToxMC4wcHQ7DQpmb250LWZhbWlseTpB
-cmlhbCc+SUwgNjAxOTY8L3NwYW4+PC9mb250PjxvOnA+PC9vOnA+PC9wPg0KDQo8cCBjbGFzcz1N
-c29Ob3JtYWw+PGZvbnQgc2l6ZT0zIGZhY2U9IlRpbWVzIE5ldyBSb21hbiI+PHNwYW4gc3R5bGU9
-J2ZvbnQtc2l6ZToNCjEyLjBwdCc+Jm5ic3A7PG86cD48L286cD48L3NwYW4+PC9mb250PjwvcD4N
-Cg0KPHAgY2xhc3M9TXNvTm9ybWFsPjxmb250IHNpemU9MyBmYWNlPSJUaW1lcyBOZXcgUm9tYW4i
-PjxzcGFuIHN0eWxlPSdmb250LXNpemU6DQoxMi4wcHQnPiZuYnNwOzwvc3Bhbj48bzpwPjwvbzpw
-PjwvZm9udD48L3A+DQoNCjxwIGNsYXNzPU1zb05vcm1hbD48Zm9udCBzaXplPTMgZmFjZT0iVGlt
-ZXMgTmV3IFJvbWFuIj48c3BhbiBzdHlsZT0nZm9udC1zaXplOg0KMTIuMHB0Jz48bzpwPiZuYnNw
-OzwvbzpwPjwvc3Bhbj48L2ZvbnQ+PC9wPg0KDQo8L2Rpdj4NCg0KPC9ib2R5Pg0KDQo8L2h0bWw+
-DQo=
-
-------_=_NextPart_001_01C56D06.0AD95EBA--
+Al Chane wrote:
+> Hi, there:
+>
+> I'm a newbie of blueZ. I'm trying to use bluez-libs/utils with
+> kernel 2.6.x on Fedora for a csr dongle.
+> How to use bluez-libs and utils after compile and install?
+> Is there any simple instruction or documentation on this?
+>
+> Thanks a lot,
+>
+> Al
+>
+>
+>
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: NEC IT Guy Games. How far can you
+> shotput
+> a projector? How fast can you ride your desk chair down the office
+> luge track?
+> If you want to score the big prize, get to know the little guy. Play
+> to win an NEC 61" plasma display: http://www.necitguy.com/?r=20
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
