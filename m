@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <006601c56d69$1c676920$0132a8c0@AL>
-From: "Al Chane" <al_chane@issc.com.tw>
-To: <bluez-users@lists.sourceforge.net>
-References: <001501c56bfe$477592c0$1e1410ac@AL>
-Subject: Re: [Bluez-users] How to use bluez-libs and bluez-utils
+Message-ID: <42A8985A.1030206@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="big5";
-	reply-type=response
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] How to use bluez-libs??
+References: <cb0063a605060911485e75f59b@mail.gmail.com> <42A89628.8050807@gmx.ch>
+In-Reply-To: <42A89628.8050807@gmx.ch>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,36 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Jun 2005 11:04:24 +0800
+Date: Thu, 09 Jun 2005 13:28:26 -0600
 
-Thanks for reply.
+Bashar
 
-I found a link for BlueZ utility usage.
-http://www.harbaum.org/till/palm/bluetooth/
+Look at bluez-utils for examples of the c api usage. Best if you can 
+find a util that does something close to what you're trying.
 
-Al
------ Original Message ----- 
-From: "Al Chane" <al_chane@issc.com.tw>
-To: <bluez-users@lists.sourceforge.net>
-Sent: Wednesday, June 08, 2005 3:47 PM
-Subject: [Bluez-users] How to use bluez-libs and bluez-utils
+Brad
 
-
-> Hi, there:
->
-> I'm a newbie of blueZ. I'm trying to use bluez-libs/utils with
-> kernel 2.6.x on Fedora for a csr dongle.
-> How to use bluez-libs and utils after compile and install?
-> Is there any simple instruction or documentation on this?
->
-> Thanks a lot,
->
-> Al
->
->
->
->
->
+Marco Trudel wrote:
+> there's no documentation. you can read the source from the libs from the 
+> functions you're interested in...
+> 
+> regards
+> Marco
+> 
+> 
+> Bashar Al Rawi wrote:
+> 
+>> I am a newbie, I just wonder if there is a little documentation or a 
+>> place that someone recommends me to start with programming in C++ 
+>> using the bluez libraries
+>>
+> 
+> 
 > -------------------------------------------------------
 > This SF.Net email is sponsored by: NEC IT Guy Games.  How far can you 
 > shotput
@@ -61,9 +54,6 @@ Subject: [Bluez-users] How to use bluez-libs and bluez-utils
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
-
-
 
 
 -------------------------------------------------------
