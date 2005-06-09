@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42A89628.8050807@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
+Message-ID: <cb0063a605060911485e75f59b@mail.gmail.com>
+From: Bashar Al Rawi <bashar.alrawi@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] How to use bluez-libs??
-References: <cb0063a605060911485e75f59b@mail.gmail.com>
-In-Reply-To: <cb0063a605060911485e75f59b@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_282_2399075.1118342936926"
+Subject: [Bluez-users] How to use bluez-libs??
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,20 +17,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 09 Jun 2005 21:19:04 +0200
+Date: Thu, 9 Jun 2005 22:48:56 +0400
 
-there's no documentation. you can read the source from the libs from the 
-functions you're interested in...
+------=_Part_282_2399075.1118342936926
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-regards
-Marco
+I am a newbie, I just wonder if there is a little documentation or a place=
+=20
+that someone recommends me to start with programming in C++ using the bluez=
+=20
+libraries
+
+--=20
+Bashar Al-Rawi
+Department of Computer Engineering.
+American University in Dubai.
+
+------=_Part_282_2399075.1118342936926
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+I am a newbie, I just wonder if there is a little documentation or a
+place that someone recommends me to start with programming in C++ using
+the bluez libraries<br><br>-- <br>Bashar Al-Rawi<br>Department of Computer =
+Engineering.<br>American University in Dubai.<br>
 
 
-Bashar Al Rawi wrote:
-> I am a newbie, I just wonder if there is a little documentation or a place 
-> that someone recommends me to start with programming in C++ using the bluez 
-> libraries
-> 
+------=_Part_282_2399075.1118342936926--
 
 
 -------------------------------------------------------
