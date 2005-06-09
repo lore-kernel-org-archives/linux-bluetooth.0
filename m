@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <BAY106-F15FBDD4392CEB90B612B31BBFC0@phx.gbl>
-From: "Jahanzeb Tippu" <tipputhegreat@hotmail.com>
+From: Nelson Murilo <nelson@pangeia.com.br>
 To: bluez-devel@lists.sourceforge.net
+Message-ID: <20050609131722.GF6606@pangeia.com.br>
+References: <BAY20-F20A55F402EB690A199F6BD853E0@phx.gbl> <d1f423d30504070519333f3148@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Subject: [Bluez-devel] bluez documentation.. plz help
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <d1f423d30504070519333f3148@mail.gmail.com>
+Subject: [Bluez-devel] code is ok, but still unknown field type
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,28 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 09 Jun 2005 18:30:48 +0000
+Date: Thu, 9 Jun 2005 10:17:22 -0300
 
-Hi,
-Please someone help me. I want to transfer file between two bluetooth 
-devices. I have to do it using bluez API. But I could not find a 
-documentation for API so that I could know which files and methods I should 
-use and how do the methods work. Please help me, I need some guidance.
-I shall be very thankful to you.
+lk2a is a ascii dump for link_key database (default in /etc/bluetooth) 
 
+Field1 = key
+Field2 = bdaddr remote
+Field3 = bdaddr local
+Field4 = type (???)
+Field5 = time
 
-
-
-Jahanzeb Farooq (Tippu)
------------------------------
-MS Computer Sciences
-Umeå University - Sweden
-BS Computer Sciences
-Hamdard University Karachi
------------------------------
-Web: http://www.jahanzeb.com
-Cell: 0768-636572
-
+# ./lk2a 
+88fc30d45810b6f32cfd626c969bfc49 00:10:60:AA:9B:5B 00:60:57:DF:1D:29 0 Fri May 27 10:58:47 2005
 
 
 
