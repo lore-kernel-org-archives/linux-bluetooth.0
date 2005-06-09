@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42A85B6E.7080106@futurlink.com>
-From: Pedro Monjo Florit <pedro.monjo@futurlink.com>
-MIME-Version: 1.0
+Message-ID: <20050609143225.6623.qmail@web26810.mail.ukl.yahoo.com>
+From: Fabien Letort <fletort@yahoo.fr>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] How to use bluez-libs and bluez-utils
-References: <001501c56bfe$477592c0$1e1410ac@AL>
-In-Reply-To: <001501c56bfe$477592c0$1e1410ac@AL>
-Content-Type: text/plain; charset=Big5
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] question on GAP, SPP Interface
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,47 +16,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 09 Jun 2005 17:08:30 +0200
+Date: Thu, 9 Jun 2005 16:32:24 +0200 (CEST)
 
-Hi,
+I am quite used to use Bluetooth Stack, and begin to
+be really interesting by BlueZ Stack.
 
-As far as I know, there is little or no documentation. All I can suggest
-you is that you try to run the command with no arguments (or with
-"--help" argument) in order to get a hint of what the command does.
-Reading the source code should help you too.
+If i have understand all this stack is qualified for
+BT1.1, SPP and GAP profile.
 
-Regards,
+What i didn't understant is where are interface of SPP
+and GAP ?
 
-Pedro
+I found usual interface on HCI, L2CAP, RFCOMM in
+socket format, what is quite good, but i didn't found
+interface on a GAP profile and on SPP profile like an
+usual stack...
 
-Al Chane wrote:
-> Hi, there:
->
-> I'm a newbie of blueZ. I'm trying to use bluez-libs/utils with
-> kernel 2.6.x on Fedora for a csr dongle.
-> How to use bluez-libs and utils after compile and install?
-> Is there any simple instruction or documentation on this?
->
-> Thanks a lot,
->
-> Al
->
->
->
->
->
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: NEC IT Guy Games. How far can you
-> shotput
-> a projector? How fast can you ride your desk chair down the office
-> luge track?
-> If you want to score the big prize, get to know the little guy. Play
-> to win an NEC 61" plasma display: http://www.necitguy.com/?r=20
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+Thanks for you reply, and felecitations for all this
+work !
+
+Fabien.
+
+
+
+	
+
+	
+		
+_____________________________________________________________________________ 
+Découvrez le nouveau Yahoo! Mail : 1 Go d'espace de stockage pour vos mails, photos et vidéos ! 
+Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com
 
 
 -------------------------------------------------------
