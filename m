@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] code is ok, but still unknown field type
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <ddc9dd7e050609154524bf83ac@mail.gmail.com>
+From: Christopher Peterson <webappz@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050609131722.GF6606@pangeia.com.br>
-References: <BAY20-F20A55F402EB690A199F6BD853E0@phx.gbl>
-	 <d1f423d30504070519333f3148@mail.gmail.com>
-	 <20050609131722.GF6606@pangeia.com.br>
-Content-Type: text/plain
-Message-Id: <1118365168.5609.2.camel@notepaq>
 Mime-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_1240_2019350.1118357120796"
+Subject: [Bluez-devel] Bluetooth 1.2 Java-based USB Dongle Interface - 6 simultaneous scanners
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,31 +17,111 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Jun 2005 02:59:28 +0200
+Date: Thu, 9 Jun 2005 15:45:20 -0700
 
-Hi Nelson,
+------=_Part_1240_2019350.1118357120796
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> lk2a is a ascii dump for link_key database (default in /etc/bluetooth) 
-> 
-> Field1 = key
-> Field2 = bdaddr remote
-> Field3 = bdaddr local
-> Field4 = type (???)
-> Field5 = time
-> 
-> # ./lk2a 
-> 88fc30d45810b6f32cfd626c969bfc49 00:10:60:AA:9B:5B 00:60:57:DF:1D:29 0 Fri May 27 10:58:47 2005
+Description: Bluetooth 1.2 Java-based USB Dongle Interface - with support=
+=20
+for 6 Parallel serial port sessions
 
-why don't you read the Bluetooth specification to understand what type
-is. Look for HCI_Link_Key_Notification.
+Hello everyone, I'm looking for a quick fix here. I am in the middle of=20
+completing a project for a Java based POS system. We had decided to use BT=
+=20
+usb dongle and BT 1.1 flicscanner(microvision), but when we asked if we=20
+could add any additional scanners for inventory we discovered that it wasn'=
+t=20
+a viable option without a BT hub. One of our main focuses for the POS over=
+=20
+the last few years is to minimize the footprint, in retail - space matters!=
+=20
 
-Starting with bluez-utils-2.16 it is no longer a binary file.
+To sync multiple units via BT 1.1 I would have to tell the unit to "power=
+=20
+off" and then wait for the next device to sync. I would considered this a=
+=20
+"confusing batch mode" method.
+The concept is to build a Java server that will connect to 6 scanners=20
+simultaneously, we will parse the data and stream it directly into our MySQ=
+L=20
+database.
 
-Regards
+I want to avoid installing yet another hardware device(BT Hub) to support,=
+=20
+so I'm asking the Bluetooth Pro's two questions:
 
-Marcel
+   1. Am I possibly misunderstanding the scatternet concept in BT 1.2? Is=
+=20
+   simultaneous scanning possible via a USB Dongle?=20
+   2. Would any of you be interested in a 20-40 hour project to build=20
+   this for us, so I can focus on POS development?=20
+      - We need source code so we can continue development.
+       - You can choose to do the entire project, or just the part=20
+      that you're good at. e.g. we could handle the Java/MySQL=20
+      connectivity as long as you can develop the file transfer
+communication with
+      the BlueZ protocol API.
+      =20
 
+Chris Peterson
+MIS Manager
+Sterling Shoes Inc.
+604-270-6114 x125
+webappz@gmail.com
 
+------=_Part_1240_2019350.1118357120796
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Description: Bluetooth 1.2 Java-based USB Dongle Interface - with support f=
+or 6 Parallel serial port sessions<br>
+<br>
+Hello everyone, I'm looking for a quick fix here.&nbsp; I am in the
+middle of completing a project for a Java based POS system.&nbsp; We
+had decided to use BT usb dongle and BT 1.1 flicscanner(microvision),
+but when we asked if we could add any additional scanners for inventory
+we discovered that it wasn't a viable option without a BT hub.&nbsp;
+One of our main focuses for the POS over the last few years is to
+minimize the footprint, in retail - space matters! <br>
+<br>
+To sync multiple units via BT 1.1 I would have to tell the unit to
+&quot;power off&quot; and then wait for the next device to sync.&nbsp; I wo=
+uld
+considered this a &quot;confusing batch mode&quot; method.<br>
+<span style=3D"font-weight: bold;">The concept is to build a Java server
+that will connect to 6 scanners simultaneously, we will parse the data
+and stream it directly into our MySQL database.</span><br>
+<br>
+I want to avoid installing yet another hardware device(BT Hub) to support, =
+so I'm asking the Bluetooth Pro's two questions:<br>
+<ol>
+  <li>Am I possibly misunderstanding the scatternet concept in BT 1.2?&nbsp=
+; Is simultaneous scanning possible via a USB Dongle?</li>
+  <li>Would any of you be interested in a 20-40 hour project to build this =
+for us, so I can focus on POS development?</li>
+  <ul>
+    <li>We need source code so we can continue development.<br>
+    </li>
+    <li>You can choose to do the entire project, or just the part that
+you're good at. e.g. we could handle the Java/MySQL connectivity as
+long as you can develop the file transfer communication with the BlueZ
+protocol API.<br>
+    </li>
+  </ul>
+</ol>
+<br>
+Chris Peterson<br>
+MIS Manager<br>
+Sterling Shoes Inc.<br>
+604-270-6114 x125<br>
+<a href=3D"mailto:webappz@gmail.com">webappz@gmail.com</a><br>
+<br>
+
+------=_Part_1240_2019350.1118357120796--
 
 
 -------------------------------------------------------
