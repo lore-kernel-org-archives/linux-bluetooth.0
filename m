@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42ABFDF1.5060406@thomae-privat.de>
-From: Matthias Thomae <bluez@thomae-privat.de>
-MIME-Version: 1.0
+From: Nelson Murilo <nelson@pangeia.com.br>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] First dongle with EDR support
-References: <1117788913.3656.61.camel@pegasus>
-In-Reply-To: <1117788913.3656.61.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] code is ok, but still unknown field type
+Message-ID: <20050610015054.GA14580@pangeia.com.br>
+References: <BAY20-F20A55F402EB690A199F6BD853E0@phx.gbl> <d1f423d30504070519333f3148@mail.gmail.com> <20050609131722.GF6606@pangeia.com.br> <1118365168.5609.2.camel@notepaq>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1118365168.5609.2.camel@notepaq>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 12 Jun 2005 11:18:41 +0200
+Date: Thu, 9 Jun 2005 22:50:54 -0300
 
-Hi Marcel,
+On Fri, Jun 10, 2005 at 02:59:28AM +0200, Marcel Holtmann wrote:
+> Hi Nelson,
+> 
+> > lk2a is a ascii dump for link_key database (default in /etc/bluetooth) 
+> > 
+> > Field1 = key
+> > Field2 = bdaddr remote
+> > Field3 = bdaddr local
+> > Field4 = type (???)
+> > Field5 = time
+> > 
+> > # ./lk2a 
+> > 88fc30d45810b6f32cfd626c969bfc49 00:10:60:AA:9B:5B 00:60:57:DF:1D:29 0 Fri May 27 10:58:47 2005
+> 
+> why don't you read the Bluetooth specification to understand what type
+> is. Look for HCI_Link_Key_Notification.
 
-in case you're still looking for a reseller in germany, have a look at this:
+I will check it, thanks. 
 
-http://www.bauers.com/shop/sp.php?artnr=81480&s=ea14a0034629100186d471ee72a302fc&kat=
+> Starting with bluez-utils-2.16 it is no longer a binary file.
 
-Regards.
-Matthias
+Hmmm, great. Debian packages (unstable) is not up to date. 
 
-Marcel Holtmann wrote:
-> Hi Folks,
-> 
-> it seems that Cellink is building the first EDR dongle. It is qualified
-> and you will find it on their website.
-> 
-> http://www.cellink.com.tw/pro-bta-6030.htm
-> 
-> I like to get some of these, but so far I haven't found any place that
-> sells them. Any hints are welcome.
-> 
-> Regards
-> 
-> Marcel
+
+Thanks again and sorry for disturb,
+
+./nelson -murilo
+
 
 
 -------------------------------------------------------
