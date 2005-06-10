@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <7aa80ced05061005101877c45b@mail.gmail.com>
-From: Mohan K <kmohangda@gmail.com>
+Message-ID: <20050610055739.9622.qmail@web50703.mail.yahoo.com>
+From: "John H." <mistamaila@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] rfcomm connect problem
+In-Reply-To: <20050610050430.97627.qmail@web50703.mail.yahoo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] hcid error on pair attempt
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,119 +17,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Jun 2005 17:40:22 +0530
+Date: Thu, 9 Jun 2005 22:57:39 -0700 (PDT)
 
-Hi Everyone,
-                 I am using two PC's, one consist of VIA mother board
-and another one consist of Intel chipset mother board. I am having one
-dongle of CSR chipset. In both PC's I installed Bluez(2.17).
-                First, I plugged the usb bluetooth dongle to VIA PC
-and i used "rfcomm connect 0 <BDADDR> 1". It get connected and worked
-fine. Then, I plugged the same dongle in the Intel chipset PC and used
-"rfcomm connect 0 <BDADDR> 1". This is also working fine.
-                Again I did the First step. But now "rfcomm connect 0
-<BDADDR> 1" fails with the following message:
+When I try to pair my phone, despite changing pin in
+/etc/bluetooth/pin to 0000 and typing that in the
+phone when I try to pair, it says pairing failed, and
+/var/log/messages says
 
-Can't connect RFCOMM socket: Connection refused
 
-At this time i am getting the following hcidump:
+Jun 10 00:56:33 home hcid[15309]: pin_code_request
+(sba=00:02:72:81:AB:C4, dba=08:00:37:12:C4:B1)
+Jun 10 00:56:33 home hcid[15309]: link_key_notify
+(sba=00:02:72:81:AB:C4, dba=08:00:37:12:C4:B1)
 
-[root@localhost]# hcidump -x
-HCI sniffer - Bluetooth packet analyzer ver 1.21
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Create Connection (0x01|0x0005)
-plen 13
-   bdaddr 00:80:25:02:02:69 ptype 0xcc18 rswitch
-0x01 clkoffset 0x1cb8 (valid)
-   Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
- 00 01 05 04
-> HCI Event: Connect Complete (0x03) plen 11
- 00 29 00 69 02 02 25 80 00 01 00
-< ACL data: handle 41 flags 0x02 dlen 12
-   L2CAP(s): Connect req: psm 3 scid 0x0040
-< HCI Command: Write Link Policy Settings
-(0x02|0x000d) plen 4
-   handle 41 policy 0x0f
-   Link policy: RSWITCH HOLD SNIFF PARK
-> HCI Event: Number of Completed Packets (0x13)
-plen 5
- 01 29 00 01 00
-> HCI Event: Command Complete (0x0e) plen 6
- 01 0D 08 00 29 00
-> HCI Event: Max Slots Change (0x1b) plen 3
- 29 00 05
-> ACL data: handle 41 flags 0x02 dlen 16
-   L2CAP(s): Connect rsp: dcid 0x0052 scid
-0x0040 result 0 status 0
-     Connection successful
-< ACL data: handle 41 flags 0x02 dlen 16
-   L2CAP(s): Config req: dcid 0x0052 flags 0x00
-clen 4
-     MTU 1024
-> HCI Event: Number of Completed Packets (0x13)
-plen 5
- 01 29 00 01 00
-> ACL data: handle 41 flags 0x02 dlen 18
-   L2CAP(s): Config rsp: scid 0x0040 flags 0x00
-result 0 clen 4
-     Success
-     MTU 335
-> ACL data: handle 41 flags 0x02 dlen 16
-   L2CAP(s): Config req: dcid 0x0040 flags 0x00
-clen 4
-     MTU 335
-< ACL data: handle 41 flags 0x02 dlen 14
-   L2CAP(s): Config rsp: scid 0x0052 flags 0x00
-result 0 clen 0
-     Success
-< ACL data: handle 41 flags 0x02 dlen 8
-   L2CAP(d): cid 0x0052 len 4 [psm 3]
-     RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0
-fcs 0x1c
-> HCI Event: Number of Completed Packets (0x13)
-plen 5
- 01 29 00 01 00
-> HCI Event: Number of Completed Packets (0x13)
-plen 5
- 01 29 00 01 00
-> HCI Event: Link Key Request (0x17) plen 6
- 69 02 02 25 80 00
-< HCI Command: Link Key Request Reply
-(0x01|0x000b) plen 22
-   bdaddr 00:80:25:02:02:69 key
-4BA5C9668C9B95F6134A074382BE737F
-> HCI Event: Command Complete (0x0e) plen 10
- 01 0B 04 00 69 02 02 25 80 00
-> ACL data: handle 41 flags 0x02 dlen 8
-   L2CAP(d): cid 0x0040 len 4 [psm 3]
-     RFCOMM(s): DM: cr 1 dlci 0 pf 1 ilen 0 fcs
-0x36
-< ACL data: handle 41 flags 0x02 dlen 12
-   L2CAP(s): Disconn req: dcid 0x0052 scid
-0x0040
-> ACL data: handle 41 flags 0x02 dlen 12
-   L2CAP(s): Disconn req: dcid 0x0040 scid
-0x0052
-< ACL data: handle 41 flags 0x02 dlen 12
-   L2CAP(s): Disconn rsp: dcid 0x0040 scid
-0x0052
-> HCI Event: Number of Completed Packets (0x13)
-plen 5
- 01 29 00 01 00
-> HCI Event: Number of Completed Packets (0x13)
-plen 5
- 01 29 00 01 00
-> ACL data: handle 41 flags 0x02 dlen 12
-   L2CAP(s): Disconn rsp: dcid 0x0052 scid
-0x0040
-> HCI Event: Disconn Complete (0x05) plen 4
- 00 29 00 13
-Can any one tell me why this is happenning?
-Advanced thanks for your valuable suggestions
 
-Thanks & Regards,
-Mohan
+?
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
