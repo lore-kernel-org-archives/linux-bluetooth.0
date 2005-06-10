@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY103-F22303199CE59F2EEF6DED98FF0@phx.gbl>
+Message-ID: <BAY103-F66B5768FFCB3EC5004DDC98FF0@phx.gbl>
 From: "Serkan FAHRIOGLU" <serkanfahrioglu013@hotmail.com>
 To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
 Content-Type: text/plain; format=flowed
-Subject: [Bluez-users] (no subject)
+Subject: [Bluez-users] error
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,7 +16,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Jun 2005 15:55:54 +0000
+Date: Fri, 10 Jun 2005 15:56:09 +0000
 
 I installed linux to my laptop then i installed all the sources from 
 bluez.org in the download part but when I tried to check my bluetooth card I 
