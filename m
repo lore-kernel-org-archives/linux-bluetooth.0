@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY103-F66B5768FFCB3EC5004DDC98FF0@phx.gbl>
-From: "Serkan FAHRIOGLU" <serkanfahrioglu013@hotmail.com>
+Message-ID: <98e24d19050610065147830fdc@mail.gmail.com>
+From: Joel - JFX <jfxbrazil@gmail.com>
 To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Subject: [Bluez-users] error
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] DENY ACCESS USING MAC ADDRESS
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,15 +16,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Jun 2005 15:56:09 +0000
+Date: Fri, 10 Jun 2005 10:51:27 -0300
 
-I installed linux to my laptop then i installed all the sources from 
-bluez.org in the download part but when I tried to check my bluetooth card I 
-got an error ; " bluetooth linux serial_cs: register_serial() at 0x02f8, irq 
-3 failed" I tried lot of time but I can not get any solution. I hope 
-somebody can help me.
+hi,
 
+i have 1 linux server and its have a lot of Palm zire conected with
+bluez, how can i deny access to only my palms can conect on the
+server?
 
+im using chap-secrets autentication, how can i block simultaneous login?
+
+thanks a lot and sorry by my english
+
+Joel Tom=E1s Cachioli
+jfxbrazil@gmail.com
 
 
 -------------------------------------------------------
