@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] can't receive files from phone
-From: Fredy P <digitalfredy@debiancolombia.org>
+Message-ID: <42ACAE93.3050200@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1118566621.9197.5.camel@localhost.localdomain>
-References: <1118566621.9197.5.camel@localhost.localdomain>
-Content-Type: text/plain;
-	charset=iso-8859-1
-Message-Id: <1118581008.11973.10.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] pairing plantronics M3000 with my laptop
+References: <42AA0EED.9060104@lesagepono.be> <42AA5C31.2040009@xmission.com> <42AB720D.20806@lesagepono.be> <42AC42C1.7050903@lesagepono.be>
+In-Reply-To: <42AC42C1.7050903@lesagepono.be>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,60 +18,120 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 12 Jun 2005 07:56:47 -0500
+Date: Sun, 12 Jun 2005 15:52:19 -0600
 
-El dom, 12-06-2005 a las 09:57 +0100, Graham White escribi=F3:
-> I have a Thinkpad T42 running Ubuntu Hoary, and a Motorola V547 mobile
-> phone. I can do almost anything I want with the bluetooth connection
-> to the mobile: ppp over gprs, send files to the mobile from the
-> thinkpad, send sms with gnome-phone-manager, and so on. However,
-> I cannot send files to the thinkpad from the mobile: the mobile
-> discovers the thinkpad correctly, but when I select it for
-> file transfer I get a dialogue box on the mobile saying
-> "Unable to Connect". hcidump -x on the thinkpad shows, for each
-> failed connection attempt, the following three lines:
->=20
-> > HCI Event: Connect Request (0x04) plen 10
->   BF AA 58 8A 12 00 04 22 52 01
-> > HCI Event: Command Status (0x0f) plen 4
->   00 01 09 04
-> > HCI Event: Connect Complete (0x03) plen 11
->   21 29 00 BF AA 58 8A 12 00 01 00
->=20
-> This behaviour is exactly the same whether I have gnome-obex-server
-> running, or obexserver running, or *nothing at all* running.=20
->=20
-> And I have the device class correctly set; that is, I have
-> a line in hcid.conf on the thinkpad saying
->=20
->         class 0x100100;
->=20
-> (in fact, if I had the device class wrong, the mobile couldn't=20
-> discover the thinkpad, and it can).=20
->=20
-> Anyone got any ideas?
-For send and recive files whit my sonyericsson i use obexftp,
-y made some ifo about it in spanish, but you can read the conf files for
-understand.
-http://el-directorio.org/index.php/T610:Transferencia_de_Archivos#Preparaci=
-.C3.B3n_de_Debian_GNU.2FLinux
->=20
-> Graham White
->=20
->=20
->=20
+Hi
+
+I suspect a volume problem (try using a soft mixer on your computer and 
+try volume controls on the headset)
+
+or sco routing; as root run
+  hciconfig hci0 revision
+and see if sco is routed to hci as it should be
+
+It's possible that Marcel's new pskey program can reroute sco but I 
+haven't tried that.
+
+Brad
+
+Laurent Lesage wrote:
+> Laurent Lesage a écrit :
+> 
+>> Thanks : that works!
+>>
+>>> Brad Midgley a écrit : I would try removing /etc/bluetooth/link_key 
+>>> so the pairing will be reset.
+>>>
+>>
+> Hi again...
+> 
+> well, now it seems to work, but I have no sound : it is like the voice 
+> packet are not sent to the headset.
+> 
+> 1) info about the headset
+> 
+>> laptop:/usr/local/btsco/btsco/kernel# hcitool info 00:03:89:4C:2D:C7
+>> Requesting information ...
+>>         BD Address:  00:03:89:4C:2D:C7
+>>         Device Name: M3000 by Plantronics
+>>         LMP Version: 1.1 (0x1) LMP Subversion: 0x349
+>>         Manufacturer: Cambridge Silicon Radio (10)
+>>         Features: 0xbc 0xe8 0x01 0x00 0x00 0x00 0x00 0x00
+>>                 <encryption> <slot offset> <timing accuracy> <role 
+>> switch>
+>>                 <sniff mode> <SCO link> <HV3 packets> <u-law log> 
+>> <A-law log>
+>>                 <CVSD>
+> 
+> 
+> 
+> 2)BTSCO :
+> 
+>> laptop:/usr/local/btsco/btsco/kernel# btsco -v
+>> btsco v0.4c
+>> Device is 1:0
+> 
+> 
+> 3)dongle :
+> 
+>> laptop:/usr/local/btsco/btsco/kernel# hciconfig -a
+>> hci0:   Type: USB
+>>         BD Address: 00:E0:98:FD:9A:BD ACL MTU: 192:8 SCO MTU: 64:8
+>>         UP RUNNING PSCAN ISCAN
+>>         RX bytes:5979 acl:196 sco:0 events:286 errors:0
+>>         TX bytes:3492 acl:147 sco:0 commands:80 errors:0
+>>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>>         Link policy: RSWITCH HOLD SNIFF PARK
+>>         Link mode: SLAVE ACCEPT
+>>         Name: 'laptop-0'
+>>         Class: 0x3e0100
+>>         Service Classes: Networking, Rendering, Capturing
+>>         Device Class: Computer, Uncategorized
+>>         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP 
+>> Subver: 0x20d
+>>         Manufacturer: Cambridge Silicon Radio (10)
+>>
+> Using Debian Sarge, with a patch for bluez from march 2005. Got btsco 
+> form cvs. Compiled without error. Seems running ok. When using XMMS, I 
+> see a second audio device "bluetooth headset", I see it with alsa and 
+> with OSS output plugin. If I try to play a song with XMMS, I hear a 
+> "beep" indicating the activation of the SCO channel. I can see it with 
+> "btsco -v", verbose mode. I also can adjust the volume of my headset : 
+> it's echoed on the output of btsco. On the other side, if I use the oss 
+> mixer, I hear a small beep in the headset and see that the volume is 
+> changed accordingly to the mixer on the computer. Same for microphone.
+> 
+> So (I'm BT newbie...), the "signalling" seems to work perfect *BUT* no 
+> voice packet are sent. HCIdump shows the "signalling packets" but after 
+> that, no other packet. with XMMS, if I "play", the song remains still 
+> (time stops). Just the beep in my ear to say that the channel is opened 
+> (I hear the same under WinXP when I accept to "connect" the headset, 
+> pushing on the "answer" button of the headset), and another beep when I 
+> stop the song and thus, "disconnect" the SCO channel (again, I see all 
+> that with btsco -v and hcidump).
+> 
+> When I will get it , I will resume the whole thing for configs like 
+> mine. Help me get the sound work :-(
+> 
+> thanks
+> 
+> Laurent
+> 
+> 
+> 
 > -------------------------------------------------------
-> This SF.Net email is sponsored by: NEC IT Guy Games.  How far can you sho=
-tput
-> a projector? How fast can you ride your desk chair down the office luge t=
-rack?
-> If you want to score the big prize, get to know the little guy. =20
-> Play to win an NEC 61" plasma display: http://www.necitguy.com/?r=3D20
+> This SF.Net email is sponsored by: NEC IT Guy Games.  How far can you 
+> shotput
+> a projector? How fast can you ride your desk chair down the office luge 
+> track?
+> If you want to score the big prize, get to know the little guy.  Play to 
+> win an NEC 61" plasma display: http://www.necitguy.com/?r 
 > _______________________________________________
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-
+> https://lists.sourceforge.net/lists/listinfo/bluez-user
+> s
 
 
 -------------------------------------------------------
