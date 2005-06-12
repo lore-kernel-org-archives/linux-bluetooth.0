@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42AC42C1.7050903@lesagepono.be>
-From: Laurent Lesage <laurent@lesagepono.be>
+Message-ID: <42AC05A4.1090105@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] pairing plantronics M3000 with my laptop
-References: <42AA0EED.9060104@lesagepono.be> <42AA5C31.2040009@xmission.com> <42AB720D.20806@lesagepono.be>
-In-Reply-To: <42AB720D.20806@lesagepono.be>
+Subject: Re: [Bluez-users] BlueZ on ETRAX 100LX devboard 82+
+References: <20050610050635.82925.qmail@web52804.mail.yahoo.com>
+In-Reply-To: <20050610050635.82925.qmail@web52804.mail.yahoo.com>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,89 +18,188 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 12 Jun 2005 14:12:17 +0000
+Date: Sun, 12 Jun 2005 11:51:32 +0200
 
-Laurent Lesage a =E9crit :
+Hello Naved
 
-> Thanks : that works!
->
->> Brad Midgley a =E9crit : I would try removing /etc/bluetooth/link_key=20
->> so the pairing will be reset.
+Step 3 should automatically be done from hcid.
+Step 2 (sdpd), is not needed if you haven't services on the axis board.
+
+I suggest do program step 6 yourself. look at the sources from rfcomm and 
+read a socket programming howto. bluez is basically socket programming. 
+There are examples in the archive too.
+If the problem is with the rfcomm utility, you'll get around it by doing 
+this step yourself.
+
+
+btw, does your script look like:
+#!/bin/sh
+#echo "PIN:1234"
+
+or like:
+#!/bin/sh
+echo "PIN:1234"
+
+
+regards
+Marco
+
+
+Naved Aziz wrote:
+> Hi,
+> 
+> Basically, these are the steps that I am taking to set
+> up an SP connection between the Axis board and the
+> Nokia 6600:
+> 
+> (1) hcid
+> (2) sdpd
+> (3) hciconfig hci0 up #set up the bluetooth dongle
+> (4) hcitool scan  #spot the phone, get the BD address
+> (5) sdptool browse <BD address> #see services and 
+>     their corrresponding channels
+> (6) rfcomm connect /dev/rfcomm0 <BD address> <channel>
+>     #where, if channel 2 is the one on nokia 6600    
+>     providing serial port service, I put 2 for
+> channel.   
+>     The /dev/rfcomm0 is already created prior to 
+>     flashing the image onto the board as follows:
+>     mknod -m 0666 /dev/rfcomm0 c 216 0 
+> 
+> At this point, the phone gives a prompt, asking for a
+> pin number.  The value in /etc/bluetooth/pin is 1234,
+> and I have changed the pin_helper in hcid.conf to
+> refer to a script file called qpin that looks like
+> this:
+> 
+> #!/bin/sh
+> #echo "PIN:1234"
+> 
+> This script file that I have created to work with the
+> pin_helper is stored in the /tmp directory, since this
+> is the only place where I am allowed to create any
+> files, etc once an image has been downloaded onto the
+> board. 
+> 
+> After I type in the pin on the Nokia 6600, there is a
+> moment of wait, and then, the phone says "unable to
+> connect", and the board says "can't create socket:
+> resource temporarily unavailable".
+> 
+> You mentioned that the rfcomm utility creates a device
+> that causes problems on some systems; how to get
+> around this?
+> 
+> Thanks in advance for your help.
+> 
+> Naved
+> 
+> 
+> 
+>  
+> --- Marco Trudel <mtrudel@gmx.ch> wrote:
+> 
+> 
+>>Hello Naved
 >>
->
-Hi again...
-
-well, now it seems to work, but I have no sound : it is like the voice=20
-packet are not sent to the headset.
-
-1) info about the headset
-
-> laptop:/usr/local/btsco/btsco/kernel# hcitool info 00:03:89:4C:2D:C7
-> Requesting information ...
->         BD Address:  00:03:89:4C:2D:C7
->         Device Name: M3000 by Plantronics
->         LMP Version: 1.1 (0x1) LMP Subversion: 0x349
->         Manufacturer: Cambridge Silicon Radio (10)
->         Features: 0xbc 0xe8 0x01 0x00 0x00 0x00 0x00 0x00
->                 <encryption> <slot offset> <timing accuracy> <role swit=
-ch>
->                 <sniff mode> <SCO link> <HV3 packets> <u-law log>=20
-> <A-law log>
->                 <CVSD>
-
-
-2)BTSCO :
-
-> laptop:/usr/local/btsco/btsco/kernel# btsco -v
-> btsco v0.4c
-> Device is 1:0
-
-3)dongle :
-
-> laptop:/usr/local/btsco/btsco/kernel# hciconfig -a
-> hci0:   Type: USB
->         BD Address: 00:E0:98:FD:9A:BD ACL MTU: 192:8 SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:5979 acl:196 sco:0 events:286 errors:0
->         TX bytes:3492 acl:147 sco:0 commands:80 errors:0
->         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'laptop-0'
->         Class: 0x3e0100
->         Service Classes: Networking, Rendering, Capturing
->         Device Class: Computer, Uncategorized
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP=20
-> Subver: 0x20d
->         Manufacturer: Cambridge Silicon Radio (10)
->
-Using Debian Sarge, with a patch for bluez from march 2005. Got btsco=20
-form cvs. Compiled without error. Seems running ok. When using XMMS, I=20
-see a second audio device "bluetooth headset", I see it with alsa and=20
-with OSS output plugin. If I try to play a song with XMMS, I hear a=20
-"beep" indicating the activation of the SCO channel. I can see it with=20
-"btsco -v", verbose mode. I also can adjust the volume of my headset :=20
-it's echoed on the output of btsco. On the other side, if I use the oss=20
-mixer, I hear a small beep in the headset and see that the volume is=20
-changed accordingly to the mixer on the computer. Same for microphone.
-
-So (I'm BT newbie...), the "signalling" seems to work perfect *BUT* no=20
-voice packet are sent. HCIdump shows the "signalling packets" but after=20
-that, no other packet. with XMMS, if I "play", the song remains still=20
-(time stops). Just the beep in my ear to say that the channel is opened=20
-(I hear the same under WinXP when I accept to "connect" the headset,=20
-pushing on the "answer" button of the headset), and another beep when I=20
-stop the song and thus, "disconnect" the SCO channel (again, I see all=20
-that with btsco -v and hcidump).
-
-When I will get it , I will resume the whole thing for configs like=20
-mine. Help me get the sound work :-(
-
-thanks
-
-Laurent
-
+>>
+>>>So you're saying that you programmed, as in write
+>>
+>>the code, for the 
+>>
+>>>rfcomm protocol, while keeping the other (working)
+>>
+>>BlueZ stuff (meaning 
+>>
+>>>the other utilities like sdptool) on the board?  I
+>>
+>>will eventually have 
+>>
+>>>to write some applcation using rfcomm in order to
+>>
+>>exchange files and 
+>>
+>>>stuff with phones, but now, I am actually at a
+>>
+>>loss as to how to 
+>>
+>>>progress.  As a cherry on top, it has been only a
+>>
+>>couple of weeks since 
+>>
+>>>I have begun working with Linux. 
+>>
+>>Can you explain what you try to reach?
+>>
+>>
+>>>Marco, it would mean a lot to me if you could
+>>
+>>provide me with some 
+>>
+>>>guidance as to how to get rfcomm working on the
+>>
+>>devboard 82+.  I am a 
+>>
+>>>total newbie at this, so if you could give me a
+>>
+>>step-by-step guide as to 
+>>
+>>>how to set up the Axis board with rfcomm support,
+>>
+>>I would be forever in 
+>>
+>>>your debt =)
+>>
+>>Everything works fine. The rfcomm utility creates a
+>>device, this creates 
+>>proglems on some systems. But rfcomm isn't broken.
+>>
+>>
+>>regards
+>>Marco
+>>
+>>
+>>
+> 
+> -------------------------------------------------------
+> 
+>>This SF.Net email is sponsored by: NEC IT Guy Games.
+>> How far can you shotput
+>>a projector? How fast can you ride your desk chair
+>>down the office luge track?
+>>If you want to score the big prize, get to know the
+>>little guy.  
+>>Play to win an NEC 61" plasma display:
+>>http://www.necitguy.com/?r=20
+>>_______________________________________________
+>>Bluez-users mailing list
+>>Bluez-users@lists.sourceforge.net
+>>
+> 
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+> 
+> 
+> 
+> 	
+> 		
+> __________________________________ 
+> Do you Yahoo!? 
+> Yahoo! Mail - You care about security. So do we. 
+> http://promotions.yahoo.com/new_mail
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: NEC IT Guy Games.  How far can you shotput
+> a projector? How fast can you ride your desk chair down the office luge track?
+> If you want to score the big prize, get to know the little guy.  
+> Play to win an NEC 61" plasma display: http://www.necitguy.com/?r=20
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+> 
 
 
 -------------------------------------------------------
