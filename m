@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050613025028.48961.qmail@web50704.mail.yahoo.com>
-From: "John H." <mistamaila@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1118581008.11973.10.camel@localhost.localdomain>
+Message-ID: <42ACD3A7.1010809@lesagepono.be>
+From: Laurent Lesage <laurent@lesagepono.be>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] python error on bluepin
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] pairing plantronics M3000 with my laptop SOLVED
+ (bis)
+References: <42AA0EED.9060104@lesagepono.be> <42AA5C31.2040009@xmission.com> <42AB720D.20806@lesagepono.be> <42AC42C1.7050903@lesagepono.be> <42ACAE93.3050200@xmission.com>
+In-Reply-To: <42ACAE93.3050200@xmission.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,25 +19,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 12 Jun 2005 19:50:28 -0700 (PDT)
+Date: Mon, 13 Jun 2005 00:30:31 +0000
 
- bluepin
-Xlib: connection to ":0.0" refused by server
-Xlib: No protocol specified
+Well, just to add that sometime, the sound disappear when using skype or=20
+IAX client. I must stop the call and redo it to get the sound back.=20
+Maybe another application picked up the route? (grip and XMMS where=20
+present at the same time).
 
-Traceback (most recent call last):
-  File "/usr/bin/bluepin", line 39, in ?
-    import gtk
-  File
-"/var/tmp/pygtk2-2.6.2-root/usr/lib/python2.3/site-packages/gtk-2.0/gtk/__init__.py",
-line 37, in ?
-RuntimeError: could not open display
+Brad Midgley a =E9crit :
+
+> Hi
+>
+> I suspect a volume problem (try using a soft mixer on your computer=20
+> and try volume controls on the headset)
+>
+> or sco routing; as root run
+>  hciconfig hci0 revision
+> and see if sco is routed to hci as it should be
+>
+> It's possible that Marcel's new pskey program can reroute sco but I=20
+> haven't tried that.
+>
+> Brad
 
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
 
 
 -------------------------------------------------------
