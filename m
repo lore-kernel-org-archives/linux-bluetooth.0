@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BlueZ on ETRAX 100LX devboard 82+
-From: Erwin Authried <eauth@softsys.co.at>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050610050635.82925.qmail@web52804.mail.yahoo.com>
-References: <20050610050635.82925.qmail@web52804.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1118651555.25847.19.camel@justakiss>
-Mime-Version: 1.0
+Message-ID: <20050613025028.48961.qmail@web50704.mail.yahoo.com>
+From: "John H." <mistamaila@yahoo.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1118581008.11973.10.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] python error on bluepin
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,65 +17,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 13 Jun 2005 10:32:35 +0200
+Date: Sun, 12 Jun 2005 19:50:28 -0700 (PDT)
 
-Am Fre, den 10.06.2005 schrieb Naved Aziz um 7:06:
-> Hi,
-> 
-> Basically, these are the steps that I am taking to set
-> up an SP connection between the Axis board and the
-> Nokia 6600:
-> 
-> (1) hcid
-> (2) sdpd
-> (3) hciconfig hci0 up #set up the bluetooth dongle
-> (4) hcitool scan  #spot the phone, get the BD address
-> (5) sdptool browse <BD address> #see services and 
->     their corrresponding channels
-> (6) rfcomm connect /dev/rfcomm0 <BD address> <channel>
->     #where, if channel 2 is the one on nokia 6600    
->     providing serial port service, I put 2 for
-> channel.   
->     The /dev/rfcomm0 is already created prior to 
->     flashing the image onto the board as follows:
->     mknod -m 0666 /dev/rfcomm0 c 216 0 
-> 
-> At this point, the phone gives a prompt, asking for a
-> pin number.  The value in /etc/bluetooth/pin is 1234,
-> and I have changed the pin_helper in hcid.conf to
-> refer to a script file called qpin that looks like
-> this:
-> 
-> #!/bin/sh
-> #echo "PIN:1234"
-> 
-> This script file that I have created to work with the
-> pin_helper is stored in the /tmp directory, since this
-> is the only place where I am allowed to create any
-> files, etc once an image has been downloaded onto the
-> board. 
-> 
-> After I type in the pin on the Nokia 6600, there is a
-> moment of wait, and then, the phone says "unable to
-> connect", and the board says "can't create socket:
-> resource temporarily unavailable".
-> 
-> You mentioned that the rfcomm utility creates a device
-> that causes problems on some systems; how to get
-> around this?
-> 
-> Thanks in advance for your help.
-> 
-> Naved
-> 
-are you sure that your board is able to save the link key? It is
-normally stored in /etc/bluetooth/link_key. If your /etc is r/o, you
-must make a symlink into a writeable directory.
+ bluepin
+Xlib: connection to ":0.0" refused by server
+Xlib: No protocol specified
 
-Regards,
-Erwin
+Traceback (most recent call last):
+  File "/usr/bin/bluepin", line 39, in ?
+    import gtk
+  File
+"/var/tmp/pygtk2-2.6.2-root/usr/lib/python2.3/site-packages/gtk-2.0/gtk/__init__.py",
+line 37, in ?
+RuntimeError: could not open display
 
 
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
