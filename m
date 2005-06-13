@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Content-Type: text/plain;
-  charset="iso-8859-1"
-From: Ronny L Nilsson <bb@arbetsmyra.dyndns.org>
+Subject: Re: [Bluez-users] python error on bluepin
+From: Fredy P <digitalfredy@debiancolombia.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Message-Id: <20050613194748.5455A56F@arbetsmyra.dyndns.org>
-Subject: [Bluez-users] varying time to connect
+In-Reply-To: <20050613025028.48961.qmail@web50704.mail.yahoo.com>
+References: <20050613025028.48961.qmail@web50704.mail.yahoo.com>
+Content-Type: text/plain;
+	charset=iso-8859-1
+Message-Id: <1118644870.3909.3.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,27 +19,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 13 Jun 2005 21:46:56 +0200
+Date: Mon, 13 Jun 2005 01:41:10 -0500
 
+El dom, 12-06-2005 a las 19:50 -0700, John H. escribi=F3:
+>  bluepin
+> Xlib: connection to ":0.0" refused by server
+> Xlib: No protocol specified
+>=20
+> Traceback (most recent call last):
+>   File "/usr/bin/bluepin", line 39, in ?
+>     import gtk
+>   File
+> "/var/tmp/pygtk2-2.6.2-root/usr/lib/python2.3/site-packages/gtk-2.0/gtk/_=
+_init__.py",
+> line 37, in ?
+> RuntimeError: could not open display
+its becouse your blue_pin needs X, for use without x you can made a
+simple pin_helper, you can see it in:
+http://el-directorio.org/index.php/Bluetooth_en_debian
+In spanish, but if you read the congig files you can understand
 
-Hi
-I guess this is normal, but I'm a bit curious:
-
-When connecting to a remote device with:
-  hcitool cc 00:11:22:33:44:55
-the time for the connection to succeed vary from anything between 0.5 - 
-5 seconds. Is there any good explanation for this? Shouldn't it be 
-somewhat equal each and every time? Especially when trying many times 
-in a row?
-
-Is there a way to optimse the connection phase? Obviously it can be 
-made within 0.5 s, but how to do it every time and not just randomly?
-
-
-BR
-/Ronny Nilsson
-
-
+>=20
+>=20
+> __________________________________________________
+> Do You Yahoo!?
+> Tired of spam?  Yahoo! Mail has the best spam protection around=20
+> http://mail.yahoo.com=20
+>=20
+>=20
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: NEC IT Guy Games.  How far can you sho=
+tput
+> a projector? How fast can you ride your desk chair down the office luge t=
+rack?
+> If you want to score the big prize, get to know the little guy. =20
+> Play to win an NEC 61" plasma display: http://www.necitguy.com/?r=3D20
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 
