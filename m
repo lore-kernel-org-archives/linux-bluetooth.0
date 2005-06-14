@@ -1,12 +1,21 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Peter Wippich <pewi@gw-instruments.de>
-To: <bluez-devel@lists.sourceforge.net>
-Cc: Albert Huang <ashuang@gmail.com>
-Subject: Re: [Bluez-devel] varying time to connect
-In-Reply-To: <20050615113734.035D26EC@arbetsmyra.dyndns.org>
-Message-ID: <Pine.LNX.4.33.0506151256440.16795-100000@redbean.intranet.gw-instruments.de>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-ID: <e1effdeb0506140437647fe446@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] DBUS service support - poll patch
+In-Reply-To: <e1effdeb050606061850ac0134@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1115901694.18499.32.camel@pegasus>
+	 <e1effdeb050525152067a5cbd3@mail.gmail.com>
+	 <1117098491.12036.23.camel@pegasus>
+	 <e1effdeb05052614222118e70c@mail.gmail.com>
+	 <1117143615.12036.74.camel@pegasus>
+	 <e1effdeb050530154229f338a2@mail.gmail.com>
+	 <1117494345.7072.235.camel@pegasus>
+	 <e1effdeb05060313345fb564a3@mail.gmail.com>
+	 <1117836644.3656.100.camel@pegasus>
+	 <e1effdeb050606061850ac0134@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,78 +27,105 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Jun 2005 13:04:46 +0200 (CEST)
+Date: Tue, 14 Jun 2005 08:37:59 -0300
+
+Hi Marcel,
+
+There is a new patch available.
+
+http://www.indt.org.br/maemo/bluez/bluez-dbus-poll-v00.02.diff
+
+I read the Greg K.H. paper, I tryed adjust the code following his
+suggestion. Probably there are points that remain incorrect.
+Send me suggestions and comments that I will fix it.
+
+I am working on library for hidding D-BUS details. I don' t=20
+know how provide it to the developers. Basically, this library
+will hide the code inside the pand_dbus_client.tar.gz
+
+Another subject that I want introduce is bridge creation. I think
+we discuss this subject before. Two approachs can be applied:
+1. put in the pand daemon under optional feature
+   advantages: can be shared between dbus and no-dbus=20
+   disadvantages: libbridge dependency=20
+2. put it in a library(commented previously)
+   advantages: This feature can be added with another=20
+               features/functions, like D-Bus message=20
+               functions, Zeroconf integration (UDHCP) or HOWL.
+               UDHCP and HOWL D-BUS services are being developed.
+   disadvantages: no-dbus pand daemon will not be able to=20
+               control bridges
 
 
-Hello Ronny,
 
-the clock offset is only usefull (if at all.....) if the most recent
-inquiry wasn't to long ago and both devices were not powered down (or
-reset) in between. From our experiences it doesn't help alot under normal
-conditions to speed up connection setup.
-Of cause you can do an inquiry just before connection setup to get the
-actual clock offset, but in total your connection setup time will
-increase.
+Regards,
+Claudio.
 
-Further, if I remember right, most Bluetooth modules cache clock offsets
-internaly.
 
-I think these are the reasons why BlueZ doen't make use of it.
-
-Ciao,
-
-Peter
-
-On Wed, 15 Jun 2005, Ronny L Nilsson wrote:
-
+On 6/6/05, Claudio Takahasi <cktakahasi@gmail.com> wrote:
+> Hi Marcel,
+>=20
+> Probably you are not satisfied with D-Bus watches.  I tryed remove
+> it, but it is not possible.
+> According with D-Bus documentation is not allowed read/write directly
+> in the file descriptor. DBusWatch must be used for main loop integration.
+>=20
+> Another important approach is develop a library for D-Bus function
+> hidding. The sample client is just a usage sample and a better idea
+> is use a common library for all applications: gamming, UPnP, messenger, .=
+..
+>=20
+> Regarding the coding style I will review it.
+>=20
+> Regards,
+> Claudio.
+>=20
+> On 6/3/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> > Hi Claudio,
+> >
+> > > A new patch is available using a main loop and poll to wait for some =
+event
+> > > on a file descriptor list (D-Bus and Bluetooth).
+> > >
+> > > All Glib and pthread dependencies were remove.
+> >
+> > I just had some some time for a quick review. It is not fully what I ha=
+d
+> > in mind, but it is something from what we can work onwards. I think it
+> > is a good idea to include it into release 2.18 and then start on
+> > improving it.
+> >
+> > Since I am away the next week you might wanna address the coding style
+> > issues in that time. Read the paper from Greg KH from the OLS 2002. I
+> > think it gives a very good understanding on it.
+> >
+> > Regards
+> >
+> > Marcel
+> >
+> >
+> >
+> >
+> > -------------------------------------------------------
+> > This SF.Net email is sponsored by: NEC IT Guy Games.  How far can you s=
+hotput
+> > a projector? How fast can you ride your desk chair down the office luge=
+ track?
+> > If you want to score the big prize, get to know the little guy.
+> > Play to win an NEC 61" plasma display: http://www.necitguy.com/?r=3D20
+> > _______________________________________________
+> > Bluez-devel mailing list
+> > Bluez-devel@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> >
 >
->
-> Hi
-> Following up my own question on the users-list at
-> http://sourceforge.net/mailarchive/forum.php?thread_id=7501858&forum_id=1883
-> I've made futher investigations regarding the optimise-connect issue.
->
-> Reading the BT 1.2 spec it seems like HCI support an optional clock
-> offset parameter when doing connects. However, it seems like BlueZ
-> doesn't utilise it. My guess is this might be the case to the very much
-> varying delays when establishing a connection with
->    hcitool cc 00:11:22:33:44:55
->
-> Anyone who can confirm this? Or is there a reason why the clock offset
-> parameter ain't used? I'm thinking of perhaps modifying hcid to cache
-> clocks from most resent inqury to reuse them later, at a subsequent
-> connect. Or is there a better way?
->
-> Regards
-> /Ronny Nilsson
->
->
->
->
-> -------------------------------------------------------
-> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-> from IBM. Find simple to follow Roadmaps, straightforward articles,
-> informative Webcasts and more! Get everything you need to get up to
-> speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-
-|	Peter Wippich 			Voice: +49 30 46776411		|
-|	G&W Instruments GmbH		fax:   +49 30 46776419		|
-|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
-|	D-13355 Berlin  / Germany					|
-
-
 
 
 -------------------------------------------------------
-SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-from IBM. Find simple to follow Roadmaps, straightforward articles,
-informative Webcasts and more! Get everything you need to get up to
-speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
+This SF.Net email is sponsored by: NEC IT Guy Games.  How far can you shotput
+a projector? How fast can you ride your desk chair down the office luge track?
+If you want to score the big prize, get to know the little guy.  
+Play to win an NEC 61" plasma display: http://www.necitguy.com/?r=20
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
