@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: =?ISO-8859-1?Q?Henryk_Pl=F6tz?= <henryk@ploetzli.ch>
-To: Claudio Takahasi <cktakahasi@gmail.com>
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Advanced Audio Distribution Profile (A2DP)
-In-Reply-To: <e1effdeb05061510191a7a40b0@mail.gmail.com>
-Message-ID: <Pine.LNX.4.58.0506151946370.2480@server1.ploetzli.ch>
-References: <e1effdeb05061510191a7a40b0@mail.gmail.com>
+Message-ID: <42B06A2A.7040009@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=ISO-8859-1
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Advanced Audio Distribution Profile (A2DP)
+References: <e1effdeb05061510191a7a40b0@mail.gmail.com>
+In-Reply-To: <e1effdeb05061510191a7a40b0@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,26 +18,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Jun 2005 19:51:05 +0200 (CEST)
+Date: Wed, 15 Jun 2005 11:49:30 -0600
 
-Moin,
+Claudio,
 
-On Wed, 15 Jun 2005, Claudio Takahasi wrote:
+What is it you want to do?
 
+We have prototypes for sending and receiving a2dp. For the desktop, we 
+need to adapt the a2dp sender to be an alsa plugin. Marcel has done some 
+work on that.
+
+I've been trying to slim down the floating point operations in the sbc 
+library so the thing will run on an arm cpu.
+
+see http://bluetooth-alsa.sf.net
+
+Brad
+
+Claudio Takahasi wrote:
+> Hi folks,
+> 
 > Is there anybody working on Advanced Audio Distribution Profile (A2DP)?
-
-Well, probably not exactly at this moment, but in general: yes.
-
+> 
+> 
 > What are the available tools and software for linux/Bluez that
 > provide audio streaming?
-
-A2DP is an experimental part of bluetooth-alsa, take a look at
-http://bluetooth-alsa.sf.net/. All relevant explanations should be on that
-page.
-
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
+> 
+> 
+> 
+> Claudio.
+> 
+> 
+> -------------------------------------------------------
+> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+> from IBM. Find simple to follow Roadmaps, straightforward articles,
+> informative Webcasts and more! Get everything you need to get up to
+> speed, fast. http://ads.osdn.com/?ad_idt77&alloc_id492&op=click
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------
