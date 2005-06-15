@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 To: bluez-devel@lists.sourceforge.net
 From: Gunter Ohrner <G.Ohrner@post.rwth-aachen.de>
-Message-ID: <d8qam2$vki$1@sea.gmane.org>
+Message-ID: <d8qanv$vp7$1@sea.gmane.org>
 References: <d7uvkf$jm$1@sea.gmane.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
@@ -17,7 +17,7 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 16 Jun 2005 00:43:39 +0200
+Date: Thu, 16 Jun 2005 00:45:11 +0200
 
 Gunter Ohrner wrote:
 > I've had a hard time trying to get my headset working but had no success
