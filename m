@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0506160550b28cb3f@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
-To: =?ISO-8859-1?Q?Henryk_Pl=F6tz?= <henryk@ploetzli.ch>
-Subject: Re: [Bluez-devel] Advanced Audio Distribution Profile (A2DP)
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.58.0506151946370.2480@server1.ploetzli.ch>
+To: bluez-devel@lists.sourceforge.net
+From: Gunter Ohrner <G.Ohrner@post.rwth-aachen.de>
+Message-ID: <d8qam2$vki$1@sea.gmane.org>
+References: <d7uvkf$jm$1@sea.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <e1effdeb05061510191a7a40b0@mail.gmail.com>
-	 <Pine.LNX.4.58.0506151946370.2480@server1.ploetzli.ch>
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-devel] Re: btsco and Jabra Headset
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,38 +17,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 16 Jun 2005 09:50:38 -0300
+Date: Thu, 16 Jun 2005 00:43:39 +0200
 
-Thanks for all answer!
+Gunter Ohrner wrote:
+> I've had a hard time trying to get my headset working but had no success
+> so far. :-(
 
-At first moment I want setup a motorola HS810 to working on Linux and
-after that analise how can it work on embedded linux.
+Mh, noone has any idea? So it's probably a hardware defect rather than a
+configuration or software problem? Unfortunately I have no replacement
+hardware to verify, I'll need to buy some if it's the likely cause...
 
+Greetings,
 
-Regards,
-Claudio.
+  Gunter
 
-On 6/15/05, Henryk Pl=F6tz <henryk@ploetzli.ch> wrote:
-> Moin,
->=20
-> On Wed, 15 Jun 2005, Claudio Takahasi wrote:
->=20
-> > Is there anybody working on Advanced Audio Distribution Profile (A2DP)?
->=20
-> Well, probably not exactly at this moment, but in general: yes.
->=20
-> > What are the available tools and software for linux/Bluez that
-> > provide audio streaming?
->=20
-> A2DP is an experimental part of bluetooth-alsa, take a look at
-> http://bluetooth-alsa.sf.net/. All relevant explanations should be on tha=
-t
-> page.
->=20
-> --
-> Henryk Pl=F6tz
-> Gr=FC=DFe aus Berlin
->
+-- 
+Der Gesundheitsminister:
+Rauchen gefährdet die Gesundheit. Nichtrauchen gefährdet den 
+Bundesfinanzminister.        -- <news:u4qrb3uyz.fsf@ikier.net>
+*** PGP-Verschlüsselung bei eMails erwünscht :-) *** PGP: 0x1128F25F ***
+
 
 
 -------------------------------------------------------
