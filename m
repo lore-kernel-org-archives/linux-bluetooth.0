@@ -2,12 +2,12 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Luiz Fernando Capitulino <lcapitulino@conectiva.com.br>
 Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <42B1DE9B.5020607@conectiva.com.br>
-References: <42B1DE9B.5020607@conectiva.com.br>
+In-Reply-To: <42B1DA59.6040608@conectiva.com.br>
+References: <42B1DA59.6040608@conectiva.com.br>
 Content-Type: text/plain
-Message-Id: <1118957189.8980.102.camel@pegasus>
+Message-Id: <1118957041.8980.101.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: [PATCH] - Fixes hcitool error code on memory allocations.
+Subject: [Bluez-devel] Re: [RESEND] - Fixes rfcomm program error codes.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,19 +19,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 16 Jun 2005 23:26:29 +0200
+Date: Thu, 16 Jun 2005 23:24:01 +0200
 
 Hi Luiz,
 
-> This patch adds proper error code and message for memory allocations
-> errors in hcitool program.
+> I sent this patch some days ago, but I saw that my e-mail client
+> took the bluez-users address. Hopes to not annoy you sending it
+> again (to the right place now).
 > 
-> Comments are welcome.
+> rfcomm program does not return proper error codes to the environment,
+> this makes hard to use it from a shell script or from another program.
 > 
-> tools/hcitool.c |   72 +++++++++++++++++++++++++++++++++++++-------------------
-> 1 files changed, 48 insertions(+), 24 deletions(-)
+> Here goes a patch to fix it. I didn't have much time to test it, so
+> any feedback is welcome.
+> 
+> - Changes functions to return -1 on error and 0 on success
+> - Adds missing error checks
+> - Adds missing error messages
+> - Fixes rfcomm exit() return codes
 
-applied. Thanks.
+I don't see the advantages from changing "exit(1)" into "return -1".
+This doesn't fix program error codes.
 
 Regards
 
