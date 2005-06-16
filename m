@@ -1,59 +1,201 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Fernando Capitulino <lcapitulino@conectiva.com.br>
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <42B1DA59.6040608@conectiva.com.br>
-References: <42B1DA59.6040608@conectiva.com.br>
-Content-Type: text/plain
-Message-Id: <1118957041.8980.101.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: [RESEND] - Fixes rfcomm program error codes.
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 16 Jun 2005 23:24:01 +0200
+Return-Path: <lcapitulino@conectiva.com.br>
+Message-ID: <42B1DE9B.5020607@conectiva.com.br>
+Date: Thu, 16 Jun 2005 17:18:35 -0300
+From: Luiz Fernando Capitulino <lcapitulino@conectiva.com.br>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net, marcel@holtmann.org
+Subject: [PATCH] - Fixes hcitool error code on memory allocations.
+Content-Type: multipart/mixed;
+ boundary="------------010006040800060006020403"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Luiz,
+This is a multi-part message in MIME format.
+--------------010006040800060006020403
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> I sent this patch some days ago, but I saw that my e-mail client
-> took the bluez-users address. Hopes to not annoy you sending it
-> again (to the right place now).
-> 
-> rfcomm program does not return proper error codes to the environment,
-> this makes hard to use it from a shell script or from another program.
-> 
-> Here goes a patch to fix it. I didn't have much time to test it, so
-> any feedback is welcome.
-> 
-> - Changes functions to return -1 on error and 0 on success
-> - Adds missing error checks
-> - Adds missing error messages
-> - Fixes rfcomm exit() return codes
+Hello all,
 
-I don't see the advantages from changing "exit(1)" into "return -1".
-This doesn't fix program error codes.
+This patch adds proper error code and message for memory allocations
+errors in hcitool program.
 
-Regards
+Comments are welcome.
 
-Marcel
+tools/hcitool.c |   72 +++++++++++++++++++++++++++++++++++++-------------------
+1 files changed, 48 insertions(+), 24 deletions(-)
+
+-- 
+Luiz Fernando N. Capitulino
+
+--------------010006040800060006020403
+Content-Type: text/x-patch;
+ name="hcitool_malloc_audit.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="hcitool_malloc_audit.patch"
+
+ tools/hcitool.c |   72 +++++++++++++++++++++++++++++++++++++-------------------
+ 1 files changed, 48 insertions(+), 24 deletions(-)
 
 
+diff -X /home/lcapitulino/kernels/2.6/dontdiff -Nparu a/tools/hcitool.c a~/tools/hcitool.c
+--- a/tools/hcitool.c	2005-05-09 15:33:24.000000000 -0300
++++ a~/tools/hcitool.c	2005-06-12 20:30:11.000000000 -0300
+@@ -1030,8 +1030,10 @@ static void cmd_dc(int dev_id, int argc,
+ 	}
+ 
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+-	if (!cr)
+-		return;
++	if (!cr) {
++		perror("Can't allocate memory");
++		exit(1);
++	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+@@ -1165,8 +1167,10 @@ static void cmd_rssi(int dev_id, int arg
+ 	}
+ 
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+-	if (!cr)
+-		return;
++	if (!cr) {
++		perror("Can't allocate memory");
++		exit(1);
++	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+@@ -1236,8 +1240,10 @@ static void cmd_lq(int dev_id, int argc,
+ 	}
+ 
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+-	if (!cr)
+-		return;
++	if (!cr) {
++		perror("Can't allocate memory");
++		exit(1);
++	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+@@ -1309,8 +1315,10 @@ static void cmd_tpl(int dev_id, int argc
+ 	}
+ 
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+-	if (!cr)
+-		return;
++	if (!cr) {
++		perror("Can't allocate memory");
++		exit(1);
++	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+@@ -1382,8 +1390,10 @@ static void cmd_afh(int dev_id, int argc
+ 	}
+ 
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+-	if (!cr)
+-		return;
++	if (!cr) {
++		perror("Can't allocate memory");
++		exit(1);
++	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+@@ -1465,8 +1475,10 @@ static void cmd_cpt(int dev_id, int argc
+ 	}
+ 
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+-	if (!cr)
+-		return;
++	if (!cr) {
++		perror("Can't allocate memory");
++		exit(1);
++	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+@@ -1546,8 +1558,10 @@ static void cmd_lst(int dev_id, int argc
+ 	}
+ 
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+-	if (!cr)
+-		return;
++	if (!cr) {
++		perror("Can't allocate memory");
++		exit(1);
++	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+@@ -1631,8 +1645,10 @@ static void cmd_auth(int dev_id, int arg
+ 	}
+ 
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+-	if (!cr)
+-		return;
++	if (!cr) {
++		perror("Can't allocate memory");
++		exit(1);
++	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+@@ -1700,8 +1716,10 @@ static void cmd_enc(int dev_id, int argc
+ 	}
+ 
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+-	if (!cr)
+-		return;
++	if (!cr) {
++		perror("Can't allocate memory");
++		exit(1);
++	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+@@ -1770,8 +1788,10 @@ static void cmd_key(int dev_id, int argc
+ 	}
+ 
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+-	if (!cr)
+-		return;
++	if (!cr) {
++		perror("Can't allocate memory");
++		exit(1);
++	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+@@ -1839,8 +1859,10 @@ static void cmd_clkoff(int dev_id, int a
+ 	}
+ 
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+-	if (!cr)
+-		return;
++	if (!cr) {
++		perror("Can't allocate memory");
++		exit(1);
++	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+@@ -1912,8 +1934,10 @@ static void cmd_clock(int dev_id, int ar
+ 	}
+ 
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+-	if (!cr)
+-		return;
++	if (!cr) {
++		perror("Can't allocate memory");
++		exit(1);
++	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
 
-
--------------------------------------------------------
-SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-from IBM. Find simple to follow Roadmaps, straightforward articles,
-informative Webcasts and more! Get everything you need to get up to
-speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--------------010006040800060006020403--
