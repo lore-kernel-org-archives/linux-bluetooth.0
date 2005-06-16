@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] patch to add read/write inquiry scan type
-	functionality
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <ef9938ec0506151258214c60e1@mail.gmail.com>
-References: <ef9938ec0506151258214c60e1@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1118930737.8980.37.camel@pegasus>
+Message-ID: <e1effdeb0506160550b28cb3f@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
+To: =?ISO-8859-1?Q?Henryk_Pl=F6tz?= <henryk@ploetzli.ch>
+Subject: Re: [Bluez-devel] Advanced Audio Distribution Profile (A2DP)
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <Pine.LNX.4.58.0506151946370.2480@server1.ploetzli.ch>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <e1effdeb05061510191a7a40b0@mail.gmail.com>
+	 <Pine.LNX.4.58.0506151946370.2480@server1.ploetzli.ch>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,24 +20,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 16 Jun 2005 16:05:37 +0200
+Date: Thu, 16 Jun 2005 09:50:38 -0300
 
-Hi Albert,
+Thanks for all answer!
 
-> The attached patches add reading and writing of inquiry scan type (for
-> interlaced inquiry scan)
-> 
-> One patch is for libs, the other is for utils
-
-I applied the patch and changed "istype" to "inqtype". I also added a
-section in the manual page about the new command. You also forgot to add
-decoding support for it to hcidump.
-
-Regards
-
-Marcel
+At first moment I want setup a motorola HS810 to working on Linux and
+after that analise how can it work on embedded linux.
 
 
+Regards,
+Claudio.
+
+On 6/15/05, Henryk Pl=F6tz <henryk@ploetzli.ch> wrote:
+> Moin,
+>=20
+> On Wed, 15 Jun 2005, Claudio Takahasi wrote:
+>=20
+> > Is there anybody working on Advanced Audio Distribution Profile (A2DP)?
+>=20
+> Well, probably not exactly at this moment, but in general: yes.
+>=20
+> > What are the available tools and software for linux/Bluez that
+> > provide audio streaming?
+>=20
+> A2DP is an experimental part of bluetooth-alsa, take a look at
+> http://bluetooth-alsa.sf.net/. All relevant explanations should be on tha=
+t
+> page.
+>=20
+> --
+> Henryk Pl=F6tz
+> Gr=FC=DFe aus Berlin
+>
 
 
 -------------------------------------------------------
