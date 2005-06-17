@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Code Logic <codelogic@gmail.com>
+From: Joe Halliwell <joeh@dai.ed.ac.uk>
 To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1119020785.7933.5.camel@santafe>
+Message-Id: <1119020625.9917.44.camel@localhost.localdomain>
 Mime-Version: 1.0
-Subject: [Bluez-users] Emulating a Handsfree
+Subject: [Bluez-users] Re: Modprobe FATAL errors
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,15 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Jun 2005 09:06:25 -0600
+Date: Fri, 17 Jun 2005 16:03:45 +0100
 
-Can bluez act as a headset (Handsfree profile not Headset profile), so
-that a phone can connect to it as its handsfree device? My phone doesn't
-seem to have implemented the Handsfree profile correctly, so I was
-wondering if I could debug its implementation by making it connect to a
-computer instead of an actual HF and sniffing the BT packets.
+Hi,
 
-Thanks a lot!!
+Please ignore my previous mail, as everything's working again :)
+
+What fixed it? Power-cycling my Nokia 6230... :-S
+
+Thanks,
+Joe
 
 
 
