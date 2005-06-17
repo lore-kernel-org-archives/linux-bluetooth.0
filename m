@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050617025850.59350.qmail@web50708.mail.yahoo.com>
-From: "John H." <mistamaila@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1118908231.3826.10.camel@localhost.localdomain>
+Message-ID: <42B22532.5050406@lesagepono.be>
+From: Laurent Lesage <laurent@lesagepono.be>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] upgrade to fc4 kills bluez-utils
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] How can you give the pin without using the keyboard?
+References: <42B1E0EA.7010304@lesagepono.be> <42B1E2A7.8070001@gmx.ch> <42B1EB97.3040303@lesagepono.be> <42B1F004.3040106@gmx.ch>
+In-Reply-To: <42B1F004.3040106@gmx.ch>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,39 +18,119 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 16 Jun 2005 19:58:50 -0700 (PDT)
+Date: Fri, 17 Jun 2005 01:19:46 +0000
 
-and so I tried to recompile and i get this, despite
-recompiling/installing bluez-libs
+Thanks again!
 
- -L/usr/lib -ldbus-1 /usr/lib/libbluetooth.so
-dbus.o(.text+0x75): In function
-`hcid_dbus_request_pin':
-dbus.c: undefined reference to
-`dbus_message_append_iter_init'
-dbus.o(.text+0x85):dbus.c: undefined reference to
-`dbus_message_iter_append_boolean'
-dbus.o(.text+0x91):dbus.c: undefined reference to
-`dbus_message_iter_append_byte_array'
-dbus.o(.text+0x2f1): In function
-`reply_handler_function':
-dbus.c: undefined reference to
-`dbus_pending_call_get_reply'
-dbus.o(.text+0x354):dbus.c: undefined reference to
-`dbus_message_iter_get_string'
-collect2: ld returned 1 exit status
-make[2]: *** [hcid] Error 1
-make[2]: Leaving directory
-`/tmp/bluez-utils-2.17/hcid'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/tmp/bluez-utils-2.17'
-make: *** [all] Error 2
+Laurent
 
+Marco Trudel a =E9crit :
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+> Hello Laurent
+>
+> This is used if a device connects to your computer. If you read the=20
+> comments in hcid.conf, you see that your auto value is for incoming=20
+> connections.
+> Feel free to adapt your script to echo /etc/bluetooth/pin if you wan't=20
+> to use the same pin for incoming and outgoing connections...
+>
+> regards
+> Marco
+>
+>
+> Laurent Lesage wrote:
+>
+>> Thanks Marco, it works well. What is the "/etc/bluetooth/pin" file=20
+>> for, then?
+>>
+>> Laurent
+>>
+>>
+>> Marco Trudel a =E9crit :
+>>
+>>> Hello Laurent
+>>>
+>>> replace the pin_helper utility (referenced in hcid.conf) with a=20
+>>> script that echoes your pin:
+>>> echo PIN:1234
+>>> if 1234 is your pin...
+>>>
+>>> regards
+>>> Marco
+>>>
+>>>
+>>> Laurent Lesage wrote:
+>>>
+>>>> Hi all,
+>>>>
+>>>> I would like to pair my headset without typing the pin on the=20
+>>>> keyboard. I use the "auto" value for security in "hcid.conf" but=20
+>>>> the PIN is asked every time I start to use the headset (once=20
+>>>> paired, it is ok). I have a file 'pin' with the vlaue of the pin=20
+>>>> but it seems to be of no use.
+>>>>
+>>>> Thanks
+>>>>
+>>>> Laurent
+>>>>
+>>>>
+>>>> -------------------------------------------------------
+>>>> SF.Net email is sponsored by: Discover Easy Linux Migration Strategi=
+es
+>>>> from IBM. Find simple to follow Roadmaps, straightforward articles,
+>>>> informative Webcasts and more! Get everything you need to get up to
+>>>> speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3D=
+click
+>>>> _______________________________________________
+>>>> Bluez-users mailing list
+>>>> Bluez-users@lists.sourceforge.net
+>>>> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>>>>
+>>>>
+>>>
+>>>
+>>> -------------------------------------------------------
+>>> SF.Net email is sponsored by: Discover Easy Linux Migration Strategie=
+s
+>>> from IBM. Find simple to follow Roadmaps, straightforward articles,
+>>> informative Webcasts and more! Get everything you need to get up to
+>>> speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3D=
+click
+>>> _______________________________________________
+>>> Bluez-users mailing list
+>>> Bluez-users@lists.sourceforge.net
+>>> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>>>
+>>>
+>>
+>>
+>>
+>> -------------------------------------------------------
+>> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+>> from IBM. Find simple to follow Roadmaps, straightforward articles,
+>> informative Webcasts and more! Get everything you need to get up to
+>> speed, fast. http://ads.osdn.com/?ad_idt77&alloc_id=16492&op=3Dclick
+>> _______________________________________________
+>> Bluez-users mailing list
+>> Bluez-users@lists.sourceforge.net
+>> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>>
+>>
+>
+>
+> -------------------------------------------------------
+> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+> from IBM. Find simple to follow Roadmaps, straightforward articles,
+> informative Webcasts and more! Get everything you need to get up to
+> speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dcl=
+ick
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>
+
 
 
 -------------------------------------------------------
