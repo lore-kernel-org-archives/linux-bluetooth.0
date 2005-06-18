@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050619213012.59055.qmail@web50704.mail.yahoo.com>
-From: "John H." <mistamaila@yahoo.com>
+Subject: Re: [Bluez-users] Kernel panic on stopping pand
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1118908231.3826.10.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] error on bluez-utils compile(fc4)
+In-Reply-To: <42B447F2.9080801@eridani.co.uk>
+References: <42B447F2.9080801@eridani.co.uk>
+Content-Type: text/plain
+Message-Id: <1119137187.9217.5.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,39 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 19 Jun 2005 14:30:12 -0700 (PDT)
+Date: Sun, 19 Jun 2005 01:26:27 +0200
 
-Any ideas?  I am assuming it's something new with
-dbus.
+Hi Michael,
 
+> Trying kernel 2.6.11.12, I got this (attached) kernel panic message 
+> after trying to stop pand after the first set of messages logged appeared.
+> 
+> Before that are the messages, when the entire USB layer seems to stall.  
+> It's possibly worth noting this only happens going through a hub - when 
+> connected directly to the machine the problem doesn't occur.
+> 
+> There was a second panic, where the machine froze up, and the message 
+> was way too long to fit on the screen... this wasn't logged in syslog.
+> 
+> It's possible the fault could be the USB hub driver, but it doesn't play 
+> up like this when I run my USB hard disc through it. I haven't tried my 
+> DVD burner through the hub - they make expensive beermats :-/
 
-dbus.o(.text+0x75): In function
-`hcid_dbus_request_pin':
-dbus.c: undefined reference to
-`dbus_message_append_iter_init'
-dbus.o(.text+0x85):dbus.c: undefined reference to
-`dbus_message_iter_append_boolean'
-dbus.o(.text+0x91):dbus.c: undefined reference to
-`dbus_message_iter_append_byte_array'
-dbus.o(.text+0x2f1): In function
-`reply_handler_function':
-dbus.c: undefined reference to
-`dbus_pending_call_get_reply'
-dbus.o(.text+0x354):dbus.c: undefined reference to
-`dbus_message_iter_get_string'
-collect2: ld returned 1 exit status
-make[2]: *** [hcid] Error 1
-make[2]: Leaving directory
-`/tmp/bluez-utils-2.17/hcid'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/tmp/bluez-utils-2.17'
-make: *** [all] Error 2
+please re-test it with the 2.6.12 kernel. The hci_usb driver is not
+perfect, but we had problems with dongles attached to an USB hub before
+and so this might be also a problem inside the USB subsystem.
+
+Regards
+
+Marcel
 
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
 
 
 -------------------------------------------------------
