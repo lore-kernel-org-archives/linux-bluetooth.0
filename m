@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] error on bluez-utils compile(fc4)
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20050619213012.59055.qmail@web50704.mail.yahoo.com>
+From: "John H." <mistamaila@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050619213012.59055.qmail@web50704.mail.yahoo.com>
-References: <20050619213012.59055.qmail@web50704.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1119216918.8954.3.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <1118908231.3826.10.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] error on bluez-utils compile(fc4)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,43 +17,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 19 Jun 2005 23:35:18 +0200
+Date: Sun, 19 Jun 2005 14:30:12 -0700 (PDT)
 
-Hi John,
-
-> Any ideas?  I am assuming it's something new with
-> dbus.
-> 
-> 
-> dbus.o(.text+0x75): In function
-> `hcid_dbus_request_pin':
-> dbus.c: undefined reference to
-> `dbus_message_append_iter_init'
-> dbus.o(.text+0x85):dbus.c: undefined reference to
-> `dbus_message_iter_append_boolean'
-> dbus.o(.text+0x91):dbus.c: undefined reference to
-> `dbus_message_iter_append_byte_array'
-> dbus.o(.text+0x2f1): In function
-> `reply_handler_function':
-> dbus.c: undefined reference to
-> `dbus_pending_call_get_reply'
-> dbus.o(.text+0x354):dbus.c: undefined reference to
-> `dbus_message_iter_get_string'
-> collect2: ld returned 1 exit status
-> make[2]: *** [hcid] Error 1
-> make[2]: Leaving directory
-> `/tmp/bluez-utils-2.17/hcid'
-> make[1]: *** [all-recursive] Error 1
-> make[1]: Leaving directory `/tmp/bluez-utils-2.17'
-> make: *** [all] Error 2
-
-the CVS version should fix it.
-
-Regards
-
-Marcel
+Any ideas?  I am assuming it's something new with
+dbus.
 
 
+dbus.o(.text+0x75): In function
+`hcid_dbus_request_pin':
+dbus.c: undefined reference to
+`dbus_message_append_iter_init'
+dbus.o(.text+0x85):dbus.c: undefined reference to
+`dbus_message_iter_append_boolean'
+dbus.o(.text+0x91):dbus.c: undefined reference to
+`dbus_message_iter_append_byte_array'
+dbus.o(.text+0x2f1): In function
+`reply_handler_function':
+dbus.c: undefined reference to
+`dbus_pending_call_get_reply'
+dbus.o(.text+0x354):dbus.c: undefined reference to
+`dbus_message_iter_get_string'
+collect2: ld returned 1 exit status
+make[2]: *** [hcid] Error 1
+make[2]: Leaving directory
+`/tmp/bluez-utils-2.17/hcid'
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory `/tmp/bluez-utils-2.17'
+make: *** [all] Error 2
+
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
