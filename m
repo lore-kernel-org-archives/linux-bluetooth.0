@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] multimedia keys MS Bluetooth desktop
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <BAY10-F503039E475B8677F27C14EB5E80@phx.gbl>
+From: "Hui Vzhopu" <huivzhopu@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <BAY10-F503039E475B8677F27C14EB5E80@phx.gbl>
-References: <BAY10-F503039E475B8677F27C14EB5E80@phx.gbl>
-Content-Type: text/plain
-Message-Id: <1119387991.26772.136.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Subject: [Bluez-users] multimedia keys MS Bluetooth desktop
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,25 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 21 Jun 2005 23:06:31 +0200
+Date: Tue, 21 Jun 2005 18:03:59 -0300
 
-Hi Hui,
+If I run hcidump utility, all normal keys generate some data dumps,
+BUT the multimedia keys produce nothing!!
 
-> If I run hcidump utility, all normal keys generate some data dumps,
-> BUT the multimedia keys produce nothing!!
-> 
-> How could this be? With Same keyboard, same computer, multimedia keys work 
-> great in WinXP.
-> 
-> I read somewhere in regards to a USB game controller, that depending on how 
-> the device is initialized, it will report a DIFFERENT number of buttons.
+How could this be? With Same keyboard, same computer, multimedia keys work 
+great in WinXP.
 
-try a 2.6.12-mh1 kernel and check again.
+I read somewhere in regards to a USB game controller, that depending on how 
+the device is initialized, it will report a DIFFERENT number of buttons.
 
-Regards
+Any thoughts???
 
-Marcel
-
+_________________________________________________________________
+FREE pop-up blocking with the new MSN Toolbar - get it now! 
+http://toolbar.msn.click-url.com/go/onm00200415ave/direct/01/
 
 
 
