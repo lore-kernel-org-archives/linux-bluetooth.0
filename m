@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Fred Schaettgen <bluez-user@schaettgen.de>
+Subject: Re: [Bluez-users] multimedia keys MS Bluetooth desktop
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Pairing in FC4 without gnome or kde?
-Cc: David Wuertele <dave-gnus@bfnet.com>
-References: <m3psuelq3x.fsf@bfnet.com>
-In-Reply-To: <m3psuelq3x.fsf@bfnet.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200506221258.10097.bluez-user@schaettgen.de>
+In-Reply-To: <200506220030.39840.cijoml@volny.cz>
+References: <BAY10-F503039E475B8677F27C14EB5E80@phx.gbl>
+	 <200506220003.17917.cijoml@volny.cz> <1119392076.26772.138.camel@pegasus>
+	 <200506220030.39840.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1119393804.26772.140.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,24 +20,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Jun 2005 12:58:09 +0200
+Date: Wed, 22 Jun 2005 00:43:24 +0200
 
-On Wednesday, 22. June 2005 11:04, David Wuertele wrote:
-...
-> I then did "service stop bluetooth" and "service start bluetooth", and
-> then put my headset in pairing mode.  But nothing happens.
->
-> Can someone give this poor non-gnome non-kde user a clue?
+Hi Michal,
 
-You've got to search for the headset and connect to it to trigger the 
-authentication process. Keep an eye on the syslog just in case something went 
-wrong with the pin helper setup.
+> > > I have an old MS keyboard and 2.6.12-mh1 didn't help
+> >
+> > the key may not work, but you will at least see them with hcidump.
+> 
+> I tried hcidump as first application...nothing happens after pressing button
 
-Fred
+that is weird. Does hidd shows this device in boot-protocol mode?
 
--- 
-Fred Schaettgen
-bluez-devel@schaettgen.de
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
