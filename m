@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Advanced Audio Distribution Profile (A2DP)
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <42B8563E.9040008@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <42B8563E.9040008@xmission.com>
-References: <C70061B183DE09419568AB2060C52A95702C9A@arion.intra.local>
-	 <1119374946.26772.119.camel@pegasus>  <42B8563E.9040008@xmission.com>
-Content-Type: text/plain
-Message-Id: <1119378538.26772.127.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Advanced Audio Distribution Profile (A2DP)
+References: <C70061B183DE09419568AB2060C52A95702C9A@arion.intra.local> <1119374946.26772.119.camel@pegasus>
+In-Reply-To: <1119374946.26772.119.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,36 +18,68 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 21 Jun 2005 20:28:58 +0200
+Date: Tue, 21 Jun 2005 12:02:38 -0600
 
-Hi Brad,
+Guys,
 
-> i was hoping to get the timing problem hammered by using setitimer. 
-> unfortunately, there still seems to be some dependency on the cpu speed 
-> which is surprising to me. there's a place in the code where the time 
-> period reported by libsbc is multiplied by 87/100. that 87 has to be 
-> tweaked for different cpus :(
+>>I've tried recently to run a2play on arm (@~380), well no surprise here,
+>>it looks like there is not enough cpu to deal with fp emulation. Later
+>>I've modified a2play so it can play pre-encoded sbc (sbcend output) to
+>>skip encoding part, but it still far from what I get when run it on PC.
 
-this is because the encoding itself takes some time. For that we need to
-encode up to 6 SBC frames in advance.
+the irony is we just overwrote an old a2play that required a preencoded 
+stream to be piped in :(
 
-> > You need to encode the SBC frames in advance and then use a timer for
-> > sending them. I am working on a ALSA plugin that will do exactly this,
-> > but I think that won't help you on your embedded platform.
+>>I think there is a synchronization problem somewhere there, hear a lot
+>>of clicks, drops and repetitions. I've tried it with 2 different pairs
+>>of headphones, on Bluewalker and on HP's (iPAQ gadget), and while the
+>>former sound not extremelly bad, the latter sound very crappy (there are
+>>periods when they sound ok, but mostly they are out of sync?). So it
+>>looks like it somehow connected with how the headphone handle timing?
+
+i was hoping to get the timing problem hammered by using setitimer. 
+unfortunately, there still seems to be some dependency on the cpu speed 
+which is surprising to me. there's a place in the code where the time 
+period reported by libsbc is multiplied by 87/100. that 87 has to be 
+tweaked for different cpus :(
+
+i came by the 87 by using my 1.4ghz pentium-M with the hp headset.
+
+the iphono and itech headsets are very forgiving with timing. they also 
+seem to have the worst problems with audio delay.
+
+>>1) Is there anyone buse with sbc fixed point convertion?
 > 
-> i'm very excited to see this part. go, Marcel! and hopefully you can let 
-> us see what this work looks like soon :)
+> We need an integer only implementation of SBC. I may repeat myself, but
+> I am not going to code this. This must be done by someone else.
 
-Don't expect any updates this month, because I am too busy with other
-things. I will release bluez-utils-2.18 without an updated version of
-the plugin. However my plan is to have a basic A2DP plugin and also a
-headset plugin working before I am going to the OLS.
+i started trying to do this with a library (gnu mp). the library is 
+really meant for arbitrary-sized numbers, and not so great with short 
+floats. if i had a reference implementation of soft floating point in C, 
+i could dig into this again. i might try it without but i would have to 
+reinvent the normalizing floats after multiply/divides.
 
-Regards
+>>2) Is there anyone with similar problems (out-of-synch sound) and knows
+>>how to solve it (or is it just about tuning the timer?)?
 
-Marcel
+yes, we found out pretty soon that the hp headset insists on that "87" 
+to be tuned for different cpus. maybe there is something wrong with how 
+i did the timer or maybe itimer is not a great route to go.
 
+i also have an arm board that i am trying to use with this stuff. it can 
+*receive* audio if the encoder settings are turned way down but can't 
+transmit a2dp. see
 
+  http://bluetooth-alsa.sourceforge.net/embed.html
+
+> You need to encode the SBC frames in advance and then use a timer for
+> sending them. I am working on a ALSA plugin that will do exactly this,
+> but I think that won't help you on your embedded platform.
+
+i'm very excited to see this part. go, Marcel! and hopefully you can let 
+us see what this work looks like soon :)
+
+Brad
 
 
 -------------------------------------------------------
