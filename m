@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: RE: [Bluez-devel] Advanced Audio Distribution Profile (A2DP)
-Message-ID: <C70061B183DE09419568AB2060C52A9570322F@arion.intra.local>
-From: "Victor Shcherbatyuk" <Victor.Shcherbatyuk@tomtom.com>
-To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <5256d0b0506220154442156ac@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Advanced Audio Distribution Profile (A2DP)
+In-Reply-To: <e1effdeb0506160550b28cb3f@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <e1effdeb05061510191a7a40b0@mail.gmail.com>
+	 <Pine.LNX.4.58.0506151946370.2480@server1.ploetzli.ch>
+	 <e1effdeb0506160550b28cb3f@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,105 +20,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 22 Jun 2005 17:27:55 +0200
+Date: Wed, 22 Jun 2005 09:54:24 +0100
 
-Hello all,
-
-Today I was playing with the timeout. None of the values I've tried
-gives good results for HP headphones. Bigger values as I undestand lead
-to a buffer underrun in the headphones (same sound as I get with fp
-emulation on), while smaller values  lead to frame(sample?) drops on the
-headphone side (it kind of sounds faster, but I thing it just drops the
-samples)? The only thing that is stable are breaks in the music I have
-now and then. From another side, with Bluewalker, with the magic "87" it
-sounds almost the same as with HP headphones (so still break now and
-then), but if I reduce timeout by changing e.g. 87 -> 40 it becomes good
-and there is no difference from the PC. That makes me think that there
-is something to do with the buffering model used for these headphones. I
-still want to chek it.
-
-The next step is the fixed point. As I understood Brad is already
-looking in to it? Cause I also wanted to look into it somewhere in short
-time...
-
-Regards,
-       Victor.
-
------Original Message-----
-From: bluez-devel-admin@lists.sourceforge.net
-[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Brad
-Midgley
-Sent: Tuesday, June 21, 2005 20:03 PM
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Advanced Audio Distribution Profile (A2DP)
-
-i was hoping to get the timing problem hammered by using setitimer.=20
-unfortunately, there still seems to be some dependency on the cpu speed
-which is surprising to me. there's a place in the code where the time
-period reported by libsbc is multiplied by 87/100. that 87 has to be
-tweaked for different cpus :(
-
-i came by the 87 by using my 1.4ghz pentium-M with the hp headset.
-
-the iphono and itech headsets are very forgiving with timing. they also
-seem to have the worst problems with audio delay.
-
->>1) Is there anyone buse with sbc fixed point convertion?
+> Thanks for all answer!
 >=20
-> We need an integer only implementation of SBC. I may repeat myself,=20
-> but I am not going to code this. This must be done by someone else.
+> At first moment I want setup a motorola HS810 to working on Linux and
+> after that analise how can it work on embedded linux.
 
-i started trying to do this with a library (gnu mp). the library is
-really meant for arbitrary-sized numbers, and not so great with short
-floats. if i had a reference implementation of soft floating point in C,
-i could dig into this again. i might try it without but i would have to
-reinvent the normalizing floats after multiply/divides.
+Umm. Maybe its just early in the morning but isn't the A2DP for stereo
+audio while the HS-810 is mono with a mic and hence uses the SCO audio
+which is different. Although the fixed point stuff probably still
+applies.
 
->>2) Is there anyone with similar problems (out-of-synch sound) and=20
->>knows how to solve it (or is it just about tuning the timer?)?
-
-yes, we found out pretty soon that the hp headset insists on that "87"=20
-to be tuned for different cpus. maybe there is something wrong with how
-i did the timer or maybe itimer is not a great route to go.
-
-i also have an arm board that i am trying to use with this stuff. it can
-*receive* audio if the encoder settings are turned way down but can't
-transmit a2dp. see
-
-  http://bluetooth-alsa.sourceforge.net/embed.html
-
-> You need to encode the SBC frames in advance and then use a timer for=20
-> sending them. I am working on a ALSA plugin that will do exactly this,
-
-> but I think that won't help you on your embedded platform.
-
-i'm very excited to see this part. go, Marcel! and hopefully you can let
-us see what this work looks like soon :)
-
-Brad
-
-
--------------------------------------------------------
-SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-from IBM. Find simple to follow Roadmaps, straightforward articles,
-informative Webcasts and more! Get everything you need to get up to
-speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dclic=
-k
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
-This e-mail message contains information which is confidential and may be=
- privileged. It is intended for use by the addressee only. If you are not=
- the intended addressee, we request that you notify the sender immediatel=
-y and delete or destroy this e-mail message and any attachment(s), withou=
-t copying, saving, forwarding, disclosing or using its contents in any ot=
-her way. TomTom N.V., TomTom International BV or any other company belong=
-ing to the TomTom group of companies will not be liable for damage relati=
-ng to the communication by e-mail of data, documents or any other informa=
-tion.
+Pete
 
 
 -------------------------------------------------------
