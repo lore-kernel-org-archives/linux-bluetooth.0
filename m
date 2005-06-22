@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: andreas.knuth@daimlerchrysler.com
+Message-ID: <42B9D9D1.4020200@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Message-id: <OF6C4333A9.A9953808-ONC125702A.00447737-C125702A.0049AD28@dcx.dcx>
-MIME-version: 1.0
-Content-type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] using scanner with bluez and question to csr-hci-commands
+Subject: Re: [Bluez-devel] Advanced Audio Distribution Profile (A2DP)
+References: <C70061B183DE09419568AB2060C52A95702C9A@arion.intra.local>  <1119374946.26772.119.camel@pegasus>  <42B8563E.9040008@xmission.com>  <1119378538.26772.127.camel@pegasus>  <42B86FD5.8020204@xmission.com>  <1119387838.26772.134.camel@pegasus>  <42B8ADC8.6010802@xmission.com> <1119399984.26772.145.camel@pegasus> <42B919BB.6000107@xmission.com> <Pine.LNX.4.62.0506222203110.4779@server1.ploetzli.ch>
+In-Reply-To: <Pine.LNX.4.62.0506222203110.4779@server1.ploetzli.ch>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,57 +18,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 24 Jun 2005 15:24:45 +0200
+Date: Wed, 22 Jun 2005 15:36:17 -0600
 
+Henryk
 
+> So now you're going to bigger-than-32-bit integers anyways?
 
+We don't need the full 32 bits. I want to get this working and then play 
+around with slimming it down.
 
+> Some time ago I already stated that using 32 bit for the floating point 
+> presentation with 16 bits before the decimal point and 16 bits after 
+> should be enough. (PCM and reconstructed subband samples should not exceed 
+> 16 bits and all intermediary values should only be fractions of these 
+> samples. I might have forgotten one bit for the sign, though.)
 
-Hi,
+yes, i remember your suggestion. the libmad guys took an interesting 
+approach... they only use 3 bits for the decimal and 28 for the 
+fractional part. i will look at the range of our computation but it may 
+be possible to similarly dedicate most of the range to the fractional part.
 
-A time ago I installed csrsniff and bpasniff from cvs. I have a FTS and=
- a
-BPA-Sniffer.
+libmad produces 24-bit audio, another indication it is overkill for us 
+to have 32-bit numbers.
 
-When I'm looking now into the cvs I can't find the code again. Why?
+> But then intermediate results during multiplication need an additional 16 
+> bits and your platform therefore needs to be able to handle (at least) 48 
+> bit integers without falling back to floating-point emulation speeds.
 
-Now its time for me to try using this with linux too. currently I am on=
-ly
-tried the bpasniff. It works.  the outcome from the bpasniff looks like=
+multiplying two n-bit numbers results in a 2n-bit product. if we have 
+16-bit numbers, then the multiply/divide intermediate result would fit 
+in a tidy 32 bits.
 
-baseband packages.
-Have someone written some tools for decoding the packages? Or are there=
+> If it can do that, then of course doing fixed point should be easy: 
+> Addition, multiplication and shift work unchanged. Each multiplication 
+> must be followed by a shift right 16 bits. Conversion integer -> fixed 
+> point or fixed point -> integer is shift left 16 bits or shift right 16 
+> bits respectively.
 
-some source /info-link available for this topic?
+yes, exactly. I put inline functions in sbc.h to do the multiply and 
+divide and add/sub "just work."
 
-Second question.
-The csr-ships supporting a lot of additional HCI-commands (I guess its
-implementation specific ...). What I have found in your CVS is the
-possibility to set the BT-Address.
-Is there someone working on getting the following HCI-commands implemen=
-ted
-in bluez - at least in cvs for testing - too?
-
-Display supported key length of the module
-Display acl connection keylength
-warm-reset Resets the module
-cold-reset Resets the module
-Get or set the min keylen
-Get or set the max keylen
-Get or set if a unitkey is used
-
-It would be helpful for testing BT implementaions, because testing the
-black boxes from our supplier is not so easy without tools.
-Is this genrally possible - or are there some restrictions from CSR?
-
-
-
-Mit freundlichen Gr=FC=DFen / kind regards
-
-Andreas Knuth
-=
-
-
+Brad
 
 
 -------------------------------------------------------
