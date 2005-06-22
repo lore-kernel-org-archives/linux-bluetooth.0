@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42B919BB.6000107@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <5256d0b05062123457f881104@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Advanced Audio Distribution Profile (A2DP)
-References: <C70061B183DE09419568AB2060C52A95702C9A@arion.intra.local>	 <1119374946.26772.119.camel@pegasus>  <42B8563E.9040008@xmission.com>	 <1119378538.26772.127.camel@pegasus>  <42B86FD5.8020204@xmission.com>	 <1119387838.26772.134.camel@pegasus>  <42B8ADC8.6010802@xmission.com> <1119399984.26772.145.camel@pegasus>
-In-Reply-To: <1119399984.26772.145.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <1119387838.26772.134.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <C70061B183DE09419568AB2060C52A95702C9A@arion.intra.local>
+	 <1119374946.26772.119.camel@pegasus> <42B8563E.9040008@xmission.com>
+	 <1119378538.26772.127.camel@pegasus> <42B86FD5.8020204@xmission.com>
+	 <1119387838.26772.134.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,30 +21,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 22 Jun 2005 01:56:43 -0600
+Date: Wed, 22 Jun 2005 07:45:07 +0100
 
-Marcel
+> > as far as integer stuff, should we be doing something like a short floa=
+t
+> >
+> > struct sfloat {
+> >   int16 mantissa;
+> >   uint8 exponent;
+> > }
+> >
+> > or a fixed point 32-bit value? any idea what part of the 32 bits would
+> > be best to have in front and behind the decimal?
+> >
+> > i guess i should start by having libsbc keep track of ranges of the
+> > different floats so we can figure out where the precision needs to be.
+>=20
+> Look at how the MAD project does it:
+>=20
+> http://www.underbit.com/products/mad/
 
-It actually isn't that bad to do multiply and divide ops using fixed 
-point. I committed a change that provides a config option --enable-fixed 
-and provides the datatype and inline functions for the basic math ops 
-and conversions (add and subtract don't need anything special)
+The development version of the speex library which has a lot of fixed
+point stuff which generic implementation and some arch specific ones
+may be a good place to look too. www.speex.org
 
-I like the flexibility of keeping an LGPL license as long as we can.
-
-I used the explanation in 
-http://home.rochester.rr.com/ohommes/MathFP/mathfp_bg.html which is a 
-lot better than trying to figure out or tear out code from mad.
-
-One strange thing was I had to abandon using int32_t as the native type. 
-For some reason, math ops on these things that should have used 64 bits 
-for intermediate results instead used 32-bit intermediates. Anyway, 
-using the type "int" outright made it work as expected.
-
-I think a function to do the conversion from double to fixed will 
-require linking libm (for trunc(double) etc) so hopefully we can avoid it.
-
-Brad
+Pete
 
 
 -------------------------------------------------------
