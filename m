@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42BAAA89.8030201@conectiva.com.br>
+Message-ID: <42BAA9C2.3090805@conectiva.com.br>
 From: Luiz Fernando Capitulino <lcapitulino@conectiva.com.br>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Can"t connect RFCOMM socket: resource temporarily
- unavailable
-References: <20050623104846.8137A1EA7F3@mrelay1.st2.lyceu.net>
-In-Reply-To: <20050623104846.8137A1EA7F3@mrelay1.st2.lyceu.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Subject: Re: [Bluez-users] how to scan for other bluetooth device
+References: <42BA9D29.2070303@e28.com.hk>
+In-Reply-To: <42BA9D29.2070303@e28.com.hk>
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,45 +18,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Jun 2005 09:26:49 -0300
+Date: Thu, 23 Jun 2005 09:23:30 -0300
 
-Hi Esther,
+Hi Jacky,
 
-Esther Lopez wrote:
-> I have also created a file: /etc/Bluetooth/my-pin:
->=20
->             #! /bin/bash
->             Echo =93PIN:1111=94
->=20
->=20
-> In /etc/Bluetooth/hcid.conf I have changed the line corresponding to=20
-> =93pin helper=94 to:
->=20
->             Pin_helper/etc/Bluetooth/my-pin
->=20
->=20
-> If I start gnome =93file sharing=94 utility, I can send files from my L=
-inux=20
-> box to the Win XP one (no Pin message is shown).
->=20
->=20
-> If I state: =93rfcomm connect /dev/rfcomm0 <mac> 1=94, I can see in my =
-Win=20
-> XP Pc a message to set the PIN, I put 1111, and press enter. When a tim=
-e=20
-> is elapsed, the message =93Can"t connect RFCOMM socket: resource=20
-> temporarily unavailable=94 appears
-> =20
->=20
-> Some idea of what is going wrong??
+Jacky Cheung wrote:
+> Hi all,
+> 
+> I am new to linux Bluetooth. I've got a question in paging other
+> bluetooth device, says Bluetooth support phone.
+> 
+> My PC is running in Redhat9.0, and I got a USB Bluetooth device. When I
+> plugin the Bluetooth device, I've got the following message from
+> /var/log/message
+> 
+> Jun 23 18:03:48 localhost kernel: hub.c: new USB device 00:1d.2-1,
+> assigned address 5
+> Jun 23 18:03:49 localhost hcid[2611]: HCI dev 0 registered
+> Jun 23 18:03:49 localhost hcid[2579]: HCI dev 0 registered
+> Jun 23 18:03:49 localhost hcid[2611]: HCI dev 0 up
+> Jun 23 18:03:49 localhost hcid[2579]: HCI dev 0 up
+> Jun 23 18:03:49 localhost hcid[2579]: Starting security manager 0
+> Jun 23 18:03:49 localhost hcid[2611]: Starting security manager 0
+> Jun 23 18:03:49 localhost /sbin/hotplug: no runnable
+> /etc/hotplug/bluetooth.agent is installed
+> Jun 23 18:03:52 localhost /etc/hotplug/usb.agent: Setup hci_usb for USB
+> product a12/1/1120
+> 
+> Actually, I can see the Bluetooth device from hciconfig, and the phone
+> can scan the USB BT. However, I fail to scan the phone device in PC. Is
+> that I have missed some settings?
 
-Yes. :)
+Did you try 'hcitool scan' from the PC? Did it give some error message?
 
-Did you write 'Echo' instead of 'echo'? Bash is case-sensitive. Try to wr=
-ite
-such commands in lower-case.
-
---=20
+-- 
 Luiz Fernando N. Capitulino
 
 
