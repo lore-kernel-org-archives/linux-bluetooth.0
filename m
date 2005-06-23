@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42BABCBE.1060200@cefriel.it>
-From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
+Message-ID: <42BA9D29.2070303@e28.com.hk>
+From: Jacky Cheung <jackycheung@e28.com.hk>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] btsco and Musicool 300
+Content-Type: text/plain; charset=Big5
+Subject: [Bluez-users] how to scan for other bluetooth device
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,106 +16,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Jun 2005 15:44:30 +0200
+Date: Thu, 23 Jun 2005 19:29:45 +0800
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi all,
 
-Hi.
-I'm trying to use the Musicool 300 headset with BlueZ.
-I see Marcel Holtmann reports on him site.
-I have some trouble because my headset doesn't reply to my question:
+I am new to linux Bluetooth. I've got a question in paging other
+bluetooth device, says Bluetooth support phone.
 
-~# hcitool inq
-Inquiring ...
-        00:0B:0D:50:15:C7       clock offset: 0x2705    class: 0x200404
-~# hcitool name 00:0B:0D:50:15:C7
-Headphone[15C7]
-~# hcitool info 00:0B:0D:50:15:C7
-Requesting information ...
-Can't create connection: Connection timed out
-~#
+My PC is running in Redhat9.0, and I got a USB Bluetooth device. When I
+plugin the Bluetooth device, I've got the following message from
+/var/log/message
 
-I report hcidump output:
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr 00:0B:0D:50:15:C7 mode 2 clkoffset 0x0000
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr 00:0B:0D:50:15:C7 name 'Headphone[15C7]'
+Jun 23 18:03:48 localhost kernel: hub.c: new USB device 00:1d.2-1,
+assigned address 5
+Jun 23 18:03:49 localhost hcid[2611]: HCI dev 0 registered
+Jun 23 18:03:49 localhost hcid[2579]: HCI dev 0 registered
+Jun 23 18:03:49 localhost hcid[2611]: HCI dev 0 up
+Jun 23 18:03:49 localhost hcid[2579]: HCI dev 0 up
+Jun 23 18:03:49 localhost hcid[2579]: Starting security manager 0
+Jun 23 18:03:49 localhost hcid[2611]: Starting security manager 0
+Jun 23 18:03:49 localhost /sbin/hotplug: no runnable
+/etc/hotplug/bluetooth.agent is installed
+Jun 23 18:03:52 localhost /etc/hotplug/usb.agent: Setup hci_usb for USB
+product a12/1/1120
 
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0B:0D:50:15:C7 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:0B:0D:50:15:C7
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x22 handle 41 bdaddr 00:0B:0D:50:15:C7 type ACL encrypt 0x00
-    Error: LMP Response Timeout
+Actually, I can see the Bluetooth device from hciconfig, and the phone
+can scan the USB BT. However, I fail to scan the phone device in PC. Is
+that I have missed some settings?
 
-When I try to connect btsco with the headset, I obtain:
+Thanks
 
-~# btsco 00:0B:0D:50:15:C7
-Error: Failed to connect to SDP server: Function not implemented
-Assuming channel 2
+Regards,
+Jacky Cheung
 
-Can't connect RFCOMM channel: Resource temporarily unavailable
-~#
-
-and the hcidump output is:
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0B:0D:50:15:C7 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:0B:0D:50:15:C7
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x22 handle 41 bdaddr 00:0B:0D:50:15:C7 type ACL encrypt 0x00
-    Error: LMP Response Timeout
-< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
-> HCI Event: Command Complete (0x0e) plen 6
-    Read Voice Setting (0x03|0x0025) ncmd 1
-    status 0x00 voice setting 0x0060
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0B:0D:50:15:C7 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:0B:0D:50:15:C7
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x22 handle 42 bdaddr 00:0B:0D:50:15:C7 type ACL encrypt 0x00
-    Error: LMP Response Timeout
-
-
-pin helper application doesn't start in both cases.
-Any ideas or suggestions?
-
-thx in advance!
-
-PS: with the same system, I've configured a working NAP, so my bluetooth
-dongle is ok.
-
-- -------------------------------------------
-Luca Pizzamiglio
-CEFRIEL - Embedded Systems Design Unit
-Via Fucini, 2 - 20133 MILANO (ITALY)
-Phone:		+39 02 23954 343
-e-mail:		pizzamiglio@cefriel.it
-ICQ:		5046978
-- -------------------------------------------
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.7 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFCury+AoUy56ORfbERAhTqAJ9Ggtu5FOHRaCW9cRp2DQa7KhAHRwCfaKpS
-UMnl3vEsOk8sYwHQAuDy3AU=
-=HxsQ
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
