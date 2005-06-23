@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42BAA9C2.3090805@conectiva.com.br>
-From: Luiz Fernando Capitulino <lcapitulino@conectiva.com.br>
+From: "Esther Lopez" <esther.lopez@erzia.com>
+To: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] how to scan for other bluetooth device
-References: <42BA9D29.2070303@e28.com.hk>
-In-Reply-To: <42BA9D29.2070303@e28.com.hk>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0010_01C577F1.FCB018F0"
+Message-Id: <20050623104846.8137A1EA7F3@mrelay1.st2.lyceu.net>
+Subject: [Bluez-users] Can"t connect RFCOMM socket: resource temporarily unavailable
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,41 +17,340 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Jun 2005 09:23:30 -0300
+Date: Thu, 23 Jun 2005 12:49:25 +0200
 
-Hi Jacky,
+This is a multi-part message in MIME format.
 
-Jacky Cheung wrote:
-> Hi all,
-> 
-> I am new to linux Bluetooth. I've got a question in paging other
-> bluetooth device, says Bluetooth support phone.
-> 
-> My PC is running in Redhat9.0, and I got a USB Bluetooth device. When I
-> plugin the Bluetooth device, I've got the following message from
-> /var/log/message
-> 
-> Jun 23 18:03:48 localhost kernel: hub.c: new USB device 00:1d.2-1,
-> assigned address 5
-> Jun 23 18:03:49 localhost hcid[2611]: HCI dev 0 registered
-> Jun 23 18:03:49 localhost hcid[2579]: HCI dev 0 registered
-> Jun 23 18:03:49 localhost hcid[2611]: HCI dev 0 up
-> Jun 23 18:03:49 localhost hcid[2579]: HCI dev 0 up
-> Jun 23 18:03:49 localhost hcid[2579]: Starting security manager 0
-> Jun 23 18:03:49 localhost hcid[2611]: Starting security manager 0
-> Jun 23 18:03:49 localhost /sbin/hotplug: no runnable
-> /etc/hotplug/bluetooth.agent is installed
-> Jun 23 18:03:52 localhost /etc/hotplug/usb.agent: Setup hci_usb for USB
-> product a12/1/1120
-> 
-> Actually, I can see the Bluetooth device from hciconfig, and the phone
-> can scan the USB BT. However, I fail to scan the phone device in PC. Is
-> that I have missed some settings?
+------=_NextPart_000_0010_01C577F1.FCB018F0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Did you try 'hcitool scan' from the PC? Did it give some error message?
+Hi everybody
 
--- 
-Luiz Fernando N. Capitulino
+=20
+
+I=92m running Fedora Core 4 (Linux Kernel 2.4.11) and have a =
+Conceptronic
+CBT100U USB Dongle.
+
+=20
+
+I have this device UP, and I can other devices (a Windows XP PC).
+
+=20
+
+I have modified the file /etc/bluetooth/rfcomm.conf including (as read =
+in
+some tutorials):
+
+            Rfcomm0{
+
+                        Bind yes;
+
+                        Device <win xp mac>;
+
+                        Channel 1;
+
+                        Comment =93TDK-BT=94;
+
+            }
+
+=20
+
+I have also created a file: /etc/Bluetooth/my-pin:
+
+            #! /bin/bash
+
+            Echo =93PIN:1111=94
+
+=20
+
+In /etc/Bluetooth/hcid.conf I have changed the line corresponding to =
+=93pin
+helper=94 to:
+
+            Pin_helper/etc/Bluetooth/my-pin
+
+=20
+
+=20
+
+If I start gnome =93file sharing=94 utility, I can send files from my =
+Linux box
+to the Win XP one (no Pin message is shown).
+
+=20
+
+If I state: =93rfcomm connect /dev/rfcomm0 <mac> 1=94, I can see in my =
+Win XP Pc
+a message to set the PIN, I put 1111, and press enter. When a time is
+elapsed, the message =93Can"t connect RFCOMM socket: resource =
+temporarily
+unavailable=94 appears
+
+=20
+
+Some idea of what is going wrong??
+
+=20
+
+Thanks in advance
+
+=20
+
+Regards
+
+=20
+
+=20
+
+Esther L=F3pez Casariego
+
+
+------=_NextPart_000_0010_01C577F1.FCB018F0
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered)">
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:Arial;}
+h1
+	{margin-top:9.0pt;
+	margin-right:0cm;
+	margin-bottom:6.0pt;
+	margin-left:39.6pt;
+	text-align:justify;
+	text-indent:-21.6pt;
+	page-break-after:avoid;
+	font-size:16.0pt;
+	font-family:Arial;}
+h2
+	{margin-top:6.0pt;
+	margin-right:0cm;
+	margin-bottom:6.0pt;
+	margin-left:46.8pt;
+	text-align:justify;
+	text-indent:-28.8pt;
+	page-break-after:avoid;
+	font-size:14.0pt;
+	font-family:Arial;
+	font-style:italic;}
+h3
+	{margin-top:12.0pt;
+	margin-right:0cm;
+	margin-bottom:3.0pt;
+	margin-left:54.0pt;
+	text-indent:-36.0pt;
+	page-break-after:avoid;
+	font-size:13.0pt;
+	font-family:Arial;}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EstiloCorreo17
+	{font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:21.0cm 841.95pt;
+	margin:70.9pt 3.0cm 70.9pt 3.0cm;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+ ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+
+</head>
+
+<body lang=3DES link=3Dblue vlink=3Dpurple>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt'>Hi
+everybody</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>I&#8217;m running Fedora Core 4 (Linux Kernel 2.4.11) and have a =
+Conceptronic
+CBT100U USB Dongle.</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>I have this device UP, and I can other devices (a Windows XP =
+PC).</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>I have modified the file /etc/bluetooth/rfcomm.conf including =
+(as read
+in some tutorials):</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 Rfcomm0{</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 Bind yes;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 Device &lt;win xp mac&gt;;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 Channel 1;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 Comment &#8220;TDK-BT&#8221;;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>I have also created a file: =
+/etc/Bluetooth/my-pin:</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 #! /bin/bash</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 Echo =
+&#8220;PIN:1111&#8221;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>In /etc/Bluetooth/hcid.conf I have changed the line =
+corresponding to &#8220;pin
+helper&#8221; to:</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 =
+Pin_helper/etc/Bluetooth/my-pin</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>If I start gnome &#8220;file sharing&#8221; utility, I can send =
+files
+from my Linux box to the Win XP one (no Pin message is =
+shown).</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>If I state: &#8220;rfcomm connect /dev/rfcomm0 &lt;mac&gt; =
+1&#8221;, I
+can see in my Win XP Pc a message to set the PIN, I put 1111, and press =
+enter.
+When a time is elapsed, the message &#8220;Can&quot;t connect RFCOMM =
+socket:
+resource temporarily unavailable&#8221; appears</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>Some idea of what is going wrong??</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>Thanks in advance</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>Regards</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><b><font size=3D2 face=3DArial><span lang=3DEN-GB
+style=3D'font-size:10.0pt;font-weight:bold'>Esther L=F3pez =
+Casariego</span></font></b></p>
+
+</div>
+
+</body>
+
+</html>
+
+------=_NextPart_000_0010_01C577F1.FCB018F0--
+
 
 
 -------------------------------------------------------
