@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Question to using sdptool
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-From: andreas knuth <andreas.knuth@daimlerchrysler.com>
-Message-ID: <loom.20050624T174404-129@post.gmane.org>
-References: <1119525688.17872.4.camel@sliver.usr.dsi.unimi.it>
+In-Reply-To: <1119621425.3878.216.camel@baroque.rococosoft.com>
+References: 
+	 <OFB3085819.655FE670-ONC125702A.0040152A-C125702A.00445A7F@dcx.dcx>
+	 <1119621425.3878.216.camel@baroque.rococosoft.com>
+Content-Type: text/plain
+Message-Id: <1119627972.7129.10.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Connecting to a Nokia 6021
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,41 +20,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 24 Jun 2005 15:50:22 +0000 (UTC)
+Date: Fri, 24 Jun 2005 17:46:12 +0200
 
-Hi Sebastian,
+Hi Steve,
 
-Sebastiano Vigna <vigna <at> dsi.unimi.it> writes:
-
+> > I am trying to generate some testcases for testing the BT-solution in our
+> > products. Therefore some small questions.
+> > 
+> > I am using two BT-dongles on one host.
+> > At moment when I'm execute "sdptool add <service>" or "sdptool  -i hci1 add
+> > <service>" both hcix gets the service.
+> > Question:
+> > Does provide bluez more then one sdp-daemon - especially to each local
+> > BT-address one dedicated daemon?
+> > Or is it possible to have two separated sdp-data bases - one for each local
+> > address?
 > 
-...
->     L2CAP(d): cid 0x0040 len 4 [psm 3]
->       RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59
-> > HCI Event: Number of Completed Packets (0x13) plen 5
->   0000: 01 28 00 01 00                                    .(...
-> > HCI Event: PIN Code Request (0x16) plen 6
->   0000: 10 26 00 70 13 00                                 .&.p..
-> 
-> And them the phone times out. The interesting point is that if you look at 
-the included hcid.conf,
-> I have a pin helper of my own, containing:
-> 
-> #!/bin/bash
-> echo "Request $(date)" >>/tmp/req
-> echo "PIN:112358"
-> 
-> This is never called by the stack.
-> 
-> I couldn't find any log anywhere to find out what's happening, so I'm
-> really stuck.
+> It doesn't really make sense to have one sdpd per device. Services
+> aren't really bound to a device, rather the machine to which the device
+> is attached.
 
+this depends on it. You can bound a service to a specific and device and
+in this case also the SDP records should bound to a specific address.
+However I don't have really time to look into it at the moment.
 
-In your hcid.conf there are two "PIN-HELPER"s active at the same time! You 
-should have active only one at the same time. Try it out (deactivate 
-dbus_pin_helper -> #dbus_pin_helper.
+> > If the option -i for using with sdptool is correct : when I execute
+> > "sdptool -i hci1 browse" then bluez is doing on hci0 an inquiring and with
+> > the results on hci1 the sdp-requests. Is this process as expected?
+> 
+> Hmmm. It seems there is no way to pass the interface to
+> sdp_general_inquiry(). Perhaps it is best to add a new function,
+> sdp_directed_general_inquiry()? Marcel what do you think?
 
-regards,
-Andreas
+If only sdptool uses these function, we can change it or fix sdptool to
+use hci_inquiry and sdp_* explicitly.
+
+> > One wish to the bluez developer:
+> > The old link-key file (etc/bluetooth/link_key) contained also the time
+> > (+date) of generating the corresponding key. In the new one
+> > (/var/lib/bluetooth/.../linkkeys) the time (+date)is missing.
+> > It was a helpful feature for testing. It is possible to implement this
+> > again?
+
+I left it out, because I don't saw any reason for that. However I have
+plans for a "last seen" file.
+
+Regards
+
+Marcel
 
 
 
