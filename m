@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050626104000.28921.qmail@web52801.mail.yahoo.com>
-From: Naved Aziz <no2alikebd@yahoo.com>
-Subject: Re: [Bluez-users] BlueZ on ETRAX 100LX devboard 82+
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <42AF2149.1030701@gmx.ch>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+From: andreas knuth <andreas.knuth@daimlerchrysler.com>
+Message-ID: <loom.20050624T174404-129@post.gmane.org>
+References: <1119525688.17872.4.camel@sliver.usr.dsi.unimi.it>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: Connecting to a Nokia 6021
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,110 +17,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 26 Jun 2005 03:40:00 -0700 (PDT)
+Date: Fri, 24 Jun 2005 15:50:22 +0000 (UTC)
 
+Hi Sebastian,
 
-Hi Marco,
+Sebastiano Vigna <vigna <at> dsi.unimi.it> writes:
 
-Thanks a lot for your help.  I wrote my own program
-using rfcomm, and have been able to establish
-connections with phones.
-
-I have also been able to write data to phones. 
-However, I am currently having trouble reading data
-sent from the phone to the board.  
-
-The application running on the phone receives data
-from me, displays it, and then echoes it back.
-
-The program I have written is pretty much the same as
-the RFCOMM's main.c's cmd_connect function, except now
-it receives an argument from the user and sends that
-out through a socket once it has connected with a
-phone.  This part works fine.  
-
-Just after the write function call, I call read as:
-
-chk_read = read (sk, readbuff, 2);                   
-
-with sk being the file descriptor of the socket
-connected to the phone, readbuff being an array of
-type unsigned char and size 100, and reading in only 2
-characters.  I have earlier initialized readbuff as:
-
-memset (dread, 0, 100);
-
-However, when I send data to the phone and it receives
-this data and displays it, once it has sent the data
-back to the board, the board does not receive it. 
-Rather it waits for data to be received, and once
-disconnected displays that chk_read has been assigned
-a -1, meaning no data has been read.  I have called
-the read function for reading more than 2 characters
-(have used readbuff's maximum size, 100), but still no
-good.
-
-Any idead what's going wrong here? Any help will be
-greatly appreciated.
-
-Thanks and sincerely,
-
-Naved
-
-
-
-
-
---- Marco Trudel <mtrudel@gmx.ch> wrote:
-
-> > My question is this: instead of creating a device
-> > using ioctl(), do you know how to assign this
-> already
-> > created device to dev in the above if statement?
 > 
-> no. I never worked with such devices.
+...
+>     L2CAP(d): cid 0x0040 len 4 [psm 3]
+>       RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>   0000: 01 28 00 01 00                                    .(...
+> > HCI Event: PIN Code Request (0x16) plen 6
+>   0000: 10 26 00 70 13 00                                 .&.p..
 > 
-> > The device resides in the /dev directory.  This is
-> a
-> > problem I will face even if I write step(6)
-> > separately
+> And them the phone times out. The interesting point is that if you look at 
+the included hcid.conf,
+> I have a pin helper of my own, containing:
 > 
-> actually no. There's no need for a device, use a
-> socket.
+> #!/bin/bash
+> echo "Request $(date)" >>/tmp/req
+> echo "PIN:112358"
 > 
-> > becuase the question of using an already
-> > created device will still come up.
+> This is never called by the stack.
 > 
-> what for? not for bluez...
-> 
-> 
-> regards
-> Marco
-> 
-> 
->
--------------------------------------------------------
-> SF.Net email is sponsored by: Discover Easy Linux
-> Migration Strategies
-> from IBM. Find simple to follow Roadmaps,
-> straightforward articles,
-> informative Webcasts and more! Get everything you
-> need to get up to
-> speed, fast.
->
-http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+> I couldn't find any log anywhere to find out what's happening, so I'm
+> really stuck.
 
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+In your hcid.conf there are two "PIN-HELPER"s active at the same time! You 
+should have active only one at the same time. Try it out (deactivate 
+dbus_pin_helper -> #dbus_pin_helper.
+
+regards,
+Andreas
+
+
 
 
 -------------------------------------------------------
