@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] problem building btsco.
-From: Stephen Crane <steve.crane@rococosoft.com>
+Message-ID: <42BC08BA.10603@ibdcon.org.br>
+From: Paulo Wollny <paulo.wollny@ibdcon.org.br>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <42BC08BA.10603@ibdcon.org.br>
-References: <42BC08BA.10603@ibdcon.org.br>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-+2QQF6V6H0erGiIEch0a"
-Message-Id: <1119620816.3896.210.camel@baroque.rococosoft.com>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] problem building btsco.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,94 +16,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 24 Jun 2005 14:46:56 +0100
+Date: Fri, 24 Jun 2005 10:20:58 -0300
 
+Hi,
 
---=-+2QQF6V6H0erGiIEch0a
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+i'm trying o build the btsco and am getting the following error. Does 
+anyone knows how to solve it?
 
-Hi Paolo
-It looks as if your version of bluez-libs is very old. Recent versions
-have the sdp library merged in.
+Kind regards,
 
-Cheers,
-Steve
+Paulo Wollny
 
-On Fri, 2005-06-24 at 10:20 -0300, Paulo Wollny wrote:
-> Hi,
->=20
-> i'm trying o build the btsco and am getting the following error. Does=20
-> anyone knows how to solve it?
->=20
-> Kind regards,
->=20
-> Paulo Wollny
->=20
-> gcc -DHAVE_CONFIG_H -I. -I. -I..     -Wall -O2 -c `test -f 'sbcinfo.c'=20
-> || echo './'`sbcinfo.c
-> gcc  -Wall -O2   -o sbcinfo  sbcinfo.o  -lasound -lm -ldl -lpthread
-> gcc -DHAVE_CONFIG_H -I. -I. -I..     -Wall -O2 -c `test -f 'sbcenc.c' ||=20
-> echo './'`sbcenc.c
-> gcc  -Wall -O2   -o sbcenc  sbcenc.o libsbc.a -lasound -lm -ldl -lpthread
-> gcc -DHAVE_CONFIG_H -I. -I. -I..     -Wall -O2 -c `test -f 'rcplay.c' ||=20
-> echo './'`rcplay.c
-> gcc  -Wall -O2   -o rcplay  rcplay.o -lbluetooth -lasound -lm -ldl -lpthr=
-ead
-> rcplay.o(.text+0xd0): In function `main':
-> : undefined reference to `sdp_connect'
-> rcplay.o(.text+0xed): In function `main':
-> : undefined reference to `sdp_uuid16_create'
-> rcplay.o(.text+0xf7): In function `main':
-> : undefined reference to `sdp_list_append'
-> rcplay.o(.text+0x11b): In function `main':
-> : undefined reference to `sdp_list_append'
-> rcplay.o(.text+0x12c): In function `main':
-> : undefined reference to `sdp_list_append'
-> rcplay.o(.text+0x141): In function `main':
-> : undefined reference to `sdp_service_search_attr_req'
-> rcplay.o(.text+0x14c): In function `main':
-> : undefined reference to `sdp_close'
-> rcplay.o(.text+0x18f): In function `main':
-> : undefined reference to `sdp_get_access_protos'
-> rcplay.o(.text+0x1a6): In function `main':
-> : undefined reference to `sdp_get_proto_port'
-> collect2: ld returned 1 exit status
-> make[2]: *** [rcplay] Fehler 1
-> make[2]: Leaving directory `/home/paulo/Bluetooth-Linux/btsco-0.4/sbc'
-> make[1]: *** [all-recursive] Fehler 1
-> make[1]: Leaving directory `/home/paulo/Bluetooth-Linux/btsco-0.4'
-> make: *** [all] Fehler 2
->=20
->=20
-> -------------------------------------------------------
-> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-> from IBM. Find simple to follow Roadmaps, straightforward articles,
-> informative Webcasts and more! Get everything you need to get up to
-> speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dclic=
-k
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
---=20
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
-
---=-+2QQF6V6H0erGiIEch0a
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQBCvA7QlgMqgVzLyWcRAoAWAJ994JzLw46Cyv14ZsxmbKZd55hDjQCeKj7y
-aojNIOtQ86HfdaYlfjF6jTU=
-=/ynD
------END PGP SIGNATURE-----
-
---=-+2QQF6V6H0erGiIEch0a--
-
+gcc -DHAVE_CONFIG_H -I. -I. -I..     -Wall -O2 -c `test -f 'sbcinfo.c' 
+|| echo './'`sbcinfo.c
+gcc  -Wall -O2   -o sbcinfo  sbcinfo.o  -lasound -lm -ldl -lpthread
+gcc -DHAVE_CONFIG_H -I. -I. -I..     -Wall -O2 -c `test -f 'sbcenc.c' || 
+echo './'`sbcenc.c
+gcc  -Wall -O2   -o sbcenc  sbcenc.o libsbc.a -lasound -lm -ldl -lpthread
+gcc -DHAVE_CONFIG_H -I. -I. -I..     -Wall -O2 -c `test -f 'rcplay.c' || 
+echo './'`rcplay.c
+gcc  -Wall -O2   -o rcplay  rcplay.o -lbluetooth -lasound -lm -ldl -lpthread
+rcplay.o(.text+0xd0): In function `main':
+: undefined reference to `sdp_connect'
+rcplay.o(.text+0xed): In function `main':
+: undefined reference to `sdp_uuid16_create'
+rcplay.o(.text+0xf7): In function `main':
+: undefined reference to `sdp_list_append'
+rcplay.o(.text+0x11b): In function `main':
+: undefined reference to `sdp_list_append'
+rcplay.o(.text+0x12c): In function `main':
+: undefined reference to `sdp_list_append'
+rcplay.o(.text+0x141): In function `main':
+: undefined reference to `sdp_service_search_attr_req'
+rcplay.o(.text+0x14c): In function `main':
+: undefined reference to `sdp_close'
+rcplay.o(.text+0x18f): In function `main':
+: undefined reference to `sdp_get_access_protos'
+rcplay.o(.text+0x1a6): In function `main':
+: undefined reference to `sdp_get_proto_port'
+collect2: ld returned 1 exit status
+make[2]: *** [rcplay] Fehler 1
+make[2]: Leaving directory `/home/paulo/Bluetooth-Linux/btsco-0.4/sbc'
+make[1]: *** [all-recursive] Fehler 1
+make[1]: Leaving directory `/home/paulo/Bluetooth-Linux/btsco-0.4'
+make: *** [all] Fehler 2
 
 
 -------------------------------------------------------
