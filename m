@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Ronny L Nilsson <bb@arbetsmyra.dyndns.org>
+Subject: Re: [Bluez-devel] Function not implemented (38)
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="------------Boundary-00=_UHLRDRDJVNHE2W54GQ31"
-Message-Id: <20050627223919.793D83BC@arbetsmyra.dyndns.org>
-Subject: [Bluez-devel] bccmd reading clock
+In-Reply-To: <20050627175446.GA1392@pangeia.com.br>
+References: 
+	 <OF6C4333A9.A9953808-ONC125702A.00447737-C125702A.0049AD28@dcx.dcx>
+	 <1119627686.7129.5.camel@notepaq> <20050626224545.GA14629@pangeia.com.br>
+	 <1119851313.15397.2.camel@pegasus>  <20050627175446.GA1392@pangeia.com.br>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1119896414.7179.0.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,110 +21,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 28 Jun 2005 00:37:06 +0200
+Date: Mon, 27 Jun 2005 20:20:13 +0200
 
+Hi Nelson,
 
---------------Boundary-00=_UHLRDRDJVNHE2W54GQ31
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 8bit
-Subject: 
+> > > Sorry, but I don=B4t found it in docs/faq.=20
+> > >=20
+> > > I try use csrsniff (and bpasniff) and both failed with same error:
+> > > # csrsniff 00:60:57:XX:XX:XX
+> > > Can't find sniffer at hci0: Function not implemented (38)
+> >=20
+> > you need special hardware for it.
+>=20
+> Have you any links about it?=20
 
-
-
-Hi
-I was in the need for an enhancement of the bccmd tool and thus made a 
-small change. The supplied patch adds a command for reading the the 
-BT-clock of local device. In the process I also made some minor changes 
-to utils/tools/csr.c to reuse existing code. Besided reading 16-bit 
-variables it can now also read 32- and 8-bits alike.
-
-No changes has (yet) been made to hcidump. Should it be done?
+check www.fte.com, but keep in mind that csrsniff doesn't contain
+working code.
 
 Regards
-/Ronny Nilsson
+
+Marcel
 
 
-
-
---------------Boundary-00=_UHLRDRDJVNHE2W54GQ31
-Content-Type: text/x-diff;
-  charset="iso-8859-1";
-  name="bccmd-clock.patch"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="bccmd-clock.patch"
-
-SW5kZXg6IHV0aWxzL3Rvb2xzL2JjY21kLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3Qv
-Ymx1ZXovdXRpbHMvdG9vbHMvYmNjbWQuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4xCmRpZmYg
-LXUgLXAgLXIxLjEgYmNjbWQuYwotLS0gdXRpbHMvdG9vbHMvYmNjbWQuYwkxNiBNYXkgMjAwNSAx
-MTo1MToyNyAtMDAwMAkxLjEKKysrIHV0aWxzL3Rvb2xzL2JjY21kLmMJMjcgSnVuIDIwMDUgMjI6
-MzA6MDUgLTAwMDAKQEAgLTc5LDEzICs3OSwzMyBAQCBzdGF0aWMgaW50IGNtZF9rZXlsZW4oaW50
-IGRkLCBpbnQgYXJnYywgCiAJcmV0dXJuIDA7CiB9CiAKKworc3RhdGljIGludCBjbWRfY2xvY2so
-aW50IGRkLCBpbnQgYXJnYywgY2hhciAqYXJndltdKQoreworCXVpbnQzMl90IGNsaz0wOworCWlu
-dCBlcnI7CisKKwllcnIgPSBjc3JfcmVhZF92YXJpZF91aW50MzIoZGQsIDB4MjE0MywgQ1NSX1ZB
-UklEX0JUX0NMT0NLLCAmY2xrKTsKKwlpZiAoZXJyIDwgMCkgeworCQllcnJubyA9IC1lcnI7CisJ
-CXJldHVybiAtMTsKKwl9CisKKwlwcmludGYoIkRldmljZSBsb2NhbCBCVC1jbG9jazogMHgleFxu
-IiwgY2xrKTsKKworCXJldHVybiAwOworfQorCisKKwogc3RhdGljIHN0cnVjdCB7CiAJY2hhciAq
-c3RyOwogCWludCAoKmZ1bmMpKGludCBkZCwgaW50IGFyZ2MsIGNoYXIgKiphcmd2KTsKIAljaGFy
-ICphcmc7CiAJY2hhciAqZG9jOwogfSBjb21tYW5kc1tdID0gewotCXsgImtleWxlbiIsIGNtZF9r
-ZXlsZW4sICI8aGFuZGxlPiIsICJHZXQgY3VycmVudCBjcnlwdCBrZXkgbGVuZ3RoIiB9LAorCXsg
-ImtleWxlbiIsIGNtZF9rZXlsZW4sICAgIjxoYW5kbGU+IiwgIkdldCBjdXJyZW50IGNyeXB0IGtl
-eSBsZW5ndGgiIH0sCisJeyAiY2xvY2siLCBjbWRfY2xvY2ssICAgICAiICAgICAgICAiLCAiR2V0
-IGxvY2FsIEJULWNsb2NrIiB9LAogCXsgTlVMTCB9LAogfTsKIApJbmRleDogdXRpbHMvdG9vbHMv
-Y3NyLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovdXRpbHMvdG9vbHMvY3Ny
-LmMsdgpyZXRyaWV2aW5nIHJldmlzaW9uIDEuMjcKZGlmZiAtdSAtcCAtcjEuMjcgY3NyLmMKLS0t
-IHV0aWxzL3Rvb2xzL2Nzci5jCTEwIEp1biAyMDA1IDA2OjU5OjI3IC0wMDAwCTEuMjcKKysrIHV0
-aWxzL3Rvb2xzL2Nzci5jCTI3IEp1biAyMDA1IDIyOjMwOjA2IC0wMDAwCkBAIC00NjQsNyArNDY0
-LDggQEAgaW50IGNzcl9yZWFkX3ZhcmlkX2NvbXBsZXgoaW50IGRkLCB1aW50MQogCXJldHVybiAw
-OwogfQogCi1pbnQgY3NyX3JlYWRfdmFyaWRfdWludDE2KGludCBkZCwgdWludDE2X3Qgc2VxbnVt
-LCB1aW50MTZfdCB2YXJpZCwgdWludDE2X3QgKnZhbHVlKQorCitpbnQgY3NyX3JlYWRfdmFyaWRf
-dWludDMyKGludCBkZCwgdWludDE2X3Qgc2VxbnVtLCB1aW50MTZfdCB2YXJpZCwgdWludDMyX3Qg
-KnZhbHVlKQogewogCXVuc2lnbmVkIGNoYXIgY21kW10gPSB7IDB4MDAsIDB4MDAsIDB4MDksIDB4
-MDAsCiAJCQkJc2VxbnVtICYgMHhmZiwgc2VxbnVtID4+IDgsIHZhcmlkICYgMHhmZiwgdmFyaWQg
-Pj4gOCwgMHgwMCwgMHgwMCwKQEAgLTQ4OCwyMiArNDg5LDU2IEBAIGludCBjc3JfcmVhZF92YXJp
-ZF91aW50MTYoaW50IGRkLCB1aW50MTYKIAogCWlmIChoY2lfc2VuZF9yZXEoZGQsICZycSwgMjAw
-MCkgPCAwKQogCQlyZXR1cm4gLTE7Ci0KLQlpZiAocnBbMF0gIT0gMHhjMikgeworCQorCWlmIChy
-cFswXSAhPSAweGMyIHx8IHJwWzVdICE9IChzZXFudW0gJiAweGZmKSB8fCAKKwkJCXJwWzZdICE9
-IChzZXFudW0gPj4gOCkpIHsKIAkJZXJybm8gPSBFSU87CiAJCXJldHVybiAtMTsKIAl9CiAKLQlp
-ZiAoKHJwWzldICsgKHJwWzEwXSA8PCA4KSkgIT0gMCkgeworCWlmIChycFs5XSB8fCBycFsxMF0p
-IHsKIAkJZXJybm8gPSBFTlhJTzsKIAkJcmV0dXJuIC0xOwogCX0KIAotCSp2YWx1ZSA9IHJwWzEx
-XSArIChycFsxMl0gPDwgOCk7CisJKnZhbHVlID0gcnBbMTJdOworCSp2YWx1ZSA8PD0gODsKKwkq
-dmFsdWUgfD0gcnBbMTFdOworCSp2YWx1ZSA8PD0gODsKKwkqdmFsdWUgfD0gcnBbMTRdOworCSp2
-YWx1ZSA8PD0gODsKKwkqdmFsdWUgfD0gcnBbMTNdOwogCiAJcmV0dXJuIDA7CiB9CiAKKworaW50
-IGNzcl9yZWFkX3ZhcmlkX3VpbnQxNihpbnQgZGQsIHVpbnQxNl90IHNlcW51bSwgdWludDE2X3Qg
-dmFyaWQsIHVpbnQxNl90ICp2YWx1ZSkKK3sKKwl1aW50MzJfdCB2YWwzMjsKKwkKKwlpZihjc3Jf
-cmVhZF92YXJpZF91aW50MzIoZGQsIHNlcW51bSwgdmFyaWQsICZ2YWwzMik9PTApIHsKKwkJKnZh
-bHVlID0gKHVpbnQxNl90KSAodmFsMzIgPj4gMTYpOworCQlyZXR1cm4gMDsKKwl9CisJCisJcmV0
-dXJuIC0xOworfQorCisKK2ludCBjc3JfcmVhZF92YXJpZF91aW50OChpbnQgZGQsIHVpbnQxNl90
-IHNlcW51bSwgdWludDE2X3QgdmFyaWQsIHVpbnQ4X3QgKnZhbHVlKQoreworCXVpbnQxNl90IHZh
-bDE2OworCQorCWlmKGNzcl9yZWFkX3ZhcmlkX3VpbnQxNihkZCwgc2VxbnVtLCB2YXJpZCwgJnZh
-bDE2KT09MCkgeworCQkqdmFsdWUgPSAodWludDhfdCkgdmFsMTY7CisJCXJldHVybiAwOworCX0K
-KwkKKwlyZXR1cm4gLTE7Cit9CisKKwogaW50IGNzcl9yZWFkX3Bza2V5X2NvbXBsZXgoaW50IGRk
-LCB1aW50MTZfdCBzZXFudW0sIHVpbnQxNl90IHBza2V5LCB1aW50OF90ICp2YWx1ZSwgdWludDE2
-X3QgbGVuZ3RoKQogewogCXVuc2lnbmVkIGNoYXIgY21kW10gPSB7IDB4MDAsIDB4MDAsICgobGVu
-Z3RoIC8gMikgKyA4KSAmIDB4ZmYsICgobGVuZ3RoIC8gMikgKyA4KSA+PiA4LApJbmRleDogdXRp
-bHMvdG9vbHMvY3NyLmgKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovdXRpbHMv
-dG9vbHMvY3NyLmgsdgpyZXRyaWV2aW5nIHJldmlzaW9uIDEuMTIKZGlmZiAtdSAtcCAtcjEuMTIg
-Y3NyLmgKLS0tIHV0aWxzL3Rvb2xzL2Nzci5oCTEwIEp1biAyMDA1IDA1OjMwOjI4IC0wMDAwCTEu
-MTIKKysrIHV0aWxzL3Rvb2xzL2Nzci5oCTI3IEp1biAyMDA1IDIyOjMwOjA2IC0wMDAwCkBAIC03
-Niw3ICs3Niw5IEBAIGNoYXIgKmNzcl9jaGlwdmVydG9zdHIodWludDE2X3QgdmVyLCB1aW4KIGNo
-YXIgKmNzcl9wc2tleXRvc3RyKHVpbnQxNl90IHBza2V5KTsKIAogaW50IGNzcl9yZWFkX3Zhcmlk
-X2NvbXBsZXgoaW50IGRkLCB1aW50MTZfdCBzZXFudW0sIHVpbnQxNl90IHZhcmlkLCB1aW50OF90
-ICp2YWx1ZSwgdWludDE2X3QgbGVuZ3RoKTsKK2ludCBjc3JfcmVhZF92YXJpZF91aW50MzIoaW50
-IGRkLCB1aW50MTZfdCBzZXFudW0sIHVpbnQxNl90IHZhcmlkLCB1aW50MzJfdCAqdmFsdWUpOwog
-aW50IGNzcl9yZWFkX3ZhcmlkX3VpbnQxNihpbnQgZGQsIHVpbnQxNl90IHNlcW51bSwgdWludDE2
-X3QgdmFyaWQsIHVpbnQxNl90ICp2YWx1ZSk7CitpbnQgY3NyX3JlYWRfdmFyaWRfdWludDgoaW50
-IGRkLCB1aW50MTZfdCBzZXFudW0sIHVpbnQxNl90IHZhcmlkLCB1aW50OF90ICp2YWx1ZSk7CiBp
-bnQgY3NyX3JlYWRfcHNrZXlfY29tcGxleChpbnQgZGQsIHVpbnQxNl90IHNlcW51bSwgdWludDE2
-X3QgcHNrZXksIHVpbnQ4X3QgKnZhbHVlLCB1aW50MTZfdCBsZW5ndGgpOwogaW50IGNzcl9yZWFk
-X3Bza2V5X3VpbnQxNihpbnQgZGQsIHVpbnQxNl90IHNlcW51bSwgdWludDE2X3QgcHNrZXksIHVp
-bnQxNl90ICp2YWx1ZSk7CiBpbnQgY3NyX3dyaXRlX3Bza2V5X3VpbnQxNihpbnQgZGQsIHVpbnQx
-Nl90IHNlcW51bSwgdWludDE2X3QgcHNrZXksIHVpbnQxNl90IHZhbHVlKTsK
-
---------------Boundary-00=_UHLRDRDJVNHE2W54GQ31--
 
 
 -------------------------------------------------------
