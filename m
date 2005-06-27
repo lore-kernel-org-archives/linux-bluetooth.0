@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <009401c57b06$7afe3ef0$0132a8c0@AL>
-From: "Al Chane" <al_chane@issc.com.tw>
-To: <bluez-users@lists.sourceforge.net>
+Message-ID: <42BFCECC.30905@lesagepono.be>
+From: Laurent Lesage <laurent@lesagepono.be>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="big5";
-	reply-type=original
-Subject: [Bluez-users] ISSC USB dongle patch
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] how to use BT headset as microphone and the	souncard
+ as output
+References: <42BB64FE.4070002@lesagepono.be>	 <42BF39A6.2020305@lesagepono.be> <1119846705.31327.2.camel@power>
+In-Reply-To: <1119846705.31327.2.camel@power>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,46 +19,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 27 Jun 2005 18:53:40 +0800
+Date: Mon, 27 Jun 2005 10:02:52 +0000
 
-Hi,
+Tony Clark a =C3=A9crit :
 
-     I have an ISSC USB dongle and search the last year's archive to find 
-the patch to
-make it work with BlueZ.
+>On Sun, 2005-06-26 at 23:26 +0000, Laurent Lesage wrote:
+> =20
+>
+>>Well, I have part of the answer. I just used " cat /dev/dsp1 > /dev/dsp=
+"=20
+>>to re-route from the BT headset to the sound card. It works but there i=
+s=20
+>>a delay of around one second : this is annoying if it has to be used fo=
+r=20
+>>a conference or training.
+>>
+>>What is this delay due to?
+>>
+>>Any idea appreciated :-)
+>>
+>>Laurent
+>>
+>>Laurent Lesage a =C3=A9crit :
+>>   =20
+>>
+>I think from memory the best you will get it down to is around .5sec.  A
+>BT mic is probably not want for doing presentations, a normal wireless
+>mic should be much better.
+>
+>tony
+>
+> =20
+>
+A BT headset is more comfortable and leaves your hands free. A small=20
+wireless mic is not as cheap as BT headset. (and I don't own the first=20
+but the second!)
 
-     I just wonder how it works. What's black_ids[] for and the purpose of
-adding .driver_info = HCI_RESET?
+Thank you for the information
 
-struct usb_device_id bluetooth_ids[]
-struct usb_device_id ignore_ids[] or black_ids[]
-
-thanks a lot,
-
-Al
-
-
-
-=================================================================
-it looks like that this device needs the HCI_Reset before it can run an
-inquiry. Funny is that every other HCI command work without it. Try the
-attached patch.
-
-Regards
-
-Marcel
-
-
-===== drivers/bluetooth/hci_usb.c 1.53 vs edited =====
---- 1.53/drivers/bluetooth/hci_usb.c	2004-07-16 12:55:02 +02:00
-+++ edited/drivers/bluetooth/hci_usb.c	2004-07-31 12:13:10 +02:00
- <at>  <at>  -98,6 +98,9  <at>  <at>
- 	/* Broadcom BCM2035 */
- 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = HCI_RESET },
-
-+	/* ISSC Bluetooth Adapter v3.1 */
-+	{ USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET },
-
+Laurent
 
 
 
