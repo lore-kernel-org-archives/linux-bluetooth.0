@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050628015550.25133.qmail@web15408.mail.cnb.yahoo.com>
-From: yfw <nh26223@yahoo.com.cn>
-To: Bluez-users@lists.sourceforge.net
+Message-ID: <42BFFCE9.6060703@cefriel.it>
+From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=gb2312
-Subject: [Bluez-users] Can PAN and File transfer profile be enabled at the same time?
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] btsco and Musicool 300
+References: <42BABCBE.1060200@cefriel.it>
+In-Reply-To: <42BABCBE.1060200@cefriel.it>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +18,140 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Jun 2005 09:55:50 +0800 (CST)
+Date: Mon, 27 Jun 2005 15:19:37 +0200
 
-Hi folks,
-    I want to know can I use File transfer profile
-when PAN
-enabling. Thanks.
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-Regards
-Yin, Fengwei
+Hi.
+I've solved my problems: battery lifewas ending, so Musicool headset
+dosn'work so well.
+Now it's run. I've only tried sco link, but next time I'll try A2DP profile.
+
+Cheers,
+Pizza
 
 
-	
+Luca Pizzamiglio wrote:
+> Hi.
+> I'm trying to use the Musicool 300 headset with BlueZ.
+> I see Marcel Holtmann reports on him site.
+> I have some trouble because my headset doesn't reply to my question:
+> 
+> ~# hcitool inq
+> Inquiring ...
+>         00:0B:0D:50:15:C7       clock offset: 0x2705    class: 0x200404
+> ~# hcitool name 00:0B:0D:50:15:C7
+> Headphone[15C7]
+> ~# hcitool info 00:0B:0D:50:15:C7
+> Requesting information ...
+> Can't create connection: Connection timed out
+> ~#
+> 
+> I report hcidump output:
+> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>     bdaddr 00:0B:0D:50:15:C7 mode 2 clkoffset 0x0000
+> 
+>>>HCI Event: Command Status (0x0f) plen 4
+> 
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> 
+>>>HCI Event: Remote Name Req Complete (0x07) plen 255
+> 
+>     status 0x00 bdaddr 00:0B:0D:50:15:C7 name 'Headphone[15C7]'
+> 
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:0B:0D:50:15:C7 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> 
+>>>HCI Event: Command Status (0x0f) plen 4
+> 
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> 
+>>>HCI Event: PIN Code Request (0x16) plen 6
+> 
+>     bdaddr 00:0B:0D:50:15:C7
+> 
+>>>HCI Event: Connect Complete (0x03) plen 11
+> 
+>     status 0x22 handle 41 bdaddr 00:0B:0D:50:15:C7 type ACL encrypt 0x00
+>     Error: LMP Response Timeout
+> 
+> When I try to connect btsco with the headset, I obtain:
+> 
+> ~# btsco 00:0B:0D:50:15:C7
+> Error: Failed to connect to SDP server: Function not implemented
+> Assuming channel 2
+> 
+> Can't connect RFCOMM channel: Resource temporarily unavailable
+> ~#
+> 
+> and the hcidump output is:
+> 
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:0B:0D:50:15:C7 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> 
+>>>HCI Event: Command Status (0x0f) plen 4
+> 
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> 
+>>>HCI Event: PIN Code Request (0x16) plen 6
+> 
+>     bdaddr 00:0B:0D:50:15:C7
+> 
+>>>HCI Event: Connect Complete (0x03) plen 11
+> 
+>     status 0x22 handle 41 bdaddr 00:0B:0D:50:15:C7 type ACL encrypt 0x00
+>     Error: LMP Response Timeout
+> < HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+> 
+>>>HCI Event: Command Complete (0x0e) plen 6
+> 
+>     Read Voice Setting (0x03|0x0025) ncmd 1
+>     status 0x00 voice setting 0x0060
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:0B:0D:50:15:C7 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> 
+>>>HCI Event: Command Status (0x0f) plen 4
+> 
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> 
+>>>HCI Event: PIN Code Request (0x16) plen 6
+> 
+>     bdaddr 00:0B:0D:50:15:C7
+> 
+>>>HCI Event: Connect Complete (0x03) plen 11
+> 
+>     status 0x22 handle 42 bdaddr 00:0B:0D:50:15:C7 type ACL encrypt 0x00
+>     Error: LMP Response Timeout
+> 
+> 
+> pin helper application doesn't start in both cases.
+> Any ideas or suggestions?
+> 
+> thx in advance!
+> 
+> PS: with the same system, I've configured a working NAP, so my bluetooth
+> dongle is ok.
 
-	
-		
-___________________________________________________________ 
-雅虎免费G邮箱－中国第一绝无垃圾邮件骚扰超大邮箱
-http://cn.mail.yahoo.com/?id=77071
+- -------------------------------------------
+Luca Pizzamiglio
+CEFRIEL - Embedded Systems Design Unit
+Via Fucini, 2 - 20133 MILANO (ITALY)
+Phone:		+39 02 23954 343
+e-mail:		pizzamiglio@cefriel.it
+ICQ:		5046978
+- -------------------------------------------
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.7 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
+iD8DBQFCv/zpAoUy56ORfbERAsqkAJ9TXse+opDyx9FOQK6ZFu15glmtKgCgjiKy
+E7HdyIiIbepfKW6BthC9Qrk=
+=nObX
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
