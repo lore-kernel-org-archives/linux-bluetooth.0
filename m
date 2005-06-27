@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5256d0b050627041636573db9@mail.gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
+Subject: Re: [Bluez-devel] null bytes in 'SDP_TEXT_STR8' data element
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <001301c57a9b$69a0c2b0$fefda8c0@planetmunich.buci.de>
+References: <001301c57a9b$69a0c2b0$fefda8c0@planetmunich.buci.de>
+Content-Type: text/plain
+Message-Id: <1119851418.15397.4.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] iMuffs BT Headset
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,17 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 27 Jun 2005 12:16:40 +0100
+Date: Mon, 27 Jun 2005 07:50:18 +0200
 
-Hi All,
+Hi Raimund,
 
-Just found this set of BT Headphones http://www.wi-gear.com/. Appart
-from the slightly interesting name they support BT1.2, A2DP, AVRCP,
-Handsfree, Headset. It also has a mic and pairs with your phone and
-ipod at the same time pausing the ipod if your phone rings. Looks like
-a pretty cool product. Interesting to see what the audio is like.
+> I have problems adding a "TEXT" attribute value to a service
+> record that contains '0x00' bytes. First, it seems like the sdp_data_alloc()
+> function does use strlen() for text entries which will use these
+> bytes as string terminators.
+> 
+> Second, I use the JSR-82 library from Avetana, where the service record
+> gets registered via send_req_w4_rsp which seems to be null-byte safe.
+> However, when someone queries the record, the string element is again
+> truncated which seems to happen in the sdp_gen_pdu() function in
+> sdp/sdp.c [of bluez-libs-2.17], l. 686, where strlen() is used to
+> determine the string element's length. Would it be possible to use
+> d->unitSize in this place instead?
 
-Pete
+it is fine to use unitSize. Send in a patch for both problems.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
