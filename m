@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5256d0b050628033668da137c@mail.gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
+From: Ronny L Nilsson <bb@arbetsmyra.dyndns.org>
 To: bluez-devel@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Compile btsco kernel module on FC4
+MIME-Version: 1.0
+Content-Type: Multipart/Mixed;
+  boundary="------------Boundary-00=_UHLRDRDJVNHE2W54GQ31"
+Message-Id: <20050627223919.793D83BC@arbetsmyra.dyndns.org>
+Subject: [Bluez-devel] bccmd reading clock
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,679 +17,110 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 28 Jun 2005 11:36:48 +0100
+Date: Tue, 28 Jun 2005 00:37:06 +0200
 
-Hi All,
 
-Anyone had any luck compling the btsco kernel module on FC4. When I
-tried I get the following spew (and that's only a small bit of it).
+--------------Boundary-00=_UHLRDRDJVNHE2W54GQ31
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 8bit
+Subject: 
 
-Cheers,
-Pete
 
-/home/peterr/download/build/btsco/kernel/btsco.c:98: error: syntax
-error before 'atomic_t'
-/home/peterr/download/build/btsco/kernel/btsco.c:98: warning: no
-semicolon at end of struct or union
-/home/peterr/download/build/btsco/kernel/btsco.c:120: error: syntax
-error before '}' token
-/home/peterr/download/build/btsco/kernel/btsco.c:120: warning: type
-defaults to 'int' in declaration of 'snd_card_bt_sco_t'
-/home/peterr/download/build/btsco/kernel/btsco.c:120: warning: data
-definition has no type or storage class
-/home/peterr/download/build/btsco/kernel/btsco.c:123: error: syntax
-error before 'snd_card_bt_sco_t'
-/home/peterr/download/build/btsco/kernel/btsco.c:123: warning: no
-semicolon at end of struct or union
-/home/peterr/download/build/btsco/kernel/btsco.c:131: error: syntax
-error before '}' token
-/home/peterr/download/build/btsco/kernel/btsco.c:131: warning: type
-defaults to 'int' in declaration of 'snd_card_bt_sco_pcm_t'
-/home/peterr/download/build/btsco/kernel/btsco.c:131: warning: data
-definition has no type or storage class
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_playback_trigger':
-/home/peterr/download/build/btsco/kernel/btsco.c:138: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:139: error: 'bspcm'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:139: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:140: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:140: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:151: error: 'EINVAL'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_capture_trigger':
-/home/peterr/download/build/btsco/kernel/btsco.c:159: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:160: error: 'bspcm'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:160: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:161: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:161: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:172: error: 'EINVAL'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_pcm_prepare':
-/home/peterr/download/build/btsco/kernel/btsco.c:179: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:180: error: 'bspcm'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:180: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:181: warning: ISO C90
-forbids mixed declarations and code
-/home/peterr/download/build/btsco/kernel/btsco.c:183: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:183: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:184: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:187: error: 'EINVAL'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c: At top level:
-/home/peterr/download/build/btsco/kernel/btsco.c:209: error: syntax
-error before '*' token
-/home/peterr/download/build/btsco/kernel/btsco.c:211: warning:
-function declaration isn't a prototype
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_pcm_receive':
-/home/peterr/download/build/btsco/kernel/btsco.c:215: error: 'bspcm'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c: At top level:
-/home/peterr/download/build/btsco/kernel/btsco.c:241: error: syntax
-error before '*' token
-/home/peterr/download/build/btsco/kernel/btsco.c:243: warning:
-function declaration isn't a prototype
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_pcm_send':
-/home/peterr/download/build/btsco/kernel/btsco.c:247: error: 'bspcm'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_playback_pointer':
-/home/peterr/download/build/btsco/kernel/btsco.c:275: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:276: error: 'bspcm'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:276: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_capture_pointer':
-/home/peterr/download/build/btsco/kernel/btsco.c:284: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:285: error: 'bspcm'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:285: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c: At top level:
-/home/peterr/download/build/btsco/kernel/btsco.c:290: error: syntax
-error before 'snd_card_bt_sco_playback'
-/home/peterr/download/build/btsco/kernel/btsco.c:290: warning: type
-defaults to 'int' in declaration of 'snd_card_bt_sco_playback'
-/home/peterr/download/build/btsco/kernel/btsco.c:291: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:291: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:293: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:293: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:293: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:293: warning: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:294: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:294: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:294: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:294: warning: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:295: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:295: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:295: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:295: warning: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:296: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:296: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:296: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:296: warning: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:297: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:297: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:297: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:297: warning: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:298: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:298: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:298: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:298: warning: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:299: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:299: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:299: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:299: warning: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:300: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:300: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:300: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:300: warning: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:301: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:301: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:301: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:301: warning: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:302: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:302: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:302: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:302: warning: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:303: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:303: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:303: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:303: warning: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:304: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:304: error: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:304: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:304: warning: (near
-initialization for 'snd_card_bt_sco_playback')
-/home/peterr/download/build/btsco/kernel/btsco.c:305: warning: data
-definition has no type or storage class
-/home/peterr/download/build/btsco/kernel/btsco.c:307: error: syntax
-error before 'snd_card_bt_sco_capture'
-/home/peterr/download/build/btsco/kernel/btsco.c:307: warning: type
-defaults to 'int' in declaration of 'snd_card_bt_sco_capture'
-/home/peterr/download/build/btsco/kernel/btsco.c:308: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:308: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:310: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:310: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:310: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:310: warning: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:311: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:311: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:311: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:311: warning: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:312: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:312: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:312: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:312: warning: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:313: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:313: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:313: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:313: warning: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:314: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:314: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:314: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:314: warning: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:315: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:315: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:315: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:315: warning: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:316: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:316: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:316: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:316: warning: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:317: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:317: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:317: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:317: warning: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:318: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:318: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:318: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:318: warning: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:319: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:319: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:319: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:319: warning: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:320: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:320: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:320: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:320: warning: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:321: error: field
-name not in record or union initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:321: error: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:321: warning: excess
-elements in scalar initializer
-/home/peterr/download/build/btsco/kernel/btsco.c:321: warning: (near
-initialization for 'snd_card_bt_sco_capture')
-/home/peterr/download/build/btsco/kernel/btsco.c:322: warning: data
-definition has no type or storage class
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_runtime_free':
-/home/peterr/download/build/btsco/kernel/btsco.c:326: error: 'bspcm'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:326: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_playback_open':
-/home/peterr/download/build/btsco/kernel/btsco.c:332: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:333: error: 'bspcm'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:334: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:334: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:340: error: 'ENOMEM'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:342: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:347: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:350: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:351: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:352: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_capture_open':
-/home/peterr/download/build/btsco/kernel/btsco.c:365: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:366: error: 'bspcm'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:367: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:367: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:373: error: 'ENOMEM'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:375: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:380: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:381: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:381: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:384: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:385: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:386: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_playback_close':
-/home/peterr/download/build/btsco/kernel/btsco.c:399: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:400: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:400: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:415: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:415: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_capture_close':
-/home/peterr/download/build/btsco/kernel/btsco.c:421: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:423: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:425: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:429: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:430: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:432: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:433: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:433: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:433: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:433: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:433: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:433: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:433: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:433: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:433: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:433: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:433: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:433: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:434: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:435: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:435: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:435: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:435: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:435: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:435: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:435: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:435: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:436: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:438: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:438: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c: At top level:
-/home/peterr/download/build/btsco/kernel/btsco.c:460: error: syntax
-error before '*' token
-/home/peterr/download/build/btsco/kernel/btsco.c:461: warning:
-function declaration isn't a prototype
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_pcm':
-/home/peterr/download/build/btsco/kernel/btsco.c:466: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_bt_sco_volume_info':
-/home/peterr/download/build/btsco/kernel/btsco.c:487: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:488: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:489: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:490: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_bt_sco_volume_get':
-/home/peterr/download/build/btsco/kernel/btsco.c:497: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:497: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:498: warning: ISO C90
-forbids mixed declarations and code
-/home/peterr/download/build/btsco/kernel/btsco.c:499: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_bt_sco_volume_put':
-/home/peterr/download/build/btsco/kernel/btsco.c:510: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:510: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:511: warning: ISO C90
-forbids mixed declarations and code
-/home/peterr/download/build/btsco/kernel/btsco.c:512: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_bt_sco_boolean_info':
-/home/peterr/download/build/btsco/kernel/btsco.c:536: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:537: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:538: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:539: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_bt_sco_loopback_get':
-/home/peterr/download/build/btsco/kernel/btsco.c:546: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:546: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:547: warning: ISO C90
-forbids mixed declarations and code
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_bt_sco_loopback_put':
-/home/peterr/download/build/btsco/kernel/btsco.c:558: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:558: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:559: warning: ISO C90
-forbids mixed declarations and code
-/home/peterr/download/build/btsco/kernel/btsco.c: At top level:
-/home/peterr/download/build/btsco/kernel/btsco.c:586: error: syntax
-error before '*' token
-/home/peterr/download/build/btsco/kernel/btsco.c:587: warning:
-function declaration isn't a prototype
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_new_mixer':
-/home/peterr/download/build/btsco/kernel/btsco.c:588: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_ioctl':
-/home/peterr/download/build/btsco/kernel/btsco.c:620: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:621: warning: ISO C90
-forbids mixed declarations and code
-/home/peterr/download/build/btsco/kernel/btsco.c:622: error: 'ENOTTY'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:626: error: syntax
-error before 'int'
-/home/peterr/download/build/btsco/kernel/btsco.c:631: error: 'SIGINT'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:642: error: 'EINVAL'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:645: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:646: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:651: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:651: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:661: error: case
-label does not reduce to an integer constant
-/home/peterr/download/build/btsco/kernel/btsco.c: At top level:
-/home/peterr/download/build/btsco/kernel/btsco.c:672: error: syntax
-error before 'loff_t'
-/home/peterr/download/build/btsco/kernel/btsco.c:673: warning:
-function declaration isn't a prototype
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_write':
-/home/peterr/download/build/btsco/kernel/btsco.c:674: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:674: error: invalid
-type argument of '->'
-/home/peterr/download/build/btsco/kernel/btsco.c:675: warning: ISO C90
-forbids mixed declarations and code
-/home/peterr/download/build/btsco/kernel/btsco.c:680: error: 'EINVAL'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:682: error: 'buf'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:683: error: 'EFAULT'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c: At top level:
-/home/peterr/download/build/btsco/kernel/btsco.c:707: error: syntax
-error before 'loff_t'
-/home/peterr/download/build/btsco/kernel/btsco.c:708: warning:
-function declaration isn't a prototype
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_read':
-/home/peterr/download/build/btsco/kernel/btsco.c:709: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:709: error: invalid
-type argument of '->'
-/home/peterr/download/build/btsco/kernel/btsco.c:710: error: 'current'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:710: warning: ISO C90
-forbids mixed declarations and code
-/home/peterr/download/build/btsco/kernel/btsco.c:711: error: syntax
-error before 'retval'
-/home/peterr/download/build/btsco/kernel/btsco.c:716: error: 'EINVAL'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:738: error: 'retval'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:749: error: 'buf'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:750: error: 'EFAULT'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:758: warning: control
-reaches end of non-void function
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_poll':
-/home/peterr/download/build/btsco/kernel/btsco.c:763: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:764: warning: ISO C90
-forbids mixed declarations and code
-/home/peterr/download/build/btsco/kernel/btsco.c:771: error: 'POLLIN'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:771: error:
-'POLLRDNORM' undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_thread':
-/home/peterr/download/build/btsco/kernel/btsco.c:785: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:786: warning: ISO C90
-forbids mixed declarations and code
-/home/peterr/download/build/btsco/kernel/btsco.c:790: error: storage
-size of 'msg' isn't known
-/home/peterr/download/build/btsco/kernel/btsco.c:791: error: storage
-size of 'iov' isn't known
-/home/peterr/download/build/btsco/kernel/btsco.c:792: error:
-'sigset_t' undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:792: error: syntax
-error before 'unblocked'
-/home/peterr/download/build/btsco/kernel/btsco.c:797: error:
-'unblocked' undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:798: error: 'SIGINT'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:799: error: 'SIGTERM'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:800: error:
-'SIG_UNBLOCK' undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:803: warning:
-implicit declaration of function 'set_fs'
-/home/peterr/download/build/btsco/kernel/btsco.c:803: error:
-'KERNEL_DS' undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:809: error: 'current'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:825: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:924: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:925: error:
-dereferencing pointer to incomplete type
-/home/peterr/download/build/btsco/kernel/btsco.c:791: warning: unused
-variable 'iov'
-/home/peterr/download/build/btsco/kernel/btsco.c:790: warning: unused
-variable 'msg'
-/home/peterr/download/build/btsco/kernel/btsco.c:937: warning: control
-reaches end of non-void function
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_private_free':
-/home/peterr/download/build/btsco/kernel/btsco.c:941: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:945: error: 'SIGTERM'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'snd_card_bt_sco_probe':
-/home/peterr/download/build/btsco/kernel/btsco.c:962: error: 'bt_sco'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:963: warning: ISO C90
-forbids mixed declarations and code
-/home/peterr/download/build/btsco/kernel/btsco.c:970: error: 'ENOMEM'
-undeclared (first use in this function)
-/home/peterr/download/build/btsco/kernel/btsco.c:982: warning:
-implicit declaration of function 'init_MUTEX_LOCKED'
-/home/peterr/download/build/btsco/kernel/btsco.c:983: warning:
-implicit declaration of function 'init_MUTEX'
-/home/peterr/download/build/btsco/kernel/btsco.c:994: warning:
-implicit declaration of function 'kernel_thread'
-/home/peterr/download/build/btsco/kernel/btsco.c: In function
-'alsa_card_bt_sco_init':
-/home/peterr/download/build/btsco/kernel/btsco.c:1041: error: 'ENODEV'
-undeclared (first use in this function)
-make[2]: *** [/home/peterr/download/build/btsco/kernel/btsco.o] Error 1
-make[1]: *** [_module_/home/peterr/download/build/btsco/kernel] Error 2
-make[1]: Leaving directory `/usr/src/kernels/2.6.11-1.1369_FC4-i686'
-make: *** [default] Error 2
+
+Hi
+I was in the need for an enhancement of the bccmd tool and thus made a 
+small change. The supplied patch adds a command for reading the the 
+BT-clock of local device. In the process I also made some minor changes 
+to utils/tools/csr.c to reuse existing code. Besided reading 16-bit 
+variables it can now also read 32- and 8-bits alike.
+
+No changes has (yet) been made to hcidump. Should it be done?
+
+Regards
+/Ronny Nilsson
+
+
+
+
+--------------Boundary-00=_UHLRDRDJVNHE2W54GQ31
+Content-Type: text/x-diff;
+  charset="iso-8859-1";
+  name="bccmd-clock.patch"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="bccmd-clock.patch"
+
+SW5kZXg6IHV0aWxzL3Rvb2xzL2JjY21kLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3Qv
+Ymx1ZXovdXRpbHMvdG9vbHMvYmNjbWQuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4xCmRpZmYg
+LXUgLXAgLXIxLjEgYmNjbWQuYwotLS0gdXRpbHMvdG9vbHMvYmNjbWQuYwkxNiBNYXkgMjAwNSAx
+MTo1MToyNyAtMDAwMAkxLjEKKysrIHV0aWxzL3Rvb2xzL2JjY21kLmMJMjcgSnVuIDIwMDUgMjI6
+MzA6MDUgLTAwMDAKQEAgLTc5LDEzICs3OSwzMyBAQCBzdGF0aWMgaW50IGNtZF9rZXlsZW4oaW50
+IGRkLCBpbnQgYXJnYywgCiAJcmV0dXJuIDA7CiB9CiAKKworc3RhdGljIGludCBjbWRfY2xvY2so
+aW50IGRkLCBpbnQgYXJnYywgY2hhciAqYXJndltdKQoreworCXVpbnQzMl90IGNsaz0wOworCWlu
+dCBlcnI7CisKKwllcnIgPSBjc3JfcmVhZF92YXJpZF91aW50MzIoZGQsIDB4MjE0MywgQ1NSX1ZB
+UklEX0JUX0NMT0NLLCAmY2xrKTsKKwlpZiAoZXJyIDwgMCkgeworCQllcnJubyA9IC1lcnI7CisJ
+CXJldHVybiAtMTsKKwl9CisKKwlwcmludGYoIkRldmljZSBsb2NhbCBCVC1jbG9jazogMHgleFxu
+IiwgY2xrKTsKKworCXJldHVybiAwOworfQorCisKKwogc3RhdGljIHN0cnVjdCB7CiAJY2hhciAq
+c3RyOwogCWludCAoKmZ1bmMpKGludCBkZCwgaW50IGFyZ2MsIGNoYXIgKiphcmd2KTsKIAljaGFy
+ICphcmc7CiAJY2hhciAqZG9jOwogfSBjb21tYW5kc1tdID0gewotCXsgImtleWxlbiIsIGNtZF9r
+ZXlsZW4sICI8aGFuZGxlPiIsICJHZXQgY3VycmVudCBjcnlwdCBrZXkgbGVuZ3RoIiB9LAorCXsg
+ImtleWxlbiIsIGNtZF9rZXlsZW4sICAgIjxoYW5kbGU+IiwgIkdldCBjdXJyZW50IGNyeXB0IGtl
+eSBsZW5ndGgiIH0sCisJeyAiY2xvY2siLCBjbWRfY2xvY2ssICAgICAiICAgICAgICAiLCAiR2V0
+IGxvY2FsIEJULWNsb2NrIiB9LAogCXsgTlVMTCB9LAogfTsKIApJbmRleDogdXRpbHMvdG9vbHMv
+Y3NyLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovdXRpbHMvdG9vbHMvY3Ny
+LmMsdgpyZXRyaWV2aW5nIHJldmlzaW9uIDEuMjcKZGlmZiAtdSAtcCAtcjEuMjcgY3NyLmMKLS0t
+IHV0aWxzL3Rvb2xzL2Nzci5jCTEwIEp1biAyMDA1IDA2OjU5OjI3IC0wMDAwCTEuMjcKKysrIHV0
+aWxzL3Rvb2xzL2Nzci5jCTI3IEp1biAyMDA1IDIyOjMwOjA2IC0wMDAwCkBAIC00NjQsNyArNDY0
+LDggQEAgaW50IGNzcl9yZWFkX3ZhcmlkX2NvbXBsZXgoaW50IGRkLCB1aW50MQogCXJldHVybiAw
+OwogfQogCi1pbnQgY3NyX3JlYWRfdmFyaWRfdWludDE2KGludCBkZCwgdWludDE2X3Qgc2VxbnVt
+LCB1aW50MTZfdCB2YXJpZCwgdWludDE2X3QgKnZhbHVlKQorCitpbnQgY3NyX3JlYWRfdmFyaWRf
+dWludDMyKGludCBkZCwgdWludDE2X3Qgc2VxbnVtLCB1aW50MTZfdCB2YXJpZCwgdWludDMyX3Qg
+KnZhbHVlKQogewogCXVuc2lnbmVkIGNoYXIgY21kW10gPSB7IDB4MDAsIDB4MDAsIDB4MDksIDB4
+MDAsCiAJCQkJc2VxbnVtICYgMHhmZiwgc2VxbnVtID4+IDgsIHZhcmlkICYgMHhmZiwgdmFyaWQg
+Pj4gOCwgMHgwMCwgMHgwMCwKQEAgLTQ4OCwyMiArNDg5LDU2IEBAIGludCBjc3JfcmVhZF92YXJp
+ZF91aW50MTYoaW50IGRkLCB1aW50MTYKIAogCWlmIChoY2lfc2VuZF9yZXEoZGQsICZycSwgMjAw
+MCkgPCAwKQogCQlyZXR1cm4gLTE7Ci0KLQlpZiAocnBbMF0gIT0gMHhjMikgeworCQorCWlmIChy
+cFswXSAhPSAweGMyIHx8IHJwWzVdICE9IChzZXFudW0gJiAweGZmKSB8fCAKKwkJCXJwWzZdICE9
+IChzZXFudW0gPj4gOCkpIHsKIAkJZXJybm8gPSBFSU87CiAJCXJldHVybiAtMTsKIAl9CiAKLQlp
+ZiAoKHJwWzldICsgKHJwWzEwXSA8PCA4KSkgIT0gMCkgeworCWlmIChycFs5XSB8fCBycFsxMF0p
+IHsKIAkJZXJybm8gPSBFTlhJTzsKIAkJcmV0dXJuIC0xOwogCX0KIAotCSp2YWx1ZSA9IHJwWzEx
+XSArIChycFsxMl0gPDwgOCk7CisJKnZhbHVlID0gcnBbMTJdOworCSp2YWx1ZSA8PD0gODsKKwkq
+dmFsdWUgfD0gcnBbMTFdOworCSp2YWx1ZSA8PD0gODsKKwkqdmFsdWUgfD0gcnBbMTRdOworCSp2
+YWx1ZSA8PD0gODsKKwkqdmFsdWUgfD0gcnBbMTNdOwogCiAJcmV0dXJuIDA7CiB9CiAKKworaW50
+IGNzcl9yZWFkX3ZhcmlkX3VpbnQxNihpbnQgZGQsIHVpbnQxNl90IHNlcW51bSwgdWludDE2X3Qg
+dmFyaWQsIHVpbnQxNl90ICp2YWx1ZSkKK3sKKwl1aW50MzJfdCB2YWwzMjsKKwkKKwlpZihjc3Jf
+cmVhZF92YXJpZF91aW50MzIoZGQsIHNlcW51bSwgdmFyaWQsICZ2YWwzMik9PTApIHsKKwkJKnZh
+bHVlID0gKHVpbnQxNl90KSAodmFsMzIgPj4gMTYpOworCQlyZXR1cm4gMDsKKwl9CisJCisJcmV0
+dXJuIC0xOworfQorCisKK2ludCBjc3JfcmVhZF92YXJpZF91aW50OChpbnQgZGQsIHVpbnQxNl90
+IHNlcW51bSwgdWludDE2X3QgdmFyaWQsIHVpbnQ4X3QgKnZhbHVlKQoreworCXVpbnQxNl90IHZh
+bDE2OworCQorCWlmKGNzcl9yZWFkX3ZhcmlkX3VpbnQxNihkZCwgc2VxbnVtLCB2YXJpZCwgJnZh
+bDE2KT09MCkgeworCQkqdmFsdWUgPSAodWludDhfdCkgdmFsMTY7CisJCXJldHVybiAwOworCX0K
+KwkKKwlyZXR1cm4gLTE7Cit9CisKKwogaW50IGNzcl9yZWFkX3Bza2V5X2NvbXBsZXgoaW50IGRk
+LCB1aW50MTZfdCBzZXFudW0sIHVpbnQxNl90IHBza2V5LCB1aW50OF90ICp2YWx1ZSwgdWludDE2
+X3QgbGVuZ3RoKQogewogCXVuc2lnbmVkIGNoYXIgY21kW10gPSB7IDB4MDAsIDB4MDAsICgobGVu
+Z3RoIC8gMikgKyA4KSAmIDB4ZmYsICgobGVuZ3RoIC8gMikgKyA4KSA+PiA4LApJbmRleDogdXRp
+bHMvdG9vbHMvY3NyLmgKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovdXRpbHMv
+dG9vbHMvY3NyLmgsdgpyZXRyaWV2aW5nIHJldmlzaW9uIDEuMTIKZGlmZiAtdSAtcCAtcjEuMTIg
+Y3NyLmgKLS0tIHV0aWxzL3Rvb2xzL2Nzci5oCTEwIEp1biAyMDA1IDA1OjMwOjI4IC0wMDAwCTEu
+MTIKKysrIHV0aWxzL3Rvb2xzL2Nzci5oCTI3IEp1biAyMDA1IDIyOjMwOjA2IC0wMDAwCkBAIC03
+Niw3ICs3Niw5IEBAIGNoYXIgKmNzcl9jaGlwdmVydG9zdHIodWludDE2X3QgdmVyLCB1aW4KIGNo
+YXIgKmNzcl9wc2tleXRvc3RyKHVpbnQxNl90IHBza2V5KTsKIAogaW50IGNzcl9yZWFkX3Zhcmlk
+X2NvbXBsZXgoaW50IGRkLCB1aW50MTZfdCBzZXFudW0sIHVpbnQxNl90IHZhcmlkLCB1aW50OF90
+ICp2YWx1ZSwgdWludDE2X3QgbGVuZ3RoKTsKK2ludCBjc3JfcmVhZF92YXJpZF91aW50MzIoaW50
+IGRkLCB1aW50MTZfdCBzZXFudW0sIHVpbnQxNl90IHZhcmlkLCB1aW50MzJfdCAqdmFsdWUpOwog
+aW50IGNzcl9yZWFkX3ZhcmlkX3VpbnQxNihpbnQgZGQsIHVpbnQxNl90IHNlcW51bSwgdWludDE2
+X3QgdmFyaWQsIHVpbnQxNl90ICp2YWx1ZSk7CitpbnQgY3NyX3JlYWRfdmFyaWRfdWludDgoaW50
+IGRkLCB1aW50MTZfdCBzZXFudW0sIHVpbnQxNl90IHZhcmlkLCB1aW50OF90ICp2YWx1ZSk7CiBp
+bnQgY3NyX3JlYWRfcHNrZXlfY29tcGxleChpbnQgZGQsIHVpbnQxNl90IHNlcW51bSwgdWludDE2
+X3QgcHNrZXksIHVpbnQ4X3QgKnZhbHVlLCB1aW50MTZfdCBsZW5ndGgpOwogaW50IGNzcl9yZWFk
+X3Bza2V5X3VpbnQxNihpbnQgZGQsIHVpbnQxNl90IHNlcW51bSwgdWludDE2X3QgcHNrZXksIHVp
+bnQxNl90ICp2YWx1ZSk7CiBpbnQgY3NyX3dyaXRlX3Bza2V5X3VpbnQxNihpbnQgZGQsIHVpbnQx
+Nl90IHNlcW51bSwgdWludDE2X3QgcHNrZXksIHVpbnQxNl90IHZhbHVlKTsK
+
+--------------Boundary-00=_UHLRDRDJVNHE2W54GQ31--
 
 
 -------------------------------------------------------
