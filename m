@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Matthew Lenz <matthew@nocturnal.org>
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1119970811.16338.7.camel@mlenzdesktop>
-Mime-Version: 1.0
-Subject: [Bluez-users] need a usb dongle to use with FC4 .. any suggestions?
+Message-ID: <20050628015550.25133.qmail@web15408.mail.cnb.yahoo.com>
+From: yfw <nh26223@yahoo.com.cn>
+To: Bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=gb2312
+Subject: [Bluez-users] Can PAN and File transfer profile be enabled at the same time?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,23 +16,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Jun 2005 10:00:11 -0500
+Date: Tue, 28 Jun 2005 09:55:50 +0800 (CST)
 
-I'm looking for a bluetooth usb dongle that'll work with those operating
-systems.  I've got a Dell Axim X50v and I want to be able to access the
-network with it via a host computer and also sync with the host.
-Probably just pick up the dongle at compusa.  Anyone spot one on their
-site that will work well with linux?  Btw, as I'm sure you already know
-the hardware compatibility linked in the FAQ was removed by the author
-due to legal issues.
+Hi folks,
+    I want to know can I use File transfer profile
+when PAN
+enabling. Thanks.
 
-Here is a link to compusa's usb bluetooth adapters:
+Regards
+Yin, Fengwei
 
-http://tinyurl.com/cltac
 
-appreciate any advice.
+	
 
--Matt
+	
+		
+___________________________________________________________ 
+雅虎免费G邮箱－中国第一绝无垃圾邮件骚扰超大邮箱
+http://cn.mail.yahoo.com/?id=77071
 
 
 
