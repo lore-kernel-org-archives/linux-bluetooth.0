@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42C172E4.7070006@kernelconcepts.de>
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] How simulate HID connections?
-References: <e1effdeb05062706072f1a04c8@mail.gmail.com> <1119973394.15397.78.camel@pegasus>
-In-Reply-To: <1119973394.15397.78.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-15
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb05062706072f1a04c8@mail.gmail.com>
+References: <e1effdeb05062706072f1a04c8@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1119973394.15397.78.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,40 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 28 Jun 2005 17:55:16 +0200
+Date: Tue, 28 Jun 2005 17:43:14 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Claudio,
 
-Marcel Holtmann schrieb:
-> Hi Claudio,
->>I don't have a Bluetooth keyboard at the moment.
->>Is there a way to simulate a Bluetooth keyboard using two desktops?
-> it is possible, but I don't know of any problem capable of doing it.
+> I don't have a Bluetooth keyboard at the moment.
+> Is there a way to simulate a Bluetooth keyboard using two desktops?
 
-Problems are only good for causing other problems.
-Sorry, could not resist ;)
+it is possible, but I don't know of any problem capable of doing it.
 
-I guess what you meant are programs to solve that problem...
+Regards
 
-> Regards
-> Marcel
-Cheers
-  nils faerber
+Marcel
 
-- --
-kernel concepts          Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          Mob: +49-176-21024535
-- --
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFCwXLkJXeIURG1qHgRAg6IAKC3I3ZrYdcvdS2LjnzzcTVC4yMX4gCgkZf+
-ZmtRaa/5b3wgAe2xWsVyAAA=
-=Tc9w
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
