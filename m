@@ -1,10 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42C29EB2.8080502@lesagepono.be>
-From: "Laurent@lesagepono.be" <laurent@lesagepono.be>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] need a usb dongle to use with FC4 .. any
+	suggestions?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] problem using skype + BT headset, Linux OS
+In-Reply-To: <1119993302.16338.20.camel@mlenzdesktop>
+References: <1119970811.16338.7.camel@mlenzdesktop>
+	 <1119973206.15397.72.camel@pegasus>
+	 <1119978364.16338.10.camel@mlenzdesktop>
+	 <ef9938ec050628134822256629@mail.gmail.com>
+	 <1119993302.16338.20.camel@mlenzdesktop>
+Content-Type: text/plain
+Message-Id: <1119994218.15397.93.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,45 +23,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Jun 2005 13:14:26 +0000
+Date: Tue, 28 Jun 2005 23:30:18 +0200
 
-Hi all,
+Hi Matthew,
 
-back again with a persistent problem. It seems specific with this 
-"assembly" (?) : Linux OS + BT headset + skype. In fact there is no 
-problem when I use the headset to listen : the problem is when I use the 
-microphone. The first time I set up btsco, and use Skype (or other phone 
-client), the micrphone creates a terrible noise. I hangup. I reconnect. 
-Generally, this is OK. (don't know why it doesn't work the first time). 
-But with skype, the problem appears again. I can place one or two calls, 
-then the noise appear and my peer does not hear anything he could 
-understand. After that, I often get this error with "btsco -v"
+> So I just need to determine what my Axim uses? Or do class 1 support
+> class 2 automatically?
 
-> i/o needed: connecting sco...
-> Can't connect SCO audio channel
-> : Software caused connection abort
->
->
+don't worry about the class. They will work perfect together.
 
-while with hcidump, nothing is visible. I just see the dump of the last 
-call:
+Regards
 
-> > SCO data: handle 44 dlen 48
-> > SCO data: handle 44 dlen 48
-> > SCO data: handle 44 dlen 48
-> > SCO data: handle 44 dlen 48
-> > SCO data: handle 44 dlen 48
-> > SCO data: handle 44 dlen 48
-> > SCO data: handle 44 dlen 48
-> > SCO data: handle 44 dlen 48
-> > SCO data: handle 44 dlen 48
->
-
-I remeber someone had a similar problem a few days ago. Any idea? A bug?
-
-thanks
-
-Laurent
+Marcel
 
 
 
