@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] How simulate HID connections?
+Subject: Re: [Bluez-devel] bccmd reading clock
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb05062706072f1a04c8@mail.gmail.com>
-References: <e1effdeb05062706072f1a04c8@mail.gmail.com>
+In-Reply-To: <20050627223919.793D83BC@arbetsmyra.dyndns.org>
+References: <20050627223919.793D83BC@arbetsmyra.dyndns.org>
 Content-Type: text/plain
-Message-Id: <1119973394.15397.78.camel@pegasus>
+Message-Id: <1119973364.15397.77.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,14 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 28 Jun 2005 17:43:14 +0200
+Date: Tue, 28 Jun 2005 17:42:44 +0200
 
-Hi Claudio,
+Hi Ronny,
 
-> I don't have a Bluetooth keyboard at the moment.
-> Is there a way to simulate a Bluetooth keyboard using two desktops?
+> I was in the need for an enhancement of the bccmd tool and thus made a 
+> small change. The supplied patch adds a command for reading the the 
+> BT-clock of local device. In the process I also made some minor changes 
+> to utils/tools/csr.c to reuse existing code. Besided reading 16-bit 
+> variables it can now also read 32- and 8-bits alike.
 
-it is possible, but I don't know of any problem capable of doing it.
+don't do type conversion like this. Use varid_complex for it if you
+wanna support uint32 and unit8 without copying code.
+
+> No changes has (yet) been made to hcidump. Should it be done?
+
+Of course ;)
 
 Regards
 
