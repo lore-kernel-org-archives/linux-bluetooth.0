@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] need a usb dongle to use with FC4 .. any
-	suggestions?
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Matthew Lenz <matthew@nocturnal.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1119970811.16338.7.camel@mlenzdesktop>
-References: <1119970811.16338.7.camel@mlenzdesktop>
 Content-Type: text/plain
-Message-Id: <1119973206.15397.72.camel@pegasus>
+Message-Id: <1119970811.16338.7.camel@mlenzdesktop>
 Mime-Version: 1.0
+Subject: [Bluez-users] need a usb dongle to use with FC4 .. any suggestions?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,31 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Jun 2005 17:40:06 +0200
+Date: Tue, 28 Jun 2005 10:00:11 -0500
 
-Hi Matt,
+I'm looking for a bluetooth usb dongle that'll work with those operating
+systems.  I've got a Dell Axim X50v and I want to be able to access the
+network with it via a host computer and also sync with the host.
+Probably just pick up the dongle at compusa.  Anyone spot one on their
+site that will work well with linux?  Btw, as I'm sure you already know
+the hardware compatibility linked in the FAQ was removed by the author
+due to legal issues.
 
-> I'm looking for a bluetooth usb dongle that'll work with those operating
-> systems.  I've got a Dell Axim X50v and I want to be able to access the
-> network with it via a host computer and also sync with the host.
-> Probably just pick up the dongle at compusa.  Anyone spot one on their
-> site that will work well with linux?  Btw, as I'm sure you already know
-> the hardware compatibility linked in the FAQ was removed by the author
-> due to legal issues.
-> 
-> Here is a link to compusa's usb bluetooth adapters:
-> 
-> http://tinyurl.com/cltac
-> 
-> appreciate any advice.
+Here is a link to compusa's usb bluetooth adapters:
 
-most of them should work. You might wanna go with the D-Link DBT-120 or
-the new Cellink EDR dongles.
+http://tinyurl.com/cltac
 
-Regards
+appreciate any advice.
 
-Marcel
-
+-Matt
 
 
 
