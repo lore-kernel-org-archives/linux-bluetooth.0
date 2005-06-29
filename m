@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Key exchange before pairing
+Subject: Re: [Bluez-users] Odd inquiry scan result
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <537e39c905062907433980aa7f@mail.gmail.com>
-References: <537e39c905062907433980aa7f@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1120067870.15397.134.camel@pegasus>
+In-Reply-To: <42C2DA3D.3020808@csr.com>
+References: <20050629163820.10206.qmail@web30711.mail.mud.yahoo.com>
+	 <42C2DA3D.3020808@csr.com>
+Content-Type: text/plain
+Message-Id: <1120067737.15397.132.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,46 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Jun 2005 19:57:50 +0200
+Date: Wed, 29 Jun 2005 19:55:37 +0200
 
-Hi Jordi,
+Hi Steven,
 
-> I would like to know if it is possible to perform a "peer key
-> exchange" prior to the pairing operation, in order to for example,
-> have the peers exchange some extra information about them and be able
-> for example to look-up different PINs for every different service /
-> connection / device.
->=20
-> I have written a little program using rfcomm sockets (although I am
-> planing to change them to BNEP ones) which carries out the data
-> exchange without problems as long as the security manager is set to
-> 'none'.
->=20
-> But I would like to be able to replace the normal pairing procedure
-> with this "key exchange between bluetooth peers" procedure:=20
->=20
-> * it is then possible to trigger (maybe via 'pin_helper' ?) a data
-> exchange between the two bluetooth sockets (using raw L2CAP sockets,
-> for example) while the devices are _not paired_ and while the security
-> level is set at least to authentication ?
->=20
-> * I tried to change the rfcomm "working" sockets program to L2CAP
-> sockets, but then I don=B4t know which  Protocol Service MUX (psm) valu=
-e
-> I might have to set for this sockets to have them connect successfully
-> (the one from an already existing service, one of the reserved
-> values?!).=20
->=20
-> I tried different odd values greater than 1 for the psm (using
-> htobs(psm)) and I get the following error message:=20
->=20
-> Cannot connect to socket: Connection refused (111)
->=20
-> I would really appreciate it if you could help me out or give me some
-> advise on these topics.
+> >> HCI Event: 0x0e plen 8
+> >   01 1D 0C 12 00 00 00 00
+> 
+> Event 0e:    Command Complete
+> 01:          num_hci_command_packets = 1
+> 1D 0C:       Opcode 0x0c1d = Read Inquiry Scan Activity
+> 12:          Status = Invalid HCI command parameters !
+> 00 00 00 00: Parameters = not valid as there was an error !
 
-actually I have no idea what you are trying to achieve. Try to include
-examples, because I can't follow you.
+thanks for the decoding work, but using "hcidump -X -V" would have also
+done the work ;)
+
+> See the 10 commandments of C by Henry Spencer at:
+> 
+>   http://www.lysator.liu.se/c/ten-commandments.html
+
+These are really good ones. I like them.
 
 Regards
 
