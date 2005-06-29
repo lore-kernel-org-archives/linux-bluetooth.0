@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050629163820.10206.qmail@web30711.mail.mud.yahoo.com>
-From: Olivier Randriamanana <olivier_randria@yahoo.com>
+Message-ID: <537e39c905062907433980aa7f@mail.gmail.com>
+From: Jordi Jaen Pallares <jordijp@gmail.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Odd inquiry scan result
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_7075_14945350.1120056231664"
+Subject: [Bluez-users] Key exchange before pairing
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,164 +17,109 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Jun 2005 09:38:19 -0700 (PDT)
+Date: Wed, 29 Jun 2005 16:43:51 +0200
 
-Hi,
+------=_Part_7075_14945350.1120056231664
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I'm trying to understand how to send HCI commands (my
-final goal is to put my device in periodic
-inquiry...). For the moment, using hcitool.c as an
-example, I issue a HCI_Read_Inquiry_Scan_Activity
-command to the device.
-
-I zero the read_inq_activity_rp structure, and send
-the command. No error it seems, as the Command
-Complete event is received, and here is the hex dump
-of received data:
-> HCI Event: 0x0e plen 8
-  01 1D 0C 12 00 00 00 00
-
-However my read_inq_activity_rp structure is not
-changed. I would have expected it to have the default
-values (as read from the spec). 
-I can't figure out what I'm getting wrong, could
-someone please provide a hint???
-
-Regards, 
-Olivier
+Hi @ll !
 
 
-Code:
-#include <stdio.h>
-#include <stdlib.h>
+I would like to know if it is possible to perform a "peer key exchange"=20
+prior to the pairing operation, in order to for example, have the peers=20
+exchange some extra information about them and be able for example to=20
+look-up different PINs for every different service / connection / device.
 
-#include <sys/socket.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/hci.h>
-#include <bluetooth/hci_lib.h>
+I have written a little program using rfcomm sockets (although I am planing=
+=20
+to change them to BNEP ones) which carries out the data exchange without=20
+problems as long as the security manager is set to 'none'.
 
-void hex_dump(char *pref, int width, unsigned char
-*buf, int len);
-void send_cmd(int dev_id, uint16_t ocf,uint8_t ogf /*,
-int argc, char **argv*/);
+But I would like to be able to replace the normal pairing procedure with=20
+this "key exchange between bluetooth peers" procedure:=20
 
-int main(int argc, char* argv[])
-{
-  printf("%s:\n",argv[0]);
+* it is then possible to trigger (maybe via 'pin_helper' ?) a data exchange=
+=20
+between the two bluetooth sockets (using raw L2CAP sockets, for example)=20
+while the devices are _not paired_ and while the security level is set at=
+=20
+least to authentication ?
 
-  send_cmd(0,OCF_PERIODIC_INQUIRY,OGF_HOST_CTL);
+* I tried to change the rfcomm "working" sockets program to L2CAP sockets,=
+=20
+but then I don=B4t know which Protocol Service MUX (psm) value I might have=
+ to=20
+set for this sockets to have them connect successfully (the one from an=20
+already existing service, one of the reserved values?!).=20
 
-  return 0;
-}
+I tried different odd values greater than 1 for the psm (using htobs(psm))=
+=20
+and I get the following error message:=20
 
-void send_cmd(int dev_id, uint16_t uocf,uint8_t uogf
-/*, int argc, char **argv*/)
-{
-  char buf[HCI_MAX_EVENT_SIZE], *ptr = buf;
-  struct hci_filter flt;
-  hci_event_hdr *hdr;
-  int i, opt, len, dd;
-  read_inq_activity_rp rp;
-  read_inq_activity_rp* prp;
-  
-  uint16_t ocf = OCF_READ_INQ_ACTIVITY;
-  uint8_t ogf  = OGF_HOST_CTL;
-  
-  
-  printf("%s: OGF %d OCF %d dev_id
-%d\n",__FUNCTION__,ogf,ocf,dev_id);
-  dd = hci_open_dev(dev_id);
-  if (dd < 0) {
-    perror("Device open failed");
-    exit(EXIT_FAILURE);
-  }
-  
-  
-  /* Setup filter */
-  hci_filter_clear(&flt);
-  
-  hci_filter_set_ptype(HCI_EVENT_PKT, &flt);
-  hci_filter_all_events(&flt);
-  
-  if (setsockopt(dd, SOL_HCI, HCI_FILTER, &flt,
-sizeof(flt)) < 0) {
-    perror("HCI filter setup failed");
-    exit(EXIT_FAILURE);
-  }
-  prp = &rp;
-  prp->status = 0;
-  prp->interval = 0;
-  prp->window = 0;
-  
-  len = READ_INQ_ACTIVITY_RP_SIZE;
-  ptr = &rp;
-  printf("< HCI Command: ogf 0x%02x, ocf 0x%04x, plen
-%d (sizeof %d)\n", ogf, ocf, len,sizeof(rp));
-  
-  if (hci_send_cmd(dd, ogf, ocf, len, ptr /*buf*/) <
-0) {
-    perror("Send failed");
-    exit(EXIT_FAILURE);
-  }
-  printf("rp.status %d, interval %d, window %d\n",
-	       prp->status,
-	 prp->interval,
-	 prp->window);
-  
-  len = read(dd, buf, sizeof(buf));
-  if (len < 0) {
-    perror("Read failed");
-		exit(EXIT_FAILURE);
-  }
-  
-  hdr = (void *)(buf + 1);
-  ptr = buf + (1 + HCI_EVENT_HDR_SIZE);
-  len -= (1 + HCI_EVENT_HDR_SIZE);
-  
-  printf("> HCI Event: 0x%02x plen %d\n", hdr->evt,
-hdr->plen);
-  
-  hex_dump("  ", 20, ptr, len); fflush(stdout);
-  printf("rp.status %d, interval %d, window %d\n",
-	 prp->status,
-	 prp->interval,
-	 prp->window);
-  prp = ptr;
-  printf("rp.status %d, interval %d, window %d\n",
-	 prp->status,
-	 prp->interval,
-	 prp->window);
-  hci_close_dev(dd);
-}
+Cannot connect to socket: Connection refused (111)
 
-void hex_dump(char *pref, int width, unsigned char
-*buf, int len)
-{
-	register int i,n;
-
-	for (i = 0, n = 1; i < len; i++, n++) {
-		if (n == 1)
-			printf("%s", pref);
-		printf("%2.2X ", buf[i]);
-		if (n == width) {
-			printf("\n");
-			n = 0;
-		}
-	}
-	if (i && n!=1)
-		printf("\n");
-}
+I would really appreciate it if you could help me out or give me some advis=
+e=20
+on these topics.
 
 
---
-Olivier
+Best Regards,
 
 
-		
-____________________________________________________ 
-Yahoo! Sports 
-Rekindle the Rivalries. Sign up for Fantasy Football 
-http://football.fantasysports.yahoo.com
+Jordi
+
+------=_Part_7075_14945350.1120056231664
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi @ll !<br>
+<br>
+<br>
+I would like to know if it is possible to perform a &quot;peer key
+exchange&quot; prior to
+the pairing operation, in order to for example, have the peers exchange
+some extra information about them and be able for example to look-up
+different PINs for every different service / connection / device.<br>
+<br>
+I have written a little program using rfcomm sockets (although I am
+planing to change them to BNEP ones) which carries out the data
+exchange without problems as long as the security manager is set to
+'none'.<br>
+<br>
+But I would like to be able to replace the normal pairing procedure with th=
+is &quot;key exchange between bluetooth peers&quot; procedure: <br>
+<br>
+* it is then possible to trigger (maybe via 'pin_helper' ?) a data exchange
+between the two bluetooth sockets (using raw L2CAP sockets, for example)
+while the devices are _not paired_ and while the security level is set
+at least to authentication ?<br>
+<br>
+* I tried to change the rfcomm &quot;working&quot; sockets program to L2CAP
+sockets, but then I don=B4t know which&nbsp; Protocol Service MUX (psm)
+value I might have to set for this sockets to have them connect
+successfully (the one from an already existing service, one of the
+reserved values?!). <br>
+<br>
+I tried different odd values greater than 1 for the psm (using htobs(psm)) =
+and I get the following error message: <br>
+<br>
+Cannot connect to socket: Connection refused (111)<br>
+<br>
+I would really appreciate it if you could help me out or give me some advis=
+e on these topics.<br>
+<br>
+<br>
+Best Regards,<br>
+<br>
+<br>
+Jordi<br>
+
+
+
+------=_Part_7075_14945350.1120056231664--
 
 
 -------------------------------------------------------
