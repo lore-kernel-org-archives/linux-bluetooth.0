@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <537e39c905062916247959acdf@mail.gmail.com>
-From: Jordi Jaen Pallares <jordijp@gmail.com>
+Subject: Re: [Bluez-users] Problem with btsoc and new handset.
+From: Tim Ansell <mithro@mithis.net>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Key exchange before pairing
-In-Reply-To: <1120067870.15397.134.camel@pegasus>
+In-Reply-To: <1120077474.4343.9.camel@ultralight>
+References: <1120077474.4343.9.camel@ultralight>
+Content-Type: text/plain
+Message-Id: <1120077793.4343.14.camel@ultralight>
 Mime-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_8971_24717438.1120087442872"
-References: <537e39c905062907433980aa7f@mail.gmail.com>
-	 <1120067870.15397.134.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,47 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 30 Jun 2005 01:24:02 +0200
+Date: Thu, 30 Jun 2005 06:13:13 +0930
 
-------=_Part_8971_24717438.1120087442872
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+On Thu, 2005-06-30 at 06:07 +0930, Tim Ansell wrote:
+> Hello,
+> 
 
-Hi Marcel,
+I also get this when running a2play,
+
+root@ultralight:/dev/snd# /home/tim/bluetooth/btsco/a2play -s -d -v
+00:0E:A1:02:B8:7A /dev/dsp -m
+subbands = 8 blocks = 16 bitpool = 32
+
+Sample Rate:44100
+Channels:1
+Using address: 00:0E:A1:02:B8:7A
+
+Found A2DP Sink at the destination
+Can't connect to 7A:B8:02:A1:0E:00. Connection refused(111)
+cannot open psm_cmd = 25
 
 
-I=B4d like to generate the PIN based on the shared key derived from a Diffi=
-e=20
-Hellman exchange between the bluetooth peers.
 
-Is it possible to trigger this exchange at pairing time using my own=20
-'pin_helper' program ?
-
-Regards,
-
-Jordi
-
-------=_Part_8971_24717438.1120087442872
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi Marcel,<br>
-<br>
-<br>I=B4d like to generate the PIN based on the shared key derived from a D=
-iffie Hellman exchange between the bluetooth peers.<br>
-<br>
-Is it possible to trigger this exchange at pairing time using my own 'pin_h=
-elper' program ?<br>
-<br>
-Regards,<br>
-<br>
-Jordi<br>
-<br>
-<br>
-
-------=_Part_8971_24717438.1120087442872--
 
 
 -------------------------------------------------------
