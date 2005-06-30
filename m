@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <c93f2a29050629233978453a1c@mail.gmail.com>
-From: Embedded System <embed.sys@gmail.com>
+From: bc90021 <bc90021@bc90021.net>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] problems when connect Nokia 7650 to an arm box with BlueZ
-In-Reply-To: <1120108334.15397.141.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1120113308.22582.9.camel@viskulan.tigerhost.net>
 Mime-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_2015_15193643.1120113577891"
-References: <c93f2a29050629200733f9acd6@mail.gmail.com>
-	 <1120108334.15397.141.camel@pegasus>
+Subject: [Bluez-users] Unabe To Pair With My Linux Machine
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,110 +16,132 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 30 Jun 2005 14:39:37 +0800
+Date: Thu, 30 Jun 2005 02:35:07 -0400
 
-------=_Part_2015_15193643.1120113577891
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+All,
 
-hi, Marcel
- Thanks for the prompt reply! But for my case, the kernel is hard to change=
-,=20
-could you please advice me what can I do for the time being, to ensure the=
-=20
-data can be sent & received correctly?
- Regards,
-Andy
- On 6/30/05, Marcel Holtmann <marcel@holtmann.org> wrote:=20
->=20
-> Hi Andy,
->=20
-> > I am currently connect Nokia 7650 to an arm box (kernel 2.4.27) via
-> > Serial Profile using BlueZ(libs-2.14, utils-2.14, hcidump-1.16). The
-> > problems are:
-> >
-> > 1. Every twice connections, one success, and the other said time out.
-> > 2. After receive about 5 message from arm box, it do not send back any
-> > data, from hcidump output, it simplely stalls.
-> > 3. Every twice sending message from Nokia, one success, and one has no
-> > effects, hcidump has no output also.
-> > 4. If I start hcidump before connection, then I can never connect
-> > successfully.
-> >
-> > But everything seems to work well when I connect the Nokia 7650 to a
-> > PC.
->=20
-> update bluez-libs and bluez-utils and you should also update your
-> kernel. The 2.4.27 is quite old and it might have bugs.
->=20
-> Regards
->=20
-> Marcel
->=20
->=20
->=20
->=20
-> -------------------------------------------------------
-> SF.Net <http://SF.Net> email is sponsored by: Discover Easy Linux=20
-> Migration Strategies
-> from IBM. Find simple to follow Roadmaps, straightforward articles,
-> informative Webcasts and more! Get everything you need to get up to
-> speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dclic=
-k
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+I apologise, as it is late, and I am tired.  I would like to pair my
+Treo 650 with my Gentoo desktop, in the hopes of eventually using
+MultiSync over Bluetooth.  I have the two connecting to each other, and
+they can see each other.  However, when setting up the Desktop as a
+trusted device, I can't get them to pair.
 
-------=_Part_2015_15193643.1120113577891
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Here are the two scenarios:
 
-<div>hi, Marcel</div>
-<div>&nbsp;</div>
-<div>Thanks for the prompt reply! But for my case, the kernel is hard to ch=
-ange, could you please advice me what can I do for the time being, to ensur=
-e the data can be sent &amp; received correctly?<br>&nbsp;</div>
-<div>Regards,</div>
-<div>Andy<br>&nbsp;</div>
-<div><span class=3D"gmail_quote">On 6/30/05, <b class=3D"gmail_sendername">=
-Marcel Holtmann</b> &lt;<a href=3D"mailto:marcel@holtmann.org">marcel@holtm=
-ann.org</a>&gt; wrote:</span>
-<blockquote class=3D"gmail_quote" style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0=
-px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Hi Andy,<br><br>&gt; I am curren=
-tly connect Nokia 7650 to an arm box (kernel 2.4.27) via<br>&gt; Serial Pro=
-file using BlueZ(
-libs-2.14, utils-2.14, hcidump-1.16).&nbsp;&nbsp;The<br>&gt; problems are:<=
-br>&gt;<br>&gt; 1. Every twice connections, one success, and the other said=
- time out.<br>&gt; 2. After receive about 5 message from arm box, it do not=
- send back any
-<br>&gt; data, from hcidump output, it simplely stalls.<br>&gt; 3. Every tw=
-ice sending message from Nokia, one success, and one has no<br>&gt; effects=
-, hcidump has no output also.<br>&gt; 4. If I start hcidump before connecti=
-on, then I can never connect
-<br>&gt; successfully.<br>&gt;<br>&gt; But everything seems to work well wh=
-en I connect the Nokia 7650 to a<br>&gt; PC.<br><br>update bluez-libs and b=
-luez-utils and you should also update your<br>kernel. The 2.4.27 is quite o=
-ld and it might have bugs.
-<br><br>Regards<br><br>Marcel<br><br><br><br><br>--------------------------=
------------------------------<br><a href=3D"http://SF.Net">SF.Net</a> email=
- is sponsored by: Discover Easy Linux Migration Strategies<br>from IBM. Fin=
-d simple to follow Roadmaps, straightforward articles,
-<br>informative Webcasts and more! Get everything you need to get up to<br>=
-speed, fast. <a href=3D"http://ads.osdn.com/?ad_id=3D7477&amp;alloc_id=3D16=
-492&amp;op=3Dclick">http://ads.osdn.com/?ad_id=3D7477&amp;alloc_id=3D16492&=
-amp;op=3Dclick
-</a><br>_______________________________________________<br>Bluez-users mail=
-ing list<br><a href=3D"mailto:Bluez-users@lists.sourceforge.net">Bluez-user=
-s@lists.sourceforge.net</a><br><a href=3D"https://lists.sourceforge.net/lis=
-ts/listinfo/bluez-users">
-https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquot=
-e></div><br>
+1)  Scenario 1:  hcid.conf has "auth" and "encrypt" enabled
+(uncommented).  The connection is initiated from the phone, and I get
+the following with hcidump -x:
 
-------=_Part_2015_15193643.1120113577891--
+HCI sniffer - Bluetooth packet analyzer ver 1.21
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Write Scan Enable (0x03|0x001a) plen 1
+    enable 3
+> HCI Event: Command Complete (0x0e) plen 4
+  01 1A 0C 00
+< HCI Command: Read Stored Link Key (0x03|0x000d) plen 7
+    bdaddr 00:00:00:00:00:00 all 1
+> HCI Event: Command Complete (0x0e) plen 8
+  01 0D 0C 00 10 00 00 00
+< HCI Command: Write Authentication Enable (0x03|0x0020) plen 1
+    enable 1
+> HCI Event: Command Complete (0x0e) plen 4
+  01 20 0C 00
+< HCI Command: Write Encryption Mode (0x03|0x0022) plen 1
+    mode 1
+> HCI Event: Command Complete (0x0e) plen 4
+  01 22 0C 00
+< HCI Command: Write Local Name (0x03|0x0013) plen 248
+    name 'BlueZ (Viskulan)'
+> HCI Event: Command Complete (0x0e) plen 4
+  01 13 0C 00
+< HCI Command: Write Class of Device (0x03|0x0024) plen 3
+    class 0x3e0100
+> HCI Event: Command Complete (0x0e) plen 4
+  01 24 0C 00
+> HCI Event: Connect Request (0x04) plen 10
+  5D 63 60 E0 07 00 0C 02 50 01
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+    bdaddr 00:07:E0:60:63:5D role 0x01
+    Role: Slave
+> HCI Event: Command Status (0x0f) plen 4
+  00 01 09 04
+> HCI Event: Link Key Request (0x17) plen 6
+  5D 63 60 E0 07 00
+< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
+    bdaddr 00:07:E0:60:63:5D
+> HCI Event: Command Complete (0x0e) plen 10
+  01 0C 04 00 5D 63 60 E0 07 00
+> HCI Event: PIN Code Request (0x16) plen 6
+  5D 63 60 E0 07 00
+< HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+    bdaddr 00:07:E0:60:63:5D
+> HCI Event: Command Complete (0x0e) plen 10
+  01 0E 04 00 5D 63 60 E0 07 00
+> HCI Event: Connect Complete (0x03) plen 11
+  06 29 00 5D 63 60 E0 07 00 01 00
+
+As you can see, with the auth and encrypt enabled, the desktop doesn't
+seem to be sending anything.  Also, I never get the popup on my phone to
+put in the pin.
+
+Scenario 2: hcid.conf has "auth" and "encrypt" disabled (commented).
+The connection is initiated from the phone, and I get the following with
+hcidump -x:
+
+HCI sniffer - Bluetooth packet analyzer ver 1.21
+device: hci0 snap_len: 1028 filter: 0xffffffff
+> HCI Event: Connect Request (0x04) plen 10
+  5D 63 60 E0 07 00 0C 02 50 01
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+    bdaddr 00:07:E0:60:63:5D role 0x01
+    Role: Slave
+> HCI Event: Command Status (0x0f) plen 4
+  00 01 09 04
+> HCI Event: Connect Complete (0x03) plen 11
+  00 29 00 5D 63 60 E0 07 00 01 00
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 41 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK
+> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+  5D 63 60 E0 07 00 01
+> HCI Event: Max Slots Change (0x1b) plen 3
+  29 00 05
+> HCI Event: Command Complete (0x0e) plen 6
+  01 0D 08 00 29 00
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+    handle 41 ptype 0x0018
+    Packet type: DM1 DH1
+> HCI Event: Command Status (0x0f) plen 4
+  00 01 0F 04
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+  00 29 00 18 00
+> HCI Event: PIN Code Request (0x16) plen 6
+  5D 63 60 E0 07 00
+< HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+    bdaddr 00:07:E0:60:63:5D
+> HCI Event: Command Complete (0x0e) plen 10
+  01 0E 04 00 5D 63 60 E0 07 00
+> HCI Event: Disconn Complete (0x05) plen 4
+  00 29 00 13
+
+This time, I get the popup on the phone, and can put in the pin, but I
+still never get anything sent by the desktop.
+
+I'm using /usr/bin/bluepin, which is a python script that looks like
+it's supposed to popup a dialog box for a pin.  That never works.  I
+tried using the pin-helper bash  script in /etc/bluetooth (which just
+uses cat to output the pin), but that made no difference.
+
+As you can see, I'm stuck.  I'm pretty sure that I'll be able to get
+everything else working once I can get the devices paired.
+
+I'm sorry for the long message, and very grateful for any assistance
+anyone can offer.
+
+Thanks.
+
+bc90021
+
 
 
 -------------------------------------------------------
