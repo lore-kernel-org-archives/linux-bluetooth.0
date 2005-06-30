@@ -1,42 +1,73 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <429D4256.8080803@isofttech.com>
-From: Durai <durai@isofttech.com>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <42C46920.809@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] UART based bluetooth dongle
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Jun 2005 10:36:30 +0530
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Problem with btsoc and new handset.
+References: <1120077474.4343.9.camel@ultralight> <1120077793.4343.14.camel@ultralight>
+In-Reply-To: <1120077793.4343.14.camel@ultralight>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 30 Jun 2005 14:50:24 -0700
 
-Hi,
-I am looking for an UART based bluetooth dongle for my project. From the 
-bluez features document,
-I found  this, http://www.digi.com/products/wireless/wavespeeds.jsp . 
-But this looks like a UART replacement dongle.
-What I am looking is for is a bluetooth device which can support GAP, 
-Serial port,LAN, PAN profiles with bluez support, with
-UART interface. Please help me to find one,
-regards
-durai
+Tim,
 
+a2play only works with stereo headsets
+
+brad
+
+Tim Ansell wrote:
+> On Thu, 2005-06-30 at 06:07 +0930, Tim Ansell wrote:
+> 
+>>Hello,
+>>
+> 
+> 
+> I also get this when running a2play,
+> 
+> root@ultralight:/dev/snd# /home/tim/bluetooth/btsco/a2play -s -d -v
+> 00:0E:A1:02:B8:7A /dev/dsp -m
+> subbands = 8 blocks = 16 bitpool = 32
+> 
+> Sample Rate:44100
+> Channels:1
+> Using address: 00:0E:A1:02:B8:7A
+> 
+> Found A2DP Sink at the destination
+> Can't connect to 7A:B8:02:A1:0E:00. Connection refused(111)
+> cannot open psm_cmd = 25
+> 
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+> from IBM. Find simple to follow Roadmaps, straightforward articles,
+> informative Webcasts and more! Get everything you need to get up to
+> speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by Yahoo.
-Introducing Yahoo! Search Developer Network - Create apps using Yahoo!
-Search APIs Find out how you can build Yahoo! directly into your own
-Applications - visit http://developer.yahoo.net/?fr=offad-ysdn-ostg-q22005
+SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+from IBM. Find simple to follow Roadmaps, straightforward articles,
+informative Webcasts and more! Get everything you need to get up to
+speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
