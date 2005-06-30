@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1120135682.42c3ea026eacb@www.webmail.ucl.ac.uk>
-From: uceemoa@ucl.ac.uk
+Message-ID: <20050630085415.24897.qmail@web30708.mail.mud.yahoo.com>
+From: Olivier Randriamanana <olivier_randria@yahoo.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] RFCOMM connection problem Casira (Bluelab) and Bluez
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Re: Odd inquiry scan result
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +16,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 30 Jun 2005 13:48:02 +0100
+Date: Thu, 30 Jun 2005 01:54:14 -0700 (PDT)
+
+Almighty Steven & Marcel,
+
+Zero the parameter length should have been, grateful
+for your help I am!
+
+Olivier
+
+PS: thanks for the commandments, I am not too familiar
+with the Shakespear styled english...
 
 
-Hi all,
+--
+Olivier
 
-I'm a newbie for this bluez. I have a dongle (Bluez) and trying to connect with
-Casira (Bluelab). I can not establish the RFCOMM connection between both of
-them. I set the Casira as slave and the dongle (bluez) as a master. I try to
-connect the dongle, rfcomm connect 0 <addr>. But it display "can't open RFCOMM
-device : No such file or directory".  I hd try to connect with Nokia 660, and
-it's working. Do any of you know what I should do? one more thing, how I want
-to disable the modem status command?
 
+		
+____________________________________________________ 
+Yahoo! Sports 
+Rekindle the Rivalries. Sign up for Fantasy Football 
+http://football.fantasysports.yahoo.com
 
 
 -------------------------------------------------------
