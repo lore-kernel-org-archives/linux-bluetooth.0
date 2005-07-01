@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] freezes
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20050701164432.8740.qmail@webmaild.fe1.aruba.it>
+From: "Ubaldo Porcheddu" <ubaldo@eja.it>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050701164432.8740.qmail@webmaild.fe1.aruba.it>
-References: <20050701164432.8740.qmail@webmaild.fe1.aruba.it>
-Content-Type: text/plain
-Message-Id: <1120243933.15397.199.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; format=flowed; charset="iso-8859-1"
+Subject: [Bluez-devel] freezes
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,24 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 01 Jul 2005 20:52:13 +0200
+Date: Fri, 01 Jul 2005 18:44:32 +0200
 
-Hi Ubaldo,
+Buondi', 
 
-> I am still developing the miax, a bt-iax client, and I am going to get crazy 
-> to understand why after 10/15 times that I open/close a SCO channel the 
-> bt-dongle or the phone freezes. I tried a lot of mobile phones and a lot of 
-> bt-dongles > 16.4 but the problem is still there. 
-> 
-> Maybe I wrote something wrong into the code, so if someone have a bit of 
-> time to check the code please get it at http://miax.sf.net . 
+I am still developing the miax, a bt-iax client, and I am going to get crazy 
+to understand why after 10/15 times that I open/close a SCO channel the 
+bt-dongle or the phone freezes. I tried a lot of mobile phones and a lot of 
+bt-dongles > 16.4 but the problem is still there. 
 
-about what kernel and libs/utils are we talking?
+Maybe I wrote something wrong into the code, so if someone have a bit of 
+time to check the code please get it at http://miax.sf.net . 
 
-Regards
-
-Marcel
-
+Any good idea or suggestion about this problem will be very very 
+appreciated! :) 
 
 
 
