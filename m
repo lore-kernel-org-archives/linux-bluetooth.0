@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] SDPD problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] H5 3 wire UART connect problem 
-In-reply-to: <f16b04cf05070102493b480412@mail.gmail.com> 
-References: <f16b04cf050630083549f68fef@mail.gmail.com> <1120157509.15397.152.camel@pegasus> <f16b04cf05070102493b480412@mail.gmail.com>
-Message-ID: <15935.1120213339@csr.com>
-From: Peter Stephenson <pws@csr.com>
+In-Reply-To: <20050630150432.88B0C1DD1C5@mrelay2.st2.lyceu.net>
+References: <20050630150432.88B0C1DD1C5@mrelay2.st2.lyceu.net>
+Content-Type: text/plain
+Message-Id: <1120213468.15397.191.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,31 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 01 Jul 2005 11:22:19 +0100
+Date: Fri, 01 Jul 2005 12:24:28 +0200
 
-hariharan veerappan wrote:
-> As per Silicon wave datasheet the 3 WIRE UART is compatible with BCSP.
-> May we have to follow the H4 UART or BCSP one for our development.
+Hi Esther,
 
-Definitely follow the existing BCSP code.  You should find you can
-adapt it for 3WU with a minimum of difficulty.  Some of the constants
-are different (British humour doesn't always travel well) but otherwise
-the core design is very similar.  3WU has some weird additional options,
-but you probably don't need those.
+> I'm trying to get Bluez work. I'm making some progress, but I haven't been
+> able to add services to the Linux box, and discover them through another
+> devices.
+> 
+> When I type sdpd, to start the sdp daemon, the following error arise:
+> 
+> init_server: binding L2CAP socket: Address already in use
+> main: Server initialization failed
 
--- 
-Peter Stephenson <pws@csr.com>                  Software Engineer
-CSR PLC, Churchill House, Cambridge Business Park, Cowley Road
-Cambridge, CB4 0WZ, UK                          Tel: +44 (0)1223 692070
+this means that a SDP server is already running.
 
+> (If I type sdptool add XX, nothing really happens)
+> 
+> How can I manage to get it into work?
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
+Add them and then check with "sdptool browse local".
 
-**********************************************************************
+Regards
+
+Marcel
+
 
 
 
