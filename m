@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] SDPD problem
+Subject: Re: [Bluez-users] H5 3 wire UART connect problem
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050630150432.88B0C1DD1C5@mrelay2.st2.lyceu.net>
-References: <20050630150432.88B0C1DD1C5@mrelay2.st2.lyceu.net>
+In-Reply-To: <f16b04cf05070102493b480412@mail.gmail.com>
+References: <f16b04cf050630083549f68fef@mail.gmail.com>
+	 <1120157509.15397.152.camel@pegasus>
+	 <f16b04cf05070102493b480412@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1120213468.15397.191.camel@pegasus>
+Message-Id: <1120213256.15397.187.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,26 +20,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 01 Jul 2005 12:24:28 +0200
+Date: Fri, 01 Jul 2005 12:20:56 +0200
 
-Hi Esther,
+Hi Hariharan,
 
-> I'm trying to get Bluez work. I'm making some progress, but I haven't been
-> able to add services to the Linux box, and discover them through another
-> devices.
+> we wants to develop and implement the 3 WIRE UART support for the 
+> Bluez Stack. can any one suggest an idea to develop and implement
+> 3 WIRE UART in BlueZ. 
 > 
-> When I type sdpd, to start the sdp daemon, the following error arise:
+> May i follow the H4 UART Implementation with Some modifications related with 
+> H5 (3 WIRE UART). We came to know that Packets has to be added before and after
+> the HCI commands according to H4 and H5 UART. Is it right ?. 
 > 
-> init_server: binding L2CAP socket: Address already in use
-> main: Server initialization failed
-
-this means that a SDP server is already running.
-
-> (If I type sdptool add XX, nothing really happens)
+> We wish to know that whether it takes major development cycle.
 > 
-> How can I manage to get it into work?
+> As per Silicon wave datasheet the 3 WIRE UART is compatible with BCSP.
+> May we have to follow the H4 UART or BCSP one for our development.
 
-Add them and then check with "sdptool browse local".
+create a file drivers/bluetooth/hci_3wire.c and start with BCSP as base.
+In general you can do a driver that supports BCSP and 3-Wire at the same
+time, but actually I really like to have two separate drivers. Try to
+start from scratch and don't copy too much things. The second part is
+adding support for 3-Wire to the hciattach program.
 
 Regards
 
