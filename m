@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] API reference needed...
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <9307f5f205070103081afbeb2f@mail.gmail.com>
-References: <9307f5f205070103081afbeb2f@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1120213332.15397.189.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] H5 3 wire UART connect problem 
+In-reply-to: <f16b04cf05070102493b480412@mail.gmail.com> 
+References: <f16b04cf050630083549f68fef@mail.gmail.com> <1120157509.15397.152.camel@pegasus> <f16b04cf05070102493b480412@mail.gmail.com>
+Message-ID: <15935.1120213339@csr.com>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,23 +16,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 01 Jul 2005 12:22:12 +0200
+Date: Fri, 01 Jul 2005 11:22:19 +0100
 
-Hi,
+hariharan veerappan wrote:
+> As per Silicon wave datasheet the 3 WIRE UART is compatible with BCSP.
+> May we have to follow the H4 UART or BCSP one for our development.
 
-> I need to write a c++ wrapper for BlueZ, but couldn't find any valid
-> api reference so far and it's quite tough to figure out what each
-> function does, what parameters it takes etc just by inspecting the
-> code, the "documentation" on the official website doesn't help either,
-> could anyone point me to some good resources ?
+Definitely follow the existing BCSP code.  You should find you can
+adapt it for 3WU with a minimum of difficulty.  Some of the constants
+are different (British humour doesn't always travel well) but otherwise
+the core design is very similar.  3WU has some weird additional options,
+but you probably don't need those.
 
-what is a C++ wrapper? You can use all BlueZ API functions directly from
-C++ and so I don't understand what a wrapper would do.
+-- 
+Peter Stephenson <pws@csr.com>                  Software Engineer
+CSR PLC, Churchill House, Cambridge Business Park, Cowley Road
+Cambridge, CB4 0WZ, UK                          Tel: +44 (0)1223 692070
 
-Regards
 
-Marcel
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
 
+**********************************************************************
 
 
 
