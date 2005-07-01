@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] H5 3 wire UART connect problem
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <9307f5f205070103081afbeb2f@mail.gmail.com>
+From: "P. Durante" <shackan@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <f16b04cf05070102493b480412@mail.gmail.com>
-References: <f16b04cf050630083549f68fef@mail.gmail.com>
-	 <1120157509.15397.152.camel@pegasus>
-	 <f16b04cf05070102493b480412@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1120213256.15397.187.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] API reference needed...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,34 +16,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 01 Jul 2005 12:20:56 +0200
+Date: Fri, 1 Jul 2005 12:08:08 +0200
 
-Hi Hariharan,
+I need to write a c++ wrapper for BlueZ, but couldn't find any valid
+api reference so far and it's quite tough to figure out what each
+function does, what parameters it takes etc just by inspecting the
+code, the "documentation" on the official website doesn't help either,
+could anyone point me to some good resources ?
 
-> we wants to develop and implement the 3 WIRE UART support for the 
-> Bluez Stack. can any one suggest an idea to develop and implement
-> 3 WIRE UART in BlueZ. 
-> 
-> May i follow the H4 UART Implementation with Some modifications related with 
-> H5 (3 WIRE UART). We came to know that Packets has to be added before and after
-> the HCI commands according to H4 and H5 UART. Is it right ?. 
-> 
-> We wish to know that whether it takes major development cycle.
-> 
-> As per Silicon wave datasheet the 3 WIRE UART is compatible with BCSP.
-> May we have to follow the H4 UART or BCSP one for our development.
-
-create a file drivers/bluetooth/hci_3wire.c and start with BCSP as base.
-In general you can do a driver that supports BCSP and 3-Wire at the same
-time, but actually I really like to have two separate drivers. Try to
-start from scratch and don't copy too much things. The second part is
-adding support for 3-Wire to the hciattach program.
-
-Regards
-
-Marcel
-
-
+thanks
 
 
 -------------------------------------------------------
