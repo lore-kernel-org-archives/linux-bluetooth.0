@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <c93f2a29050702074045ad46dd@mail.gmail.com>
-From: Embedded System <embed.sys@gmail.com>
+Subject: Re: [Bluez-users] H5 3 wire UART connect problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <f16b04cf05070103496a3e64e6@mail.gmail.com>
+References: <f16b04cf050630083549f68fef@mail.gmail.com>
+	 <1120157509.15397.152.camel@pegasus>
+	 <f16b04cf05070102493b480412@mail.gmail.com>
+	 <1120213256.15397.187.camel@pegasus>
+	 <f16b04cf05070103496a3e64e6@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1120224082.15397.197.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_1346_15761985.1120315257914"
-Subject: [Bluez-users] HCID problem? (Help)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,79 +22,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 2 Jul 2005 14:40:57 +0000
+Date: Fri, 01 Jul 2005 15:21:22 +0200
 
-------=_Part_1346_15761985.1120315257914
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Hriharan,
 
-hi, all
+> If we wish to study some basic fundamentals of development.
+> Can any body advise whether any tutorials available for H5 UART (3 WIRE UART)
+> on bluez. Tell me the any website link for better solution for our development.
 
-HCI command do not complete after "inquiure request" completed succesfully.
+look at the hci_h4.c and hci_bcsp.c files for examples. They show you
+how to use our HCI UART API. The number of lines of code are very small
+and it should be easy to understand what the callback functions are for.
+The hciattach.c is a little bit more freaky. I need to split it into
+more separate files for each transport or vendor.
 
-I run "hcitool inq" & "hcidum", the output is as following:
+Regards
 
-HCIDump - HCI packet analyzer ver 1.16
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-33 8B 9E 08 00
-> HCI Event: Command Status (0x0f) plen 4
-00 01 01 04
-> HCI Event: Inquiry Result (0x02) plen 15
-01 91 DC AC EE 02 00 01 00 00 04 22 50 C5 57
-> HCI Event: Inquiry Complete (0x01) plen 1
-00
+Marcel
 
-(based on the packet dump, the inquery is succesful, and hcid should=20
-complete), but hcitool output is:
-Inquiring ...
-Inquiry failed.: Connection timed out
 
-Is it a HCID problem? How can I fix it? I thought it will also cause packet=
-=20
-lost & program hang.
-
-Regards,
-Andy
-
-------=_Part_1346_15761985.1120315257914
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-hi, all<br>
-<br>
-HCI command do not complete after &quot;inquiure request&quot; completed su=
-ccesfully.<br>
-<br>
-I run &quot;hcitool inq&quot; &amp; &quot;hcidum&quot;, the output is as fo=
-llowing:<br>
-<br>
-HCIDump - HCI packet analyzer ver 1.16<br>
-device: hci0 snap_len: 1028 filter: 0xffffffff<br>
-&lt; HCI Command: Inquiry (0x01|0x0001) plen 5<br>
-&nbsp; 33 8B 9E 08 00<br>
-&gt; HCI Event: Command Status (0x0f) plen 4<br>
-&nbsp; 00 01 01 04<br>
-&gt; HCI Event: Inquiry Result (0x02) plen 15<br>
-&nbsp; 01 91 DC AC EE 02 00 01 00 00 04 22 50 C5 57<br>
-&gt; HCI Event: Inquiry Complete (0x01) plen 1<br>
-&nbsp; 00<br>
-<br>
-(based on the packet dump, the inquery is succesful, and hcid should comple=
-te), but hcitool output is:<br>
-Inquiring ...<br>
-
-Inquiry failed.: Connection timed out<br>
-<br>
-Is it a HCID problem? How can I fix it? I thought it will also cause packet=
- lost &amp; program hang.<br>
-<br>
-Regards,<br>
-Andy<br>
-
-------=_Part_1346_15761985.1120315257914--
 
 
 -------------------------------------------------------
