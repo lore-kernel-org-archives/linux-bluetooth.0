@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bccmd reading clock
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Andreas =?ISO-8859-1?Q?B=F6hler?= <andy.boehler@gmx.at>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050629082735.CC3AC84E@arbetsmyra.dyndns.org>
-References: <20050627223919.793D83BC@arbetsmyra.dyndns.org>
-	 <1119973364.15397.77.camel@pegasus>
-	 <20050629082735.CC3AC84E@arbetsmyra.dyndns.org>
-Content-Type: text/plain
-Message-Id: <1120385776.10273.8.camel@pegasus>
+Subject: Re: [Bluez-devel] emporia/mega-Headset and btsco problems
+Message-Id: <20050703004746.45b60662.andy.boehler@gmx.at>
+In-Reply-To: <42C70688.9050407@xmission.com>
+References: <20050702172632.3d3b3dcd.andy.boehler@gmx.at>
+	<42C70688.9050407@xmission.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,37 +19,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 03 Jul 2005 12:16:16 +0200
+Date: Sun, 3 Jul 2005 00:47:46 +0200
 
-Hi Ronny,
+Hi, thanks for the quick reply;
 
-> > > I was in the need for an enhancement of the bccmd tool and thus
-> > > made a small change. The supplied patch adds a command for reading
-> > > the the BT-clock of local device. In the process I also made some
-> > > minor changes to utils/tools/csr.c to reuse existing code. Besided
-> > > reading 16-bit variables it can now also read 32- and 8-bits alike.
-> >
-> > don't do type conversion like this. Use varid_complex for it if you
-> > wanna support uint32 and unit8 without copying code.
-> 
-> As you command.... :)  Perhaps like this then? Added parsing read of 
-> uart speed setting too. I'm a bit uncertain however of where to put 
-> corresponding uart config write. Both BCCMD and PSKEY seems adequate.
+> One thing we have needed to do for a long time that would help this is=20
+> to rebuild the rfcomm connection when it goes bad (or even make it=20
+> happen on demand). With other headsets, the rfcomm connection only goes=20
+> bad if the headset goes out of range. Holding the rfcomm connection open=
+=20
+> isn't great anyway because I think it prevents a laptop from suspending.
 
-actually I added the clock reading support by copying the uint32 reading
-command. Using the complex command needs a little bit more testing and
-of course audit. The CSR BCCMD can be quite picky if you do something
-wrong. I also added support for uint32 and BT_CLOCK to hcidump.
+yeah, the best way to handle my particular headset would be if btsco reconn=
+ects the rfcomm-channel after it is lost!
+May I ask someone if it is possible to supply such a patch? I would really =
+do it myself, if I had the necessary C-skills....
 
-The UART config is used via BCCMD for temporary changes and via the
-PSKEY for permanent changes. I didn't added it, because I don't like
-mixing patches. One patch per feature.
+thanks,=20
 
-Regards
+andy
 
-Marcel
-
-
+--=20
+Andreas B=F6hler
+andy (dot) boehler (at) gmx (dot) at
+www.klasseonline.tk
 
 
 -------------------------------------------------------
