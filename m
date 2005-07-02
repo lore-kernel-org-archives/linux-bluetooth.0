@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Content-Type: text/plain;
-  charset="iso-8859-1"
-From: Ronny L Nilsson <bb@arbetsmyra.dyndns.org>
-To: bluez-devel@lists.sourceforge.net, Johan Hedin <sua@home.se>
-Subject: Re: [Bluez-devel] HCI reset problem
-References: <200507021912.29173.sua@home.se>
-In-Reply-To: <200507021912.29173.sua@home.se>
-MIME-Version: 1.0
-Message-Id: <20050702211535.3F4B356F@arbetsmyra.dyndns.org>
+From: Andreas =?ISO-8859-1?Q?B=F6hler?= <andy.boehler@gmx.at>
+To: bluez-devel@lists.sourceforge.net
+Message-Id: <20050702172632.3d3b3dcd.andy.boehler@gmx.at>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] emporia/mega-Headset and btsco problems
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,71 +16,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 2 Jul 2005 23:15:20 +0200
+Date: Sat, 2 Jul 2005 17:26:32 +0200
 
+Hi!
 
-Hi
-This is probably of limited use but one can see from your hciconfig 
-output your dongle hit a trouble. Here's some cut'n-paste from one of 
-the CSR developer manuals of the meanings:
+I recently purchased a Mega BT-Headset and fetched, compiled and installed =
+btsco from bluetooth-alsa.sf.net.=20
+Pairing works fine and sending and receiving audio from and to the headset =
+also works - for a while.=20
+My problem is, that the headset disconnects after a very short time if no a=
+udio is transmitted!
+I think that this is the same problem as with the Jabra BT-110: "Jabra BT11=
+0 (will turn off very soon after the last audio packets have been transmitt=
+ed and btsco will quit with "RFCOMM channel lost")" -> quote from bluetooth=
+-alsa.sf.net main page.
+I'm wondering if someone has solved this problem? Isn't it possible that bt=
+sco simply reconnects to the headset? Or that it transmits empty or quiet a=
+udio-frames just to keep the connection alive?
+I tried what is done using Windows: When you connect the headset, it rings =
+as if the phone was ringing and you have to pick it up (headset-button), th=
+en the connection is established. I wonder if this would also work under Li=
+nux? Or is this the implementation of the Hands-Free profile and not the He=
+adset-Profile?
 
->         Panic code:   0x16
-An irrecoverable error has occurred within the Bluetooth Link 
-Controller.
+Any help is appreciated,=20
 
->         Fault code:   0x1e
-Either the chip received an unrecognised RFCOMM (upper interface) 
-command message from the host or the chip ran out of pool memory when 
-processing the message. In either case the message has been discarded. 
-Presuming the fault was issued because of an invalid RFCOMM message, 
-the firmware has survived the problem. 
+thanks,
 
-Since your dongle seem to do a reset it "looks" like the mem pool ran 
-out. But this is only a gues of mine. Is the error reproducable when 
-using MS-Windows? In that case the donge firmware might need an update.
+Andreas B=F6hler
 
-BR
-/Ronny Nilsson
+PS: I'm using Linux 2.6.12, custom compilation, D-Link DBT-120 (or Digitus =
+DN-3008), SoL-Linux 18.00, BlueZ-stack and Mega BTHS-6023-F (manufacturer i=
+s Emporia, www.emporia.at)
 
-
-
-
---------------------------
-> Hi everyone!
->
-> After spending a few days googling and browsing the e-mail archives
-> of bluez-devel, I need some expert help for my strange "HCI
-> reset"/USB disconnect problem.
->
- .....
-> My system is Fedora Core 4 (kernel 2.6.11) on a Dell Latitude X300
-> with a Dell TrueMobile 300 Bluetooth built in USB dongle (CSR
-> BlueCore02 chip). I'm using the latest bluez-libs, bluez-utils and
-> bluez-hcidump from bluez.org and NOT the Fedora RPM:s (even though
-> the problem is the same with the Fedora supplied bluez packages)
->
-> hciconfig says the following:
->
-> [root@x300 ~]# hciconfig -a hci0 version features revision
-> hci0:   Type: USB
->         BD Address: 00:10:C6:60:34:21 ACL MTU: 192:8 SCO MTU: 64:8
->         HCI Ver: 1.2 (0x2) HCI Rev: 0x4f2 LMP Ver: 1.2 (0x2) LMP
-> Subver: 0x4f2 Manufacturer: Cambridge Silicon Radio (10)
->         Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
->                 <3-slot packets> <5-slot packets> <encryption> <slot
-> offset> <timing accuracy> <role switch> <hold mode> <sniff mode>
-> <park state> <RSSI> <channel quality> <SCO link> <HV2 packets> <HV3
-> packets> <u-law log> <A-law log> <CVSD> <paging scheme> <power
-> control> <transparent SCO> <broadcast encrypt> <enhanced iscan>
-> <interlaced iscan> <interlaced pscan> <inquiry with RSSI> <AFH cap.
-> slave> <AFH class. slave> <AFH cap. master> <AFH class. master>
-> <extended features> Build 1266
->         Chip version: BlueCore02-External
->         Max key size: 128 bi
->         SCO mapping:  HCI
->         Panic code:   0x16
->         Fault code:   0x1e
->
+--=20
+Andreas B=F6hler
+andy.boehler@gmx.at
+www.klasseonline.tk
 
 
 -------------------------------------------------------
