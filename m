@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedin <sua@home.se>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] HCI reset problem
-References: <200507021912.29173.sua@home.se> <20050702211535.3F4B356F@arbetsmyra.dyndns.org>
-In-Reply-To: <20050702211535.3F4B356F@arbetsmyra.dyndns.org>
+Message-ID: <42C7A344.4060700@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200507031653.47442.sua@home.se>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] emporia/mega-Headset and btsco problems
+References: <20050702172632.3d3b3dcd.andy.boehler@gmx.at>	<42C70688.9050407@xmission.com> <20050703004746.45b60662.andy.boehler@gmx.at>
+In-Reply-To: <20050703004746.45b60662.andy.boehler@gmx.at>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,55 +18,74 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 3 Jul 2005 16:53:46 +0200
+Date: Sun, 03 Jul 2005 02:35:16 -0600
 
-Hi Ronny and thanks for the quick reply
+maybe something like this... i wish the whole thing wasn't such a big 
+ugly function...
 
-> This is probably of limited use but one can see from your hciconfig
-> output your dongle hit a trouble. Here's some cut'n-paste from one of
-> the CSR developer manuals of the meanings:
->
-> >         Panic code:   0x16
-> An irrecoverable error has occurred within the Bluetooth Link
-> Controller.
->
-> >         Fault code:   0x1e
-> Either the chip received an unrecognised RFCOMM (upper interface)
-> command message from the host or the chip ran out of pool memory when
-> processing the message. In either case the message has been discarded.
-> Presuming the fault was issued because of an invalid RFCOMM message,
-> the firmware has survived the problem.
+diff -u -b -B -w -p -r1.28 btsco.c
+--- btsco.c     17 Jun 2005 15:57:42 -0000      1.28
++++ btsco.c     3 Jul 2005 08:27:12 -0000
+@@ -80,7 +80,7 @@ struct action {
+         char *cmd;
+  };
 
-Now that I know that the codes mean something I looked a bit more into it. The 
-Panic code is 0x01 before the reset and 0x16 after (I guess that 0x01 is the 
-normal value). Also, when I did a few more tries this morning, I got Panic 
-code 0x22 and Fault code 0x1f. Since it looks that you have some usefull 
-documents, could you look up the meaning of 0x22 and 0x1f?
+-static volatile int terminate = 0, ring = 0, hupped = 0, reconnect = 0;
++static volatile int terminate = 0, ring = 0, hupped = 0, reconnect = 0, 
+rfreconnect = 0;
+  static int verbose = 0;
 
-So, I get panic code 0x16 when the reset happend out of it self and 0x22 when
-provoked by a rfcomm connection. The strange thing is that Fault code 0x1f is 
-there all the time. It shows up when I run the first hciconfig directly after 
-bringing up everyting which makes me believe that someting else is wrong 
-earlier in the startup process (or is 0x1f the "normal" value for the fault 
-code?).
+  static void sig_term(int sig)
+@@ -589,6 +589,8 @@ int main(int argc, char *argv[])
+         sigaction(SIGCHLD, &sa, NULL);
+         sigaction(SIGPIPE, &sa, NULL);
 
-> Since your dongle seem to do a reset it "looks" like the mem pool ran
-> out. But this is only a gues of mine. Is the error reproducable when
-> using MS-Windows? In that case the donge firmware might need an update.
++       do {
++
+         /* connect rfcomm control channel */
+         if ((rd = rfcomm_connect(&local, &bdaddr, channel)) < 0) {
+                 perror("Can't connect RFCOMM channel");
+@@ -682,6 +684,7 @@ int main(int argc, char *argv[])
+                                         fflush(stdout);
+                                 }
+                                 terminate = 1;
++                               rfreconnect = 1;
+                         }
 
-Hmm, I nuked the pre-installed XP since I didn't plan to use it.... perhaps a 
-mistake. But it is possible to reinstall to check, but then I have to remove 
-my current linux installation so I like to try other options first.
+                         // control transmission events for volume and 
+channel control
+@@ -890,6 +893,11 @@ int main(int argc, char *argv[])
+                         hupped = 0;
+                 }
+         }
++       if(rfreconnect) {
++               rfreconnect = 0;
++               terminate = 0;
++       }
++       } while(!terminate);
 
-Do any of you have firmware files available? Perhaps any of the HCI 18.2 
-versions listed here:
+         if (sco_mode == CONNECTED) {
+                 close(sd);
 
- http://www.holtmann.org/linux/bluetooth/csr.html
 
-Can I restore my dongle in case of bad firmware if I do dfutool archive first 
-to save my current firmware?
-
-Regards Johan
+Andreas Böhler wrote:
+> Hi, thanks for the quick reply;
+> 
+> 
+>>One thing we have needed to do for a long time that would help this is 
+>>to rebuild the rfcomm connection when it goes bad (or even make it 
+>>happen on demand). With other headsets, the rfcomm connection only goes 
+>>bad if the headset goes out of range. Holding the rfcomm connection open 
+>>isn't great anyway because I think it prevents a laptop from suspending.
+> 
+> 
+> yeah, the best way to handle my particular headset would be if btsco reconnects the rfcomm-channel after it is lost!
+> May I ask someone if it is possible to supply such a patch? I would really do it myself, if I had the necessary C-skills....
+> 
+> thanks, 
+> 
+> andy
+> 
 
 
 -------------------------------------------------------
