@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42C7A344.4060700@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] bccmd reading clock
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] emporia/mega-Headset and btsco problems
-References: <20050702172632.3d3b3dcd.andy.boehler@gmx.at>	<42C70688.9050407@xmission.com> <20050703004746.45b60662.andy.boehler@gmx.at>
-In-Reply-To: <20050703004746.45b60662.andy.boehler@gmx.at>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <20050629082735.CC3AC84E@arbetsmyra.dyndns.org>
+References: <20050627223919.793D83BC@arbetsmyra.dyndns.org>
+	 <1119973364.15397.77.camel@pegasus>
+	 <20050629082735.CC3AC84E@arbetsmyra.dyndns.org>
+Content-Type: text/plain
+Message-Id: <1120385776.10273.8.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,74 +20,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 03 Jul 2005 02:35:16 -0600
+Date: Sun, 03 Jul 2005 12:16:16 +0200
 
-maybe something like this... i wish the whole thing wasn't such a big 
-ugly function...
+Hi Ronny,
 
-diff -u -b -B -w -p -r1.28 btsco.c
---- btsco.c     17 Jun 2005 15:57:42 -0000      1.28
-+++ btsco.c     3 Jul 2005 08:27:12 -0000
-@@ -80,7 +80,7 @@ struct action {
-         char *cmd;
-  };
-
--static volatile int terminate = 0, ring = 0, hupped = 0, reconnect = 0;
-+static volatile int terminate = 0, ring = 0, hupped = 0, reconnect = 0, 
-rfreconnect = 0;
-  static int verbose = 0;
-
-  static void sig_term(int sig)
-@@ -589,6 +589,8 @@ int main(int argc, char *argv[])
-         sigaction(SIGCHLD, &sa, NULL);
-         sigaction(SIGPIPE, &sa, NULL);
-
-+       do {
-+
-         /* connect rfcomm control channel */
-         if ((rd = rfcomm_connect(&local, &bdaddr, channel)) < 0) {
-                 perror("Can't connect RFCOMM channel");
-@@ -682,6 +684,7 @@ int main(int argc, char *argv[])
-                                         fflush(stdout);
-                                 }
-                                 terminate = 1;
-+                               rfreconnect = 1;
-                         }
-
-                         // control transmission events for volume and 
-channel control
-@@ -890,6 +893,11 @@ int main(int argc, char *argv[])
-                         hupped = 0;
-                 }
-         }
-+       if(rfreconnect) {
-+               rfreconnect = 0;
-+               terminate = 0;
-+       }
-+       } while(!terminate);
-
-         if (sco_mode == CONNECTED) {
-                 close(sd);
-
-
-Andreas Böhler wrote:
-> Hi, thanks for the quick reply;
+> > > I was in the need for an enhancement of the bccmd tool and thus
+> > > made a small change. The supplied patch adds a command for reading
+> > > the the BT-clock of local device. In the process I also made some
+> > > minor changes to utils/tools/csr.c to reuse existing code. Besided
+> > > reading 16-bit variables it can now also read 32- and 8-bits alike.
+> >
+> > don't do type conversion like this. Use varid_complex for it if you
+> > wanna support uint32 and unit8 without copying code.
 > 
-> 
->>One thing we have needed to do for a long time that would help this is 
->>to rebuild the rfcomm connection when it goes bad (or even make it 
->>happen on demand). With other headsets, the rfcomm connection only goes 
->>bad if the headset goes out of range. Holding the rfcomm connection open 
->>isn't great anyway because I think it prevents a laptop from suspending.
-> 
-> 
-> yeah, the best way to handle my particular headset would be if btsco reconnects the rfcomm-channel after it is lost!
-> May I ask someone if it is possible to supply such a patch? I would really do it myself, if I had the necessary C-skills....
-> 
-> thanks, 
-> 
-> andy
-> 
+> As you command.... :)  Perhaps like this then? Added parsing read of 
+> uart speed setting too. I'm a bit uncertain however of where to put 
+> corresponding uart config write. Both BCCMD and PSKEY seems adequate.
+
+actually I added the clock reading support by copying the uint32 reading
+command. Using the complex command needs a little bit more testing and
+of course audit. The CSR BCCMD can be quite picky if you do something
+wrong. I also added support for uint32 and BT_CLOCK to hcidump.
+
+The UART config is used via BCCMD for temporary changes and via the
+PSKEY for permanent changes. I didn't added it, because I don't like
+mixing patches. One patch per feature.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
