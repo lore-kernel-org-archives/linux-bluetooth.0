@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42C8AD2B.4020106@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] bccmd reading clock
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] emporia/mega-Headset and btsco problems
-References: <20050702172632.3d3b3dcd.andy.boehler@gmx.at>	<42C70688.9050407@xmission.com>	<20050703004746.45b60662.andy.boehler@gmx.at>	<42C7A344.4060700@xmission.com> <20050703180226.458a1bd7.andy.boehler@gmx.at>
-In-Reply-To: <20050703180226.458a1bd7.andy.boehler@gmx.at>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <20050703163538.1E47C3FB@arbetsmyra.dyndns.org>
+References: <20050627223919.793D83BC@arbetsmyra.dyndns.org>
+	 <20050629082735.CC3AC84E@arbetsmyra.dyndns.org>
+	 <1120385776.10273.8.camel@pegasus>
+	 <20050703163538.1E47C3FB@arbetsmyra.dyndns.org>
+Content-Type: text/plain
+Message-Id: <1120409776.10273.71.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,14 +21,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 03 Jul 2005 21:29:47 -0600
+Date: Sun, 03 Jul 2005 18:56:16 +0200
 
-Andreas
+Hi Ronny,
 
-Thanks for making it an option. It makes our ugliest function even 
-deeper but I applied it anyway (sigh :)
+> > actually I added the clock reading support by copying the uint32
+> > reading command. Using the complex command needs a little bit more
+> > testing and of course audit. The CSR BCCMD can be quite picky if you
+> > do something wrong. I also added support for uint32 and BT_CLOCK to
+> > hcidump.
+> 
+> Ok. Nice, but how can we "test" the complex command if we don't use it? 
+> I agree we need to be careful yes, but BCCMD works in ram only, right? 
+> If something goes wrong one can just do a cold reset to restore 
+> settings.
 
-Brad
+it is not about the settings. The bccmd tool must be usable all the time
+without crashing the device at runtime. Feel free to send new patches
+against the current CVS. I will see if I get some time to review and of
+course test them.
+
+> > The UART config is used via BCCMD for temporary changes and via the
+> > PSKEY for permanent changes. I didn't added it, because I don't like
+> > mixing patches. One patch per feature.
+> 
+> I understand. Besides the UART feature I've also added preliminary 
+> support for these additional commands:
+> 	- Read RSSI
+> 	- Read/write BER threshold
+> 	- Read/write max tx power
+> 	- Read/write default tx power
+> And also made a find_conn_handle() function to automatically get the 
+> ACL connection handle and pass it on to all the BCCMDs who needs it 
+> (most of them, including your "keylen" function). User can then use the 
+> commands simply with a <bdaddr> on the commandline instead of the 
+> harder to find handle. Should I send you patches for these too? Perhaps 
+> separated in smal chunks?
+
+Send small chunks and step by step. It is then easier for me to review
+them and apply them. This is also better for the revision history.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
