@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Content-Type: text/plain;
-  charset="iso-8859-1"
-From: Ronny L Nilsson <bb@arbetsmyra.dyndns.org>
+From: Johan Hedin <sua@home.se>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bccmd reading clock
-References: <20050627223919.793D83BC@arbetsmyra.dyndns.org> <20050629082735.CC3AC84E@arbetsmyra.dyndns.org> <1120385776.10273.8.camel@pegasus>
-In-Reply-To: <1120385776.10273.8.camel@pegasus>
+Subject: Re: [Bluez-devel] HCI reset problem
+References: <200507021912.29173.sua@home.se> <1120404389.10273.56.camel@pegasus>
+In-Reply-To: <1120404389.10273.56.camel@pegasus>
 MIME-Version: 1.0
-Message-Id: <20050703163538.1E47C3FB@arbetsmyra.dyndns.org>
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200507031809.41745.sua@home.se>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,44 +19,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 3 Jul 2005 18:33:34 +0200
+Date: Sun, 3 Jul 2005 18:09:41 +0200
 
+On Sunday 03 July 2005 17.26, Marcel Holtmann wrote:
 
-> actually I added the clock reading support by copying the uint32
-> reading command. Using the complex command needs a little bit more
-> testing and of course audit. The CSR BCCMD can be quite picky if you
-> do something wrong. I also added support for uint32 and BT_CLOCK to
-> hcidump.
+> Hi Johan,
+>
+> > This is what I see when the reset happens (and yes, there are two output
+> > lines from hcidump):
+> >
+> > [root@x300 ~]# hcidump -t -X -V
+> > 2005-07-02 14:09:10.093053 < HCI Command: Reset (0x03|0x0003) plen 0
+> > 2005-07-02 14:09:10.093053 < HCI Command: Reset (0x03|0x0003) plen 0
+>
+> this is a bug that I introduced with bluez-hcidump-1.22 release. I did
+> some type changes and was a little bit too lazy to check their users. In
+> this case you should only see one HCI_Reset and then hcidump should
+> terminate, because the device is gone. A fix for it is in the CVS now.
 
-Hi
-Ok. Nice, but how can we "test" the complex command if we don't use it? 
-I agree we need to be careful yes, but BCCMD works in ram only, right? 
-If something goes wrong one can just do a cold reset to restore 
-settings.
+Ok, I almost suspected this because hcidump behaved as you describe in a 
+previous release I used.
 
+One problem less to be sleepless over then :-)
 
-> The UART config is used via BCCMD for temporary changes and via the
-> PSKEY for permanent changes. I didn't added it, because I don't like
-> mixing patches. One patch per feature.
-
-I understand. Besides the UART feature I've also added preliminary 
-support for these additional commands:
-	- Read RSSI
-	- Read/write BER threshold
-	- Read/write max tx power
-	- Read/write default tx power
-And also made a find_conn_handle() function to automatically get the 
-ACL connection handle and pass it on to all the BCCMDs who needs it 
-(most of them, including your "keylen" function). User can then use the 
-commands simply with a <bdaddr> on the commandline instead of the 
-harder to find handle. Should I send you patches for these too? Perhaps 
-separated in smal chunks?
-
-
-Regards
-/Ronny
-
-
+/ Johan
 
 
 -------------------------------------------------------
