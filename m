@@ -1,21 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f16b04cf05070500152e8f94c2@mail.gmail.com>
-From: hariharan veerappan <hariharanneevee@gmail.com>
+Message-ID: <42C99E83.8090305@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] H5 3 wire UART connect problem
-In-Reply-To: <1120482028.10273.154.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <f16b04cf050630083549f68fef@mail.gmail.com>
-	 <1120157509.15397.152.camel@pegasus>
-	 <f16b04cf05070102493b480412@mail.gmail.com>
-	 <1120213256.15397.187.camel@pegasus>
-	 <f16b04cf05070103496a3e64e6@mail.gmail.com>
-	 <1120224082.15397.197.camel@pegasus>
-	 <f16b04cf0507032307413fcef@mail.gmail.com>
-	 <f16b04cf05070405321b3bc41b@mail.gmail.com>
-	 <f16b04cf05070405392568477e@mail.gmail.com>
-	 <1120482028.10273.154.camel@pegasus>
+Subject: Re: [Bluez-users] problem compiling btsco....
+References: <42C971CD.8050106@ibdcon.org.br>
+In-Reply-To: <42C971CD.8050106@ibdcon.org.br>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -27,107 +18,83 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 5 Jul 2005 12:45:07 +0530
+Date: Mon, 04 Jul 2005 14:39:31 -0600
 
-Hello All / Marcel,
+you may have more luck with btsco from cvs with 2.6.12
 
-We have changed the hciattach.c and hci_h5.c (H5 3 WIRE UART Bluetooth driv=
-er).
-The Bluetooth module is up. We could read the Bluetooth device address
-and scan the
-bluetooth network.
-
-Thanks marcel for your valuable support.
-
-Now we are facing the general problem.
-we are trying to run SDPD daemon, it fails.
-
-we could not able to browse the bluetooth network.
-This SDPD fail occurs, when we use the USB Dongle also.
-
-We have only changed the hci_h5.c and hciattach with new name of the
-dongle (H5 3 WIRE).
-
-Our specification :
-Kernel - 2.4.20.
-
-For information:
-
-we run sdpd
-then we try to kill sdpd, it returns NO PROCESS is KILLED information.
-
-Advise us.
-=20
-Thanks and regards
-Hariharan.V.
-
-On 7/4/05, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Hariharan,
->=20
-> >  Presently we are working in 3 WIRE UART Bluetooth transport protocol
-> >  implementation.
-> >  We are in implementation of 3 WIRE UART in hciattach.c.
-> >
-> >  Our Specification:
-> >  Linux kernel - 2.4.20.
->=20
-> this kernel version is a little bit problematic. Do your development
-> with the 2.6.12 kernel and then backport it. Otherwise nobody will
-> review it and it may become useless.
->=20
-> >  Module - Solicon wave Serial port Bluetooth Module.
->=20
-> I can test it out with a Casira and a BlueCore4.
->=20
-> >  In the HCI attach, We are following the procedure of given below.
-> >
-> >  Host side  -> SYNC Command -> BT Device
-> >  Host side <-  SYNC Response <- BT Device
-> >  Host Side <-  SYNC Command <- BT Device
-> >  Host Side -> SYNC Response -> BT Device
-> >  Host side <- Config Command <- BT Device
-> >  Host side -> Config Response -> BT Device
-> >
-> > Here after the device does not respond for any of the commands
->=20
-> Actually I have no idea why that happens, but I also don't have any
-> Silicon Wave development kit at hand.
->=20
-> > Please advise us whether our command sequence for the HCI attach of 3 W=
-IRE
-> > bluetooth device.
->=20
-> Check the specification. I have no idea.
->=20
-> > Our progress plan in the Implementation of H5 3 WIRE in Bluez.
-> > First we attach the module HCI layer with the bluez stack.
-> > Second we build the driver to usr 3 WIRE stack.
-> > our plan is a proper one or not. Advise.
->=20
-> You add the basic configuration stuff to hciattach like it was done for
-> BCSP and then you set the TTY line discipline to N_HCI and switch to the
-> 3-Wire UART protocol. However this must be implemented in hci_3wire.c
-> and linked correctly into the hci_uart.ko driver. The complete protocol
-> handling then has to be done inside the kernel.
->=20
-> Regards
->=20
-> Marcel
->=20
->=20
->=20
->=20
+Paulo Wollny wrote:
+> Hi All,
+> 
+> i'm trying to compile the kernel portion of btsco, but am getting the 
+> following errors:
+> 
+> Does anyone knows what's going on?
+> 
+> Best regards,
+> 
+> Paulo Wollny
+> 
+> hirschberg:/home/paulo/Bluetooth-Linux/btsco-0.4/kernel # make
+> make[1]: Entering directory `/usr/src/linux-2.6.5-7.155.29'
+>   CC [M]  /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.o
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c: In function 
+> `snd_card_bt_sco_playback_trigger':
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c:140: error: 
+> `snd_card_bt_sco_t_magic' undeclared (first use in this function)
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c:140: error: (Each 
+> undeclared identifier is reported only once
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c:140: error: for 
+> each function it appears in.)
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c: In function 
+> `snd_card_bt_sco_capture_trigger':
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c:161: error: 
+> `snd_card_bt_sco_t_magic' undeclared (first use in this function)
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c: In function 
+> `snd_card_bt_sco_playback_open':
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c:334: error: 
+> `snd_card_bt_sco_t_magic' undeclared (first use in this function)
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c: In function 
+> `snd_card_bt_sco_capture_open':
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c:367: error: 
+> `snd_card_bt_sco_t_magic' undeclared (first use in this function)
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c: In function 
+> `snd_card_bt_sco_playback_close':
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c:400: error: 
+> `snd_card_bt_sco_t_magic' undeclared (first use in this function)
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c: In function 
+> `snd_bt_sco_volume_get':
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c:497: error: 
+> `snd_card_bt_sco_t_magic' undeclared (first use in this function)
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c: In function 
+> `snd_bt_sco_volume_put':
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c:510: error: 
+> `snd_card_bt_sco_t_magic' undeclared (first use in this function)
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c: In function 
+> `snd_bt_sco_loopback_get':
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c:546: error: 
+> `snd_card_bt_sco_t_magic' undeclared (first use in this function)
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c: In function 
+> `snd_bt_sco_loopback_put':
+> /home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.c:558: error: 
+> `snd_card_bt_sco_t_magic' undeclared (first use in this function)
+> make[2]: *** [/home/paulo/Bluetooth-Linux/btsco-0.4/kernel/btsco.o] 
+> Fehler 1
+> make[1]: *** [_module_/home/paulo/Bluetooth-Linux/btsco-0.4/kernel] 
+> Fehler 2
+> make[1]: Leaving directory `/usr/src/linux-2.6.5-7.155.29'
+> make: *** [default] Fehler 2
+> hirschberg:/home/paulo/Bluetooth-Linux/btsco-0.4/kernel #
+> 
+> 
 > -------------------------------------------------------
 > SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
 > from IBM. Find simple to follow Roadmaps, straightforward articles,
 > informative Webcasts and more! Get everything you need to get up to
-> speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dclic=
-k
+> speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
 > _______________________________________________
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
->
 
 
 -------------------------------------------------------
