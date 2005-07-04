@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sbc and fixed-point progress
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <42C8B510.7080206@xmission.com>
-References: <42C8B510.7080206@xmission.com>
-Content-Type: text/plain
-Message-Id: <1120475470.10273.99.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <42C8B510.7080206@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] sbc and fixed-point progress
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,35 +16,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 04 Jul 2005 13:11:10 +0200
+Date: Sun, 03 Jul 2005 22:03:28 -0600
 
-Hi Brad,
+Guys,
 
-> I found a decent fixed point multiply that preshifts the values before
-> multiplying them. It keeps things in 32 bits. Most of the roundoff error
-> is taken care of in two additional terms. I think the result is
-> reasonable.
-> (http://www.accu.org/acornsig/public/caugers/volume2/issue6/fixedpoint.html)
-> 
-> If you compile with fixed-point on, libsbc will run both the
-> fixed and floating point calculations and flag errors when they differ
-> too much. It seems to be working well and has helped me catch a couple
-> of fixed-point calculation problems.
-> 
-> I have the decoder almost finished but I probably need to split some 
-> terms into integer and fixed-point components. Loading up 
-> frame->sb_sample for example can have a big integer part but we want to 
-> use most of the 32 bit fixed-point type for the fractional part.
+just FYI...
 
-go ahead and keep on with the good work.
+I found a decent fixed point multiply that preshifts the values before
+multiplying them. It keeps things in 32 bits. Most of the roundoff error
+is taken care of in two additional terms. I think the result is
+reasonable.
+(http://www.accu.org/acornsig/public/caugers/volume2/issue6/fixedpoint.html)
 
-However someone might be looking at the SBC algorithm itself. I've been
-told that there are a lot of optimizations possible.
+If you compile with fixed-point on, libsbc will run both the
+fixed and floating point calculations and flag errors when they differ
+too much. It seems to be working well and has helped me catch a couple
+of fixed-point calculation problems.
 
-Regards
+I have the decoder almost finished but I probably need to split some 
+terms into integer and fixed-point components. Loading up 
+frame->sb_sample for example can have a big integer part but we want to 
+use most of the 32 bit fixed-point type for the fractional part.
 
-Marcel
-
+Brad
 
 
 
