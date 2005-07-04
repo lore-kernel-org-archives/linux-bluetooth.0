@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] asus w5 and bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
+From: "Fernando A. P. Gomes" <fapg-bluez@nsk.yi.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200507041804.19709.fapg-bluez@nsk.yi.org>
-References: <200507041804.19709.fapg-bluez@nsk.yi.org>
-Content-Type: text/plain
-Message-Id: <1120498056.10273.191.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200507041804.19709.fapg-bluez@nsk.yi.org>
+Subject: [Bluez-users] asus w5 and bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,22 +17,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 04 Jul 2005 19:27:36 +0200
+Date: Mon, 4 Jul 2005 18:04:19 +0100
 
-Hi Fernando,
+Hi,
 
->  I have a asus laptop w5 with builtin bluetooth and my kernel detects it, but   
-> seems that is disable. Anyone knowns howto enable it? The Vaio spicctrl 
-> doesn't  work.
+ I have a asus laptop w5 with builtin bluetooth and my kernel detects it, but   
+seems that is disable. Anyone knowns howto enable it? The Vaio spicctrl 
+doesn't  work.
 
-show us the content of /proc/bus/usb/devices and what lspci and lsusb
-says.
+Regards,
+Fernando Gomes
 
-Regards
+kernel dmesg:
+Bluetooth: Core ver 2.7
+NET: Registered protocol family 31
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: L2CAP ver 2.7
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: RFCOMM ver 1.5
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM TTY layer initialized
 
-Marcel
-
-
+lsmod:
+bluetooth              41252  14 
+hci_vhci,hci_uart,dtl1_cs,btuart_cs,bt3c_cs,bpa10x,bluecard_cs,bfusb,hidp,hci_usb,rfcomm,l2cap
 
 
 -------------------------------------------------------
