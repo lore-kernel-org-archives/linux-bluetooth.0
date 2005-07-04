@@ -1,31 +1,57 @@
-Return-Path: <ville.tervo@nokia.com>
-Subject: Re: rfcomm oops
-From: Ville Tervo <ville.tervo@nokia.com>
-Reply-To: ville.tervo@nokia.com
-To: ext Marcel Holtmann <marcel@holtmann.org>
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1120490944.10273.164.camel@pegasus>
-References: <1120490370.30194.50.camel@localhost.localdomain>
-	 <1120490944.10273.164.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Re: freezes
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050704165641.27065.qmail@webmaild.fe1.aruba.it>
+References: <20050701164432.8740.qmail@webmaild.fe1.aruba.it>
+	 <1120243933.15397.199.camel@pegasus>
+	 <20050704165641.27065.qmail@webmaild.fe1.aruba.it>
 Content-Type: text/plain
-Date: Tue, 05 Jul 2005 10:41:17 +0300
-Message-Id: <1120549277.30194.55.camel@localhost.localdomain>
+Message-Id: <1120496453.10273.179.camel@pegasus>
 Mime-Version: 1.0
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Mon, 04 Jul 2005 19:00:53 +0200
 
-On Mon, 2005-07-04 at 17:29 +0200, ext Marcel Holtmann wrote:
-> Hi Ville,
-> 
-> > I found reproducible way to make rfcomm layer oops. I attached oops and
-> > some notes how they were produced. I used several Nokia phones and IBM
-> > T40 laptop in these tests.
-> 
-> if the attached patch makes it go away, then I know what it is. Actually
-> I introduced that problem when I tried to fix another bug with buggy
-> phones that can't disconnect their DLCI 0 even if they established it.
-> 
+Hi Ubaldo,
 
-Look like this patch helps. I tested with i386 and arm.
+> >> I am still developing the miax, a bt-iax client, and I am going to get crazy 
+> >> to understand why after 10/15 times that I open/close a SCO channel the 
+> >> bt-dongle or the phone freezes. I tried a lot of mobile phones and a lot of 
+> >> bt-dongles > 16.4 but the problem is still there.  
+> >> 
+> >> Maybe I wrote something wrong into the code, so if someone have a bit of 
+> >> time to check the code please get it at http://miax.sf.net . 
+> > 
+> > about what kernel and libs/utils are we talking?
+> 
+> last from bluez and kernel 2.4.26, 2.4.29 and 2.4.30, do you think it could 
+> be a kernel problem? 
 
--- 
-Ville
+why don't you try the 2.6.12 kernel?
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+from IBM. Find simple to follow Roadmaps, straightforward articles,
+informative Webcasts and more! Get everything you need to get up to
+speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
