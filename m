@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Wolfram Quester <wolfi@mittelerde.physik.uni-konstanz.de>
-To: bluez-devel@lists.sourceforge.net
-Cc: Ville Tervo <ville.tervo@nokia.com>
-Subject: Re: [Bluez-devel] rfcomm oops
-Message-ID: <20050704153704.GG20510@halley.zuhause>
-References: <1120490370.30194.50.camel@localhost.localdomain>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="WkfBGePaEyrk4zXB"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: ville.tervo@nokia.com
+Cc: bluez-devel@lists.sourceforge.net
 In-Reply-To: <1120490370.30194.50.camel@localhost.localdomain>
+References: <1120490370.30194.50.camel@localhost.localdomain>
+Content-Type: multipart/mixed; boundary="=-mT9vnyt+l3jRt9lyfiAF"
+Message-Id: <1120490944.10273.164.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: rfcomm oops
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,54 +19,57 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 4 Jul 2005 17:37:05 +0200
+Date: Mon, 04 Jul 2005 17:29:04 +0200
 
 
---WkfBGePaEyrk4zXB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+--=-mT9vnyt+l3jRt9lyfiAF
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
 Hi Ville,
 
-On Mon, Jul 04, 2005 at 06:19:30PM +0300, Ville Tervo wrote:
-> Hi,
->=20
 > I found reproducible way to make rfcomm layer oops. I attached oops and
 > some notes how they were produced. I used several Nokia phones and IBM
 > T40 laptop in these tests.
->=20
->=20
-> PPP Deflate Compression module registered
-> atkbd.c: Keyboard on isa0060/serio0 reports too many keys pressed.
-> Unable to handle kernel NULL pointer dereference at virtual address
-> 00000047
->  printing eip:
-> c0294798
-> *pde =3D 00000000
-> Oops: 0000 [#1]
-> PREEMPT
-What happens if you disable CONFIG_PREEMPT? At least on ppc this leads
-to crashes quite oft, I don't know ho well it works on i386.=20
 
-HTH,
+if the attached patch makes it go away, then I know what it is. Actually
+I introduced that problem when I tried to fix another bug with buggy
+phones that can't disconnect their DLCI 0 even if they established it.
 
-Wolfi
+Regards
 
---WkfBGePaEyrk4zXB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
+Marcel
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
 
-iD8DBQFCyVegH0o2mefAfsQRAi1ZAJoD9EqLl8fsL7lhEKFoMITDzlAnogCdEOwo
-OB9V0Wvx5bFaosbWRkGPHeg=
-=lU+V
------END PGP SIGNATURE-----
+--=-mT9vnyt+l3jRt9lyfiAF
+Content-Disposition: attachment; filename=patch
+Content-Type: text/x-patch; name=patch; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
---WkfBGePaEyrk4zXB--
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -389,8 +389,6 @@ static int __rfcomm_dlc_close(struct rfc
+ 		rfcomm_dlc_unlock(d);
+ 
+ 		skb_queue_purge(&d->tx_queue);
+-		rfcomm_session_put(s);
+-
+ 		rfcomm_dlc_unlink(d);
+ 	}
+ 
+@@ -600,8 +598,6 @@ static struct rfcomm_session *rfcomm_ses
+ 		goto failed;
+ 	}
+ 
+-	rfcomm_session_hold(s);
+-
+ 	s->initiator = 1;
+ 
+ 	bacpy(&addr.l2_bdaddr, dst);
+
+--=-mT9vnyt+l3jRt9lyfiAF--
+
 
 
 -------------------------------------------------------
