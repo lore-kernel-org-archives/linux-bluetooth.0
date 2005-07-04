@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: freezes
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050704165641.27065.qmail@webmaild.fe1.aruba.it>
+Message-ID: <20050704165641.27065.qmail@webmaild.fe1.aruba.it>
 References: <20050701164432.8740.qmail@webmaild.fe1.aruba.it>
-	 <1120243933.15397.199.camel@pegasus>
-	 <20050704165641.27065.qmail@webmaild.fe1.aruba.it>
-Content-Type: text/plain
-Message-Id: <1120496453.10273.179.camel@pegasus>
+            <1120243933.15397.199.camel@pegasus>
+In-Reply-To: <1120243933.15397.199.camel@pegasus>
+From: "Ubaldo Porcheddu" <ubaldo@eja.it>
+To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; format=flowed; charset="iso-8859-1"
+Subject: [Bluez-devel] Re: freezes
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,28 +19,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 04 Jul 2005 19:00:53 +0200
+Date: Mon, 04 Jul 2005 18:56:41 +0200
 
-Hi Ubaldo,
+Ciao Marcel, 
 
-> >> I am still developing the miax, a bt-iax client, and I am going to get crazy 
-> >> to understand why after 10/15 times that I open/close a SCO channel the 
-> >> bt-dongle or the phone freezes. I tried a lot of mobile phones and a lot of 
-> >> bt-dongles > 16.4 but the problem is still there.  
-> >> 
-> >> Maybe I wrote something wrong into the code, so if someone have a bit of 
-> >> time to check the code please get it at http://miax.sf.net . 
-> > 
-> > about what kernel and libs/utils are we talking?
+>> I am still developing the miax, a bt-iax client, and I am going to get crazy 
+>> to understand why after 10/15 times that I open/close a SCO channel the 
+>> bt-dongle or the phone freezes. I tried a lot of mobile phones and a lot of 
+>> bt-dongles > 16.4 but the problem is still there.  
+>> 
+>> Maybe I wrote something wrong into the code, so if someone have a bit of 
+>> time to check the code please get it at http://miax.sf.net . 
 > 
-> last from bluez and kernel 2.4.26, 2.4.29 and 2.4.30, do you think it could 
-> be a kernel problem? 
+> about what kernel and libs/utils are we talking?
 
-why don't you try the 2.6.12 kernel?
-
-Regards
-
-Marcel
+last from bluez and kernel 2.4.26, 2.4.29 and 2.4.30, do you think it could 
+be a kernel problem? 
 
 
 
