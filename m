@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Fernando A. P. Gomes" <fapg-bluez@nsk.yi.org>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] re: asus w5 and bluetooth
-References: <200507052352.11585.fapg-bluez@nsk.yi.org> <200507060016.09893.fapg-bluez@nsk.yi.org> <1120605664.6797.0.camel@pegasus>
-In-Reply-To: <1120605664.6797.0.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-6"
-Message-Id: <200507060046.54683.fapg-bluez@nsk.yi.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <200507060016.09893.fapg-bluez@nsk.yi.org>
+References: <200507052352.11585.fapg-bluez@nsk.yi.org>
+	 <1120604362.5470.3.camel@pegasus>
+	 <200507060016.09893.fapg-bluez@nsk.yi.org>
+Content-Type: text/plain
+Message-Id: <1120605664.6797.0.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,20 +20,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 6 Jul 2005 00:46:54 +0100
+Date: Wed, 06 Jul 2005 01:21:04 +0200
+
+Hi Fernando,
+
+>  I wish :)
+> 
+> [root@evo ~]# modprobe asus_acpi
+> [root@evo ~]#
+> 
+> 
+> Jul  6 00:15:12 evo kernel: Asus Laptop ACPI Extras version 0.29
+> Jul  6 00:15:12 evo kernel: unsupported, trying default values, supply the 
+> developers with your DSDT
+> 
+> More ideas?
+
+not really. Use Google to find more information about your laptop.
+
+Regards
+
+Marcel
 
 
-> not really. Use Google to find more information about your laptop.
-
-I did it at first .... :( 
-
-Thanks anyway,
-Fernando
-
->
-> Regards
->
-> Marcel
 
 
 -------------------------------------------------------
