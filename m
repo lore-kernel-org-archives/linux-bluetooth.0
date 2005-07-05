@@ -1,11 +1,22 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Fernando A. P. Gomes" <fapg-bluez@nsk.yi.org>
+Subject: Re: [Bluez-users] H5 3 wire UART connect problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200507050932.23464.fapg-bluez@nsk.yi.org>
-Subject: [Bluez-users] re: asus w5 and bluetooth
+In-Reply-To: <f16b04cf05070500152e8f94c2@mail.gmail.com>
+References: <f16b04cf050630083549f68fef@mail.gmail.com>
+	 <1120157509.15397.152.camel@pegasus>
+	 <f16b04cf05070102493b480412@mail.gmail.com>
+	 <1120213256.15397.187.camel@pegasus>
+	 <f16b04cf05070103496a3e64e6@mail.gmail.com>
+	 <1120224082.15397.197.camel@pegasus>
+	 <f16b04cf0507032307413fcef@mail.gmail.com>
+	 <f16b04cf05070405321b3bc41b@mail.gmail.com>
+	 <f16b04cf05070405392568477e@mail.gmail.com>
+	 <1120482028.10273.154.camel@pegasus>
+	 <f16b04cf05070500152e8f94c2@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1120551220.10273.202.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,156 +28,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 5 Jul 2005 09:32:23 +0100
+Date: Tue, 05 Jul 2005 10:13:40 +0200
 
-Hi,
+Hi Hariharan,
 
-[root@evo ~]# lsusb
-Bus 005 Device 003: ID 0402:5602 ALi Corp.
-Bus 005 Device 001: ID 0000:0000
-Bus 004 Device 001: ID 0000:0000
-Bus 003 Device 003: ID 046d:c50e Logitech, Inc. MX-1000 Cordless Mouse 
-Receiver
-Bus 003 Device 001: ID 0000:0000
-Bus 002 Device 001: ID 0000:0000
-Bus 001 Device 001: ID 0000:0000
+> We have changed the hciattach.c and hci_h5.c (H5 3 WIRE UART Bluetooth driver).
+> The Bluetooth module is up. We could read the Bluetooth device address
+> and scan the
+> bluetooth network.
 
-[root@evo ~]# lspci
-00:00.0 Host bridge: Intel Corporation Mobile 915GM/PM/GMS/910GML Express 
-Processor to DRAM Controller (rev 03)
-00:02.0 VGA compatible controller: Intel Corporation Mobile 915GM/GMS/910GML 
-Express Graphics Controller (rev 03)
-00:02.1 Display controller: Intel Corporation Mobile 915GM/GMS/910GML Express 
-Graphics Controller (rev 03)
-00:1b.0 Class 0403: Intel Corporation 82801FB/FBM/FR/FW/FRW (ICH6 Family) High 
-Definition Audio Controller (rev 04)
-00:1d.0 USB Controller: Intel Corporation 82801FB/FBM/FR/FW/FRW (ICH6 Family) 
-USB UHCI #1 (rev 04)
-00:1d.1 USB Controller: Intel Corporation 82801FB/FBM/FR/FW/FRW (ICH6 Family) 
-USB UHCI #2 (rev 04)
-00:1d.2 USB Controller: Intel Corporation 82801FB/FBM/FR/FW/FRW (ICH6 Family) 
-USB UHCI #3 (rev 04)
-00:1d.3 USB Controller: Intel Corporation 82801FB/FBM/FR/FW/FRW (ICH6 Family) 
-USB UHCI #4 (rev 04)
-00:1d.7 USB Controller: Intel Corporation 82801FB/FBM/FR/FW/FRW (ICH6 Family) 
-USB2 EHCI Controller (rev 04)
-00:1e.0 PCI bridge: Intel Corporation 82801 Mobile PCI Bridge (rev d4)
-00:1f.0 ISA bridge: Intel Corporation 82801FBM (ICH6M) LPC Interface Bridge 
-(rev 04)
-00:1f.1 IDE interface: Intel Corporation 82801FB/FBM/FR/FW/FRW (ICH6 Family) 
-IDE Controller (rev 04)
-01:03.0 CardBus bridge: Ricoh Co Ltd RL5c476 II (rev b3)
-01:03.1 FireWire (IEEE 1394): Ricoh Co Ltd R5C552 IEEE 1394 Controller (rev 
-08)
-01:03.2 Class 0805: Ricoh Co Ltd: Unknown device 0822 (rev 17)
-01:03.3 System peripheral: Ricoh Co Ltd R5C592 Memory Stick Bus Host Adapter 
-(rev 08)
-01:03.4 System peripheral: Ricoh Co Ltd: Unknown device 0852 (rev 03)
-01:04.0 Ethernet controller: Realtek Semiconductor Co., Ltd. 
-RTL-8139/8139C/8139C+ (rev 10)
-01:05.0 Network controller: Intel Corporation PRO/Wireless 2200BG (rev 05)
+I think it is time to show us the source code for the 3-Wire UART
+support, before we discuss any other things.
+
+Regards
+
+Marcel
 
 
-[root@evo ~]# cat  /proc/bus/usb/devices
-
-T:  Bus=05 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480 MxCh= 8
-B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS= 8 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.12-3mdk ehci_hcd
-S:  Product=EHCI Host Controller
-S:  SerialNumber=0000:00:1d.7
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=256ms
-
-T:  Bus=05 Lev=01 Prnt=01 Port=06 Cnt=01 Dev#=  3 Spd=480 MxCh= 0
-D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=0402 ProdID=5602 Rev= 1.00
-S:  Product=USB2.0 Camera
-C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=81(I) Atr=01(Isoc) MxPS=   0 Ivl=125us
-E:  Ad=82(I) Atr=03(Int.) MxPS=   0 Ivl=1ms
-I:  If#= 0 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=81(I) Atr=01(Isoc) MxPS=3072 Ivl=125us
-E:  Ad=82(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-I:  If#= 0 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=81(I) Atr=01(Isoc) MxPS=2688 Ivl=125us
-E:  Ad=82(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-I:  If#= 0 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=81(I) Atr=01(Isoc) MxPS=2304 Ivl=125us
-E:  Ad=82(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-
-T:  Bus=04 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
-B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.12-3mdk uhci_hcd
-S:  Product=UHCI Host Controller
-S:  SerialNumber=0000:00:1d.3
-C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
-
-T:  Bus=03 Lecat  /proc/bus/usb/devicesv=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 
-Spd=12  MxCh= 2
-B:  Alloc=118/900 us (13%), #Int=  1, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=00cat  /proc/bus/usb/devices00 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.12-3mdk uhci_hcd
-S:  Product=UHCI Host Controller
-S:  SerialNumber=0000:00:1d.2
-C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
-
-T:  Bus=03 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  3 Spd=1.5 MxCh= 0
-D:  Ver= 1.10 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=046d ProdID=c50e Rev=25.10
-S:  Manufacturer=Logitech
-S:  Product=USB RECEIVER
-C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr= 70mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=usbhid
-E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
-
-T:  Bus=02 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
-B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.12-3mdk uhci_hcd
-S:  Product=UHCI Host Controller
-S:  SerialNumber=0000:00:1d.1
-C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
-
-T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
-B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.12-3mdk uhci_hcd
-S:  Product=UHCI Host Controller
-S:  SerialNumber=0000:00:1d.0
-C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
-
-Thanks for your time,
-Fernando
-
->Hi Fernando,
- >
- >>  I have a asus laptop w5 with builtin bluetooth and my kernel detects it, 
-but   
-> > seems that is disable. Anyone knowns howto enable it? The Vaio spicctrl 
->> doesn"t  work.
-> 
->show us the content of /proc/bus/usb/devices and what lspci and lsusb says.
->
-> Regards
- >
- >Marcel
 
 
 -------------------------------------------------------
