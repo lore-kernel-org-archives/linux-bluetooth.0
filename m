@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY106-F18ED26F8078BBF56D2EC87FAD90@phx.gbl>
-From: "Abraham HAouchar" <a_haouchar@hotmail.com>
+From: "Fernando A. P. Gomes" <fapg-bluez@nsk.yi.org>
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/html; format=flowed
-Subject: [Bluez-users] hey--i got a n-gage,wirelless internet,bluetooth dongle....
+Subject: Re: [Bluez-users] re: asus w5 and bluetooth
+References: <200507052352.11585.fapg-bluez@nsk.yi.org> <200507060016.09893.fapg-bluez@nsk.yi.org> <1120605664.6797.0.camel@pegasus>
+In-Reply-To: <1120605664.6797.0.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-6"
+Message-Id: <200507060046.54683.fapg-bluez@nsk.yi.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,12 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 06 Jul 2005 13:54:26 +1000
+Date: Wed, 6 Jul 2005 00:46:54 +0100
 
-<html><div style='background-color:'><DIV class=RTE>
-<P>i am hoping there are windows programers out there that want&nbsp;to start&nbsp;somthing&nbsp;mad wit bluetooth.I extended da range of bluetooth from 10m to 34m.Now im buying another BT dongle that can go up 2 100m and im goin 2 modify it and hoping 2 extend it 2 atleast 550m.</P>
-<P>I want some programmer to contact me about my new project and its not about extending range of bluetooth, cant tell the public yet.Can a programmer can contact me <A href="mailto:a_haouchar@hotmail.com">a_haouchar@hotmail.com</A> please</P></DIV></div><br clear=all><hr>Meet 1000's of Aussie Singles  <a href="http://g.msn.com/8HMBENAU/2728??PS=47575" target="_top">today at Lavalife!</a> </html>
 
+> not really. Use Google to find more information about your laptop.
+
+I did it at first .... :( 
+
+Thanks anyway,
+Fernando
+
+>
+> Regards
+>
+> Marcel
 
 
 -------------------------------------------------------
