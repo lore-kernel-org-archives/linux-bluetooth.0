@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] re: asus w5 and bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
+From: "Fernando A. P. Gomes" <fapg-bluez@nsk.yi.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200507052352.11585.fapg-bluez@nsk.yi.org>
-References: <200507052352.11585.fapg-bluez@nsk.yi.org>
-Content-Type: text/plain
-Message-Id: <1120604362.5470.3.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200507052352.11585.fapg-bluez@nsk.yi.org>
+Subject: [Bluez-users] re: asus w5 and bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +17,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 06 Jul 2005 00:59:21 +0200
+Date: Tue, 5 Jul 2005 23:52:11 +0100
 
-Hi Fernando,
+Hello Marcel,
 
->  I know I don't have a Bluetooth dongle here, and via hardware is activate, 
-> but via software I don't know how activate it. I need a tool like "spicctrl" 
-> for Vaio laptop's :). Anyone knows how I can activate it?
+ I know I don't have a Bluetooth dongle here, and via hardware is activate, 
+but via software I don't know how activate it. I need a tool like "spicctrl" 
+for Vaio laptop's :). Anyone knows how I can activate it?
 
-try the asus_acpi kernel module.
+Regards,
+Fernando
 
-Regards
-
-Marcel
-
-
+> Hi Fernando,
+> 
+> [root@evo ~]# lsusb
+> Bus 005 Device 003: ID 0402:5602 ALi Corp.
+> Bus 005 Device 001: ID 0000:0000
+> Bus 004 Device 001: ID 0000:0000
+> Bus 003 Device 003: ID 046d:c50e Logitech, Inc. MX-1000 Cordless Mouse 
+> Receiver
+> Bus 003 Device 001: ID 0000:0000
+> Bus 002 Device 001: ID 0000:0000
+> Bus 001 Device 001: ID 0000:0000
+> 
+>so we don"t have a Bluetooth dongle here. Either you need to activate it
+>via software or via a hardware switch.
+> 
+>Regards
+> 
+>Marcel
 
 
 -------------------------------------------------------
