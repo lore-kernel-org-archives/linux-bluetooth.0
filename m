@@ -1,8 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] H5 3 wire UART connect problem
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <f16b04cf05070500152e8f94c2@mail.gmail.com>
+From: hariharan veerappan <hariharanneevee@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <f16b04cf05070500152e8f94c2@mail.gmail.com>
+Subject: Re: [Bluez-users] H5 3 wire UART connect problem
+In-Reply-To: <1120482028.10273.154.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 References: <f16b04cf050630083549f68fef@mail.gmail.com>
 	 <1120157509.15397.152.camel@pegasus>
 	 <f16b04cf05070102493b480412@mail.gmail.com>
@@ -13,10 +16,6 @@ References: <f16b04cf050630083549f68fef@mail.gmail.com>
 	 <f16b04cf05070405321b3bc41b@mail.gmail.com>
 	 <f16b04cf05070405392568477e@mail.gmail.com>
 	 <1120482028.10273.154.camel@pegasus>
-	 <f16b04cf05070500152e8f94c2@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1120551220.10273.202.camel@pegasus>
-Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -28,23 +27,107 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 05 Jul 2005 10:13:40 +0200
+Date: Tue, 5 Jul 2005 12:45:07 +0530
 
-Hi Hariharan,
+Hello All / Marcel,
 
-> We have changed the hciattach.c and hci_h5.c (H5 3 WIRE UART Bluetooth driver).
-> The Bluetooth module is up. We could read the Bluetooth device address
-> and scan the
-> bluetooth network.
+We have changed the hciattach.c and hci_h5.c (H5 3 WIRE UART Bluetooth driv=
+er).
+The Bluetooth module is up. We could read the Bluetooth device address
+and scan the
+bluetooth network.
 
-I think it is time to show us the source code for the 3-Wire UART
-support, before we discuss any other things.
+Thanks marcel for your valuable support.
 
-Regards
+Now we are facing the general problem.
+we are trying to run SDPD daemon, it fails.
 
-Marcel
+we could not able to browse the bluetooth network.
+This SDPD fail occurs, when we use the USB Dongle also.
 
+We have only changed the hci_h5.c and hciattach with new name of the
+dongle (H5 3 WIRE).
 
+Our specification :
+Kernel - 2.4.20.
+
+For information:
+
+we run sdpd
+then we try to kill sdpd, it returns NO PROCESS is KILLED information.
+
+Advise us.
+=20
+Thanks and regards
+Hariharan.V.
+
+On 7/4/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Hariharan,
+>=20
+> >  Presently we are working in 3 WIRE UART Bluetooth transport protocol
+> >  implementation.
+> >  We are in implementation of 3 WIRE UART in hciattach.c.
+> >
+> >  Our Specification:
+> >  Linux kernel - 2.4.20.
+>=20
+> this kernel version is a little bit problematic. Do your development
+> with the 2.6.12 kernel and then backport it. Otherwise nobody will
+> review it and it may become useless.
+>=20
+> >  Module - Solicon wave Serial port Bluetooth Module.
+>=20
+> I can test it out with a Casira and a BlueCore4.
+>=20
+> >  In the HCI attach, We are following the procedure of given below.
+> >
+> >  Host side  -> SYNC Command -> BT Device
+> >  Host side <-  SYNC Response <- BT Device
+> >  Host Side <-  SYNC Command <- BT Device
+> >  Host Side -> SYNC Response -> BT Device
+> >  Host side <- Config Command <- BT Device
+> >  Host side -> Config Response -> BT Device
+> >
+> > Here after the device does not respond for any of the commands
+>=20
+> Actually I have no idea why that happens, but I also don't have any
+> Silicon Wave development kit at hand.
+>=20
+> > Please advise us whether our command sequence for the HCI attach of 3 W=
+IRE
+> > bluetooth device.
+>=20
+> Check the specification. I have no idea.
+>=20
+> > Our progress plan in the Implementation of H5 3 WIRE in Bluez.
+> > First we attach the module HCI layer with the bluez stack.
+> > Second we build the driver to usr 3 WIRE stack.
+> > our plan is a proper one or not. Advise.
+>=20
+> You add the basic configuration stuff to hciattach like it was done for
+> BCSP and then you set the TTY line discipline to N_HCI and switch to the
+> 3-Wire UART protocol. However this must be implemented in hci_3wire.c
+> and linked correctly into the hci_uart.ko driver. The complete protocol
+> handling then has to be done inside the kernel.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+> from IBM. Find simple to follow Roadmaps, straightforward articles,
+> informative Webcasts and more! Get everything you need to get up to
+> speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dclic=
+k
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
