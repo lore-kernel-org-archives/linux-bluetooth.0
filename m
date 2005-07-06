@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] l2ping working only in one direction
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Florian Echtler <echtler@fs.tum.de>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.63.0507060942310.7056@block.bubble>
+Subject: Re: [Bluez-users] l2ping working only in one direction
+In-Reply-To: <Pine.LNX.4.63.0507060905270.7056@block.bubble>
+Message-ID: <Pine.LNX.4.63.0507060942310.7056@block.bubble>
 References: <Pine.LNX.4.63.0507060905270.7056@block.bubble>
-	 <Pine.LNX.4.63.0507060942310.7056@block.bubble>
-Content-Type: text/plain
-Message-Id: <1120638405.8967.2.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,23 +18,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 06 Jul 2005 10:26:45 +0200
+Date: Wed, 6 Jul 2005 09:45:49 +0200 (CEST)
 
-Hi Florian,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> How is it determined which side will become master when both try
-> to be? Just timing issues?
+Okay, sorry to have bothered you, just solved the problem myself:
 
-the side that creates the ACL connection is the master of the piconet by
-definition. This can be changes after the piconet has been created. If
-the create wants to stay as master and the acceptor mandats the role
-switch to become master then this will be fail.
+> Here's hciconfig -a from the desktop:
+> 	Link mode: ACCEPT MASTER
 
-Regards
+> And this is hciconfig -a from the router, where l2ping fails:
+> 	Link mode: ACCEPT MASTER
 
-Marcel
+Obviously, not both sides can be master, so I changed the router
+to use only "lm accept;", and now everything works, including
+the headset (which I consider somewhat interesting, because it
+worked with the desktop machine, which used "lm accept,master;"
+all the time).
 
+How is it determined which side will become master when both try
+to be? Just timing issues?
 
+Yours, Florian
+- -- 
+Preserve wildlife - pickle a squirrel today!
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFCy4wv7CzyshGvatgRAqndAJ0T4D3yROQd/U1UOhtTWZNGWhNZbACggcBw
+sZXWqUganh0UWc/SNCGuBuc=
+=HgXx
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
