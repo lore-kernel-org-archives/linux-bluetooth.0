@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f16b04cf05070603491870f9cf@mail.gmail.com>
+Message-ID: <f16b04cf0507060342300f17ec@mail.gmail.com>
 From: hariharan veerappan <hariharanneevee@gmail.com>
 To: Bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_Part_144_13734269.1120646965274"
-Subject: [Bluez-users] HCI 3 WIRE UART Problem
+	boundary="----=_Part_140_13146702.1120646545137"
+Subject: [Bluez-users] H5 3 WIRE UART Problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,9 +17,9 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 6 Jul 2005 16:19:25 +0530
+Date: Wed, 6 Jul 2005 16:12:25 +0530
 
-------=_Part_144_13734269.1120646965274
+------=_Part_140_13146702.1120646545137
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
@@ -31,15 +31,23 @@ compatible with the
 BCSP when it configured for 3 WIRE H5 protocol.
 As per our study on 3 WIRE protcol (H5 ) from bluetooth.org
 specification. The H5 and BCSP seems to be almost same except the
-protocol number and Initialization process.The H5 3 WIRE UART
-Transport layer specification document is attached
+protocol number and Initialization process.
+
+we handled the Initialization process (SYNC and CONFIG) in hciattach.c.
+As per the document, the device is in Uninitialized state. We have to
+SYNC and CONFIGURE
+in order to make the device into ACTIVE mode.
+
+Please verify it and confirm us whether we are anything wrong,
+
+The H5 3 WIRE UART Transport layer specification document is attached
 for your kind
 reference.
 
 Thanks and regards
 Hariharan.V
 
-------=_Part_144_13734269.1120646965274
+------=_Part_140_13146702.1120646545137
 Content-Type: application/pdf; name="HCI_Three-Wire_UART_Transport_SP_V095.pdf"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="HCI_Three-Wire_UART_Transport_SP_V095.pdf"
@@ -1508,7 +1516,7 @@ MDc3NDg3IDAwMDAwIG4NCjAwMDAwNzc2NDUgMDAwMDAgbg0KMDAwMDA3NzY4MCAwMDAwMCBuDQow
 MDAwMDc3NzA0IDAwMDAwIG4NCjAwMDAwNzc3NzEgMDAwMDAgbg0KMDAwMDA3Nzg5OCAwMDAwMCBu
 DQowMDAwMDc4MDI4IDAwMDAwIG4NCjAwMDAwNzgxMDEgMDAwMDAgbg0KMDAwMDA4MTU0NSAwMDAw
 MCBuDQp0cmFpbGVyDQo8PC9TaXplIDc5Pj4NCnN0YXJ0eHJlZg0KMTE2DQolJUVPRg0K
-------=_Part_144_13734269.1120646965274--
+------=_Part_140_13146702.1120646545137--
 
 
 -------------------------------------------------------
