@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Moving over to GCC 4.0
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <5256d0b05070610026bd6a1cc@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <5256d0b05070610026bd6a1cc@mail.gmail.com>
-References: <1120649879.8836.5.camel@pegasus>
-	 <42CBF7A6.7090708@xmission.com> <1120669070.18553.2.camel@pegasus>
-	 <5256d0b05070610026bd6a1cc@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1120669776.18553.5.camel@pegasus>
+Subject: Re: [Bluez-devel] Moving over to GCC 4.0
+In-Reply-To: <1120669070.18553.2.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1120649879.8836.5.camel@pegasus> <42CBF7A6.7090708@xmission.com>
+	 <1120669070.18553.2.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,31 +19,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 06 Jul 2005 19:09:36 +0200
+Date: Wed, 6 Jul 2005 18:02:51 +0100
 
-Hi Peter,
+Hi Marcel,
 
-> > > just FYI everybody... sourceforge seems to have broken anonymous cvs
-> > > (both bluez and bluetooth-alsa are affected)
-> > >
-> > > $ cvs update -d
-> > > cvs [update aborted]: unrecognized auth response from cvs.bluez.org: cvs
-> > > pserver: cannot read /cvsroot/bluez/CVSROOT/config: Input/output error
-> > 
-> > argh, not again. This crazy error postponed the bluez-{libs|utils}-2.18
-> > release already, because I always build the release packages from the
-> > anonymous CVS.
-> 
-> I've been seeing this problem on and off for a week or more.
+> > just FYI everybody... sourceforge seems to have broken anonymous cvs
+> > (both bluez and bluetooth-alsa are affected)
+> >
+> > $ cvs update -d
+> > cvs [update aborted]: unrecognized auth response from cvs.bluez.org: cv=
+s
+> > pserver: cannot read /cvsroot/bluez/CVSROOT/config: Input/output error
+>=20
+> argh, not again. This crazy error postponed the bluez-{libs|utils}-2.18
+> release already, because I always build the release packages from the
+> anonymous CVS.
 
-start filing bug reports at sf.net so they have to react on it and
-hopefully improve their CVS service.
+I've been seeing this problem on and off for a week or more.
 
-Regards
-
-Marcel
-
-
+Peter
 
 
 -------------------------------------------------------
