@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Moving over to GCC 4.0
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <42CC0841.9070301@conectiva.com.br>
+From: Luiz Fernando Capitulino <lcapitulino@conectiva.com.br>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <42CC0841.9070301@conectiva.com.br>
+Subject: Re: [Bluez-devel] Moving over to GCC 4.0
 References: <1120649879.8836.5.camel@pegasus>
-	 <42CC0841.9070301@conectiva.com.br>
-Content-Type: text/plain
-Message-Id: <1120672130.18553.6.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <1120649879.8836.5.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,30 +18,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 06 Jul 2005 19:48:50 +0200
+Date: Wed, 06 Jul 2005 13:35:13 -0300
 
-Hi Luiz,
+Hi Marcel,
 
-> > since Debian Etch now also switched to GCC 4.0 as default compiler, it
-> > is time to address all GCC 4.0 problems in the BlueZ source code. I
-> > started two days ago with fixing most of its crazy compiler warnings.
-> > The GCC 4.0 is really picky with the signedness and so I moved over to
-> > explicit types like uint8_t, uint16_t and uint32_t where possible. I now
-> > hope that I haven't introduced any signedness bugs. Please start testing
-> > the CVS versions of libs and utils.
+Marcel Holtmann wrote:
+> Hi Folks,
 > 
-> Good news. :)
-> 
->  I'd like to know if you're going to accept patches which fixes Linus sparse
-> warnings, they seems to be trivial though.
+> since Debian Etch now also switched to GCC 4.0 as default compiler, it
+> is time to address all GCC 4.0 problems in the BlueZ source code. I
+> started two days ago with fixing most of its crazy compiler warnings.
+> The GCC 4.0 is really picky with the signedness and so I moved over to
+> explicit types like uint8_t, uint16_t and uint32_t where possible. I now
+> hope that I haven't introduced any signedness bugs. Please start testing
+> the CVS versions of libs and utils.
 
-I never used sparse outside the kernel, but go ahead and send patches.
+Good news. :)
 
-Regards
+ I'd like to know if you're going to accept patches which fixes Linus sparse
+warnings, they seems to be trivial though.
 
-Marcel
+PS: I think CVS is back again, it's working here.
 
-
+ Thanks,
 
 
 -------------------------------------------------------
