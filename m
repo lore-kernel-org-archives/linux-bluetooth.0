@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Florian Echtler <echtler@fs.tum.de>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] l2ping working only in one direction
-In-Reply-To: <Pine.LNX.4.63.0507060905270.7056@block.bubble>
-Message-ID: <Pine.LNX.4.63.0507060942310.7056@block.bubble>
-References: <Pine.LNX.4.63.0507060905270.7056@block.bubble>
+Message-ID: <Pine.LNX.4.63.0507060905270.7056@block.bubble>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] l2ping working only in one direction
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,27 +16,59 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 6 Jul 2005 09:45:49 +0200 (CEST)
+Date: Wed, 6 Jul 2005 09:15:06 +0200 (CEST)
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-Okay, sorry to have bothered you, just solved the problem myself:
+Hi everybody, I have a desktop machine and a router, both with a
+CSR bluetooth USB dongle. On both sides, hcid is running, with 
+identical configuration (no auth, no encryption, same pin).
 
-> Here's hciconfig -a from the desktop:
-> 	Link mode: ACCEPT MASTER
+However, I can only do l2ping from desktop to router, not vice versa.
+When tried on the router, l2ping fails after a short pause with:
 
-> And this is hciconfig -a from the router, where l2ping fails:
-> 	Link mode: ACCEPT MASTER
+Can't connect: Function not implemented
 
-Obviously, not both sides can be master, so I changed the router
-to use only "lm accept;", and now everything works, including
-the headset (which I consider somewhat interesting, because it
-worked with the desktop machine, which used "lm accept,master;"
-all the time).
+Here's hciconfig -a from the desktop:
 
-How is it determined which side will become master when both try
-to be? Just timing issues?
+hci0:	Type: USB
+	BD Address: 00:50:F2:7D:51:FA ACL MTU: 192:8 SCO MTU: 64:8
+	UP RUNNING PSCAN ISCAN 
+	RX bytes:25782968 acl:1334369 sco:122643 events:65955 errors:0
+	TX bytes:6277536 acl:1388 sco:122547 commands:404 errors:0
+	Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+	Link policy: RSWITCH HOLD SNIFF PARK 
+	Link mode: ACCEPT MASTER 
+	Name: 'FloesServer (block)'
+	Class: 0x3e0100
+	Service Classes: Networking, Rendering, Capturing
+	Device Class: Computer, Uncategorized
+	HCI Ver: 1.1 (0x1) HCI Rev: 0x1f9 LMP Ver: 1.1 (0x1) LMP Subver: 0x1f9
+	Manufacturer: Cambridge Silicon Radio (10)
+
+And this is hciconfig -a from the router, where l2ping fails:
+
+hci0:	Type: USB
+	BD Address: 00:09:DD:10:77:6F ACL MTU: 192:8 SCO MTU: 64:8
+	UP RUNNING PSCAN ISCAN 
+	RX bytes:957 acl:0 sco:0 events:25 errors:0
+	TX bytes:343 acl:0 sco:0 commands:23 errors:0
+	Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+	Link policy: RSWITCH HOLD SNIFF PARK 
+	Link mode: ACCEPT MASTER 
+	Name: 'FloesRouter (flunder)'
+	Class: 0x3e0100
+	Service Classes: Networking, Rendering, Capturing
+	Device Class: Computer, Uncategorized
+	HCI Ver: 1.1 (0x1) HCI Rev: 0x460 LMP Ver: 1.1 (0x1) LMP Subver: 0x460
+	Manufacturer: Cambridge Silicon Radio (10)
+
+
+Does anybody have a clue why this happens? Additionally, I can l2ping and 
+use my headset from the desktop, but again not from the router..
 
 Yours, Florian
 - -- 
@@ -46,9 +76,9 @@ Preserve wildlife - pickle a squirrel today!
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.1 (GNU/Linux)
 
-iD8DBQFCy4wv7CzyshGvatgRAqndAJ0T4D3yROQd/U1UOhtTWZNGWhNZbACggcBw
-sZXWqUganh0UWc/SNCGuBuc=
-=HgXx
+iD8DBQFCy4T+7CzyshGvatgRAs/MAKDadjr13Z/qFPrmkNzmmhl2GPjBPgCggH6g
+3qjeVp/PcGnr8s0X/vExHd0=
+=9FcR
 -----END PGP SIGNATURE-----
 
 
