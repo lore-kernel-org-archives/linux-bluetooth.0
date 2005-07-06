@@ -1,11 +1,22 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f16b04cf0507060342300f17ec@mail.gmail.com>
+Message-ID: <f16b04cf0507060301728cf8a4@mail.gmail.com>
 From: hariharan veerappan <hariharanneevee@gmail.com>
-To: Bluez-users@lists.sourceforge.net
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] H5 3 wire UART connect problem
+In-Reply-To: <1120643149.8967.13.camel@pegasus>
 Mime-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_Part_140_13146702.1120646545137"
-Subject: [Bluez-users] H5 3 WIRE UART Problem
+	boundary="----=_Part_116_29527860.1120644101838"
+References: <f16b04cf050630083549f68fef@mail.gmail.com>
+	 <1120224082.15397.197.camel@pegasus>
+	 <f16b04cf0507032307413fcef@mail.gmail.com>
+	 <f16b04cf05070405321b3bc41b@mail.gmail.com>
+	 <f16b04cf05070405392568477e@mail.gmail.com>
+	 <1120482028.10273.154.camel@pegasus>
+	 <f16b04cf05070500152e8f94c2@mail.gmail.com>
+	 <1120551220.10273.202.camel@pegasus>
+	 <f16b04cf050706022079c5b876@mail.gmail.com>
+	 <1120643149.8967.13.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,9 +28,9 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 6 Jul 2005 16:12:25 +0530
+Date: Wed, 6 Jul 2005 15:31:41 +0530
 
-------=_Part_140_13146702.1120646545137
+------=_Part_116_29527860.1120644101838
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
@@ -47,7 +58,40 @@ reference.
 Thanks and regards
 Hariharan.V
 
-------=_Part_140_13146702.1120646545137
+On 7/6/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Hariharan,
+>=20
+> > Please find her with the source modified for the H:5 3 WIRE UART
+> > Silicon wave dongle
+> > implementation in Bluez stack.
+>=20
+> please send an unified diff for the hciattach changes.
+>=20
+> Is this statement "3-Wire UART differs only with the protocol number
+> definitions" really true? If yes, it should be very easy to integrate
+> the 3-Wire UART support directly into hci_bcsp.c without any unneeded
+> overhead.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+> from IBM. Find simple to follow Roadmaps, straightforward articles,
+> informative Webcasts and more! Get everything you need to get up to
+> speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dclic=
+k
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+------=_Part_116_29527860.1120644101838
 Content-Type: application/pdf; name="HCI_Three-Wire_UART_Transport_SP_V095.pdf"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="HCI_Three-Wire_UART_Transport_SP_V095.pdf"
@@ -1516,7 +1560,7 @@ MDc3NDg3IDAwMDAwIG4NCjAwMDAwNzc2NDUgMDAwMDAgbg0KMDAwMDA3NzY4MCAwMDAwMCBuDQow
 MDAwMDc3NzA0IDAwMDAwIG4NCjAwMDAwNzc3NzEgMDAwMDAgbg0KMDAwMDA3Nzg5OCAwMDAwMCBu
 DQowMDAwMDc4MDI4IDAwMDAwIG4NCjAwMDAwNzgxMDEgMDAwMDAgbg0KMDAwMDA4MTU0NSAwMDAw
 MCBuDQp0cmFpbGVyDQo8PC9TaXplIDc5Pj4NCnN0YXJ0eHJlZg0KMTE2DQolJUVPRg0K
-------=_Part_140_13146702.1120646545137--
+------=_Part_116_29527860.1120644101838--
 
 
 -------------------------------------------------------
