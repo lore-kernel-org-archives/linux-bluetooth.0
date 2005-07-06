@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5256d0b05070610026bd6a1cc@mail.gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Moving over to GCC 4.0
-In-Reply-To: <1120669070.18553.2.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <42CBF7A6.7090708@xmission.com>
+References: <1120649879.8836.5.camel@pegasus>
+	 <42CBF7A6.7090708@xmission.com>
+Content-Type: text/plain
+Message-Id: <1120669070.18553.2.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <1120649879.8836.5.camel@pegasus> <42CBF7A6.7090708@xmission.com>
-	 <1120669070.18553.2.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,25 +19,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 6 Jul 2005 18:02:51 +0100
+Date: Wed, 06 Jul 2005 18:57:50 +0200
 
-Hi Marcel,
+Hi Brad,
 
-> > just FYI everybody... sourceforge seems to have broken anonymous cvs
-> > (both bluez and bluetooth-alsa are affected)
-> >
-> > $ cvs update -d
-> > cvs [update aborted]: unrecognized auth response from cvs.bluez.org: cv=
-s
-> > pserver: cannot read /cvsroot/bluez/CVSROOT/config: Input/output error
->=20
-> argh, not again. This crazy error postponed the bluez-{libs|utils}-2.18
-> release already, because I always build the release packages from the
-> anonymous CVS.
+> just FYI everybody... sourceforge seems to have broken anonymous cvs 
+> (both bluez and bluetooth-alsa are affected)
+> 
+> $ cvs update -d
+> cvs [update aborted]: unrecognized auth response from cvs.bluez.org: cvs 
+> pserver: cannot read /cvsroot/bluez/CVSROOT/config: Input/output error
 
-I've been seeing this problem on and off for a week or more.
+argh, not again. This crazy error postponed the bluez-{libs|utils}-2.18
+release already, because I always build the release packages from the
+anonymous CVS.
 
-Peter
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
