@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Querying device information.
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Dave Mielke <dave@mielke.cc>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050706123359.GY21449@beta.private.mielke.cc>
-References: <1120649879.8836.5.camel@pegasus>
-	 <20050706120934.GW21449@beta.private.mielke.cc>
-	 <1120652788.8836.7.camel@pegasus>
-	 <20050706123359.GY21449@beta.private.mielke.cc>
-Content-Type: text/plain
-Message-Id: <1120653839.8836.10.camel@pegasus>
+Subject: Re: [Bluez-devel] Querying device information.
+Message-ID: <20050706123359.GY21449@beta.private.mielke.cc>
+References: <1120649879.8836.5.camel@pegasus> <20050706120934.GW21449@beta.private.mielke.cc> <1120652788.8836.7.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1120652788.8836.7.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,24 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 06 Jul 2005 14:43:59 +0200
+Date: Wed, 6 Jul 2005 08:33:59 -0400
 
-Hi Dave,
+[quoted lines by Marcel Holtmann on 2005/07/06 at 14:26 +0200]
 
-> >this depends on the information you want. 
-> 
-> Bluetooth is new to me so I'll describe what I'm looking for in terms of USB. 
-> I'm looking to determine what kind of device is connected to the other end of
-> the socket in the same way that I'd use the USB Vendor/Product identifiers.
+>this depends on the information you want. 
 
-no you can't, but you can use SDP to retrieve information about the
-services/profiles offered by the peer device.
+Bluetooth is new to me so I'll describe what I'm looking for in terms of USB. 
+I'm looking to determine what kind of device is connected to the other end of
+the socket in the same way that I'd use the USB Vendor/Product identifiers.
 
-Regards
-
-Marcel
-
-
+-- 
+Dave Mielke           | 2213 Fox Crescent | I believe that the Bible is the
+Phone: 1-613-726-0014 | Ottawa, Ontario   | Word of God. Please contact me
+EMail: dave@mielke.cc | Canada  K2A 1H7   | if you're concerned about Hell.
+http://FamilyRadio.com/                   | http://Mielke.cc/bible/
 
 
 -------------------------------------------------------
