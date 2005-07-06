@@ -1,10 +1,22 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f16b04cf0507062355523c3d61@mail.gmail.com>
-From: hariharan veerappan <hariharanneevee@gmail.com>
-To: Bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] H5 3 wire UART connect problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <f16b04cf050706022079c5b876@mail.gmail.com>
+References: <f16b04cf050630083549f68fef@mail.gmail.com>
+	 <1120213256.15397.187.camel@pegasus>
+	 <f16b04cf05070103496a3e64e6@mail.gmail.com>
+	 <1120224082.15397.197.camel@pegasus>
+	 <f16b04cf0507032307413fcef@mail.gmail.com>
+	 <f16b04cf05070405321b3bc41b@mail.gmail.com>
+	 <f16b04cf05070405392568477e@mail.gmail.com>
+	 <1120482028.10273.154.camel@pegasus>
+	 <f16b04cf05070500152e8f94c2@mail.gmail.com>
+	 <1120551220.10273.202.camel@pegasus>
+	 <f16b04cf050706022079c5b876@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1120643149.8967.13.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] OBEX File Receive
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,36 +28,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 7 Jul 2005 12:25:26 +0530
+Date: Wed, 06 Jul 2005 11:45:49 +0200
 
-Dear all/ Marcel,
+Hi Hariharan,
 
-We are presently working on OBEX FTP file transfer.
+> Please find her with the source modified for the H:5 3 WIRE UART
+> Silicon wave dongle
+> implementation in Bluez stack.
 
-We are doing the Obex ftp with following specification:
+please send an unified diff for the hciattach changes.
 
-Machine 1:
-Bluetooth Dongle with Windows
+Is this statement "3-Wire UART differs only with the protocol number
+definitions" really true? If yes, it should be very easy to integrate
+the 3-Wire UART support directly into hci_bcsp.c without any unneeded
+overhead.
 
-Machine 2:
-Bluetooth Dongle with Linux 2.4.20 Kernel.
+Regards
 
-We had made the Machine 1 bluetooth dongle to receive file from any
-bluetooth device. We can able to send the file from machine 2 to the
-Machine 1.
+Marcel
 
-The command used on Machine 2 Linux machine.
-obexftp -b <bdaddr> -B <channel number> --put <filename>
 
-Like the same, when we send the file from Machine 1 to Machine 2. The
-file cannot be send to Machine2
-
-whether command is to be given to make the Linux OBEXFTP to be in
-receive mode of operation.
-
-Advise us
-Thanks and regards
-Hariharan.V
 
 
 -------------------------------------------------------
