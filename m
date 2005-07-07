@@ -1,49 +1,42 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Content-Type: text/plain;
-  charset="iso-8859-1"
-From: Ronny L Nilsson <bb@arbetsmyra.dyndns.org>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Message-Id: <20050707223942.12A0D464@arbetsmyra.dyndns.org>
-Subject: [Bluez-devel] Power control for EDR
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 8 Jul 2005 00:39:28 +0200
+Return-Path: <domen@homer.coderock.org>
+Message-Id: <20050707213035.624483000@homer>
+Date: Thu, 07 Jul 2005 23:30:35 +0200
+From: domen@coderock.org
+To: marcel@holtmann.org
+Cc: bluez-devel@lists.sourceforge.net, Victor Fusco <victor@cetuc.puc-rio.br>,
+   domen@coderock.org
+Subject: [patch 3/3] bpa10x: fix sparse warnings (__nocast type)
+List-ID: <bluez-devel.lists.sourceforge.net>
+
+From: Victor Fusco <victor@cetuc.puc-rio.br>
 
 
-Hi
-I'm currently implementing transmitter power control for CSR chipsets. 
-I've manged to succed with BlueCore2 and has moved on to BlueCore4 with 
-BT v2.0 and EDR. This one is much trickier though, especially since I'm 
-lacking documentation. 
+Fix the sparse warning "implicit cast to nocast type"
+ 
+File/Subsystem: drivers/bluetooth/bpa10x.c
 
-Marcel, do you (or any one else for that matter) have information about 
-the pskey and bccmd constants PSKEY_LC_ENHANCED_POWER_TABLE and 
-LIMIT_EDR_POWER? I've seen them mentioned as text only, without the 
-corresponding necessary value.  :(  Perhaps they can be looked up in 
-the development utils PSTool or BTCli? Unfortunately I don't have any 
-of those.
+Signed-off-by: Victor Fusco <victor@cetuc.puc-rio.br>
+Signed-off-by: Domen Puncer <domen@coderock.org>
+ 
 
-Regards
-/Ronny
+---
+ bpa10x.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletion(-)
 
+Index: quilt/drivers/bluetooth/bpa10x.c
+===================================================================
+--- quilt.orig/drivers/bluetooth/bpa10x.c
++++ quilt/drivers/bluetooth/bpa10x.c
+@@ -307,7 +307,9 @@ unlock:
+ 	read_unlock(&data->lock);
+ }
+ 
+-static inline struct urb *bpa10x_alloc_urb(struct usb_device *udev, unsigned int pipe, size_t size, int flags, void *data)
++static inline struct urb *bpa10x_alloc_urb(struct usb_device *udev, unsigned int pipe,
++                                           size_t size, unsigned int __nocast flags,
++                                           void *data)
+ {
+ 	struct urb *urb;
+ 	struct usb_ctrlrequest *cr;
 
-
--------------------------------------------------------
-This SF.Net email is sponsored by the 'Do More With Dual!' webinar happening
-July 14 at 8am PDT/11am EDT. We invite you to explore the latest in dual
-core and dual graphics technology at this free one hour event hosted by HP, 
-AMD, and NVIDIA.  To register visit http://www.hp.com/go/dualwebinar
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--
