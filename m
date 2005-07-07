@@ -1,11 +1,11 @@
 Return-Path: <domen@homer.coderock.org>
-Message-Id: <20050707213035.624483000@homer>
-Date: Thu, 07 Jul 2005 23:30:35 +0200
+Message-Id: <20050707213034.335385000@homer>
+Date: Thu, 07 Jul 2005 23:30:34 +0200
 From: domen@coderock.org
 To: marcel@holtmann.org
 Cc: bluez-devel@lists.sourceforge.net, Victor Fusco <victor@cetuc.puc-rio.br>,
    domen@coderock.org
-Subject: [patch 3/3] bpa10x: fix sparse warnings (__nocast type)
+Subject: [patch 2/3] hci_usb: fix sparse warnings (__nocast type)
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 From: Victor Fusco <victor@cetuc.puc-rio.br>
@@ -13,30 +13,28 @@ From: Victor Fusco <victor@cetuc.puc-rio.br>
 
 Fix the sparse warning "implicit cast to nocast type"
  
-File/Subsystem: drivers/bluetooth/bpa10x.c
+File/Subsystem: drivers/bluetooth/hci_usb.c
 
 Signed-off-by: Victor Fusco <victor@cetuc.puc-rio.br>
 Signed-off-by: Domen Puncer <domen@coderock.org>
  
 
 ---
- bpa10x.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletion(-)
+ hci_usb.c |    2 +-
+ 1 files changed, 1 insertion(+), 1 deletion(-)
 
-Index: quilt/drivers/bluetooth/bpa10x.c
+Index: quilt/drivers/bluetooth/hci_usb.c
 ===================================================================
---- quilt.orig/drivers/bluetooth/bpa10x.c
-+++ quilt/drivers/bluetooth/bpa10x.c
-@@ -307,7 +307,9 @@ unlock:
- 	read_unlock(&data->lock);
- }
+--- quilt.orig/drivers/bluetooth/hci_usb.c
++++ quilt/drivers/bluetooth/hci_usb.c
+@@ -126,7 +126,7 @@ static struct usb_device_id blacklist_id
+ 	{ }	/* Terminating entry */
+ };
  
--static inline struct urb *bpa10x_alloc_urb(struct usb_device *udev, unsigned int pipe, size_t size, int flags, void *data)
-+static inline struct urb *bpa10x_alloc_urb(struct usb_device *udev, unsigned int pipe,
-+                                           size_t size, unsigned int __nocast flags,
-+                                           void *data)
+-static struct _urb *_urb_alloc(int isoc, int gfp)
++static struct _urb *_urb_alloc(int isoc, unsigned int __nocast gfp)
  {
- 	struct urb *urb;
- 	struct usb_ctrlrequest *cr;
+ 	struct _urb *_urb = kmalloc(sizeof(struct _urb) +
+ 				sizeof(struct usb_iso_packet_descriptor) * isoc, gfp);
 
 --
