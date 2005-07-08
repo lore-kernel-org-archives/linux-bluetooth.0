@@ -2,13 +2,17 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Bluetooth MIME types and URIs
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200507081754.55107.bluez-devel@schaettgen.de>
+In-Reply-To: <e1effdeb050708092343073205@mail.gmail.com>
 References: <1120747365.18553.15.camel@pegasus>
-	 <200507081451.38781.bluez-devel@schaettgen.de>
-	 <1120833804.18553.117.camel@pegasus>
-	 <200507081754.55107.bluez-devel@schaettgen.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1120850233.7444.8.camel@notepaq>
+	 <200507071900.33313.bluez-devel@schaettgen.de>
+	 <1120759981.18553.52.camel@pegasus>
+	 <200507080315.50686.bluez-devel@schaettgen.de>
+	 <1120804711.18553.100.camel@pegasus>
+	 <e1effdeb05070805454b8960b6@mail.gmail.com>
+	 <1120834052.18553.123.camel@pegasus>
+	 <e1effdeb050708092343073205@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1120849847.7444.5.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,59 +25,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 08 Jul 2005 21:17:13 +0200
+Date: Fri, 08 Jul 2005 21:10:47 +0200
 
-Hi Fred,
+Hi Claudio,
 
-> > > At the moment, an item with the mimetype =A8bluetooth/obex-push-pro=
-file=A8
-> > > can only live inside the sdp kioslave.
-> > > Maybe a more correct way would in fact be to have a helper applicat=
-ion
-> > > associated with the type application/x-bt.service, which gets the
-> > > information what device to connect to not from the URL, but from th=
-e URL
-> > > contents. application/x-bt.service could simply be a file that cont=
-ains
-> > > the whole service record as xml, similar to the service record file=
-s for
-> > > the metaserver. The applications would have to parse this xml file,=
- which
-> > > isn=B4t very lightweight, but it gives all available information an=
-d we
-> > > don=B4t have to worry how to squezze everything into an URL.
-> >
-> > I am not really happy with adding somekind of XML overhead.
->=20
-> But it=B4s the most natural format for a hierarchical data structure li=
-ke the=20
-> service records. The computational overhead would be neglectable and it=
- only=20
-> has to be implemented in the service dispatcher, not in each applicatio=
-n=20
-> started by it. We can put everything we know in the xml structure witho=
-ut=20
-> much effort. Extending the url format might become more troublesome at =
-some=20
-> point.=20
-> We could also go without the service dispatcher and still use distinct=20
-> mimetypes for each service, but let the application read the needed=20
-> information from the data the url points to and not from the URL itself.
-> We didn=B4t have to standardize on a URL format then, but just on the m=
-imetypes=20
-> and the service description format, be it xml or anything else.=20
-> In KDE it would allow for a kfile plugin which displays additional prop=
-erties=20
-> of services in konqueror besides the name.=20
-> Or we could do both - putting just the most relevant information into t=
-he URL=20
-> (bdaddr+channel) and the complete service record, device adress + name =
-and=20
-> everything else we know about a service into the file contents as xml s=
-imilar=20
-> to sdp registration files we use (see attachment).
+> I see a new repository in the CVS(Bluehood).  I think that this
+> daemon will be the metaserver, is that correct?
 
-actually right now, I don't tend in either direction.
+actually that is quite old and has nothing to do with it. The new
+bluetoothd will be inside utils/daemon/.
+
+> > The new InquiryResult and RemoteName signals are implemented in hcid for
+> > testing. Start "dbus-monitor --system" and call "hcitool scan".
+> I didn't find  this code in the bluez-utils-2.18 code. Where is it? Could
+> you send me the CVS branch or the code?
+> I found references in the kbluetoothd(neighbourmonitor.cpp), but there is no 
+> D-Bus messages involved.
+
+You are mixing things here. The KDE Bluetooth stuff has nothing to do
+with it at the moment. The code is inside the CVS and will be part of
+the 2.19 release.
 
 Regards
 
