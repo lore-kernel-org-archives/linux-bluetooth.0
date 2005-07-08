@@ -1,18 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb050708092343073205@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+From: Fred Schaettgen <bluez-devel@schaettgen.de>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Bluetooth MIME types and URIs
-In-Reply-To: <1120834052.18553.123.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <1120747365.18553.15.camel@pegasus>
-	 <200507071900.33313.bluez-devel@schaettgen.de>
-	 <1120759981.18553.52.camel@pegasus>
-	 <200507080315.50686.bluez-devel@schaettgen.de>
-	 <1120804711.18553.100.camel@pegasus>
-	 <e1effdeb05070805454b8960b6@mail.gmail.com>
-	 <1120834052.18553.123.camel@pegasus>
+References: <1120747365.18553.15.camel@pegasus> <200507081451.38781.bluez-devel@schaettgen.de> <1120833804.18553.117.camel@pegasus>
+In-Reply-To: <1120833804.18553.117.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_PHqzC42ygfYRJil"
+Message-Id: <200507081754.55107.bluez-devel@schaettgen.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -24,78 +19,142 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 8 Jul 2005 13:23:31 -0300
+Date: Fri, 8 Jul 2005 17:54:54 +0200
 
-Hi Marcel,
+--Boundary-00=_PHqzC42ygfYRJil
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-On 7/8/05, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Claudio,
->=20
-> > Basically two bus type are available: system and session.
-> > System bus is not able to start applications with user interfaces
-> > because the dbus-daemon is running with root permissions.
->=20
-> why is activation not working with the system bus. However we might have
-> to use system and session bus at the same time.
-No, It is working fine. I tested in D-Bus 0.23, 0.33 and 0.34.
-I developed the D-Bus service for pand and it's possible start this daemon
-using system Bus because there no graphical interface involved.
-System bus is intended to be common for all user sessions and=20
-session bus is restricted to the current user session.
-If you need start a program that has graphical interface the activate reque=
-st
-should be sent to the session bus instance.
-
->=20
-> > Use DBUS for request BlueZ services will be nice because it's
-> > possible handle security issues and concurrency.
->=20
-> This is the basic idea and it is the reason for putting everything
-> inside bluetoothd and designing a new kernel interface.
-
-I see a new repository in the CVS(Bluehood).  I think that this
-daemon will be the metaserver, is that correct?
-
->=20
-> > DBus signal can be used to notify all D-BUS registered applications abo=
-ut
-> > new devices, new services, connection problems, ...
->=20
-> The new InquiryResult and RemoteName signals are implemented in hcid for
-> testing. Start "dbus-monitor --system" and call "hcitool scan".
-I didn't find  this code in the bluez-utils-2.18 code. Where is it? Could
-you send me the CVS branch or the code?
-I found references in the kbluetoothd(neighbourmonitor.cpp), but there is n=
-o=20
-D-Bus messages involved.
-
->=20
-> > D-Bus is under development and some changes can occur, but it's
-> > possible develop some workarround to make the application compliant
-> > with Dbus 0.34, 0.33 and 0.23.
->=20
-> I already did that, but I am not very happy with it. I actually really
-> like to see the 1.0 release of their API.
->=20
-> Regards
->=20
-> Marcel
->=20
->=20
->=20
->=20
-> -------------------------------------------------------
-> This SF.Net email is sponsored by the 'Do More With Dual!' webinar happen=
-ing
-> July 14 at 8am PDT/11am EDT. We invite you to explore the latest in dual
-> core and dual graphics technology at this free one hour event hosted by H=
-P,
-> AMD, and NVIDIA.  To register visit http://www.hp.com/go/dualwebinar
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+On Friday, 8. July 2005 16:43, Marcel Holtmann wrote:
+=2E..
+> > But I wonder if this isn=B4t actually an abuse of mimetypes. Aren=B4t
+> > mimetypes supposed to declare the format of a file? Yet we are not
+> > talking about file contents at all here. Instead we associate a mimetype
+> > with a certain URL format.
 >
+> In general yes, but they always have been misused.
+
+
+
+> > At the moment, an item with the mimetype =A8bluetooth/obex-push-profile=
+=A8
+> > can only live inside the sdp kioslave.
+> > Maybe a more correct way would in fact be to have a helper application
+> > associated with the type application/x-bt.service, which gets the
+> > information what device to connect to not from the URL, but from the URL
+> > contents. application/x-bt.service could simply be a file that contains
+> > the whole service record as xml, similar to the service record files for
+> > the metaserver. The applications would have to parse this xml file, whi=
+ch
+> > isn=B4t very lightweight, but it gives all available information and we
+> > don=B4t have to worry how to squezze everything into an URL.
+>
+> I am not really happy with adding somekind of XML overhead.
+
+But it=B4s the most natural format for a hierarchical data structure like t=
+he=20
+service records. The computational overhead would be neglectable and it onl=
+y=20
+has to be implemented in the service dispatcher, not in each application=20
+started by it. We can put everything we know in the xml structure without=20
+much effort. Extending the url format might become more troublesome at some=
+=20
+point.=20
+We could also go without the service dispatcher and still use distinct=20
+mimetypes for each service, but let the application read the needed=20
+information from the data the url points to and not from the URL itself.
+We didn=B4t have to standardize on a URL format then, but just on the mimet=
+ypes=20
+and the service description format, be it xml or anything else.=20
+In KDE it would allow for a kfile plugin which displays additional properti=
+es=20
+of services in konqueror besides the name.=20
+Or we could do both - putting just the most relevant information into the U=
+RL=20
+(bdaddr+channel) and the complete service record, device adress + name and=
+=20
+everything else we know about a service into the file contents as xml simil=
+ar=20
+to sdp registration files we use (see attachment).
+
+=46red
+
+=2D-=20
+=46red Schaettgen
+bluez-devel@schaettgen.de
+
+--Boundary-00=_PHqzC42ygfYRJil
+Content-Type: text/xml;
+  charset="iso-8859-1";
+  name="kbluetoothd_kbtobexsrv.sdp.xml"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="kbluetoothd_kbtobexsrv.sdp.xml"
+
+<sdprecord>
+<attributes>
+
+<!-- Service name -->
+<attribute id='0x0100'>
+<str>Obex Push Server</str>
+</attribute>
+
+<!-- Service description -->
+<attribute id='0x0101'>
+<str>KDE OBEX Object Push Service</str>
+</attribute>
+
+<!-- Supported formats list -->
+<attribute id='0x0303'>
+<seq>
+<uint val='0xFF' size='8'/><!-- anything  -->
+<uint val='0x01' size='8'/><!-- vCard 2.1 -->
+<uint val='0x02' size='8'/><!-- vCard 3.0 -->
+<uint val='0x03' size='8'/><!-- vCal  1.0 -->
+<uint val='0x04' size='8'/><!-- iCal  2.0 -->
+<uint val='0x05' size='8'/><!-- vNotes    -->
+<uint val='0x06' size='8'/><!-- vMessage  -->
+</seq>
+</attribute>
+
+<!-- Service class ID list -->
+<attribute id='0x0001'>
+<seq>
+<uuid val='0x1105' size='16'/>
+</seq>
+</attribute>
+
+<!-- Protocol descriptor list -->
+<attribute id='0x0004'>
+<seq>
+<seq><uuid val='256' size='16'/></seq>
+<seq><uuid val='3' size='16'/>
+<uint valref='rfcommchannel' size='8'/></seq>
+<seq><uuid val='0x0008' size='16'/></seq>
+</seq>
+</attribute>
+
+<!-- Browse group list-->
+<attribute id='0x0005'>
+<seq>
+<uuid val='0x1002' size='16'/>
+</seq>
+</attribute>
+
+<!-- Bluetooth profile descriptor list -->
+<attribute id='0x0009'>
+<seq>
+<seq><uuid val='0x1105' size='16'/>
+<uint val='0x0100' size='16'/></seq>
+</seq>
+</attribute>
+
+</attributes>
+</sdprecord>
+
+--Boundary-00=_PHqzC42ygfYRJil--
 
 
 -------------------------------------------------------
