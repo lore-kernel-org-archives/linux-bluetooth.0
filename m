@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42CF0E8E.4040602@phealy.com>
-From: "Patrick W. Healy" <phealy@phealy.com>
-MIME-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] diNovo/MX900 problem with hidd
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200507090129.43874.cijoml@volny.cz>
+Subject: [Bluez-users] MSI dongle flash
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,27 +17,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 08 Jul 2005 18:38:54 -0500
+Date: Sat, 9 Jul 2005 01:29:42 +0200
 
-Greetings, everyone. I'm having some issues with getting my bluetooth 
-keyboard and mouse to work, and they're getting rather frustrating. 
-Perhaps someone can help me.
+Hi,
 
-I have a Logitech diNovo media desktop and the matching MX900 mouse, 
-which I am attempting to pair with the internal bluetooth on my Dell 
-Inspiron 8500. I can get them to pair successfully, and even move and 
-type, but the mouse movement is extremely jerky and useless, while the 
-keyboard types erratically and quite often repeats keystrokes.
+I have here dongle from MSI firmware 
+HCI 18.2  	bc02x  	bc02x_8unified_fl_bt1.2_18p2_0405241530_encr56  	May 24, 
+2004  	0x570 (1392)
 
-I'm using a 2.6.12 kernel and the latest bluez in debian unstable (hcid 
-2.15) along with all the bluetooth modules compiled and ready.
+0db0:697a Micro Star International
 
-I also usually receive a message saying "Can't create HID control 
-channel: Invalid exchange", along with input output errors and errors 
-about the file descriptor being in a bad state. Sometimes the pin auth 
-system comes up, sometimes it doesn't.
+I would like flash it via Apple fw to have it 128bit encryption. Is it 
+possible? Does anybody had success with it? This dongle is some unknown 
+public I took with my new laptop. MSI is not mentioned on it, but it look 
+like MSI
 
-Any help? I'd be happy to provide any additional information needed.
+Thanks for reply
+
+Michal
 
 
 -------------------------------------------------------
