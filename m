@@ -1,16 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bluetooth MIME types and URIs
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Fred Schaettgen <bluez-devel@schaettgen.de>
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Bluetooth MIME types and URIs
+References: <1120747365.18553.15.camel@pegasus> <200507071900.33313.bluez-devel@schaettgen.de> <1120759981.18553.52.camel@pegasus>
+In-Reply-To: <1120759981.18553.52.camel@pegasus>
 Cc: kde-bluetooth@liste.ferrara.linux.it
-In-Reply-To: <200507080315.50686.bluez-devel@schaettgen.de>
-References: <1120747365.18553.15.camel@pegasus>
-	 <200507071900.33313.bluez-devel@schaettgen.de>
-	 <1120759981.18553.52.camel@pegasus>
-	 <200507080315.50686.bluez-devel@schaettgen.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1120804711.18553.100.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200507080315.50686.bluez-devel@schaettgen.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,243 +20,157 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 08 Jul 2005 08:38:31 +0200
+Date: Fri, 8 Jul 2005 03:15:50 +0200
 
-Hi Fred,
+On Thursday, 7. July 2005 20:13, Marcel Holtmann wrote:
+=2E..
+> > What is this VFS module supposed to do? Device discovery, service
+> > discovery..?
+>
+> all these tasks are done inside bluetoothd (needs to be written) and the
+> VFS module is used for displaying them. The communication will be done
+> via D-Bus.
+>
+> An after-talk beer session at the LinuxTag with one of the D-Bus guys
+> convinced me that there is no other way that makes sense.
 
-> > An after-talk beer session at the LinuxTag with one of the D-Bus guys
-> > convinced me that there is no other way that makes sense.
->=20
-> Indeed. That=B4s also more or less what we are doing. Well, the ioslave=
-s do the=20
-> inquiry and sdp requests on their own, but the name cache is accessed v=
-ia=20
-> DCOP. I wouldn=B4t mind if BlueZ could do part of the work. Qt support =
-for dbus=20
-> wasn=B4t all that good last time I checked, but this will certainly cha=
-nge if=20
-> KDE4 starts using dbus more than just removable media.
+Indeed. That=B4s also more or less what we are doing. Well, the ioslaves do=
+ the=20
+inquiry and sdp requests on their own, but the name cache is accessed via=20
+DCOP. I wouldn=B4t mind if BlueZ could do part of the work. Qt support for =
+dbus=20
+wasn=B4t all that good last time I checked, but this will certainly change =
+if=20
+KDE4 starts using dbus more than just removable media.
 
-I will move the device and service discovery into bluetoothd and also
-the name cache. Actually hcid already maintains a name cache, but at the
-moment you can access it only via the filesystem.
+> I have a rough=20
+> design on how these things will interact, but only a bare minimum is
+> implemented at the moment. The kernel needs an extra event mechanism for
+> all this stuff and I have to write bluetoothd of course. The basic idea
+> looks like this:
 
-> > I have a rough=20
-> > design on how these things will interact, but only a bare minimum is
-> > implemented at the moment. The kernel needs an extra event mechanism =
-for
-> > all this stuff and I have to write bluetoothd of course. The basic id=
-ea
-> > looks like this:
->=20
-> What is that extra event mechanism good for? Can=B4t you monitor everyt=
-hing that=20
-> is needed without new extensions?
+What is that extra event mechanism good for? Can=B4t you monitor everything=
+ that=20
+is needed without new extensions?
+Oh, btw. is there a way to get the number of transfered packets/bytes? =20
 
-But you need to do everything twice. Inside the kernel and then again in
-userspace. The kernel needs to keep track of a lot of stuff anyway and
-so I don't wanna redo that in userspace.
+=2E..
+> > The [xx:xx...] syntax is inspired by the syntax used for IPv6 addresses
+> > in URLs (RFC 2732).
+=2E..
+> Another way is to strip the colon from the device address. This method
+> was used in the ESDP and JSR-82 specifications. I used the latter method
+> in the URIs for the CUPS backend.
 
-The best example is the Inquiry Result with RSSI event. Some vendor got
-it wrong and so I had to implement a workaround in the kernel, in hcid
-and in hcidump. The hcidump part will never go away, because I need to
-keep it separate to be able to detect errors, but the kernel and hcid
-(bluetoothd in the future) shouldn't need to do that twice.
+Ok, someone flip a coin please ;)
 
-> Oh, btw. is there a way to get the number of transfered packets/bytes? =
+> Main question is how we deal with different local devices. We need a
+> method to specify an optional source. No specification really deals with
+> multiple Bluetooth devices attached to the same host.
+
+We could simply append the device number to the device address and default =
+to=20
+the first usable device if that suffix is missing. Like [xx:xx:xx:xx:xx:xx.=
+2]=20
+for instance. =20
+But remember that you are targeting desktop users now. We support several=20
+devices only by setting a special environment variable/command line paramet=
+er=20
+and before that we=B4ve had about one complaint in total regarding missing=
 =20
-
-The "struct hci_dev_info" contain them. Check hciconfig for an example.
-
-> > > The [xx:xx...] syntax is inspired by the syntax used for IPv6 addre=
-sses
-> > > in URLs (RFC 2732).
-> ...
-> > Another way is to strip the colon from the device address. This metho=
-d
-> > was used in the ESDP and JSR-82 specifications. I used the latter met=
-hod
-> > in the URIs for the CUPS backend.
->=20
-> Ok, someone flip a coin please ;)
-
-I checked the RFC 2732 and I think both are fine. Maybe it is a good
-idea to also support both.
-
-> > Main question is how we deal with different local devices. We need a
-> > method to specify an optional source. No specification really deals w=
-ith
-> > multiple Bluetooth devices attached to the same host.
->=20
-> We could simply append the device number to the device address and defa=
-ult to=20
-> the first usable device if that suffix is missing. Like [xx:xx:xx:xx:xx=
-:xx.2]=20
-> for instance. =20
-
-I don't like it. My thoughts were something like:
-
-	hci0@aabbccddeeff or 112233445566@aabbccddeeff
-
-But actually I must admit I am not really convinced.
-
-> But remember that you are targeting desktop users now. We support sever=
-al=20
-> devices only by setting a special environment variable/command line par=
-ameter=20
-> and before that we=B4ve had about one complaint in total regarding miss=
-ing=20
-> support for multiple adapters. A workaround for special needs is obviou=
-sly=20
-> enough, no need to complicate the UI for the vast majority with just a =
-single=20
-> adapter.
-
-This is no argument for me. We always will have the special case where
-only one adapter exists and BDADDR_ANY is enough, but this is Linux and
-we do it the right way and support everything possible. You need to redo
-your thinking. Multiple adapters is the normal case and only one adapter
-is a special case.
-
-And if I start using graphical toys for Bluetooth then they must support
-it, because for me the normal case is three attached adapters ;)
-
-> > I think we need at least two different MIME types. One for devices an=
-d
-> > one for the service records. Having different types for every UUID is
-> > also a good idea. Thoughts?
->=20
-> Sure, when I said =A8one mimetype=A8 I was talking just about the sdp i=
-oslave=20
-> which does the services. Do you want to use one VFS module for everythi=
-ng? We=20
-> used to have one kioslave for both device discovery and service listing=
-, but=20
-> it=B4s cleaner if it=B4s separated in my eyes.
-> If you have one mimetype per UUID, then which one do you pick for the f=
-ile=20
-> item? Or can you assign several mimetypes to one item with gnome=B4s VF=
-S?
-> That=B4s one of the points where doing bluetooth with kioslaves looked =
-like a=20
-> not so good idea.
-
-I don't see the advantage of having two different VFS modules for device
-and service discovery. And since both are only presenting stuff that can
-be retrieved from bluetoothd they won't be highly complex.
-
-Since Nautilus is supporting "Open with" it might be possible to assign
-multiple applications to one MIME type. This also means that we need
-different MIME types for each service/profile.
-
-> > Actually I have no ideas for their string representation. Does anybod=
-y
-> > know a reference for this?
->=20
-> String representation of what? Mime types? This might help in that case=
-:
-> http://www.iana.org/assignments/media-types/
-> I never bothered reading it though.
-
-It was a long time ago when I read the RFC 2046. However after looking
-through it, I think we must use the application main type with the x-
-subtype. What about stuff like this:
-
-	application/x-bt.device
-	application/x-bt.service
-
-	application/x-bt.handsfree
-
-On the other hand I remembered that the BIP already needed special MIME
-types and it seems they are using x-bt/img-listing and so on for it.
-
-> > For these kind of things it would be great to go along with the JSR-8=
-2
-> > specification and their ideas of a Bluetooth URI. However I am not 10=
-0%
-> > sure about that at the moment, because some of the JSR-82 stuff is cr=
-ap.
->=20
-> If it does all we need - fine. How would a JSR-82 style URL look like t=
-o=20
-> access some service of a device?
-
-They only define btspp:, btl2cap: and btgoep: and it is mostly used for
-protocol transports. As I said, some of it is crap.
-
-> > Last time I played with the KDE-Bluetooth thing it was working great =
-and
-> > the version included in SuSE 9.3 is really usable. However we need so=
-me
-> > kind of standard between Gnome and KDE (and every other desktop). At =
-the
-> > moment my mind is totally open for anything. The more feedback the
-> > better.
->=20
-> The metaserver feature of kbluetoothd really shouldn=B4t be KDE-specifi=
-c in my=20
-> eyes. It=B4s extremly helpful to implement new services, which can then=
- be=20
-> controlled in a consistent and secure fashion. It proved to work very w=
-ell=20
-> for us in all the time, but having it implemented in BlueZ (with KDE an=
-d=20
-> Gnome providing just a GUI for it) it might even used by third parties.=
- It=B4s=20
-> hard to sell if it=B4s tied to KDE.
-
-Before talking about any metaserver, I need to resolve some other basic
-issues like authentication, authorization etc.
-
-> Another service that might be worth sharing is the device discovery. Th=
-is is a=20
-> service offered by kbluetoothd which searches for nearby devices regula=
-rly =20
-> and starts scripts when devices come and go. It totally sucks UI-wise, =
-but it=20
-> is good for many interesting applications. And if you have more than on=
-e=20
-> application where each one polls for new devices, then it makes a lot o=
-f=20
-> sense to have just a central service doing that on behalf of them.
-> The biggest problem is how to deal with devices that are not discoverab=
-le. In=20
-> kbluetoothd the user (or applications via DCOP) can configure a list of=
+support for multiple adapters. A workaround for special needs is obviously=
 =20
-> devices that are paged to find out if they are around. But those connec=
-tion=20
-> attempts don=B4t do any good when you try to use the adapter for someth=
-ing else=20
-> meanwhile.
+enough, no need to complicate the UI for the vast majority with just a sing=
+le=20
+adapter.
 
-The inquiries in background is something I don't really like about it,
-because for some devices this is simply disturbing and if you play music
-over A2DP you might kill the audio stream with it. However I wanna move
-that all into bluetoothd (including somekind of SDP cache).
+=2E..
+[mimetypes used by kde=B4s ioslaves]
+=2E..
+> I think we need at least two different MIME types. One for devices and
+> one for the service records. Having different types for every UUID is
+> also a good idea. Thoughts?
 
-> Will the bluetoothd run in the user session or as root? Maybe it should=
- be=20
-> able to do both, just like the dbus daemon itself. If bluetoothd contai=
-ns a=20
-> metaserver eventually it should be possible to have it launch applicati=
-ons=20
-> with a GUI, like kbluetoothd is doing now. But we can=B4t start system =
-services=20
-> on demand, even though this can be desirable too.=20
+Sure, when I said =A8one mimetype=A8 I was talking just about the sdp iosla=
+ve=20
+which does the services. Do you want to use one VFS module for everything? =
+We=20
+used to have one kioslave for both device discovery and service listing, bu=
+t=20
+it=B4s cleaner if it=B4s separated in my eyes.
+If you have one mimetype per UUID, then which one do you pick for the file=
+=20
+item? Or can you assign several mimetypes to one item with gnome=B4s VFS?
+That=B4s one of the points where doing bluetooth with kioslaves looked like=
+ a=20
+not so good idea.
 
-It will be root only, because otherwise it can't listen for kernel
-events. We also need one central daemon to deal with all the stuff and
-so a session version makes no sense. However there is also no need it,
-because it will communicate only over D-Bus and this can be made session
-aware. The D-Bus also have somekind of activation mechanism that should
-make it possible to start application, but I never looked at that. Right
-now there are other things with higher priority.
+> Actually I have no ideas for their string representation. Does anybody
+> know a reference for this?
 
-Regards
+String representation of what? Mime types? This might help in that case:
+http://www.iana.org/assignments/media-types/
+I never bothered reading it though.
 
-Marcel
+=2E..
+> For these kind of things it would be great to go along with the JSR-82
+> specification and their ideas of a Bluetooth URI. However I am not 100%
+> sure about that at the moment, because some of the JSR-82 stuff is crap.
+
+If it does all we need - fine. How would a JSR-82 style URL look like to=20
+access some service of a device?
+
+> Last time I played with the KDE-Bluetooth thing it was working great and
+> the version included in SuSE 9.3 is really usable. However we need some
+> kind of standard between Gnome and KDE (and every other desktop). At the
+> moment my mind is totally open for anything. The more feedback the
+> better.
+
+The metaserver feature of kbluetoothd really shouldn=B4t be KDE-specific in=
+ my=20
+eyes. It=B4s extremly helpful to implement new services, which can then be=
+=20
+controlled in a consistent and secure fashion. It proved to work very well=
+=20
+for us in all the time, but having it implemented in BlueZ (with KDE and=20
+Gnome providing just a GUI for it) it might even used by third parties. It=
+=B4s=20
+hard to sell if it=B4s tied to KDE.
+
+Another service that might be worth sharing is the device discovery. This i=
+s a=20
+service offered by kbluetoothd which searches for nearby devices regularly =
+=20
+and starts scripts when devices come and go. It totally sucks UI-wise, but =
+it=20
+is good for many interesting applications. And if you have more than one=20
+application where each one polls for new devices, then it makes a lot of=20
+sense to have just a central service doing that on behalf of them.
+The biggest problem is how to deal with devices that are not discoverable. =
+In=20
+kbluetoothd the user (or applications via DCOP) can configure a list of=20
+devices that are paged to find out if they are around. But those connection=
+=20
+attempts don=B4t do any good when you try to use the adapter for something =
+else=20
+meanwhile.
+
+Will the bluetoothd run in the user session or as root? Maybe it should be=
+=20
+able to do both, just like the dbus daemon itself. If bluetoothd contains a=
+=20
+metaserver eventually it should be possible to have it launch applications=
+=20
+with a GUI, like kbluetoothd is doing now. But we can=B4t start system serv=
+ices=20
+on demand, even though this can be desirable too.=20
+
+=46red
 
 
+=2D-=20
+=46red Schaettgen
+bluez-devel@schaettgen.de
 
 
 -------------------------------------------------------
