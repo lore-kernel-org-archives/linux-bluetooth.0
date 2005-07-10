@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY7-F138540399B59B859EA98DDD4DC0@phx.gbl>
-From: "Fahad Khowaja" <fahadkhowaja@hotmail.com>
+Message-ID: <42D12BA1.7040406@phealy.com>
+From: "Patrick W. Healy" <phealy@phealy.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Subject: [Bluez-users] unable to open /dev/rfcomm0: No such device.
+Subject: Re: [Bluez-users] Re: diNovo/MX900 problem with hidd
+References: <42CF0E8E.4040602@phealy.com>	 <loom.20050709T112217-147@post.gmane.org> <42CFD081.90800@phealy.com>	 <42D0329D.7090500@phealy.com> <1120941001.18553.125.camel@pegasus>	 <42D04E35.7060109@phealy.com> <1120982405.18553.133.camel@pegasus>
+In-Reply-To: <1120982405.18553.133.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,50 +18,128 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 11 Jul 2005 10:37:12 +0000
+Date: Sun, 10 Jul 2005 09:07:29 -0500
 
-Hello list members!
+Sorry, I wasn't clear. I can make a connection, once, for a short time. 
+After I've done so, the connection gets "lost"; it doesn't work until I 
+pull the batteries on the device and reconnect with hidd --search. Could 
+you possibly direct me somewhere to an exact set of steps to try so that 
+I can try exactly what you know should work?
 
-I am using Bluez on an Axis Developer Board 82+ running kernel 2.4. I have 
-everything running fine except when I try to issue "rfcomm bind" or cat 
-/dev/rfcomm0 or echo "foo" > /dev/rfcomm0 I get a "No such device" error. A 
-cat of my /proc/devices produces:
+Thanks,
 
-Character devices:
-  1 mem
-  2 pty
-  3 ttyp
-  4 ttyS
-  5 cua
-10 misc
-90 mtd
-108 ppp
-120 etrax gpio
-121 ds1302
-128 ptm
-136 pts
-162 raw
-180 usb
+Patrick
 
-Block devices:
-  1 ramdisk
-31 mtdblock
+Marcel Holtmann wrote:
 
-It seems that the character device with major version 216 is not recognized 
-by the kernel. Which driver is used for these devices? Which options should 
-I enable in the kernel for it to be included in the kernel (I don't have 
-module support on the axis board)? It will be an immense help if someone can 
-give me some pointers!
-
-Gratefully yours,
-Fahad.
-
-_________________________________________________________________
-Take advantage of powerful junk e-mail filters built on patented Microsoft® 
-SmartScreen Technology. 
-http://join.msn.com/?pgmarket=en-ca&page=byoa/prem&xAPID=1994&DI=1034&SU=http://hotmail.com/enca&HL=Market_MSNIS_Taglines 
-  Start enjoying all the benefits of MSN® Premium right now and get the 
-first two months FREE*.
+>Hi Patrick,
+>
+>  
+>
+>>Used hcitool cc to connect to my mediapad, authed it, got a valid link key:
+>>Jul  9 17:09:07 localhost hcid[7758]: link_key_request 
+>>(sba=00:10:C6:3B:0B:95, dba=00:07:61:12:60:11)
+>>Jul  9 17:09:07 localhost hcid[7758]: pin_code_request 
+>>(sba=00:10:C6:3B:0B:95, dba=00:07:61:12:60:11)
+>>Jul  9 17:09:13 localhost hcid[7758]: link_key_notify 
+>>(sba=00:10:C6:3B:0B:95)
+>>Jul  9 17:09:13 localhost hcid[7758]: Saving link key 00:10:C6:3B:0B:95 
+>>00:07:61:12:60:11
+>>    
+>>
+>
+>don't use "hcitool cc" for creating a connection. This is a testing
+>command only and the kernel will create the low-level ACL connections if
+>needed.
+>
+>  
+>
+>>hciconfig -a shows:
+>>hci0:   Type: USB
+>>        BD Address: 00:10:C6:3B:0B:95 ACL MTU: 192:8 SCO MTU: 64:8
+>>        UP RUNNING PSCAN ISCAN AUTH ENCRYPT
+>>        RX bytes:5867 acl:236 sco:0 events:195 errors:0
+>>        TX bytes:2150 acl:47 sco:0 commands:47 errors:0
+>>        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>>        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>>        Link policy: RSWITCH HOLD SNIFF PARK
+>>        Link mode: SLAVE ACCEPT
+>>        Name: 'nimitz-0'
+>>        Class: 0x3e0100
+>>        Service Classes: Networking, Rendering, Capturing
+>>        Device Class: Computer, Uncategorized
+>>        HCI Ver: 1.1 (0x1) HCI Rev: 0x235 LMP Ver: 1.1 (0x1) LMP Subver: 
+>>0x235
+>>        Manufacturer: Cambridge Silicon Radio (10)
+>>    
+>>
+>
+>If you enable AUTH and ENCRYPT you set your local device into security
+>mode 3. Do this only if you really know what you are doing.
+>
+>  
+>
+>>hcitool con shows:
+>>Connections:
+>>        < ACL 00:07:61:12:60:11 handle 41 state 1 lm MASTER AUTH ENCRYPT
+>>
+>>Immediately after all this, hidd --search returns "No devices in range 
+>>or visible"... yet my mediapad lets me type WHILE it is searching.
+>>As soon as it's done searching, it quits. After three more searches, 
+>>hidd --search returns "Can't create HID control channel: Connection refused"
+>>    
+>>
+>
+>What do you expect to find if you are already connected?
+>
+>  
+>
+>>If I push the connect button and then do hidd --search, hidd displays 
+>>the following:
+>>Searching ...
+>>        Connecting to device 00:07:61:12:60:11
+>>then the pin request window comes up... I put in 1234 on the computer, 
+>>then am prompted for a pin by the mediapad. I put in 1234, get the 
+>>'connected' light, and see the following in /var/log/daemon.log:
+>>Jul  9 17:18:34 localhost hcid[7758]: link_key_request 
+>>(sba=00:10:C6:3B:0B:95, dba=00:07:61:12:60:11)
+>>Jul  9 17:18:34 localhost hcid[7758]: pin_code_request 
+>>(sba=00:10:C6:3B:0B:95, dba=00:07:61:12:60:11)
+>>Jul  9 17:18:40 localhost hcid[7758]: link_key_notify 
+>>(sba=00:10:C6:3B:0B:95)
+>>Jul  9 17:18:40 localhost hcid[7758]: Replacing link key 
+>>00:10:C6:3B:0B:95 00:07:61:12:60:11
+>>
+>>after about another 30 seconds or so, hidd --search returns with "HID 
+>>create error 110 (Connection timed out)"
+>>    
+>>
+>
+>For what reason are you always searching? If you are connected once then
+>you never have to worry about it again. All further re-connects will be
+>handles by a running "hidd --server".
+>
+>Use "hcidump -X -V" to see if something strange happens when the
+>keyboard acts weird.
+>
+>Regards
+>
+>Marcel
+>
+>
+>
+>
+>-------------------------------------------------------
+>This SF.Net email is sponsored by the 'Do More With Dual!' webinar happening
+>July 14 at 8am PDT/11am EDT. We invite you to explore the latest in dual
+>core and dual graphics technology at this free one hour event hosted by HP, 
+>AMD, and NVIDIA.  To register visit http://www.hp.com/go/dualwebinar
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>  
+>
 
 
 
