@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] help
+Subject: Re: [Bluez-devel] zeevo module on uart
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <ef9938ec05071014177f92578@mail.gmail.com>
-References: <BAY103-F112E7D6714817182ECD2C798DA0@phx.gbl>
-	 <1120982496.18553.135.camel@pegasus>
-	 <ef9938ec05071014177f92578@mail.gmail.com>
+In-Reply-To: <42D2505A.6070206@soft.uni-linz.ac.at>
+References: <42D2505A.6070206@soft.uni-linz.ac.at>
 Content-Type: text/plain
-Message-Id: <1121102444.5934.3.camel@notepaq>
+Message-Id: <1121102289.5934.1.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,15 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 11 Jul 2005 19:20:44 +0200
+Date: Mon, 11 Jul 2005 19:18:09 +0200
 
-Hi Albert,
+Hi Simon,
 
-> I have to admit that I've had trouble reading the sdptool
-> documentation before.  Attached is a patch for sdptool.1 that I think
-> explains how to use it a little better.
+> I am trying to talk to a Zeevo BT module (tc2001p chip on it) which is
+> attached to an xscale processor via serial.
+> When I start hciattach, I get an error message (and I cannot talk to the
+> device later on):
+> 
+> root@tinypxa263:~# hciattach ttyS1 any
+> h4_recv: Unknown HCI packet type f1
+> 
+> The current kernel is 2.4.19-rmk7-pxa2 +local patches, bluez* 2.18
+> Is this a kernel issue or is something else in my setup wrong?
 
-I applied your changes. Thanks.
+the support for the 2.4 kernel series is limited as you now. So I can't
+provide you any details. However if the Zeevo module capable of working
+with H:4 and doesn't need any special initialization, then this can only
+mean the the serial port or baud rate settings are wrong.
 
 Regards
 
