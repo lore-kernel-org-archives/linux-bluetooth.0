@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] OBEX File Receive
-From: Fredy P <digitalfredy@debiancolombia.org>
+Subject: Re: [Bluez-users] Re: diNovo/MX900 problem with hidd
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <f16b04cf0507062355523c3d61@mail.gmail.com>
-References: <f16b04cf0507062355523c3d61@mail.gmail.com>
-Content-Type: text/plain;
-	charset=iso-8859-1
-Message-Id: <1121087185.27635.5.camel@localhost.localdomain>
+In-Reply-To: <42D12BA1.7040406@phealy.com>
+References: <42CF0E8E.4040602@phealy.com>
+	 <loom.20050709T112217-147@post.gmane.org> <42CFD081.90800@phealy.com>
+	 <42D0329D.7090500@phealy.com> <1120941001.18553.125.camel@pegasus>
+	 <42D04E35.7060109@phealy.com> <1120982405.18553.133.camel@pegasus>
+	 <42D12BA1.7040406@phealy.com>
+Content-Type: text/plain
+Message-Id: <1121102507.5934.5.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,52 +22,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 11 Jul 2005 08:06:25 -0500
+Date: Mon, 11 Jul 2005 19:21:47 +0200
 
-El jue, 07-07-2005 a las 12:25 +0530, hariharan veerappan escribi=F3:
-> Dear all/ Marcel,
->=20
-> We are presently working on OBEX FTP file transfer.
->=20
-> We are doing the Obex ftp with following specification:
->=20
-> Machine 1:
-> Bluetooth Dongle with Windows
->=20
-> Machine 2:
-> Bluetooth Dongle with Linux 2.4.20 Kernel.
->=20
-> We had made the Machine 1 bluetooth dongle to receive file from any
-> bluetooth device. We can able to send the file from machine 2 to the
-> Machine 1.
->=20
-> The command used on Machine 2 Linux machine.
-> obexftp -b <bdaddr> -B <channel number> --put <filename>
->=20
-> Like the same, when we send the file from Machine 1 to Machine 2. The
-> file cannot be send to Machine2
->=20
-> whether command is to be given to make the Linux OBEXFTP to be in
-> receive mode of operation.
+Hi Patrick,
 
-You need use opd (object push daemon) if want recive files=20
+> Sorry, I wasn't clear. I can make a connection, once, for a short time. 
+> After I've done so, the connection gets "lost"; it doesn't work until I 
+> pull the batteries on the device and reconnect with hidd --search. Could 
+> you possibly direct me somewhere to an exact set of steps to try so that 
+> I can try exactly what you know should work?
 
-# opd --mode OBEX --channel 10 --sdp --path=20
->=20
-> Advise us
-> Thanks and regards
-> Hariharan.V
->=20
->=20
-> -------------------------------------------------------
-> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-> from IBM. Find simple to follow Roadmaps, straightforward articles,
-> informative Webcasts and more! Get everything you need to get up to
-> speed, fast. http://ads.osdn.com/?ad_idt77&alloc_id=16492&op=3Dclick
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+do you have a "hidd --server" running as root? Provide "hcidump -X -V"
+output for your problem.
+
+Regards
+
+Marcel
+
 
 
 
