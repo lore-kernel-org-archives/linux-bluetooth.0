@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Strange hci_get_route() result
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <e1effdeb050711115470809e4a@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Cc: Albert Huang <ashuang@gmail.com>
-In-Reply-To: <20050711180747.C34033A4@arbetsmyra.dyndns.org>
-References: <20050710224918.A15613CE@arbetsmyra.dyndns.org>
-	 <1121094313.6158.9.camel@notepaq>
-	 <20050711180747.C34033A4@arbetsmyra.dyndns.org>
-Content-Type: text/plain
-Message-Id: <1121109721.5934.17.camel@notepaq>
+Subject: Re: [Bluez-devel] pand D-Bus service
+In-Reply-To: <1120849681.7444.1.camel@notepaq>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <e1effdeb05070811375af87810@mail.gmail.com>
+	 <1120849681.7444.1.camel@notepaq>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,37 +19,84 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 11 Jul 2005 21:22:01 +0200
+Date: Mon, 11 Jul 2005 15:54:03 -0300
 
-Hi Albert,
+Hi Marcel,
 
-> > check the CVS. I changed the hci_get_route() lately.
-> 
-> My lib is up to date with CVS so that's not the problem.
+According with your emails, bluetoothd shall provide=20
+methods for settings and send signals.
+I finished the D-Bus services for pand, now we need
+define how organize these services.=20
 
-please try again. What happens if you use NULL as address argument.
+In my opinion the bluetoothd should be responsible for
+provide all D-Bus services, including pand, hidd, cip, ...
+Create D-Bus services for each daemon will require=20
+monitor a lot of dbus connections. It's easier and more
+efficient create "profile objects" for each profile inside
+bluetoothd. Buetoothd can monitor different interfaces and=20
+objects.
 
-> > And the ba is
-> > the address of the remote system.
-> 
-> Really? umm, ok. The "manual" by Albert Huang 
-> http://people.csail.mit.edu/albert/pubs/ashuang-sm-thesis-2005.pdf  
-> states the opposite. If you happen to already know the bdaddr of a 
-> *local* adapter you can look up its device id with hci_get_rotue(). I 
-> guess there is no such handy utility function then? 
-
-It is really the remote address. Otherwise this function wouldn't make
-any sense. We need to find a local adapter that can connect to the
-remote one. This is the reason why it is called *_route().
-
-Use hci_devid() if you wanna get the dev_id of a local adapter when you
-know its address.
-
-Regards
-
-Marcel
+Currently, my D-Bus pand implementation is providing:
+  -adapters: show local bluetooth adapters
+  -connect:connect to a bluetooth device
+  -connections: show active connections
+  -disconnect: kill connections
+  -enable-bridge: enable automatic bridge creation on listening
+  -find: search for a service
+  -listen: start/stop listen for bluetooth connections
+  -role: switch the role MASTER|SLAVE
+  -udhcp:enable UDHCP on listen or connect
+  -init: initialize the bluez pan daemon (pand)
+  -kill: kill the pand
 
 
+If you see the code of D-Bus hcid, the D-Bus message control functions
+are similar. The best approach is move all to daemon directory.
+
+
+What is your opinion?
+
+Regards,
+Claudio.
+
+
+On 7/8/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Claudio,
+>=20
+> > We exchanged some emails last month about D-Bus services
+> > for pand. I implemented some D-Bus services, but ...
+> > How will be the relationship between the pand and the "metaserver"?
+> > It is not clear for me how the other daemons will
+> > interact with the current bluez-utils daemons and tools
+> > (pand, hidd, dund, rfcomm, ...).
+>=20
+> forget about the metaserver. This is something KDE specific at the
+> moment.
+>=20
+> > Could you explain me how the D-Bus services will be organized?
+>=20
+> I am not 100% sure at the moment. Need to play with it a little bit
+> more.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> This SF.Net email is sponsored by the 'Do More With Dual!' webinar happen=
+ing
+> July 14 at 8am PDT/11am EDT. We invite you to explore the latest in dual
+> core and dual graphics technology at this free one hour event hosted by H=
+P,
+> AMD, and NVIDIA.  To register visit http://www.hp.com/go/dualwebinar
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 
 -------------------------------------------------------
