@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <30200a94050713052112c7095f@mail.gmail.com>
-From: Gregory Machin <gregory.machin@gmail.com>
+Subject: Re: [Bluez-users] OBEX File Receive
+From: Fredy P <digitalfredy@debiancolombia.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <f16b04cf0507062355523c3d61@mail.gmail.com>
+References: <f16b04cf0507062355523c3d61@mail.gmail.com>
+Content-Type: text/plain;
+	charset=iso-8859-1
+Message-Id: <1121087185.27635.5.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Gigabyte Blue tooth and Fedora core 4
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +19,53 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Jul 2005 14:21:13 +0200
+Date: Mon, 11 Jul 2005 08:06:25 -0500
 
-Hi all i'm a newbee to blue tooth on linux.=20
-I'm trying to get some functionality out of me usb gigabyte blue
-adaper GN-BTD02 but when i do a scan for devices nothing hapes in the
-blue tooth tool that comes with fc4..
-Any ideas ?=20
+El jue, 07-07-2005 a las 12:25 +0530, hariharan veerappan escribi=F3:
+> Dear all/ Marcel,
+>=20
+> We are presently working on OBEX FTP file transfer.
+>=20
+> We are doing the Obex ftp with following specification:
+>=20
+> Machine 1:
+> Bluetooth Dongle with Windows
+>=20
+> Machine 2:
+> Bluetooth Dongle with Linux 2.4.20 Kernel.
+>=20
+> We had made the Machine 1 bluetooth dongle to receive file from any
+> bluetooth device. We can able to send the file from machine 2 to the
+> Machine 1.
+>=20
+> The command used on Machine 2 Linux machine.
+> obexftp -b <bdaddr> -B <channel number> --put <filename>
+>=20
+> Like the same, when we send the file from Machine 1 to Machine 2. The
+> file cannot be send to Machine2
+>=20
+> whether command is to be given to make the Linux OBEXFTP to be in
+> receive mode of operation.
 
---=20
-Gregory Machin
-greg@linuxpro.co.za
-gregory.machin@gmail.com
-www.linuxpro.co.za
-Web Hosting Solutions
-Scalable Linux Solutions=20
-www.iberry.info (support and admin)
-www.goeducation (support and admin)
-+27 72 524 8096
+You need use opd (object push daemon) if want recive files=20
+
+# opd --mode OBEX --channel 10 --sdp --path=20
+>=20
+> Advise us
+> Thanks and regards
+> Hariharan.V
+>=20
+>=20
+> -------------------------------------------------------
+> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+> from IBM. Find simple to follow Roadmaps, straightforward articles,
+> informative Webcasts and more! Get everything you need to get up to
+> speed, fast. http://ads.osdn.com/?ad_idt77&alloc_id=16492&op=3Dclick
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+
 
 
 -------------------------------------------------------
