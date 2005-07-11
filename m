@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] pand D-Bus service
+Subject: Re: [Bluez-devel] Strange hci_get_route() result
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb050711115470809e4a@mail.gmail.com>
-References: <e1effdeb05070811375af87810@mail.gmail.com>
-	 <1120849681.7444.1.camel@notepaq>
-	 <e1effdeb050711115470809e4a@mail.gmail.com>
+Cc: Albert Huang <ashuang@gmail.com>
+In-Reply-To: <20050711180747.C34033A4@arbetsmyra.dyndns.org>
+References: <20050710224918.A15613CE@arbetsmyra.dyndns.org>
+	 <1121094313.6158.9.camel@notepaq>
+	 <20050711180747.C34033A4@arbetsmyra.dyndns.org>
 Content-Type: text/plain
-Message-Id: <1121110034.5934.24.camel@notepaq>
+Message-Id: <1121109721.5934.17.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,51 +21,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 11 Jul 2005 21:27:14 +0200
+Date: Mon, 11 Jul 2005 21:22:01 +0200
 
-Hi Claudio,
+Hi Albert,
 
-> According with your emails, bluetoothd shall provide 
-> methods for settings and send signals.
-> I finished the D-Bus services for pand, now we need
-> define how organize these services. 
+> > check the CVS. I changed the hci_get_route() lately.
 > 
-> In my opinion the bluetoothd should be responsible for
-> provide all D-Bus services, including pand, hidd, cip, ...
-> Create D-Bus services for each daemon will require 
-> monitor a lot of dbus connections. It's easier and more
-> efficient create "profile objects" for each profile inside
-> bluetoothd. Buetoothd can monitor different interfaces and 
-> objects.
+> My lib is up to date with CVS so that's not the problem.
 
-this is my idea and then you can write a simple Python script and use
-all Bluetooth stuff over D-Bus. This way it should be possible to
-implement some graphical tools for using Bluetooth.
+please try again. What happens if you use NULL as address argument.
 
-> Currently, my D-Bus pand implementation is providing:
->   -adapters: show local bluetooth adapters
->   -connect:connect to a bluetooth device
->   -connections: show active connections
->   -disconnect: kill connections
->   -enable-bridge: enable automatic bridge creation on listening
->   -find: search for a service
->   -listen: start/stop listen for bluetooth connections
->   -role: switch the role MASTER|SLAVE
->   -udhcp:enable UDHCP on listen or connect
->   -init: initialize the bluez pan daemon (pand)
->   -kill: kill the pand
+> > And the ba is
+> > the address of the remote system.
 > 
-> 
-> If you see the code of D-Bus hcid, the D-Bus message control functions
-> are similar. The best approach is move all to daemon directory.
+> Really? umm, ok. The "manual" by Albert Huang 
+> http://people.csail.mit.edu/albert/pubs/ashuang-sm-thesis-2005.pdf  
+> states the opposite. If you happen to already know the bdaddr of a 
+> *local* adapter you can look up its device id with hci_get_rotue(). I 
+> guess there is no such handy utility function then? 
 
-The bluetoothd should handle every of these things. However the main
-focus at the moment is device configuration and the handling of security
-related stuff. I am not 100% sure about the interface, but in general I
-like to use something similar to Hal.
+It is really the remote address. Otherwise this function wouldn't make
+any sense. We need to find a local adapter that can connect to the
+remote one. This is the reason why it is called *_route().
 
-Adding interfaces for PAN, HID etc. is not so important for me. Once we
-have the core stuff running, the should be really easy then.
+Use hci_devid() if you wanna get the dev_id of a local adapter when you
+know its address.
 
 Regards
 
