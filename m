@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42D4FD45.2030006@soft.uni-linz.ac.at>
-From: Simon Vogl <vogl@soft.uni-linz.ac.at>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] zeevo module on uart
-References: <42D2505A.6070206@soft.uni-linz.ac.at> <1121102289.5934.1.camel@notepaq>
-In-Reply-To: <1121102289.5934.1.camel@notepaq>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Message-ID: <e1effdeb05071213476bbc0fa0@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
+To: bluez-devel@lists.sourceforge.net, cktakahasi@gmail.com
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] bluetoothd specification
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,76 +16,73 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 13 Jul 2005 13:38:45 +0200
+Date: Tue, 12 Jul 2005 17:47:38 -0300
+
+Hi Marcel,
+
+Periodic inquiry and adapter setup is extremely
+necessary for me. Is it possible set a high priority
+for these features?
+
+Regarding the interfaces and objects path of the=20
+bluetoothd my suggestion is:
+
+>>>bluetoothd
+DBus service :    org.bluez.hci
+DBus interface:   org.bluez.hci
+DBus object path: org/bluez/hci
+    - setup link properties
+    - setup inquiry mode
+    - kill bluetoothd
+    - show local adapters
+    - ???
+>>>SDP
+DBus service :    org.bluez.sdp
+DBus interface:   org.bluez.sdp
+DBus object path: org/bluez/sdp
+methods:
+    - search
+    - register/unregister
+    - get local services
+    - ???
+
+>>>PAN
+DBus service :    org.bluez.pan
+DBus interface:   org.bluez.pan
+DBus object path: org/bluez/pan
+    - connect/disconnect
+    - listen start/stop
+    - connections
 
 
-the module works now, after some experimenting, the following two
-lines do the trick:
+Open issues:
+- How/Where handle multiple bluetooth adapters?
+  solution1: the device id (hci0) can be part of object path
+  eg: org.bluez.hci0.pan org.bluez.hci0.sdp
+            =20
+  solution2: pass the device id as parameter or define a method=20
+             to set the active adapter.
 
-         setserial /dev/ttyS1 baud_base 921600 divisor 1 spd_cust
-         hciattach ttyS1 any 921600
-interestingly, hciattach alone did not manage to start communicating, als=
-o
-not with the -s option (the zeevo firmware is configured to communicate a=
-t
-921600 bps).
 
-Now all I need to do is port a decent 2.6 kernel...
-Simon
+I am not sure if it is better define a hierarchical objects or
+register multiples objects. Dbus support two functions:
+dbus_connection_register_object_path and=20
+dbus_connection_register_fallback(for a given subsection of the=20
+object hierarchy). But I think that it is not important now because
+for both approachs the message handler functions are distinct.
+I will investigate more which approach is the best.
 
-Marcel Holtmann wrote:
-> Hi Simon,
->=20
->=20
->>I am trying to talk to a Zeevo BT module (tc2001p chip on it) which is
->>attached to an xscale processor via serial.
->>When I start hciattach, I get an error message (and I cannot talk to th=
-e
->>device later on):
->>
->>root@tinypxa263:~# hciattach ttyS1 any
->>h4_recv: Unknown HCI packet type f1
->>
->>The current kernel is 2.4.19-rmk7-pxa2 +local patches, bluez* 2.18
->>Is this a kernel issue or is something else in my setup wrong?
->=20
->=20
-> the support for the 2.4 kernel series is limited as you now. So I can't
-> provide you any details. However if the Zeevo module capable of working
-> with H:4 and doesn't need any special initialization, then this can onl=
-y
-> mean the the serial port or baud rate settings are wrong.
->=20
-> Regards
->=20
-> Marcel
->=20
->=20
->=20
->=20
-> -------------------------------------------------------
-> This SF.Net email is sponsored by the 'Do More With Dual!' webinar happ=
-ening
-> July 14 at 8am PDT/11am EDT. We invite you to explore the latest in dua=
-l
-> core and dual graphics technology at this free one hour event hosted by=
- HP,=20
-> AMD, and NVIDIA.  To register visit http://www.hp.com/go/dualwebinar
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Defining an hierarchical approach make easier define policy/rules
+in the dbus configuration files.=20
 
---=20
-_______________________________________________________________________
-Dr. Simon Vogl
-ARC Seibersdorf research GmbH
-Research Studios Austria, Studio Pervasive Computing Applications
-Altenberger Stra=DFe 69, A-4040 Linz, Austria
+Do you have a different design for it or suggestions?
+There are a lot services that shall be inserted in the bluetoothd,
+maybe should be better define multiple interfaces(adapter, link, ... )=20
+for this daemon.
 
-Tel: +43 732 2468-8517, Fax: +43 732 2468-8426
-mailto: simon.vogl@researchstudio.at
 
+Regards,
+Claudio.
 
 
 -------------------------------------------------------
