@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050713170258.12182.qmail@web33507.mail.mud.yahoo.com>
-From: Vinod <geekvinod@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Obex file transfer from ipaq
+Subject: Re: [Bluez-users] BlueZ in embedded linux
+From: Erwin Authried <eauth@softsys.co.at>
+To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050713161256.27473.qmail@web53210.mail.yahoo.com>
+References: <20050713161256.27473.qmail@web53210.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1121273152.18272.34.camel@justakiss>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,47 +18,64 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Jul 2005 10:02:58 -0700 (PDT)
+Date: Wed, 13 Jul 2005 18:45:52 +0200
 
-Hi All.
+Am Mit, den 13.07.2005 schrieb Filipa Duarte um 18:12:
+> Hello,
+> 
+> I am trying to have the bluez-utils-2.14 running on my
+> embedded ppc with linux 2.4.20.
+> 
+> Are the bluez-utils-2.14 and bluez-libs-2.15 ok to run
+> with a kernel 2.4.20?
+> 
+> 
+> I was able to cross-compile without much problems and
+> have enable the kernel support, however I am not able
+> to run the hcid.  When I type hcid -n the result is: 
+> hcid[479]: Bluetooth HCI daemon 
+> and it does not go on from this point.
+> 
+> If I run hciconfig hci0 up;  hciconfig -a the result
+> is: 
+> hci0:   Type: USB
+>         BD Address: 00:10:60:AA:B0:CC ACL MTU: 192:8
+> SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:2838 acl:0 sco:0 events:67 errors:0
+>         TX bytes:228 acl:0 sco:0 commands:66 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00
+> 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2
+> HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'BlueZ (0)'
+>         Class: 0x000000
+>         Service Classes: Unspecified
+>         Device Class: Miscellaneous,
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x33c LMP Ver: 1.1
+> (0x1) LMP Subver: 0x33c
+>         Manufacturer: Cambridge Silicon Radio (10)
+> 
+> which seams ok. However I changed the hcid.conf to a
+> diferent Name and Class. It seams it is not reading
+> from the hcid.conf file but from somewhere else. 
+> 
+> Any idea of what is happening?
+> 
+> Regards,
+> 
+> Filipa Duarte
+> 
+> 
+are you sure that you killed the previously running hcid first? ps
+should show exactly one hcid process after running hcid: 
+"hcid: processing events".
 
-I have ipaq 3870 running familiar linux v0.8.2 with
-kernel 2.4.19. I want to send files to a desktop
-running windows and a usb bluetooth dongle.
+Erwin
 
-The bluetooth on my ipaq is detected and i can use
-hcitool to find the other device. My question is how
-to send files from the ipaq to the other bluetooth
-device?
 
-I found a page
-http://www.caside.lancs.ac.uk/java_bt.php
-
-which uses obex transfer. But a tool they use
-'ussp-push' is not avialable to install through ipkg
-and i cant compile usng make on my ipaq due to no gcc
-compiler.
-Is there any other way i can do this file transfer?
-I can detect a obex service on the other machine.
-
-i installed obexftp_0.10.3-r0_arm.ipk to see if i can
-use this. However i am unure of how to use it.
-
-# ipkg install openobex-apps_1.0.0-r0_arm.ipk
-Installing openobex-apps (1.0.0-r0) to root...
-Configuring openobex-apps
-root@h3600:/etc/bluetooth# obexftp
--sh: obexftp: not found
-
-Would appreciate any pointers.
-
-Thanks,
-Vinod
-
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
 
 
 -------------------------------------------------------
