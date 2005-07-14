@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <6951a38b05071509167d6c66f@mail.gmail.com>
-From: Nuno Gomes <nunomiguelgomes@gmail.com>
+Message-ID: <9307f5f205071408293075bb92@mail.gmail.com>
+From: "P. Durante" <shackan@gmail.com>
 To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] setting inquiry mode
+Subject: [Bluez-devel] Using bluez-libs for non-blocking I/O
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,29 +16,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 15 Jul 2005 17:16:34 +0100
+Date: Thu, 14 Jul 2005 17:29:43 +0200
 
-Hello
+Hi,
+I've been digging the bluez mailing lists and the source code of the
+libraries for a while, but couldn't find a solution for my problem yet.
+I'm writing a bluetooth library in C++, it wraps the whole bluez-libs
+around C++ objects, I'll use it for my project of a GUI-based
+bluetooth management tool.
+Things have not been though until now, I've layed out the whole class
+hierarchy and most class member functions don't do anything but calling
+their bluez-counterpart.
+Now I wanted to implement an event-driven interface, using libsigc++
+to provide a basic callback mechanism (basically, the library gets a
+event from the hci device and dispatches it to the originating object
+trough the appropriate callback functor) but this is giving me quite
+some headaches, I'm going to have a single, separate, thread which
+does all the poll()ing stuff, I want to reuse as most of the original
+bluez library as possible, but I don't know how to make the existing
+hci_send_req() return immediately without waiting for a reply (which,
+in case of a asynchronous request, will be handled in the
+event-dispatching-thread described above), I don't want to rewrite
+hci_send_req() nor any of the many functions which rely on it, which
+could be the best solution ?
 
-My name is Nuno Gomes anda i'm writting from Portugal.
+Another question: the existing kernel modules and the library are able
+to handle multiple pending requests at once or am I just wasting my
+time trying to do something Bluez wasn't actually designed for ?
 
-I=B4m trying to develop a program to control several bluetooth devices
-from a central pc.
-
-My question is: how can I set a inquiry mode on my bluetooth dongle so
-my central application just responds to the inquirys made by the
-bluetooth devices and in the same time get the information from the
-devices.
-
-I know that if I do the inquiry I can get all the information from the
-devices, but I need to just respond to the inquirys because of energy
-issues.
-
-thank you very much!!
-
---=20
-Nuno Miguel Gomes
-Has just sent you an E-mail!!!
+thanks in advance,
+Paul
 
 
 -------------------------------------------------------
