@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <aed73f8b0507141152412f6ae@mail.gmail.com>
-From: Maginot Junior <maginot.junior@gmail.com>
+Message-ID: <20050714155156.16265.qmail@web33507.mail.mud.yahoo.com>
+From: Vinod <geekvinod@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] ussp-push anyone have it ?
-In-Reply-To: <20050714133309.85262.qmail@web53208.mail.yahoo.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <1121273152.18272.34.camel@justakiss>
-	 <20050714133309.85262.qmail@web53208.mail.yahoo.com>
+In-Reply-To: <42D5EB4B.6040206@cc.lv>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] can't open hcid socket
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,15 +17,65 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Jul 2005 16:52:03 -0200
+Date: Thu, 14 Jul 2005 08:51:55 -0700 (PDT)
 
-Hi everyone!=20
-The original site of this file ussp-push is down and I cant find it in
-any other place... so Im wondering if anyone here have this file so
-could share it with me... please i=B4ve been searching a long time and
-Im needing it...
+Hi All.
 
-thks!
+I am trying to send create a bluetooth connection
+between my ipaq 3870 running familiar v0.8.2,GPE,
+(2.4.19 .. hh37) and a desktop with usb dongle.
+
+I was following a link
+http://opie.handhelds.org/cgi-bin/moin.cgi/BluetoothGprs
+
+But i ran into trouble,
+
+#/etc/init.d/bluetooth start
+
+i got
+
+Starting Bluetooth subsystem: hcid sdpdCan't open HIDP
+control socket: Invalid argument
+ hidd rfcomm.
+
+This is what the log had to say
+
+root@h3600:/var/log# cat /var/log/messages
+Oct 21 12:14:40 h3600 syslog.info syslogd started:
+BusyBox v1.00 (2005.04.07-12:
+08+0000)
+Oct 21 12:14:48 h3600 daemon.info hcid[5948]:
+Bluetooth HCI daemon
+Oct 21 12:14:48 h3600 daemon.err sdpd[5952]:
+init_server: binding L2CAP socket:
+Address already in use
+Oct 21 12:14:48 h3600 daemon.err sdp
+
+I found a bug report on this
+
+Bug
+report:https://bugzilla.altlinux.org/show_bug.cgi?id=5247
+
+There were some more posts on the web with similar
+problems but i did not find a concrete solution.
+
+Can anyone tell me what is going wrong? The l2cap
+socket 'address already in use' is somethign that may
+be causing it or somethign with the hcid interface. I
+have two serial ports on my desktop, one of which i am
+using as a serial console to my ipaq. I am  a newbie
+to bluetooth and don't understand the protocols well
+enough yet.
+
+Thanks,
+Vinod
+
+
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
