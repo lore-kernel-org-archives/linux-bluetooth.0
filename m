@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] (Newbie) send strings/messaging using BlueZ
+Subject: Re: [Bluez-users] Gigabyte Blue tooth and Fedora core 4
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1121264757.42d52475bf449@www.webmail.ucl.ac.uk>
-References: <1121264757.42d52475bf449@www.webmail.ucl.ac.uk>
+In-Reply-To: <30200a94050713052112c7095f@mail.gmail.com>
+References: <30200a94050713052112c7095f@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1121335249.6192.8.camel@notepaq>
+Message-Id: <1121334429.6192.4.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,18 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Jul 2005 12:00:49 +0200
+Date: Thu, 14 Jul 2005 11:47:09 +0200
 
-Hi Fikry,
+Hi Gregory,
 
-> I'm a newbie in using the BlueZ. Could anyone tell me how to send a message or a
-> string from one machine to another via bluetooth e.g. sending "Hello World". In
-> my linux machine I downloaded and installed  bluez-hcidump-1.21,
-> bluez-libs-2.17 and bluez-utils-2.17. I did read that I can use rctest.c. Could
-> anyone tell me how to do that. Thank you.
+> all i'm a newbee to blue tooth on linux. 
+> I'm trying to get some functionality out of me usb gigabyte blue
+> adaper GN-BTD02 but when i do a scan for devices nothing hapes in the
+> blue tooth tool that comes with fc4..
 
-you can use the RFCOMM TTY devices and the echo/cat commands or you
-simply write a client/server program using RFCOMM sockets.
+use "hcidump -X -V" as root while you do it and show us the content
+of /proc/bus/usb/devices.
 
 Regards
 
