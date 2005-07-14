@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050714155156.16265.qmail@web33507.mail.mud.yahoo.com>
-From: Vinod <geekvinod@yahoo.com>
+Message-ID: <20050714133309.85262.qmail@web53208.mail.yahoo.com>
+From: Filipa Duarte <filipa_duarte@yahoo.com>
+Subject: Re: [Bluez-users] BlueZ in embedded linux
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <42D5EB4B.6040206@cc.lv>
+In-Reply-To: <1121273152.18272.34.camel@justakiss>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] can't open hcid socket
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,59 +17,203 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Jul 2005 08:51:55 -0700 (PDT)
+Date: Thu, 14 Jul 2005 06:33:09 -0700 (PDT)
 
-Hi All.
+Hello again,
 
-I am trying to send create a bluetooth connection
-between my ipaq 3870 running familiar v0.8.2,GPE,
-(2.4.19 .. hh37) and a desktop with usb dongle.
+You were right! I am able now to go one step forward
+however it is not working yet...
 
-I was following a link
-http://opie.handhelds.org/cgi-bin/moin.cgi/BluetoothGprs
+hcid -n:
+hcid[294]: Bluetooth HCI daemon
+hcid[294]: HCI dev 0 up
+hcid[294]: Starting security manager 0
 
-But i ran into trouble,
+hciconfig -a:
+hci0:   Type: USB
+        BD Address: 00:10:60:AA:B0:CC ACL MTU: 192:8
+SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:9459 acl:0 sco:0 events:213 errors:0
+        TX bytes:3066 acl:0 sco:0 commands:212
+errors:0
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00
+0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2
+HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'BlueZ(hci0,ml310)'
+        Class: 0x3e0100
+        Service Classes: Networking, Rendering,
+Capturing
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x33c LMP Ver: 1.1
+(0x1) LMP Subver: 0x33c
+        Manufacturer: Cambridge Silicon Radio (10)
 
-#/etc/init.d/bluetooth start
+For me both seamed ok. However hcitool dev does not
+return any device!
 
-i got
+An there is something else which is interesting. If I
+run hciconfig hci0 revision the result is:
+hci0:   Type: USB
+        BD Address: 00:10:60:AA:B0:CC ACL MTU: 192:8
+SCO MTU: 64:8
+        HCI 16.14
+hci_cmd_task: hci0 command tx timeout
+        Max key size: 16 bit
 
-Starting Bluetooth subsystem: hcid sdpdCan't open HIDP
-control socket: Invalid argument
- hidd rfcomm.
+and the next 3 hciconfig -a will return:
+hci0hci_cmd_task: hci0 command tx timeout
+:       Type: USB
+        BD Address: 00:10:60:AA:B0:CC ACL MTU: 192:8
+SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:9813 acl:0 sco:0 events:220 errors:0
+        TX bytes:3144 acl:0 sco:0 commands:219
+errors:0
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00
+0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2
+HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+Can't read local name on hci0: Connection timed out
+(110)
 
-This is what the log had to say
+dmesg| grep hci returns:
+usb-ohci-pci.c: USB OHCI at membase 0xc901b000, IRQ 31
+usb-ohci-pci.c: usb-00:0f.0, PCI device 10b9:5237
+usb.c: registered new driver hci_usb
+usb.c: hci_usb driver claimed interface c7f5b1f8
+usb.c: hci_usb driver claimed interface c7f5b1e0
+hci_cmd_task: hci0 command tx timeout
+hci_cmd_task: hci0 command tx timeout
+hci_cmd_task: hci0 command tx timeout
 
-root@h3600:/var/log# cat /var/log/messages
-Oct 21 12:14:40 h3600 syslog.info syslogd started:
-BusyBox v1.00 (2005.04.07-12:
-08+0000)
-Oct 21 12:14:48 h3600 daemon.info hcid[5948]:
-Bluetooth HCI daemon
-Oct 21 12:14:48 h3600 daemon.err sdpd[5952]:
-init_server: binding L2CAP socket:
-Address already in use
-Oct 21 12:14:48 h3600 daemon.err sdp
+and my /proc/bus/usb/devices is::  Ad=03(O)
+Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01
+Driver=hci_usb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01
+Driver=hci_usb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01
+Driver=hci_usb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01
+Driver=hci_usb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 2 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00
+Driver=(none)
 
-I found a bug report on this
+Any idea why I do not see any devices?
 
-Bug
-report:https://bugzilla.altlinux.org/show_bug.cgi?id=5247
+Regards,
 
-There were some more posts on the web with similar
-problems but i did not find a concrete solution.
+Filipa
 
-Can anyone tell me what is going wrong? The l2cap
-socket 'address already in use' is somethign that may
-be causing it or somethign with the hcid interface. I
-have two serial ports on my desktop, one of which i am
-using as a serial console to my ipaq. I am  a newbie
-to bluetooth and don't understand the protocols well
-enough yet.
 
-Thanks,
-Vinod
+--- Erwin Authried <eauth@softsys.co.at> wrote:
 
+> Am Mit, den 13.07.2005 schrieb Filipa Duarte um
+> 18:12:
+> > Hello,
+> > 
+> > I am trying to have the bluez-utils-2.14 running
+> on my
+> > embedded ppc with linux 2.4.20.
+> > 
+> > Are the bluez-utils-2.14 and bluez-libs-2.15 ok to
+> run
+> > with a kernel 2.4.20?
+> > 
+> > 
+> > I was able to cross-compile without much problems
+> and
+> > have enable the kernel support, however I am not
+> able
+> > to run the hcid.  When I type hcid -n the result
+> is: 
+> > hcid[479]: Bluetooth HCI daemon 
+> > and it does not go on from this point.
+> > 
+> > If I run hciconfig hci0 up;  hciconfig -a the
+> result
+> > is: 
+> > hci0:   Type: USB
+> >         BD Address: 00:10:60:AA:B0:CC ACL MTU:
+> 192:8
+> > SCO MTU: 64:8
+> >         UP RUNNING PSCAN ISCAN
+> >         RX bytes:2838 acl:0 sco:0 events:67
+> errors:0
+> >         TX bytes:228 acl:0 sco:0 commands:66
+> errors:0
+> >         Features: 0xff 0xff 0x0f 0x00 0x00 0x00
+> 0x00
+> > 0x00
+> >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1
+> HV2
+> > HV3
+> >         Link policy: RSWITCH HOLD SNIFF PARK
+> >         Link mode: SLAVE ACCEPT
+> >         Name: 'BlueZ (0)'
+> >         Class: 0x000000
+> >         Service Classes: Unspecified
+> >         Device Class: Miscellaneous,
+> >         HCI Ver: 1.1 (0x1) HCI Rev: 0x33c LMP Ver:
+> 1.1
+> > (0x1) LMP Subver: 0x33c
+> >         Manufacturer: Cambridge Silicon Radio (10)
+> > 
+> > which seams ok. However I changed the hcid.conf to
+> a
+> > diferent Name and Class. It seams it is not
+> reading
+> > from the hcid.conf file but from somewhere else. 
+> > 
+> > Any idea of what is happening?
+> > 
+> > Regards,
+> > 
+> > Filipa Duarte
+> > 
+> > 
+> are you sure that you killed the previously running
+> hcid first? ps
+> should show exactly one hcid process after running
+> hcid: 
+> "hcid: processing events".
+> 
+> Erwin
+> 
+> 
+> 
+> 
+>
+-------------------------------------------------------
+> This SF.Net email is sponsored by the 'Do More With
+> Dual!' webinar happening
+> July 14 at 8am PDT/11am EDT. We invite you to
+> explore the latest in dual
+> core and dual graphics technology at this free one
+> hour event hosted by HP, 
+> AMD, and NVIDIA.  To register visit
+> http://www.hp.com/go/dualwebinar
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
 
 
 __________________________________________________
@@ -79,10 +223,10 @@ http://mail.yahoo.com
 
 
 -------------------------------------------------------
-SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-from IBM. Find simple to follow Roadmaps, straightforward articles,
-informative Webcasts and more! Get everything you need to get up to
-speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
+This SF.Net email is sponsored by the 'Do More With Dual!' webinar happening
+July 14 at 8am PDT/11am EDT. We invite you to explore the latest in dual
+core and dual graphics technology at this free one hour event hosted by HP, 
+AMD, and NVIDIA.  To register visit http://www.hp.com/go/dualwebinar
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
