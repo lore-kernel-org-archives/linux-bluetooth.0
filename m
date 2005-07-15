@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <5b9417770507151137560b2a85@mail.gmail.com>
+Message-ID: <5b9417770507151134494b0676@mail.gmail.com>
 From: "John H." <mistamaila@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] bluez-pin .25 won't compile on fc4
-In-Reply-To: <e1effdeb050711060735b7effc@mail.gmail.com>
+Subject: Re: [Bluez-users] kde-bluetooth
+In-Reply-To: <200507151349.08373.tim@birdsnest.maths.tcd.ie>
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_1262_28193362.1121452648677"
-References: <BAY106-F18ED26F8078BBF56D2EC87FAD90@phx.gbl>
-	 <20050708200429.66216.qmail@web50705.mail.yahoo.com>
-	 <e1effdeb050711060735b7effc@mail.gmail.com>
+	boundary="----=_Part_1258_21493973.1121452488527"
+References: <200507151349.08373.tim@birdsnest.maths.tcd.ie>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,103 +19,86 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 15 Jul 2005 13:37:28 -0500
+Date: Fri, 15 Jul 2005 13:34:48 -0500
 
-------=_Part_1262_28193362.1121452648677
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: base64
+------=_Part_1258_21493973.1121452488527
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Ymx1ZXotcGluIGhhcyBubyBjb25maWd1cmUgc2NyaXB0LiBhdCBsZWFzdCwgbm90IGluIHJvb3Qg
-ZGlyLgoKT24gNy8xMS8wNSwgQ2xhdWRpbyBUYWthaGFzaSA8Y2t0YWthaGFzaUBnbWFpbC5jb20+
-IHdyb3RlOgo+IAo+IFRoaXMgaXMgYSBwcm9ibGVtIHdpdGggRC1CdXMgdmVyc2lvbi4KPiBUaGUg
-ZnVuY3Rpb24gZGJ1c19idXNfYWNxdWlyZV9zZXJ2aWNlIGJlbG9uZ3MgdG8gRC1CdXMgdmVyc2lv
-biA8IDAuMzAuCj4gSXQgd2FzIHJlcGxhY2VkIGJ5IGRidXNfYnVzX3JlcXVlc3RfbmFtZS4KPiAK
-PiBDaGVjayBpZiB5b3VyICIuL2NvbmZpZ3VyZSIgaXMgZ2V0dGluZyB0aGUgRC1CdXMgdmVyc2lv
-biBwcm9wZXJseS4KPiAKPiAKPiBSZWdhcmRzLAo+IENsYXVkaW8KPiAKPiAKPiBPbiA3LzgvMDUs
-IEpvaG4gSC4gPG1pc3RhbWFpbGFAeWFob28uY29tPiB3cm90ZToKPiA+IG1ha2UKPiA+IGNjIC1P
-MyAtTzIgLWcgYHBrZy1jb25maWcgLS1jZmxhZ3MgZ3RrKy0yLjAKPiA+IGxpYmdsYWRlLTIuMCBk
-YnVzLWdsaWItMSBnY29uZi0yLjBgCj4gPiAtREdUS19ESVNBQkxFX0RFUFJFQ0FURUQgLUREQlVT
-X0FQSV9TVUJKRUNUX1RPX0NIQU5HRQo+ID4gLVdhbGwgLU9zIC1mb21pdC1mcmFtZS1wb2ludGVy
-IC1EUEFDS0FHRT1cImJsdWV6LXBpblwiCj4gPiAtRFBSRUZJWD1cIi91c3IvbG9jYWxcIgo+ID4g
-LURQQUNLQUdFX0xPQ0FMRV9ESVI9XCIvdXNyL2xvY2FsL3NoYXJlL2xvY2FsZVwiIC1jCj4gPiBt
-YWluLmMgLW8gbWFpbi5vCj4gPiBtYWluLmM6IEluIGZ1bmN0aW9uICdoYW5kbGVyX2Z1bmMnOgo+
-ID4gbWFpbi5jOjUwOiBlcnJvcjoKPiA+ICdEQlVTX0lOVEVSRkFDRV9PUkdfRlJFRURFU0tUT1Bf
-TE9DQUwnIHVuZGVjbGFyZWQKPiA+IChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKPiA+IG1h
-aW4uYzo1MDogZXJyb3I6IChFYWNoIHVuZGVjbGFyZWQgaWRlbnRpZmllciBpcwo+ID4gcmVwb3J0
-ZWQgb25seSBvbmNlCj4gPiBtYWluLmM6NTA6IGVycm9yOiBmb3IgZWFjaCBmdW5jdGlvbiBpdCBh
-cHBlYXJzIGluLikKPiA+IG1haW4uYzogSW4gZnVuY3Rpb24gJ2JsdWV6X3Bpbl9kYnVzX3NlcnZl
-cl9ydW4nOgo+ID4gbWFpbi5jOjg3OiB3YXJuaW5nOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBm
-dW5jdGlvbgo+ID4gJ2RidXNfYnVzX2FjcXVpcmVfc2VydmljZScKPiA+IG1ha2U6ICoqKiBbbWFp
-bi5vXSBFcnJvciAxCj4gPgo+ID4KPiA+Cj4gPgo+ID4gX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+ID4gU2VsbCBvbiBZYWhvbyEgQXVjdGlvbnMg
-liBubyBmZWVzLiBCaWQgb24gZ3JlYXQgaXRlbXMuCj4gPiBodHRwOi8vYXVjdGlvbnMueWFob28u
-Y29tLwo+ID4KPiA+Cj4gPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tCj4gPiBUaGlzIFNGLk5ldCA8aHR0cDovL1NGLk5ldD4gZW1haWwgaXMg
-c3BvbnNvcmVkIGJ5IHRoZSAnRG8gTW9yZSBXaXRoIAo+IER1YWwhJyB3ZWJpbmFyIGhhcHBlbmlu
-Zwo+ID4gSnVseSAxNCBhdCA4YW0gUERULzExYW0gRURULiBXZSBpbnZpdGUgeW91IHRvIGV4cGxv
-cmUgdGhlIGxhdGVzdCBpbiBkdWFsCj4gPiBjb3JlIGFuZCBkdWFsIGdyYXBoaWNzIHRlY2hub2xv
-Z3kgYXQgdGhpcyBmcmVlIG9uZSBob3VyIGV2ZW50IGhvc3RlZCBieSAKPiBIUCwKPiA+IEFNRCwg
-YW5kIE5WSURJQS4gVG8gcmVnaXN0ZXIgdmlzaXQgaHR0cDovL3d3dy5ocC5jb20vZ28vZHVhbHdl
-YmluYXIKPiA+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Cj4gPiBCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKPiA+IEJsdWV6LXVzZXJzQGxpc3RzLnNvdXJj
-ZWZvcmdlLm5ldAo+ID4gaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGlu
-Zm8vYmx1ZXotdXNlcnMKPiA+Cj4K
-------=_Part_1262_28193362.1121452648677
-Content-Type: text/html; charset=WINDOWS-1252
-Content-Transfer-Encoding: base64
+use this rpm for fc4.
+kdebluetooth-devel-0.0-0.1.20050110.kde
+kdebluetooth-0.0-0.1.20050110.kde
+
+
+
+On 7/15/05, Timothy Murphy <tim@birdsnest.maths.tcd.ie> wrote:
+>=20
+> Has anyone managed to use (or even install)
+> kdebluetooth under Fedora-4?
+>=20
+> There don't seem to be any RPMs that work,
+> and it's not clear where to get the source,
+> as they seem to have given up using CVS.
+>=20
+> --
+> Timothy Murphy
+> e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie<http://birdsnest.math=
+s.tcd.ie>
+> tel: +353-86-2336090, +353-1-2842366
+> s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
+>=20
+>=20
+> -------------------------------------------------------
+> SF.Net <http://SF.Net> email is sponsored by: Discover Easy Linux=20
+> Migration Strategies
+> from IBM. Find simple to follow Roadmaps, straightforward articles,
+> informative Webcasts and more! Get everything you need to get up to
+> speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dclic=
+k
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+------=_Part_1258_21493973.1121452488527
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Ymx1ZXotcGluIGhhcyBubyBjb25maWd1cmUgc2NyaXB0LiZuYnNwOyBhdCBsZWFzdCwgbm90IGlu
-IHJvb3QgZGlyLjxicj48YnI+PGRpdj48c3BhbiBjbGFzcz0iZ21haWxfcXVvdGUiPk9uIDcvMTEv
-MDUsIDxiIGNsYXNzPSJnbWFpbF9zZW5kZXJuYW1lIj5DbGF1ZGlvIFRha2FoYXNpPC9iPiAmbHQ7
-PGEgaHJlZj0ibWFpbHRvOmNrdGFrYWhhc2lAZ21haWwuY29tIj5ja3Rha2FoYXNpQGdtYWlsLmNv
-bQo8L2E+Jmd0OyB3cm90ZTo8L3NwYW4+PGJsb2NrcXVvdGUgY2xhc3M9ImdtYWlsX3F1b3RlIiBz
-dHlsZT0iYm9yZGVyLWxlZnQ6IDFweCBzb2xpZCByZ2IoMjA0LCAyMDQsIDIwNCk7IG1hcmdpbjog
-MHB0IDBwdCAwcHQgMC44ZXg7IHBhZGRpbmctbGVmdDogMWV4OyI+VGhpcyBpcyBhIHByb2JsZW0g
-d2l0aCBELUJ1cyB2ZXJzaW9uLjxicj5UaGUgZnVuY3Rpb24gZGJ1c19idXNfYWNxdWlyZV9zZXJ2
-aWNlIGJlbG9uZ3MgdG8gRC1CdXMgdmVyc2lvbiAmbHQ7IAowLjMwLjxicj5JdCB3YXMgcmVwbGFj
-ZWQgYnkgZGJ1c19idXNfcmVxdWVzdF9uYW1lLjxicj48YnI+Q2hlY2sgaWYgeW91ciAmcXVvdDsu
-L2NvbmZpZ3VyZSZxdW90OyBpcyBnZXR0aW5nIHRoZSBELUJ1cyB2ZXJzaW9uIHByb3Blcmx5Ljxi
-cj48YnI+PGJyPlJlZ2FyZHMsPGJyPkNsYXVkaW88YnI+PGJyPjxicj5PbiA3LzgvMDUsIEpvaG4g
-SC4gJmx0OzxhIGhyZWY9Im1haWx0bzptaXN0YW1haWxhQHlhaG9vLmNvbSI+Cm1pc3RhbWFpbGFA
-eWFob28uY29tPC9hPiZndDsgd3JvdGU6PGJyPiZndDsmbmJzcDsmbmJzcDttYWtlPGJyPiZndDsg
-Y2MgLU8zIC1PMiAtZyBgcGtnLWNvbmZpZyAtLWNmbGFncyBndGsrLTIuMDxicj4mZ3Q7IGxpYmds
-YWRlLTIuMCBkYnVzLWdsaWItMSBnY29uZi0yLjBgPGJyPiZndDsgLURHVEtfRElTQUJMRV9ERVBS
-RUNBVEVEIC1EREJVU19BUElfU1VCSkVDVF9UT19DSEFOR0U8YnI+Jmd0OyAtV2FsbCAtT3MgLWZv
-bWl0LWZyYW1lLXBvaW50ZXIgLURQQUNLQUdFPVwmcXVvdDtibHVlei1waW5cJnF1b3Q7Cjxicj4m
-Z3Q7IC1EUFJFRklYPVwmcXVvdDsvdXNyL2xvY2FsXCZxdW90Ozxicj4mZ3Q7IC1EUEFDS0FHRV9M
-T0NBTEVfRElSPVwmcXVvdDsvdXNyL2xvY2FsL3NoYXJlL2xvY2FsZVwmcXVvdDsmbmJzcDsmbmJz
-cDsgLWM8YnI+Jmd0OyBtYWluLmMgLW8gbWFpbi5vPGJyPiZndDsgbWFpbi5jOiBJbiBmdW5jdGlv
-biAnaGFuZGxlcl9mdW5jJzo8YnI+Jmd0OyBtYWluLmM6NTA6IGVycm9yOjxicj4mZ3Q7ICdEQlVT
-X0lOVEVSRkFDRV9PUkdfRlJFRURFU0tUT1BfTE9DQUwnIHVuZGVjbGFyZWQKPGJyPiZndDsgKGZp
-cnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKTxicj4mZ3Q7IG1haW4uYzo1MDogZXJyb3I6IChFYWNo
-IHVuZGVjbGFyZWQgaWRlbnRpZmllciBpczxicj4mZ3Q7IHJlcG9ydGVkIG9ubHkgb25jZTxicj4m
-Z3Q7IG1haW4uYzo1MDogZXJyb3I6IGZvciBlYWNoIGZ1bmN0aW9uIGl0IGFwcGVhcnMgaW4uKTxi
-cj4mZ3Q7IG1haW4uYzogSW4gZnVuY3Rpb24gJ2JsdWV6X3Bpbl9kYnVzX3NlcnZlcl9ydW4nOgo8
-YnI+Jmd0OyBtYWluLmM6ODc6IHdhcm5pbmc6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0
-aW9uPGJyPiZndDsgJ2RidXNfYnVzX2FjcXVpcmVfc2VydmljZSc8YnI+Jmd0OyBtYWtlOiAqKiog
-W21haW4ub10gRXJyb3IgMTxicj4mZ3Q7PGJyPiZndDs8YnI+Jmd0Ozxicj4mZ3Q7PGJyPiZndDsg
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo8YnI+
-Jmd0OyBTZWxsIG9uIFlhaG9vISBBdWN0aW9ucyCWIG5vIGZlZXMuIEJpZCBvbiBncmVhdCBpdGVt
-cy48YnI+Jmd0OyA8YSBocmVmPSJodHRwOi8vYXVjdGlvbnMueWFob28uY29tLyI+aHR0cDovL2F1
-Y3Rpb25zLnlhaG9vLmNvbS88L2E+PGJyPiZndDs8YnI+Jmd0Ozxicj4mZ3Q7IC0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS08YnI+CiZndDsgVGhp
-cyA8YSBocmVmPSJodHRwOi8vU0YuTmV0Ij5TRi5OZXQ8L2E+IGVtYWlsIGlzIHNwb25zb3JlZCBi
-eSB0aGUgJ0RvIE1vcmUgV2l0aCBEdWFsIScgd2ViaW5hciBoYXBwZW5pbmc8YnI+Jmd0OyBKdWx5
-IDE0IGF0IDhhbSBQRFQvMTFhbSBFRFQuIFdlIGludml0ZSB5b3UgdG8gZXhwbG9yZSB0aGUgbGF0
-ZXN0IGluIGR1YWw8YnI+Jmd0OyBjb3JlIGFuZCBkdWFsIGdyYXBoaWNzIHRlY2hub2xvZ3kgYXQg
-dGhpcyBmcmVlIG9uZSBob3VyIGV2ZW50IGhvc3RlZCBieSBIUCwKPGJyPiZndDsgQU1ELCBhbmQg
-TlZJRElBLiZuYnNwOyZuYnNwO1RvIHJlZ2lzdGVyIHZpc2l0IDxhIGhyZWY9Imh0dHA6Ly93d3cu
-aHAuY29tL2dvL2R1YWx3ZWJpbmFyIj5odHRwOi8vd3d3LmhwLmNvbS9nby9kdWFsd2ViaW5hcjwv
-YT48YnI+Jmd0OyBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Xzxicj4mZ3Q7IEJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdDxicj4mZ3Q7IAo8YSBocmVmPSJtYWls
-dG86Qmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Ij5CbHVlei11c2Vyc0BsaXN0cy5z
-b3VyY2Vmb3JnZS5uZXQ8L2E+PGJyPiZndDsgPGEgaHJlZj0iaHR0cHM6Ly9saXN0cy5zb3VyY2Vm
-b3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMiPmh0dHBzOi8vbGlzdHMuc291cmNl
-Zm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzPC9hPgo8YnI+Jmd0Ozxicj48L2Js
-b2NrcXVvdGU+PC9kaXY+PGJyPgo=
-------=_Part_1262_28193362.1121452648677--
+use this rpm for fc4.<br>
+kdebluetooth-devel-0.0-0.1.20050110.kde<br>
+kdebluetooth-0.0-0.1.20050110.kde<br>
+<br>
+<br><br><div><span class=3D"gmail_quote">On 7/15/05, <b class=3D"gmail_send=
+ername">Timothy Murphy</b> &lt;<a href=3D"mailto:tim@birdsnest.maths.tcd.ie=
+">tim@birdsnest.maths.tcd.ie</a>&gt; wrote:</span><blockquote class=3D"gmai=
+l_quote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0p=
+t 0pt 0.8ex; padding-left: 1ex;">
+Has anyone managed to use (or even install)<br>kdebluetooth under Fedora-4?=
+<br><br>There don't seem to be any RPMs that work,<br>and it's not clear wh=
+ere to get the source,<br>as they seem to have given up using CVS.<br><br>
+--<br>Timothy Murphy<br>e-mail (&lt;80k only): tim /at/ <a href=3D"http://b=
+irdsnest.maths.tcd.ie">birdsnest.maths.tcd.ie</a><br>tel: +353-86-2336090, =
++353-1-2842366<br>s-mail: School of Mathematics, Trinity College, Dublin 2,=
+ Ireland
+<br><br><br>-------------------------------------------------------<br><a h=
+ref=3D"http://SF.Net">SF.Net</a> email is sponsored by: Discover Easy Linux=
+ Migration Strategies<br>from IBM. Find simple to follow Roadmaps, straight=
+forward articles,
+<br>informative Webcasts and more! Get everything you need to get up to<br>=
+speed, fast. <a href=3D"http://ads.osdn.com/?ad_id=3D7477&amp;alloc_id=3D16=
+492&amp;op=3Dclick">http://ads.osdn.com/?ad_id=3D7477&amp;alloc_id=3D16492&=
+amp;op=3Dclick
+</a><br>_______________________________________________<br>Bluez-users mail=
+ing list<br><a href=3D"mailto:Bluez-users@lists.sourceforge.net">Bluez-user=
+s@lists.sourceforge.net</a><br><a href=3D"https://lists.sourceforge.net/lis=
+ts/listinfo/bluez-users">
+https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquot=
+e></div><br>
+
+------=_Part_1258_21493973.1121452488527--
 
 
 -------------------------------------------------------
