@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Message-ID: <42D797AF.40405@cefriel.it>
+From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200507151349.08373.tim@birdsnest.maths.tcd.ie>
-Subject: [Bluez-users] kde-bluetooth
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Pairing problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,20 +16,57 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 15 Jul 2005 13:49:08 +0100
+Date: Fri, 15 Jul 2005 13:02:07 +0200
 
-Has anyone managed to use (or even install)
-kdebluetooth under Fedora-4?
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-There don't seem to be any RPMs that work,
-and it's not clear where to get the source,
-as they seem to have given up using CVS.
+Hi to hall.
 
--- 
-Timothy Murphy  
-e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
-tel: +353-86-2336090, +353-1-2842366
-s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
+I'm using a Slackware Linux box with Linux 2.6.12 and Bluez patch.
+I'm using the latest 2.18 Bluez libs and utils.
+I want to develop a hands-free phone profile with BlueZ stack.
+
+I create a RFCOMM interface with the command
+
+> rfcomm bind 0 00:00:00:00:00:00 1
+
+with the right baddr.
+After that, I try to send an AT command:
+
+> echo ATA > /dev/rfcomm0
+
+Then, the phone claim a pin to establish a connection.
+My pin_helper application is:
+
+#!/bin/bash
+echo "PIN:0000"
+
+so, I enter a 0000 PIN, but the phone tell me the PIN is wrong.
+
+Maybe I've a misconfigured pin-helper application?
+
+Thx in advance!
+
+Cheers,
+Pizza
+
+- -------------------------------------------
+Luca Pizzamiglio
+CEFRIEL - Embedded Systems Design Unit
+Via Fucini, 2 - 20133 MILANO (ITALY)
+Phone:		+39 02 23954 343
+e-mail:		pizzamiglio@cefriel.it
+ICQ:		5046978
+- -------------------------------------------
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.7 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFC15evAoUy56ORfbERAqcRAJ91u38moNHzINY8E4OZtVPo7YULfwCfXMUY
+7bpb8yusRHGhMg+7px4Rt7g=
+=CZc4
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
