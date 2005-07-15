@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec0507151026188541a8@mail.gmail.com>
-From: Albert Huang <ashuang@gmail.com>
+Message-ID: <6951a38b05071509167d6c66f@mail.gmail.com>
+From: Nuno Gomes <nunomiguelgomes@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] setting inquiry mode
-In-Reply-To: <6951a38b05071509167d6c66f@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-References: <6951a38b05071509167d6c66f@mail.gmail.com>
+Subject: [Bluez-devel] setting inquiry mode
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,22 +16,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 15 Jul 2005 13:26:13 -0400
+Date: Fri, 15 Jul 2005 17:16:34 +0100
 
-This is not possible.  An inquiring device doesn't transmit its
-address or name during an inquiry, and the specification does not
-provide any events that fire when responding to an inquiry.
+Hello
 
--albert
+My name is Nuno Gomes anda i'm writting from Portugal.
 
-> My question is: how can I set a inquiry mode on my bluetooth dongle so
-> my central application just responds to the inquirys made by the
-> bluetooth devices and in the same time get the information from the
-> devices.
->=20
-> I know that if I do the inquiry I can get all the information from the
-> devices, but I need to just respond to the inquirys because of energy
-> issues.
+I=B4m trying to develop a program to control several bluetooth devices
+from a central pc.
+
+My question is: how can I set a inquiry mode on my bluetooth dongle so
+my central application just responds to the inquirys made by the
+bluetooth devices and in the same time get the information from the
+devices.
+
+I know that if I do the inquiry I can get all the information from the
+devices, but I need to just respond to the inquirys because of energy
+issues.
+
+thank you very much!!
+
+--=20
+Nuno Miguel Gomes
+Has just sent you an E-mail!!!
 
 
 -------------------------------------------------------
