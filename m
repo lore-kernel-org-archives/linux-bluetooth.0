@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Douglas Russell <puggy@gentoo.org>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] kde-bluetooth
-References: <200507151349.08373.tim@birdsnest.maths.tcd.ie>
-In-Reply-To: <200507151349.08373.tim@birdsnest.maths.tcd.ie>
+From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200507151407.54364.puggy@gentoo.org>
+  charset="us-ascii"
+Message-Id: <200507151349.08373.tim@birdsnest.maths.tcd.ie>
+Subject: [Bluez-users] kde-bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,24 +17,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 15 Jul 2005 14:07:54 +0100
+Date: Fri, 15 Jul 2005 13:49:08 +0100
 
-You can get the source here: http://dev.gentoo.org/~motaboy/files/
+Has anyone managed to use (or even install)
+kdebluetooth under Fedora-4?
 
-I don't know what they are up to with CVS as I just use the gentoo ebuilds, 
-but if you are having trouble, I know you can get the source from there. I 
-think it's probably a cvs snapshot and the 0.99-beta1 has worked well for me 
-for some months.
+There don't seem to be any RPMs that work,
+and it's not clear where to get the source,
+as they seem to have given up using CVS.
 
-Puggy
-
-On Friday 15 Jul 2005 13:49, Timothy Murphy wrote:
-> Has anyone managed to use (or even install)
-> kdebluetooth under Fedora-4?
->
-> There don't seem to be any RPMs that work,
-> and it's not clear where to get the source,
-> as they seem to have given up using CVS.
+-- 
+Timothy Murphy  
+e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
+tel: +353-86-2336090, +353-1-2842366
+s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
 
 
 -------------------------------------------------------
