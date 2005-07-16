@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] read data from one device to another over rfcomm
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20b987f5050716121359298b52@mail.gmail.com>
+From: Dirk Vanden Boer <dirk.vdb@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050714093139.3323.qmail@web52814.mail.yahoo.com>
-References: <20050714093139.3323.qmail@web52814.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1121606894.22662.1.camel@pegasus>
+Subject: Re: [Bluez-devel] At commands not available
+In-Reply-To: <Pine.LNX.4.33.0507162023200.4834-100000@redbean.intranet.gw-instruments.de>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <20b987f505071611066dd13083@mail.gmail.com>
+	 <Pine.LNX.4.33.0507162023200.4834-100000@redbean.intranet.gw-instruments.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,124 +19,117 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 17 Jul 2005 15:28:14 +0200
+Date: Sat, 16 Jul 2005 21:13:04 +0200
 
-Hi Naved,
+I believe DUN is channel 1, to be sure I tried every channel, nothing
+seems to work
 
-> I am developing some applications using BlueZ.  The
-> developer board is Axis Developer 82+.  
-> 
-> The following is the code for one of the functions. 
-> Basically, there are two axis boards, one is acting as
-> a server, the other, a client.  Upon establising a
-> connection with the server, the client receives a menu
-> that shows the actions it can take: run a command on
-> the other server, receive a file from the server, send
-> a file to the server.
-> 
-> This is the code for the client after connecting to
-> the server:
-> 
-> 	while (1)
-> 	  {	    
-> 	    memset (optn_buff, 0, 3 );
-> 	    
->             printf ("What do you want to do (type in
-> the option number)?  Press CTRL-C for hang-up\n");
->             printf ("\t(1) Run a command\n");
-> 	    printf ("\t(2) Transfer a file from here to
-> there\n");
-> 	    printf ("\t(3) Transfer a file from there to
-> here\n");
-> 	    
-> 	    gets(optn);                                // get
-> option
-> 	    
-> 	    optn_int = atoi(optn);
-> 	    
-> 	    if (optn_int < 1 || optn_int > 3)
-> 	      {
-> 	        printf ("Choose the option that's
-> given\n\n");
-> 		continue;
-> 	      }
-> 	      
-> 	    optn_str = sprintf(optn_buff, "%d", optn_int);   
->       // convert optn to string 
-> 	    chk_write = write (sk, optn_buff, optn_str);     
->   // send optn to server
-> 	    
-> 	    switch (optn_int)
-> 	      {
-> 	        case 1:
-> 		  rcmdc (sk);                                   //
-> run command on server
-> 		  break;
-> 		case 2:
-> 		  snd (sk);                                     //
-> send file from here
-> 		  break;
-> 		case 3:
-> 		  rec (sk);                                     //
-> receive file from there
-> 		  break;    
-> 	      }
-> 	  }  
-> 
-> optn_buff is an array of unsigned char type, of size
-> 3.  It sends the choice made by the client to the
-> server.
-> 
-> The following is the code from the server:
-> 
-> 	while (1)
-> 	  {	    
-> 	    memset (optn_buff, 0, 3 );
-> 	    
-> 	    chk_read = read (sk, optn_buff, 1);	             
->  // read option chosen by the client
-> 	    optn = atoi(optn_buff);                          
->  // convert buffer data to int    
-> 	    
-> 	    switch (optn)
-> 	      {
-> 	        case 1:
-> 		  rcmds (sk);                                   //
-> run command on server
-> 		  break;
-> 		case 2:
-> 		  rec (sk);                                     //
-> receive file 
-> 		  break;
-> 		case 3:
-> 		  snd (sk);                                     //
-> send file 
-> 		  break;    
-> 	      }
-> 	   }  	
-> 
-> After connection is made, the server waits to receive 
-> the instruction to be executed as requested by the
-> client.  
-> 
-> The problem I am facing is with the read statements:  
->  The devices do not read what's being sent to them. 
-> The queer thing is, if I use the same code to connect
-> and play with a phone, the read statements execute.  I
-> have been able to send and receive data (using read
-> and write as above) with a number of phones.  So, the
-> boards can't read when they are being written to, but
-> the phones can read when they're being written to.
+Dirk
 
-you must have a bug somewhere, because the RFCOMM is a real duplex
-stream and it is working perfect. Do you use the latest kernel? Do you
-checked with "hcidump -X -V" what happens on each side?
-
-Regards
-
-Marcel
-
-
+On 7/16/05, Peter Wippich <pewi@gw-instruments.de> wrote:
+>=20
+> Try DUN. But maybe the CBC command is only available on the physical port=
+.
+>=20
+> Ciao,
+>=20
+> Peter
+>=20
+>=20
+> On Sat, 16 Jul 2005, Dirk Vanden Boer wrote:
+>=20
+> > Thanks for pointing me to that. I was connecting to channel 4 (heaset
+> > service) which was wrong, I think I should be connecting to the serial
+> > port service (channel 1). But the CBC command is still not available.
+> > In fact the available commands listed with AT* are the same for
+> > channel 1 and 4.
+> >
+> > Dirk
+> >
+> >
+> > On 7/16/05, Peter Wippich <pewi@gw-instruments.de> wrote:
+> > >
+> > > Hi Dirk,
+> > >
+> > > which service you are connecting to ??? If you connect to the wrong
+> > > service (channel) the phone may (shall !) only make available the AT
+> > > commands belonging to this service.
+> > >
+> > > Ciao,
+> > >
+> > > Peter
+> > >
+> > >
+> > > On Sat, 16 Jul 2005, Dirk Vanden Boer wrote:
+> > >
+> > > > On 7/16/05, Fred Schaettgen <bluez-devel@schaettgen.de> wrote:
+> > > > > On Saturday, 16. July 2005 18:32, Dirk Vanden Boer wrote:
+> > > > > > Hi,
+> > > > > > I'm trying to send AT commands to my mobile phone using an rfco=
+mm
+> > > > > > connection. The connection seems to work because I can exectute=
+ some
+> > > > > > commands (like manufacturer name). But a whole bunch of command=
+s are
+> > > > > > not available (eg. battery charge: "AT+CBC\r" returns ERROR). I=
+ can
+> > > > > > run the AT* command which lists the available commands but a lo=
+t of
+> > > > > > common commands are not in the list. Could it be that there is
+> > > > > > something wrong with my connection?
+> > > > >
+> > > > > Are you sure that this command should be supported at all? If you=
+ are
+> > > > > connecting to the handsfree service, then the phone probably does=
+ not have to
+> > > > > support it. At least I can't find +CBC in the handsfree spec. Pho=
+nes are free
+> > > > > to support additional commands though, or at least they do suppor=
+t more in
+> > > > > practice. It works with a Nokia 6230 for instance, without any sp=
+ecial
+> > > > > initialization.
+> > > > >
+> > > > > Fred
+> > > >
+> > > > The CBC command is listed in the developers guidelines document of =
+the
+> > > > ericsson t68 phone, so I guess it should be available.
+> > > >
+> > > > Dirk
+> > > >
+> > > >
+> >
+> >
+> > -------------------------------------------------------
+> > SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+> > from IBM. Find simple to follow Roadmaps, straightforward articles,
+> > informative Webcasts and more! Get everything you need to get up to
+> > speed, fast. http://ads.osdn.com/?ad_idt77&alloc_id=16492&op=CCk
+> > _______________________________________________
+> > Bluez-devel mailing list
+> > Bluez-devel@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> >
+>=20
+> |       Peter Wippich                   Voice: +49 30 46776411          |
+> |       G&W Instruments GmbH            fax:   +49 30 46776419          |
+> |       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+> |       D-13355 Berlin  / Germany                                       |
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+> from IBM. Find simple to follow Roadmaps, straightforward articles,
+> informative Webcasts and more! Get everything you need to get up to
+> speed, fast. http://ads.osdn.com/?ad_idt77&alloc_id=16492&opclick
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 
 -------------------------------------------------------
