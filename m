@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] how to transmit hexadecimal data and voice?
+Subject: Re: [Bluez-users] can't open hcid socket
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050715064552.34058.qmail@web15701.mail.cnb.yahoo.com>
-References: <20050715064552.34058.qmail@web15701.mail.cnb.yahoo.com>
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1121607163.22662.9.camel@pegasus>
+In-Reply-To: <20050714155156.16265.qmail@web33507.mail.mud.yahoo.com>
+References: <20050714155156.16265.qmail@web33507.mail.mud.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1121607080.22662.6.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,35 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 17 Jul 2005 15:32:43 +0200
+Date: Sun, 17 Jul 2005 15:31:20 +0200
 
-Hi,
+Hi Vinod,
 
+> I am trying to send create a bluetooth connection
+> between my ipaq 3870 running familiar v0.8.2,GPE,
+> (2.4.19 .. hh37) and a desktop with usb dongle.
+> 
+> I was following a link
+> http://opie.handhelds.org/cgi-bin/moin.cgi/BluetoothGprs
+> 
+> But i ran into trouble,
+> 
+> #/etc/init.d/bluetooth start
+> 
+> i got
+> 
+> Starting Bluetooth subsystem: hcid sdpdCan't open HIDP
+> control socket: Invalid argument
+>  hidd rfcomm.
 
-> I use two CSR(Bluecore2) modlues on two arm platforms respectively .
-> And now,I can create ACL and SCO connection=EF=BC=8Cboth l2test and sco=
-test
-> run well.Even,I can transmit files using the program obex_test.
-> But still,
-> 1>I don't know how to transmit acl data such as hexadecimal data. Can
-> I use "hcitool cmd"??If I can,what is the hci command?
-
-use the L2CAP or RFCOMM interfaces for data transmission.
-
-> 2>I just want to transmit voice data through bluetooth modules so that
-> I can talk with others using microphone.And I connected a MC145483
-> Codes throught PCM interface yesterady.But I have no idea about how to
-> do now.which profile should I use? sdptool add Headset?I think it's
-> not the right one! And if I add the right profile,what should I do
-> next?? Maybe some tools just like btsco?
-
-The scotest program shows on how to create SCO only connections.
+this means that the hidp kernel module is missing.
 
 Regards
 
 Marcel
 
->=20
 
 
 
