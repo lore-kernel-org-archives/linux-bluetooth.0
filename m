@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050718075432.27262.qmail@web15702.mail.cnb.yahoo.com>
-From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
-To: bluez users <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=gb2312
-Subject: [Bluez-users] Re:how to transmit hexadecimal data and voice?
+Subject: Re: [Bluez-users] Debian unstable updated
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1121523914.11479.62.camel@saag.bunker.heddley.com>
+References: <1121523914.11479.62.camel@saag.bunker.heddley.com>
+Content-Type: text/plain
+Message-Id: <1121608013.22662.26.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,75 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 18 Jul 2005 15:54:32 +0800 (CST)
+Date: Sun, 17 Jul 2005 15:46:53 +0200
 
-Hi,
-Thanks Marcel for your reply! And I have solved the
-first problem,I created a rfcomm connection,and sent
-data sucessfully! Thanks again!
+Hi Edd,
 
-However,I am still puzzled with then second
-problem.What I did is as follows:
-on platform A: 
-$ rfcomm listen 0 1
-Waiting for connection on channel 1
+> I refreshed Debian unstable today with all the latest BlueZ packages.
 
-on platform B: 
-$ hsmicro 4A:49:4E:00:15:2F 1
--t: No such file or directory
-Voice setting: 0x0060
-RFCOMM channel connected
-SCO audio channel connected (handle 44, mtu 64)
-R
-I
-N
-G
-                                                      
-                                                      
-                                                      
-                                                 
-                                                      
-                                                      
-O
-                                                      
-                                                      
-K
-                                                      
-                                                      
- 
-O
-K
-                                                      
-                                                      
- 
-                                                      
-                                                      
- ....
-
-Then ,I inserted a microphone into the MC145483 Codec
-on platform B and spoken,but on platform A there was
-no response from the Code's speaker! 
-Please correct me if i"m wrong. Do I need to add some
-services such as HS,HF,A2SRC and A2SNK?
-Or maybe there is something wrong on the connection
-between Bluetooth module's PCM interface and the
-Motoral MC145483 Codec?
-
-I am really confused now!
+this is great. Thank you.
 
 Regards
 
-gadfly
+Marcel
 
-
-
-	
-
-	
-		
-___________________________________________________________ 
-—≈ª¢√‚∑—G” œ‰£≠÷–π˙µ⁄“ªæ¯Œﬁ¿¨ª¯” º˛…ß»≈≥¨¥Û” œ‰
-http://cn.mail.yahoo.com/?id=77071
 
 
 
