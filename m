@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] usb/sco problems
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.53.0507180927480.6913@antilope>
-References: <20050717145709.GI3613@stusta.de>
-	 <1121615883.22662.38.camel@pegasus> <20050717225345.GI3753@stusta.de>
-	 <Pine.LNX.4.53.0507180927480.6913@antilope>
-Content-Type: text/plain
-Message-Id: <1121677562.22662.63.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20050718085659.20030.qmail@web15704.mail.cnb.yahoo.com>
+From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
+To: bluez-devel <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=gb2312
+Subject: [Bluez-devel] How can I talk with others through bluetooth modules?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,45 +16,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 18 Jul 2005 11:06:02 +0200
+Date: Mon, 18 Jul 2005 16:56:59 +0800 (CST)
 
-Hi Victor,
+Hi,
+My case is as follows:
+I use two CSR(Bluecore2) modlues on two arm platforms
+respectively . And now,I can create ACL and SCO
+connection,both l2test and scotest run well.Even,I can
+transmit files using the program obex_test.
+I just want to transmit voice data through bluetooth
+modules so that I can talk with others using
+microphone.And I connected a C145483 Codec throught
+PCM interface yesterady.But I have no idea about how
+to do now.which profile should I use? sdptool add
+Headset?I think it"s not the right one! The hardware
+is just bluetooth module,not headset! And if I add the
+right profile,what should I do next?? Maybe some tools
+just like btsco?
+ 
+ [\u@\h \W]\$ hciconfig hci0 version revision
+ hci0:   Type: UART
+         BD Address: 4A:49:4E:00:15:2D ACL MTU: 384:4
+SCO MTU: 64:8
+         HCI Ver: 1.1 (0x1) HCI Rev: 0x2c1 LMP Ver:
+1.1 (0x1) LMP Subver: 0x2c1
+         Manufacturer: Cambridge Silicon Radio (10)
+         Build 705
+         Chip version: BlueCore02-External
+         Max key size: 56 bit
+         SCO mapping:  PCM
 
-> I have a small app which routes back sco data received from a 
-> headset, so basically you supposed to hear yourself back in the headset. 
-> It works fine with the voice setting 0x0060, but when I switch to u-law 
-> 0x014c sound is starting to break out, if I run the program on arm using 
-> uart it works fine for both of the settings.
->  
-> Using hcidump shows a regular pattern of sco receives/sends (normally like 
-> 3 packets in, 3 packets out, which is probably the result of usb buffering 
-> for incoming packets), but if I look at the output of an air-sniffer, I 
-> see that the data sent back to the headset has very 
-> irregular time pattern (a lot of transmissions are missing), while the 
-> time pattern of incoming data from the headset is ok.
-> So it looks like something goes wrong after the sco data is supplied to 
-> the hci_usb. I have this problems with 2 dongles I have (BC4 and 
-> Broadcom built-in in my laptop), so does not look as a dongle problem. Any 
-> idea what might be wrong?
-> 
-> Well, I also have a app which does copying data received from a phone 
-> sco to a headset sco and back (2 sco channels open and app functions as a 
-> middle agent). This app is also working for arm via UART, but not on my 
-> laptop (and home pc) via usb. The question does any1 has a successful 
-> example of having 2 sco channel open (to different devices) at the same 
-> time?
-
-for USB you need to set the correct alternate setting for the SCO ISOC
-endpoint. This should be done automaticly, but at the moment this is a
-static module parameter called "isoc". Look at the specification on how
-to calculate its value depending on the number of SCO connections and if
-they are 8-bit or 16-bit. The default value is 2, which means one SCO
-connection with 16-bit (aka voice setting 0x0060).
+Any help will always be appreciated !
 
 Regards
+gadfly
 
-Marcel
 
+	
+
+	
+		
+___________________________________________________________ 
+雅虎免费G邮箱－中国第一绝无垃圾邮件骚扰超大邮箱
+http://cn.mail.yahoo.com/?id=77071
 
 
 
