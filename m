@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: Help with bluez pairing problem!!
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <IJTXZS$9CA8D20A0536E55B00E237264563340B@libero.it>
-References: <IJTXZS$9CA8D20A0536E55B00E237264563340B@libero.it>
-Content-Type: text/plain
-Message-Id: <1121702183.22662.115.camel@pegasus>
-Mime-Version: 1.0
+Message-Id: <IJTXZS$9CA8D20A0536E55B00E237264563340B@libero.it>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+From: "andi.c@libero.it" <andi.c@libero.it>
+To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Re: Help with bluez pairing problem!!
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,21 +16,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 18 Jul 2005 17:56:23 +0200
+Date: Mon, 18 Jul 2005 17:35:52 +0200
 
-Hi Andrea,
+Thanks Marcel,
+but can you be a little more clear ? Where authenticated =
+devece are now stored (you tell me no more on link_key..)? There is a way=
+ to erese its records ?
 
-> but can you be a little more clear ? Where authenticated devece are now stored (you tell me no more on link_key..)? There is a way to erese its records ?
+thanks
 
-why don't you search the mailing list archive for that answer? I also
-posted the notes about it along with announcement of the release.
-
-The new format is ASCII based and so it is easy to erase a link key.
-
-Regards
-
-Marcel
-
+Andrea =0A=0A=0A=0A_________________=
+___________________________________________=0ALibero Flat, sempre a 4 Meg=
+a a 19,95 euro al mese! =0AAbbonati subito su http://www.libero.it=0A=0A
 
 
 
