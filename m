@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42DBF631.3070307@programmingzone.net>
-From: Alessandro Giordano <gmalex@programmingzone.net>
-MIME-Version: 1.0
+Message-ID: <51461ca605071811274514728@mail.gmail.com>
+From: Arlen Nascimento <arlen.nascimento@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Blueetooth interface
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Piconet problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,20 +16,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 18 Jul 2005 20:34:25 +0200
+Date: Mon, 18 Jul 2005 15:27:18 -0300
 
-Hi,
-I need some informations about Bluetooth interface to computer.
-How can i take advantages of bluetooth technology with any programming language? Possibly...C.
-Can you indicate to me which libraries i have to use to do this?
-Which ones did you use for hcitool?
+Hi all,
 
-Regards, 
-Alessandro.
+I'm building a piconet with five slaves but i'm facing a problem (i
+followed Personal Area Network HOWTO from bluez home page).
+I just can ping (or call) the first slave added, e.g.:
+master ip: 10.0.1.1
+slaves ip from 10.0.1.2 to 10.0.1.6.
+i can ping or make calls from/to 10.0.1.1 to/from 10.0.1.2, when i try
+to ping any other slave i receive Host Unreachable message.
+Any help?
+
+Regards
 
 
-
-
+--=20
+Arlen Nascimento
 
 
 -------------------------------------------------------
