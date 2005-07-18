@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Blueetooth interface
+Subject: Re: [Bluez-users] Piconet problems
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <42DBF631.3070307@programmingzone.net>
-References: <42DBF631.3070307@programmingzone.net>
+In-Reply-To: <51461ca605071811274514728@mail.gmail.com>
+References: <51461ca605071811274514728@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1121712193.22662.133.camel@pegasus>
+Message-Id: <1121711764.22662.130.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,18 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 18 Jul 2005 20:43:13 +0200
+Date: Mon, 18 Jul 2005 20:36:04 +0200
 
-Hi Alessandro,
+Hi Arlen,
 
-> I need some informations about Bluetooth interface to computer.
-> How can i take advantages of bluetooth technology with any programming language? Possibly...C.
-> Can you indicate to me which libraries i have to use to do this?
-> Which ones did you use for hcitool?
+> I'm building a piconet with five slaves but i'm facing a problem (i
+> followed Personal Area Network HOWTO from bluez home page).
+> I just can ping (or call) the first slave added, e.g.:
+> master ip: 10.0.1.1
+> slaves ip from 10.0.1.2 to 10.0.1.6.
+> i can ping or make calls from/to 10.0.1.1 to/from 10.0.1.2, when i try
+> to ping any other slave i receive Host Unreachable message.
 
-the Bluetooth library is a C/C++ library for using Bluetooth. All tools
-are actually using this library. Look at the source of these tools and
-you find the answers on how to use the API.
+are you using a bridge on the master? If not, then do so.
 
 Regards
 
