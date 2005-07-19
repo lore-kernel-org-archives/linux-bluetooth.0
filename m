@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42DC9FBE.2050406@isofttech.com>
-From: Durai <durai@isofttech.com>
+Message-ID: <20050719031114.82492.qmail@web15710.mail.cnb.yahoo.com>
+From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
+To: bluez-devel <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] tty->flip.count  >= TTY_FLIPBUF_SIZE
+Content-Type: text/plain; charset=gb2312
+Subject: [Bluez-devel] Re: How can I talk with others through bluetooth modules?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,60 +16,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 19 Jul 2005 12:07:50 +0530
+Date: Tue, 19 Jul 2005 11:11:14 +0800 (CST)
 
-Hi all
-    Platform - linux-2.4.18 , big endian Mips CPU running on 100MHz
-    Bluetooth dongle - UART based CSR device
+Hi,Peter
+Thanks for your reply.
+ [\u@\h \W]\$ hciconfig hci0 version revision
+   hci0:   Type: UART
+           BD Address: 4A:49:4E:00:15:2D ACL MTU:
+384:4
+  SCO MTU: 64:8
+           HCI Ver: 1.1 (0x1) HCI Rev: 0x2c1 LMP Ver:
+  1.1 (0x1) LMP Subver: 0x2c1
+           Manufacturer: Cambridge Silicon Radio (10)
+           Build 705
+           Chip version: BlueCore02-External
+           Max key size: 56 bit
+           SCO mapping:  PCM
+I had compiled pskey,and it could reconfigure
+scomap.But the revision says "SCO mapping:  PCM",so I
+think sco maps PCM instead of HCI,right?
+And I guess maybe there is a switch that can
+open/close the PCM interface. Then,what's that?
+Buy the way ,when I plug the microphone into the
+Codec,I get the error messages like this: 
+h4_recv:Unknown HCI packet type 00
+h4_recv:Unknown HCI packet type fc
+.....
 
-We are using a non-standard UART device, which receives the bytes and 
-put it in a buffer. We are using a timer interrupt
-to periodically poll the for the received data. When data is received, 
-it will be passed to the TTY layer using the following code.
+So,do you have any idea?
 
- /*
-     * Make sure that we do not overflow the buffer
-     */
-    if (tty->flip.count >= TTY_FLIPBUF_SIZE) {
-        printk
-            ("\n tty->flip.count %d  >= TTY_FLIPBUF_SIZE %d and dataLen %d",
-             tty->flip.count, TTY_FLIPBUF_SIZE, dataLen);
+Regards
 
-        queue_task(&tty->flip.tqueue, &tq_timer);
-       //the incoming bytes are dropped :(
-        return;
-    }
+gadfly
 
- while (i < dataLen) {
-        tty->flip.count++;
-        *tty->flip.char_buf_ptr++ = pClusPtr[i++];
-        //printk("< %c  >", pClusPtr[i-1]);
-    }
-    queue_task(&tty->flip.tqueue, &tq_timer);
-
-Everything goes fine and we are able to setup a PAN network and we are 
-able to transmit & receive files over FTP.
-But when we increase the UART baud rate to 115200 or beyond that, the 
-tty->flip.count exceeds to  TTY_FLIPBUF_SIZE.
-and  we are getting errors in the console (I have changed the 
-TTY_FLIPBUF_SIZE from 512 to 1024, but it doesnt help)
-
-tty->flip.count 1030  >= TTY_FLIPBUF_SIZE 1024 and dataLen 77
-h4_check_data_len: Data length is too large
-h4_recv: Unknown HCI packet type 75
-h4_recv: Unknown HCI packet type a2
-h4_recv: Unknown HCI packet type 22
-
-This is because, the TTY layer is unable to process the received data 
-before the next chunk of data arrives.
-So my question is, how to speed up the botton half processing in the TTY 
-layer. I know that this has got nothing
-to do with the bluez layer, but i dont know where to find more 
-information about debugging this issue. Anyone had
-faced such issues?
-
-regards
-durai
+__________________________________________________
+∏œøÏ◊¢≤·—≈ª¢≥¨¥Û»›¡ø√‚∑—” œ‰?
+http://cn.mail.yahoo.com
 
 
 -------------------------------------------------------
