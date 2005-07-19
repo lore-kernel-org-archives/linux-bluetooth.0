@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <001501c58cf3$f1fdc990$1101a8c0@w2ksn>
-From: "Stewart Nelson" <sn@scgroup.com>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="Windows-1252"
-Subject: [Bluez-users] Can CNet USB dongle work with BlueZ?
+Message-ID: <ef9938ec050719092119c727c1@mail.gmail.com>
+From: Albert Huang <ashuang@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Blueetooth interface
+In-Reply-To: <42DCC40F.20205@programmingzone.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <42DBF631.3070307@programmingzone.net>
+	 <1121712193.22662.133.camel@pegasus>
+	 <42DC171C.9040807@programmingzone.net>
+	 <ef9938ec0507182023257b341c@mail.gmail.com>
+	 <42DCC40F.20205@programmingzone.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,55 +22,138 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 19 Jul 2005 23:26:19 -0700
+Date: Tue, 19 Jul 2005 12:21:54 -0400
 
-Hi,
+BlueZ is linux only.
 
-I'm new to Bluetooth and would like to place calls on a Mot. V551
-from Asterisk, using chan_bluetooth.  Although a recent Asterisk
-is installed, the base system is Asterisk@home, running
-2.4.21-27.0.1.EL kernel.
+For windows XP, you'll need to install Service Pack 2 and look for the
+Microsoft Platform SDK.  You'll also need visual studio or some other
+compiler.  I don't know about earlier versions of windows.
 
-bluez-libs and bluez-utils compiled and installed with no
-apparent error, but:
+-albert
 
-# hciconfig
-Can't open HCI socket.: Address family not supported by protocol
-
-dmesg shows (partial):
-hub.c: new USB device 00:07.2-1, assigned address 2
-usb.c: USB device 2 (vend/prod 0xc10/0x0) is not claimed by any active driver.
-
-lsusb -v shows (partial):
-Bus 001 Device 002: ID 0c10:0000
-Device Descriptor:
-  bLength                18
-  bDescriptorType         1
-  bcdUSB               1.10
-  bDeviceClass          224
-  bDeviceSubClass         1
-  bDeviceProtocol         1
-  bMaxPacketSize0        64
-  idVendor           0x0c10
-  idProduct          0x0000
-  bcdDevice           15.00
-  iManufacturer           1 SiW
-  iProduct                2 SiW
-
-Pardon my ignorance, but is the "not claimed" error caused by the device
-being unsupported, or do I need to somehow enable the driver(s)?
-(The dongle can talk to the phone ok under Win XP.)
-
-If the former, is there some way to force a driver association, to see
-if it will work?
-
-If this dongle is not suitable, what do you recommend for such an
-application?
-
-Thanks,
-
-Stewart
-
+On 7/19/05, Alessandro Giordano <gmalex@programmingzone.net> wrote:
+> Thank you so much.....
+> however, do you know if is possible to use these libraries on Windows?
+> If not, do you know others libraries which i can use to do it on Win?
+>=20
+> Regards,
+> Alessandro.
+>=20
+> Albert Huang wrote:
+>=20
+> >This may help a little:
+> >
+> >http://people.csail.mit.edu/albert/pubs/ashuang-sm-thesis-2005.pdf
+> >
+> >-albert
+> >
+> >On 7/18/05, Alessandro Giordano <gmalex@programmingzone.net> wrote:
+> >
+> >
+> >>Marcel Holtmann wrote:
+> >>
+> >>
+> >>
+> >>>Hi Alessandro,
+> >>>
+> >>>
+> >>>
+> >>>
+> >>>
+> >>>>I need some informations about Bluetooth interface to computer.
+> >>>>How can i take advantages of bluetooth technology with any programmin=
+g language? Possibly...C.
+> >>>>Can you indicate to me which libraries i have to use to do this?
+> >>>>Which ones did you use for hcitool?
+> >>>>
+> >>>>
+> >>>>
+> >>>>
+> >>>the Bluetooth library is a C/C++ library for using Bluetooth. All tool=
+s
+> >>>are actually using this library. Look at the source of these tools and
+> >>>you find the answers on how to use the API.
+> >>>
+> >>>Regards
+> >>>
+> >>>Marcel
+> >>>
+> >>>
+> >>>
+> >>>
+> >>>-------------------------------------------------------
+> >>>SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+> >>>
+> >>>
+> >>>from IBM. Find simple to follow Roadmaps, straightforward articles,
+> >>
+> >>
+> >>>informative Webcasts and more! Get everything you need to get up to
+> >>>speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dc=
+lick
+> >>>_______________________________________________
+> >>>Bluez-users mailing list
+> >>>Bluez-users@lists.sourceforge.net
+> >>>https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >>>
+> >>>
+> >>>
+> >>>
+> >>>
+> >>>
+> >>>
+> >>there isn't a documention, a manual, anoyone useful to help me learning
+> >>to use these libraries?
+> >>
+> >>
+> >>
+> >>
+> >>
+> >>-------------------------------------------------------
+> >>SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+> >>from IBM. Find simple to follow Roadmaps, straightforward articles,
+> >>informative Webcasts and more! Get everything you need to get up to
+> >>speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dcl=
+ick
+> >>_______________________________________________
+> >>Bluez-users mailing list
+> >>Bluez-users@lists.sourceforge.net
+> >>https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >>
+> >>
+> >>
+> >
+> >
+> >-------------------------------------------------------
+> >SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+> >from IBM. Find simple to follow Roadmaps, straightforward articles,
+> >informative Webcasts and more! Get everything you need to get up to
+> >speed, fast. http://ads.osdn.com/?ad_idt77&alloc_id=16492&op=3Dclick
+> >_______________________________________________
+> >Bluez-users mailing list
+> >Bluez-users@lists.sourceforge.net
+> >https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >
+> >
+> >
+> >
+> >
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+> from IBM. Find simple to follow Roadmaps, straightforward articles,
+> informative Webcasts and more! Get everything you need to get up to
+> speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dclic=
+k
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
