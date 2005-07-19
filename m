@@ -1,16 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec050719092119c727c1@mail.gmail.com>
-From: Albert Huang <ashuang@gmail.com>
+Message-ID: <42DCC40F.20205@programmingzone.net>
+From: Alessandro Giordano <gmalex@programmingzone.net>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Blueetooth interface
-In-Reply-To: <42DCC40F.20205@programmingzone.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <42DBF631.3070307@programmingzone.net>
-	 <1121712193.22662.133.camel@pegasus>
-	 <42DC171C.9040807@programmingzone.net>
-	 <ef9938ec0507182023257b341c@mail.gmail.com>
-	 <42DCC40F.20205@programmingzone.net>
+References: <42DBF631.3070307@programmingzone.net>	 <1121712193.22662.133.camel@pegasus>	 <42DC171C.9040807@programmingzone.net> <ef9938ec0507182023257b341c@mail.gmail.com>
+In-Reply-To: <ef9938ec0507182023257b341c@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,138 +18,112 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 19 Jul 2005 12:21:54 -0400
+Date: Tue, 19 Jul 2005 11:12:47 +0200
 
-BlueZ is linux only.
+Thank you so much.....
+however, do you know if is possible to use these libraries on Windows?
+If not, do you know others libraries which i can use to do it on Win?
 
-For windows XP, you'll need to install Service Pack 2 and look for the
-Microsoft Platform SDK.  You'll also need visual studio or some other
-compiler.  I don't know about earlier versions of windows.
+Regards,
+Alessandro.
 
--albert
+Albert Huang wrote:
 
-On 7/19/05, Alessandro Giordano <gmalex@programmingzone.net> wrote:
-> Thank you so much.....
-> however, do you know if is possible to use these libraries on Windows?
-> If not, do you know others libraries which i can use to do it on Win?
->=20
-> Regards,
-> Alessandro.
->=20
-> Albert Huang wrote:
->=20
-> >This may help a little:
-> >
-> >http://people.csail.mit.edu/albert/pubs/ashuang-sm-thesis-2005.pdf
-> >
-> >-albert
-> >
-> >On 7/18/05, Alessandro Giordano <gmalex@programmingzone.net> wrote:
-> >
-> >
-> >>Marcel Holtmann wrote:
-> >>
-> >>
-> >>
-> >>>Hi Alessandro,
-> >>>
-> >>>
-> >>>
-> >>>
-> >>>
-> >>>>I need some informations about Bluetooth interface to computer.
-> >>>>How can i take advantages of bluetooth technology with any programmin=
-g language? Possibly...C.
-> >>>>Can you indicate to me which libraries i have to use to do this?
-> >>>>Which ones did you use for hcitool?
-> >>>>
-> >>>>
-> >>>>
-> >>>>
-> >>>the Bluetooth library is a C/C++ library for using Bluetooth. All tool=
-s
-> >>>are actually using this library. Look at the source of these tools and
-> >>>you find the answers on how to use the API.
-> >>>
-> >>>Regards
-> >>>
-> >>>Marcel
-> >>>
-> >>>
-> >>>
-> >>>
-> >>>-------------------------------------------------------
-> >>>SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-> >>>
-> >>>
-> >>>from IBM. Find simple to follow Roadmaps, straightforward articles,
-> >>
-> >>
-> >>>informative Webcasts and more! Get everything you need to get up to
-> >>>speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dc=
-lick
-> >>>_______________________________________________
-> >>>Bluez-users mailing list
-> >>>Bluez-users@lists.sourceforge.net
-> >>>https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >>>
-> >>>
-> >>>
-> >>>
-> >>>
-> >>>
-> >>>
-> >>there isn't a documention, a manual, anoyone useful to help me learning
-> >>to use these libraries?
-> >>
-> >>
-> >>
-> >>
-> >>
-> >>-------------------------------------------------------
-> >>SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-> >>from IBM. Find simple to follow Roadmaps, straightforward articles,
-> >>informative Webcasts and more! Get everything you need to get up to
-> >>speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dcl=
-ick
-> >>_______________________________________________
-> >>Bluez-users mailing list
-> >>Bluez-users@lists.sourceforge.net
-> >>https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >>
-> >>
-> >>
-> >
-> >
-> >-------------------------------------------------------
-> >SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-> >from IBM. Find simple to follow Roadmaps, straightforward articles,
-> >informative Webcasts and more! Get everything you need to get up to
-> >speed, fast. http://ads.osdn.com/?ad_idt77&alloc_id=16492&op=3Dclick
-> >_______________________________________________
-> >Bluez-users mailing list
-> >Bluez-users@lists.sourceforge.net
-> >https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >
-> >
-> >
-> >
-> >
->=20
->=20
->=20
->=20
-> -------------------------------------------------------
-> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-> from IBM. Find simple to follow Roadmaps, straightforward articles,
-> informative Webcasts and more! Get everything you need to get up to
-> speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dclic=
-k
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>This may help a little:
 >
+>http://people.csail.mit.edu/albert/pubs/ashuang-sm-thesis-2005.pdf
+>
+>-albert
+>
+>On 7/18/05, Alessandro Giordano <gmalex@programmingzone.net> wrote:
+>  
+>
+>>Marcel Holtmann wrote:
+>>
+>>    
+>>
+>>>Hi Alessandro,
+>>>
+>>>
+>>>
+>>>      
+>>>
+>>>>I need some informations about Bluetooth interface to computer.
+>>>>How can i take advantages of bluetooth technology with any programming language? Possibly...C.
+>>>>Can you indicate to me which libraries i have to use to do this?
+>>>>Which ones did you use for hcitool?
+>>>>
+>>>>
+>>>>        
+>>>>
+>>>the Bluetooth library is a C/C++ library for using Bluetooth. All tools
+>>>are actually using this library. Look at the source of these tools and
+>>>you find the answers on how to use the API.
+>>>
+>>>Regards
+>>>
+>>>Marcel
+>>>
+>>>
+>>>
+>>>
+>>>-------------------------------------------------------
+>>>SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+>>>      
+>>>
+>>>from IBM. Find simple to follow Roadmaps, straightforward articles,
+>>    
+>>
+>>>informative Webcasts and more! Get everything you need to get up to
+>>>speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
+>>>_______________________________________________
+>>>Bluez-users mailing list
+>>>Bluez-users@lists.sourceforge.net
+>>>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>>>
+>>>
+>>>
+>>>
+>>>
+>>>      
+>>>
+>>there isn't a documention, a manual, anoyone useful to help me learning
+>>to use these libraries?
+>>
+>>
+>>
+>>
+>>
+>>-------------------------------------------------------
+>>SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+>>from IBM. Find simple to follow Roadmaps, straightforward articles,
+>>informative Webcasts and more! Get everything you need to get up to
+>>speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
+>>_______________________________________________
+>>Bluez-users mailing list
+>>Bluez-users@lists.sourceforge.net
+>>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>>
+>>    
+>>
+>
+>
+>-------------------------------------------------------
+>SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+>from IBM. Find simple to follow Roadmaps, straightforward articles,
+>informative Webcasts and more! Get everything you need to get up to
+>speed, fast. http://ads.osdn.com/?ad_idt77&alloc_id492&op=click
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>
+>
+>  
+>
+
+
 
 
 -------------------------------------------------------
