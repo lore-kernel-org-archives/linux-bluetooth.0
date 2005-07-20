@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1ffb4b0705072008471f85c2df@mail.gmail.com>
-From: Mike Lee <eemike@gmail.com>
+Message-ID: <42DE5ABC.8010802@cefriel.it>
+From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth as ttyS0
-In-Reply-To: <E1Dv9Kx-0007c4-NM@server.broadrick.moe.edu.sg>
-Mime-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_2300_12630985.1121874453586"
-References: <E1Dv9Kx-0007c4-NM@server.broadrick.moe.edu.sg>
+Subject: Re: [Bluez-users] Permission problems, Bluetooth Headset
+References: <42DE3EAA.30705@toughguy.net>
+In-Reply-To: <42DE3EAA.30705@toughguy.net>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,78 +18,75 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 20 Jul 2005 23:47:33 +0800
+Date: Wed, 20 Jul 2005 16:07:56 +0200
 
-------=_Part_2300_12630985.1121874453586
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Ola,
 
-On 7/20/05, fyp@dreamx.org <fyp@dreamx.org> wrote:=20
->=20
-> Hi!
->=20
-> I've having reading many sites and found that to bind a port for
-> bluetooth i need rfcomm. I've also tried the steps in doing it but it
-> doesn't seem like what I really wanted.
->=20
-> My objective is to make a USB Bluetooth dongle work as a Serial port
-> (i.e ttyS0). I've a USB Bluetooth dongle and a RS232 Bluetooth device.
-> This is to emulate a serial cable replacement.
-> A simple diagram of what I really want to achieve is osmething like
-> this:
->=20
-> |LinuxPC| USB<-->Bluetooth ~~~~~~ Bluetooth<-->RS232 |LinuxPC|
+Ola Benderius wrote:
+> Hi,
+> got a problem when trying to connect my Bluetooth headset (it's a
+> Plantronics 2500) with Linux.
+> 
+> I follow this guide and this is my hcid.conf:
+> 
+>     #
+>     # HCI daemon configuration file.
+>     #
+>     # $Id: hcid.conf,v 1.7 2004/12/13 14:16:03 holtmann Exp $
+>     #
+> 
+>     # HCId options
+>     options {
+>             # Automatically initialize new devices
+>             autoinit yes;
+> 
+>             # Security Manager mode
+>             #   none - Security manager disabled
+>             #   auto - Use local PIN for incoming connections
+>             #   user - Always ask user for a PIN
+>             #
+>             security auto;
+> 
+>             # Pairing mode
+>             #   none  - Pairing disabled
+>             #   multi - Allow pairing with already paired devices
+>             #   once  - Pair once and deny successive attempts
+>             pairing multi;
+> 
+>             # PIN helper
+>             # pin_helper /usr/bin/bluepin;
+>             pin_helper /etc/bluetooth/pin-helper;
+> 
+>             # D-Bus PIN helper
+>             #dbus_pin_helper;
+>     }
+> 
 
-  I guess you are using rs232 bluetooth dongle in the right side. Then firs=
-t=20
-of all, you need to know how to get the dongle works. For the usb dongle ,=
-=20
-kernel should dynamic detect and what you need to do is to setup hcid. For=
-=20
-the RS232 dongle, you need additional command hciattach to setup the dongle=
-=20
-and run hcid.=20
- Up to now , you should get something by "hciconfig -a". Then you should us=
-e=20
-rfcomm command from bluez-util to setup the link between computer.
-  Mike,Lee
+> But the PIN is set to '0000' since that the PIN of the headset.
+> (according to the manual)
+> 
+> /    echo "0000" > /etc/bluetooth/pin/
+> 
 
-------=_Part_2300_12630985.1121874453586
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+what's pin-helper?
+It's your script?
+If yes, it must echo "PIN:0000", not only "0000".
+typically:
 
-<br><br>
-<div><span class=3D"gmail_quote">On 7/20/05, <b class=3D"gmail_sendername">=
-<a href=3D"mailto:fyp@dreamx.org">fyp@dreamx.org</a></b> &lt;<a href=3D"mai=
-lto:fyp@dreamx.org">fyp@dreamx.org</a>&gt; wrote:</span>
-<blockquote class=3D"gmail_quote" style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0=
-px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Hi!<br><br>I've having reading m=
-any sites and found that to bind a port for<br>bluetooth i need rfcomm. I'v=
-e also tried the steps in doing it but it
-<br>doesn't seem like what I really wanted.<br><br>My objective is to make =
-a USB Bluetooth dongle work as a Serial port<br>(i.e ttyS0). I've a USB Blu=
-etooth dongle and a RS232 Bluetooth device.<br>This is to emulate a serial =
-cable replacement.
-<br>A simple diagram of what I really want to achieve is osmething like<br>=
-this:<br><br>|LinuxPC| USB&lt;--&gt;Bluetooth ~~~~~~ Bluetooth&lt;--&gt;RS2=
-32 |LinuxPC|</blockquote>
-<div>&nbsp;</div>
-<div>&nbsp;&nbsp;&nbsp; I guess you are using rs232 bluetooth dongle in the=
- right side.&nbsp; Then first of all, you need to know how to get the dongl=
-e works. For the usb dongle , kernel should dynamic detect and what you nee=
-d to do is to setup hcid. For the RS232 dongle, you need additional command=
- hciattach to setup the dongle and run hcid.=20
-</div>
-<div>&nbsp;&nbsp; Up to now , you should get something by &quot;hciconfig -=
-a&quot;. Then you should use rfcomm command from bluez-util to setup the li=
-nk between computer.</div>
-<div>&nbsp;</div>
-<div>&nbsp;</div>
-<div>Mike,Lee</div><br>&nbsp;</div>
+#!/bin/bash
+echo "PIN:0000"
 
-------=_Part_2300_12630985.1121874453586--
+Cheers,
+Pizza
+
+-------------------------------------------
+Luca Pizzamiglio
+CEFRIEL - Embedded Systems Design Unit
+Via Fucini, 2 - 20133 MILANO (ITALY)
+Phone:		+39 02 23954 343
+e-mail:		pizzamiglio@cefriel.it
+ICQ:		5046978
+-------------------------------------------
 
 
 -------------------------------------------------------
