@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <baec107c05072005529550ac5@mail.gmail.com>
-From: Tri Ngo <tringo@gmail.com>
+Message-ID: <42DDFDD4.7050204@soft.uni-linz.ac.at>
+From: Simon Vogl <vogl@soft.uni-linz.ac.at>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] making a cellphone ring using bluetooth message
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: [Bluez-devel] zeevo module and h4 implementation
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,17 +16,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 20 Jul 2005 08:52:03 -0400
+Date: Wed, 20 Jul 2005 09:31:32 +0200
 
 Hi,
-I apologize that this may not be the perfect place to post this
-question but I was hoping that someone would be able to point me in
-the right direction. I would like to make a cellphone ring by sending
-a bluetooth message.  I was wondering if anyone on this list knows if
-this functionality is possible to implement.
+I have a Zeevo module here with a firmware that is not fully compliant
+to the BT specification, as it seems: The module sends hci command packet=
+s(!)
+over the uart, which of course confuses the stack, and blocks further com=
+munication.
 
-Thanks,
-Tri
+Details: It seems like the module has the PIN stored on-device and sends
+the link_key_failed command to the host as an indication for an unsuccess=
+ful
+pairing attempt.
+
+Besides me looking for a different firmware, are there any objections to =
+extend
+the h4 module with command packet reading support? And what should I do w=
+ith them
+afterwards besides ignoring - would hcid be interested in this informatio=
+n, or
+a d-bus interface?
+
+cheers
+Simon
+
+--=20
+_______________________________________________________________________
+Dr. Simon Vogl
+ARC Seibersdorf research GmbH
+Research Studios Austria, Studio Pervasive Computing Applications
+Altenberger Stra=C3=9Fe 69, A-4040 Linz, Austria
+
+Tel: +43 732 2468-8517, Fax: +43 732 2468-8426
+mailto: simon.vogl@researchstudio.at
+
 
 
 -------------------------------------------------------
