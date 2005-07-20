@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb050720121520ed4b4a@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+Message-ID: <42DE9F3C.6050503@hasborg.com>
+From: Joshua Wright <jwright@hasborg.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] making a cellphone ring using bluetooth message
+References: <baec107c05072005529550ac5@mail.gmail.com>	 <1121876820.24456.273.camel@santafe> <1121878162.7415.22.camel@panic> <baec107c05072011129b1402f@mail.gmail.com>
+In-Reply-To: <baec107c05072011129b1402f@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Periodic Inquiry
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,33 +18,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 20 Jul 2005 16:15:52 -0300
+Date: Wed, 20 Jul 2005 15:00:12 -0400
 
-Hi folks,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-What is the correct way to deal with periodic inquiry?
+Tri Ngo wrote:
+> Thanks everyone. I havea  follow up question, is it possible to
+> establish an rfcomm connection with a bluetooth phone automatically. 
 
-Currently I created a raw BT HCI socket integrated with my
-application main loop. The following events is being captured:
+My understanding is that if you have already established a paired
+relationship with the target bluetooth device, some phones will allow
+you to connect without prompting Yes/No on the target device.
 
-int8_t hci_events[]  =3D { EVT_INQUIRY_RESULT, \
-=09=09=09=09 EVT_INQUIRY_RESULT_WITH_RSSI, \
-=09=09=09=09 EVT_INQUIRY_COMPLETE, \
-=09=09=09=09 EVT_REMOTE_NAME_REQ_COMPLETE, \
-=09=09=09=09 EVT_CMD_STATUS, \
-=09=09=09=09 0 };
+Looking at the content on the trifinite.org site, it appears that phones
+vulnerable to the BlueBug attack
+(http://trifinite.org/trifinite_stuff_bluebug.html) would also allow an
+attacker to establish an rfcomm connection without notifying the owner
+of the target device.
 
-.....
-The hci command is:
-ret =3D hci_send_cmd(sock, OGF_LINK_CTL, OCF_PERIODIC_INQUIRY, \
-=09=09=09PERIODIC_INQUIRY_CP_SIZE, &inq_param);
+- -Josh
+- --
+- -Joshua Wright
+jwright@hasborg.com
 
+2005-2006 pgpkey: http://802.11ninja.net/pgpkey.htm
+fingerprint: F00E 7A42 8375 0C55 964F E5A4 4D2F 22F6 3658 A4BF
 
-Is there another way to do this task? eg: Using ioctl.
+Today I stumbled across the world's largest hotspot.  The SSID is "linksys".
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (MingW32)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-
-Regards,
-Claudio.
+iD8DBQFC3p87TS8i9jZYpL8RAlKWAKDF2zfEZpn+2jaPfLqMFdF9GB94hgCgwRZJ
+qYXLgTBTT9gRufP9INLSumk=
+=lFx+
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
