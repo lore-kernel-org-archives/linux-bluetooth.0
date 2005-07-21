@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] making a cellphone ring using bluetooth message
-From: Code Logic <codelogic@gmail.com>
+Message-ID: <e1effdeb050721070860bf3de1@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200507201748.02597.puggy@gentoo.org>
-References: <baec107c05072005529550ac5@mail.gmail.com>
-	 <1121876820.24456.273.camel@santafe>  <200507201748.02597.puggy@gentoo.org>
-Content-Type: text/plain
-Message-Id: <1121962591.24456.279.camel@santafe>
+In-Reply-To: <e1effdeb050720121520ed4b4a@mail.gmail.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <e1effdeb050720121520ed4b4a@mail.gmail.com>
+Subject: [Bluez-devel] Re: Periodic Inquiry
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,73 +18,63 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 21 Jul 2005 10:16:31 -0600
+Date: Thu, 21 Jul 2005 11:08:26 -0300
 
-You're most probably right. Google for this file :
+Hi folks,
 
-r320at_r1a.pdf
+The inquiry periodic is not working properly. The minimum=20
+amount of time specified between consecutive inquiries
+is not working as I expect. The device is entering on
+inquiry mode every +- 5seconds.
 
-It has a complete list of AT commands (form Ericsson), including some
-that looked like commands to generate a ring. Also, you should take a
-look at the source code of Float's Mobile Agent (fma.sourceforge.net)
-This program, I think, makes extensive use of the AT command set
-(through bluetooth and IR) to perform all kinds of cool things.
+Is there a problem in the code below?
+
+=09inq_param.num_rsp =3D 100;
+=09inq_param.length  =3D 4; /* 5.12s */
+
+=09inq_param.max_period =3D 49; /* 62.72s */
+=09inq_param.min_period =3D 27;  /* 34.56s */
 
 
-On Wed, 2005-07-20 at 17:48 +0100, Douglas Russell wrote:
-> Actually, I'm pretty sure you can do this with an AT command. Don't ask me 
-> what it might be though. :-)
-> 
-> On Wednesday 20 Jul 2005 17:27, Code Logic wrote:
-> > I'm not sure if you can actually do that, at least not with only a BT
-> > client. You will probably need an app that listens for BT messages on
-> > the phone and plays some sound upon receiving the specific BT command.
-> > Depending on the type of phone you are targeting, there might already be
-> > some apps out there (Bemused) that can help you out.
-> >
-> > On Wed, 2005-07-20 at 08:52 -0400, Tri Ngo wrote:
-> > > Hi,
-> > > I apologize that this may not be the perfect place to post this
-> > > question but I was hoping that someone would be able to point me in
-> > > the right direction. I would like to make a cellphone ring by sending
-> > > a bluetooth message.  I was wondering if anyone on this list knows if
-> > > this functionality is possible to implement.
-> > >
-> > > Thanks,
-> > > Tri
-> > >
-> > >
-> > > -------------------------------------------------------
-> > > SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-> > > from IBM. Find simple to follow Roadmaps, straightforward articles,
-> > > informative Webcasts and more! Get everything you need to get up to
-> > > speed, fast. http://ads.osdn.com/?ad_idt77&alloc_id492&op=click
-> > > _______________________________________________
-> > > Bluez-devel mailing list
-> > > Bluez-devel@lists.sourceforge.net
-> > > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> >
-> > -------------------------------------------------------
-> > SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-> > from IBM. Find simple to follow Roadmaps, straightforward articles,
-> > informative Webcasts and more! Get everything you need to get up to
-> > speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
-> > _______________________________________________
-> > Bluez-devel mailing list
-> > Bluez-devel@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-> 
-> -------------------------------------------------------
-> SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-> from IBM. Find simple to follow Roadmaps, straightforward articles,
-> informative Webcasts and more! Get everything you need to get up to
-> speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+=09/* General/Unlimited Inquiry Access Code */
+=09inq_param.lap[0] =3D 0x33;
+=09inq_param.lap[1] =3D 0x8b;
+=09inq_param.lap[2] =3D 0x9e;
+=09ret =3D hci_send_cmd(sock, OGF_LINK_CTL, OCF_PERIODIC_INQUIRY,=20
+=09=09=09PERIODIC_INQUIRY_CP_SIZE, &inq_param);
 
+
+
+Regards,
+Claudio.
+
+On 7/20/05, Claudio Takahasi <cktakahasi@gmail.com> wrote:
+> Hi folks,
+>=20
+> What is the correct way to deal with periodic inquiry?
+>=20
+> Currently I created a raw BT HCI socket integrated with my
+> application main loop. The following events is being captured:
+>=20
+> int8_t hci_events[]  =3D { EVT_INQUIRY_RESULT, \
+>                                  EVT_INQUIRY_RESULT_WITH_RSSI, \
+>                                  EVT_INQUIRY_COMPLETE, \
+>                                  EVT_REMOTE_NAME_REQ_COMPLETE, \
+>                                  EVT_CMD_STATUS, \
+>                                  0 };
+>=20
+> .....
+> The hci command is:
+> ret =3D hci_send_cmd(sock, OGF_LINK_CTL, OCF_PERIODIC_INQUIRY, \
+>                         PERIODIC_INQUIRY_CP_SIZE, &inq_param);
+>=20
+>=20
+> Is there another way to do this task? eg: Using ioctl.
+>=20
+>=20
+> Regards,
+> Claudio.
+>
 
 
 -------------------------------------------------------
