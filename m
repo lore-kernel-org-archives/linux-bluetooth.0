@@ -1,8 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: te@identisys.de
+Message-ID: <42DFE719.9010600@csr.com>
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20050722055529.7516790007@www.strato-webmail.de>
-Subject: [Bluez-users] Range Problem
+Subject: Re: [Bluez-users] hcitool and rssi value=0
+References: <9f41439105072109526cb11e82@mail.gmail.com>
+In-Reply-To: <9f41439105072109526cb11e82@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -14,35 +18,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 22 Jul 2005 07:55:29 +0200 (CEST)
+Date: Thu, 21 Jul 2005 19:19:05 +0100
 
-Hello,
+Julien BIBOLLET wrote:
+> hcitool rssi 00:04:3E:46:02:26
+> output is always RSSI return value: 0
 
-i have a problem with my bluetooth system.
+0 means that the received signal strength is good - it's in what's
+called the golden range (see the HCI specification).
 
-There are 4 Levels One class I dongles connected to a linux-box over an
-active 4-Port USB-HUB.
+If the signal goes below the bottom of the golden range you'll get
+negative numbers, if it goes above you'll get positive numbers.
 
-Each dongle connects to 7  different mobile devices. For each dongle there
-is a separate process that permanently tries to connect to devices that
-are not yet connected.
+The golden range is nominally -60 to -40 dBm.
 
-This works fine, but after integrating the third and fourth dongle, the
-range to the mobile devices reduces by half.
+Devices will use power control to keep the signal at the receiver within
+the golden range. So, you'll find that the RSSI is zero over a large
+variation in range. Devices may power control by 30 dB. Add that to the
+20 dB width of the range and you effectively can't distinguish path
+losses of 50 dB. That's a factor of 10^5 in power or a factor of 300 in
+range (in free space). So, you may not be able to distinguish a device
+5 cm away from one 15 m away.
 
-The dongles are away from each other about 1.5 m and more, variating it,
-doesnt seem to have any effect.
+Basically, RSSI on its own is no good for ranging.
 
-The only thing which is courious, that sometimes i GET the full range and
-performance, but i don't know why.
+If you can get the transmit power of the other side then you can improve
+things immensely. You can find out what power you're transmitting with
+by using the HCI_Read_Transmit_Power_Level command. Finding out the
+remote side's power is much trickier (unless, of course, it doesn't
+support power control).
 
-Is there something special i have missed ?
-Can i fix this problem by special parameters ?
+If you've got a BT 1.2 device then you can use inquiry with RSSI.
+Devices tend to respond to inquiry at fixed power (although exactly what
+that power is may vary from device to device). The inquiry results don't
+have a golden range dead band in them which helps too.
+
+However, inquiry results can easily be spoofed so I wouldn't use it for
+any secure applications.
+
+	- Steven
+-- 
 
 
-Thanks.
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
 
-Thomas
+**********************************************************************
+
 
 
 -------------------------------------------------------
