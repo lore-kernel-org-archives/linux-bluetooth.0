@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42DFE719.9010600@csr.com>
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
+From: Michael Mauch <michael.mauch@gmx.de>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] hcitool and rssi value=0
-References: <9f41439105072109526cb11e82@mail.gmail.com>
-In-Reply-To: <9f41439105072109526cb11e82@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <20050721180417.GB18197@elmicha.333200002251-0001.dialin.t-online.de>
+References: <E1DvTw1-00021X-U4@server.broadrick.moe.edu.sg>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <E1DvTw1-00021X-U4@server.broadrick.moe.edu.sg>
+Subject: [Bluez-users] Re: Bluetooth as ttyS0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,56 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 21 Jul 2005 19:19:05 +0100
+Date: Thu, 21 Jul 2005 20:04:17 +0200
 
-Julien BIBOLLET wrote:
-> hcitool rssi 00:04:3E:46:02:26
-> output is always RSSI return value: 0
+fyp@dreamx.org wrote:
 
-0 means that the received signal strength is good - it's in what's
-called the golden range (see the HCI specification).
+> Yes I'm using a rs232 dongle. I've got it setup using AT commands to
+> make it auto accept connections. So now the problem I'm facing is
+> setting up the USB dongle on the linux pc. I'm not really sure how to go
+> about doing it. Why use rfcomm instead of hciattach to attach the
+> bluetooth to ttys0 ?
 
-If the signal goes below the bottom of the golden range you'll get
-negative numbers, if it goes above you'll get positive numbers.
+I don't know when you would use hciattach, but with rfcomm you can
+create a connection to a serial device (e.g. /dev/rfcomm0, not /dev/ttyS0).
 
-The golden range is nominally -60 to -40 dBm.
+E.g.
 
-Devices will use power control to keep the signal at the receiver within
-the golden range. So, you'll find that the RSSI is zero over a large
-variation in range. Devices may power control by 30 dB. Add that to the
-20 dB width of the range and you effectively can't distinguish path
-losses of 50 dB. That's a factor of 10^5 in power or a factor of 300 in
-range (in free space). So, you may not be able to distinguish a device
-5 cm away from one 15 m away.
+  rfcomm bind 0 11:22:33:44:55:66 7
 
-Basically, RSSI on its own is no good for ranging.
+This will create a /dev/rfcomm0 which you can use just like your real
+serial port /dev/ttyS0 (e.g. with minicom). See "man rfcomm" for details.
 
-If you can get the transmit power of the other side then you can improve
-things immensely. You can find out what power you're transmitting with
-by using the HCI_Read_Transmit_Power_Level command. Finding out the
-remote side's power is much trickier (unless, of course, it doesn't
-support power control).
+Use "sdptool browse 11:22:33:44:55:66" (of course with the BT address of
+your device) to find the channel number of the Serial Port service of
+your device (that's the "7" in the rfcomm bind example above).
 
-If you've got a BT 1.2 device then you can use inquiry with RSSI.
-Devices tend to respond to inquiry at fixed power (although exactly what
-that power is may vary from device to device). The inquiry results don't
-have a golden range dead band in them which helps too.
+Also have a look at /etc/bluetooth/rfcomm.conf.
 
-However, inquiry results can easily be spoofed so I wouldn't use it for
-any secure applications.
-
-	- Steven
--- 
-
-
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-**********************************************************************
-
+Regards...
+		Michael
 
 
 -------------------------------------------------------
