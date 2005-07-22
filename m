@@ -1,7 +1,7 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: te@identisys.de
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20050722055516.EEC3D90007@www.strato-webmail.de>
+Message-Id: <20050722055529.7516790007@www.strato-webmail.de>
 Subject: [Bluez-users] Range Problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -14,7 +14,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 22 Jul 2005 07:55:16 +0200 (CEST)
+Date: Fri, 22 Jul 2005 07:55:29 +0200 (CEST)
 
 Hello,
 
