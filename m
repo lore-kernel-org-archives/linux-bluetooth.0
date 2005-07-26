@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: andy thomas <andy@time-domain.co.uk>
+Message-ID: <7aa80ced050726074418daf874@mail.gmail.com>
+From: Mohan K <kmohangda@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050727122832.1DE4D33222@sc8-sf-spam1.sourceforge.net>
-Message-ID: <Pine.LNX.4.60.0507271515220.12469@purdy.demon.co.uk>
-References: <20050727122832.1DE4D33222@sc8-sf-spam1.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Subject: [Bluez-users] Kernel module for PCMCIA/CF Bluetooth cards with CSR chipset
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Xandros linux - rfcomm not working
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,72 +16,100 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 27 Jul 2005 15:37:44 +0100 (BST)
+Date: Tue, 26 Jul 2005 07:44:50 -0700
 
-I'm having a problem finding support in BlueZ for a Socket Communications 
-CF+ Bluetooth card, which is a later version using the CSR chipset and not
-the Nokia DTL-1 chipset as used in earlier versions of the same card. The 
-Nokia-based card is supported in BlueZ using the dtl1_cs.o module but the 
-CSR-based card is not. Does anyone know if there are any plans to support 
-CSR-based PCMCIA/CF cards?
+Hi everyone,
+I am using Xandros linux distribution in my via motherboard PC.
 
-If not, I will go and buy a USB Bluetooth dongle instead as these seem to
-better supported, and the external antenna possibly works better too. The 
-only reason I would like to use the Socket CF card is because I already have
-one in my Jornada PDA (runs Windows CE) and sharing the Bluetooth device
-between PDA and Linux laptop means less to carry around.
+I have installed the bluez stack.
+In that "hcitool scan is working. But when i try to connect with the
+remote device using "rfcomm connect 0 <BDADDR> 1", it fails with
+following message.
+#rfcomm connect 0 00:80:25:02:00:35 1
+Can't connect RFCOMM socket: Connection refused
 
-One thing puzzles me - back in March this year, Erwin Authried wrote in 
-this mailing list that PCMCIA/CF UARTs are register-compatible emulations 
-of a standard UART (see original mail below). Does this mean that I could 
-be using just the serial_cs.o kernel module for the Socket CF+ card? All I
-want to use Bluetooth for at this stage is to interface my laptop to a 
-Bluetooth phone so I can connect to the 'Net via GPRS or PPP/dial-up while
-I'm away from base (mainly to ssh into remote servers, etc). I do this 
-already from my PDA but a laptop would be nicer.
+The following is the hcidump:
 
-Thanks in advance for any suggestions,
+# hcidump -x
+HCI sniffer - Bluetooth packet analyzer ver 1.21
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:80:25:02:00:35 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+  00 01 05 04
+> HCI Event: Connect Complete (0x03) plen 11
+  00 28 00 35 00 02 25 80 00 01 00
+< ACL data: handle 40 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 40 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+> HCI Event: Command Complete (0x0e) plen 6
+  01 0D 08 00 28 00
+> HCI Event: Max Slots Change (0x1b) plen 3
+  28 00 05
+> ACL data: handle 40 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0043 scid 0x0040 result 0 status 0
+      Connection successful
+< ACL data: handle 40 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0043 flags 0x00 clen 4
+      MTU 1024
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+> ACL data: handle 40 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+      Success
+      MTU 335
+> ACL data: handle 40 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 335
+< ACL data: handle 40 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0043 flags 0x00 result 0 clen 0
+      Success
+< ACL data: handle 40 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0043 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+> HCI Event: Link Key Request (0x17) plen 6
+  35 00 02 25 80 00
+< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
+    bdaddr 00:80:25:02:00:35
+> HCI Event: Command Complete (0x0e) plen 10
+  01 0C 04 00 35 00 02 25 80 00
+> HCI Event: PIN Code Request (0x16) plen 6
+  35 00 02 25 80 00
+< HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+    bdaddr 00:80:25:02:00:35
+> HCI Event: Command Complete (0x0e) plen 10
+  01 0E 04 00 35 00 02 25 80 00
+> ACL data: handle 40 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x36
+< ACL data: handle 40 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0043 scid 0x0040
+> ACL data: handle 40 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0043
+< ACL data: handle 40 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0043
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+> ACL data: handle 40 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0043 scid 0x0040
+> HCI Event: Disconn Complete (0x05) plen 4
+  00 28 00 13
 
-Andy
+Can anyone tell me why this is happening? Advanced thanks.
 
-Original archive posting follows:
-
-On Sat, 2005-03-05 at 06:37, Mathias Adam wrote:
-  > Hi,
-  >
-  > I just got it working by doing a little change in the serial driver
-  > (8250.c). I tested it with 2.6.11 but I think it could work for any 2.6
-  > kernel.
-  >
-  > Marcel Holtmann schrieb:
-  > > I am not an serial card expert. This is a problem in the serial
-  > > subsystem and a BlueZ problem.
-  >
-  > That proved to be true.
-  >
-  > Marcel: One thing I discovered while debugging this: the hci_uart 
-driver
-  > seems to initialize the actual UART with only 230400 baud. Is this
-  > really the case or are those UARTs clocked at nonstandard (higher)
-  > frequencies so that this setting does result in a higher real baud 
-rate?
-
-  I can"t say for sure if that applies to your specific CF card, but
-  usually PCMCIA/CF uarts are just register-compatible emulations of a
-  standard uart, and the clockrate doesn"t matter at all. The actual data
-  rate can be very high.
-
-  Regards,
-  Erwin
-
-
--------------------------------------------
-Andy Thomas,
-Time Domain Systems
-
-Tel: +44 (0)7866 556626
-Fax: +44 (0)20 8372 2582
-http://www.time-domain.co.uk
+Thanks & Regards,
+Mohan
 
 
 -------------------------------------------------------
