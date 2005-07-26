@@ -1,12 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: John Gruenenfelder <johng@as.arizona.edu>
+Subject: Re: [Bluez-devel] Re: bluetoothd specification - new patch
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Can't get btsco to connect to Plantronics M2500 headset
-Message-ID: <20050726225514.GA26245@as.arizona.edu>
-References: <20050726042812.GA16828@as.arizona.edu> <42E5CA58.4030408@xmission.com> <20050726062958.GA17805@as.arizona.edu>
+In-Reply-To: <e1effdeb05072612066bd4d11a@mail.gmail.com>
+References: <e1effdeb05071213476bbc0fa0@mail.gmail.com>
+	 <e1effdeb050715103731d599d7@mail.gmail.com>
+	 <42DBD4F5.8000805@palmsource.com>
+	 <e1effdeb05071809461382a01c@mail.gmail.com>
+	 <e1effdeb05072609312aa92cc0@mail.gmail.com>
+	 <1122398308.5805.24.camel@notepaq>
+	 <e1effdeb05072612066bd4d11a@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1122415021.6005.7.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20050726062958.GA17805@as.arizona.edu>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,57 +24,70 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 26 Jul 2005 15:55:14 -0700
+Date: Tue, 26 Jul 2005 23:57:01 +0200
 
-On Mon, Jul 25, 2005 at 11:29:58PM -0700, John Gruenenfelder wrote:
->On Mon, Jul 25, 2005 at 11:30:00PM -0600, Brad Midgley wrote:
->>
->>I've looked at your messages and I can't think of many other things. Do 
->>you have other bluetooth devices you can try? Can you easily try it with 
->>a 32-bit kernel/userland?
->
->I do have an old laptop that I can test with.  I will try this tomorrow.  I
->don't actually intend to use the headset on my 64bit machine, but as it is my
->desktop, it's what I use for testing.  So if it works with a 32bit machine,
->that will be just fine.
+Hi Claudio,
 
-Okay, I tried to use the headset on my laptop.  Unfortunately, the result was
-the same.
+> I will fix it. The current patch is just a skeleton(draft)
+> of my idea.
 
-I did find that when I first turned on the headset with the bluetooth dongle
-plugged into the laptop, I saw the "pin_request" events in the hcidump
-output.  After reading up on what the link key is and how it is generated, it
-now seems to me that this is just fine.
+very good.
 
-If I understand correctly, the first time a device is connected to a bluetooth
-host, they will negotiate the link key.  This usually involves transmitting
-the PIN and generating the encryption key.  After that, this procedure no
-longer needs to be done.  This would explain why I never saw those messages
-again on my other machine.  The link setup had already been performed.
+> Basically only the function signature or name changed, the behaviour 
+> are the same. The current code is compatible with 0.23, 0.33 and 0.34.
+> I didn't test the 0.35 version. But, I belive that we will not have problems.
+> The current "configure"(2.18) file is using AC_CHECK_LIB, for check function
+> availability. This is not so elegant too.
+> In my current implementation the version of D-Bus is checked by "configure".
+> There is no references to changed functions in the code, I defined macros
+> replacing the function name/signature according to D-Bus version.
 
-So... if the link status is fine, and the device is properly paired... what
-could be wrong?  If it weren't for the fact that I breifly had it functioning,
-I would strongly suspect that the headset is broken.
+I think you missed my point. If some function is not available in 0.23,
+but it is in 0.3x then implement it in compat.c via a "static inline"
+function covered by an "#ifdef".
 
-Is such a breakage possible, where the radio/link is working, but everything
-past that doesn't function?
+And I do think that the checking for a specific library is a good thing
+to do, because tracking specific versions is bad. And after D-Bus 1.0 is
+released I might remove all compat D-Bus function from the BlueZ source
+code.
 
-I don't know anybody else with anything bluetooth (even a phone), so it's hard
-for me to test this.  My only other option right now is the tiny iota of
-information I can get out of Windows.  In XP, the pairing succeeds, but when I
-check the headset "Properties" and check the "Services" tab, it pauses for a
-second, but lists nothing.  If anybody here has any idea what, if anything,
-should be listed in that tab, please let me know.  Otherwise I'll try to
-contact Plantronics support and see what they say.
+> The current main loop is exactly the same approach of Glib.
+> bluetoothd supposes to be the main daemon, therefore it must
+> be the first D-Bus object of the hierarchy and the object resposible
+> for start the connection, register the object, register filters, 
+> handle signals(Disconnect, NameOwnerChanged, NameAcquired ...)
+> The file descriptor poll should be flexible in order to handle other
+> file descriptors(socket for incomming connections, socket for hci packets).
+> These are the assumptions that I considered.
+
+What has the D-Bus object to do with the event loop? The event loop is
+something that is provided by Glib and we need our own implementation.
+The bluetoothd then adds file descriptors to the watch and that's it. I
+don't see any need why D-Bus must be the first file descriptor in the
+list and so bluetoothd itself and the event loop implementation are
+independent from each other.
+
+> I am not understanding how you plan integrate hcid and HAL. Could you
+> give me more details?
+
+This is not what I said. I said that we should model the D-Bus methods
+and signals like the HAL people did.
+
+> HCI and SDP are essential to the others profiles. PAN is important to me
+> because I am developing a network library to help multiplayer games
+> developers and UPnP applications control bluetooth connections.
+> I will create a document with the basic interfaces required and submit 
+> a for your analysis as son as possible. But I will keep coding because
+> I have a schedule to follow.
+
+I can't do anything about your schedule. For it is important that we get
+a clean interface over D-Bus.
+
+Regards
+
+Marcel
 
 
--- 
---John Gruenenfelder    Research Assistant, Steward Observatory, U of Arizona
-                        johng@as.arizona.edu
-Try Weasel Reader for PalmOS  --  http://gutenpalm.sf.net
-"This is the most fun I've had without being drenched in the blood
-of my enemies!"
-        --Sam of Sam & Max
 
 
 -------------------------------------------------------
