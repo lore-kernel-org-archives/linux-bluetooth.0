@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050726083000.1153.qmail@web15704.mail.cnb.yahoo.com>
-From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
-To: bluez-devel <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=gb2312
-Subject: [Bluez-devel] How can I set CSR module as PCM master?
+From: John Gruenenfelder <johng@as.arizona.edu>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Can't get btsco to connect to Plantronics M2500 headset
+Message-ID: <20050726062958.GA17805@as.arizona.edu>
+References: <20050726042812.GA16828@as.arizona.edu> <42E5CA58.4030408@xmission.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <42E5CA58.4030408@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,38 +18,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 26 Jul 2005 16:30:00 +0800 (CST)
+Date: Mon, 25 Jul 2005 23:29:58 -0700
 
-Hi,
-I want to transmit voice data through CSR modules so
-that I can talk with others using speaker and
-microphone.And I connecte a C145483 Codec throught PCM
-interface .But unfortunately,CSR module doesn't send 
-the PCM clock and sync,so the Codec doesn't work.And
-now, I know that when the CSR module is set as a PCM
-master it will send the PCM clock. However ,I don't
-know how to do that. I can change the PCM mapping
-using pskey just like this: 
-$ pskey -i hci0 mapsco 0
-$ hciconfig hci0 revision
-hci0:   Type: UART
-        BD Address: 4A:49:4E:00:15:2F ACL MTU: 384:4
-SCO                          MTU: 64:8
-        Build 705
-        Chip version: BlueCore02-External
-        Max key size: 56 bit
-        SCO mapping:  HCI
-So, what can I do?
+On Mon, Jul 25, 2005 at 11:30:00PM -0600, Brad Midgley wrote:
+>John,
+>
+>You can force the pairing to be built again by removing 
+>/etc/bluetooth/link_key
 
-Thanks in advance!
+I thought something like this might be possible.  If I have hcidump running,
+when I start hcid I see:
 
-gadfly
+< HCI Command: Read Stored Link Key (0x03|0x000d) plen 7
+> HCI Event: Command Complete (0x0e) plen 8
+
+Which says to me that a key is stored somewhere.  However, I have never seen
+the file /etc/bluetooth/link_key on my system.  Is there anyplace else it
+might be located, perhaps under /var?  I searched my machine for any
+*link_key* files, but didn't find anything.
+
+>I've looked at your messages and I can't think of many other things. Do 
+>you have other bluetooth devices you can try? Can you easily try it with 
+>a 32-bit kernel/userland?
+
+I do have an old laptop that I can test with.  I will try this tomorrow.  I
+don't actually intend to use the headset on my 64bit machine, but as it is my
+desktop, it's what I use for testing.  So if it works with a 32bit machine,
+that will be just fine.
 
 
-
-__________________________________________________
-∏œøÏ◊¢≤·—≈ª¢≥¨¥Û»›¡ø√‚∑—” œ‰?
-http://cn.mail.yahoo.com
+-- 
+--John Gruenenfelder    Research Assistant, Steward Observatory, U of Arizona
+                        johng@as.arizona.edu
+Try Weasel Reader for PalmOS  --  http://gutenpalm.sf.net
+"This is the most fun I've had without being drenched in the blood
+of my enemies!"
+        --Sam of Sam & Max
 
 
 -------------------------------------------------------
