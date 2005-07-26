@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: John Gruenenfelder <johng@as.arizona.edu>
+Message-ID: <42E5CA58.4030408@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Can't get btsco to connect to Plantronics M2500 headset
-Message-ID: <20050726062958.GA17805@as.arizona.edu>
-References: <20050726042812.GA16828@as.arizona.edu> <42E5CA58.4030408@xmission.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <42E5CA58.4030408@xmission.com>
+Subject: Re: [Bluez-devel] Can't get btsco to connect to Plantronics M2500
+ headset
+References: <20050726042812.GA16828@as.arizona.edu>
+In-Reply-To: <20050726042812.GA16828@as.arizona.edu>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,42 +19,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 25 Jul 2005 23:29:58 -0700
+Date: Mon, 25 Jul 2005 23:30:00 -0600
 
-On Mon, Jul 25, 2005 at 11:30:00PM -0600, Brad Midgley wrote:
->John,
->
->You can force the pairing to be built again by removing 
->/etc/bluetooth/link_key
+John,
 
-I thought something like this might be possible.  If I have hcidump running,
-when I start hcid I see:
+You can force the pairing to be built again by removing 
+/etc/bluetooth/link_key
 
-< HCI Command: Read Stored Link Key (0x03|0x000d) plen 7
-> HCI Event: Command Complete (0x0e) plen 8
+I've looked at your messages and I can't think of many other things. Do 
+you have other bluetooth devices you can try? Can you easily try it with 
+a 32-bit kernel/userland?
 
-Which says to me that a key is stored somewhere.  However, I have never seen
-the file /etc/bluetooth/link_key on my system.  Is there anyplace else it
-might be located, perhaps under /var?  I searched my machine for any
-*link_key* files, but didn't find anything.
+Brad
 
->I've looked at your messages and I can't think of many other things. Do 
->you have other bluetooth devices you can try? Can you easily try it with 
->a 32-bit kernel/userland?
-
-I do have an old laptop that I can test with.  I will try this tomorrow.  I
-don't actually intend to use the headset on my 64bit machine, but as it is my
-desktop, it's what I use for testing.  So if it works with a 32bit machine,
-that will be just fine.
-
-
--- 
---John Gruenenfelder    Research Assistant, Steward Observatory, U of Arizona
-                        johng@as.arizona.edu
-Try Weasel Reader for PalmOS  --  http://gutenpalm.sf.net
-"This is the most fun I've had without being drenched in the blood
-of my enemies!"
-        --Sam of Sam & Max
+> * The first time I tried to use the headset in Linux, I encountered these same
+>   problems, but I *did* get it to work.  I was even able to play and record
+>   audio.  After a short time, btsco exited and I haven't gotten it to work
+>   again.  :(
+> 
+> * That first time, I also found an entry in the logs which I have never seen
+>   again: 
+>   hcid[4365]: pin_code_request (sba=00:0C:41:E1:E2:F1, dba=00:03:89:6E:C9:11)
+>   This comes immediately after a link_key_request.  I still see the
+>   link_key_request messages every time I I do any bluetooth commands, but I
+>   have not seen the pin_code_request line again.  I don't know if that is
+>   significant.
+> 
+> Please help!
+> 
+> 
 
 
 -------------------------------------------------------
