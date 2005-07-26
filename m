@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42E76684.20301@csr.com>
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
+From: John Gruenenfelder <johng@as.arizona.edu>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re:How can I set CSR module as PCM master?
-References: <20050727090711.69181.qmail@web15702.mail.cnb.yahoo.com>
-In-Reply-To: <20050727090711.69181.qmail@web15702.mail.cnb.yahoo.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Bluez-devel] Can't get btsco to connect to Plantronics M2500 headset
+Message-ID: <20050726225514.GA26245@as.arizona.edu>
+References: <20050726042812.GA16828@as.arizona.edu> <42E5CA58.4030408@xmission.com> <20050726062958.GA17805@as.arizona.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20050726062958.GA17805@as.arizona.edu>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,51 +18,57 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 27 Jul 2005 11:48:36 +0100
+Date: Tue, 26 Jul 2005 15:55:14 -0700
 
-宁 宁 wrote:
-> Hi,
-> thanks Steven and Peter.
-> I have no other PS tools except pskey,so I cann't set PSKEY PCM_CONFIG32.  
->  And if the module's default is PCM master,it should generate clock and sync,but it don't
-> ,so the MC145483 doesn't work! I didn't change other settings except PCM map using
-> "pskey -i hci0 mapsco 1"! The Codec's sample format is 13-bit,but the CSR module's is
-> 16-bit, is that the matter?
+On Mon, Jul 25, 2005 at 11:29:58PM -0700, John Gruenenfelder wrote:
+>On Mon, Jul 25, 2005 at 11:30:00PM -0600, Brad Midgley wrote:
+>>
+>>I've looked at your messages and I can't think of many other things. Do 
+>>you have other bluetooth devices you can try? Can you easily try it with 
+>>a 32-bit kernel/userland?
+>
+>I do have an old laptop that I can test with.  I will try this tomorrow.  I
+>don't actually intend to use the headset on my 64bit machine, but as it is my
+>desktop, it's what I use for testing.  So if it works with a 32bit machine,
+>that will be just fine.
 
-This doesn't matter. PSKEY_PCM_FORMAT overrides the HCI Voice_Settings
-(for the input format, not for the air format). By default, that's set
-to produce 13 bit data - just what the MC145483 wants.
+Okay, I tried to use the headset on my laptop.  Unfortunately, the result was
+the same.
 
-You are running some slightly unusual firmware for an HCI module. The
-firmware you're running is more normally associated with having an
-application on chip. Is it possible there's an application on board
-which is messing things up? (Of course, if it's a dual boot dongle then
-we'd expect there to be an application on chip, but it'll shut down in
-HCI mode).
+I did find that when I first turned on the headset with the bluetooth dongle
+plugged into the laptop, I saw the "pin_request" events in the hcidump
+output.  After reading up on what the link key is and how it is generated, it
+now seems to me that this is just fine.
 
-> If not,what's wrong?
+If I understand correctly, the first time a device is connected to a bluetooth
+host, they will negotiate the link key.  This usually involves transmitting
+the PIN and generating the encryption key.  After that, this procedure no
+longer needs to be done.  This would explain why I never saw those messages
+again on my other machine.  The link setup had already been performed.
 
-I've no idea.
+So... if the link status is fine, and the device is properly paired... what
+could be wrong?  If it weren't for the fact that I breifly had it functioning,
+I would strongly suspect that the headset is broken.
 
-The codec you've got and the setup you're using (BlueCore is PCM master
-on an MC145483 codec) is exactly the one we use for all our regression
-tests. Hence, I'm really, really sure it works.
+Is such a breakage possible, where the radio/link is working, but everything
+past that doesn't function?
 
-Is there any possibility of a PCB problem? What module or dongle are
-you using? Do you have a Casira you can use for comparison?
+I don't know anybody else with anything bluetooth (even a phone), so it's hard
+for me to test this.  My only other option right now is the tiny iota of
+information I can get out of Windows.  In XP, the pairing succeeds, but when I
+check the headset "Properties" and check the "Services" tab, it pauses for a
+second, but lists nothing.  If anybody here has any idea what, if anything,
+should be listed in that tab, please let me know.  Otherwise I'll try to
+contact Plantronics support and see what they say.
 
-	- Steven
+
 -- 
-
-
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-**********************************************************************
-
+--John Gruenenfelder    Research Assistant, Steward Observatory, U of Arizona
+                        johng@as.arizona.edu
+Try Weasel Reader for PalmOS  --  http://gutenpalm.sf.net
+"This is the most fun I've had without being drenched in the blood
+of my enemies!"
+        --Sam of Sam & Max
 
 
 -------------------------------------------------------
