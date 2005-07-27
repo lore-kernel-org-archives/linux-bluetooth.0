@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <39673606050727232616de871f@mail.gmail.com>
-From: Robert Brewer <rwb123@gmail.com>
+From: Wolfgang =?iso-8859-1?q?M=FCes?= <wolfgang@iksw-muees.de>
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] zonet zub6101c dongle advice?
+Subject: Re: [Bluez-users] Kernel module for PCMCIA/CF Bluetooth cards with CSR chipset
+References: <Pine.LNX.4.60.0507271810310.12694@purdy.demon.co.uk>
+In-Reply-To: <Pine.LNX.4.60.0507271810310.12694@purdy.demon.co.uk>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200507272054.48650.wolfgang@iksw-muees.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,28 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 28 Jul 2005 02:26:59 -0400
+Date: Wed, 27 Jul 2005 20:54:48 +0200
 
-The zonet zub6101c dongle (class 1, bluetooth 1.2) is on sale
-at newegg.com for $5 plus shipping after a mail-in rebate.
+On Wednesday 27 July 2005 19:11, andy thomas wrote:
+> One thing puzzles me - back in March this year, Erwin Authried wrote
+> in this mailing list that PCMCIA/CF UARTs are register-compatible
+> emulations of a standard UART (see original mail below). Does this
+> mean that I could be using just the serial_cs.o kernel module for the
+> Socket CF+ card?
 
-http://www.newegg.com/Product/Product.asp?Item=3DN82E16833130023#sctNav
+Yes. I do it on my Zaurus.
 
-One of the reviews at that site says it works with linux.  Can anyone else
-confirm?  Does anyone know what chipset it is using?
+Best regards
 
-I just bought the logitech mobile freedom headset, and I'm thinking about t=
-he
-zonet adapter to experiment with voice applications under linux.  Both the =
-100m
-range and bluetooth 1.2 for reducing interference with wifi are important
-to me. =20
-
-Thanks for any advice.
-
--Rob
---=20
-Robert W. Brewer
+Wolfgang
 
 
 -------------------------------------------------------
