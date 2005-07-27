@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] dfutool block size
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <42E799DA.70207@fbl.cz>
+From: Tomas Vanek <Tomas.Vanek@fbl.cz>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <42E799DA.70207@fbl.cz>
-References: <42E799DA.70207@fbl.cz>
-Content-Type: text/plain
-Message-Id: <1122511081.916.4.camel@notepaq>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] dfutool block size
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,52 +16,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 28 Jul 2005 02:38:01 +0200
+Date: Wed, 27 Jul 2005 16:27:38 +0200
 
-Hi Thomas,
+I tryied upgrade an old i-Tec BT dongle (CSR BlueCore2 ext + 4M flash, 
+ID=0a12:0001, original version 272 - BT 1.1 HCI 14.3) by dfutool. 
+Archiving old firmware was OK.
 
-> I tryied upgrade an old i-Tec BT dongle (CSR BlueCore2 ext + 4M flash, 
-> ID=0a12:0001, original version 272 - BT 1.1 HCI 14.3) by dfutool. 
-> Archiving old firmware was OK.
-> 
-> dfutool upgrade GenericCSR829.dfu
-> 
-> failed after time-out with message:
-> 
-> Can't upload next block: Broken pipe (32)
-> 
-> No change after upgrading to today's bluez cvs head.
-> I reduced written block size to 512 (why original length was 1023 and 
-> not 1024??)
-> and dongle got upgraded OK (tested with archived fw version 272). Then I 
-> tested sizes
-> in between:
-> 
-> 1008 and 992: broken pipe
-> 960: Can't get status: No such device after 9600 bytes
-> 896: dfutool finished upgrade OK but dongle stays in DFU mode
-> 768: upgrade worked
-> 
-> It's clear this is a problem in dfu loader in the dongle. I tested it again
-> with upgraded firmware and problem persists.
-> If there is more such dongles, it might be worth to add a block size 
-> parameter to dfutool.
+dfutool upgrade GenericCSR829.dfu
 
-feel free to send in a patch that adds a parameter for a different block
-size.
+failed after time-out with message:
 
-Regards
+Can't upload next block: Broken pipe (32)
 
-Marcel
+No change after upgrading to today's bluez cvs head.
+I reduced written block size to 512 (why original length was 1023 and 
+not 1024??)
+and dongle got upgraded OK (tested with archived fw version 272). Then I 
+tested sizes
+in between:
 
+1008 and 992: broken pipe
+960: Can't get status: No such device after 9600 bytes
+896: dfutool finished upgrade OK but dongle stays in DFU mode
+768: upgrade worked
 
+It's clear this is a problem in dfu loader in the dongle. I tested it again
+with upgraded firmware and problem persists.
+If there is more such dongles, it might be worth to add a block size 
+parameter to dfutool.
+
+Tom
 
 
 -------------------------------------------------------
-SF.Net email is Sponsored by the Better Software Conference & EXPO September
-19-22, 2005 * San Francisco, CA * Development Lifecycle Practices
-Agile & Plan-Driven Development * Managing Projects & Teams * Testing & QA
-Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
+SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+from IBM. Find simple to follow Roadmaps, straightforward articles,
+informative Webcasts and more! Get everything you need to get up to
+speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
