@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050729125729.81622.qmail@web26802.mail.ukl.yahoo.com>
-From: Fabien Letort <fletort@yahoo.fr>
+Subject: Re: [Bluez-devel] EVT_CONN_COMPLETE not received on HCI socket
+	when RFComm connected
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] Question about bluetooth qualification
+In-Reply-To: <42E8F1F8.10700@palmsource.com>
+References: <42E8F1F8.10700@palmsource.com>
+Content-Type: text/plain
+Message-Id: <1122592426.5814.1.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,38 +19,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 29 Jul 2005 14:57:29 +0200 (CEST)
+Date: Fri, 29 Jul 2005 01:13:46 +0200
 
-I saw that BlueZ is qualified for GAP, Serial-DevA and
-Serial-DevB.
+Hi Fred,
 
-This is really a good point because GAP qualification
-should be expensive because there are A test to get it
-(test make by special firm). I know that RFCOMM
-qualification contains alos this kind of test.
+> I am writing a daemon that watches over bluetooth states (up, down, 
+> connected, disconnected, ...) to display this information to user.
+> I use HCI_FILTER (set to all events) to do this, but when a program make 
+> a connection using RFComm I do not receive the EVT_CONN_COMPLETE event 
+> (I use BlueZ 2.17 libs and utils).
+> Is it normal ? Is there a way to watch for connection/disconnection for 
+> all protocols ?
 
-BPut I would like to know if someone know, if
-qualification of other profile are really expensive ?
-In fact, these qualifcation procedure needs only test
-B or C type, so test that the developper can do
-himself.
+you can only watch ACL and SCO connect complete events with it. With the
+new bluetoothd and the new event mechanism from the kernel we can add
+something like this. In general it is not possible to what RFCOMM events
+for connection and disconnection.
 
-Someone know something on that ?
+Regards
 
-Thanks for your help !
-
-Regards,
-
-Fabien.
+Marcel
 
 
-	
-
-	
-		
-___________________________________________________________________________ 
-Appel audio GRATUIT partout dans le monde avec le nouveau Yahoo! Messenger 
-Téléchargez cette version sur http://fr.messenger.yahoo.com
 
 
 -------------------------------------------------------
