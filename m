@@ -1,39 +1,45 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Prakash <aprakash@tataelxsi.co.in>
-To: bluez-users@lists.sourceforge.net
-Message-id: <200507291658.49149.aprakash@tataelxsi.co.in>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Subject: [Bluez-users] HCI_USB
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 29 Jul 2005 16:58:49 +0530
+Return-Path: <rwaldrop@urbana.css.mot.com>
+Date: Thu, 28 Jul 2005 14:10:20 -0500
+From: Robert L Waldrop <bob.waldrop@motorola.com>
+To: martin.herfurt@trifinite.org, marcel@holtmann.org,
+   bluez-users@lists.sourceforge.net
+Subject: OPP and execl
+Message-ID: <20050728191020.GD7483@urbana.css.mot.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi,
+Hi Everyone in BlueZ world,
 
-           I am started to look on to Bluez source code ...  i would like to 
-know how application running on userland interacts with functions which are 
-defined/exported by hci_usb kernel module. 
+I'm playing around with some OPP fun and was wondering whether anyone
+had run into security issues using execl(...) from unistd.h.  I'm 
+wondering if it is prone to a shell attack or buffer overrun if I
+use it like this...
 
-Thanks
-Prakash
+execl("/my/mycmd","mycmd","arg1","arg2");
 
+Somehow the call forces arg1 (regardless of content, including special
+characters like semi-colons) to be the argument of mycmd.  But I'm
+curious if maybe there is a combination of characters that aren't 
+escaped correctly and someone might be able to invoke a second command
+or effect the kernel.  
 
--------------------------------------------------------
-SF.Net email is Sponsored by the Better Software Conference & EXPO September
-19-22, 2005 * San Francisco, CA * Development Lifecycle Practices
-Agile & Plan-Driven Development * Managing Projects & Teams * Testing & QA
-Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Also wondering if I'm susceptible to someone passing a large string 
+as arg1 if I open that up to the user.
+
+If there are such problems, what is the typical answer to the need for
+exec.
+
+Muchas Gracias!
+
+--bob w.
+
+-- 
+Robert Waldrop                  Motorola Personal Communications Sector
+rwaldrop@urbana.css.mot.com     Urbana-Champaign Design Center
+voice  217-384-8719             1800 South Oak Street
+                                Champaign IL 61820
+
+[X]  Motorola General Business Information
+[ ]  Motorola Internal Use Only
+[ ]  Motorola Confidential Proprietary
