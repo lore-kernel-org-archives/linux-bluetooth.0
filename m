@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42E881A4.30702@cefriel.it>
-From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] dfutool block size
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] multiple SCO link
+In-Reply-To: <42E799DA.70207@fbl.cz>
+References: <42E799DA.70207@fbl.cz>
+Content-Type: text/plain
+Message-Id: <1122511081.916.4.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,79 +18,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 28 Jul 2005 08:56:36 +0200
+Date: Thu, 28 Jul 2005 02:38:01 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Thomas,
 
-Hi to all.
-I'm developing an application that needs multiple SCO link.
-I've an A system that want to link to B and C system.
+> I tryied upgrade an old i-Tec BT dongle (CSR BlueCore2 ext + 4M flash, 
+> ID=0a12:0001, original version 272 - BT 1.1 HCI 14.3) by dfutool. 
+> Archiving old firmware was OK.
+> 
+> dfutool upgrade GenericCSR829.dfu
+> 
+> failed after time-out with message:
+> 
+> Can't upload next block: Broken pipe (32)
+> 
+> No change after upgrading to today's bluez cvs head.
+> I reduced written block size to 512 (why original length was 1023 and 
+> not 1024??)
+> and dongle got upgraded OK (tested with archived fw version 272). Then I 
+> tested sizes
+> in between:
+> 
+> 1008 and 992: broken pipe
+> 960: Can't get status: No such device after 9600 bytes
+> 896: dfutool finished upgrade OK but dongle stays in DFU mode
+> 768: upgrade worked
+> 
+> It's clear this is a problem in dfu loader in the dongle. I tested it again
+> with upgraded firmware and problem persists.
+> If there is more such dongles, it might be worth to add a block size 
+> parameter to dfutool.
 
-The code looks like this one:
+feel free to send in a patch that adds a parameter for a different block
+size.
 
-  if ((s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO)) < 0) {
-    perror("socket");
-    return -1;
-  }
+Regards
 
-  memset(&addr, 0, sizeof(addr));
-  addr.sco_family = AF_BLUETOOTH;
-  bacpy(&addr.sco_bdaddr, src);
-  if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-    perror("bind");
-    close(s);
-    return -1;
-  }
+Marcel
 
-  memset(&addr, 0, sizeof(addr));
-  addr.sco_family = AF_BLUETOOTH;
-  bacpy(&addr.sco_bdaddr, dst_1);
-  if (connect(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-    perror("connect");
-    close(s);
-    return -1;
-  }
 
-  if ((s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO)) < 0) {
-    perror("socket");
-    return -1;
-  }
-
-  memset(&addr, 0, sizeof(addr));
-  addr.sco_family = AF_BLUETOOTH;
-  bacpy(&addr.sco_bdaddr, dst_2);
-  if (connect(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-    perror("connect");
-    close(s);
-    return -1;
-  }
-
-The last connect seems not work. What's the problem? How could I solve it?
-
-A second question: what the way to route sco audio to an ALSA device?
-
-thanks a lot in advance.
-
-Cheers,
-Pizza
-
-- -------------------------------------------
-Luca Pizzamiglio
-CEFRIEL - Embedded Systems Design Unit
-Via Fucini, 2 - 20133 MILANO (ITALY)
-Phone:		+39 02 23954 343
-e-mail:		pizzamiglio@cefriel.it
-ICQ:		5046978
-- -------------------------------------------
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.7 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFC6IGkAoUy56ORfbERAiYqAJ986lOQ0CfVCtRqdreUc6F86/Z4VQCgmW6o
-b3jSUh7hLu3OWOXXzfYrQco=
-=QM9q
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
