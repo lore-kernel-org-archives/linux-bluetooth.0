@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <42E881A4.30702@cefriel.it>
+From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
-Subject: RE: [Bluez-devel] sbc and fixed-point progress
-Message-ID: <C70061B183DE09419568AB2060C52A95980BDC@arion.intra.local>
-From: "Victor Shcherbatyuk" <Victor.Shcherbatyuk@tomtom.com>
-To: <bluez-devel@lists.sourceforge.net>
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] multiple SCO link
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,83 +16,79 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 28 Jul 2005 15:14:48 +0200
+Date: Thu, 28 Jul 2005 08:56:36 +0200
 
-Hello Brad,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-FYI,
+Hi to all.
+I'm developing an application that needs multiple SCO link.
+I've an A system that want to link to B and C system.
 
-Yesterday I converted encoder to fixed point (I did it a dirty way, so
-probably it doesn't have much of the value). I've converted each of the
-tables with different precision in such a way that the operations
-involving the tables (mults and adds) will not overflow 32 bit, and
-where necessary I pre-shift intermediate results to prevent overlowing.
-Currently the output  is a slightly noisy, but the purpose was to
-estimate required performance. The result is, in the current
-implementation, using fixed point it is just about to be enough to run
-on 400Mhz arm combined with mp3 decoder (mp3 piped though mad mp3
-decoder to sbc encoder to a2play). This means either something is wrong
-:) or SBC codec should be heavily optimized (3 - 5 times ?) to make it
-reasonable (memcopies is the first thing to optimize probably)...
+The code looks like this one:
 
-Regards,
-     Victor.
+  if ((s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO)) < 0) {
+    perror("socket");
+    return -1;
+  }
 
+  memset(&addr, 0, sizeof(addr));
+  addr.sco_family = AF_BLUETOOTH;
+  bacpy(&addr.sco_bdaddr, src);
+  if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    perror("bind");
+    close(s);
+    return -1;
+  }
 
------Original Message-----
-From: bluez-devel-admin@lists.sourceforge.net
-[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Brad
-Midgley
-Sent: Monday, July 04, 2005 6:03 AM
-To: BlueZ Mailing List
-Subject: [Bluez-devel] sbc and fixed-point progress
+  memset(&addr, 0, sizeof(addr));
+  addr.sco_family = AF_BLUETOOTH;
+  bacpy(&addr.sco_bdaddr, dst_1);
+  if (connect(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    perror("connect");
+    close(s);
+    return -1;
+  }
 
-Guys,
+  if ((s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO)) < 0) {
+    perror("socket");
+    return -1;
+  }
 
-just FYI...
+  memset(&addr, 0, sizeof(addr));
+  addr.sco_family = AF_BLUETOOTH;
+  bacpy(&addr.sco_bdaddr, dst_2);
+  if (connect(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    perror("connect");
+    close(s);
+    return -1;
+  }
 
-I found a decent fixed point multiply that preshifts the values before
-multiplying them. It keeps things in 32 bits. Most of the roundoff error
-is taken care of in two additional terms. I think the result is
-reasonable.
-(http://www.accu.org/acornsig/public/caugers/volume2/issue6/fixedpoint.h
-tml)
+The last connect seems not work. What's the problem? How could I solve it?
 
-If you compile with fixed-point on, libsbc will run both the fixed and
-floating point calculations and flag errors when they differ too much.
-It seems to be working well and has helped me catch a couple of
-fixed-point calculation problems.
+A second question: what the way to route sco audio to an ALSA device?
 
-I have the decoder almost finished but I probably need to split some
-terms into integer and fixed-point components. Loading up=20
-frame->sb_sample for example can have a big integer part but we want to
-use most of the 32 bit fixed-point type for the fractional part.
+thanks a lot in advance.
 
-Brad
+Cheers,
+Pizza
 
+- -------------------------------------------
+Luca Pizzamiglio
+CEFRIEL - Embedded Systems Design Unit
+Via Fucini, 2 - 20133 MILANO (ITALY)
+Phone:		+39 02 23954 343
+e-mail:		pizzamiglio@cefriel.it
+ICQ:		5046978
+- -------------------------------------------
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.7 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-
--------------------------------------------------------
-SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-from IBM. Find simple to follow Roadmaps, straightforward articles,
-informative Webcasts and more! Get everything you need to get up to
-speed, fast. http://ads.osdn.com/?ad_id=3D7477&alloc_id=3D16492&op=3Dclic=
-k
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
-This e-mail message contains information which is confidential and may be=
- privileged. It is intended for use by the addressee only. If you are not=
- the intended addressee, we request that you notify the sender immediatel=
-y and delete or destroy this e-mail message and any attachment(s), withou=
-t copying, saving, forwarding, disclosing or using its contents in any ot=
-her way. TomTom N.V., TomTom International BV or any other company belong=
-ing to the TomTom group of companies will not be liable for damage relati=
-ng to the communication by e-mail of data, documents or any other informa=
-tion.
+iD8DBQFC6IGkAoUy56ORfbERAiYqAJ986lOQ0CfVCtRqdreUc6F86/Z4VQCgmW6o
+b3jSUh7hLu3OWOXXzfYrQco=
+=QM9q
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
