@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Cesare Marzano <cesare.marzano@enteos.it>
+From: Prakash <aprakash@tataelxsi.co.in>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200507291734.54966.cesare.marzano@enteos.it>
-Subject: [Bluez-users] Daemons and OBEX file transfer
+Message-id: <200507291658.49149.aprakash@tataelxsi.co.in>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Subject: [Bluez-users] HCI_USB
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,24 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 29 Jul 2005 17:34:54 +0200
+Date: Fri, 29 Jul 2005 16:58:49 +0530
 
-Hi all!
-I'm new in the bluez environment and I've some questions about the state of 
-the art.
+Hi,
 
-- Which are the services actually supported by bluez protocol (In terms of 
-daemon programs) ?
+           I am started to look on to Bluez source code ...  i would like to 
+know how application running on userland interacts with functions which are 
+defined/exported by hci_usb kernel module. 
 
-- I would like to set up an FTP server via bluetooth on my MX21 development 
-board. Is there any daemon (in bluez or in other package) to set up this 
-service? I can declare the service via sdpd but there is not any program 
-responding to the queries. Moreover: is there any FTP client over bluetooth 
-to navigate through the remote filesystem?
-
-Thanks in advance all of you.
-
-Cesare.
+Thanks
+Prakash
 
 
 -------------------------------------------------------
