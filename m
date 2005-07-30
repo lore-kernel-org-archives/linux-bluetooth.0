@@ -1,42 +1,82 @@
-Return-Path: <bb@arbetsmyra.dyndns.org>
-Content-Type: text/plain;
-  charset="iso-8859-1"
-From: Ronny L Nilsson <bb@arbetsmyra.dyndns.org>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bccmd reading clock
-Date: Fri, 1 Jul 2005 10:43:28 +0200
-References: <20050627223919.793D83BC@arbetsmyra.dyndns.org> <1119973364.15397.77.camel@pegasus> <20050629082735.CC3AC84E@arbetsmyra.dyndns.org>
-In-Reply-To: <20050629082735.CC3AC84E@arbetsmyra.dyndns.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-MIME-Version: 1.0
-Message-Id: <20050701084528.C38DD82D@arbetsmyra.dyndns.org>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: bc90021 <bc90021@bc90021.net>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <loom.20050728T195337-380@post.gmane.org>
+References: <428EDFCA.5070702@gmail.com>
+	 <1116842776.30044.33.camel@pegasus>	 <4292938B.2090000@gmail.com>
+	 <1116924491.30044.131.camel@pegasus>	 <429553F1.7020604@gmail.com>
+	 <1117095364.12036.14.camel@pegasus>	 <429682D6.2020800@gmail.com>
+	 <1117177537.12036.90.camel@pegasus>	 <42980599.9040801@gmail.com>
+	 <1117287707.12036.138.camel@pegasus> <429E8F28.3010008@gmail.com>
+	 <loom.20050728T195337-380@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1122682209.11983.113.camel@viskulan.tigerhost.net>
+Mime-Version: 1.0
+Subject: [Bluez-users] Treo 650 Oddities
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Fri, 29 Jul 2005 20:10:08 -0400
+
+Hi All,
+
+I have three devices:
 
 
-hi
-I got no response to my revised bccmd patch
-http://sourceforge.net/mailarchive/message.php?msg_id=12199652
-Accepted, rejected och just delayed review?
-
-regards
-/Ronny
+Dell Desktop, with USB Dongle
+Dell Laptop, with USB Dongle
+Treo 650 (Verizon)
 
 
+>>From the desktop, I can see the phone and the laptop.
+>>From the laptop, I can see the desktop and the phone.
+>>From the phone, I can see the desktop, but not the laptop.
+
+No matter what I do, the phone will not discover the laptop.  It sees
+the desktop with no problem.
+
+I've tried switching the dongles, to no effect.  I've tried updating my
+BlueZ software, to no effect.  I've tried updating the kernel, to no
+effect.
+
+I can't use hcidump to find out what's going on, because it doesn't
+register the connection attempt from the phone.  (I tried that with the
+desktop, too, with the same effect.)  However, the desktop can
+successfully connect to the phone nonetheless, as the laptop should.
+(I've backed up the Treo with pilot-xfer, so I know it works.)
+
+The dongle (either one), when in the laptop, will turn to a more solid
+blue (as opposed to intermittently flashing), making it look like it is
+getting a signal.  I'm never more than three feet from the laptop with
+the phone, so range is not an issue.
+
+The kernel versions are the same on the desktop and the laptop.  The
+BlueZ software versions are identical (I'm using Gentoo on both).  The
+configuration files are the same (literally, I scp'ed them) on the
+laptop as they are on the desktop.
+
+Can anyone suggest what to try next?  I'm at a loss here... I want to be
+able to use the Treo as a modem for the laptop while I'm on vacation,
+but since I can't pair them, I can't do that right now.
+
+Thanks in advance for any and all help.
 
 
-----------------------------------------------------------
-> > > I was in the need for an enhancement of the bccmd tool and thus
-> > > made a small change. The supplied patch adds a command for
-> > > reading the the BT-clock of local device. In the process I also
-> > > made some minor changes to utils/tools/csr.c to reuse existing
-> > > code. Besided reading 16-bit variables it can now also read 32-
-> > > and 8-bits alike.
-> >
-> > don't do type conversion like this. Use varid_complex for it if you
-> > wanna support uint32 and unit8 without copying code.
->
-> As you command.... :)  Perhaps like this then? Added parsing read of
-> uart speed setting too. I'm a bit uncertain however of where to put
-> corresponding uart config write. Both BCCMD and PSKEY seems adequate.
->
-> /Ronny
+
+-------------------------------------------------------
+SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
+from IBM. Find simple to follow Roadmaps, straightforward articles,
+informative Webcasts and more! Get everything you need to get up to
+speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
