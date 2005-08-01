@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Getting an adaptor to be supported (for SCO
-	audio)
-From: Alexandros Vellis <avel@noc.uoa.gr>
+Message-ID: <42EDE01E.7010602@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <42EDBD25.4050301@xmission.com>
-References: <1122875141.6800.8.camel@amy>  <42EDBD25.4050301@xmission.com>
-Content-Type: text/plain
-Message-Id: <1122888885.6800.13.camel@amy>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] sbc and fixed-point progress
+References: <C70061B183DE09419568AB2060C52A959BEBF9@arion.intra.local>
+In-Reply-To: <C70061B183DE09419568AB2060C52A959BEBF9@arion.intra.local>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,38 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 01 Aug 2005 12:34:44 +0300
+Date: Mon, 01 Aug 2005 02:41:02 -0600
 
-Brad Midgley wrote:
+Victor
 
-> It seems that hci routing of sco audio is only available on CSR chips.
-> 
-> SCO will be routed through the PCM hardware on your silicon wave chip 
-> but that PCM interface is not connected to anything in a usb dongle.
+> I've looked at the code once more. Probably you asware of this,  but
+> using rmagnitude(...)  gives almost no information about required
+> precision :(
 
-Voice audio works perfectly in Windows XP, though.
+it's intended to capture the min and max exponent of the various 
+floating point values a variable has at runtime, but, yes, it won't help 
+with finding the number of bits required to represent something accurately.
 
-Is it a case such as the one with winmodems, in that software is doing
-the voice routing?
-
-Or would these (cheap, admittedly, I got mine for 15 euros) dongles need
-some sort of (difficult) reverse engineering to pass through the audio?
-
-Just wondering. :)
-
-> I have the same problem with the builtin infineon bluetooth on gumstix 
-> (see http://bluetooth-alsa.sf.net/embed.html for more)
-
-I don't particulary like this TODO item:
-
-- Find out if SCO can be mapped to HCI as it can on CSR (*no*)
-
-:-D
-
-Thanks,
-Alexandros
-
-
+brad
 
 
 -------------------------------------------------------
