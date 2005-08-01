@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Mathias Adam <a2@adamis.de>
+From: Robert L Waldrop <bob.waldrop@motorola.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: Kernel module for PCMCIA/CF Bluetooth cards with CSR chipset
-Message-ID: <20050801214137.GA30572@adamis.de>
-References: <20050728030527.B34DB12FEB@sc8-sf-spam2.sourceforge.net> <Pine.LNX.4.60.0507281157380.15380@purdy.demon.co.uk> <200507281340.00164.wolfgang@iksw-muees.de> <Pine.LNX.4.60.0507281250290.15380@purdy.demon.co.uk>
+Message-ID: <20050801190110.GC11317@urbana.css.mot.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <Pine.LNX.4.60.0507281250290.15380@purdy.demon.co.uk>
+Subject: [Bluez-users] BlueZ stack failure
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,36 +16,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 1 Aug 2005 23:41:37 +0200
+Date: Mon, 1 Aug 2005 14:01:10 -0500
 
-On 28.07.05 13:08:13, andy thomas wrote:
-> Ah, I thought I'd try a low baud rate to begin with. But it still times 
-> out if I use the 'bcsp' parameter although if I use 'any' then the hci0 
-> device is registered:
-> 
->   # hciattach ttyS1 any
->   # hciconfig -a
->   hci0:   Type: UART
->         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
->         DOWN
->         RX bytes:2086 acl:0 sco:0 events:6 errors:168
->         TX bytes:4 acl:0 sco:0 commands:1 errors:0
-> 
-> but it still won't come up.
-> 
->   # hciconfig hci0 up
->   Can't init device hci0: Connection timed out (110)
+Hi,
 
-if you're using a 2.6 kernel: did you apply the patch for the serial
-driver I posted here some time ago? had the same problems before.
+I'm having a problem with the rfcomm utility and linux select().
+The symptoms are that if I CTRL-C after incomming connection is heard,
+when using "rfcomm listen ... /dev/rfcomm10", /dev/rfcomm10 is deleted.  
+More importantly, a select call on the device blocks except for the 
+first try.  Also, when my machine boots, you have to run 
+"/etc/init.d/bluetooth restart" for some reason, otherwise; bluetooth
+doesn't work, it's like there is something stuck at boot up.
 
-Regards,
-Mathias
+I created the /dev/rfcomm10 using .../bluz-utils-2.18/scripts/create_dev 
+and am using a clean copy of "rfcomm."  I've also tried rebooting bluetooth
+between each calls rfcomm and that doesn't work.
+
+I reinstalled libs and utils.  I had been using the patch on 2.6.11 from
+bluez.org.  I'm initially had an install of Fedora Core three based on 
+2.6.9.
+
+Thanks!
+
+--bob w.
 
 -- 
-Perfection is achieved not when you have nothing more to add,
-but when you have nothing left to take away.
- - Antoine de Saint-Exupery
+Robert Waldrop                  Motorola Personal Communications Sector
+rwaldrop@urbana.css.mot.com     Urbana-Champaign Design Center
+voice  217-384-8719             1800 South Oak Street
+                                Champaign IL 61820
+
+[X]  Motorola General Business Information
+[ ]  Motorola Internal Use Only
+[ ]  Motorola Confidential Proprietary
 
 
 -------------------------------------------------------
