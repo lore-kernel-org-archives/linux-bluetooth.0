@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Prakash <aprakash@tataelxsi.co.in>
+Message-ID: <42EEF35E.4080405@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Message-id: <200508021321.35064.aprakash@tataelxsi.co.in>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] SCO Query on tty based Stack
+Subject: Re: [Bluez-devel] btsco problems
+References: <39673606050801205131f308d3@mail.gmail.com>
+In-Reply-To: <39673606050801205131f308d3@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,31 +18,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 02 Aug 2005 13:21:35 +0530
+Date: Mon, 01 Aug 2005 22:15:26 -0600
 
-Hi,
+Robert
 
-         I am trying to run OPEN-BT with USB device. i have compiled
- userstack application and initialized my USB dongle too.  I am aware of
- openbt that it doesn't support SCO and interacts through tty device. I have
- gonethrough bluetty.c (class driver). I didn't find any codes for SCO
- packet.
+> Zonet zub6101c usb dongle (class 1, bluetooth 1.2, broadcom chipset)
 
-         Suppose if we would like to add SCO support on OPENBT, we should
- have add SCO packet handling code in bluetty class driver.... otherwise Can
- we use hci_usb module. (COZ SCO support already available in BLUEZ).  This
- hci_usb module depends on bluetooth module. Bluetooth module initialize
- socket layer for interaction...
+I believe this is the problem. btsco can transfer audio only to CSR modules.
 
-         what i m thinking , there should be a separate kernel module, which
-will interact with hci_usb module and Openbt stack.  Is it feasible to
-achieve it ?...  or  Can i add SCO support on bluetty class driver itself ?.
-Have any one tried this ?..
-
-Expecting your valuable suggestions !!!..
-
-Thanks
-PRAKASH
+Brad
 
 
 -------------------------------------------------------
