@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3967360605080206231820ee1f@mail.gmail.com>
-From: Robert Brewer <rwb123@gmail.com>
+From: Prakash <aprakash@tataelxsi.co.in>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] btsco problems
-In-Reply-To: <42EEF35E.4080405@xmission.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <39673606050801205131f308d3@mail.gmail.com>
-	 <42EEF35E.4080405@xmission.com>
+Message-id: <200508021321.35064.aprakash@tataelxsi.co.in>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] SCO Query on tty based Stack
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,34 +16,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 2 Aug 2005 09:23:46 -0400
+Date: Tue, 02 Aug 2005 13:21:35 +0530
 
-Any thoughts on how hard it would be to make broadcom work?
-I'm willing to donate some time to help make it happen... I have
-some previous lower-level coding experience, but no bluetooth
-experience.
+Hi,
 
-Failing that, can anyone recommend a CSR dongle that is class 1 (100m range=
-)
-and bluetooth 1.2?
+         I am trying to run OPEN-BT with USB device. i have compiled
+ userstack application and initialized my USB dongle too.  I am aware of
+ openbt that it doesn't support SCO and interacts through tty device. I have
+ gonethrough bluetty.c (class driver). I didn't find any codes for SCO
+ packet.
 
-Thanks,
-Rob
+         Suppose if we would like to add SCO support on OPENBT, we should
+ have add SCO packet handling code in bluetty class driver.... otherwise Can
+ we use hci_usb module. (COZ SCO support already available in BLUEZ).  This
+ hci_usb module depends on bluetooth module. Bluetooth module initialize
+ socket layer for interaction...
 
-On 8/2/05, Brad Midgley <bmidgley@xmission.com> wrote:
-> Robert
->=20
-> > Zonet zub6101c usb dongle (class 1, bluetooth 1.2, broadcom chipset)
->=20
-> I believe this is the problem. btsco can transfer audio only to CSR modul=
-es.
->=20
-> Brad
->=20
+         what i m thinking , there should be a separate kernel module, which
+will interact with hci_usb module and Openbt stack.  Is it feasible to
+achieve it ?...  or  Can i add SCO support on bluetty class driver itself ?.
+Have any one tried this ?..
 
+Expecting your valuable suggestions !!!..
 
---=20
-Robert W. Brewer
+Thanks
+PRAKASH
 
 
 -------------------------------------------------------
