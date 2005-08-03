@@ -1,5 +1,5 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42F0D338.8080502@gmail.com>
+Message-ID: <42F0D2F0.8090709@gmail.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Content-Type: text/plain; charset=ISO-8859-1
@@ -16,7 +16,7 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 03 Aug 2005 16:22:48 +0200
+Date: Wed, 03 Aug 2005 16:21:36 +0200
 
 Dear Ladies and Gentleman
 
