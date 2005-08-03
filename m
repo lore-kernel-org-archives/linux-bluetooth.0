@@ -1,5 +1,5 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42F0D2F0.8090709@gmail.com>
+Message-ID: <42F0D2A1.2060106@gmail.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Content-Type: text/plain; charset=ISO-8859-1
@@ -16,7 +16,10 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 03 Aug 2005 16:21:36 +0200
+Date: Wed, 03 Aug 2005 16:20:17 +0200
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
 Dear Ladies and Gentleman
 
@@ -105,6 +108,13 @@ Greetings
 Oliver Leitner
 Technical Staff
 http://www.shells.at
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFC8NKgxHPquN24yVsRAvCLAJ9gmAsLjMErJ4jT28WlddbjQlmRMQCeOz79
+jsKugdg20BaUaFoJ1UGdk5s=
+=NYdc
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
