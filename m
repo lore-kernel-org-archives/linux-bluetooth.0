@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42F0D2A1.2060106@gmail.com>
+Message-ID: <20050803134223.53095.qmail@web15708.mail.cnb.yahoo.com>
+From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
+To: bluez-devel <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-From: Oliver Leitner <shadow333@gmail.com>
-Subject: [Bluez-devel] Problem Debian Sarge and btscanner-1.0
+Content-Type: multipart/alternative; boundary="0-335755496-1123076543=:52921"
+Subject: [Bluez-devel] Re:How can I set CSR module as PCM master?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,105 +16,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 03 Aug 2005 16:20:17 +0200
+Date: Wed, 3 Aug 2005 21:42:23 +0800 (CST)
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+--0-335755496-1123076543=:52921
+Content-Type: text/plain; charset=gb2312
+Content-Transfer-Encoding: 8bit
 
-Dear Ladies and Gentleman
+Hi,
+did anybody meet the same problem? I need your help! It's emergent! I'll appreciate your any reply very much！
+Regards
+gadfly
 
-I have a slight problem with the current stable branch of debian, and bluez.
+		
+---------------------------------
+DO YOU YAHOO!?
+  雅虎免费G邮箱－中国第一绝无垃圾邮件骚扰超大邮箱 
+--0-335755496-1123076543=:52921
+Content-Type: text/html; charset=gb2312
+Content-Transfer-Encoding: 8bit
 
-when i try to run ./configure within the btscanner-1.0 directory, i get
-the following error:
-
-lappy:/home/nevermind/btscanner-1.0# ./configure
-checking for gcc... gcc
-checking for C compiler default output... a.out
-checking whether the C compiler works... yes
-checking whether we are cross compiling... no
-checking for suffix of executables...
-checking for suffix of object files... o
-checking whether we are using the GNU C compiler... yes
-checking whether gcc accepts -g... yes
-checking for gcc option to accept ANSI C... none needed
-checking for main in -lcurses... yes
-checking for main in -lbluetooth... yes
-checking for main in -lsdp... no
-configure: error: SDP not found
-
-the next thing ive tried was to install the bluetooth things from your
-page via the apt repository:
-
-deb http://bluez.sourceforge.net/download/debian/ ./
-deb-src http://bluez.sourceforge.net/download/debian/ ./
-
-which gave me the following error for the bluez-sdp package (amongst
-other errors with version dependencies...)
-
-Paketlisten werden gelesen... Fertig
-Abh鋘gigkeitsbaum wird aufgebaut... Fertig
-Einige Pakete konnten nicht installiert werden. Das kann bedeuten, dass
-Sie eine unm鰃liche Situation angefordert haben oder dass, wenn Sie die
-instabile Distribution verwenden, einige erforderliche Pakete noch nicht
-kreiert oder aus Incoming herausbewegt wurden.
-
-Da Sie nur eine einzige Operation angefordert haben ist es sehr
-wahrscheinlich,
-dass das Paket einfach nicht installierbar ist und eine Fehlermeldung 黚er
-dieses Paket erfolgen sollte.
-Die folgenden Informationen helfen Ihnen vielleicht, die Situation zu l鰏en:
-
-Die folgenden Pakete haben nichterf黮lte Abh鋘gigkeiten:
-  bluez-sdp: H鋘gt ab: bluez-utils (>= 2.2-1) soll aber nicht
-installiert werden
-
-it seems that bluez-sdp needs a more actual bluez-utils package than
-that, that is included with sarge... (Version: 2.2-2)
-
-now when i try to install the bluez-utils package from your repository
-via dpkg -i, and then the bluez-sdp via dpkg -i, i get the following error:
-
-dpkg: Betrachte bluez-sdp_1.4-1_i386.deb, welches bluez-sdp enth鋖t:
- bluez-utils kollidiert mit bluez-sdp (<= 1.5-2)
-  bluez-sdp (Version 1.4-1) soll installiert werden.
-dpkg: Fehler beim Bearbeiten von bluez-sdp_1.4-1_i386.deb (--install):
- kollidierende Pakete - installiere bluez-sdp nicht
-Fehler traten auf beim Bearbeiten von:
- bluez-sdp_1.4-1_i386.deb
-
-im runnind debian sarge, with the following kernel:
-2.6.8-2-386 (generic stable sarge kernel)
-
-currently installed bluez packages:
-ii  bluez-firmware 1.0-2          Firmware for Bluetooth devices
-ii  bluez-hcidump  1.17-1         Analyses Bluetooth HCI packets
-ii  bluez-pin      0.25-1         Bluetooth PIN helper with D-BUS
-support
-ic  bluez-sdp      1.4-1          BlueZ Bluetooth SDP daemon and tool
-ii  bluez-utils    2.15-1         Bluetooth tools and daemons
-ii  libbluetooth1  2.15-2         Library to use the BlueZ Linux
-Bluetooth sta
-ii  libbluetooth1- 2.15-2         Development files for using the BlueZ
-Linux
-
-see the "ic" flag before bluez-sdp....
-means "installed but conflicting", from what i can tell (maybe i
-understood that wrong, but i think thats bout it...)
-
-maybe im missing something, any help would be greatly appreciated.
-
-Greetings
-Oliver Leitner
-Technical Staff
-http://www.shells.at
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQFC8NKgxHPquN24yVsRAvCLAJ9gmAsLjMErJ4jT28WlddbjQlmRMQCeOz79
-jsKugdg20BaUaFoJ1UGdk5s=
-=NYdc
------END PGP SIGNATURE-----
+<DIV>Hi,</DIV>
+<DIV>did anybody meet the same problem? I need your help! It's emergent! I'll appreciate your any reply&nbsp;very much！</DIV>
+<DIV>Regards</DIV>
+<DIV>gadfly</DIV><p>
+		<hr size=1>DO YOU YAHOO!?<br> 
+<a href="http://cn.mail.yahoo.com/?id=77071" target=blank> 
+雅虎免费G邮箱－中国第一绝无垃圾邮件骚扰超大邮箱</a> 
+--0-335755496-1123076543=:52921--
 
 
 -------------------------------------------------------
