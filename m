@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Peter Wippich <pewi@gw-instruments.de>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] DUN lookup on Samsung D500 raises SIGSEGV
-In-Reply-To: <42F0C263.8070606@teleline.es>
-Message-ID: <Pine.LNX.4.33.0508031910480.4458-100000@redbean.intranet.gw-instruments.de>
+Message-ID: <42F102E2.5060608@csr.com>
+From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] DUN lookup on Samsung D500 raises SIGSEGV
+References: 
+    <Pine.LNX.4.33.0508031910480.4458-100000@redbean.intranet.gw-instruments.de>
+In-Reply-To: 
+    <Pine.LNX.4.33.0508031910480.4458-100000@redbean.intranet.gw-instruments.de>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,73 +20,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 3 Aug 2005 19:12:59 +0200 (CEST)
+Date: Wed, 03 Aug 2005 18:46:10 +0100
+
+Peter Wippich wrote:
+> without realy knowing the internals this looks to me like BlueZ does not
+> support 32 Bit UUIDS. It is a little bit unusual to use 32 Bit UUIDs but
+> legal. So BlueZ SDP Parser shall support them.
+
+We've been through this before and someone also suggested that the 32 bit
+UUIDs were the problem. They're not. The Samsung D-500 DUN SDP record is
+incorrect (or at the very least bizarre) and sdptool doesn't do proper
+input validation (always a security risk).
+
+An archived copy of the thread starts at:
+
+  http://sourceforge.net/mailarchive/message.php?msg_id=11057683
+
+The correct diagnosis is at:
+
+  http://sourceforge.net/mailarchive/message.php?msg_id=11057684
+
+I suspect sdptool is "knows" that a BluetoothProfileDescriptorList
+should be a sequence of sequences and so doesn't validate the input.
+Perhaps the way to go is to add a getNextAsSequence call to sdptool
+which looks to see if the next element in the stream is a sequence.
+If it is, it returns it, if it isn't, it wraps it in a dummy sequence
+with an appropriate length and returns that.
+
+	- Steven
+-- 
 
 
-Hi,
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
 
-without realy knowing the internals this looks to me like BlueZ does not
-support 32 Bit UUIDS. It is a little bit unusual to use 32 Bit UUIDs but
-legal. So BlueZ SDP Parser shall support them.
-
-Ciao,
-
-Peter
-
-On Wed, 3 Aug 2005, Pedro Monjo Florit wrote:
-
-> Hi folks:
->
-> I am having problems with a Samsung SGH-D500 mobile phone. I do the
-> following:
->
-> pm@PM:~/Development/picdproto> sdptool search DUN
-> Inquiring ...
-> Searching for DUN on 00:12:47:63:FB:2A ...
-> Service Name: Dial-up networking
-> Service RecHandle: 0x10002
-> Service Class ID List:
->       "Error: This is uuid32" (0x00001103)
-> Protocol Descriptor List:
->       "Error: " (0x00000100)
->       "Error: " (0x00000003)
->         Channel: 4
-> Segmentation fault
->
-> I have attached the output of "hcidump -X".
->
-> Using gdb, I have found that the offending instruction is in
-> bluez-libs-2.xx/src/sdp.c. It is produced in the library function
-> sdp_get_profile_descs(), in the line
->
-> 	...
-> 	sdp_data_t *pVnum = seq->val.dataseq->next;
-> 	...
->
-> It seems that the problem is that "seq->val.dataseq" points to an
-> out-of-memory address (in my case, it was 0x1a), so trying to get the
-> "next" field raises SIGSEGV.
->
-> I do not quite understand all bluez structures (sdp_data_t and similar),
-> so I do not know exactly what went wrong. My guess is that the SDP
-> information sent by the mobile phone was corrupt or bogus and that the
-> bluez SDP code did not handled it correctly.
->
-> I hope that this information could help to fix this.
->
-> Regards,
->
-> Pedro Monjo
->
->
->
->
-
-|	Peter Wippich 			Voice: +49 30 46776411		|
-|	G&W Instruments GmbH		fax:   +49 30 46776419		|
-|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
-|	D-13355 Berlin  / Germany					|
-
+**********************************************************************
 
 
 
