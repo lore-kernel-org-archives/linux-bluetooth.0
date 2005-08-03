@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <396736060508031219119970cf@mail.gmail.com>
-From: Robert Brewer <rwb123@gmail.com>
+Subject: Re: [Bluez-devel] DUN lookup on Samsung D500 raises SIGSEGV
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <42F102E2.5060608@csr.com>
+References: 
+	 <Pine.LNX.4.33.0508031910480.4458-100000@redbean.intranet.gw-instruments.de>
+	 <42F102E2.5060608@csr.com>
+Content-Type: text/plain
+Message-Id: <1123094332.8331.34.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] broadcom SCO questions
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,42 +20,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 3 Aug 2005 15:19:57 -0400
+Date: Wed, 03 Aug 2005 20:38:52 +0200
 
-This is mainly directed at Marcel...
+Hi Steven,
 
-As the proud owner of a new Broadcom-based
-dongle, I'd really like to get it working with btsco.
+> > without realy knowing the internals this looks to me like BlueZ does not
+> > support 32 Bit UUIDS. It is a little bit unusual to use 32 Bit UUIDs but
+> > legal. So BlueZ SDP Parser shall support them.
+> 
+> We've been through this before and someone also suggested that the 32 bit
+> UUIDs were the problem. They're not. The Samsung D-500 DUN SDP record is
+> incorrect (or at the very least bizarre) and sdptool doesn't do proper
+> input validation (always a security risk).
+> 
+> An archived copy of the thread starts at:
+> 
+>   http://sourceforge.net/mailarchive/message.php?msg_id=11057683
+> 
+> The correct diagnosis is at:
+> 
+>   http://sourceforge.net/mailarchive/message.php?msg_id=11057684
+> 
+> I suspect sdptool is "knows" that a BluetoothProfileDescriptorList
+> should be a sequence of sequences and so doesn't validate the input.
+> Perhaps the way to go is to add a getNextAsSequence call to sdptool
+> which looks to see if the next element in the stream is a sequence.
+> If it is, it returns it, if it isn't, it wraps it in a dummy sequence
+> with an appropriate length and returns that.
 
-Brad had mentioned that only CSR chipsets are
-supported for SCO right now.  I'm interested
-in taking up the charge and would like to know
-what has been tried already so I don't repeat=20
-it.
+if someone is willing to donate one of these buggy Samsung phones, I am
+happy to fix it and implement a workaround for it. If not, then this
+problem will exists until someone else sends me a patch for. I am not
+changing something in the SDP code without being able to test it with
+real life hardware.
 
-Is the thinking that the broadcom chip needs some special
-commands to enable SCO?  Has broadcom been
-contacted and refused to provide details?  Has
-reverse engineering of the Windows USB traffic
-been attempted?
+Regards
 
-I looked at the Bluetooth H:2 spec for USB=20
-and it seemed pretty light on details.  I also
-looked at the broadcom-specific bluez driver code
-and it seemed to be for uploading firmware and
-causing the dongle to reattach as a standard H:2
-device.
+Marcel
 
-I've recently "rediscovered" my WinXP partition
-on my laptop, so I may try to test the Windows
-driver that came with my dongle and see if I can
-get the headset working.
 
-Thanks for any info.
-
--Rob
---=20
-Robert W. Brewer
 
 
 -------------------------------------------------------
