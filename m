@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42F36564.9010505@palmsource.com>
-From: Frederic Danis <frederic.danis@palmsource.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Possible security vulnerability in hcid
+	when	calling pin helper
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bluetoothd D-Bus interface proposals
-References: <e1effdeb05080412401bc562f6@mail.gmail.com>
-In-Reply-To: <e1effdeb05080412401bc562f6@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <42F34840.4070503@csr.com>
+References: <20050805050932.3111586d.henryk@ploetzli.ch>
+	 <1123211794.8331.104.camel@pegasus>  <42F34840.4070503@csr.com>
+Content-Type: text/plain
+Message-Id: <1123240334.8331.112.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,54 +20,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 05 Aug 2005 15:11:00 +0200
+Date: Fri, 05 Aug 2005 13:12:14 +0200
 
-Hello Claudio,
+Hi Steven,
 
-I think it could be usefull to get remote device 
-connection/disconnection signal from hci.
+> >> I just stumbled upon a bug in hcid that can possibly be used as a
+> >> security vulnerability: ...
+> > thanks for catching this problem. Do you have a fix for it?
+> 
+> On behalf of everyone at Unplugfest with whom you've been doing security
+> testing, I'd just like to say, using my best impression of Nelson Muntz
+> from The Simpsons, "Ha Ha!".
+> 
+> :-)
 
-Regards,
-Fred
+what should I say? Sh* happens. I am still afraid of that day when I
+have to hack into BlueZ. And this day will come ;)
 
------------------------------------------------
-It is not by improving the oil lamp that one invents the electric bulb!
------------------------------------------------
-Danis Frederic            PalmSource Europe
-Software engineer
-Mail : mailto:frederic.danis@palmsource.com
------------------------------------------------
+Regards
+
+Marcel
 
 
-
-Claudio Takahasi wrote:
-
->Hi folks/Marcel,
->
->I am sending a new version of bluetoothd D-Bus interfaces document.
->
->When you have time, please look this document to see if the interfaces
->names, object paths and services are following your ideas.
->
->The documents are available at:
->http://www.cin.ufpe.br/~ckt/bluez/
->
->
->Regards,
->Claudio
->
->
->-------------------------------------------------------
->SF.Net email is Sponsored by the Better Software Conference & EXPO
->September 19-22, 2005 * San Francisco, CA * Development Lifecycle Practices
->Agile & Plan-Driven Development * Managing Projects & Teams * Testing & QA
->Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
->  
->
 
 
 -------------------------------------------------------
