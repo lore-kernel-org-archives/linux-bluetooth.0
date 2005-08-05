@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C59C1D.86533268"
-Message-ID: <9772C290CD0BDF4B91356C9102BA886A019BAE20@ftrdmel1.rd.francetelecom.fr>
-From: "zze-CONCEPT-PHONE CHABOUD-CROUSAZ B ext RD-TECH-GRE" <bchaboudcrousaz.ext@rd.francetelecom.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] How to etablish a Bluetooth communication between a pocket PC (windows) and a linux station?
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200508051801.20795.wim.delvaux@adaptiveplanet.com>
+Subject: [Bluez-users] Other WinCE-Linux PAN connect problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,81 +17,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 8 Aug 2005 15:31:46 +0200
+Date: Fri, 5 Aug 2005 18:01:20 +0200
 
-This is a multi-part message in MIME format.
+I am now able to search the bt network and easily get sdp info from mylinux 
+desktop box.
 
-------_=_NextPart_001_01C59C1D.86533268
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+However when I click the icon in the BT manager on WinCE 2003 and select 
+connect I do not even see any hcidump messages being sent and of course do 
+not get any connection either.
 
-Hi all,
+Suggestions ?
 
-I'm wondering if someone has already etablished a bluetooth
-communication between a pocket PC (windows) and the Bluez stack running
-on a Linux station.
-
-The pocket PC send data through a serial port. I don't know how it
-really works, but my problem it that I was unable to receive these data
-on my linux station with the Bluez stack. (My linux  uses a USB
-bluetooth dongle that works file - bluetooth communication between 2
-linux works fine).
-
-Has someone some ideas to receive the data send by the pocketPC on my
-linux?
-
-Thanks for your help.
-Best Regards
-
-Baptiste
-
-------_=_NextPart_001_01C59C1D.86533268
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
-<HTML>
-<HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
-6.5.7226.0">
-<TITLE>How to etablish a Bluetooth communication between a pocket PC =
-(windows) and a linux station?</TITLE>
-</HEAD>
-<BODY>
-<!-- Converted from text/rtf format -->
-
-<P><FONT SIZE=3D2 FACE=3D"Arial">Hi all,</FONT>
-</P>
-
-<P><FONT SIZE=3D2 FACE=3D"Arial">I'm wondering if someone has already =
-etablished a bluetooth communication between a pocket PC (windows) and =
-the Bluez stack running on a Linux station.</FONT></P>
-
-<P><FONT SIZE=3D2 FACE=3D"Arial">The pocket PC send data through a =
-serial port. I don't know how it really works, but my problem it that I =
-was unable to receive these data on my linux station with the Bluez =
-stack. (My linux&nbsp; uses a USB bluetooth dongle that works file - =
-bluetooth communication between 2 linux works fine).</FONT></P>
-
-<P><FONT SIZE=3D2 FACE=3D"Arial">Has someone some ideas to receive the =
-data send by the pocketPC on my linux?</FONT>
-</P>
-
-<P><FONT SIZE=3D2 FACE=3D"Arial">Thanks for your help.</FONT>
-
-<BR><FONT SIZE=3D2 FACE=3D"Arial">Best Regards</FONT>
-</P>
-
-<P><FONT SIZE=3D2 FACE=3D"Arial">Baptiste</FONT>
-</P>
-
-</BODY>
-</HTML>
-------_=_NextPart_001_01C59C1D.86533268--
+W
 
 
 -------------------------------------------------------
