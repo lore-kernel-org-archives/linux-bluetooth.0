@@ -1,16 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Possible security vulnerability in hcid when
- calling pin helper
-Message-Id: <20050805063927.3d714a89.henryk@ploetzli.ch>
-In-Reply-To: <1123211794.8331.104.camel@pegasus>
+	calling pin helper
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050805050932.3111586d.henryk@ploetzli.ch>
 References: <20050805050932.3111586d.henryk@ploetzli.ch>
-	<1123211794.8331.104.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1123211794.8331.104.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Fri__5_Aug_2005_06_39_27_+0200_NKwzzAn=rr40Lbzg"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,102 +19,66 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 5 Aug 2005 06:39:27 +0200
+Date: Fri, 05 Aug 2005 05:16:34 +0200
 
---Signature=_Fri__5_Aug_2005_06_39_27_+0200_NKwzzAn=rr40Lbzg
-Content-Type: multipart/mixed;
- boundary="Multipart=_Fri__5_Aug_2005_06_39_27_+0200_GXy2KcNU2bVcdoe0"
+Hi Henryk,
+
+> (I'm using a Gentoo Linux box with kernel 2.6.12.1, hcid 2.18 and
+> kbluepin from kbluetoothd 0.99-beta1; although the problem seems 
+> to still exist in current CVS hcid and should be independent of 
+> the pin helper used.)
+> 
+> I just stumbled upon a bug in hcid that can possibly be used as a
+> security vulnerability: In hcid/security.c (around line 335 in current
+> CVS) the device name from the remote device is copied straight into the
+> command line that is used to call the pin helper, only surrounded by a
+> pair of single quotes with _no_ _escaping_ done:
+> 
+> | read_device_name(sba, &ci->bdaddr, name);
+> | //hci_remote_name(dev, &ci->bdaddr, sizeof(name), name, 0);
+> |
+> | ba2str(&ci->bdaddr, addr);
+> | snprintf(str, sizeof(str), "%s %s %s \'%s\'", hcid.pin_helper,
+> |                                 ci->out ? "out" : "in", addr, name);
+> 
+> At the very least this leads to failures when the remote device uses
+> single quotes in its name. E.g. something like "Henryk's Phone" (without 
+> the double quotes) will give 
+> 
+> Aug  5 03:41:03 gleam hcid[24398]: PIN helper exited abnormally with code 512
+> 
+> in the syslog and 
+> 
+> sh: -c: line 0: unexpected EOF while looking for matching `''
+> sh: -c: line 1: syntax error: unexpected end of file
+> 
+> at stderr when running hcid -n (this is how I originally found the 
+> problem).
+> 
+> However, something more creative like "';touch '/tmp/foo23" (again 
+> without the double quotes) will actually execute a program on the 
+> attacked box (and create a file /tmp/foo23 in this case). For 
+> reference: in strace this looks like this:
+> 
+> execve("/bin/sh", ["sh", "-c", "/usr/lib/kdebluetooth/kbluepin out 00:0E:ED:00:23:42 \'\';touch \'/tmp/foo23\'"], [/* 62 vars */]) = 0
+> 
+> (note that the conversion from ' to \' was done by strace)
+> 
+> Using this vulnerability one can also create pairings without approval
+> of the user: Setting the bluetooth device name to something like
+> "'>/dev/null&echo 'PIN:42" (without the double quotes) and then trying 
+> to create a pairing with a bluez box will override the decision of the 
+> pin helper and always set 42 as the PIN.
+> 
+> PS: Thanks to roh and Sascha from the CCC Berlin.
+
+thanks for catching this problem. Do you have a fix for it?
+
+Regards
+
+Marcel
 
 
---Multipart=_Fri__5_Aug_2005_06_39_27_+0200_GXy2KcNU2bVcdoe0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Moin,
-
-Am Fri, 05 Aug 2005 05:16:34 +0200 schrieb Marcel Holtmann:
-
-> thanks for catching this problem. Do you have a fix for it?
-
-Now I have, I think. Doing string escaping in C is really awkward, but
-this patch should prefix all occurences of ", \, $ or ` in the name with
-an \, and will also change the enclosing single quotes to double quotes
-(because no escaping is possible in single quotes). There would also be
-an alternative way to fix it: remove the popen() and instead do a
-pipe()/fork()/dup2()/execv() combination. That should be more clean, but
-likely more complicated.
-
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
-
---Multipart=_Fri__5_Aug_2005_06_39_27_+0200_GXy2KcNU2bVcdoe0
-Content-Type: text/x-patch;
- name="callpinhelper.patch"
-Content-Disposition: attachment;
- filename="callpinhelper.patch"
-Content-Transfer-Encoding: quoted-printable
-
---- security.c.orig	2005-08-05 05:34:15.000000000 +0200
-+++ security.c	2005-08-05 06:18:14.000000000 +0200
-@@ -306,7 +306,7 @@ static void call_pin_helper(int dev, bda
- {
- 	pin_code_reply_cp pr;
- 	struct sigaction sa;
--	char addr[18], str[255], *pin, name[249];
-+	char addr[18], str[255], *pin, name[249], escapename[498];
- 	FILE *pipe;
- 	int ret, len;
-=20
-@@ -331,9 +331,28 @@ static void call_pin_helper(int dev, bda
- 	read_device_name(sba, &ci->bdaddr, name);
- 	//hci_remote_name(dev, &ci->bdaddr, sizeof(name), name, 0);
-=20
-+	/* Escape special chars from the remote name */
-+	{
-+		char *src =3D name, *dest =3D escapename,=20
-+		    *end =3D name + sizeof(name) - 1;
-+		while (src < end && *src !=3D 0) {
-+			switch(*src) {
-+				case '\"': /* fall-through */
-+				case '$':
-+				case '`':
-+				case '\\':=20
-+					*dest++ =3D '\\';
-+				default:
-+					*dest++ =3D *src++;
-+	    		}
-+		}
-+		*dest =3D 0;
-+	}
-+
- 	ba2str(&ci->bdaddr, addr);
--	snprintf(str, sizeof(str), "%s %s %s \'%s\'", hcid.pin_helper,
--					ci->out ? "out" : "in", addr, name);
-+	snprintf(str, sizeof(str), "%s %s %s \"%s\"", hcid.pin_helper,
-+					ci->out ? "out" : "in", addr,=20
-+					escapename);
-=20
- 	setenv("PATH", "/bin:/usr/bin:/usr/local/bin", 1);
-=20
-
---Multipart=_Fri__5_Aug_2005_06_39_27_+0200_GXy2KcNU2bVcdoe0--
-
---Signature=_Fri__5_Aug_2005_06_39_27_+0200_NKwzzAn=rr40Lbzg
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQFC8u2DIjWgKE0OA2gRAg1NAJ4qBYApmWsvQEe6aSPJJiK9RkbuuQCcCpOp
-R0MPbMLRAtHEeRrslA8VfeU=
-=yE++
------END PGP SIGNATURE-----
-
---Signature=_Fri__5_Aug_2005_06_39_27_+0200_NKwzzAn=rr40Lbzg--
 
 
 -------------------------------------------------------
