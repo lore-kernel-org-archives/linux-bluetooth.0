@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: John Gruenenfelder <johng@as.arizona.edu>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Problem with link keys
-Message-ID: <20050806090723.GA13065@as.arizona.edu>
-References: <20050806030119.GA10008@as.arizona.edu> <1123301455.26693.4.camel@pegasus> <20050806050145.GA11152@as.arizona.edu> <1123304874.7296.3.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050806050145.GA11152@as.arizona.edu>
+References: <20050806030119.GA10008@as.arizona.edu>
+	 <1123301455.26693.4.camel@pegasus>  <20050806050145.GA11152@as.arizona.edu>
+Content-Type: text/plain
+Message-Id: <1123304874.7296.3.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1123304874.7296.3.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,48 +19,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 6 Aug 2005 02:07:23 -0700
+Date: Sat, 06 Aug 2005 07:07:53 +0200
 
-On Sat, Aug 06, 2005 at 07:07:53AM +0200, Marcel Holtmann wrote:
->> And it is working just fine.  It only seems to misbehave when I power it off.
->> Are any other people on this list using a Plantronics M2500 headset and, if
->> so, are you experiencing anything similar?
->
->I see always a authentication failure in your log. This means you never
->succeeded with your command or you send the wrong log. However the usage
->of "hcitool cc ..." doesn't qualifies for a correct headset/handsfree
->profile setup and thus your headset may forget your link key. Use tools
->like hstest of btsco and try again.
->
->Regards
->
->Marcel
+Hi John,
 
-Ah yes, that was it exactly.  It's now working very well, even after powering
-on and off.
+> >> I do not see any "reply negative" messages in any of the hcidump output yet it
+> >> doesn't work until I make a new key.
+> >
+> >use "hcidump -X -V".
+> 
+> The -V helps a lot.  I have attached a short hcidump listing from when I power
+> on the headset and it attempts to make a connection and fails.
+> 
+> >> Am I doing something wrong or in the wrong order?  This is with the current
+> >> bluez packages from Debian unstable (amd64 port).
+> >
+> >Is the link key valid if you don't power cycle your headset, but
+> >disconnect and then reconnect? If yes, then your headset is maybe
+> >broken.
+> 
+> Yes.  I was able to do the following:
+> 
+> hcitool cc bdaddr
+> hcitool dc bdaddr
+> hcitool cc bdaddr
+> hcitool info bdaddr
+> 
+> And it is working just fine.  It only seems to misbehave when I power it off.
+> Are any other people on this list using a Plantronics M2500 headset and, if
+> so, are you experiencing anything similar?
 
-Now that it is working reliably, I just have two more minor questions about
-btsco:
+I see always a authentication failure in your log. This means you never
+succeeded with your command or you send the wrong log. However the usage
+of "hcitool cc ..." doesn't qualifies for a correct headset/handsfree
+profile setup and thus your headset may forget your link key. Use tools
+like hstest of btsco and try again.
 
-1) Is there any way to have btsco started when I turn on the headset?  hcid
-   sees this event, but I did not see anything in the hcid.conf manpage for
-   launching processes.
+Regards
 
-2) btsco allows for creating a .btsco file with regex in it so that you can
-   make it do something on a button press.  How do I learn what those regex
-   should be for my particular headset?  Is it part of one of the packets
-   dumped by hcidump?
-
-Thanks again for all the help!
+Marcel
 
 
--- 
---John Gruenenfelder    Research Assistant, Steward Observatory, U of Arizona
-                        johng@as.arizona.edu
-Try Weasel Reader for PalmOS  --  http://gutenpalm.sf.net
-"This is the most fun I've had without being drenched in the blood
-of my enemies!"
-        --Sam of Sam & Max
 
 
 -------------------------------------------------------
