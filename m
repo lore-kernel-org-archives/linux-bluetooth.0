@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] new to bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <42F5C839.507@laposte.net>
+From: henri lelong <hlelong@laposte.net>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <42F5C839.507@laposte.net>
-References: <42F5C839.507@laposte.net>
-Content-Type: text/plain
-Message-Id: <1123404038.7758.26.camel@pegasus>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] new to bluetooth
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,21 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 07 Aug 2005 10:40:38 +0200
+Date: Sun, 07 Aug 2005 10:37:13 +0200
 
-Hi Henri,
+>
+>
+>I am new to bluetooth, but quite old with linux.
+>I have got a sagem MyX8 (with bt connection) and would like to know 
+>about a usb/bluetooth adaptator working well with linux.
+>What is the best kernel now (2.4.31 or 2.6.12)?
+>  
+>
 
-> >I am new to bluetooth, but quite old with linux.
-> >I have got a sagem MyX8 (with bt connection) and would like to know 
-> >about a usb/bluetooth adaptator working well with linux.
-> >What is the best kernel now (2.4.31 or 2.6.12)?
+Henri, France
 
-you should use a 2.6.12 or 2.6.13-rc5 kernel. For the adapter you should
-try to get a CSR BlueCore4 based adapter.
 
-Regards
-
-Marcel
 
 
 
