@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <8eddf07b05080809396f5d3c1@mail.gmail.com>
-From: Wu Jason <superht001@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Can't init device hci0. Connection timed out(110)
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C59C1D.86533268"
+Message-ID: <9772C290CD0BDF4B91356C9102BA886A019BAE20@ftrdmel1.rd.francetelecom.fr>
+From: "zze-CONCEPT-PHONE CHABOUD-CROUSAZ B ext RD-TECH-GRE" <bchaboudcrousaz.ext@rd.francetelecom.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] How to etablish a Bluetooth communication between a pocket PC (windows) and a linux station?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,94 +17,81 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 9 Aug 2005 00:39:59 +0800
+Date: Mon, 8 Aug 2005 15:31:46 +0200
 
-Dear All,
+This is a multi-part message in MIME format.
 
-I'm a newbie to use bluez in my school final project on Fedora Core 3.
-But I encounter the problem as the Subject "Can't init device hci0.
-Connection timed out(110)".
-I had search the older mail list, and try many methods to cover the
-problem but it still didn't work.
-Finally, I still need your help, thanks.
+------_=_NextPart_001_01C59C1D.86533268
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-My environment (I had updated the kernal to the lastest version and patch)
+Hi all,
 
-[root@localhost ~]# uname -a
-Linux localhost.localdomain 2.6.12-mh2 #1 Sat Aug 6 00:25:51 CST 2005
-i686 i686 i386 GNU/Linux
+I'm wondering if someone has already etablished a bluetooth
+communication between a pocket PC (windows) and the Bluez stack running
+on a Linux station.
 
-[root@localhost ~]# rpm -qa | grep ^bluez
-bluez-libs-2.10-2
-bluez-hcidump-1.11-1
-bluez-bluefw-1.0-6
-bluez-utils-2.10-2
+The pocket PC send data through a serial port. I don't know how it
+really works, but my problem it that I was unable to receive these data
+on my linux station with the Bluez stack. (My linux  uses a USB
+bluetooth dongle that works file - bluetooth communication between 2
+linux works fine).
 
-Status
+Has someone some ideas to receive the data send by the pocketPC on my
+linux?
 
-[root@localhost ~]# modprobe hci_usb
-[root@localhost ~]# modprobe l2cap
-[root@localhost ~]# lsmod
-Module                  Size  Used by
-l2cap                  29700  0
-hci_usb                17288  0
-bluetooth              51972  2 l2cap,hci_usb
-md5                     4096  1
-ipv6                  267264  10
-parport_pc             26948  1
-lp                     11272  0
-parport                38984  2 parport_pc,lp
-autofs4                27652  0
-sunrpc                158916  1
-ipt_REJECT              4736  1
-ipt_state               1792  2
-ip_conntrack           39128  1 ipt_state
-iptable_filter          2560  1
-ip_tables              19200  3 ipt_REJECT,ipt_state,iptable_filter
-dm_mod                 57396  0
-button                  5264  0
-battery                 7940  0
-ac                      3716  0
-uhci_hcd               34192  0
-i2c_piix4               8080  0
-i2c_core               18816  1 i2c_piix4
-pcnet32                33028  0
-mii                     5248  1 pcnet32
-floppy                 63028  0
-BusLogic               79380  0
-sd_mod                 17920  0
-scsi_mod              138312  2 BusLogic,sd_mod
+Thanks for your help.
+Best Regards
 
-[root@localhost ~]# hciconfig -a
-hci0:   Type: USB
-       BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
-       DOWN
-       RX bytes:0 acl:0 sco:0 events:0 errors:0
-       TX bytes:0 acl:0 sco:0 commands:0 errors:0
-       Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-       Packet type: DM1 DH1 HV1
-       Link policy:
-       Link mode: SLAVE ACCEPT
+Baptiste
 
-[root@localhost ~]# hciconfig hci0 up
-Can't init device hci0. Connection timed out(110)
+------_=_NextPart_001_01C59C1D.86533268
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-The method I tried (remove the bluetooth.ko)
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+6.5.7226.0">
+<TITLE>How to etablish a Bluetooth communication between a pocket PC =
+(windows) and a linux station?</TITLE>
+</HEAD>
+<BODY>
+<!-- Converted from text/rtf format -->
 
-[root@localhost bluetooth]# pwd
-/lib/modules/2.6.12-mh2/kernel/net/bluetooth
-[root@localhost bluetooth]# mv bluetooth.ko bluetooth.ko.old
-[root@localhost bluetooth]# modprobe hci_usb
-WARNING: Could not open
-'/lib/modules/2.6.12-mh2/kernel/net/bluetooth/bluetooth.ko': No such
-file or directory
-FATAL: Error inserting hci_usb
-(/lib/modules/2.6.12-mh2/kernel/drivers/bluetooth/hci_usb.ko): Unknown
-symbol in module, or unknown parameter (see dmesg)
+<P><FONT SIZE=3D2 FACE=3D"Arial">Hi all,</FONT>
+</P>
 
+<P><FONT SIZE=3D2 FACE=3D"Arial">I'm wondering if someone has already =
+etablished a bluetooth communication between a pocket PC (windows) and =
+the Bluez stack running on a Linux station.</FONT></P>
 
-If you need more information to help me, please let me know, thank for
-your help again.
+<P><FONT SIZE=3D2 FACE=3D"Arial">The pocket PC send data through a =
+serial port. I don't know how it really works, but my problem it that I =
+was unable to receive these data on my linux station with the Bluez =
+stack. (My linux&nbsp; uses a USB bluetooth dongle that works file - =
+bluetooth communication between 2 linux works fine).</FONT></P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Has someone some ideas to receive the =
+data send by the pocketPC on my linux?</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Thanks for your help.</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Arial">Best Regards</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Baptiste</FONT>
+</P>
+
+</BODY>
+</HTML>
+------_=_NextPart_001_01C59C1D.86533268--
 
 
 -------------------------------------------------------
