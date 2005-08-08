@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050809022036.2043.qmail@web51504.mail.yahoo.com>
-From: C J <cj100570@yahoo.com>
+From: Michael Mauch <michael.mauch@gmx.de>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Using dial up via bluetooth enabled phone
+Message-ID: <20050808184309.GD12641@elmicha.333200002251-0001.dialin.t-online.de>
+References: <9772C290CD0BDF4B91356C9102BA886A019BAE20@ftrdmel1.rd.francetelecom.fr>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <9772C290CD0BDF4B91356C9102BA886A019BAE20@ftrdmel1.rd.francetelecom.fr>
+Subject: [Bluez-users] Re: How to etablish a Bluetooth communication between a pocket PC (windows) and a linux station?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 8 Aug 2005 19:20:36 -0700 (PDT)
+Date: Mon, 8 Aug 2005 20:43:10 +0200
 
-i'm using suse 9.3 and can't seem to get bluez to show
-a dial up networking dialog so that i may use my
-smartphone as a modem. i don't really need this
-functionality but since i had it when using windows
-i'd like to be able to do it now that i've switched to
-linux. any help will be greatly appreciated. 
+zze-CONCEPT-PHONE CHABOUD-CROUSAZ B ext RD-TECH-GRE wrote:
 
+> I'm wondering if someone has already etablished a bluetooth
+> communication between a pocket PC (windows) and the Bluez stack running
+> on a Linux station.
 
-CJ
+Yes.
 
+> The pocket PC send data through a serial port. I don't know how it
+> really works, but my problem it that I was unable to receive these data
+> on my linux station with the Bluez stack. (My linux  uses a USB
+> bluetooth dongle that works file - bluetooth communication between 2
+> linux works fine).
+> 
+> Has someone some ideas to receive the data send by the pocketPC on my
+> linux?
 
+You need an obexftp server. I'm using KDE Bluetooth
+<http://kde-bluetooth.sourceforge.net/> which comes with its own obexftp
+server. Perhaps your distribution has a package for it.
+
+Another possibility is Synce-KDE <http://synce.sourceforge.net/synce/kde/>, 
+which works with Bluez as well.
+
+Regards...
+		Michael
 
 
 -------------------------------------------------------
