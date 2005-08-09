@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Problem with link keys
-From: Alexandros Vellis <avel@noc.uoa.gr>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050806090723.GA13065@as.arizona.edu>
-References: <20050806030119.GA10008@as.arizona.edu>
-	 <1123301455.26693.4.camel@pegasus> <20050806050145.GA11152@as.arizona.edu>
-	 <1123304874.7296.3.camel@pegasus>  <20050806090723.GA13065@as.arizona.edu>
-Content-Type: text/plain
-Message-Id: <1123683286.31383.6.camel@amy>
-Mime-Version: 1.0
+Mime-Version: 1.0 (Apple Message framework v733)
+Message-Id: <AF23A417-8600-4F53-87AC-359586BD2AB1@pepper.com>
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+To: BlueZ List Mailing <bluez-devel@lists.sourceforge.net>
+From: Michael Frey <mfrey@pepper.com>
+Subject: [Bluez-devel] btsco with 2.6.12
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,18 +16,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 10 Aug 2005 17:14:46 +0300
+Date: Tue, 9 Aug 2005 16:09:44 -0400
 
-John Gruenenfelder wrote:
+All,
 
-> 2) btsco allows for creating a .btsco file with regex in it so that you can
->    make it do something on a button press.  How do I learn what those regex
->    should be for my particular headset?  Is it part of one of the packets
->    dumped by hcidump?
+I am using a stock 2.6.12.3 kernel and just built btsco.  I am  
+getting an error when trying to run it and do not know what it means.
 
-If I'm not mistaken, you can watch what is communicated with the headset
-with 'btsco -v'.
+root@(none):~# ./btsco
+Error: hwdep next device (hw:0): Operation not permitted
+Error: control open (hw:1): No such device
+Error: Can't find device. Bail
 
+I do have alsa set up and can play audio.  Am I just missing  
+something in my /etc/asound.conf?
+
+
+Michael
 
 
 
