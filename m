@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v733)
-In-Reply-To: <AF23A417-8600-4F53-87AC-359586BD2AB1@pepper.com>
-References: <AF23A417-8600-4F53-87AC-359586BD2AB1@pepper.com>
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <8B0AF3C0-969B-4843-94E8-92E7ECA4BD20@pepper.com>
-From: Michael Frey <mfrey@pepper.com>
-Subject: Re: [Bluez-devel] btsco with 2.6.12
+Subject: Re: [Bluez-devel] Problem with link keys
+From: Alexandros Vellis <avel@noc.uoa.gr>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050806090723.GA13065@as.arizona.edu>
+References: <20050806030119.GA10008@as.arizona.edu>
+	 <1123301455.26693.4.camel@pegasus> <20050806050145.GA11152@as.arizona.edu>
+	 <1123304874.7296.3.camel@pegasus>  <20050806090723.GA13065@as.arizona.edu>
+Content-Type: text/plain
+Message-Id: <1123683286.31383.6.camel@amy>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,53 +20,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 10 Aug 2005 10:51:24 -0400
+Date: Wed, 10 Aug 2005 17:14:46 +0300
 
-ok --
+John Gruenenfelder wrote:
 
-I got further -- I needed the HW_DEP built for my kernel.  I can now  
-connect to my headset using btsco.
+> 2) btsco allows for creating a .btsco file with regex in it so that you can
+>    make it do something on a button press.  How do I learn what those regex
+>    should be for my particular headset?  Is it part of one of the packets
+>    dumped by hcidump?
 
-However when I play a wav file using aplay I just get static on the  
-headset.
+If I'm not mistaken, you can watch what is communicated with the headset
+with 'btsco -v'.
 
-Any clues.
-
-Michael
-
-On Aug 9, 2005, at 4:09 PM, Michael Frey wrote:
-
-> All,
->
-> I am using a stock 2.6.12.3 kernel and just built btsco.  I am  
-> getting an error when trying to run it and do not know what it means.
->
-> root@(none):~# ./btsco
-> Error: hwdep next device (hw:0): Operation not permitted
-> Error: control open (hw:1): No such device
-> Error: Can't find device. Bail
->
-> I do have alsa set up and can play audio.  Am I just missing  
-> something in my /etc/asound.conf?
->
->
-> Michael
->
->
->
-> -------------------------------------------------------
-> SF.Net email is Sponsored by the Better Software Conference & EXPO
-> September 19-22, 2005 * San Francisco, CA * Development Lifecycle  
-> Practices
-> Agile & Plan-Driven Development * Managing Projects & Teams *  
-> Testing & QA
-> Security * Process Improvement & Measurement * http://www.sqe.com/ 
-> bsce5sf
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
 
 
 
