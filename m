@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Mime-Version: 1.0 (Apple Message framework v733)
+In-Reply-To: <AF23A417-8600-4F53-87AC-359586BD2AB1@pepper.com>
+References: <AF23A417-8600-4F53-87AC-359586BD2AB1@pepper.com>
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <8B0AF3C0-969B-4843-94E8-92E7ECA4BD20@pepper.com>
+From: Michael Frey <mfrey@pepper.com>
+Subject: Re: [Bluez-devel] btsco with 2.6.12
 To: bluez-devel@lists.sourceforge.net
-From: Marcus Better <marcus@better.se>
-Message-ID: <ddf2qc$eps$1@sea.gmane.org>
-References: <AF23A417-8600-4F53-87AC-359586BD2AB1@pepper.com> <8B0AF3C0-969B-4843-94E8-92E7ECA4BD20@pepper.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Re: btsco with 2.6.12
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,25 +18,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 11 Aug 2005 10:38:36 +0200
+Date: Wed, 10 Aug 2005 10:51:24 -0400
 
-Michael Frey wrote:
+ok --
 
-> However when I play a wav file using aplay I just get static on the
-> headset.
+I got further -- I needed the HW_DEP built for my kernel.  I can now  
+connect to my headset using btsco.
 
-I have a similar problem. When I play any sound through the headset, I just
-get a continuous beep tone. It stops when I kill btsco.
+However when I play a wav file using aplay I just get static on the  
+headset.
 
-The connection to the headset seems normal, only the sound fails. The
-headset is a Motorola HS-801.
+Any clues.
 
-I use the latest CVS version (as of a few days ago) and Debian kernel 2.6.11
-or 2.6.12.
+Michael
 
-This worked very well last time I tested, which was a couple of months ago.
-Perhaps something broke in between?
+On Aug 9, 2005, at 4:09 PM, Michael Frey wrote:
 
+> All,
+>
+> I am using a stock 2.6.12.3 kernel and just built btsco.  I am  
+> getting an error when trying to run it and do not know what it means.
+>
+> root@(none):~# ./btsco
+> Error: hwdep next device (hw:0): Operation not permitted
+> Error: control open (hw:1): No such device
+> Error: Can't find device. Bail
+>
+> I do have alsa set up and can play audio.  Am I just missing  
+> something in my /etc/asound.conf?
+>
+>
+> Michael
+>
+>
+>
+> -------------------------------------------------------
+> SF.Net email is Sponsored by the Better Software Conference & EXPO
+> September 19-22, 2005 * San Francisco, CA * Development Lifecycle  
+> Practices
+> Agile & Plan-Driven Development * Managing Projects & Teams *  
+> Testing & QA
+> Security * Process Improvement & Measurement * http://www.sqe.com/ 
+> bsce5sf
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 
 
