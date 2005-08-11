@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Adam Cooper <adam.cooper@port.ac.uk>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="Windows-1252"
-Message-ID: <E64BAD5A8AD46740828069A678D9DD73011A87@netbe01.net.unimis>
-From: "Al" <Al_chane@issc.com.tw>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Porting BlueZ on embedded uClinux
+  charset="us-ascii"
+Message-Id: <200508112219.12677.adam.cooper@port.ac.uk>
+Subject: [Bluez-devel] save_link_key in 2.19
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,105 +17,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 12 Aug 2005 16:39:25 +0800
+Date: Thu, 11 Aug 2005 22:19:12 +0000
 
-Hi, there:
+Hi there,
 
-     I'm trying to port BlueZ on embedded linux. The followings are
-what I've done so far:
+I've just spent the last couple of hours trying to figure out why my 'hcid' 
+was not storing my paired devices between restarts. I'm running gentoo and 
+the latest version of bluez utils (2.19). 
 
-=3D=3D=3D=3D=3D=3D=3D=3D For Kernel part =
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+In a final act of desperation I had a good hunt through the code. Low and 
+behold the 'save_link_key' function has been commented out, along with the 
+calls to it.
 
-The embedded linux cannot load modules so I need to make BlueZ as part =
-of kernel itself.
+Is there a specific reason this is so? 
 
-1. Change Makefile in linux/drivers/bluetooth
-                                                                         =
-                                                                      =
--------------------------------------
-O_TARGET        :=3D bluetooth.o
-                                                                         =
-                                                                      =
-list-multi      :=3D hci_uart.o
-                                                                         =
-                                                                      =
-obj-y +=3D hci_usb.o
-obj-y +=3D hci_vhci.o
-                                                                         =
-                                                                      =
-obj-y +=3D hci_uart.o
-uart-y :=3D hci_ldisc.o
-uart-y +=3D hci_h4.o
-                                                                         =
-                                                                      =
-obj-y +=3D dtl1_cs.o
-obj-y +=3D bt3c_cs.o
-obj-y +=3D bluecard_cs.o
-                                                                         =
-                                                                      =
-include $(TOPDIR)/Rules.make
-                                                                         =
-                                                                      =
-hci_uart.o: $(uart-y)
-        $(LD) -r -o $@ $(uart-y)
---------------------------------------
-2. Add line below in Makefile in linux/drivers
-    subdir-y +=3D bluetooth
+My mobile runs with it's visibility off so not being able to save pairings is 
+a bit of a pain.
 
-3. Change Makefile in /linux/net/bluetooth
---------------------------------------------
-O_TARGET :=3D bluetooth.o
-                                                                         =
-      =20
-obj-y    :=3D af_bluetooth.o hci_core.o hci_sock.o lib.o syms.o =
-hci_conn.o hci_event.o l2cap.o sco.o
-                                                                         =
-                                                                         =
-             =20
-include $(TOPDIR)/Rules.make
-------------------------------------------
-
-4. Add lines Makefile in linux/net
-    subdir-y +=3D bluetooth
-    obj-y +=3D bluetooth/bluetooth.o
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D For User Space (Utility) =
-part=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-Use embedded compilier to make  "hciconfig" and copy it to embedded =
-romdisk.
-
-A CSR USB dongle is used. When I boot up the device and execute
-hciconfig.
-
-It prints errors when trying to create bluetooth socket:
-
-"Can't open HCI socket.: Address family not supported by protocol"
-
-if ((ctl =3D socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI)) < 0)=20
-{=09
-		perror("Can't open HCI socket.");
-		exit(1);
-}
-
-It seems like BlueZ is not integrated into kernel, but the object files =
-in linux/drivers/bluetooth and linux/net/bluetooth are created without =
-errors.
-
-Does anyone have previous experience to port BlueZ on embeded linux and =
-not using as modules?
-Any advice/comment is appriciated.
-
-Thanks for the helps.
-
-Al
-
-
-
-
-
-
-
+Thanks 
+Adam Cooper
 
 
 -------------------------------------------------------
