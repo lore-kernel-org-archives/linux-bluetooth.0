@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-From: "Morgan Rowe" <morrow@iname.com>
-To: Bluez-devel@lists.sourceforge.net
-Message-Id: <20050811181411.8F9861CE303@ws1-6.us4.outblaze.com>
-Subject: [Bluez-devel] how to meassure BER (bit error rate)?
+Message-ID: <e1effdeb050811101346f4ddd6@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] bluetoothd D-Bus interface proposals(draft 00.03)
+In-Reply-To: <42F36564.9010505@palmsource.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <e1effdeb05080412401bc562f6@mail.gmail.com>
+	 <42F36564.9010505@palmsource.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,30 +19,96 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 11 Aug 2005 13:14:11 -0500
+Date: Thu, 11 Aug 2005 14:13:02 -0300
 
-Hi,
+Hi folks,
 
-I would like to meassure the BER (bit error rate) while sending data betwen=
-n two bluetooth devices.
-Is it possible to meassure the BER directly or do I have to use RSSI (recei=
-ved signal strengh indication)?
-How can I achieve this. Can I meassure it using hcidump or hciconfig?
 
-I learned that RSSI is an indicator for the BER, is that true and how is th=
-e relationship.
+I am sending a new draft(v00.03) of the bluetoothd D-Bus interfaces.
 
-Are LQ (link quality) and TPL (transmission power level) also indicators fo=
-r BER?
+BlueZ community, please send your feedback. I need collect your opinions
+and discuss with Marcel.
 
-Thanks,
-Morgan
+The most important part for now is hci, hciconfig, sdp and bluetoothd.
 
---=20
-___________________________________________________________
-Sign-up for Ads Free at Mail.com
-http://promo.mail.com/adsfreejump.htm
+The documents are available at:
+http://www.cin.ufpe.br/~ckt/bluez/
 
+Fred, thanks for your comment. I am not sure if is useful send
+signal for connection/disconnection from hci. I think they should
+be restricted to object hierarchy subsection(pan, dun, rfcomm, ..).
+But we can discuss with the BlueZ community in order to verify if
+these signals will be required or not.
+
+
+Regards,
+Claudio.
+
+
+On 8/5/05, Frederic Danis <frederic.danis@palmsource.com> wrote:
+> Hello Claudio,
+>=20
+> I think it could be usefull to get remote device
+> connection/disconnection signal from hci.
+>=20
+> Regards,
+> Fred
+>=20
+> -----------------------------------------------
+> It is not by improving the oil lamp that one invents the electric bulb!
+> -----------------------------------------------
+> Danis Frederic            PalmSource Europe
+> Software engineer
+> Mail : mailto:frederic.danis@palmsource.com
+> -----------------------------------------------
+>=20
+>=20
+>=20
+> Claudio Takahasi wrote:
+>=20
+> >Hi folks/Marcel,
+> >
+> >I am sending a new version of bluetoothd D-Bus interfaces document.
+> >
+> >When you have time, please look this document to see if the interfaces
+> >names, object paths and services are following your ideas.
+> >
+> >The documents are available at:
+> >http://www.cin.ufpe.br/~ckt/bluez/
+> >
+> >
+> >Regards,
+> >Claudio
+> >
+> >
+> >-------------------------------------------------------
+> >SF.Net email is Sponsored by the Better Software Conference & EXPO
+> >September 19-22, 2005 * San Francisco, CA * Development Lifecycle Practi=
+ces
+> >Agile & Plan-Driven Development * Managing Projects & Teams * Testing & =
+QA
+> >Security * Process Improvement & Measurement * http://www.sqe.com/bsce5s=
+f
+> >_______________________________________________
+> >Bluez-devel mailing list
+> >Bluez-devel@lists.sourceforge.net
+> >https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> >
+> >
+>=20
+>=20
+> -------------------------------------------------------
+> SF.Net email is Sponsored by the Better Software Conference & EXPO
+> September 19-22, 2005 * San Francisco, CA * Development Lifecycle Practic=
+es
+> Agile & Plan-Driven Development * Managing Projects & Teams * Testing & Q=
+A
+> Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 
 -------------------------------------------------------
