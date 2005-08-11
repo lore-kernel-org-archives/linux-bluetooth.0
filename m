@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Adam Cooper <adam.cooper@port.ac.uk>
-To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200508112219.12677.adam.cooper@port.ac.uk>
-Subject: [Bluez-devel] save_link_key in 2.19
+From: "Morgan Rowe" <morrow@iname.com>
+To: Bluez-devel@lists.sourceforge.net
+Message-Id: <20050811181411.8F9861CE303@ws1-6.us4.outblaze.com>
+Subject: [Bluez-devel] how to meassure BER (bit error rate)?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,25 +16,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 11 Aug 2005 22:19:12 +0000
+Date: Thu, 11 Aug 2005 13:14:11 -0500
 
-Hi there,
+Hi,
 
-I've just spent the last couple of hours trying to figure out why my 'hcid' 
-was not storing my paired devices between restarts. I'm running gentoo and 
-the latest version of bluez utils (2.19). 
+I would like to meassure the BER (bit error rate) while sending data betwen=
+n two bluetooth devices.
+Is it possible to meassure the BER directly or do I have to use RSSI (recei=
+ved signal strengh indication)?
+How can I achieve this. Can I meassure it using hcidump or hciconfig?
 
-In a final act of desperation I had a good hunt through the code. Low and 
-behold the 'save_link_key' function has been commented out, along with the 
-calls to it.
+I learned that RSSI is an indicator for the BER, is that true and how is th=
+e relationship.
 
-Is there a specific reason this is so? 
+Are LQ (link quality) and TPL (transmission power level) also indicators fo=
+r BER?
 
-My mobile runs with it's visibility off so not being able to save pairings is 
-a bit of a pain.
+Thanks,
+Morgan
 
-Thanks 
-Adam Cooper
+--=20
+___________________________________________________________
+Sign-up for Ads Free at Mail.com
+http://promo.mail.com/adsfreejump.htm
+
 
 
 -------------------------------------------------------
