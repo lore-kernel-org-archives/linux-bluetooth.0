@@ -1,9 +1,7 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
 From: aeriksson@fastmail.fm
-Message-Id: <20050812145457.63BB8EB2A2@tippex.mynet.no-ip.org>
+Message-Id: <20050812115046.CD708EB2A2@tippex.mynet.no-ip.org>
 Subject: [Bluez-users] pand vs. sdpd
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -16,9 +14,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 12 Aug 2005 16:54:56 +0200
-
-<Resending since last version got QP mangled>
+Date: Fri, 12 Aug 2005 13:50:47 +0200
 
 Hi all,
 
