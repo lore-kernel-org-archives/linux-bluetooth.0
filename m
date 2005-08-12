@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Peter Wippich <pewi@gw-instruments.de>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Porting BlueZ on embedded uClinux
-In-Reply-To: <E64BAD5A8AD46740828069A678D9DD73011A89@netbe01.net.unimis>
-Message-ID: <Pine.LNX.4.33.0508121431290.4037-100000@redbean.intranet.gw-instruments.de>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: multipart/mixed;
+	boundary="----_=_NextPart_001_01C59F24.FB51E536"
+Subject: RE: [Bluez-devel] Porting BlueZ on embedded uClinux
+Message-ID: <E64BAD5A8AD46740828069A678D9DD73011A89@netbe01.net.unimis>
+From: "Al" <Al_chane@issc.com.tw>
+To: <bluez-devel@lists.sourceforge.net>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,52 +17,107 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 12 Aug 2005 14:34:09 +0200 (CEST)
+Date: Fri, 12 Aug 2005 18:02:43 +0800
+
+This is a multi-part message in MIME format.
+
+------_=_NextPart_001_01C59F24.FB51E536
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,=20
+
+> Strange ! What "package" are you using ??
+Yeah, somehow BlueZ is missing in config file. But
+other BlueZ stuffs are there in kernel.
+It's an ARM7 development toolkit with uClinux ported.=20
+
+> Is the USB dongle detected by the USB subsystem ???
+Yes, I think so.
+
+I just wonder did I miss any other BlueZ directory in kernel?
+1. Protocol stack: linux/net/bluetooth
+2. HCI device driver: linux/drivers/bluetooth
+3. I haven't put anything in /etc/bluetooth, does it matter for the =
+error?
+    I just want to use " hciconfig" to list bluetooth USB dongle now.
+
+Thanks for helps,
+
+Al
+
+	=20
 
 
-Hi Al,
+------_=_NextPart_001_01C59F24.FB51E536
+Content-Type: application/ms-tnef;
+	name="winmail.dat"
+Content-Transfer-Encoding: base64
 
-when I remember your original posting right the error message was
-something like "protokoll family not registered...". This may be the case
-when the BlueZ is not initialized. Do you get some start up message from
-BlueZ when your system boots up ??
+eJ8+IiwKAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAAtgMAAAAAAAC5AAEIgAcAGAAAAElQTS5NaWNy
+b3NvZnQgTWFpbC5Ob3RlADEIAQ2ABAACAAAAAgACAAEEgAEANAAAAFJFOiBbQmx1ZXotZGV2ZWxd
+IFBvcnRpbmcgQmx1ZVogb24gZW1iZWRkZWQgdUNsaW51eAA8EgEFgAMADgAAANUHCAAMABIAAgAr
+AAUANAEBIIADAA4AAADVBwgADAASAAIAKwAFADQBAQmAAQAhAAAAMzlGQTlEREQzMUQ3NjE0RDk5
+Qjk4ODI3QTk2NzQxQkIATAcBA5AGAHgMAAA2AAAAAwA2AAAAAABAADkANuVR+ySfxQEeAD0AAQAA
+AAUAAABSRTogAAAAAAIBRwABAAAALgAAAGM9dXM7YT0gO3A9dW5pbWlzO2w9TkVUQkUwMS0wNTA4
+MTIxMDAyNDNaLTk4NQAAAB4ASQABAAAANAAAAFJFOiBbQmx1ZXotZGV2ZWxdIFBvcnRpbmcgQmx1
+ZVogb24gZW1iZWRkZWQgdUNsaW51eABAAE4AgNhtmCGfxQEeAFoAAQAAACgAAABibHVlei1kZXZl
+bC1hZG1pbkBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQAAgFbAAEAAABtAAAAAAAAAIErH6S+oxAZnW4A
+3QEPVAIAAAAAYmx1ZXotZGV2ZWwtYWRtaW5AbGlzdHMuc291cmNlZm9yZ2UubmV0AFNNVFAAYmx1
+ZXotZGV2ZWwtYWRtaW5AbGlzdHMuc291cmNlZm9yZ2UubmV0AAAAAAIBXAABAAAALQAAAFNNVFA6
+QkxVRVotREVWRUwtQURNSU5ATElTVFMuU09VUkNFRk9SR0UuTkVUAAAAAB4AXQABAAAADgAAAFBl
+dGVyIFdpcHBpY2gAAAACAV4AAQAAAEIAAAAAAAAAgSsfpL6jEBmdbgDdAQ9UAgAAAABQZXRlciBX
+aXBwaWNoAFNNVFAAcGV3aUBndy1pbnN0cnVtZW50cy5kZQAAAAIBXwABAAAAHAAAAFNNVFA6UEVX
+SUBHVy1JTlNUUlVNRU5UUy5ERQAeAGYAAQAAAAUAAABTTVRQAAAAAB4AZwABAAAAKAAAAGJsdWV6
+LWRldmVsLWFkbWluQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAAeAGgAAQAAAAUAAABTTVRQAAAAAB4A
+aQABAAAAFwAAAHBld2lAZ3ctaW5zdHJ1bWVudHMuZGUAAB4AcAABAAAAMAAAAFtCbHVlei1kZXZl
+bF0gUG9ydGluZyBCbHVlWiBvbiBlbWJlZGRlZCB1Q2xpbnV4AAIBcQABAAAAGwAAAAHFnyGye43x
+2oL7n0K8kVqDnuH5UzMAAMD9oQAeAHQAAQAAACIAAABibHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vm
+b3JnZS5uZXQAAAAeABoMAQAAAAMAAABBbAAAHgAdDgEAAAAwAAAAW0JsdWV6LWRldmVsXSBQb3J0
+aW5nIEJsdWVaIG9uIGVtYmVkZGVkIHVDbGludXgAAgEJEAEAAAA2BQAAMgUAAK8NAABMWkZ11PpQ
+TYMACgByY3BnOTUC0cEDYWh0bWwxAzABAy8B9wqAAqQD5E0LgGdMfGl1AoAP8wBQBFYQ3DITAuMC
+AGNoCsBzZXRuMgYABsMRRTMERhOXMH4gCFUHsgKAEVMI7wn3O7EX/zI1NRFCDGBjAFAzCwkBZDM2
+FjALpTQg2Q/yKlwOogGQZxQgCqMLEVMdGDQUIDwhRE8AQ1RZUEUgSFQATUwgUFVCTEkAQyAiLS8v
+VzMiQyCwRFREH8QzLsIyILBFTiI+Hh0dv/ki8TE4HyAf0iI/I08lwMYzHLAkoEVBRCT9DuEXJh8o
+nyQkNg7gPE1FFFRBB7BBK5A9IkdTCfAEkGF0BbAiFkBPNE5UIgBULCAF4UV46xOxEPBlBlJ2FqEu
+cQCQAQIgIDYuMC42NHA4Ny4xIi4p/yQzN4I3HyBUSVRMRST+AjQO4FJFOiBbQpkKQXotAQAucGxd
+IBBLF6EQ4SA0QlogLwFlBwbQCYABAGQgdUNsqQuAdXgjnjUfIC8yf/8wryV1M8E4QCd/Jc88FA4w
+AR8gQk9EWSBkafRyPTwwcjuAO/MAIQMwOT6RZG8A4D6RCrFccf8X4D6RE7ADMD71FjA7qxwhizyv
+DhA2HyBESVY+yT8AAEEHO8kvcEQ/QVJIadosHMwxK0A94VI+ywuAfmUKgUEPSG9Jf0qPPFA4sRyw
+Jmd0AoA+5z5NSMcGAD6gLfMhIFcTwAVA0iIKsGNrPFBlLNAKwD0uIHkIYDagAJA1YT8/h0rvS/9N
+DFllYWhHwOJzA3BlaG8H4DosQnVzNZQEACBtBAE1UguAIDEFoG5maTVwWbBsZXIuNYB1dFMfVC9N
+DG+MdGgWoTWUc3R1ASB/BCBSEl2SLiBZUVb/QqJrOwSRNNAuWo9bn00MSXTGJ16RA6BBUk0yQDSj
+XG9wB4ACMF7gbwbwa55pBUAD8F2QNqYgcBeh/wmAWjBhT2JfTQ9n32jvaf/3Tk9PX1BgSQQgX49C
+ol2RsCBVU0I+QAIgZ1oQi2UBZ1BjZ1EgYnle4sFx83N1YnN5XkA2IK9S4VMPa69VL3NHwEle4f0L
+gGtWYWE/dc9sv3jvef/3Y4twb0KTalKQZjECIASB/z5BNpB4EFjSZIFzUF2KPlH/cuEFsHNQWVFg
+1HS/fM963foxWjBQA2AsoBdxft9Cky9eQFGRNBA20y8sYHQvvwoyZdFdkIPvhP967DJaMPxIQ3gQ
+NKEN4HKRBRAucd80EIevQqKJZI50c4n/iw8/jB97VSGweAETwC5wbie9BUBwWmCBkngyWTMvFAD+
+Y5EYR8A/sAeRZiGO/0Ki/wDAAkAWoQIQBcBxwgSQA2BecoPfkr96323NbnQQcONu2RTjJ2EwPted
+j56f35+voL+hz6LfcBIggDQAcM9lslKBLiAs0GhjDeBZk38s0KgBmA+QBIBRkSdx+m5/VsB4v5uv
+nL+sz63frupUnS3hawQgmcJdoGxwd+A/r6+wv67Ps++0/7YJQWx/O8kBwD7XCqKjWAqAI6ww/ydB
+IRBEC6NfQf9DDSBAH2BwS1FVTy0gPkZeMXkHWhAtYWTAR0lOLVKMSUcf0DQQMHB4IiH/PugKsQ/y
+P/VAk0BRQO+/X/8eS1BRwC9D30TvRf/GSLihbxwCI6wvgB8gRi0BVmBpenrCwDLKuwvixj8kBjX9
+ylEvz8K9n9HvpM+l38vO/7qPu5+8r9PP0g/bc8FY2/v/xNPcv8df4R887SSB3nA+Eb87j+Mv5bEy
+QTswJMN95+AAAB4ANRABAAAAPAAAADxFNjRCQUQ1QThBRDQ2NzQwODI4MDY5QTY3OEQ5REQ3MzAx
+MUE4OUBuZXRiZTAxLm5ldC51bmltaXM+AB4ARxABAAAADwAAAG1lc3NhZ2UvcmZjODIyAAALAPIQ
+AQAAAB8A8xABAAAAdAAAAFIARQAlADMAQQAgAFsAQgBsAHUAZQB6AC0AZABlAHYAZQBsAF0AIABQ
+AG8AcgB0AGkAbgBnACAAQgBsAHUAZQBaACAAbwBuACAAZQBtAGIAZQBkAGQAZQBkACAAdQBDAGwA
+aQBuAHUAeAAuAEUATQBMAAAACwD2EAAAAABAAAcwSIZutiSfxQFAAAgwjm5b+ySfxQEDAN4/tgMA
+AAMA8T8EBAAAHgD4PwEAAAADAAAAQWwAAAIB+T8BAAAAXQAAAAAAAADcp0DIwEIQGrS5CAArL+GC
+AQAAAAAAAAAvTz1VTklNSVMvT1U9RklSU1QgQURNSU5JU1RSQVRJVkUgR1JPVVAvQ049UkVDSVBJ
+RU5UUy9DTj1BTC5JU1NDAAAAAB4A+j8BAAAAFQAAAFN5c3RlbSBBZG1pbmlzdHJhdG9yAAAAAAIB
++z8BAAAAHgAAAAAAAADcp0DIwEIQGrS5CAArL+GCAQAAAAAAAAAuAAAAAwD9P7YDAAADABlAAAAA
+AAMAGkAAAAAAAwAdQAAAAAADAB5AAAAAAB4AMEABAAAACAAAAEFMLklTU0MAHgAxQAEAAAAIAAAA
+QUwuSVNTQwAeADJAAQAAACgAAABibHVlei1kZXZlbC1hZG1pbkBsaXN0cy5zb3VyY2Vmb3JnZS5u
+ZXQAHgAzQAEAAAAXAAAAcGV3aUBndy1pbnN0cnVtZW50cy5kZQAAHgA4QAEAAAAIAAAAQUwuSVNT
+QwAeADlAAQAAAAIAAAAuAAAACwApAAAAAAALACMAAAAAAAMABhCqhS8zAwAHEMwBAAADABAQAAAA
+AAMAERAAAAAAHgAIEAEAAABlAAAASEksU1RSQU5HRVdIQVQiUEFDS0FHRSJBUkVZT1VVU0lORz8/
+WUVBSCxTT01FSE9XQkxVRVpJU01JU1NJTkdJTkNPTkZJR0ZJTEVCVVRPVEhFUkJMVUVaU1RVRkZT
+QVJFVEhFUgAAAAACAX8AAQAAADwAAAA8RTY0QkFENUE4QUQ0Njc0MDgyODA2OUE2NzhEOURENzMw
+MTFBODlAbmV0YmUwMS5uZXQudW5pbWlzPgC+pA==
 
-Ciao,
-
-Peter
-
-On Fri, 12 Aug 2005, Al wrote:
-
-> Hi,
->
-> > Strange ! What "package" are you using ??
-> Yeah, somehow BlueZ is missing in config file. But
-> other BlueZ stuffs are there in kernel.
-> It's an ARM7 development toolkit with uClinux ported.
->
-> > Is the USB dongle detected by the USB subsystem ???
-> Yes, I think so.
->
-> I just wonder did I miss any other BlueZ directory in kernel?
-> 1. Protocol stack: linux/net/bluetooth
-> 2. HCI device driver: linux/drivers/bluetooth
-> 3. I haven't put anything in /etc/bluetooth, does it matter for the error?
->     I just want to use " hciconfig" to list bluetooth USB dongle now.
->
-> Thanks for helps,
->
-> Al
->
->
->
->
-
-|	Peter Wippich 			Voice: +49 30 46776411		|
-|	G&W Instruments GmbH		fax:   +49 30 46776419		|
-|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
-|	D-13355 Berlin  / Germany					|
-
-
+------_=_NextPart_001_01C59F24.FB51E536--
 
 
 -------------------------------------------------------
