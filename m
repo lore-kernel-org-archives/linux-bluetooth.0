@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <396736060508141923370a6662@mail.gmail.com>
-From: Robert Brewer <rwb123@gmail.com>
+Message-ID: <dc98d8d905081408412d2c43b5@mail.gmail.com>
+From: Paul Webster <pjwebster@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] pairing problem - please help
-In-Reply-To: <42FEDEBA.8060007@xmission.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-References: <39673606050813203174545cc1@mail.gmail.com>
-	 <42FEDEBA.8060007@xmission.com>
+Subject: [Bluez-users] Broadcom BCM2035 Firmware
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,58 +16,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 14 Aug 2005 22:23:34 -0400
+Date: Mon, 15 Aug 2005 01:41:30 +1000
 
-I'm not sure I ever had an /etc/bluetooth/link_key file. =20
-I've got an email into Logitech support to find out more
-about it pairing abilities and any reset capability... but
-my guess is the best I can do is remove the battery.  I'm
-not certain that will clear its memory though.
+Hi,
 
-If I tried to find the PIN and hostname used on the Windows
-side would that help?
+I have a laptop with a built in BCM2035 USB bluetooth module
+("plugged" and "unplugged" by way of a "wireless" button). Downloaded
+and installed the latest bluez packages from source, including the
+firmware one. I notice that it only has BCM2033 firmware, and I'm
+fairly sure this is being loaded when I modprobe the bcm203x kernel
+module, however utilities all report BD Address as 00:00:00:00:00:00
+regardless of whether the interface is up or down. Aside from this, it
+all works ok, except that I have to specify the device (hci0) with
+each tool command. I assume this is because they "use the first
+available hci device by default", but because mine has a null address,
+it isn't recognised.
 
-Thanks for the tips.
+Therefore, I have 2 questions:
 
--Rob
+Is there anywhere I can get 2035 firmware from? Can it be extracted
+from the windows drivers, and if so, how?
 
-On 8/14/05, Brad Midgley <bmidgley@xmission.com> wrote:
-> Robert,
->=20
-> > A few weeks ago I successfully paired my headset with my broadcom dongl=
-e
-> > under bluez.  I was able to l2ping the headset, and btsco was able to m=
-ake
-> > the headset ring.  I couldn't get audio data through, but now I know th=
-at
-> > is because bluez doesn't support SCO for broadcom.
-> >
-> > Now I can't get the headset paired.  The past week I've been pairing th=
-e headset
-> > with the same dongle under WinXP.  Any thoughts on what is going wrong?
->=20
-> Several people have had similar issues. Sometimes, removing
-> /etc/bluetooth/link_key works since it resets the pairing. Sometimes it
-> doesn't help at all.
->=20
-> Is it true that the failed attempts are all on dualboot machines that
-> have used windows to pair to the headset? Maybe the headset remembers
-> the bdaddr but gets confused by the fact that the stored credentials
-> under linux don't match the last pairing in windows. That's about the
-> only idea I've had on it and I don't see much discussion here about
-> what's going on...
->=20
-> Some headsets remember multiple pairings. Does yours have a reset,
-> something more drastic than just putting it in pairing mode? My iTech
-> set has a reset but I've come to believe they put that in there because
-> the headset completely locks up and becomes unresponsive on occasion :(
->=20
-> Brad
->=20
->=20
+Thanks
 
---=20
-Robert W. Brewer
+Paul W
 
 
 -------------------------------------------------------
