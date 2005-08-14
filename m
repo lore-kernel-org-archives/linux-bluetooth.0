@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <dc98d8d905081408412d2c43b5@mail.gmail.com>
-From: Paul Webster <pjwebster@gmail.com>
+Message-ID: <42FEDEBA.8060007@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Broadcom BCM2035 Firmware
+Subject: Re: [Bluez-users] pairing problem - please help
+References: <39673606050813203174545cc1@mail.gmail.com>
+In-Reply-To: <39673606050813203174545cc1@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,30 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 15 Aug 2005 01:41:30 +1000
+Date: Sun, 14 Aug 2005 00:03:38 -0600
 
-Hi,
+Robert,
 
-I have a laptop with a built in BCM2035 USB bluetooth module
-("plugged" and "unplugged" by way of a "wireless" button). Downloaded
-and installed the latest bluez packages from source, including the
-firmware one. I notice that it only has BCM2033 firmware, and I'm
-fairly sure this is being loaded when I modprobe the bcm203x kernel
-module, however utilities all report BD Address as 00:00:00:00:00:00
-regardless of whether the interface is up or down. Aside from this, it
-all works ok, except that I have to specify the device (hci0) with
-each tool command. I assume this is because they "use the first
-available hci device by default", but because mine has a null address,
-it isn't recognised.
+> A few weeks ago I successfully paired my headset with my broadcom dongle
+> under bluez.  I was able to l2ping the headset, and btsco was able to make
+> the headset ring.  I couldn't get audio data through, but now I know that
+> is because bluez doesn't support SCO for broadcom.
+> 
+> Now I can't get the headset paired.  The past week I've been pairing the headset
+> with the same dongle under WinXP.  Any thoughts on what is going wrong?
 
-Therefore, I have 2 questions:
+Several people have had similar issues. Sometimes, removing 
+/etc/bluetooth/link_key works since it resets the pairing. Sometimes it 
+doesn't help at all.
 
-Is there anywhere I can get 2035 firmware from? Can it be extracted
-from the windows drivers, and if so, how?
+Is it true that the failed attempts are all on dualboot machines that 
+have used windows to pair to the headset? Maybe the headset remembers 
+the bdaddr but gets confused by the fact that the stored credentials 
+under linux don't match the last pairing in windows. That's about the 
+only idea I've had on it and I don't see much discussion here about 
+what's going on...
 
-Thanks
+Some headsets remember multiple pairings. Does yours have a reset, 
+something more drastic than just putting it in pairing mode? My iTech 
+set has a reset but I've come to believe they put that in there because 
+the headset completely locks up and becomes unresponsive on occasion :(
 
-Paul W
+Brad
 
 
 -------------------------------------------------------
