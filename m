@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Fredrik Tolf <fredrik@dolda2000.com>
+Subject: Re: [Bluez-devel] hciemu documentation
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050813210225.87521.qmail@web25703.mail.ukl.yahoo.com>
+References: <20050813210225.87521.qmail@web25703.mail.ukl.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1124215347.21719.31.camel@pc7.dolda2000.com>
+Message-Id: <1124206596.7466.19.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Headset reconnection
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,22 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 16 Aug 2005 20:02:27 +0200
+Date: Tue, 16 Aug 2005 17:36:36 +0200
 
-Hi!
+Hi Morgan,
 
-I'm wondering about how BT headsets and mobile phones usually work
-together, in hope of implementing automatic connection in btsco.
+> is there a good documentation about the usage of
+> hciemu?
+> I searched the mailinglist and asked google, without
+> success.
+> 
+> Or does anyone have some experiences to share?
 
-Normally, it seems that a mobile phone and a headset manage to keep
-their link, even across "reboots" and other disconnections. Does a phone
-periodically scan for headsets that it knows, or does the headset
-somehow try to automatically reconnect to the phone under certain
-circumstances, or is it something completely different?
+actually there is no good documentation and it is very limited. What do
+you wanna do with it?
 
-Can anyone tell me where to find info on this?
+Regards
 
-Fredrik Tolf
+Marcel
 
 
 
