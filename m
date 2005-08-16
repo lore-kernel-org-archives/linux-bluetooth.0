@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="big5"
-Subject: Re: [Bluez-devel] Porting BlueZ on embedded uClinux
-Message-ID: <E64BAD5A8AD46740828069A678D9DD73011A91@netbe01.net.unimis>
-From: "Al" <Al_chane@issc.com.tw>
+From: "Whoopie" <whoopie79@gmx.net>
 To: <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_NextPart_000_002D_01C5A2C9.AA43BF60"
+Message-ID: <E1E5AiB-0000wJ-Dw@mail.sourceforge.net>
+Subject: [Bluez-devel] Patch for btsco kernel module (index parameter)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,44 +17,60 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 17 Aug 2005 10:28:54 +0800
+Date: Wed, 17 Aug 2005 01:19:06 +0200
 
-Hi, durai:
+This is a multi-part message in MIME format.
 
-     I port hcid to embedded uClinux (2.4.20). But it has problem to
-fork(), fork() return -1. Did you have fork() problem in your embedded
-linux?
+------=_NextPart_000_002D_01C5A2C9.AA43BF60
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-thanks a lot,
+Hi,
+I made a small patch for the btsco kernel module, so that it doesn't grep
+the ALSA device 0. And you can specify any index parameter.
+I think that it's important because the soundcard should be device 0. Now, I
+can load the module in /etc/modules at startup.
 
-Al
+It's based on the ALSA modem drivers, so it was just a copy&paste work.
 
------ Original Message -----=20
-From: "durai" <durai@isofttech.com>
-To: <bluez-devel@lists.sourceforge.net>
-Sent: Monday, August 15, 2005 3:22 PM
-Subject: Re: [Bluez-devel] Porting BlueZ on embedded uClinux
+Regards,
+Whoopie
 
+------=_NextPart_000_002D_01C5A2C9.AA43BF60
+Content-Type: text/x-patch;
+	name="btsco.c.patch"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+	filename="btsco.c.patch"
 
-> Hi Al,
-> I recently ported bluez stack in a embedded linux running 2.4.18 =
-kernel.
-> First I downloaded the MH patch from=20
-> http://www.holtmann.org/linux/kernel/. and
-> applied it. Now both statically compiled driver as well as modules are =
+--- btsco.c.orig	2005-08-16 23:12:56.000000000 +0200
++++ btsco.c	2005-08-17 00:19:59.000000000 +0200
+@@ -63,6 +63,11 @@
+=20
+ static char *mod_revision =3D "$Revision: 1.6 $";
+=20
++static int index[SNDRV_CARDS] =3D {[0 ... (SNDRV_CARDS - 1)] =3D -2}; =
+/* Exclude the first card */
++
++module_param_array(index, int, NULL, 0444);
++MODULE_PARM_DESC(index, "Index value for Bluetooth SCO Headset =
+Soundcard.");
++
+ #undef dprintk
+ #if 1
+ #define dprintk(fmt...) printk(KERN_INFO "snd-bt-sco: " fmt)
+@@ -964,7 +969,7 @@
+ 	snd_hwdep_t *hw;
+=20
+ 	card =3D
+-	    snd_card_new(SNDRV_DEFAULT_IDX1, SNDRV_DEFAULT_STR1,
++	    snd_card_new(index[dev], SNDRV_DEFAULT_STR1,
+ 			 THIS_MODULE, 0);
+ 	if (card =3D=3D NULL)
+ 		return -ENOMEM;
 
-> working correctly.
-> You can also try finding an appropriate patch and patch it with your=20
-> kernel. But what is
-> surprising for me is, though your kernel is 2.4.21 and you are not =
-able to=20
-> find the options in
-> make menuconfig.  I guess something  is messed up in your package.
->
-> Can you find "hci_usb_init" in your System.map? Is it integrated=20
-> correctly?
-> regards
-> durai
+------=_NextPart_000_002D_01C5A2C9.AA43BF60--
 
 
 
