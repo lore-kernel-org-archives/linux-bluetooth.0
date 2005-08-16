@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] save_link_key in 2.19
+Subject: Re: [Bluez-devel] how to meassure BER (bit error rate)?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200508112219.12677.adam.cooper@port.ac.uk>
-References: <200508112219.12677.adam.cooper@port.ac.uk>
+In-Reply-To: <20050811181411.8F9861CE303@ws1-6.us4.outblaze.com>
+References: <20050811181411.8F9861CE303@ws1-6.us4.outblaze.com>
 Content-Type: text/plain
-Message-Id: <1124206342.7466.14.camel@pegasus>
+Message-Id: <1124206242.7466.11.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,25 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 16 Aug 2005 17:32:22 +0200
+Date: Tue, 16 Aug 2005 17:30:42 +0200
 
-Hi Adam,
+Hi Morgan,
 
-> I've just spent the last couple of hours trying to figure out why my 'hcid' 
-> was not storing my paired devices between restarts. I'm running gentoo and 
-> the latest version of bluez utils (2.19). 
+> I would like to meassure the BER (bit error rate) while sending data betwenn two bluetooth devices.
+> Is it possible to meassure the BER directly or do I have to use RSSI (received signal strengh indication)?
+> How can I achieve this. Can I meassure it using hcidump or hciconfig?
 > 
-> In a final act of desperation I had a good hunt through the code. Low and 
-> behold the 'save_link_key' function has been commented out, along with the 
-> calls to it.
+> I learned that RSSI is an indicator for the BER, is that true and how is the relationship.
 > 
-> Is there a specific reason this is so? 
-> 
-> My mobile runs with it's visibility off so not being able to save pairings is 
-> a bit of a pain.
+> Are LQ (link quality) and TPL (transmission power level) also indicators for BER?
 
-the newer hcid stores the link keys under /var/lib/bluetooth/. Check if
-you see a directory with your BD_ADDR there.
+with the CSR chips you can use the link quality and extract the BER
+value. The tables for that are on my website.
 
 Regards
 
