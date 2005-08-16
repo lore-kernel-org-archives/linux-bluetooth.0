@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Broadcom BCM2035 Firmware
+Subject: Re: [Bluez-users] Multiple RFCOMM connections with 2.4.x kernel
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <dc98d8d905081408412d2c43b5@mail.gmail.com>
-References: <dc98d8d905081408412d2c43b5@mail.gmail.com>
+In-Reply-To: <79ae4fa10508111433c9739cb@mail.gmail.com>
+References: <79ae4fa10508111433c9739cb@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1124206678.7466.21.camel@pegasus>
+Message-Id: <1124206470.7466.17.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,30 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 16 Aug 2005 17:37:58 +0200
+Date: Tue, 16 Aug 2005 17:34:30 +0200
 
-Hi Paul,
+Hi Venkat,
 
-> I have a laptop with a built in BCM2035 USB bluetooth module
-> ("plugged" and "unplugged" by way of a "wireless" button). Downloaded
-> and installed the latest bluez packages from source, including the
-> firmware one. I notice that it only has BCM2033 firmware, and I'm
-> fairly sure this is being loaded when I modprobe the bcm203x kernel
-> module, however utilities all report BD Address as 00:00:00:00:00:00
-> regardless of whether the interface is up or down. Aside from this, it
-> all works ok, except that I have to specify the device (hci0) with
-> each tool command. I assume this is because they "use the first
-> available hci device by default", but because mine has a null address,
-> it isn't recognised.
-> 
-> Therefore, I have 2 questions:
-> 
-> Is there anywhere I can get 2035 firmware from? Can it be extracted
-> from the windows drivers, and if so, how?
+>   I am trying to establish two rfcomm connections between two linux
+> machines running 2.4.21 kernel. I am using different channel numbers
+> for both connections. First connection getting established normally.
+> Second connection fails in the connect() with EBUSY OR EAGAIN. I have
+> putdown the steps I am doing exactly below. My question is "Can I
+> establish more than one RFCOMM connection between two machines running
+> 2.4.x kernels"? It would be very helpful if somecan reply to this.
 
-show us the content of /proc/bus/usb/devices after you activated your
-Bluetooth dongle. What happens if you load the hci_usb.ko module with
-the "reset=1" kernel parameter?
+yes, you can. I don't know of a bug in 2.4.21, but you should try the
+latest 2.6 kernel.
+
+> Here is what I am doing:
+> 1. Start RFCOMM serversocket on Machine1. Its waiting on accept()
+> 2. Connect from Machine2 to Machine1 using connect(). I am able to
+> connect to server here.
+> 3.Start another serversocket on Machine2 on different channelID. Its
+> waiting on accept()
+> 4. Try to connect from Machine1 to Machine2 using connect(). This
+> fails with EAGAIN or EBUSY as long as the connection established in
+> step 2 remains.
+
+Provide some example code and the output of "hcidump -X -V" on the
+server machines.
 
 Regards
 
