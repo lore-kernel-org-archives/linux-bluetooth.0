@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4303A01D.6030104@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <007501c5a35c$d1fc51a0$640aa8c0@ROBYHOME>
+From: "Roberto" <rlr@bitween.com>
+To: <bluez-devel@lists.sourceforge.net>
+References: <013e01c5a30a$b9329eb0$050aa8c0@gateway> <430351BD.7090100@xmission.com> <000e01c5a355$e6b0a0d0$0201a8c0@NBVICTOR>
+Subject: Re: [Bluez-devel] SBC Fixed Point for A2Dp
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SCO over UART
-References: <4302F91F.7020202@umit.at>
-In-Reply-To: <4302F91F.7020202@umit.at>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,22 +18,97 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 17 Aug 2005 14:37:49 -0600
+Date: Wed, 17 Aug 2005 20:52:29 +0200
 
-David
+thanks for the update my main poblem is that working with Mobile at around
+100,10 Mhz it is quite slow this ckind of calculation , the one that I have
+(sbc.c floating point) is totally slow so I hope you will implement oen a
+little bit better and then I can improve on mobile, if you have time to send
+me a version so I can test it on these days because i'm not in vacation :)
 
-> i'm using an ericsson "ROK 101008" bluetooth module and kernel 2.6.10. 
-> the module can be connected via usb or rs232. and i found an ericsson 
-> specific hci command to switch the sco-path to HCI (it is set to PCM by 
-> default).
+Ciao Roberto
 
-What is the ericsson command and how do you inject it into hci?
+----- Original Message ----- 
+From: "Victor Shcherbatyuk" <victor@win.tue.nl>
+To: <bluez-devel@lists.sourceforge.net>
+Sent: Wednesday, August 17, 2005 8:02 PM
+Subject: Re: [Bluez-devel] SBC Fixed Point for A2Dp
 
-Is the rok101008 similar in this respect to the rok104001? That's what's 
-on the gumstix.com board and I've been *very* interested in getting sco 
-working with this. I thought it couldn't be coaxed into using hci.
 
-Brad
+> It will be out there by the end of the week, we already have ARM specific
+> 64-bit precise version which runs within around 30 MIPS and does not sound
+> noisy, I'm finishing general 64-bit thing (uses long long for
+multiplication
+> result) to make it complete and currently integrating it into the a2dp
+code.
+> I'm on vacation now, so the progress is slow...
+>
+> Victor.
+>
+> ----- Original Message ----- 
+> From: "Brad Midgley" <bmidgley@xmission.com>
+> To: <bluez-devel@lists.sourceforge.net>
+> Sent: Wednesday, August 17, 2005 17:03
+> Subject: Re: [Bluez-devel] SBC Fixed Point for A2Dp
+>
+>
+> > Roberto
+> >
+> >> I have read some transcoding to SBC fixed point somewhere , do you know
+> >> where become available ? We are working on a mobile version of A2DP
+with
+> >> headphones for Symbian and we would like to port this part of code to
+> >> mobile and deliver the library under LGPL
+> >
+> > I hope you are able to help us with this. We currently have no
+> > implementation. Victor Shcherbatyuk has been tinkering with fixed point
+> > but was getting noisy audio last I heard and has not contributed
+anything
+> > yet.
+> >
+> > If you look in sbc/sbc.h, you'll see some fixed point functions like
+> > fxmult and conversion functions. Currently, the precision is set to 20
+> > bits. This is probably not enough, but after you change it to get more
+> > precision, the fixed point tables in sbc_tables_f.h need to be
+> > regenerated; build gen_fixed.c by hand and run
+> >
+> > ./gen_fixed > sbc_tables_f.h
+> >
+> > to do that.
+> >
+> > Can I help in any other way?
+> >
+> > thanks!
+> > Brad
+> >
+> >
+> > -------------------------------------------------------
+> > SF.Net email is Sponsored by the Better Software Conference & EXPO
+> > September 19-22, 2005 * San Francisco, CA * Development Lifecycle
+> > Practices
+> > Agile & Plan-Driven Development * Managing Projects & Teams * Testing &
+QA
+> > Security * Process Improvement & Measurement *
+http://www.sqe.com/bsce5sf
+> > _______________________________________________
+> > Bluez-devel mailing list
+> > Bluez-devel@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+>
+>
+> -------------------------------------------------------
+> SF.Net email is Sponsored by the Better Software Conference & EXPO
+> September 19-22, 2005 * San Francisco, CA * Development Lifecycle
+Practices
+> Agile & Plan-Driven Development * Managing Projects & Teams * Testing & QA
+> Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+
 
 
 -------------------------------------------------------
