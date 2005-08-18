@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <dc98d8d905081805131f658b62@mail.gmail.com>
-From: Paul Webster <pjwebster@gmail.com>
+Message-ID: <BAY104-F11FDC6DE6FBCEC9843FF66C1B20@phx.gbl>
+In-Reply-To: <E64BAD5A8AD46740828069A678D9DD73011A99@netbe01.net.unimis>
+From: "blookk -" <blookk@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Broadcom BCM2035 Firmware
-In-Reply-To: <1124206678.7466.21.camel@pegasus>
+Subject: RE: [Bluez-users] RE: Port BlueZ lib and utility on embedded uClinux
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <dc98d8d905081408412d2c43b5@mail.gmail.com>
-	 <1124206678.7466.21.camel@pegasus>
+Content-Type: text/html; charset=iso-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,67 +17,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 18 Aug 2005 22:13:09 +1000
+Date: Thu, 18 Aug 2005 19:21:41 +0000
 
-Hi Marcel,
+<html><div style='background-color:'><DIV class=RTE>
+<P>Hi,</P>
+<P>When I am porting BlueZ to uCLinux, I found the same problem.<BR>I try with "select()" instead of "poll()", but I did not &nbsp;solve the problem.</P>
+<P>I decided disable this option, and do not read the local name or other characteristics that I do not remenber.<BR></P>
+<P>Regards.<BR></P></DIV>
+<DIV></DIV>
+<BLOCKQUOTE style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #a0c6e5 2px solid; MARGIN-RIGHT: 0px"><FONT style="FONT-SIZE: 11px; FONT-FAMILY: tahoma,sans-serif">
+<HR color=#a0c6e5 SIZE=1>
 
-The relavant secion of /proc/bus/usb/devices says:
+<DIV></DIV>From:&nbsp;&nbsp;<I>"Al" &lt;Al_chane@issc.com.tw&gt;</I><BR>Reply-To:&nbsp;&nbsp;<I>bluez-users@lists.sourceforge.net</I><BR>To:&nbsp;&nbsp;<I>&lt;bluez-users@lists.sourceforge.net&gt;</I><BR>Subject:&nbsp;&nbsp;<I>[Bluez-users] RE: Port BlueZ lib and utility on embedded uClinux</I><BR>Date:&nbsp;&nbsp;<I>Thu, 18 Aug 2005 14:42:09 +0800</I><BR>&gt;<BR>&gt;Hi,<BR>&gt;<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The poll() always return error :<BR>&gt;<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while ((n = poll(&amp;p, 1, to)) &lt; 0) in funcion int hci_send_req () (file: hci.c) results in "Can't read local name on hci0: Connection timed out (110)"<BR>&gt;<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Has anyone had same problem using poll() in embedded linux?<BR>&gt;<BR>&gt;thanks a lot,<BR>&gt;<BR>&gt;Al<BR>&gt;-----Original Message-----<BR>&gt;From: Al on behalf of 
+Al<BR>&gt;Sent: Wed 8/17/2005 3:48 PM<BR>&gt;To: bluez-users@lists.sourceforge.net<BR>&gt;Cc:<BR>&gt;Subject: Port BlueZ lib and utility on embedded uClinux<BR>&gt;Hi, there:<BR>&gt;<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;I'm trying to port BlueZ on embedded uClinux. Kernel part seems ok so far.<BR>&gt;<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp; For the HCI utility on user space part, I first have /hci-lib and /hcid<BR>&gt;compiled to hcid. Then have /hci-lib and /hciconfig compiled to hciconfig.<BR>&gt;Copy two applications, hcid and hciconfig, to ramdisk. Also I have hcid.conf<BR>&gt;copied to ramdisk /etc/bluetooth/<BR>&gt;<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;After boot up, run hcid, then hciconfig hci0 up to bring up the device.<BR>&gt;MAC address is read correctly. But when running hciconfig -a, it can't read local name correctly.<BR>&gt;Are those steps correct? What do I 
+miss?<BR>&gt;<BR>&gt;thanks a lot,<BR>&gt;<BR>&gt;Al<BR>&gt;<BR>&gt;--------------------------------------<BR>&gt;If I rn hcid -n to see the printout:<BR>&gt;<BR>&gt;/&gt;hcid -n<BR>&gt;hcid[18]: Bluetooth HCI deamon<BR>&gt;hcid[18]: Starting security manager 0<BR>&gt;<BR>&gt;---------------------------------------------------------------<BR>&gt;/&gt; hcid<BR>&gt;/&gt; hciconfig hci0 up<BR>&gt;/&gt; hciconfig -a<BR>&gt;hci0:&nbsp;&nbsp; Type: USB<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:11:67:03:DB:62 ACL MTU: 678:8 SCO MTU: 48:10<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:323 acl:0 sco:0 events:9 errors:0<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:33 acl:0 sco:0 commands:9 errors:0<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+Features: 0xff 0xff 0x8d 0x78 0x08 0x18 0x00 0x00<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy:<BR>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link mode: SLAVE ACCEPT<BR>&gt;<BR>&gt;<BR>&gt;Can't read local name on hci0: Connection timed out (110)<BR>&gt;pid 17: failed 256<BR>&gt;/&gt;<BR>&gt;-------------------------------------------------------------------------------------------<BR>&gt;<BR>&gt;<BR>&gt;<BR>&gt;<BR>&gt;<BR>
+<P>&gt;&lt;&lt; winmail.dat &gt;&gt;
+<DIV></DIV>
+<P></FONT></P></BLOCKQUOTE></div></html>
 
-........ 8>< ........ SNIP ........ ><8 ........
-T:  Bus=3D02 Lev=3D01 Prnt=3D01 Port=3D00 Cnt=3D01 Dev#=3D  3 Spd=3D12  MxC=
-h=3D 0
-D:  Ver=3D 2.00 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
-P:  Vendor=3D0a5c ProdID=3D2035 Rev=3D 1.00
-S:  Manufacturer=3DBroadcom Corp
-S:  Product=3DBCM2035B
-C:* #Ifs=3D 3 Cfg#=3D 1 Atr=3Da0 MxPwr=3D100mA
-I:  If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
-E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-I:  If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  32 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  32 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  64 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  64 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  64 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  64 Ivl=3D1ms
-I:  If#=3D 2 Alt=3D 0 #EPs=3D 2 Cls=3Dff(vend.) Sub=3Dff Prot=3Dff Driver=
-=3D(none)
-E:  Ad=3D84(I) Atr=3D02(Bulk) MxPS=3D  32 Ivl=3D0ms
-E:  Ad=3D04(O) Atr=3D02(Bulk) MxPS=3D  32 Ivl=3D0ms
-........ 8>< ........ SNIP ........ ><8 ........
-
-After issuing rmmod for all the bluetooth related modules, as well as
-"rmmod -f hci_usb", I gave a "modprobe usb_hci reset=3D1" and then
-"hciconfig up" gave:
-hci0:   Type: USB
-        BD Address: 00:00:00:00:00:00 ACL MTU: 377:10 SCO MTU: 16:0
-        DOWN=20
-        RX bytes:83 acl:0 sco:0 events:10 errors:0
-        TX bytes:37 acl:0 sco:0 commands:10 errors:0
-=20
-I still had to issue "hciconfig hci0 up" to bring up the interface,
-before "hidd --search" was able to reconnect my mouse, even though the
-BD Address is still blank.
 
 
 -------------------------------------------------------
