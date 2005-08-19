@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] current state of Microsoft bluetooth mouse
 	(scroll wheel)
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Scott Gilliland <gtg902r@mail.gatech.edu>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1124467117.16439.15.camel@localhost.localdomain>
+In-Reply-To: <1124462940.6398.6.camel@notepaq>
 References: <1124406281.16439.8.camel@localhost.localdomain>
 	 <1124462940.6398.6.camel@notepaq>
-	 <1124467117.16439.15.camel@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1124467190.6398.19.camel@notepaq>
+Message-Id: <1124467117.16439.15.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,30 +20,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 19 Aug 2005 17:59:50 +0200
+Date: Fri, 19 Aug 2005 11:58:37 -0400
 
-Hi Scott,
+It doesn't actually say what version it is (so i maybe ought to assume
+version 1, but you never know with M$). Is there a good way to tell if
+that patch made a difference? Or should my hidd output have been
+different?
 
-> It doesn't actually say what version it is (so i maybe ought to assume
-> version 1, but you never know with M$). Is there a good way to tell if
-> that patch made a difference? Or should my hidd output have been
-> different?
+Could you explain the details of "report mode" vs "boot mode"? I only
+have a vauge idea of what the difference is.
 
-use "hcitool info ..." as root and show us the output.
+Also, is this to say that if i use a git kernel, there's no reason it
+shouldn't work perfectly? 
 
-> Could you explain the details of "report mode" vs "boot mode"? I only
-> have a vauge idea of what the difference is.
+Thanks again,
+Scott.
 
-Look at the mailing list archive or the USB HID specification.
-
-> Also, is this to say that if i use a git kernel, there's no reason it
-> shouldn't work perfectly? 
-
-Using a 2.6.12-mh2 kernel should be fine.
-
-Regards
-
-Marcel
+On Fri, 2005-08-19 at 16:49 +0200, Marcel Holtmann wrote:
+> Hi Scott,
+> is this the first or second genration of the mouse. I own the first
+> generation and it works fine in report protocol mode with my -mh patch.
+> The Bitkeeper repository is out of date, because we don't use Bitkeeper
+> anymore. The latest stuff is inside the Git repostiories at kernel.org.
+> 
+> Regards
+> 
+> Marcel
 
 
 
