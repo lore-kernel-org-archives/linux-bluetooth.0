@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <430606F9.3060906@hasborg.com>
-From: Joshua Wright <jwright@hasborg.com>
-MIME-Version: 1.0
+From: Nicholas Piper <nick-bluez@nickpiper.co.uk>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Reset card
-References: <43038D0B.1060209@hasborg.com>	 <20050819092419.715FE479@arbetsmyra.dyndns.org>	 <4305A63E.7020507@soft.uni-linz.ac.at> <1124462989.6398.8.camel@notepaq>
-In-Reply-To: <1124462989.6398.8.camel@notepaq>
-Content-Type: multipart/mixed;
- boundary="------------000605070505040803070405"
+Subject: Re: [Bluez-devel] Looking for a Palm with Bluetooth
+Message-ID: <20050819161746.GB17868@zanu.org.uk>
+References: <1124467416.6398.24.camel@notepaq>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1124467416.6398.24.camel@notepaq>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,116 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 Aug 2005 12:21:13 -0400
+Date: Fri, 19 Aug 2005 17:17:46 +0100
 
-This is a multi-part message in MIME format.
---------------000605070505040803070405
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Marcel,
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+On Fri, 19 Aug 2005, Marcel Holtmann wrote:
 
-Marcel Holtmann wrote:
-> feel free to send me a patch for the bccmd tool that I can include 
-> into the bluez-utils distribution.
+> I just played a little bit with a Palm Tungsten T3 and found there
+> secret 128-bit UUIDs for specific services like HotSync. I added support
+> for them to sdptool and now I like to fully add Bluetooth support to the
+> pilot-link library and its utils. The way with using PPP in between is
+> ugly and not really needed. Is there anyone out there that has an old T3
+> and don't need it anymore? I am really happy if someone sends me such a
+> device, so I can add native synchronization support over Bluetooth for
+> the PalmOS devices.
 
-Thanks to all who replied.  Simon's code was exactly what was needed,
-and the CSR BCCMD documentation was very helpful.
+That would be really great! Sadly, I have no device for you yet :-( In
+a few months, if I buy a lifedrive then I will have a TT spare though.
 
-Attached is a patch to automatically reset CSR cards after changing the
-BD_ADDR with the bdaddr utility.
+Nick
 
-Thanks,
-
-- -Josh
-- --
-- -Joshua Wright
-jwright@hasborg.com
-
-2005-2006 pgpkey: http://802.11ninja.net/pgpkey.htm
-fingerprint: F00E 7A42 8375 0C55 964F E5A4 4D2F 22F6 3658 A4BF
-
-Today I stumbled across the world's largest hotspot.  The SSID is "linksys".
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (MingW32)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFDBgb4TS8i9jZYpL8RAqOoAKCPXtduODADCFt6bOt2xofhVEG6oQCg8Bx6
-2zYqq5VehC3FpOhPYwyiFgE=
-=9B88
------END PGP SIGNATURE-----
-
---------------000605070505040803070405
-Content-Type: text/plain;
- name="bdaddr-csr-reset.diff"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="bdaddr-csr-reset.diff"
-
---- bdaddr.c	2005-05-09 14:33:24.000000000 -0400
-+++ bdaddr-jlw.c	2005-08-19 12:15:03.000000000 -0400
-@@ -103,6 +103,40 @@
- }
- #endif
- 
-+static int csr_cold_reset(int dd)
-+{
-+	unsigned char cmd[] = { 0x02, 0x00, /* message type */
-+				0x09, 0x00, /* message length */
-+				0x00, 0x00, /* seqno for pairing response */
-+				0x01, 0x40, /* varid for cold reset */
-+				0x00, 0x00, /* status */
-+				/* payload follows, must be at least at least
-+				   4 uint16s in length accordind to BCCMD */
-+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-+
-+	unsigned char cp[254], rp[254];
-+	struct hci_request rq;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp[0] = 0xc2;
-+	memcpy(cp + 1, cmd, sizeof(cmd));
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf	= OGF_VENDOR_CMD;
-+	rq.ocf	= 0x00;
-+	rq.event  = EVT_VENDOR;
-+	rq.cparam = cp;
-+	rq.clen   = sizeof(cmd) + 1;
-+	rq.rparam = rp;
-+	rq.rlen   = sizeof(rp);
-+
-+	if (hci_send_req(dd, &rq, 2000) < 0)
-+		return -1;
-+
-+	return 0;
-+}
-+
-+
- static int csr_write_bd_addr(int dd, bdaddr_t *bdaddr)
- {
- 	unsigned char cmd[] = { 0x02, 0x00, 0x0c, 0x00, 0x11, 0x47, 0x03, 0x70,
-@@ -291,7 +325,16 @@
- 				exit(1);
- 			}
- 
--			printf("Address changed - Reset device now\n");
-+			if (ver.manufacturer == 10) { /* CSR devices */
-+				if (csr_cold_reset(dd) != 0) {
-+					fprintf(stderr, "Error resetting card, remove and insert manually.\n");
-+					exit(1);
-+				} else {
-+					printf("Address changed - card reset successfully\n");
-+				}
-+			} else { /* non-CSR devices */
-+				printf("Address changed - Reset device now\n");
-+			}
- 
- 			//ioctl(dd, HCIDEVRESET, dev);
- 			//ioctl(dd, HCIDEVDOWN, dev);
-
---------------000605070505040803070405--
+-- 
+Nick Piper, Developer, LogicaCMG           http://www.nickpiper.co.uk/
+GPG Encrypted mail welcome!                             1024D/3ED8B27F
+Choose life. Be Vegan :-) Please reduce needless cruelty + suffering !
 
 
 -------------------------------------------------------
