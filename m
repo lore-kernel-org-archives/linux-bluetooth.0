@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Reset card
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4305B185.2080604@umit.at>
+From: David Bannach <david.bannach@umit.at>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4305A63E.7020507@soft.uni-linz.ac.at>
-References: <43038D0B.1060209@hasborg.com>
-	 <20050819092419.715FE479@arbetsmyra.dyndns.org>
-	 <4305A63E.7020507@soft.uni-linz.ac.at>
-Content-Type: text/plain
-Message-Id: <1124462989.6398.8.camel@notepaq>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] SCO over UART
+References: <4302F91F.7020202@umit.at> <4303A01D.6030104@xmission.com>
+In-Reply-To: <4303A01D.6030104@xmission.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,22 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 Aug 2005 16:49:49 +0200
+Date: Fri, 19 Aug 2005 12:16:37 +0200
 
-Hi Simon,
+brad,
 
-> there's a little reset utility on my page, as I needed this as well:
-> http://www.soft.uni-linz.ac.at/_wiki/tiki-index.php?page=ProjectBluezHandsfree
-> Look at the end of the page and use at your own risk :)
+> What is the ericsson command and how do you inject it into hci?
+>
+> Is the rok101008 similar in this respect to the rok104001? That's 
+> what's on the gumstix.com board and I've been *very* interested in 
+> getting sco working with this. I thought it couldn't be coaxed into 
+> using hci.
 
-feel free to send me a patch for the bccmd tool that I can include into
-the bluez-utils distribution.
+the command is "ericsson_set_sco_data_path". i found it in this document 
+(only): 
+http://www.vs.inf.ethz.ch/res/proj/smart-its/dl/ROK_101_007_revR1C-HCI_ericsson_specific.pdf
 
-Regards
+i use hcitool for sending the command to the module, e.g. the following 
+line will set the sco mapping to hci:
 
-Marcel
+    hcitool cmd 0x3f 0x001d 0x00
 
+the rok101008 and rok104001 seem very similar. at least the command 
+above returns a positive response on both devices. i did not notice 
+differences of these devices so far. actually i want to get sco running 
+on the rok104001 which is built into a qbic (pxa based wearable) but 
+it's easier to try things with an external module attached to a notebook.
 
+i'm still having the problem that bluez does not send any sco data to 
+the module. i'm really curious about your results.
+
+david
 
 
 -------------------------------------------------------
