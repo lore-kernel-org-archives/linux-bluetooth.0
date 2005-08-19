@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [PATCH] hcid/dbus crasher fix
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+Cc: Nathaniel McCallum <npmccallum@asbury.edu>
+In-Reply-To: <1124383820.2312.3.camel@vacation.asbury.edu>
+References: <1124383820.2312.3.camel@vacation.asbury.edu>
 Content-Type: text/plain
-Message-Id: <1124467416.6398.24.camel@notepaq>
+Message-Id: <1124463220.6398.13.camel@notepaq>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Looking for a Palm with Bluetooth
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,18 +19,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 Aug 2005 18:03:36 +0200
+Date: Fri, 19 Aug 2005 16:53:40 +0200
 
-Hi,
+Hi Nathaniel,
 
-I just played a little bit with a Palm Tungsten T3 and found there
-secret 128-bit UUIDs for specific services like HotSync. I added support
-for them to sdptool and now I like to fully add Bluetooth support to the
-pilot-link library and its utils. The way with using PPP in between is
-ugly and not really needed. Is there anyone out there that has an old T3
-and don't need it anymore? I am really happy if someone sends me such a
-device, so I can add native synchronization support over Bluetooth for
-the PalmOS devices.
+> The following patch corrects a crasher bug when using hcid with dbus.
+> 
+> I'm still having a problem even after this bug, hcid just exits with
+> exitstatus 1 (but at least it doesn't crash).  Any ideas?
+
+this patch is not correct, because ba2str() then writes 18 bytes to a
+pointer where you haven't allocated memory for. Why do you need this
+kind of fix.
+
+> BTW, I'm not subscribed to the list, so please CC me in any responses.
+
+Why don't you subscribe?
 
 Regards
 
