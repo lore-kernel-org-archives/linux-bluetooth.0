@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Getting periodic inquiry parameters
+Subject: Re: [Bluez-devel] Reset card
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <9307f5f2050817122274e6243f@mail.gmail.com>
-References: <9307f5f2050817122274e6243f@mail.gmail.com>
+In-Reply-To: <4305A63E.7020507@soft.uni-linz.ac.at>
+References: <43038D0B.1060209@hasborg.com>
+	 <20050819092419.715FE479@arbetsmyra.dyndns.org>
+	 <4305A63E.7020507@soft.uni-linz.ac.at>
 Content-Type: text/plain
-Message-Id: <1124463083.6398.11.camel@notepaq>
+Message-Id: <1124462989.6398.8.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,18 +20,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 Aug 2005 16:51:23 +0200
+Date: Fri, 19 Aug 2005 16:49:49 +0200
 
-Hi Paul,
+Hi Simon,
 
-> I'm looking for a way to know if a device has been put in periodic
-> inquiry scan mode and, if affirmative, the values of the periodic
-> inquiry parameters (max/min period and length), the bluez-utils don't
-> seem to have anything in this regard, hopefully someone here does :)
+> there's a little reset utility on my page, as I needed this as well:
+> http://www.soft.uni-linz.ac.at/_wiki/tiki-index.php?page=ProjectBluezHandsfree
+> Look at the end of the page and use at your own risk :)
 
-I don't think there is any way to get this information. The kernel must
-track the command and provide these kind of stuff via sysfs or some new
-ioctl.
+feel free to send me a patch for the bccmd tool that I can include into
+the bluez-utils distribution.
 
 Regards
 
