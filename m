@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Nicholas Piper <nick-bluez@nickpiper.co.uk>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Looking for a Palm with Bluetooth
-Message-ID: <20050819161746.GB17868@zanu.org.uk>
-References: <1124467416.6398.24.camel@notepaq>
+Content-Type: text/plain
+Message-Id: <1124467416.6398.24.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1124467416.6398.24.camel@notepaq>
+Subject: [Bluez-devel] Looking for a Palm with Bluetooth
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,30 +16,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 Aug 2005 17:17:46 +0100
+Date: Fri, 19 Aug 2005 18:03:36 +0200
 
-Marcel,
+Hi,
 
-On Fri, 19 Aug 2005, Marcel Holtmann wrote:
+I just played a little bit with a Palm Tungsten T3 and found there
+secret 128-bit UUIDs for specific services like HotSync. I added support
+for them to sdptool and now I like to fully add Bluetooth support to the
+pilot-link library and its utils. The way with using PPP in between is
+ugly and not really needed. Is there anyone out there that has an old T3
+and don't need it anymore? I am really happy if someone sends me such a
+device, so I can add native synchronization support over Bluetooth for
+the PalmOS devices.
 
-> I just played a little bit with a Palm Tungsten T3 and found there
-> secret 128-bit UUIDs for specific services like HotSync. I added support
-> for them to sdptool and now I like to fully add Bluetooth support to the
-> pilot-link library and its utils. The way with using PPP in between is
-> ugly and not really needed. Is there anyone out there that has an old T3
-> and don't need it anymore? I am really happy if someone sends me such a
-> device, so I can add native synchronization support over Bluetooth for
-> the PalmOS devices.
+Regards
 
-That would be really great! Sadly, I have no device for you yet :-( In
-a few months, if I buy a lifedrive then I will have a TT spare though.
+Marcel
 
-Nick
 
--- 
-Nick Piper, Developer, LogicaCMG           http://www.nickpiper.co.uk/
-GPG Encrypted mail welcome!                             1024D/3ED8B27F
-Choose life. Be Vegan :-) Please reduce needless cruelty + suffering !
 
 
 -------------------------------------------------------
