@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Kevin Page <maillists@krp.org.uk>
+Subject: Re: [Bluez-users] current state of Microsoft bluetooth mouse
+	(scroll wheel)
+From: Scott Gilliland <gtg902r@mail.gatech.edu>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1124467190.6398.19.camel@notepaq>
+References: <1124406281.16439.8.camel@localhost.localdomain>
+	 <1124462940.6398.6.camel@notepaq>
+	 <1124467117.16439.15.camel@localhost.localdomain>
+	 <1124467190.6398.19.camel@notepaq>
 Content-Type: text/plain
-Message-Id: <1124468372.2968.76.camel@localhost.localdomain>
+Message-Id: <1124468191.16439.18.camel@localhost.localdomain>
 Mime-Version: 1.0
-Subject: [Bluez-users] 8250.c kernel patch for Socket CF bluetooth card
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +22,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 19 Aug 2005 17:19:32 +0100
+Date: Fri, 19 Aug 2005 12:16:30 -0400
 
-Hi,
+Here's that output
 
-Firstly, I can confirm that the patch to 8250.c (posted to this list by
-Mathias Adam on 2005-03-05) applies cleanly to 2.6.12 (Fedora patched
-kernel 2.6.12-1.1398_FC4), and that with this patch my Socket
-CompactFlash bluetooth card works again (without it I get the "BCSP
-timed out" error on hciattach).
+> use "hcitool info ..." as root and show us the output.
 
-Secondly, does anyone know if this patch has already been pushed
-upstream to the kernel?
+hcitool info 00:0D:3A:A3:C2:5A
+Requesting information ...
+        BD Address:  00:0D:3A:A3:C2:5A
+        Device Name: Microsoft Mouse
+        LMP Version: 1.2 (0x2) LMP Subversion: 0x100
+        Manufacturer: Broadcom Corporation (15)
+        Features: 0xbc 0x02 0x04 0x28 0x08 0x08 0x00 0x00
+                <encryption> <slot offset> <timing accuracy> <role
+switch>
+                <sniff mode> <RSSI> <power control> <enhanced iscan>
+                <interlaced pscan> <AFH cap. slave> <AFH cap. master>
 
-Regards,
 
-kev
+Thanks again,
+Scott
+aim: gtg902r
+
 
 
 
