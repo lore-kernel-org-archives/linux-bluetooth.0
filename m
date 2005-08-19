@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Tom Allebrandi" <tom@ytram.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Looking for a Palm with Bluetooth
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1124467416.6398.24.camel@notepaq>
-Message-ID: <E1E6KUf-0000w8-5I@smtpauth08.mail.atl.earthlink.net>
+From: John Gruenenfelder <johng@as.arizona.edu>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] btsco - a few comments and a small .py script
+Message-ID: <20050819204447.GA31631@as.arizona.edu>
+References: <20050819193855.GA25514@uni-duesseldorf.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20050819193855.GA25514@uni-duesseldorf.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,63 +18,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 Aug 2005 23:57:49 -0400
+Date: Fri, 19 Aug 2005 13:44:47 -0700
 
-Marcel -
+On Fri, Aug 19, 2005 at 09:38:55PM +0200, Andreas Beck wrote:
+>Q: I have used the same bluetooth dongle on different machines or with
+>different machine configurations (e.g. using windows). Now my device
+>will refuse to pair again with the dongle.
+>
+>A: Remove the line in /var/lib/bluetooth/[my-bdaddr]/linkkeys that is
+>corresponding to the device that doesn't want to pair. BlueZ thinks it
+>is already paired, but the Link-Key does not match.
+>
+>   I've seen a rather recent question that seems to be the same problem
+>   on bluez-users. However the hints there point to
+>   /etc/bluetooth/linkkeys - is this outdated or is this due to me using
+>   debian packages?
 
-Did you also observe the other "glitch"?
+This was my experience.  My device simply stopped working after I had used it
+on another machine (same dongle though).  I am also using the Debian packages
+and there is no /etc/bluetooth/linkkeys.
 
-o)Palm does an SDP request for a service
+For me, the problem manifested itself as "input/output error" messages when
+trying most bluetooth commands or btsco.  That's not a lot of help.
 
-o)The other side doesn't have the service and responds with an empty
-response
+Eventually, somebody in my local users group tipped me off to the location of
+the link keys as /var/lib/bluetooth and after deleting the offending files, my
+headset could be paired again and it works now.
 
-o) The Palm then does an attribute search on handle 0
+This seems, to me, to be a bug on both ends.
 
-I have reported this issue in the Bluetooth Forum on the PalmOS developers
-website.
+Bug 1) When you list the files in the Debian bluez packages,
+/var/lib/bluetooth is not listed.  This is a clear packaging bug as that
+directory should definitely be listed therein, even if the package doesn't
+actually ship with any files *in* that directory (they are program
+generated).
 
---- tom
-tom allebrandi
-tom@ytram.com
- 
------Original Message-----
-From: bluez-devel-admin@lists.sourceforge.net
-[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: Friday, August 19, 2005 12:04 PM
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Looking for a Palm with Bluetooth
-
-Hi,
-
-I just played a little bit with a Palm Tungsten T3 and found there
-secret 128-bit UUIDs for specific services like HotSync. I added support
-for them to sdptool and now I like to fully add Bluetooth support to the
-pilot-link library and its utils. The way with using PPP in between is
-ugly and not really needed. Is there anyone out there that has an old T3
-and don't need it anymore? I am really happy if someone sends me such a
-device, so I can add native synchronization support over Bluetooth for
-the PalmOS devices.
-
-Regards
-
-Marcel
+Bug 2) When the bluez tools (hcitool I think) are told to remove a key, they
+do not do so.  That also made tracking down my problem harder.  Thinking it
+was a key issue, the command to delete the key was given, but it didn't seem
+to do anything.  Only manually deleting the file off the filesystem did the
+trick.
 
 
-
-
--------------------------------------------------------
-SF.Net email is Sponsored by the Better Software Conference & EXPO
-September 19-22, 2005 * San Francisco, CA * Development Lifecycle Practices
-Agile & Plan-Driven Development * Managing Projects & Teams * Testing & QA
-Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
+-- 
+--John Gruenenfelder    Research Assistant, Steward Observatory, U of Arizona
+                        johng@as.arizona.edu
+Try Weasel Reader for PalmOS  --  http://gutenpalm.sf.net
+"This is the most fun I've had without being drenched in the blood
+of my enemies!"
+        --Sam of Sam & Max
 
 
 -------------------------------------------------------
