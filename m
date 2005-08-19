@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4305B185.2080604@umit.at>
-From: David Bannach <david.bannach@umit.at>
+Message-ID: <4305A63E.7020507@soft.uni-linz.ac.at>
+From: Simon Vogl <vogl@soft.uni-linz.ac.at>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SCO over UART
-References: <4302F91F.7020202@umit.at> <4303A01D.6030104@xmission.com>
-In-Reply-To: <4303A01D.6030104@xmission.com>
+Subject: Re: [Bluez-devel] Reset card
+References: <43038D0B.1060209@hasborg.com> <20050819092419.715FE479@arbetsmyra.dyndns.org>
+In-Reply-To: <20050819092419.715FE479@arbetsmyra.dyndns.org>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,36 +18,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 Aug 2005 12:16:37 +0200
+Date: Fri, 19 Aug 2005 11:28:30 +0200
 
-brad,
+there's a little reset utility on my page, as I needed this as well:
+http://www.soft.uni-linz.ac.at/_wiki/tiki-index.php?page=3DProjectBluezHa=
+ndsfree
+Look at the end of the page and use at your own risk :)
+Simon
 
-> What is the ericsson command and how do you inject it into hci?
->
-> Is the rok101008 similar in this respect to the rok104001? That's 
-> what's on the gumstix.com board and I've been *very* interested in 
-> getting sco working with this. I thought it couldn't be coaxed into 
-> using hci.
+Ronny L Nilsson wrote:
+>>I'd like to programatically reset my CSR USB dongle after running
+>>"bdaddr" from bluez-utils, but I haven't found a way to do that
+>>(short of manually removing and inserting the dongle).
+>=20
+>=20
+> Hi
+> This MAY perhaps be possible using a CSR proprietary BCCMD reset=20
+> command. There is no support for it (yet) in BlueZ though since it's=20
+> not widely asked for (what I know of).
+>=20
+> Regards
+> /Ronny
+>=20
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> SF.Net email is Sponsored by the Better Software Conference & EXPO
+> September 19-22, 2005 * San Francisco, CA * Development Lifecycle Pract=
+ices
+> Agile & Plan-Driven Development * Managing Projects & Teams * Testing &=
+ QA
+> Security * Process Improvement & Measurement * http://www.sqe.com/bsce5=
+sf
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-the command is "ericsson_set_sco_data_path". i found it in this document 
-(only): 
-http://www.vs.inf.ethz.ch/res/proj/smart-its/dl/ROK_101_007_revR1C-HCI_ericsson_specific.pdf
+--=20
+_______________________________________________________________________
+Dr. Simon Vogl
+ARC Seibersdorf research GmbH
+Research Studios Austria, Studio Pervasive Computing Applications
+Altenberger Stra=DFe 69, A-4040 Linz, Austria
 
-i use hcitool for sending the command to the module, e.g. the following 
-line will set the sco mapping to hci:
+Tel: +43 732 2468-8517, Fax: +43 732 2468-8426
+mailto: simon.vogl@researchstudio.at
 
-    hcitool cmd 0x3f 0x001d 0x00
-
-the rok101008 and rok104001 seem very similar. at least the command 
-above returns a positive response on both devices. i did not notice 
-differences of these devices so far. actually i want to get sco running 
-on the rok104001 which is built into a qbic (pxa based wearable) but 
-it's easier to try things with an external module attached to a notebook.
-
-i'm still having the problem that bluez does not send any sco data to 
-the module. i'm really curious about your results.
-
-david
 
 
 -------------------------------------------------------
