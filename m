@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] hcid/dbus crasher fix
+Subject: Re: [Bluez-devel] Getting periodic inquiry parameters
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Cc: Nathaniel McCallum <npmccallum@asbury.edu>
-In-Reply-To: <1124383820.2312.3.camel@vacation.asbury.edu>
-References: <1124383820.2312.3.camel@vacation.asbury.edu>
+In-Reply-To: <9307f5f2050817122274e6243f@mail.gmail.com>
+References: <9307f5f2050817122274e6243f@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1124463220.6398.13.camel@notepaq>
+Message-Id: <1124463083.6398.11.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,22 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 Aug 2005 16:53:40 +0200
+Date: Fri, 19 Aug 2005 16:51:23 +0200
 
-Hi Nathaniel,
+Hi Paul,
 
-> The following patch corrects a crasher bug when using hcid with dbus.
-> 
-> I'm still having a problem even after this bug, hcid just exits with
-> exitstatus 1 (but at least it doesn't crash).  Any ideas?
+> I'm looking for a way to know if a device has been put in periodic
+> inquiry scan mode and, if affirmative, the values of the periodic
+> inquiry parameters (max/min period and length), the bluez-utils don't
+> seem to have anything in this regard, hopefully someone here does :)
 
-this patch is not correct, because ba2str() then writes 18 bytes to a
-pointer where you haven't allocated memory for. Why do you need this
-kind of fix.
-
-> BTW, I'm not subscribed to the list, so please CC me in any responses.
-
-Why don't you subscribe?
+I don't think there is any way to get this information. The kernel must
+track the command and provide these kind of stuff via sysfs or some new
+ioctl.
 
 Regards
 
