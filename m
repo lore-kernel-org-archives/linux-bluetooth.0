@@ -1,15 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Reset card
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4308887E.9010400@gmx.de>
+From: Christian Reiser <r.christian@gmx.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <430606F9.3060906@hasborg.com>
-References: <43038D0B.1060209@hasborg.com>
-	 <20050819092419.715FE479@arbetsmyra.dyndns.org>
-	 <4305A63E.7020507@soft.uni-linz.ac.at> <1124462989.6398.8.camel@notepaq>
-	 <430606F9.3060906@hasborg.com>
-Content-Type: text/plain
-Message-Id: <1124632986.6260.9.camel@notepaq>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Suspend locks up usb
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,28 +16,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 21 Aug 2005 16:03:06 +0200
+Date: Sun, 21 Aug 2005 15:58:22 +0200
 
-Hi Joshua,
+Hi,
 
-> > feel free to send me a patch for the bccmd tool that I can include 
-> > into the bluez-utils distribution.
-> 
-> Thanks to all who replied.  Simon's code was exactly what was needed,
-> and the CSR BCCMD documentation was very helpful.
-> 
-> Attached is a patch to automatically reset CSR cards after changing the
-> BD_ADDR with the bdaddr utility.
+i have a little problem with bluetooth on my Thinkpad 600e. Every time
+when suspending (apm -s) while the usb bluetooth dongle is still plugged
+in (that means: the modules are still loaded), usb is no longer
+operational after the wakeup. (Un)Plugging of the dongle or any other
+device is not recognized. As the module-use-count is not zero, i cannot
+unload the modules and try it again.
+Module                  Size  Used by
+hci_usb                12360  1
+bluetooth              41700  1 hci_usb
+bcm203x                 4772  0
+firmware_class          7520  1 bcm203x
 
-I modified it a little bit to make it more generic, but it is in the CVS
-now. Feel free to test it. Do I get also a patch for bccmd for a reset
-command and a patch for decoding this command in hcidump?
+The log states:
+Aug 21 14:48:53 alpha apmd[9065]: Suspending now
+Aug 21 14:49:16 alpha hub 1-0:1.0: resubmit --> -108
+Aug 21 14:49:16 alpha hub 1-0:1.0: hub_port_status failed (err = -108)
 
-Regards
+I have the newest bluez versions in use (Gentoo):
+bluez-hciemu-1.0
+bluez-firmware-1.0
+bluez-hcidump-1.21
+bluez-libs-2.19
+bluez-utils-2.19
+Linux version 2.6.12-mh2
 
-Marcel
+The problem seems to be independend of the used dongle: I tried LevelOne
+MDU-0005USB and Broadcom WTB-3020.
 
+Unloading the modules before suspend might help - i just try not to
+forget to unplug it before suspending ;-)
 
+Ciao
+	Christian
 
 
 -------------------------------------------------------
