@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Looking for a Palm with Bluetooth
+Subject: Re: [Bluez-devel] Looking for a Palm with Bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <E1E6KUf-0000w8-5I@smtpauth08.mail.atl.earthlink.net>
-References: <E1E6KUf-0000w8-5I@smtpauth08.mail.atl.earthlink.net>
+In-Reply-To: <1124468847.1783.4.camel@panic>
+References: <1124467416.6398.24.camel@notepaq>
+	 <1124468847.1783.4.camel@panic>
 Content-Type: text/plain
-Message-Id: <1124614283.7598.4.camel@notepaq>
+Message-Id: <1124614083.7598.0.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,28 +19,13 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 21 Aug 2005 10:51:23 +0200
+Date: Sun, 21 Aug 2005 10:48:03 +0200
 
-Hi Tom,
+Hi Collin,
 
-> Did you also observe the other "glitch"?
-> 
-> o)Palm does an SDP request for a service
-> 
-> o)The other side doesn't have the service and responds with an empty
-> response
-> 
-> o) The Palm then does an attribute search on handle 0
+> Could you tell us the secret UUIDs?
 
-not really, because I had some hard time to play around with the SDP
-records itself to present a correct record with all needed information.
-However this should be investigated.
-
-> I have reported this issue in the Bluetooth Forum on the PalmOS developers
-> website.
-
-I got the impression from previous comments on some mailing list and
-boards that the PalmOS developers don't really fix Bluetooth bugs.
+look at the sdptool source code in the CVS.
 
 Regards
 
