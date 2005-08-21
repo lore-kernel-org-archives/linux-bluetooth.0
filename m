@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Matthias =?ISO-8859-1?Q?Gr=FCter?= <mgrueter@ee.ethz.ch>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1124653868.4816.16.camel@localhost.localdomain>
+From: sean <seandarcy2@gmail.com>
+Message-ID: <deah86$c2k$1@sea.gmane.org>
 Mime-Version: 1.0
-Subject: [Bluez-users] authentication problem when pairing with headset
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] What's status of bt headset on linux?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,74 +16,68 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 21 Aug 2005 21:51:08 +0200
+Date: Sun, 21 Aug 2005 14:30:29 -0400
 
-I'm using a Logitech Mobile Freedom Headset with my iBook G4. I have
-been using this device for some time now, but since a week or so I'm not
-able to pair with my headset anymore.
+I have a Zonet BT usb adapter:
 
-Output of btsco:
-# btsco -v 00:0D:44:32:D3:FF
-btsco v0.4c
-Device is 1:0
-Error: Failed to connect to SDP server: Permission denied
-Assuming channel 2
+cat /proc/bus/usb/devices:
 
-Voice setting: 0x0060
-Can't connect RFCOMM channel: Permission denied
+........
+T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12 
+MxCh= 0
+D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0a5c ProdID=200a Rev= 0.01
+S:  Manufacturer=Broadcom
+S:  Product=CCBT2035BDGP23-1
+S:  SerialNumber=000272C426F1
+C:* #Ifs= 3 Cfg#= 1 Atr=a0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 
+Driver=hci_usb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 
+Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+...............
 
 
-Sysconfig:
-link_key_request (sba=00:0D:93:06:A6:19, dba=00:0D:44:32:D3:FF)
+and a Logitech Mobile Pro bt headset.
 
+I'm trying to set this up to use Sype or Free World Dialup 
+on FC4.
 
-Output of hcidump:
-# hcidump -V
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0D:44:32:D3:FF ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr 00:0D:44:32:D3:FF
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr 00:0D:44:32:D3:FF key 56975B38589747E25A3B35A2F4C9399A
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-    status 0x00 bdaddr 00:0D:44:32:D3:FF
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x05 handle 46 bdaddr 00:0D:44:32:D3:FF type ACL encrypt 0x00
-    Error: Authentication Failure
-< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
-> HCI Event: Command Complete (0x0e) plen 6
-    Read Voice Setting (0x03|0x0025) ncmd 1
-    status 0x00 voice setting 0x0060
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0D:44:32:D3:FF ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr 00:0D:44:32:D3:FF
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr 00:0D:44:32:D3:FF key 56975B38589747E25A3B35A2F4C9399A
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-    status 0x00 bdaddr 00:0D:44:32:D3:FF
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x05 handle 47 bdaddr 00:0D:44:32:D3:FF type ACL encrypt 0x00
-    Error: Authentication Failure
+ From dmesg:
 
-What kind of authentication failure is this? And how can I solve this
-issue?
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+.......
+Bluetooth: HCI USB driver ver 2.8
+usbcore: registered new driver hci_usb
+Bluetooth: Broadcom Blutonium firmware driver ver 1.0
+usbcore: registered new driver bcm203x
+.............
+Bluetooth: L2CAP ver 2.7
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: SCO (Voice Link) ver 0.4
+Bluetooth: SCO socket layer initialized
+Bluetooth: HIDP (Human Interface Emulation) ver 1.1
+............
+Bluetooth: RFCOMM ver 1.5
+Bluetooth: RFCOMM socket layer initialized
 
-My version of the bluez-tools is 2.18.
-The awkward thing is, that I'm still able to pair with other headsets
-(same model) and my headset is still able to pair with other computers
-or mobile phones.
+Do I need btsco to make this work? It appears btsco will 
+only work with csr chips, not broadcom like I have.
 
-I'd be glad for any kind of pointers in the right direction.
+But dmesg shows an SCO socket layer. Is this all that's needed?
+
+If so, could someone give me, or direct me, to some explicit 
+instructions on how to make this work? googling has not been 
+successful.
+
+thanks
+sean
 
 
 
