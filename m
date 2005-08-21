@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4308887E.9010400@gmx.de>
-From: Christian Reiser <r.christian@gmx.de>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Looking for a Palm with Bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Suspend locks up usb
+In-Reply-To: <20050819161746.GB17868@zanu.org.uk>
+References: <1124467416.6398.24.camel@notepaq>
+	 <20050819161746.GB17868@zanu.org.uk>
+Content-Type: text/plain
+Message-Id: <1124630782.6260.6.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,43 +19,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 21 Aug 2005 15:58:22 +0200
+Date: Sun, 21 Aug 2005 15:26:22 +0200
 
-Hi,
+Hi Nick,
 
-i have a little problem with bluetooth on my Thinkpad 600e. Every time
-when suspending (apm -s) while the usb bluetooth dongle is still plugged
-in (that means: the modules are still loaded), usb is no longer
-operational after the wakeup. (Un)Plugging of the dongle or any other
-device is not recognized. As the module-use-count is not zero, i cannot
-unload the modules and try it again.
-Module                  Size  Used by
-hci_usb                12360  1
-bluetooth              41700  1 hci_usb
-bcm203x                 4772  0
-firmware_class          7520  1 bcm203x
+> > I just played a little bit with a Palm Tungsten T3 and found there
+> > secret 128-bit UUIDs for specific services like HotSync. I added support
+> > for them to sdptool and now I like to fully add Bluetooth support to the
+> > pilot-link library and its utils. The way with using PPP in between is
+> > ugly and not really needed. Is there anyone out there that has an old T3
+> > and don't need it anymore? I am really happy if someone sends me such a
+> > device, so I can add native synchronization support over Bluetooth for
+> > the PalmOS devices.
+> 
+> That would be really great! Sadly, I have no device for you yet :-( In
+> a few months, if I buy a lifedrive then I will have a TT spare though.
 
-The log states:
-Aug 21 14:48:53 alpha apmd[9065]: Suspending now
-Aug 21 14:49:16 alpha hub 1-0:1.0: resubmit --> -108
-Aug 21 14:49:16 alpha hub 1-0:1.0: hub_port_status failed (err = -108)
+this would be great. Thanks.
 
-I have the newest bluez versions in use (Gentoo):
-bluez-hciemu-1.0
-bluez-firmware-1.0
-bluez-hcidump-1.21
-bluez-libs-2.19
-bluez-utils-2.19
-Linux version 2.6.12-mh2
+Regards
 
-The problem seems to be independend of the used dongle: I tried LevelOne
-MDU-0005USB and Broadcom WTB-3020.
+Marcel
 
-Unloading the modules before suspend might help - i just try not to
-forget to unplug it before suspending ;-)
 
-Ciao
-	Christian
 
 
 -------------------------------------------------------
