@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Looking for a Palm with Bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43087A88.4030306@gmx.net>
+From: Whoopie <whoopie79@gmx.net>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050819161746.GB17868@zanu.org.uk>
-References: <1124467416.6398.24.camel@notepaq>
-	 <20050819161746.GB17868@zanu.org.uk>
-Content-Type: text/plain
-Message-Id: <1124630782.6260.6.camel@notepaq>
-Mime-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="------------090602050207080701020604"
+Subject: [Bluez-devel] Re: btsco - a few comments and a small .py script
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,29 +17,82 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 21 Aug 2005 15:26:22 +0200
+Date: Sun, 21 Aug 2005 14:58:48 +0200
 
-Hi Nick,
+This is a multi-part message in MIME format.
+--------------090602050207080701020604
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> > I just played a little bit with a Palm Tungsten T3 and found there
-> > secret 128-bit UUIDs for specific services like HotSync. I added support
-> > for them to sdptool and now I like to fully add Bluetooth support to the
-> > pilot-link library and its utils. The way with using PPP in between is
-> > ugly and not really needed. Is there anyone out there that has an old T3
-> > and don't need it anymore? I am really happy if someone sends me such a
-> > device, so I can add native synchronization support over Bluetooth for
-> > the PalmOS devices.
-> 
-> That would be really great! Sadly, I have no device for you yet :-( In
-> a few months, if I buy a lifedrive then I will have a TT spare though.
+Hi,
+great work, Andreas! Thanks!
 
-this would be great. Thanks.
+I did a small modification so that you can also finish the call if the 
+call is in progress.
 
-Regards
+Thanks again,
+Whoopie
 
-Marcel
+--------------090602050207080701020604
+Content-Type: text/x-python;
+ name="skype_pickup.py"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="skype_pickup.py"
 
+#! /usr/bin/python
+# -*- coding: iso-8859-15 -*- 
 
+import dbus, sys
+
+class Api_obj:
+	def __init__(self):
+		remote_bus = dbus.SystemBus()
+		
+		system_service_list = remote_bus.get_service('org.freedesktop.DBus').get_object('/org/freedesktop/DBus', 'org.freedesktop.DBus').ListServices()
+		skype_api_found = 0
+
+		for service in system_service_list:
+			if service=='com.Skype.API':
+				skype_api_found = 1
+				break
+
+		if not skype_api_found:
+			sys.exit('No running API-capable Skype found')
+
+		skype_service = remote_bus.get_service('com.Skype.API')
+		self.skype_api_object = skype_service.get_object('/com/Skype','com.Skype.API')
+
+		answer = self.send_message('NAME SkypeApiPythonBluetoothHeadset')
+		if answer != 'OK':
+			sys.exit('Could not bind to Skype client')
+
+		answer = self.send_message('PROTOCOL 1')
+#		if answer != 'PROTOCOL 1':
+#			sys.exit('This test program only supports Skype API protocol version 1')
+
+		answer = self.send_message('SEARCH ACTIVECALLS')
+		answer = answer[6:]
+		status = self.send_message('GET CALL '+answer+' STATUS')
+		status = status[15:]
+		if status == 'INPROGRESS':
+			answer = self.send_message('SET CALL '+answer+' STATUS FINISHED')
+		else:
+			answer = self.send_message('SET CALL '+answer+' STATUS INPROGRESS')
+
+	# Client -> Skype
+	def send_message(self, message):		
+		answer = self.skype_api_object.Invoke(message)
+		return answer
+
+def main():
+	api_object = Api_obj()
+	return 0	
+
+if __name__ == "__main__":
+	main()
+
+--------------090602050207080701020604--
 
 
 -------------------------------------------------------
