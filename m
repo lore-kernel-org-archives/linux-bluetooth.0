@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Headset reconnection
-From: Fredrik Tolf <fredrik@dolda2000.com>
+Message-ID: <430A4D5F.7090201@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43022E86.7080909@xmission.com>
-References: <1124215347.21719.31.camel@pc7.dolda2000.com>
-	 <43022E86.7080909@xmission.com>
-Content-Type: text/plain
-Message-Id: <1124754748.21719.82.camel@pc7.dolda2000.com>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] AGC and anti-noise patch for btsco kernel module
+References: <20050819193855.GA25514@uni-duesseldorf.de> <43078EF3.4050702@xmission.com> <20050821192634.GA10231@uni-duesseldorf.de> <430954A6.40107@xmission.com> <20050822120911.GA5397@uni-duesseldorf.de> <20050822183820.GA18410@uni-duesseldorf.de> <20050822185341.GA18549@uni-duesseldorf.de>
+In-Reply-To: <20050822185341.GA18549@uni-duesseldorf.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,42 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Aug 2005 01:52:28 +0200
+Date: Mon, 22 Aug 2005 16:10:39 -0600
 
-On Tue, 2005-08-16 at 12:20 -0600, Brad Midgley wrote:
-> Fredrik,
-> 
-> You can get pdfs from bluetooth.org. The relevant ones are 6_headset.pdf 
-> and "HFP Spec Version 1_0.pdf"
-> 
-> Most headsets attempt to make the rfcomm connection to the last-used 
-> handset (or only handset if they only keep one pairing) on power-up. The 
-> stereo headsets tend to wait until the first click of the answer button.
+Andreas,
 
-Indeed -- I tried clicking the button on my headset, and judging from
-hcidump, it attempts to connect to my computer (although I have a mono
-headset, not a stereo). After that, however, weirdness occurs.
+The adaptive strategy you chose seems like it will work well. That was 
+very quick coding and good intuition on the noise problem! I'll try the 
+patch.
 
-Looking at the data from hcidump, the headset requests a connection, and
-the computer replies with a success message. The next package, the
-headset disconnects again immediately (and the computer acknowledges
-that). Then the headset connects again, and disconnects again, over and
-over.
+Converting our kernel module to an alsa userspace driver is on the 
+roadmap and I believe your approach could be used there as well.
 
-> I don't think we are doing the device class or sdp stuff to even make 
-> the headset aware that it can make this connection. On top of that, we 
-> need to be listening for connections.
+Marcel will probably ask why we don't fix the problem in the bluez 
+layers if that's where it is, so every SCO app benefits.
 
-Indeed, I'm not even attempting to public SDP data to the headset at
-this point, but if that were the problem, I would think that the headset
-wouldn't even attempt to connect to begin with, rather than going into a
-loop of connecting and disconnecting all the time, right?
+Can you surround the adaptive stuff and swapping stuff with two 
+different macros so we can select them independently? Like USE_ADAPTIVE 
+and USE_AUTOSWAP or something?
 
-Does anyone have any idea what the cause of this could be?
-
-Fredrik Tolf
-
-
+Brad
 
 
 -------------------------------------------------------
