@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Andreas Beck <becka-bzdvl@bedatec.de>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050822185341.GA18549@uni-duesseldorf.de>
-References: <20050819193855.GA25514@uni-duesseldorf.de> <43078EF3.4050702@xmission.com> <20050821192634.GA10231@uni-duesseldorf.de> <430954A6.40107@xmission.com> <20050822120911.GA5397@uni-duesseldorf.de> <20050822183820.GA18410@uni-duesseldorf.de>
+Subject: Re: [Bluez-devel] btsco - a few comments and a small .py script
+Message-ID: <20050822183820.GA18410@uni-duesseldorf.de>
+References: <20050819193855.GA25514@uni-duesseldorf.de> <43078EF3.4050702@xmission.com> <20050821192634.GA10231@uni-duesseldorf.de> <430954A6.40107@xmission.com> <20050822120911.GA5397@uni-duesseldorf.de>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="tThc/1wpZn/ma/RB"
-In-Reply-To: <20050822183820.GA18410@uni-duesseldorf.de>
-Subject: [Bluez-devel] AGC and anti-noise patch for btsco kernel module
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20050822120911.GA5397@uni-duesseldorf.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,206 +18,92 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Aug 2005 20:53:41 +0200
+Date: Mon, 22 Aug 2005 20:38:20 +0200
+
+Andreas Beck <becka-bzdvl@bedatec.de> wrote:
+> > >[I just noticed, that the copying around is done in kernelspace. Got to
+> > > check it there, then.]
+> > I'll bet we could watch for this. If byte order gets reversed, it might 
+> > present a pattern that we can identify. 
+> Very probably. If there is a little noise on the line, the pattern for a
+> signed16 signal will be, that there is an unusual amount of
+> lowbytes being 0x00 or 0xff.
+
+That was right. I have a patch that fixes this. It basically checks, if 
+all lowbytes are 0x00 or 0xff in a transmission block (which happens when 
+there is silence, and the bytes are swapped). I also request that the
+block is at least 32 bytes long, but I suppose this always happens.
+I have only seen 48 byte blocks for my hardware.
+
+> > It seems like SCO is not a reliable transport so maybe bluez is 
+> > supposed to watch for this kind of stuff somehow. I should read 
+> > up on it...
+> I had assumed it is reliable enough to send only even-length messages.
+> But that might be not true. You might want to check that.
+
+It seems it is not an issue of variable length messages. I have put in a
+warning, if you get odd length packets, but it doesn't trigger for me,
+though I have the noise-problem occasionally.
+
+The above heuristic seems to fix it, though.
+
+For me, it happend once on the first connection after loading the
+module, usually.
+
+For this reason, my fixup code will trigger on the first and second
+connection now (fix the first, fall back to normal behaviour for the
+second). All connections are ok now.
 
 
---tThc/1wpZn/ma/RB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> > >A nice addition for me would be a software mic-boost. The quality of the
+> > >sound is not bad, but (probably due to the ridiculously compact design
+> > >of my headset) the dynamic range is not used appropriately.
+> > The general solution is an adaptive boost which would be nice even for 
+> > mics that use the full range. It's a common problem so I'll bet you can 
+> > get this from one of the alsa layers in userspace.
+> The main problem is, that I got to work without floating point stuff,
+> as this goes into kernelspace and that I got to keep CPU usage low.
+> But I think I can manage that. I used to do some realtime signal
+> processing a while ago.
 
-Now for the patch (against CVS) described in the previous mail ...
+[x] Done. 
 
-Have fun with it, 
+I added a new boolean mixer variable AGC that will turn on AGC.
 
-Andy
+You may want to check if I did that right, and if it was really
+necessary to put in the put and get functions, or if alsa standard
+functions would have done.
 
---tThc/1wpZn/ma/RB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="btsco.diff"
 
-Index: btsco.c
-===================================================================
-RCS file: /cvsroot/bluetooth-alsa/btsco/kernel/btsco.c,v
-retrieving revision 1.6
-diff -c -r1.6 btsco.c
-*** btsco.c	19 Mar 2005 14:28:59 -0000	1.6
---- btsco.c	22 Aug 2005 18:12:39 -0000
-***************
-*** 21,26 ****
---- 21,33 ----
-   *
-   */
-  
-+ /* Autoadjust mic at most this often in 1/8000s */
-+ #define GRABSAMPLES 400
-+ /* Maximum push for the mike 16= 1:1 - default 20:1 = 320*/
-+ #define COMPRESSION_MAX_16 320
-+ /* Minimum push for the mike  1= 1:16*/
-+ #define COMPRESSION_MIN_16 1
-+ 
-  #define chip_t snd_card_bt_sco_t
-  
-  #include <sound/driver.h>
-***************
-*** 93,100 ****
-  	snd_card_t *card;
-  	spinlock_t mixer_lock;
-  	int mixer_volume[MIXER_ADDR_LAST + 1];
-! 	snd_kcontrol_t *mixer_controls[MIXER_ADDR_LAST + 2];	/* also loopback */
-  	volatile int loopback;
-  	atomic_t playback_count, capture_count;
-  	volatile int count_changed;
-  	spinlock_t count_changed_lock;
---- 100,108 ----
-  	snd_card_t *card;
-  	spinlock_t mixer_lock;
-  	int mixer_volume[MIXER_ADDR_LAST + 1];
-! 	snd_kcontrol_t *mixer_controls[MIXER_ADDR_LAST + 2 + 1];	/* also loopback and agc */
-  	volatile int loopback;
-+ 	volatile int agc;
-  	atomic_t playback_count, capture_count;
-  	volatile int count_changed;
-  	spinlock_t count_changed_lock;
-***************
-*** 569,574 ****
---- 577,611 ----
-  	return changed;
-  }
-  
-+ static int snd_bt_sco_agc_get(snd_kcontrol_t * kcontrol,
-+ 				   snd_ctl_elem_value_t * ucontrol)
-+ {
-+ 	snd_card_bt_sco_t *bt_sco = snd_kcontrol_chip(kcontrol);
-+ 	unsigned long flags;
-+ 
-+ 	spin_lock_irqsave(&bt_sco->mixer_lock, flags);
-+ 	ucontrol->value.integer.value[0] = bt_sco->agc;
-+ 	spin_unlock_irqrestore(&bt_sco->mixer_lock, flags);
-+ 	return 0;
-+ }
-+ 
-+ static int snd_bt_sco_agc_put(snd_kcontrol_t * kcontrol,
-+ 				   snd_ctl_elem_value_t * ucontrol)
-+ {
-+ 	snd_card_bt_sco_t *bt_sco = snd_kcontrol_chip(kcontrol);
-+ 	unsigned long flags;
-+ 	int changed;
-+ 	int agc;
-+ 
-+ 	agc = !!ucontrol->value.integer.value[0];
-+ 
-+ 	spin_lock_irqsave(&bt_sco->mixer_lock, flags);
-+ 	changed = bt_sco->agc != agc;
-+ 	bt_sco->agc = agc;
-+ 	spin_unlock_irqrestore(&bt_sco->mixer_lock, flags);
-+ 	return changed;
-+ }
-+ 
-  #define BT_SCO_CONTROLS (sizeof(snd_bt_sco_controls)/sizeof(snd_kcontrol_new_t))
-  
-  static snd_kcontrol_new_t snd_bt_sco_controls[] = {
-***************
-*** 580,585 ****
---- 617,629 ----
-  	 .info = snd_bt_sco_boolean_info,
-  	 .get = snd_bt_sco_loopback_get,
-  	 .put = snd_bt_sco_loopback_put,
-+ 	 },
-+ 	{.iface = SNDRV_CTL_ELEM_IFACE_MIXER,
-+ 	 .name = "AGC Switch",
-+ 	 .index = 0,
-+ 	 .info = snd_bt_sco_boolean_info,
-+ 	 .get = snd_bt_sco_agc_get,
-+ 	 .put = snd_bt_sco_agc_put,
-  	 }
-  };
-  
-***************
-*** 790,795 ****
---- 834,844 ----
-  	struct msghdr msg;
-  	struct iovec iov;
-  	sigset_t unblocked;
-+ 	int i;
-+ 	static int factor=16;
-+ 	static int maxvalsmoothed=0;
-+ 	static int maxvalgrablen=GRABSAMPLES; /* adjust volume at most 4 times/second */
-+ 	static int swap=0;
-  
-  	lock_kernel();
-  
-***************
-*** 839,844 ****
---- 888,954 ----
-  		len = sock_recvmsg(sock, &msg, BUF_SIZE, 0);
-  		if (len > 0) {
-  
-+ 			int lostatcnt;
-+ 
-+ 			lostatcnt=0;
-+ 			if (len&1) dprintk("odd len %d\n",len);
-+ 			for(i=0;i<len-1;i+=2) {
-+ 				short int j;
-+ 				int k;
-+ 				
-+ 				if (swap) j=(buf[i]<<8)|buf[i+1];
-+ 				else j=(buf[i+1]<<8)|buf[i];
-+ 
-+ 				/* occasionally the Headset will loose a byte
-+ 				 * on startup. Thus swapping lo/hi.
-+ 				 * counting, if _all_ lo bytes (which are 
-+ 				 * actually high bytes) are 0 or -1
-+ 				 * will detect this with a very high probability
-+ 				 */
-+ 				if ((j&0xff)==0||(j&0xff)==0xff) {
-+ 					lostatcnt++;
-+ 				}
-+ 				/* scale the mic input - we do some kind
-+ 				 * of dynamics compression
-+ 				 */
-+ 				k=((int)j*factor)/16;
-+ 				/* clip overshoot. Better than just letting
-+ 				 * it wrap around. Immediately adjust factor.
-+ 				 */
-+ 				if (k>0x7fff) {
-+ 					k=0x7fff;
-+ 					if (bt_sco->agc&&factor>COMPRESSION_MIN_16) factor--;
-+ 				} else if (k<-0x8000) {
-+ 					k=0x8000;
-+ 					if (bt_sco->agc&&factor>COMPRESSION_MIN_16) factor--;
-+ 				}
-+ 				buf[i+1]=(k>>8)&0xff;
-+ 				buf[i  ]=k&0xff;
-+ 				/* find the highest absolute value in a 
-+ 				 * GRABSAMPLES long interval.
-+ 				 */
-+ 				if (k<0) k=-j;
-+ 				if (k>maxvalsmoothed) maxvalsmoothed=k;
-+ 				/* if the interval is over, recalculate
-+ 				 * the compression factor. Move it slowly.
-+ 				 */
-+ 				if (maxvalgrablen--<=0) {
-+ 					maxvalgrablen=GRABSAMPLES;
-+ 					/* If the noise goes up over 1000, we stop
-+ 					 * pushing the software gain 
-+ 					 */
-+ 					if (maxvalsmoothed<1000&&factor<COMPRESSION_MAX_16) {
-+ 						factor++;
-+ 						// dprintk("Up to %d\n",factor);
-+ 					}
-+ 					if (!bt_sco->agc) factor=16;
-+ 					maxvalsmoothed=0;
-+ 				}
-+ 			}
-+ 			if (lostatcnt==len/2&&len>32&&maxvalgrablen>GRABSAMPLES-len) {
-+ 				dprintk("SWAP problem detected! Fixing.\n");
-+ 				swap=!swap;
-+ 			}
-  			down(&bt_sco->capture_sem);
-  			if (bt_sco->capture) {
-  				snd_card_bt_sco_pcm_receive
+AGC is very simplistic, but works nicely for me:
 
---tThc/1wpZn/ma/RB--
+AGC ist limited to 1/16 - 20 times gain. 
+
+It goes up by 1/16 for every 1/20 second that the signal (after processing) 
+stays below an absolute value of 1000. This puts an upper limit to 
+amplifying MIC noise.
+
+It goes down immediately ba 1/16 for every overshoot value detected.
+
+
+Works ok for me.
+
+> > I've seen times where the mouse starts acting whacked and focus gets 
+> > stuck on some widget even if the mouse is pointing elsewhere. I've been 
+> > meaning to restart hidd and/or reload evdev to see if it's linked to the 
+> > bluetooth mouse.
+> This sounds more like a windowmanager problem. I've seen this with wired
+> mice as well at times. Restarting the WM usually helps.
+
+Very interesting. I got that one as well this afternoon.
+However keyboard was not working as well (maybe due to the stuck focus)
+So restarting fvwm didn't work. Killing from the console did.
+
+
+CU, ANdy
+
+-- 
+= Andreas Beck                    |  Email :  <becka-sig@bedatec.de>         =
 
 
 -------------------------------------------------------
