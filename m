@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050823050058.8940.qmail@web35314.mail.mud.yahoo.com>
-From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
+Subject: Re: [Bluez-users] [Fwd: Bug#322732: bluez-utils: rfcomm bind fails
+	with obscure error message]
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-813142130-1124773257=:8857"
-Subject: [Bluez-users] newbie: Is Bluez only for  PC's or does it work on any linux kernel version 2.4.x .?
+In-Reply-To: <200508221448.11084.bluez-user@schaettgen.de>
+References: <1124658001.1592.21.camel@saag.bunker.heddley.com>
+	 <1124709149.23599.19.camel@pegasus>
+	 <200508221448.11084.bluez-user@schaettgen.de>
+Content-Type: text/plain
+Message-Id: <1124720419.23599.37.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,33 +21,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Aug 2005 22:00:57 -0700 (PDT)
+Date: Mon, 22 Aug 2005 16:20:19 +0200
 
---0-813142130-1124773257=:8857
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Hi Fred,
 
-Hello,
-This is my first question on the bluez forum. I have the embedded linux board sitsang-400 from Intel (processor PXA255).  Linux 2.4.19 B-1-2-1 Kernel runs on this. This version of Linux doesn't support Bluez. Through the bluez.org website i was able to find out that by installing the Linux Kernel Patch 2.4.19, i would be able to support and communicate between bluetooth devices. My question is 
-Does this Bluez work only on the PC's which has linux O.S 2.4.x versions or will i be able to install on any of the embedded linux boards which has the linux kernel version 2.4.x
-I would glad if any of you could be able to answer my question.
-Thanks in Advance,
-Swathi
+> > > > When the 'rfcomm' kernel module isn't compiled with
+> > > > CONFIG_BT_RFCOMM_TTY enabled, 'rfcomm bind' will fail with an obscure
+> > > > error message, "Can't create device: Operation not supported".  It does
+> > > > this when it's trying to bind to a device in /dev.
+> >
+> > this error message is correct. It follows the errno error code that
+> > comes back from the kernel.
+> 
+> There is a difference between "correct" and "helpful" ;)
+> You might at least consider pointing users to the manpage along with the 
+> generic error message for diagnosis of the error, because not too many will 
+> actually try the manpage.
+> Error codes are for scripts, error messages are for people. If you need the 
+> manpage to figure out what's wrong, then you could just as well print the 
+> error code only. Listing the error codes in the manpage should be only 
+> necessary to list all *possible* errors, so that scripts can handle all of 
+> them for instance.
 
-		
----------------------------------
- Start your day with Yahoo! - make it your home page 
---0-813142130-1124773257=:8857
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+the command line tools are still the Unix world and an error which is
+called "Operation not supported" is from my perspective a clear error
+that the tool in use or the kernel lacks support for something. And in
+this specific case he compiled the kernel by itself and not included
+support for RFCOMM TTY in the rfcomm.ko module.
 
-<DIV>Hello,</DIV>
-<DIV>This is my first question on the bluez forum. I have the embedded linux board sitsang-400 from Intel (processor PXA255).&nbsp;&nbsp;Linux 2.4.19 B-1-2-1 Kernel runs on this. This version of Linux doesn't support Bluez.&nbsp;Through the bluez.org website&nbsp;i was able to find out that by installing the Linux Kernel Patch 2.4.19, i would be able to support and communicate between&nbsp;bluetooth devices. My question is </DIV>
-<DIV>Does this Bluez work only on the PC's which has linux O.S 2.4.x versions or will i be able to install on any of the embedded linux boards which has the linux kernel version 2.4.x<BR>I would glad if any of you could be able to answer my question.</DIV>
-<DIV>Thanks in Advance,</DIV>
-<DIV>Swathi</DIV><p>
-		<hr size=1> <a href="http://us.rd.yahoo.com/evt=34442/*http://www.yahoo.com/r/hs">Start your day with Yahoo! - make it your home page </a>
---0-813142130-1124773257=:8857--
+Said this, I don't like additional switch or if statements to add a lot
+of user friendly error messages to make the users feel better. For
+command line tools it is fine to expect people to open a manual page to
+investigate further. For graphical tools this is different, but the last
+time I checked rfcomm is still command line only ;)
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
