@@ -1,11 +1,21 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] BCCMD Test Command "memory"
+Subject: Re: [Bluez-devel] bluetoothd D-Bus interface proposals(draft 00.05)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4309DF55.3010106@hasborg.com>
-References: <4309DF55.3010106@hasborg.com>
+In-Reply-To: <9307f5f2050822072659387e3b@mail.gmail.com>
+References: <e1effdeb05081614151ee4f4bd@mail.gmail.com>
+	 <9307f5f2050816154545b6f046@mail.gmail.com>
+	 <e1effdeb05081805054a0be4aa@mail.gmail.com>
+	 <9307f5f2050818135877575293@mail.gmail.com>
+	 <8c9e090508191027e4646f1@mail.gmail.com>
+	 <1124709468.23599.27.camel@pegasus>
+	 <8c9e090508220504100c127e@mail.gmail.com>
+	 <e1effdeb0508220527500878ab@mail.gmail.com>
+	 <5256d0b050822053737c9cd8f@mail.gmail.com>
+	 <e1effdeb05082205517cac906c@mail.gmail.com>
+	 <9307f5f2050822072659387e3b@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1124721945.23599.58.camel@pegasus>
+Message-Id: <1124721252.23599.53.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,27 +28,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Aug 2005 16:45:45 +0200
+Date: Mon, 22 Aug 2005 16:34:12 +0200
 
-Hi Josh,
+Hi Paul,
 
-> While reading through the BlueCore BCCMD Commands documentation, I came
-> across the "memory" test command.  This command allows us to read or
-> write from/to a block of RAM within the chip.
-> 
-> The documentation is rather sparse for this test command.  The Varid and
-> Type are documented, indicating that it's possible to specify a base
-> memory address and a length of bytes, but it does not indicate how to
-> differentiate a read or write operation.
+> Another big concern I'm having is about security, most hciconfig
+> commands require 'higher than normal' privileges to execute, should
+> the daemon allow certain requests only to the root user ? (luckily
+> dbus was conceived with security in mind, so adding such a policy
+> would not be difficult).
+> This would just make things more complicated and I don't think there's
+> any real gain in doing so, but maybe there are some security issues I
+> ignore at the moment, let me know your opinion.
+> (if for example, a program calls ListDevices to list the adapters, and
+> the user wants to use an interface which is not active, should the
+> program be allowed to bring it up?)
 
-the BCCMD itself differs between writing or reading a value and this
-should be the same for direct memory access.
+the bluetoothd run with root (or chroot) rights and thus it needs to
+provide its own security policy.
 
-> Does anyone have more documentation on this test command, or know how to
-> use this command to read memory from RAM on the chip for a given offset?
+> What if two (or more) applications chose, for whatever reason, to set
+> a different default adapter? If you *really* want such a mechanism,
+> maybe you should make such a method callable only by authorized code
+> (hence my dilemma above) or simply select the default adapter
+> internally in the daemon and don't expose this method at all.
 
-I think that I do, but without permission from CSR I will not share them
-or make them public.
+as I said in the previous answers, the setting which is the default
+adapter must go through the kernel.
 
 Regards
 
