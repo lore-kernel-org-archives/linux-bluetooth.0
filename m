@@ -1,8 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluetoothd D-Bus interface proposals(draft 00.05)
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <9307f5f2050822072659387e3b@mail.gmail.com>
+From: "P. Durante" <shackan@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0508220527500878ab@mail.gmail.com>
+Subject: Re: [Bluez-devel] bluetoothd D-Bus interface proposals(draft 00.05)
+In-Reply-To: <e1effdeb05082205517cac906c@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 References: <e1effdeb05081614151ee4f4bd@mail.gmail.com>
 	 <9307f5f2050816154545b6f046@mail.gmail.com>
 	 <e1effdeb05081805054a0be4aa@mail.gmail.com>
@@ -11,9 +14,8 @@ References: <e1effdeb05081614151ee4f4bd@mail.gmail.com>
 	 <1124709468.23599.27.camel@pegasus>
 	 <8c9e090508220504100c127e@mail.gmail.com>
 	 <e1effdeb0508220527500878ab@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1124720878.23599.47.camel@pegasus>
-Mime-Version: 1.0
+	 <5256d0b050822053737c9cd8f@mail.gmail.com>
+	 <e1effdeb05082205517cac906c@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -25,51 +27,62 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Aug 2005 16:27:58 +0200
+Date: Mon, 22 Aug 2005 16:26:00 +0200
 
-Hi Claudio,
+On 8/22/05, Claudio Takahasi <cktakahasi@gmail.com> wrote:
+> Hi Peter,
+>=20
+> I am planning provide a D-Bus service for setup a default adapter. But
+> the developer will
+> have to call a service to discover all available adapters. The steps shal=
+l be:
+> 1. Call a method to discover the available adapters
+>     org.bluez.bluetoothd.getAdapters will return a array of the
+> available devices
+>=20
 
-> It's possible register multiple D-Bus object paths. My suggestion 
-> for handle multiple adapters is register a default path and paths
-> based on the device address. 
-> eg: suppose two adapters(11:22:33:44:55:66, 77:88:99:00:11:22)
-> 
-> The possible paths are:
-> 
-> /org/bluez/bluetoothd/hci (default path - first adapter)
-> /org/bluez/bluetoothd/112233445566/hci (first adapter)
-> /org/bluez/bluetoothd/778899001122/hci (second adapter)
-> 
-> /org/bluez/bluetoothd/pan (default path - first adapter)
-> /org/bluez/bluetoothd/112233445566/pan (first adapter)
-> /org/bluez/bluetoothd/778899001122/pan (second adapter)
-> ...
-> 
-> The service to list the adapter must be moved to the main path
-> (/org/bluez/bluetoothd) or to a new one /org/bluez/bluetoothd/devices.
-> 
-> The message handle function will become more complex, but I don't
-> see other solution.
+That's exactly what I do now in org.bluetool.manager.ListDevices.
+I was thinking if it's worth returning, for each adapter, together
+with the device path, a boolean value indicating if the device is up
+or not, so that applications can immediately check what adapters a
+effectively 'available'
+ps: I also added signals which are broadcasted when an interface is
+brought up/down
 
-the main problem is that I would like to do identification of the host
-adapter by id (hci0), by address (11:22:33:44:55:66) and maybe by an
-alias (bluecore-dongle) or by its name ("BlueZ dongle"). The only fully
-unique identification across reboots/enumerations is the address. For
-the kernel it is only the current id and this means bluetoothd has to
-translate between them. If you look at the default adapter by the
-address identification it is 00:00:00:00:00:00 (BDADDR_ANY) and I will
-leave it this way.
+Another big concern I'm having is about security, most hciconfig
+commands require 'higher than normal' privileges to execute, should
+the daemon allow certain requests only to the root user ? (luckily
+dbus was conceived with security in mind, so adding such a policy
+would not be difficult).
+This would just make things more complicated and I don't think there's
+any real gain in doing so, but maybe there are some security issues I
+ignore at the moment, let me know your opinion.
+(if for example, a program calls ListDevices to list the adapters, and
+the user wants to use an interface which is not active, should the
+program be allowed to bring it up?)
 
-When choosing a default adapter without any further configuration we
-must do this unique and for this means this decision can only be done by
-the kernel. This means that the kernel need to know about a change and
-must also tell bluetoothd what it thinks is the default adapter.
+> 2. Call a method to setup the default adapter.
+>    org.bluez.bluetoothd.setDefaultAdapter, passing the adapter id
+>=20
 
-Regards
+What if two (or more) applications chose, for whatever reason, to set
+a different default adapter? If you *really* want such a mechanism,
+maybe you should make such a method callable only by authorized code
+(hence my dilemma above) or simply select the default adapter
+internally in the daemon and don't expose this method at all.
 
-Marcel
+> After that you will be able call the services passing the default path
+>=20
+> In the future we can try discover the best adapter to use and set it as
+> default.
+>=20
+> Regards,
+> Claudio.
+>=20
+>=20
 
-
+Regards,
+Paul
 
 
 -------------------------------------------------------
