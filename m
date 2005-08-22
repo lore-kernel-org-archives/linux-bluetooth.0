@@ -1,22 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluetoothd D-Bus interface proposals(draft 00.05)
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <9307f5f20508220730efa48d3@mail.gmail.com>
+From: "P. Durante" <shackan@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <9307f5f2050822072659387e3b@mail.gmail.com>
-References: <e1effdeb05081614151ee4f4bd@mail.gmail.com>
-	 <9307f5f2050816154545b6f046@mail.gmail.com>
-	 <e1effdeb05081805054a0be4aa@mail.gmail.com>
-	 <9307f5f2050818135877575293@mail.gmail.com>
-	 <8c9e090508191027e4646f1@mail.gmail.com>
-	 <1124709468.23599.27.camel@pegasus>
-	 <8c9e090508220504100c127e@mail.gmail.com>
-	 <e1effdeb0508220527500878ab@mail.gmail.com>
-	 <5256d0b050822053737c9cd8f@mail.gmail.com>
-	 <e1effdeb05082205517cac906c@mail.gmail.com>
-	 <9307f5f2050822072659387e3b@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1124721252.23599.53.camel@pegasus>
+Subject: Re: [Bluez-devel] Informative: "The Use of Bluetooth in Linux and Location,Aware Computing"
+In-Reply-To: <4309CE5F.10205@hasborg.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <4309CE5F.10205@hasborg.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -28,39 +18,63 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Aug 2005 16:34:12 +0200
+Date: Mon, 22 Aug 2005 16:30:33 +0200
 
-Hi Paul,
+On 8/22/05, Joshua Wright <jwright@hasborg.com> wrote:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+>=20
+> I came across this recently published thesis paper by Albert Huang
+> today.  Albert does an excellent job introducing Bluetooth development
+> concepts using BlueZ and introduces a Python extension module called
+> PyBluez.
+>=20
+> http://people.csail.mit.edu/albert/pubs/ashuang-sm-thesis-2005.pdf
+>=20
+> PyBluez is available at http://org.csail.mit.edu/pybluez/.
+>=20
+> I thought other folks on this list would find this paper interesting as
+> well.  If Albert is still on this list, kudos for the excellent work and
+> congratulations on publishing your thesis.
+>=20
+> - -Josh
+> - --
+> - -Joshua Wright
+> jwright@hasborg.com
+>=20
+> 2005-2006 pgpkey: http://802.11ninja.net/pgpkey.htm
+> fingerprint: F00E 7A42 8375 0C55 964F E5A4 4D2F 22F6 3658 A4BF
+>=20
+> Today I stumbled across the world's largest hotspot.  The SSID is "linksy=
+s".
+> -----BEGIN PGP SIGNATURE-----
+> Version: GnuPG v1.4.1 (MingW32)
+> Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+>=20
+> iD8DBQFDCc5fTS8i9jZYpL8RApEqAJ9E7Me/IDeLWSS8qxEDrbwteL6wSwCfR5bl
+> emE4lrrjlH2P8fYeS+MGg9I=3D
+> =3DXRlM
+> -----END PGP SIGNATURE-----
+>=20
+>=20
+> -------------------------------------------------------
+> SF.Net email is Sponsored by the Better Software Conference & EXPO
+> September 19-22, 2005 * San Francisco, CA * Development Lifecycle Practic=
+es
+> Agile & Plan-Driven Development * Managing Projects & Teams * Testing & Q=
+A
+> Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>=20
 
-> Another big concern I'm having is about security, most hciconfig
-> commands require 'higher than normal' privileges to execute, should
-> the daemon allow certain requests only to the root user ? (luckily
-> dbus was conceived with security in mind, so adding such a policy
-> would not be difficult).
-> This would just make things more complicated and I don't think there's
-> any real gain in doing so, but maybe there are some security issues I
-> ignore at the moment, let me know your opinion.
-> (if for example, a program calls ListDevices to list the adapters, and
-> the user wants to use an interface which is not active, should the
-> program be allowed to bring it up?)
+A nice read, I also stumbled into it a while ago while looking for
+some decent Bluez  documentation and it was one of the best docs I
+could find
 
-the bluetoothd run with root (or chroot) rights and thus it needs to
-provide its own security policy.
-
-> What if two (or more) applications chose, for whatever reason, to set
-> a different default adapter? If you *really* want such a mechanism,
-> maybe you should make such a method callable only by authorized code
-> (hence my dilemma above) or simply select the default adapter
-> internally in the daemon and don't expose this method at all.
-
-as I said in the previous answers, the setting which is the default
-adapter must go through the kernel.
-
-Regards
-
-Marcel
-
-
+Paul
 
 
 -------------------------------------------------------
