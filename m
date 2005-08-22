@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] [Fwd: Bug#322732: bluez-utils: rfcomm bind fails
-	with obscure error message]
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Andreas Beck <becka-bzus@bedatec.de>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1124658001.1592.21.camel@saag.bunker.heddley.com>
-References: <1124658001.1592.21.camel@saag.bunker.heddley.com>
-Content-Type: text/plain
-Message-Id: <1124709149.23599.19.camel@pegasus>
+Subject: Re: [Bluez-users] authentication problem when pairing with headset
+Message-ID: <20050822090249.GA4917@uni-duesseldorf.de>
+References: <1124653868.4816.16.camel@localhost.localdomain>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1124653868.4816.16.camel@localhost.localdomain>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,29 +18,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Aug 2005 13:12:29 +0200
+Date: Mon, 22 Aug 2005 11:02:49 +0200
 
-Hi Edd,
+Matthias Grüter <mgrueter@ee.ethz.ch> wrote:
+> I'm using a Logitech Mobile Freedom Headset with my iBook G4. I have
+> been using this device for some time now, but since a week or so I'm not
+> able to pair with my headset anymore.
 
-> > When the 'rfcomm' kernel module isn't compiled with CONFIG_BT_RFCOMM_TTY
-> > enabled, 'rfcomm bind' will fail with an obscure error message, "Can't
-> > create device: Operation not supported".  It does this when it's trying to
-> > bind to a device in /dev.
+Did you use it with the same dongle on another machine or OS?
 
-this error message is correct. It follows the errno error code that
-comes back from the kernel.
+> Output of btsco:
+> # btsco -v 00:0D:44:32:D3:FF
+> btsco v0.4c
+> Device is 1:0
+> Error: Failed to connect to SDP server: Permission denied
+> Assuming channel 2
+> Voice setting: 0x0060
+> Can't connect RFCOMM channel: Permission denied
 
-> > Could this be changed to report something more useful, such as "Check
-> > rfcomm.ko is compiled with TTY support"?
+This looks like wrong linkkeys. See the btsco page:
 
-What about a patch for the RFCOMM manual page that explains this
-problem?
+>> If you can't pair or connect with the headset, did you pair it with
+>> another device? Did it help to reset the pairing by removing
+>> /etc/bluetooth/link_key or /var/lib/bluetooth/[headsetaddr]/linkkeys or
+>> by putting the headset in pair mode? You may have to redo this often if
+>> you try to dual-boot windows or if you use the same dongle on another
+>> computer.
 
-Regards
+Ups - I see there is an error in there. [headsetaddr] should be
+[dongleaddr]. The headsetaddr is in the linkkeys file on the line with
+the linkkey. It is enough to remove that single line, thus retaining
+the other pairing information.
 
-Marcel
+> What kind of authentication failure is this? And how can I solve this
+> issue?
+> My version of the bluez-tools is 2.18.
+> The awkward thing is, that I'm still able to pair with other headsets
+> (same model) and my headset is still able to pair with other computers
+> or mobile phones.
+
+Yes. sounds perfectly like this problem.
 
 
+CU, Andy
 
 
 -------------------------------------------------------
