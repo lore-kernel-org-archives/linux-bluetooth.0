@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Fred Schaettgen <bluez-user@schaettgen.de>
+Subject: Re: [Bluez-users] PPPOE use PAN service
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] [Fwd: Bug#322732: bluez-utils: rfcomm bind fails with obscure error message]
-References: <1124658001.1592.21.camel@saag.bunker.heddley.com> <1124709149.23599.19.camel@pegasus>
-In-Reply-To: <1124709149.23599.19.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200508221448.11084.bluez-user@schaettgen.de>
+In-Reply-To: <c43104b3050821201255940c3a@mail.gmail.com>
+References: <1124653868.4816.16.camel@localhost.localdomain>
+	 <c43104b3050821201255940c3a@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1124709202.23599.21.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,35 +19,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Aug 2005 14:48:10 +0200
+Date: Mon, 22 Aug 2005 13:13:22 +0200
 
-On Monday, 22. August 2005 13:12, Marcel Holtmann wrote:
-> Hi Edd,
->
-> > > When the 'rfcomm' kernel module isn't compiled with
-> > > CONFIG_BT_RFCOMM_TTY enabled, 'rfcomm bind' will fail with an obscure
-> > > error message, "Can't create device: Operation not supported".  It does
-> > > this when it's trying to bind to a device in /dev.
->
-> this error message is correct. It follows the errno error code that
-> comes back from the kernel.
+Hi,
 
-There is a difference between "correct" and "helpful" ;)
-You might at least consider pointing users to the manpage along with the 
-generic error message for diagnosis of the error, because not too many will 
-actually try the manpage.
-Error codes are for scripts, error messages are for people. If you need the 
-manpage to figure out what's wrong, then you could just as well print the 
-error code only. Listing the error codes in the manpage should be only 
-necessary to list all *possible* errors, so that scripts can handle all of 
-them for instance.
+>     Could I use PPPOE dial-up via PAN service??
+>   
+>     I used PPPOE dial-up on windows PC, PC to borad via BT, borad use
+> PAN service:
+>             PC(windows)  -----bt----->borad(linux bluez) ---lan--->internet
 
-regards
-Fred
+in general yes, but I never tried it. However using TCP/IP over BNEP
+directly should be enough.
 
--- 
-Fred Schaettgen
-bluez-devel@schaettgen.de
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
