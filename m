@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Rescuing a WML C09 AHR by SPI
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43097D1F.6050107@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050821215602.GA19979@externe.net>
-References: <20050821215602.GA19979@externe.net>
-Content-Type: text/plain
-Message-Id: <1124709049.23599.16.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] sbc and fixed-point progress
+References: <C70061B183DE09419568AB2060C52A95980BDC@arion.intra.local> <42E8F2B6.6090804@xmission.com> <001001c5a680$cfb641e0$0201a8c0@NBVICTOR> <43096D8C.2020805@xmission.com>
+In-Reply-To: <43096D8C.2020805@xmission.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,42 +18,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Aug 2005 13:10:49 +0200
+Date: Mon, 22 Aug 2005 01:22:07 -0600
 
-Hi Guylhem,
+Victor
 
-> I have a problem with a WML C09 AHR bluetooth module purchased from
-> Segor Germany.
+>> I do not have HW to test arm specific version real time, hope no 
+>> suprises there, but I could have missed something when integrating it 
+>> into sbc code (it decodes well, but how fast, I will try only monday 
+>> evening).
 > 
-> The problem is similar to:
-> http://www.handhelds.org/hypermail/familiar/132/13253.html
 > 
-> I had a kernel panic while issuing commands to the module (I'm working
-> on some MMC stuff hooked to the same serial port, but to
-> DSR/DRT/RI/DCD lines and my stuff is not that stable)
-> 
-> Result: I could only write 1f9 0001 - I couldn't do the 191 part.
-> 
-> I tried the recommanded rescue mode from CSR forums:
-> http://66.102.9.104/search?q=cache:XnYWRYWUhSsJ:www.csr.com/ubb/Forum2/HTML/000185.html+pskey+csr+but&hl=fr&client=firefox-a
-> 
-> Unfortunately, it didn't work. I would like to try to rescue the chip
-> via its SPI port since it is easily accessible.
-> 
-> My problem is I don't know how to do that (any link is appreciated) on
-> both the hardware side and the software side (!)
-> 
-> Maybe someone can help?
+> Ok, I'll load it on gumstix now and give it a try.
 
-the CSR guys told me that sometimes the only way is to use their
-BlueFlash tool (for Windows) and fully erase the flash and start over
-with a new boot loader and a new firmware image.
+This is almost perfect. On a 400mhz gumstix (pxa255), I'm able to send a 
+5-minute audio stream with only about three breaks in the audio (about 5 
+seconds each).
 
-Regards
+I think it will work flawlessly in 4 subbands or if we can shorten a few 
+of the ops from 64 to 32 bit.
 
-Marcel
+I committed what's there and used __arm__ for the conditional asm code.
 
+>> Using a2play needs to tweak 87 magic number, otherwise it drops samples?
+> 
+> 
+> yes, this is disappointing. We may need to find another way to get 
+> reliable timing than setitimer.
+> 
+> I did change the first usleep(10) to usleep(1000) and that *may* help 
+> with this problem by ensuring that we always interrupt the usleep 
+> syscall consistently. I don't have my hp headphones (the set that's very 
+> sensitive to timing) handy to test.
 
+fwiw, I had to use the -n flag to a2play so it wouldn't use itimer at 
+all. This flag tells a2play to just send the audio as fast as it can 
+encode it.
+
+Brad
 
 
 -------------------------------------------------------
