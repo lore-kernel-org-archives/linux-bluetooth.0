@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43096D8C.2020805@xmission.com>
+Message-ID: <430954A6.40107@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] sbc and fixed-point progress
-References: <C70061B183DE09419568AB2060C52A95980BDC@arion.intra.local> <42E8F2B6.6090804@xmission.com> <001001c5a680$cfb641e0$0201a8c0@NBVICTOR>
-In-Reply-To: <001001c5a680$cfb641e0$0201a8c0@NBVICTOR>
+Subject: Re: [Bluez-devel] btsco - a few comments and a small .py script
+References: <20050819193855.GA25514@uni-duesseldorf.de> <43078EF3.4050702@xmission.com> <20050821192634.GA10231@uni-duesseldorf.de>
+In-Reply-To: <20050821192634.GA10231@uni-duesseldorf.de>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,51 +18,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Aug 2005 00:15:40 -0600
+Date: Sun, 21 Aug 2005 22:29:26 -0600
 
-Victor
+Andreas
 
-> In the attachment is the patch to support fixed point encoding for 
+>>>3. I have written a small Python-Script and a .btscorc
+>>
+>>Perfect. I gave a talk about btsco at our usergroup meeting and this 
+>>very question came up! (slides at http://flamebot.com/blog)
+>>I will link to you or put these in a contrib dir (what do you think?)
+> 
+> 
+> I don't care. I don't think this will need updates, unless the skype
+> d-bus protocol gets changed in a fundamental way.
 
-This is great! If everything works I'm going to commit it as-is and we 
-can tweak it later for 4 subbands etc.
+Ok, I will put it in contrib and add a note that it's derived from the 
+api documentation example. If you like the mod from "Whoopie" I'll apply 
+that too.
 
-> 8-subband sbc codec. To compie ARM specific version USE_FIXED_ARM should 
-> be defined (currently in sbc/sbc.c should be in configuration?). It is 
+> [I just noticed, that the copying around is done in kernelspace. Got to
+>  check it there, then.]
 
-If it seems ok, I'd like to just use '#ifdef __arm__' so it's automatic.
+I'll bet we could watch for this. If byte order gets reversed, it might 
+present a pattern that we can identify. It seems like SCO is not a 
+reliable transport so maybe bluez is supposed to watch for this kind of 
+stuff somehow. I should read up on it...
 
-> possible I broke your fixed point tables cause I've changed gen_fixed.c, 
-> but it should be easy fixable.
+> A nice addition for me would be a software mic-boost. The quality of the
+> sound is not bad, but (probably due to the ridiculously compact design
+> of my headset) the dynamic range is not used appropriately.
 
-ok, the change should be fine
+The general solution is an adaptive boost which would be nice even for 
+mics that use the full range. It's a common problem so I'll bet you can 
+get this from one of the alsa layers in userspace.
 
-> Floating point implementation is optimized too, runs 30% faster on my 
+> Another thing I noticed (which is probably not btsco related, but more
+> of a general bluez problem, maybe even a general kernel problem) is,
+> that I now had two occasions where my USB subsystem became unresponsive 
+> to a point where the machine froze.
 
-wow, nice. Maybe this room for optimization is what Marcel was talking 
-about.
+I suppose since it's only happened twice you can't reproduce it? I'm not 
+much help looking over logs since I don't know what to look for.
 
-> AthlonXP. General fixed point (long long) runs slower than floating on 
-> my PC, which is strange...
-
-interesting
-
-> I do not have HW to test arm specific version 
-> real time, hope no suprises there, but I could have missed something 
-> when integrating it into sbc code (it decodes well, but how fast, I will 
-> try only monday evening).
-
-Ok, I'll load it on gumstix now and give it a try.
-
-> Using a2play needs to tweak 87 magic number, otherwise it drops samples?
-
-yes, this is disappointing. We may need to find another way to get 
-reliable timing than setitimer.
-
-I did change the first usleep(10) to usleep(1000) and that *may* help 
-with this problem by ensuring that we always interrupt the usleep 
-syscall consistently. I don't have my hp headphones (the set that's very 
-sensitive to timing) handy to test.
+I've seen times where the mouse starts acting whacked and focus gets 
+stuck on some widget even if the mouse is pointing elsewhere. I've been 
+meaning to restart hidd and/or reload evdev to see if it's linked to the 
+bluetooth mouse.
 
 Brad
 
