@@ -1,12 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Andreas Beck <becka-bzdvl@bedatec.de>
+Message-ID: <8c9e090508220504100c127e@mail.gmail.com>
+From: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <elvis.pfutzenreuter@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] btsco - a few comments and a small .py script
-Message-ID: <20050822120911.GA5397@uni-duesseldorf.de>
-References: <20050819193855.GA25514@uni-duesseldorf.de> <43078EF3.4050702@xmission.com> <20050821192634.GA10231@uni-duesseldorf.de> <430954A6.40107@xmission.com>
+Subject: Re: [Bluez-devel] bluetoothd D-Bus interface proposals(draft 00.05)
+In-Reply-To: <1124709468.23599.27.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <430954A6.40107@xmission.com>
+Content-Type: multipart/alternative;
+	boundary="----=_Part_2285_12933444.1124712294963"
+References: <e1effdeb05081614151ee4f4bd@mail.gmail.com>
+	 <9307f5f2050816154545b6f046@mail.gmail.com>
+	 <e1effdeb05081805054a0be4aa@mail.gmail.com>
+	 <9307f5f2050818135877575293@mail.gmail.com>
+	 <8c9e090508191027e4646f1@mail.gmail.com>
+	 <1124709468.23599.27.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,88 +24,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Aug 2005 14:09:11 +0200
+Date: Mon, 22 Aug 2005 09:04:54 -0300
 
-Hi Brad,
-> >>>3. I have written a small Python-Script and a .btscorc
-> >>I will link to you or put these in a contrib dir (what do you think?)
-> >I don't care. I don't think this will need updates, unless the skype
-> >d-bus protocol gets changed in a fundamental way.
-> Ok, I will put it in contrib and add a note that it's derived from the 
-> api documentation example. If you like the mod from "Whoopie" I'll apply 
-> that too.
+------=_Part_2285_12933444.1124712294963
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Yeah. I like it. Much appreciated enhancement. I've uploaded his version
-to my site as well.
-
-I suggest you use this version. I made a minimal change to Whoopie's
-version. I call the API-Name "SkypePickup" which is probably more
-generic, as the script will do a pickup - it does not really have 
-something to do with BT headsets, except that it is a nice sample 
-application.
-
-> >[I just noticed, that the copying around is done in kernelspace. Got to
-> > check it there, then.]
-> I'll bet we could watch for this. If byte order gets reversed, it might 
-> present a pattern that we can identify. 
-
-Very probably. If there is a little noise on the line, the pattern for a
-signed16 signal will be, that there is an unusual amount of
-lowbytes being 0x00 or 0xff.
-
-My first idea would be to check, if _all_ lowbytes (i.e. the lowbytes
-as they are transmitted) are 0x00 or 0xff in a transmitted block of not
-too short length. If that is the case, I'd suggest to just "miss" a
-single byte in transfer. If that cures the problem, it should be ok.
-
-The only case where this doesn't work should be very noisy environments.
-
-I don't think it will mistrigger on natural inputs.
-
-> It seems like SCO is not a reliable transport so maybe bluez is 
-> supposed to watch for this kind of stuff somehow. I should read 
-> up on it...
-
-I had assumed it is reliable enough to send only even-length messages.
-But that might be not true. You might want to check that.
+> this is a wrong argument. The case with only one adapter is the special
+> case. Multiple adapters are default.
 
 
-> >A nice addition for me would be a software mic-boost. The quality of the
-> >sound is not bad, but (probably due to the ridiculously compact design
-> >of my headset) the dynamic range is not used appropriately.
-> The general solution is an adaptive boost which would be nice even for 
-> mics that use the full range. It's a common problem so I'll bet you can 
-> get this from one of the alsa layers in userspace.
+You mean, e.g. a computer with multiple dongles?
 
-The main problem is, that I got to work without floating point stuff,
-as this goes into kernelspace and that I got to keep CPU usage low.
+------=_Part_2285_12933444.1124712294963
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-But I think I can manage that. I used to do some realtime signal
-processing a while ago.
+<br>
+<div><blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(=
+204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">this is a wr=
+ong argument. The case with only one adapter is the special<br>
+case. Multiple adapters are default.</blockquote><div><br>
+You mean, e.g. a computer with multiple dongles? <br>
+</div><br></div><br>
 
-
-> >Another thing I noticed (which is probably not btsco related, but more
-> >of a general bluez problem, maybe even a general kernel problem) is,
-> >that I now had two occasions where my USB subsystem became unresponsive 
-> >to a point where the machine froze.
-> I suppose since it's only happened twice you can't reproduce it? 
-
-No, not really. The shutdown-lockup seems to happen quite often,
-though.
-
-> I've seen times where the mouse starts acting whacked and focus gets 
-> stuck on some widget even if the mouse is pointing elsewhere. I've been 
-> meaning to restart hidd and/or reload evdev to see if it's linked to the 
-> bluetooth mouse.
-
-This sounds more like a windowmanager problem. I've seen this with wired
-mice as well at times. Restarting the WM usually helps.
-
-
-CU, ANdy
-
--- 
-= Andreas Beck                    |  Email :  <becka-sig@bedatec.de>         =
+------=_Part_2285_12933444.1124712294963--
 
 
 -------------------------------------------------------
