@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Suspend locks up usb
+Subject: Re: [Bluez-devel] Rescuing a WML C09 AHR by SPI
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4308887E.9010400@gmx.de>
-References: <4308887E.9010400@gmx.de>
+In-Reply-To: <20050821215602.GA19979@externe.net>
+References: <20050821215602.GA19979@externe.net>
 Content-Type: text/plain
-Message-Id: <1124709328.23599.24.camel@pegasus>
+Message-Id: <1124709049.23599.16.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,46 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Aug 2005 13:15:27 +0200
+Date: Mon, 22 Aug 2005 13:10:49 +0200
 
-Hi Christian,
+Hi Guylhem,
 
-> i have a little problem with bluetooth on my Thinkpad 600e. Every time
-> when suspending (apm -s) while the usb bluetooth dongle is still plugged
-> in (that means: the modules are still loaded), usb is no longer
-> operational after the wakeup. (Un)Plugging of the dongle or any other
-> device is not recognized. As the module-use-count is not zero, i cannot
-> unload the modules and try it again.
-> Module                  Size  Used by
-> hci_usb                12360  1
-> bluetooth              41700  1 hci_usb
-> bcm203x                 4772  0
-> firmware_class          7520  1 bcm203x
+> I have a problem with a WML C09 AHR bluetooth module purchased from
+> Segor Germany.
 > 
-> The log states:
-> Aug 21 14:48:53 alpha apmd[9065]: Suspending now
-> Aug 21 14:49:16 alpha hub 1-0:1.0: resubmit --> -108
-> Aug 21 14:49:16 alpha hub 1-0:1.0: hub_port_status failed (err = -108)
+> The problem is similar to:
+> http://www.handhelds.org/hypermail/familiar/132/13253.html
 > 
-> I have the newest bluez versions in use (Gentoo):
-> bluez-hciemu-1.0
-> bluez-firmware-1.0
-> bluez-hcidump-1.21
-> bluez-libs-2.19
-> bluez-utils-2.19
-> Linux version 2.6.12-mh2
+> I had a kernel panic while issuing commands to the module (I'm working
+> on some MMC stuff hooked to the same serial port, but to
+> DSR/DRT/RI/DCD lines and my stuff is not that stable)
 > 
-> The problem seems to be independend of the used dongle: I tried LevelOne
-> MDU-0005USB and Broadcom WTB-3020.
+> Result: I could only write 1f9 0001 - I couldn't do the 191 part.
 > 
-> Unloading the modules before suspend might help - i just try not to
-> forget to unplug it before suspending ;-)
+> I tried the recommanded rescue mode from CSR forums:
+> http://66.102.9.104/search?q=cache:XnYWRYWUhSsJ:www.csr.com/ubb/Forum2/HTML/000185.html+pskey+csr+but&hl=fr&client=firefox-a
+> 
+> Unfortunately, it didn't work. I would like to try to rescue the chip
+> via its SPI port since it is easily accessible.
+> 
+> My problem is I don't know how to do that (any link is appreciated) on
+> both the hardware side and the software side (!)
+> 
+> Maybe someone can help?
 
-I can't tell you anything about the APM. Did you tried to use ACPI? What
-kernel version is this?
-
-However to unload you module you need to do a "hciconfig hci0 down"
-first. This will deactivate the interface.
+the CSR guys told me that sometimes the only way is to use their
+BlueFlash tool (for Windows) and fully erase the flash and start over
+with a new boot loader and a new firmware image.
 
 Regards
 
