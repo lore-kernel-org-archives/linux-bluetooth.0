@@ -1,21 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <9307f5f2050822072659387e3b@mail.gmail.com>
-From: "P. Durante" <shackan@gmail.com>
+Message-ID: <4309DF55.3010106@hasborg.com>
+From: Joshua Wright <jwright@hasborg.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bluetoothd D-Bus interface proposals(draft 00.05)
-In-Reply-To: <e1effdeb05082205517cac906c@mail.gmail.com>
-Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-References: <e1effdeb05081614151ee4f4bd@mail.gmail.com>
-	 <9307f5f2050816154545b6f046@mail.gmail.com>
-	 <e1effdeb05081805054a0be4aa@mail.gmail.com>
-	 <9307f5f2050818135877575293@mail.gmail.com>
-	 <8c9e090508191027e4646f1@mail.gmail.com>
-	 <1124709468.23599.27.camel@pegasus>
-	 <8c9e090508220504100c127e@mail.gmail.com>
-	 <e1effdeb0508220527500878ab@mail.gmail.com>
-	 <5256d0b050822053737c9cd8f@mail.gmail.com>
-	 <e1effdeb05082205517cac906c@mail.gmail.com>
+Subject: [Bluez-devel] BCCMD Test Command "memory"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -27,62 +16,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Aug 2005 16:26:00 +0200
+Date: Mon, 22 Aug 2005 10:21:09 -0400
 
-On 8/22/05, Claudio Takahasi <cktakahasi@gmail.com> wrote:
-> Hi Peter,
->=20
-> I am planning provide a D-Bus service for setup a default adapter. But
-> the developer will
-> have to call a service to discover all available adapters. The steps shal=
-l be:
-> 1. Call a method to discover the available adapters
->     org.bluez.bluetoothd.getAdapters will return a array of the
-> available devices
->=20
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-That's exactly what I do now in org.bluetool.manager.ListDevices.
-I was thinking if it's worth returning, for each adapter, together
-with the device path, a boolean value indicating if the device is up
-or not, so that applications can immediately check what adapters a
-effectively 'available'
-ps: I also added signals which are broadcasted when an interface is
-brought up/down
+While reading through the BlueCore BCCMD Commands documentation, I came
+across the "memory" test command.  This command allows us to read or
+write from/to a block of RAM within the chip.
 
-Another big concern I'm having is about security, most hciconfig
-commands require 'higher than normal' privileges to execute, should
-the daemon allow certain requests only to the root user ? (luckily
-dbus was conceived with security in mind, so adding such a policy
-would not be difficult).
-This would just make things more complicated and I don't think there's
-any real gain in doing so, but maybe there are some security issues I
-ignore at the moment, let me know your opinion.
-(if for example, a program calls ListDevices to list the adapters, and
-the user wants to use an interface which is not active, should the
-program be allowed to bring it up?)
+The documentation is rather sparse for this test command.  The Varid and
+Type are documented, indicating that it's possible to specify a base
+memory address and a length of bytes, but it does not indicate how to
+differentiate a read or write operation.
 
-> 2. Call a method to setup the default adapter.
->    org.bluez.bluetoothd.setDefaultAdapter, passing the adapter id
->=20
+Does anyone have more documentation on this test command, or know how to
+use this command to read memory from RAM on the chip for a given offset?
 
-What if two (or more) applications chose, for whatever reason, to set
-a different default adapter? If you *really* want such a mechanism,
-maybe you should make such a method callable only by authorized code
-(hence my dilemma above) or simply select the default adapter
-internally in the daemon and don't expose this method at all.
+Thanks!
 
-> After that you will be able call the services passing the default path
->=20
-> In the future we can try discover the best adapter to use and set it as
-> default.
->=20
-> Regards,
-> Claudio.
->=20
->=20
+- -Josh
+- --
+- -Joshua Wright
+jwright@hasborg.com
 
-Regards,
-Paul
+2005-2006 pgpkey: http://802.11ninja.net/pgpkey.htm
+fingerprint: F00E 7A42 8375 0C55 964F E5A4 4D2F 22F6 3658 A4BF
+
+Today I stumbled across the world's largest hotspot.  The SSID is "linksys".
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (MingW32)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFDCd9UTS8i9jZYpL8RAvjSAKDZvRO7LsWagY5fUVWpvtQpBVw1ewCfQGRF
+VBzGIaagNFCg+WA0RL/9MYw=
+=ZpZJ
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
