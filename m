@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <032b01c5a7ae$fd98ba00$6c01a8c0@Vijayakumar>
-From: "Vijayakumar" <vijayakumar@isofttech.com>
-To: <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
-Subject: [Bluez-devel] pand problem
+Subject: Re: [Bluez-devel] Headset reconnection
+From: Fredrik Tolf <fredrik@dolda2000.com>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <43022E86.7080909@xmission.com>
+References: <1124215347.21719.31.camel@pc7.dolda2000.com>
+	 <43022E86.7080909@xmission.com>
+Content-Type: text/plain
+Message-Id: <1124754748.21719.82.camel@pc7.dolda2000.com>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,64 +19,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Aug 2005 12:20:46 +0530
+Date: Tue, 23 Aug 2005 01:52:28 +0200
 
-Hi all,
+On Tue, 2005-08-16 at 12:20 -0600, Brad Midgley wrote:
+> Fredrik,
+> 
+> You can get pdfs from bluetooth.org. The relevant ones are 6_headset.pdf 
+> and "HFP Spec Version 1_0.pdf"
+> 
+> Most headsets attempt to make the rfcomm connection to the last-used 
+> handset (or only handset if they only keep one pairing) on power-up. The 
+> stereo headsets tend to wait until the first click of the answer button.
 
-My linux kernel version is 2.4.20-8
-Applied 2.4.18 mh patch
+Indeed -- I tried clicking the button on my headset, and judging from
+hcidump, it attempts to connect to my computer (although I have a mono
+headset, not a stereo). After that, however, weirdness occurs.
 
-      My pand connection gets disconnected after about 4-5 hrs. I 
-established pand connection between 2 dongles and ran multiple telnet 
-sessions (each running ls -lR in an infinite loop) and an ftp 
-session(transfers files repeatedly between the machines in an infinite 
-loop).After some 4-5 hrs i found that the pand onnection no longer existed.
+Looking at the data from hcidump, the headset requests a connection, and
+the computer replies with a success message. The next package, the
+headset disconnects again immediately (and the computer acknowledges
+that). Then the headset connects again, and disconnects again, over and
+over.
 
-And I found "NET unregister event not supported" in my system log 
-messages....Below is my system log...
+> I don't think we are doing the device class or sdp stuff to even make 
+> the headset aware that it can make this connection. On top of that, we 
+> need to be listening for connections.
 
+Indeed, I'm not even attempting to public SDP data to the headset at
+this point, but if that were the problem, I would think that the headset
+wouldn't even attempt to connect to begin with, rather than going into a
+loop of connecting and disconnecting all the time, right?
 
-Aug 22 20:45:14 test1 kernel: BlueZ L2CAP ver 2.1 Copyright (C) 2000,2001 
-Qualcomm Inc
-Aug 22 20:45:14 test1 kernel: Written 2000,2001 by Maxim Krasnyansky 
-<maxk@qualcomm.com>
-Aug 22 20:45:19 test1 kernel: BlueZ RFCOMM ver 0.4
-Aug 22 20:45:19 test1 kernel: Copyright (C) 2002 Maxim Krasnyansky 
-<maxk@qualcomm.com>
-Aug 22 20:45:19 test1 kernel: Copyright (C) 2002 Marcel Holtmann 
-<marcel@holtmann.org>
-Aug 22 20:45:29 test1 kernel: BlueZ BNEP ver 1.1
-Aug 22 20:45:29 test1 kernel: Copyright (C) 2001,2002 Inventel Systemes
-Aug 22 20:45:29 test1 kernel: Written 2001,2002 by Clement Moreau 
-<clement.moreau@inventel.fr>
-Aug 22 20:45:29 test1 kernel: Written 2001,2002 by David Libault 
-<david.libault@inventel.fr>
-Aug 22 20:45:29 test1 kernel: Copyright (C) 2002 Maxim Krasnyanskiy 
-<maxk@qualcomm.com>
-Aug 22 20:45:50 test1 hcid[27188]: Bluetooth HCI daemon
-Aug 22 20:45:50 test1 hcid[27188]: Starting security manager 0
-Aug 22 20:45:52 test1 sdpd[27192]: Bluetooth SDP daemon
-Aug 22 20:46:59 test1 pand[27198]: Bluetooth PAN daemon version 2.17
-Aug 22 20:47:16 test1 hcid[27188]: link_key_request (sba=00:0F:3D:4C:4D:C6, 
-dba=00:0B:91:FF:FF:41)
-Aug 22 20:47:16 test1 hcid[27188]: pin_code_request (sba=00:0F:3D:4C:4D:C6, 
-dba=00:0B:91:FF:FF:41)
-Aug 22 20:47:16 test1 hcid[27188]: link_key_notify (sba=00:0F:3D:4C:4D:C6, 
-dba=00:0B:91:FF:FF:41)
-Aug 22 20:47:16 test1 pand[27199]: New connection from 00:0B:91:FF:FF:41 
-bnep0
-Aug 22 20:47:16 test1 /etc/hotplug/net.agent: invoke ifup bnep0
-Aug 22 20:47:17 test1 kernel: ip_tables: (C) 2000-2002 Netfilter core team
-Aug 22 20:54:42 test1 login(pam_unix)[4647]: session opened for user root by 
-LOGIN(uid=0)
-Aug 23 01:01:35 test1 /etc/hotplug/net.agent: NET unregister event not 
-supported
-Aug 23 04:22:32 test1 su(pam_unix)[28881]: session opened for user news by 
-(uid=0)
-Aug 23 04:22:32 test1 su(pam_unix)[28881]: session closed for user news
+Does anyone have any idea what the cause of this could be?
 
-Regards,
-Vijayakumar. 
+Fredrik Tolf
+
 
 
 
