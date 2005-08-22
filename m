@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PPPOE use PAN service
+Subject: Re: [Bluez-users] [Fwd: Bug#322732: bluez-utils: rfcomm bind fails
+	with obscure error message]
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <c43104b3050821201255940c3a@mail.gmail.com>
-References: <1124653868.4816.16.camel@localhost.localdomain>
-	 <c43104b3050821201255940c3a@mail.gmail.com>
+In-Reply-To: <1124658001.1592.21.camel@saag.bunker.heddley.com>
+References: <1124658001.1592.21.camel@saag.bunker.heddley.com>
 Content-Type: text/plain
-Message-Id: <1124709202.23599.21.camel@pegasus>
+Message-Id: <1124709149.23599.19.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,18 +19,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Aug 2005 13:13:22 +0200
+Date: Mon, 22 Aug 2005 13:12:29 +0200
 
-Hi,
+Hi Edd,
 
->     Could I use PPPOE dial-up via PAN service??
->   
->     I used PPPOE dial-up on windows PC, PC to borad via BT, borad use
-> PAN service:
->             PC(windows)  -----bt----->borad(linux bluez) ---lan--->internet
+> > When the 'rfcomm' kernel module isn't compiled with CONFIG_BT_RFCOMM_TTY
+> > enabled, 'rfcomm bind' will fail with an obscure error message, "Can't
+> > create device: Operation not supported".  It does this when it's trying to
+> > bind to a device in /dev.
 
-in general yes, but I never tried it. However using TCP/IP over BNEP
-directly should be enough.
+this error message is correct. It follows the errno error code that
+comes back from the kernel.
+
+> > Could this be changed to report something more useful, such as "Check
+> > rfcomm.ko is compiled with TTY support"?
+
+What about a patch for the RFCOMM manual page that explains this
+problem?
 
 Regards
 
