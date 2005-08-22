@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Beck <becka-bzus@bedatec.de>
+Message-ID: <3967360605082120543847e56d@mail.gmail.com>
+From: Robert Brewer <rwb123@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] authentication problem when pairing with headset
-Message-ID: <20050822090249.GA4917@uni-duesseldorf.de>
-References: <1124653868.4816.16.camel@localhost.localdomain>
+Subject: Re: [Bluez-users] pairing problem - please help
+In-Reply-To: <43005ADB.9040400@ubuntu.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1124653868.4816.16.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1
+References: <39673606050813203174545cc1@mail.gmail.com>
+	 <42FEDEBA.8060007@xmission.com>
+	 <396736060508141923370a6662@mail.gmail.com>
+	 <43005ADB.9040400@ubuntu.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,49 +21,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Aug 2005 11:02:49 +0200
+Date: Sun, 21 Aug 2005 23:54:29 -0400
 
-Matthias Grüter <mgrueter@ee.ethz.ch> wrote:
-> I'm using a Logitech Mobile Freedom Headset with my iBook G4. I have
-> been using this device for some time now, but since a week or so I'm not
-> able to pair with my headset anymore.
+A new post on bluez-devel has answered my question.
+The summary is /var/lib/bluetooth/<bd-addr>/linkkeys needed
+to be removed.  That solved the problem for me, I am=20
+now able to pair my headset under Linux again.
 
-Did you use it with the same dongle on another machine or OS?
+http://sourceforge.net/mailarchive/forum.php?thread_id=3D7999370&forum_id=
+=3D1881
 
-> Output of btsco:
-> # btsco -v 00:0D:44:32:D3:FF
-> btsco v0.4c
-> Device is 1:0
-> Error: Failed to connect to SDP server: Permission denied
-> Assuming channel 2
-> Voice setting: 0x0060
-> Can't connect RFCOMM channel: Permission denied
+Unfortunately Logitech support has been of very little help
+for my headset... they pointed me to their standard FAQ list
+for WinXP... finally I dragged out of them that the headset
+can only pair with 1 device at a time, but no more technical
+details than that.
 
-This looks like wrong linkkeys. See the btsco page:
-
->> If you can't pair or connect with the headset, did you pair it with
->> another device? Did it help to reset the pairing by removing
->> /etc/bluetooth/link_key or /var/lib/bluetooth/[headsetaddr]/linkkeys or
->> by putting the headset in pair mode? You may have to redo this often if
->> you try to dual-boot windows or if you use the same dongle on another
->> computer.
-
-Ups - I see there is an error in there. [headsetaddr] should be
-[dongleaddr]. The headsetaddr is in the linkkeys file on the line with
-the linkkey. It is enough to remove that single line, thus retaining
-the other pairing information.
-
-> What kind of authentication failure is this? And how can I solve this
-> issue?
-> My version of the bluez-tools is 2.18.
-> The awkward thing is, that I'm still able to pair with other headsets
-> (same model) and my headset is still able to pair with other computers
-> or mobile phones.
-
-Yes. sounds perfectly like this problem.
-
-
-CU, Andy
+-Rob
+--=20
+Robert W. Brewer
 
 
 -------------------------------------------------------
