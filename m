@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <430A2579.2060609@hasborg.com>
-From: Joshua Wright <jwright@hasborg.com>
-MIME-Version: 1.0
+From: Andreas Beck <becka-bzdvl@bedatec.de>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Reset card
-References: <43038D0B.1060209@hasborg.com>	 <20050819092419.715FE479@arbetsmyra.dyndns.org>	 <4305A63E.7020507@soft.uni-linz.ac.at> <1124462989.6398.8.camel@notepaq>	 <430606F9.3060906@hasborg.com> <1124632986.6260.9.camel@notepaq>
-In-Reply-To: <1124632986.6260.9.camel@notepaq>
-Content-Type: multipart/mixed;
- boundary="------------030604090403030501030105"
+Message-ID: <20050822185341.GA18549@uni-duesseldorf.de>
+References: <20050819193855.GA25514@uni-duesseldorf.de> <43078EF3.4050702@xmission.com> <20050821192634.GA10231@uni-duesseldorf.de> <430954A6.40107@xmission.com> <20050822120911.GA5397@uni-duesseldorf.de> <20050822183820.GA18410@uni-duesseldorf.de>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="tThc/1wpZn/ma/RB"
+In-Reply-To: <20050822183820.GA18410@uni-duesseldorf.de>
+Subject: [Bluez-devel] AGC and anti-noise patch for btsco kernel module
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,219 +18,206 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Aug 2005 15:20:25 -0400
+Date: Mon, 22 Aug 2005 20:53:41 +0200
 
-This is a multi-part message in MIME format.
---------------030604090403030501030105
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+--tThc/1wpZn/ma/RB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Marcel Holtmann wrote:
-> I modified it a little bit to make it more generic, but it is in the CVS
-> now. Feel free to test it. Do I get also a patch for bccmd for a reset
-> command and a patch for decoding this command in hcidump?
+Now for the patch (against CVS) described in the previous mail ...
 
-Why, yes!  Attached is a patch to add decoding for hcidump, and a few
-extras for bccmd.  I added "disabletx", "enabletx" and "rand", as well
-as "coldreset" to bccmd.
+Have fun with it, 
 
-Note that coldreset will be decoded in hcidump properly, but hcidump
-dies shortly afterward when it isn't getting a response from the card
-during reset.
+Andy
 
-Thanks!
+--tThc/1wpZn/ma/RB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="btsco.diff"
 
-- -Josh
-- --
-- -Joshua Wright
-jwright@hasborg.com
+Index: btsco.c
+===================================================================
+RCS file: /cvsroot/bluetooth-alsa/btsco/kernel/btsco.c,v
+retrieving revision 1.6
+diff -c -r1.6 btsco.c
+*** btsco.c	19 Mar 2005 14:28:59 -0000	1.6
+--- btsco.c	22 Aug 2005 18:12:39 -0000
+***************
+*** 21,26 ****
+--- 21,33 ----
+   *
+   */
+  
++ /* Autoadjust mic at most this often in 1/8000s */
++ #define GRABSAMPLES 400
++ /* Maximum push for the mike 16= 1:1 - default 20:1 = 320*/
++ #define COMPRESSION_MAX_16 320
++ /* Minimum push for the mike  1= 1:16*/
++ #define COMPRESSION_MIN_16 1
++ 
+  #define chip_t snd_card_bt_sco_t
+  
+  #include <sound/driver.h>
+***************
+*** 93,100 ****
+  	snd_card_t *card;
+  	spinlock_t mixer_lock;
+  	int mixer_volume[MIXER_ADDR_LAST + 1];
+! 	snd_kcontrol_t *mixer_controls[MIXER_ADDR_LAST + 2];	/* also loopback */
+  	volatile int loopback;
+  	atomic_t playback_count, capture_count;
+  	volatile int count_changed;
+  	spinlock_t count_changed_lock;
+--- 100,108 ----
+  	snd_card_t *card;
+  	spinlock_t mixer_lock;
+  	int mixer_volume[MIXER_ADDR_LAST + 1];
+! 	snd_kcontrol_t *mixer_controls[MIXER_ADDR_LAST + 2 + 1];	/* also loopback and agc */
+  	volatile int loopback;
++ 	volatile int agc;
+  	atomic_t playback_count, capture_count;
+  	volatile int count_changed;
+  	spinlock_t count_changed_lock;
+***************
+*** 569,574 ****
+--- 577,611 ----
+  	return changed;
+  }
+  
++ static int snd_bt_sco_agc_get(snd_kcontrol_t * kcontrol,
++ 				   snd_ctl_elem_value_t * ucontrol)
++ {
++ 	snd_card_bt_sco_t *bt_sco = snd_kcontrol_chip(kcontrol);
++ 	unsigned long flags;
++ 
++ 	spin_lock_irqsave(&bt_sco->mixer_lock, flags);
++ 	ucontrol->value.integer.value[0] = bt_sco->agc;
++ 	spin_unlock_irqrestore(&bt_sco->mixer_lock, flags);
++ 	return 0;
++ }
++ 
++ static int snd_bt_sco_agc_put(snd_kcontrol_t * kcontrol,
++ 				   snd_ctl_elem_value_t * ucontrol)
++ {
++ 	snd_card_bt_sco_t *bt_sco = snd_kcontrol_chip(kcontrol);
++ 	unsigned long flags;
++ 	int changed;
++ 	int agc;
++ 
++ 	agc = !!ucontrol->value.integer.value[0];
++ 
++ 	spin_lock_irqsave(&bt_sco->mixer_lock, flags);
++ 	changed = bt_sco->agc != agc;
++ 	bt_sco->agc = agc;
++ 	spin_unlock_irqrestore(&bt_sco->mixer_lock, flags);
++ 	return changed;
++ }
++ 
+  #define BT_SCO_CONTROLS (sizeof(snd_bt_sco_controls)/sizeof(snd_kcontrol_new_t))
+  
+  static snd_kcontrol_new_t snd_bt_sco_controls[] = {
+***************
+*** 580,585 ****
+--- 617,629 ----
+  	 .info = snd_bt_sco_boolean_info,
+  	 .get = snd_bt_sco_loopback_get,
+  	 .put = snd_bt_sco_loopback_put,
++ 	 },
++ 	{.iface = SNDRV_CTL_ELEM_IFACE_MIXER,
++ 	 .name = "AGC Switch",
++ 	 .index = 0,
++ 	 .info = snd_bt_sco_boolean_info,
++ 	 .get = snd_bt_sco_agc_get,
++ 	 .put = snd_bt_sco_agc_put,
+  	 }
+  };
+  
+***************
+*** 790,795 ****
+--- 834,844 ----
+  	struct msghdr msg;
+  	struct iovec iov;
+  	sigset_t unblocked;
++ 	int i;
++ 	static int factor=16;
++ 	static int maxvalsmoothed=0;
++ 	static int maxvalgrablen=GRABSAMPLES; /* adjust volume at most 4 times/second */
++ 	static int swap=0;
+  
+  	lock_kernel();
+  
+***************
+*** 839,844 ****
+--- 888,954 ----
+  		len = sock_recvmsg(sock, &msg, BUF_SIZE, 0);
+  		if (len > 0) {
+  
++ 			int lostatcnt;
++ 
++ 			lostatcnt=0;
++ 			if (len&1) dprintk("odd len %d\n",len);
++ 			for(i=0;i<len-1;i+=2) {
++ 				short int j;
++ 				int k;
++ 				
++ 				if (swap) j=(buf[i]<<8)|buf[i+1];
++ 				else j=(buf[i+1]<<8)|buf[i];
++ 
++ 				/* occasionally the Headset will loose a byte
++ 				 * on startup. Thus swapping lo/hi.
++ 				 * counting, if _all_ lo bytes (which are 
++ 				 * actually high bytes) are 0 or -1
++ 				 * will detect this with a very high probability
++ 				 */
++ 				if ((j&0xff)==0||(j&0xff)==0xff) {
++ 					lostatcnt++;
++ 				}
++ 				/* scale the mic input - we do some kind
++ 				 * of dynamics compression
++ 				 */
++ 				k=((int)j*factor)/16;
++ 				/* clip overshoot. Better than just letting
++ 				 * it wrap around. Immediately adjust factor.
++ 				 */
++ 				if (k>0x7fff) {
++ 					k=0x7fff;
++ 					if (bt_sco->agc&&factor>COMPRESSION_MIN_16) factor--;
++ 				} else if (k<-0x8000) {
++ 					k=0x8000;
++ 					if (bt_sco->agc&&factor>COMPRESSION_MIN_16) factor--;
++ 				}
++ 				buf[i+1]=(k>>8)&0xff;
++ 				buf[i  ]=k&0xff;
++ 				/* find the highest absolute value in a 
++ 				 * GRABSAMPLES long interval.
++ 				 */
++ 				if (k<0) k=-j;
++ 				if (k>maxvalsmoothed) maxvalsmoothed=k;
++ 				/* if the interval is over, recalculate
++ 				 * the compression factor. Move it slowly.
++ 				 */
++ 				if (maxvalgrablen--<=0) {
++ 					maxvalgrablen=GRABSAMPLES;
++ 					/* If the noise goes up over 1000, we stop
++ 					 * pushing the software gain 
++ 					 */
++ 					if (maxvalsmoothed<1000&&factor<COMPRESSION_MAX_16) {
++ 						factor++;
++ 						// dprintk("Up to %d\n",factor);
++ 					}
++ 					if (!bt_sco->agc) factor=16;
++ 					maxvalsmoothed=0;
++ 				}
++ 			}
++ 			if (lostatcnt==len/2&&len>32&&maxvalgrablen>GRABSAMPLES-len) {
++ 				dprintk("SWAP problem detected! Fixing.\n");
++ 				swap=!swap;
++ 			}
+  			down(&bt_sco->capture_sem);
+  			if (bt_sco->capture) {
+  				snd_card_bt_sco_pcm_receive
 
-2005-2006 pgpkey: http://802.11ninja.net/pgpkey.htm
-fingerprint: F00E 7A42 8375 0C55 964F E5A4 4D2F 22F6 3658 A4BF
-
-Today I stumbled across the world's largest hotspot.  The SSID is "linksys".
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (MingW32)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFDCiV3TS8i9jZYpL8RAusWAKC6bYjtEyvQDTvzulJNWdH2h6gyyQCeNtrI
-L+FfgUfB+pCBKi8ZWfCYKDY=
-=XBJy
------END PGP SIGNATURE-----
-
---------------030604090403030501030105
-Content-Type: text/plain;
- name="bccmd-extras.diff"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="bccmd-extras.diff"
-
-diff -ru bluez-utils-2.19/tools/bccmd.c bluez-utils-2.19-jlw/tools/bccmd.c
---- bluez-utils-2.19/tools/bccmd.c	2005-07-03 19:12:08.000000000 -0400
-+++ bluez-utils-2.19-jlw/tools/bccmd.c	2005-08-22 14:42:31.000000000 -0400
-@@ -129,16 +129,53 @@
- 	return 0;
- }
- 
-+static int cmd_disabletx(int dd, int argc, char *argv[])
-+{
-+	return csr_write_varid_uint16(dd, 0, CSR_VARID_DISABLE_TX, 0, 0);
-+}
-+	
-+static int cmd_enabletx(int dd, int argc, char *argv[])
-+{
-+	return csr_write_varid_uint16(dd, 0, CSR_VARID_ENABLE_TX, 0, 0);
-+}
-+	
-+static int cmd_coldreset(int dd, int argc, char *argv[])
-+{
-+	return csr_write_varid_uint16(dd, 0, CSR_VARID_COLD_RESET, 0, 0);
-+}
-+	
-+static int cmd_rand(int dd, int argc, char *argv[])
-+{
-+	uint16_t error = 0;
-+	int err;
-+
-+	err = csr_read_varid_uint16(dd, 5, CSR_VARID_RAND, &error);
-+	if (err < 0) {
-+		errno = -err;
-+		return -1;
-+	}
-+
-+	printf("Random number: 0x%02x (%d)\n", error, error);
-+
-+	return 0;
-+}
-+
-+
-+
- static struct {
- 	char *str;
- 	int (*func)(int dd, int argc, char **argv);
- 	char *arg;
- 	char *doc;
- } commands[] = {
--	{ "keylen",   cmd_keylen,   "<handle>", "Get current crypt key length" },
--	{ "clock",    cmd_clock,    "",         "Get local Bluetooth clock"    },
--	{ "panicarg", cmd_panicarg, "",         "Get panic code argument"      },
--	{ "faultarg", cmd_faultarg, "",         "Get fault code argument"      },
-+	{ "keylen",    cmd_keylen,    "<handle>", "Get current crypt key length" },
-+	{ "clock",     cmd_clock,     "",         "Get local Bluetooth clock"    },
-+	{ "panicarg",  cmd_panicarg,  "",         "Get panic code argument"      },
-+	{ "faultarg",  cmd_faultarg,  "",         "Get fault code argument"      },
-+    { "coldreset", cmd_coldreset, "",         "Perform cold reset"           },
-+    { "disabletx", cmd_disabletx, "",         "Disable TX on the device"     },
-+    { "enabletx",  cmd_enabletx,  "",         "Enable TX on the device"      },
-+    { "rand",      cmd_rand,      "",         "Obtain a random number"       },
- 	{ NULL },
- };
- 
-diff -ru bluez-utils-2.19/tools/csr.c bluez-utils-2.19-jlw/tools/csr.c
---- bluez-utils-2.19/tools/csr.c	2005-07-18 20:12:37.000000000 -0400
-+++ bluez-utils-2.19-jlw/tools/csr.c	2005-08-22 14:41:47.000000000 -0400
-@@ -668,3 +668,53 @@
- 
- 	return 0;
- }
-+
-+
-+int csr_write_varid_uint16(int dd, uint16_t seqnum, uint16_t varid, uint16_t value, int chkresp)
-+{
-+	unsigned char cmd[] = { 0x02, 0x00, 
-+				0x09, 0x00,
-+				seqnum & 0xff, seqnum >> 8, 
-+				varid & 0xff, varid >> 8, 
-+				0x00, 0x00,	  // status
-+				0x00, 0x00,	  // payload
-+				0x00, 0x00, 
-+				0x00, 0x00, 
-+				0x00, 0x00 };
-+
-+	unsigned char cp[254], rp[254];
-+	struct hci_request rq;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp[0] = 0xc2;
-+	memcpy(cp + 1, cmd, sizeof(cmd));
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf	= OGF_VENDOR_CMD;
-+	rq.ocf	= 0x00;
-+	rq.event  = EVT_VENDOR;
-+	rq.cparam = cp;
-+	rq.clen   = sizeof(cmd) + 1;
-+	rq.rparam = rp;
-+	rq.rlen   = sizeof(rp);
-+
-+	/* Only check for a response if the BCCMD warrants it.  Reset does not. */
-+	if (chkresp) {
-+		if (hci_send_req(dd, &rq, 2000) < 0)
-+		return -1;
-+
-+		if (rp[0] != 0xc2) {
-+			errno = EIO;
-+			return -1;
-+		}
-+
-+		if ((rp[9] + (rp[10] << 8)) != 0) {
-+			errno = ENXIO;
-+			return -1;
-+		}
-+	} else {
-+		hci_send_req(dd, &rq, 2000);
-+	}
-+
-+	return 0;
-+}
-diff -ru bluez-utils-2.19/tools/csr.h bluez-utils-2.19-jlw/tools/csr.h
---- bluez-utils-2.19/tools/csr.h	2005-07-03 17:19:51.000000000 -0400
-+++ bluez-utils-2.19-jlw/tools/csr.h	2005-08-22 14:37:26.000000000 -0400
-@@ -81,3 +81,4 @@
- int csr_read_pskey_complex(int dd, uint16_t seqnum, uint16_t pskey, uint8_t *value, uint16_t length);
- int csr_read_pskey_uint16(int dd, uint16_t seqnum, uint16_t pskey, uint16_t *value);
- int csr_write_pskey_uint16(int dd, uint16_t seqnum, uint16_t pskey, uint16_t value);
-+int csr_write_varid_uint16(int dd, uint16_t seqnum, uint16_t varid, uint16_t value, int chkresp);
-
---------------030604090403030501030105
-Content-Type: text/plain;
- name="hcidump-bccmd-extras.diff"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="hcidump-bccmd-extras.diff"
-
-Only in bluez-hcidump-1.24-jlw/: Makefile
-Only in bluez-hcidump-1.24-jlw/: config.h
-Only in bluez-hcidump-1.24-jlw/: config.log
-Only in bluez-hcidump-1.24-jlw/: config.status
-Only in bluez-hcidump-1.24-jlw/parser: .csr.c.swp
-Only in bluez-hcidump-1.24-jlw/parser: Makefile
-diff -ru bluez-hcidump-1.24/parser/csr.c bluez-hcidump-1.24-jlw/parser/csr.c
---- bluez-hcidump-1.24/parser/csr.c	2005-07-03 17:19:51.000000000 -0400
-+++ bluez-hcidump-1.24-jlw/parser/csr.c	2005-08-22 15:05:24.000000000 -0400
-@@ -214,6 +214,15 @@
- 	case 0x3008:
- 		handle_length_dump(level + 1, "CRYPT_KEY_LENGTH", frm);
- 		break;
-+	case 0x4001:
-+		uint16_dump(level + 1, "COLD_RESET", frm);
-+		break;
-+	case 0x4007:
-+		uint16_dump(level + 1, "ENABLE_TX", frm);
-+		break;
-+	case 0x4008:
-+		uint16_dump(level + 1, "DISABLE_TX", frm);
-+		break;
- 	case 0x481c:
- 		uint16_dump(level + 1, "MAP_SCO_PCM", frm);
- 		break;
-Only in bluez-hcidump-1.24-jlw/src: Makefile
-Only in bluez-hcidump-1.24-jlw/: stamp-h1
-
---------------030604090403030501030105--
+--tThc/1wpZn/ma/RB--
 
 
 -------------------------------------------------------
