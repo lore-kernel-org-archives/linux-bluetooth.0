@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <259637e050823112533997b1c@mail.gmail.com>
-From: Rui Silva <rukinhas@gmail.com>
+Subject: Re: [Bluez-users] O2 XDA mini and DUND
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <87fyt15a5b.fsf@secunet.de>
+References: <20050823050058.8940.qmail@web35314.mail.mud.yahoo.com>
+	 <87fyt15a5b.fsf@secunet.de>
+Content-Type: text/plain
+Message-Id: <1124786244.23599.146.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Bluetooth services not found
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,29 +19,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 23 Aug 2005 19:25:12 +0100
+Date: Tue, 23 Aug 2005 10:37:24 +0200
 
-hello ppl=20
+Hi Sascha,
 
-i'm to get a windows PC to access the Serial Port Profile on my linux
-Box, but windows, does not find any service in my windows box.
+> I have some problems to configure DUN access for the XDA mini.  I use
+> the description for the XDA II:
+> 
+> http://wiki.xda-developers.com/wiki/bluetoothnetworking
+> 
+> but it does not work at all.  If I understand it right the DUND should
+> start the PPPD to enable the PPP handshake, but DUND reports only a
+> timeout error (110) and a protocol error (71).  I could not find any
+> DUND option to enable any debuging output.
+> 
+> The basic communication works.  I can search on each side each other
+> and I can l2ping from my Debian system the XDA mini.
+> 
+> After this I tried HCIDUMP, but I dont understand the output.  How can
+> I analyse this problem further?  Is anybody here able to read the
+> HCIDUMP output?
 
-I have all the kernel configured and the bluettoth service starts fine
-on boot, but when i'm searching for the services, the windows machine
-does not find any service at all??
+looks like there is no service running on RFCOMM channel 1. Don't use
+the sdptool call in the example, because dund can register the service
+record by itself and then the channel number will match.
 
-how can I advertize the serial port service to all machines in the room?
+Regards
+
+Marcel
 
 
-
-
---=20
-Rui Silva
-Powered by Gentoo Linux under :
-CELERON 1000 - Stage1 install with nptl
-Pentium M 1800GHz - Stage1 install with NPTL
-
-http://rukinhas.no-ip.org
 
 
 -------------------------------------------------------
