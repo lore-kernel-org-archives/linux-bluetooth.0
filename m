@@ -1,5 +1,5 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <430B41E1.4000700@core.kaist.ac.kr>
+Message-ID: <430B3F5F.6070908@core.kaist.ac.kr>
 From: Youngwoo Park <ywpark@core.kaist.ac.kr>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
@@ -16,20 +16,110 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Aug 2005 00:33:53 +0900
+Date: Wed, 24 Aug 2005 00:23:11 +0900
 
 
-I fogot to tell about the experimental environment.
+
+I'm sorry about my coding style and thank you for your comment.
+I modified sco_send_frame() function like following..
 
 
-I tested using CSR Bluecore Chipset.
+Before Modification...
+-----------------
 
-The Problem is occured using SCO over UART(h4).
-Fame size is larger than MTU and varied periodically
-I adjusted MTU size but it had no effect.
+/*static inline int sco_send_frame(struct sock *sk, struct msghdr *msg,
+int len)
+{
+struct sco_conn *conn = sco_pi(sk)->conn;
+struct sk_buff *skb;
+int err, count;*/
 
-However USB Module operate well.
-In this case, frame size is smaller than MTU.
+/* Check outgoing MTU */
+if (len > conn->mtu)
+return -EINVAL;
+
+BT_DBG("sk %p len %d", sk, len);
+
+count = min_t(unsigned int, conn->mtu, len);
+if (!(skb = bt_skb_send_alloc(sk, count, msg->msg_flags & MSG_DONTWAIT,
+&err)))
+return err;
+
+if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count)) {
+err = -EFAULT;
+goto fail;
+}
+
+if ((err = hci_send_sco(conn->hcon, skb)) < 0)
+goto fail;
+
+return count;
+
+
+fail:
+kfree_skb(skb);
+return err;
+}*/
+
+
+
+After Modification...
+----------------
+
+/**
+* sco_send_frame - send sco frame
+*
+* Modified 2005 by Youngwoo Park
+*
+* Send large sco frame sequentially even if frame size is larger than MTU
+*
+**/
+static inline int sco_send_frame(struct sock *sk, struct msghdr *msg,
+int len)
+{
+struct sco_conn *conn = sco_pi(sk)->conn;
+struct sk_buff *skb;
+int err, count;
+
+do {
+
+BT_DBG("sk %p len %d", sk, len);
+
+count = min_t(unsigned int, conn->mtu, len);
+
+if (!(skb = bt_skb_send_alloc(sk, count, msg->msg_flags & MSG_DONTWAIT,
+&err))) {
+BT_DBG("Faile to alloc");
+return err;
+}
+
+if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count)) {
+err = -EFAULT;
+goto fail;
+}
+
+if ((err = hci_send_sco(conn->hcon, skb)) < 0)
+goto fail;
+
+len -= count;
+
+} while(len > 0);
+
+return len;
+
+fail:
+BT_DBG("Fail To Send", sk, len);
+kfree_skb(skb);
+return err;
+}
+
+
+
+Regards
+
+Park.
+
+
 
 -- 
 Youngwoo Park
