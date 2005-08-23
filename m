@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <430B477E.4050503@gmx.de>
-From: Christian Reiser <r.christian@gmx.de>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Re: Bluetooth SCO message sending
+	(sco_send_frame) (Marcel Holtmann)
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Suspend locks up usb
-References: <Pine.LNX.4.63.0508230921130.9834@Magrathea>
-In-Reply-To: <Pine.LNX.4.63.0508230921130.9834@Magrathea>
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <430B3F5F.6070908@core.kaist.ac.kr>
+References: <430B3F5F.6070908@core.kaist.ac.kr>
+Content-Type: text/plain
+Message-Id: <1124811475.23599.166.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,42 +19,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Aug 2005 17:57:50 +0200
+Date: Tue, 23 Aug 2005 17:37:55 +0200
 
-Hi Marcel,
+Hi Youngwoo,
 
-Marcel Holtmann wrote:
-> I can't tell you anything about the APM. Did you tried to use ACPI?
+> I'm sorry about my coding style and thank you for your comment.
+> I modified sco_send_frame() function like following..
 
-Sorry, this is a Thinkpad 600e (400 Mhz, PII). APM is working well -
-ACPI won't.
+follow the coding style and create a unified diff. Otherwise I will not
+even consider including it.
 
-> What kernel version is this?
+Regards
 
-Linux version 2.6.12-mh2
-
-> However to unload you module you need to do a "hciconfig hci0 down"
-> first. This will deactivate the interface.
-
-Okay - did not know this. But it does not entirely solve my problem. The
-bluetooth modules can be unloaded after executing hciconfig - USB is
-still dead. Syslog:
-Aug 23 10:20:35 alpha uhci_hcd 0000:00:07.2: Unlink after no-IRQ?
-Controller is probably using the wrong IRQ.
-Aug 23 10:20:41 alpha usbcore: deregistering driver hci_usb
-
-Anyway. I borrowed an USB-Memorydevice and suspended... same problem.
+Marcel
 
 
-So: This is not a bluez-bug.
-============================
-
-
-Sorry Guys - i will look for the USB-developers list ;-)
-
-
-Thanks for your help && Ciao
-	Christian
 
 
 -------------------------------------------------------
