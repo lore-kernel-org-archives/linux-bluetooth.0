@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <430CA30B.7070104@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: RE: [Bluez-devel] HCI data packet
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] sbc and fixed-point progress
-References: <C70061B183DE09419568AB2060C52A950E4492@arion.intra.local>
-In-Reply-To: <C70061B183DE09419568AB2060C52A950E4492@arion.intra.local>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <20050824143059.0AA7D1EAEE7@mrelay1.st2.lyceu.net>
+References: <20050824143059.0AA7D1EAEE7@mrelay1.st2.lyceu.net>
+Content-Type: text/plain
+Message-Id: <1124896464.8019.0.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,28 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Aug 2005 10:40:43 -0600
+Date: Wed, 24 Aug 2005 17:14:24 +0200
 
-Victor,
+Hi Esther,
 
-That's good news, glad to hear.
+> Regarding the HCI data packets... What is the maximum size of the data
+> field? Is if fixed or can be set by the BlueZ user?
 
-I thought itimer used the rtc behind the scenes but maybe we need to try 
-latching into the rtc directly for our timing. It's insane to have to tweak.
+this depends on the ACL and SCO MTU sizes.
 
-Can you tell me if the sources you tested used the new usleep value? I 
-committed a change to use 1000 in that first usleep call but you may not 
-have updated and gotten it.
+Regards
 
-Brad
+Marcel
 
-Victor Shcherbatyuk wrote:
-> Brad,
-> 
-> I ran one more test and instead of -n flag for a2play I changed magic 87 to magic 50, CPU usage dropped >2 times to ~8% on ARM9@400Mhz and sound is still smooth. That's how it was tested in first place which is close to 30 MIPS I guess...
-> 
-> Regards,
->     Victor.
+
 
 
 -------------------------------------------------------
