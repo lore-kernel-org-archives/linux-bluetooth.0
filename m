@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] HCI data packet
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050824095709.2A88B1EC813@mrelay1.st2.lyceu.net>
-References: <20050824095709.2A88B1EC813@mrelay1.st2.lyceu.net>
-Content-Type: text/plain
-Message-Id: <1124877666.23599.174.camel@pegasus>
-Mime-Version: 1.0
+From: "Esther Lopez" <esther.lopez@erzia.com>
+To: <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_000F_01C5A8A3.1425E2D0"
+Message-Id: <20050824095709.2A88B1EC813@mrelay1.st2.lyceu.net>
+Subject: [Bluez-devel] HCI data packet
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,25 +17,173 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Aug 2005 12:01:06 +0200
+Date: Wed, 24 Aug 2005 11:58:01 +0200
 
-Hi Ester,
+This is a multi-part message in MIME format.
 
-> 
-> I have been reviewing BlueZ code and Bluetooth specification, and have
-> found a doubt related with HCI data packets. They are supposed to be
-> used to exchange data between Host and Host Controller, and the
-> Connection Handle field addresses the connection from one BT device to
-> another. But, how is this connection handle assigned? Can it be used
-> to directly send data from one device to another by using HCI? 
+------=_NextPart_000_000F_01C5A8A3.1425E2D0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-the ACL packet handle is assigned by the connect_complete event and you
-can find any details about it in the HCI part of the core specification.
+Hello you all
 
-Regards
+ 
 
-Marcel
+I have been reviewing BlueZ code and Bluetooth specification, and have found
+a doubt related with HCI data packets. They are supposed to be used to
+exchange data between Host and Host Controller, and the Connection Handle
+field addresses the connection from one BT device to another. But, how is
+this connection handle assigned? Can it be used to directly send data from
+one device to another by using HCI? 
 
+ 
+
+(I was wondering, if I can exchange data between devices directly through
+HCI, by using HCI socket opened by the function hci_open_dev, and how can it
+be done)
+
+ 
+
+Thank you very much for your help!!
+
+ 
+
+Esther
+
+
+------=_NextPart_000_000F_01C5A8A3.1425E2D0
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+
+<head>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered)">
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:Arial;}
+h1
+	{margin-top:9.0pt;
+	margin-right:0cm;
+	margin-bottom:6.0pt;
+	margin-left:39.6pt;
+	text-align:justify;
+	text-indent:-21.6pt;
+	page-break-after:avoid;
+	font-size:16.0pt;
+	font-family:Arial;}
+h2
+	{margin-top:6.0pt;
+	margin-right:0cm;
+	margin-bottom:6.0pt;
+	margin-left:46.8pt;
+	text-align:justify;
+	text-indent:-28.8pt;
+	page-break-after:avoid;
+	font-size:14.0pt;
+	font-family:Arial;
+	font-style:italic;}
+h3
+	{margin-top:12.0pt;
+	margin-right:0cm;
+	margin-bottom:3.0pt;
+	margin-left:54.0pt;
+	text-indent:-36.0pt;
+	page-break-after:avoid;
+	font-size:13.0pt;
+	font-family:Arial;}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EstiloCorreo17
+	{font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:21.0cm 841.95pt;
+	margin:70.9pt 3.0cm 70.9pt 3.0cm;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+ ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+
+</head>
+
+<body lang=3DES link=3Dblue vlink=3Dpurple>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt'>Hello
+you all</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>I have been reviewing BlueZ code and Bluetooth specification, =
+and have
+found a doubt related with HCI data packets. They are supposed to be =
+used to
+exchange data between Host and Host Controller, and the Connection =
+Handle field
+addresses the connection from one BT device to another. But, how is this
+connection handle assigned? Can it be used to directly send data from =
+one
+device to another by using HCI? </span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>(I was wondering, if I can exchange data between devices =
+directly
+through HCI, by using HCI socket opened by the function hci_open_dev, =
+and how
+can it be done)</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>Thank you very much for your help!!</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>Esther</span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------=_NextPart_000_000F_01C5A8A3.1425E2D0--
 
 
 
