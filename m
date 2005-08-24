@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <430C0976.40400@core.kaist.ac.kr>
-From: Youngwoo Park <ywpark@core.kaist.ac.kr>
+Message-ID: <04f801c5a869$711dfbb0$6c01a8c0@Vijayakumar>
+From: "Vijayakumar" <vijayakumar@isofttech.com>
+To: <bluez-devel@lists.sourceforge.net>
+References: <032b01c5a7ae$fd98ba00$6c01a8c0@Vijayakumar> <1124780679.23599.119.camel@pegasus>
+Subject: Re: [Bluez-devel] pand problem
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=EUC-KR
-Subject: [Bluez-devel] Re: Re: Bluetooth SCO message sending (sco_send_frame)
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,131 +20,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Aug 2005 14:45:26 +0900
+Date: Wed, 24 Aug 2005 10:35:26 +0530
 
+Hi Marcel,
+>> My linux kernel version is 2.4.20-8
+>> Applied 2.4.18 mh patch
 
+Sorry for the incorrect information, my kernel is 2.4.18.
 
-I apologize my inexperience..
+> this kernel is quite old and the -mh patch for 2.4.18 can't be applied
+> to a 2.4.20 kernel. Why don't you switch to the latest 2.6 kernel?
+>
+Upgrading to a latest kernel is not possible right now, it is beyond my 
+control
 
-This is unified diff result..
+> Run "hcidump -X -V" and see why the connection gets terminated.
+>
+I got the following on my board side (2.4.18 kernel)
 
+< ACL data: handle 42 flags 0x02 dlen 192
+< ACL data: handle 42 flags 0x02 dlen 192
+< ACL data: handle 42 flags 0x01 dlen 192
+> ACL data: handle 42 flags 0x02 dlen 512
+> ACL data: handle 42 flags 0x01 dlen 512
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 42 reason 0x08
+    Reason: Connection Timeout
 
---- linux-2.6.12/net/bluetooth/sco.c 2005-06-18 04:48:29.000000000 +0900
-+++ linux-2.6.12-patch/net/bluetooth/sco.c 2005-08-24 14:33:54.517717440
-+0900
-@@ -234,35 +234,50 @@
-return err;
-}
+and on the pc side (running redhat linux )
 
-+/**
-+ * sco_send_frame
-+ *
-+ * Modified 2005 by Youngwoo Park
-+ *
-+ * Send large sco frame sequentially even if frame size is larger than MTU
-+ *
-+ **/
-static inline int sco_send_frame(struct sock *sk, struct msghdr *msg,
-int len)
-{
-- struct sco_conn *conn = sco_pi(sk)->conn;
-- struct sk_buff *skb;
-- int err, count;
-+ struct sco_conn *conn = sco_pi(sk)->conn;
-+ struct sk_buff *skb;
-+ int err, count;
+> ACL data: handle 41 flags 0x01 dlen 192
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 41 reason 0x08
+    Reason: Connection Timeout
 
-- /* Check outgoing MTU */
-- if (len > conn->mtu)
-- return -EINVAL;
-+ do {
-
-- BT_DBG("sk %p len %d", sk, len);
-+ BT_DBG("sk %p len %d", sk, len);
-
-- count = min_t(unsigned int, conn->mtu, len);
-- if (!(skb = bt_skb_send_alloc(sk, count, msg->msg_flags &
-MSG_DONTWAIT, &err)))
-- return err;
-+ count = min_t(unsigned int, conn->mtu, len);
-+ BT_DBG("sk %p len %d", sk, len);
-
-- if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count)) {
-- err = -EFAULT;
-- goto fail;
-- }
-+ if (!(skb = bt_skb_send_alloc(sk, count, msg->msg_flags &
-MSG_DONTWAIT, &err))) {
-+ BT_DBG("Faile to alloc");
-+ return err;
-+ }
-+
-+ if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count)) {
-+ err = -EFAULT;
-+ goto fail;
-+ }
-
-- if ((err = hci_send_sco(conn->hcon, skb)) < 0)
-- goto fail;
-+ if ((err = hci_send_sco(conn->hcon, skb)) < 0)
-+ goto fail;
-
-- return count;
-+ len -= count;
-+
-+ } while(len > 0);
-+
-+ return len;
-
-fail:
-- kfree_skb(skb);
-- return err;
-+ BT_DBG("Fail To Send", sk, len);
-+ kfree_skb(skb);
-+ return err;
-}
-
-static inline void sco_recv_frame(struct sco_conn *conn, struct sk_buff
-*skb)
-
-
-
-If my diff format or coding style still has a problem.
-Please, let me give a hint about that.
-
-Thank you.
-
-
-Regards
-
-Park.
-
--- 
-Youngwoo Park
-
-M.S. Student
-CORE(COmputer engineering REsearch) Lab
-Dept. EECS, KAIST, Daejeon 305-701, Korea
-Phone: +82-42-869-5425 Fax: +82-42-8695425
-e-mail: ywpark@core.kaist.ac.kr
-
---
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Can you give some clues?
+Regards,
+Vijayakumar.
 
 
 
