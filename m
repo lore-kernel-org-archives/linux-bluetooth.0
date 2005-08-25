@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] An Introduction to Bluetooth programming in
-	GNU/Linux
+Subject: Re: [Bluez-devel] Re: Re: Bluetooth SCO message sending
+	(sco_send_frame)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <ef9938ec0508251208621847fd@mail.gmail.com>
-References: <ef9938ec0508251208621847fd@mail.gmail.com>
+Cc: ywpark@core.kaist.ac.kr
+In-Reply-To: <c8850521050824203567b8914c@mail.gmail.com>
+References: <c8850521050824203567b8914c@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1124997684.8019.76.camel@pegasus>
+Message-Id: <1124997093.8019.72.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,25 +20,14 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Aug 2005 21:21:24 +0200
+Date: Thu, 25 Aug 2005 21:11:33 +0200
 
-Hi Albert,
+Hi Young-woo,
 
-> I've gotten some encouraging feedback, and put up an HTML version of
-> the documentation I wrote a few months back.
-> 
-> http://csail.mit.edu/~albert/bluez-intro
-> 
-> It was a good excuse to learn DocBook XML (very cool), and it's my
-> hope that beginning BlueZ programmers will find this a good starting
-> point.  As always, comments and corrections are welcome.
+> Here is my patch..
 
-I really like it, but I think we need to redo the example code. You know
-that I am very picky about coding style ;)
-
-However what do think about maintaining this guide inside the BlueZ CVS?
-If you have a Sourceforge account I can set this up and if you like you
-can start writing more documentation.
+so the question is, why can't you do the fragmentation inside your
+userspace program? I don't see any need to make the kernel deal with it.
 
 Regards
 
