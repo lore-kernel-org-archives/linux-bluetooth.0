@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec0508251208621847fd@mail.gmail.com>
-From: Albert Huang <ashuang@gmail.com>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Send packets using scotest  over bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <30238633.1124977021953.JavaMail.Administrator@appsrv>
+References: <30238633.1124977021953.JavaMail.Administrator@appsrv>
+Content-Type: text/plain
+Message-Id: <1124996789.8019.65.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] An Introduction to Bluetooth programming in GNU/Linux
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,20 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Aug 2005 15:08:38 -0400
+Date: Thu, 25 Aug 2005 21:06:29 +0200
 
-Hi all,
+Hi Ivy,
 
-I've gotten some encouraging feedback, and put up an HTML version of
-the documentation I wrote a few months back.
+don't do cross-posting.
 
-http://csail.mit.edu/~albert/bluez-intro
+>        I have two bluetooth tongles with Linux machines. I am trying to send voice over bluetooth.  For test purpose, i m using scotest program. SCO test program generates some packets with 0x7F (except First 6 Bytes). scotest program connect with another PC,authunicated successfully and starts sending data . between  i ma running hcidump -XR in the sending machine. But i am not seeing any data like going out ... But another system receiving completly 0xFF ..  MY dongle info. 
 
-It was a good excuse to learn DocBook XML (very cool), and it's my
-hope that beginning BlueZ programmers will find this a good starting
-point.  As always, comments and corrections are welcome.
+the SCO data send on one side must not be the same as received on the
+other side. There is a CVSD codec in between.
 
--albert
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
