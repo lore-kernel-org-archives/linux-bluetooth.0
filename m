@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <c8850521050824203567b8914c@mail.gmail.com>
-From: Young-woo Park <lucky.park@gmail.com>
+Message-ID: <430D2B3B.3090106@core.kaist.ac.kr>
+From: Youngwoo Park <ywpark@core.kaist.ac.kr>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Cc: ywpark@core.kaist.ac.kr
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Re: Re: Bluetooth SCO message sending (sco_send_frame)
+Content-Type: text/html; charset=EUC-KR
+Subject: [Bluez-devel] Re: Re: Re: Bluetooth SCO message sending (sco_send_frame)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,96 +16,138 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Aug 2005 12:35:47 +0900
+Date: Thu, 25 Aug 2005 11:21:47 +0900
 
-I'm really apologize my mistake.
-The problem was my e-mail sending program.
-Of course, I follow up the bluez-coding style.
-However the e-mail program sent message as a plain text removing tab!!!
-I change my mail server now.
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=EUC-KR" http-equiv="Content-Type">
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<div class="moz-text-html" lang="ko"> <br>
+I apologize my mistake.<br>
+The problem was my e-mail sending program.<br>
+Of course, I follow up the bluez-coding style.<br>
+However the e-mail program sent message as a plain text removing tab!!!<br>
+It's all my fault.<br>
+<br>
+Thank you very much for eveyone who point out my mistake :)<br>
+<br>
+<br>
+Here is my patch..<br>
+<br>
+<br>
+<br>
+--- linux-2.6.12/net/bluetooth/sco.c&nbsp;&nbsp;&nbsp; 2005-06-18 04:48:29.000000000
++0900<br>
++++ linux-2.6.12-patch/net/bluetooth/sco.c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2005-08-25
+10:58:44.537536256 +0900<br>
+@@ -234,33 +234,48 @@<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return err;<br>
+&nbsp;}<br>
+<br>
++/**<br>
++ *&nbsp; sco_send_frame<br>
++ *<br>
++ *&nbsp; Modified 2005 by Youngwoo Park<br>
++ *<br>
++ *&nbsp; Send large sco frame sequentially even if frame size is larger
+than MTU<br>
++ *<br>
++ **/<br>
+&nbsp;static inline int sco_send_frame(struct sock *sk, struct msghdr *msg,
+int len)<br>
+&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; struct sco_conn *conn = sco_pi(sk)-&gt;conn;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; struct sk_buff *skb;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int err, count;<br>
+<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Check outgoing MTU */<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (len &gt; conn-&gt;mtu)<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return -EINVAL;<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; do {<br>
+<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BT_DBG("sk %p len %d", sk, len);<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BT_DBG("sk %p len %d", sk, len);<br>
+<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; count = min_t(unsigned int, conn-&gt;mtu, len);<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (!(skb = bt_skb_send_alloc(sk, count, msg-&gt;msg_flags
+&amp; MSG_DONTWAIT, &amp;err)))<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return err;<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; count = min_t(unsigned int, conn-&gt;mtu, len);<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BT_DBG("sk %p len %d", sk, len);<br>
+<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (memcpy_fromiovec(skb_put(skb, count), msg-&gt;msg_iov,
+count)) {<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; err = -EFAULT;<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; goto fail;<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (!(skb = bt_skb_send_alloc(sk, count,
+msg-&gt;msg_flags &amp; MSG_DONTWAIT, &amp;err))) {<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BT_DBG("Faile to alloc");<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return err;<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
++<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (memcpy_fromiovec(skb_put(skb, count),
+msg-&gt;msg_iov, count)) {<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; err = -EFAULT;<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; goto fail;<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
++<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((err = hci_send_sco(conn-&gt;hcon, skb)) &lt; 0)<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; goto fail;<br>
++<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; len -= count;<br>
+<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((err = hci_send_sco(conn-&gt;hcon, skb)) &lt; 0)<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; goto fail;<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } while(len &gt; 0);<br>
+<br>
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return count;<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return len;<br>
+<br>
+&nbsp;fail:<br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BT_DBG("Fail To Send", sk, len);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; kfree_skb(skb);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return err;<br>
+&nbsp;}<br>
+<br>
+<br>
+Regards<br>
+<br>
+Park<br>
+<br>
+</div>
+<pre class="moz-signature" cols="72">-- 
+Youngwoo Park
+
+M.S. Student
+CORE(COmputer engineering REsearch) Lab
+Dept. EECS, KAIST, Daejeon 305-701, Korea
+Phone: +82-42-869-5425 Fax: +82-42-8695425
+e-mail: <a class="moz-txt-link-abbreviated" href="mailto:ywpark@core.kaist.ac.kr">ywpark@core.kaist.ac.kr</a>
+
+--
 
 
-It's all my fault that I don't confirm my message.
-
-
-Here is my patch..
 
 
 
---- linux-2.6.12/net/bluetooth/sco.c=092005-06-18 04:48:29.000000000 +0900
-+++ linux-2.6.12-patch/net/bluetooth/sco.c=092005-08-25 10:58:44.537536256 =
-+0900
-@@ -234,33 +234,48 @@
- =09return err;
- }
-=20
-+/**
-+ *  sco_send_frame
-+ *
-+ *  Modified 2005 by Youngwoo Park
-+ *
-+ *  Send large sco frame sequentially even if frame size is larger than MT=
-U
-+ *
-+ **/
- static inline int sco_send_frame(struct sock *sk, struct msghdr *msg, int =
-len)
- {
- =09struct sco_conn *conn =3D sco_pi(sk)->conn;
- =09struct sk_buff *skb;
- =09int err, count;
-=20
--=09/* Check outgoing MTU */
--=09if (len > conn->mtu)
--=09=09return -EINVAL;
-+=09do {
-=20
--=09BT_DBG("sk %p len %d", sk, len);
-+=09=09BT_DBG("sk %p len %d", sk, len);
-=20
--=09count =3D min_t(unsigned int, conn->mtu, len);
--=09if (!(skb =3D bt_skb_send_alloc(sk, count, msg->msg_flags &
-MSG_DONTWAIT, &err)))
--=09=09return err;
-+=09=09count =3D min_t(unsigned int, conn->mtu, len);
-+=09=09BT_DBG("sk %p len %d", sk, len);
-=20
--=09if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count)) {
--=09=09err =3D -EFAULT;
--=09=09goto fail;
--=09}
-+=09=09if (!(skb =3D bt_skb_send_alloc(sk, count, msg->msg_flags &
-MSG_DONTWAIT, &err))) {
-+=09=09=09BT_DBG("Faile to alloc");
-+=09=09=09return err;
-+=09=09}
-+
-+=09=09if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count)) {
-+=09=09=09err =3D -EFAULT;
-+=09=09=09goto fail;
-+=09=09}
-+
-+=09=09if ((err =3D hci_send_sco(conn->hcon, skb)) < 0)
-+=09=09=09goto fail;
-+
-+=09=09len -=3D count;
-=20
--=09if ((err =3D hci_send_sco(conn->hcon, skb)) < 0)
--=09=09goto fail;
-+=09} while(len > 0);
-=20
--=09return count;
-+=09return len;
-=20
- fail:
-+=09BT_DBG("Fail To Send", sk, len);
- =09kfree_skb(skb);
- =09return err;
- }
 
-Regards
 
-Park
+
+
+
+
+
+
+
+
+
+
+</pre>
+</body>
+</html>
 
 
 -------------------------------------------------------
