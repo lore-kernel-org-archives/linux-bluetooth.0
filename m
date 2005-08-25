@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Send packets using scotest  over bluetooth
+Subject: Re: [Bluez-devel] dbus_pin_helper
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <30238633.1124977021953.JavaMail.Administrator@appsrv>
-References: <30238633.1124977021953.JavaMail.Administrator@appsrv>
+In-Reply-To: <9307f5f20508250352dd3b5c7@mail.gmail.com>
+References: <9307f5f20508250352dd3b5c7@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1124996789.8019.65.camel@pegasus>
+Message-Id: <1124996674.8019.62.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,16 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Aug 2005 21:06:29 +0200
+Date: Thu, 25 Aug 2005 21:04:34 +0200
 
-Hi Ivy,
+Hi Paul,
 
-don't do cross-posting.
+> while I was writing a graphical tool to configure various bluetooth
+> parameters I stumbled into the 'dbus_pin_helper' option in hcid.conf,
+> the only information I could find googling is that this option seems
+> broken, is it fixed now ? can anybody explain how to use it? Something
+> like that would fit nicely into my dbus daemon.
 
->        I have two bluetooth tongles with Linux machines. I am trying to send voice over bluetooth.  For test purpose, i m using scotest program. SCO test program generates some packets with 0x7F (except First 6 Bytes). scotest program connect with another PC,authunicated successfully and starts sending data . between  i ma running hcidump -XR in the sending machine. But i am not seeing any data like going out ... But another system receiving completly 0xFF ..  MY dongle info. 
-
-the SCO data send on one side must not be the same as received on the
-other side. There is a CVSD codec in between.
+we had some problems, but the CVS from today should work fine again.
 
 Regards
 
