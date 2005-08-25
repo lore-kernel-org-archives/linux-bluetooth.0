@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v734)
-Message-Id: <5770C039-928B-43A4-9D7A-B6A849625422@gmx.net>
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Subject: Re: [Bluez-users] rfcomm: Connection Refused
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-From: lists <gargarmel@gmx.net>
-Subject: [Bluez-users] send appointment to cellular phone
+In-Reply-To: <430E0AF9.4050502@gmx.de>
+References: <430E0AF9.4050502@gmx.de>
+Content-Type: text/plain
+Message-Id: <1124996959.8019.70.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,30 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Aug 2005 23:59:54 +0200
+Date: Thu, 25 Aug 2005 21:09:19 +0200
 
-hey,
+Hi Johannes,
 
-i'm just programming a shopping list for my flat-sharing-folks and  
-want to distribute shopping-lists as appointments onto our cellular  
-phones.
+> I'm having trouble with Bluez. I think I'm almost there, however. Here's
+> the description:
 
-well, i have some early testing experience with bluez about 2 years  
-ago (with multisync). but now i just want to send an appointment  
-(.ics file) to my device (i.e Siemens S55) and accept it there as  
-appointment in my calendar.
+run "hcidump -X -V" of your connection attempt.
 
-i tried to send a single .ics file via obexftp, but it's just placed  
-on the file-system of my phone. no question whether i want to import  
-it to the calendar.
+> And I have paired my PC with my Sony Ericsson K700i Cellular Phone:
+> 
+> # hcitool scan
+> Scanning ...
+>         00:0E:07:A7:7E:D2       K700i
+> # hcitool cc 00:0E:07:A7:7E:D2
+> # hcitool auth 00:0E:07:A7:7E:D2
+> # hcitool dc 00:0E:07:A7:7E:D2
 
-does anyone have a hint, how i should send this and in what format?
+Who cares about this commands? These are for testing and development
+only.
 
-i think it should work for any device (same as early irda sending  
-appointments/vcards).
+Regards
 
-kind regards,
-ralph.
+Marcel
+
+
 
 
 -------------------------------------------------------
