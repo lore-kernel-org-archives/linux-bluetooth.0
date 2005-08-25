@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm: Connection Refused
+Subject: Re: [Bluez-users] rfcomm bind as unpriveledged user?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <430E0AF9.4050502@gmx.de>
-References: <430E0AF9.4050502@gmx.de>
+In-Reply-To: <86wtmajyvx.fsf@coulee.tdb.com>
+References: <86wtmajyvx.fsf@coulee.tdb.com>
 Content-Type: text/plain
-Message-Id: <1124996959.8019.70.camel@pegasus>
+Message-Id: <1124996637.8019.60.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,26 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Aug 2005 21:09:19 +0200
+Date: Thu, 25 Aug 2005 21:03:57 +0200
 
-Hi Johannes,
+Hi Russell,
 
-> I'm having trouble with Bluez. I think I'm almost there, however. Here's
-> the description:
-
-run "hcidump -X -V" of your connection attempt.
-
-> And I have paired my PC with my Sony Ericsson K700i Cellular Phone:
+> Is it possible to rfcomm bind as an unpriveledged user?  My naive
+> attempts, e.g.:
 > 
-> # hcitool scan
-> Scanning ...
->         00:0E:07:A7:7E:D2       K700i
-> # hcitool cc 00:0E:07:A7:7E:D2
-> # hcitool auth 00:0E:07:A7:7E:D2
-> # hcitool dc 00:0E:07:A7:7E:D2
+>   $ rfcomm bind 0 xx:xx:xx:xx:xx:xx
+>   Can't create device: Operation not permitted
+> 
+> ... are obviously not working.  Works fine as root.
+> 
+> This is on a Debian/unstable box, custom-compiled vanilla kernel
+> v2.6.12.4, with udev 0.068-1.
 
-Who cares about this commands? These are for testing and development
-only.
+this has been done on purpose. You can use connect as normal user.
 
 Regards
 
