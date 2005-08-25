@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <430E2002.2060309@hasborg.com>
-From: Joshua Wright <jwright@hasborg.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] An Introduction to Bluetooth programming in
+	GNU/Linux
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Picky about coding style
-References: <ef9938ec0508251208621847fd@mail.gmail.com> <1124997684.8019.76.camel@pegasus>
-In-Reply-To: <1124997684.8019.76.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <ef9938ec0508251208621847fd@mail.gmail.com>
+References: <ef9938ec0508251208621847fd@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1124997684.8019.76.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,41 +19,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Aug 2005 15:46:10 -0400
+Date: Thu, 25 Aug 2005 21:21:24 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Albert,
 
-While reading up on the Linux kernel coding style to satisfy patch
-requirements, I came the kernel scripts/Lindent script:
+> I've gotten some encouraging feedback, and put up an HTML version of
+> the documentation I wrote a few months back.
+> 
+> http://csail.mit.edu/~albert/bluez-intro
+> 
+> It was a good excuse to learn DocBook XML (very cool), and it's my
+> hope that beginning BlueZ programmers will find this a good starting
+> point.  As always, comments and corrections are welcome.
 
-mercury:/usr/src/linux/scripts $ cat Lindent
-#!/bin/sh
-indent -kr -i8 -ts8 -sob -l80 -ss -ncs "$@"
-mercury:/usr/src/linux/scripts $
+I really like it, but I think we need to redo the example code. You know
+that I am very picky about coding style ;)
 
-Is it safe to use this script to satisfy formatting requirements for
-patch submissions for BlueZ?
+However what do think about maintaining this guide inside the BlueZ CVS?
+If you have a Sourceforge account I can set this up and if you like you
+can start writing more documentation.
 
-Thanks,
+Regards
 
-- -Josh
-- --
-- -Joshua Wright
-jwright@hasborg.com
+Marcel
 
-2005-2006 pgpkey: http://802.11ninja.net/pgpkey.htm
-fingerprint: F00E 7A42 8375 0C55 964F E5A4 4D2F 22F6 3658 A4BF
 
-Today I stumbled across the world's largest hotspot.  The SSID is "linksys".
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (MingW32)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFDDiABTS8i9jZYpL8RAswwAKCxavrFA1OkutWuEaO3oG9zbDgPEQCcC6mY
-OhwJfaVZkmDv/ge2nIJLgpI=
-=zsw5
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
