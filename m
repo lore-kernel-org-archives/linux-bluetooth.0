@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <430E9192.1010609@core.kaist.ac.kr>
-From: Youngwoo Park <ywpark@core.kaist.ac.kr>
-MIME-Version: 1.0
+Mime-Version: 1.0 (Apple Message framework v734)
+Message-Id: <E7BE78BC-60F2-40BC-8ABA-9F5E5F8DA5DA@gmx.net>
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: Re: Bluetooth SCO message sending	(sco_send_frame)
-Content-Type: text/plain; charset=EUC-KR
+From: lists <gargarmel@gmx.net>
+Subject: [Bluez-devel] send appointment to cellular phone
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,55 +16,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 Aug 2005 12:50:42 +0900
+Date: Thu, 25 Aug 2005 22:28:17 +0200
 
+hey,
 
+i'm just programming a shopping list for my flat-sharing-folks and  
+want to distribute shopping-lists as appointments onto our cellular  
+phones.
 
-I used the "btsco" program.
-Do you think that "btsco' program is changed to solve my problem?
+well, i have some early testing experience with bluez about 2 years  
+ago (with multisync). but now i just want to send an appointment  
+(.ics file) to my device (i.e Siemens S55) and accept it there as  
+appointment in my calendar.
 
-I think btsco program read data from bluetooth h4 device, and just write
-data to bluetooth.
-Also, Application has no information about socket and MTU size.
-Is it hard to handling data fragmentation in application program?
+i tried to send a single .ics file via obexftp, but it's just placed  
+on the file-system of my phone. no question whether i want to import  
+it to the calendar.
 
-I think framgmentation is handled by kernel if we need.
-Otherwise h4 device driver must guarantee that data frame size is
-smaller than MTU.
+does anyone have a hint, how i should send this and in what format?
 
+i think it should work for any device (same as early irda sending  
+appointments/vcards).
 
-Regards
-
-Park
-
--- 
-Youngwoo Park
-
-M.S. Student
-CORE(COmputer engineering REsearch) Lab
-Dept. EECS, KAIST, Daejeon 305-701, Korea
-Phone: +82-42-869-5425 Fax: +82-42-8695425
-e-mail: ywpark@core.kaist.ac.kr
-
---
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+kind regards,
+ralph.
 
 
 -------------------------------------------------------
