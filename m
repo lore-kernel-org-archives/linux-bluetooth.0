@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Looking for BlueTooth implementation expert in
-	France (Grenoble)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <OFB5C34BE5.B1A8A1B5-ONC1257068.0059C8D2-C1257068.005AFEE2@unilog.fr>
-References: 
-	 <OFB5C34BE5.B1A8A1B5-ONC1257068.0059C8D2-C1257068.005AFEE2@unilog.fr>
-Content-Type: text/plain
-Message-Id: <1124996894.8019.68.camel@pegasus>
+Message-ID: <ef9938ec0508251208621847fd@mail.gmail.com>
+From: Albert Huang <ashuang@gmail.com>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] An Introduction to Bluetooth programming in GNU/Linux
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,37 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Aug 2005 21:08:14 +0200
+Date: Thu, 25 Aug 2005 15:08:38 -0400
 
-Hi Eric,
+Hi all,
 
-> For an emergency, I'm looking for an expert with Bluetooth implementation
-> either on the Software and Hardware sides.
-> 
-> The job is to assist our project manager in the coordination of two
-> compagnies which work on the developpement of a global bluetooth solution
-> (HW & SW).
-> It mean's that we need such an expertise for a few days per month during
-> the next six months.
-> 
-> Job is located in Grenoble, France.
-> Start of job : September 2005
-> 
-> If you are already in position, we can study the solution of a contract
-> with your company.
-> 
-> If you are interrested in this opportunity, please contact me back as soon
-> as possible,
+I've gotten some encouraging feedback, and put up an HTML version of
+the documentation I wrote a few months back.
 
-actually this is not a job bazaar and unless this is a job offer for a
-Linux developer and you try to help the open source community, you
-should never post any offers like this here again.
+http://csail.mit.edu/~albert/bluez-intro
 
-Regards
+It was a good excuse to learn DocBook XML (very cool), and it's my
+hope that beginning BlueZ programmers will find this a good starting
+point.  As always, comments and corrections are welcome.
 
-Marcel
-
-
+-albert
 
 
 -------------------------------------------------------
