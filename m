@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: Re: Bluetooth SCO message sending
-	(sco_send_frame)
+Subject: Re: [Bluez-devel] Looking for BlueTooth implementation expert in
+	France (Grenoble)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Cc: ywpark@core.kaist.ac.kr
-In-Reply-To: <c8850521050824203567b8914c@mail.gmail.com>
-References: <c8850521050824203567b8914c@mail.gmail.com>
+In-Reply-To: <OFB5C34BE5.B1A8A1B5-ONC1257068.0059C8D2-C1257068.005AFEE2@unilog.fr>
+References: 
+	 <OFB5C34BE5.B1A8A1B5-ONC1257068.0059C8D2-C1257068.005AFEE2@unilog.fr>
 Content-Type: text/plain
-Message-Id: <1124997093.8019.72.camel@pegasus>
+Message-Id: <1124996894.8019.68.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,14 +20,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Aug 2005 21:11:33 +0200
+Date: Thu, 25 Aug 2005 21:08:14 +0200
 
-Hi Young-woo,
+Hi Eric,
 
-> Here is my patch..
+> For an emergency, I'm looking for an expert with Bluetooth implementation
+> either on the Software and Hardware sides.
+> 
+> The job is to assist our project manager in the coordination of two
+> compagnies which work on the developpement of a global bluetooth solution
+> (HW & SW).
+> It mean's that we need such an expertise for a few days per month during
+> the next six months.
+> 
+> Job is located in Grenoble, France.
+> Start of job : September 2005
+> 
+> If you are already in position, we can study the solution of a contract
+> with your company.
+> 
+> If you are interrested in this opportunity, please contact me back as soon
+> as possible,
 
-so the question is, why can't you do the fragmentation inside your
-userspace program? I don't see any need to make the kernel deal with it.
+actually this is not a job bazaar and unless this is a job offer for a
+Linux developer and you try to help the open source community, you
+should never post any offers like this here again.
 
 Regards
 
