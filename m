@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm bind as unpriveledged user?
+Subject: Re: [Bluez-users] Trouble with D-LINK adapter w/Treo 650 and FC4
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <86wtmajyvx.fsf@coulee.tdb.com>
-References: <86wtmajyvx.fsf@coulee.tdb.com>
+In-Reply-To: <430D4681.80609@gulik.org>
+References: <430D4681.80609@gulik.org>
 Content-Type: text/plain
-Message-Id: <1124996637.8019.60.camel@pegasus>
+Message-Id: <1124996595.8019.58.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,22 +18,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Aug 2005 21:03:57 +0200
+Date: Thu, 25 Aug 2005 21:03:15 +0200
 
-Hi Russell,
+Hi Greg,
 
-> Is it possible to rfcomm bind as an unpriveledged user?  My naive
-> attempts, e.g.:
-> 
->   $ rfcomm bind 0 xx:xx:xx:xx:xx:xx
->   Can't create device: Operation not permitted
-> 
-> ... are obviously not working.  Works fine as root.
-> 
-> This is on a Debian/unstable box, custom-compiled vanilla kernel
-> v2.6.12.4, with udev 0.068-1.
+> I've been trying to follow the instructions to get a D-LINK DBT-120 
+> Bluetooth adapter to work with Fedora Core 4 using a Treo 650 PalmOS 
+> phone on the Sprint network.
 
-this has been done on purpose. You can use connect as normal user.
+what version of bluez-utils is installed with your FC4? Provide us with
+a "hcidump -X -V" for that failure.
 
 Regards
 
