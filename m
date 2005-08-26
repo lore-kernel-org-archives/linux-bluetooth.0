@@ -1,16 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <259637e050826135628159aea@mail.gmail.com>
-From: Rui Silva <rukinhas@gmail.com>
+From: Nate Delage <nate@natedelage.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] help needed with rfcomm
-In-Reply-To: <259637e0508260635526d51f6@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1125077053.11411.7.camel@slim>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <259637e0508241221e7f081b@mail.gmail.com>
-	 <1124916916.8019.20.camel@pegasus>
-	 <259637e05082506435fb9a5fc@mail.gmail.com>
-	 <1124980168.8019.31.camel@pegasus>
-	 <259637e0508260635526d51f6@mail.gmail.com>
+Subject: [Bluez-devel] Belkin F8T020 adapter
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,22 +16,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 Aug 2005 21:56:46 +0100
+Date: Fri, 26 Aug 2005 10:24:13 -0700
 
-is there as way to set a timetout to a socket??=20
-what i mean is, if the socket does not read anything for certain time, the =
-read=20
-operation would unlock and the execution of the program continues. is
-there a way to
-accomplish this??
+Hi...
 
---=20
-Rui Silva
-Powered by Gentoo Linux under :
-CELERON 1000 - Stage1 install with nptl
-Pentium M 1800GHz - Stage1 install with NPTL
+I just got a Belkin F8T020 adapter. It is a CF card but comes with a
+PCMCIA adaptor as well. The card doesn't seem to be supported under
+Linux. I've loaded all the bluetooth modules after compiling them from
+the latest kernel patch (patch-2.6.12-mh3.gz)
 
-http://rukinhas.no-ip.org
+Two other individuals have already asked about this device, but it
+doesn't seem they reached any conclusions...
+
+http://sourceforge.net/mailarchive/forum.php?thread_id=1878907&forum_id=1881
+
+http://sourceforge.net/mailarchive/forum.php?thread_id=1878907&forum_id=1881
+
+After inserted the card I don't have any indication that Linux sees the
+card (nothing from dmesg or lspci).
+
+Does anyone know the status of this card? Or have any suggestions on how
+to proceed? I'm more than willing to do any sort of debugging
+necessary...
+
+-Nate
+
+
+
 
 
 -------------------------------------------------------
