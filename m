@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050826112050.21504.qmail@web35311.mail.mud.yahoo.com>
-From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <430EAF0C.4000608@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-2007639834-1125055250=:15969"
-Subject: [Bluez-users] will bluez still works even if isochronous data transfer is not being supported ?
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] No SCO Mapping? No Link Key Reply?
+References: <20050826053506.11947.qmail@web30304.mail.mud.yahoo.com>
+In-Reply-To: <20050826053506.11947.qmail@web30304.mail.mud.yahoo.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,43 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Aug 2005 04:20:50 -0700 (PDT)
+Date: Thu, 25 Aug 2005 23:56:28 -0600
 
---0-2007639834-1125055250=:15969
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Brian,
 
+> I have a Motorola HS805 headset that I would like to
+> use with a Thinkpad T43 with built-in Broadcom
+> Bluetooth Module.
+> (http://www.thinkwiki.org/wiki/IBM_Integr
 
-Hello,
+> 1. My revision output does not contain any SCO
+> Mapping.
 
-I want to port bluez protocol stack onto the T-Engine ( which has a T-Kernel as the operating System). T-Kernel usb host protocol does not support isochronous data transfer. 
+It just means that the linux driver doesn't have broadcom-specific code 
+for dealing with the sco connection. The available docs aren't very 
+complete on this adapter iirc.
 
-Will bluez still works even if the isochronous data transfer is not being present ?
-
-Where can i find the whole bluez protocol stack ? the *.c files.
-For minimal functionality is it sufficient to have the bluez-libs and bluez-utils package as this is being mentioned in the http://www.bluez.org/download.html website.
-
-Thanks in advance,
-Swathi
-
- 
-
-
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
---0-2007639834-1125055250=:15969
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-<DIV><FONT size=2>
-<P>Hello,</P>
-<P>I want to port bluez protocol stack onto the T-Engine ( which has a T-Kernel as the operating System). T-Kernel usb host protocol does not support isochronous data transfer. </P>
-<P>Will bluez still works even if the isochronous data transfer is not being present ?</P>
-<P>Where can i find the whole bluez protocol stack ? the *.c files.<BR>For minimal functionality is it sufficient to have the </FONT><I><FONT face="Times New Roman"><FONT size=3>bluez-libs and bluez-utils</FONT></I><FONT size=3> package as this is being mentioned in the </FONT></FONT><FONT size=2>http://www.bluez.org/download.html website.<BR><BR></FONT><FONT size=2>Thanks in advance,<BR>Swathi</FONT></P>
-<P><FONT size=2>&nbsp;</P></FONT></DIV><p>__________________________________________________<br>Do You Yahoo!?<br>Tired of spam?  Yahoo! Mail has the best spam protection around <br>http://mail.yahoo.com 
---0-2007639834-1125055250=:15969--
+Brad
 
 
 -------------------------------------------------------
