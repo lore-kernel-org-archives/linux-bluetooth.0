@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] L2CAP sockets
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Fred Schaettgen <bluez-devel@schaettgen.de>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050826111844.1ACEC1DC1D6@mrelay2.st2.lyceu.net>
-References: <20050826111844.1ACEC1DC1D6@mrelay2.st2.lyceu.net>
-Content-Type: text/plain; charset=windows-1251
-Message-Id: <1125055955.25535.8.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] send appointment to cellular phone
+References: <E7BE78BC-60F2-40BC-8ABA-9F5E5F8DA5DA@gmx.net>
+In-Reply-To: <E7BE78BC-60F2-40BC-8ABA-9F5E5F8DA5DA@gmx.net>
+Cc: lists <gargarmel@gmx.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200508261329.32767.bluez-devel@schaettgen.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,29 +20,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 Aug 2005 13:32:35 +0200
+Date: Fri, 26 Aug 2005 13:29:32 +0200
 
-Hi Esther,
+On Thursday, 25. August 2005 22:28, lists wrote:
+...
+> well, i have some early testing experience with bluez about 2 years
+> ago (with multisync). but now i just want to send an appointment
+> (.ics file) to my device (i.e Siemens S55) and accept it there as
+> appointment in my calendar.
+>
+> i tried to send a single .ics file via obexftp, but it's just placed
+> on the file-system of my phone. no question whether i want to import
+> it to the calendar.
 
-> I have a question related with BlueZ L2CAP sockets, and I hope
-> somebody can help me=85
->=20
-> If I want to communicate two Bluetooth devices using L2CAP, I just
-> open an L2CAP socket and send data through this open socket. (Is this
-> OK?).=20
->=20
-> The question is related with the size and format of the data send
-> throught this socket. How is the data packet created? Do I need to
-> create headers and so on? What is the size of the data I can send?
+Does it make a difference if you send it via obex push instead?
 
-the L2CAP socket is a SOCK_SEQPACKET and the MTU size can be retrieved
-with a getsockopt() call.
-
-Regards
-
-Marcel
-
-
+-- 
+Fred Schaettgen
+bluez-devel@schaettgen.de
 
 
 -------------------------------------------------------
