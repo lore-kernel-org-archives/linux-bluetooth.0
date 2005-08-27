@@ -1,16 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] help needed with rfcomm
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <430FD9E9.3030604@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <259637e0508260635526d51f6@mail.gmail.com>
-References: <259637e0508241221e7f081b@mail.gmail.com>
-	 <1124916916.8019.20.camel@pegasus>
-	 <259637e05082506435fb9a5fc@mail.gmail.com>
-	 <1124980168.8019.31.camel@pegasus>
-	 <259637e0508260635526d51f6@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1125147309.14395.0.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Re: Re: Bluetooth SCO message sending	(sco_send_frame)
+References: <430E9192.1010609@core.kaist.ac.kr>
+In-Reply-To: <430E9192.1010609@core.kaist.ac.kr>
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,22 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 27 Aug 2005 14:55:09 +0200
+Date: Fri, 26 Aug 2005 21:11:37 -0600
 
-Hi Rui,
+Youngwoo
 
-> now it works with SOCK_STREAM, and i havent changed anythig to the
-> program. i realy don't understand how this could be. I'm using kernel
-> 2.6.12-CK and the bluez libs version 2.19?
+> I used the "btsco" program.
+> Do you think that "btsco' program is changed to solve my problem?
+> 
+> I think btsco program read data from bluetooth h4 device, and just write
+> data to bluetooth.
+> Also, Application has no information about socket and MTU size.
+> Is it hard to handling data fragmentation in application program?
+> 
+> I think framgmentation is handled by kernel if we need.
+> Otherwise h4 device driver must guarantee that data frame size is
+> smaller than MTU.
 
-this is how it should be. I fixed the kernel code to prevent creating
-connections with the SOCK_RAW interface.
+When does this fragmentation problem show up? btsco is not doing
+anything special so we expect the kernel to take care of it...
 
-Regards
-
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
