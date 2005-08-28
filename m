@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <001201c5ac65$73bba980$0107a8c0@heejune>
-From: "Heejune AHN" <heejune@snut.ac.kr>
-To: <bluez-users@lists.sourceforge.net>
-Cc: "Heejune AHN" <heejune@snut.ac.kr>
-References: <4dfd570904122402134ec2fd32@mail.gmail.com>  <BAY104-F28B10D34C6CA29EC4D37E9C1A70@phx.gbl>  <4dfd5709041225041648e1f356@mail.gmail.com>  <1103980205.8758.22.camel@pegasus> <4dfd570904122505192221bf97@mail.gmail.com>
+Message-ID: <43114FA9.8010803@laposte.net>
+From: henri lelong <hlelong@laposte.net>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset="ISO-8859-1"
-Subject: [Bluez-users] Bluez PAN (bnep) Supports IP Multicast ?
+To: bluez-users@lists.sourceforge.net
+References: <1125177628.14395.12.camel@blade>
+In-Reply-To: <1125177628.14395.12.camel@blade>
+Content-Type: multipart/alternative;
+ boundary="------------090008030807010308010200"
+Subject: [Bluez-users] Re: [BlueZ-Announce] Release of bluez-libs-2.20 and bluez-utils-2.20
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,23 +19,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Aug 2005 15:46:58 +0900
+Date: Sun, 28 Aug 2005 07:46:17 +0200
 
-SGksDQoNCkkgYW0gaW50ZWdyYXRpbmcgVVBOUCBQcm9ncmFtIG9uIEJsdWV6IChSRURIQVQgOS4w
-KS4gDQpBcyB5b3UgbWF5IGtub3csIFVwblAgdXNlcyBJUCBtdWx0aWNhc3QgZm9yIE0tU0VSQUNI
-LCBOT1RJRlkgZnVuY3Rpb24uDQpJIHN1Y2Nlc3NmdWxseSBzZXR1cCBQQU4gUHJvZmlsZSBHTiwg
-YW5kIGl0IGlzIGNvbmZpcm1lZCBieSAicGluZyIuDQoNCkhvd2V2ZXIsIHdoZW4gIEkgdHJ5IHRv
-IHNldG9wdGlvbiBteSBzb2NrZXQgdG8gbXVsdGljYXN0LCBpdCBpcyBnb3QgZXJyb3JlZCEhISEh
-ISEhISEhISEhISEhISEhISEhISEhIQ0KcmVzID0gc2V0c29ja29wdChzc2RwU29jaywgSVBQUk9U
-T19JUCwgSVBfQUREX01FTUJFUlNISVAsICAoY2hhciAqKSAmc3NkcE1jYXN0QWRkciwgc2l6ZW9m
-KHN0cnVjdCBpcG1yZXEpKSk7DQp3ZSBnb3QgInJlcyAgPDAiIF5eOzs7DQpGcm9tIGJsdWV0b290
-aCBzcGVjLCB0aGUgZGVmYXVsdCBiZWhhdmlvciBpcyBubyBmaWx0ZXJpbmcsIGkuZSwgYW55IG11
-bHRpY2FzdCBwYWNrZXQgc2hvdWxkIGJlIGJyb2FkY2FzdGVkIHRvIGFsbCBQQU5VLg0KV2hhdCBz
-aG91bGQgSSBkbyBmb3IgbWFraW5nIG15IHByb2dyYW0gdXNlICBtdWx0aWNhc3QgSVAgYWRkcmVz
-cz8/PyBJUyBpdCBwb3NzaWJsZSBpbiBCTFVFWj8NCg0KSSBhbSB1c2luZyBSRURIQVQgOS4wIGFu
-ZCBibHVlemxpYi0yLjEzIGFuZCBibHVleHV0aWwtMi4xMyANCg0KVGhhbmtzISEhIQ0KDQoNCg0K
-DQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0K
+This is a multi-part message in MIME format.
+--------------090008030807010308010200
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 
+Marcel Holtmann wrote:
+
+>Hi Folks,
+>
+>I released new stable versions of the Bluetooth library and also the
+>  
+>
+Thanks, but I have now very poor hope that my *BT Dongle IS1002N Horus 
+Module*
+can ever work with my Sagem MyX8.
+Henri
+
+
+
+--------------090008030807010308010200
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title></title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Marcel Holtmann wrote:
+<blockquote cite="mid1125177628.14395.12.camel@blade" type="cite">
+  <pre wrap="">Hi Folks,
+
+I released new stable versions of the Bluetooth library and also the
+  </pre>
+</blockquote>
+Thanks, but I have now very poor hope that my <strong><font
+ color="#ff6600" size="4">BT Dongle IS1002N Horus Module</font></strong><br>
+can ever work with my Sagem MyX8.<br>
+Henri<br>
+<br>
+<br>
+</body>
+</html>
+
+--------------090008030807010308010200--
 
 
 -------------------------------------------------------
