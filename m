@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <8a8ea833050831071333ca4cd3@mail.gmail.com>
-From: d B <apemaia@gmail.com>
+Subject: Re: [Bluez-users] 0 bytes from L2PING
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <6.2.3.4.0.20050829203319.01daedf8@posta.unizar.es>
+References: <6.2.3.4.0.20050829203319.01daedf8@posta.unizar.es>
+Content-Type: text/plain
+Message-Id: <1125341677.17698.17.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] ipaq 5500 / 5400 problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,23 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 31 Aug 2005 16:13:28 +0200
+Date: Mon, 29 Aug 2005 20:54:37 +0200
 
-Hi,
+Hi Nacho,
 
-Have anyone worked with bluez on ipaq H5500 / 5400?
-I have some problems:
+> One fast question:
+> 
+> I execute a L2PING command and you get "0 bytes from ...."
+> 
+> Is that OK or should I receive the number of bytes specified with -s option?
 
-H5500 does not work properly. After an inquiry I can't connect with any dev=
-ices.
+according to the specification the remote side can return any payload it
+likes. So 0 byte responses are fine.
 
-H5400 instead works very well. The only problem is I can't get a
-reasonable RSSI value. The only values I get are 0 or -1. Is it
-possible? How can I get a widely range of value?
+Regards
 
-regards.
+Marcel
 
-dB
+
 
 
 -------------------------------------------------------
