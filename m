@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] HID device?
+Subject: Re: [Bluez-users] pand Encryption
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1125139965.13443.10.camel@localhost>
-References: <1125139965.13443.10.camel@localhost>
+In-Reply-To: <025601c5ac6f$2c7cc950$6c01a8c0@Vijayakumar>
+References: <025601c5ac6f$2c7cc950$6c01a8c0@Vijayakumar>
 Content-Type: text/plain
-Message-Id: <1125308785.25073.14.camel@blade>
+Message-Id: <1125308699.25073.11.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Aug 2005 11:46:25 +0200
+Date: Mon, 29 Aug 2005 11:44:59 +0200
 
-Hi Jesper,
+Hi Vijayakumar,
 
-> I am trying to use my phone as a remote for my comp, using bt and hidd.
-> And it's somewhat working. Not just exactly as I want.
-> 
-> As it is now the phone can act as a second mouse as well as a second
-> keyboard (overriding core mouse/keyb)
-> 
-> The thing is that i would like the phone to only act on my second screen
-> (where core mouse/keyb is not) This is possible through xorg.conf but
-> the problem is i dont know how i am supposed to sepperate the phone and
-> the core I/O. In other words how to define the phone-HID-device in
-> xorg.conf?
+> Iam using pand version 2.17 and establishing pan connection between 2
+> bluetooth devices.
 
-for the mouse this should be possible if you can separate the mouse
-devices, because sometimes they are enumerated in another order. For the
-keyboard I have no idea. Ask the Xorg or the input subsystem guys.
+update to bluez-utils-2.20 and use the latest 2.6 kernel.
+ 
+> I find that even though I enable both authentication and encryption on
+> one side and only authentication on the other side(thru hciconfig),
+> still the connection gets established and iam able to transfer files
+> thru this connection and read them on the other side....My doubt is
+> how does connection is created even if encryption is disabled on the
+> other side....
+
+The security mode 1 says, if one side wants authentication or
+encryption, the other side must do it too or disconnect.
 
 Regards
 
