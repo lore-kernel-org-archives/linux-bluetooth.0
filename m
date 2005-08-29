@@ -1,12 +1,19 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <893c1030050829080733bb047e@mail.gmail.com>
-From: Julien Carbonell <jcarbonellpro@gmail.com>
+Subject: Re: [Bluez-users] Bluez PAN (bnep) Supports IP Multicast ?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <893c103005082908023cd7f021@mail.gmail.com>
+Cc: Heejune AHN <heejune@snut.ac.kr>
+In-Reply-To: <001901c5ac8b$7bf71870$650ba8c0@heejune>
+References: <4dfd570904122402134ec2fd32@mail.gmail.com>
+	 <BAY104-F28B10D34C6CA29EC4D37E9C1A70@phx.gbl>
+	 <4dfd5709041225041648e1f356@mail.gmail.com>
+	 <1103980205.8758.22.camel@pegasus>
+	 <4dfd570904122505192221bf97@mail.gmail.com>
+	 <001201c5ac65$73bba980$0107a8c0@heejune> <1125308614.25073.8.camel@blade>
+	 <001901c5ac8b$7bf71870$650ba8c0@heejune>
+Content-Type: text/plain
+Message-Id: <1125315052.17698.11.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <893c103005082908023cd7f021@mail.gmail.com>
-Subject: [Bluez-users] Cannot connect BT RS232 module
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,66 +25,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Aug 2005 17:07:30 +0200
+Date: Mon, 29 Aug 2005 13:30:52 +0200
 
-****************
-Sorry I made a mistake and sent my email to bluez-devel... Here it is
-again on the appropriate mailing list.
-****************
+Hi Heejune,
 
-I'm trying to connect a BrainBoxes BL-510 BT module to a Freescale
-imx21 board (ARM cpu) running Linux 2.4.20 patched with
-bluez-patch-2.4.20-mh18
+> Then you mean  no one can use multicast ip address with kernel 2.4.20-8 and lib-2.3?
+> Is it not my fault of using bluez utilities?
+> 
+> And kernel 2.6 supports multicast stuff? I have to check it.
 
-When I run "hciattach /dev/ttyS3 bcsp 115200 flow", I get the following err=
-ors :
-"Can't set device: Protocol not supported
-Can't initialize device: Illegal seek"
+you should at least check. I remember some patches for the BNEP filter
+stuff that only were applied to the 2.6 kernels. The Bluetooth support
+for 2.4 kernels is deprecated. However there can be still a bug hidden
+somewhere.
 
->From what I understood reading hciattach.c, this error means that the
-HCI_BCSP protocol is not supported. I checked the modules: bluez and
-hci_uart are loaded. I also checked my kernel config (copy/paste at
-the end of my email).
-i can't find what's missing in my configuration.
+> BTW, the reason why I am using old ones is because my chip maker still provides their evaluation board with kernel 2.4.x instead of 2.6.x since so many drivers still works more smoothly with 2.4.x 
 
-I've tested the module on a PC running Mandrake 10.0 kernel 2.4.25
-(bluez and hci_uart loaded as modules) and it works perfectly
-(hciattach + scan + ...).
+Don't get me started on the stupid chip manufactures. They are simply
+too lazy to move to 2.6 even if most of their chips will work out of the
+box. The Linux 2.4 series is way outdated and so no excuse.
 
-Any idea ?
+Regards
 
-Thanks
+Marcel
 
-Julien
 
-#
-# Bluetooth support
-#
-CONFIG_BLUEZ=3Dm
-CONFIG_BLUEZ_L2CAP=3Dm
-CONFIG_BLUEZ_SCO=3Dm
-CONFIG_BLUEZ_RFCOMM=3Dm
-CONFIG_BLUEZ_RFCOMM_TTY=3Dy
-CONFIG_BLUEZ_BNEP=3Dm
-CONFIG_BLUEZ_BNEP_MC_FILTER=3Dy
-CONFIG_BLUEZ_BNEP_PROTO_FILTER=3Dy
-CONFIG_BLUEZ_CMTP=3Dm
-
-#
-# Bluetooth device drivers
-#
-CONFIG_BLUEZ_HCIUSB=3Dm
-CONFIG_BLUEZ_HCIUSB_SCO=3Dy
-CONFIG_BLUEZ_HCIUART=3Dm
-CONFIG_BLUEZ_HCIUART_H4=3Dy
-CONFIG_BLUEZ_HCIUART_BCSP=3Dy
-CONFIG_BLUEZ_HCIUART_BCSP_TXCRC=3Dy
-# CONFIG_BLUEZ_HCIBFUSB is not set
-CONFIG_BLUEZ_HCIDTL1=3Dm
-CONFIG_BLUEZ_HCIBT3C=3Dm
-CONFIG_BLUEZ_HCIBLUECARD=3Dm
-CONFIG_BLUEZ_HCIBTUART=3Dm
-CONFIG_BLUEZ_HCIVHCI=3Dm
 
 
 -------------------------------------------------------
