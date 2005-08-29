@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <893c103005082908023cd7f021@mail.gmail.com>
-From: Julien Carbonell <jcarbonellpro@gmail.com>
+From: Rutger Hendriks <Loial@home.nl>
 To: bluez-devel@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Cannot connect BT RS232 module
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart7464293.Bx7UQgVftC";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <200508291336.13270.Loial@home.nl>
+Subject: [Bluez-devel] missing keys from logitech dinovo keyboard
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,61 +19,79 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 29 Aug 2005 17:02:02 +0200
+Date: Mon, 29 Aug 2005 13:36:13 +0200
 
-I'm trying to connect a BrainBoxes BL-510 BT module to a Freescale
-imx21 board (ARM cpu) running Linux 2.4.20 patched with
-bluez-patch-2.4.20-mh18
+--nextPart7464293.Bx7UQgVftC
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-When I run "hciattach /dev/ttyS3 bcsp 115200 flow", I get the following err=
-ors :
-"Can't set device: Protocol not supported
-Can't initialize device: Illegal seek"
+>From: Marcel Holtmann <marcel <at> holtmann.org>
+> Subject: Re: missing keys from logitech dinovo keyboard
+> Newsgroups: gmane.linux.bluez.devel
+> Date: 2004-07-06 10:40:33 GMT (1 year, 7 weeks, 4 days, 18 hours and 30=20
+minutes ago)
+>
+>Hi Dick,
+>
+>> I'm playing with showkey from kbd (http://freshmeat.net/projects/kbd/)
+>> All keys are shown except "New" (FnF1), "Reply" (FnF2), "Forward" (FnF3)=
+,=20
+>> "Send" (FnF4), "Redo" (FnF6), "Print" (FnF7), "Save" (FnF8), "My=20
+>> Doc" (FnF10), "My Pic" (FnF11) and "My Music" (FnF12) (you get those by=
+=20
+>> enabling F-Lock)
+>> Undo (FnF5) and MyComp (FnF9) work though, giving keycode 144 and 145
+>> I'm using 2.6.7-mh1 and bluez-(utils/libs)2.7
+>> Is this a bug or am I missing something?
+>
+>I don't know. I never checked the extra keys of my diNovo desktop, but
+>maybe the HID parser didn't take them into account and transforms them
+>into the correct key events. Feel free to look at the kernel code.
+>
+>Regards
+>
+>Marcel
 
->From what I understood reading hciattach.c, this error means that the
-HCI_BCSP protocol is not supported. I checked the modules: bluez and
-hci_uart are loaded. I also checked my kernel config (copy/paste at
-the end of my email).
-i can't find what's missing in my configuration.
+Hi list,
 
-I've tested the module on a PC running Mandrake 10.0 kernel 2.4.25
-(bluez and hci_uart loaded as modules) and it works perfectly
-(hciattach + scan + ...).
+This is a reply to a message sent over 1 year ago :)
+Unfortunately, the issue described in the original message still seems to=20
+occur and is troubling me now. I.e. the function keys F1 - F12 are working=
+=20
+fine, but when I press F-Lock, the special keys FnF1 to FnF4 and FnF6 to Fn=
+=468=20
+and FnF10 to FnF12 are not working for me. Nothing is shown in xev, or in=20
+showkeys or in dmesg.
+=46nF5 and FnF9 give "keycode 199 (keysym 0x0, NoSymbol)" and "keycode 198=
+=20
+(keysym 0x0, NoSymbol)" respectively in xev, which is different from the=20
+original post. I am using 2.6.12-gentoo-r6 on AMD64 with bluez-(utils/libs)=
+=20
+2.19.
 
-Any idea ?
+I have been unable to find anything useful in the kernel code. Is there a=20
+specific place I should look? There seem to be quite some tables with=20
+keycodes/scancodes, and I can not seem to find the one that is used by my=20
+Dinovo keyboard in bluetooth mode (i.e. not in bootmode).
 
-Thanks
+Thanks,
 
-Julien
+Rutger
 
-#
-# Bluetooth support
-#
-CONFIG_BLUEZ=3Dm
-CONFIG_BLUEZ_L2CAP=3Dm
-CONFIG_BLUEZ_SCO=3Dm
-CONFIG_BLUEZ_RFCOMM=3Dm
-CONFIG_BLUEZ_RFCOMM_TTY=3Dy
-CONFIG_BLUEZ_BNEP=3Dm
-CONFIG_BLUEZ_BNEP_MC_FILTER=3Dy
-CONFIG_BLUEZ_BNEP_PROTO_FILTER=3Dy
-CONFIG_BLUEZ_CMTP=3Dm
+--nextPart7464293.Bx7UQgVftC
+Content-Type: application/pgp-signature
 
-#
-# Bluetooth device drivers
-#
-CONFIG_BLUEZ_HCIUSB=3Dm
-CONFIG_BLUEZ_HCIUSB_SCO=3Dy
-CONFIG_BLUEZ_HCIUART=3Dm
-CONFIG_BLUEZ_HCIUART_H4=3Dy
-CONFIG_BLUEZ_HCIUART_BCSP=3Dy
-CONFIG_BLUEZ_HCIUART_BCSP_TXCRC=3Dy
-# CONFIG_BLUEZ_HCIBFUSB is not set
-CONFIG_BLUEZ_HCIDTL1=3Dm
-CONFIG_BLUEZ_HCIBT3C=3Dm
-CONFIG_BLUEZ_HCIBLUECARD=3Dm
-CONFIG_BLUEZ_HCIBTUART=3Dm
-CONFIG_BLUEZ_HCIVHCI=3Dm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQBDEvMtZNkx8LIJzQ4RAkkDAJsFVX8Xw/OinZY68kktAKS0bKv5XwCggzCd
+0w6sfhmBodY4d4Ip8XK6Lyg=
+=MDfc
+-----END PGP SIGNATURE-----
+
+--nextPart7464293.Bx7UQgVftC--
 
 
 -------------------------------------------------------
