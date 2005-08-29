@@ -1,18 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluez PAN (bnep) Supports IP Multicast ?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-Cc: Heejune AHN <heejune@snut.ac.kr>
-In-Reply-To: <001201c5ac65$73bba980$0107a8c0@heejune>
-References: <4dfd570904122402134ec2fd32@mail.gmail.com>
-	 <BAY104-F28B10D34C6CA29EC4D37E9C1A70@phx.gbl>
-	 <4dfd5709041225041648e1f356@mail.gmail.com>
-	 <1103980205.8758.22.camel@pegasus>
-	 <4dfd570904122505192221bf97@mail.gmail.com>
-	 <001201c5ac65$73bba980$0107a8c0@heejune>
-Content-Type: text/plain
-Message-Id: <1125308614.25073.8.camel@blade>
-Mime-Version: 1.0
+Message-ID: <025601c5ac6f$2c7cc950$6c01a8c0@Vijayakumar>
+From: "Vijayakumar" <vijayakumar@isofttech.com>
+To: <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0253_01C5AC9D.45E8BA10"
+Subject: [Bluez-users] pand Encryption
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -24,29 +17,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Aug 2005 11:43:34 +0200
+Date: Mon, 29 Aug 2005 13:26:33 +0530
 
-Hi Heejune,
+This is a multi-part message in MIME format.
 
-> I am integrating UPNP Program on Bluez (REDHAT 9.0). 
-> As you may know, UpnP uses IP multicast for M-SERACH, NOTIFY function.
-> I successfully setup PAN Profile GN, and it is confirmed by "ping".
-> 
-> However, when  I try to setoption my socket to multicast, it is got errored!!!!!!!!!!!!!!!!!!!!!!!!!!!
-> res = setsockopt(ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,  (char *) &ssdpMcastAddr, sizeof(struct ipmreq)));
-> we got "res  <0" ^^;;;
-> From bluetooth spec, the default behavior is no filtering, i.e, any multicast packet should be broadcasted to all PANU.
-> What should I do for making my program use  multicast IP address??? IS it possible in BLUEZ?
-> 
-> I am using REDHAT 9.0 and bluezlib-2.13 and bluexutil-2.13 
+------=_NextPart_000_0253_01C5AC9D.45E8BA10
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-why don't you start using a 2.6 kernel and the latest bluez-libs and
-bluez-utils? Your versions are outdated.
+Iam using pand version 2.17 and establishing pan connection between 2 =
+bluetooth devices.
 
-Regards
+I find that even though I enable both authentication and encryption on =
+one side and only authentication on the other side(thru hciconfig), =
+still the connection gets established and iam able to transfer files =
+thru this connection and read them on the other side....My doubt is how =
+does connection is created even if encryption is disabled on the other =
+side....
 
-Marcel
+------=_NextPart_000_0253_01C5AC9D.45E8BA10
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2722" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Iam using pand version 2.17 and =
+establishing pan=20
+connection between 2 bluetooth devices.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I find that even though I enable both=20
+authentication and encryption on one side and only authentication on the =
+other=20
+side(thru hciconfig), still the connection gets established and iam able =
+to=20
+transfer files thru this connection and read them on the other =
+side....My doubt=20
+is how does connection is created even if encryption is disabled on the =
+other=20
+side....</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV></BODY></HTML>
+
+------=_NextPart_000_0253_01C5AC9D.45E8BA10--
 
 
 
