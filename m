@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4312C44C.1020107@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <4312AEBD.4090907@core.kaist.ac.kr>
+From: Youngwoo Park <ywpark@core.kaist.ac.kr>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] a2play and rtc/pthread
+Content-Type: text/plain; charset=EUC-KR
+Subject: [Bluez-devel] 2. Re: Re: Re: Bluetooth SCO message sending	(sco_send_frame)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,21 +16,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 29 Aug 2005 02:16:12 -0600
+Date: Mon, 29 Aug 2005 15:44:13 +0900
 
-Victor
 
-I just committed changes to a2play so it can use the real time clock 
-inside a separate thread for sending frames to the headset. Please try 
-it out. (flag is -p)
 
-The values to tweak are TICKS and the first "100" in the frameticks 
-assignment.
+In my case, there is some problem when I connect SCO over UART(h4).
+When I sent data to h4 interface, h4 make frame and btsco sent that
+frame to the SCO channel.
+The frame size from h4 interface is varied periodically and somtimes
+larger than MTU size so SCO channel drop several frames.
 
-The headset that I have handy is too forgiving with timing to be useful 
-for testing this out well...
+Of course I changed the MTU size using "hciconfig scomtu" command but it
+is not effective at all.
 
-Brad
+Now, I tested the problem using samsung module based on CSR bluecore
+chipset.
+However, there is no problem if I use SCO over USB because the frame
+size from USB is always same & smaller than MTU.
+
+-- 
+Youngwoo Park
+
+M.S. Student
+CORE(COmputer engineering REsearch) Lab
+Dept. EECS, KAIST, Daejeon 305-701, Korea
+Phone: +82-42-869-5425 Fax: +82-42-8695425
+e-mail: ywpark@core.kaist.ac.kr
+
+--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 -------------------------------------------------------
