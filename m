@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] send appointment to cellular phone
-From: Taneli =?ISO-8859-1?Q?V=E4h=E4kangas?= <taneli.vahakangas@netsonic.fi>
-To: gargarmel@gmx.net
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <5770C039-928B-43A4-9D7A-B6A849625422@gmx.net>
-References: <5770C039-928B-43A4-9D7A-B6A849625422@gmx.net>
-Content-Type: text/plain
-Message-Id: <1125329935.10748.4.camel@newer.loc>
+Message-ID: <893c1030050829080733bb047e@mail.gmail.com>
+From: Julien Carbonell <jcarbonellpro@gmail.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <893c103005082908023cd7f021@mail.gmail.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <893c103005082908023cd7f021@mail.gmail.com>
+Subject: [Bluez-users] Cannot connect BT RS232 module
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,32 +18,66 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Aug 2005 18:38:54 +0300
+Date: Mon, 29 Aug 2005 17:07:30 +0200
 
-On Thu, 2005-08-25 at 23:59 +0200, lists wrote:
-> hey,
-> 
-> i'm just programming a shopping list for my flat-sharing-folks and  
-> want to distribute shopping-lists as appointments onto our cellular  
-> phones.
-> 
-> well, i have some early testing experience with bluez about 2 years  
-> ago (with multisync). but now i just want to send an appointment  
-> (.ics file) to my device (i.e Siemens S55) and accept it there as  
-> appointment in my calendar.
-> 
-> i tried to send a single .ics file via obexftp, but it's just placed  
-> on the file-system of my phone. no question whether i want to import  
-> it to the calendar.
-> 
-> does anyone have a hint, how i should send this and in what format?
+****************
+Sorry I made a mistake and sent my email to bluez-devel... Here it is
+again on the appropriate mailing list.
+****************
 
-Have you tried obex object push (OPUSH) instead of obexftp? At least
-with Nokia phones there is a tremendous difference between the two.
+I'm trying to connect a BrainBoxes BL-510 BT module to a Freescale
+imx21 board (ARM cpu) running Linux 2.4.20 patched with
+bluez-patch-2.4.20-mh18
 
-	Taneli
+When I run "hciattach /dev/ttyS3 bcsp 115200 flow", I get the following err=
+ors :
+"Can't set device: Protocol not supported
+Can't initialize device: Illegal seek"
 
+>From what I understood reading hciattach.c, this error means that the
+HCI_BCSP protocol is not supported. I checked the modules: bluez and
+hci_uart are loaded. I also checked my kernel config (copy/paste at
+the end of my email).
+i can't find what's missing in my configuration.
 
+I've tested the module on a PC running Mandrake 10.0 kernel 2.4.25
+(bluez and hci_uart loaded as modules) and it works perfectly
+(hciattach + scan + ...).
+
+Any idea ?
+
+Thanks
+
+Julien
+
+#
+# Bluetooth support
+#
+CONFIG_BLUEZ=3Dm
+CONFIG_BLUEZ_L2CAP=3Dm
+CONFIG_BLUEZ_SCO=3Dm
+CONFIG_BLUEZ_RFCOMM=3Dm
+CONFIG_BLUEZ_RFCOMM_TTY=3Dy
+CONFIG_BLUEZ_BNEP=3Dm
+CONFIG_BLUEZ_BNEP_MC_FILTER=3Dy
+CONFIG_BLUEZ_BNEP_PROTO_FILTER=3Dy
+CONFIG_BLUEZ_CMTP=3Dm
+
+#
+# Bluetooth device drivers
+#
+CONFIG_BLUEZ_HCIUSB=3Dm
+CONFIG_BLUEZ_HCIUSB_SCO=3Dy
+CONFIG_BLUEZ_HCIUART=3Dm
+CONFIG_BLUEZ_HCIUART_H4=3Dy
+CONFIG_BLUEZ_HCIUART_BCSP=3Dy
+CONFIG_BLUEZ_HCIUART_BCSP_TXCRC=3Dy
+# CONFIG_BLUEZ_HCIBFUSB is not set
+CONFIG_BLUEZ_HCIDTL1=3Dm
+CONFIG_BLUEZ_HCIBT3C=3Dm
+CONFIG_BLUEZ_HCIBLUECARD=3Dm
+CONFIG_BLUEZ_HCIBTUART=3Dm
+CONFIG_BLUEZ_HCIVHCI=3Dm
 
 
 -------------------------------------------------------
