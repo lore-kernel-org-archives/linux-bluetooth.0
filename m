@@ -1,11 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] pand Encryption
+Subject: Re: [Bluez-users] Bluez PAN (bnep) Supports IP Multicast ?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <025601c5ac6f$2c7cc950$6c01a8c0@Vijayakumar>
-References: <025601c5ac6f$2c7cc950$6c01a8c0@Vijayakumar>
+Cc: Heejune AHN <heejune@snut.ac.kr>
+In-Reply-To: <001201c5ac65$73bba980$0107a8c0@heejune>
+References: <4dfd570904122402134ec2fd32@mail.gmail.com>
+	 <BAY104-F28B10D34C6CA29EC4D37E9C1A70@phx.gbl>
+	 <4dfd5709041225041648e1f356@mail.gmail.com>
+	 <1103980205.8758.22.camel@pegasus>
+	 <4dfd570904122505192221bf97@mail.gmail.com>
+	 <001201c5ac65$73bba980$0107a8c0@heejune>
 Content-Type: text/plain
-Message-Id: <1125308699.25073.11.camel@blade>
+Message-Id: <1125308614.25073.8.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,24 +24,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Aug 2005 11:44:59 +0200
+Date: Mon, 29 Aug 2005 11:43:34 +0200
 
-Hi Vijayakumar,
+Hi Heejune,
 
-> Iam using pand version 2.17 and establishing pan connection between 2
-> bluetooth devices.
+> I am integrating UPNP Program on Bluez (REDHAT 9.0). 
+> As you may know, UpnP uses IP multicast for M-SERACH, NOTIFY function.
+> I successfully setup PAN Profile GN, and it is confirmed by "ping".
+> 
+> However, when  I try to setoption my socket to multicast, it is got errored!!!!!!!!!!!!!!!!!!!!!!!!!!!
+> res = setsockopt(ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,  (char *) &ssdpMcastAddr, sizeof(struct ipmreq)));
+> we got "res  <0" ^^;;;
+> From bluetooth spec, the default behavior is no filtering, i.e, any multicast packet should be broadcasted to all PANU.
+> What should I do for making my program use  multicast IP address??? IS it possible in BLUEZ?
+> 
+> I am using REDHAT 9.0 and bluezlib-2.13 and bluexutil-2.13 
 
-update to bluez-utils-2.20 and use the latest 2.6 kernel.
- 
-> I find that even though I enable both authentication and encryption on
-> one side and only authentication on the other side(thru hciconfig),
-> still the connection gets established and iam able to transfer files
-> thru this connection and read them on the other side....My doubt is
-> how does connection is created even if encryption is disabled on the
-> other side....
-
-The security mode 1 says, if one side wants authentication or
-encryption, the other side must do it too or disconnect.
+why don't you start using a 2.6 kernel and the latest bluez-libs and
+bluez-utils? Your versions are outdated.
 
 Regards
 
