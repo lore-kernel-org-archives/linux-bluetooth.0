@@ -1,11 +1,22 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Esther Lopez" <esther.lopez@erzia.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] HCI data packet
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Message-Id: <20050901145400.BB3131EC845@mrelay1.st2.lyceu.net>
+Subject: Re: [Bluez-devel] bluetoothd D-Bus interface proposals(draft 00.05)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb050830111665325706@mail.gmail.com>
+References: <e1effdeb05081614151ee4f4bd@mail.gmail.com>
+	 <e1effdeb05082205517cac906c@mail.gmail.com>
+	 <9307f5f2050822072659387e3b@mail.gmail.com>
+	 <1124721252.23599.53.camel@pegasus>
+	 <e1effdeb05082210394bed468@mail.gmail.com>
+	 <1124733046.23599.81.camel@pegasus>
+	 <e1effdeb050822124710aa8798@mail.gmail.com>
+	 <e1effdeb0508291413753e3b2e@mail.gmail.com>
+	 <1125351995.17698.37.camel@pegasus>
+	 <e1effdeb050830061474e1e560@mail.gmail.com>
+	 <e1effdeb050830111665325706@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1125568671.5496.11.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,91 +28,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 1 Sep 2005 16:54:47 +0200
+Date: Thu, 01 Sep 2005 11:57:51 +0200
 
-Hello again
+Hi Claudio,
 
-Regarding HCI data packets and BlueZ...
+> Regarding the special HCI_DEV_NONE system socket with vendor packet
+> type. Do you 
+> have a patch for it or it just ideas for BlueZ improvements? What are
+> exactly the events that 
+> you want send in this socket?
 
-If I use the BlueZ command "hci_create_connection" and connect to =
-another
-device, how do I sent an HCI data packet to this device?
+the latest hcidump has support for dumping these packets, but at the
+moment the kernel is not sending any of them. I still have to implement
+the kernel part for it. Only the basic frame format is defined at the
+moment, but no actual message packets are defined.
 
-Thanks and Regards
+The main messages would be notifying about added/removed adapters on the
+system. Also the exchange of pin code and link keys between the kernel
+and the userspace is what I have in mind. The other thing would be
+notification of inquiry responses and name resolves. And then I am open
+for suggestions.
 
-Esther
+Regards
 
------Mensaje original-----
-De: bluez-devel-admin@lists.sourceforge.net
-[mailto:bluez-devel-admin@lists.sourceforge.net] En nombre de Esther =
-Lopez
-Enviado el: jueves, 25 de agosto de 2005 18:45
-Para: bluez-devel@lists.sourceforge.net
-Asunto: RE: [Bluez-devel] HCI data packet
+Marcel
 
-Hi Marcel
-
-> -----Mensaje original-----
-> De: bluez-devel-admin@lists.sourceforge.net [mailto:bluez-devel-
-> admin@lists.sourceforge.net] En nombre de Marcel Holtmann
-> Enviado el: mi=E9rcoles, 24 de agosto de 2005 17:14
-> Para: bluez-devel@lists.sourceforge.net
-> Asunto: RE: [Bluez-devel] HCI data packet
->=20
-> Hi Esther,
->=20
-> > Regarding the HCI data packets... What is the maximum size of the =
-data
-> > field? Is if fixed or can be set by the BlueZ user?
->=20
-> this depends on the ACL and SCO MTU sizes.
->=20
-Thanks again for your help. I have been investigating and found that the =
-ACL
-and MTU sizes are fixed by the manufacturer. Is there any typical or =
-maximum
-value for them? I have here 2 USB dongle, and both have 192 bytes.
-
-Thanks, and regards
-
-Esther
-
-
-
-> Regards
->=20
-> Marcel
->=20
->=20
->=20
->=20
-> -------------------------------------------------------
-> SF.Net email is Sponsored by the Better Software Conference & EXPO
-> September 19-22, 2005 * San Francisco, CA * Development Lifecycle
-> Practices
-> Agile & Plan-Driven Development * Managing Projects & Teams * Testing =
-& QA
-> Security * Process Improvement & Measurement * =
-http://www.sqe.com/bsce5sf
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
-
--------------------------------------------------------
-SF.Net email is Sponsored by the Better Software Conference & EXPO
-September 19-22, 2005 * San Francisco, CA * Development Lifecycle =
-Practices
-Agile & Plan-Driven Development * Managing Projects & Teams * Testing & =
-QA
-Security * Process Improvement & Measurement * =
-http://www.sqe.com/bsce5sf
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 
