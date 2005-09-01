@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050902020721.51217.qmail@web25004.mail.ukl.yahoo.com>
-From: Clifford Graham <clifforg@yahoo.co.uk>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4316B5BE.4090901@avantwave.com>
+From: mike lee <mikelee@avantwave.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] VMWare 5.0 and those timeout messages
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Could not connect with pand profile
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,89 +16,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 1 Sep 2005 19:07:20 -0700 (PDT)
+Date: Thu, 01 Sep 2005 16:03:10 +0800
 
-Hello,
+Dear all
+   I am developing a embedded device with pand profile. But the device
+can not connect to a bluetooth access point with error code 0x22 which
+is LMP timeout. Below is the hcidump result.
+   It seems to not give out the pincode. Although the bluepin script is
+refined to one line "echo PIN:0000" , i don't know whether it is the
+problem. And all other things are the default setting.
 
-I have been having a lot of trouble getting a Broadcom
-device working properly under Fedora 4 (Kernel 2.6.11)
-in a VMWare 5.0 session.  I was wondering if anyone
-had managed to get this working?  I found an article
-in the archives from the beginning of the year with a
-similar problem (see
-http://sourceforge.net/mailarchive/message.php?msg_id=10640453).
+< HCI Command: Create Connection(0x01|0x0005) plen 13
+  5A 06 00 E0 08 00 18 CC 02 00 00 00 01
+> HCI Event: Command Status(0x0f) plen 4
+  00 01 05 04
+> HCI Event: Role Change(0x12) plen 8
+  00 5A 06 00 E0 08 00 01
+> HCI Event: PIN Code Request(0x16) plen 6
+  5A 06 00 E0 08 00
+> HCI Event: Connect Complete(0x03) plen 11
+  22 29 00 5A 06 00 E0 08 00 01 00
 
-I get the following messages in my /var/log/messages
-file.
+hciconfig -a
+hci0:   Type: UART
+        BD Address: 00:08:E0:04:A4:BF ACL MTU: 192:8  SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:5933 acl:153 sco:0 events:337 errors:0
+        TX bytes:3632 acl:141 sco:0 commands:71 errors:0
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy:
+        Link mode: SLAVE ACCEPT
+        Name: '00:08:E0:04:A4:BF'
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
+0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
 
-**************************************************
-Sep  1 21:42:22 localhost hcid[2714]: Bluetooth HCI
-daemon
-Sep  1 21:42:22 localhost kernel: Bluetooth: Core ver
-2.7
-Sep  1 21:42:22 localhost kernel: NET: Registered
-protocol family 31
-Sep  1 21:42:22 localhost kernel: Bluetooth: HCI
-device and connection manager initialized
-Sep  1 21:42:22 localhost kernel: Bluetooth: HCI
-socket layer initialized
-Sep  1 21:42:39 localhost kernel: usb 1-1: new full
-speed USB device using uhci_hcd and address 2
-Sep  1 21:42:42 localhost kernel: Bluetooth: Broadcom
-Blutonium firmware driver ver 1.0
-Sep  1 21:42:42 localhost kernel: usbcore: registered
-new driver bcm203x
-Sep  1 21:42:42 localhost kernel: Bluetooth: HCI USB
-driver ver 2.8
-Sep  1 21:42:42 localhost kernel: usbcore: registered
-new driver hci_usb
-Sep  1 21:42:48 localhost kernel: usb 1-1: USB
-disconnect, address 2
-Sep  1 21:42:50 localhost kernel: usb 1-1: new full
-speed USB device using uhci_hcd and address 3
-Sep  1 21:42:51 localhost hcid[2714]: HCI dev 0
-registered
-Sep  1 21:43:01 localhost hcid[2926]: Can't init
-device hci0: Connection timed out (110)
-**************************************************
-
-hciconfig -a shows
-
-**************************************************
-[root@localhost ~]# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO
-MTU: 0:0
-        DOWN 
-        RX bytes:0 acl:0 sco:0 events:0 errors:0
-        TX bytes:3 acl:0 sco:0 commands:1 errors:0
-**************************************************
-
-and lsusb shows
-
-**************************************************
-[root@localhost ~]# lsusb
-Bus 001 Device 003: ID 0a5c:2001 Broadcom Corp. 
-Bus 001 Device 001: ID 0000:0000  
-**************************************************
-
-I can provide /proc/bus/usb/devices if need be.
-
-I've tried lots of different versions of bluez, and
-the old bluefw....nothing seems to work!
-
-Help!
-
-Thank you kindly in advance
-
-Graham 
-
-
-		
-____________________________________________________
-Start your day with Yahoo! - make it your home page 
-http://www.yahoo.com/r/hs 
- 
+Thx for helping
+Mike,Lee
 
 
 -------------------------------------------------------
