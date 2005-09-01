@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4316B5BE.4090901@avantwave.com>
-From: mike lee <mikelee@avantwave.com>
+Message-ID: <001301c5aeed$828e6760$650ba8c0@heejune>
+From: "Heejune AHN" <heejune@snut.ac.kr>
+To: <bluez-users@lists.sourceforge.net>
+References: <4dfd570904122402134ec2fd32@mail.gmail.com>  <BAY104-F28B10D34C6CA29EC4D37E9C1A70@phx.gbl>  <4dfd5709041225041648e1f356@mail.gmail.com>  <1103980205.8758.22.camel@pegasus>  <4dfd570904122505192221bf97@mail.gmail.com>  <001201c5ac65$73bba980$0107a8c0@heejune> <1125308614.25073.8.camel@blade>  <001901c5ac8b$7bf71870$650ba8c0@heejune> <1125315052.17698.11.camel@pegasus>
+Subject: Re: [Bluez-users] Bluez PAN (bnep) Supports IP Multicast ?
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Could not connect with pand profile
+Content-Type: text/plain;
+ charset="ks_c_5601-1987"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,47 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 01 Sep 2005 16:03:10 +0800
+Date: Thu, 1 Sep 2005 21:05:57 +0900
 
-Dear all
-   I am developing a embedded device with pand profile. But the device
-can not connect to a bluetooth access point with error code 0x22 which
-is LMP timeout. Below is the hcidump result.
-   It seems to not give out the pincode. Although the bluepin script is
-refined to one line "echo PIN:0000" , i don't know whether it is the
-problem. And all other things are the default setting.
+DQpUaGFua3MgZm9yIHlvdXIgYWR2aXNlIGFuZCBjcnRpY3Mgb24gdGhlaXIgYW5kIG15IGxhemlu
+ZXNzLg0KSSB0cnllZCB3aXRoIGxhc3Rlc3QgdmVyaW9uIG9mIEZlZG9yYSBhbmQgdGhlIHJlc3Vs
+dCB3YXMgc2FtZSwgaWUuIGZhaWx1cmUuDQpCdXQgdG8gbXkgc2hhbWUsIEkgZm9yZ290IHRvIGFk
+ZCByb3V0aW5nIGZvciB0aGUgbXVsdGljYXN0aW5nIGFkZHJlc3MsIHdoaWNoIGlzIGRvbmUgYnkg
+Ym9vdGluZyBzY3JpcHQgZm9yIGV0aDAsIDEsIDIgZXRjLg0KDQpTbywgbXkgYmVucCB3b3JrcyBv
+ayBmb3IgdXBucCBub3cuIEl0IHdvcmtzIGJvdGggaW4gTGF0ZXN0IGZlZG9yYSBhbmQgb2xkIDIu
+NC4yMC04IChSZWQgaGF0KS4NCk5vdyBJIGNhbiBmaW5pc2ggbXkgcHJvamVjdCwgbXkgaGFwcGlu
+ZXNzLg0KDQpIZWVqdW5lDQoNCg0KDQo+IEhpIEhlZWp1bmUsDQo+IA0KPiA+IFRoZW4geW91IG1l
+YW4gIG5vIG9uZSBjYW4gdXNlIG11bHRpY2FzdCBpcCBhZGRyZXNzIHdpdGgga2VybmVsIDIuNC4y
+MC04IGFuZCBsaWItMi4zPw0KPiA+IElzIGl0IG5vdCBteSBmYXVsdCBvZiB1c2luZyBibHVleiB1
+dGlsaXRpZXM/DQo+ID4gDQo+ID4gQW5kIGtlcm5lbCAyLjYgc3VwcG9ydHMgbXVsdGljYXN0IHN0
+dWZmPyBJIGhhdmUgdG8gY2hlY2sgaXQuDQo+IA0KPiB5b3Ugc2hvdWxkIGF0IGxlYXN0IGNoZWNr
+LiBJIHJlbWVtYmVyIHNvbWUgcGF0Y2hlcyBmb3IgdGhlIEJORVAgZmlsdGVyDQo+IHN0dWZmIHRo
+YXQgb25seSB3ZXJlIGFwcGxpZWQgdG8gdGhlIDIuNiBrZXJuZWxzLiBUaGUgQmx1ZXRvb3RoIHN1
+cHBvcnQNCj4gZm9yIDIuNCBrZXJuZWxzIGlzIGRlcHJlY2F0ZWQuIEhvd2V2ZXIgdGhlcmUgY2Fu
+IGJlIHN0aWxsIGEgYnVnIGhpZGRlbg0KPiBzb21ld2hlcmUuDQo+IA0KPiA+IEJUVywgdGhlIHJl
+YXNvbiB3aHkgSSBhbSB1c2luZyBvbGQgb25lcyBpcyBiZWNhdXNlIG15IGNoaXAgbWFrZXIgc3Rp
+bGwgcHJvdmlkZXMgdGhlaXIgZXZhbHVhdGlvbiBib2FyZCB3aXRoIGtlcm5lbCAyLjQueCBpbnN0
+ZWFkIG9mIDIuNi54IHNpbmNlIHNvIG1hbnkgZHJpdmVycyBzdGlsbCB3b3JrcyBtb3JlIHNtb290
+aGx5IHdpdGggMi40LnggDQo+IA0KPiBEb24ndCBnZXQgbWUgc3RhcnRlZCBvbiB0aGUgc3R1cGlk
+IGNoaXAgbWFudWZhY3R1cmVzLiBUaGV5IGFyZSBzaW1wbHkNCj4gdG9vIGxhenkgdG8gbW92ZSB0
+byAyLjYgZXZlbiBpZiBtb3N0IG9mIHRoZWlyIGNoaXBzIHdpbGwgd29yayBvdXQgb2YgdGhlDQo+
+IGJveC4gVGhlIExpbnV4IDIuNCBzZXJpZXMgaXMgd2F5IG91dGRhdGVkIGFuZCBzbyBubyBleGN1
+c2UuDQo+IA0KPiBSZWdhcmRzDQo+IA0KPiBNYXJjZWwNCj4gDQo+IA==
 
-< HCI Command: Create Connection(0x01|0x0005) plen 13
-  5A 06 00 E0 08 00 18 CC 02 00 00 00 01
-> HCI Event: Command Status(0x0f) plen 4
-  00 01 05 04
-> HCI Event: Role Change(0x12) plen 8
-  00 5A 06 00 E0 08 00 01
-> HCI Event: PIN Code Request(0x16) plen 6
-  5A 06 00 E0 08 00
-> HCI Event: Connect Complete(0x03) plen 11
-  22 29 00 5A 06 00 E0 08 00 01 00
-
-hciconfig -a
-hci0:   Type: UART
-        BD Address: 00:08:E0:04:A4:BF ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:5933 acl:153 sco:0 events:337 errors:0
-        TX bytes:3632 acl:141 sco:0 commands:71 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: '00:08:E0:04:A4:BF'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
-0x20d
-        Manufacturer: Cambridge Silicon Radio (10)
-
-Thx for helping
-Mike,Lee
 
 
 -------------------------------------------------------
