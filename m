@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Mark Rasmussen" <mark_s_rasmussen@comcast.net>
-To: <bluez-users@lists.sourceforge.net>
-Subject: RE: [Bluez-users] VMWare 5.0 and those timeout messages
-Message-ID: <000601c5b040$4518b5d0$0500a8c0@SATURNA>
+Message-ID: <20050902102514.73330.qmail@web35310.mail.mud.yahoo.com>
+From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
+Subject: Re: [Bluez-users] source code for bluez
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1125056087.25535.11.camel@pegasus>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <20050902020721.51217.qmail@web25004.mail.ukl.yahoo.com>
+Content-Type: multipart/alternative; boundary="0-561001498-1125656713=:72506"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,115 +17,76 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 2 Sep 2005 21:30:51 -0700
+Date: Fri, 2 Sep 2005 03:25:13 -0700 (PDT)
 
-
-
------Original Message-----
-From: bluez-users-admin@lists.sourceforge.net
-[mailto:bluez-users-admin@lists.sourceforge.net] On Behalf Of Clifford
-Graham
-Sent: Thursday, September 01, 2005 7:07 PM
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] VMWare 5.0 and those timeout messages
-
+--0-561001498-1125656713=:72506
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
 Hello,
+As per your suggestions i downloaded 2.4.x kernel patch which is supposed to have the Bluez on it.  But i am not able to find the bluez code. 
+1. Which folder has the bluez ?
+2. Do i still need the packages from the www.bluez.org to write my applications program or just the patch is enough to write my applications. 
+The second question was not answered in my previous queries. Could any one be kind enough to answer my queries. as i don't have any experience on working on the linux OS.
+Thanks & Warm Regards,
+Swathi
 
-I have been having a lot of trouble getting a Broadcom
-device working properly under Fedora 4 (Kernel 2.6.11)
-in a VMWare 5.0 session.  I was wondering if anyone
-had managed to get this working?  I found an article
-in the archives from the beginning of the year with a
-similar problem (see
-http://sourceforge.net/mailarchive/message.php?msg_id=3D10640453).
+Marcel Holtmann <marcel@holtmann.org> wrote:
+Hi Swathi,
 
-I get the following messages in my /var/log/messages
-file.
+> I want to port bluez protocol stack onto the T-Engine ( which has a
+> T-Kernel as the operating System). T-Kernel usb host protocol does not
+> support isochronous data transfer. 
 
-**************************************************
-Sep  1 21:42:22 localhost hcid[2714]: Bluetooth HCI
-daemon
-Sep  1 21:42:22 localhost kernel: Bluetooth: Core ver
-2.7
-Sep  1 21:42:22 localhost kernel: NET: Registered
-protocol family 31
-Sep  1 21:42:22 localhost kernel: Bluetooth: HCI
-device and connection manager initialized
-Sep  1 21:42:22 localhost kernel: Bluetooth: HCI
-socket layer initialized
-Sep  1 21:42:39 localhost kernel: usb 1-1: new full
-speed USB device using uhci_hcd and address 2
-Sep  1 21:42:42 localhost kernel: Bluetooth: Broadcom
-Blutonium firmware driver ver 1.0
-Sep  1 21:42:42 localhost kernel: usbcore: registered
-new driver bcm203x
-Sep  1 21:42:42 localhost kernel: Bluetooth: HCI USB
-driver ver 2.8
-Sep  1 21:42:42 localhost kernel: usbcore: registered
-new driver hci_usb
-Sep  1 21:42:48 localhost kernel: usb 1-1: USB
-disconnect, address 2
-Sep  1 21:42:50 localhost kernel: usb 1-1: new full
-speed USB device using uhci_hcd and address 3
-Sep  1 21:42:51 localhost hcid[2714]: HCI dev 0
-registered
-Sep  1 21:43:01 localhost hcid[2926]: Can't init
-device hci0: Connection timed out (110)
-**************************************************
+what the f* is T-Engine and T-Kernel?
 
-hciconfig -a shows
+The USB isoc transfer are only needed for the SCO channel in the USB
+host transport protocol.
 
-**************************************************
-[root@localhost ~]# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO
-MTU: 0:0
-        DOWN=20
-        RX bytes:0 acl:0 sco:0 events:0 errors:0
-        TX bytes:3 acl:0 sco:0 commands:1 errors:0
-**************************************************
+> Where can i find the whole bluez protocol stack ? the *.c files.
+> For minimal functionality is it sufficient to have the bluez-libs and
+> bluez-utils package as this is being mentioned in the
+> http://www.bluez.org/download.html website.
 
-and lsusb shows
+Maybe you should look at www.kernel.org ;)
 
-**************************************************
-[root@localhost ~]# lsusb
-Bus 001 Device 003: ID 0a5c:2001 Broadcom Corp.=20
-Bus 001 Device 001: ID 0000:0000 =20
-**************************************************
+Regards
 
-I can provide /proc/bus/usb/devices if need be.
-
-I've tried lots of different versions of bluez, and
-the old bluefw....nothing seems to work!
-
-Help!
-
-Thank you kindly in advance
-
-Graham=20
+Marcel
 
 
-	=09
-____________________________________________________
-Start your day with Yahoo! - make it your home page=20
-http://www.yahoo.com/r/hs=20
-=20
 
 
 -------------------------------------------------------
-SF.Net email is Sponsored by the Better Software Conference & EXPO =
-September
-19-22, 2005 * San Francisco, CA * Development Lifecycle Practices Agile =
-&
-Plan-Driven Development * Managing Projects & Teams * Testing & QA =
-Security
-* Process Improvement & Measurement * http://www.sqe.com/bsce5sf
+SF.Net email is Sponsored by the Better Software Conference & EXPO
+September 19-22, 2005 * San Francisco, CA * Development Lifecycle Practices
+Agile & Plan-Driven Development * Managing Projects & Teams * Testing & QA
+Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
+--0-561001498-1125656713=:72506
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+<DIV>Hello,</DIV>
+<DIV>As per your suggestions i&nbsp;downloaded 2.4.x kernel patch which is supposed to have the Bluez on it. &nbsp;But i am not able to find the bluez code. </DIV>
+<DIV>1. Which folder has the bluez ?</DIV>
+<DIV>2. Do i still need the packages from the <A href="http://www.bluez.org">www.bluez.org</A> to write my applications program or just the patch is enough to write my applications. </DIV>
+<DIV>The second question was not answered in my previous queries. Could any one be kind enough to answer my queries. as i don't have any experience on working on the linux OS.</DIV>
+<DIV>Thanks &amp; Warm Regards,</DIV>
+<DIV>Swathi</DIV>
+<DIV><BR><B><I>Marcel Holtmann &lt;marcel@holtmann.org&gt;</I></B> wrote:</DIV>
+<BLOCKQUOTE class=replbq style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #1010ff 2px solid">Hi Swathi,<BR><BR>&gt; I want to port bluez protocol stack onto the T-Engine ( which has a<BR>&gt; T-Kernel as the operating System). T-Kernel usb host protocol does not<BR>&gt; support isochronous data transfer. <BR><BR>what the f* is T-Engine and T-Kernel?<BR><BR>The USB isoc transfer are only needed for the SCO channel in the USB<BR>host transport protocol.<BR><BR>&gt; Where can i find the whole bluez protocol stack ? the *.c files.<BR>&gt; For minimal functionality is it sufficient to have the bluez-libs and<BR>&gt; bluez-utils package as this is being mentioned in the<BR>&gt; http://www.bluez.org/download.html website.<BR><BR>Maybe you should look at www.kernel.org ;)<BR><BR>Regards<BR><BR>Marcel<BR><BR><BR><BR><BR>-------------------------------------------------------<BR>SF.Net email is Sponsored by the Better Software Conference &amp; EXPO<BR>September 19-22, 2005 * Sa
+ n
+ Francisco, CA * Development Lifecycle Practices<BR>Agile &amp; Plan-Driven Development * Managing Projects &amp; Teams * Testing &amp; QA<BR>Security * Process Improvement &amp; Measurement * http://www.sqe.com/bsce5sf<BR>_______________________________________________<BR>Bluez-users mailing list<BR>Bluez-users@lists.sourceforge.net<BR>https://lists.sourceforge.net/lists/listinfo/bluez-users<BR></BLOCKQUOTE><p>__________________________________________________<br>Do You Yahoo!?<br>Tired of spam?  Yahoo! Mail has the best spam protection around <br>http://mail.yahoo.com 
+--0-561001498-1125656713=:72506--
 
 
 -------------------------------------------------------
