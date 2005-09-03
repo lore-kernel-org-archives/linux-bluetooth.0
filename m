@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Seba T." <dpbasti@wp.pl>
-To: bluez-users@lists.sourceforge.net
+From: "Mark Rasmussen" <mark_s_rasmussen@comcast.net>
+To: <bluez-users@lists.sourceforge.net>
+Subject: RE: [Bluez-users] VMWare 5.0 and those timeout messages
+Message-ID: <000701c5b040$45d63970$0500a8c0@SATURNA>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200509031151.32766.dpbasti@wp.pl>
-Subject: [Bluez-users] pand host to host stability
+	charset="us-ascii"
+In-Reply-To: <20050902020721.51217.qmail@web25004.mail.ukl.yahoo.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,75 +18,115 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 3 Sep 2005 11:51:32 +0200
+Date: Fri, 2 Sep 2005 21:30:54 -0700
 
-hey i'm trying to get my bluetooth connection to connect two host with pand
+
+
+-----Original Message-----
+From: bluez-users-admin@lists.sourceforge.net
+[mailto:bluez-users-admin@lists.sourceforge.net] On Behalf Of Clifford
+Graham
+Sent: Thursday, September 01, 2005 7:07 PM
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] VMWare 5.0 and those timeout messages
+
+
+Hello,
+
+I have been having a lot of trouble getting a Broadcom
+device working properly under Fedora 4 (Kernel 2.6.11)
+in a VMWare 5.0 session.  I was wondering if anyone
+had managed to get this working?  I found an article
+in the archives from the beginning of the year with a
+similar problem (see
+http://sourceforge.net/mailarchive/message.php?msg_id=3D10640453).
+
+I get the following messages in my /var/log/messages
+file.
+
+**************************************************
+Sep  1 21:42:22 localhost hcid[2714]: Bluetooth HCI
+daemon
+Sep  1 21:42:22 localhost kernel: Bluetooth: Core ver
+2.7
+Sep  1 21:42:22 localhost kernel: NET: Registered
+protocol family 31
+Sep  1 21:42:22 localhost kernel: Bluetooth: HCI
+device and connection manager initialized
+Sep  1 21:42:22 localhost kernel: Bluetooth: HCI
+socket layer initialized
+Sep  1 21:42:39 localhost kernel: usb 1-1: new full
+speed USB device using uhci_hcd and address 2
+Sep  1 21:42:42 localhost kernel: Bluetooth: Broadcom
+Blutonium firmware driver ver 1.0
+Sep  1 21:42:42 localhost kernel: usbcore: registered
+new driver bcm203x
+Sep  1 21:42:42 localhost kernel: Bluetooth: HCI USB
+driver ver 2.8
+Sep  1 21:42:42 localhost kernel: usbcore: registered
+new driver hci_usb
+Sep  1 21:42:48 localhost kernel: usb 1-1: USB
+disconnect, address 2
+Sep  1 21:42:50 localhost kernel: usb 1-1: new full
+speed USB device using uhci_hcd and address 3
+Sep  1 21:42:51 localhost hcid[2714]: HCI dev 0
+registered
+Sep  1 21:43:01 localhost hcid[2926]: Can't init
+device hci0: Connection timed out (110)
+**************************************************
+
+hciconfig -a shows
+
+**************************************************
+[root@localhost ~]# hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO
+MTU: 0:0
+        DOWN=20
+        RX bytes:0 acl:0 sco:0 events:0 errors:0
+        TX bytes:3 acl:0 sco:0 commands:1 errors:0
+**************************************************
+
+and lsusb shows
+
+**************************************************
+[root@localhost ~]# lsusb
+Bus 001 Device 003: ID 0a5c:2001 Broadcom Corp.=20
+Bus 001 Device 001: ID 0000:0000 =20
+**************************************************
+
+I can provide /proc/bus/usb/devices if need be.
+
+I've tried lots of different versions of bluez, and
+the old bluefw....nothing seems to work!
+
+Help!
+
+Thank you kindly in advance
+
+Graham=20
+
+
+	=09
+____________________________________________________
+Start your day with Yahoo! - make it your home page=20
+http://www.yahoo.com/r/hs=20
 =20
- on both hosts I run
-=20
- hciconfig hci0 up
- hcid
- sdpd
-=20
- hcitool cc address_of_device_A
-=20
- "hcitool con" shows active connection
-=20
- so on host A i do
-=20
- pand -n --listen --master
-=20
- and from host B
- pand -c address_of_device_A
-=20
- i have /etc/bluetooth/pan/dev-up files configured so the interfaces bnep0 =
-on=20
-both mashines come up
-=20
- everything works ok- i can ping the mashine -and even using masquerading=20
-connect to the internet. i can ping hosts on internet and i could even ente=
-r=20
-a www page but
- after some seconds when the transfer is high the connection just disapears
- any clue?
-=20
- the funny think is i have 2 usb bluetooth dongles of different brends and=
-=20
-ping works both ways. but when i want to open a www from host A on host B i=
-t=20
-works and opening www from host B on the host A crashes the connection and =
-i=20
-have to do the pand -c thing again
-=20
-my /etc/bluetooth/pan/dev-up:
-
-#!/bin/sh
-ifconfig $1 up 192.168.0.130 broadcast 192.168.0.255 netmask 255.255.255.128
-route add default gw 192.168.0.129
-#end
-
-any clues?
 
 
-2. i dont have any brctl on my system- do i really need it ?
+-------------------------------------------------------
+SF.Net email is Sponsored by the Better Software Conference & EXPO =
+September
+19-22, 2005 * San Francisco, CA * Development Lifecycle Practices Agile =
+&
+Plan-Driven Development * Managing Projects & Teams * Testing & QA =
+Security
+* Process Improvement & Measurement * http://www.sqe.com/bsce5sf
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-3. what should be the transfer between 2 bluetooth dongles each for 100mete=
-rs=20
-=2Dwhen i'm at 3meters - i have 12kB/s i think it's not enough
-
-
-my bluez version is 2.20
-
-
-
-
-
-=2D-=20
-Powered by Yoper Linux=20
-kernel 2.6.11 ; kde 3.4.2
-moj nr gg: 149460
-
-Je=B6li musisz by=E6 pod winblowsem u=BFywaj www.firefox.pl
 
 
 -------------------------------------------------------
