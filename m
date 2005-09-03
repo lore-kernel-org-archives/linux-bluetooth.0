@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <431A810B.2060705@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] sbc synthesis inconsistencies
+From: Guylhem Aznar <bluez-devel@externe.net>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Rescuing a WML C09 AHR by SPI
+Message-ID: <20050903214412.GA5510@externe.net>
+References: <1124709049.23599.16.camel@pegasus> <Pine.LNX.4.33.0508221321180.6514-100000@redbean.intranet.gw-instruments.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <Pine.LNX.4.33.0508221321180.6514-100000@redbean.intranet.gw-instruments.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,36 +18,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 03 Sep 2005 23:07:23 -0600
+Date: Sat, 3 Sep 2005 17:44:12 -0400
 
-Guys,
+On Monday, 22 August 2005 at 13:23:06 (+0200), Peter Wippich wrote:
+> but I'm not aware of any free tools which can replace the CSR software
+> needed.
 
-Have any of you looked closely at this? It comes straight from the spec 
-for a2dp on page 66:
+> > the CSR guys told me that sometimes the only way is to use their
+> > BlueFlash tool (for Windows) and fully erase the flash and start over
+> > with a new boot loader and a new firmware image.
 
+Hmm - I have neither the software nor the hardware, and I realize it
+will be quite hard to find someone having them in my area.
 
-	/* Build a 80 values vector U */
-	for (i = 0; i <= 4; i++) {
-		for (j = 0; j < 8; j++) {
-			state->U[ch][i * 16 + j] = state->V[ch][i * 32 + j];
-			state->U[ch][i * 16 + j + 8] = state->V[ch][i * 32 + j + 24];
-		}
-	}
+I purchased 2 WML AHR C09 from Segor - the first one I killed, and the
+2nd one seems to have an hardware problem (and I can=B4t find the bill
+to have it repaired). I'd be happy to have at least one working... it
+just needs to be set to use "BCSP over UART" by SPI to be brought back
+to life.
 
-But isn't this code only populating u[ch][0..63] and not through 79 like 
-the comment suggests? So the u[ch][64..79] terms are always 0 right?
+:-(
 
-This isn't the only thing that looks wrong in the spec. We also have a 
-sliding window of v[] values that moves 16 values in each pass. The 
-vector is 160 elements long even though the code above never accesses 
-anything beyond the 128th value!
+So if someone here has a SPI cable and BlueFlash, and if he/she can
+spend 5 minutes to help, please contact me by email offlist - guylhem
+at gmail dot com
 
-It's amazing this stuff even works as poorly specified as it is :(
+Guylhem
 
-BTW, in our code it looks like sbc_synthesize_eight was multiplying 
-sbc_proto_8_80 by -4 where it should be -8. I changed that in cvs.
+--=20
+Bien =E0 vous - Best regards,
+Guylhem P. Aznar
 
-Brad
+--=20
+*@externe.net                                            http://externe.n=
+et
+P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
+un.org
+GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
+ey
 
 
 -------------------------------------------------------
