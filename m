@@ -2,7 +2,7 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: "Mark Rasmussen" <mark_s_rasmussen@comcast.net>
 To: <bluez-users@lists.sourceforge.net>
 Subject: RE: [Bluez-users] VMWare 5.0 and those timeout messages
-Message-ID: <000701c5b040$45d63970$0500a8c0@SATURNA>
+Message-ID: <000601c5b040$4518b5d0$0500a8c0@SATURNA>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="us-ascii"
@@ -18,7 +18,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 2 Sep 2005 21:30:54 -0700
+Date: Fri, 2 Sep 2005 21:30:51 -0700
 
 
 
