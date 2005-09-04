@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <431AAF30.304@xmission.com>
+Message-ID: <431A810B.2060705@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] unrolling sbc decoder
+Subject: [Bluez-devel] sbc synthesis inconsistencies
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,60 +16,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 04 Sep 2005 02:24:16 -0600
+Date: Sat, 03 Sep 2005 23:07:23 -0600
 
-Hey
+Guys,
 
-I thought I had this nailed after some careful unrolling/simplifying 
-work but there may still be something I missed. I'm finding I get choppy 
-audio, but then I reverted and it was still choppy... can someone try 
-this in sbc.c with a2recv by transmit 8-subband audio to it from some 
-other device?
+Have any of you looked closely at this? It comes straight from the spec 
+for a2dp on page 66:
+
+
+	/* Build a 80 values vector U */
+	for (i = 0; i <= 4; i++) {
+		for (j = 0; j < 8; j++) {
+			state->U[ch][i * 16 + j] = state->V[ch][i * 32 + j];
+			state->U[ch][i * 16 + j + 8] = state->V[ch][i * 32 + j + 24];
+		}
+	}
+
+But isn't this code only populating u[ch][0..63] and not through 79 like 
+the comment suggests? So the u[ch][64..79] terms are always 0 right?
+
+This isn't the only thing that looks wrong in the spec. We also have a 
+sliding window of v[] values that moves 16 values in each pass. The 
+vector is 160 elements long even though the code above never accesses 
+anything beyond the 128th value!
+
+It's amazing this stuff even works as poorly specified as it is :(
+
+BTW, in our code it looks like sbc_synthesize_eight was multiplying 
+sbc_proto_8_80 by -4 where it should be -8. I changed that in cvs.
 
 Brad
-
-static inline void sbc_synthesize_eight(struct sbc_decoder_state *state,
-				struct sbc_frame *frame, int ch, int blk)
-{
-	int i, j, k, idx, offset;
-	static int off1[] = {0, 16, 32, 48, 64, 80, 96, 112, 0, 16, 32, 48, 64, 
-80, 96};
-	static int off2[] = {24, 40, 56, 72, 88, 104, 120, 8, 24, 40, 56, 72, 
-88, 104, 120};
-	static int pass = 0;
-	int window = pass*16;
-
-	/* Matrixing */
-	for (k = 0; k < 16; k++) {
-		state->V[ch][window+k] = 0;
-		for (i = 0; i < 8; i++) {
-			state->V[ch][window+k] += synmatrix8[k][i] * 
-frame->sb_sample[blk][ch][i];
-		}
-	}
-
-	for (j = 0; j < 8; j++) {
-		state->X[ch][j] = 0;
-	}
-
-	/* Calculate 8 audio samples */
-	for (i = 0; i <= 4; i++) {
-		offset = (i*2) + pass;
-		idx = i*16;
-		for (j = 0; j < 8; j++, idx++) {
-			state->X[ch][j] +=
-				state->V[ch][off1[offset] + j] * sbc_proto_8_80[idx] +
-				state->V[ch][off2[offset] + j] * sbc_proto_8_80[idx+8];
-		}
-	}
-
-	/* Ouput 8 reconstructed Audio Samples */
-	for (i = 0; i < 8; i++) {
-		frame->pcm_sample[ch][blk * 8 + i] = (int16_t)(-8.0 * state->X[ch][i]);
-	}
-
-	pass = (pass+1) & 0x7;
-}
 
 
 -------------------------------------------------------
