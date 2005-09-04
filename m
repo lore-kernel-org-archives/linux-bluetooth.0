@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <dc98d8d9050904050925daa428@mail.gmail.com>
-From: Paul Webster <pjwebster@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bcm2035
-In-Reply-To: <001301c5b0be$d4717f90$0100a8c0@rdhome>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <C70061B183DE09419568AB2060C52A95980BDC@arion.intra.local>
-	 <001601c5b09c$df79dee0$0201a8c0@NBVICTOR>
-	 <001301c5b0be$d4717f90$0100a8c0@rdhome>
+Message-ID: <431AAF30.304@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] unrolling sbc decoder
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,70 +16,60 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 4 Sep 2005 22:09:52 +1000
+Date: Sun, 04 Sep 2005 02:24:16 -0600
 
-> Anybody tested the chip 2035 under BlueZ stack?
-I have a laptop sporting one of these USB based chips "built-in". An
-HP Pavilion zd8004AP
+Hey
 
-> I have been playing with it with good results, but suddently i get the
-> BD_ADDR as 00:00:00:00:00:00, and the dongle due to this (i think) is not
-> working even in windows. All other commands or inquiry process is working
-Same, although, when I first purchased the laptop, it came with
-Windows XP installed, and the bluetooth _WAS_ working. After
-repartitioning the 80Gb HDD and re-installing XP on a smaller
-partition, using the discs that came with the laptop, I couldn't get
-bluetooth installed again. I kept getting errors saying that the
-bluetooth license was not valid, and asking to locate the correct
-license file.
+I thought I had this nailed after some careful unrolling/simplifying 
+work but there may still be something I missed. I'm finding I get choppy 
+audio, but then I reverted and it was still choppy... can someone try 
+this in sbc.c with a2recv by transmit 8-subband audio to it from some 
+other device?
 
-Under linux, it works fine, although I have to specify the interface
-(hci0) every time I use things like hcitool and hciconfig. For
-example:
+Brad
 
-~ $ hciconfig
-hci0:   Type: USB
-        BD Address: 00:00:00:00:00:00 ACL MTU: 377:10 SCO MTU: 16:0
-        UP RUNNING PSCAN ISCAN=20
-        RX bytes:111 acl:0 sco:0 events:14 errors:0
-        TX bytes:310 acl:0 sco:0 commands:14 errors:0
-~ $ hcitool scan
-Device is not available: No such device
-~ $ hcitool -i hci0 scan
-Scanning ...
-        00:0A:94:C0:2A:6E       Bluetooth Mouse
-~ $ hidd --connect 00:0A:94:C0:2A:6E
-~ $ hidd --show                    =20
-00:0A:94:C0:2A:6E HID Boot Device [0000:0000] connected [boot-protocol]
+static inline void sbc_synthesize_eight(struct sbc_decoder_state *state,
+				struct sbc_frame *frame, int ch, int blk)
+{
+	int i, j, k, idx, offset;
+	static int off1[] = {0, 16, 32, 48, 64, 80, 96, 112, 0, 16, 32, 48, 64, 
+80, 96};
+	static int off2[] = {24, 40, 56, 72, 88, 104, 120, 8, 24, 40, 56, 72, 
+88, 104, 120};
+	static int pass = 0;
+	int window = pass*16;
 
-> Looks like it forgot its BD_ADDR, and as far as i know there is no SW
-> way(hci command) to set it again, I wonder if there is a SW way that i co=
-uld
-> have deleted it by mistake....
-This is kind of an interesting idea. I would have assumed that the
-BD_ADDR was a harware adress, and not alterable by software.
-Certainly, what I assume was/is the original adress is stamped on a
-sticker on the module (I pulled the laptop appart to check it out last
-week).
+	/* Matrixing */
+	for (k = 0; k < 16; k++) {
+		state->V[ch][window+k] = 0;
+		for (i = 0; i < 8; i++) {
+			state->V[ch][window+k] += synmatrix8[k][i] * 
+frame->sb_sample[blk][ch][i];
+		}
+	}
 
-> The model is BT3035 from Tecom with as i said the chip is Broadcom 2035
-for reference:
-~ $ lsusb
-...
-Bus 002 Device 002: ID 0a5c:2035 Broadcom Corp. BCM2035 Bluetooth
-...
+	for (j = 0; j < 8; j++) {
+		state->X[ch][j] = 0;
+	}
 
-The lable on the module says:
-Broadcom BCM92035NMD
-FCC ID: QDS-BRCM1009
-Canada IC: 4324A-BRCM1009
-HP PN: 36438-001
-Product of Taiwan
-F/W: 105.97 Rev:0A
-SPS PN: 376651-001
+	/* Calculate 8 audio samples */
+	for (i = 0; i <= 4; i++) {
+		offset = (i*2) + pass;
+		idx = i*16;
+		for (j = 0; j < 8; j++, idx++) {
+			state->X[ch][j] +=
+				state->V[ch][off1[offset] + j] * sbc_proto_8_80[idx] +
+				state->V[ch][off2[offset] + j] * sbc_proto_8_80[idx+8];
+		}
+	}
 
-> Any idea / advice ?
-I'm planning on looking into it some more once I have some more time
+	/* Ouput 8 reconstructed Audio Samples */
+	for (i = 0; i < 8; i++) {
+		frame->pcm_sample[ch][blk * 8 + i] = (int16_t)(-8.0 * state->X[ch][i]);
+	}
+
+	pass = (pass+1) & 0x7;
+}
 
 
 -------------------------------------------------------
