@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Guylhem Aznar <bluez-devel@externe.net>
+Message-ID: <431C4B37.4030004@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050905153219.GA6879@externe.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] hidp question
+Subject: Re: [Bluez-devel] sbc synthesis inconsistencies
+References: <Pine.LNX.4.33.0509051123130.25062-100000@redbean.intranet.gw-instruments.de>
+In-Reply-To: <Pine.LNX.4.33.0509051123130.25062-100000@redbean.intranet.gw-instruments.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,34 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 5 Sep 2005 11:32:19 -0400
+Date: Mon, 05 Sep 2005 07:42:15 -0600
 
-Hello
+Peter
 
-I'm still playing with hidp - now on a new system. Everything work,
-the keyboard is bound by hidd, no error.
+> outer loop goes from i=0 up to i=4 -> 5 times * 8 * 2 = 80
 
-The keyboard is reported as bound, and /dev/input/event1 displays
-activity when I press on the keys.  Yet pressing on any key does
-nothing.
+Yes, thanks... I missed the <= (working too late).
 
-I think I'm missing a kernel option. INPUT and INPUT_KEYBDEV are
-however included. Any idea/suggestion?
+I also remembered that Henryk was always testing the decoder against sbc 
+files on the filesystem which simplifies testing. I'm going to have 
+another whack at the simplification step and then try unrolling things.
 
-It already happened to me when I started playing with hidp on the
-zaurus, but I can't remember the solution.
-
---=20
-Bien =E0 vous - Best regards,
-Guylhem P. Aznar
-
---=20
-*@externe.net                                            http://externe.n=
-et
-P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
-un.org
-GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
-ey
+Brad
 
 
 -------------------------------------------------------
