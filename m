@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] About SCO PACKET SIZE
+Subject: Re: [Bluez-devel] sdp_connect, how to make it shorter ?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <11433896.1125404507500.JavaMail.Administrator@appsrv>
-References: <11433896.1125404507500.JavaMail.Administrator@appsrv>
+In-Reply-To: <becc9d2c0508300646fe3b33e@mail.gmail.com>
+References: <becc9d2c0508300646fe3b33e@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1125922229.11955.19.camel@pegasus>
+Message-Id: <1125922154.11955.17.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,19 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 05 Sep 2005 14:10:29 +0200
+Date: Mon, 05 Sep 2005 14:09:14 +0200
 
-Hi Ivy,
+Hi Andrea,
 
->      I have some query related to SCO PACKET... 
-> 
->    1.. About SCO PACKET PAYLOAD SIZE ...
->         I went through bluetooth specification. I found that HV1,HV2, HV3 packets payload size is 240bits. But information bytes are varied.  i m bit confused here.. what would be the Maximum size of SCO PACKET (Including HEADER).... 
-> 
->    2. Is there any identifier to identify the start of SCO PACKET or continuation of SCO PACKET ?...
+> i need to browse a set of random bt device for
+> a specific sdp profile. So use a function like
+> the "do_search" of sdptool.
+> But when an inquired bt device does not
+> aswer the request, the sdp_connect tries
+> for a long time to estabilish a connection,
+> and this is bad for my project.
+> How can i make much shorter the the sdp_connect
+> timeout ?
 
-the SCO packets are still voice packets. Read through email archive for
-comments about that.
+don't use the SDP_RETRY_IF_BUSY flag in sdp_connect().
 
 Regards
 
