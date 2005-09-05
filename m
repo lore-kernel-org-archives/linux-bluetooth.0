@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hid2hci segementation fault at boot time
+Subject: RE: [Bluez-devel] HCI data packet
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <27820.1125566922@www47.gmx.net>
-References: <27820.1125566922@www47.gmx.net>
+In-Reply-To: <20050901145400.BB3131EC845@mrelay1.st2.lyceu.net>
+References: <20050901145400.BB3131EC845@mrelay1.st2.lyceu.net>
 Content-Type: text/plain
-Message-Id: <1125921697.11955.8.camel@pegasus>
+Message-Id: <1125921628.11955.6.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,25 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 05 Sep 2005 14:01:37 +0200
+Date: Mon, 05 Sep 2005 14:00:28 +0200
 
-Hi Stefan,
+Hi Esther,
 
-> I own a Logitech Bluetooth Desktop keyboard and mouse. I wanted to use the
-> Logitech dongle to additionally connect my Bluetooth headset to the PC for
-> Skype voice calls. 
-> So far no problems, modules and demons load fine, switched the Logitech
-> dongle to bluetooth mode via hid2hci.
-> To automate this process during boot time I enabled the bluetooth.init
-> script. The demons and modules still load fine, but hid2hci crashes with a
-> segmentation fault. When I run the init script after bootup as superuser
-> everything goes fine.
-> Any idea where is the difference or what I am doing wrong?
-> Running Suse 9.1 with a vanilla kernel 2.6.12.4. Tried the last three
-> releases of Bluez.
+> Regarding HCI data packets and BlueZ...
+> 
+> If I use the BlueZ command "hci_create_connection" and connect to another
+> device, how do I sent an HCI data packet to this device?
 
-check with dmesg if you see a kernel oops. Otherwise use gdb to debug
-the problem.
+you need to use the raw socket for it and then follow the H:4 protocol,
+but doing any communication this way is not a good idea. You have to
+deal with different packet sizes and handle the ACL-cont flag. Even for
+a very simple protocol you should use L2CAP. The overhead of L2CAP is
+really not that much.
 
 Regards
 
