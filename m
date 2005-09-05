@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] 2. Re: Re: Re: Bluetooth SCO message
-	sending	(sco_send_frame)
+Subject: Re: [Bluez-devel] [PATCH] LM_AUTH and LM_ENCRYPT support for
+	outgoing sockets
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4312AEBD.4090907@core.kaist.ac.kr>
-References: <4312AEBD.4090907@core.kaist.ac.kr>
+In-Reply-To: <4316C4A0.1070100@palmsource.com>
+References: <4316C4A0.1070100@palmsource.com>
 Content-Type: text/plain
-Message-Id: <1125922447.11955.24.camel@pegasus>
+Message-Id: <1125922059.11955.15.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,28 +19,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 05 Sep 2005 14:14:07 +0200
+Date: Mon, 05 Sep 2005 14:07:39 +0200
 
-Hi,
+Hi Fred,
 
-> In my case, there is some problem when I connect SCO over UART(h4).
-> When I sent data to h4 interface, h4 make frame and btsco sent that
-> frame to the SCO channel.
-> The frame size from h4 interface is varied periodically and somtimes
-> larger than MTU size so SCO channel drop several frames.
-> 
-> Of course I changed the MTU size using "hciconfig scomtu" command but it
-> is not effective at all.
+> The following patch adds supports of LM_AUTH and LM_ENCRYPT flags for outgoing L2CAP and RFCOMM sockets.
 
-this command is useless.
+I am still not sure if LM_AUTH and LM_ENCRYPT support is needed for
+outgoing connection, but I would add it if the implementation is sane
+and it is tested enough.
 
-> Now, I tested the problem using samsung module based on CSR bluecore
-> chipset.
-> However, there is no problem if I use SCO over USB because the frame
-> size from USB is always same & smaller than MTU.
+> diff -ruN linux-2.6.12.5/include/net/bluetooth/bluetooth.h linux-2.6.12.5-fda/include/net/bluetooth/bluetooth.h
+> --- linux-2.6.12.5/include/net/bluetooth/bluetooth.h	2005-08-15 02:20:18.000000000 +0200
+> +++ linux-2.6.12.5-fda/include/net/bluetooth/bluetooth.h	2005-08-25 10:43:47.000000000 +0200
+> @@ -73,6 +73,7 @@
+>  	BT_LISTEN,
+>  	BT_CONNECT,
+>  	BT_CONNECT2,
+> +	BT_CONNECT3,
+>  	BT_CONFIG,
+>  	BT_DISCONN,
+>  	BT_CLOSED
 
-As I told you, the kernel will tell you the MTU size you have to use and
-then you must segment and reassembly in your code.
+Without fully looking at the rest of your patch, I can tell you that we
+can't do it this way. This will break the userspace, because we use the
+same enum in userspace. Please find another way.
 
 Regards
 
