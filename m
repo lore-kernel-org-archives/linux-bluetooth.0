@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sdp_connect, how to make it shorter ?
+Subject: Re: [Bluez-devel] hid2hci segementation fault at boot time
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <becc9d2c0508300646fe3b33e@mail.gmail.com>
-References: <becc9d2c0508300646fe3b33e@mail.gmail.com>
+In-Reply-To: <27820.1125566922@www47.gmx.net>
+References: <27820.1125566922@www47.gmx.net>
 Content-Type: text/plain
-Message-Id: <1125922154.11955.17.camel@pegasus>
+Message-Id: <1125921697.11955.8.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,21 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 05 Sep 2005 14:09:14 +0200
+Date: Mon, 05 Sep 2005 14:01:37 +0200
 
-Hi Andrea,
+Hi Stefan,
 
-> i need to browse a set of random bt device for
-> a specific sdp profile. So use a function like
-> the "do_search" of sdptool.
-> But when an inquired bt device does not
-> aswer the request, the sdp_connect tries
-> for a long time to estabilish a connection,
-> and this is bad for my project.
-> How can i make much shorter the the sdp_connect
-> timeout ?
+> I own a Logitech Bluetooth Desktop keyboard and mouse. I wanted to use the
+> Logitech dongle to additionally connect my Bluetooth headset to the PC for
+> Skype voice calls. 
+> So far no problems, modules and demons load fine, switched the Logitech
+> dongle to bluetooth mode via hid2hci.
+> To automate this process during boot time I enabled the bluetooth.init
+> script. The demons and modules still load fine, but hid2hci crashes with a
+> segmentation fault. When I run the init script after bootup as superuser
+> everything goes fine.
+> Any idea where is the difference or what I am doing wrong?
+> Running Suse 9.1 with a vanilla kernel 2.6.12.4. Tried the last three
+> releases of Bluez.
 
-don't use the SDP_RETRY_IF_BUSY flag in sdp_connect().
+check with dmesg if you see a kernel oops. Otherwise use gdb to debug
+the problem.
 
 Regards
 
