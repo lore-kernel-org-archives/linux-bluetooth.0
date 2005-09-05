@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <431C4B37.4030004@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] 2. Re: Re: Re: Bluetooth SCO message
+	sending	(sco_send_frame)
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] sbc synthesis inconsistencies
-References: <Pine.LNX.4.33.0509051123130.25062-100000@redbean.intranet.gw-instruments.de>
-In-Reply-To: <Pine.LNX.4.33.0509051123130.25062-100000@redbean.intranet.gw-instruments.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <4312AEBD.4090907@core.kaist.ac.kr>
+References: <4312AEBD.4090907@core.kaist.ac.kr>
+Content-Type: text/plain
+Message-Id: <1125922447.11955.24.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,19 +19,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 05 Sep 2005 07:42:15 -0600
+Date: Mon, 05 Sep 2005 14:14:07 +0200
 
-Peter
+Hi,
 
-> outer loop goes from i=0 up to i=4 -> 5 times * 8 * 2 = 80
+> In my case, there is some problem when I connect SCO over UART(h4).
+> When I sent data to h4 interface, h4 make frame and btsco sent that
+> frame to the SCO channel.
+> The frame size from h4 interface is varied periodically and somtimes
+> larger than MTU size so SCO channel drop several frames.
+> 
+> Of course I changed the MTU size using "hciconfig scomtu" command but it
+> is not effective at all.
 
-Yes, thanks... I missed the <= (working too late).
+this command is useless.
 
-I also remembered that Henryk was always testing the decoder against sbc 
-files on the filesystem which simplifies testing. I'm going to have 
-another whack at the simplification step and then try unrolling things.
+> Now, I tested the problem using samsung module based on CSR bluecore
+> chipset.
+> However, there is no problem if I use SCO over USB because the frame
+> size from USB is always same & smaller than MTU.
 
-Brad
+As I told you, the kernel will tell you the MTU size you have to use and
+then you must segment and reassembly in your code.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
