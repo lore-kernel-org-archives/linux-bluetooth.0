@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Andreas Beck <becka@uni-duesseldorf.de>
 Subject: Re: [Bluez-users] I have a question about the bdaddr utility
-From: Marcel Holtmann <marcel@holtmann.org>
+In-reply-to: <1126026222.4645.53.camel@blade>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050906201502.GA4955@uni-duesseldorf.de>
-References: <431DC228.7030309@infomatrix.com>
-	 <1126026222.4645.53.camel@blade> <20050906201502.GA4955@uni-duesseldorf.de>
-Content-Type: text/plain
-Message-Id: <1126040038.19765.3.camel@blade>
-Mime-Version: 1.0
+Message-id: <20050906201502.GA4955@uni-duesseldorf.de>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+References: <431DC228.7030309@infomatrix.com> <1126026222.4645.53.camel@blade>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,50 +18,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 06 Sep 2005 22:53:58 +0200
+Date: Tue, 06 Sep 2005 22:15:02 +0200
 
-Hi Andy,
+Marcel Holtmann <marcel@holtmann.org> wrote:
+> > My question is, is this change permanently written to the chip, or is it 
+> > merely a volatile change as far as the running kernel is concerned?
+> the change is permanent.
 
-> > > My question is, is this change permanently written to the chip, or is it 
-> > > merely a volatile change as far as the running kernel is concerned?
-> > the change is permanent.
-> 
-> Would it be possible to make it volatile?
+Would it be possible to make it volatile?
 
-in case of CSR chips the BD_ADDR is a PSKEY. I don't know if it can be
-made volatile. This is a question for the CSR gurus ;)
+> > The reason I ask is that I am having trouble with dual-booting between 
+> > Windows XP and Linux. I have to repair each time I swap operating 
+> > systems and it is a pain.
+> Once you paired with Linux you can store the link key on the Bluetooth
+> chip and you don't need to repair with Windows. Check the hciconfig for
+> the correct command.
 
-> > > The reason I ask is that I am having trouble with dual-booting between 
-> > > Windows XP and Linux. I have to repair each time I swap operating 
-> > > systems and it is a pain.
-> > Once you paired with Linux you can store the link key on the Bluetooth
-> > chip and you don't need to repair with Windows. Check the hciconfig for
-> > the correct command.
-> 
-> Could you please detail on that? I can see no obvious way in the manpage
-> (maybe I should use CVS version?) and I don't quite understand how it
-> would work. Is there some on-chip storage for linkkeys that gets read
-> by the windows drivers?
+Could you please detail on that? I can see no obvious way in the manpage
+(maybe I should use CVS version?) and I don't quite understand how it
+would work. Is there some on-chip storage for linkkeys that gets read
+by the windows drivers?
 
-Whoops. It seems that I forgot to update the manual page. What you are
-searching for are the putkey and delkey commands. Call "hciconfig -h".
+I'm asking, because I have the same problem when moving a bluetooth adapter 
+between two different PCs. The headset will need to be re-paired with the 
+other PC, whenever I do so (and I got to remove the linkkey before, of 
+course).
 
-> I'm asking, because I have the same problem when moving a bluetooth adapter 
-> between two different PCs. The headset will need to be re-paired with the 
-> other PC, whenever I do so (and I got to remove the linkkey before, of 
-> course).
-> 
-> I could try copying the link keys, as they are both linux (not sure, if 
-> that would work, but it sounds worth a try), but I doubt this is possible 
-> with windows.
-
-Copying the link key should work.
-
-Regards
-
-Marcel
+I could try copying the link keys, as they are both linux (not sure, if 
+that would work, but it sounds worth a try), but I doubt this is possible 
+with windows.
 
 
+CU, Andy
 
 
 -------------------------------------------------------
