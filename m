@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Beck <becka@uni-duesseldorf.de>
 Subject: Re: [Bluez-users] I have a question about the bdaddr utility
-In-reply-to: <1126026222.4645.53.camel@blade>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Message-id: <20050906201502.GA4955@uni-duesseldorf.de>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-References: <431DC228.7030309@infomatrix.com> <1126026222.4645.53.camel@blade>
+In-Reply-To: <431DC228.7030309@infomatrix.com>
+References: <431DC228.7030309@infomatrix.com>
+Content-Type: text/plain
+Message-Id: <1126026222.4645.53.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,38 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 06 Sep 2005 22:15:02 +0200
+Date: Tue, 06 Sep 2005 19:03:42 +0200
 
-Marcel Holtmann <marcel@holtmann.org> wrote:
-> > My question is, is this change permanently written to the chip, or is it 
-> > merely a volatile change as far as the running kernel is concerned?
-> the change is permanent.
+Hi Ben,
 
-Would it be possible to make it volatile?
+> Maybe this should be directed at bluez-devel, but I'll ask anyway.
+> I have a question about the bdaddr utility, with reference to a CSR 
+> chipset, connected via internal USB on a Sony Vaio
+> According to the list, this utility is able to change the bluetooth 
+> address of a particular device.
+> 
+> My question is, is this change permanently written to the chip, or is it 
+> merely a volatile change as far as the running kernel is concerned?
 
-> > The reason I ask is that I am having trouble with dual-booting between 
-> > Windows XP and Linux. I have to repair each time I swap operating 
-> > systems and it is a pain.
-> Once you paired with Linux you can store the link key on the Bluetooth
-> chip and you don't need to repair with Windows. Check the hciconfig for
-> the correct command.
+the change is permanent.
 
-Could you please detail on that? I can see no obvious way in the manpage
-(maybe I should use CVS version?) and I don't quite understand how it
-would work. Is there some on-chip storage for linkkeys that gets read
-by the windows drivers?
+> The reason I ask is that I am having trouble with dual-booting between 
+> Windows XP and Linux. I have to repair each time I swap operating 
+> systems and it is a pain.
 
-I'm asking, because I have the same problem when moving a bluetooth adapter 
-between two different PCs. The headset will need to be re-paired with the 
-other PC, whenever I do so (and I got to remove the linkkey before, of 
-course).
+Once you paired with Linux you can store the link key on the Bluetooth
+chip and you don't need to repair with Windows. Check the hciconfig for
+the correct command.
 
-I could try copying the link keys, as they are both linux (not sure, if 
-that would work, but it sounds worth a try), but I doubt this is possible 
-with windows.
+Regards
+
+Marcel
 
 
-CU, Andy
 
 
 -------------------------------------------------------
