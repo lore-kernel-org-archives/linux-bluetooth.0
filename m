@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Fix memory textfile_get() memory leaks
+Subject: Re: [Bluez-devel] [PATCH] Properly replace an existing key value
+	pair in a text file
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <431ECFA0.50401@tcs.hut.fi>
-References: <431ECFA0.50401@tcs.hut.fi>
+In-Reply-To: <431ECC4D.9030302@tcs.hut.fi>
+References: <431ECC4D.9030302@tcs.hut.fi>
 Content-Type: text/plain
-Message-Id: <1126094328.10631.24.camel@blade>
+Message-Id: <1126094276.10631.22.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,17 +19,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 07 Sep 2005 13:58:48 +0200
+Date: Wed, 07 Sep 2005 13:57:56 +0200
 
 Hi Ville,
 
-> there apparently are a couple of places where the bluez-utils is leaking 
-> memory after calling textfile_get(). The patch below should fix this...
+> textfile_put() was unable to replace a key value pair if it happened to 
+> be the last entry in a file. I noticed this problem in bluez-utils-2.19, 
+> but it still seems to exist in the latest CVS code. The patch below 
+> should fix it...
 
-coding style, coding style, coding style !!!
-
-We use tabs instead of whitespaces. This means your patch is wrong or
-your mailer screwed it up.
+I though that I fixed this. Are you sure that problem is still present?
 
 Regards
 
