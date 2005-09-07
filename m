@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <431F0839.7050502@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] LM_AUTH and LM_ENCRYPT support
+	for	outgoing sockets
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: a2play and rtc/pthread
-References: <20050830050012.1059BA0286@bostoncoop.net>
-In-Reply-To: <20050830050012.1059BA0286@bostoncoop.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <431F0401.4010808@palmsource.com>
+References: <4316C4A0.1070100@palmsource.com>
+	 <1125922059.11955.15.camel@pegasus>  <431F0401.4010808@palmsource.com>
+Content-Type: text/plain
+Message-Id: <1126107009.10631.69.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,46 +20,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 07 Sep 2005 09:33:13 -0600
+Date: Wed, 07 Sep 2005 17:30:09 +0200
 
-Nat,
+Hi Fred,
 
-FWIW, I found and fixed a problem in the way we interpreted the rtc 
-return, but I still kept having problems with using what libsbc returned 
-for the duration of a frame.
+> This patch can help us to develop an application to create pairing 
+> between devices with no need to be root. Further more, in Handsfree 
+> profile it is written that : "If both devices support authentication and 
+> encryption, the application on either device may require its use."
 
-Brad
+I don't really like it, but I already opened my mind to accept such a
+patch. However this must be tested a lot so we can be sure that it
+doesn't break any state machine.
 
-Nat Butler wrote:
-> Hi Brad,
-> 
-> I tried the new a2play code on my Motorola HT820.
-> 
-> 
->>I just committed changes to a2play so it can use the real time clock
->>inside a separate thread for sending frames to the headset. Please try
->>it out. (flag is -p)
->>
->>The values to tweak are TICKS and the first "100" in the frameticks
->>assignment.
-> 
-> 
-> I'm finding that the sound cuts out after about 10 seconds of playing an mp3 with -p.  I haven't found a value to replace the 100 which corrects that.  
-> 
-> Per a previous suggestion of yours, I tried using different values from 87 for the itimer option.  A value of 84 seems to work decently with this headset.  The sound cuts out for a fraction of a second every 15 seconds or so.  I was unable to improve this with different values or by using a range of values with either the -t or -t -t options.  
-> 
-> -Nat
-> 
-> 
-> -------------------------------------------------------
-> SF.Net email is Sponsored by the Better Software Conference & EXPO
-> September 19-22, 2005 * San Francisco, CA * Development Lifecycle Practices
-> Agile & Plan-Driven Development * Managing Projects & Teams * Testing & QA
-> Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> I have updated the patch so it should no more break userspace.
+
+The RFCOMM part is wrong. You can't set the LM mode of RFCOMM to the
+underlaying L2CAP. This means that the authentication/encryption will be
+triggered when the L2CAP connection is created and not on the SABM at
+RFCOMM level.
+
+Please drop the RFCOMM part for now and send in patch that only modifies
+the L2CAP layer. We need to get this right and tested first anyhow.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
