@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] PAN question
+Subject: Re: [Bluez-devel] [PATCH] Fix memory textfile_get() memory leaks
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050907111226.010371EC5B3@mrelay1.st2.lyceu.net>
-References: <20050907111226.010371EC5B3@mrelay1.st2.lyceu.net>
+In-Reply-To: <431ECFA0.50401@tcs.hut.fi>
+References: <431ECFA0.50401@tcs.hut.fi>
 Content-Type: text/plain
-Message-Id: <1126095186.10631.33.camel@blade>
+Message-Id: <1126094328.10631.24.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,19 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 07 Sep 2005 14:13:06 +0200
+Date: Wed, 07 Sep 2005 13:58:48 +0200
 
-Hi Esther,
+Hi Ville,
 
-> One more question. I can have one Bluetooth device on two different piconet,
-> acting as a master in one of them, and as a slave in the other, and
-> therefore forming a scatternet. But can this Bluetooth device form one PAN
-> on each piconet, and be GN on one of them and PANU on the other?
+> there apparently are a couple of places where the bluez-utils is leaking 
+> memory after calling textfile_get(). The patch below should fix this...
 
-you can and talking about GN and PANU is crap. The specification of PAN
-has been written by someone without network knowledge at all. Every BNEP
-connection has its own network interface in Linux and after that you can
-use Bridging, Routing, NAT etc. to form the needed TCP/IP networks.
+coding style, coding style, coding style !!!
+
+We use tabs instead of whitespaces. This means your patch is wrong or
+your mailer screwed it up.
 
 Regards
 
