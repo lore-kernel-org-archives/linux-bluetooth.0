@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Properly replace an existing key value
-	pair in a text file
+Subject: Re: [Bluez-devel] [PATCH] Fix memory textfile_get() memory leaks
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <431F0F7C.9090006@tcs.hut.fi>
-References: <431ECC4D.9030302@tcs.hut.fi> <1126094276.10631.22.camel@blade>
-	 <431F0F7C.9090006@tcs.hut.fi>
+In-Reply-To: <431F1F9C.4010900@tcs.hut.fi>
+References: <431ECFA0.50401@tcs.hut.fi> <1126094328.10631.24.camel@blade>
+	 <431F1041.3040603@tcs.hut.fi>  <431F1F9C.4010900@tcs.hut.fi>
 Content-Type: text/plain
-Message-Id: <1126114397.10631.80.camel@blade>
+Message-Id: <1126113908.10631.78.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,21 +19,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 07 Sep 2005 19:33:17 +0200
+Date: Wed, 07 Sep 2005 19:25:08 +0200
 
 Hi Ville,
 
-> Yes. I located the problem in Gentoo's bluez-utils-2.19 and since it 
-> hasn't yet been fixed in the CVS repository, I'm quite certain it still 
-> is present ;-)
-> 
-> I noticed the problem when hcid just wouldn't update the link key in 
-> var/lib/bluetooth/<hwaddr>/linkkeys, even though the debug statements 
-> claimed otherwise. The textfile_put() function clearly works incorrectly 
-> since zero is a valid value for the len variable, but the if (len <= 0 
-> || ..) check causes the the function to exit before anything is written.
+> Sorry, I forgot to include stdlib.h in test_textfile.c. Please use this 
+> updated patch file...
 
-this sounds plausible. Your patch is applied to the CVS. Thanks.
+ok, this one is now in the CVS. Thanks for looking at it. More fixes for
+memory leaks are welcome ;)
 
 Regards
 
