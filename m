@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: david <gangchen@mobilesoft.com.cn>
+From: Peter Stephenson <pws@csr.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1126084543.3507.4.camel@localhost.localdomain>
+Subject: Re: [Bluez-users] I have a question about the bdaddr utility
+Message-Id: <20050907101308.027e8482.pws@csr.com>
+In-Reply-To: <1126040038.19765.3.camel@blade>
+References: <431DC228.7030309@infomatrix.com>
+    <1126026222.4645.53.camel@blade>
+    <20050906201502.GA4955@uni-duesseldorf.de>
+    <1126040038.19765.3.camel@blade>
 Mime-Version: 1.0
-Subject: [Bluez-users] file transfer problem
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,196 +21,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 07 Sep 2005 17:15:43 +0800
+Date: Wed, 7 Sep 2005 10:13:08 +0100
 
-hi,
+Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Andy,
+> 
+> > > > My question is, is this change permanently written to the chip, or is it 
+> > > > merely a volatile change as far as the running kernel is concerned?
+> > > the change is permanent.
+> > 
+> > Would it be possible to make it volatile?
+> 
+> in case of CSR chips the BD_ADDR is a PSKEY. I don't know if it can be
+> made volatile. This is a question for the CSR gurus ;)
 
-I meet a problem while doing file transfer using bluez-2.9 source code.
-Some
-phone cannot find my services I register. I browse my sevice and get the
-following message:
+It's possible to have volatile PSKEYs.  You need to use the CSR BCCMD
+command set to make this work, but that's the same set you'd be using to
+write the PSKEY to flash.  The command is BCCMDVARID_PS.  You write the
+PSKEY to temporary (actually, it says here "transient") store (code 8)
+instead of the default (code 0) or implementation (usually meaning flash,
+code 1).  Then you have to perform a warm reset by setting
+BCCMDVARID_WARM_RESET --- this resets pretty much everything except the
+persistent store, including resetting the host transport.  There's no way
+around the warm reset; the new address won't take effect otherwise.  Note
+the temporary store overrides any address in flash.
 
-/************browse my phone*******************/
-Browsing 00:0D:18:01:1C:2E ...
-Service Name: SDP Server
-Service Description: Bluetooth service discovery server
-Service Provider: BlueZ
-Service RecHandle: 0x0
-Service Class ID List:
-  "SDP Server" (0x1000)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 1
-    Version: 0x0001
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
+If you don't already have access to the BCCMD command set this is likely to
+be Greek, unfortunately.  (Unless you speak Greek.)
 
-Service Name: Public Browse Group Root
-Service Description: Root of public browse hierarchy
-Service Provider: BlueZ
-Service RecHandle: 0x804d008
-Service Class ID List:
-  "Browse Group Descriptor" (0x1001)
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-
-Service Name: OBEX Object Push
-Service RecHandle: 0x804d9f0
-Service Class ID List:
-  "OBEX Object Push" (0x1105)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 2
-  "OBEX" (0x0008)
-Profile Descriptor List:
-  "OBEX Object Push" (0x1105)
-    Version: 0x0100
-
-Service Name: Serial Port
-Service RecHandle: 0x804fa00
-Service Class ID List:
-  "Serial Port" (0x1101)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 1
-Profile Descriptor List:
-  "Serial Port" (0x1101)
-    Version: 0x0100
-
-/*****************************/
+pws
 
 
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
 
-So I compare my phone's service with others'. I find the only difference
-between them is that my Service RecHandle is different from others. My
-Service Rechandle is very big such as ox804fa00. Others are 0x10000,
-0x10001...,and so on. Is there anything to do with Service RecHandle why
-other bluetooth devices cannot find my bluetooth services?
+**********************************************************************
 
-I am expecting for you reply. Thanks very much.
-
-/*****other bluetooth device's service***/
-
-
-sdptool browse 00:E0:03:35:9C:C3
-Browsing 00:E0:03:35:9C:C3 ...
-Service Name: OBEX Object Push
-Service RecHandle: 0x10000
-Service Class ID List:
- "OBEX Object Push" (0x1105)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 9
- "OBEX" (0x0008)
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "OBEX Object Push" (0x1105)
-   Version: 0x0100
-
-Service Name: OBEX File Transfer
-Service RecHandle: 0x10001
-Service Class ID List:
- "OBEX File Transfer" (0x1106)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 10
- "OBEX" (0x0008)
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "OBEX File Transfer" (0x1106)
-   Version: 0x0100
-
-Service Name: Dial-up networking
-Service RecHandle: 0x10002
-Service Class ID List:
- "Dialup Networking" (0x1103)
- "Generic Networking" (0x1201)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 1
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "Dialup Networking" (0x1103)
-   Version: 0x0100
-
-Service Name: Nokia PC Suite
-Service RecHandle: 0x10003
-Service Class ID List:
- "Serial Port" (0x1101)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 15
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-
-Service Name: COM 1
-Service RecHandle: 0x10004
-Service Class ID List:
- "Serial Port" (0x1101)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 3
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-
-Service Name: Voice Gateway
-Service RecHandle: 0x10005
-Service Class ID List:
- "" (0x111f)
- "Generic Audio" (0x1203)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 13
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "" (0x111e)
-   Version: 0x0101
-
-Service Name: Audio Gateway
-Service RecHandle: 0x10006
-Service Class ID List:
- "Headset Audio Gateway" (0x1112)
- "Generic Audio" (0x1203)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 12
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "Headset" (0x1108)
-   Version: 0x0100
-/********************************8/
 
 
 -------------------------------------------------------
