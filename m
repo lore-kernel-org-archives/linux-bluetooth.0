@@ -1,13 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Content-Type: text/plain;
-  charset="iso-8859-1"
-From: Ronny L Nilsson <bb@arbetsmyra.dyndns.org>
+Subject: Re: [Bluez-users] Hcidump stays in waiting state after RFCOMM "PN
+	CMD" packet
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] I have a question about the bdaddr utility
-References: <431DC228.7030309@infomatrix.com> <20050906201502.GA4955@uni-duesseldorf.de> <1126040038.19765.3.camel@blade>
-In-Reply-To: <1126040038.19765.3.camel@blade>
-MIME-Version: 1.0
-Message-Id: <20050907091350.437D57ED@arbetsmyra.dyndns.org>
+In-Reply-To: <1326.193.48.73.126.1126083608.squirrel@webmail.essi.fr>
+References: <200509071002.26456.cijoml@volny.cz>
+	 <1301.193.48.73.126.1126082483.squirrel@webmail.essi.fr>
+	 <1126082971.29676.43.camel@blade>
+	 <1326.193.48.73.126.1126083608.squirrel@webmail.essi.fr>
+Content-Type: text/plain
+Message-Id: <1126083857.29676.47.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,30 +22,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 7 Sep 2005 11:13:13 +0200
+Date: Wed, 07 Sep 2005 11:04:17 +0200
 
+Hi Steve,
 
-> > > > My question is, is this change permanently written to the chip,
-> > > > or is it merely a volatile change as far as the running kernel
-> > > > is concerned?
-> > >
-> > > the change is permanent.
-> >
-> > Would it be possible to make it volatile?
->
-> in case of CSR chips the BD_ADDR is a PSKEY. I don't know if it can
-> be made volatile. This is a question for the CSR gurus ;)
+> I'm begginner with Bluetooth and... in fact I don't know what to do that.
+> I'm using Linux and I tryed several things without success.
+> As my PC is a slave and can't connect to the bluetooth device (this last
+> one initiate connection when it wants to send data), I couldn't use rfcomm
+> program... Should I launch rfcomm with special options or a ppp service or
+> someone like that ?
 
+how should I know if you don't tell what you really wanna do. I only
+commented on your snippet of hcidump ;)
 
-Hi
-This is a bit of guessing...but I think there is at least a theoretical 
-way of achieving this volatile.
+Regards
 
-Some PSKEYs can be written to the device RAM which then overrides the 
-persisten flash values as long power supply retains. Haven't tried it 
-though but it's perhaps something to investigate further.
-
-/Ronny
+Marcel
 
 
 
