@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <431F1041.3040603@tcs.hut.fi>
+Message-ID: <431F0F7C.9090006@tcs.hut.fi>
 From: Ville Nuorvala <vnuorval@tcs.hut.fi>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH] Fix memory textfile_get() memory leaks
-References: <431ECFA0.50401@tcs.hut.fi> <1126094328.10631.24.camel@blade>
-In-Reply-To: <1126094328.10631.24.camel@blade>
+Subject: Re: [Bluez-devel] [PATCH] Properly replace an existing key value
+ pair in a text file
+References: <431ECC4D.9030302@tcs.hut.fi> <1126094276.10631.22.camel@blade>
+In-Reply-To: <1126094276.10631.22.camel@blade>
 Content-Type: multipart/mixed;
- boundary="------------090203010206050706090702"
+ boundary="------------020909090404040003010802"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,10 +20,10 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 07 Sep 2005 19:07:29 +0300
+Date: Wed, 07 Sep 2005 19:04:12 +0300
 
 This is a multi-part message in MIME format.
---------------090203010206050706090702
+--------------020909090404040003010802
 Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Content-Transfer-Encoding: 7bit
 
@@ -30,16 +31,26 @@ Marcel Holtmann wrote:
 > Hi Ville,
 > 
 > 
->>there apparently are a couple of places where the bluez-utils is leaking 
->>memory after calling textfile_get(). The patch below should fix this...
+>>textfile_put() was unable to replace a key value pair if it happened to 
+>>be the last entry in a file. I noticed this problem in bluez-utils-2.19, 
+>>but it still seems to exist in the latest CVS code. The patch below 
+>>should fix it...
 > 
 > 
-> coding style, coding style, coding style !!!
-> 
-> We use tabs instead of whitespaces. This means your patch is wrong or
-> your mailer screwed it up.
+> I though that I fixed this. Are you sure that problem is still present?
 
-Sorry, the tabs got screwed up. The attached patch should be acceptable.
+Yes. I located the problem in Gentoo's bluez-utils-2.19 and since it 
+hasn't yet been fixed in the CVS repository, I'm quite certain it still 
+is present ;-)
+
+I noticed the problem when hcid just wouldn't update the link key in 
+var/lib/bluetooth/<hwaddr>/linkkeys, even though the debug statements 
+claimed otherwise. The textfile_put() function clearly works incorrectly 
+since zero is a valid value for the len variable, but the if (len <= 0 
+|| ..) check causes the the function to exit before anything is written.
+
+Btw, I resend the patch as a separate attachement since the tabs got 
+screwed up last time.
 
 Regards,
 Ville
@@ -50,63 +61,39 @@ Laboratory for Theoretical Computer Science,
 Helsinki University of Technology
 email: vnuorval@tcs.hut.fi, phone: +358 (0)9 451 5257
 
---------------090203010206050706090702
+--------------020909090404040003010802
 Content-Type: text/x-patch;
- name="mem_leak.patch"
+ name="replace_key_value.patch"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline;
- filename="mem_leak.patch"
+ filename="replace_key_value.patch"
 
-Index: hcid/storage.c
+Index: common/textfile.c
 ===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/storage.c,v
-retrieving revision 1.24
-diff -u -r1.24 storage.c
---- hcid/storage.c	30 Aug 2005 00:35:39 -0000	1.24
-+++ hcid/storage.c	7 Sep 2005 14:36:58 -0000
-@@ -87,6 +87,8 @@
- 		str[248] = '\0';
- 	strcpy(name, str);
+RCS file: /cvsroot/bluez/utils/common/textfile.c,v
+retrieving revision 1.6
+diff -u -r1.6 textfile.c
+--- common/textfile.c	30 Aug 2005 00:35:39 -0000	1.6
++++ common/textfile.c	7 Sep 2005 11:06:43 -0000
+@@ -180,8 +180,14 @@
+ 	end += len;
  
-+	free(str);
-+
- 	return 0;
- }
- 
-@@ -161,6 +163,7 @@
- 		memcpy(tmp, str + (i * 2), 2);
- 		key[i] = (uint8_t) strtol(tmp, NULL, 16);
+ 	len = size - (end - map);
+-
+-	if (len <= 0 || len > size) {
++	if (!len) {
++		munmap(map, size);
++		ftruncate(fd, base);
++		pos = lseek(fd, base, SEEK_SET);
++		err = write_key_value(fd, key, value);
++		goto unlock;
++	}
++	if (len < 0 || len > size) {
+ 		err = EILSEQ;
+ 		goto unmap;
  	}
-+	free(str);
- 
- 	return 0;
- }
-@@ -181,5 +184,7 @@
- 	strncpy(pin, str, 16);
- 	len = strlen(pin);
- 
-+	free(str);
-+
- 	return len;
- }
-Index: common/test_textfile.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/common/test_textfile.c,v
-retrieving revision 1.2
-diff -u -r1.2 test_textfile.c
---- common/test_textfile.c	6 Aug 2005 06:27:40 -0000	1.2
-+++ common/test_textfile.c	7 Sep 2005 14:36:58 -0000
-@@ -64,6 +64,8 @@
- 		str = textfile_get(filename, key);
- 		if (!str)
- 			fprintf(stderr, "No value for %s\n", key);
-+		else
-+			free(str);
- 	}
- 
- 	return 0;
 
---------------090203010206050706090702--
+--------------020909090404040003010802--
 
 
 -------------------------------------------------------
