@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] LM_AUTH and LM_ENCRYPT
-	support	for	outgoing sockets
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <431F1041.3040603@tcs.hut.fi>
+From: Ville Nuorvala <vnuorval@tcs.hut.fi>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <431F0CEB.30605@palmsource.com>
-References: <4316C4A0.1070100@palmsource.com>
-	 <1125922059.11955.15.camel@pegasus>  <431F0401.4010808@palmsource.com>
-	 <1126107009.10631.69.camel@blade>  <431F0CEB.30605@palmsource.com>
-Content-Type: text/plain
-Message-Id: <1126110986.10631.74.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] Fix memory textfile_get() memory leaks
+References: <431ECFA0.50401@tcs.hut.fi> <1126094328.10631.24.camel@blade>
+In-Reply-To: <1126094328.10631.24.camel@blade>
+Content-Type: multipart/mixed;
+ boundary="------------090203010206050706090702"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,27 +19,94 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 07 Sep 2005 18:36:26 +0200
+Date: Wed, 07 Sep 2005 19:07:29 +0300
 
-Hi Fred,
+This is a multi-part message in MIME format.
+--------------090203010206050706090702
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> Find attached the l2cap patch.
+Marcel Holtmann wrote:
+> Hi Ville,
+> 
+> 
+>>there apparently are a couple of places where the bluez-utils is leaking 
+>>memory after calling textfile_get(). The patch below should fix this...
+> 
+> 
+> coding style, coding style, coding style !!!
+> 
+> We use tabs instead of whitespaces. This means your patch is wrong or
+> your mailer screwed it up.
 
-this will actually need some time, because your patch is quite complex.
+Sorry, the tabs got screwed up. The attached patch should be acceptable.
 
-However looking at the first chunk. This means you wanna authenticate
-after we established the ACL link. I think this is wrong. We should
-first send the connection request and on a positive response we will
-authenticate. The reason for this is that the other side might request
-also the authentication and if they do we don't have to do anything.
+Regards,
+Ville
+-- 
+Ville Nuorvala
+Research Assistant,
+Laboratory for Theoretical Computer Science,
+Helsinki University of Technology
+email: vnuorval@tcs.hut.fi, phone: +358 (0)9 451 5257
 
-Can you fix this?
+--------------090203010206050706090702
+Content-Type: text/x-patch;
+ name="mem_leak.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="mem_leak.patch"
 
-Regards
+Index: hcid/storage.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/storage.c,v
+retrieving revision 1.24
+diff -u -r1.24 storage.c
+--- hcid/storage.c	30 Aug 2005 00:35:39 -0000	1.24
++++ hcid/storage.c	7 Sep 2005 14:36:58 -0000
+@@ -87,6 +87,8 @@
+ 		str[248] = '\0';
+ 	strcpy(name, str);
+ 
++	free(str);
++
+ 	return 0;
+ }
+ 
+@@ -161,6 +163,7 @@
+ 		memcpy(tmp, str + (i * 2), 2);
+ 		key[i] = (uint8_t) strtol(tmp, NULL, 16);
+ 	}
++	free(str);
+ 
+ 	return 0;
+ }
+@@ -181,5 +184,7 @@
+ 	strncpy(pin, str, 16);
+ 	len = strlen(pin);
+ 
++	free(str);
++
+ 	return len;
+ }
+Index: common/test_textfile.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/common/test_textfile.c,v
+retrieving revision 1.2
+diff -u -r1.2 test_textfile.c
+--- common/test_textfile.c	6 Aug 2005 06:27:40 -0000	1.2
++++ common/test_textfile.c	7 Sep 2005 14:36:58 -0000
+@@ -64,6 +64,8 @@
+ 		str = textfile_get(filename, key);
+ 		if (!str)
+ 			fprintf(stderr, "No value for %s\n", key);
++		else
++			free(str);
+ 	}
+ 
+ 	return 0;
 
-Marcel
-
-
+--------------090203010206050706090702--
 
 
 -------------------------------------------------------
