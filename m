@@ -1,12 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <431F0465.70605@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <1589.193.48.73.126.1126102883.squirrel@webmail.essi.fr>
+In-Reply-To: <1126083857.29676.47.camel@blade>
+References: <200509071002.26456.cijoml@volny.cz>
+    <1301.193.48.73.126.1126082483.squirrel@webmail.essi.fr>
+    <1126082971.29676.43.camel@blade>
+    <1326.193.48.73.126.1126083608.squirrel@webmail.essi.fr>
+    <1126083857.29676.47.camel@blade>
+Subject: Re: [Bluez-users] Hcidump stays in waiting state after RFCOMM "PN  
+     CMD" packet
+From: "Steve MOREAU" <moreau@essi.fr>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Mobi Bluetooth RC
-References: <200509061212.56588.mailing-list@wauter.com> <200509061316.11145.dpbasti@wp.pl>
-In-Reply-To: <200509061316.11145.dpbasti@wp.pl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+MIME-Version: 1.0
+Content-Type: text/plain;charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,35 +23,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 07 Sep 2005 09:16:53 -0600
+Date: Wed, 7 Sep 2005 16:21:23 +0200 (CEST)
 
-Guys,
+Thanks Marcel,
 
-The most general purpose app would also be able to deal with AVRCP so 
-headset buttons could be controllers too. It's just too bad only 
-ericsson phones support the protocol you're using.
+I finally succeeded in having data from the bluetooth device !!!
+I did :
 
-I saw another project somewhere that was a symbian app on the phone and 
-a custom daemon on the other side. It sounds like they can build some 
-interesting menus/interfaces with it.
+rfcomm -i hci0 listen 1
 
-The problem is you can't use any phone to do these things. bluetooth 
-remote control would be very slick if every phone had it.
+and it worked :-)
+Thanks a lot for your help
 
-Brad
+Best regards
 
-Seba T. wrote:
-> Dnia wtorek, 6 września 2005 12:12, mailing-list@wauter.com napisał:
-> 
->>I've written a general purpose BT remote controll app, using the
->>SonyEricsson accessory feature. It searches for BT phones and, if found,
->>loads a configurable menu in it which allows you to perform certain actions
->>(shell commands).
->>
->>You may check it out at http://www.cs.utwente.nl/~bosmaw/mobi/
-> 
-> i made a gui for bluemote if u'd like to chack it see 
-> http://kde-apps.org/content/show.php?content=23061
+Steve
+
 
 
 -------------------------------------------------------
