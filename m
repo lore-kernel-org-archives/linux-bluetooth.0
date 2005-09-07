@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <431EBC9A.2070403@infomatrix.com>
-From: Ben Tullis <ben.tullis@infomatrix.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] file transfer problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] I have a question about the bdaddr utility
-References: <431DC228.7030309@infomatrix.com>	 <1126026222.4645.53.camel@blade> <20050906201502.GA4955@uni-duesseldorf.de> <1126040038.19765.3.camel@blade>
-In-Reply-To: <1126040038.19765.3.camel@blade>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1126084543.3507.4.camel@localhost.localdomain>
+References: <1126084543.3507.4.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1126085274.29676.55.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,82 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 07 Sep 2005 11:10:34 +0100
+Date: Wed, 07 Sep 2005 11:27:54 +0200
 
-Thanks for all the responses.
+Hi David,
 
-hciconfig hci0 putkey [bdaddr]
-worked perfectly for me and my chip.
+> I meet a problem while doing file transfer using bluez-2.9 source code.
 
-I can now dual-boot and use the bluetooth seamlessly between XP and Linux.
+you might wanna start using bluez-utils-2.20, because the 2.9 release is
+really old and I fixed some parts inside the sdpd. Now the record handle
+numbers will start with 0x10000. The sdptool then also contains a --raw
+switch to display the full record.
 
-Regards,
+Regards
 
-Ben Tullis
+Marcel
 
-Marcel Holtmann wrote:
-
->Hi Andy,
->
->  
->
->>>>My question is, is this change permanently written to the chip, or is it 
->>>>merely a volatile change as far as the running kernel is concerned?
->>>>        
->>>>
->>>the change is permanent.
->>>      
->>>
->>Would it be possible to make it volatile?
->>    
->>
->
->in case of CSR chips the BD_ADDR is a PSKEY. I don't know if it can be
->made volatile. This is a question for the CSR gurus ;)
->
->  
->
->>>>The reason I ask is that I am having trouble with dual-booting between 
->>>>Windows XP and Linux. I have to repair each time I swap operating 
->>>>systems and it is a pain.
->>>>        
->>>>
->>>Once you paired with Linux you can store the link key on the Bluetooth
->>>chip and you don't need to repair with Windows. Check the hciconfig for
->>>the correct command.
->>>      
->>>
->>Could you please detail on that? I can see no obvious way in the manpage
->>(maybe I should use CVS version?) and I don't quite understand how it
->>would work. Is there some on-chip storage for linkkeys that gets read
->>by the windows drivers?
->>    
->>
->
->Whoops. It seems that I forgot to update the manual page. What you are
->searching for are the putkey and delkey commands. Call "hciconfig -h".
->
->  
->
->>I'm asking, because I have the same problem when moving a bluetooth adapter 
->>between two different PCs. The headset will need to be re-paired with the 
->>other PC, whenever I do so (and I got to remove the linkkey before, of 
->>course).
->>
->>I could try copying the link keys, as they are both linux (not sure, if 
->>that would work, but it sounds worth a try), but I doubt this is possible 
->>with windows.
->>    
->>
->
->Copying the link key should work.
->
->Regards
->
->Marcel
->
->  
->
 
 
 
