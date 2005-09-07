@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Peter Stephenson <pws@csr.com>
+Content-Type: text/plain;
+  charset="iso-8859-1"
+From: Ronny L Nilsson <bb@arbetsmyra.dyndns.org>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] I have a question about the bdaddr utility
-Message-Id: <20050907101308.027e8482.pws@csr.com>
+References: <431DC228.7030309@infomatrix.com> <20050906201502.GA4955@uni-duesseldorf.de> <1126040038.19765.3.camel@blade>
 In-Reply-To: <1126040038.19765.3.camel@blade>
-References: <431DC228.7030309@infomatrix.com>
-    <1126026222.4645.53.camel@blade>
-    <20050906201502.GA4955@uni-duesseldorf.de>
-    <1126040038.19765.3.camel@blade>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Message-Id: <20050907091350.437D57ED@arbetsmyra.dyndns.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,44 +19,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 7 Sep 2005 10:13:08 +0100
+Date: Wed, 7 Sep 2005 11:13:13 +0200
 
-Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Andy,
-> 
-> > > > My question is, is this change permanently written to the chip, or is it 
-> > > > merely a volatile change as far as the running kernel is concerned?
+
+> > > > My question is, is this change permanently written to the chip,
+> > > > or is it merely a volatile change as far as the running kernel
+> > > > is concerned?
+> > >
 > > > the change is permanent.
-> > 
+> >
 > > Would it be possible to make it volatile?
-> 
-> in case of CSR chips the BD_ADDR is a PSKEY. I don't know if it can be
-> made volatile. This is a question for the CSR gurus ;)
-
-It's possible to have volatile PSKEYs.  You need to use the CSR BCCMD
-command set to make this work, but that's the same set you'd be using to
-write the PSKEY to flash.  The command is BCCMDVARID_PS.  You write the
-PSKEY to temporary (actually, it says here "transient") store (code 8)
-instead of the default (code 0) or implementation (usually meaning flash,
-code 1).  Then you have to perform a warm reset by setting
-BCCMDVARID_WARM_RESET --- this resets pretty much everything except the
-persistent store, including resetting the host transport.  There's no way
-around the warm reset; the new address won't take effect otherwise.  Note
-the temporary store overrides any address in flash.
-
-If you don't already have access to the BCCMD command set this is likely to
-be Greek, unfortunately.  (Unless you speak Greek.)
-
-pws
+>
+> in case of CSR chips the BD_ADDR is a PSKEY. I don't know if it can
+> be made volatile. This is a question for the CSR gurus ;)
 
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
+Hi
+This is a bit of guessing...but I think there is at least a theoretical 
+way of achieving this volatile.
 
-**********************************************************************
+Some PSKEYs can be written to the device RAM which then overrides the 
+persisten flash values as long power supply retains. Haven't tried it 
+though but it's perhaps something to investigate further.
+
+/Ronny
+
 
 
 
