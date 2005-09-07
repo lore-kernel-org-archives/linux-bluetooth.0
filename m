@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1326.193.48.73.126.1126083608.squirrel@webmail.essi.fr>
-In-Reply-To: <1126082971.29676.43.camel@blade>
-References: <200509071002.26456.cijoml@volny.cz>
-    <1301.193.48.73.126.1126082483.squirrel@webmail.essi.fr>
-    <1126082971.29676.43.camel@blade>
-Subject: Re: [Bluez-users] Hcidump stays in waiting state after RFCOMM "PN
-     CMD" packet
-From: "Steve MOREAU" <moreau@essi.fr>
+Subject: Re: [Bluez-users] BlueZ speach
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+In-Reply-To: <200509071028.05843.cijoml@volny.cz>
+References: <200509071002.26456.cijoml@volny.cz>
+	 <1126080949.29676.17.camel@blade>  <200509071028.05843.cijoml@volny.cz>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1126083451.29676.45.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,23 +19,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 7 Sep 2005 11:00:08 +0200 (CEST)
+Date: Wed, 07 Sep 2005 10:57:31 +0200
 
-Thanks Marcel
+Hi Michal,
 
-I'm begginner with Bluetooth and... in fact I don't know what to do that.
-I'm using Linux and I tryed several things without success.
-As my PC is a slave and can't connect to the bluetooth device (this last
-one initiate connection when it wants to send data), I couldn't use rfcom=
-m
-program... Should I launch rfcomm with special options or a ppp service o=
-r
-someone like that ?
-Sorry for these newbie question, and thanks again
+> no problem, come again at that time. :) It is at weekend :)
 
-Regards,
+actually this is not possible, because I am at a wedding that weekend
+and before that I am in Warsaw at IT-Underground.
 
-Steve
+> Title is:
+> in czech: Aplikace Bluetooth a bezpe=C4=8Dnost Bluetooth
+> in english: Applications of Bluetooth technology and Bluetooth security
+
+Done.
+
+Regards
+
+Marcel
 
 
 
