@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] I have a question about the bdaddr utility
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <431F0465.70605@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050907101308.027e8482.pws@csr.com>
-References: <431DC228.7030309@infomatrix.com>
-	 <1126026222.4645.53.camel@blade> <20050906201502.GA4955@uni-duesseldorf.de>
-	 <1126040038.19765.3.camel@blade>  <20050907101308.027e8482.pws@csr.com>
-Content-Type: text/plain
-Message-Id: <1126139317.14636.15.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Mobi Bluetooth RC
+References: <200509061212.56588.mailing-list@wauter.com> <200509061316.11145.dpbasti@wp.pl>
+In-Reply-To: <200509061316.11145.dpbasti@wp.pl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,44 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Sep 2005 02:28:37 +0200
+Date: Wed, 07 Sep 2005 09:16:53 -0600
 
-Hi Peter,
+Guys,
 
-> > > > > My question is, is this change permanently written to the chip, or is it 
-> > > > > merely a volatile change as far as the running kernel is concerned?
-> > > > the change is permanent.
-> > > 
-> > > Would it be possible to make it volatile?
-> > 
-> > in case of CSR chips the BD_ADDR is a PSKEY. I don't know if it can be
-> > made volatile. This is a question for the CSR gurus ;)
+The most general purpose app would also be able to deal with AVRCP so 
+headset buttons could be controllers too. It's just too bad only 
+ericsson phones support the protocol you're using.
+
+I saw another project somewhere that was a symbian app on the phone and 
+a custom daemon on the other side. It sounds like they can build some 
+interesting menus/interfaces with it.
+
+The problem is you can't use any phone to do these things. bluetooth 
+remote control would be very slick if every phone had it.
+
+Brad
+
+Seba T. wrote:
+> Dnia wtorek, 6 września 2005 12:12, mailing-list@wauter.com napisał:
 > 
-> It's possible to have volatile PSKEYs.  You need to use the CSR BCCMD
-> command set to make this work, but that's the same set you'd be using to
-> write the PSKEY to flash.  The command is BCCMDVARID_PS.  You write the
-> PSKEY to temporary (actually, it says here "transient") store (code 8)
-> instead of the default (code 0) or implementation (usually meaning flash,
-> code 1).  Then you have to perform a warm reset by setting
-> BCCMDVARID_WARM_RESET --- this resets pretty much everything except the
-> persistent store, including resetting the host transport.  There's no way
-> around the warm reset; the new address won't take effect otherwise.  Note
-> the temporary store overrides any address in flash.
-
-this is great. I added a "-t" switch to the bdaddr utility to make the
-change of the address volatile and a "-r" switch to perform the needed
-cold or warm reset.
-
-> If you don't already have access to the BCCMD command set this is likely to
-> be Greek, unfortunately.  (Unless you speak Greek.)
-
-Some people of us speak Greek ;)
-
-Regards
-
-Marcel
-
-
+>>I've written a general purpose BT remote controll app, using the
+>>SonyEricsson accessory feature. It searches for BT phones and, if found,
+>>loads a configurable menu in it which allows you to perform certain actions
+>>(shell commands).
+>>
+>>You may check it out at http://www.cs.utwente.nl/~bosmaw/mobi/
+> 
+> i made a gui for bluemote if u'd like to chack it see 
+> http://kde-apps.org/content/show.php?content=23061
 
 
 -------------------------------------------------------
