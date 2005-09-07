@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <431ECFA0.50401@tcs.hut.fi>
+Message-ID: <431ECC4D.9030302@tcs.hut.fi>
 From: Ville Nuorvala <vnuorval@tcs.hut.fi>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-devel] [PATCH] Fix memory textfile_get() memory leaks
+Content-Type: multipart/mixed;
+ boundary="------------070608020800080108000108"
+Subject: [Bluez-devel] [PATCH] Properly replace an existing key value pair in a text file
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,62 +17,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 07 Sep 2005 14:31:44 +0300
+Date: Wed, 07 Sep 2005 14:17:33 +0300
+
+This is a multi-part message in MIME format.
+--------------070608020800080108000108
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
 
 Hi,
 
-there apparently are a couple of places where the bluez-utils is leaking 
-memory after calling textfile_get(). The patch below should fix this...
+textfile_put() was unable to replace a key value pair if it happened to 
+be the last entry in a file. I noticed this problem in bluez-utils-2.19, 
+but it still seems to exist in the latest CVS code. The patch below 
+should fix it...
 
-Index: hcid/storage.c
+Index: common/textfile.c
 ===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/storage.c,v
-retrieving revision 1.24
-diff -u -r1.24 storage.c
---- hcid/storage.c      30 Aug 2005 00:35:39 -0000      1.24
-+++ hcid/storage.c      7 Sep 2005 11:23:14 -0000
-@@ -87,6 +87,8 @@
-                 str[248] = '\0';
-         strcpy(name, str);
+RCS file: /cvsroot/bluez/utils/common/textfile.c,v
+retrieving revision 1.6
+diff -u -r1.6 textfile.c
+--- common/textfile.c   30 Aug 2005 00:35:39 -0000      1.6
++++ common/textfile.c   7 Sep 2005 11:06:43 -0000
+@@ -180,8 +180,14 @@
+         end += len;
 
-+       free(str);
-+
-         return 0;
-  }
-
-@@ -161,6 +163,7 @@
-                 memcpy(tmp, str + (i * 2), 2);
-                 key[i] = (uint8_t) strtol(tmp, NULL, 16);
+         len = size - (end - map);
+-
+-       if (len <= 0 || len > size) {
++       if (!len) {
++               munmap(map, size);
++               ftruncate(fd, base);
++               pos = lseek(fd, base, SEEK_SET);
++               err = write_key_value(fd, key, value);
++               goto unlock;
++       }
++       if (len < 0 || len > size) {
+                 err = EILSEQ;
+                 goto unmap;
          }
-+       free(str);
-
-         return 0;
-  }
-@@ -181,5 +184,7 @@
-         strncpy(pin, str, 16);
-         len = strlen(pin);
-
-+       free(str);
-+
-         return len;
-  }
-Index: common/test_textfile.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/common/test_textfile.c,v
-retrieving revision 1.2
-diff -u -r1.2 test_textfile.c
---- common/test_textfile.c      6 Aug 2005 06:27:40 -0000       1.2
-+++ common/test_textfile.c      7 Sep 2005 11:23:14 -0000
-@@ -64,6 +64,8 @@
-                 str = textfile_get(filename, key);
-                 if (!str)
-                         fprintf(stderr, "No value for %s\n", key);
-+               else
-+                       free(str);
-         }
-
-         return 0;
-
 
 Regards,
 Ville
@@ -81,6 +64,28 @@ Research Assistant,
 Laboratory for Theoretical Computer Science,
 Helsinki University of Technology
 email: vnuorval@tcs.hut.fi, phone: +358 (0)9 451 5257
+
+--------------070608020800080108000108
+Content-Type: text/x-vcard; charset=utf-8;
+ name="vnuorval.vcf"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="vnuorval.vcf"
+
+begin:vcard
+fn:Ville Nuorvala
+n:Nuorvala;Ville
+adr:;;Helsinginkatu 17 A 18;Helsinki;;FIN-00500;Finland
+email;internet:vnuorval@tcs.hut.fi
+tel;work:+35894515257
+tel;fax:+35894513369
+tel;cell:+358405835323
+x-mozilla-html:FALSE
+version:2.1
+end:vcard
+
+
+--------------070608020800080108000108--
 
 
 -------------------------------------------------------
