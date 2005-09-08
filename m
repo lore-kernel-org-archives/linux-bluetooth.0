@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] How can I access Internet over PAN?
+Subject: Re: [Bluez-users] Converting a PC in a multiradio access point
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050908021239.16175.qmail@web15710.mail.cnb.yahoo.com>
-References: <20050908021239.16175.qmail@web15710.mail.cnb.yahoo.com>
+In-Reply-To: <01C5B49E.6F5C7590.emonturus@teltronic.es>
+References: <01C5B49E.6F5C7590.emonturus@teltronic.es>
 Content-Type: text/plain
-Message-Id: <1126221429.5286.68.camel@blade>
+Message-Id: <1126221207.5286.63.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,64 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 09 Sep 2005 01:17:09 +0200
+Date: Fri, 09 Sep 2005 01:13:27 +0200
 
-Hi Gadfly,
+Hi Esteban,
 
-> I want to access Internet through PAN . I have to BT
-> modules that work propely on two ARM9 platform (linux
-> 2.4.18) .And I can create a BNEP connection between
-> the PANU and the NAP following the steps in the
-> HOWTO-PAN. 
-> 
-> 1.
-> on NAP side:
-> pand --listen --master --role=NAP
-> on PANU side:
-> pand -c <bt_addr>
-> 
-> 2.
-> on NAP side:
-> ifconfig bnep0 10.0.0.1
-> on PANU side:
-> ifconfig bnep0 10.0.0.2
-> 
-> Utill now,I can ping each other!
-> $ pand --show
-> bnep0 4A:49:4E:00:15:2D NAP
-> 
-> 3.
-> on NAP side:
-> brctl addbr pan0
-> ifconfig pan0 10.0.0.1
-> brctl setfd pan0 0
-> brctl stp pan0 disable
-> brctl addif pan0 eth0
-> 
-> $ brctl show
-> bridge name     bridge id        STP enabled    
-> interfaces
-> pan0         8000.0000c0ffee08       no          eth0
-> 
-> on PANU side:
-> route add default gw 10.0.0.1
-> 
-> Then,on PANU I ping the eth0 IP address of NAP ,but it
-> says on "NETDEV WATCHDOG: eth0: transmit timed out "! 
-> 
-> What's the problem? How can I access Internet over
-> PAN??
-> 
-> Do I have to enable ip_forward and iptables? But the
-> 2.4.18 kernel seems don't work with these! I have
-> build in iptables,but I still can't use "iptables"
-> command!
+> 	I want to configure a PC to work as multiradio access point. In order to 
+> do that, I have plugged two USB dongles to a PC and entered the command 
+> "pand --listen --role PANU". When I establish the first PAN connection from 
+> another computer the bnep0 interface appears in both PC's and there is no 
+> trouble. Without terminating this connection, I try to establish a new one 
+> with the other dongle of the acces-point-computer and it fails. In the 
+> /var/log/messages file of the access-point-computer appears the following 
+> error message: pand[7546]: Connection failed. File exists(17). It is not 
+> relevant whether the computer I try to connect from is the same as in the 
+> first PAN connection. I don't understand this limitation because if both 
+> connections are established from the computer that has two dongles 
+> everything works well.
 
-it is a bad idea to bridge between eth0 and pan0. Use IP forwarding and
-masquerading for this.
-
-And the 2.4.18 is not a good choice. Try to update it, because I stopped
-supporting it a long time ago.
+send in the output of "hciconfig -a" and run "hcidump -X -V" when you
+try to connect.
 
 Regards
 
