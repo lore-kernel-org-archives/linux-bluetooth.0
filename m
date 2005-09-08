@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Converting a PC in a multiradio access point
+Subject: Re: [Bluez-users] new Bluetooth mouse from Logitech
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <01C5B49E.6F5C7590.emonturus@teltronic.es>
-References: <01C5B49E.6F5C7590.emonturus@teltronic.es>
-Content-Type: text/plain
-Message-Id: <1126221207.5286.63.camel@blade>
+In-Reply-To: <1126184250.18498.4.camel@bluez.bueche.ch>
+References: <1126184250.18498.4.camel@bluez.bueche.ch>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1126221095.5286.61.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 09 Sep 2005 01:13:27 +0200
+Date: Fri, 09 Sep 2005 01:11:35 +0200
 
-Hi Esteban,
+Hi Charles,
 
-> 	I want to configure a PC to work as multiradio access point. In order to 
-> do that, I have plugged two USB dongles to a PC and entered the command 
-> "pand --listen --role PANU". When I establish the first PAN connection from 
-> another computer the bnep0 interface appears in both PC's and there is no 
-> trouble. Without terminating this connection, I try to establish a new one 
-> with the other dongle of the acces-point-computer and it fails. In the 
-> /var/log/messages file of the access-point-computer appears the following 
-> error message: pand[7546]: Connection failed. File exists(17). It is not 
-> relevant whether the computer I try to connect from is the same as in the 
-> first PAN connection. I don't understand this limitation because if both 
-> connections are established from the computer that has two dongles 
-> everything works well.
+> Logitech has a new BT mouse on his US web page "Logitech=C2=AE V270 Cor=
+dless
+> Optical Notebook Mouse for Bluetooth".
+>=20
+> http://www.logitech.com/index.cfm/products/details/US/EN,CRID=3D2135,CO=
+NTENTID=3D10916
+>=20
+> It seems they have understand our needs and remade the MX900 with a
+> power switch (well, with less buttons than the MX900). Can't wait to ge=
+t
+> my hands on it. I have gone back to cabled mouse for my laptop bag, as
+> the batteries of the MX900 weren't working long enough. A BUT mouse is
+> certainly more fun.
 
-send in the output of "hciconfig -a" and run "hcidump -X -V" when you
-try to connect.
+I think they got too much complains from the laptop users. It is so
+stupid not to include a power switch. Even Apple did it right. However
+maybe the simply copied from the Microsoft mouse ;)
+
+The more exiting news was the new Microsoft Natural keyboard in black. I
+know it has a cable, but I can't wait to get my hands on one these. This
+maybe replaces my over twelve years old Natural Pro which got a little
+bit filthy over the years ;)
 
 Regards
 
