@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] new Bluetooth mouse from Logitech
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Charles Bueche <charles@bueche.ch>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1126184250.18498.4.camel@bluez.bueche.ch>
-References: <1126184250.18498.4.camel@bluez.bueche.ch>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <1126221095.5286.61.camel@blade>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1126184250.18498.4.camel@bluez.bueche.ch>
 Mime-Version: 1.0
+Subject: [Bluez-users] new Bluetooth mouse from Logitech
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,37 +16,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 09 Sep 2005 01:11:35 +0200
+Date: Thu, 08 Sep 2005 14:57:30 +0200
 
-Hi Charles,
+Hi,
 
-> Logitech has a new BT mouse on his US web page "Logitech=C2=AE V270 Cor=
-dless
-> Optical Notebook Mouse for Bluetooth".
->=20
-> http://www.logitech.com/index.cfm/products/details/US/EN,CRID=3D2135,CO=
-NTENTID=3D10916
->=20
-> It seems they have understand our needs and remade the MX900 with a
-> power switch (well, with less buttons than the MX900). Can't wait to ge=
-t
-> my hands on it. I have gone back to cabled mouse for my laptop bag, as
-> the batteries of the MX900 weren't working long enough. A BUT mouse is
-> certainly more fun.
+Logitech has a new BT mouse on his US web page "Logitech=AE V270 Cordless
+Optical Notebook Mouse for Bluetooth".
 
-I think they got too much complains from the laptop users. It is so
-stupid not to include a power switch. Even Apple did it right. However
-maybe the simply copied from the Microsoft mouse ;)
+http://www.logitech.com/index.cfm/products/details/US/EN,CRID=3D2135,CONT=
+ENTID=3D10916
 
-The more exiting news was the new Microsoft Natural keyboard in black. I
-know it has a cable, but I can't wait to get my hands on one these. This
-maybe replaces my over twelve years old Natural Pro which got a little
-bit filthy over the years ;)
+It seems they have understand our needs and remade the MX900 with a
+power switch (well, with less buttons than the MX900). Can't wait to get
+my hands on it. I have gone back to cabled mouse for my laptop bag, as
+the batteries of the MX900 weren't working long enough. A BUT mouse is
+certainly more fun.
 
-Regards
+Charles
 
-Marcel
-
+--=20
+Charles Bueche <charles@bueche.ch>
+sand, snow, wave, wind and net -surfer
 
 
 
