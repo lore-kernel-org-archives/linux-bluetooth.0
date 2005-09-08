@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050908021239.16175.qmail@web15710.mail.cnb.yahoo.com>
-From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
-To: bluez users <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=gb2312
-Subject: [Bluez-users] How can I access Internet over PAN?
+Subject: Re: [Bluez-users] I have a question about the bdaddr utility
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <20050907101308.027e8482.pws@csr.com>
+References: <431DC228.7030309@infomatrix.com>
+	 <1126026222.4645.53.camel@blade> <20050906201502.GA4955@uni-duesseldorf.de>
+	 <1126040038.19765.3.camel@blade>  <20050907101308.027e8482.pws@csr.com>
+Content-Type: text/plain
+Message-Id: <1126139317.14636.15.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,73 +20,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 8 Sep 2005 10:12:39 +0800 (CST)
+Date: Thu, 08 Sep 2005 02:28:37 +0200
 
-hi,
+Hi Peter,
 
-I want to access Internet through PAN . I have to BT
-modules that work propely on two ARM9 platform (linux
-2.4.18) .And I can create a BNEP connection between
-the PANU and the NAP following the steps in the
-HOWTO-PAN. 
+> > > > > My question is, is this change permanently written to the chip, or is it 
+> > > > > merely a volatile change as far as the running kernel is concerned?
+> > > > the change is permanent.
+> > > 
+> > > Would it be possible to make it volatile?
+> > 
+> > in case of CSR chips the BD_ADDR is a PSKEY. I don't know if it can be
+> > made volatile. This is a question for the CSR gurus ;)
+> 
+> It's possible to have volatile PSKEYs.  You need to use the CSR BCCMD
+> command set to make this work, but that's the same set you'd be using to
+> write the PSKEY to flash.  The command is BCCMDVARID_PS.  You write the
+> PSKEY to temporary (actually, it says here "transient") store (code 8)
+> instead of the default (code 0) or implementation (usually meaning flash,
+> code 1).  Then you have to perform a warm reset by setting
+> BCCMDVARID_WARM_RESET --- this resets pretty much everything except the
+> persistent store, including resetting the host transport.  There's no way
+> around the warm reset; the new address won't take effect otherwise.  Note
+> the temporary store overrides any address in flash.
 
-1.
-on NAP side:
-pand --listen --master --role=NAP
-on PANU side:
-pand -c <bt_addr>
+this is great. I added a "-t" switch to the bdaddr utility to make the
+change of the address volatile and a "-r" switch to perform the needed
+cold or warm reset.
 
-2.
-on NAP side:
-ifconfig bnep0 10.0.0.1
-on PANU side:
-ifconfig bnep0 10.0.0.2
+> If you don't already have access to the BCCMD command set this is likely to
+> be Greek, unfortunately.  (Unless you speak Greek.)
 
-Utill now,I can ping each other!
-$ pand --show
-bnep0 4A:49:4E:00:15:2D NAP
+Some people of us speak Greek ;)
 
-3.
-on NAP side:
-brctl addbr pan0
-ifconfig pan0 10.0.0.1
-brctl setfd pan0 0
-brctl stp pan0 disable
-brctl addif pan0 eth0
+Regards
 
-$ brctl show
-bridge name     bridge id        STP enabled    
-interfaces
-pan0         8000.0000c0ffee08       no          eth0
+Marcel
 
-on PANU side:
-route add default gw 10.0.0.1
-
-Then,on PANU I ping the eth0 IP address of NAP ,but it
-says on "NETDEV WATCHDOG: eth0: transmit timed out "! 
-
-What's the problem? How can I access Internet over
-PAN??
-
-Do I have to enable ip_forward and iptables? But the
-2.4.18 kernel seems don't work with these! I have
-build in iptables,but I still can't use "iptables"
-command!
-
-Thanks in advance!
-
-gadfly
-
- 
-
-
-	
-
-	
-		
-___________________________________________________________ 
-—≈ª¢√‚∑—G” œ‰£≠÷–π˙µ⁄“ªæ¯Œﬁ¿¨ª¯” º˛…ß»≈≥¨¥Û” œ‰ 
-http://cn.mail.yahoo.com
 
 
 
