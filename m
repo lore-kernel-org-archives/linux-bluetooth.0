@@ -1,10 +1,8 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Charles Bueche <charles@bueche.ch>
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1126184250.18498.4.camel@bluez.bueche.ch>
-Mime-Version: 1.0
-Subject: [Bluez-users] new Bluetooth mouse from Logitech
+Message-ID: <01C5B49E.6F5C7590.emonturus@teltronic.es>
+From: Esteban Monturus <emonturus@teltronic.es>
+To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Converting a PC in a multiradio access point
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,27 +14,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Sep 2005 14:57:30 +0200
+Date: Thu, 8 Sep 2005 17:55:00 +0200
 
-Hi,
+	I want to configure a PC to work as multiradio access point. In order to 
+do that, I have plugged two USB dongles to a PC and entered the command 
+"pand --listen --role PANU". When I establish the first PAN connection from 
+another computer the bnep0 interface appears in both PC's and there is no 
+trouble. Without terminating this connection, I try to establish a new one 
+with the other dongle of the acces-point-computer and it fails. In the 
+/var/log/messages file of the access-point-computer appears the following 
+error message: pand[7546]: Connection failed. File exists(17). It is not 
+relevant whether the computer I try to connect from is the same as in the 
+first PAN connection. I don't understand this limitation because if both 
+connections are established from the computer that has two dongles 
+everything works well.
 
-Logitech has a new BT mouse on his US web page "Logitech=AE V270 Cordless
-Optical Notebook Mouse for Bluetooth".
+	Could somebody tell me what is happening?
 
-http://www.logitech.com/index.cfm/products/details/US/EN,CRID=3D2135,CONT=
-ENTID=3D10916
-
-It seems they have understand our needs and remade the MX900 with a
-power switch (well, with less buttons than the MX900). Can't wait to get
-my hands on it. I have gone back to cabled mouse for my laptop bag, as
-the batteries of the MX900 weren't working long enough. A BUT mouse is
-certainly more fun.
-
-Charles
-
---=20
-Charles Bueche <charles@bueche.ch>
-sand, snow, wave, wind and net -surfer
+	Thank you.
 
 
 
