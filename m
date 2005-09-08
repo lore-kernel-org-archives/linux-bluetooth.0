@@ -1,8 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <01C5B49E.6F5C7590.emonturus@teltronic.es>
-From: Esteban Monturus <emonturus@teltronic.es>
-To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Converting a PC in a multiradio access point
+Message-ID: <20050908021239.16175.qmail@web15710.mail.cnb.yahoo.com>
+From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
+To: bluez users <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=gb2312
+Subject: [Bluez-users] How can I access Internet over PAN?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -14,24 +16,73 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 8 Sep 2005 17:55:00 +0200
+Date: Thu, 8 Sep 2005 10:12:39 +0800 (CST)
 
-	I want to configure a PC to work as multiradio access point. In order to 
-do that, I have plugged two USB dongles to a PC and entered the command 
-"pand --listen --role PANU". When I establish the first PAN connection from 
-another computer the bnep0 interface appears in both PC's and there is no 
-trouble. Without terminating this connection, I try to establish a new one 
-with the other dongle of the acces-point-computer and it fails. In the 
-/var/log/messages file of the access-point-computer appears the following 
-error message: pand[7546]: Connection failed. File exists(17). It is not 
-relevant whether the computer I try to connect from is the same as in the 
-first PAN connection. I don't understand this limitation because if both 
-connections are established from the computer that has two dongles 
-everything works well.
+hi,
 
-	Could somebody tell me what is happening?
+I want to access Internet through PAN . I have to BT
+modules that work propely on two ARM9 platform (linux
+2.4.18) .And I can create a BNEP connection between
+the PANU and the NAP following the steps in the
+HOWTO-PAN. 
 
-	Thank you.
+1.
+on NAP side:
+pand --listen --master --role=NAP
+on PANU side:
+pand -c <bt_addr>
+
+2.
+on NAP side:
+ifconfig bnep0 10.0.0.1
+on PANU side:
+ifconfig bnep0 10.0.0.2
+
+Utill now,I can ping each other!
+$ pand --show
+bnep0 4A:49:4E:00:15:2D NAP
+
+3.
+on NAP side:
+brctl addbr pan0
+ifconfig pan0 10.0.0.1
+brctl setfd pan0 0
+brctl stp pan0 disable
+brctl addif pan0 eth0
+
+$ brctl show
+bridge name     bridge id        STP enabled    
+interfaces
+pan0         8000.0000c0ffee08       no          eth0
+
+on PANU side:
+route add default gw 10.0.0.1
+
+Then,on PANU I ping the eth0 IP address of NAP ,but it
+says on "NETDEV WATCHDOG: eth0: transmit timed out "! 
+
+What's the problem? How can I access Internet over
+PAN??
+
+Do I have to enable ip_forward and iptables? But the
+2.4.18 kernel seems don't work with these! I have
+build in iptables,but I still can't use "iptables"
+command!
+
+Thanks in advance!
+
+gadfly
+
+ 
+
+
+	
+
+	
+		
+___________________________________________________________ 
+—≈ª¢√‚∑—G” œ‰£≠÷–π˙µ⁄“ªæ¯Œﬁ¿¨ª¯” º˛…ß»≈≥¨¥Û” œ‰ 
+http://cn.mail.yahoo.com
 
 
 
