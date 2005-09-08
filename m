@@ -1,23 +1,23 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: "Gavin Glynn" <gglynn@hcvwireless.com>
 To: <bluez-users@lists.sourceforge.net>, <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
 	boundary="----=_NextPart_000_000E_01C5B51F.D4345420"
-Message-ID: <E1EDVht-00011p-Nn@mail.sourceforge.net>
-Subject: [Bluez-users] PAND + DUND
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Message-ID: <E1EDVht-00011o-Nf@mail.sourceforge.net>
+Subject: [Bluez-devel] PAND + DUND
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
 Date: Fri, 9 Sep 2005 09:21:14 +1000
-List-ID: <bluez-devel.lists.sourceforge.net>
 
 This is a multi-part message in MIME format.
 
@@ -209,6 +209,6 @@ September 19-22, 2005 * San Francisco, CA * Development Lifecycle Practices
 Agile & Plan-Driven Development * Managing Projects & Teams * Testing & QA
 Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
