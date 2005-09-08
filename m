@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] HCID D-Bus
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <e1effdeb050908125079935830@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb050908125079935830@mail.gmail.com>
-References: <e1effdeb050908125079935830@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1126220839.5286.57.camel@blade>
 Mime-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_5061_24926217.1126209018408"
+Subject: [Bluez-devel] HCID D-Bus
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,60 +17,216 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 09 Sep 2005 01:07:19 +0200
+Date: Thu, 8 Sep 2005 16:50:18 -0300
 
-Hi Claudio,
+------=_Part_5061_24926217.1126209018408
+Content-Type: multipart/alternative;
+	boundary="----=_Part_5062_7851046.1126209018408"
 
-> In the last email about bluetoothd, you suggested send patches to
-> enhance hcid. I studied the hcid code and I would like align our ideas
-> before start coding. My suggestions are:
-> 
-> 1. Develop a common code addressing all D-Bus versions
+------=_Part_5062_7851046.1126209018408
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-not needed, because my plan is to drop support for anything below D-Bus
-version 0.5 (which should be compatible with D-Bus 0.3x) starting with
-bluez-utils-0.22. My original plan was to do it in next release, but
-there are some memory leak fixes and I want to get out a new version as
-soon as possible. However maybe it is a good idea to drop support for
-older D-Bus versions now.
+Hi Marcel,
 
-It seems the only problematic distribution is Debian unstable. Every
-other distribution (including Ubuntu) uses at least D-Bus 0.35.
+In the last email about bluetoothd, you suggested send patches to enhance=
+=20
+hcid. I studied the hcid code and I would like align our ideas before start=
+=20
+coding. My suggestions are:
 
-> 2. Send signals to connection complete and disconnection
+1. Develop a common code addressing all D-Bus versions
+2. Send signals to connection complete and disconnection
+3. Register a D-Bus hci object path as a initial point for bluetoothd and=
+=20
+provide basic services(inquiry, auth, ...).
 
-While I was adding the signals for the inquiry responses, I thought
-about doing this, too. I added the needed functions for it and open the
-filter for these messages. The only problem is that the disconnect uses
-the ACL handle and not the device address. This means you have to keep
-track of all handles. Normally the kernel does this all for us. This is
-one reason for a good/new interface between the kernel and bluetoothd.
-Coding everything twice is stupid.
+Do you agree? Do you have suggestions/comments?
 
-> 3. Register a D-Bus hci object path as a initial point for bluetoothd
-> and provide basic services(inquiry, auth, ...).
+I am sending a patch to solve the problem of D-Bus versions. Sorry, byte=20
+array is not being handled yet, but I will fix it. This is just a idea of=
+=20
+how solve the problem of several D-Bus versions. Get the dbus major/minor=
+=20
+version in the "configure" is a better approach, instead of check if the=20
+function dbus_message_iter_get_basic belongs to the dbus-1 library. If you=
+=20
+allow change the makefiles(acinclude.m4, configure.in <http://configure.in>=
+,=20
+config.h.in <http://config.h.in> ) I can modify it.
 
-Go ahead. I would really welcome it.
+Regards,
+Claudio.
 
-I need a job where I can fulltime work on bluetoothd and add all the
-cool things we talked about. If anyone know one or has one, let me know.
+------=_Part_5062_7851046.1126209018408
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> I am sending a patch to solve the problem of D-Bus versions. Sorry,
-> byte array is not being handled yet, but I will fix it. This is just a
-> idea of how solve the problem of several D-Bus versions. Get the dbus
-> major/minor version in the "configure" is a better approach, instead
-> of check if the function dbus_message_iter_get_basic belongs to the
-> dbus-1 library. If you allow change the makefiles(acinclude.m4,
-> configure.in, config.h.in ) I can modify it.
+Hi Marcel,<br>
+<br>
+In the last email about bluetoothd, you suggested send patches to
+enhance hcid. I studied the hcid code and I would like align our ideas
+before start coding. My suggestions are:<br>
+<br>
+1. Develop a common code addressing all D-Bus versions<br>
+2. Send signals to connection complete and disconnection<br>
+3. Register a D-Bus hci object path as a initial point for bluetoothd and p=
+rovide basic services(inquiry, auth, ...).<br>
+<br>
+Do you agree? Do you have suggestions/comments?<br>
+<br>
+I am sending a patch to solve the problem of D-Bus versions.
+Sorry,&nbsp; byte array is not being handled yet, but I will fix it.
+This is just a idea of how solve the problem of several D-Bus versions.
+Get the dbus major/minor version in the &quot;configure&quot; is a better
+approach, instead of check if the function dbus_message_iter_get_basic
+belongs to the dbus-1 library. If you allow change the
+makefiles(acinclude.m4, <a href=3D"http://configure.in">configure.in</a>, <=
+a href=3D"http://config.h.in">config.h.in</a> ) I can modify it.<br>
+<br>
+Regards,<br>
+Claudio.<br>
+<br>
 
-I like to drop support for older D-Bus versions. After a private talk
-with J5 it seems the only sane way to do.
+------=_Part_5062_7851046.1126209018408--
 
-Regards
+------=_Part_5061_24926217.1126209018408
+Content-Type: application/octet-stream; name="hcid_dbus_patch00.01"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="hcid_dbus_patch00.01"
 
-Marcel
-
-
+LS0tIGJsdWV6LXV0aWxzLTIuMjAvaGNpZC9kYnVzLmMJMjAwNS0wOC0yNyAxMDozNzoxNC4wMDAw
+MDAwMDAgLTAzMDAKKysrIGJsdWV6LWhjaWQtMC4wLjEvaGNpZC9kYnVzLmMJMjAwNS0wOS0wOCAx
+NjowODozOC43NzIwODI2MDAgLTAzMDAKQEAgLTQ2LDYgKzQ2LDggQEAKIAogI2luY2x1ZGUgImhj
+aWQuaCIKIAorI2luY2x1ZGUgImRidXMtY29tcGF0LmgiCisKIHN0YXRpYyBEQnVzQ29ubmVjdGlv
+biAqY29ubmVjdGlvbjsKIAogI2RlZmluZSBUSU1FT1VUICgzMCAqIDEwMDApCQkvKiAzMCBzZWNv
+bmRzICovCkBAIC04MywxMSArODUsNyBAQAogCWlmICh0eXBlICE9IERCVVNfVFlQRV9TVFJJTkcp
+CiAJCWdvdG8gZXJyb3I7CiAKLSNpZmRlZiBIQVZFX0RCVVNfTUVTU0FHRV9JVEVSX0dFVF9CQVNJ
+QwotCWRidXNfbWVzc2FnZV9pdGVyX2dldF9iYXNpYygmaXRlciwgJnBpbik7Ci0jZWxzZQotCXBp
+biA9IGRidXNfbWVzc2FnZV9pdGVyX2dldF9zdHJpbmcoJml0ZXIpOwotI2VuZGlmCisJREJVU19N
+U0dfSVRFUl9HRVRfU1RSKCZpdGVyLCBwaW4pOwogCiAJbGVuID0gc3RybGVuKHBpbik7CiAKQEAg
+LTE3MSw5ICsxNjksNyBAQAogdm9pZCBoY2lkX2RidXNfaW5xdWlyeV9zdGFydChiZGFkZHJfdCAq
+bG9jYWwpCiB7CiAJREJ1c01lc3NhZ2UgKm1lc3NhZ2U7Ci0jaWZuZGVmIEhBVkVfREJVU19NRVNT
+QUdFX0lURVJfR0VUX0JBU0lDCiAJREJ1c01lc3NhZ2VJdGVyIGl0ZXI7Ci0jZW5kaWYKIAljaGFy
+ICpsb2NhbF9hZGRyOwkKIAliZGFkZHJfdCB0bXA7CiAKQEAgLTE4NiwxNSArMTgyLDggQEAKIAkJ
+Z290byBmYWlsZWQ7CiAJfQogCi0jaWZkZWYgSEFWRV9EQlVTX01FU1NBR0VfSVRFUl9HRVRfQkFT
+SUMKLQlkYnVzX21lc3NhZ2VfYXBwZW5kX2FyZ3MobWVzc2FnZSwKLQkJCQkJREJVU19UWVBFX1NU
+UklORywgJmxvY2FsX2FkZHIsCi0JCQkJCURCVVNfVFlQRV9JTlZBTElEKTsKLSNlbHNlCi0JZGJ1
+c19tZXNzYWdlX2FwcGVuZF9pdGVyX2luaXQobWVzc2FnZSwgJml0ZXIpOwotCi0JZGJ1c19tZXNz
+YWdlX2l0ZXJfYXBwZW5kX3N0cmluZygmaXRlciwgbG9jYWxfYWRkcik7Ci0jZW5kaWYKKwlEQlVT
+X01TR19BUFBFTkRfSVRFUl9JTklUKG1lc3NhZ2UsICZpdGVyKTsKKwlEQlVTX01TR19JVEVSX0FQ
+UEVORF9TVFIoJml0ZXIsIGxvY2FsX2FkZHIpOwogCiAJaWYgKGRidXNfY29ubmVjdGlvbl9zZW5k
+KGNvbm5lY3Rpb24sIG1lc3NhZ2UsIE5VTEwpID09IEZBTFNFKSB7CiAJCXN5c2xvZyhMT0dfRVJS
+LCAiQ2FuJ3Qgc2VuZCBELUJVUyBpbnF1aXJ5IHN0YXJ0IG1lc3NhZ2UiKTsKQEAgLTIxNCw5ICsy
+MDMsNyBAQAogdm9pZCBoY2lkX2RidXNfaW5xdWlyeV9jb21wbGV0ZShiZGFkZHJfdCAqbG9jYWwp
+CiB7CiAJREJ1c01lc3NhZ2UgKm1lc3NhZ2U7Ci0jaWZuZGVmIEhBVkVfREJVU19NRVNTQUdFX0lU
+RVJfR0VUX0JBU0lDCiAJREJ1c01lc3NhZ2VJdGVyIGl0ZXI7Ci0jZW5kaWYKIAljaGFyICpsb2Nh
+bF9hZGRyOwogCWJkYWRkcl90IHRtcDsKIApAQCAtMjI5LDE1ICsyMTYsOCBAQAogCQlnb3RvIGZh
+aWxlZDsKIAl9CiAKLSNpZmRlZiBIQVZFX0RCVVNfTUVTU0FHRV9JVEVSX0dFVF9CQVNJQwotCWRi
+dXNfbWVzc2FnZV9hcHBlbmRfYXJncyhtZXNzYWdlLAotCQkJCQlEQlVTX1RZUEVfU1RSSU5HLCAm
+bG9jYWxfYWRkciwKLQkJCQkJREJVU19UWVBFX0lOVkFMSUQpOwotI2Vsc2UKLQlkYnVzX21lc3Nh
+Z2VfYXBwZW5kX2l0ZXJfaW5pdChtZXNzYWdlLCAmaXRlcik7Ci0KLQlkYnVzX21lc3NhZ2VfaXRl
+cl9hcHBlbmRfc3RyaW5nKCZpdGVyLCBsb2NhbF9hZGRyKTsKLSNlbmRpZgorCURCVVNfTVNHX0FQ
+UEVORF9JVEVSX0lOSVQobWVzc2FnZSwgJml0ZXIpOworCURCVVNfTVNHX0lURVJfQVBQRU5EX1NU
+UigmaXRlciwgbG9jYWxfYWRkcik7CiAKIAlpZiAoZGJ1c19jb25uZWN0aW9uX3NlbmQoY29ubmVj
+dGlvbiwgbWVzc2FnZSwgTlVMTCkgPT0gRkFMU0UpIHsKIAkJc3lzbG9nKExPR19FUlIsICJDYW4n
+dCBzZW5kIEQtQlVTIGlucXVpcnkgY29tcGxldGUgbWVzc2FnZSIpOwpAQCAtMjU3LDkgKzIzNyw3
+IEBACiB2b2lkIGhjaWRfZGJ1c19pbnF1aXJ5X3Jlc3VsdChiZGFkZHJfdCAqbG9jYWwsIGJkYWRk
+cl90ICpwZWVyLCB1aW50MzJfdCBjbGFzcywgaW50OF90IHJzc2kpCiB7CiAJREJ1c01lc3NhZ2Ug
+Km1lc3NhZ2U7Ci0jaWZuZGVmIEhBVkVfREJVU19NRVNTQUdFX0lURVJfR0VUX0JBU0lDCiAJREJ1
+c01lc3NhZ2VJdGVyIGl0ZXI7Ci0jZW5kaWYKIAljaGFyICpsb2NhbF9hZGRyLCAqcGVlcl9hZGRy
+OwogCWJkYWRkcl90IHRtcDsKIApAQCAtMjczLDIxICsyNTEsMTEgQEAKIAkJZ290byBmYWlsZWQ7
+CiAJfQogCi0jaWZkZWYgSEFWRV9EQlVTX01FU1NBR0VfSVRFUl9HRVRfQkFTSUMKLQlkYnVzX21l
+c3NhZ2VfYXBwZW5kX2FyZ3MobWVzc2FnZSwKLQkJCQkJREJVU19UWVBFX1NUUklORywgJmxvY2Fs
+X2FkZHIsCi0JCQkJCURCVVNfVFlQRV9TVFJJTkcsICZwZWVyX2FkZHIsCi0JCQkJCURCVVNfVFlQ
+RV9VSU5UMzIsICZjbGFzcywKLQkJCQkJREJVU19UWVBFX0lOVDMyLCAmcnNzaSwKLQkJCQkJREJV
+U19UWVBFX0lOVkFMSUQpOwotI2Vsc2UKLQlkYnVzX21lc3NhZ2VfYXBwZW5kX2l0ZXJfaW5pdCht
+ZXNzYWdlLCAmaXRlcik7Ci0KLQlkYnVzX21lc3NhZ2VfaXRlcl9hcHBlbmRfc3RyaW5nKCZpdGVy
+LCBsb2NhbF9hZGRyKTsKLQlkYnVzX21lc3NhZ2VfaXRlcl9hcHBlbmRfc3RyaW5nKCZpdGVyLCBw
+ZWVyX2FkZHIpOwotCWRidXNfbWVzc2FnZV9pdGVyX2FwcGVuZF91aW50MzIoJml0ZXIsIGNsYXNz
+KTsKLQlkYnVzX21lc3NhZ2VfaXRlcl9hcHBlbmRfaW50MzIoJml0ZXIsIHJzc2kpOwotI2VuZGlm
+CisJREJVU19NU0dfQVBQRU5EX0lURVJfSU5JVChtZXNzYWdlLCAmaXRlcik7CisJREJVU19NU0df
+SVRFUl9BUFBFTkRfU1RSKCZpdGVyLCBsb2NhbF9hZGRyKTsKKwlEQlVTX01TR19JVEVSX0FQUEVO
+RF9TVFIoJml0ZXIsIHBlZXJfYWRkcik7CisJREJVU19NU0dfSVRFUl9BUFBFTkRfVUlOVDMyKCZp
+dGVyLCBjbGFzcyk7CisJREJVU19NU0dfSVRFUl9BUFBFTkRfSU5UMzIoJml0ZXIsIHJzc2kpOwog
+CiAJaWYgKGRidXNfY29ubmVjdGlvbl9zZW5kKGNvbm5lY3Rpb24sIG1lc3NhZ2UsIE5VTEwpID09
+IEZBTFNFKSB7CiAJCXN5c2xvZyhMT0dfRVJSLCAiQ2FuJ3Qgc2VuZCBELUJVUyBpbnF1aXJ5IHJl
+c3VsdCBtZXNzYWdlIik7CkBAIC0zMDgsOSArMjc2LDcgQEAKIHZvaWQgaGNpZF9kYnVzX3JlbW90
+ZV9uYW1lKGJkYWRkcl90ICpsb2NhbCwgYmRhZGRyX3QgKnBlZXIsIGNoYXIgKm5hbWUpCiB7CiAJ
+REJ1c01lc3NhZ2UgKm1lc3NhZ2U7Ci0jaWZuZGVmIEhBVkVfREJVU19NRVNTQUdFX0lURVJfR0VU
+X0JBU0lDCiAJREJ1c01lc3NhZ2VJdGVyIGl0ZXI7Ci0jZW5kaWYKIAljaGFyICpsb2NhbF9hZGRy
+LCAqcGVlcl9hZGRyOwogCWJkYWRkcl90IHRtcDsKIApAQCAtMzI0LDE5ICsyOTAsMTAgQEAKIAkJ
+Z290byBmYWlsZWQ7CiAJfQogCi0jaWZkZWYgSEFWRV9EQlVTX01FU1NBR0VfSVRFUl9HRVRfQkFT
+SUMKLQlkYnVzX21lc3NhZ2VfYXBwZW5kX2FyZ3MobWVzc2FnZSwKLQkJCQkJREJVU19UWVBFX1NU
+UklORywgJmxvY2FsX2FkZHIsCi0JCQkJCURCVVNfVFlQRV9TVFJJTkcsICZwZWVyX2FkZHIsCi0J
+CQkJCURCVVNfVFlQRV9TVFJJTkcsICZuYW1lLAotCQkJCQlEQlVTX1RZUEVfSU5WQUxJRCk7Ci0j
+ZWxzZQotCWRidXNfbWVzc2FnZV9hcHBlbmRfaXRlcl9pbml0KG1lc3NhZ2UsICZpdGVyKTsKLQot
+CWRidXNfbWVzc2FnZV9pdGVyX2FwcGVuZF9zdHJpbmcoJml0ZXIsIGxvY2FsX2FkZHIpOwotCWRi
+dXNfbWVzc2FnZV9pdGVyX2FwcGVuZF9zdHJpbmcoJml0ZXIsIHBlZXJfYWRkcik7Ci0JZGJ1c19t
+ZXNzYWdlX2l0ZXJfYXBwZW5kX3N0cmluZygmaXRlciwgbmFtZSk7Ci0jZW5kaWYKKwlEQlVTX01T
+R19BUFBFTkRfSVRFUl9JTklUKG1lc3NhZ2UsICZpdGVyKTsKKwlEQlVTX01TR19JVEVSX0FQUEVO
+RF9TVFIoJml0ZXIsIGxvY2FsX2FkZHIpOworCURCVVNfTVNHX0lURVJfQVBQRU5EX1NUUigmaXRl
+ciwgcGVlcl9hZGRyKTsKKwlEQlVTX01TR19JVEVSX0FQUEVORF9TVFIoJml0ZXIsIG5hbWUpOwog
+CiAJaWYgKGRidXNfY29ubmVjdGlvbl9zZW5kKGNvbm5lY3Rpb24sIG1lc3NhZ2UsIE5VTEwpID09
+IEZBTFNFKSB7CiAJCXN5c2xvZyhMT0dfRVJSLCAiQ2FuJ3Qgc2VuZCBELUJVUyByZW1vdGUgbmFt
+ZSBtZXNzYWdlIik7Ci0tLSBibHVlei11dGlscy0yLjIwL2hjaWQvZGJ1cy1jb21wYXQuaAkxOTY5
+LTEyLTMxIDIxOjAwOjAwLjAwMDAwMDAwMCAtMDMwMAorKysgYmx1ZXotaGNpZC0wLjAuMS9oY2lk
+L2RidXMtY29tcGF0LmgJMjAwNS0wOS0wOCAxNjo0MDozNS44NTY2NDE0NDggLTAzMDAKQEAgLTAs
+MCArMSw4MSBAQAorLyoKKyAqCisgKiAgQmx1ZVogLSBCbHVldG9vdGggcHJvdG9jb2wgc3RhY2sg
+Zm9yIExpbnV4CisgKgorICogIENvcHlyaWdodCAoQykgMjAwMC0yMDAxICBRdWFsY29tbSBJbmNv
+cnBvcmF0ZWQKKyAqICBDb3B5cmlnaHQgKEMpIDIwMDItMjAwMyAgTWF4aW0gS3Jhc255YW5za3kg
+PG1heGtAcXVhbGNvbW0uY29tPgorICogIENvcHlyaWdodCAoQykgMjAwMi0yMDA1ICBNYXJjZWwg
+SG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+CisgKgorICoKKyAqICBUaGlzIHByb2dyYW0g
+aXMgZnJlZSBzb2Z0d2FyZTsgeW91IGNhbiByZWRpc3RyaWJ1dGUgaXQgYW5kL29yIG1vZGlmeQor
+ICogIGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2Ug
+dmVyc2lvbiAyIGFzCisgKiAgcHVibGlzaGVkIGJ5IHRoZSBGcmVlIFNvZnR3YXJlIEZvdW5kYXRp
+b247CisgKgorICogIFRIRSBTT0ZUV0FSRSBJUyBQUk9WSURFRCAiQVMgSVMiLCBXSVRIT1VUIFdB
+UlJBTlRZIE9GIEFOWSBLSU5ELCBFWFBSRVNTCisgKiAgT1IgSU1QTElFRCwgSU5DTFVESU5HIEJV
+VCBOT1QgTElNSVRFRCBUTyBUSEUgV0FSUkFOVElFUyBPRiBNRVJDSEFOVEFCSUxJVFksCisgKiAg
+RklUTkVTUyBGT1IgQSBQQVJUSUNVTEFSIFBVUlBPU0UgQU5EIE5PTklORlJJTkdFTUVOVCBPRiBU
+SElSRCBQQVJUWSBSSUdIVFMuCisgKiAgSU4gTk8gRVZFTlQgU0hBTEwgVEhFIENPUFlSSUdIVCBI
+T0xERVIoUykgQU5EIEFVVEhPUihTKSBCRSBMSUFCTEUgRk9SIEFOWQorICogIENMQUlNLCBPUiBB
+TlkgU1BFQ0lBTCBJTkRJUkVDVCBPUiBDT05TRVFVRU5USUFMIERBTUFHRVMsIE9SIEFOWSBEQU1B
+R0VTIAorICogIFdIQVRTT0VWRVIgUkVTVUxUSU5HIEZST00gTE9TUyBPRiBVU0UsIERBVEEgT1Ig
+UFJPRklUUywgV0hFVEhFUiBJTiBBTiAKKyAqICBBQ1RJT04gT0YgQ09OVFJBQ1QsIE5FR0xJR0VO
+Q0UgT1IgT1RIRVIgVE9SVElPVVMgQUNUSU9OLCBBUklTSU5HIE9VVCBPRiAKKyAqICBPUiBJTiBD
+T05ORUNUSU9OIFdJVEggVEhFIFVTRSBPUiBQRVJGT1JNQU5DRSBPRiBUSElTIFNPRlRXQVJFLgor
+ICoKKyAqICBBTEwgTElBQklMSVRZLCBJTkNMVURJTkcgTElBQklMSVRZIEZPUiBJTkZSSU5HRU1F
+TlQgT0YgQU5ZIFBBVEVOVFMsIAorICogIENPUFlSSUdIVFMsIFRSQURFTUFSS1MgT1IgT1RIRVIg
+UklHSFRTLCBSRUxBVElORyBUTyBVU0UgT0YgVEhJUyAKKyAqICBTT0ZUV0FSRSBJUyBESVNDTEFJ
+TUVELgorICoKKyAqCisgKiAgJElkOiBkYnVzLWNvbXBhdC5oLHYgMS4yNCAyMDA1LzA5LzA4IDE4
+OjMyOjQxIGhvbHRtYW5uIEV4cCAkCisgKi8KKworI2lmbmRlZiBfX0hfREJVU19DT01QQVRfSF9f
+CisjZGVmaW5lIF9fSF9EQlVTX0NPTVBBVF9IX18KKworI2lmZGVmIEhBVkVfQ09ORklHX0gKKyNp
+bmNsdWRlIDxjb25maWcuaD4KKyNlbmRpZgorCisjZGVmaW5lIENIRUNLX0RCVVNfVkVSU0lPTiht
+YWpvciwgbWlub3IpIFwKKwkJKERCVVNfTUFKT1JfVkVSID4gKG1ham9yKSB8fCBcCisJCSAJKERC
+VVNfTUFKT1JfVkVSID09IChtYWpvcikgJiYgREJVU19NSU5PUl9WRVIgPj0gKG1pbm9yKSkpCisJ
+CisjaWYgQ0hFQ0tfREJVU19WRVJTSU9OKDAsIDMwKQorCS8qIEZvciBELUJ1cyB2ZXJzaW9uID49
+IDAuMzAgKi8KKwkvKioqKioqIHBlbmRpbmcsIHJlcXVpcmVzIGNobmFnZXMgaW4gdGhlIG1ha2Vm
+aWxlICAqKioqKi8KKyNlbHNlIC8qIDwgMC4zMCAqLworCS8qIEZvciBELUJ1cyB2ZXJzaW9uIG9s
+ZGVyIHRoYW4gMC4zMCAqLworCQorI2VuZGlmCisKKyNpZiAgSEFWRV9EQlVTX01FU1NBR0VfSVRF
+Ul9HRVRfQkFTSUMKKwkjd2FybmluZyAiRC1CdXMgPiAwLjMwIgorCSNkZWZpbmUgREJVU19NU0df
+SVRFUl9HRVRfU1RSKGl0ZXIsIHJldHZhcikgXAorCQlkYnVzX21lc3NhZ2VfaXRlcl9nZXRfYmFz
+aWMoKGl0ZXIpLCAmKHJldHZhcikpCisJI2RlZmluZSBEQlVTX01TR19JVEVSX0FQUEVORF9TVFIo
+aXRlciwgdmFsKSBcCisJCWRidXNfbWVzc2FnZV9pdGVyX2FwcGVuZF9iYXNpYygoaXRlciksIERC
+VVNfVFlQRV9TVFJJTkcsICYodmFsKSkKKwkjZGVmaW5lIERCVVNfTVNHX0FQUEVORF9JVEVSX0lO
+SVQoYSwgYikgXAorCQlkYnVzX21lc3NhZ2VfaXRlcl9pbml0X2FwcGVuZChhLCBiKQkKKwkjZGVm
+aW5lIERCVVNfTVNHX0lURVJfQVBQRU5EX0lOVDMyKGl0ZXIsIHZhbCkgXAorCQlkYnVzX21lc3Nh
+Z2VfaXRlcl9hcHBlbmRfYmFzaWMoKGl0ZXIpLCBEQlVTX1RZUEVfSU5UMzIsICYodmFsKSkKKwkj
+ZGVmaW5lIERCVVNfTVNHX0lURVJfQVBQRU5EX1VJTlQzMihpdGVyLCB2YWwpIFwKKwkJZGJ1c19t
+ZXNzYWdlX2l0ZXJfYXBwZW5kX2Jhc2ljKChpdGVyKSwgREJVU19UWVBFX1VJTlQzMiwgJih2YWwp
+KQorCQkKKyNlbHNlCisJI3dhcm5pbmcgIkQtQnVzIDwgMC4zMCIKKwkjZGVmaW5lIERCVVNfTVNH
+X0lURVJfR0VUX1NUUihpdGVyLCByZXR2YXIpIFwKKwkJcmV0dmFyID0gZGJ1c19tZXNzYWdlX2l0
+ZXJfZ2V0X3N0cmluZyhpdGVyKQorCSNkZWZpbmUgREJVU19NU0dfSVRFUl9BUFBFTkRfU1RSKGl0
+ZXIsIHZhbCkgXAorCQlkYnVzX21lc3NhZ2VfaXRlcl9hcHBlbmRfc3RyaW5nKChpdGVyKSwgKHZh
+bCkpCisJI2RlZmluZSBEQlVTX01TR19BUFBFTkRfSVRFUl9JTklUKGEsIGIpIFwKKwkJZGJ1c19t
+ZXNzYWdlX2FwcGVuZF9pdGVyX2luaXQoYSwgYikKKwkjZGVmaW5lIERCVVNfTVNHX0lURVJfQVBQ
+RU5EX0lOVDMyKGl0ZXIsIHZhbCkgXAorCQlkYnVzX21lc3NhZ2VfaXRlcl9hcHBlbmRfaW50MzIo
+KGl0ZXIpLCAodmFsKSkKKwkjZGVmaW5lIERCVVNfTVNHX0lURVJfQVBQRU5EX1VJTlQzMihpdGVy
+LCB2YWwpIFwKKwkJZGJ1c19tZXNzYWdlX2l0ZXJfYXBwZW5kX3VpbnQzMigoaXRlciksICh2YWwp
+KQorI2VuZGlmCisKKworCisKKworI2VuZGlmIC8qX19IX0RCVVNfQ09NUEFUX0hfXyovCg==
+------=_Part_5061_24926217.1126209018408--
 
 
 -------------------------------------------------------
