@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: RE: [Bluez-devel] sbc decoder unrolled
-Message-ID: <C70061B183DE09419568AB2060C52A95C7C7E7@arion.intra.local>
-From: "Victor Shcherbatyuk" <Victor.Shcherbatyuk@tomtom.com>
-To: <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] HCID D-Bus
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050909132940.GE17543@spring.luon.net>
+References: <e1effdeb050908125079935830@mail.gmail.com>
+	 <1126220839.5286.57.camel@blade> <5256d0b050909012577fcb19c@mail.gmail.com>
+	 <1126258645.5227.16.camel@blade>  <20050909132940.GE17543@spring.luon.net>
+Content-Type: text/plain
+Message-Id: <1126273252.5227.119.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,141 +20,56 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 9 Sep 2005 15:56:19 +0200
+Date: Fri, 09 Sep 2005 15:40:52 +0200
 
-Brad,
+Hi Sjoerd,
 
-I think I know another way of getting rid of shifting for the sample
-history array (X[] in case of encoder). If I use double sized array (160
-elements instead of 80), copy incoming data twice (to both halfs of the
-array) and passing a modulo 80 (40 for 4 subbands) index (increased by
-8(4) each of the runs) to _sbc_analyse8(4)(), I will eliminate data
-shifting at price that I have to copy incoming data twice. So for 8
-subbands instead of 72 + 8 mem copies I will have 8+8 mem copies... This
-would not require any smart index calculations.
+> > having 0.33 is better than 0.23 and this is what Debian unstable still
+> > uses. However lets make a list of the distributions:
+> > 
+> > 	SuSE Linux 10.0		D-Bus 0.35
+> > 	Fedora Core 4		D-Bus 0.33
+> > 	Ubuntu Breezy		D-Bus 0.36
+> > 	Debian unstable		D-Bus 0.23
+>     Debian experimental D-Bus 0.50
 
-Sorry, just an idea, it might be applicable only to the encoder, do not
-have access/time to the code right know, will implement it when I can
-(I'm going on vacation for a week)...
+this is good.
 
-Regards,
-    Victor.=20
+> > The only bad guy is Debian unstable and I don't care anymore. They use
+> > Xorg finally and have GCC 4.0 etc., but they can't move over to the next
+> > D-Bus generation. I think that is their problem now and the release of
+> > bluez-utils-0.22 will definitely drop the support for the old D-Bus 0.23
+> > version.
+> 
+> D-bus >= 0.3x has been in debian experimental for quite some time. There are
+> various transitions going on in debian unstable currently which makes it
+> inappropriate to do a dbus transition now too.
 
------Original Message-----
-From: bluez-devel-admin@lists.sourceforge.net
-[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Brad
-Midgley
-Sent: Friday, September 09, 2005 15:16 PM
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] sbc decoder unrolled
+Last time I looked at it, the complete KDE part was broken and full of
+wrong dependencies. So breaking D-Bus wouldn't even be notified ;)
 
-Victor,
+> > I like to base everything around the current D-Bus 0.50 release, because
+> > the C API should be quite stable now. I will accept small workarounds to
+> > make D-Bus 0.3x work, but as soon as the distributions update their
+> > D-Bus libraries I will drop them.
+> > 
+> > This is not a nice thing to do, I know, but a wrong usage of D-Bus lets
+> > hcid segfault and this is not what I want.
+> 
+> As one of debian's dbus maintainers i would advise to indeed base everything on
+> dbus >= 0.50. Hopefully it won't take too long before we can move the new dbus
+> from experimental to unstable, so the workarounds for old dbus release are just
+> not worth it.
 
-Yeah, the only thing I didn't like about it is adding a bunch of
-computed array index and index modulo operations... I think we end up
-coming out ahead but I didn't test it specifically.
+This means I will release bluez-utils-2.21 on the weekend, because of
+some memory leak fixes and then I will drop D-Bus 0.23 support. So if
+any patches need to go in before, please send them now.
 
-I could also double the size of sbc_proto_x_x0 and then I wouldn't have
-to worry about the modulo ops wrapping around our indexing into it. That
-will hurt any kind of caching of the array however.
+Regards
 
-Brad
-
-Victor Shcherbatyuk wrote:
-> Brad,
->=20
-> I'll check if I can do the same for the encoder, getting rid of that=20
-> array shifting might speed up the stuff (well, it will probably add=20
-> some array index operations which might make things worse, but we will
-see).
->=20
-> Regards,
->     Victor.
->=20
-> -----Original Message-----
-> From: bluez-devel-admin@lists.sourceforge.net
-> [mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Brad=20
-> Midgley
-> Sent: Friday, September 09, 2005 7:37 AM
-> To: BlueZ Mailing List
-> Subject: [Bluez-devel] sbc decoder unrolled
->=20
-> Hey
->=20
-> woohoo... I worked over the decoder a lot more and finally unrolled &=20
-> committed it. It still uses floating point for now.
->=20
-> I was very proud of the fact that I found a way to rotate which=20
-> sbc_proto_x_x0 value we choose rather than shifting matrixed values=20
-> around in every loop. It's even more clear that the implementation=20
-> they illustrate in the spec is meant to make the algorithm clear but=20
-> not be an efficient way to do it.
->=20
-> I don't know how the instruction cache size in arm compares to x86. I=20
-> haven't checked to see yet if unrolling is as big a win on xscale.=20
-> fwiw, it cut x86 cpu use by about 50% over the looped code.
->=20
-> I'll look at fixed point next.
->=20
-> Brad
->=20
->=20
-> -------------------------------------------------------
-> SF.Net email is Sponsored by the Better Software Conference & EXPO=20
-> September 19-22, 2005 * San Francisco, CA * Development Lifecycle=20
-> Practices Agile & Plan-Driven Development * Managing Projects & Teams=20
-> * Testing & QA Security * Process Improvement & Measurement *=20
-> http://www.sqe.com/bsce5sf=20
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->=20
->=20
-> This e-mail message contains information which is confidential and may
-be privileged. It is intended for use by the addressee only. If you are
-not the intended addressee, we request that you notify the sender
-immediately and delete or destroy this e-mail message and any
-attachment(s), without copying, saving, forwarding, disclosing or using
-its contents in any other way. TomTom N.V., TomTom International BV or
-any other company belonging to the TomTom group of companies will not be
-liable for damage relating to the communication by e-mail of data,
-documents or any other information.
->=20
->=20
-> -------------------------------------------------------
-> SF.Net email is Sponsored by the Better Software Conference & EXPO=20
-> September 19-22, 2005 * San Francisco, CA * Development Lifecycle=20
-> Practices Agile & Plan-Driven Development * Managing Projects & Teams=20
-> * Testing & QA Security * Process Improvement & Measurement *=20
-> http://www.sqe.com/bsce5sf=20
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Marcel
 
 
--------------------------------------------------------
-SF.Net email is Sponsored by the Better Software Conference & EXPO
-September 19-22, 2005 * San Francisco, CA * Development Lifecycle
-Practices Agile & Plan-Driven Development * Managing Projects & Teams *
-Testing & QA Security * Process Improvement & Measurement *
-http://www.sqe.com/bsce5sf
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
-This e-mail message contains information which is confidential and may be=
- privileged. It is intended for use by the addressee only. If you are not=
- the intended addressee, we request that you notify the sender immediatel=
-y and delete or destroy this e-mail message and any attachment(s), withou=
-t copying, saving, forwarding, disclosing or using its contents in any ot=
-her way. TomTom N.V., TomTom International BV or any other company belong=
-ing to the TomTom group of companies will not be liable for damage relati=
-ng to the communication by e-mail of data, documents or any other informa=
-tion.
 
 
 -------------------------------------------------------
