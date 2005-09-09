@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4321F221.3030604@gulik.org>
-From: Gregory Gulik <greg@gulik.org>
+Message-ID: <4321EE6B.80406@juletraesfoden.dk>
+From: Thomas <tm@juletraesfoden.dk>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Trouble with D-LINK adapter w/Treo 650 and FC4
-References: <430D4681.80609@gulik.org> <1124996595.8019.58.camel@pegasus> <430F2C70.5090601@gulik.org>
-In-Reply-To: <430F2C70.5090601@gulik.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Motorola DC800, and Motorola HT820
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,74 +16,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 09 Sep 2005 15:35:45 -0500
+Date: Fri, 09 Sep 2005 22:19:55 +0200
+
+Got myself a headset (Motorola HT820) and the accompanying audio source 
+(DC800)
+
+Just for fun, I thought that I would like to stream some audio from my 
+server, to either one of them. But so far I haven't been able to do it 
+with a2play. apparently it starts up fine, but I don't hear any audio. I 
+have attached dump from a2play for refference (this is the DC800 that I 
+try to stream to).
+
+the a2play is from the CVS (I removed pthread support, as it apparently 
+was broken in my setup, as it barfed about pthread_create and pthread_join)
+
+Any pointers?
+
+/ Thomas
+------ DUMP a2play -------
+len=2048
+Header size=28
+Sample Rate:44100
+Channels:2
+Using address: 00:07:A4:D5:51:1B
+Found A2DP Sink
+Found A2DP Sink
+
+Found A2DP Sink at the destination
+Connected [imtu 672, omtu 895, flush_to 65535]
+
+Sent the Stream End Point Discovery Command
+Got a Stream End Point Discovery Response
+received 2 capabilities
+
+SEID = 3
+Requested Capabilities for SEID = 3
+Got capabilities response
+Sent set configurations command
+Set configurations command accepted
+Sent open stream command
+Connected [imtu 672, omtu 895, flush_to 65535]
+Got open stream confirm
+Sent stream start
 
 
-Since I got no response in several days I take it nobody knows why the 
-D-Link bluetooth adapter doesn't work with Fedora Core 4.
-
-Can someone recommend a USB Bluetooth dongle that IS known to work well 
-with Fedora Core 4, specifically for DUN support through a Treo 650 phone?
-
-
-
-Gregory Gulik wrote:
-> The bluez version in FC4 are:
-> 
-> bluez-hcidump-1.18-1
-> bluez-utils-2.15-7
-> bluez-pin-0.24-2
-> bluez-bluefw-1.0-6
-> bluez-libs-2.15-1
-> bluez-utils-cups-2.15-7
-> 
-> 
-> And here is the contents of hcidump -X -V:
-> 
-> HCI sniffer - Bluetooth packet analyzer ver 1.18
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> < HCI Command: Create Connection (0x01|0x0005) plen 13
->     bdaddr 00:07:E0:03:D3:99 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
->     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
->  > HCI Event: Command Status (0x0f) plen 4
->     Create Connection (0x01|0x0005) status 0x00 ncmd 1
->  > HCI Event: Link Key Request (0x17) plen 6
->     bdaddr 00:07:E0:03:D3:75
-> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
->     bdaddr 00:07:E0:03:D3:99
->     Link key: 5e937eccd8e812c626964b66cd838bce
->  > HCI Event: Command Complete (0x0e) plen 10
->     Link Key Request Reply (0x01|0x000b) ncmd 1
->     status 0x00 bdaddr 00:07:E0:03:D3:99
->  > HCI Event: Connect Complete (0x03) plen 11
->     status 0x00 handle 41 bdaddr 00:07:E0:03:D3:99 type ACL encrypt 0x01
-> < ACL data: handle 41 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 3 scid 0x0040
-> < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
->     handle 41 policy 0x0f
->     Link policy: RSWITCH HOLD SNIFF PARK
->  > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 41
->  > HCI Event: Max Slots Change (0x1b) plen 3
->   0000: 29 00 05                                          )..
->  > HCI Event: Command Complete (0x0e) plen 6
->     Write Link Policy Settings (0x02|0x000d) ncmd 1
->     status 0x00 handle 41
->  > HCI Event: Disconn Complete (0x05) plen 4
->     status 0x00 handle 41 reason 0x13
->     Reason: Remote User Teminated Connection
-> 
-> 
-> Marcel Holtmann wrote:
-> 
->> what version of bluez-utils is installed with your FC4? Provide us with
->> a "hcidump -X -V" for that failure.
-> 
-> 
-
--- 
-Greg Gulik                                 http://www.gulik.org/greg/
-greg @ gulik.org
 
 
 
