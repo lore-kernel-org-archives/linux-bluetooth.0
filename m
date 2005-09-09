@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Lost connection and caching
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-From: "Kilian Lackhove" <Pommeskalle@web.de>
-Content-Type: text/plain; format=flowed; delsp=yes; charset=us-ascii
-MIME-Version: 1.0
-Message-ID: <op.swuhkyyjjitc0a@rechenknecht>
-Subject: [Bluez-users] Apple Wireless Keyboard on PC: "Can't create connection: Input/output error"
+In-Reply-To: <8a8ea833050909011724f3fcc8@mail.gmail.com>
+References: <8a8ea833050909011724f3fcc8@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1126256913.5227.1.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,34 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 09 Sep 2005 19:01:36 +0200
+Date: Fri, 09 Sep 2005 11:08:33 +0200
+
+Hi,
+
+> I'm using hcitool and bluez libraries to develop a simple application
+> on PDA and laptop.
+> 
+> I have noticed this behaviour:
+> I pair two dongles so I can retrieve information such as RSSI, Link quality....
+> If I extract the USB dongle from the laptop, the other one continues
+> providing  RSSI information, and hcitool con show me that the
+> connection is still alive.
+> Only after 10 secs  it recognize the disconnection. I guess there is
+> cache mechanism.
+> Where can I get more info about that?
+> Is there possible to force a refresh when I retrieve connection information?
+
+the disconnect is easy. That is the disconnect timeout or supervision
+timeout, but for the caching of RSSI I have no idea.
+
+Regards
+
+Marcel
 
 
-Hi there!
-I am using an apple wireless keyboard pro with a Gigabyte GN-BTD02  
-USB-Dongle and Kernel-2.6.12-gentoo-r9 with bluetooth, L2CAP, and HIDP as  
-modules. The modules are loeaded and /etc/init.d/bluetooth has started.
-
-Now the problem:
-
-> rechenknecht kilian # hcitool inq
-> Inquiring ...
->        00:0A:95:38:CA:58       clock offset: 0x1272    class: 0x002540
-
-ok, this is my keyboard - now i try:
-
-> rechenknecht kilian # hcitool cc 00:0A:95:38:CA:58
-> Can't create connection: Input/output error
-
-but "name" works:
-
-> rechenknecht kilian # hcitool scan
-> Scanning ...
->        00:0A:95:38:CA:58       meine Tastatur
-
-So whats wrong? Please help me!
-
-PS: In windows everything works fine, so the hardware must be alright
 
 
 -------------------------------------------------------
