@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] PAND + DUND
-From: David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [Bluez-devel] HCID D-Bus
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1126222497.5286.78.camel@blade>
-References: <E1EDVht-00011o-Nf@mail.sourceforge.net>
-	 <1126222497.5286.78.camel@blade>
+In-Reply-To: <5256d0b050909012577fcb19c@mail.gmail.com>
+References: <e1effdeb050908125079935830@mail.gmail.com>
+	 <1126220839.5286.57.camel@blade> <5256d0b050909012577fcb19c@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1126266637.4171.178.camel@baythorne.infradead.org>
+Message-Id: <1126258645.5227.16.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,23 +19,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 09 Sep 2005 12:50:36 +0100
+Date: Fri, 09 Sep 2005 11:37:25 +0200
 
-On Fri, 2005-09-09 at 01:34 +0200, Marcel Holtmann wrote:
-> you might not wanna hear it, but the DUN profile is deprecated (even by
-> the Bluetooth SIG). However to integrate it into your bridge you need to
-> play some tricks with pppd. It is all about pppd and this is not going
-> to be very easy.
+Hi Pete,
 
-That's sad. DUN allows for compression; Unless I'm mistaken, PAN does
-not.
+> I think 0.5 is compatible with >0.35. The current FC4 only uses  0.33
+> and I don't think its compatible with > 0.35. I think this is similar
+> for a number of the current releases (I think most with gnome 2.10)
+> but obviously isn't the case for the development streams that aren't
+> releases yet.
 
-I keep intending to write a pppd plugin and kernel module to do
-ppp-over-rfcomm directly instead of using the tty. Haven't quite got
-round to it yet though :)
+having 0.33 is better than 0.23 and this is what Debian unstable still
+uses. However lets make a list of the distributions:
 
--- 
-dwmw2
+	SuSE Linux 10.0		D-Bus 0.35
+	Fedora Core 4		D-Bus 0.33
+	Ubuntu Breezy		D-Bus 0.36
+	Debian unstable		D-Bus 0.23
+
+The only bad guy is Debian unstable and I don't care anymore. They use
+Xorg finally and have GCC 4.0 etc., but they can't move over to the next
+D-Bus generation. I think that is their problem now and the release of
+bluez-utils-0.22 will definitely drop the support for the old D-Bus 0.23
+version.
+
+I like to base everything around the current D-Bus 0.50 release, because
+the C API should be quite stable now. I will accept small workarounds to
+make D-Bus 0.3x work, but as soon as the distributions update their
+D-Bus libraries I will drop them.
+
+This is not a nice thing to do, I know, but a wrong usage of D-Bus lets
+hcid segfault and this is not what I want.
+
+Regards
+
+Marcel
 
 
 
