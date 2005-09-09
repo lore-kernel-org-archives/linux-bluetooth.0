@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050909180813.27679.qmail@web34104.mail.mud.yahoo.com>
-From: Joe Samuel <sjoe2@yahoo.com>
-To: Bluez-devel@lists.sourceforge.net
+Message-ID: <4321CD68.4070800@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] SBC encoding Wav files
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] sbc decoder unrolled
+References: <43211F8F.5030607@xmission.com> <43217888.9030902@csr.com>
+In-Reply-To: <43217888.9030902@csr.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,35 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 9 Sep 2005 19:08:13 +0100 (BST)
+Date: Fri, 09 Sep 2005 11:59:04 -0600
 
-Hi,
-Why is the sbc code accepting only au?
-I tried a PCM wav file, changed the endianness here:
-for (ch = 0; ch < sbc->channels; ch++) {
-			int16_t s = *((short *)ptr);
-			ptr += 2;
-			priv->frame.pcm_sample[ch][i] = s;
-		}
+Steven
 
-And of course, changed the header reading part; but it
-looks like things are not as simple as that. The
-encoded file sounds horrible (rather I would say, it
-had nothing in it that sounds like the original).
-Did I miss out something?
+>   output of reference encoder + your decoder (spec requires K > 14)
+>   output of your encoder + reference decoder
+>   output of your encoder + your decoder
 
-regards,
-Joe
+There is a little gotcha here in that we only have a windows binary for 
+a reference encoder/decoder. I haven't tried to build our stuff in 
+cygwin or windows dev tools and there are probably things to fix...
 
-
-
-
-
-	
-	
-		
-___________________________________________________________ 
-Yahoo! Messenger - NEW crystal clear PC to PC calling worldwide with voicemail http://uk.messenger.yahoo.com
+Brad
 
 
 -------------------------------------------------------
