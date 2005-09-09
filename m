@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000a01c5b571$377ba870$0201a8c0@NBVICTOR>
-From: "Victor Shcherbatyuk" <victor@win.tue.nl>
-To: <bluez-devel@lists.sourceforge.net>
-References: <20050909180813.27679.qmail@web34104.mail.mud.yahoo.com>
-Subject: Re: [Bluez-devel] SBC encoding Wav files
+Message-ID: <4321D8A0.6030103@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] sbc decoder unrolled
+References: <C70061B183DE09419568AB2060C52A950E449C@arion.intra.local>
+In-Reply-To: <C70061B183DE09419568AB2060C52A950E449C@arion.intra.local>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,65 +18,60 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 9 Sep 2005 21:03:51 +0200
+Date: Fri, 09 Sep 2005 12:46:56 -0600
 
-Joe,
+Victor,
 
-If .pcm works and .wav doesn't, must be something with audio parameters 
-extracted from wav header? I've never tried wav's and the earliest I can is 
-the week after the next week... May be Brad has some ideas?
+I was hoping to have regression tests as a regular makefile target... 
+it's just more of a pain when it requires shipping stuff around.
 
-Regards,
-    Victor.
+However, if we are willing to assume that our floating point 
+implementations are correct enough to be our own golden standard, then 
+it is pretty straightforward to make a special target that builds both 
+and compares them.
 
------ Original Message ----- 
-From: "Joe Samuel" <sjoe2@yahoo.com>
-To: <Bluez-devel@lists.sourceforge.net>
-Sent: Friday, September 09, 2005 20:08
-Subject: [Bluez-devel] SBC encoding Wav files
+Brad
 
-
-> Hi,
-> Why is the sbc code accepting only au?
-> I tried a PCM wav file, changed the endianness here:
-> for (ch = 0; ch < sbc->channels; ch++) {
-> int16_t s = *((short *)ptr);
-> ptr += 2;
-> priv->frame.pcm_sample[ch][i] = s;
-> }
->
-> And of course, changed the header reading part; but it
-> looks like things are not as simple as that. The
-> encoded file sounds horrible (rather I would say, it
-> had nothing in it that sounds like the original).
-> Did I miss out something?
->
-> regards,
-> Joe
->
->
->
->
->
->
->
->
-> ___________________________________________________________
-> Yahoo! Messenger - NEW crystal clear PC to PC calling worldwide with 
-> voicemail http://uk.messenger.yahoo.com
->
->
+Victor Shcherbatyuk wrote:
+> Brad,
+> 
+> But why is it a problem? The result of encoding/decoding is save to a file - we compare files... So we run reference encoder under windows (or using wine under linux) and then run our stuff under linux, and compare the results obtained using windows reference ebcoder/decoder?
+> 
+> Regards,
+>      Victor.
+> 
+> 
+> -----Original Message-----
+> From: bluez-devel-admin@lists.sourceforge.net on behalf of Brad Midgley
+> Sent: Fri 9/9/2005 7:59 PM
+> To: bluez-devel@lists.sourceforge.net
+> Subject: Re: [Bluez-devel] sbc decoder unrolled
+>  
+> Steven
+> 
+> 
+>>  output of reference encoder + your decoder (spec requires K > 14)
+>>  output of your encoder + reference decoder
+>>  output of your encoder + your decoder
+> 
+> 
+> There is a little gotcha here in that we only have a windows binary for 
+> a reference encoder/decoder. I haven't tried to build our stuff in 
+> cygwin or windows dev tools and there are probably things to fix...
+> 
+> Brad
+> 
+> 
 > -------------------------------------------------------
 > SF.Net email is Sponsored by the Better Software Conference & EXPO
-> September 19-22, 2005 * San Francisco, CA * Development Lifecycle 
-> Practices
+> September 19-22, 2005 * San Francisco, CA * Development Lifecycle Practices
 > Agile & Plan-Driven Development * Managing Projects & Teams * Testing & QA
 > Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
 > _______________________________________________
 > Bluez-devel mailing list
 > Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel 
-
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
 
 
 -------------------------------------------------------
