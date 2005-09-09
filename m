@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] PAND + DUND
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43217888.9030902@csr.com>
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1126266637.4171.178.camel@baythorne.infradead.org>
-References: <E1EDVht-00011o-Nf@mail.sourceforge.net>
-	 <1126222497.5286.78.camel@blade>
-	 <1126266637.4171.178.camel@baythorne.infradead.org>
-Content-Type: text/plain
-Message-Id: <1126268507.5227.83.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] sbc decoder unrolled
+References: <43211F8F.5030607@xmission.com>
+In-Reply-To: <43211F8F.5030607@xmission.com>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,30 +18,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 09 Sep 2005 14:21:47 +0200
+Date: Fri, 09 Sep 2005 12:56:56 +0100
 
-Hi David,
+Brad Midgley wrote:
+>                       It's even more clear that the implementation they 
+> illustrate in the spec is meant to make the algorithm clear but not be 
+> an efficient way to do it.
 
-> > you might not wanna hear it, but the DUN profile is deprecated (even by
-> > the Bluetooth SIG). However to integrate it into your bridge you need to
-> > play some tricks with pppd. It is all about pppd and this is not going
-> > to be very easy.
-> 
-> That's sad. DUN allows for compression; Unless I'm mistaken, PAN does
-> not.
-> 
-> I keep intending to write a pppd plugin and kernel module to do
-> ppp-over-rfcomm directly instead of using the tty. Haven't quite got
-> round to it yet though :)
+This is definitely true.
 
-the bluez-utils package still contains ppporc, but the kernel PPP and
-pppd sucks and so PPP over RFCOMM socket directly is almost impossible
-without tricks.
+The spec allows you complete flexibility on your implementation. You're
+not even obliged to use the algorithm in the spec. You need make sure
+only that the errors between the outputs of your encoder and decoder and
+the outputs of the reference encoder and decoder are less than a
+threshold. (For qualification, they talk about the decoder having a K
+value which needs to be greater than 14).
 
-Regards
+If you have a program that can calculate K, then I suggest that a
+suitable regression test is to measure the K values of the reference
+test inputs between:
 
-Marcel
+  output of reference encoder + reference decoder
 
+and each of:
+
+  output of reference encoder + your decoder (spec requires K > 14)
+  output of your encoder + reference decoder
+  output of your encoder + your decoder
+
+This gives you much more optimisation flexibility than requiring an
+identical output bit stream.
+
+As well as measuring K, you should also listen to the outputs -
+otherwise you may have a bug that sounds bad but somehow manages to
+pass the K test.
+
+Remember SBC is a lossy codec, it'd be pointless to try too hard to
+precisely reproduce the losses of the reference codec.
+
+	- Steven
+-- 
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+**********************************************************************
 
 
 
