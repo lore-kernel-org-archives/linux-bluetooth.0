@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4321BDC2.70404@tcs.hut.fi>
-From: Ville Nuorvala <vnuorval@tcs.hut.fi>
+Message-ID: <43219928.5050507@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Content-Type: multipart/mixed;
- boundary="------------000504040705060206090604"
-Subject: [Bluez-devel] [PATCH] Fix infinite loops in textfile.c
+Subject: Re: [Bluez-devel] sbc decoder unrolled
+References: <43211F8F.5030607@xmission.com> <43217888.9030902@csr.com>
+In-Reply-To: <43217888.9030902@csr.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,126 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 09 Sep 2005 19:52:18 +0300
+Date: Fri, 09 Sep 2005 08:16:08 -0600
 
-This is a multi-part message in MIME format.
---------------000504040705060206090604
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
+Steven,
 
-Hi,
+> threshold. (For qualification, they talk about the decoder having a K
+> value which needs to be greater than 14).
 
-both textfile_put() and textfile_get() go into inifinite loops if a 
-string matching the search key is found anywhere except at the beginning 
-of a line.
+I had given up on regression tests for accuracy and performance because 
+I didn't know about K values and I figured x86 performance might 
+actually go down for fixed point (Victor confirmed this)
 
-Both functions may also get false positive matches if the search key 
-forms a substring of some other key in the same file.
+Google isn't helping me find much about K value this morning but I would 
+like to put a regression test in the build if we find something...
 
-The attached patch fixes both problems, but I can split it up into two 
-separate parts if you wish.
+> As well as measuring K, you should also listen to the outputs -
+> otherwise you may have a bug that sounds bad but somehow manages to
+> pass the K test.
 
-Regards,
-Ville
--- 
-Ville Nuorvala
-Research Assistant,
-Laboratory for Theoretical Computer Science,
-Helsinki University of Technology
-email: vnuorval@tcs.hut.fi, phone: +358 (0)9 451 5257
+Yes... the only thing worse than listening to the reference streams for 
+the thousandth time is listening to the reference streams again with 
+some new distortion introduced. I ended up encoding some music snipets 
+for testing that I (used to) like to listen to :)
 
---------------000504040705060206090604
-Content-Type: text/x-patch;
- name="infinite_loop.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="infinite_loop.patch"
+thanks for the input
 
-Index: common/textfile.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/common/textfile.c,v
-retrieving revision 1.7
-diff -u -r1.7 textfile.c
---- common/textfile.c	7 Sep 2005 17:31:56 -0000	1.7
-+++ common/textfile.c	9 Sep 2005 15:31:10 -0000
-@@ -113,6 +113,15 @@
- 	return err;
- }
- 
-+static inline char *find_key(char *map, char *key, size_t len)
-+{
-+	char *off = strstr(map, key);
-+
-+	while (off && ((off > map && *(off - 1) != '\r' && *(off - 1) != '\n') || *(off + len) != ' '))
-+		off = strstr(off + len, key);
-+	return off;
-+}
-+
- int textfile_put(char *pathname, char *key, char *value)
- {
- 	struct stat st;
-@@ -148,7 +157,7 @@
- 		goto unlock;
- 	}
- 
--	off = strstr(map, key);
-+	off = find_key(map, key, strlen(key));
- 	if (!off) {
- 		munmap(map, size);
- 		pos = lseek(fd, size, SEEK_SET);
-@@ -156,18 +165,6 @@
- 		goto unlock;
- 	}
- 
--	if (off > map) {
--		while (*(off - 1) != '\r' && *(off - 1) != '\n') {
--			off = strstr(off, key);
--			if (!off) {
--				munmap(map, size);
--				pos = lseek(fd, size, SEEK_SET);
--				err = write_key_value(fd, key, value);
--				goto unlock;
--			}
--		}
--	}
--
- 	base = off - map;
- 
- 	end = strpbrk(off, "\r\n");
-@@ -254,29 +251,19 @@
- 		goto unlock;
- 	}
- 
--	off = strstr(map, key);
-+	len = strlen(key);
-+	off = find_key(map, key, len);
- 	if (!off) {
- 		err = EILSEQ;
- 		goto unmap;
- 	}
- 
--	if (off > map) {
--		while (*(off - 1) != '\r' && *(off - 1) != '\n') {
--			off = strstr(off, key);
--			if (!off) {
--				err = EILSEQ;
--				goto unmap;
--			}
--		}
--	}
--
- 	end = strpbrk(off, "\r\n");
- 	if (!end) {
- 		err = EILSEQ;
- 		goto unmap;
- 	}
- 
--	len = strlen(key);
- 	str = malloc(end - off - len);
- 	if (!str) {
- 		err = EILSEQ;
-
---------------000504040705060206090604--
+Brad
 
 
 -------------------------------------------------------
