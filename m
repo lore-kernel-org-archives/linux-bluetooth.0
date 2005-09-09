@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Rutger Hendriks <Loial@home.nl>
+Subject: Re: [Bluez-devel] PAND + DUND
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] missing keys from logitech dinovo keyboard
-References: <200508291336.13270.Loial@home.nl> <200509012058.02028.Loial@home.nl> <dc98d8d905090113311c72bb07@mail.gmail.com>
-In-Reply-To: <dc98d8d905090113311c72bb07@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart1307745.MSTaIXxD4D";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Message-Id: <200509091423.14538.Loial@home.nl>
+In-Reply-To: <1126266637.4171.178.camel@baythorne.infradead.org>
+References: <E1EDVht-00011o-Nf@mail.sourceforge.net>
+	 <1126222497.5286.78.camel@blade>
+	 <1126266637.4171.178.camel@baythorne.infradead.org>
+Content-Type: text/plain
+Message-Id: <1126268507.5227.83.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,49 +20,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 9 Sep 2005 14:23:09 +0200
+Date: Fri, 09 Sep 2005 14:21:47 +0200
 
---nextPart1307745.MSTaIXxD4D
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi David,
 
-On Thursday 01 September 2005 22:31, Paul Webster wrote:
-> I have one of these keyboards. I'm fairly sure that all the normal
-> keys and media buttons work, but I'm not sure whether the FnF-Keys do.
-> I'll look into it when I'm home this weekend.
->
-> For reference, I followed the advice of a few different postings on
-> linuxquestions.org. I'll see if I can dig up the links...
->
-> Paul W
+> > you might not wanna hear it, but the DUN profile is deprecated (even by
+> > the Bluetooth SIG). However to integrate it into your bridge you need to
+> > play some tricks with pppd. It is all about pppd and this is not going
+> > to be very easy.
+> 
+> That's sad. DUN allows for compression; Unless I'm mistaken, PAN does
+> not.
+> 
+> I keep intending to write a pppd plugin and kernel module to do
+> ppp-over-rfcomm directly instead of using the tty. Haven't quite got
+> round to it yet though :)
 
-I took a look at linuxquestions.org, but couldn't find any reference to the=
-=20
-Dinovo functionkeys (F1-F12 in F-lock mode)
+the bluez-utils package still contains ppporc, but the kernel PPP and
+pppd sucks and so PPP over RFCOMM socket directly is almost impossible
+without tricks.
 
-To be absolutely clear, I have no problems getting the nice silver media=20
-buttons to work (or the halfmoon sleep button). My only problem is with F1 =
-to=20
-=464, F6 to F8 and F10 to F12 in F-lock mode. Normal F1-F12 work okay.
+Regards
 
-Thanks,
+Marcel
 
-Rutger
 
---nextPart1307745.MSTaIXxD4D
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQBDIX6yZNkx8LIJzQ4RAksAAJ0Urg7WhHZPEipoRicmIGXo70VrUQCfbQok
-WXK11nvdf75+8uAdcuBImGs=
-=zpn8
------END PGP SIGNATURE-----
-
---nextPart1307745.MSTaIXxD4D--
 
 
 -------------------------------------------------------
