@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4322E012.1070701@telia.com>
-From: Mikael Hakali <mhakali@telia.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] Fix infinite loops in textfile.c
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] Samsung Z500 + bluez rfcomm problem, potential bug?
+In-Reply-To: <4321BDC2.70404@tcs.hut.fi>
+References: <4321BDC2.70404@tcs.hut.fi>
+Content-Type: text/plain
+Message-Id: <1126345421.5697.5.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,23 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 10 Sep 2005 15:30:58 +0200
+Date: Sat, 10 Sep 2005 11:43:41 +0200
 
-Hello!
+Hi Ville,
 
-(wooops. this mail was accidently sent to announce, sorry)
+> both textfile_put() and textfile_get() go into inifinite loops if a 
+> string matching the search key is found anywhere except at the beginning 
+> of a line.
+> 
+> Both functions may also get false positive matches if the search key 
+> forms a substring of some other key in the same file.
+> 
+> The attached patch fixes both problems, but I can split it up into two 
+> separate parts if you wish.
 
-Can anyone from the developer team look at 
-http://sourceforge.net/mailarchive/forum.php?thread_id=8154927&forum_id=1883 
-?
+no need to split it. Thanks for the patch. I applied it.
 
-I am suspecting it is a potential bug in either the phone or the 
-software. Yet I am not qualified enough in the area to judge which. I 
-did try out  Seba T.'s suggestion yet the reply was placed as a new 
-thread (for some reason) at 
-http://sourceforge.net/mailarchive/forum.php?thread_id=8159796&forum_id=1883.
+What do you think about writing some regression tests for the textfile
+library?
 
-  Mikael
+Regards
+
+Marcel
 
 
 
