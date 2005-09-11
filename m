@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43245D2E.4070009@gmail.com>
-From: JoKo <jokogr@gmail.com>
+Message-ID: <43242E39.4080804@ee.duth.gr>
+From: Ioannis Koutras <ik5272@ee.duth.gr>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Microsoft Optical Desktop for Bluetooth - Help!
-References: <4324344D.1030401@gmail.com> <1126447038.31313.11.camel@blade>
-In-Reply-To: <1126447038.31313.11.camel@blade>
-Content-Type: text/plain; charset=windows-1253; format=flowed
+Content-Type: text/plain; charset=ISO-8859-7; format=flowed
+Subject: [Bluez-users] Microsoft Optical Desktop for Bluetooth - Help!
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,85 +16,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 11 Sep 2005 19:37:02 +0300
+Date: Sun, 11 Sep 2005 16:16:41 +0300
 
-Marcel Holtmann wrote:
+Hi,
 
->Hi,
->
->  
->
->>I've recently bought a new PC which came with Microsoft Optical Desktop
->>for Bluetooth set. During setup (both Windows and Linux) I've used a
->>normal PS/2 keyboard and everything went OK. The installation of the
->>bluetooth devices in Windows was also OK.
->>
->>But with Linux, I came up with lots of problems. By trial and error, I
->>have managed to use it, but I still have problems. The mouse has no
->>problems at all, since no PIN is used for it, but for the bluetooth
->>keyboard I had to setup a PIN (using the default pin-helper) which has
->>to be the same with the one in Windows.
->>
->>Although it works for a while, if you don't press any buttons for some
->>time, the connection between keyboard and PC is lost.In addition to
->>that, when I exit from Linux, the connection is most of times also lost,
->>so I cannot control the boot loader or the BIOS and even worse, I have
->>to go into Windows to re-install the keyboard so that I can finally use it.
->>
->>Thanks god the mouse always works and therefore, I don't have to connect
->>a PS/2 keyboard every time I use Linux.
->>    
->>
->
->use a HID proxy dongle (CSR or Broadcom) and write the link key for the
->keyboard to the Bluetooth chip itself. See the mailing list archive for
->some details, because such a question was raised before.
->
->Regards
->
->Marcel
->
->
->
->
->-------------------------------------------------------
->SF.Net email is Sponsored by the Better Software Conference & EXPO
->September 19-22, 2005 * San Francisco, CA * Development Lifecycle Practices
->Agile & Plan-Driven Development * Managing Projects & Teams * Testing & QA
->Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
->_______________________________________________
->Bluez-users mailing list
->Bluez-users@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->  
->
-Hi again,
+I've recently bought a new PC which came with Microsoft Optical Desktop 
+for Bluetooth set. During setup (both Windows and Linux) I've used a 
+normal PS/2 keyboard and everything went OK. The installation of the 
+bluetooth devices in Windows was also OK.
 
-Thanks for your fast reply and I'm feeling sorry for asking the same 
-question again, but a search in the mailing list archive wasn't very 
-helpful. A HID proxy dongle is a dongle which saves all the required 
-info so that my device (keyboard, mouse) could be used during booting as 
-a USB device, right? If so, after installing the keyboard device in 
-Windows, my keyboard works during booting (I can go into the BIOS menu, 
-choose an OS with the boot loader etc.) even after I shut down my PC.
+But with Linux, I came up with lots of problems. By trial and error, I 
+have managed to use it, but I still have problems. The mouse has no 
+problems at all, since no PIN is used for it, but for the bluetooth 
+keyboard I had to setup a PIN (using the default pin-helper) which has 
+to be the same with the one in Windows.
 
-So, I suppose, the Microsoft USB dongle supports HID proxy. After all, 
-your list (http://www.holtmann.org/linux/bluetooth/features.html) 
-indicates that the bluetooth chip Microsoft uses could be either CSR or 
-Broadcom. If I'm right, my next question is how to write the link key to 
-the bluetooth chip.
+Although it works for a while, if you don't press any buttons for some 
+time, the connection between keyboard and PC is lost.In addition to 
+that, when I exit from Linux, the connection is most of times also lost, 
+so I cannot control the boot loader or the BIOS and even worse, I have 
+to go into Windows to re-install the keyboard so that I can finally use it.
 
-Although I've searched through the mailing list, I couldn't find any 
-explanatory note about it. The only thing I found was something about 
-tranferring the link key between Windows and Linux, but I suppose this 
-has to do with the operating systems only (and in both of them I use the 
-same pin number) and not with the firmware itself.
+Thanks god the mouse always works and therefore, I don't have to connect 
+a PS/2 keyboard every time I use Linux.
 
-Anyway, a full guide would be very helpful...
+Oops, I've forgotten to mention that I'm using Gentoo Linux with a 
+2.6.12 kernel (morph-sources) and the latest stable BlueZ stuff for 
+Portage...
+
+If anyone could help me, I would be very grateful...
 
 
-Thanks again for your help
+Thanks in advance
 
 
 -------------------------------------------------------
