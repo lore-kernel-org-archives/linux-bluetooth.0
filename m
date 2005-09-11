@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <8eddf07b050912011254a84668@mail.gmail.com>
-From: Wu Jason <superht001@gmail.com>
+Message-ID: <43245D2E.4070009@gmail.com>
+From: JoKo <jokogr@gmail.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_7225_31189135.1126512761034"
-Subject: [Bluez-users] I can't compile with -lbluetooth
+Subject: Re: [Bluez-users] Microsoft Optical Desktop for Bluetooth - Help!
+References: <4324344D.1030401@gmail.com> <1126447038.31313.11.camel@blade>
+In-Reply-To: <1126447038.31313.11.camel@blade>
+Content-Type: text/plain; charset=windows-1253; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,32 +18,85 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 12 Sep 2005 16:12:41 +0800
+Date: Sun, 11 Sep 2005 19:37:02 +0300
 
-------=_Part_7225_31189135.1126512761034
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Marcel Holtmann wrote:
 
-I use "gcc -o test test.c -lbluetooth" to compile my program,
-but it didn't work and has error message mean it can't find -lbluetooth,
-how can I do?
- my platform is fedora core 3 included bluez.
+>Hi,
+>
+>  
+>
+>>I've recently bought a new PC which came with Microsoft Optical Desktop
+>>for Bluetooth set. During setup (both Windows and Linux) I've used a
+>>normal PS/2 keyboard and everything went OK. The installation of the
+>>bluetooth devices in Windows was also OK.
+>>
+>>But with Linux, I came up with lots of problems. By trial and error, I
+>>have managed to use it, but I still have problems. The mouse has no
+>>problems at all, since no PIN is used for it, but for the bluetooth
+>>keyboard I had to setup a PIN (using the default pin-helper) which has
+>>to be the same with the one in Windows.
+>>
+>>Although it works for a while, if you don't press any buttons for some
+>>time, the connection between keyboard and PC is lost.In addition to
+>>that, when I exit from Linux, the connection is most of times also lost,
+>>so I cannot control the boot loader or the BIOS and even worse, I have
+>>to go into Windows to re-install the keyboard so that I can finally use it.
+>>
+>>Thanks god the mouse always works and therefore, I don't have to connect
+>>a PS/2 keyboard every time I use Linux.
+>>    
+>>
+>
+>use a HID proxy dongle (CSR or Broadcom) and write the link key for the
+>keyboard to the Bluetooth chip itself. See the mailing list archive for
+>some details, because such a question was raised before.
+>
+>Regards
+>
+>Marcel
+>
+>
+>
+>
+>-------------------------------------------------------
+>SF.Net email is Sponsored by the Better Software Conference & EXPO
+>September 19-22, 2005 * San Francisco, CA * Development Lifecycle Practices
+>Agile & Plan-Driven Development * Managing Projects & Teams * Testing & QA
+>Security * Process Improvement & Measurement * http://www.sqe.com/bsce5sf
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>  
+>
+Hi again,
 
-------=_Part_7225_31189135.1126512761034
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Thanks for your fast reply and I'm feeling sorry for asking the same 
+question again, but a search in the mailing list archive wasn't very 
+helpful. A HID proxy dongle is a dongle which saves all the required 
+info so that my device (keyboard, mouse) could be used during booting as 
+a USB device, right? If so, after installing the keyboard device in 
+Windows, my keyboard works during booting (I can go into the BIOS menu, 
+choose an OS with the boot loader etc.) even after I shut down my PC.
 
-<div>I use &quot;gcc -o test test.c -lbluetooth&quot; to compile my program=
-,</div>
-<div>but it didn't work and has error message mean it can't find -lbluetoot=
-h,</div>
-<div>how can I do?</div>
-<div>&nbsp;</div>
-<div>my platform is fedora core 3 included bluez.</div>
+So, I suppose, the Microsoft USB dongle supports HID proxy. After all, 
+your list (http://www.holtmann.org/linux/bluetooth/features.html) 
+indicates that the bluetooth chip Microsoft uses could be either CSR or 
+Broadcom. If I'm right, my next question is how to write the link key to 
+the bluetooth chip.
 
-------=_Part_7225_31189135.1126512761034--
+Although I've searched through the mailing list, I couldn't find any 
+explanatory note about it. The only thing I found was something about 
+tranferring the link key between Windows and Linux, but I suppose this 
+has to do with the operating systems only (and in both of them I use the 
+same pin number) and not with the firmware itself.
+
+Anyway, a full guide would be very helpful...
+
+
+Thanks again for your help
 
 
 -------------------------------------------------------
