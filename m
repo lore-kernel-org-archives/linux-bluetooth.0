@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4324344D.1030401@gmail.com>
-From: JoKo <jokogr@gmail.com>
+Message-ID: <20050911074518.21076.qmail@web15705.mail.cnb.yahoo.com>
+From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
+To: bluez users <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=windows-1253; format=flowed
-Subject: [Bluez-users] Microsoft Optical Desktop for Bluetooth - Help!
+Content-Type: text/plain; charset=gb2312
+Subject: [Bluez-users] Re:How can I access Internet over PAN?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,38 +16,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 11 Sep 2005 16:42:37 +0300
+Date: Sun, 11 Sep 2005 15:45:18 +0800 (CST)
 
 Hi,
+Thanks ,Marcel !
+We have a LAN to access the network and Internet. I
+would like to connect two ARM platforms to the LAN to
+the network and Internet. 
+One platform which can access Internet is NAP, and the
+other is PANU. We are using a network domain for the
+LAN,The LAN IP range is 202.118.181.0.
+And now,I have built iptables in ARM
+linux(2.4.18-rmk7-pxa1),but I am not sure if it really
+works! 
 
-I've recently bought a new PC which came with Microsoft Optical Desktop
-for Bluetooth set. During setup (both Windows and Linux) I've used a
-normal PS/2 keyboard and everything went OK. The installation of the
-bluetooth devices in Windows was also OK.
+Marcle told me use IP forwarding and masquerading for
+this! And I have read PAN HOW-TO and this web
+http://fedoranews.org/contributors/muhammad_al_ismail/bluetooth/
+,but sitll ,I cann't ping 202.118.181.x,I have no idea
+about how to do next !
 
-But with Linux, I came up with lots of problems. By trial and error, I
-have managed to use it, but I still have problems. The mouse has no
-problems at all, since no PIN is used for it, but for the bluetooth
-keyboard I had to setup a PIN (using the default pin-helper) which has
-to be the same with the one in Windows.
-
-Although it works for a while, if you don't press any buttons for some
-time, the connection between keyboard and PC is lost.In addition to
-that, when I exit from Linux, the connection is most of times also lost,
-so I cannot control the boot loader or the BIOS and even worse, I have
-to go into Windows to re-install the keyboard so that I can finally use it.
-
-Thanks god the mouse always works and therefore, I don't have to connect
-a PS/2 keyboard every time I use Linux.
-
-Oops, I've forgotten to mention that I'm using Gentoo Linux with a
-2.6.12 kernel (morph-sources) and the latest stable BlueZ stuff for
-Portage...
-
-If anyone could help me, I would be very grateful...
-
-
+Any example?
 Thanks in advance
+
+gadfly
+
+
+	
+
+	
+		
+___________________________________________________________ 
+—≈ª¢√‚∑—G” œ‰£≠÷–π˙µ⁄“ªæ¯Œﬁ¿¨ª¯” º˛…ß»≈≥¨¥Û” œ‰ 
+http://cn.mail.yahoo.com
 
 
 
