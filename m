@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Wauter <mailing-list@wauter.com>
+Message-ID: <e8113e5f05091211405e440a53@mail.gmail.com>
+From: Pedro Pinto <pedromcpinto@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Mobi Bluetooth RC
-References: <200509061212.56588.mailing-list@wauter.com> <200509061316.11145.dpbasti@wp.pl> <431F0465.70605@xmission.com>
-In-Reply-To: <431F0465.70605@xmission.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200509122133.55977.mailing-list@wauter.com>
+Subject: Re: [Bluez-users] I can't compile with -lbluetooth
+In-Reply-To: <8eddf07b050912011254a84668@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_12115_27375641.1126550423394"
+References: <8eddf07b050912011254a84668@mail.gmail.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,28 +19,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 12 Sep 2005 21:33:55 +0200
+Date: Mon, 12 Sep 2005 19:40:23 +0100
 
-> The most general purpose app would also be able to deal with AVRCP so
-> headset buttons could be controllers too. It's just too bad only
-> ericsson phones support the protocol you're using.
+------=_Part_12115_27375641.1126550423394
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I certainly agree that AVRCP is very interesting, but unfortunately I don't 
-have a budget for hardware on this project so it's unlikely to be implemented 
-in the near future.
+Hello!
+Try using libbluetooth.so instead.
 
-> I saw another project somewhere that was a symbian app on the phone and
-> a custom daemon on the other side. It sounds like they can build some
-> interesting menus/interfaces with it.
+Good luck
 
-Bemused does this.
+On 9/12/05, Wu Jason <superht001@gmail.com> wrote:
+>=20
+> I use "gcc -o test test.c -lbluetooth" to compile my program,
+> but it didn't work and has error message mean it can't find -lbluetooth,
+> how can I do?
+>  my platform is fedora core 3 included bluez.
+>
 
-> The problem is you can't use any phone to do these things. bluetooth
-> remote control would be very slick if every phone had it.
+------=_Part_12115_27375641.1126550423394
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Sooner or later it will happen. For now, buy an SE :-)
+Hello!<br>
+Try using libbluetooth.so instead.<br>
+<br>
+Good luck<br><br><div><span class=3D"gmail_quote">On 9/12/05, <b class=3D"g=
+mail_sendername">Wu Jason</b> &lt;<a href=3D"mailto:superht001@gmail.com">s=
+uperht001@gmail.com</a>&gt; wrote:</span><blockquote class=3D"gmail_quote" =
+style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8=
+ex; padding-left: 1ex;">
+<div>I use &quot;gcc -o test test.c -lbluetooth&quot; to compile my program=
+,</div>
+<div>but it didn't work and has error message mean it can't find -lbluetoot=
+h,</div>
+<div>how can I do?</div>
+<div>&nbsp;</div>
+<div>my platform is fedora core 3 included bluez.</div>
 
-Wauter
+</blockquote></div><br>
+
+------=_Part_12115_27375641.1126550423394--
 
 
 -------------------------------------------------------
