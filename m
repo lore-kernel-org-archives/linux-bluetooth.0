@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] I can't compile with -lbluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Wauter <mailing-list@wauter.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <8eddf07b050912011254a84668@mail.gmail.com>
-References: <8eddf07b050912011254a84668@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1126563492.5518.0.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Mobi Bluetooth RC
+References: <200509061212.56588.mailing-list@wauter.com> <200509061316.11145.dpbasti@wp.pl> <431F0465.70605@xmission.com>
+In-Reply-To: <431F0465.70605@xmission.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200509122133.55977.mailing-list@wauter.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,22 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 13 Sep 2005 00:18:12 +0200
+Date: Mon, 12 Sep 2005 21:33:55 +0200
 
-Hi,
+> The most general purpose app would also be able to deal with AVRCP so
+> headset buttons could be controllers too. It's just too bad only
+> ericsson phones support the protocol you're using.
 
-> I use "gcc -o test test.c -lbluetooth" to compile my program,
-> but it didn't work and has error message mean it can't find
-> -lbluetooth,
-> how can I do?
+I certainly agree that AVRCP is very interesting, but unfortunately I don't 
+have a budget for hardware on this project so it's unlikely to be implemented 
+in the near future.
 
-install the BlueZ devel package and show us the full error messages.
+> I saw another project somewhere that was a symbian app on the phone and
+> a custom daemon on the other side. It sounds like they can build some
+> interesting menus/interfaces with it.
 
-Regards
+Bemused does this.
 
-Marcel
+> The problem is you can't use any phone to do these things. bluetooth
+> remote control would be very slick if every phone had it.
 
+Sooner or later it will happen. For now, buy an SE :-)
 
+Wauter
 
 
 -------------------------------------------------------
