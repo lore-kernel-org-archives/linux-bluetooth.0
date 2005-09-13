@@ -1,10 +1,20 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Collin R. Mulliner" <collin@betaversion.net>
+Subject: Re: [Bluez-devel] HCID D-Bus (Seg Fault)
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb05091306033c7476a@mail.gmail.com>
+References: <e1effdeb050908125079935830@mail.gmail.com>
+	 <1126220839.5286.57.camel@blade> <5256d0b050909012577fcb19c@mail.gmail.com>
+	 <1126258645.5227.16.camel@blade> <20050909132940.GE17543@spring.luon.net>
+	 <1126273252.5227.119.camel@blade>
+	 <e1effdeb050912140719fc9d3b@mail.gmail.com>
+	 <1126561206.24935.1.camel@localhost.localdomain>
+	 <e1effdeb050912160979b5ba49@mail.gmail.com>
+	 <1126567316.5518.9.camel@localhost.localdomain>
+	 <e1effdeb05091306033c7476a@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1126640851.2890.8.camel@panic>
+Message-Id: <1126637659.9456.0.camel@localhost.localdomain>
 Mime-Version: 1.0
-Subject: [Bluez-devel] FYI: obex server with support for put/get obexftp
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,31 +26,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 13 Sep 2005 21:47:31 +0200
+Date: Tue, 13 Sep 2005 20:54:18 +0200
 
-maybe some of you are interested ...
+Hi Claudio,
 
-sobexsrv - or the scripting OBEX server
-        
-is a Linux OBEX server with support for OPUSH put/get and OBEXFTP. The
-server is currently Bluetooth only and build ontop of openobex and BlueZ
-(of course).
-        
-The server handles only the basic OBEX operations and calls an external
-executable for all the application-logic (like OBEXFTP). The basic
-script included in the package can do OPUSH put/get and OBEXFTP. 
-        
-The code is in early development so watch out for bugs!
-        
-Download it here http://www.mulliner.org/bluetooth/sobexsrv-0.1.tar.gz
+> The patch for reply_handler_function is attached.
 
-... Collin
+please redo it against the latest CVS, because I already dropped the
+D-Bus 0.23 support.
 
---
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-All programmers are optimists --Frederick P. Brooks, Jr.
+Regards
+
+Marcel
+
 
 
 
