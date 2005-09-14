@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <432823D3.3060705@cefriel.it>
-From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] L2CAP chnnel
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SCO & btsco
-References: <4327D66A.1030304@cefriel.it> <43280B35.1070303@csr.com>
-In-Reply-To: <43280B35.1070303@csr.com>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <E1EFR9z-0001K1-00.bizon_art-mail-ru@f48.mail.ru>
+References: <E1EFR9z-0001K1-00.bizon_art-mail-ru@f48.mail.ru>
+Content-Type: text/plain
+Message-Id: <1126703758.16166.34.camel@station6.example.com>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,83 +18,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 14 Sep 2005 15:21:23 +0200
+Date: Wed, 14 Sep 2005 15:15:58 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi,
 
-Thanks, Steven.
-I'm sorry for confusion I created.
-
-with sox:
-
-sox -t raw -r 8000 -s -w sound.raw pippo.wav
-
-I build a transformation chain that works.
-
-Thank you.
-
-Cheers,
-Pizza
-
-
-Steven Singer wrote:
-> Luca Pizzamiglio wrote:
+>     I`m try to write application that send and recive data over L2CAP channel, between PC and my custom arm board. I have a next problem. I dont understand haw create a socket, if PC must inquirying and connect to my board. Device must remain slave in piconnect.
+>     I`m try run next simpl daemon on my custom arm board:
 > 
->>bt specification says that bluetooth supports three audio formats:
->>- CVSD
->>- u-law
->>- a-law
+> 	struct sockaddr_l2 L2capAddr;
+> 	int iSockFd;
+> 	iSockFd = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_L2CAP);
+> 	if (iSockFd == -1) {
+> 		TRACE1("opening L2CAP socket: %s", strerror(errno));
+> 		return -1;
+> 	};
+> 	L2capAddr.l2_bdaddr = *BDADDR_ANY;
+> 	/*L2capAddr.l2_bdaddr = *strtoba( strdup("78:A1:1F:96:A0:00"));*/
+> 	L2capAddr.l2_family = AF_BLUETOOTH;
+> 	L2capAddr.l2_psm    = htobs(SDP_PSM); // I sigth this valuer in Tsimbal code
+> 	if(0 > bind(iSockFd, (struct sockaddr *)&L2capAddr, sizeof(L2capAddr)))
+> 	{
+> 		TRACE1("binding L2CAP socket: %s", strerror(errno));
+> 		return -1;
+> 	}
+> 	incoming = listen(iSockFd, ACTIVE_CONN_MAX);
 > 
-> 
-> That's not what the BT spec says, you need to read it more carefully.
-> 
-> BT supports 3 *air* formats: u-law, A-law and CVSD, however, that's
-> irrelevant as far as interfacing with the chip is concerned as the
-> chip will transcode to and from those formats from and to the HCI
-> format (aka the input format).
-> 
-> BT supports the following HCI formats:
-> 
->   2's complement linear
->   1's complement linear
->   sign-magnitude
->   unsigned (some devices only)
->   u-law
->   A-law
-> 
-> The linear formats can be 8 bit, 16 bit or 9..15 bit right aligned
-> in a 16 bit word.
-> 
-> The default format - 0x0060 - is CVSD on the air and 16 bit 2's
-> complement linear signed on the wire as the output of hciconfig
-> clearly states.
-> 
-> Always keep the air format set to CVSD (as the two sides need to agree
-> on the air format in order to be able to make a connection and most,
-> if not all, Bluetooth devices are set up for CVSD). Make the HCI
-> format whatever your program supports.
-> 
-> 	- Steven
+> But ACL connection don`t establishing. The hcidump on board give next chat
+
+what about using "hcidump -X -V", because I am no longer decoding hex
+numbers.
+
+Regards
+
+Marcel
 
 
-- --
-- -------------------------------------------
-Luca Pizzamiglio
-CEFRIEL - Embedded Systems Design Unit
-Via Fucini, 2 - 20133 MILANO (ITALY)
-Phone:		+39 02 23954 343
-e-mail:		pizzamiglio@cefriel.it
-ICQ:		5046978
-- -------------------------------------------
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.7 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFDKCPTAoUy56ORfbERAv+XAKCjAVKqVVugB0wTSZFMMjQPFGcIQwCgtdr7
-XyCn4ayjOeATXi0ckPA0Njk=
-=6h94
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
