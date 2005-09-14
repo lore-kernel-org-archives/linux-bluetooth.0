@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4327D66A.1030304@cefriel.it>
-From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
-MIME-Version: 1.0
+From: =?koi8-r?Q?=E1=D2=D4=C5=CD=20=E2=C9=DA=C0=CB=CF=D7?= <bizon_art@mail.ru>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] SCO & btsco
+Mime-Version: 1.0
+Content-Type: text/plain; charset=koi8-r
+Message-Id: <E1EFR9z-0001K1-00.bizon_art-mail-ru@f48.mail.ru>
+Subject: [Bluez-devel] L2CAP chnnel
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,58 +16,98 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 14 Sep 2005 09:51:06 +0200
+Date: Wed, 14 Sep 2005 10:54:23 +0400
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
 
-Hi to all.
+Hellow all.
 
-I'm using btsco with a headset and it works very well.
-Now I'm trying to record audio from another bt device (es. a phone):
-using socket SCO interface I read data and I write it in a file (sound.raw);
-I'm trying to understand what audio formats I receive.
+    I`m try to write application that send and recive data over L2CAP channel, between PC and my custom arm board. I have a next problem. I dont understand haw create a socket, if PC must inquirying and connect to my board. Device must remain slave in piconnect.
+    I`m try run next simpl daemon on my custom arm board:
 
-bt specification says that bluetooth supports three audio formats:
-- - CVSD
-- - u-law
-- - a-law
+	struct sockaddr_l2 L2capAddr;
+	int iSockFd;
+	iSockFd = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_L2CAP);
+	if (iSockFd == -1) {
+		TRACE1("opening L2CAP socket: %s", strerror(errno));
+		return -1;
+	};
+	L2capAddr.l2_bdaddr = *BDADDR_ANY;
+	/*L2capAddr.l2_bdaddr = *strtoba( strdup("78:A1:1F:96:A0:00"));*/
+	L2capAddr.l2_family = AF_BLUETOOTH;
+	L2capAddr.l2_psm    = htobs(SDP_PSM); // I sigth this valuer in Tsimbal code
+	if(0 > bind(iSockFd, (struct sockaddr *)&L2capAddr, sizeof(L2capAddr)))
+	{
+		TRACE1("binding L2CAP socket: %s", strerror(errno));
+		return -1;
+	}
+	incoming = listen(iSockFd, ACTIVE_CONN_MAX);
 
-hciconfig hci0 voice command reports:
+But ACL connection don`t establishing. The hcidump on board give next chat
 
-hci0:   Type: USB
-        BD Address: 00:09:DD:10:4C:C6 ACL MTU: 192:8 SCO MTU: 64:8
-        Voice setting: 0x0060 (Default Condition)
-        Input Coding: Linear
-        Input Data Format: 2's complement
-        Input Sample Size: 16 bit
-        # of bits padding at MSB: 0
-        Air Coding Format: CVSD
+> HCI Event: Connect Request (0x04) plen 10
+  78 A1 1F 96 A0 00 04 5F 00 01
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+  78 A1 1F 96 A0 00 01
+> HCI Event: Command Status (0x0f) plen 4
+  00 01 09 04
+> HCI Event: Link Key Request (0x17) plen 6
+  78 A1 1F 96 A0 00
+< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
+  78 A1 1F 96 A0 00
+> HCI Event: Command Complete (0x0e) plen 10
+  01 0C 04 00 78 A1 1F 96 A0 00
+> HCI Event: PIN Code Request (0x16) plen 6
+  78 A1 1F 96 A0 00
+< HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
+  78 A1 1F 96 A0 00 10 xx xx xx xx xx xx xx xx xx xx xx xx xx
+  xx xx xx
+> HCI Event: Command Complete (0x0e) plen 10
+  01 0D 04 00 78 A1 1F 96 A0 00
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+  78 A1 1F 96 A0 00 01
+> HCI Event: Command Status (0x0f) plen 4
+  0C 01 09 04
+> HCI Event: Link Key Notification (0x18) plen 23
+  78 A1 1F 96 A0 00 xx xx xx xx xx xx xx xx xx xx xx xx xx xx
+  xx xx xx
+> HCI Event: Connect Complete (0x03) plen 11
+  00 28 00 78 A1 1F 96 A0 00 01 00
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+  28 00 18 CC
+> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+  78 A1 1F 96 A0 00 01
+> HCI Event: Command Status (0x0f) plen 4
+  00 01 0F 04
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+  00 28 00 18 CC
+> HCI Event: Max Slots Change (0x1b) plen 3
+  28 00 05
+< HCI Command: PIN Code Request Reply (0x01|0x000d) plen 4
+  28 00 00 00
+> HCI Event: Command Complete (0x0e) plen 10
+  01 0D 04 12 28 00 00 00 00 00
+< HCI Command: Write Scan Enable (0x03|0x001a) plen 1
+  00
+> HCI Event: Command Complete (0x0e) plen 4
+  01 1A 0C 00
+> HCI Event: QoS Setup Complete (0x0d) plen 21
+  00 28 00 00 01 00 00 00 00 00 00 00 00 FF FF FF FF FF FF FF
+  FF
+> ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+< ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 2 status 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+> HCI Event: Disconn Complete (0x05) plen 4
+  00 28 00 13
 
-I see from btsco sources that btsco support only mu-law format (it is a
-comment), but the code check if voice setting is equal to 0x0060 (CVSD).
-So, btsco support CVSD? There's a CVSD codec in btsco source code or I
-have to implement a Bluez CVSD codec?
+And my board don`t response on HCI inquiryng from PC. I must restart hciattach.
+I think, i incorrectly open L2CAP socket. Somebody help me please.
 
-Cheers,
-Pizza
 
-- -------------------------------------------
-Luca Pizzamiglio
-CEFRIEL - Embedded Systems Design Unit
-Via Fucini, 2 - 20133 MILANO (ITALY)
-Phone:		+39 02 23954 343
-e-mail:		pizzamiglio@cefriel.it
-ICQ:		5046978
-- -------------------------------------------
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.7 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFDJ9ZqAoUy56ORfbERAiCgAJ99Bu1+gXGwGnaoigrmtlQCziMWJQCfVtMc
-K7t5kgaiP17l2Q4uivDMQvE=
-=KAmk
------END PGP SIGNATURE-----
+
 
 
 -------------------------------------------------------
