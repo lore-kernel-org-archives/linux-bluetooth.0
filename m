@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <becc9d2c050914054534d59263@mail.gmail.com>
-From: Andrea Carlevato <andrea.carlevatoml@gmail.com>
+Message-ID: <43280B35.1070303@csr.com>
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_6890_26755820.1126701916002"
-Subject: [Bluez-devel] How 'respond' in BlueZ to a PIN request ?
+Subject: Re: [Bluez-devel] SCO & btsco
+References: <4327D66A.1030304@cefriel.it>
+In-Reply-To: <4327D66A.1030304@cefriel.it>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,61 +18,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 14 Sep 2005 14:45:16 +0200
+Date: Wed, 14 Sep 2005 12:36:21 +0100
 
-------=_Part_6890_26755820.1126701916002
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Luca Pizzamiglio wrote:
+> bt specification says that bluetooth supports three audio formats:
+> - CVSD
+> - u-law
+> - a-law
 
-Hi to all,
-if i set my usb dongle in authentication mode
-(hciconfig hci0 auth) and connect to my bluetooth phone,=20
-(hcitool cc BTADDR) the phone ask me for the pin of my pc,=20
-and after i ve entered correctly, the connection i created.
+That's not what the BT spec says, you need to read it more carefully.
 
-My question is: how can i control the same thing on my
-bluez pc ? If i do the same (hcitool cc BTADDR) to connect
-another pc instead of my phone no PIN is requested and
-create connection fails!=20
+BT supports 3 *air* formats: u-law, A-law and CVSD, however, that's
+irrelevant as far as interfacing with the chip is concerned as the
+chip will transcode to and from those formats from and to the HCI
+format (aka the input format).
 
-I need to know this beacause i need to write a simple program
-that listen for l2cap connection on a socket, GIVE THE PIN, and
-allows the connection to be estabilished.
+BT supports the following HCI formats:
 
-Thanks a lot!
+  2's complement linear
+  1's complement linear
+  sign-magnitude
+  unsigned (some devices only)
+  u-law
+  A-law
 
-Andrea
+The linear formats can be 8 bit, 16 bit or 9..15 bit right aligned
+in a 16 bit word.
 
-------=_Part_6890_26755820.1126701916002
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+The default format - 0x0060 - is CVSD on the air and 16 bit 2's
+complement linear signed on the wire as the output of hciconfig
+clearly states.
 
-Hi to all,<br>
-if i set my usb dongle in authentication mode<br>
-(hciconfig hci0 auth) and connect to my bluetooth phone, <br>
-(hcitool cc BTADDR)&nbsp; the phone&nbsp; ask me for the pin of my pc, <br>
-and after i ve entered correctly, the connection i created.<br>
-<br>
-My question is: how can i control the same thing on my<br>
-bluez pc ? If i do the same (hcitool cc BTADDR) to connect<br>
-another pc instead of my phone no PIN is requested and<br>
-create connection fails! <br>
-<br>
-I need to know this beacause i need to write a simple program<br>
-that listen for l2cap connection on a socket, GIVE THE PIN, and<br>
-allows the connection to be estabilished.<br>
-<br>
-Thanks a lot!<br>
-<br>
-Andrea<br>
-<br>
-<br>
-<br>
-<br>
+Always keep the air format set to CVSD (as the two sides need to agree
+on the air format in order to be able to make a connection and most,
+if not all, Bluetooth devices are set up for CVSD). Make the HCI
+format whatever your program supports.
 
-------=_Part_6890_26755820.1126701916002--
+	- Steven
+-- 
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+**********************************************************************
+
 
 
 -------------------------------------------------------
