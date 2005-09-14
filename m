@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: =?koi8-r?Q?=E1=D2=D4=C5=CD=20=E2=C9=DA=C0=CB=CF=D7?= <bizon_art@mail.ru>
+Message-ID: <4327AD9A.6010500@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Message-Id: <E1EFR9z-0001K1-00.bizon_art-mail-ru@f48.mail.ru>
-Subject: [Bluez-devel] L2CAP chnnel
+Subject: Re: [Bluez-devel] skype_bt_hijacker released/updated
+References: <20050827193154.GA7618@uni-duesseldorf.de>
+In-Reply-To: <20050827193154.GA7618@uni-duesseldorf.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,98 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 14 Sep 2005 10:54:23 +0400
+Date: Tue, 13 Sep 2005 22:56:58 -0600
 
+Andreas,
 
-Hellow all.
+ > I've played around with integrating skype and btsco a little further,
+ > and now it starts making some sense to publish the current state:
+...
 
-    I`m try to write application that send and recive data over L2CAP channel, between PC and my custom arm board. I have a next problem. I dont understand haw create a socket, if PC must inquirying and connect to my board. Device must remain slave in piconnect.
-    I`m try run next simpl daemon on my custom arm board:
+I put this in contrib/ in our btsco cvs and modified/applied your patch. 
+I tweaked a couple of things, so can you make sure it looks good?
 
-	struct sockaddr_l2 L2capAddr;
-	int iSockFd;
-	iSockFd = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_L2CAP);
-	if (iSockFd == -1) {
-		TRACE1("opening L2CAP socket: %s", strerror(errno));
-		return -1;
-	};
-	L2capAddr.l2_bdaddr = *BDADDR_ANY;
-	/*L2capAddr.l2_bdaddr = *strtoba( strdup("78:A1:1F:96:A0:00"));*/
-	L2capAddr.l2_family = AF_BLUETOOTH;
-	L2capAddr.l2_psm    = htobs(SDP_PSM); // I sigth this valuer in Tsimbal code
-	if(0 > bind(iSockFd, (struct sockaddr *)&L2capAddr, sizeof(L2capAddr)))
-	{
-		TRACE1("binding L2CAP socket: %s", strerror(errno));
-		return -1;
-	}
-	incoming = listen(iSockFd, ACTIVE_CONN_MAX);
-
-But ACL connection don`t establishing. The hcidump on board give next chat
-
-> HCI Event: Connect Request (0x04) plen 10
-  78 A1 1F 96 A0 00 04 5F 00 01
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-  78 A1 1F 96 A0 00 01
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 09 04
-> HCI Event: Link Key Request (0x17) plen 6
-  78 A1 1F 96 A0 00
-< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
-  78 A1 1F 96 A0 00
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0C 04 00 78 A1 1F 96 A0 00
-> HCI Event: PIN Code Request (0x16) plen 6
-  78 A1 1F 96 A0 00
-< HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
-  78 A1 1F 96 A0 00 10 xx xx xx xx xx xx xx xx xx xx xx xx xx
-  xx xx xx
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0D 04 00 78 A1 1F 96 A0 00
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-  78 A1 1F 96 A0 00 01
-> HCI Event: Command Status (0x0f) plen 4
-  0C 01 09 04
-> HCI Event: Link Key Notification (0x18) plen 23
-  78 A1 1F 96 A0 00 xx xx xx xx xx xx xx xx xx xx xx xx xx xx
-  xx xx xx
-> HCI Event: Connect Complete (0x03) plen 11
-  00 28 00 78 A1 1F 96 A0 00 01 00
-< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
-  28 00 18 CC
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-  78 A1 1F 96 A0 00 01
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 0F 04
-> HCI Event: Connection Packet Type Changed (0x1d) plen 5
-  00 28 00 18 CC
-> HCI Event: Max Slots Change (0x1b) plen 3
-  28 00 05
-< HCI Command: PIN Code Request Reply (0x01|0x000d) plen 4
-  28 00 00 00
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0D 04 12 28 00 00 00 00 00
-< HCI Command: Write Scan Enable (0x03|0x001a) plen 1
-  00
-> HCI Event: Command Complete (0x0e) plen 4
-  01 1A 0C 00
-> HCI Event: QoS Setup Complete (0x0d) plen 21
-  00 28 00 00 01 00 00 00 00 00 00 00 00 FF FF FF FF FF FF FF
-  FF
-> ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-< ACL data: handle 0x0028 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 2 status 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 28 00 01 00
-> HCI Event: Disconn Complete (0x05) plen 4
-  00 28 00 13
-
-And my board don`t response on HCI inquiryng from PC. I must restart hciattach.
-I think, i incorrectly open L2CAP socket. Somebody help me please.
-
-
-
-
+Brad
 
 
 -------------------------------------------------------
