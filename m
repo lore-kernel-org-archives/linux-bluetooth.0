@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] FYI: obex server with support for put/get obexftp
+Subject: Re: [Bluez-devel] How 'respond' in BlueZ to a PIN request ?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1126640851.2890.8.camel@panic>
-References: <1126640851.2890.8.camel@panic>
+In-Reply-To: <becc9d2c050914054534d59263@mail.gmail.com>
+References: <becc9d2c050914054534d59263@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1126703658.16166.32.camel@station6.example.com>
+Message-Id: <1126703130.16166.23.camel@station6.example.com>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,37 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 14 Sep 2005 15:14:18 +0200
+Date: Wed, 14 Sep 2005 15:05:30 +0200
 
-Hi Collin,
+Hi Andrea,
 
-> maybe some of you are interested ...
+> if i set my usb dongle in authentication mode
+> (hciconfig hci0 auth) and connect to my bluetooth phone, 
+> (hcitool cc BTADDR)  the phone  ask me for the pin of my pc, 
+> and after i ve entered correctly, the connection i created.
 > 
-> sobexsrv - or the scripting OBEX server
->         
-> is a Linux OBEX server with support for OPUSH put/get and OBEXFTP. The
-> server is currently Bluetooth only and build ontop of openobex and BlueZ
-> (of course).
->         
-> The server handles only the basic OBEX operations and calls an external
-> executable for all the application-logic (like OBEXFTP). The basic
-> script included in the package can do OPUSH put/get and OBEXFTP. 
->         
-> The code is in early development so watch out for bugs!
->         
-> Download it here http://www.mulliner.org/bluetooth/sobexsrv-0.1.tar.gz
+> My question is: how can i control the same thing on my
+> bluez pc ? If i do the same (hcitool cc BTADDR) to connect
+> another pc instead of my phone no PIN is requested and
+> create connection fails! 
+> 
+> I need to know this beacause i need to write a simple program
+> that listen for l2cap connection on a socket, GIVE THE PIN, and
+> allows the connection to be estabilished.
 
-I like to have something like this as btobexd inside the bluez-utils. My
-time is too limited (again) to fully review the source code, but I think
-it is a good idea to have something like this inside the base.
+if you talk about L2CAP then you don't use security mode 3, which is
+activated after "hciconfig hci0 auth". You should only do this when you
+really know what you are doing. The same applies to "hcitool cc ...",
+because this is a testing and should not be used at all.
 
-The scripting part is a nice idea, but I think parts of it should
-support native FTP and INBOX push. What do you think about extending it
-to a full Bluetooth FTP daemon that also supports OPP/BIP/BPP to some
-extend.
-
-And since FUSE is mainline now, I am willing to implement a btfs, but my
-current ideas with btfs are a little bit more advanced.
+The L2CAP has options to require authentication and encryption. You
+should look at the l2test code for an example.
 
 Regards
 
