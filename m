@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <432850B5.1050302@comcast.net>
-From: Noel Paz <noelpaz@comcast.net>
-MIME-Version: 1.0
+From: Jon Kristian Nilsen <jonn3@broadpark.no>
+Subject: Re: [Bluez-users] Documentation
+In-reply-to: <1126703897.16166.37.camel@station6.example.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Best way to communicate with hidden devices
+Message-id: <4328295B.4030405@broadpark.no>
+MIME-version: 1.0
+Content-type: text/plain; charset=ISO-8859-1; format=flowed
+References: <1126632421.43270be545c73@student.up.ac.za>
+ <1126703897.16166.37.camel@station6.example.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,35 +19,59 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 14 Sep 2005 10:32:53 -0600
+Date: Wed, 14 Sep 2005 15:44:59 +0200
 
-I have a BT weight scale and I want to communicate to it. Problem is I 
-think it is set to be un discoverable.  According to it's scant 
-documentation it uses the BT serial protocol and a 128 bit encyrption 
-and a PIN. - that it expects to start communication.  Supposedly, after 
-it weighs something,  it tries to find an ACCESS point, see if the 
-Access Point has the same PIN and if it does it transmits data packets 
-which are very discrete
+Marcel Holtmann wrote:
 
-hcitool --scan and sdptool --browse cannot find it (yes I have made sure 
-it can find other devices). I've turned hcidump too too make sure I can 
-sniff it but to no avail
+>Hi Reinier,
+>
+>  
+>
+>>I recently downloaded and compiled Bluez on my linux ( Suse 9.3 ). I'm really
+>>struggling to work with bluez 'cause I can't seem to find the right
+>>documentation. I tried the FAQ and documentation section and even some google
+>>but it's not what I'm looking for. I found the functions 'hcitool' and 'hcidump'
+>>but all that I figured out at this moment is how to scan for bluetooth devices
+>>(which works) from my linux. My ultimate goal is to be able to hack into my
+>>bluetooth phone and get all the information from my phone onto my pc. I know
+>>this must be rather trivial for you guys but some help would really be appreciated!
+>>    
+>>
+>
+>actually this mailing list is not about hacking Bluetooth enabled
+>phones. We do serious stuff. If you wanna know how to hack phones, then
+>visit one of my talks about that topic.
+>
+>Regards
+>
+>Marcel
+>
+>
+>
+>
+>-------------------------------------------------------
+>SF.Net email is sponsored by:
+>Tame your development challenges with Apache's Geronimo App Server. 
+>Download it for free - -and be entered to win a 42" plasma tv or your very
+>own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>  
+>
+I guess what he meant was how can he send/receive files between the 
+computer and phone. This is someting that I've been searching alot for 
+too...
 
-Honestly, I am new to BlueZ and have been devouring as much 
-documentation as I can. My thoughts are setting up a PAN with an access 
-point role using rfcomm. If anybody has worked on one way traffic 
-bluetooth devices, let me know. I really have no way of knowing whether 
-this weight scale  has a broken radio, although I can experiment with 
-making my other devices undiscoverable with a PIN. Unfortunately their 
-support is for Windoze only and require you to buy a container full of 
-weight scales before their engineers will talk to you.
+Reinier take a look at http://openobex.sourceforge.net/applications.html
+obexftp and obextool, i havent tried them yet, but i will..
+I know this might seem of topic to you guys, just wanted to give my five cents on the subject...
 
-BTW there is a little sticker which seems to be the bdaddr.
+Best Regards
+Jon Kristian
 
-
-Thanks
-
-Noel
 
 
 -------------------------------------------------------
