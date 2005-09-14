@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] FYI: obex server with support for put/get obexftp
-From: "Collin R. Mulliner" <collin@betaversion.net>
+Message-ID: <432823D3.3060705@cefriel.it>
+From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1126703658.16166.32.camel@station6.example.com>
-References: <1126640851.2890.8.camel@panic>
-	 <1126703658.16166.32.camel@station6.example.com>
-Content-Type: text/plain
-Message-Id: <1126704925.2617.7.camel@panic>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] SCO & btsco
+References: <4327D66A.1030304@cefriel.it> <43280B35.1070303@csr.com>
+In-Reply-To: <43280B35.1070303@csr.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,44 +18,83 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 14 Sep 2005 15:35:25 +0200
+Date: Wed, 14 Sep 2005 15:21:23 +0200
 
-Marcel,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> I like to have something like this as btobexd inside the bluez-utils. My
-> time is too limited (again) to fully review the source code, but I think
-> it is a good idea to have something like this inside the base.
+Thanks, Steven.
+I'm sorry for confusion I created.
 
-sure, I mainly wrote this because there is no btobexd
+with sox:
 
-> The scripting part is a nice idea, but I think parts of it should
-> support native FTP and INBOX push. What do you think about extending it
+sox -t raw -r 8000 -s -w sound.raw pippo.wav
 
-the scripting part is mainly to have better user control over things
-like security (who is allowed to connect etc.) or GUI notification
+I build a transformation chain that works.
 
-> to a full Bluetooth FTP daemon that also supports OPP/BIP/BPP to some
-> extend.
+Thank you.
 
-of course why not, I just need some more free time and the specs for
-BIP/BPP :)
-
-> And since FUSE is mainline now, I am willing to implement a btfs, but my
-> current ideas with btfs are a little bit more advanced.
-
-oh btfs, I also started rewriting this completely I guess our ideas are
-not so different for this ... so this will also happen when I have more
-time :-)
+Cheers,
+Pizza
 
 
-... Collin
+Steven Singer wrote:
+> Luca Pizzamiglio wrote:
+> 
+>>bt specification says that bluetooth supports three audio formats:
+>>- CVSD
+>>- u-law
+>>- a-law
+> 
+> 
+> That's not what the BT spec says, you need to read it more carefully.
+> 
+> BT supports 3 *air* formats: u-law, A-law and CVSD, however, that's
+> irrelevant as far as interfacing with the chip is concerned as the
+> chip will transcode to and from those formats from and to the HCI
+> format (aka the input format).
+> 
+> BT supports the following HCI formats:
+> 
+>   2's complement linear
+>   1's complement linear
+>   sign-magnitude
+>   unsigned (some devices only)
+>   u-law
+>   A-law
+> 
+> The linear formats can be 8 bit, 16 bit or 9..15 bit right aligned
+> in a 16 bit word.
+> 
+> The default format - 0x0060 - is CVSD on the air and 16 bit 2's
+> complement linear signed on the wire as the output of hciconfig
+> clearly states.
+> 
+> Always keep the air format set to CVSD (as the two sides need to agree
+> on the air format in order to be able to make a connection and most,
+> if not all, Bluetooth devices are set up for CVSD). Make the HCI
+> format whatever your program supports.
+> 
+> 	- Steven
 
---
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-All software sucks equally, but some software is more equal.
 
+- --
+- -------------------------------------------
+Luca Pizzamiglio
+CEFRIEL - Embedded Systems Design Unit
+Via Fucini, 2 - 20133 MILANO (ITALY)
+Phone:		+39 02 23954 343
+e-mail:		pizzamiglio@cefriel.it
+ICQ:		5046978
+- -------------------------------------------
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.7 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFDKCPTAoUy56ORfbERAv+XAKCjAVKqVVugB0wTSZFMMjQPFGcIQwCgtdr7
+XyCn4ayjOeATXi0ckPA0Njk=
+=6h94
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
