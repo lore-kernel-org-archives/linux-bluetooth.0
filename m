@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluetooth speed
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43293D53.4060200@cefriel.it>
+From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050915090118.62189.qmail@web50602.mail.yahoo.com>
-References: <20050915090118.62189.qmail@web50602.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1126777440.28510.43.camel@station6.example.com>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] multiple btsco istance
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,33 +16,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Sep 2005 11:44:00 +0200
+Date: Thu, 15 Sep 2005 11:22:27 +0200
 
-Hi Christian,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> I tested several phones to see the bluetooth speed
-> (sending a file from a PC). Here's are the scores: 
-> 
-> Nokia 3650 - 24-26KB/sec 
-> Motorola MPx220 - 10-11KB/sec 
-> Sony Ericsson 1010 - 25-28KB/sec 
+Hi to all.
 
-this depends on the internal UART inside the phone and of course it
-depends on the supported packet types from the features.
+I want to establish a SCO connection with btsco with two another device
+(two headset). I need two bluetooth dongle?
+At the moment, when I launch two istance of btsco, only the last works.
 
-> My PC's bluetooth device is a bluetooth 1.1 one. 
-> My question is : why is bluetooth so slow?? There's
-> something wrong with these phone or with my bluetooth
-> device? Is a 1.2 bluetooth device faster? 
-> What's new with bluetooth 2?
+Using two dongles, hci0 and hci1, how to tell to btsco what interface to
+use?
 
-The speed improvement comes with Bluetooth 2.0 with EDR.
+Is it possible modify btsco to work with two device or it need kernel
+changes (snd-bt-sco)? I'm studying source code, but I don't clearly
+understand the use of bind syscall before the connect.
 
-Regards
+Thanks in advance!
 
-Marcel
+Cheers,
+Pizza
 
+- -------------------------------------------
+Luca Pizzamiglio
+CEFRIEL - Embedded Systems Design Unit
+Via Fucini, 2 - 20133 MILANO (ITALY)
+Phone:		+39 02 23954 343
+e-mail:		pizzamiglio@cefriel.it
+ICQ:		5046978
+- -------------------------------------------
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.7 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
+iD8DBQFDKT1TAoUy56ORfbERAi89AKCUk8RcsMH+m7YbLTkrBDWz0cuRLACfegFG
+qQsBznGWBAHCAbWbqrHOJ/E=
+=UHaC
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
