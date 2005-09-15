@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: david <gangchen@mobilesoft.com.cn>
+Message-ID: <8522981.1126758155187.JavaMail.Administrator@appsrv>
+From: Ivy <ivy@cashette.com>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1126765997.2406.16.camel@localhost.localdomain>
 Mime-Version: 1.0
-Subject: [Bluez-devel] power consumption
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] AVDTP in Bluez
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,19 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Sep 2005 14:33:17 +0800
+Date: Wed, 14 Sep 2005 21:22:34 -0700 (PDT)
 
-hi marcel,
+Hi,
 
-I am working on an an embedded phone, so power consumption is very
-important to me. Bluez-utils-2.9 supports the following link policy,
-RSWITH, HOLD, PARK, SNIFF mode. Dose it support
-auto-sniff/hold/park-mode, or it must be done by ourselves by sending
-HCI command?
+        I'd like to know that weather AVDTP has implemented and integrated with BLUEZ Stack or not ?.  I have gonethrough Bluez Mailing list. I had seen the discussion between Marcel and Aarthi about AVDTP Design. If it is implemented, where can i see that file ?.. 
 
-Regards,
+        Thanks for your time and Help...
 
-david
+Thanks
+-Ivy ..
+
+
+__________________________
+Free 3000MB email. Stops spam 100%. No banner ads. No popup ads. http://www.cashette.com
 
 
 -------------------------------------------------------
