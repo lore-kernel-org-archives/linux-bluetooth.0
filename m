@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] sdptool -i
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Pete Stevens <pete@ex-parrot.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.58.0509151651420.23886@sphinx.mythic-beasts.com>
-References: <Pine.LNX.4.58.0509151651420.23886@sphinx.mythic-beasts.com>
-Content-Type: text/plain
-Message-Id: <1126801396.15633.0.camel@localhost.localdomain>
-Mime-Version: 1.0
+Message-ID: <Pine.LNX.4.58.0509151651420.23886@sphinx.mythic-beasts.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] sdptool -i
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,29 +16,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 15 Sep 2005 18:23:16 +0200
+Date: Thu, 15 Sep 2005 16:56:20 +0100 (BST)
 
-Hi Pete,
+Hi,
 
-> [root@pstevens root]# sdptool -i hci0 search OPUSH
-> sdptool: invalid option -- i
-> sdptool - SDP Tool v1.5
-> Usage:
->         sdptool [options] <command> [command parameters]
-> 
-> 
-> As far as I can tell, sdptool 1.5 is the latest version. Scanning the mailing
-> list suggests that the -i option has been mentioned but I can't confirm if
-> it's been implemented or not.
+My system has multiple bluetooth dongles. How can I specify which dongle
+to use with sdptool ? I thought there was a -i option that specified the
+interface but this doesn't seem to work.
 
-my sdptool tells me it is version 2.21. I think you should update,
-because this was fixed long time ago.
+[root@pstevens root]# hciconfig
+hci0:   Type: USB
+        BD Address: 00:0E:A1:33:0E:4A ACL MTU: 377:10  SCO MTU: 16:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:107 acl:0 sco:0 events:14 errors:0
+        TX bytes:303 acl:0 sco:0 commands:14 errors:0
 
-Regards
+hci1:   Type: USB
+        BD Address: 00:0E:A1:33:0E:45 ACL MTU: 377:10  SCO MTU: 16:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:107 acl:0 sco:0 events:14 errors:0
+        TX bytes:303 acl:0 sco:0 commands:14 errors:0
 
-Marcel
+
+[root@pstevens root]# sdptool -i hci0 search OPUSH
+sdptool: invalid option -- i
+sdptool - SDP Tool v1.5
+Usage:
+        sdptool [options] <command> [command parameters]
 
 
+As far as I can tell, sdptool 1.5 is the latest version. Scanning the mailing
+list suggests that the -i option has been mentioned but I can't confirm if
+it's been implemented or not.
+
+Many thanks,
+
+Pete Stevens
+
+--
+Pete Stevens
+pete@ex-parrot.com
+http://www.ex-parrot.com/~pete/
+
+             I have kleptomania, but when it gets bad, I take something for it.
+                                                                   -- Anonymous
 
 
 -------------------------------------------------------
