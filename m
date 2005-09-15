@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050915113222.89004.qmail@web50613.mail.yahoo.com>
-From: Miron Cristian <cris_miron@yahoo.com>
+Subject: Re: [Bluez-devel] power consumption
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] detection phones with bluez
+In-Reply-To: <1126765997.2406.16.camel@localhost.localdomain>
+References: <1126765997.2406.16.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1126778108.28510.49.camel@station6.example.com>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,30 +18,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Sep 2005 04:32:22 -0700 (PDT)
+Date: Thu, 15 Sep 2005 11:55:08 +0200
 
-Hi,
+Hi David,
 
-   My issue manifests when in the same room there are
-many bluetooth phones ( > 15 ). My application has a
-bluetooth detection engine using a bluetooth dongle
-device. I'm sending a OCF_INQUIRY command with
-hci_send_cmd, with inquiry_cp.length = 10 (~13 sec I
-guess) and when loop with poll function. My phone
-detection engine doesn't detect all the phone. In the
-first loop it detects some of them, then in the next
-loop other phones and so on. 
-   Is there a way to detect all the phone without
-increasing the interval for scanning ? What is the
-recommended interval for this? 
+> I am working on an an embedded phone, so power consumption is very
+> important to me. Bluez-utils-2.9 supports the following link policy,
+> RSWITH, HOLD, PARK, SNIFF mode. Dose it support
+> auto-sniff/hold/park-mode, or it must be done by ourselves by sending
+> HCI command?
 
-Thanks,
-Cristian Miron
+you should first update your bluez-utils, because version 2.9 is quite
+old.
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+The auto-sniff is on my todo list, but so far I haven't done it and
+nobody offered me something for doing it now. The support for hold mode
+or park state is not needed. The hold mode is used internally by every
+chip to support multiple connections with scatternet formation and the
+park state doesn't give you any advantage at all. This means that you
+have to use sniff at the moment by yourself. However the only source for
+doing good decisions of putting a device into sniff mode, is the kernel
+and thus the auto-sniff support should be implemented there.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
