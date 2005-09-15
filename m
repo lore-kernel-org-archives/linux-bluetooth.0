@@ -1,22 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] HCID D-Bus (Seg Fault)
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43291AB1.8060402@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb05091409061f00ea01@mail.gmail.com>
-References: <e1effdeb050908125079935830@mail.gmail.com>
-	 <1126273252.5227.119.camel@blade>
-	 <e1effdeb050912140719fc9d3b@mail.gmail.com>
-	 <1126561206.24935.1.camel@localhost.localdomain>
-	 <e1effdeb050912160979b5ba49@mail.gmail.com>
-	 <1126567316.5518.9.camel@localhost.localdomain>
-	 <e1effdeb05091306033c7476a@mail.gmail.com>
-	 <1126637659.9456.0.camel@localhost.localdomain>
-	 <e1effdeb0509140500650ec0c0@mail.gmail.com>
-	 <1126710977.16166.62.camel@station6.example.com>
-	 <e1effdeb05091409061f00ea01@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1126771915.28510.18.camel@station6.example.com>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] AVDTP in Bluez
+References: <8522981.1126758155187.JavaMail.Administrator@appsrv>
+In-Reply-To: <8522981.1126758155187.JavaMail.Administrator@appsrv>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -28,24 +18,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Sep 2005 10:11:55 +0200
+Date: Thu, 15 Sep 2005 00:54:41 -0600
 
-Hi Claudio,
+Ivy,
 
-> sorry. It's done!
+There is no AVDTP code implemented in the kernel or bluez libs. The 
+closest thing we have is an example of some AVDTP (specifically, just 
+A2DP) negotiation in userspace by a2play.c. see bluetooth-alsa.sf.net.
 
-patch is in, but next time also use tabs for the second line of this:
+Brad
 
-	hci_send_cmd(req->dev, OGF_LINK_CTL,
-	             OCF_PIN_CODE_NEG_REPLY, 6, &req->bda);
+Brad
 
-No spaces for indentation at all.
-
-Regards
-
-Marcel
-
-
+Ivy wrote:
+> Hi,
+> 
+>         I'd like to know that weather AVDTP has implemented and integrated with BLUEZ Stack or not ?.  I have gonethrough Bluez Mailing list. I had seen the discussion between Marcel and Aarthi about AVDTP Design. If it is implemented, where can i see that file ?.. 
+> 
+>         Thanks for your time and Help...
+> 
+> Thanks
+> -Ivy ..
+> 
+> 
+> __________________________
+> Free 3000MB email. Stops spam 100%. No banner ads. No popup ads. http://www.cashette.com
+> 
+> 
+> -------------------------------------------------------
+> SF.Net email is sponsored by:
+> Tame your development challenges with Apache's Geronimo App Server. 
+> Download it for free - -and be entered to win a 42" plasma tv or your very
+> own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------
