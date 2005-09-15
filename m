@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050916004341.47261.qmail@web15705.mail.cnb.yahoo.com>
-From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
-To: bluez users <bluez-users@lists.sourceforge.net>
+From: Pete Stevens <pete@ex-parrot.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] sdptool -i
+In-Reply-To: <1126801396.15633.0.camel@localhost.localdomain>
+Message-ID: <Pine.LNX.4.58.0509151732320.23886@sphinx.mythic-beasts.com>
+References: <Pine.LNX.4.58.0509151651420.23886@sphinx.mythic-beasts.com>
+ <1126801396.15633.0.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-470477470-1126831421=:47241"
-Subject: [Bluez-users] (no subject)
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,42 +19,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 16 Sep 2005 08:43:41 +0800 (CST)
+Date: Thu, 15 Sep 2005 17:33:26 +0100 (BST)
 
---0-470477470-1126831421=:47241
-Content-Type: text/plain; charset=gb2312
-Content-Transfer-Encoding: 8bit
+On Thu, 15 Sep 2005, Marcel Holtmann wrote:
 
-Hi,Marcel,
- 
-hciattach /dev/ttyS1 any 57600 noflow. 
- 
-but if I change to 115200,it says :Can't init device hci0: Connection timed out (110). it seems that only 57600 is right!
- 
-Regards
- 
-gadfly
+> Hi Pete,
+>
+> > [root@pstevens root]# sdptool -i hci0 search OPUSH
+> > sdptool: invalid option -- i
+> > sdptool - SDP Tool v1.5
+> > Usage:
+> >         sdptool [options] <command> [command parameters]
+> >
+> >
+> > As far as I can tell, sdptool 1.5 is the latest version. Scanning the mailing
+> > list suggests that the -i option has been mentioned but I can't confirm if
+> > it's been implemented or not.
+>
+> my sdptool tells me it is version 2.21. I think you should update,
+> because this was fixed long time ago.
 
+Apologies - I've just built the latest version from source and it's working
+fine now.
 
-		
----------------------------------
-DO YOU YAHOO!?
-  雅虎免费G邮箱－中国第一绝无垃圾邮件骚扰超大邮箱 
---0-470477470-1126831421=:47241
-Content-Type: text/html; charset=gb2312
-Content-Transfer-Encoding: 8bit
+I'll go and hide under a rock.
 
-<DIV>Hi,Marcel,</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>hciattach /dev/ttyS1 any 57600 noflow. </DIV>
-<DIV>&nbsp;</DIV>
-<DIV>but if I change to 115200,it says :Can't init device hci0: Connection timed out (110). it seems that only 57600 is right!</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Regards<BR>&nbsp;<BR>gadfly<BR></DIV><p>
-		<hr size=1>DO YOU YAHOO!?<br> 
-<a href="http://cn.mail.yahoo.com" target=blank> 
-雅虎免费G邮箱－中国第一绝无垃圾邮件骚扰超大邮箱</a> 
---0-470477470-1126831421=:47241--
+Yours,
+
+Pete Stevens
+
+--
+Pete Stevens
+pete@ex-parrot.com
+http://www.ex-parrot.com/~pete/
+
+                                               What's got four legs and an arm?
+                                                            A happy Rottweiler.
 
 
 -------------------------------------------------------
