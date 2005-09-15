@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050915131226.8041.qmail@web15710.mail.cnb.yahoo.com>
-From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
-To: bluez users <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1743937648-1126789946=:5290"
-Subject: [Bluez-users] BlueCore2 speed problem!
+Message-ID: <dc98d8d905091417046437c4e7@mail.gmail.com>
+From: Paul Webster <pjwebster@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Documentation
+In-Reply-To: <200509150118.18043.bluez-user@schaettgen.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1126632421.43270be545c73@student.up.ac.za>
+	 <1126703897.16166.37.camel@station6.example.com>
+	 <43289DFF.3050504@BDen.org>
+	 <200509150118.18043.bluez-user@schaettgen.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,58 +21,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 15 Sep 2005 21:12:26 +0800 (CST)
+Date: Thu, 15 Sep 2005 10:04:03 +1000
 
---0-1743937648-1126789946=:5290
-Content-Type: text/plain; charset=gb2312
-Content-Transfer-Encoding: 8bit
+> The problem is that we all simply lack the time to fill all these gaps. A=
+nd
+> perhaps Marcel still hopes that someone else will help out with writing g=
+ood
+> user documentation. It's certainly his job to document command line
+> parameters, but writing and maintaining a good official introduction and
+> HOWTOs for Bluetooth/BlueZ is a lot of work and it can be done by someone=
+ who
+> is not a programmer. I would go as far as saying that this kind of
+> documentation *should not* be written but only checked by the developers.
+> Maybe an official bluez wiki would be the most efficient way to make peop=
+le
+> contribute documentation.
 
-Hi,
-I use two BlueCore2-External modules to transfer data through UART interface,but the max speed is only 5KB/s!!!  Howerver,in the data sheet,it says "The maximum UART data rate is 1.5 MBaud"!!   1.5Mb/s / 8=192KB/s,am i  right?
- 
-so,why my speed is slow? How can I do to improve the speed??
- 
-hci0:   Type: UART
-        BD Address: 4A:49:4E:00:15:2F ACL MTU: 384:4 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:70 acl:0 sco:0 events:7 errors:0
-        TX bytes:34 acl:0 sco:0 commands:7 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'B'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x2c1 LMP Ver: 1.1 (0x1) LMP Subver: 0x2c1
-        Manufacturer: Cambridge Silicon Radio (10)
- 
-gadfly
- 
+I'm planning to do a bluez install on a laptop and desktop machine
+this weekend. Since both run LFS, it will be a fairly involved
+"bootscripts and all" install. I was planning on writing a LFS hint
+for the process, but if there was a bluez-wiki available, I'd gladly
+contribute my experiences.
 
-		
----------------------------------
-DO YOU YAHOO!?
-  ÑÅ»¢Ãâ·ÑGÓÊÏä£­No.1µÄ·À¶¾·ÀÀ¬»ø³¬´óÓÊÏä  
---0-1743937648-1126789946=:5290
-Content-Type: text/html; charset=gb2312
-Content-Transfer-Encoding: 8bit
-
-<DIV>Hi,</DIV>
-<DIV>I use two BlueCore2-External modules to transfer data through UART interface,but the max speed is only 5KB/s!!!&nbsp; Howerver,in the data sheet,it says "The maximum UART data rate is 1.5 MBaud"!!&nbsp;&nbsp; 1.5Mb/s / 8=192KB/s,am i &nbsp;right?</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>so,why my speed is slow? How can I do to improve the speed??</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>hci0:&nbsp;&nbsp; Type: UART<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 4A:49:4E:00:15:2F ACL MTU: 384:4 SCO MTU: 64:8<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:70 acl:0 sco:0 events:7 errors:0<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:34 acl:0 sco:0 commands:7 errors:0<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy:<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link mode: SLAVE ACCEPT<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'B'<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class: 0x000000<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Service Classes: Unspecified<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Device Class:
- Miscellaneous,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI Ver: 1.1 (0x1) HCI Rev: 0x2c1 LMP Ver: 1.1 (0x1) LMP Subver: 0x2c1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufacturer: Cambridge Silicon Radio (10)</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>gadfly</DIV>
-<DIV>&nbsp;</DIV><p>
-		<hr size=1>DO YOU YAHOO!?<br> 
-<a href="http://cn.mail.yahoo.com" target=blank> 
-ÑÅ»¢Ãâ·ÑGÓÊÏä£­No.1µÄ·À¶¾·ÀÀ¬»ø³¬´óÓÊÏä </a> 
---0-1743937648-1126789946=:5290--
+Paul W
 
 
 -------------------------------------------------------
