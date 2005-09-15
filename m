@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4329844F.70409@cefriel.it>
-From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] hcid and bluetoothd
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] multiple btsco istance
-References: <43293D53.4060200@cefriel.it> <43297D56.70908@xmission.com>
-In-Reply-To: <43297D56.70908@xmission.com>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <e1effdeb05091507045d13ca3f@mail.gmail.com>
+References: <e1effdeb050914064849913a76@mail.gmail.com>
+	 <1126775298.28510.40.camel@station6.example.com>
+	 <e1effdeb05091507045d13ca3f@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1126794184.3505.31.camel@station6.example.com>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,116 +20,94 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Sep 2005 16:25:19 +0200
+Date: Thu, 15 Sep 2005 16:23:04 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Claudio,
 
-Brad,
+> Remember that we need cover  normal inquiry and periodic inquiry. For
+> periodic inquiry
+> I agree with this approach of send signals every time. We can
+> implement a cache 
+> to make the inquiry fast/powerful. Two or more clients can request
+> inquiry at same 
+> time, this is a normal scenario, but it can happen. For normal
+> inquiry, we can't
+> use hci_inquiry because it a blocking operation. The inquiry must be
+> integrated
+> in the main loop of the bluetoothd, using a HCI raw socket or the new
+> interface that 
+> your are defining.
 
-I could implement the patch of btsco to accept an optional command-line
-parameter in order to specify the adapter to bind to.
-I think it's the easyest way at the moment.
+the kernel already has an inquiry cache. We can simply deliver that
+cache at the moment.
 
-With one dongle, that's a lot of hard work and now I'm not sure I'm able
-to implement this feature.
+I am not going to duplicate the inquiry stuff inside bluetoothd. We will
+do it in hcid for now, but for bluetoothd the kernel should do all the
+work.
 
-After that, I could try to solve multiple alsa device issue.
+> I suggested  previously use the bus name "org.bluez.bluetoothd", but
+> do you think 
+> relevant participate on freedesktop project?
+> 
+> The bus name could be "org.freedesktop.Bluez"
+> 
+> I don't know what are the advantages and which rules we need respect.
 
-Thanks a lot.
+For now we will use "org.bluez" as base and I think about moving over to
+"org.bluetooth" and propose it as an additional standard. However that
+is not so important at the moment.
 
-Cheers,
-Pizza
+I like to use names that don't have any daemon names in it. This means
+that something like "org.bluez.bluetoothd" is bad if FreeBSD wants to
+provide a compat interface, but they don't call their daemon bluetoothd.
+So what I like to see is something like "org.bluetooth.device" and so
+on. Make it more logical. We don't even have to use the Bluetooth
+terminology. This includes HCI command names. In general I like to have
+an "discovery" procedure. This is doing an inquiry, a name resolve and
+the SDP service stuff. In case of EIR the inquiry response may deliver
+already enough information, because it can include a short name and a
+service UUID list.
 
+> I agree. We need define exactly which signals are necessary. I am
+> going 
+> to update the specification document that I am writing and I will send
+> you soon.
 
-Brad Midgley wrote:
-> Luca,
-> 
-> It's in our todo list but there is still a significant amount of work to
-> do it...
-> 
-> With two dongles, we would need btsco the daemon to accept a
-> command-line parameter for the adapter to bind to.
-> 
-> With one dongle, we need to load the sco kernel mod with a parameter
-> that tweaks one of the sco settings. This is from memory and it's a bit
-> fuzzy.
-> 
-> Either way, we then need to make multiple alsa devices available using
-> btsco the kernel mod and work out a way to communicate with the
-> corresponding daemon.
-> 
-> Brad
-> 
-> Luca Pizzamiglio wrote:
-> 
-> Hi to all.
-> 
-> I want to establish a SCO connection with btsco with two another device
-> (two headset). I need two bluetooth dongle?
-> At the moment, when I launch two istance of btsco, only the last works.
-> 
-> Using two dongles, hci0 and hci1, how to tell to btsco what interface to
-> use?
-> 
-> Is it possible modify btsco to work with two device or it need kernel
-> changes (snd-bt-sco)? I'm studying source code, but I don't clearly
-> understand the use of bind syscall before the connect.
-> 
-> Thanks in advance!
-> 
-> Cheers,
-> Pizza
-> 
-> -------------------------------------------
-> Luca Pizzamiglio
-> CEFRIEL - Embedded Systems Design Unit
-> Via Fucini, 2 - 20133 MILANO (ITALY)
-> Phone:        +39 02 23954 343
-> e-mail:        pizzamiglio@cefriel.it
-> ICQ:        5046978
-> -------------------------------------------
->>
->>
-- -------------------------------------------------------
-SF.Net email is sponsored by:
-Tame your development challenges with Apache's Geronimo App Server.
-Download it for free - -and be entered to win a 42" plasma tv or your
-very
-own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+My idea is to have multiple Bluetooth clients running at the same time
+and if one starts a new inquiry the others also got informed of these
+results. What they do with this results is their problem. I can draw a
+picture if needed, but I think my ideas behind it are clear.
 
-> -------------------------------------------------------
-> SF.Net email is sponsored by:
-> Tame your development challenges with Apache's Geronimo App Server.
-> Download it for free - -and be entered to win a 42" plasma tv or your very
-> own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> hcid already contains the structure(main loop) required to register 
+> D-Bus services, it will be easy implement the D-Bus services.
+
+Since I dropped D-Bus 0.23 support now, I am happy to accept any
+extensions to hcid.
+
+> Regarding sdpd, currently an  application have to connect
+> (sdp_connect) 
+> and stablish a session to register/update a service. 
+> sdp D-Bus service shall  be provided in the future, how do you 
+> think it should work in this new scenario?
+
+The SDP stuff is blocking at the moment and that is bad. My idea is to
+rewrite the SDP support and include it in bluetoothd. This means that it
+will be capable of caching SDP information and D-Bus clients can ask for
+service information quite easy. This is also important with the extended
+inquiry support, because the UUID list can be provided via an inquiry
+response. And of course bluetoothd should add the UUID of all registered
+services to the extended inquiry data when someone registers a new
+record via D-Bus.
+
+> Where is the CVS branch? If possible, send me the address.
+
+It will be in the GIT tree, when I have some spare time to clean it.
+
+Regards
+
+Marcel
 
 
-- --
-- -------------------------------------------
-Luca Pizzamiglio
-CEFRIEL - Embedded Systems Design Unit
-Via Fucini, 2 - 20133 MILANO (ITALY)
-Phone:		+39 02 23954 343
-e-mail:		pizzamiglio@cefriel.it
-ICQ:		5046978
-- -------------------------------------------
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.7 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFDKYRPAoUy56ORfbERAp26AKCJInVlEZLnU5/t1Oj4EP9pENWi4QCggl9h
-Ci6CyKxBl+O/4MOuQJoyRqw=
-=i52x
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
