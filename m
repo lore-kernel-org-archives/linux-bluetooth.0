@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: AndreasBeckbecka-bzdvl@bedatec.de
+Subject: Re: [Bluez-devel] detection phones with bluez
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] skype_bt_hijacker released/updated
-Message-ID: <20050915115712.GA5233@uni-duesseldorf.de>
-References: <20050827193154.GA7618@uni-duesseldorf.de> <4327AD9A.6010500@xmission.com>
+In-Reply-To: <20050915113222.89004.qmail@web50613.mail.yahoo.com>
+References: <20050915113222.89004.qmail@web50613.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1126784734.31715.4.camel@station6.example.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4327AD9A.6010500@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,33 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Sep 2005 13:57:12 +0200
+Date: Thu, 15 Sep 2005 13:45:34 +0200
 
-Hi Brad,
-> > I've played around with integrating skype and btsco a little further,
-> > and now it starts making some sense to publish the current state:
-> I put this in contrib/ in our btsco cvs and modified/applied your patch. 
-> I tweaked a couple of things, so can you make sure it looks good?
+Hi Christian,
 
-Looks great. The -s switch is a good idea. I wonder if one should make
-it take the lockfile path as a parameter.
+>    My issue manifests when in the same room there are
+> many bluetooth phones ( > 15 ). My application has a
+> bluetooth detection engine using a bluetooth dongle
+> device. I'm sending a OCF_INQUIRY command with
+> hci_send_cmd, with inquiry_cp.length = 10 (~13 sec I
+> guess) and when loop with poll function. My phone
+> detection engine doesn't detect all the phone. In the
+> first loop it detects some of them, then in the next
+> loop other phones and so on. 
+>    Is there a way to detect all the phone without
+> increasing the interval for scanning ? What is the
+> recommended interval for this? 
 
-I've seen you also added the AGC/LostByte fixup. Looks fine, too.
+the easy answer is no. Increase the interval as needed.
 
-I'll update my package to reflect your Changes for those that grab it
-from my site and put a pointer there, that it has been integrated into
-the contrib dir and will be maintained there.
+Regards
 
-If I have major changes (don't think so, works like a charm for me, but
-maybe users have some ideas on how to enhance it), I'll send them to 
-you, or you can give me (ggibecka on sf) CVS write to the 
-contrib/skype_bt_hijacker subdir.
+Marcel
 
 
-Thanks and CU, Andy
-
--- 
-= Andreas Beck                    |  Email :  <becka-sig@bedatec.de>         =
 
 
 -------------------------------------------------------
