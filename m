@@ -1,19 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <becc9d2c0509160020670a627b@mail.gmail.com>
-From: Andrea Carlevato <andrea.carlevatoml@gmail.com>
+Subject: Re: [Bluez-devel] Palm hotsync over BT
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Problem with l2test, rctest
-In-Reply-To: <1126802829.15633.7.camel@localhost.localdomain>
+In-Reply-To: <1126826943.17881.20.camel@wyatt.hadess.net>
+References: <1126826943.17881.20.camel@wyatt.hadess.net>
+Content-Type: text/plain
+Message-Id: <1126844669.5934.7.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_8778_33383574.1126855235563"
-References: <becc9d2c05091505534b795f7b@mail.gmail.com>
-	 <becc9d2c05091506452748d6a0@mail.gmail.com>
-	 <1126792737.3505.6.camel@station6.example.com>
-	 <becc9d2c050915091830e5a609@mail.gmail.com>
-	 <1126801476.15633.2.camel@localhost.localdomain>
-	 <becc9d2c0509150944132bb8f1@mail.gmail.com>
-	 <1126802829.15633.7.camel@localhost.localdomain>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -25,112 +18,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 16 Sep 2005 09:20:35 +0200
+Date: Fri, 16 Sep 2005 06:24:29 +0200
 
-------=_Part_8778_33383574.1126855235563
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Bastien,
 
-Ok,
-hciconfig - of my client is:
+> Apart from submitting a patch (attached below), I wanted to ask about
+> the PALMOS and HOTSYNC SDP records that sdptool can now add. First of
+> all, what is the difference between those two?
 
-hci0: Type: USB
-BD Address: 00:10:60:A5:81:68 ACL MTU: 192:8 SCO MTU: 64:8
-UP RUNNING PSCAN ISCAN
-RX bytes:254 acl:0 sco:0 events:28 errors:0
-TX bytes:379 acl:0 sco:0 commands:20 errors:0
-Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-Link policy: RSWITCH HOLD SNIFF PARK
-Link mode: ACCEPT MASTER
-Name: 'EnviCartello'
-Class: 0x820100
-Service Classes: Networking
-Device Class: Computer, Uncategorized
-HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
-Manufacturer: Cambridge Silicon Radio (10)
+oh yeah, the patch fixes a stupid paste and copy mistake. Thanks.
 
-And the hciconfig of my server is :
+The HOTSYNC record is the record the Palm OS is searching for when it is
+doing HotSync over Bluetooth. It will fall back to a normal SP record,
+but this can be confusing if the sync host runs multiple targets. The
+PALMOS record is an identification record like NOKID, I think. This
+hasn't been confirmed and so far I haven't seen any device requesting
+it.
 
-hci0: Type: USB
-BD Address: 00:10:60:29:3B:9A ACL MTU: 192:8 SCO MTU: 64:8
-UP RUNNING PSCAN ISCAN
-RX bytes:241 acl:0 sco:0 events:28 errors:0
-TX bytes:373 acl:0 sco:0 commands:20 errors:0
-Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-Link policy: RSWITCH HOLD SNIFF PARK
-Link mode: ACCEPT MASTER
-Name: 'PROMOPC'
-Class: 0x820100
-Service Classes: Networking
-Device Class: Computer, Uncategorized
-HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver: 0x175
-Manufacturer: Cambridge Silicon Radio (10)
+> If I understood well Marcel's mail[1], one could now sync a Palm over
+> Bluetooth by doing:
+> - sdptool add HOTSYNC
+> - adding an rfcomm connection to the Palm
+> - using pilot-link or other Palm software using the just created rfcomm
+> device as the serial device
+> 
+> And the mail mentioned above was to avoid having to create an rfcomm
+> connection by hand. Am I even close?
 
-------=_Part_8778_33383574.1126855235563
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+The pilot-link library should be extended to do everything by itself.
+This means the service registration and the RFCOMM channel handling to
+map the HotSync protocol over RFCOMM.
 
-Ok,<br>
-hciconfig - of my client is:<br>
-<br>
-hci0:&nbsp;&nbsp; Type: USB<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:10:60:A5:81:68 AC=
-L MTU: 192:8 SCO MTU: 64:8<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:254 acl:0 sco:0 events:=
-28 errors:0<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:379 acl:0 sco:0 command=
-s:20 errors:0<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xff 0x0f 0x00 0x=
-00 0x00 0x00 0x00<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3=
- DH5 HV1 HV2 HV3<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy: RSWITCH HOLD SNIFF =
-PARK<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link mode: ACCEPT MASTER<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'EnviCartello'<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class: 0x820100<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Service Classes: Networking<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Device Class: Computer, Uncatego=
-rized<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI Ver: 1.1 (0x1) HCI Rev: 0x20=
-d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufacturer: Cambridge Silicon =
-Radio (10)<br>
-<br>
-And the hciconfig of my server is :<br>
-<br>
-hci0:&nbsp;&nbsp; Type: USB<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:10:60:29:3B:9A AC=
-L MTU: 192:8 SCO MTU: 64:8<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:241 acl:0 sco:0 events:=
-28 errors:0<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:373 acl:0 sco:0 command=
-s:20 errors:0<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xff 0x0f 0x00 0x=
-00 0x00 0x00 0x00<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3=
- DH5 HV1 HV2 HV3<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy: RSWITCH HOLD SNIFF =
-PARK<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link mode: ACCEPT MASTER<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'PROMOPC'<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class: 0x820100<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Service Classes: Networking<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Device Class: Computer, Uncatego=
-rized<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI Ver: 1.1 (0x1) HCI Rev: 0x17=
-5 LMP Ver: 1.1 (0x1) LMP Subver: 0x175<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufacturer: Cambridge Silicon =
-Radio (10)<br>
-<br>
+Regards
 
-------=_Part_8778_33383574.1126855235563--
+Marcel
+
+
 
 
 -------------------------------------------------------
