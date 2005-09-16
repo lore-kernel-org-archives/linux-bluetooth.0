@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] (no subject)
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <432A314C.4050701@avantwave.com>
+From: mike lee <mikelee@avantwave.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050916004341.47261.qmail@web15705.mail.cnb.yahoo.com>
-References: <20050916004341.47261.qmail@web15705.mail.cnb.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1126844287.5934.1.camel@localhost.localdomain>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] PAN and RFCOMM
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +16,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 16 Sep 2005 06:18:07 +0200
+Date: Fri, 16 Sep 2005 10:43:24 +0800
 
-Hi Gadfly,
+Dear all
+   I am writing a file transfer program though rfcomm to my device. But
+I found that whenever my device connected with a bluetooth access point,
+the connect/transfer/disconnect actions are all very slow. Is it the
+restriction on the bluetooth protocol/baseband or i should set something
+before any connections?
 
-> hciattach /dev/ttyS1 any 57600 noflow. 
->  
-> but if I change to 115200,it says :Can't init device hci0: Connection
-> timed out (110). it seems that only 57600 is right!
+Here is the result of hciconfig -a
+hci0:   Type: UART
+        BD Address: 00:08:E0:04:A4:BF ACL MTU: 192:8  SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:373706 acl:4542 sco:0 events:1669 errors:0
+        TX bytes:323342 acl:2083 sco:0 commands:85 errors:0
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'testing'
+        Class: 0x080100
+        Service Classes: Capturing
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
+0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
 
-with an UART speed of 57600 you Bluetooth data transfer is limited. If
-these are CSR chips then you can use the type csr or bcsp and it is
-possible to change the initial baud rate of these chips.
-
-Regards
-
-Marcel
-
-
+THX
+Mike,Lee
 
 
 -------------------------------------------------------
