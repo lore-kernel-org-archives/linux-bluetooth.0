@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050917064447.39911.qmail@web15710.mail.cnb.yahoo.com>
-From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
-To: bluez users <bluez-users@lists.sourceforge.net>
+Message-ID: <432B4327.4030107@juletraesfoden.dk>
+From: =?ISO-8859-1?Q?Thomas_M=F8rch?= <thomas@juletraesfoden.dk>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1664981827-1126939487=:39762"
-Subject: [Bluez-users] Re:BlueCore2 speed problem!
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Palm tungsten T2, and bluez...
+References: <432B263E.3030600@juletraesfoden.dk>
+In-Reply-To: <432B263E.3030600@juletraesfoden.dk>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,47 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Sep 2005 14:44:47 +0800 (CST)
+Date: Sat, 17 Sep 2005 00:11:51 +0200
 
---0-1664981827-1126939487=:39762
-Content-Type: text/plain; charset=gb2312
-Content-Transfer-Encoding: 8bit
+Thomas M=F8rch wrote:
 
-Hi,Marcel
- 
-I use this hciattach :hciattach /dev/ttyS1 any 57600 noflow
-But I change it to 115200,it says :Can't init device hci0: Connection timed out (110)!!
-It seems that only 57600 is ok!!  What can I do next?
- 
+> Hi
+>
+> this is probably one of the trivial questions for the master geeks=20
+> here, but I have browsed the net for a couple of days, trying lots of=20
+> different configurations, pulled my hair out, prayed to all the gods=20
+> that I know of, but still I can't get my palm tungsten T2 to connect=20
+> to my pc running debian.
+>
+> I have followed (amongst others) this description :=20
+> http://www.toobusyto.org.uk/tech/tungsten_linux.html
+>
+> All I get in the end is this error on my palm "Error: Serial: timeout.=20
+> Could be a bad cable or faulty modem. (0x0305)". I have tried=20
+> debugging, logging, etc. no pointers whatsoever to what could be wrong.
+
+Ok, it is working now. I deleted the directories under=20
+/var/lib/bluetooth (linkkeys etc.) and startet out from scratch.. Now I=20
+can read my imap folders.. :)
+
 Regards
- 
-gadfly
-
-
-		
----------------------------------
- ÑÅ»¢Ãâ·ÑGÓÊÏä£­ÖĞ¹úµÚÒ»¾øÎŞÀ¬»øÓÊ¼şÉ§ÈÅ³¬´óÓÊÏä
- ÑÅ»¢ÖúÊÖ¡§DËÑË÷¡¢É±¶¾¡¢·ÀÉ§ÈÅ  
---0-1664981827-1126939487=:39762
-Content-Type: text/html; charset=gb2312
-Content-Transfer-Encoding: 8bit
-
-<DIV>
-<DIV>Hi,Marcel</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>I use this hciattach&nbsp;:hciattach /dev/ttyS1 any 57600 noflow</DIV>
-<DIV>But I change it to 115200,it says :Can't init device hci0: Connection timed out (110)!!</DIV>
-<DIV>It seems that only 57600 is ok!!&nbsp; What can I do next?</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Regards</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>gadfly</DIV></DIV><p>
-		<hr size=1><a href="http://cn.mail.yahoo.com" target=blank> 
-ÑÅ»¢Ãâ·ÑGÓÊÏä£­ÖĞ¹úµÚÒ»¾øÎŞÀ¬»øÓÊ¼şÉ§ÈÅ³¬´óÓÊÏä</a><br> 
-<a href="http://cn.zs.yahoo.com" target=blank>ÑÅ»¢ÖúÊÖ¡§DËÑË÷¡¢É±¶¾¡¢·ÀÉ§ÈÅ</a> 
- 
-
---0-1664981827-1126939487=:39762--
+Thomas
 
 
 -------------------------------------------------------
