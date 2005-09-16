@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Stefan Behlert <behlert@suse.de>
+Message-Id: <6.2.3.4.0.20050916111745.02ae0008@mail.impulsesoft.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Documentation
-Message-ID: <20050916101535.GI7487@suse.de>
-References: <1126632421.43270be545c73@student.up.ac.za>
+From: Pragya Gupta <pragya@impulsesoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1126632421.43270be545c73@student.up.ac.za>
+Content-Type: text/plain; charset="us-ascii"; format=flowed
+Subject: [Bluez-users] Failed to send data over a writable l2cap socket
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,33 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 16 Sep 2005 12:15:35 +0200
-
-Moin,
-
-On Sep 13, 05 19:27:01 +0200, Reinier Coetzer wrote:
-> Hi,
-> I recently downloaded and compiled Bluez on my linux ( Suse 9.3 ). I'm really
-> struggling to work with bluez 'cause I can't seem to find the right
-> documentation. I tried the FAQ and documentation section and even some google
-> but it's not what I'm looking for. I found the functions 'hcitool' and 'hcidump'
-> but all that I figured out at this moment is how to scan for bluetooth devices
-> (which works) from my linux. My ultimate goal is to be able to hack into my
-> bluetooth phone and get all the information from my phone onto my pc. I know
-> this must be rather trivial for you guys but some help would really be appreciated!
-> Thanks
-
-The question is, what do you want to do?
-"get all the information  ... onto my pc" is a little bit vague. Do you
-want to put your adressbook etc. into your kontact/evolution/whatever? Do
-you just want to save your pictures and sounds? Or do you only want to see
-the vendor-specific data?
-All needs a little different approach :)
+Date: Fri, 16 Sep 2005 11:36:41 +0530
 
 
-        Stefan
--- 
-Stefan Behlert
+Hi,
+
+I am trying to establish more than one l2cap channel over same hci 
+link between a pair of devices. I am using "select" to find out when 
+a socket becomes writable. When I say "connect" for first two l2cap 
+sockets , I come out of select when it becomes writable and I am able 
+to send data to it. But when I repeat the same for the third l2cap 
+socket, the socket is writable but I am unable to send data on it . 
+The data goes out successfully only after few attempts.
+
+Any suggestions ? Am I doing something wrong ?
+
+Thanks and Regds
+Pragya
+
+
 
 
 -------------------------------------------------------
