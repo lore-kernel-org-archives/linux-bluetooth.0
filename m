@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PAN and RFCOMM
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Stefan Behlert <behlert@suse.de>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <432A5DD6.2090205@avantwave.com>
-References: <432A314C.4050701@avantwave.com>
-	 <1126844755.5934.9.camel@localhost.localdomain>
-	 <432A5DD6.2090205@avantwave.com>
-Content-Type: text/plain
-Message-Id: <1126877114.5512.3.camel@localhost.localdomain>
+Subject: Re: [Bluez-users] Documentation
+Message-ID: <20050916101535.GI7487@suse.de>
+References: <1126632421.43270be545c73@student.up.ac.za>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1126632421.43270be545c73@student.up.ac.za>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,31 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 16 Sep 2005 15:25:14 +0200
+Date: Fri, 16 Sep 2005 12:15:35 +0200
 
-Hi,
+Moin,
 
-> >this can be and depends on the chips of the other devices.
-> >
->     That means it is restricted by the CSR chip. It is too bad
+On Sep 13, 05 19:27:01 +0200, Reinier Coetzer wrote:
+> Hi,
+> I recently downloaded and compiled Bluez on my linux ( Suse 9.3 ). I'm really
+> struggling to work with bluez 'cause I can't seem to find the right
+> documentation. I tried the FAQ and documentation section and even some google
+> but it's not what I'm looking for. I found the functions 'hcitool' and 'hcidump'
+> but all that I figured out at this moment is how to scan for bluetooth devices
+> (which works) from my linux. My ultimate goal is to be able to hack into my
+> bluetooth phone and get all the information from my phone onto my pc. I know
+> this must be rather trivial for you guys but some help would really be appreciated!
+> Thanks
 
-it can be, but in general using CSR chips are less problematic.
-
->     I am now using 2.12 utils. I will change it later
->     Because it seem to be a problem on bluetooth architechure, I choose
-> to turn bnep off whenever there is rfcomm connection. But i find that
-> when i disconnect bnep several time by "pand -K" a kernel error message
-> come out "unregister_netdevice: waiting for bnep0 to become free. Usage
-> count = 1".
->     Do i need to close all the network application first?
-
-If you wanna make this error go away, then yes.
-
-Regards
-
-Marcel
+The question is, what do you want to do?
+"get all the information  ... onto my pc" is a little bit vague. Do you
+want to put your adressbook etc. into your kontact/evolution/whatever? Do
+you just want to save your pictures and sounds? Or do you only want to see
+the vendor-specific data?
+All needs a little different approach :)
 
 
+        Stefan
+-- 
+Stefan Behlert
 
 
 -------------------------------------------------------
