@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <432B263E.3030600@juletraesfoden.dk>
-From: =?ISO-8859-1?Q?Thomas_M=F8rch?= <thomas@juletraesfoden.dk>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Failed to send data over a writable l2cap socket
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Palm tungsten T2, and bluez...
+In-Reply-To: <6.2.3.4.0.20050916111745.02ae0008@mail.impulsesoft.com>
+References: <6.2.3.4.0.20050916111745.02ae0008@mail.impulsesoft.com>
+Content-Type: text/plain
+Message-Id: <1126877192.5512.5.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,38 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 16 Sep 2005 22:08:30 +0200
+Date: Fri, 16 Sep 2005 15:26:31 +0200
 
-Hi
+Hi Pragya,
 
- this is probably one of the trivial questions for the master geeks 
-here, but I have browsed the net for a couple of days, trying lots of 
-different configurations, pulled my hair out, prayed to all the gods 
-that I know of, but still I can't get my palm tungsten T2 to connect to 
-my pc running debian.
+> I am trying to establish more than one l2cap channel over same hci 
+> link between a pair of devices. I am using "select" to find out when 
+> a socket becomes writable. When I say "connect" for first two l2cap 
+> sockets , I come out of select when it becomes writable and I am able 
+> to send data to it. But when I repeat the same for the third l2cap 
+> socket, the socket is writable but I am unable to send data on it . 
+> The data goes out successfully only after few attempts.
 
-I have followed (amongst others) this description : 
-http://www.toobusyto.org.uk/tech/tungsten_linux.html
-
-All I get in the end is this error on my palm "Error: Serial: timeout. 
-Could be a bad cable or faulty modem. (0x0305)". I have tried debugging, 
-logging, etc. no pointers whatsoever to what could be wrong.
-
-I know my bluetooth is up and running on my debian box, I can make a 
-scan for other devices, I can even stream audio to my motorola stereo 
-headsets now (using a2play). But no connection for that dam palm thing.. 
-And others have it up and running..
-
-Is there anything in the above mentioned guide, that doesn't comply with 
-the current implementation of the stuff? Anything that has to be done 
-differently?
-
-Btw. my BT dongle is a CSR BC3-MM based class 1 device.
-
-Any inputs are very much appreciated!!!!
+I need a "hcidump -X -V" of this problem and an example problem to
+reproduce this behavior at home. Make sure you use the latest kernel and
+bluez-utils.
 
 Regards
-Thomas
+
+Marcel
+
+
 
 
 -------------------------------------------------------
