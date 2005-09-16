@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <6.2.3.4.0.20050916111745.02ae0008@mail.impulsesoft.com>
+Message-ID: <432A5DD6.2090205@avantwave.com>
+From: mike lee <mikelee@avantwave.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: Pragya Gupta <pragya@impulsesoft.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; format=flowed
-Subject: [Bluez-users] Failed to send data over a writable l2cap socket
+Subject: Re: [Bluez-users] PAN and RFCOMM
+References: <432A314C.4050701@avantwave.com> <1126844755.5934.9.camel@localhost.localdomain>
+In-Reply-To: <1126844755.5934.9.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +18,61 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 16 Sep 2005 11:36:41 +0530
+Date: Fri, 16 Sep 2005 13:53:26 +0800
 
+Hi Marcel
 
-Hi,
+Marcel Holtmann wrote:
 
-I am trying to establish more than one l2cap channel over same hci 
-link between a pair of devices. I am using "select" to find out when 
-a socket becomes writable. When I say "connect" for first two l2cap 
-sockets , I come out of select when it becomes writable and I am able 
-to send data to it. But when I repeat the same for the third l2cap 
-socket, the socket is writable but I am unable to send data on it . 
-The data goes out successfully only after few attempts.
+>Hi,
+>
+>  
+>
+>>   I am writing a file transfer program though rfcomm to my device. But
+>>I found that whenever my device connected with a bluetooth access point,
+>>the connect/transfer/disconnect actions are all very slow. Is it the
+>>restriction on the bluetooth protocol/baseband or i should set something
+>>before any connections?
+>>    
+>>
+>
+>this can be and depends on the chips of the other devices.
+>
+    That means it is restricted by the CSR chip. It is too bad
 
-Any suggestions ? Am I doing something wrong ?
+> However the
+>HCI 16.4 of your local adapter is not bad, but still quite old.
+>  
+>
+    I am now using 2.12 utils. I will change it later
+    Because it seem to be a problem on bluetooth architechure, I choose
+to turn bnep off whenever there is rfcomm connection. But i find that
+when i disconnect bnep several time by "pand -K" a kernel error message
+come out "unregister_netdevice: waiting for bnep0 to become free. Usage
+count = 1".
+    Do i need to close all the network application first?
 
-Thanks and Regds
-Pragya
+Thx for helping
+Mike,Lee
 
+>Regards
+>
+>Marcel
+>
+>
+>
+>
+>-------------------------------------------------------
+>SF.Net email is sponsored by:
+>Tame your development challenges with Apache's Geronimo App Server. 
+>Download it for free - -and be entered to win a 42" plasma tv or your very
+>own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>  
+>
 
 
 
