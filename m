@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <432C256B.1070908@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: "Heike C. Zimmerer" <nospam05q2@gmx.net>
-Message-ID: <dghaav$4r7$1@sea.gmane.org>
-References: <dgfhr3$nrc$2@sea.gmane.org>
-	<20050917120141.GA5231@uni-duesseldorf.de>
-	<dgh60h$qaq$1@sea.gmane.org> <432C256B.1070908@xmission.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Conceptronic 200M (CBT200U V2.0)
+Subject: Re: [Bluez-users] Re: Conceptronic 200M (CBT200U V2.0)
+References: <dgfhr3$nrc$2@sea.gmane.org>	<20050917120141.GA5231@uni-duesseldorf.de> <dgh60h$qaq$1@sea.gmane.org>
+In-Reply-To: <dgh60h$qaq$1@sea.gmane.org>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,25 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Sep 2005 16:46:19 +0200
-
-Brad Midgley <bmidgley@xmission.com> writes:
-
->> Maybe this is worth a note on the compatibility list since this model
->> is mentioned there as working which isn't true any more.
->
-> Which list is that? I thought Marcel took down his compatibility list.
-
-Yes.  It's the features list I was talking about
-(http://www.holtmann.org/linux/bluetooth/features.html).  It lists the
-CBT100U as using a CSR chipset which in turn lead me to believe it was
-fully supported.
-
-
-Greetings,
+Date: Sat, 17 Sep 2005 08:17:15 -0600
 
 Heike
 
+> Maybe this is worth a note on the compatibility list since this model
+> is mentioned there as working which isn't true any more.
+
+Which list is that? I thought Marcel took down his compatibility list.
+
+It's a good point... I think the compatibility list I last saw didn't 
+say anything about sco/voice.
+
+Brad
 
 
 -------------------------------------------------------
