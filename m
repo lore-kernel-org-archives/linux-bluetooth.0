@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: "Heike C. Zimmerer" <nospam05q2@gmx.net>
-Message-ID: <dgfhr3$nrc$2@sea.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Conceptronic 200M (CBT200U V2.0)
+Message-ID: <20050917064447.39911.qmail@web15710.mail.cnb.yahoo.com>
+From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
+To: bluez users <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-1664981827-1126939487=:39762"
+Subject: [Bluez-users] Re:BlueCore2 speed problem!
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,35 +16,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Sep 2005 00:31:35 +0200
+Date: Sat, 17 Sep 2005 14:44:47 +0800 (CST)
 
-Hello,
+--0-1664981827-1126939487=:39762
+Content-Type: text/plain; charset=gb2312
+Content-Transfer-Encoding: 8bit
 
-Recently, I've bought a Conceptronic 200M BT dongle, which, as far as
-I have learned, is also known as CBT100U V.2 USB.  In contrary to its
-CBT100U V1.1 predecessor which AFAIK used the CSR chipset, this one
-has Broadcom chips.
-
-I'm trying to connect to a Logitech headset (the one mentioned in
-another article because of problems with the mic mixer). I don't get any
-audio output at the headset.  I didn't check if I can get mic audio
-from it.  What puzzles me is that the output mixer seems to work;
-increasing/decreasing the output volume affects a very low noise which
-can be heard at high mixer levels.
-
-Telling from btsco's -v output, the Conceptronic connects just as the
-other dongle does - I can't see any difference.  I'd prefer to use the
-Conceptronic because of its small antenna which I hope will give me
-the 1..3 meters additional coverage I'm currently missing.
-
-I'm using CVS btsco and the newest bluez software.  Any idea what and
-where to look for?
+Hi,Marcel
+ 
+I use this hciattach :hciattach /dev/ttyS1 any 57600 noflow
+But I change it to 115200,it says :Can't init device hci0: Connection timed out (110)!!
+It seems that only 57600 is ok!!  What can I do next?
+ 
+Regards
+ 
+gadfly
 
 
-Thanks,
+		
+---------------------------------
+ —≈ª¢√‚∑—G” œ‰£≠÷–π˙µ⁄“ªæ¯Œﬁ¿¨ª¯” º˛…ß»≈≥¨¥Û” œ‰
+ —≈ª¢÷˙ ÷°ßDÀ—À˜°¢…±∂æ°¢∑¿…ß»≈  
+--0-1664981827-1126939487=:39762
+Content-Type: text/html; charset=gb2312
+Content-Transfer-Encoding: 8bit
 
-Heike
+<DIV>
+<DIV>Hi,Marcel</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>I use this hciattach&nbsp;:hciattach /dev/ttyS1 any 57600 noflow</DIV>
+<DIV>But I change it to 115200,it says :Can't init device hci0: Connection timed out (110)!!</DIV>
+<DIV>It seems that only 57600 is ok!!&nbsp; What can I do next?</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Regards</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>gadfly</DIV></DIV><p>
+		<hr size=1><a href="http://cn.mail.yahoo.com" target=blank> 
+—≈ª¢√‚∑—G” œ‰£≠÷–π˙µ⁄“ªæ¯Œﬁ¿¨ª¯” º˛…ß»≈≥¨¥Û” œ‰</a><br> 
+<a href="http://cn.zs.yahoo.com" target=blank>—≈ª¢÷˙ ÷°ßDÀ—À˜°¢…±∂æ°¢∑¿…ß»≈</a> 
+ 
 
+--0-1664981827-1126939487=:39762--
 
 
 -------------------------------------------------------
