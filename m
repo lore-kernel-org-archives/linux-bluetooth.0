@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Fredrik Noring <noring@nocrew.org>
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1127025473.14893.51.camel@yeti>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Multiple user/device model?
+Message-ID: <432CE905.6050006@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] caching A2DP/alsa connection
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,30 +16,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 18 Sep 2005 08:37:53 +0200
+Date: Sat, 17 Sep 2005 22:11:49 -0600
 
-Hi,
+Marcel,
 
-Can multiple users have different sets of Bluetooth devices? I.e.
-something like this:
+I remember you were trying to keep the headset connection open between 
+the quick audio device close and reopen that some clients like xmms do.
 
-    /home/peter/.bluetooth/devices/00:11:22:33:44:55/linkkeys
-    /home/maria/.bluetooth/devices/99:88:77:66:55:44/linkkeys
+I started thinking we need to put esd or another audio server or alsa 
+layer between the apps and our libalsa a2dp connection. Could we extend 
+the caching to work between different apps this way? We may even be able 
+to use a soft mixer to get simultaneous clients...
 
-With the following properties:
+This is part of the reason I've been slow to jump in. It seems like I'd 
+need to understand alsa up and down to know how to best make this work.
 
-    1. User pairing and device management don't require
-       administrative (root) privileges.
-    2. Peter cannot remove/modify Maria's devices and vice versa.
-    3. Would be excellent if Peter and Maria could use Bluetooth
-       simultaneously, but good enough if only one at the time.
-
-Any thoughts?
-
-Thanks,
-Fredrik
-
-
+Brad
 
 
 -------------------------------------------------------
