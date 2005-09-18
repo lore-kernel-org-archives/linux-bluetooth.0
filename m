@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <432DE3E3.7010107@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Matthew Marshall <mmarshall@myrealbox.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Audio service class?
-References: <200509181632.29044.mmarshall@myrealbox.com>
-In-Reply-To: <200509181632.29044.mmarshall@myrealbox.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200509181632.29044.mmarshall@myrealbox.com>
+Subject: [Bluez-users] Audio service class?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,20 +17,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 18 Sep 2005 16:02:11 -0600
+Date: Sun, 18 Sep 2005 16:32:28 +0000
 
-Matthew
+Hello,
 
-> haven't been able get the dongle to pick up the headset.
+ I am wanting to use a bluetooth headset with bluetooth-alsa.  However, I 
+haven't been able get the dongle to pick up the headset.  hciconfig -a gives 
+me this output:
 
-what does this mean? it isn't found by 'hcitool scan' or something?
+hci0:   Type: USB
+        BD Address: 00:13:EF:F0:D0:6A ACL MTU: 192:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:404 acl:0 sco:0 events:18 errors:0
+        TX bytes:323 acl:0 sco:0 commands:18 errors:0
+        Features: 0xff 0xff 0x8f 0xf8 0x18 0x18 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'BlueZ (0)'
+        Class: 0x3e0100
+        Service Classes: Networking, Rendering, Capturing
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x639 LMP Ver: 1.2 (0x2) LMP Subver: 0x639
+        Manufacturer: Cambridge Silicon Radio (10)
 
-> The class is set to 0x3e0100, but Audio is not included in the Service Classes 
-> list.  (I assume this is the reason why the headset is not being detected.) 
+The class is set to 0x3e0100, but Audio is not included in the Service Classes 
+list.  (I assume this is the reason why the headset is not being detected.)  
+Is the Audio service class not supported by some dongles?  Is there some 
+kernel option that needs to be set?
 
-the host sets the service class mask--it's not a feature of the dongle.
+I am using Arch linux with kernel 2.6.12, bluez-lib and bluez-util 2.20.
 
-brad
+Anyone know what might be wrong?
+
+Thanks for any help!
+
+MWM
 
 
 -------------------------------------------------------
