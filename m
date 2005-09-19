@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Palm tungsten T2, and bluez...
-From: Fredy Pulido =?ISO-8859-1?Q?L=F3pez?= <digitalfredy@debiancolombia.org>
+From: Matthew Marshall <mmarshall@myrealbox.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <432B263E.3030600@juletraesfoden.dk>
-References: <432B263E.3030600@juletraesfoden.dk>
+Subject: Re: [Bluez-users] Audio service class?
+References: <200509181632.29044.mmarshall@myrealbox.com> <200509181721.55295.mmarshall@myrealbox.com> <432E34E5.3070704@xmission.com>
+In-Reply-To: <432E34E5.3070704@xmission.com>
+MIME-Version: 1.0
 Content-Type: text/plain;
-	charset=iso-8859-1
-Message-Id: <1127125636.2457.9.camel@yoda.digitalfredy.org>
-Mime-Version: 1.0
+  charset="iso-8859-1"
+Message-Id: <200509191651.47272.mmarshall@myrealbox.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,54 +19,90 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 19 Sep 2005 05:27:16 -0500
+Date: Mon, 19 Sep 2005 16:51:46 +0000
 
-El vie, 16-09-2005 a las 22:08 +0200, Thomas M=F8rch escribi=F3:
-> Hi
->=20
->  this is probably one of the trivial questions for the master geeks=20
-> here, but I have browsed the net for a couple of days, trying lots of=20
-> different configurations, pulled my hair out, prayed to all the gods=20
-> that I know of, but still I can't get my palm tungsten T2 to connect to=20
-> my pc running debian.
-http://el-directorio.org/index.php/Bluetooth_en_debian
-is in spanish but you can read the files
->=20
-> I have followed (amongst others) this description :=20
-> http://www.toobusyto.org.uk/tech/tungsten_linux.html
->=20
-> All I get in the end is this error on my palm "Error: Serial: timeout.=20
-> Could be a bad cable or faulty modem. (0x0305)". I have tried debugging,=20
-> logging, etc. no pointers whatsoever to what could be wrong.
->=20
-> I know my bluetooth is up and running on my debian box, I can make a=20
-> scan for other devices, I can even stream audio to my motorola stereo=20
-> headsets now (using a2play). But no connection for that dam palm thing..=20
-> And others have it up and running..
->=20
-> Is there anything in the above mentioned guide, that doesn't comply with=20
-> the current implementation of the stuff? Anything that has to be done=20
-> differently?
->=20
-> Btw. my BT dongle is a CSR BC3-MM based class 1 device.
->=20
-> Any inputs are very much appreciated!!!!
->=20
-> Regards
-> Thomas
->=20
->=20
+Hi Brad,
+
+Thanks for the help!
+
+Turns out I made a stupid mistake... I was using ciptool instead of hcitool :$
+I guess the fact that the Audio service class isn't show doesn't matter?
+
+Anyway, although I am now able to detect the headset, I'm still having 
+problems.  I'll play with it some more, and come back here if I cannot figure 
+it out on my own :P
+
+Thanks!
+
+MWM
+
+On Monday 19 September 2005 03:47 am, Brad Midgley wrote:
+> Matthew,
+>
+> Device class on the host seems to be a first-level service advertisement
+> queried by devices initiating a connection to the host. Device class,
+> sdp record, and listening/server socket are all necessary to accept a
+> new connection "cold" from the headset. We don't support this currently,
+> but we should.
+>
+> We do have a lot of trouble with dual boot systems or using a dongle on
+> different hosts to talk to the same headset. Are you doing either of
+> those? (we have some hints on bluetooth-alsa.sf.net)
+>
+> You're putting the headset in pairing mode before the scan, right? Most
+> sets flash between blue and red while in pairing mode.
+>
+> Brad
+>
+> Matthew Marshall wrote:
+> > On Sunday 18 September 2005 10:02 pm, Brad Midgley wrote:
+> >>Matthew
+> >>
+> >>>haven't been able get the dongle to pick up the headset.
+> >>
+> >>what does this mean? it isn't found by 'hcitool scan' or something?
+> >
+> > Yeah, that's what I mean.
+> >
+> >>>The class is set to 0x3e0100, but Audio is not included in the Service
+> >>>Classes list.  (I assume this is the reason why the headset is not being
+> >>>detected.)
+> >>
+> >>the host sets the service class mask--it's not a feature of the dongle.
+> >
+> > That's what I thought.  From the hcid.conf man page, I see that Audio is
+> > bit 6 which is set by 0x3e.  So why isn't Audio listed?  (For that
+> > matter, 0x3e should also enable Object Transfer, which isn't in the list
+> > either.)  I tried other classes as well, with no success.  (Such as
+> > 0x200100, which should give me only Audio, but gives me nothing.)
+> >
+> > Any clue what is causing this?
+> >
+> > Thanks!
+> >
+> > MWM
+> >
+> >
+> > -------------------------------------------------------
+> > SF.Net email is sponsored by:
+> > Tame your development challenges with Apache's Geronimo App Server.
+> > Download it for free - -and be entered to win a 42" plasma tv or your
+> > very own Sony(tm)PSP.  Click here to play:
+> > http://sourceforge.net/geronimo.php
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 > -------------------------------------------------------
 > SF.Net email is sponsored by:
-> Tame your development challenges with Apache's Geronimo App Server.=20
-> Download it for free - -and be entered to win a 42" plasma tv or your ver=
-y
+> Tame your development challenges with Apache's Geronimo App Server.
+> Download it for free - -and be entered to win a 42" plasma tv or your very
 > own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
 > _______________________________________________
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
-
 
 
 -------------------------------------------------------
