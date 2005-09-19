@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Palm hotsync over BT
-From: Bastien Nocera <hadess@hadess.net>
+Message-ID: <e1effdeb05091907316665534d@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1126844669.5934.7.camel@localhost.localdomain>
-References: <1126826943.17881.20.camel@wyatt.hadess.net>
-	 <1126844669.5934.7.camel@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1127142348.24203.95.camel@wyatt.hadess.net>
+In-Reply-To: <e1effdeb05091607426f824afa@mail.gmail.com>
 Mime-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_4231_21257557.1127140294946"
+References: <e1effdeb05091607426f824afa@mail.gmail.com>
+Subject: [Bluez-devel] Re: hcid D-Bus patch (RSSI question)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,52 +19,166 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 19 Sep 2005 16:05:48 +0100
+Date: Mon, 19 Sep 2005 11:31:34 -0300
 
-On Fri, 2005-09-16 at 06:24 +0200, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > Apart from submitting a patch (attached below), I wanted to ask about
-> > the PALMOS and HOTSYNC SDP records that sdptool can now add. First of
-> > all, what is the difference between those two?
-> 
-> oh yeah, the patch fixes a stupid paste and copy mistake. Thanks.
-> 
-> The HOTSYNC record is the record the Palm OS is searching for when it is
-> doing HotSync over Bluetooth. It will fall back to a normal SP record,
-> but this can be confusing if the sync host runs multiple targets. The
-> PALMOS record is an identification record like NOKID, I think. This
-> hasn't been confirmed and so far I haven't seen any device requesting
-> it.
-> 
-> > If I understood well Marcel's mail[1], one could now sync a Palm over
-> > Bluetooth by doing:
-> > - sdptool add HOTSYNC
-> > - adding an rfcomm connection to the Palm
-> > - using pilot-link or other Palm software using the just created rfcomm
-> > device as the serial device
-> > 
-> > And the mail mentioned above was to avoid having to create an rfcomm
-> > connection by hand. Am I even close?
-> 
-> The pilot-link library should be extended to do everything by itself.
-> This means the service registration and the RFCOMM channel handling to
-> map the HotSync protocol over RFCOMM.
+------=_Part_4231_21257557.1127140294946
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Do you know which channel it is supposed to connect to on the Palm?
-Something like that is supposed to work:
+Hi Marcel,
 
-$ sdptool add HOTSYNC
-$ rfcomm bind  0 <palm bdaddr> <channel num>
-$ pilot-xfer -p /dev/rfcomm0 -l
+What are the requirements to use inquiry with rssi? My=20
+kernel version is 2.6.10 with bluez-utils.2.21.
 
-Right now, with the few channels I tried, the Palm complains about the
-port already being used by another application.
+Why it is not working? The periodic inquiry is working, but without
+return an inquiry with rssi event.
 
----
-Bastien Nocera <hadess@hadess.net> 
+Regards,
+Claudio
+
+if((dev_id =3D hci_get_route(NULL)) < 0) {
+syslog(LOG_ERR, "Bluetooth device is not available");
+result =3D RESULT_ADAPTER_NOT_FOUND;
+goto cleanup;
+}
+
+if((sock =3D hci_open_dev(dev_id)) < 0) {
+syslog(LOG_ERR, "HCI device open failed");
+result =3D RESULT_ADAPTER_NOT_FOUND;
+goto cleanup;
+}
+
+...
+
+inq_mode.mode =3D 1; //INQUIRY_WITH_RSSI;
+
+if (hci_send_cmd(sock, OGF_HOST_CTL, OCF_WRITE_INQUIRY_MODE,
+WRITE_INQUIRY_MODE_CP_SIZE, &inq_mode) < 0) {
+syslog(LOG_ERR, "Can't set inquiry mode:%s.", strerror(errno));
+goto cleanup;
+}
+
+if (hci_send_cmd(sock, OGF_LINK_CTL, OCF_PERIODIC_INQUIRY,
+PERIODIC_INQUIRY_CP_SIZE, &inq_param) < 0) {
+syslog(LOG_ERR, "Can't send HCI commands:%s.", strerror(errno));
+goto cleanup;
+}
+...
 
 
+
+On 9/16/05, Claudio Takahasi <cktakahasi@gmail.com> wrote:
+>=20
+> Hi Marcel,
+>=20
+> I am sending the initial patch that implementing the skeleton
+> of the hcid D-Bus services.
+>=20
+> Run hcid with a non-daemon option to see the output
+>=20
+> Send the following messages to see the message handling.
+>=20
+> dbus-send --system --type=3Dmethod_call --dest=3Dorg.bluez /org/bluez/hci=
+=20
+> org.bluez.hci.PeriodicInqReq byte:1 byte:2 byte:3
+> dbus-send --system --type=3Dmethod_call --dest=3Dorg.bluez /org/bluez/hci=
+=20
+> org.bluez.hci.CancelPeriodicInqReq
+> dbus-send --system --type=3Dmethod_call --dest=3Dorg.bluez /org/bluez/hci=
+=20
+> org.bluez.hci.InquiryReq byte:1
+> dbus-send --system --type=3Dmethod_call --dest=3Dorg.bluez /org/bluez/hci=
+=20
+> org.bluez.hci.RoleSwitchReq string:panu byte:1
+>=20
+> Suggestions are welcome!
+>=20
+> Regards,
+> Claudio.
+>=20
+>
+
+------=_Part_4231_21257557.1127140294946
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi Marcel,<br>
+<br>
+What are the requirements to use inquiry with rssi? My <br>
+kernel version is 2.6.10 with bluez-utils.2.21.<br>
+<br>
+Why it is not working? The periodic inquiry is working, but without<br>
+return an inquiry with rssi event.<br>
+<br>
+Regards,<br>
+Claudio<br>
+<br>
+if((dev_id =3D hci_get_route(NULL)) &lt; 0) {<br>
+&nbsp;&nbsp;&nbsp; syslog(LOG_ERR, &quot;Bluetooth device is not available&=
+quot;);<br>
+&nbsp;&nbsp;&nbsp; result =3D RESULT_ADAPTER_NOT_FOUND;<br>
+&nbsp;&nbsp;&nbsp; goto cleanup;<br>
+}<br>
+<br>
+if((sock =3D hci_open_dev(dev_id)) &lt; 0) {<br>
+&nbsp;&nbsp;&nbsp; syslog(LOG_ERR, &quot;HCI device open failed&quot;);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; result =3D RESULT_ADAPTER_NOT_FO=
+UND;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; goto cleanup;<br>
+}<br>
+<br>
+...<br>
+<br>
+inq_mode.mode =3D 1; //INQUIRY_WITH_RSSI;<br>
+<br>
+if (hci_send_cmd(sock, OGF_HOST_CTL, OCF_WRITE_INQUIRY_MODE,<br>
+&nbsp;&nbsp;&nbsp; WRITE_INQUIRY_MODE_CP_SIZE, &amp;inq_mode) &lt; 0) {<br>
+&nbsp;&nbsp;&nbsp; syslog(LOG_ERR, &quot;Can't set inquiry mode:%s.&quot;, =
+strerror(errno));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; goto cleanup;<br>
+}<br>
+<br>
+if (hci_send_cmd(sock, OGF_LINK_CTL, OCF_PERIODIC_INQUIRY,<br>
+&nbsp;&nbsp;&nbsp; PERIODIC_INQUIRY_CP_SIZE, &amp;inq_param) &lt; 0) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; syslog(LOG_ERR, &quot;Can't send=
+ HCI commands:%s.&quot;, strerror(errno));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; goto cleanup;<br>
+}<br>
+...<br>
+<br>
+<br><br><div><span class=3D"gmail_quote">On 9/16/05, <b class=3D"gmail_send=
+ername">Claudio Takahasi</b> &lt;<a href=3D"mailto:cktakahasi@gmail.com">ck=
+takahasi@gmail.com</a>&gt; wrote:</span><blockquote class=3D"gmail_quote" s=
+tyle=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8e=
+x; padding-left: 1ex;">
+Hi Marcel,<br>
+<br>
+I am sending the initial patch that implementing the skeleton<br>
+of the hcid D-Bus services.<br>
+<br>
+Run hcid with a non-daemon option to see the output<br>
+<br>
+Send the following messages to see the message handling.<br>
+<br>
+dbus-send --system --type=3Dmethod_call --dest=3Dorg.bluez /org/bluez/hci o=
+rg.bluez.hci.PeriodicInqReq byte:1 byte:2 byte:3<br>
+dbus-send --system --type=3Dmethod_call --dest=3Dorg.bluez /org/bluez/hci o=
+rg.bluez.hci.CancelPeriodicInqReq<br>
+dbus-send --system --type=3Dmethod_call --dest=3Dorg.bluez /org/bluez/hci o=
+rg.bluez.hci.InquiryReq byte:1<br>
+dbus-send --system --type=3Dmethod_call --dest=3Dorg.bluez /org/bluez/hci o=
+rg.bluez.hci.RoleSwitchReq string:panu byte:1<br>
+<br>
+Suggestions are welcome!<br>
+<br>
+Regards,<br><span class=3D"sg">
+Claudio.<br>
+
+</span><br clear=3D"all"></blockquote></div><br>
+
+------=_Part_4231_21257557.1127140294946--
 
 
 -------------------------------------------------------
