@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] caching A2DP/alsa connection
+Subject: Re: [Bluez-devel] rfcomm bluez problem
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <432CE905.6050006@xmission.com>
-References: <432CE905.6050006@xmission.com>
+Cc: swegmann@repr.at
+In-Reply-To: <432CA117.5060109@psi.co.at>
+References: <432CA117.5060109@psi.co.at>
 Content-Type: text/plain
-Message-Id: <1127216847.5168.27.camel@localhost.localdomain>
+Message-Id: <1127216728.5168.24.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,25 +19,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Sep 2005 13:47:27 +0200
+Date: Tue, 20 Sep 2005 13:45:28 +0200
 
-Hi Brad,
+Hi Raphael,
 
-> I remember you were trying to keep the headset connection open between 
-> the quick audio device close and reopen that some clients like xmms do.
-> 
-> I started thinking we need to put esd or another audio server or alsa 
-> layer between the apps and our libalsa a2dp connection. Could we extend 
-> the caching to work between different apps this way? We may even be able 
-> to use a soft mixer to get simultaneous clients...
-> 
-> This is part of the reason I've been slow to jump in. It seems like I'd 
-> need to understand alsa up and down to know how to best make this work.
+> the connection to my bluetooth modem doesn't work very reliable.
+> When I connect successfully, "hcidump -V -X" looks like this:
 
-even I have to look at it again, but what also came up lately is a
-native integration of A2DP as GStreamer plugin. Maybe you wanna start
-looking at that, because I never looked at any Code of the GStreamer
-project by now.
+the support for a 2.4 kernel is deprecated. Move to the latest 2.6
+kernel and use the latest hcidump. I am not looking at hex numbers.
 
 Regards
 
