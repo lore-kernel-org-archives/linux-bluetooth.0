@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] rfcomm bluez problem
+Subject: Re: [Bluez-devel] hcid crashes with "buffer overflow detected"
+	when pairing
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Cc: swegmann@repr.at
-In-Reply-To: <432CA117.5060109@psi.co.at>
-References: <432CA117.5060109@psi.co.at>
+In-Reply-To: <1126981781.14893.27.camel@yeti>
+References: <1126981781.14893.27.camel@yeti>
 Content-Type: text/plain
-Message-Id: <1127216728.5168.24.camel@localhost.localdomain>
+Message-Id: <1127216630.5168.22.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,15 +19,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Sep 2005 13:45:28 +0200
+Date: Tue, 20 Sep 2005 13:43:50 +0200
 
-Hi Raphael,
+Hi Fredrik,
 
-> the connection to my bluetooth modem doesn't work very reliable.
-> When I connect successfully, "hcidump -V -X" looks like this:
+> I'm trying out the following packages on Fedora Core 4, x86_64:
+> 
+>     bluez-pin-0.24-2
+>     bluez-libs-2.20-1
+>     bluez-utils-2.20-1
+>     dbus-0.33-3
+> 
+> Unfortunately hcid crashes with "buffer overflow detected" when pairing.
+> Is this a known problem?
 
-the support for a 2.4 kernel is deprecated. Move to the latest 2.6
-kernel and use the latest hcidump. I am not looking at hex numbers.
+try bluez-utils-2.21 or the latest CVS. I fixed some possible buffer
+overflows lately.
+
+> Marcel, I'm happy you decided on moving to ASCII based storage. Is there
+> any documentation on this? Perhaps I can update the man pages if I can
+> get this working.
+
+I did this some time ago and no, it is not documented at the moment.
+Feel free to update all the manual pages. The hidd also now caches the
+device information.
 
 Regards
 
