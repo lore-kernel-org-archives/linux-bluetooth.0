@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050921084150.21461.qmail@web15706.mail.cnb.yahoo.com>
-From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
-To: bluez users <bluez-users@lists.sourceforge.net>
+Message-ID: <dc98d8d9050920163852b27348@mail.gmail.com>
+From: Paul Webster <pjwebster@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Documentation
+In-Reply-To: <dc98d8d905091417046437c4e7@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=gb2312
-Subject: [Bluez-users] Re:BlueCore2 speed problem!
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1126632421.43270be545c73@student.up.ac.za>
+	 <1126703897.16166.37.camel@station6.example.com>
+	 <43289DFF.3050504@BDen.org>
+	 <200509150118.18043.bluez-user@schaettgen.de>
+	 <dc98d8d905091417046437c4e7@mail.gmail.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,32 +22,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Sep 2005 16:41:50 +0800 (CST)
+Date: Wed, 21 Sep 2005 09:38:19 +1000
 
-hi,Marcel,
+Grrr. Delay on the documentation thing. spent the weekend wondering
+why I had no love from my bluetooth module with the fresh kernel I'd
+compiled. Left it, slept, did other stuff and looked again last night
+to find "< > HCI USB driver". Fixed it and was back to getting my
+BD_ADDR 00:00:00:00:00:00:00
 
-Now, I get the tool pskey,and I have compiled it. But
-I don't know how to use it. When I used it to change
-UART baudrate, it didn't work:
-$ pskey -i hci0 baudrate 115200
-Can't write persistent storage: No such device or
-address (6)
+This weekend......
 
-How can I do ?
-
-Regards
-
-gadfly
-
-
-	
-
-	
-		
-___________________________________________________________ 
-雅虎免费G邮箱－中国第一绝无垃圾邮件骚扰超大邮箱 
-http://cn.mail.yahoo.com
-
+On 9/15/05, Paul Webster <pjwebster@gmail.com> wrote:
+> > The problem is that we all simply lack the time to fill all these gaps.=
+ And
+> > perhaps Marcel still hopes that someone else will help out with writing=
+ good
+> > user documentation. It's certainly his job to document command line
+> > parameters, but writing and maintaining a good official introduction an=
+d
+> > HOWTOs for Bluetooth/BlueZ is a lot of work and it can be done by someo=
+ne who
+> > is not a programmer. I would go as far as saying that this kind of
+> > documentation *should not* be written but only checked by the developer=
+s.
+> > Maybe an official bluez wiki would be the most efficient way to make pe=
+ople
+> > contribute documentation.
+>
+> I'm planning to do a bluez install on a laptop and desktop machine
+> this weekend. Since both run LFS, it will be a fairly involved
+> "bootscripts and all" install. I was planning on writing a LFS hint
+> for the process, but if there was a bluez-wiki available, I'd gladly
+> contribute my experiences.
+>
+> Paul W
+>
 
 
 -------------------------------------------------------
