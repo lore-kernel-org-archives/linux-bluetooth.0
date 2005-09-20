@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hcid crashes with "buffer overflow detected"
-	when pairing
+Subject: Re: [Bluez-devel] Re: hcid D-Bus patch (RSSI question)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1126981781.14893.27.camel@yeti>
-References: <1126981781.14893.27.camel@yeti>
+In-Reply-To: <e1effdeb05091907316665534d@mail.gmail.com>
+References: <e1effdeb05091607426f824afa@mail.gmail.com>
+	 <e1effdeb05091907316665534d@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1127216630.5168.22.camel@localhost.localdomain>
+Message-Id: <1127216342.5168.16.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,30 +19,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Sep 2005 13:43:50 +0200
+Date: Tue, 20 Sep 2005 13:39:02 +0200
 
-Hi Fredrik,
+Hi Claudio,
 
-> I'm trying out the following packages on Fedora Core 4, x86_64:
+> What are the requirements to use inquiry with rssi? My 
+> kernel version is 2.6.10 with bluez-utils.2.21.
 > 
->     bluez-pin-0.24-2
->     bluez-libs-2.20-1
->     bluez-utils-2.20-1
->     dbus-0.33-3
-> 
-> Unfortunately hcid crashes with "buffer overflow detected" when pairing.
-> Is this a known problem?
+> Why it is not working? The periodic inquiry is working, but without
+> return an inquiry with rssi event.
 
-try bluez-utils-2.21 or the latest CVS. I fixed some possible buffer
-overflows lately.
-
-> Marcel, I'm happy you decided on moving to ASCII based storage. Is there
-> any documentation on this? Perhaps I can update the man pages if I can
-> get this working.
-
-I did this some time ago and no, it is not documented at the moment.
-Feel free to update all the manual pages. The hidd also now caches the
-device information.
+you need a chip where "hciconfig hci0 features" shows support for
+Inquiry with RSSI. A good choice seems to be the D-Link DBT-120 updated
+with the Apple firmware or one of the EDR capable Cellink dongles.
 
 Regards
 
