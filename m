@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: hcid D-Bus patch (RSSI question)
+Subject: Re: [Bluez-devel] Palm hotsync over BT
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb05091907316665534d@mail.gmail.com>
-References: <e1effdeb05091607426f824afa@mail.gmail.com>
-	 <e1effdeb05091907316665534d@mail.gmail.com>
+In-Reply-To: <1127176074.24203.109.camel@wyatt.hadess.net>
+References: <1126826943.17881.20.camel@wyatt.hadess.net>
+	 <1126844669.5934.7.camel@localhost.localdomain>
+	 <1127142348.24203.95.camel@wyatt.hadess.net>
+	 <1127176074.24203.109.camel@wyatt.hadess.net>
 Content-Type: text/plain
-Message-Id: <1127216342.5168.16.camel@localhost.localdomain>
+Message-Id: <1127216203.5168.13.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,19 +21,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Sep 2005 13:39:02 +0200
+Date: Tue, 20 Sep 2005 13:36:42 +0200
 
-Hi Claudio,
+Hi Bastien,
 
-> What are the requirements to use inquiry with rssi? My 
-> kernel version is 2.6.10 with bluez-utils.2.21.
+> Something that works much better:
+> http://lists.pilot-link.org/pipermail/pilot-link-general/2004-November/002068.html
+> with a patch to pilot-link afterwards:
+> http://lists.pilot-link.org/pipermail/pilot-link-general/2004-November/002075.html
 > 
-> Why it is not working? The periodic inquiry is working, but without
-> return an inquiry with rssi event.
+> I've managed to upload some apps to my Palm following those
+> instructions. It works with both the SP and the HOTSYNC local SDP
+> records.
+> 
+> There doesn't seem to be any Bluetooth specific code in pilot-link CVS,
+> although it should be possible to update Paul's patch to the current
+> sources.
 
-you need a chip where "hciconfig hci0 features" shows support for
-Inquiry with RSSI. A good choice seems to be the D-Link DBT-120 updated
-with the Apple firmware or one of the EDR capable Cellink dongles.
+this is exactly what is needed, but without a Palm with Bluetooth
+support I can't really test any of these stuff.
 
 Regards
 
