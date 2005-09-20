@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] BCM2035 over UART on the E680I
+Subject: Re: [Bluez-devel] Multiple user/device model?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050919092548.1173.2@@vodafone.es>
-References: <432D6F49.80304@cyph.ath.cx>
-	 <20050919092548.1173.2@@vodafone.es>
+In-Reply-To: <1127025473.14893.51.camel@yeti>
+References: <1127025473.14893.51.camel@yeti>
 Content-Type: text/plain
-Message-Id: <1127217202.5168.36.camel@localhost.localdomain>
+Message-Id: <1127216957.5168.30.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,20 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Sep 2005 13:53:22 +0200
+Date: Tue, 20 Sep 2005 13:49:16 +0200
 
-Hi guys,
+Hi Fredrik,
 
-> > Is this a sign that the chip is somehow configured wrongly?
+> Can multiple users have different sets of Bluetooth devices? I.e.
+> something like this:
 > 
-> Looks like, but I fear its too late for the the device. Would help a lot if 
-> it can take again a valid BD_ADDR. The HCI_USB driver behaves different for 
-> this device it casts a reset hci command on it, before the intialitation 
-> commands. May there is a point to look at but you are talking over UART...
+>     /home/peter/.bluetooth/devices/00:11:22:33:44:55/linkkeys
+>     /home/maria/.bluetooth/devices/99:88:77:66:55:44/linkkeys
+> 
+> With the following properties:
+> 
+>     1. User pairing and device management don't require
+>        administrative (root) privileges.
+>     2. Peter cannot remove/modify Maria's devices and vice versa.
+>     3. Would be excellent if Peter and Maria could use Bluetooth
+>        simultaneously, but good enough if only one at the time.
 
-if it is a ROM chip, you may need to call HCI_Reset to establish the new
-configuration. For the hci_uart driver you can load it with "reset=1" to
-tell the Bluetooth core to always send a reset command first.
+the idea is not bad, but it will never work this way. This is because
+how the Bluetooth security architecture is designed. We need a central
+root service that deals with the kernel side of HCI. However the control
+of pairing etc. for users will be handled over D-Bus.
 
 Regards
 
