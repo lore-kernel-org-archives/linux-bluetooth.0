@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <becc9d2c0509200605212255a9@mail.gmail.com>
-From: Andrea Carlevato <andrea.carlevatoml@gmail.com>
+Subject: Re: [Bluez-devel] BCM2035 over UART on the E680I
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050919092548.1173.2@@vodafone.es>
+References: <432D6F49.80304@cyph.ath.cx>
+	 <20050919092548.1173.2@@vodafone.es>
+Content-Type: text/plain
+Message-Id: <1127217202.5168.36.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_46733_1906634.1127221529953"
-Subject: [Bluez-devel] How inquiry to a custo IAC code ?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,46 +19,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Sep 2005 15:05:29 +0200
+Date: Tue, 20 Sep 2005 13:53:22 +0200
 
-------=_Part_46733_1906634.1127221529953
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi guys,
 
-Hello,
-i ve set a bluetooth dongle to a custom iac code via:
-"hciconfig hci0 iac 0x9e8b17"
-,and correctly it is not detected anymore by standard inquiry.
+> > Is this a sign that the chip is somehow configured wrongly?
+> 
+> Looks like, but I fear its too late for the the device. Would help a lot if 
+> it can take again a valid BD_ADDR. The HCI_USB driver behaves different for 
+> this device it casts a reset hci command on it, before the intialitation 
+> commands. May there is a point to look at but you are talking over UART...
 
-My question is: how can i ask another dongle to inquiry to that iac ?
-I ve tried setting this dongle with the same "hciconfig hci0 iac 0x9e8b17"
-but it still inquiries to the standard IAC.
+if it is a ROM chip, you may need to call HCI_Reset to establish the new
+configuration. For the hci_uart driver you can load it with "reset=1" to
+tell the Bluetooth core to always send a reset command first.
 
-can someone help me ?
+Regards
 
-thanks a lot
+Marcel
 
-------=_Part_46733_1906634.1127221529953
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-Hello,<br>
-i ve set a bluetooth dongle to a custom iac code via:<br>
-&quot;hciconfig hci0 iac 0x9e8b17&quot;<br>
-,and correctly it is not detected anymore by standard inquiry.<br>
-<br>
-My question is: how can i ask another dongle to inquiry to that iac ?<br>
-I ve tried setting this dongle with the same &quot;hciconfig hci0 iac 0x9e8=
-b17&quot;<br>
-but it still inquiries to the standard IAC.<br>
-<br>
-can someone help me ?<br>
-<br>
-thanks a lot<br>
-
-------=_Part_46733_1906634.1127221529953--
 
 
 -------------------------------------------------------
