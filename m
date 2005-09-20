@@ -1,79 +1,68 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43302E11.5010103@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Return-Path: <bizyukov@gmail.com>
+Message-ID: <e98637f4050920082942759d50@mail.gmail.com>
+Date: Tue, 20 Sep 2005 19:29:27 +0400
+From: Artem Bizyukov <bizyukov@gmail.com>
+Reply-To: Artem Bizyukov <bizyukov@gmail.com>
+To: marcel@holtmann.org
+Subject: Re[2]: It may be a bug in hcidump
+Cc: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] caching A2DP/alsa connection
-References: <432CE905.6050006@xmission.com> <1127216847.5168.27.camel@localhost.localdomain>
-In-Reply-To: <1127216847.5168.27.camel@localhost.localdomain>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Sep 2005 09:43:13 -0600
+Content-Type: multipart/mixed;
+	boundary="----=_Part_2860_3276041.1127230167377"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Marcel,
+------=_Part_2860_3276041.1127230167377
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I've joined the gstreamer list and I'm looking into the docs some more 
-before I ask them if gstreamer plugins can do everything we need. I hate 
-to add a dependency, but if gstreamer is a more straightforward way to 
-go and it's becoming mainstream, I don't mind requiring it.
+Marcel
 
-Brad
+I`m save dump with -w option.  hcidump fail only with -V option. I`m
+tested this tool on the same system but use glibc-2.3.2. The result is
+the same.
 
-Marcel Holtmann wrote:
-> Hi Brad,
-> 
-> 
->>I remember you were trying to keep the headset connection open between 
->>the quick audio device close and reopen that some clients like xmms do.
->>
->>I started thinking we need to put esd or another audio server or alsa 
->>layer between the apps and our libalsa a2dp connection. Could we extend 
->>the caching to work between different apps this way? We may even be able 
->>to use a soft mixer to get simultaneous clients...
->>
->>This is part of the reason I've been slow to jump in. It seems like I'd 
->>need to understand alsa up and down to know how to best make this work.
-> 
-> 
-> even I have to look at it again, but what also came up lately is a
-> native integration of A2DP as GStreamer plugin. Maybe you wanna start
-> looking at that, because I never looked at any Code of the GStreamer
-> project by now.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> SF.Net email is sponsored by:
-> Tame your development challenges with Apache's Geronimo App Server. 
-> Download it for free - -and be entered to win a 42" plasma tv or your very
-> own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+I can normally load this tool under gdbserver. But i can`t normally
+connect to gdbserver from scratchbox gdb. On command list gdb get next
+ answer:
 
+(gdb) list
+1       /home/tsavola/sb-toolchains/gcc/glibc/work/glibc_build/csu/crti.S:
+No such file or directory.
+        in /home/tsavola/sb-toolchains/gcc/glibc/work/glibc_build/csu/crti.=
+S
 
--------------------------------------------------------
-SF.Net email is sponsored by:
-Tame your development challenges with Apache's Geronimo App Server. 
-Download it for free - -and be entered to win a 42" plasma tv or your very
-own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+All my another programme loading and debugging fine. Do you know that
+does it mean?
+
+Regurds. Bizyukov Artem.
+
+------=_Part_2860_3276041.1127230167377
+Content-Type: application/octet-stream; name=hcidump.new
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="hcidump.new"
+
+BAAAAMwMAEDQ1wIAAQMMAA0AAQDMDABA0NcCAAQECnihH5agAARfAAELAAAAzAwAQNDXAgABCQQH
+eKEflqAAAQcAAQDMDABA0NcCAAQPBAABCQQLAAAAzAwAQNDXAgABCQQHeKEflqAAAQkAAQDMDABA
+0NcCAAQXBnihH5agAAcAAQDMDABA0NcCAAQPBAwBCQQKAAAAzAwAQNDXAgABDAQGeKEflqAADQAB
+AMwMAEDQ1wIABA4KAQwEAHihH5agAAkAAQDMDABA0NcCAAQWBnihH5agABsAAADMDABA0NcCAAEN
+BBd4oR+WoAAQAAECAwQFBgcICQoLDA0ODw0AAQDMDABA0NcCAAQOCgENBAB4oR+WoAAaAAEAzAwA
+QNDXAgAEGBd4oR+WoAC27gXMFgvbaQXjRa+P8DoYAA4AAQDMDABA0NcCAAQDCwAoAHihH5agAAEA
+CAAAAMwMAEDQ1wIAAQ8EBCgAGMwKAAEAzAwAQNDXAgAEIAd4oR+WoAABBwABAMwMAEDQ1wIABA8E
+AAEPBAgAAQDMDABA0NcCAAQdBQAoABjMCAAAAMwMAEDQ1wIAAQ0EBCgAAAANAAEAzAwAQNDXAgAE
+DgoBDQQSKAAAAAAABQAAAMwMAEDQ1wIAARoMAQAGAAEAzAwAQNDXAgAEGwMoAAUHAAEAzAwAQNDX
+AgAEDgQBGgwAGAABAMwMAEDQ1wIABA0VACgAAAEAAAAAAAAAAP//////////EQABAMwMAEDQ1wIA
+AiggDAAIAAEAAgEEAAEAQAAVAAAAzAwAQNDXAgACKCAQAAwAAQADAQgAAABAAAIAAAAIAAEAzAwA
+QNDXAgAEEwUBKAABAAQAAADMDABA0NcCAAEDDAAHAAEAzAwAQNDXAgAEBQQAKAAfDQABAMwMAEDQ
+1wIABAQKeKEflqAABF8AAQsAAADMDABA0NcCAAEJBAd4oR+WoAABBwABAMwMAEDQ1wIABA8EAAEJ
+BAsAAADMDABA0NcCAAEJBAd4oR+WoAABCQABAMwMAEDQ1wIABBcGeKEflqAABwABAMwMAEDQ1wIA
+BA8EDAEJBAoAAADMDABA0NcCAAEMBAZ4oR+WoAANAAEAzAwAQNDXAgAEDgoBDAQAeKEflqAACQAB
+AMwMAEDQ1wIABBYGeKEflqAAGwAAAMwMAEDQ1wIAAQ0EF3ihH5agABAAAQIDBAUGBwgJCgsMDQ4P
+DQABAMwMAEDQ1wIABA4KAQ0EAHihH5agABoAAQDMDABA0NcCAAQYF3ihH5agAAXOW37ReTZ6IpIF
+DQpY4kIADgABAMwMAEDQ1wIABAMLACkAeKEflqAAAQAIAAAAzAwAQNDXAgABDwQEKQAYzAoAAQDM
+DABA0NcCAAQgB3ihH5agAAEHAAEAzAwAQNDXAgAEDwQAAQ8ECAAAAMwMAEDQ1wIAAQ0EBCkAAAAI
+AAEAzAwAQNDXAgAEHQUAKQAYzA0AAQDMDABA0NcCAAQOCgENBBIpAAAAAAAFAAAAzAwAQNDXAgAB
+GgwBAAYAAQDMDABA0NcCAAQbAykABQcAAQDMDABA0NcCAAQOBAEaDAAYAAEAzAwAQNDXAgAEDRUA
+KQAAAQAAAAAAAAAA//////////8RAAEAzAwAQNDXAgACKSAMAAgAAQACAQQAAQBAABUAAADMDABA
+0NcCAAIpIBAADAABAAMBCAAAAEAAAgAAAAgAAQDMDABA0NcCAAQTBQEpAAEA
+------=_Part_2860_3276041.1127230167377--
