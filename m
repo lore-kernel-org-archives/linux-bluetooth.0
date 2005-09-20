@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Multiple user/device model?
-From: Fredrik Noring <noring@nocrew.org>
+Subject: Re: [Bluez-devel] firmware upgrade
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1127216957.5168.30.camel@localhost.localdomain>
-References: <1127025473.14893.51.camel@yeti>
-	 <1127216957.5168.30.camel@localhost.localdomain>
+In-Reply-To: <e1effdeb05092009524d67443b@mail.gmail.com>
+References: <e1effdeb05092009524d67443b@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1127249749.26495.1.camel@yeti>
+Message-Id: <1127235372.5068.0.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,19 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Sep 2005 22:55:49 +0200
+Date: Tue, 20 Sep 2005 18:56:12 +0200
 
-Hi Marcel,
+Hi Claudio,
 
-> the idea is not bad, but it will never work this way. This is because
-> how the Bluetooth security architecture is designed. We need a central
-> root service that deals with the kernel side of HCI. However the control
-> of pairing etc. for users will be handled over D-Bus.
+> Before start update the firmware of my dongles I would like make sure
+> that nothing is wrong. Sometimes, dongles upgrades can end up with
+> a dead dongle :) I read some documents in the Marcel's home 
+> page(http://holtmann.org) but I am afraid of upgrade my dongles :)
+> 
+> I have the following dongles/adapters:
+> 
+> >>>> D-Link DBT-120 Hardware B3
 
-Ah. Is there any documentation on how this D-BUS interface works?
+try only this dongle. This should work, but others may break.
 
-Thanks,
-Fredrik
+Regards
+
+Marcel
 
 
 
