@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Palm hotsync over BT
-From: Bastien Nocera <hadess@hadess.net>
+From: Andreas Beck <becka-bzdvl@bedatec.de>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1127142348.24203.95.camel@wyatt.hadess.net>
-References: <1126826943.17881.20.camel@wyatt.hadess.net>
-	 <1126844669.5934.7.camel@localhost.localdomain>
-	 <1127142348.24203.95.camel@wyatt.hadess.net>
-Content-Type: text/plain
-Message-Id: <1127176074.24203.109.camel@wyatt.hadess.net>
+Subject: Re: [Bluez-devel] caching A2DP/alsa connection
+Message-ID: <20050920001133.GA5818@uni-duesseldorf.de>
+References: <432CE905.6050006@xmission.com> <20050918114545.GA5175@uni-duesseldorf.de> <432E0AFB.4050800@xmission.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <432E0AFB.4050800@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,59 +18,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Sep 2005 01:27:54 +0100
+Date: Tue, 20 Sep 2005 02:11:33 +0200
 
-On Mon, 2005-09-19 at 16:05 +0100, Bastien Nocera wrote:
-> On Fri, 2005-09-16 at 06:24 +0200, Marcel Holtmann wrote:
-> > Hi Bastien,
-> > 
-> > > Apart from submitting a patch (attached below), I wanted to ask about
-> > > the PALMOS and HOTSYNC SDP records that sdptool can now add. First of
-> > > all, what is the difference between those two?
-> > 
-> > oh yeah, the patch fixes a stupid paste and copy mistake. Thanks.
-> > 
-> > The HOTSYNC record is the record the Palm OS is searching for when it is
-> > doing HotSync over Bluetooth. It will fall back to a normal SP record,
-> > but this can be confusing if the sync host runs multiple targets. The
-> > PALMOS record is an identification record like NOKID, I think. This
-> > hasn't been confirmed and so far I haven't seen any device requesting
-> > it.
-> > 
-> > > If I understood well Marcel's mail[1], one could now sync a Palm over
-> > > Bluetooth by doing:
-> > > - sdptool add HOTSYNC
-> > > - adding an rfcomm connection to the Palm
-> > > - using pilot-link or other Palm software using the just created rfcomm
-> > > device as the serial device
-> > > 
-> > > And the mail mentioned above was to avoid having to create an rfcomm
-> > > connection by hand. Am I even close?
-> > 
-> > The pilot-link library should be extended to do everything by itself.
-> > This means the service registration and the RFCOMM channel handling to
-> > map the HotSync protocol over RFCOMM.
-> 
-> Do you know which channel it is supposed to connect to on the Palm?
-> Something like that is supposed to work:
+Brad Midgley <bmidgley@xmission.com> wrote:
+> I want to avoid a sound server that is tied to a specific desktop. What 
+> about alsa's dmix? it seems to do what we want and at a lower level 
+> where it would work for everyone... 
+> http://alsa.opensrc.org/index.php?page=DmixPlugin
 
-Something that works much better:
-http://lists.pilot-link.org/pipermail/pilot-link-general/2004-November/002068.html
-with a patch to pilot-link afterwards:
-http://lists.pilot-link.org/pipermail/pilot-link-general/2004-November/002075.html
+Have you seen 
+http://www.alsa-project.org/alsa-doc/doc-php/asoundrc.php?company=Generic&card=Generic&chip=Generic&module=Generic#virmulti
+?
 
-I've managed to upload some apps to my Palm following those
-instructions. It works with both the SP and the HOTSYNC local SDP
-records.
+Looks like it basically _is_, what we want. However I am unable to get
+the "multi"-example working. I don't quite get the syntax and am unsure 
+if it will do what I am trying to accomplish.
 
-There doesn't seem to be any Bluetooth specific code in pilot-link CVS,
-although it should be possible to update Paul's patch to the current
-sources.
+I tried to hack it to push the same sound stream to both the
+headset-device and the soundcard. However alsaplayer segfaults at
+startup after some not really meaningful error messages.
 
----
-Bastien Nocera <hadess@hadess.net> 
+Maybe you can get that working? I think I need some sleep now.
+
+It doesn't look, if it is designed to be reconfigureable dynamically,
+but I'll think about that, when I have it working statically.
+
+Do we have a contact to the alsa developers already? Someone who can
+shed some light on how it is supposed to work, and if it can be tweaked 
+to serve our purposes?
 
 
+CU, Andy
+
+-- 
+= Andreas Beck                    |  Email :  <becka-sig@bedatec.de>         =
 
 
 -------------------------------------------------------
