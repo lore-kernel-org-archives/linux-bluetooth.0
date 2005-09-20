@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] caching A2DP/alsa connection
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43302EA9.5050506@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43302E11.5010103@xmission.com>
-References: <432CE905.6050006@xmission.com>
-	 <1127216847.5168.27.camel@localhost.localdomain>
-	 <43302E11.5010103@xmission.com>
-Content-Type: text/plain
-Message-Id: <1127231352.5168.80.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] caching A2DP/alsa connection
+References: <432CE905.6050006@xmission.com> <20050918114545.GA5175@uni-duesseldorf.de> <432E0AFB.4050800@xmission.com> <20050920001133.GA5818@uni-duesseldorf.de>
+In-Reply-To: <20050920001133.GA5818@uni-duesseldorf.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,24 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Sep 2005 17:49:12 +0200
+Date: Tue, 20 Sep 2005 09:45:45 -0600
 
-Hi Brad,
+Andreas
 
-> I've joined the gstreamer list and I'm looking into the docs some more 
-> before I ask them if gstreamer plugins can do everything we need. I hate 
-> to add a dependency, but if gstreamer is a more straightforward way to 
-> go and it's becoming mainstream, I don't mind requiring it.
+> Have you seen 
+> http://www.alsa-project.org/alsa-doc/doc-php/asoundrc.php?company=Generic&card=Generic&chip=Generic&module=Generic#virmulti
+> ?
 
-I still think the ALSA plugin is the way to go, but there are still some
-problems to solve and it doesn't help for embedded systems that don't
-use ALSA. I think we have to go both ways anyhow.
+This looks like it's for bonding cards together to behave like a big 
+multichannel card. This doesn't solve the core problem of giving 
+multiple clients simultaneous access to a userspace plugin.
 
-Regards
-
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
