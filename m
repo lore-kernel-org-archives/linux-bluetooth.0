@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Multiple user/device model?
+Subject: Re: [Bluez-devel] caching A2DP/alsa connection
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1127025473.14893.51.camel@yeti>
-References: <1127025473.14893.51.camel@yeti>
+In-Reply-To: <432CE905.6050006@xmission.com>
+References: <432CE905.6050006@xmission.com>
 Content-Type: text/plain
-Message-Id: <1127216957.5168.30.camel@localhost.localdomain>
+Message-Id: <1127216847.5168.27.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,28 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Sep 2005 13:49:16 +0200
+Date: Tue, 20 Sep 2005 13:47:27 +0200
 
-Hi Fredrik,
+Hi Brad,
 
-> Can multiple users have different sets of Bluetooth devices? I.e.
-> something like this:
+> I remember you were trying to keep the headset connection open between 
+> the quick audio device close and reopen that some clients like xmms do.
 > 
->     /home/peter/.bluetooth/devices/00:11:22:33:44:55/linkkeys
->     /home/maria/.bluetooth/devices/99:88:77:66:55:44/linkkeys
+> I started thinking we need to put esd or another audio server or alsa 
+> layer between the apps and our libalsa a2dp connection. Could we extend 
+> the caching to work between different apps this way? We may even be able 
+> to use a soft mixer to get simultaneous clients...
 > 
-> With the following properties:
-> 
->     1. User pairing and device management don't require
->        administrative (root) privileges.
->     2. Peter cannot remove/modify Maria's devices and vice versa.
->     3. Would be excellent if Peter and Maria could use Bluetooth
->        simultaneously, but good enough if only one at the time.
+> This is part of the reason I've been slow to jump in. It seems like I'd 
+> need to understand alsa up and down to know how to best make this work.
 
-the idea is not bad, but it will never work this way. This is because
-how the Bluetooth security architecture is designed. We need a central
-root service that deals with the kernel side of HCI. However the control
-of pairing etc. for users will be handled over D-Bus.
+even I have to look at it again, but what also came up lately is a
+native integration of A2DP as GStreamer plugin. Maybe you wanna start
+looking at that, because I never looked at any Code of the GStreamer
+project by now.
 
 Regards
 
