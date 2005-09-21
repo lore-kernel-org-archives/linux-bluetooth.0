@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re:BlueCore2 speed problem!
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050921084150.21461.qmail@web15706.mail.cnb.yahoo.com>
-References: <20050921084150.21461.qmail@web15706.mail.cnb.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1127292786.495.14.camel@localhost.localdomain>
-Mime-Version: 1.0
+Message-ID: <20050921084150.21461.qmail@web15706.mail.cnb.yahoo.com>
+From: =?gb2312?q?=C4=FE=20=C4=FE?= <gadfly_no@yahoo.com.cn>
+To: bluez users <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=gb2312
+Subject: [Bluez-users] Re:BlueCore2 speed problem!
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,25 +16,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Sep 2005 10:53:06 +0200
+Date: Wed, 21 Sep 2005 16:41:50 +0800 (CST)
 
-Hi Gadfly,
+hi,Marcel,
 
-> Now, I get the tool pskey,and I have compiled it. But
-> I don't know how to use it. When I used it to change
-> UART baudrate, it didn't work:
-> $ pskey -i hci0 baudrate 115200
-> Can't write persistent storage: No such device or
-> address (6)
+Now, I get the tool pskey,and I have compiled it. But
+I don't know how to use it. When I used it to change
+UART baudrate, it didn't work:
+$ pskey -i hci0 baudrate 115200
+Can't write persistent storage: No such device or
+address (6)
 
-you should ask your module manufacturer for the detailed documentation
-about the PS keys. Or you look at the mailing list archive for answers
-from the CSR guys.
+How can I do ?
 
 Regards
 
-Marcel
+gadfly
 
+
+	
+
+	
+		
+___________________________________________________________ 
+雅虎免费G邮箱－中国第一绝无垃圾邮件骚扰超大邮箱 
+http://cn.mail.yahoo.com
 
 
 
