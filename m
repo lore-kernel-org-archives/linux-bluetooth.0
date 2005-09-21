@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4331DA0C.3040808@chello.at>
+Message-ID: <4331D6FE.6000009@chello.at>
 From: Roland Lezuo <roland.lezuo@chello.at>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] No audio, just noise with btsco
-References: <43318946.1000506@chello.at> <20050921211547.GA5201@uni-duesseldorf.de> <4331D6FE.6000009@chello.at>
-In-Reply-To: <4331D6FE.6000009@chello.at>
-Content-Type: multipart/signed; protocol="application/x-pkcs7-signature"; micalg=sha1; boundary="------------ms020602090700000801060000"
+References: <43318946.1000506@chello.at> <20050921211547.GA5201@uni-duesseldorf.de>
+In-Reply-To: <20050921211547.GA5201@uni-duesseldorf.de>
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature"; micalg=sha1; boundary="------------ms030209080008090603010403"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,35 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Sep 2005 00:09:16 +0200
+Date: Wed, 21 Sep 2005 23:56:14 +0200
 
 This is a cryptographically signed message in MIME format.
 
---------------ms020602090700000801060000
+--------------ms030209080008090603010403
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 
+> As root(!) run "/usr/sbin/hciconfig hci0 revision"
 
-here is something written about SCO link cap.
 
-sudo hciconfig hci0 features
 hci0:   Type: USB
          BD Address: 00:0A:3A:65:83:84 ACL MTU: 377:10 SCO MTU: 16:0
-         Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-                 <3-slot packets> <5-slot packets> <encryption> <slot 
-offset>
-                 <timing accuracy> <role switch> <hold mode> <sniff mode>
-                 <RSSI> <channel quality> <SCO link> <HV2 packets>
-                 <HV3 packets> <u-law log> <A-law log> <CVSD> <power 
-control>
-                 <transparent SCO> <enhanced iscan> <interlaced iscan>
-                 <interlaced pscan> <AFH cap. slave> <AFH cap. master>
+         Firmware 0.3 / 9
 
+
+> it must say something like "SCO mapping:  HCI". If it doesn't say
+nope nothing...
+
+...have to get another bluetooth dongle? Or firmware update?
 
 regards
 roland lezuo
 
---------------ms020602090700000801060000
+--------------ms030209080008090603010403
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -103,8 +99,8 @@ MsPJYy3hMCtEb7IV3wiFokuT+txO4ZL+AWNGGGMsHqH9ZoSLxeuVCVvBOAnBNjpdHIc6cQGP
 uL8jy8biMYIDhzCCA4MCAQEwgYAweTEQMA4GA1UEChMHUm9vdCBDQTEeMBwGA1UECxMVaHR0
 cDovL3d3dy5jYWNlcnQub3JnMSIwIAYDVQQDExlDQSBDZXJ0IFNpZ25pbmcgQXV0aG9yaXR5
 MSEwHwYJKoZIhvcNAQkBFhJzdXBwb3J0QGNhY2VydC5vcmcCAwExfTAJBgUrDgMCGgUAoIIB
-2zAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0wNTA5MjEyMjA5
-MTZaMCMGCSqGSIb3DQEJBDEWBBT8tG9Y7FLyq1bshxxWTDy7Q70K5DBSBgkqhkiG9w0BCQ8x
+2zAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0wNTA5MjEyMTU2
+MTRaMCMGCSqGSIb3DQEJBDEWBBQqa7kgYmx1cAQGmz1WbI8clpCMHDBSBgkqhkiG9w0BCQ8x
 RTBDMAoGCCqGSIb3DQMHMA4GCCqGSIb3DQMCAgIAgDANBggqhkiG9w0DAgIBQDAHBgUrDgMC
 BzANBggqhkiG9w0DAgIBKDCBkQYJKwYBBAGCNxAEMYGDMIGAMHkxEDAOBgNVBAoTB1Jvb3Qg
 Q0ExHjAcBgNVBAsTFWh0dHA6Ly93d3cuY2FjZXJ0Lm9yZzEiMCAGA1UEAxMZQ0EgQ2VydCBT
@@ -112,13 +108,13 @@ aWduaW5nIEF1dGhvcml0eTEhMB8GCSqGSIb3DQEJARYSc3VwcG9ydEBjYWNlcnQub3JnAgMB
 MX0wgZMGCyqGSIb3DQEJEAILMYGDoIGAMHkxEDAOBgNVBAoTB1Jvb3QgQ0ExHjAcBgNVBAsT
 FWh0dHA6Ly93d3cuY2FjZXJ0Lm9yZzEiMCAGA1UEAxMZQ0EgQ2VydCBTaWduaW5nIEF1dGhv
 cml0eTEhMB8GCSqGSIb3DQEJARYSc3VwcG9ydEBjYWNlcnQub3JnAgMBMX0wDQYJKoZIhvcN
-AQEBBQAEggEACg69YEjUHR6TWERPJoyac2clSIyQvusIUTFjNp0WF6bMtCBRJGyHFcy33HLH
-n7LWYmXNSTXqJKRACwrlVzM3vA0asP9z6JvPs37K3qnnKNt3+BL0uXluwQSge7o0nQlk8adz
-Tu91pKgOrtmRQfymsPoFXRAs1OiVbFPOchJ2APF71QiPS5pMB3cifizrcIFMHCQGEAHW6v4L
-Fn0h5h3DZgFgyLvNyZNNsPqaVaH299u3GQ9WxEO05lgTvQsIuVHVBk/s/PgccSaz9X8PnZ39
-z6DHoJ/0aQQRAErBc7ykr37xUk0X4T4neETzigvcID3RfveeYKrBbc98capH6U4GNAAAAAAA
+AQEBBQAEggEAb2A4h+6EI1V6F2f6NUJbcwKbnRnHRU1Mwf6MNCTXEnxlX6cHTxO3owKUztTt
+EmuAEAauDizX1wPgqZ5WQUvb/cgx/RjVmBNQQRvKo0i5yer9Oqr1AC1N/W3gvyiHXWZBCRIe
+/lyuEOZsFZez5vpHfRsRdRLEvauFJdvVrOzwns6Ddsr20y7oHdrZdCKBcZv5t5ih6ofc+CeS
+skb1/hMCaAWMRxz1iLtqPbJAd1g9vTQt/JQDRZiD8C+bNlR/yK5aafYPeIddz+hf+oizpOL0
+MWQoTqQcO1dSt0GrjTS+75jf1+GpCmbkl4sWtQGKze/41rrV0R3qCdbrcn3ffw8o7QAAAAAA
 AA==
---------------ms020602090700000801060000--
+--------------ms030209080008090603010403--
 
 
 -------------------------------------------------------
