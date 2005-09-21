@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e98637f4050921062814aa7282@mail.gmail.com>
-From: Artem Bizyukov <bizyukov@gmail.com>
+Message-ID: <9307f5f205092106191197c374@mail.gmail.com>
+From: "P. Durante" <shackan@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e98637f405092102346d904d4a@mail.gmail.com>
+Subject: Re: [Bluez-devel] hcid D-Bus patch
+In-Reply-To: <e1effdeb05092105492fce2ff2@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-References: <e98637f4050920082942759d50@mail.gmail.com>
-	 <1127231935.5168.86.camel@localhost.localdomain>
-	 <e98637f405092102346d904d4a@mail.gmail.com>
-Subject: [Bluez-devel] Fwd: Re[2]: It may be a bug in hcidump
+References: <e1effdeb05091607426f824afa@mail.gmail.com>
+	 <1127292701.495.11.camel@localhost.localdomain>
+	 <e1effdeb05092105492fce2ff2@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,84 +20,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 21 Sep 2005 17:28:44 +0400
+Date: Wed, 21 Sep 2005 15:19:51 +0200
 
----------- Forwarded message ----------
-From: Artem Bizyukov <bizyukov@gmail.com>
-Date: 21.09.2005 13:34
-Subject: Re: Re[2]: It may be a bug in hcidump
-To: Marcel Holtmann <marcel@holtmann.org>
+Hi,
 
+>  org.bluez.hci.error.Failed  /* here we can add the bluetooth error code =
+*/
 
-2005/9/20, Marcel Holtmann <marcel@holtmann.org>:
-> Hi Artem,
->
-> > I`m save dump with -w option.  hcidump fail only with -V option. I`m
-> > tested this tool on the same system but use glibc-2.3.2. The result is
-> > the same.
->
-> the problem is easy, because it is not a valid HCI frame and hcidump is
-> not doing any robustness checks.
->
-> < HCI Command: PIN Code Request Reply (0x01|0x000d) plen 4
->   0000: 29 00 00 00                                       )...
->
-> A PIN code reply must include the BD_ADDR and not the connection handle.
-> Install bluez-utils-2.21 (or from CVS) and try again.
->
-> Regards
->
-> Marcel
->
->
->
+Just an idea, keep it simple, if you give the clients just the
+bluetooth error code they'll have to decode its meaning using
+something like strerror( bt_error( error_code )) every time they make
+a request, quite boring, even worse, bt_error is bluez-specific and if
+the client wants to use something like that in a language which is not
+C, they should grab the bluetooth specification write their own
+function which tells what each error code means...
 
-Hello Marcel
-I used the latest utils and libs. And those dump i record with:
+or
 
-OMAP5912OSK:~# hcitool
-hcitool - HCI Tool ver 2.21
+since dbus errors consist of error_name + error_message you could put
+something meaningful in the error_message, and eventually append an
+additional field with the error code to the message as well ( if the
+application wants to treat some error codes in a particular way ) this
+seems ok with the dbus specification which only says (if I remember
+correctly) that if the first field in an error message is of type
+'string' that string will be treated as the error message, and doesn't
+say anything about additional fields.
 
-
-MAP5912OSK:~# hcidump --help
-HCI sniffer - Bluetooth packet analyzer ver 1.25
-
-
-I`m thin this bug is not critical. In my previous post "L2CAP channel"
-i describe my main problem. I cant connect to my board through L2CAP
-channel.
-
-
-> ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-< ACL data: handle 41 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 1
-      Connection pending - Authentication pending
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-< HCI Command: Set Connection Encryption (0x01|0x0013) plen 3
-  0000: 29 00 01                                          )..
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  0000: 01 29 00 01 00                                    .)...
-> HCI Event: Command Status (0x0f) plen 4
-  0000: 00 01 13 04                                       ....
-> HCI Event: Encrypt Change (0x08) plen 4
-  0000: 00 29 00 01                                       .)..
-< HCI Command: Change Connection Link Key (0x01|0x0015) plen 2
-  0000: 29 00                                             ).
-< ACL data: handle 41 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
-> HCI Event: Number of Completed Packets (0x13) plen 5
-
-Kernel answer  "Connection pending". But i ned that kernel enswer
-"Connection successful" without "Connection pending". I am write
-application that must communicate with already exist big  PC
-application, and i can`t change it. How i must open socket, or  set it
-parametrs, for succesful connect with a PC application?
-
-
-Regards.
-Bizyukov Artem.
+regards
 
 
 -------------------------------------------------------
