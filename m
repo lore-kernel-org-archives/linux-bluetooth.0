@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Re:BlueCore2 speed problem!
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <1127311478.4331687601b7b@student.up.ac.za>
-From: Reinier Coetzer <s24072967@tuks.co.za>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Installing bluetooth devices
+In-Reply-To: <20050921084150.21461.qmail@web15706.mail.cnb.yahoo.com>
+References: <20050921084150.21461.qmail@web15706.mail.cnb.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1127292786.495.14.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,31 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Sep 2005 16:04:38 +0200 (SAST)
+Date: Wed, 21 Sep 2005 10:53:06 +0200
 
-Hi,
+Hi Gadfly,
 
-I have some trouble running a bluetooth app. I tried to contact the developers
-of the app for help, but they couldn't/wouldn't help me. Apparently I need to
-install my bluetooth devices (I'm using a usb dongle to connect to my mobile
-phone) to be able to run the app. "rfcomm -a" from the console returns an empty
-list (in fact it returns nothing at all). I suppose this means that I have no
-bluetooth devices installed, but I am able to execute "hcitool scan" which
-returns the correct mac address of my phone. I'm not sure what to make of this.I
-got error messages like 
+> Now, I get the tool pskey,and I have compiled it. But
+> I don't know how to use it. When I used it to change
+> UART baudrate, it didn't work:
+> $ pskey -i hci0 baudrate 115200
+> Can't write persistent storage: No such device or
+> address (6)
 
- open /dev/bluetooth/rfcomm0, No such file or directory
- bt_rfcomm_config failed
- unable to create rfcomm connection
-
-I've heard that I have to configure my dongle some how using "rfcomm". I've
-tried some bluetooth appz which came with my distro ( Suse9.3 ) and I'm able to
-communicate with certain types of phones. I'm rather new to bluez, so a detailed
-answer would be much appreciated!
+you should ask your module manufacturer for the detailed documentation
+about the PS keys. Or you look at the mailing list archive for answers
+from the CSR guys.
 
 Regards
 
-Reinier
+Marcel
+
+
 
 
 -------------------------------------------------------
