@@ -2,12 +2,14 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] hcid D-Bus patch
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb05092105492fce2ff2@mail.gmail.com>
+In-Reply-To: <e1effdeb05092106526cd16196@mail.gmail.com>
 References: <e1effdeb05091607426f824afa@mail.gmail.com>
 	 <1127292701.495.11.camel@localhost.localdomain>
 	 <e1effdeb05092105492fce2ff2@mail.gmail.com>
+	 <9307f5f205092106191197c374@mail.gmail.com>
+	 <e1effdeb05092106526cd16196@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1127398647.5344.24.camel@blade>
+Message-Id: <1127398388.5344.20.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,37 +22,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 22 Sep 2005 16:17:27 +0200
+Date: Thu, 22 Sep 2005 16:13:08 +0200
 
 Hi Claudio,
 
-> I will analize our comments.
-> 
-> service_table_t and the function create_error_reply_message will be
-> shared by other profiles(pan, hid, rfcomm, ...)
-> this the reason to put in the dbus-internal.h file. 
+> An ERROR may have any arguments, but if the first argument is a 
+> STRING(error message). Therefore, the signature should be sq (string
+> +uint16).
+> In my opinion the error message string is not relevant, the client
+> applications
+> can use it or not. If we consider internationalization, this string
+> will not
+> the useful.
 
-if this is shared code then I like to have it in the common/ toplevel
-directory. We should create the files dbus.[ch] and then use them from
-there.
+the Bluetooth status is always uint8_t and I think it is a good idea to
+map these error codes directly. We can define our own codes from 0xff
+onwards if we use a uint16. However we should try to use the Bluetooth
+defined errors whenever possible.
 
-> Regarding the Bluetooth error codes, we can add the code in the D-Bus
-> error messages as a argument. My proposal
-> is use a standard like this:
-> 
-> org.bluez.hci.error.UnknowMethod
-> org.bluez.hci.error.WrongSignature
-> org.bluez.hci.error.WrongParam
-> org.bluez.hci.error.Failed  /* here we can add the bluetooth error
-> code */
-> org.bluez.hci.error.Busy
-> org.bluez.hci.error.NoDevFound
-> 
-> I will send a new path soon.
-
-So a D-Bus error is always a method? I would simply use a general error
-with an identifier number. Help me out here to understand what is the
-best way to represent the errors.
+A string would be nice, but in generell these are useless. However for
+application that doesn't consider internationalization it will be easy
+for them to display the errors in clear text.
 
 Regards
 
