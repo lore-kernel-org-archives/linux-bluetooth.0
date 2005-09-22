@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] hcid D-Bus patch
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb05092105492fce2ff2@mail.gmail.com>
+References: <e1effdeb05091607426f824afa@mail.gmail.com>
+	 <1127292701.495.11.camel@localhost.localdomain>
+	 <e1effdeb05092105492fce2ff2@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1127399305.5344.36.camel@blade>
+Message-Id: <1127398647.5344.24.camel@blade>
 Mime-Version: 1.0
-Subject: [Bluez-devel] D-Bus patching session opened
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,29 +20,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 22 Sep 2005 16:28:25 +0200
+Date: Thu, 22 Sep 2005 16:17:27 +0200
 
-Hi,
+Hi Claudio,
 
-after I dropped the D-Bus 0.23 API support it is now time to really play
-with the integration of D-Bus support into hcid and other daemons. This
-is the first step into creating a full D-Bus aware bluetoothd in the
-future.
+> I will analize our comments.
+> 
+> service_table_t and the function create_error_reply_message will be
+> shared by other profiles(pan, hid, rfcomm, ...)
+> this the reason to put in the dbus-internal.h file. 
 
-I like to see some more D-Bus enhancements now and Claudio already
-started and he's working hard in explaining his work and making me
-happy. So please help him and review his code and send small patches to
-make the D-Bus experience better. I think about making the D-Bus a core
-dependency of bluez-utils. Does anybody have any arguments against it?
+if this is shared code then I like to have it in the common/ toplevel
+directory. We should create the files dbus.[ch] and then use them from
+there.
 
-Next thing that I like to see are some Python applications that are
-using GTK+ and D-Bus for a graphical interface to BlueZ. For that I
-think about creating a bluez-python package. Therefor we need people who
-are writing the code and other people who are creating some nice fancy
-icons and graphics for it. First thing should be a D-Bus aware PIN
-helper written completely in Python.
+> Regarding the Bluetooth error codes, we can add the code in the D-Bus
+> error messages as a argument. My proposal
+> is use a standard like this:
+> 
+> org.bluez.hci.error.UnknowMethod
+> org.bluez.hci.error.WrongSignature
+> org.bluez.hci.error.WrongParam
+> org.bluez.hci.error.Failed  /* here we can add the bluetooth error
+> code */
+> org.bluez.hci.error.Busy
+> org.bluez.hci.error.NoDevFound
+> 
+> I will send a new path soon.
 
-There exists a job/task for everyone :)
+So a D-Bus error is always a method? I would simply use a general error
+with an identifier number. Help me out here to understand what is the
+best way to represent the errors.
 
 Regards
 
