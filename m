@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Installing bluetooth devices
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4332056B.1060903@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1127311478.4331687601b7b@student.up.ac.za>
-References: <1127311478.4331687601b7b@student.up.ac.za>
-Content-Type: text/plain
-Message-Id: <1127401561.12287.0.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] No audio, just noise with btsco
+References: <43318946.1000506@chello.at> <20050921211547.GA5201@uni-duesseldorf.de> <4331D6FE.6000009@chello.at> <4331DA0C.3040808@chello.at>
+In-Reply-To: <4331DA0C.3040808@chello.at>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,36 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Sep 2005 17:06:01 +0200
+Date: Wed, 21 Sep 2005 19:14:19 -0600
 
-Hi Reinier,
+Roland
 
-> I have some trouble running a bluetooth app. I tried to contact the developers
-> of the app for help, but they couldn't/wouldn't help me. Apparently I need to
-> install my bluetooth devices (I'm using a usb dongle to connect to my mobile
-> phone) to be able to run the app. "rfcomm -a" from the console returns an empty
-> list (in fact it returns nothing at all). I suppose this means that I have no
-> bluetooth devices installed, but I am able to execute "hcitool scan" which
-> returns the correct mac address of my phone. I'm not sure what to make of this.I
-> got error messages like 
-> 
->  open /dev/bluetooth/rfcomm0, No such file or directory
->  bt_rfcomm_config failed
->  unable to create rfcomm connection
-> 
-> I've heard that I have to configure my dongle some how using "rfcomm". I've
-> tried some bluetooth appz which came with my distro ( Suse9.3 ) and I'm able to
-> communicate with certain types of phones. I'm rather new to bluez, so a detailed
-> answer would be much appreciated!
+> here is something written about SCO link cap.
 
-why don't you tell us what application you are using? However using
-"rfcomm bind ..." could be the solution for your problem.
+Yes, the capability is there but the linux driver can't exploit it. If 
+you have a usb adapter, there's no pain in replacing it but if it's a 
+builtin adapter or on an embedded board then yes it is a real problem.
 
-Regards
-
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
