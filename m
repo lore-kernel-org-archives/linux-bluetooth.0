@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <362622973@web.de>
-MIME-Version: 1.0
-From: dominic.werner@email.de
+Subject: Re: [Bluez-users] Installing bluetooth devices
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] PC can't receive files from SE K750i
+In-Reply-To: <1127311478.4331687601b7b@student.up.ac.za>
+References: <1127311478.4331687601b7b@student.up.ac.za>
+Content-Type: text/plain
+Message-Id: <1127401561.12287.0.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,40 +18,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Sep 2005 09:46:55 +0200
+Date: Thu, 22 Sep 2005 17:06:01 +0200
+
+Hi Reinier,
+
+> I have some trouble running a bluetooth app. I tried to contact the developers
+> of the app for help, but they couldn't/wouldn't help me. Apparently I need to
+> install my bluetooth devices (I'm using a usb dongle to connect to my mobile
+> phone) to be able to run the app. "rfcomm -a" from the console returns an empty
+> list (in fact it returns nothing at all). I suppose this means that I have no
+> bluetooth devices installed, but I am able to execute "hcitool scan" which
+> returns the correct mac address of my phone. I'm not sure what to make of this.I
+> got error messages like 
+> 
+>  open /dev/bluetooth/rfcomm0, No such file or directory
+>  bt_rfcomm_config failed
+>  unable to create rfcomm connection
+> 
+> I've heard that I have to configure my dongle some how using "rfcomm". I've
+> tried some bluetooth appz which came with my distro ( Suse9.3 ) and I'm able to
+> communicate with certain types of phones. I'm rather new to bluez, so a detailed
+> answer would be much appreciated!
+
+why don't you tell us what application you are using? However using
+"rfcomm bind ..." could be the solution for your problem.
+
+Regards
+
+Marcel
 
 
-Hi there,
-
-i've got an ACER bluetooth-dongle and a Sony Ericsson K750i mobilephone.
-All things i write, i've tried with Debian.
-
-1. I startet the dongle with "hciconfig hci up"
-
-2. I search my phone with "hcitool search" --> I found it
-
-3. I used "sdptool browse (MAC of the phone)" to get the OBEX push channel.  --> channel is 5
-
-4. "sdptool add --channel=5 OPUSH"
-
-5. I started "obexserver"
-
-now the PC is waiting for incoming files
-
-the first problem: my mobile phone  doesn't find my PC
-problem fixed: I changed the line "0x100;" in "/etc/bluetooth/hci.conf" to "0x100100;" i read in an Ubuntu-forum. 
-no my phone finds the PC
-
-but the 2nd problem:
-when I try to send an image to my PC an error appears "connection refused"
-
-who can help?
-
-thanks!
-
-greetings Dominic
-
-p.s.: sorry about my bad english
 
 
 -------------------------------------------------------
