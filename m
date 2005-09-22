@@ -1,16 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hcid D-Bus patch
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <74d0deb30509220424ef67b06@mail.gmail.com>
+From: pHilipp Zabel <philipp.zabel@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb05092106526cd16196@mail.gmail.com>
-References: <e1effdeb05091607426f824afa@mail.gmail.com>
-	 <1127292701.495.11.camel@localhost.localdomain>
-	 <e1effdeb05092105492fce2ff2@mail.gmail.com>
-	 <9307f5f205092106191197c374@mail.gmail.com>
-	 <e1effdeb05092106526cd16196@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1127398388.5344.20.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] hcid: memory alignment problems on arm
+In-Reply-To: <1127382235.5344.6.camel@blade>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <74d0deb3050921035545e2a33d@mail.gmail.com>
+	 <1127336002.23006.0.camel@blade>
+	 <74d0deb305092202185bd2308b@mail.gmail.com>
+	 <1127381721.5344.4.camel@blade> <1127382235.5344.6.camel@blade>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,33 +21,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 22 Sep 2005 16:13:08 +0200
+Date: Thu, 22 Sep 2005 13:24:31 +0200
 
-Hi Claudio,
+Hi Marcel,
 
-> An ERROR may have any arguments, but if the first argument is a 
-> STRING(error message). Therefore, the signature should be sq (string
-> +uint16).
-> In my opinion the error message string is not relevant, the client
-> applications
-> can use it or not. If we consider internationalization, this string
-> will not
-> the useful.
+> > is the attached patch also working for you? I think it is better to use
+> > the D-Bus specific types.
 
-the Bluetooth status is always uint8_t and I think it is a good idea to
-map these error codes directly. We can define our own codes from 0xff
-onwards if we use a uint16. However we should try to use the Bluetooth
-defined errors whenever possible.
+It does work exactly the same as mine.
+I still don't see pin request messages on the system message bus,
+but  the alignment issues are gone.
 
-A string would be nice, but in generell these are useless. However for
-application that doesn't consider internationalization it will be easy
-for them to display the errors in clear text.
-
-Regards
-
-Marcel
-
-
+thanks
+--
+Philipp
 
 
 -------------------------------------------------------
