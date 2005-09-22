@@ -1,50 +1,41 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Fernando Capitulino <lcapitulino@conectiva.com.br>
+Return-Path: <lcapitulino@conectiva.com.br>
+Date: Thu, 22 Sep 2005 18:06:03 -0300
+From: Luiz Fernando Capitulino <lcapitulino@conectiva.com.br>
+To: marcel@holtmann.org
 Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050922180429.59bfc0ca.lcapitulino@conectiva.com.br>
-References: <20050922180429.59bfc0ca.lcapitulino@conectiva.com.br>
-Content-Type: text/plain
-Message-Id: <1127430722.5557.0.camel@blade>
+Subject: [PATCH 2/2] - Fixes errno overwrite in sdp_connect().
+Message-Id: <20050922180603.6bb82eef.lcapitulino@conectiva.com.br>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: [PATCH 0/2] - Errno overwrite fixes.
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 23 Sep 2005 01:12:02 +0200
-
-Hi Luiz,
-
-> In the next two e-mails I will send two minor fixes for 'errno' overwrite bugs.
-> 
-> [PATCH 1/2] - Fixes errno overwrite in hci_for_each_dev().
-> [PATCH 2/2] - Fixes errno overwrite in sdp_connect().
-> 
-> Didn't test it too mutch, but I hope it helps.
-
-both patches are looked good and I applied them. Thanks.
-
-Regards
-
-Marcel
+Content-Type: text/plain; charset=US-ASCII
+List-ID: <bluez-devel.lists.sourceforge.net>
 
 
+If bind() fails (or connect() in the do-while() fails with EBUSY), the 'errno'
+contents will be overwritten in the 'fail' label.
+
+ src/sdp.c |    3 +++
+ 1 files changed, 3 insertions(+)
 
 
--------------------------------------------------------
-SF.Net email is sponsored by:
-Tame your development challenges with Apache's Geronimo App Server. 
-Download it for free - -and be entered to win a 42" plasma tv or your very
-own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+diff -X /home/lcapitulino/kernels/2.6/dontdiff -Nparu a/src/sdp.c a~/src/sdp.c
+--- a/src/sdp.c	2005-08-07 08:19:58.000000000 -0300
++++ a~/src/sdp.c	2005-09-22 17:39:38.000000000 -0300
+@@ -3160,6 +3160,7 @@ static inline int sdp_is_local(const bda
+ 
+ sdp_session_t *sdp_connect(const bdaddr_t *src, const bdaddr_t *dst, uint32_t flags)
+ {
++	int err;
+ 	sdp_session_t *session = malloc(sizeof(sdp_session_t));
+ 	if (!session)
+ 		return session;
+@@ -3204,8 +3205,10 @@ sdp_session_t *sdp_connect(const bdaddr_
+ 		}
+ 	}
+ fail:
++	err = errno;
+ 	if (session->sock >= 0)
+ 		close(session->sock);
+ 	free(session);
++	errno = err;
+ 	return 0;
+ }
