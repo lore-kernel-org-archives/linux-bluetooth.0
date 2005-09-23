@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4333EA05.7090707@cyph.ath.cx>
-From: Ho Ming Shun <cyph@cyph.ath.cx>
-MIME-Version: 1.0
+From: david <gangchen@mobilesoft.com.cn>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] BCM2035 over UART on the E680I
-References: <432D6F49.80304@cyph.ath.cx>	 <20050919092548.1173.2@@vodafone.es> <1127217202.5168.36.camel@localhost.localdomain>
-In-Reply-To: <1127217202.5168.36.camel@localhost.localdomain>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain
+Message-Id: <1127464121.4035.40.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-devel] power consumption
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,59 +16,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 23 Sep 2005 19:41:57 +0800
+Date: Fri, 23 Sep 2005 16:28:41 +0800
 
-Marcel Holtmann wrote:
+Hi marcel,
 
->Hi guys,
->
->  
->
->>>Is this a sign that the chip is somehow configured wrongly?
->>>      
->>>
->>Looks like, but I fear its too late for the the device. Would help a lot if 
->>it can take again a valid BD_ADDR. The HCI_USB driver behaves different for 
->>this device it casts a reset hci command on it, before the intialitation 
->>commands. May there is a point to look at but you are talking over UART...
->>    
->>
->
->if it is a ROM chip, you may need to call HCI_Reset to establish the new
->configuration. For the hci_uart driver you can load it with "reset=1" to
->tell the Bluetooth core to always send a reset command first.
->  
->
-I've looked through bluez sources for 2.6.12 and found the "reset" 
-parameter in the hci_uart driver. However, I need to use the MontaVista 
-kernel on this phone. Nevertheless I have modified hci_uart driver to 
-set the appropriate quirks flag, and verified with hcidump that it sent 
-a reset on "hciconfig up". However this still does not work.
+The host send HCILL_GO_TO_SLEEP_IND commdand which is HCI
+Vendor-Specific Command to let bluetooth device(BRF6100) go to sleep
+through hcitool cmd. The bluetooth device will send
+HCILL_GO_TO_SLEEP_ACK to the host before it goes to sleep. The question
+is that where should I listen the response of bluetooth device.
 
-The phone's native stack though, still works fine. Unlike bluez, it does 
-not read the the BD_ADDR from the chip, which makes sense because it 
-programs the address into the chip...
 
->Regards
->
->Marcel
->
->
->
->
->-------------------------------------------------------
->SF.Net email is sponsored by:
->Tame your development challenges with Apache's Geronimo App Server. 
->Download it for free - -and be entered to win a 42" plasma tv or your very
->own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->  
->
+Regards,
 
+david
+
+ >Hi David,
+ 
+ > > Does anybody use BRF6100 chip on the phone? I have read "BRF6100
+ > > singel-chip bluetooth RF device" date sheet to get the method of doing
+ > > power management. It tells me that I can use the HCI command to take the
+ > > BRF6100 from wake up to deep sleep.  It seems that the date sheet
+ > > doesn't tell me how to turn off/on the BRF6100(Is this called
+ > > power-down/on mode?). I wonder to know what do ioctl(ctl, HCIDEVUP,
+ > > hdev)) and ioctl(ctl, HCIDEVDOWN, hdev) do in bluez hcitool.c? Can it
+ > > turn BRF6100 on or off? If yes, is the menu "bluetooth on/off" in
+ > > mobilephone means that the power of BRF6100 is turned on/off?
+ 
+ > the BRF6100 is a ROM chip, right? We need a special init routine for it
+ > and the last code I've seen was a mess, because it was Windows code.
+ > This needs a rewrite and I am only doing this if someone sends me a
+ > development kit with that I can test it. The other possibility is that
+ > someone cleans the code and sends me a patch for it.
+ 
+ > If you need special support, then tell TI to open their documents and
+ > sponsor the BlueZ project with hardware. Or choose a chip manufacturer
+ > that is more open source friendly. For example CSR.
+ 
+ > Regards
+ 
+ > Marcel
+ 
 
 
 -------------------------------------------------------
