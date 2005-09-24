@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <8441772.1127557236734.JavaMail.Administrator@appsrv>
-From: Ivy <ivy@cashette.com>
+Message-ID: <4335003A.6000400@cyph.ath.cx>
+From: Ho Ming Shun <cyph@cyph.ath.cx>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Voice setting for U-law and A-law.
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Bluez-devel] BCM2035 over UART on the E680I
+References: <432D6F49.80304@cyph.ath.cx>	 <20050919092548.1173.2@@vodafone.es>	 <1127217202.5168.36.camel@localhost.localdomain>	 <4333EA05.7090707@cyph.ath.cx>	 <1127483592.5623.5.camel@localhost.localdomain>	 <4333FE27.1050909@cyph.ath.cx> <1127485700.5623.8.camel@localhost.localdomain>
+In-Reply-To: <1127485700.5623.8.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,59 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 24 Sep 2005 03:20:36 -0700 (PDT)
+Date: Sat, 24 Sep 2005 15:28:58 +0800
 
-Hi Marcel,
+Hi,
 
-            Thanks for your information. I wentthrought the Documentation and our Mailing list.. Please bare with me for asking this silly questions .... Still i m confused about INPUT Data Format,INput sample size and PCM BIT POSITION. Please correct me if i am wrong. I HAVE choosen in the following way.. (Right now my usb driver claimed 2nd alternate setting (isoc=2). i.e One voice connection with 16 Bit encoding & 2 Voice connection with 8 Bit encoding . 
-              
-          0101101000 = 0x168 
+I just did an interesting experiment:
 
- Bitwise that"s:
- 
-   xxxxxx01xxxxxxxx Input Coding: u-law
-   xxxxxxxx01xxxxxx Input Data Format: 2"s complement ( what is the advantage of 2's complement that 1's com ?). 
-   xxxxxxxxxx1xxxxx Input Sample Size: 16 bit   ( Can i use 8 bit ?) (what does it  mean "ONly FOR Linear PCM in Documentation ?).
-   xxxxxxxxxxx010xx # of bits padding at MSB: 2 (if i use 16 Bit, 2bit's of MSB is needed for padding, coz only 14bits are enough for u-law)
-   xxxxxxxxxxxxxx00 Air Coding Format: CVSD
+After the phone's native stack was initialized, I killed off all 
+processes. Then I did a hciattach to ttyS1, followed by "hciconfig hci0 
+up". The BD_ADDR still shows 00:00:00:00:00:00.
 
-
-Expecting your valuable reply
-
-Thanks
--ivy
-
-
-
-
-
---- Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi,
-> 
-> >             I am trying to change the input Encoding of Voice setting using hciconfig tool. Default voice setting 0x60, supports Linear pcm ( I guess i am newbie if any thing wrong please correct me) .. I would like to change setting to u-law or a-law. I have assigned voice setting value as 0x100 for u-law  i am not sure, it is correct or not ?.. Could any one help me to set it correctly...  
-> 
-> check the mailing list archive, because it was explained in detail some
-> time ago and of course the specification is a good information source.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> SF.Net email is sponsored by:
-> Tame your development challenges with Apache's Geronimo App Server. 
-> Download it for free - -and be entered to win a 42" plasma tv or your very
-> own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-__________________________
-Free 3000MB email. Stops spam 100%. No banner ads. No popup ads. http://www.cashette.com
+It seems that the chip can still operate with READ_BD_ADDR returning 
+00:00:00:00:00:00. The phone's stack though already knows the BD_ADDR 
+through some other means (which I have not discovered).
 
 
 -------------------------------------------------------
