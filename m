@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Andreas Beck <becka-bzdvl@bedatec.de>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <10232381.1127560888625.JavaMail.Administrator@appsrv>
+From: Ivy <ivy@cashette.com>
+To: bluez-devel@lists.sourceforge.net, bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Voice setting for U-law and A-law.
-Message-ID: <20050924113216.GB5529@uni-duesseldorf.de>
-References: <10232381.1127560888625.JavaMail.Administrator@appsrv>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <10232381.1127560888625.JavaMail.Administrator@appsrv>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,45 +16,79 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 24 Sep 2005 13:32:16 +0200
+Date: Sat, 24 Sep 2005 04:21:28 -0700 (PDT)
 
-Ivy <ivy@cashette.com> wrote:
-> > >  xxxxxxxxxx1xxxxx Input Sample Size: 16 bit   (Can i use 8 bit ?) 
-> > IMHO you should, if you want alaw/ulaw.
-> You meant to use 16 Bit or 8 bit ?..
+--- Andreas Beck <becka-bzdvl@bedatec.de> wrote:
+> Ivy <ivy@cashette.com> wrote:
+> 
+> >    xxxxxx01xxxxxxxx Input Coding: u-law 
+> >    xxxxxxxx01xxxxxx Input Data Format: 2"s complement 
+> > ( what is the advantage of 2's complement that 1's com ?).
+> 
+> Actually I don't think this makes sense for ulaw/alaw, as AFAIK these
+> are always 8 bit, as they were designed for telephony channels (ISDN)
+> that operate at 64kbit, thus giving 8kSamples/s at 8 bit.
+> 
+> The alaw/ulaw encoding gives a somewhat logarithmic scale which gives
+> better dynamic range at the expense of small details the human ear
+> doesn't recognize well anyway.
+> 
+> For linear, the difference is in the coding of negative numbers.
+> 1s complement will code negative numbers as their positive equivalent 
+> XOR 0xffff (i.e. a word with all-one bits). This is a rater uncommon
+> coding scheme. It has the odditiy of having a +0 (0x0000) and a 
+> -0 (0xffff). 2s complement will add 1 after the above step, which 
+> has the advantage of simple handling of arithmetic operations with
+> common ALUs designed for unsigned numbers. It just works - only thing
+> you have to adjust is handling of overflow flags.
+> Another advantage is a slightly increased range of values (-32768 to
+> 32767 at 16 bit as compared to -32767 to 32767 at 1s complement)
+> at the expense of an asymmetric value range.
+> 
+> >  xxxxxxxxxx1xxxxx Input Sample Size: 16 bit   (Can i use 8 bit ?) 
+> 
+> IMHO you should, if you want alaw/ulaw.
 
-8 bit.
+              You meant to use 16 Bit or 8 bit ?..
 
-> > > xxxxxxxxxxx010xx # of bits padding at MSB: 2 (if i use 16 Bit, 
-> > > 2bit's of MSB is needed for padding, coz only 14bits are enough 
-> > > for u-law) 
-> > AFAIK 8 bits are enough - could you explain?
-> U-LAW takes 14bits of linear PCM data as input and generates 8 bit 
-> compressed data. Am i correct ?
+> 
+> >  (what does it  mean "ONly FOR Linear PCM in Documentation ?).  
+> 
+> I suppose these bits get ignored for formats other than linear PCM, as
+> ulaw/alaw are inherently 8 bits.
 
-Yes. That is correct.
+> 
+> > xxxxxxxxxxx010xx # of bits padding at MSB: 2 (if i use 16 Bit, 
+> > 2bit's of MSB is needed for padding, coz only 14bits are enough 
+> > for u-law) 
+> 
+> AFAIK 8 bits are enough - could you explain?
 
-> Thatswhy i assume that it needs 16 bits for INPUT Sample size and 
-> 2 bit offset in MSB position. 
+              U-LAW takes 14bits of linear PCM data as input and generates 8 bit compressed data. Am i correct ?.. Please correct me if i m wrong !!.. Thatswhy i assume that it needs 16 bits for INPUT Sample size and 2 bit offset in MSB position. 
 
-No - I suppose this is a misunderstanding about "input".
+> 
+> 
+> CU, Andy
 
-The SCM link via bluetooth uses its own encoding anyway (see the 
-comment about on air coding at the end of the list).
+-ivy 
 
-INPUT means what you feed in/get out at the driver side.
+> 
+> -- 
+> = Andreas Beck                    |  Email :  <becka-sig@bedatec.de>         =
+> 
+> 
+> -------------------------------------------------------
+> SF.Net email is sponsored by:
+> Tame your development challenges with Apache's Geronimo App Server. 
+> Download it for free - -and be entered to win a 42" plasma tv or your very
+> own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-That is, if you choose alaw, you already feed alaw data.
-
-Otherwise you could just use linear anyway. There would be no use in
-converting to alaw first and then again to the air coding format.
-
-Basically you will want to use alaw/ulaw, if you want to feed the
-received data directly into a device that wants this data format anyway,
-saving unnecessary conversions.
-
-
-CU, ANdy
+__________________________
+Free 3000MB email. Stops spam 100%. No banner ads. No popup ads. http://www.cashette.com
 
 
 -------------------------------------------------------
