@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <9c68c0a70509252034438c4857@mail.gmail.com>
-From: liang liping <lianglip@gmail.com>
+From: Robert Siemer <Robert.Siemer@backsla.sh>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] dund question
+Subject: Re: [Bluez-users] Wacom Graphire Bluetooth  problems
+Message-ID: <20050925165458.GC8683@polar.elf12.net>
+References: <20050924200358.GJ28437@polar.elf12.net> <1127644165.6362.0.camel@localhost.localdomain> <20050925123425.GA8683@polar.elf12.net> <1127661017.6362.9.camel@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1127661017.6362.9.camel@localhost.localdomain>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,16 +18,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 26 Sep 2005 11:34:14 +0800
+Date: Sun, 25 Sep 2005 18:54:58 +0200
 
-Hi
+> > I'm using debian and it's kernel-making tool but the latest prepared
+> > kernel was 2.6.12.  I patched it with 2.6.12-mh3. There does not seem
+> > to be much Bluetooth/HID related changes between it and 2.6.13 with
+> > patch. - Am I wrong?
+> 
+> yes, you are.
 
-I have a question about dund.
-My usb bluetooth can't support multi connection via dund
-acting as a server.
- I want to know if two other bluetooth device
-connect to  a server via dund, if there are ppp0 and ppp1 or
-only  ppp0 at the server side?
+Hey, that answer was to short... (-:  I found no changelog for the 2.6
+kernel series patches and I compared the patch 2.6.12-mh3 with the
+2.6.13 one (with my two human eyes). - What changed so dramatically?
+
+> > Other question: does BlueZ support HID get/set report feature?? How to
+> > interface it?
+> 
+> Not really at the moment. They will come with generic HID driver sometime
+> in the future.
+
+The Wacom Graphire Bluetooth needs it...  Where is the driving force
+behind a generic HID driver? Here or more with the USB guys? <-:
+I fear that it will take some six month or longer. - I will probably dig
+into the HID bluetooth code to get the Wacom working ...
+... and do some adaptions when the generic driver arises.
+
+Any ideas?
+
+
+
+Thanks,
+		Robert
+
 
 
 -------------------------------------------------------
