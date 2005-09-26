@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] a2dp alsa-lib plugin
+Subject: Re: [Bluez-devel] Control of radiated power
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43378A70.3000005@xmission.com>
-References: <43378A70.3000005@xmission.com>
-Content-Type: text/plain
-Message-Id: <1127726423.6163.12.camel@localhost.localdomain>
+In-Reply-To: <20050926074704.43DF81EAFC1@mrelay1.st2.lyceu.net>
+References: <20050926074704.43DF81EAFC1@mrelay1.st2.lyceu.net>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1127726332.6163.9.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,27 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 26 Sep 2005 11:20:23 +0200
+Date: Mon, 26 Sep 2005 11:18:51 +0200
 
-Hi Brad,
+Hi Esther,
 
-> I have been looking at the plugin in bluez-utils cvs. Is it working for 
-> you over rfcomm? (I don't have a headset that supports the rfcomm sbc 
-> stream any more...)
+> Just a fast question=E2=80=A6 Is there any software way (using BlueZ) f=
+or
+> controlling the radiated power and setting it to a desired value? I
+> have been investigating and having found anything
 
-this is only, because I was too lazy to cleanup the AVDTP code and
-finally commit it.
-
-> Do you want to keep rfcomm transport as an option?
-
-It is an option, but I think it is not really needed. However it is good
-for testing some stuff.
-
-> Sadly, it looks like the dmix plugin won't give multiple apps access to 
-> a plugin. The fact that it uses IPC was encouraging, so maybe it will 
-> work some day.
-
-I haven't looked at the ALSA part for some time now. So I have no clue.
+not according to the Bluetooth HCI specification. You need to find a
+vendor specific command for that. Ask you chip or dongle manufacturer.
 
 Regards
 
