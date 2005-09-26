@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <9c68c0a70509252019610067c4@mail.gmail.com>
+Message-ID: <9c68c0a70509252034438c4857@mail.gmail.com>
 From: liang liping <lianglip@gmail.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Re:PAN and DHCP
+Subject: [Bluez-users] dund question
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,26 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 26 Sep 2005 11:19:12 +0800
+Date: Mon, 26 Sep 2005 11:34:14 +0800
 
 Hi
 
-Thank you for your reply.
-The bridge works well.
-
-I added
-
-brctl addif pan0 $1
-ifconfig $1 0.0.0.0
-
-to the /etc/bluetooth/pan/dev-up
-
-and do some initialization about the bridge
-
-brctl addbr pan0
-ifconfig pan0 10.0.0.1 up
-brctl setfd pan0 0
-brctl stp pan0 off
+I have a question about dund.
+My usb bluetooth can't support multi connection via dund
+acting as a server.
+ I want to know if two other bluetooth device
+connect to  a server via dund, if there are ppp0 and ppp1 or
+only  ppp0 at the server side?
 
 
 -------------------------------------------------------
