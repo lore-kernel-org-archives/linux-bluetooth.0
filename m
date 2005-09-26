@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Robert Siemer <Robert.Siemer@backsla.sh>
+Subject: Re: [Bluez-users] PC can't receive files from SE K750i
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Wacom Graphire Bluetooth  problems
-Message-ID: <20050926113225.GA19843@polar.elf12.net>
-References: <20050924200358.GJ28437@polar.elf12.net> <1127644165.6362.0.camel@localhost.localdomain> <20050925123425.GA8683@polar.elf12.net> <1127661017.6362.9.camel@localhost.localdomain> <20050925165458.GC8683@polar.elf12.net> <1127726670.6163.18.camel@localhost.localdomain>
+In-Reply-To: <363732598@web.de>
+References: <363732598@web.de>
+Content-Type: text/plain
+Message-Id: <1127726723.6163.20.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1127726670.6163.18.camel@localhost.localdomain>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,55 +18,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 26 Sep 2005 13:32:25 +0200
+Date: Mon, 26 Sep 2005 11:25:23 +0200
 
-> > > > I'm using debian and it's kernel-making tool but the latest prepared
-> > > > kernel was 2.6.12.  I patched it with 2.6.12-mh3. There does not seem
-> > > > to be much Bluetooth/HID related changes between it and 2.6.13 with
-> > > > patch. - Am I wrong?
-> > > 
-> > > yes, you are.
-> > 
-> > Hey, that answer was to short... (-:  I found no changelog for the 2.6
-> > kernel series patches and I compared the patch 2.6.12-mh3 with the
-> > 2.6.13 one (with my two human eyes). - What changed so dramatically?
+Hi Dominic,
+
+> i've got an ACER bluetooth-dongle and a Sony Ericsson K750i mobilephone.
+> All things i write, i've tried with Debian.
 > 
-> the -mh patches contain a specific version for the hidp driver with
-> report protocol support that is not mainline. It will also never get
-> into mainline, because the solution is the generic HID driver.
-
-Aehm, sorry for being unclear, my question was: Where
-are the huge differences between
-2.6.12-mh3 and
-2.6.13-mh1
-
-A new question: Do I see it right that there are at the moment two HID
-interpreter in a patched kernel: one for USB and one for Bluetooth? Are
-there already differences between them? (Why? Which?)
-
-> > Where is the driving force
-> > behind a generic HID driver? Here or more with the USB guys? <-:
-> > I fear that it will take some six month or longer. - I will probably dig
-> > into the HID bluetooth code to get the Wacom working ...
-> > ... and do some adaptions when the generic driver arises.
+> 1. I startet the dongle with "hciconfig hci up"
 > 
-> I think the force for that have to be driven by me. We all agreed on how
-> this should be done, but there are some things pending that I like to
-> see merged first mainline (subclass support and sysfs integration)
-> before I look at it again.
+> 2. I search my phone with "hcitool search" --> I found it
+> 
+> 3. I used "sdptool browse (MAC of the phone)" to get the OBEX push channel. --> channel is 5
+> 
+> 4. "sdptool add --channel=5 OPUSH"
+> 
+> 5. I started "obexserver"
+> 
+> now the PC is waiting for incoming files
+> 
+> the first problem: my mobile phone doesn't find my PC
+> problem fixed: I changed the line "0x100;" in "/etc/bluetooth/hci.conf" to "0x100100;" i read in an Ubuntu-forum. 
+> no my phone finds the PC
+> 
+> but the 2nd problem:
+> when I try to send an image to my PC an error appears "connection refused"
 
-Hm... Would you approve some HID hacking on your -mh patches for the
-meantime? I'm also interested in a generic HID driver but don't want to
-stand still until it appears. - Later joining wanted.
+include the output of "hcidump -X -V" for that problem.
 
-> Check the mailing list archive for comments about that.
+Regards
 
-What search keywords do you recommend?
+Marcel
 
 
-
-Bye,
-	Robert
 
 
 -------------------------------------------------------
