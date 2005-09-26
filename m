@@ -1,172 +1,88 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Esther Lopez" <esther.lopez@erzia.com>
-To: <bluez-devel@lists.sourceforge.net>
+Return-Path: <linux-usb-devel-admin@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_001C_01C5C27F.60857000"
-Message-Id: <20050926074704.43DF81EAFC1@mrelay1.st2.lyceu.net>
-Subject: [Bluez-devel] Control of radiated power
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 26 Sep 2005 09:47:57 +0200
-
-This is a multi-part message in MIME format.
-
-------=_NextPart_000_001C_01C5C27F.60857000
 Content-Type: text/plain;
 	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Subject: RE: [linux-usb-devel] Re: [Bluez-devel] problem in linux 2.6.9-11
+Message-ID: <7BCD17BB75C4464D866EB5A20D5E889E988098@HYD-MKD-MBX01.wipro.com>
+From: <rao.shalini@wipro.com>
+To: <hadess@hadess.net>, <bluez-devel@lists.sourceforge.net>
+Cc: <linux-usb-devel@lists.sourceforge.net>
+Sender: linux-usb-devel-admin@lists.sourceforge.net
+Errors-To: linux-usb-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/linux-usb-devel>,
+	<mailto:linux-usb-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Post: <mailto:linux-usb-devel@lists.sourceforge.net>
+List-Help: <mailto:linux-usb-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/linux-usb-devel>,
+	<mailto:linux-usb-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=linux-usb-devel>
+Date: Mon, 26 Sep 2005 12:19:16 +0530
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hello you all!!
+Hi Bastien=20
 
- 
-
-Just a fast question. Is there any software way (using BlueZ) for
-controlling the radiated power and setting it to a desired value? I have
-been investigating and having found anything
-
- 
-
-Thanks and Regards
-
- 
-
-Esther
+Thank you your suggestions.
 
 
-------=_NextPart_000_001C_01C5C27F.60857000
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Regards,
+Shalini G
 
-<html>
+-----Original Message-----
+From: linux-usb-devel-admin@lists.sourceforge.net
+[mailto:linux-usb-devel-admin@lists.sourceforge.net] On Behalf Of
+Bastien Nocera
+Sent: Sunday, September 25, 2005 5:50 PM
+To: bluez-devel@lists.sourceforge.net
+Cc: linux-usb-devel@lists.sourceforge.net
+Subject: [linux-usb-devel] Re: [Bluez-devel] problem in linux 2.6.9-11
 
-<head>
-<meta http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dus-ascii">
-<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered)">
-<style>
-<!--
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0cm;
-	margin-bottom:.0001pt;
-	font-size:11.0pt;
-	font-family:Arial;}
-h1
-	{margin-top:9.0pt;
-	margin-right:0cm;
-	margin-bottom:6.0pt;
-	margin-left:39.6pt;
-	text-align:justify;
-	text-indent:-21.6pt;
-	page-break-after:avoid;
-	font-size:16.0pt;
-	font-family:Arial;}
-h2
-	{margin-top:6.0pt;
-	margin-right:0cm;
-	margin-bottom:6.0pt;
-	margin-left:46.8pt;
-	text-align:justify;
-	text-indent:-28.8pt;
-	page-break-after:avoid;
-	font-size:14.0pt;
-	font-family:Arial;
-	font-style:italic;}
-h3
-	{margin-top:12.0pt;
-	margin-right:0cm;
-	margin-bottom:3.0pt;
-	margin-left:54.0pt;
-	text-indent:-36.0pt;
-	page-break-after:avoid;
-	font-size:13.0pt;
-	font-family:Arial;}
-a:link, span.MsoHyperlink
-	{color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{color:purple;
-	text-decoration:underline;}
-span.EstiloCorreo17
-	{font-family:Arial;
-	color:windowtext;}
-@page Section1
-	{size:21.0cm 841.95pt;
-	margin:70.9pt 3.0cm 70.9pt 3.0cm;}
-div.Section1
-	{page:Section1;}
- /* List Definitions */
- ol
-	{margin-bottom:0cm;}
-ul
-	{margin-bottom:0cm;}
--->
-</style>
+On Sun, 2005-09-25 at 16:21 +0530, rao.shalini@wipro.com wrote:
+> Hi,
+<snip>
+> One more observation on usbserial module which is working fine with
+> linux kernel 2.6.5-11, whereas with kernel 2.6.9-11 is giving kernel
+> panic for disconnect function.=20
 
-</head>
+The kernel versions would be 2.6.9-5.EL and 2.6.9-11.EL. So you have a
+regression between 2 versions of the RHEL4 kernel.
 
-<body lang=3DES link=3Dblue vlink=3Dpurple>
+I think you might be seeing this bug with Bluetooth:
+https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=3D161314
 
-<div class=3DSection1>
+Which is a deadlock while pairing. It's already fixed in the beta kernel
+for RHEL4 U2 (available on RHN). As for the panic on disconnect, there
+are also a bunch of USB serial related fixes in RHEL4 U2 beta.
 
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt'>Hello
-you all!!</span></font></p>
+Next time you see regressions in Red Hat kernels, contact the Red Hat
+support. They're much better equipped than the community to answer this
+sort of questions.
 
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt'>&nbsp;</span></font></p>
+Cheers
 
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>Just a fast question&#8230; Is there any software way (using =
-BlueZ) for
-controlling the radiated power and setting it to a desired value? I have =
-been
-investigating and having found anything</span></font></p>
+---
+Bastien Nocera <hadess@hadess.net>=20
 
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>Thanks and Regards</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>Esther</span></font></p>
-
-</div>
-
-</body>
-
-</html>
-
-------=_NextPart_000_001C_01C5C27F.60857000--
 
 
 
 -------------------------------------------------------
 SF.Net email is sponsored by:
-Tame your development challenges with Apache's Geronimo App Server. 
-Download it for free - -and be entered to win a 42" plasma tv or your very
-own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
+Tame your development challenges with Apache's Geronimo App Server.
+Download
+it for free - -and be entered to win a 42" plasma tv or your very own
+Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+linux-usb-devel@lists.sourceforge.net
+To unsubscribe, use the last form field at:
+https://lists.sourceforge.net/lists/listinfo/linux-usb-devel
+
+
+-------------------------------------------------------
+SF.Net email is sponsored by:
+Tame your development challenges with Apache's Geronimo App Server. Download
+it for free - -and be entered to win a 42" plasma tv or your very own
+Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
+_______________________________________________
+linux-usb-devel@lists.sourceforge.net
+To unsubscribe, use the last form field at:
+https://lists.sourceforge.net/lists/listinfo/linux-usb-devel
