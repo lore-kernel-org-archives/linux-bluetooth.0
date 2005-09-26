@@ -1,11 +1,21 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb05092607273355fded@mail.gmail.com>
+Message-ID: <e1effdeb05092604597481f1a9@mail.gmail.com>
 From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] hcid D-Bus patch(Error Messages)
+Subject: Re: [Bluez-devel] hcid D-Bus patch
+In-Reply-To: <1127644396.6362.6.camel@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_2219_11917895.1127744835678"
+	boundary="----=_Part_1348_21614191.1127735947095"
+References: <e1effdeb05091607426f824afa@mail.gmail.com>
+	 <1127292701.495.11.camel@localhost.localdomain>
+	 <e1effdeb05092105492fce2ff2@mail.gmail.com>
+	 <1127398647.5344.24.camel@blade>
+	 <e1effdeb05092209516bbcb31a@mail.gmail.com>
+	 <1127411650.12287.15.camel@blade>
+	 <e1effdeb05092307283e73c546@mail.gmail.com>
+	 <e1effdeb050923101567fd59d4@mail.gmail.com>
+	 <1127644396.6362.6.camel@localhost.localdomain>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,109 +27,99 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 26 Sep 2005 11:27:15 -0300
+Date: Mon, 26 Sep 2005 08:59:07 -0300
 
-------=_Part_2219_11917895.1127744835678
+------=_Part_1348_21614191.1127735947095
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
 Hi Marcel,
 
-Returning to error messages discussion. Some common errors like EIO(5), and
-ENODEV(19) will conflict with Bluetooth failure error codes.
-We have three possible solutions:
+Define clear object paths and interfaces will make easier define rules in
+the D-Bus configuration file. In this file it's possible specify the
+permissions for send and receive messages based on the interfaces, paths an=
+d
+users/groups.
 
-1. Define different error names. Like:
-- org.bluez.HCIError signature: sq(string+uint16)
-- org.bluez.DBusError signature: sq(string+uint16)
-- org.bluez.SystemError signature: sq(string+uint32)
-- org.bluez.ENoMemory(is it necessary? There isn't system code to indicate
-it, but
-we can consider it as a DBusError because it will be triggered by D-Bus
-message
-allocation)
+Based on your comment I suggested the paths and interfaces. Defining this
+structure it's possible allow only the "root" or a "bluez manager"
+user/group change the adapter settings.
 
-2. Use error ranges
-Define only one error message name(org.bluez.EFailed), signature: sq
-- 0x0000 - 0x00FF Bluetooth error codes
-- 0x0100 - 0x01FF D-Bus errors
-- 0x0200 - 0x02FF System errors (0x0200 + system error value)
-- 0x0300 - 0xFFFF reserved to future error classes
 
-3. Use an extra parameter in the message to indicates the class
-Define only one error message name(org.bluez.EFailed), signature: sqq.
-But you didn't like this approach.
+SERVICE BUS NAME: org.bluez
 
-Please choose one of this alternative to finish this discussion. According
-with the last email about errors, you suggested the second approach. But, d=
-o
-you
-agree with this way of handle system errors?
+<=3D=3D=3D=3D=3D=3D=3D Device =3D=3D=3D=3D=3D=3D>
+description: device specific configuration services. eg: (#1)display local
+devices, inqmode, inqtype, up, down, reset, auth, noauth, encrypt, ...
+
+object path: /org/bluez/Device
+interface: /org/bluez/Device
+
+<=3D=3D=3D=3D=3D=3D=3D Manager =3D=3D=3D=3D=3D=3D>
+description: connection services. eg: inquiry, remote name, info,
+master/slave role switch, active connecions and profile specific tasks.
+Multiple local adapters scenario will be considered. The default object pat=
+h
+and the adapter specific paths will provide the same services.
+
+/***** HCI ******/
+default object path:/org/bluez/Manager/hci (will use the default device in
+the kernel)
+object path: /org/bluez/Manager/hci0/hci
+object path: /org/bluez/Manager/hci1/hci
+interface: org.bluez.Manager.hci
+
+/***** SDP ******/
+default object path:/org/bluez/Manager/sdp
+object path: /org/bluez/Manager/hci0/sdp
+object path: /org/bluez/Manager/hci1/sdp
+interface: org.bluez.Manager.sdp
+
+/***** PAN ******/
+default object path:/org/bluez/Manager/pan
+object path: /org/bluez/Manager/hci0/pan
+object path: /org/bluez/Manager/hci1/pan
+interface: org.bluez.Manager.pan
+
+/***** RFCOMM ******/
+default object path:/org/bluez/Manager/rfcomm
+object path: /org/bluez/Manager/hci0/rfcomm
+object path: /org/bluez/Manager/hci1/rfcomm
+interface: org.bluez.Manager.rfcomm
+
+...
+(#1) Probably the display local devices should be moved to other path due
+the permissions that I comment before. User applications should be able lis=
+t
+the local adapters to use in the pan, rfcomm, sdp ...
+
+
+For me, your suggestion or my last suggestion are fine, both can address th=
+e
+permissions. You have the decision in your hands! :)
+
 
 Regards,
-Claudio.
+Claudio
 
-On 9/22/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+On 9/25/05, Marcel Holtmann <marcel@holtmann.org> wrote:
 >
 > Hi Claudio,
 >
-> > Regarding the shared code I will analize the shared functions
-> > and move to the common directory.
-> >
-> >
-> > The D-Bus error is a message created based on a received message.
-> > There are 4 message types:
-> > 1. method call message
-> > 2. method reply message
-> > 3. error message
-> > 4. signal
-> >
-> > First of all you have to understand the difference bus name, path and
-> > interface. Read
-> > http://dbus.freedesktop.org/doc/dbus-faq.html#id2778454
-> > for more information. There is a FAQ with this topic.
+> > Sorry, but the last patch(hcid_dbus_0007.patch) was not
+> > based on the latest CVS version.
 >
-> this is one of my basic problems with D-Bus and object oriented
-> programming in general. They try to abstract and solve everything and
-> this is not working. The reality is always different. We now need to
-> find a way to make it usable in a sane way.
->
-> > After this discussion I would suggest the following structure:
-> >
-> > >>> Message Error Names:
-> > org.bluez.EFailed
-> > org.bluez.ENoMemory
-> > /* open to more error names */
-> >
-> > >>>org.bluez.EFailed
-> > This error message will have the signature(string+uint16+uint32).
-> > Where the first argument is the error description. The second is
-> > the error class and the third is the error code.
-> > The error class can be system error, D-Bus error or HCI errors.
-> > This structure mane possible return to the app clients any kind of
-> > error. System error includes socket error, IO, ENODEV... D-Bus error
-> > includes no service, no connection, security error and no method
-> > found.
-> > HCI errors are listed in the bluetooth specification.
->
-> We have three different categories of errors. The Bluetooth errors
-> defined in the specification. They are the same for the complete HCI.
-> Then we have the Unix/Linux error codes (errno) and we will have
-> additional codes defined by us. I don't like the idea of splitting the
-> errors into classes. This is confusing and not a nice API. We should
-> choose a base for the errors and these should be the Bluetooth error
-> codes defined in the HCI part specification. So for my point of view an
-> error org.bluez.error with string+uint16 is enough. The range 0x00-0xff
-> will be used by the Bluetooth errors and we define the rest for specific
-> errors that are currently not covered by the specification. This means
-> we have to match the Unix/Linux error codes somehow, but I don't see any
-> problems with that.
+> I realized that yesterday, but I am in Prague now for the UnPlugFest and
+> haven't had Internet access for two days. The patch looks good and I
+> think we now have a nice and clean base to start with. However there are
+> some names I like to change. For example using org.bluez.Device for all
+> device specific configuration, like name changes. And org.bluez.Manager
+> for Inquiry stuff etc. Do you think that makes sense?
 >
 > Regards
 >
 > Marcel
->
 >
 >
 >
@@ -136,96 +136,94 @@ y
 > https://lists.sourceforge.net/lists/listinfo/bluez-devel
 >
 
-------=_Part_2219_11917895.1127744835678
+------=_Part_1348_21614191.1127735947095
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
 Hi Marcel,<br>
 <br>
-Returning to error messages discussion. Some common errors like EIO(5), and=
+Define clear object paths and interfaces will make easier define rules
+in the D-Bus configuration file. In this file it's possible specify the
+permissions for send and receive messages based on the interfaces,
+paths and users/groups.<br>
 <br>
-ENODEV(19) will conflict with Bluetooth failure error codes. <br>
-We have three possible solutions:<br>
+Based on your comment I suggested the paths and interfaces. Defining
+this structure it's possible allow only the &quot;root&quot; or a &quot;blu=
+ez manager&quot;
+user/group change the adapter settings.<br>
 <br>
-1. Define different error names. Like: <br>
-&nbsp;&nbsp; - org.bluez.HCIError signature: sq(string+uint16) <br>
-&nbsp;&nbsp; - org.bluez.DBusError signature: sq(string+uint16)<br>
-&nbsp;&nbsp; - org.bluez.SystemError signature: sq(string+uint32)<br>
-&nbsp;&nbsp; - org.bluez.ENoMemory(is it necessary? There isn't system code=
- to indicate it, but <br>
-&nbsp;&nbsp;&nbsp;&nbsp; we can consider it as a DBusError because it will =
-be triggered by D-Bus message <br>
-&nbsp;&nbsp;&nbsp;&nbsp; allocation)<br>
 <br>
-2. Use error ranges<br>
-&nbsp;&nbsp; Define only one error message name(org.bluez.EFailed), signatu=
-re: sq<br>
-&nbsp;&nbsp; - 0x0000 - 0x00FF Bluetooth error codes<br>
-&nbsp;&nbsp; - 0x0100 - 0x01FF D-Bus errors<br>
-&nbsp;&nbsp; - 0x0200 - 0x02FF System errors (0x0200 + system error value)<=
-br>
-&nbsp;&nbsp; - 0x0300 - 0xFFFF reserved to future error classes<br>
+SERVICE BUS NAME: org.bluez<br>
 <br>
-3. Use an extra parameter in the message to indicates the class<br>
-&nbsp;&nbsp; Define only one error message name(org.bluez.EFailed), signatu=
-re: sqq.<br>
-&nbsp;&nbsp; But you didn't like this approach.<br>
+&lt;=3D=3D=3D=3D=3D=3D=3D Device =3D=3D=3D=3D=3D=3D&gt;<br>
+description: device specific configuration services. eg: (#1)display
+local devices, inqmode, inqtype, up, down, reset, auth, noauth,
+encrypt, ...<br>
 <br>
-Please choose one of this alternative to finish this discussion. According =
+object path: /org/bluez/Device<br>
+interface: /org/bluez/Device<br>
 <br>
-with the last email about errors, you suggested the second approach. But, d=
-o you <br>
-agree with this way of handle system errors?<br>
+&lt;=3D=3D=3D=3D=3D=3D=3D Manager =3D=3D=3D=3D=3D=3D&gt;<br>
+description: connection services. eg: inquiry, remote name, info,
+master/slave role switch, active connecions and profile specific tasks.<br>
+Multiple local adapters scenario will be considered. The default object
+path and the adapter specific paths will provide the same services.<br>
+<br>
+/***** HCI ******/<br>
+default object path:/org/bluez/Manager/hci (will use the default device in =
+the kernel)<br>
+object path: /org/bluez/Manager/hci0/hci<br>
+object path: /org/bluez/Manager/hci1/hci<br>
+interface: org.bluez.Manager.hci<br>
+<br>
+/***** SDP ******/<br>
+default object path:/org/bluez/Manager/sdp<br>
+object path: /org/bluez/Manager/hci0/sdp<br>
+object path: /org/bluez/Manager/hci1/sdp<br>
+interface: org.bluez.Manager.sdp<br>
+<br>
+/***** PAN ******/<br>
+default object path:/org/bluez/Manager/pan<br>
+object path: /org/bluez/Manager/hci0/pan<br>
+object path: /org/bluez/Manager/hci1/pan<br>
+interface: org.bluez.Manager.pan<br>
+<br>
+/***** RFCOMM ******/<br>
+default object path:/org/bluez/Manager/rfcomm<br>
+object path: /org/bluez/Manager/hci0/rfcomm<br>
+object path: /org/bluez/Manager/hci1/rfcomm<br>
+interface: org.bluez.Manager.rfcomm<br>
+<br>
+...<br>
+(#1) Probably the display local devices should be moved to other path
+due the permissions that I comment before. User&nbsp; applications
+should be able list the local adapters to use in the pan, rfcomm, sdp
+...<br>
+<br>
+<br>
+For me, your suggestion or my last suggestion are fine, both can
+address the permissions. You have the decision in your hands! :)<br>
+<br>
 <br>
 Regards,<br>
-Claudio.<br><br><div><span class=3D"gmail_quote">On 9/22/05, <b class=3D"gm=
-ail_sendername">Marcel Holtmann</b> &lt;<a href=3D"mailto:marcel@holtmann.o=
-rg">marcel@holtmann.org</a>&gt; wrote:</span><blockquote class=3D"gmail_quo=
-te" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt=
- 0.8ex; padding-left: 1ex;">
-Hi Claudio,<br><br>&gt; Regarding the shared code I will analize the shared=
- functions<br>&gt; and move to the common directory.<br>&gt;<br>&gt;<br>&gt=
-; The D-Bus error is a message created based on a received message.<br>
-&gt; There are 4 message types:<br>&gt; 1. method call message<br>&gt; 2. m=
-ethod reply message<br>&gt; 3. error message<br>&gt; 4. signal<br>&gt;<br>&=
-gt; First of all you have to understand the difference bus name, path and
-<br>&gt; interface. Read<br>&gt; <a href=3D"http://dbus.freedesktop.org/doc=
-/dbus-faq.html#id2778454">http://dbus.freedesktop.org/doc/dbus-faq.html#id2=
-778454</a><br>&gt; for more information. There is a FAQ with this topic.<br=
->
-<br>this is one of my basic problems with D-Bus and object oriented<br>prog=
-ramming in general. They try to abstract and solve everything and<br>this i=
-s not working. The reality is always different. We now need to<br>find a wa=
-y to make it usable in a sane way.
-<br><br>&gt; After this discussion I would suggest the following structure:=
-<br>&gt;<br>&gt; &gt;&gt;&gt; Message Error Names:<br>&gt; org.bluez.EFaile=
-d<br>&gt; org.bluez.ENoMemory<br>&gt; /* open to more error names */<br>
-&gt;<br>&gt; &gt;&gt;&gt;org.bluez.EFailed<br>&gt; This error message will =
-have the signature(string+uint16+uint32).<br>&gt; Where the first argument =
-is the error description. The second is<br>&gt; the error class and the thi=
-rd is the error code.
-<br>&gt; The error class can be system error, D-Bus error or HCI errors.<br=
->&gt; This structure mane possible return to the app clients any kind of<br=
->&gt; error. System error includes socket error, IO, ENODEV... D-Bus error
-<br>&gt; includes no service, no connection, security error and no method<b=
-r>&gt; found.<br>&gt; HCI errors are listed in the bluetooth specification.=
-<br><br>We have three different categories of errors. The Bluetooth errors
-<br>defined in the specification. They are the same for the complete HCI.<b=
-r>Then we have the Unix/Linux error codes (errno) and we will have<br>addit=
-ional codes defined by us. I don't like the idea of splitting the<br>errors=
- into classes. This is confusing and not a nice API. We should
-<br>choose a base for the errors and these should be the Bluetooth error<br=
->codes defined in the HCI part specification. So for my point of view an<br=
->error org.bluez.error with string+uint16 is enough. The range 0x00-0xff
-<br>will be used by the Bluetooth errors and we define the rest for specifi=
-c<br>errors that are currently not covered by the specification. This means=
-<br>we have to match the Unix/Linux error codes somehow, but I don't see an=
-y
-<br>problems with that.<br><br>Regards<br><br>Marcel<br><br><br><br><br><br=
->-------------------------------------------------------<br>SF.Net email is=
- sponsored by:<br>Tame your development challenges with Apache's Geronimo A=
-pp Server.
+Claudio<br><br><div><span class=3D"gmail_quote">On 9/25/05, <b class=3D"gma=
+il_sendername">Marcel Holtmann</b> &lt;<a href=3D"mailto:marcel@holtmann.or=
+g">marcel@holtmann.org</a>&gt; wrote:</span><blockquote class=3D"gmail_quot=
+e" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt =
+0.8ex; padding-left: 1ex;">
+Hi Claudio,<br><br>&gt; Sorry, but the last patch(hcid_dbus_0007.patch) was=
+ not<br>&gt; based on the latest CVS version.<br><br>I realized that yester=
+day, but I am in Prague now for the UnPlugFest and<br>haven't had Internet =
+access for two days. The patch looks good and I
+<br>think we now have a nice and clean base to start with. However there ar=
+e<br>some names I like to change. For example using org.bluez.Device for al=
+l<br>device specific configuration, like name changes. And org.bluez.Manage=
+r
+<br>for Inquiry stuff etc. Do you think that makes sense?<br><br>Regards<br=
+><br>Marcel<br><br><br><br><br>--------------------------------------------=
+-----------<br>SF.Net email is sponsored by:<br>Tame your development chall=
+enges with Apache's Geronimo App Server.
 <br>Download it for free - -and be entered to win a 42&quot; plasma tv or y=
 our very<br>own Sony(tm)PSP.&nbsp;&nbsp;Click here to play: <a href=3D"http=
 ://sourceforge.net/geronimo.php">http://sourceforge.net/geronimo.php</a><br=
@@ -236,7 +234,7 @@ orge.net">Bluez-devel@lists.sourceforge.net</a><br><a href=3D"https://lists=
 lists/listinfo/bluez-devel
 </a><br></blockquote></div><br>
 
-------=_Part_2219_11917895.1127744835678--
+------=_Part_1348_21614191.1127735947095--
 
 
 -------------------------------------------------------
