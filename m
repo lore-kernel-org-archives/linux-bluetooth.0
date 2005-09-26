@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <d73fa6c305092623184b76249f@mail.gmail.com>
-From: valen willie <valen.willie@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <43384BEF.3070808@scananza.net>
+From: Lorenzo Scano <scananza@scananza.net>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_25403_19674052.1127801889519"
-Subject: [Bluez-users] New User
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: [Bluez-users] bluez and Motorola V535
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,49 +16,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 27 Sep 2005 16:18:09 +1000
+Date: Mon, 26 Sep 2005 21:28:47 +0200
 
-------=_Part_25403_19674052.1127801889519
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi all,
+I'm wondering if anyone knows if this phone could work on Linux/bluez 
+just to transfer files.
+I have a 2.6.12 vanilla kernel on a debian testing machine, tried to 
+connect, got the adapter correctly found by the phone but then it hangs:
 
-Hi,
+solid-snake:/etc/bluetooth# obexftp -b -l
+Scanning ...
+Using   00:14:9A:20:A3:62       Scananzofono
+Browsing 00:14:9A:20:A3:62 ...
+Channel: 9
+No custom transport
+Connecting...bt: 1
+done
+Receiving (null)... failed: (null)
+Disconnecting...failed: disconnect
 
-I just bought myself a USB Bluetooth Adapter.
-I'm very new to Bluetooth and intend to learn more about it.
-I'm using Slackware 10.1.
-I have bluez module loaded automatically when I plug in my bluetooh adapter
-into my USB port.
-But then, what should I do, what application should I start or install now
-to utilize my bluetooth adapter?
+I'm really a newbie on bluetooth stuff so I will appreciate any help or 
+clue about a possible support for my phone.
 
+Thank you a lot, later
 
-Thanks very much,
-
-Valen
-
-------=_Part_25403_19674052.1127801889519
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi,<br>
-<br>
-I just bought myself a USB Bluetooth Adapter.<br>
-I'm very new to Bluetooth and intend to learn more about it.<br>
-I'm using Slackware 10.1.<br>
-I have bluez module loaded automatically when I plug in my bluetooh adapter=
- into my USB port.<br>
-But then, what should I do, what application should I start or install now =
-to utilize my bluetooth adapter?<br>
-<br>
-<br>
-Thanks very much,<br>
-<br>
-Valen<br>
-
-------=_Part_25403_19674052.1127801889519--
+-- 
+Lorenzo Scano
+scananza@scananza.net
+http://www.scananza.net
+Debian Etch amd64
 
 
 -------------------------------------------------------
