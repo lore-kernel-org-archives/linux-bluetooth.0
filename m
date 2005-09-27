@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Esther Lopez" <esther.lopez@erzia.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Control of radiated power
+Message-ID: <F6E1228667B6D411BAAA00306E00F2A5056F324E@pdc2.nestec.net>
+From: JIBIN K <JIBINK@nestec.net>
+To: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1127726332.6163.9.camel@localhost.localdomain>
-Message-Id: <20050927112521.925BA1DC791@mrelay2.st2.lyceu.net>
+	charset="iso-8859-1"
+Subject: [Bluez-devel] sdp server problem
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,55 +17,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 27 Sep 2005 13:26:15 +0200
+Date: Tue, 27 Sep 2005 16:02:34 +0530
 
-Thanks Marcel
+Hi
 
-My device is a Brainboxes PCMCIA card with BlueCore02 chipset. I have asked
-them, and they are on it...
-
-In the meanwhile... The LMP protocol is in charge of automatically
-controlling the power level (isn't it?). Is is possible to deactivate this
-power level control, leaving the radiated power at a fixed value?
-
-Regards
-
-Esther 
-
------Mensaje original-----
-De: bluez-devel-admin@lists.sourceforge.net
-[mailto:bluez-devel-admin@lists.sourceforge.net] En nombre de Marcel
-Holtmann
-Enviado el: lunes, 26 de septiembre de 2005 11:19
-Para: bluez-devel@lists.sourceforge.net
-Asunto: Re: [Bluez-devel] Control of radiated power
-
-Hi Esther,
-
-> Just a fast question. Is there any software way (using BlueZ) for
-> controlling the radiated power and setting it to a desired value? I
-> have been investigating and having found anything
-
-not according to the Bluetooth HCI specification. You need to find a
-vendor specific command for that. Ask you chip or dongle manufacturer.
+    We are using Bluez Linux 2.6.10 kernel. In this we can't configure sdp
+server.I typed sdpd, to start the sdp daemon.After that typed
+sdptool browse local  . Then an error message " no sdp server found"
+displayed.Why it is happenend.What are the steps needed for configuring sdp
+server. How we can configure sdp server. we are using CSR's Bluecore3
+chip.Please reply immedietly.
 
 Regards
-
-Marcel
-
+Jibin
 
 
 
--------------------------------------------------------
-SF.Net email is sponsored by:
-Tame your development challenges with Apache's Geronimo App Server. 
-Download it for free - -and be entered to win a 42" plasma tv or your very
-own Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+---------------------------------------------------------------------------
+       "This e-mail and any files transmitted with it are for the sole use
+of the intended recipient(s) and may contain confidential and privileged
+information. If you are not the intended recipient, please contact the
+sender by reply e-mail and destroy all copies of the original message.
 
+       Any unauthorized review, use, disclosure, dissemination, forwarding,
+printing or copying of this email or any action taken upon this e-mail is
+strictly prohibited and may be unlawful."
+---------------------------------------------------------------------------
 
 
 -------------------------------------------------------
