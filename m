@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Paul LeoNerd Evans <leonerd@leonerd.org.uk>
+Message-ID: <d73fa6c305092623184b76249f@mail.gmail.com>
+From: valen willie <valen.willie@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] New User
-Message-ID: <20050927095829.41367ac0@nim.leo>
-In-Reply-To: <d73fa6c305092623184b76249f@mail.gmail.com>
-References: <d73fa6c305092623184b76249f@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed;
- boundary=Signature_Tue__27_Sep_2005_09_58_29_+0100_Kb2MMlrkN5FIm+YE;
- protocol="application/pgp-signature"; micalg=PGP-SHA1
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_25403_19674052.1127801889519"
+Subject: [Bluez-users] New User
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,60 +17,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 27 Sep 2005 09:58:29 +0100
+Date: Tue, 27 Sep 2005 16:18:09 +1000
 
---Signature_Tue__27_Sep_2005_09_58_29_+0100_Kb2MMlrkN5FIm+YE
-Content-Type: text/plain; charset=US-ASCII
+------=_Part_25403_19674052.1127801889519
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-On Tue, 27 Sep 2005 16:18:09 +1000
-valen willie <valen.willie@gmail.com> wrote:
+Hi,
 
-> Hi,
->=20
-> I just bought myself a USB Bluetooth Adapter.
-> I'm very new to Bluetooth and intend to learn more about it.
-> I'm using Slackware 10.1.
-> I have bluez module loaded automatically when I plug in my bluetooh
-> adapter into my USB port.
-> But then, what should I do, what application should I start or install
-> now to utilize my bluetooth adapter?
+I just bought myself a USB Bluetooth Adapter.
+I'm very new to Bluetooth and intend to learn more about it.
+I'm using Slackware 10.1.
+I have bluez module loaded automatically when I plug in my bluetooh adapter
+into my USB port.
+But then, what should I do, what application should I start or install now
+to utilize my bluetooth adapter?
 
-Well, it'll depend on your distro. One tool you might find useful
-initially is "hcitool"; it does some initial diagnostics...
 
-$ hcitool devices
-Devices:
-        hci0    00:07:61:19:7A:BA
+Thanks very much,
 
-$ hcitool scan
-Scanning ...
-        00:02:EE:C6:41:B2       LeoPhone
+Valen
 
-hcitool --help  for a full list.
+------=_Part_25403_19674052.1127801889519
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I run debian, and this program is provided by the bluez-utils package;
-but other distros may vary.
+Hi,<br>
+<br>
+I just bought myself a USB Bluetooth Adapter.<br>
+I'm very new to Bluetooth and intend to learn more about it.<br>
+I'm using Slackware 10.1.<br>
+I have bluez module loaded automatically when I plug in my bluetooh adapter=
+ into my USB port.<br>
+But then, what should I do, what application should I start or install now =
+to utilize my bluetooth adapter?<br>
+<br>
+<br>
+Thanks very much,<br>
+<br>
+Valen<br>
 
---=20
-Paul "LeoNerd" Evans
-
-leonerd@leonerd.org.uk
-ICQ# 4135350       |  Registered Linux# 179460
-http://www.leonerd.org.uk/
-
---Signature_Tue__27_Sep_2005_09_58_29_+0100_Kb2MMlrkN5FIm+YE
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQFDOQm4vcPg11V/1hgRAsqVAJ9QnLoXLq6RSYvnlzyD+YDvFwc0WACfdHBG
-AZcvs9wwjqyYz1YnZCJBDdA=
-=8yGT
------END PGP SIGNATURE-----
-
---Signature_Tue__27_Sep_2005_09_58_29_+0100_Kb2MMlrkN5FIm+YE--
+------=_Part_25403_19674052.1127801889519--
 
 
 -------------------------------------------------------
