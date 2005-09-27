@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sdp server problem
+Subject: RE: [Bluez-devel] Control of radiated power
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <F6E1228667B6D411BAAA00306E00F2A5056F324E@pdc2.nestec.net>
-References: <F6E1228667B6D411BAAA00306E00F2A5056F324E@pdc2.nestec.net>
+In-Reply-To: <20050927112521.925BA1DC791@mrelay2.st2.lyceu.net>
+References: <20050927112521.925BA1DC791@mrelay2.st2.lyceu.net>
 Content-Type: text/plain
-Message-Id: <1127823052.22766.2.camel@localhost.localdomain>
+Message-Id: <1127822966.22766.0.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,18 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 27 Sep 2005 14:10:52 +0200
+Date: Tue, 27 Sep 2005 14:09:25 +0200
 
-Hi Jibin,
+Hi Esther,
 
->     We are using Bluez Linux 2.6.10 kernel. In this we can't configure sdp
-> server.I typed sdpd, to start the sdp daemon.After that typed
-> sdptool browse local  . Then an error message " no sdp server found"
-> displayed.Why it is happenend.What are the steps needed for configuring sdp
-> server. How we can configure sdp server. we are using CSR's Bluecore3
-> chip.Please reply immedietly.
+> My device is a Brainboxes PCMCIA card with BlueCore02 chipset. I have asked
+> them, and they are on it...
+> 
+> In the meanwhile... The LMP protocol is in charge of automatically
+> controlling the power level (isn't it?). Is is possible to deactivate this
+> power level control, leaving the radiated power at a fixed value?
 
-look at your syslog and check for any error messages.
+I don't think so, but I am not an expert for the LMP or Baseband.
 
 Regards
 
