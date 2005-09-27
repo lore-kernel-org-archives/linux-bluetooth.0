@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4339AB13.4040904@scananza.net>
-From: Lorenzo Scano <scananza@scananza.net>
-MIME-Version: 1.0
+Message-ID: <d73fa6c305092708555fb4b469@mail.gmail.com>
+From: valen willie <valen.willie@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] bluez and Motorola V535
-References: <43384BEF.3070808@scananza.net> <1127830173.3737.11.camel@localhost.localdomain>
-In-Reply-To: <1127830173.3737.11.camel@localhost.localdomain>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_213_1110734.1127836522128"
+Subject: [Bluez-users] Packages' Contents
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,36 +17,66 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 27 Sep 2005 22:26:59 +0200
+Date: Wed, 28 Sep 2005 01:55:22 +1000
 
-Fredy P ha scritto:
-> El lun, 26-09-2005 a las 21:28 +0200, Lorenzo Scano escribió:
-> 
->>Hi all,
->>I'm wondering if anyone knows if this phone could work on Linux/bluez 
->>just to transfer files.
->>I have a 2.6.12 vanilla kernel on a debian testing machine, tried to 
->>connect, got the adapter correctly found by the phone but then it hangs:
->>
->>solid-snake:/etc/bluetooth# obexftp -b -l
->>Scanning ...
->>Using   00:14:9A:20:A3:62       Scananzofono
->>Browsing 00:14:9A:20:A3:62 ...
->>Channel: 9
->>No custom transport
->>Connecting...bt: 1
->>done
-> 
-> http://el-directorio.org/index.php/Bluetooth_en_debian (see the
-> hcid.conf)
+------=_Part_213_1110734.1127836522128
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-nothing to do, the result is still the same
+Hi,
+Can anyone tell me what is contained in these packages:
 
--- 
-Lorenzo Scano
-scananza@scananza.net
-http://www.scananza.net
-Debian Etch amd64
+   - bluez-pin-0.26.tar.gz<http://www.bluez.org/redirect.php?url=3Dftp%3A%2=
+F%2Fgpe.handhelds.org%2Fprojects%2Fgpe%2Fsource%2Fbluez-pin-0.26.tar.gz>
+   - bluez-firmware-1.0.tar.gz<http://www.bluez.org/redirect.php?url=3Dhttp=
+%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-firmware-1.0.tar.gz>
+   - bluez-hcidump-1.25.tar.gz<http://www.bluez.org/redirect.php?url=3Dhttp=
+%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-hcidump-1.25.tar.gz>
+   - bluez-hciemu-1.2.tar.gz<http://www.bluez.org/redirect.php?url=3Dhttp%3=
+A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-hciemu-1.2.tar.gz>
+
+As I already have bluez-lib and bluez-utils. Do I still need those packages
+above? What features do they offer?
+
+Thanks!
+
+------=_Part_213_1110734.1127836522128
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi,<br>
+Can anyone tell me what is contained in these packages:<br>
+<ul style=3D"list-style-type: none; list-style-image: none; list-style-posi=
+tion: outside;">
+<li><a href=3D"http://www.bluez.org/redirect.php?url=3Dftp%3A%2F%2Fgpe.hand=
+helds.org%2Fprojects%2Fgpe%2Fsource%2Fbluez-pin-0.26.tar.gz" onmouseover=3D=
+"window.status=3D'ftp://gpe.handhelds.org/projects/gpe/source/bluez-pin-0.2=
+6.tar.gz'; return true;" onmouseout=3D"window.status=3D''; return true;">
+bluez-pin-0.26.tar.gz</a></li><li><a href=3D"http://www.bluez.org/redirect.=
+php?url=3Dhttp%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-firmware-1.0.tar.gz"=
+ onmouseover=3D"window.status=3D'http://bluez.sf.net/download/bluez-firmwar=
+e-1.0.tar.gz'; return true;" onmouseout=3D"window.status=3D''; return true;=
+">
+bluez-firmware-1.0.tar.gz</a></li><br><li><a href=3D"http://www.bluez.org/r=
+edirect.php?url=3Dhttp%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-hcidump-1.25=
+.tar.gz" onmouseover=3D"window.status=3D'http://bluez.sf.net/download/bluez=
+-hcidump-1.25.tar.gz'; return true;" onmouseout=3D"window.status=3D''; retu=
+rn true;">
+bluez-hcidump-1.25.tar.gz</a></li><li><a href=3D"http://www.bluez.org/redir=
+ect.php?url=3Dhttp%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-hciemu-1.2.tar.g=
+z" onmouseover=3D"window.status=3D'http://bluez.sf.net/download/bluez-hciem=
+u-1.2.tar.gz'; return true;" onmouseout=3D"window.status=3D''; return true;=
+">
+bluez-hciemu-1.2.tar.gz</a></li>
+</ul>
+As I already have bluez-lib and bluez-utils. Do I still need those packages=
+ above? What features do they offer?<br>
+<br>
+Thanks!<br>
+
+------=_Part_213_1110734.1127836522128--
 
 
 -------------------------------------------------------
