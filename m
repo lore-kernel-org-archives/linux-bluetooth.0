@@ -1,18 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Wacom Graphire Bluetooth  problems
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4339AB13.4040904@scananza.net>
+From: Lorenzo Scano <scananza@scananza.net>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050926113225.GA19843@polar.elf12.net>
-References: <20050924200358.GJ28437@polar.elf12.net>
-	 <1127644165.6362.0.camel@localhost.localdomain>
-	 <20050925123425.GA8683@polar.elf12.net>
-	 <1127661017.6362.9.camel@localhost.localdomain>
-	 <20050925165458.GC8683@polar.elf12.net>
-	 <1127726670.6163.18.camel@localhost.localdomain>
-	 <20050926113225.GA19843@polar.elf12.net>
-Content-Type: text/plain
-Message-Id: <1127892511.5321.2.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] bluez and Motorola V535
+References: <43384BEF.3070808@scananza.net> <1127830173.3737.11.camel@localhost.localdomain>
+In-Reply-To: <1127830173.3737.11.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -24,47 +18,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Sep 2005 09:28:31 +0200
+Date: Tue, 27 Sep 2005 22:26:59 +0200
 
-Hi Robert,
-
-> Aehm, sorry for being unclear, my question was: Where
-> are the huge differences between
-> 2.6.12-mh3 and
-> 2.6.13-mh1
-
-if you look only to HID then there is no difference.
-
-> A new question: Do I see it right that there are at the moment two HID
-> interpreter in a patched kernel: one for USB and one for Bluetooth? Are
-> there already differences between them? (Why? Which?)
-
-The Bluetooth HID is derived from the USB HID, but without the hiddev
-support and a lot of things stripped out. It is basically a proof of
-concept.
-
-> > > Where is the driving force
-> > > behind a generic HID driver? Here or more with the USB guys? <-:
-> > > I fear that it will take some six month or longer. - I will probably dig
-> > > into the HID bluetooth code to get the Wacom working ...
-> > > ... and do some adaptions when the generic driver arises.
-> > 
-> > I think the force for that have to be driven by me. We all agreed on how
-> > this should be done, but there are some things pending that I like to
-> > see merged first mainline (subclass support and sysfs integration)
-> > before I look at it again.
+Fredy P ha scritto:
+> El lun, 26-09-2005 a las 21:28 +0200, Lorenzo Scano escribió:
 > 
-> Hm... Would you approve some HID hacking on your -mh patches for the
-> meantime? I'm also interested in a generic HID driver but don't want to
-> stand still until it appears. - Later joining wanted.
+>>Hi all,
+>>I'm wondering if anyone knows if this phone could work on Linux/bluez 
+>>just to transfer files.
+>>I have a 2.6.12 vanilla kernel on a debian testing machine, tried to 
+>>connect, got the adapter correctly found by the phone but then it hangs:
+>>
+>>solid-snake:/etc/bluetooth# obexftp -b -l
+>>Scanning ...
+>>Using   00:14:9A:20:A3:62       Scananzofono
+>>Browsing 00:14:9A:20:A3:62 ...
+>>Channel: 9
+>>No custom transport
+>>Connecting...bt: 1
+>>done
+> 
+> http://el-directorio.org/index.php/Bluetooth_en_debian (see the
+> hcid.conf)
 
-Send in patches against the latest -mh patch.
+nothing to do, the result is still the same
 
-Regards
-
-Marcel
-
-
+-- 
+Lorenzo Scano
+scananza@scananza.net
+http://www.scananza.net
+Debian Etch amd64
 
 
 -------------------------------------------------------
