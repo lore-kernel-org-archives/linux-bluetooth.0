@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <F6E1228667B6D411BAAA00306E00F2A5056F324D@pdc2.nestec.net>
-From: JIBIN K <JIBINK@nestec.net>
-To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] SDP server problem
+From: Paul LeoNerd Evans <leonerd@leonerd.org.uk>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] New User
+Message-ID: <20050927095829.41367ac0@nim.leo>
+In-Reply-To: <d73fa6c305092623184b76249f@mail.gmail.com>
+References: <d73fa6c305092623184b76249f@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed;
+ boundary=Signature_Tue__27_Sep_2005_09_58_29_+0100_Kb2MMlrkN5FIm+YE;
+ protocol="application/pgp-signature"; micalg=PGP-SHA1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,31 +20,60 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 27 Sep 2005 16:00:44 +0530
+Date: Tue, 27 Sep 2005 09:58:29 +0100
 
-Hi
+--Signature_Tue__27_Sep_2005_09_58_29_+0100_Kb2MMlrkN5FIm+YE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-    We are using Bluez Linux 2.6.10 kernel. In this we can't configure sdp
-server.I typed sdpd, to start the sdp daemon.After that typed
-sdptool browse local  . Then an error message " no sdp server found"
-displayed.Why it is happenend.What are the steps needed for configuring sdp
-server. How we can configure sdp server. we are using CSR's Bluecore3
-chip.Please reply immedietly.
+On Tue, 27 Sep 2005 16:18:09 +1000
+valen willie <valen.willie@gmail.com> wrote:
 
-Regards
-Jibin
+> Hi,
+>=20
+> I just bought myself a USB Bluetooth Adapter.
+> I'm very new to Bluetooth and intend to learn more about it.
+> I'm using Slackware 10.1.
+> I have bluez module loaded automatically when I plug in my bluetooh
+> adapter into my USB port.
+> But then, what should I do, what application should I start or install
+> now to utilize my bluetooth adapter?
 
+Well, it'll depend on your distro. One tool you might find useful
+initially is "hcitool"; it does some initial diagnostics...
 
----------------------------------------------------------------------------
-       "This e-mail and any files transmitted with it are for the sole use
-of the intended recipient(s) and may contain confidential and privileged
-information. If you are not the intended recipient, please contact the
-sender by reply e-mail and destroy all copies of the original message.
+$ hcitool devices
+Devices:
+        hci0    00:07:61:19:7A:BA
 
-       Any unauthorized review, use, disclosure, dissemination, forwarding,
-printing or copying of this email or any action taken upon this e-mail is
-strictly prohibited and may be unlawful."
----------------------------------------------------------------------------
+$ hcitool scan
+Scanning ...
+        00:02:EE:C6:41:B2       LeoPhone
+
+hcitool --help  for a full list.
+
+I run debian, and this program is provided by the bluez-utils package;
+but other distros may vary.
+
+--=20
+Paul "LeoNerd" Evans
+
+leonerd@leonerd.org.uk
+ICQ# 4135350       |  Registered Linux# 179460
+http://www.leonerd.org.uk/
+
+--Signature_Tue__27_Sep_2005_09_58_29_+0100_Kb2MMlrkN5FIm+YE
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDOQm4vcPg11V/1hgRAsqVAJ9QnLoXLq6RSYvnlzyD+YDvFwc0WACfdHBG
+AZcvs9wwjqyYz1YnZCJBDdA=
+=8yGT
+-----END PGP SIGNATURE-----
+
+--Signature_Tue__27_Sep_2005_09_58_29_+0100_Kb2MMlrkN5FIm+YE--
 
 
 -------------------------------------------------------
