@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluetooth filesystem integration
-From: Charles Bueche <charles@bueche.ch>
+Message-ID: <433A5D99.90503@ubuntu.com>
+From: Charles Majola <charles@ubuntu.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1127865130.15926.18.camel@panic>
-References: <1127865130.15926.18.camel@panic>
-Content-Type: text/plain
-Message-Id: <1127899309.14281.7.camel@bluez.bueche.ch>
-Mime-Version: 1.0
+References: <e1effdeb05091607426f824afa@mail.gmail.com>	 <1127292701.495.11.camel@localhost.localdomain>	 <e1effdeb05092105492fce2ff2@mail.gmail.com>	 <1127398647.5344.24.camel@blade>	 <e1effdeb05092209516bbcb31a@mail.gmail.com>	 <1127411650.12287.15.camel@blade>	 <e1effdeb05092307283e73c546@mail.gmail.com>	 <e1effdeb050923101567fd59d4@mail.gmail.com>	 <1127644396.6362.6.camel@localhost.localdomain>	 <e1effdeb05092604597481f1a9@mail.gmail.com> <1127897100.5321.13.camel@localhost.localdomain>
+In-Reply-To: <1127897100.5321.13.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] help: HIDD and HID2HCI
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,39 +18,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 28 Sep 2005 11:21:49 +0200
+Date: Wed, 28 Sep 2005 11:08:41 +0200
 
-On mar, 2005-09-27 at 16:52 -0700, Collin R. Mulliner wrote:
-> Hi All,
-> 
-> Marcel and I have decided to include btfs into the bluez-utils. Btfs is
-> for integrating some kind of bluetooth services into the filesystem, so
-> you could mount an obexftp "share" into your local filesytem. The whole
-> idea is based on some work I did some time ago
-> (http://mulliner.org/bluetooth/btfs.php). The system will be based on
-> FUSE (Filesystem in Userspace).
-> 
-> So this post is basically to anounce btfs and to gether some ideas on
-> what you guys think is need and useful.
+Issint enabling hid2hci be accompanied with hidd being started? i say 
+this becouse it seem hid2hci disconnection the hid devices. So hid 
+should reconnect them?  please see : 
+http://bugzilla.ubuntu.com/show_bug.cgi?id=16037
 
-That will be great, eg to automatically rsync new pictures taken from my
-phone to a local dir. I know there is a kbluetoothd plugin, but
-rsync/btfs seems much more "UNIX-like" to me.
-
-What would be great is to see phone contacts as virtual VCard files (one
-file per contact). Not sure if it is possible, but you asked for
-ideas :-)
-
-Seeing my Palm T5 agenda as iCal file would be the top... OK, I stop
-dreaming :-/
-
-thanks anyway for you great work.
-
-Charles
--- 
-Charles Bueche <charles@bueche.ch>
-sand, snow, wave, wind and net -surfer
-
+---
+chmj
 
 
 -------------------------------------------------------
