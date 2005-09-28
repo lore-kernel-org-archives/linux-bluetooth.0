@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marko Kreen <marko@l-t.ee>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH] hci_usb: add entry for FMWBA-101 Bluetooth usb-dongle
-Message-ID: <20050928191714.GA17254@l-t.ee>
-References: <20050928152415.GA11240@l-t.ee> <1127922285.5321.20.camel@localhost.localdomain>
+From: Dimitry Andric <dimitry@andric.com>
+Message-ID: <1265464416.20050928201649@andric.com>
+To: Marcel Holtmann <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] bluetooth filesystem integration
+In-Reply-To: <1127899931.5321.16.camel@localhost.localdomain>
+References: <1127865130.15926.18.camel@panic>
+ <1127899309.14281.7.camel@bluez.bueche.ch>
+ <1127899931.5321.16.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1127922285.5321.20.camel@localhost.localdomain>
+Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg="pgp-sha1";
+  boundary="----------A31F218329C8F022"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,48 +21,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 28 Sep 2005 22:17:14 +0300
+Date: Wed, 28 Sep 2005 20:16:49 +0200
 
-On Wed, Sep 28, 2005 at 05:44:44PM +0200, Marcel Holtmann wrote:
-> > This patch adds ID's for Fujitsu-Siemens FMWBA-101 Bluetooth
-> > USB Adapter.
-> > 
-> > /proc/bus/usb/devices:
-> > T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  7 Spd=12  MxCh= 0
-> > D:  Ver= 1.10 Cls=0e(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> > P:  Vendor=0bf8 ProdID=1003 Rev= 3.36
-> > S:  Manufacturer=ALPS
-> > S:  Product=BT USB
-> 
-> this is not needed, because the USB class is enough.
+------------A31F218329C8F022
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-But it is not, the device won't be detected without this patch.
+On 2005-09-28 at 11:32:10 Marcel Holtmann wrote:
 
-# uname -r
-2.6.13.2
-# modprobe hci_usb
-# hciconfig -a
-# rmmod hci_usb
-# modprobe hci_usb_fix
-# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:02:C7:42:6A:F2 ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:111 acl:0 sco:0 events:14 errors:0
-        TX bytes:310 acl:0 sco:0 commands:14 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'grue-0'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x150 LMP Ver: 1.1 (0x1) LMP Subver: 0x150
-        Manufacturer: Cambridge Silicon Radio (10)
+> do you have any thoughts how the directory structure of this filesystem
+> should look like. Let's discuss how we design it.
 
--- 
-marko
+Maybe it's nice to look at how the KDE bluetooth project has
+implemented this.  They already overlay some sort of 'virtual'
+filesystem on top of Konqueror, which is similar to:
+
+bluetooth root
+   device1
+     service1
+     service2
+     ...
+   device2
+   device3
+   ...
+
+etc.  See for instance:
+
+http://kde-bluetooth.sourceforge.net/screenshots/index.html#kioslaves
+
+------------A31F218329C8F022
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1.4.2 (MingW32)
+
+iD8DBQFDOt4RsF6jCi4glqMRAhiDAJ9WtNvNmvTyl8cDj2Er3wTg9Ry7ZwCg5ZIS
+f43MkgZqMLRwJqxPeRTfQEQ=
+=5Qq3
+-----END PGP MESSAGE-----
+
+------------A31F218329C8F022--
 
 
 
