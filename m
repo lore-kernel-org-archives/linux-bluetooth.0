@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <CBBBD909D2D6D211B4700090273F9E6E04C49A50@polaris.hhn.com>
-From: Robert Wlaschin <robertw@healthhero.com>
-To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Trouble communicating to a non-discoverable BT devi
-	ce
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C5C489.45989B80"
+From: Andreas Beck <becka-bzus@bedatec.de>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Problem with bluetooth sound... working but not working
+Message-ID: <20050928222115.GA5135@uni-duesseldorf.de>
+References: <433AD61D.1050307@cyberserver.dk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <433AD61D.1050307@cyberserver.dk>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,112 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Sep 2005 17:03:50 -0700
+Date: Thu, 29 Sep 2005 00:21:15 +0200
 
-This message is in MIME format. Since your mail reader does not understand
-this format, some or all of this message may not be legible.
+Preben Holm <preben@cyberserver.dk> wrote:
+> Output from  hciconfig hci0 revision
+> -------------
+> laptop preben # hciconfig hci0 revision
+> hci0:   Type: USB
+>        BD Address: 00:0E:A1:33:94:FE ACL MTU: 377:10 SCO MTU: 16:0
+>        Firmware 263.3 / 9
+> Similar configurations (headset+dongle) works on windows-computers, but 
+> why isn't there a SCO: HCI/PCM in the hciconfig hci0 revision output.
 
-------_=_NextPart_001_01C5C489.45989B80
-Content-Type: text/plain;
-	charset="ISO-8859-2"
+Because this chip is not supported for SCO under linux. 
+
+> I would really like this to work...
+
+Get a CSR based chip. Did that here, too.
 
 
-I have a slightly different problem than what I've seen posted in the
-mailing list thus far, please point me in the right direction if I have
-misspoke.  I am attempting to create an Ash script (on Busybox, Arm
-processor -- uClib cross compile, Deb Kernel 2.6.10) w/ bluez-libs-2.19, and
-bluez-utils-2.19.  The system I am using is semi-embedded and has a limited
-amount of space for various utilities.
-
-My BT device is non-discoverable, I am unable to change this.  Therefore, I
-am forced to wait until I am signaled by the device to attempt a connection.
-This device is also battery operated and the Manufacturer designed it to
-conserve power by allowing only a minimal time slice for the device to link
-with my system.  Once I have a connection I have to read the data by sending
-ACK's back across the device.
-
-I was attempting to create a script that watched the system log messages
-dumped by hcid and sdpd.  I was able to create a script using rfcomm's bind
-and connect, which allowed me to read from /dev/rfcomm0 but I was unable to
-send without receiving a 'Host is down' error.  I did some reading and it
-was suggested that both the devices were setup as clients and this was why I
-was receiving this message.  Another suggestion was to use rfcomm's listen
-to setup the device.  I have attempted an implementation of that but I
-receive a Disconnect extremely quickly and I am having difficulty detecting
-when the listen connects to my device so I can extract the BT address and
-other pertinent data.
-
-First off am I even heading in the correct direction, should I use the
-rfcomm listen command, instead of the connect?  Is there an easier way to do
-what I need to get done, using already created tools I don't know about?  Do
-I need to run the sdptool and add the SP interface?  Where are the doc's
-that explain how to use the rfcomm and sdptool utils -- the man pages have
-various information/knowledge gaps?
-
-Thanks,
-Robert
-
-------_=_NextPart_001_01C5C489.45989B80
-Content-Type: text/html;
-	charset="ISO-8859-2"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
-<HTML>
-<HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3DISO-8859-2">
-<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
-5.5.2653.12">
-<TITLE>[Bluez-users] Trouble communicating to a non-discoverable BT =
-device</TITLE>
-</HEAD>
-<BODY>
-<BR>
-
-<P><FONT SIZE=3D2>I have a slightly different problem than what I've =
-seen posted in the mailing list thus far, please point me in the right =
-direction if I have misspoke.&nbsp; I am attempting to create an Ash =
-script (on Busybox, Arm processor -- uClib cross compile, Deb Kernel =
-2.6.10) w/ bluez-libs-2.19, and bluez-utils-2.19.&nbsp; The system I am =
-using is semi-embedded and has a limited amount of space for various =
-utilities.</FONT></P>
-
-<P><FONT SIZE=3D2>My BT device is non-discoverable, I am unable to =
-change this.&nbsp; Therefore, I am forced to wait until I am signaled =
-by the device to attempt a connection.&nbsp; This device is also =
-battery operated and the Manufacturer designed it to conserve power by =
-allowing only a minimal time slice for the device to link with my =
-system.&nbsp; Once I have a connection I have to read the data by =
-sending ACK's back across the device.</FONT></P>
-
-<P><FONT SIZE=3D2>I was attempting to create a script that watched the =
-system log messages dumped by hcid and sdpd.&nbsp; I was able to create =
-a script using rfcomm's bind and connect, which allowed me to read from =
-/dev/rfcomm0 but I was unable to send without receiving a 'Host is =
-down' error.&nbsp; I did some reading and it was suggested that both =
-the devices were setup as clients and this was why I was receiving this =
-message.&nbsp; Another suggestion was to use rfcomm's listen to setup =
-the device.&nbsp; I have attempted an implementation of that but I =
-receive a Disconnect extremely quickly and I am having difficulty =
-detecting when the listen connects to my device so I can extract the BT =
-address and other pertinent data.</FONT></P>
-
-<P><FONT SIZE=3D2>First off am I even heading in the correct direction, =
-should I use the rfcomm listen command, instead of the connect?&nbsp; =
-Is there an easier way to do what I need to get done, using already =
-created tools I don't know about?&nbsp; Do I need to run the sdptool =
-and add the SP interface?&nbsp; Where are the doc's that explain how to =
-use the rfcomm and sdptool utils -- the man pages have various =
-information/knowledge gaps?</FONT></P>
-
-<P><FONT SIZE=3D2>Thanks,</FONT>
-<BR><FONT SIZE=3D2>Robert</FONT>
-</P>
-
-</BODY>
-</HTML>
-------_=_NextPart_001_01C5C489.45989B80--
+CU, Andy
 
 
 -------------------------------------------------------
