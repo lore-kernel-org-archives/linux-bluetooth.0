@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Beck <becka-bzus@bedatec.de>
+From: "Seba T." <dpbasti@wp.pl>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Problem with bluetooth sound... working but not working
-Message-ID: <20050928222115.GA5135@uni-duesseldorf.de>
-References: <433AD61D.1050307@cyberserver.dk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <433AD61D.1050307@cyberserver.dk>
+Subject: Re: [Bluez-users] problems with high-speed rfcomm transfers
+References: <433ADB96.5080100@flander.com>
+In-Reply-To: <433ADB96.5080100@flander.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart2186545.ETe5OJB1aI";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <200509282302.16779.dpbasti@wp.pl>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +21,52 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 29 Sep 2005 00:21:15 +0200
+Date: Wed, 28 Sep 2005 23:02:15 +0200
 
-Preben Holm <preben@cyberserver.dk> wrote:
-> Output from  hciconfig hci0 revision
-> -------------
-> laptop preben # hciconfig hci0 revision
-> hci0:   Type: USB
->        BD Address: 00:0E:A1:33:94:FE ACL MTU: 377:10 SCO MTU: 16:0
->        Firmware 263.3 / 9
-> Similar configurations (headset+dongle) works on windows-computers, but 
-> why isn't there a SCO: HCI/PCM in the hciconfig hci0 revision output.
+--nextPart2186545.ETe5OJB1aI
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Because this chip is not supported for SCO under linux. 
+Dnia =B6roda, 28 wrze=B6nia 2005 20:06, Simo Salminen napisa=B3:
+> Hello,
+>
+> Has anyone else had problems with high-speed rfcomm transfers with
+> BlueZ?
+>
+> I am using simple rfcomm test setup. The client dumps data to rfcomm
+> socket, and the server receives the data. Sometimes the data
+> transfer just freezes, without any error messages. The client has
+> sent the data, but it does not arrive at the server program.
+>
+> Tested with the bluez version that comes with 2.6.12 kernel, using
+> usb bt dongle.
+>
+> Anyway, I understand that more detailed error description is surely
+> needed, but I just wanted to know if anyone else has had these
+> problems.
 
-> I would really like this to work...
+i had this problem wiith pand and i still have
+=2D-=20
+Powered by Yoper Linux=20
+kernel 2.6.11 ; kde 3.4.2
+moj nr gg: 149460
 
-Get a CSR based chip. Did that here, too.
+Je=B6li musisz by=E6 pod winblowsem u=BFywaj www.firefox.pl
 
+--nextPart2186545.ETe5OJB1aI
+Content-Type: application/pgp-signature
 
-CU, Andy
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+
+iD8DBQBDOwTYYOP6Bf2Zb1YRAtw4AKC6ygQHT6N4L27mydSbU0mjizLo4gCffvNI
+gtJpF0Q9UP4P5P179OmkPpo=
+=RcUF
+-----END PGP SIGNATURE-----
+
+--nextPart2186545.ETe5OJB1aI--
 
 
 -------------------------------------------------------
