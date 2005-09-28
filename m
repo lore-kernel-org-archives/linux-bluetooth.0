@@ -1,15 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluetooth filesystem integration
-From: Bastien Nocera <hadess@hadess.net>
+From: Itzhak Ben-Akiva <benakiva@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1127906387.14254.27.camel@bluez.bueche.ch>
-References: <1127865130.15926.18.camel@panic>
-	 <1127899309.14281.7.camel@bluez.bueche.ch>
-	 <1127899931.5321.16.camel@localhost.localdomain>
-	 <1127906387.14254.27.camel@bluez.bueche.ch>
 Content-Type: text/plain
-Message-Id: <1127918552.32222.83.camel@bnocera.surrey.redhat.com>
+Message-Id: <1127914574.2662.22.camel@hexa0xfb>
 Mime-Version: 1.0
+Subject: [Bluez-devel] problems with AnyCom CF-300 on ARM920 Integrator/AP
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,45 +16,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 28 Sep 2005 15:42:32 +0100
+Date: Wed, 28 Sep 2005 16:36:14 +0300
 
-On Wed, 2005-09-28 at 13:19 +0200, Charles Bueche wrote:
-> On mer, 2005-09-28 at 11:32 +0200, Marcel Holtmann wrote:
-> > Hi Charles,
-> > 
-> > > > So this post is basically to anounce btfs and to gether some ideas on
-> > > > what you guys think is need and useful.
-> > > 
-> > > That will be great, eg to automatically rsync new pictures taken from my
-> > > phone to a local dir. I know there is a kbluetoothd plugin, but
-> > > rsync/btfs seems much more "UNIX-like" to me.
-> > > 
-> > > What would be great is to see phone contacts as virtual VCard files (one
-> > > file per contact). Not sure if it is possible, but you asked for
-> > > ideas :-)
-> > > 
-> > > Seeing my Palm T5 agenda as iCal file would be the top... OK, I stop
-> > > dreaming :-/
-> > 
-> > do you have any thoughts how the directory structure of this filesystem
-> > should look like. Let's discuss how we design it.
-> 
-> not sure if my ideas make sense, as I don't know the internal of
-> bluez/btfs/devices. My view is from a user's point.
-> 
-> - first level : device name
-> 
-> - second level : the device's applications. Examples :
-<snip>
+Hi everybody,
 
-Think of ObexFTP as FTP over Bluetooth. There's no per-application
-ObexFTP service...
+I'm having a very hard time trying to make bluetooth work on the ARM
+Integrator/AP platform.
 
----
-Bastien Nocera <hadess@hadess.net> 
-"Manchester United in Brazil? I hope they all get bloody diarrhoea" -
-Brian Clough, on Manchester United's decision to opt out of the FA Cup
-to play in the World Club Championship in 2000.
+Initially, I had a problem with pccard that was not recognized by pcmcia
+yenta_socket. Then, Russell King (ARM Linux Maintainer) provided my a
+patch that solved this problem.
+
+Then, now pccard bus works properly. PCMCIA system recognizes my card:
+Socket 0:
+  product info: "BTCFCARD", "LSE139"
+  manfid: 0x0264, 0x000b
+  function: 6 (network)
+
+However, bluecard_cs fails to allocate IO regions.
+
+Has anybody same similar problems on ARM? Is there anyone working with
+AnyCom CF-300 card?
+
+I'd appreciate any hint/help that could help me solve this problem.
+
+Thanks,
+Itzhak
 
 
 
