@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] hci_usb: add entry for FMWBA-101
-	Bluetooth usb-dongle
+Subject: Re: [Bluez-devel] Control of radiated power
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050928191714.GA17254@l-t.ee>
-References: <20050928152415.GA11240@l-t.ee>
-	 <1127922285.5321.20.camel@localhost.localdomain>
-	 <20050928191714.GA17254@l-t.ee>
+In-Reply-To: <20050929075906.1FFDF819@arbetsmyra.dyndns.org>
+References: <20050927112521.925BA1DC791@mrelay2.st2.lyceu.net>
+	 <20050929075906.1FFDF819@arbetsmyra.dyndns.org>
 Content-Type: text/plain
-Message-Id: <1127982561.5123.8.camel@localhost.localdomain>
+Message-Id: <1127981509.5123.1.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,26 +19,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Sep 2005 10:29:21 +0200
+Date: Thu, 29 Sep 2005 10:11:48 +0200
 
-Hi Marko,
+Hi Ronny,
 
-> > > This patch adds ID's for Fujitsu-Siemens FMWBA-101 Bluetooth
-> > > USB Adapter.
-> > > 
-> > > /proc/bus/usb/devices:
-> > > T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  7 Spd=12  MxCh= 0
-> > > D:  Ver= 1.10 Cls=0e(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> > > P:  Vendor=0bf8 ProdID=1003 Rev= 3.36
-> > > S:  Manufacturer=ALPS
-> > > S:  Product=BT USB
-> > 
-> > this is not needed, because the USB class is enough.
+> > My device is a Brainboxes PCMCIA card with BlueCore02 chipset. I have
+> > asked them, and they are on it...
 > 
-> But it is not, the device won't be detected without this patch.
+> Yes it's possible to do transmitter power control with this chipset. I 
+> have an alfa-patch for the bccmd utility which can do this. I haven't 
+> tried it with PCMCIA though, but via USB and UART it seems to work 
+> fine. My biggest problem now seem to be finding spare time to clean the 
+> patch up according to Marcels quite high demand on codingstyle...  :) 
 
-it must work without the patch. Otherwise there is something else broken
-on your side. Try the latest 2.6.14-rc2 kernel.
+a patch for bccmd is really easy, because it is modular. Send it anyhow.
 
 Regards
 
