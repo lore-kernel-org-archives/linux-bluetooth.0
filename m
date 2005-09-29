@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] How to avoid "hciconfig hci0 up"
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Andreas Beck <becka-bzus@bedatec.de>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200509291151.50469.dpbasti@wp.pl>
-References: <20050929092945.97395.qmail@web36102.mail.mud.yahoo.com>
-	 <200509291151.50469.dpbasti@wp.pl>
-Content-Type: text/plain
-Message-Id: <1127990726.5123.20.camel@localhost.localdomain>
+Subject: Re: [Bluez-users] Can Anyone share their application which does the audio transfer between an PC and an headset.
+Message-ID: <20050929101612.GA5398@uni-duesseldorf.de>
+References: <20050929074616.71793.qmail@web36105.mail.mud.yahoo.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20050929074616.71793.qmail@web36105.mail.mud.yahoo.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,26 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 29 Sep 2005 12:45:26 +0200
+Date: Thu, 29 Sep 2005 12:16:12 +0200
 
-Hi,
+Swathi Mathur80 <swathi_mathur80@yahoo.com> wrote:
+> I want to write an applications to exchange audio signal between an PC 
+> (with Linux and BlueZ) on one side, and headset on the other side.
 
-> > Why do i need to always use the below command to get my bluetooth adpater
-> > working  when i restart my pc ?
-> >
-> > hciconfig hci0 up
-> > how can i avoid this ?
-> add it to ur startup scripts 
-> 
-> somewhere in /etc/init.d/
+The headset shows up as an extra ALSA audio device when using btsco. 
+Just use it as any other audio device.
 
-this is the wrong approach. See my other email.
-
-Regards
-
-Marcel
+Or do you really want to talk to the device yourself, bypassing btsco?
 
 
+CU, ANdy
 
 
 -------------------------------------------------------
