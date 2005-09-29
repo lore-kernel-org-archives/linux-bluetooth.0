@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e555255705092908451b2be938@mail.gmail.com>
-From: Anderson Briglia <briglia.anderson@gmail.com>
+From: Nelson Murilo <nelson@pangeia.com.br>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] snd-bt-sco on an UART bluetooth device
+Subject: Re: [Bluez-devel] Problems with CF bluetooth
+Message-ID: <20050929135631.GA11742@pangeia.com.br>
+References: <20050929134802.GA6042@elf.ucw.cz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20050929134802.GA6042@elf.ucw.cz>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,32 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Sep 2005 11:45:49 -0400
+Date: Thu, 29 Sep 2005 10:56:31 -0300
 
-Hi all,
+On Thu, Sep 29, 2005 at 03:48:02PM +0200, Pavel Machek wrote:
+> Hi!
+>=20
+> I have some problems with Billionton CF card: if I insert card,
+> hciattach to it, eject it, hciattach again, I get an oops.
 
-I'm trying to use the snd-bt-sco driver and btsco application (both
-for using a bluetooth headset). When I used a usb bluetooth dongle,
-everything was ok. But, when I use the bluetooh on-board (UART type),
-the sound on bluetooth headset is very bad and I can't hear anything,
-just noise.
-I tryed to change the ACL MTU and SCO MTU to be the same on the UART
-bluetooth and usb bluetooth, but I got the same problem with the sound
-on bt headset.
-I'm using a btsco version 0.4. And this is the output from a hciconfig
-command typed on the device:
+I have the same CF card, but it not works in my debian 2.6.13.
+Any hints?=20
 
-hci0:   Type: UART
-       BD Address: 00:12:37:20:BF:F0 ACL MTU: 339:6 SCO MTU: 180:4
-       UP RUNNING
-       RX bytes:562 acl:0 sco:0 events:15 errors:0
-       TX bytes:10150 acl:0 sco:0 commands:14 errors:0
+> Another problem is that... it works well on my PC. When I try to do
+> the same hciattach on sharp zaurus handheld, I get
 
-Somebody can help me?
-
-Thanks in advance,
-
-Anderson
+I have two zaurus too :) What=B4s model and ROM you try using?=20
+OpenZaurus use 2.6.11 kernel now.=20
 
 
 -------------------------------------------------------
