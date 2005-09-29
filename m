@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] hcid D-Bus patch(Error Messages)
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Alexey Dobriyan <adobriyan@gmail.com>
-Cc: Maxim Krasnyansky <maxk@qualcomm.com>, bluez-devel@lists.sf.net,
-   netdev@vger.kernel.org
-In-Reply-To: <20050928202856.GA27645@mipter.zuzino.mipt.ru>
-References: <20050928202856.GA27645@mipter.zuzino.mipt.ru>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb05092805194782ba65@mail.gmail.com>
+References: <e1effdeb05092607273355fded@mail.gmail.com>
+	 <1127896709.5321.7.camel@localhost.localdomain>
+	 <e1effdeb05092805194782ba65@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1128012093.30743.20.camel@localhost.localdomain>
+Message-Id: <1128011263.30743.11.camel@localhost.localdomain>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: [PATCH] net/bluetooth/lib.c: remove unneeded #defines
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,34 +20,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Sep 2005 18:41:32 +0200
+Date: Thu, 29 Sep 2005 18:27:43 +0200
 
-Hi Alexey,
+Hi Claudio,
 
-> Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
-> ---
+> it's possible use uint32 without problems.
 > 
->  net/bluetooth/lib.c |    3 ---
->  1 file changed, 3 deletions(-)
+> - 0x00000000 - 0x000000FF Bluetooth error codes (current situation)
+> - 0x00000100 - 0x0000FFFF Reserved for future Bluetooth error codes
+> extension
+> - 0x00010000 - 0x0001FFFF D-Bus errors
+> - 0x00020000 - 0x0003FFFF System errors (0x00020000 + system error
+> value)
+> - 0x00040000 - 0xFFFFFFFF Reserved to future error classes
 > 
-> --- a/net/bluetooth/lib.c
-> +++ b/net/bluetooth/lib.c
-> @@ -24,12 +24,9 @@
->  
->  /* Bluetooth kernel library. */
->  
-> -#include <linux/config.h>
->  #include <linux/module.h>
->  
->  #include <linux/kernel.h>
-> -#include <linux/stddef.h>
-> -#include <linux/string.h>
->  #include <asm/errno.h>
->  
->  #include <net/bluetooth/bluetooth.h>
+> In order to make easier discover the error type, I defined the error
+> values range 
+> considering bitwise operations.
 
-thanks for the patch. Do you have more of them? If yes, then I like to
-cleanup this in one row and not step by step.
+this looks good to me. Any complaints or comments from others.
 
 Regards
 
