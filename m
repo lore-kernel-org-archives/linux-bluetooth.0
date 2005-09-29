@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <008901c5c523$ab190cc0$0300a8c0@akira>
-From: "Sir Graham" <sirgraham@endorasoft.es>
-To: <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0086_01C5C534.6E983FD0"
-Subject: [Bluez-devel] Problems to compilate a code in Red Hat 9
+Subject: Re: [Bluez-devel] [Full-disclosure] Nokia 7610, 3210 denial of
+	service in OBEX.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <5f30e2610509281009204901f3@mail.gmail.com>
+References: <5f30e2610509281009204901f3@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1128014130.6052.0.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,93 +19,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Sep 2005 20:29:03 +0200
+Date: Thu, 29 Sep 2005 19:15:30 +0200
 
-This is a multi-part message in MIME format.
+Hi Jeff,
 
-------=_NextPart_000_0086_01C5C534.6E983FD0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+> Sorry for the cross-post, I thought some of our readers might be interested ...
+> 
+> http://lists.grok.org.uk/pipermail/full-disclosure/2005-September/037428.html
 
-Hi All,
+consider using one of these mailing lists:
 
-One stupid question...=20
+	http://trifinite.org/trifinite_lists.html
 
-I Try to compilate your example of bluetooth code but  I have a problem:
-(I using Ret HAT 9 with blueZ, the module of bluetooth works perfect).
+Regards
 
-Well when I try to compilate the coder with the GCC (make command), the =
-GCC don=B4t found the <bluetooth/bluetooth.h>
+Marcel
 
-Can you comment the correct configurate to compilate this?=20
-I am sure that the problem is for my configuration.
-
-(The BlueZ includes are in my machine in =
-/usr/scr/linux-2.4.20-31.9/include/net/bluetooth)
-
-Any idea?
-
-I sure that is a stupid configuration. But I haven=B4t more experience =
-in linux.
-
-Thanks in advanced.
-
-Regards,
-Sir Graham.
-------=_NextPart_000_0086_01C5C534.6E983FD0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2900.2722" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>
-<DIV><FONT face=3DArial size=3D2>Hi All,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>One stupid question... </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I Try to compilate your example of =
-bluetooth=20
-code&nbsp;but&nbsp; I have a problem:</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>(I using Ret HAT 9 with blueZ, the =
-module of=20
-bluetooth works perfect).</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Well when I try to compilate the coder =
-with the GCC=20
-(make command), the GCC don=B4t found the=20
-&lt;bluetooth/bluetooth.h&gt;</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Can you comment the correct configurate =
-to=20
-compilate this? </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I am sure that the problem is for my=20
-configuration.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>(The BlueZ includes are in my machine =
-in=20
-/usr/scr/linux-2.4.20-31.9/include/net/bluetooth)</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Any idea?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I sure that is a stupid configuration. =
-But I=20
-haven=B4t more experience in linux.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Thanks in advanced.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Regards,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Sir =
-Graham.</FONT></DIV></FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0086_01C5C534.6E983FD0--
 
 
 
