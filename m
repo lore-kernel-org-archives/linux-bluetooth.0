@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluetooth filesystem integration
+Subject: Re: [Bluez-devel] problems with AnyCom CF-300 on ARM920
+	Integrator/AP
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1265464416.20050928201649@andric.com>
-References: <1127865130.15926.18.camel@panic>
-	 <1127899309.14281.7.camel@bluez.bueche.ch>
-	 <1127899931.5321.16.camel@localhost.localdomain>
-	 <1265464416.20050928201649@andric.com>
+In-Reply-To: <1127914574.2662.22.camel@hexa0xfb>
+References: <1127914574.2662.22.camel@hexa0xfb>
 Content-Type: text/plain
-Message-Id: <1128012314.30743.25.camel@localhost.localdomain>
+Message-Id: <1128012252.30743.23.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,30 +19,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Sep 2005 18:45:14 +0200
+Date: Thu, 29 Sep 2005 18:44:12 +0200
 
-Hi Dimitry,
+Hi Itzhak,
 
-> > do you have any thoughts how the directory structure of this filesystem
-> > should look like. Let's discuss how we design it.
+> I'm having a very hard time trying to make bluetooth work on the ARM
+> Integrator/AP platform.
 > 
-> Maybe it's nice to look at how the KDE bluetooth project has
-> implemented this.  They already overlay some sort of 'virtual'
-> filesystem on top of Konqueror, which is similar to:
+> Initially, I had a problem with pccard that was not recognized by pcmcia
+> yenta_socket. Then, Russell King (ARM Linux Maintainer) provided my a
+> patch that solved this problem.
 > 
-> bluetooth root
->    device1
->      service1
->      service2
->      ...
->    device2
->    device3
->    ...
+> Then, now pccard bus works properly. PCMCIA system recognizes my card:
+> Socket 0:
+>   product info: "BTCFCARD", "LSE139"
+>   manfid: 0x0264, 0x000b
+>   function: 6 (network)
 > 
-> etc.  See for instance:
+> However, bluecard_cs fails to allocate IO regions.
+> 
+> Has anybody same similar problems on ARM? Is there anyone working with
+> AnyCom CF-300 card?
+> 
+> I'd appreciate any hint/help that could help me solve this problem.
 
-the important thing is to thing about multiple local adapters. We have
-to deal with it no matter what.
+I saw you discussing this on LKML and this is the right place for
+dealing with it, because I don't have ARM experince. Once you got it
+working, please report it back here and if there is a patch then send it
+to me to merge it mainline.
 
 Regards
 
