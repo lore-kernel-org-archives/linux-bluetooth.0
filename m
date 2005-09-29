@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY108-F37BFB6E454B50F1EB33E4AD68C0@phx.gbl>
-From: "djails sliajd" <djails@hotmail.com>
-To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Subject: [Bluez-users] Problem with sdpd
+Message-ID: <CBBBD909D2D6D211B4700090273F9E6E04C49A50@polaris.hhn.com>
+From: Robert Wlaschin <robertw@healthhero.com>
+To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Trouble communicating to a non-discoverable BT devi
+	ce
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C5C489.45989B80"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,192 +18,112 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 29 Sep 2005 04:54:18 +0000
+Date: Wed, 28 Sep 2005 17:03:50 -0700
 
-Hi,
-The following problem happens every time I turn on my BT headset if sdpd is 
-running (see the hcidump capture at the end): there is an ACL packet exhange 
-that loops forever...
+This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
 
-The only two ways out I found so far:
+------_=_NextPart_001_01C5C489.45989B80
+Content-Type: text/plain;
+	charset="ISO-8859-2"
 
-Kill the connection with "hcitool dc 00:03:89:52:CB:6F"
 
-OR
+I have a slightly different problem than what I've seen posted in the
+mailing list thus far, please point me in the right direction if I have
+misspoke.  I am attempting to create an Ash script (on Busybox, Arm
+processor -- uClib cross compile, Deb Kernel 2.6.10) w/ bluez-libs-2.19, and
+bluez-utils-2.19.  The system I am using is semi-embedded and has a limited
+amount of space for various utilities.
 
-Kill the sdpd daemon before turning on the headset, turn on the headset and 
-then run sdpd.
+My BT device is non-discoverable, I am unable to change this.  Therefore, I
+am forced to wait until I am signaled by the device to attempt a connection.
+This device is also battery operated and the Manufacturer designed it to
+conserve power by allowing only a minimal time slice for the device to link
+with my system.  Once I have a connection I have to read the data by sending
+ACK's back across the device.
 
-Now here is my configuration:
+I was attempting to create a script that watched the system log messages
+dumped by hcid and sdpd.  I was able to create a script using rfcomm's bind
+and connect, which allowed me to read from /dev/rfcomm0 but I was unable to
+send without receiving a 'Host is down' error.  I did some reading and it
+was suggested that both the devices were setup as clients and this was why I
+was receiving this message.  Another suggestion was to use rfcomm's listen
+to setup the device.  I have attempted an implementation of that but I
+receive a Disconnect extremely quickly and I am having difficulty detecting
+when the listen connects to my device so I can extract the BT address and
+other pertinent data.
 
-FC4, 2.6.12kernel on i686
-Bluetooth adaptor: belkin F8T001 usb BT dongle (directly connected to the 
-usb port, no USB hub)
-Headset: Plantronics M2500
-hciconfig -a:
-        hci0:   Type: USB
-        BD Address: 00:0A:3A:59:81:EC ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:3663805 acl:611 sco:71453 events:710 errors:0
-        TX bytes:3584997 acl:607 sco:70061 commands:58 errors:0
-        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'sit-146a.it.jcu.edu.au-0'
-        Class: 0x120104
-        Service Classes: Networking
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x33c LMP Ver: 1.1 (0x1) LMP Subver: 
-0x33c
-        Manufacturer: Cambridge Silicon Radio (10)
-hciconfig hci0 revision says "SCO mapping:  HCI"
+First off am I even heading in the correct direction, should I use the
+rfcomm listen command, instead of the connect?  Is there an easier way to do
+what I need to get done, using already created tools I don't know about?  Do
+I need to run the sdptool and add the SP interface?  Where are the doc's
+that explain how to use the rfcomm and sdptool utils -- the man pages have
+various information/knowledge gaps?
 
-hcitool info 00:03:89:52:CB:6F
-        Requesting information ...
-        BD Address:  00:03:89:52:CB:6F
-        Device Name: M2500 by Plantronics
-        LMP Version: 1.2 (0x2) LMP Subversion: 0x615
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features: 0xbc 0xe8 0x01 0x00 0x08 0x08 0x00 0x00
-                <encryption> <slot offset> <timing accuracy> <role switch>
-                <sniff mode> <SCO link> <HV3 packets> <u-law log> <A-law 
-log>
-                <CVSD> <AFH cap. slave> <AFH cap. master>
+Thanks,
+Robert
 
-Package version: bluez-hcidump-1.18-1 & bluez-utils-2.15-7
+------_=_NextPart_001_01C5C489.45989B80
+Content-Type: text/html;
+	charset="ISO-8859-2"
+Content-Transfer-Encoding: quoted-printable
 
-Lastly, here is the hcidump produced when I turn on my headset:
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3DISO-8859-2">
+<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+5.5.2653.12">
+<TITLE>[Bluez-users] Trouble communicating to a non-discoverable BT =
+device</TITLE>
+</HEAD>
+<BODY>
+<BR>
 
-HCI sniffer - Bluetooth packet analyzer ver 1.18
-device: hci0 snap_len: 1028 filter: 0xffffffff
->HCI Event: Connect Request (0x04) plen 10
-    bdaddr 00:03:89:52:CB:6F class 0x20040c type ACL
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-    bdaddr 00:03:89:52:CB:6F role 0x01
-    Role: Slave
->HCI Event: Command Status (0x0f) plen 4
-    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
->HCI Event: Link Key Request (0x17) plen 6
-    bdaddr 00:03:89:52:CB:6F
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr 00:03:89:52:CB:6F
-    Link key: 38538b54fad52d65f22091e314d65e5d
->HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-    status 0x00 bdaddr 00:03:89:52:CB:6F
->HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 41 bdaddr 00:03:89:52:CB:6F type ACL encrypt 0x01
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-    handle 41 policy 0x0f
-    Link policy: RSWITCH HOLD SNIFF PARK
->HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-  o . R . . . .
->HCI Event: Command Complete (0x0e) plen 6
-    Write Link Policy Settings (0x02|0x000d) ncmd 1
-    status 0x00 handle 41
-< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
-    handle 41 ptype 0xcc18
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-  ) . . .
->ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-< ACL data: handle 41 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
->HCI Event: Command Status (0x0f) plen 4
-    Change Connection Packet Type (0x01|0x000f) status 0x00 ncmd 1
->HCI Event: Connection Packet Type Changed (0x1d) plen 5
-    status 0x00 handle 41 ptype 0x0018
-    Packet type: DM1 DH1
->HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 41
->ACL data: handle 41 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 48
-< ACL data: handle 41 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-< ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
->HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 41
->HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 41
->ACL data: handle 41 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
->ACL data: handle 41 flags 0x02 dlen 19
-    L2CAP(d): cid 0x0040 len 15 [psm 1]
-        SDP SS Req: tid 0x1 len 0xa
-          pat uuid-32 0x111f (Handsfree AG)
-          max 40
-          cont 00
-< ACL data: handle 41 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0040 len 10 [psm 1]
-        SDP SS Rsp: tid 0x1 len 0x5
-          count 0
-          cont 00
->HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 41
->ACL data: handle 41 flags 0x02 dlen 19
-    L2CAP(d): cid 0x0040 len 15 [psm 1]
-        SDP SS Req: tid 0x2 len 0xa
-          pat uuid-32 0x1112 (Headset AG)
-          max 40
-          cont 00
-< ACL data: handle 41 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0040 len 10 [psm 1]
-        SDP SS Rsp: tid 0x2 len 0x5
-          count 0
-          cont 00
->HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 41
->ACL data: handle 41 flags 0x02 dlen 19
-    L2CAP(d): cid 0x0040 len 15 [psm 1]
-        SDP SS Req: tid 0x3 len 0xa
-          pat uuid-32 0x1112 (Headset AG)
-          max 40
-          cont 00
-< ACL data: handle 41 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0040 len 10 [psm 1]
-        SDP SS Rsp: tid 0x3 len 0x5
-          count 0
-          cont 00
->HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 41
->ACL data: handle 41 flags 0x02 dlen 19
-    L2CAP(d): cid 0x0040 len 15 [psm 1]
-        SDP SS Req: tid 0x4 len 0xa
-          pat uuid-32 0x1112 (Headset AG)
-          max 40
-          cont 00
-< ACL data: handle 41 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0040 len 10 [psm 1]
-        SDP SS Rsp: tid 0x4 len 0x5
-          count 0
-          cont 00
->HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 41
->ACL data: handle 41 flags 0x02 dlen 19
-    L2CAP(d): cid 0x0040 len 15 [psm 1]
-        SDP SS Req: tid 0x5 len 0xa
-          pat uuid-32 0x1112 (Headset AG)
-          max 40
-          cont 00
-< ACL data: handle 41 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0040 len 10 [psm 1]
-        SDP SS Rsp: tid 0x5 len 0x5
-          count 0
-          cont 00
-The >HCI >ACL <ACL loop goes on forever ...
+<P><FONT SIZE=3D2>I have a slightly different problem than what I've =
+seen posted in the mailing list thus far, please point me in the right =
+direction if I have misspoke.&nbsp; I am attempting to create an Ash =
+script (on Busybox, Arm processor -- uClib cross compile, Deb Kernel =
+2.6.10) w/ bluez-libs-2.19, and bluez-utils-2.19.&nbsp; The system I am =
+using is semi-embedded and has a limited amount of space for various =
+utilities.</FONT></P>
 
-Thanks for helping me fixing this
+<P><FONT SIZE=3D2>My BT device is non-discoverable, I am unable to =
+change this.&nbsp; Therefore, I am forced to wait until I am signaled =
+by the device to attempt a connection.&nbsp; This device is also =
+battery operated and the Manufacturer designed it to conserve power by =
+allowing only a minimal time slice for the device to link with my =
+system.&nbsp; Once I have a connection I have to read the data by =
+sending ACK's back across the device.</FONT></P>
 
-_________________________________________________________________
-Tout savoir sur la sécurité de vos enfants sur Internet ! 
-http://go.msn.fr/10-channel/80-security/protection/default.asp
+<P><FONT SIZE=3D2>I was attempting to create a script that watched the =
+system log messages dumped by hcid and sdpd.&nbsp; I was able to create =
+a script using rfcomm's bind and connect, which allowed me to read from =
+/dev/rfcomm0 but I was unable to send without receiving a 'Host is =
+down' error.&nbsp; I did some reading and it was suggested that both =
+the devices were setup as clients and this was why I was receiving this =
+message.&nbsp; Another suggestion was to use rfcomm's listen to setup =
+the device.&nbsp; I have attempted an implementation of that but I =
+receive a Disconnect extremely quickly and I am having difficulty =
+detecting when the listen connects to my device so I can extract the BT =
+address and other pertinent data.</FONT></P>
 
+<P><FONT SIZE=3D2>First off am I even heading in the correct direction, =
+should I use the rfcomm listen command, instead of the connect?&nbsp; =
+Is there an easier way to do what I need to get done, using already =
+created tools I don't know about?&nbsp; Do I need to run the sdptool =
+and add the SP interface?&nbsp; Where are the doc's that explain how to =
+use the rfcomm and sdptool utils -- the man pages have various =
+information/knowledge gaps?</FONT></P>
+
+<P><FONT SIZE=3D2>Thanks,</FONT>
+<BR><FONT SIZE=3D2>Robert</FONT>
+</P>
+
+</BODY>
+</HTML>
+------_=_NextPart_001_01C5C489.45989B80--
 
 
 -------------------------------------------------------
