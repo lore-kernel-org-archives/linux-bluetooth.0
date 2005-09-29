@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problem with sdpd
+Subject: Re: [Bluez-users] problems with high-speed rfcomm transfers
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <BAY108-F37BFB6E454B50F1EB33E4AD68C0@phx.gbl>
-References: <BAY108-F37BFB6E454B50F1EB33E4AD68C0@phx.gbl>
+In-Reply-To: <433ADB96.5080100@flander.com>
+References: <433ADB96.5080100@flander.com>
 Content-Type: text/plain
-Message-Id: <1127982877.5123.13.camel@localhost.localdomain>
+Message-Id: <1127982671.5123.11.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,17 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 29 Sep 2005 10:34:36 +0200
+Date: Thu, 29 Sep 2005 10:31:11 +0200
 
-Hi,
+Hi Simo,
 
-> The following problem happens every time I turn on my BT headset if sdpd is 
-> running (see the hcidump capture at the end): there is an ACL packet exhange 
-> that loops forever...
+> Has anyone else had problems with high-speed rfcomm transfers with 
+> BlueZ?
+> 
+> I am using simple rfcomm test setup. The client dumps data to rfcomm 
+> socket, and the server receives the data. Sometimes the data 
+> transfer just freezes, without any error messages. The client has 
+> sent the data, but it does not arrive at the server program.
+> 
+> Tested with the bluez version that comes with 2.6.12 kernel, using 
+> usb bt dongle.
+> 
+> Anyway, I understand that more detailed error description is surely 
+> needed, but I just wanted to know if anyone else has had these 
+> problems.
 
-this is a bug in your headset. It tries to reconnect and for that it
-looks for a headset/handsfree profile, but you don't provide it and thus
-it keeps trying to find one. Update/upgrade your headset.
+please provide some test programs to reproduce it.
+
+> With amd64 machine it sometimes crashes with this error message:
+> 
+> Unable to handle kernel NULL pointer dereference at 0000000000000050 
+> RIP:
+
+Try the latest 2.6.14-rc2 kernel.
 
 Regards
 
