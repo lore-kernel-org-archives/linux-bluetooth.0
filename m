@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Nelson Murilo <nelson@pangeia.com.br>
+Subject: Re: [Bluez-devel] [PATCH] hci_usb: add entry for FMWBA-101
+	Bluetooth usb-dongle
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Problems with CF bluetooth
-Message-ID: <20050929135631.GA11742@pangeia.com.br>
-References: <20050929134802.GA6042@elf.ucw.cz>
+In-Reply-To: <20050928191714.GA17254@l-t.ee>
+References: <20050928152415.GA11240@l-t.ee>
+	 <1127922285.5321.20.camel@localhost.localdomain>
+	 <20050928191714.GA17254@l-t.ee>
+Content-Type: text/plain
+Message-Id: <1127982561.5123.8.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20050929134802.GA6042@elf.ucw.cz>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,22 +21,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Sep 2005 10:56:31 -0300
+Date: Thu, 29 Sep 2005 10:29:21 +0200
 
-On Thu, Sep 29, 2005 at 03:48:02PM +0200, Pavel Machek wrote:
-> Hi!
->=20
-> I have some problems with Billionton CF card: if I insert card,
-> hciattach to it, eject it, hciattach again, I get an oops.
+Hi Marko,
 
-I have the same CF card, but it not works in my debian 2.6.13.
-Any hints?=20
+> > > This patch adds ID's for Fujitsu-Siemens FMWBA-101 Bluetooth
+> > > USB Adapter.
+> > > 
+> > > /proc/bus/usb/devices:
+> > > T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  7 Spd=12  MxCh= 0
+> > > D:  Ver= 1.10 Cls=0e(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> > > P:  Vendor=0bf8 ProdID=1003 Rev= 3.36
+> > > S:  Manufacturer=ALPS
+> > > S:  Product=BT USB
+> > 
+> > this is not needed, because the USB class is enough.
+> 
+> But it is not, the device won't be detected without this patch.
 
-> Another problem is that... it works well on my PC. When I try to do
-> the same hciattach on sharp zaurus handheld, I get
+it must work without the patch. Otherwise there is something else broken
+on your side. Try the latest 2.6.14-rc2 kernel.
 
-I have two zaurus too :) What=B4s model and ROM you try using?=20
-OpenZaurus use 2.6.11 kernel now.=20
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
