@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <433C0F0D.2080605@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <e555255705092908451b2be938@mail.gmail.com>
+From: Anderson Briglia <briglia.anderson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] snd-bt-sco on an UART bluetooth device
-References: <e555255705092908451b2be938@mail.gmail.com>
-In-Reply-To: <e555255705092908451b2be938@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] snd-bt-sco on an UART bluetooth device
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,20 +16,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Sep 2005 09:58:05 -0600
+Date: Thu, 29 Sep 2005 11:45:49 -0400
+
+Hi all,
+
+I'm trying to use the snd-bt-sco driver and btsco application (both
+for using a bluetooth headset). When I used a usb bluetooth dongle,
+everything was ok. But, when I use the bluetooh on-board (UART type),
+the sound on bluetooth headset is very bad and I can't hear anything,
+just noise.
+I tryed to change the ACL MTU and SCO MTU to be the same on the UART
+bluetooth and usb bluetooth, but I got the same problem with the sound
+on bt headset.
+I'm using a btsco version 0.4. And this is the output from a hciconfig
+command typed on the device:
+
+hci0:   Type: UART
+       BD Address: 00:12:37:20:BF:F0 ACL MTU: 339:6 SCO MTU: 180:4
+       UP RUNNING
+       RX bytes:562 acl:0 sco:0 events:15 errors:0
+       TX bytes:10150 acl:0 sco:0 commands:14 errors:0
+
+Somebody can help me?
+
+Thanks in advance,
 
 Anderson
-
-> for using a bluetooth headset). When I used a usb bluetooth dongle,
-> everything was ok. But, when I use the bluetooh on-board (UART type),
-> the sound on bluetooth headset is very bad and I can't hear anything,
-> just noise.
-
-I remember seeing someone else talk about this problem. It should work 
-as long as the bluetooth adapter is still made by CSR. If it is a CSR 
-chip then maybe there's a problem in the kernel driver.
-
-Brad
 
 
 -------------------------------------------------------
