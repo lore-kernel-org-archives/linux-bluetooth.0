@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [Full-disclosure] Nokia 7610, 3210 denial of
-	service in OBEX.
+Subject: Re: [Bluez-devel] bluetooth filesystem integration
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <5f30e2610509281009204901f3@mail.gmail.com>
-References: <5f30e2610509281009204901f3@mail.gmail.com>
+In-Reply-To: <1265464416.20050928201649@andric.com>
+References: <1127865130.15926.18.camel@panic>
+	 <1127899309.14281.7.camel@bluez.bueche.ch>
+	 <1127899931.5321.16.camel@localhost.localdomain>
+	 <1265464416.20050928201649@andric.com>
 Content-Type: text/plain
-Message-Id: <1128014130.6052.0.camel@localhost.localdomain>
+Message-Id: <1128012314.30743.25.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,17 +21,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Sep 2005 19:15:30 +0200
+Date: Thu, 29 Sep 2005 18:45:14 +0200
 
-Hi Jeff,
+Hi Dimitry,
 
-> Sorry for the cross-post, I thought some of our readers might be interested ...
+> > do you have any thoughts how the directory structure of this filesystem
+> > should look like. Let's discuss how we design it.
 > 
-> http://lists.grok.org.uk/pipermail/full-disclosure/2005-September/037428.html
+> Maybe it's nice to look at how the KDE bluetooth project has
+> implemented this.  They already overlay some sort of 'virtual'
+> filesystem on top of Konqueror, which is similar to:
+> 
+> bluetooth root
+>    device1
+>      service1
+>      service2
+>      ...
+>    device2
+>    device3
+>    ...
+> 
+> etc.  See for instance:
 
-consider using one of these mailing lists:
-
-	http://trifinite.org/trifinite_lists.html
+the important thing is to thing about multiple local adapters. We have
+to deal with it no matter what.
 
 Regards
 
