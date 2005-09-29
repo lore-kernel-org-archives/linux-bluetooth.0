@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] problems with high-speed rfcomm transfers
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20050929074616.71793.qmail@web36105.mail.mud.yahoo.com>
+From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <433ADB96.5080100@flander.com>
-References: <433ADB96.5080100@flander.com>
-Content-Type: text/plain
-Message-Id: <1127982671.5123.11.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-1091135867-1127979976=:71720"
+Subject: [Bluez-users] Can Anyone share their application which does the audio transfer between an PC and an headset.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,39 +16,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 29 Sep 2005 10:31:11 +0200
+Date: Thu, 29 Sep 2005 00:46:16 -0700 (PDT)
 
-Hi Simo,
-
-> Has anyone else had problems with high-speed rfcomm transfers with 
-> BlueZ?
-> 
-> I am using simple rfcomm test setup. The client dumps data to rfcomm 
-> socket, and the server receives the data. Sometimes the data 
-> transfer just freezes, without any error messages. The client has 
-> sent the data, but it does not arrive at the server program.
-> 
-> Tested with the bluez version that comes with 2.6.12 kernel, using 
-> usb bt dongle.
-> 
-> Anyway, I understand that more detailed error description is surely 
-> needed, but I just wanted to know if anyone else has had these 
-> problems.
-
-please provide some test programs to reproduce it.
-
-> With amd64 machine it sometimes crashes with this error message:
-> 
-> Unable to handle kernel NULL pointer dereference at 0000000000000050 
-> RIP:
-
-Try the latest 2.6.14-rc2 kernel.
-
-Regards
-
-Marcel
+--0-1091135867-1127979976=:71720
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
 
+Hello,
+
+I want to write an applications to exchange audio signal between an PC (with Linux and BlueZ) on one side, and headset on the other side.
+I found on the Bluez-mailing list that some of them have already done this. Will it be possible for them to provide me with the sample programs which does the above.
+Thanks in advance,
+
+Swathi
+
+
+		
+---------------------------------
+Yahoo! for Good
+ Click here to donate to the Hurricane Katrina relief effort. 
+--0-1091135867-1127979976=:71720
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+<DIV><FONT size=2>
+<P>Hello,</P>
+<P>I want to write an </FONT><FONT face="Times New Roman"><FONT size=3>applications to exchange audio signal between an PC (with Linux and BlueZ) on one side, and headset on the other side.<BR>I found on the Bluez-mailing list that some of them have already done this. Will it be possible for them to provide&nbsp;me with the sample programs which does the above.<BR></FONT>Thanks in advance,</P>
+<P>Swathi</P></FONT></DIV><p>
+		<hr size=1>Yahoo! for Good<br> 
+<a href="http://store.yahoo.com/redcross-donate3/">Click here to donate</a> to the Hurricane Katrina relief effort. 
+
+--0-1091135867-1127979976=:71720--
 
 
 -------------------------------------------------------
