@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] problems with AnyCom CF-300 on ARM920
-	Integrator/AP
 From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1127914574.2662.22.camel@hexa0xfb>
-References: <1127914574.2662.22.camel@hexa0xfb>
+To: Alexey Dobriyan <adobriyan@gmail.com>
+Cc: Maxim Krasnyansky <maxk@qualcomm.com>, bluez-devel@lists.sf.net,
+   netdev@vger.kernel.org
+In-Reply-To: <20050928202856.GA27645@mipter.zuzino.mipt.ru>
+References: <20050928202856.GA27645@mipter.zuzino.mipt.ru>
 Content-Type: text/plain
-Message-Id: <1128012252.30743.23.camel@localhost.localdomain>
+Message-Id: <1128012093.30743.20.camel@localhost.localdomain>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Re: [PATCH] net/bluetooth/lib.c: remove unneeded #defines
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,34 +20,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Sep 2005 18:44:12 +0200
+Date: Thu, 29 Sep 2005 18:41:32 +0200
 
-Hi Itzhak,
+Hi Alexey,
 
-> I'm having a very hard time trying to make bluetooth work on the ARM
-> Integrator/AP platform.
+> Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+> ---
 > 
-> Initially, I had a problem with pccard that was not recognized by pcmcia
-> yenta_socket. Then, Russell King (ARM Linux Maintainer) provided my a
-> patch that solved this problem.
+>  net/bluetooth/lib.c |    3 ---
+>  1 file changed, 3 deletions(-)
 > 
-> Then, now pccard bus works properly. PCMCIA system recognizes my card:
-> Socket 0:
->   product info: "BTCFCARD", "LSE139"
->   manfid: 0x0264, 0x000b
->   function: 6 (network)
-> 
-> However, bluecard_cs fails to allocate IO regions.
-> 
-> Has anybody same similar problems on ARM? Is there anyone working with
-> AnyCom CF-300 card?
-> 
-> I'd appreciate any hint/help that could help me solve this problem.
+> --- a/net/bluetooth/lib.c
+> +++ b/net/bluetooth/lib.c
+> @@ -24,12 +24,9 @@
+>  
+>  /* Bluetooth kernel library. */
+>  
+> -#include <linux/config.h>
+>  #include <linux/module.h>
+>  
+>  #include <linux/kernel.h>
+> -#include <linux/stddef.h>
+> -#include <linux/string.h>
+>  #include <asm/errno.h>
+>  
+>  #include <net/bluetooth/bluetooth.h>
 
-I saw you discussing this on LKML and this is the right place for
-dealing with it, because I don't have ARM experince. Once you got it
-working, please report it back here and if there is a patch then send it
-to me to merge it mainline.
+thanks for the patch. Do you have more of them? If yes, then I like to
+cleanup this in one row and not step by step.
 
 Regards
 
