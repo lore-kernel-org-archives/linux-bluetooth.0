@@ -1,62 +1,57 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Robert L Waldrop <bob.waldrop@motorola.com>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20050801190110.GC11317@urbana.css.mot.com>
-Mime-Version: 1.0
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Marko Kreen <marko@l-t.ee>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [PATCH] hci_usb: add entry for FMWBA-101 Bluetooth usb-dongle
+Message-ID: <20050930184121.GA20072@l-t.ee>
+References: <20050928152415.GA11240@l-t.ee> <1127922285.5321.20.camel@localhost.localdomain> <20050928191714.GA17254@l-t.ee> <1127982561.5123.8.camel@localhost.localdomain>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] BlueZ stack failure
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 1 Aug 2005 14:01:10 -0500
+In-Reply-To: <1127982561.5123.8.camel@localhost.localdomain>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 30 Sep 2005 21:41:21 +0300
 
-Hi,
+On Thu, Sep 29, 2005 at 10:29:21AM +0200, Marcel Holtmann wrote:
+> > > > This patch adds ID's for Fujitsu-Siemens FMWBA-101 Bluetooth
+> > > > USB Adapter.
+> > > > 
+> > > > /proc/bus/usb/devices:
+> > > > T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  7 Spd=12  MxCh= 0
+> > > > D:  Ver= 1.10 Cls=0e(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> > > > P:  Vendor=0bf8 ProdID=1003 Rev= 3.36
+> > > > S:  Manufacturer=ALPS
+> > > > S:  Product=BT USB
+> > > 
+> > > this is not needed, because the USB class is enough.
+> > 
+> > But it is not, the device won't be detected without this patch.
+> 
+> it must work without the patch. Otherwise there is something else broken
+> on your side. Try the latest 2.6.14-rc2 kernel.
 
-I'm having a problem with the rfcomm utility and linux select().
-The symptoms are that if I CTRL-C after incomming connection is heard,
-when using "rfcomm listen ... /dev/rfcomm10", /dev/rfcomm10 is deleted.  
-More importantly, a select call on the device blocks except for the 
-first try.  Also, when my machine boots, you have to run 
-"/etc/init.d/bluetooth restart" for some reason, otherwise; bluetooth
-doesn't work, it's like there is something stuck at boot up.
-
-I created the /dev/rfcomm10 using .../bluz-utils-2.18/scripts/create_dev 
-and am using a clean copy of "rfcomm."  I've also tried rebooting bluetooth
-between each calls rfcomm and that doesn't work.
-
-I reinstalled libs and utils.  I had been using the patch on 2.6.11 from
-bluez.org.  I'm initially had an install of Fedora Core three based on 
-2.6.9.
-
-Thanks!
-
---bob w.
+Now I tried with 2.6.14-rc2.  On another machine, as I cant
+reboot the first one at will.  Same result - without the patch
+hciconfig shows nothing.
 
 -- 
-Robert Waldrop                  Motorola Personal Communications Sector
-rwaldrop@urbana.css.mot.com     Urbana-Champaign Design Center
-voice  217-384-8719             1800 South Oak Street
-                                Champaign IL 61820
+marko
 
-[X]  Motorola General Business Information
-[ ]  Motorola Internal Use Only
-[ ]  Motorola Confidential Proprietary
 
 
 -------------------------------------------------------
-SF.Net email is sponsored by: Discover Easy Linux Migration Strategies
-from IBM. Find simple to follow Roadmaps, straightforward articles,
-informative Webcasts and more! Get everything you need to get up to
-speed, fast. http://ads.osdn.com/?ad_id=7477&alloc_id=16492&op=click
+This SF.Net email is sponsored by:
+Power Architecture Resource Center: Free content, downloads, discussions,
+and more. http://solutions.newsforge.com/ibmarch.tmpl
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
