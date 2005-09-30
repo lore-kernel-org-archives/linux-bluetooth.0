@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <006c01c5c599$b7446c30$0300a8c0@akira>
-From: "Sir Graham" <sirgraham@endorasoft.es>
-To: <bluez-devel@lists.sourceforge.net>
-References: <008901c5c523$ab190cc0$0300a8c0@akira> <1128062557.4955.1.camel@localhost.localdomain> <000501c5c58c$97724970$0300a8c0@akira> <1128065639.4955.3.camel@localhost.localdomain> <003301c5c596$3eef3ec0$0300a8c0@akira> <1128068119.4955.14.camel@localhost.localdomain>
-Subject: Re: [Bluez-devel] Problems to compilate a code in Red Hat 9
+Message-ID: <433CF704.4040905@ubuntu.com>
+From: Charles Majola <charles@ubuntu.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="utf-8";
-	reply-type=original
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] pairing problem
+References: <432E89E8.3040809@ubuntu.com>  <432E910B.4020301@ubuntu.com>	 <1127295068.495.19.camel@localhost.localdomain>	 <433CF32D.1080205@ubuntu.com> <1128068218.4955.16.camel@localhost.localdomain>
+In-Reply-To: <1128068218.4955.16.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,59 +18,64 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 30 Sep 2005 10:34:04 +0200
+Date: Fri, 30 Sep 2005 10:27:48 +0200
 
-Hi,
+Marcel Holtmann wrote:
 
-¿¿¿¿ yes ????
-
-I don´t see any of this. I have the Red hat 9 and I think this package not 
-included.
-
-Sorry, I don´t works with linux and don´t have much experience....
-
-How I know if this package are in my distribution?
-
-Regards,
-Sir Graham.
-
------ Original Message ----- 
-From: "Marcel Holtmann" <marcel@holtmann.org>
-To: <bluez-devel@lists.sourceforge.net>
-Sent: Friday, September 30, 2005 10:15 AM
-Subject: Re: [Bluez-devel] Problems to compilate a code in Red Hat 9
-
-
-Hi,
-
-> Yes.... thanks for you answer...
+>Hi Charles,
 >
-> Ok. But Where I can download this package... sorry but I don´t found :
+>  
 >
->  bluez-libs-devel package
+>>>>I have a strange problem. For some reason when I boot my pc, I can't 
+>>>>make outgoing connections from my computer to my cellphone until I 
+>>>>restart bluez services(although already started at boot time, incomming 
+>>>>connections work fine). If I restart my computer, I have to restart 
+>>>>bluez services again so that outgoing connections work. I can't see 
+>>>>anything might cause this, it used to work fine with bluez-{utils,libs}< 
+>>>>2.20. Any ideas ?
+>>>>   
+>>>>
+>>>>        
+>>>>
+>>>install the latest bluez-utils-2.21 and try again. Run "hcidump -X -V"
+>>>to see what is going on.
+>>>      
+>>>
 >
-> ¿¿¿??
+>looks like your PIN helper is not working. Check the syslog for messages
+>from hcid.
+>  
 >
-> I find, because I see other references to this... but I don´t know where I
-> can download this...
 
-it is part of your Linux distribution.
+Sep 30 10:03:09 localhost hcid[6848]: pin_code_request 
+(sba=00:0E:A1:04:E6:C8, dba=00:0E:6D:45:2E:4D)
+Sep 30 10:03:09 localhost hcid[7340]: PIN helper exited abnormally with 
+code 256
+
+It works fine once I restart hcid. Thats why I have no idea whats 
+causing it.
 
 Regards
+Charles
 
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by:
-Power Architecture Resource Center: Free content, downloads, discussions,
-and more. http://solutions.newsforge.com/ibmarch.tmpl
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>Regards
+>
+>Marcel
+>
+>
+>
+>
+>-------------------------------------------------------
+>This SF.Net email is sponsored by:
+>Power Architecture Resource Center: Free content, downloads, discussions,
+>and more. http://solutions.newsforge.com/ibmarch.tmpl
+>_______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+>  
+>
 
 
 
