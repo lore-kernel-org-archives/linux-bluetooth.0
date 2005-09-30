@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Preben Holm <preben@cyberserver.dk>
+Subject: Re: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR chipset?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050928222115.GA5135@uni-duesseldorf.de>
-References: <433AD61D.1050307@cyberserver.dk>
-	 <20050928222115.GA5135@uni-duesseldorf.de>
+In-Reply-To: <20050930124108.GA26157@intevation.de>
+References: <20050930124108.GA26157@intevation.de>
 Content-Type: text/plain
-Message-Id: <1128069869.8762.6.camel@dist>
+Message-Id: <1128087233.4955.43.camel@localhost.localdomain>
 Mime-Version: 1.0
-Subject: [Bluez-users] SCO and broadcom devices
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,23 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 30 Sep 2005 10:44:29 +0200
+Date: Fri, 30 Sep 2005 15:33:53 +0200
 
-Hi everyone,
+Hi Thomas,
 
-Will there be any support for SCO in the near future of broadcom
-devices?
-I won't go buy a cellink, if the support is on it's way!
+> I just bought an Anubis Typhoon Bluetooth V1.2 USB adapter, which
+> according to the product page http://www.typhoon.de/en/art.php?p=838
+> should have "Main chip - CSR BlueCore", but in reality it is a
+> Broadcom BCM2035 :-/
+> 
+> It seems to work without problems and without needing to load
+> firmware, but I'm a little disappointed because I searched a long
+> time trying to find a bluetooth 1.2 class 1 device with CSR chipset.
+> 
+> Aren't there any manufacturers today who sell CSR based USB dongles?
+> 
+> I'm tempted to return it to the store, but what to buy instead?
 
-Btw. my broadcom device works with the standard drivers hci_usb!
+try to get a Cellink BlueCore4 based dongle with EDR support.
 
-An lsusb gives this:
- ID Broadcom 0a5c:200a Broadcom Corp.
+Regards
 
+Marcel
 
-Thanks for your help!
-
-/ Preben
 
 
 
