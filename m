@@ -1,7 +1,7 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: c3t0@yahoo.de
+From: Thomas Keitzl <c3t0@yahoo.de>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20050930205939.3e5081ff.c3t0@yahoo.de>
+Message-Id: <20050930210804.51239231.c3t0@yahoo.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Subject: [Bluez-users] BlueZ on Sony Vaio notebook with builtin Bluetooth
@@ -16,7 +16,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 30 Sep 2005 20:59:39 +0200
+Date: Fri, 30 Sep 2005 21:08:04 +0200
 
 Hi,
 I'm new to this mailinglist and to be honest I'm also new to mailinglists at all.
