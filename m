@@ -1,11 +1,8 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Message-ID: <3AEC1E10243A314391FE9C01CD65429B087859@mail.esn.co.in>
-From: "Srinivas G." <srinivasg@esntechnologies.co.in>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] How can I establish the communication between BT enabled device and FC 3 Linux box
+Message-ID: <01C5C5C9.58C8F330.emonturus@teltronic.es>
+From: Esteban Monturus <emonturus@teltronic.es>
+To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] bluetooth 1.2 and 2.0 dongles support
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,27 +14,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 30 Sep 2005 17:42:47 +0530
+Date: Fri, 30 Sep 2005 14:15:00 +0200
 
-Dear All,
+	Hi Marcel,
 
-I am new to this Bluetooth Technology. I am working on Fedora Core 3
-with 2.6.9-1.667 kernel version.=20
-My question is: If I have a bluetooth device, How can I connect to my
-Fedora Core 3 Linux Box using this Bluetooth enabled Device? I have seen
-on the net about BlueZ and Affix protocol stacks that support the Linux
-kernels.=20
+	I have some other questions about BlueZ I had forgotten to ask you, so 
+here they go:
+1.	I would like to buy a 2.0+EDR dongle to use with BlueZ. I have visited 
+your "Bluetooth device features and revision information" page, but I 
+haven't found any one. Does BlueZ support Bluetooth 2.0+EDR?.
+2.	I have a Cellink BTA-3120 dongle. Although Cellink says that it is 
+Bluetooth 1.2 compliant, when I use it with BlueZ, the HCI version I get 
+with hciconfig is 1.1. Is that wright?
 
-How can I establish the communication between my Bluetooth enabled
-device and Linux box?=20
-What are the steps I need to do it?=20
+3.	I also have an old Belkin F8T001 dongle. When I plugged it BlueZ loaded 
+always some firmware stuff and it worked properly. My old version of BlueZ 
+had a bluez-bluefw-1.0-202 rpm packet. I think this is equivalent to the 
+new tarball bluez-firmware that I have downloaded from BlueZ's homepage and 
+installed, but the reality is that this dongle doesn't work anymore.
 
-Could any one provide me some information or links on this?
+	Thank you again and best regards,
 
-Thanks in advance.
+	Esteban.
 
-Regards,
-Srinivas G
 
 
 -------------------------------------------------------
