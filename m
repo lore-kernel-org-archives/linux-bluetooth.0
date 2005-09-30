@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <433D997A.7090105@schugy.de>
-From: Christian Schuglitsch <subjectbluez@schugy.de>
-MIME-Version: 1.0
+From: c3t0@yahoo.de
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] bluetooth 1.2 and 2.0 dongles support (I have AVM
- Bluefritz! V2.0)
-References: <01C5C5C9.58C8F330.emonturus@teltronic.es> <1128082981.4955.38.camel@localhost.localdomain>
-In-Reply-To: <1128082981.4955.38.camel@localhost.localdomain>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Message-Id: <20050930205939.3e5081ff.c3t0@yahoo.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] BlueZ on Sony Vaio notebook with builtin Bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,36 +16,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 30 Sep 2005 22:00:58 +0200
+Date: Fri, 30 Sep 2005 20:59:39 +0200
 
-Dear Linux Bluetooth users,
-I've bought a bluefritz2.0 dongle because AVM has a page that says that 
-this dongle works with Linux.
-This may be true for wireless ISDN/DSL but not for headsets/8khz duplex 
-audio connections. After pairing I'm stuck.
+Hi,
+I'm new to this mailinglist and to be honest I'm also new to mailinglists at all.
 
-Well, I've checked the CSR partners page but I haven't found any 
-interesting vendor there.
+I recently bought a second-hand notebook (Sony Vaio PCG-Z1M) and I'm trying to get everything
+to work atm. Almost everything works quite fine except the bluetooth-device, which is
+built-in.
 
-I've found some well known like MSI or Samsung but none of them reaches 
-the quality of AVM ( including 5 year warranty).
-MSI sells graphics cards with wrong firmware, mainboards with disabled 
-USB-Ports and Samsung device always fail ( DVD drive, HDD, DV camera).
-I don't trust them.
+I don't have problems turning the bluetooth-device on and off using sonypi and spicctrl
+as the blue led on the laptop, which indicates the bluetooth-device-status, reacts on my
+spicctrl commands. Unfortunatly the BlueZ-utils doesn't detect any bluetooth-device even 
+though I activated it via "spicctrl -l1" and loaded the hci-usb-modul (bluetooth itself 
+is compiled in the kernel).
 
-And of course I like hardware that runs with open source drivers that 
-don't require any firmware files. E.g. I've bought a Twinhan DVB card 
-instead of a Avermedia 771. It's all about diversity and choice ;)
+If I try to put the device up anyway as it is done on this tutorial I found
+( http://www.holtmann.org/linux/bluetooth/vaio.html )
+>> hciconfig hci0 up 
+I only receive this message
+>> Can't get device info: No such device
 
-snd-bt-sco isn't compatible with Bluefritz but maybe there's someone in 
-this world who can develop another driver module. I just wonder how this 
-was done the Windows way ( I don't have Windows).
-I'm just a poor apprentice and I know it isn't very attractive if I 
-donate 50¤ but I can't give more support :-(
+I currently use linux-2.6.13.2 und slack-10.2.0. It would be great if someone was able to 
+help me because I just don't know what to do.
 
-Thanks for reading
+Hopefully,
+Thomas Keitzl
 
-Schugy
+		
+___________________________________________________________ 
+Was denken Sie über E-Mail? Wir hören auf Ihre Meinung: http://surveylink.yahoo.com/wix/p0379378.aspx
+
 
 
 -------------------------------------------------------
