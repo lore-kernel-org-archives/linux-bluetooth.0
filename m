@@ -1,10 +1,19 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <433D16A7.5030805@inelis.org>
-From: =?ISO-8859-1?Q?Lo=EFc_Lefort?= <loic.lefort@inelis.org>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Problems to compilate a code in Red Hat 9
+From: Bastien Nocera <hadess@hadess.net>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Re: DUN lookup on Samsung D500 raises SIGSEGV
+Cc: sirgraham@endorasoft.es
+In-Reply-To: <006c01c5c599$b7446c30$0300a8c0@akira>
+References: <008901c5c523$ab190cc0$0300a8c0@akira>
+	 <1128062557.4955.1.camel@localhost.localdomain>
+	 <000501c5c58c$97724970$0300a8c0@akira>
+	 <1128065639.4955.3.camel@localhost.localdomain>
+	 <003301c5c596$3eef3ec0$0300a8c0@akira>
+	 <1128068119.4955.14.camel@localhost.localdomain>
+	 <006c01c5c599$b7446c30$0300a8c0@akira>
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1128069646.32222.104.camel@bnocera.surrey.redhat.com>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,63 +25,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 30 Sep 2005 12:42:47 +0200
+Date: Fri, 30 Sep 2005 09:40:46 +0100
 
-Here is a patch to fix the SEGV when doing DUN lookup on Samsung phones
-(at least D500 and E720).
-The diagnostic for the bug is here:
-http://sourceforge.net/mailarchive/message.php?msg_id=3D11057684
-The problem is that the Samsung phones return a sequence of uuid for
-BTProfileDescList instead
-of a sequence of (sequence uuid version).
+On Fri, 2005-09-30 at 10:34 +0200, Sir Graham wrote:
+> Hi,
+>=20
+> =C2=BF=C2=BF=C2=BF=C2=BF yes ????
+>=20
+> I don=C2=B4t see any of this. I have the Red hat 9 and I think this pac=
+kage not=20
+> included.
+>=20
+> Sorry, I don=C2=B4t works with linux and don=C2=B4t have much experienc=
+e....
+>=20
+> How I know if this package are in my distribution?
 
-The patch detects the "sequence of uuid" case and uses a default version
-number of 0x100,
-as recommended in:
-http://sourceforge.net/mailarchive/message.php?msg_id=3D11202759
-The other case is unchanged.
+Don't use Red Hat Linux 9, it's ancient. Fedora Core 4 (ie. 4 versions
+afterwards) is available for download and from a number of magazines
+with CDs.
 
-Tested with these phones: Samsung D500 and E720, Nokia 6680.
-
---- bluez-libs-2.19/src/sdp.c   2005-08-06 13:13:58.000000000 +0200
-+++ bluez-libs-2.19-patched-for-d500/src/sdp.c  2005-09-29
-13:46:38.000000000 +0 200
-@@ -1526,12 +1526,24 @@
-                return -1;
-        }
-        for (seq =3D sdpdata->val.dataseq; seq && seq->val.dataseq; seq =3D
-seq->nex t) {
--               sdp_data_t *uuid =3D seq->val.dataseq;
--               sdp_data_t *pVnum =3D seq->val.dataseq->next;
--               if (uuid && pVnum) {
-+               uuid_t *uuid =3D NULL;
-+               uint16_t version =3D 0x100;
-+
-+               if (SDP_IS_UUID(seq->dtd)) {
-+                       uuid =3D &seq->val.uuid;
-+               } else {
-+                       sdp_data_t *puuid =3D seq->val.dataseq;
-+                       sdp_data_t *pVnum =3D seq->val.dataseq->next;
-+                       if (puuid && pVnum) {
-+                               uuid =3D &puuid->val.uuid;
-+                               version =3D pVnum->val.uint16;
-+                       }
-+               }
-+
-+               if (uuid !=3D NULL) {
-                        profDesc =3D (sdp_profile_desc_t
-*)malloc(sizeof(sdp_profi le_desc_t));
--                       profDesc->uuid =3D uuid->val.uuid;
--                       profDesc->version =3D pVnum->val.uint16;
-+                       profDesc->uuid =3D *uuid;
-+                       profDesc->version =3D version;
- #ifdef SDP_DEBUG
-                        sdp_uuid_print(&profDesc->uuid);
-                        SDPDBG("Vnum : 0x%04x\n", profDesc->version);
-
---=20
-Lo=EFc Lefort <loic.lefort@inelis.org>
-inelis
+---
+Bastien Nocera <hadess@hadess.net>=20
+Lucas has made a vacuous, boring, pretentious, retroactively destructive
+sequel. He has lost the plot. The man is a fool. -- Simon Pegg (on the
+Phantom Menace)
 
 
 
