@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: class 1 bluetooth 1.2 dongles with CSR
-	chipset?
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <433DB949.9030705@schugy.de>
+From: Christian Schuglitsch <subjectbluez@schugy.de>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050930165937.GA1038@intevation.de>
+Subject: Re: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR chipset?
 References: <20050930124108.GA26157@intevation.de>
-	 <1128087233.4955.43.camel@localhost.localdomain>
-	 <20050930165937.GA1038@intevation.de>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <1128157950.8555.0.camel@localhost.localdomain>
-Mime-Version: 1.0
+In-Reply-To: <20050930124108.GA26157@intevation.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,38 +18,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 01 Oct 2005 11:12:29 +0200
+Date: Sat, 01 Oct 2005 00:16:41 +0200
 
-Hi Thomas,
+Dear Linux Bluetooth users,
+I've bought an AVM Bluefritz! V2.0 dongle because AVM has a page that 
+says that this dongle works with Linux.
+This may be true for wireless ISDN/DSL but not for headsets/8khz duplex 
+audio connections. After pairing I'm stuck.
 
-> > > I just bought an Anubis Typhoon Bluetooth V1.2 USB adapter, which
-> > > according to the product page http://www.typhoon.de/en/art.php?p=3D=
-838
-> > > should have "Main chip - CSR BlueCore", but in reality it is a
-> > > Broadcom BCM2035 :-/
-> > >=20
-> > > Aren't there any manufacturers today who sell CSR based USB dongles=
-?
-> > > I'm tempted to return it to the store, but what to buy instead?
-> >=20
-> > try to get a Cellink BlueCore4 based dongle with EDR support.
->=20
-> Just ordered two from misterbluetooth.com in Berlin for 25=E2=82=AC eac=
-h.
->=20
-> Their web shop is broken, but some minutes after sending the order
-> via email they phoned me back that they will send it tomorrow and
-> that I don't have to pay in advance.
->=20
-> Would the Typhoon Dongle be helpful for you?
+Well, I've checked the CSR partners page but I haven't found any 
+interesting vendor there.
 
-if you don't need anymore, of course.
+I've found some well known like MSI or Samsung but none of them reaches 
+the quality of AVM ( including 5 year warranty).
+MSI sells graphics cards with wrong firmware, mainboards with disabled 
+USB-Ports and Samsung device always fail ( DVD drive, HDD, DV camera).
+I don't trust them.
 
-Regards
+And of course I like hardware that runs with open source drivers that 
+don't require any firmware files. E.g. I've bought a Twinhan DVB card 
+instead of a Avermedia 771. It's all about diversity and choice ;)
 
-Marcel
+snd-bt-sco isn't compatible with Bluefritz but maybe there's someone in 
+this world who can develop another driver module. I just wonder how this 
+was done the Windows way ( I don't have Windows).
+I'm just a poor apprentice and I know it isn't very attractive if I 
+donate 50€ but I can't give more support :-(
 
+Thanks for reading
 
+Schugy
 
 
 -------------------------------------------------------
