@@ -1,8 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <01C5C5C9.58C8F330.emonturus@teltronic.es>
-From: Esteban Monturus <emonturus@teltronic.es>
-To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] bluetooth 1.2 and 2.0 dongles support
+Subject: Re: [Bluez-users] Installing BlueZ
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <20050930092736.16493.qmail@web60625.mail.yahoo.com>
+References: <20050930092736.16493.qmail@web60625.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1128082179.4955.35.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -14,28 +18,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 30 Sep 2005 14:15:00 +0200
+Date: Fri, 30 Sep 2005 14:09:39 +0200
 
-	Hi Marcel,
+Hi Ronny,
 
-	I have some other questions about BlueZ I had forgotten to ask you, so 
-here they go:
-1.	I would like to buy a 2.0+EDR dongle to use with BlueZ. I have visited 
-your "Bluetooth device features and revision information" page, but I 
-haven't found any one. Does BlueZ support Bluetooth 2.0+EDR?.
-2.	I have a Cellink BTA-3120 dongle. Although Cellink says that it is 
-Bluetooth 1.2 compliant, when I use it with BlueZ, the HCI version I get 
-with hciconfig is 1.1. Is that wright?
+> I have Linux Debian with 2.6.8-2-k7 kernel version.
+> When I check with 'dpkg -l' command, I can see that
+> Bluez (hcidump, pin and utils) already installed on 
+> system.
+> 
+> Can my bluetooth device (from CSR, firmware 
+> version 525) work with Bluez ?
+>  
+> In the BlueZ website, there are 6 packages to download:
+> - libs
+> - utils
+> - pin
+> - firmware
+> - hcidump
+> - hciemu
+> Why only hcidump, pin & utils installed on my Linux
+> Debian ?
+>  
+> So, I'd download libs, firmware & hciemu packages,
+> how to install these packages and work together with 
+> old packages ?
 
-3.	I also have an old Belkin F8T001 dongle. When I plugged it BlueZ loaded 
-always some firmware stuff and it worked properly. My old version of BlueZ 
-had a bluez-bluefw-1.0-202 rpm packet. I think this is equivalent to the 
-new tarball bluez-firmware that I have downloaded from BlueZ's homepage and 
-installed, but the reality is that this dongle doesn't work anymore.
+you should look at "man apt-get".
 
-	Thank you again and best regards,
+Regards
 
-	Esteban.
+Marcel
+
 
 
 
