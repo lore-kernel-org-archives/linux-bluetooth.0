@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Thomas Arendsen Hein <thomas@intevation.de>
+Subject: Re: [Bluez-users] bluetooth 1.2 and 2.0 dongles support
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20050930124108.GA26157@intevation.de>
+In-Reply-To: <01C5C5C9.58C8F330.emonturus@teltronic.es>
+References: <01C5C5C9.58C8F330.emonturus@teltronic.es>
+Content-Type: text/plain
+Message-Id: <1128082981.4955.38.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR chipset?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,28 +18,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 30 Sep 2005 14:41:08 +0200
+Date: Fri, 30 Sep 2005 14:23:01 +0200
 
-Hi!
+Hi Esteban,
 
-I just bought an Anubis Typhoon Bluetooth V1.2 USB adapter, which
-according to the product page http://www.typhoon.de/en/art.php?p=838
-should have "Main chip - CSR BlueCore", but in reality it is a
-Broadcom BCM2035 :-/
+> 	I have some other questions about BlueZ I had forgotten to ask you, so 
+> here they go:
+> 1.	I would like to buy a 2.0+EDR dongle to use with BlueZ. I have visited 
+> your "Bluetooth device features and revision information" page, but I 
+> haven't found any one. Does BlueZ support Bluetooth 2.0+EDR?.
 
-It seems to work without problems and without needing to load
-firmware, but I'm a little disappointed because I searched a long
-time trying to find a bluetooth 1.2 class 1 device with CSR chipset.
+yes. EDR is fully supported.
 
-Aren't there any manufacturers today who sell CSR based USB dongles?
+> 2.	I have a Cellink BTA-3120 dongle. Although Cellink says that it is 
+> Bluetooth 1.2 compliant, when I use it with BlueZ, the HCI version I get 
+> with hciconfig is 1.1. Is that wright?
 
-I'm tempted to return it to the store, but what to buy instead?
+Send in the "hciconfig hci0 features" output.
 
-Thomas
+> 3.	I also have an old Belkin F8T001 dongle. When I plugged it BlueZ loaded 
+> always some firmware stuff and it worked properly. My old version of BlueZ 
+> had a bluez-bluefw-1.0-202 rpm packet. I think this is equivalent to the 
+> new tarball bluez-firmware that I have downloaded from BlueZ's homepage and 
+> installed, but the reality is that this dongle doesn't work anymore.
 
--- 
-Email: thomas@intevation.de
-http://intevation.de/~thomas/
+Use bluez-firmware and the bcm203x kernel driver for the 2.6 kernels.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
