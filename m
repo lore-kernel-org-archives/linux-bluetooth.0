@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Thomas Keitzl <c3t0@yahoo.de>
+Message-ID: <433E7429.1000406@schugy.de>
+From: Christian Schuglitsch <subjectbluez@schugy.de>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] BlueZ on Sony Vaio notebook with builtin
- Bluetooth
-Message-Id: <20051002105122.6f78e429.c3t0@yahoo.de>
-In-Reply-To: <20050930210804.51239231.c3t0@yahoo.de>
-References: <20050930210804.51239231.c3t0@yahoo.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Bluez-users] bluetooth 1.2 and 2.0 dongles support (I have AVM
+ Bluefritz! V2.0)
+References: <01C5C5C9.58C8F330.emonturus@teltronic.es> <1128082981.4955.38.camel@localhost.localdomain>
+In-Reply-To: <1128082981.4955.38.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,16 +19,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 2 Oct 2005 10:51:22 +0200
+Date: Sat, 01 Oct 2005 13:34:01 +0200
 
-is there anyone reading this mailinglist? :(
+Dear Linux Bluetooth users,
+I've bought a Bluefritz! V2.0 dongle because AVM has a page that says that
+this dongle works with Linux.
+This may be true for wireless ISDN/DSL but not for headsets/8khz duplex
+audio connections. After pairing I'm stuck.
 
-	
+Well, I've checked the CSR partners page but I haven't found any
+interesting vendor there.
 
-	
-		
-___________________________________________________________ 
-Gesendet von Yahoo! Mail - Jetzt mit 1GB Speicher kostenlos - Hier anmelden: http://mail.yahoo.de
+I've found some well known like MSI or Samsung but none of them reaches
+the quality of AVM ( including 5 year warranty).
+MSI sells graphics cards with wrong firmware, mainboards with disabled
+USB-Ports and Samsung device always fail ( DVD drive, HDD, DV camera).
+I don't trust them.
+
+And of course I like hardware that runs with open source drivers that
+don't require any firmware files. E.g. I've bought a Twinhan DVB card
+instead of a Avermedia 771. It's all about diversity and choice ;)
+
+snd-bt-sco isn't compatible with Bluefritz but maybe there's someone in
+this world who can develop another driver module. I just wonder how this
+was done the Windows way ( I don't have Windows).
+I'm just a poor apprentice and I know it isn't very attractive if I
+donate 50¤ but I can't give more support :-(
+
+Thanks for reading
+
+Schugy
+
 
 
 
