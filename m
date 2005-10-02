@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hcid patch
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb05093011224be94d05@mail.gmail.com>
-References: <e1effdeb05093011224be94d05@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1128160192.8555.6.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: "EpyxMobile" <epyxmobile@epyxmobile.com>
+To: <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Message-Id: <20051002093432.065362DD86D@relaymaster.rapidns.com>
+Subject: [Bluez-devel] looking for freelancer: connecting mobile phone to Skype via Bluetooth
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,40 +17,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 01 Oct 2005 11:49:52 +0200
+Date: Sun, 2 Oct 2005 11:34:10 +0200
 
-Hi Claudio,
+Dear Developers,
 
-> The patch is attached. The basic structure to start the development of
-> the "sdp", "network", "serial", ... was added. 
-> There are a lot not implemented methods.
+We at EpyxMobile have developed a solution, connecting mobile phones to
+Skype via Bluetooth. We would like to port this solution to Linux using
+Bluez, and now looking for a freelancer developer for this project.
 
-this patch looks like this:
+Should you be interested in taking this project, (or knowing anyone capable
+and willing to take this), please contact us at epyxmobile@epyxmobile.com.
 
- common/Makefile.am   |    4
- common/util.c        |   80 ++++
- common/util.h        |   35 +
- hcid/dbus-internal.h |   82 ++++
- hcid/dbus.c          |  909 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- hcid/dbus.h          |  200 +++++++++++
- hcid/hcid.h          |    1
- hcid/main.c          |   17
- tools/Makefile.am    |    2
- tools/hcitool.c      |   27 -
- 10 files changed, 1319 insertions(+), 38 deletions(-)
+Thank you for your attention and help.
 
-It is changing everything and looks like a previous patch that I
-reviewed.
+Best regards,
 
-I don't wanna see any changes outside hcid/dbus.[ch] at the moment and
-the error definitions we agreed on are not included. It seems you just
-modified one of your older patches with the new objects and paths. I
-want to include something before the next release, but I am going the
-full patch at the moment.
+EpyxMobile Development Team
+http://www.epyxmobile.com
 
-Regards
-
-Marcel
 
 
 
