@@ -1,21 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <9307f5f20510020452n5bb6410p490ead0c5a018eb2@mail.gmail.com>
-From: "P. Durante" <shackan@gmail.com>
+Subject: Re: [Bluez-devel] [PATCH] hci_usb: add entry for FMWBA-101
+	Bluetooth usb-dongle
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] hcid D-Bus patch
-In-Reply-To: <1128092607.4955.93.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <e1effdeb05091607426f824afa@mail.gmail.com>
-	 <1127644396.6362.6.camel@localhost.localdomain>
-	 <e1effdeb05092604597481f1a9@mail.gmail.com>
-	 <1127897100.5321.13.camel@localhost.localdomain>
-	 <e1effdeb05092812196392e0ac@mail.gmail.com>
-	 <1128011132.30743.8.camel@localhost.localdomain>
-	 <e1effdeb050929122670827a96@mail.gmail.com>
-	 <1128069460.4955.25.camel@localhost.localdomain>
-	 <e1effdeb050930075263b62ffb@mail.gmail.com>
-	 <1128092607.4955.93.camel@localhost.localdomain>
+In-Reply-To: <20050930184121.GA20072@l-t.ee>
+References: <20050928152415.GA11240@l-t.ee>
+	 <1127922285.5321.20.camel@localhost.localdomain>
+	 <20050928191714.GA17254@l-t.ee>
+	 <1127982561.5123.8.camel@localhost.localdomain>
+	 <20050930184121.GA20072@l-t.ee>
+Content-Type: text/plain
+Message-Id: <1128280010.5155.1.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -27,30 +23,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 2 Oct 2005 13:52:21 +0200
+Date: Sun, 02 Oct 2005 21:06:50 +0200
 
-> Will someone provide Python based graphical applications that are using
-> this new D-Bus interface?
->
+Hi Marko,
 
-Hi,
-I'm not new here, as I've already mentioned in other posts, this
-summer I've written both a dbus daemon (from scratch) and some python
-gui eye-candy stuff, since you seem interested in the latter, take a
-look  here :)
+> > > > > This patch adds ID's for Fujitsu-Siemens FMWBA-101 Bluetooth
+> > > > > USB Adapter.
+> > > > > 
+> > > > > /proc/bus/usb/devices:
+> > > > > T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  7 Spd=12  MxCh= 0
+> > > > > D:  Ver= 1.10 Cls=0e(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> > > > > P:  Vendor=0bf8 ProdID=1003 Rev= 3.36
+> > > > > S:  Manufacturer=ALPS
+> > > > > S:  Product=BT USB
+> > > > 
+> > > > this is not needed, because the USB class is enough.
+> > > 
+> > > But it is not, the device won't be detected without this patch.
+> > 
+> > it must work without the patch. Otherwise there is something else broken
+> > on your side. Try the latest 2.6.14-rc2 kernel.
+> 
+> Now I tried with 2.6.14-rc2.  On another machine, as I cant
+> reboot the first one at will.  Same result - without the patch
+> hciconfig shows nothing.
 
-http://shackan.altervista.org/bluetools.png
+then your hotplug is broken. Fix it or send me the dongle, because none
+of these dongles need to be listed.
 
-it's still under heavy development, unfortunately university started
-last week and I don't have much time now, anyway I'll keep you
-informed if you want.
+Regards
 
-ps: the problem is my dbus interface is different from yours, I might
-consider making it compatible if I have time to, but I'm going to
-redesign my api anyway so I might "rip" a good amount of suggestions
-from the way you and Claudio are doing it.
+Marcel
 
-regards
+
 
 
 -------------------------------------------------------
