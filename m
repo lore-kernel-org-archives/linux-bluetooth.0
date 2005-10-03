@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4341EB2C.1040804@ozob.net>
-From: Gene Imes <ebi7@ozob.net>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] BlueZ on Sony Vaio notebook with builtin Bluetooth
-References: <20050930205939.3e5081ff.c3t0@yahoo.de>
-In-Reply-To: <20050930205939.3e5081ff.c3t0@yahoo.de>
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Srinivas G." <srinivasg@esntechnologies.co.in>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <3AEC1E10243A314391FE9C01CD65429B087971@mail.esn.co.in>
+References: <3AEC1E10243A314391FE9C01CD65429B087971@mail.esn.co.in>
+Content-Type: text/plain
+Message-Id: <1128341030.22437.14.camel@blade>
+Mime-Version: 1.0
+Subject: [Bluez-users] RE: How can I establish the communication between BT enableddevice
+ and FC 3 Linux box
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,27 +20,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 03 Oct 2005 21:38:36 -0500
+Date: Mon, 03 Oct 2005 14:03:50 +0200
 
-c3t0@yahoo.de wrote:
-> Hi,
-> I'm new to this mailinglist and to be honest I'm also new to mailinglists at all.
-> 
-> I recently bought a second-hand notebook (Sony Vaio PCG-Z1M) and I'm trying to get everything
-> to work atm. Almost everything works quite fine except the bluetooth-device, which is
-> built-in.
-> 
-> I don't have problems turning the bluetooth-device on and off using sonypi and spicctrl
-> as the blue led on the laptop, which indicates the bluetooth-device-status, reacts on my
-> spicctrl commands. Unfortunatly the BlueZ-utils doesn't detect any bluetooth-device even 
-> though I activated it via "spicctrl -l1" and loaded the hci-usb-modul (bluetooth itself 
-> is compiled in the kernel).
-> 
+Hi Srinivas,
 
-Try to compile bluetooth as modules.
+> > every distribution supports BlueZ, because it is the official
+> Bluetooth
+> > stack for Linux. The Affix project seems to be dead.
+> 
+> Then, is it necessary (or not necessary) to configure/install the BlueZ
+> packages on my Linux box which uses the Fedora Core 3 with 2.6.9-1.667
+> kernel version on IA32 machine?
 
--- 
-Gene Imes                               www.ozob.net
+you need only to install bluez-libs, bluez-utils and bluez-hcidump.
+
+> I have gone through the following links (by you) and other links.
+> http://www.holtmann.org/linux/bluetooth
+> http://www.bluez.org/faq.html
+> www.bluetooth.com
+> www.bluetooth.org
+> www.bluez.org
+> http://affix.sourceforge.net
+> http://www.tik.ee.ethz.ch/~beutel/pub/talks/20010402_bt_adequate_lan.pdf
+> http://tuxmobil.org/bluetooth_cell_apps.html
+> 
+> If possible, please send me a link that explains about the BLUETOOTH
+> architecture on Linux boxes.
+
+You should first read something about how communication with Bluetooth
+works in general, because otherwise I can't help you. Pick a profile
+that you wanna use or describe how your communication should work.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
