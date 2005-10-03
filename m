@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Srinivas G." <srinivasg@esntechnologies.co.in>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <3AEC1E10243A314391FE9C01CD65429B087900@mail.esn.co.in>
-References: <3AEC1E10243A314391FE9C01CD65429B087900@mail.esn.co.in>
-Content-Type: text/plain
-Message-Id: <1128339566.22437.9.camel@blade>
-Mime-Version: 1.0
-Subject: [Bluez-users] Re: How can I establish the communication between BT enabled
- device and FC 3 Linux box
+Subject: RE: [Bluez-users] How can I establish the communication between BT enabled device and FC 3 Linux box
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Message-ID: <3AEC1E10243A314391FE9C01CD65429B087963@mail.esn.co.in>
+From: "Srinivas G." <srinivasg@esntechnologies.co.in>
+To: <phil@trig222.f9.co.uk>
+Cc: <bluez-users@lists.sourceforge.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,33 +18,66 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 03 Oct 2005 13:39:26 +0200
+Date: Mon, 3 Oct 2005 16:56:39 +0530
 
-Hi Srinivas,
+Phil Wrote:
+>=20
+> Hi, what device do you have.
+>=20
+> I use bluez to connect my palm to my PC so that I can use my ADSL
+> connection to wirelessly connect to the net from anywhere in the
+house.
+>=20
+> I can post details if you are interested.
+>=20
+> Phil
+>=20
 
-> Sorry for asking such a silly questions here. Could any one please
-> respond to me? I am new to this Bluetooth Technology. I am working on
-> Fedora Core 3 with 2.6.9-1.667 kernel version. 
-> 
-> My questions are:
-> 
-> If I have a bluetooth device, how can I connect to my Fedora Core 3
-> Linux Box using this Bluetooth enabled Device? I have seen on the net
-> about BlueZ and Affix protocol stacks that support the Linux kernels. 
+Dear Phil,
 
-every distribution supports BlueZ, because it is the official Bluetooth
-stack for Linux. The Affix project seems to be dead.
+First of all, thanks a lot for your reply.=20
 
-> How can I establish the communication between my Bluetooth enabled
-> device and Linux box? 
+I am planning to write a driver/applications which use the PCI based
+bluetooth devices. I need to know the following things.
 
-You need to be more specific.
+1)	Is it necessary to configure/install the BlueZ packages on my
+Linux 	box which uses the Fedora Core 3 with 2.6.9-1.667 kernel
+version?=20
 
-Regards
+	I think this is not required, because 2.6.x kernel comes with
+Bluetooth protocols. The following link contains this info.
+	http://www.bluez.org/faq.html
+=09
+	Could you please tell me whether I need to install the packages
+explicitly or not?
 
-Marcel
+2) 	I need to learn the Bluetooth architecture on Linux systems.
+Could you 	please forward me any links that you can know about the
+Bluetooth 	architecture under Linux boxes?
+=09
+	I have seen the following links.
+	www.bluetooth.com
+	www.bluetooth.org
+	www.bluez.org
+	http://affix.sourceforge.net
+	http://www.holtmann.org/linux/bluetooth
+=20
+http://www.tik.ee.ethz.ch/~beutel/pub/talks/20010402_bt_adequate_lan.pdf
+	http://tuxmobil.org/bluetooth_cell_apps.html
+
+	Could you please forward me any other links?
+
+3)	Could you please post me your details? I did not know about it.
+I did 	not know even about the ADSL etc.
+
+Sorry for the inconvenience caused to you.=20
+
+Thanks and Regards,
+Srinivas G
 
 
+
+ =09
 
 
 -------------------------------------------------------
