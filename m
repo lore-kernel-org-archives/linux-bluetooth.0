@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <96c186cf0510041630i679033b1r@mail.gmail.com>
+Message-ID: <96c186cf0510041600j4875abeeh@mail.gmail.com>
 From: =?ISO-8859-1?Q?Rubi_Santiago_Ram=EDrez?= <rubisantiago@gmail.com>
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] How do I compile Bluez?
+In-Reply-To: <1128455837.26362.19.camel@blade>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_10330_31848239.1128468630740"
-Subject: [Bluez-devel] Problem install packages Bluetooth!!!
+	boundary="----=_Part_10246_1282860.1128466835917"
+References: <96c186cf0510041112u55398a69p@mail.gmail.com>
+	 <1128455837.26362.19.camel@blade>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,74 +20,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 4 Oct 2005 18:30:30 -0500
+Date: Tue, 4 Oct 2005 18:00:35 -0500
 
-------=_Part_10330_31848239.1128468630740
+------=_Part_10246_1282860.1128466835917
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
 Hi,
-I have problems when I tried install the packages Bluetooth. The problems
-with hcidump I compiling how said the README file but I typed make install
-the display show next error:
-
-gcc -I/usr/include -Wall -O2 -o bpasniff bpasniff.o -L/usr/lib -lbluetooth
-../parser/libparser.a
-../parser/libparser.a(lmp.o)(.text+0x7b9): En la funci=F3n `lmp_dump':
-: undefined reference to `bt_get_unaligned'
-../parser/libparser.a(lmp.o)(.text+0x844): En la funci=F3n `lmp_dump':
-: undefined reference to `bt_get_unaligned'
-../parser/libparser.a(lmp.o)(.text+0x85b): En la funci=F3n `lmp_dump':
-: undefined reference to `bt_get_unaligned'
-../parser/libparser.a(lmp.o)(.text+0xb11): En la funci=F3n `lmp_dump':
-: undefined reference to `bt_get_unaligned'
-../parser/libparser.a(lmp.o)(.text+0xd1f): En la funci=F3n `lmp_dump':
-: undefined reference to `bt_get_unaligned'
-../parser/libparser.a(lmp.o)(.text+0xd40): more undefined references to
-`bt_get_unaligned' follow
-collect2: ld devolvi=F3 el estado de salida 1
-make[1]: *** [bpasniff] Error 1
-make[1]: Leaving directory `/root/BlueZ/bluez-hcidump-1.25/src'
-make: *** [install-recursive] Error 1
-
-How I compiling and run bluez-pin-0.26? Can you explain me please?
+If installed the Fedora Core 4,
+1) Witch kernel to Bluetooth have the fedora core 4?
+2) I dont have this moment the Fedora Core 4 only I have fedora core 3, Is
+it possible should install the Fedora core 3?
+3) Is Fedora Core 4 stable system?
+4) Mi object the update kernel bluetooth is because I need use the avatanaB=
+T
+API and need that BlueZ to be version newer.
 Thanks
 
-------=_Part_10330_31848239.1128468630740
+------=_Part_10246_1282860.1128466835917
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
 Hi,<br>
-I have problems when I tried install the packages Bluetooth. The
-problems with hcidump I compiling how said the README file but I typed
-make install the display show next error:<br>
-<br>
-gcc -I/usr/include -Wall -O2&nbsp;&nbsp; -o bpasniff&nbsp; bpasniff.o -L/us=
-r/lib -lbluetooth ../parser/libparser.a<br>
-../parser/libparser.a(lmp.o)(.text+0x7b9): En la funci=F3n `lmp_dump':<br>
-: undefined reference to `bt_get_unaligned'<br>
-../parser/libparser.a(lmp.o)(.text+0x844): En la funci=F3n `lmp_dump':<br>
-: undefined reference to `bt_get_unaligned'<br>
-../parser/libparser.a(lmp.o)(.text+0x85b): En la funci=F3n `lmp_dump':<br>
-: undefined reference to `bt_get_unaligned'<br>
-../parser/libparser.a(lmp.o)(.text+0xb11): En la funci=F3n `lmp_dump':<br>
-: undefined reference to `bt_get_unaligned'<br>
-../parser/libparser.a(lmp.o)(.text+0xd1f): En la funci=F3n `lmp_dump':<br>
-: undefined reference to `bt_get_unaligned'<br>
-../parser/libparser.a(lmp.o)(.text+0xd40): more undefined references to `bt=
-_get_unaligned' follow<br>
-collect2: ld devolvi=F3 el estado de salida 1<br>
-make[1]: *** [bpasniff] Error 1<br>
-make[1]: Leaving directory `/root/BlueZ/bluez-hcidump-1.25/src'<br>
-make: *** [install-recursive] Error 1<br>
-<br>
-How I compiling and run bluez-pin-0.26? Can you explain me please?<br>
+If installed the Fedora Core 4, <br>
+1) Witch kernel to Bluetooth have the fedora core 4?<br>
+2) I dont have this moment the Fedora Core 4 only I have fedora core 3, Is =
+it possible should install the Fedora core 3?<br>
+3) Is Fedora Core 4 stable system?<br>
+4) Mi object the update kernel bluetooth is because I need use the avatanaB=
+T API and need that BlueZ to be version newer.<br>
 Thanks<br>
-<br>
+<br><br><br>
 
-------=_Part_10330_31848239.1128468630740--
+------=_Part_10246_1282860.1128466835917--
 
 
 -------------------------------------------------------
