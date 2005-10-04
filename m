@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Cannot send through serial device rfcomm
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Andreas Beck <becka-bzdvl@bedatec.de>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <CBBBD909D2D6D211B4700090273F9E6E04C49A63@polaris.hhn.com>
-References: <CBBBD909D2D6D211B4700090273F9E6E04C49A63@polaris.hhn.com>
-Content-Type: text/plain
-Message-Id: <1128424578.5226.18.camel@blade>
+Subject: Re: [Bluez-devel] looking for freelancer: connecting mobile phone to Skype via Bluetooth
+Message-ID: <20051004082707.GA5156@uni-duesseldorf.de>
+References: <20051002093432.065362DD86D@relaymaster.rapidns.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20051002093432.065362DD86D@relaymaster.rapidns.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,45 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 04 Oct 2005 13:16:18 +0200
+Date: Tue, 4 Oct 2005 10:27:08 +0200
 
-Hi Robert,
+EpyxMobile <epyxmobile@epyxmobile.com> wrote:
+> We at EpyxMobile have developed a solution, connecting mobile phones to
+> Skype via Bluetooth. We would like to port this solution to Linux using
+> Bluez, and now looking for a freelancer developer for this project.
 
-please stop using HTML emails and especially don't use colors. The good
-old plain ASCII is enough.
+I suppose you have seen the contrib dir in btsco?
 
-> I'm cross-compiling for an Arm processor using a Debian 2.6.10 kernel
-> with bluez-utils/lib 2.21, and bluez-hcidump 2.25 w/ a brainbox usb
-> adapter for rs-232 replacement (CSR chipset)
->  
-> I'm having a problem communicating through the /dev/rfcomm0 device.  I
-> thought that once the device was connected it would be have like a
-> serial device and I could do this ...
->  
-> cat /dev/rfcomm0 > myfile.dat
-> echo AT > /dev/rfcomm0
->  
-> Am I assuming correctly?  If not what am I missing?  Do I need to use
-> the pppd or the dund to communicate?  Am I in the wrong mode (master
-> vs slave).  
->  
-> If this should work please look at my log files, I'm executing
-> these commands ... 
->  
-> hcid
-> sdpd
-> sdptool add SP
-> rfcomm bind 0 XX:XX ...
+Is that what you have in mind?
 
-I think you made a big mistake in understanding how Bluetooth and Linux
-are working. Describe what kind of communication you try to achieve and
-then we might be able to help you.
+Or do you want to take the integration one step further and also use the
+phone's keyboard or even push the skype GUI to the phone?
 
-Regards
+Moreover - how do you get sound over? I didn't think phones were
+generally capable of being used as headsets ...
 
-Marcel
+I'd need more details on how it works, before I can decide if I'd be up
+to it.
 
 
+CU, Andy
+
+-- 
+= Andreas Beck                    |  Email :  <becka-sig@bedatec.de>         =
 
 
 -------------------------------------------------------
