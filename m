@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Profile porting
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <f16b04cf0510032315i46206dbfnc599fc704d1d65a7@mail.gmail.com>
-References: <f16b04cf0510032315i46206dbfnc599fc704d1d65a7@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1128424346.5226.13.camel@blade>
-Mime-Version: 1.0
+Message-ID: <f16b04cf0510032315i46206dbfnc599fc704d1d65a7@mail.gmail.com>
+From: hariharan veerappan <hariharanneevee@gmail.com>
+To: Bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Profile porting
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +16,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 04 Oct 2005 13:12:26 +0200
+Date: Tue, 4 Oct 2005 11:45:01 +0530
 
-Hi Hariharan,
+Hello all,
 
-> Presently we are working in porting of Profile with Bluez stack.
-> Anyone please advise whether the Bluez stack contains the
-> 
-> Serial Port Profile, Head set profile.
-> 
-> If yes, Advise us regarding the documents location of Profile porting
+Presently we are working in porting of Profile with Bluez stack.
+Anyone please advise whether the Bluez stack contains the
 
-the serial port profile is supported, because we implement the RFCOMM
-protocol. For the headset profile you should take a look at the ALSA
-Bluetooth project.
+Serial Port Profile, Head set profile.
 
-Regards
+If yes, Advise us regarding the documents location of Profile porting
 
-Marcel
-
-
+Hariharan.V.
 
 
 -------------------------------------------------------
