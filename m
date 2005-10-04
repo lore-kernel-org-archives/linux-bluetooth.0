@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43438BDD.5070308@erzia.com>
-From: Franz Fuerbass <franz.furbass@erzia.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] can't build bluez-utils 2.21
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Brainboxes BL-752(BCSP) card fails to transmit 1M chunk
+In-Reply-To: <200510042118.53657.neoclust@mandriva.org>
+References: <200510042118.53657.neoclust@mandriva.org>
+Content-Type: text/plain
+Message-Id: <1128455786.26362.17.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,67 +18,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 05 Oct 2005 10:16:29 +0200
+Date: Tue, 04 Oct 2005 21:56:26 +0200
 
-Hello,
+Hi,
 
-I am using the PCMCIA Brainboxes BL-752 card for measurements of the
-Bluetooth network. Currently I also recognized the well known error for
-BCSP (at least in this mailing list):
+> i can't build bluez-utils 2.21, i obtain this error:
+> 
+> 
+> In file included from csrinit.c:40:
+> csr.h:76: error: syntax error before 'id'
+> csr.h:77: error: syntax error before 'ver'
+> csr.h:78: error: syntax error before 'pskey'
+> csr.h:80: error: syntax error before 'uint16_t'
+> csr.h:81: error: syntax error before 'uint16_t'
+> csr.h:82: error: syntax error before 'uint16_t'
+> csr.h:83: error: syntax error before 'uint16_t'
+> csr.h:84: error: syntax error before 'uint16_t'
+> csr.h:85: error: syntax error before 'uint16_t'
+> csr.h:86: error: syntax error before 'uint16_t'
+> ICECREAM[16465]: Compiled on 192.168.2.53
+> make[2]: *** [csrinit.o] Error 1
+> make[2]: *** Waiting for unfinished jobs....
+> mkdir .libs
+> gcc -I/usr/include -I/usr/include -O2 -pipe -Wp,-D_FORTIFY_SOURCE=2 
+> -fomit-frame-pointer -march=i586 -mtune=pentiumpro -fpic -o hcitool hcitool.o 
+> oui.o  -L/usr/lib /lib/libbluetooth.so ../common/libtextfile.a
+> make[2]: Leaving directory `/home/neoclust/rpm/BUILD/bluez-utils-2.21/tools'
+> make[1]: *** [all-recursive] Error 1
+> make[1]: Leaving directory `/home/neoclust/rpm/BUILD/bluez-utils-2.21'
+> make: *** [all] Error 2
 
-bcsp_recv: Short BCSP packet
-bcsp_recv: Short BCSP packet
-bcsp_recv: Out-of-order packet arrived, got 3 expected 1
-bcsp_recv: Short BCSP packet
-bcsp_recv: Out-of-order packet arrived, got 6 expected 4
-bcsp_recv: Short BCSP packet
+I can't see why this happens, but you might need to include another
+header in csrinit.c in your case. However --disable-csrinit when you
+call configure should solve it.
 
-This does not hurt too much until I try to send chunks of 1 megabyte with a
-L2CAP MTU of 672 over the network, where the ACL connection (packet type 
-DH5)
-slows down to 300 kbps.
+Regards
 
-Using the PAN profile with pand, at least one UDP packet get lost.
-The last output from hcidump shows:
-
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 41 flags 0x01 dlen 490
-    L2CAP(d): cid 0x0040 len 1503 [psm 0]
- > ACL data: handle 41 flags 0x02 dlen 512
- > ACL data: handle 41 flags 0x01 dlen 505
- > ACL data: handle 41 flags 0x01 dlen 339
- > ACL data: handle 41 flags 0x01 dlen 151
-    L2CAP(d): cid 0x0040 len 1503 [psm 0]
- > ACL data: handle 41 flags 0x02 dlen 512
- > ACL data: handle 41 flags 0x01 dlen 505
- > ACL data: handle 41 flags 0x01 dlen 194
-    L2CAP(d): cid 0x0040 len 1207 [psm 0]
-
-
-I am using Kernel 2.6.13, the card was connected to a tty device with
-    $> /usr/sbin/hciattach $DEVICE bcsp
-using the hci_uart + serial driver (h4).
-
-The /etc/pcmcia/bluetooth.conf file has the following entry:
-
-card "Brain Boxes BL-752 Bluetooth Adapter"
-  manfid 0x0160,0xaba0
-  bind "serial_cs" class "bluetooth"
+Marcel
 
 
-cat /proc/tty/driver/serial gives:
-...
-2: uart:TI16750 port:000003E8 irq:3 tx:15970676 rx:17133759 
-RTS|CTS|DTR|DSR|CD
-...
-This looks ok, but seems to me that the flow control is not working 
-correctly.
-
-
-
-Please let me know if there is a solution for this
-thanks
-Franz
 
 
 -------------------------------------------------------
