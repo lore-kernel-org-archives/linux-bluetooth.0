@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4343E370.5010109@sbox.tugraz.at>
-From: Franz Fuerbass <oedi@sbox.tugraz.at>
-MIME-Version: 1.0
+Message-ID: <f16b04cf0510050701n2a3b6057md6803ff4c1ac432f@mail.gmail.com>
+From: hariharan veerappan <hariharanneevee@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Brainboxes BL-752(BCSP) card fails to transmit
- 1M chunk
-References: <43438BDD.5070308@erzia.com>
-In-Reply-To: <43438BDD.5070308@erzia.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] Profile porting
+In-Reply-To: <1128424346.5226.13.camel@blade>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <f16b04cf0510032315i46206dbfnc599fc704d1d65a7@mail.gmail.com>
+	 <1128424346.5226.13.camel@blade>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,70 +19,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 05 Oct 2005 16:30:08 +0200
+Date: Wed, 5 Oct 2005 19:31:15 +0530
 
-Franz Fuerbass wrote:
+Hello all,
+If SPP profile support is present, please advise us to how to
+implement and test it
 
-> Hello,
+Hariharan.V.
+
+On 10/4/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Hariharan,
 >
-> I am using the PCMCIA Brainboxes BL-752 card for measurements of the
-> Bluetooth network. Currently I also recognized the well known error for
-> BCSP (at least in this mailing list):
+> > Presently we are working in porting of Profile with Bluez stack.
+> > Anyone please advise whether the Bluez stack contains the
+> >
+> > Serial Port Profile, Head set profile.
+> >
+> > If yes, Advise us regarding the documents location of Profile porting
 >
-> bcsp_recv: Short BCSP packet
-> bcsp_recv: Short BCSP packet
-> bcsp_recv: Out-of-order packet arrived, got 3 expected 1
-> bcsp_recv: Short BCSP packet
-> bcsp_recv: Out-of-order packet arrived, got 6 expected 4
-> bcsp_recv: Short BCSP packet
+> the serial port profile is supported, because we implement the RFCOMM
+> protocol. For the headset profile you should take a look at the ALSA
+> Bluetooth project.
 >
-> This does not hurt too much until I try to send chunks of 1 megabyte 
-> with a
-> L2CAP MTU of 672 over the network, where the ACL connection (packet 
-> type DH5)
-> slows down to 300 kbps.
+> Regards
 >
-> Using the PAN profile with pand, at least one UDP packet get lost.
-> The last output from hcidump shows:
->
-> > HCI Event: Number of Completed Packets (0x13) plen 5
-> > ACL data: handle 41 flags 0x01 dlen 490
->    L2CAP(d): cid 0x0040 len 1503 [psm 0]
-> > ACL data: handle 41 flags 0x02 dlen 512
-> > ACL data: handle 41 flags 0x01 dlen 505
-> > ACL data: handle 41 flags 0x01 dlen 339
-> > ACL data: handle 41 flags 0x01 dlen 151
->    L2CAP(d): cid 0x0040 len 1503 [psm 0]
-> > ACL data: handle 41 flags 0x02 dlen 512
-> > ACL data: handle 41 flags 0x01 dlen 505
-> > ACL data: handle 41 flags 0x01 dlen 194
->    L2CAP(d): cid 0x0040 len 1207 [psm 0]
+> Marcel
 >
 >
-> I am using Kernel 2.6.13, the card was connected to a tty device with
->    $> /usr/sbin/hciattach $DEVICE bcsp
-> using the hci_uart + serial driver (h4).
->
-> The /etc/pcmcia/bluetooth.conf file has the following entry:
->
-> card "Brain Boxes BL-752 Bluetooth Adapter"
->  manfid 0x0160,0xaba0
->  bind "serial_cs" class "bluetooth"
->
->
-> cat /proc/tty/driver/serial gives:
-> ...
-> 2: uart:TI16750 port:000003E8 irq:3 tx:15970676 rx:17133759 
-> RTS|CTS|DTR|DSR|CD
-> ...
-> This looks ok, but seems to me that the flow control is not working 
-> correctly.
->
->
->
-> Please let me know if there is a solution for this
-> thanks
-> Franz
 >
 >
 > -------------------------------------------------------
@@ -93,18 +56,7 @@ Franz Fuerbass wrote:
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-
-Figured out that this error will only appear on a Evo N1020v Notebook.
-Everything is fine with another notebook.
-Both PC's have the same kernel version and flags with the
-same distribution and software version. 
-
-Don't know the reason, yet
-
-regards Franz
-
-
+>
 
 
 -------------------------------------------------------
