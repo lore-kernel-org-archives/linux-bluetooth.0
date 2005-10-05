@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4343953D.7070901@ruault.com>
-From: Charles-Edouard Ruault <ce@ruault.com>
+Message-ID: <43438BDD.5070308@erzia.com>
+From: Franz Fuerbass <franz.furbass@erzia.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Nokia 6680 services....
-References: <4340F256.3040605@ruault.com> <1128339452.22437.6.camel@blade>
-In-Reply-To: <1128339452.22437.6.camel@blade>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Brainboxes BL-752(BCSP) card fails to transmit 1M chunk
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,78 +16,67 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 05 Oct 2005 10:56:29 +0200
+Date: Wed, 05 Oct 2005 10:16:29 +0200
 
-Marcel Holtmann wrote:
+Hello,
 
->Hi Charles,
->
->  
->
->>i just got a 6680 and i'm trying to play with bluetooth.
->>Using sdptool browse 00:xx:xx:xx:xx:xx
->>i'm getting the following services. I've noticed that the last 2
->>services are flagged with an error ...
->>I'm using the latest bluez version ( bluez-libs-2.21& bluez-utils-2.21 ).
->>Does anyone know what it means ?
->>    
->>
->
->these are not really errors, but the normal decoding can't deal with
->UUID-128. Use --raw or --tree to enable an alternate display method.
->
->Regards
->
->Marcel
->
->
->  
->
-Hi Marcel,
-thanks for the reply. In the meantime i had dug into the code and
-figured this out ....
-I'm now trying to use obexftp to tranfer data to/from my phone but it's
-failing ( it used to work fine on my motorola e398 ).
-Here's the log i'm getting:
+I am using the PCMCIA Brainboxes BL-752 card for measurements of the
+Bluetooth network. Currently I also recognized the well known error for
+BCSP (at least in this mailing list):
 
-obexftp -b 00:xx:xx:xx:xx:xx -l -v
-Browsing 00:xx:xx:xx:xx:xx ...
-No custom transport
-Connecting...bt: 1
-done
-Receiving (null)... failed: (null)
-Disconnecting...done
+bcsp_recv: Short BCSP packet
+bcsp_recv: Short BCSP packet
+bcsp_recv: Out-of-order packet arrived, got 3 expected 1
+bcsp_recv: Short BCSP packet
+bcsp_recv: Out-of-order packet arrived, got 6 expected 4
+bcsp_recv: Short BCSP packet
 
-However, the device does advertise an obex file transfer profile:
+This does not hurt too much until I try to send chunks of 1 megabyte with a
+L2CAP MTU of 672 over the network, where the ACL connection (packet type 
+DH5)
+slows down to 300 kbps.
 
-Service Description: OBEX File Transfer
-Service RecHandle: 0x10005
-Service Class ID List:
-"OBEX File Transfer" (0x1106)
-Protocol Descriptor List:
-"L2CAP" (0x0100)
-"RFCOMM" (0x0003)
-Channel: 10
-"OBEX" (0x0008)
-Language Base Attr List:
-code_ISO639: 0x454e
-encoding: 0x6a
-base_offset: 0x100
-Profile Descriptor List:
-"OBEX File Transfer" (0x1106)
-Version: 0x0100
+Using the PAN profile with pand, at least one UDP packet get lost.
+The last output from hcidump shows:
+
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > ACL data: handle 41 flags 0x01 dlen 490
+    L2CAP(d): cid 0x0040 len 1503 [psm 0]
+ > ACL data: handle 41 flags 0x02 dlen 512
+ > ACL data: handle 41 flags 0x01 dlen 505
+ > ACL data: handle 41 flags 0x01 dlen 339
+ > ACL data: handle 41 flags 0x01 dlen 151
+    L2CAP(d): cid 0x0040 len 1503 [psm 0]
+ > ACL data: handle 41 flags 0x02 dlen 512
+ > ACL data: handle 41 flags 0x01 dlen 505
+ > ACL data: handle 41 flags 0x01 dlen 194
+    L2CAP(d): cid 0x0040 len 1207 [psm 0]
 
 
-Specifying channel 10 to obexftp does not improve things ...
-Any hint ?
-Thanks in advance.
-Regards.
+I am using Kernel 2.6.13, the card was connected to a tty device with
+    $> /usr/sbin/hciattach $DEVICE bcsp
+using the hci_uart + serial driver (h4).
+
+The /etc/pcmcia/bluetooth.conf file has the following entry:
+
+card "Brain Boxes BL-752 Bluetooth Adapter"
+  manfid 0x0160,0xaba0
+  bind "serial_cs" class "bluetooth"
 
 
--- 
-Charles-Edouard Ruault
-GPG key Id E4D2B80C
+cat /proc/tty/driver/serial gives:
+...
+2: uart:TI16750 port:000003E8 irq:3 tx:15970676 rx:17133759 
+RTS|CTS|DTR|DSR|CD
+...
+This looks ok, but seems to me that the flow control is not working 
+correctly.
 
+
+
+Please let me know if there is a solution for this
+thanks
+Franz
 
 
 -------------------------------------------------------
