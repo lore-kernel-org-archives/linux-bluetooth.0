@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] no route to host
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4344185B.1030401@gmx.de>
-References: <4344185B.1030401@gmx.de>
-Content-Type: text/plain
-Message-Id: <1128538606.5447.42.camel@localhost.localdomain>
-Mime-Version: 1.0
+Message-ID: <4344185B.1030401@gmx.de>
+From: Rainer Lay <rainer.lay@gmx.de>
+MIME-Version: 1.0
+To: Bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] no route to host
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,28 +16,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 05 Oct 2005 20:56:46 +0200
+Date: Wed, 05 Oct 2005 20:15:55 +0200
 
-Hi Rainer,
+Hi,
 
-> when trying to access rfcomm devices, I get:
-> minicom: cannot open /dev/rfcomm0: No route to host
-> 
-> rfcomm tells me:
-> rfcomm0: 00:20:E0:3A:BC:28 channel 3 clean
-> 
-> I am using bluez-utils version 2.19
-> I cannot find any log files, ...
-> I can connect to my handy via bluetooth with e.g. wammu
+when trying to access rfcomm devices, I get:
+minicom: cannot open /dev/rfcomm0: No route to host
 
-run "hcidump -X -V" to see where the problem might be. What is
-"hciconfig -a" telling you?
+rfcomm tells me:
+rfcomm0: 00:20:E0:3A:BC:28 channel 3 clean
 
-Regards
+I am using bluez-utils version 2.19
+I cannot find any log files, ...
+I can connect to my handy via bluetooth with e.g. wammu
 
-Marcel
+any hints?
 
-
+kind regards
+Rainer
 
 
 -------------------------------------------------------
