@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4344185B.1030401@gmx.de>
-From: Rainer Lay <rainer.lay@gmx.de>
-MIME-Version: 1.0
-To: Bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] no route to host
+Subject: Re: [Bluez-users] Nokia 6680 services....
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <4343EF4F.7010901@ruault.com>
+References: <4340F256.3040605@ruault.com> <1128339452.22437.6.camel@blade>
+	 <4343953D.7070901@ruault.com>
+	 <1128511597.5102.2.camel@localhost.localdomain>
+	 <4343EF4F.7010901@ruault.com>
+Content-Type: text/plain
+Message-Id: <1128534736.5447.35.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +21,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 05 Oct 2005 20:15:55 +0200
+Date: Wed, 05 Oct 2005 19:52:16 +0200
 
-Hi,
+Hi Charles,
 
-when trying to access rfcomm devices, I get:
-minicom: cannot open /dev/rfcomm0: No route to host
+> I've attached the info you've requested !
 
-rfcomm tells me:
-rfcomm0: 00:20:E0:3A:BC:28 channel 3 clean
+The SDP channel decoding is not working. May you wanna create a binary
+dump with "hcidump -w <file>".
 
-I am using bluez-utils version 2.19
-I cannot find any log files, ...
-I can connect to my handy via bluetooth with e.g. wammu
+Regards
 
-any hints?
+Marcel
 
-kind regards
-Rainer
+
 
 
 -------------------------------------------------------
