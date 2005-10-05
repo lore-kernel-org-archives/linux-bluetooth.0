@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4344DA83.30300@ruault.com>
-From: Charles-Edouard Ruault <ce@ruault.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] no route to host
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Nokia 6680 services....
-References: <4340F256.3040605@ruault.com> <1128339452.22437.6.camel@blade>	 <4343953D.7070901@ruault.com>	 <1128511597.5102.2.camel@localhost.localdomain>	 <4343EF4F.7010901@ruault.com> <1128534736.5447.35.camel@localhost.localdomain>
-In-Reply-To: <1128534736.5447.35.camel@localhost.localdomain>
-Content-Type: multipart/mixed;
- boundary="------------040402050301070207060300"
+In-Reply-To: <43442E4A.2070509@gmx.de>
+References: <4344185B.1030401@gmx.de>
+	 <1128538606.5447.42.camel@localhost.localdomain>  <43442E4A.2070509@gmx.de>
+Content-Type: text/plain
+Message-Id: <1128545657.5447.71.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,88 +19,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 06 Oct 2005 10:04:19 +0200
+Date: Wed, 05 Oct 2005 22:54:17 +0200
 
-This is a multi-part message in MIME format.
---------------040402050301070207060300
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Hi Rainer,
 
-Marcel Holtmann wrote:
+> >> when trying to access rfcomm devices, I get:
+> >> minicom: cannot open /dev/rfcomm0: No route to host
+> >>
+> >> rfcomm tells me:
+> >> rfcomm0: 00:20:E0:3A:BC:28 channel 3 clean
+> >>
+> >> I am using bluez-utils version 2.19
+> >> I cannot find any log files, ...
+> >> I can connect to my handy via bluetooth with e.g. wammu
+> > 
+> > run "hcidump -X -V" to see where the problem might be. What is
+> while running minicom, I get no output.
+> 
+> > "hciconfig -a" telling you?
+> 
+> hci0:   Type: USB
+>         BD Address: 00:20:E0:3A:BC:28 ACL MTU: 192:8 SCO MTU: 64:8
 
->Hi Charles,
->
->  
->
->>I've attached the info you've requested !
->>    
->>
->
->The SDP channel decoding is not working. May you wanna create a binary
->dump with "hcidump -w <file>".
->
->Regards
->
->Marcel
->
->
->  
->
-Here you go !
-Thanks for the help.
-Regards.
+the address in the rfcomm call is the remote address and not the local
+one. There is no loopback support in Bluetooth.
 
--- 
-Charles-Edouard Ruault
-GPG key Id E4D2B80C
+Regards
+
+Marcel
 
 
---------------040402050301070207060300
-Content-Type: application/octet-stream;
- name="obexftp.dump"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="obexftp.dump"
-
-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
-AQCF2URD5ikGAAQFBAAuABY=
---------------040402050301070207060300--
 
 
 -------------------------------------------------------
