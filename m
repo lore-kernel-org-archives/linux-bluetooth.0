@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Anthony R. J. Ball" <ant@suave.net>
+Message-ID: <434549A7.1070401@gmx.de>
+From: Rainer Lay <rainer.lay@gmx.de>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20051007150204.GA18594@suave.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Socket Rev H?
+Subject: Re: [Bluez-users] no route to host
+References: <4344185B.1030401@gmx.de>	 <1128538606.5447.42.camel@localhost.localdomain>  <43442E4A.2070509@gmx.de> <1128545657.5447.71.camel@localhost.localdomain>
+In-Reply-To: <1128545657.5447.71.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,28 +18,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 7 Oct 2005 11:02:04 -0400
+Date: Thu, 06 Oct 2005 17:58:31 +0200
 
 
-  I have been looking all around and going crazy. It seems like 
-every time I buy Linux supported hardware the manufacturer has
-upped the revision to screw my compatibilty (WRT54GS, PVR-150, now
-the socket card, sigh).
 
-  As far as I can tell this card does work, but I am having trouble
-finding directions on which incantation I need to perform the proper
-magic.
+Marcel Holtmann wrote:
+> Hi Rainer,
+> 
+>>>> when trying to access rfcomm devices, I get:
+>>>> minicom: cannot open /dev/rfcomm0: No route to host
+>>>>
+>>>> rfcomm tells me:
+>>>> rfcomm0: 00:20:E0:3A:BC:28 channel 3 clean
+>>>>
+>>>> I am using bluez-utils version 2.19
+>>>> I cannot find any log files, ...
+>>>> I can connect to my handy via bluetooth with e.g. wammu
+>>> run "hcidump -X -V" to see where the problem might be. What is
+>> while running minicom, I get no output.
+>>
+>>> "hciconfig -a" telling you?
+>> hci0:   Type: USB
+>>         BD Address: 00:20:E0:3A:BC:28 ACL MTU: 192:8 SCO MTU: 64:8
+> 
+> the address in the rfcomm call is the remote address and not the local
+> one. There is no loopback support in Bluetooth.
+> 
 
-  I am trying to put it on a Zaurus SL-5500 running OpenZaurus 3.5.3
-which has a 2.4x kernel in it.
+thanx! This was obviously my mistake.
+I was to silly to remember my MAC address :-)
+Maybe you could at the device comment from rfcomm.conf to the output
+too, so silly people like me can detect their errors themselves.
 
-  Can someone point me in the right direction, please? 
-
--- 
-     www.suave.net - Anthony Ball - ant@suave.net
-        OSB - http://rivendell.suave.net/Beer
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-Use hope and imagination as weapons of survival and progress.
+thanx,
+Rainer
 
 
 
