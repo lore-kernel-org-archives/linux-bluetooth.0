@@ -1,17 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Nokia 6680 services....
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4344DA83.30300@ruault.com>
+From: Charles-Edouard Ruault <ce@ruault.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4344DA83.30300@ruault.com>
-References: <4340F256.3040605@ruault.com> <1128339452.22437.6.camel@blade>
-	 <4343953D.7070901@ruault.com>
-	 <1128511597.5102.2.camel@localhost.localdomain>
-	 <4343EF4F.7010901@ruault.com>
-	 <1128534736.5447.35.camel@localhost.localdomain>
-	 <4344DA83.30300@ruault.com>
-Content-Type: text/plain
-Message-Id: <1128593198.5492.28.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Nokia 6680 services....
+References: <4340F256.3040605@ruault.com> <1128339452.22437.6.camel@blade>	 <4343953D.7070901@ruault.com>	 <1128511597.5102.2.camel@localhost.localdomain>	 <4343EF4F.7010901@ruault.com> <1128534736.5447.35.camel@localhost.localdomain>
+In-Reply-To: <1128534736.5447.35.camel@localhost.localdomain>
+Content-Type: multipart/mixed;
+ boundary="------------040402050301070207060300"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -23,57 +19,88 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 06 Oct 2005 12:06:37 +0200
+Date: Thu, 06 Oct 2005 10:04:19 +0200
 
-Hi Charles,
+This is a multi-part message in MIME format.
+--------------040402050301070207060300
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-> Here you go !
+Marcel Holtmann wrote:
 
-this is weird. We ask for the FTP record handle only. The handle is not
-important. We need the channel number:
+>Hi Charles,
+>
+>  
+>
+>>I've attached the info you've requested !
+>>    
+>>
+>
+>The SDP channel decoding is not working. May you wanna create a binary
+>dump with "hcidump -w <file>".
+>
+>Regards
+>
+>Marcel
+>
+>
+>  
+>
+Here you go !
+Thanks for the help.
+Regards.
 
-< ACL data: handle 46 flags 0x02 dlen 22
-    L2CAP(d): cid 0x0040 len 18 [psm 1]
-        SDP SSA Req: tid 0x0 len 0xd
-          pat uuid-16 0x1106 (OBEXObjTrnsf)
-          max 65535
-          aid(s) 0x0000 (SrvRecHndl)
-          cont 00
-> ACL data: handle 46 flags 0x02 dlen 24
-    L2CAP(d): cid 0x0040 len 20 [psm 1]
-        SDP SSA Rsp: tid 0x0 len 0xf
-          count 12
-          record #0
-              aid 0x0000 (SrvRecHndl)
-                 uint 0x10005
-          cont 00
-
-If you use obexftp then this is a bug. However this is not the big
-problem. The problem is the FTP service itself. We get a service
-unavailable response:
-
-< ACL data: handle 46 flags 0x02 dlen 36
-    L2CAP(d): cid 0x0041 len 32 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 20 pf 0 ilen 28 fcs 0x31
-        OBEX: Get cmd(f): len 28
-        Type (0x42) = Sequence length 22
-        0000: 78 2d 6f 62 65 78 2f 66  6f 6c 64 65 72 2d 6c 69  x-obex/folder-li
-        0010: 73 74 69 6e 67 00                                 sting.
-> ACL data: handle 46 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0041 len 8 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 20 pf 1 ilen 3 fcs 0xf7 credits 1
-        OBEX: Get rsp(f): status 503 len 3
-        Status 503 = Service unavailable
-
-This means another problem. Maybe it is in obexftp or in the phone
-itself. I don't know. Maybe you wanna try btftp from the obex CVS
-repository of BlueZ. Or someone has to send me such a phone for testing.
-
-Regards
-
-Marcel
+-- 
+Charles-Edouard Ruault
+GPG key Id E4D2B80C
 
 
+--------------040402050301070207060300
+Content-Type: application/octet-stream;
+ name="obexftp.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="obexftp.dump"
+
+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
+AQCF2URD5ikGAAQFBAAuABY=
+--------------040402050301070207060300--
 
 
 -------------------------------------------------------
