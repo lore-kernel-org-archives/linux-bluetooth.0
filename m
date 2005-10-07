@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <434549A7.1070401@gmx.de>
-From: Rainer Lay <rainer.lay@gmx.de>
+Message-ID: <434644FD.6000001@ruault.com>
+From: Charles-Edouard Ruault <ce@ruault.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] no route to host
-References: <4344185B.1030401@gmx.de>	 <1128538606.5447.42.camel@localhost.localdomain>  <43442E4A.2070509@gmx.de> <1128545657.5447.71.camel@localhost.localdomain>
-In-Reply-To: <1128545657.5447.71.camel@localhost.localdomain>
+Subject: Re: [Bluez-users] Question regarding sdptool
+References: <43463752.7000802@ruault.com> <1128677887.8750.18.camel@localhost.localdomain>
+In-Reply-To: <1128677887.8750.18.camel@localhost.localdomain>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,40 +18,60 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 06 Oct 2005 17:58:31 +0200
-
-
+Date: Fri, 07 Oct 2005 11:50:53 +0200
 
 Marcel Holtmann wrote:
-> Hi Rainer,
-> 
->>>> when trying to access rfcomm devices, I get:
->>>> minicom: cannot open /dev/rfcomm0: No route to host
->>>>
->>>> rfcomm tells me:
->>>> rfcomm0: 00:20:E0:3A:BC:28 channel 3 clean
->>>>
->>>> I am using bluez-utils version 2.19
->>>> I cannot find any log files, ...
->>>> I can connect to my handy via bluetooth with e.g. wammu
->>> run "hcidump -X -V" to see where the problem might be. What is
->> while running minicom, I get no output.
+
+>Hi Charles,
+>
+>  
+>
+>>i'm developping a Midlet using JSR82 on a Nokia 6680.
+>>The midlet is running as a server and therefore registers a service in
+>>the device SDP.
+>>I had been desperately trying to see if everything was going ok on the
+>>device using sdptool browse add and i was not seeing my service ...
+>>I was getting kind of desperate since everything was looking fine in my
+>>code when i tried using
+>>sdptool records btaddr and there i saw my service listed !
+>>Can someone explain the difference between the browse & records options
+>>of sdptool ?
+>>    
 >>
->>> "hciconfig -a" telling you?
->> hci0:   Type: USB
->>         BD Address: 00:20:E0:3A:BC:28 ACL MTU: 192:8 SCO MTU: 64:8
-> 
-> the address in the rfcomm call is the remote address and not the local
-> one. There is no loopback support in Bluetooth.
-> 
+>
+>the browse command looks for records in the public browse group and the
+>records command brute forces the record handles 0x10000 onwards.
+>
+>  
+>
+Ok so that means that my sevice has not been added to the public browse
+group ... I'll try to figure out how to do that with JSR82
+Sorry for the basic questions but i'm just getting started with
+bluetooth and i still have a lot to learn !
+Thanks for the explanation ! Things are getting clearer now.
 
-thanx! This was obviously my mistake.
-I was to silly to remember my MAC address :-)
-Maybe you could at the device comment from rfcomm.conf to the output
-too, so silly people like me can detect their errors themselves.
+>Regards
+>
+>Marcel
+>
+>
+>
+>
+>-------------------------------------------------------
+>This SF.Net email is sponsored by:
+>Power Architecture Resource Center: Free content, downloads, discussions,
+>and more. http://solutions.newsforge.com/ibmarch.tmpl
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>  
+>
 
-thanx,
-Rainer
+
+-- 
+Charles-Edouard Ruault
+GPG key Id E4D2B80C
 
 
 
