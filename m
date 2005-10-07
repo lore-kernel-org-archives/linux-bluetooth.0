@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Nokia 770 and SAP
-Message-ID: <20051007180014.GA15869@localhost.localdomain>
-References: <8047A06D0A6C6145A92DCE8E886AC2BF37F051@vwagwox00003.vw.vwg>
+Message-ID: <8047A06D0A6C6145A92DCE8E886AC2BF37F051@vwagwox00003.vw.vwg>
+From: "Schnier, Carsten (EEFI/4)" <carsten.schnier@volkswagen.de>
+To: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <8047A06D0A6C6145A92DCE8E886AC2BF37F051@vwagwox00003.vw.vwg>
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C5CB4C.3371AEBB"
+Subject: [Bluez-devel] Nokia 770 and SAP
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,22 +17,65 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 7 Oct 2005 21:00:14 +0300
+Date: Fri, 7 Oct 2005 16:34:19 +0200
 
-On Fri, Oct 07, 2005, Schnier, Carsten (EEFI/4) wrote:
-> Is the SIM access profile (SAP) implementation used by Nokia part of BlueZ ?
-> Is BlueZ with SAP free to download ? If yes, where ?
+This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
 
-Unfortunately the SAP implementation is one of those components that
-isn't open in maemo. If you want to play around with it on the 770
-rootfs, try running /usr/bin/sap from the command line (hint: type
-"help" to get a list of supported commands).
+------_=_NextPart_001_01C5CB4C.3371AEBB
+Content-Type: text/plain
 
-The implementation is rather limited since the only thing it is used for
-is to authenticate to WLAN networks that support the EAP-SIM
-authentication method.
+Hi 
 
-Johan
+I read the news on www.bluez.org <www.bluez.org> :   Nokia 770 passes
+Bluetooth qualification
+
+Is the SIM access profile (SAP) implementation used by Nokia part of BlueZ ?
+Is BlueZ with SAP free to download ? If yes, where ?
+
+
+Thanks, Carsten
+
+
+------_=_NextPart_001_01C5CB4C.3371AEBB
+Content-Type: text/html
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+5.5.2654.19">
+<TITLE>Nokia 770 and SAP</TITLE>
+</HEAD>
+<BODY>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Hi </FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">I read the news on </FONT><A =
+HREF=3D"www.bluez.org"><U><FONT COLOR=3D"#0000FF" SIZE=3D2 =
+FACE=3D"Arial">www.bluez.org</FONT></U></A><FONT SIZE=3D2 =
+FACE=3D"Arial">:&nbsp;&nbsp;<I> Nokia 770 passes Bluetooth =
+qualification</I></FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Is the SIM access profile (SAP) =
+implementation used by Nokia part of BlueZ ?</FONT>
+<BR><FONT SIZE=3D2 FACE=3D"Arial">Is BlueZ with SAP free to download ? =
+If yes, where ?</FONT>
+</P>
+<BR>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Thanks, Carsten</FONT>
+</P>
+
+</BODY>
+</HTML>
+------_=_NextPart_001_01C5CB4C.3371AEBB--
+
 
 
 -------------------------------------------------------
