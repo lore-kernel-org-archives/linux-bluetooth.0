@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <8047A06D0A6C6145A92DCE8E886AC2BF37F051@vwagwox00003.vw.vwg>
-From: "Schnier, Carsten (EEFI/4)" <carsten.schnier@volkswagen.de>
-To: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C5CB4C.3371AEBB"
-Subject: [Bluez-devel] Nokia 770 and SAP
+Subject: Re: [Bluez-devel] Question regarding MS bluetooth keyboard/mouse
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <4345A239.5060901@fusion-labs.com>
+References: <4345A239.5060901@fusion-labs.com>
+Content-Type: text/plain
+Message-Id: <1128669192.8750.3.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,64 +18,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 7 Oct 2005 16:34:19 +0200
+Date: Fri, 07 Oct 2005 09:13:12 +0200
 
-This message is in MIME format. Since your mail reader does not understand
-this format, some or all of this message may not be legible.
+Hi Shawn,
 
-------_=_NextPart_001_01C5CB4C.3371AEBB
-Content-Type: text/plain
+> I am unsure as to where to post this, if this is the wrong place, 
+> please feel free to let me know.  Please don't be irritated if this is 
+> in the wrong list, I am out of ideas, and this was the last place I had 
+> left to ask this question.
+> 
+> I recently purchased the MS Keyboard Elite/Intellimouse combo for 
+> bluetooth, and I do have them running with bluez (Version 2.19) under 
+> kernel version 2.6.13.2.   While I could care less about getting the 
+> multimedia keys working on the keyboard, I do have a problem with the 
+> mouse wheel not working in anything(Including xev). 
+> 
+> I usually just run hidd --search and it brings up both the devices, but 
+> when I do a(n) hidd --show, it shows both of the devices connected using 
+> boot-protocol.  My thought (At least from reading about the 
+> boot-protocol in the kernel documentation) was that this setup was the 
+> very basic setup for a wireless mouse/keyboard combination, and that 
+> nothing else besides the 104 key/3 mouse buttons were supported).
+> 
+> I have scoured the web and found lots of somewhat out-dated material 
+> involving bt-hidd (Which from what I gather has since been incorporated 
+> into Bluez), changing my xorg.conf script to use ExplorerPS/2, etc, but 
+> nothing has helped me find a solution to this issue.  Running cat on 
+> /dev/mouseX from the command line will show activity in the mouse when I 
+> move, and press one of the 3 common mouse buttons, but nothing shows up 
+> for the wheel (the 2 side buttons and the tilt buttons are in the same 
+> category, but of little importance to me).
+> 
+> I should also let you know that I have no problems being a test subject, 
+> if there are any patches (I did try applying the 2.6.13-MH1) I could 
+> test out for anyone.  I am also fairly competent with c (I would love to 
+> wrestle with this problem myself, but have a quite a bit on my plate 
+> already), and am willing to help out wherever possible.
 
-Hi 
+using patch-2.6.13-mh1 gives report mode protocol support, but this
+doesn't mean all Microsoft specific stuff is supported. I only have the
+old Microsoft Bluetooth desktop at home and the mouse works perfect with
+this patch. Maybe they changed some reports for their new model.
 
-I read the news on www.bluez.org <www.bluez.org> :   Nokia 770 passes
-Bluetooth qualification
+Regards
 
-Is the SIM access profile (SAP) implementation used by Nokia part of BlueZ ?
-Is BlueZ with SAP free to download ? If yes, where ?
+Marcel
 
-
-Thanks, Carsten
-
-
-------_=_NextPart_001_01C5CB4C.3371AEBB
-Content-Type: text/html
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
-<HTML>
-<HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
-5.5.2654.19">
-<TITLE>Nokia 770 and SAP</TITLE>
-</HEAD>
-<BODY>
-
-<P><FONT SIZE=3D2 FACE=3D"Arial">Hi </FONT>
-</P>
-
-<P><FONT SIZE=3D2 FACE=3D"Arial">I read the news on </FONT><A =
-HREF=3D"www.bluez.org"><U><FONT COLOR=3D"#0000FF" SIZE=3D2 =
-FACE=3D"Arial">www.bluez.org</FONT></U></A><FONT SIZE=3D2 =
-FACE=3D"Arial">:&nbsp;&nbsp;<I> Nokia 770 passes Bluetooth =
-qualification</I></FONT>
-</P>
-
-<P><FONT SIZE=3D2 FACE=3D"Arial">Is the SIM access profile (SAP) =
-implementation used by Nokia part of BlueZ ?</FONT>
-<BR><FONT SIZE=3D2 FACE=3D"Arial">Is BlueZ with SAP free to download ? =
-If yes, where ?</FONT>
-</P>
-<BR>
-
-<P><FONT SIZE=3D2 FACE=3D"Arial">Thanks, Carsten</FONT>
-</P>
-
-</BODY>
-</HTML>
-------_=_NextPart_001_01C5CB4C.3371AEBB--
 
 
 
