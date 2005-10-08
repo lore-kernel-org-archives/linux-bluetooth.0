@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Robert Siemer <Robert.Siemer@backsla.sh>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Jumpy cursor with Wacom Graphire Bluetooth
-Message-ID: <20051008142318.GB954@polar.elf12.net>
-References: <20051008132533.GA954@polar.elf12.net> <1128778167.5212.8.camel@blade>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20051008132533.GA954@polar.elf12.net>
+References: <20051008132533.GA954@polar.elf12.net>
+Content-Type: text/plain
+Message-Id: <1128778167.5212.8.camel@blade>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1128778167.5212.8.camel@blade>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,59 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 8 Oct 2005 16:23:18 +0200
+Date: Sat, 08 Oct 2005 15:29:27 +0200
 
-On Sat, Oct 08, 2005 at 03:29:27PM +0200, Marcel Holtmann wrote:
-> Hi Robert,
+Hi Robert,
+
+> hcidump is telling me that my tablet sends packets only after six pixels
+> of mouse movement or together with button events. - I suppose that some
+> parameters exchanged during connection handshake are the cause.
 > 
-> > hcidump is telling me that my tablet sends packets only after six pixels
-> > of mouse movement or together with button events. - I suppose that some
-> > parameters exchanged during connection handshake are the cause.
-> > 
-> > -Who is making the connectinon? (hidp kernel module?)
-> > -Who can/could influence it's outcome? (hidd userspace daemon? Plays
-> >  hcid an important role?)
-> > -Has the latency thing something to do with it?
-> > -Which spec should I first dig into - Bluetooth or HID?
-> 
-> try again with patch-2.6.13-mh1 to add report mode protocol support.
+> -Who is making the connectinon? (hidp kernel module?)
+> -Who can/could influence it's outcome? (hidd userspace daemon? Plays
+>  hcid an important role?)
+> -Has the latency thing something to do with it?
+> -Which spec should I first dig into - Bluetooth or HID?
 
-I definitly will try it, but I belong to that kind of people who like to
-understand. (-:
+try again with patch-2.6.13-mh1 to add report mode protocol support.
 
-The Wacom people told me that it should work perfect as a simple HID
-device. What will report mode do?
+> I played already around with role switching (forced, voluntary from the
+> tablet, none). - Has no influence.
 
-And to refine my other questios: when and where in the communication
-scheme do hidp and hidd jump into the boat?
+Forget about that. Use the default settings.
 
+Regards
 
-Bye,
-	Robert
+Marcel
 
 
-
-> 
-> > I played already around with role switching (forced, voluntary from the
-> > tablet, none). - Has no influence.
-> 
-> Forget about that. Use the default settings.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by:
-> Power Architecture Resource Center: Free content, downloads, discussions,
-> and more. http://solutions.newsforge.com/ibmarch.tmpl
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------
