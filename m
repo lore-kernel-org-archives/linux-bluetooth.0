@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <434801B8.8090107@andric.com>
+From: Dimitry Andric <dimitry@andric.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-From: Adam Ritter <xiph@freemail.hu>
-Message-ID: <loom.20051008T232205-496@post.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] full duplex SCO communication for head set profile
+Subject: Re: [Bluez-devel] Jumpy cursor with Wacom Graphire Bluetooth
+References: <20051008132533.GA954@polar.elf12.net>	 <1128778167.5212.8.camel@blade>  <20051008142318.GB954@polar.elf12.net> <1128783693.5212.12.camel@blade>
+In-Reply-To: <1128783693.5212.12.camel@blade>
+Content-Type: multipart/signed; micalg=pgp-ripemd160;
+ protocol="application/pgp-signature";
+ boundary="------------enigAC5DCE229F6D26C205A77137"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,64 +20,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 8 Oct 2005 21:33:08 +0000 (UTC)
+Date: Sat, 08 Oct 2005 19:28:24 +0200
 
-Hi!
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigAC5DCE229F6D26C205A77137
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-I try to use my computer as a headset for a mobile phone. The computer makes an
-rfcomm connection and when the mobile makes an SCO connection to the computer,
-it accepts it. The computer can read data from the SCO socket, but when it
-writes to that socket, the write fails with error ,,Invalid argument''.  Do you
-have any ideas what I should do to transfer sound from the computer to the
-mobile with that profile?
+Marcel Holtmann wrote:
+> I think it will at least improve it, because devices in boot protocol
+> mode are very limited.
 
-Adam
-
-
-# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:02:72:B2:F6:72 ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN 
-        RX bytes:1362628 acl:313 sco:26537 events:543 errors:0
-        TX bytes:5706 acl:238 sco:0 commands:203 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-        Link policy: RSWITCH HOLD SNIFF PARK 
-        Link mode: SLAVE ACCEPT 
-        Name: 'BlueZ (0)'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
-        Manufacturer: Cambridge Silicon Radio (10)
-
-bash-2.05b# hciconfig hci0 voice
-hci0:   Type: USB
-        BD Address: 00:02:72:B2:F6:72 ACL MTU: 192:8 SCO MTU: 64:8
-        Voice setting: 0x0060 (Default Condition)
-        Input Coding: Linear
-        Input Data Format: 2's complement
-        Input Sample Size: 16 bit
-        # of bits padding at MSB: 0
-        Air Coding Format: CVSD
+Ah, this is probably meant for use at bootloader time, with a simple
+BIOS HID implementation?
 
 
 
-zzz
+--------------enigAC5DCE229F6D26C205A77137
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (MingW32)
 
-zzz
+iD8DBQFDSAG8sF6jCi4glqMRA0bUAJ91Y8bIlPHOSjFlXpo/NAMYWKP0/ACaA0WJ
+2LlU/PkemTu7z20ciInFYY4=
+=mqxH
+-----END PGP SIGNATURE-----
 
-zzz
-
-z
-efewafafweawfe
-
-fewafaweafwe
-
-
-
-
+--------------enigAC5DCE229F6D26C205A77137--
 
 
 -------------------------------------------------------
