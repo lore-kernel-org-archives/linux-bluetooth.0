@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hcid patch (patch 00.13)
+Subject: Re: [Bluez-devel] Jumpy cursor with Wacom Graphire Bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0510060731s191b17bbrd52897af77622ba6@mail.gmail.com>
-References: <e1effdeb0510060731s191b17bbrd52897af77622ba6@mail.gmail.com>
+In-Reply-To: <20051008142318.GB954@polar.elf12.net>
+References: <20051008132533.GA954@polar.elf12.net>
+	 <1128778167.5212.8.camel@blade>  <20051008142318.GB954@polar.elf12.net>
 Content-Type: text/plain
-Message-Id: <1128784148.5212.17.camel@blade>
+Message-Id: <1128783693.5212.12.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,29 +19,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 08 Oct 2005 17:09:08 +0200
+Date: Sat, 08 Oct 2005 17:01:33 +0200
 
-Hi Claudio,
+Hi Robert,
 
-> What was the final decision about the path name? 
+> > > hcidump is telling me that my tablet sends packets only after six pixels
+> > > of mouse movement or together with button events. - I suppose that some
+> > > parameters exchanged during connection handshake are the cause.
+> > > 
+> > > -Who is making the connectinon? (hidp kernel module?)
+> > > -Who can/could influence it's outcome? (hidd userspace daemon? Plays
+> > >  hcid an important role?)
+> > > -Has the latency thing something to do with it?
+> > > -Which spec should I first dig into - Bluetooth or HID?
+> > 
+> > try again with patch-2.6.13-mh1 to add report mode protocol support.
+> 
+> I definitly will try it, but I belong to that kind of people who like to
+> understand. (-:
 
-There is non at the moment.
+check the USB HID specification for the difference between boot protocol
+and report protocol mode.
 
-> I read the e-mails exchanged in the D-Bus mailing list. Due the
-> instability/side-effects of the  support '-' for path
-> names, I think is not a good idea support it. I will keep the "hci"
-> device name in the path until we find a good solution.
+> The Wacom people told me that it should work perfect as a simple HID
+> device. What will report mode do?
 
-No problem. We will adjust it later.
+I think it will at least improve it, because devices in boot protocol
+mode are very limited.
 
-> Do you have any suggestions or changes before integrate this code?
+> And to refine my other questios: when and where in the communication
+> scheme do hidp and hidd jump into the boat?
 
-I applied this patch to my local tree and now I have to clean it up. You
-should really follow my advises on tabs, whitespaces etc. A good idea is
-to use an editor that will visualize tabs and whitespaces for you.
-
-Can you provide hcid.conf security settings file for the current
-services?
+HIDP is the protocol for HID over Bluetooth and this is handles inside
+the kernel. The hidd handles the lower level L2CAP connections for it.
 
 Regards
 
