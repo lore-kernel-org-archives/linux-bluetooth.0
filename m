@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hcid patch (patch 00.13)
-From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-devel] Services testing
+From: Bastien Nocera <hadess@hadess.net>
 To: bluez-devel@lists.sourceforge.net
-Cc: Claudio Takahasi <cktakahasi@gmail.com>
-In-Reply-To: <e1effdeb0510081605p56bcd8fcob8fcd77f616c105d@mail.gmail.com>
-References: <e1effdeb0510060731s191b17bbrd52897af77622ba6@mail.gmail.com>
-	 <1128784148.5212.17.camel@blade>
-	 <e1effdeb0510081605p56bcd8fcob8fcd77f616c105d@mail.gmail.com>
+In-Reply-To: <1128884041.5536.5.camel@blade>
+References: <1128882652.32294.5.camel@randel.hadess.net>
+	 <1128884041.5536.5.camel@blade>
 Content-Type: text/plain
-Message-Id: <1128896442.19569.26.camel@blade>
+Message-Id: <1128888797.32294.8.camel@randel.hadess.net>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,31 +19,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Oct 2005 00:20:42 +0200
+Date: Sun, 09 Oct 2005 21:13:17 +0100
 
-Hi Claudio,
-
-> The basic configuration file is attached. We can define better 
-> policies after. Check the dbus-daemon man for more policies
-> information.
+On Sun, 2005-10-09 at 20:54 +0200, Marcel Holtmann wrote:
+> Hi Bastien,
 > 
->  The hcid.conf file have to be copied to /etc/dbus-1/system.d/
+> > I've been trying to find a way to test obexftp and friends on my
+> > machine, without requiring a server on another machine/device.
+> > 
+> > Should I use "FF:FF:FF:00:00:00" as the remote address for this? (For
+> > example:
+> > obexftpd -b
+> > and
+> > obexftp -b -B 4 FF:FF:FF:00:00:00 -l
+> > )
+> > 
+> > Anyone ever tried using services in "loopback" (as you would with normal
+> > network services)?
+> 
+> Bluetooth itself doesn't support any loopback services and BlueZ will
+> not emulate a loopback interface. However you can use a second dongle to
+> test things with only one machine (exception is BNEP).
 
-this looks like an old version of the file. I committed a new version as
-dbus.conf to the CVS.
+That's a shame. Good thing I brought a spare bluetooth dongle then ;)
 
-After some basic cleanups your patch is now in the CVS. I am not fully
-happy with parts of it, but we need a starting point now. I like to
-invite everybody to help us out with the D-Bus support. The goal for the
-next release should be a D-Bus interface for the device discovery.
+Thanks Marcel.
 
-Can someone write a Python based application that uses the D-Bus
-interface of hcid to inquiry devices and present them?
-
-Regards
-
-Marcel
-
+-- 
+Bastien Nocera <hadess@hadess.net>
 
 
 
