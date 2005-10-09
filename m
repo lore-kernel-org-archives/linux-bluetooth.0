@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4348E48C.5070305@darkmetatron.de>
-From: =?UTF-8?B?U2ViYXN0aWFuIEJlw59sZXI=?= <webmaster@darkmetatron.de>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Socket Rev H?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8
-Subject: [Bluez-users] Boot Protocol Problem with Microsoft Keyboard/Mouse
+In-Reply-To: <20051009021816.GA25928@suave.net>
+References: <20051007150204.GA18594@suave.net>
+	 <1128774980.5212.6.camel@blade>  <20051009021816.GA25928@suave.net>
+Content-Type: text/plain
+Message-Id: <1128849028.15821.2.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +19,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 09 Oct 2005 11:36:12 +0200
+Date: Sun, 09 Oct 2005 11:10:28 +0200
 
-Hello,
+Hi Anthony,
 
-I bought myself the Microsoft Optical Desktop Elite for Bluetooth
-Package with Keyboard and Mouse and now I have the Problem that it is
-only recognized as a Boot Protocol Device
+>   Ugh.. still having problems... looking all over for serial_cs modules
+> for 2.4.18-rmk7-pxa3-embedix... I found some precompiled ones that I
+> loaded but dmesg says "ds: unable to create instance of 'serial_cs'!"
+> 
+>   Also, when dmesg says
+> ttyS03 at port 0xc48603f8 (irq = 35) is a 16C950/954
+>  
+>   I assume that means /dev/ttyS3... I tried
+> hciattach ttyS3 csr
+> hciattach ttyS3 bcsp
+> and
+> hciattach ttyS3 any
+> 
+>   None of those seem to work.. any gives back hciconfig, but the
+> address is all zeros... 
 
-DarkMetatron metatron # hidd
-00:0D:3A:A2:92:28 HID Boot Device [045e:0099] connected [boot-protocol]
+you need to use bcsp and specify the correct baudrate. Check the mailing
+list archive for details.
 
-(ATM i use only the Keyboard so only one Device in the list)
+Regards
 
-i have tried it both with an older ALLNET ALL1575 and the brand-new
-Microsoft Bluetooth Tranciever 2.0 that was shipped with the package.
+Marcel
 
-Greetings
 
-Sebastian Be=C3=9Fler
 
 
 -------------------------------------------------------
