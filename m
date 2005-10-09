@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Microsoft Inetllimouse for Bluetooth 2.0
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <434933FC.6020602@darkmetatron.de>
+From: =?ISO-8859-1?Q?Sebastian_Be=DFler?= <webmaster@darkmetatron.de>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <434879E2.7010902@insight.rr.com>
-References: <434879E2.7010902@insight.rr.com>
-Content-Type: text/plain
-Message-Id: <1128874661.7798.3.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Boot Protocol Problem with Microsoft Keyboard/Mouse
+References: <4348E48C.5070305@darkmetatron.de> <20051009105913.GD954@polar.elf12.net>
+In-Reply-To: <20051009105913.GD954@polar.elf12.net>
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,33 +18,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 09 Oct 2005 18:17:41 +0200
+Date: Sun, 09 Oct 2005 17:15:08 +0200
 
-Hi Daniel,
+Robert Siemer schrieb:
 
-> i am somewhat new to linux Ubuntu breezy, and i have managed to get
-> my Bluetooth Microsoft mouse 2.0 to connect to Ubuntu. And everything 
-> works fine as if the mouse is a 2button mouse with no scroll wheel. My 
-> scroll wheel isnt recognized, and my forward/back buttons do not work. I 
-> have tried every HOW TO: on the net, but they are all tailored to other 
-> mice, most of them are corded. And none of them are Bluetooth to my 
-> knowledge.
-> Here is my Setup :
-> 
-> Inspiron 6000 Laptop Internal Dell truemobile 350 Bluetooth Card.
-> MS intellimouse for Bluetooth 2.0
-> 
-> When i use Xev my movements are logged, and my clicks are too , but not 
-> forward/back buttons, and no scroll wheel
+> Patch the kernel. Stock kernels have only boot-protocol support.
 
-you need to use the 2.6.13-mh1 patch to get full report mode protocol
-support.
-
-Regards
-
-Marcel
-
-
+Thx very much, now it works like a charm.
 
 
 -------------------------------------------------------
