@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43498D8F.3040607@insight.rr.com>
-From: Daniel <Dstubbs@insight.rr.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Microsoft Inetllimouse for Bluetooth 2.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] MS intellimouse for Bluetooth 2.0
+In-Reply-To: <434879E2.7010902@insight.rr.com>
+References: <434879E2.7010902@insight.rr.com>
+Content-Type: text/plain
+Message-Id: <1128874661.7798.3.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,9 +18,11 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 09 Oct 2005 17:37:19 -0400
+Date: Sun, 09 Oct 2005 18:17:41 +0200
 
-i am somewhat new to linux Ubuntu breezy, and i have managed to get
+Hi Daniel,
+
+> i am somewhat new to linux Ubuntu breezy, and i have managed to get
 > my Bluetooth Microsoft mouse 2.0 to connect to Ubuntu. And everything 
 > works fine as if the mouse is a 2button mouse with no scroll wheel. My 
 > scroll wheel isnt recognized, and my forward/back buttons do not work. I 
@@ -33,9 +37,13 @@ i am somewhat new to linux Ubuntu breezy, and i have managed to get
 > When i use Xev my movements are logged, and my clicks are too , but not 
 > forward/back buttons, and no scroll wheel
 
-Because i am so new to linux, so i ask anyone that answers this question can you include Noobish instructions. Im still learning :)
+you need to use the 2.6.13-mh1 patch to get full report mode protocol
+support.
 
-Thank you for your time, in advanced.
+Regards
+
+Marcel
+
 
 
 
