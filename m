@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <001901c5ccef$f35b63b0$f7c4fea9@cmsrytxkk3p90i>
-From: "davidgchen" <gangchen@mobilesoft.com.cn>
-To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <43493BFD.1060300@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0016_01C5CD33.01560D10"
-Subject: [Bluez-devel] ttyS0 problem
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Nokia 770 and bluetooth audio
+References: <4346F84D.8050004@xmission.com> <1128774836.5212.4.camel@blade>	 <4348AF2B.4030301@xmission.com>  <1128849280.15821.7.camel@blade> <1128860708.8700.12.camel@localhost.localdomain>
+In-Reply-To: <1128860708.8700.12.camel@localhost.localdomain>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,79 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Oct 2005 00:38:59 +0800
+Date: Sun, 09 Oct 2005 09:49:17 -0600
 
-This is a multi-part message in MIME format.
+Victor
 
-------=_NextPart_000_0016_01C5CD33.01560D10
-Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
+> It would be nice to have at least a piece of advise from those
+> mysterious people who tell all those things about the optimization :)
 
-SGkgbWFyY2VsLA0KDQpJIHdhbnQgdG8gd3JpdGUgc29tZSBjb21tYW5kcyB0byB0aGUgdWFydCh0
-dHlTMCksIGJ1dCBpdCBmYWlscy4gVGhlIHN0ZXBzIGFyZSBhcyBmb2xsb3dzOg0KDQoxLiBoY2lh
-dHRhY2ggdHR5UzAgdGV4YXMNCjIuIE9wZW4gdHR5UzAgZGV2aWNlIGFnYWluIGFuZCBnZXQgYSBm
-ZCwgaW5pdCB0dHlTMCB3aXRoIHNwZWVkLCBmbG93X2N0bCBhbmQgc28gb24sdGhlbiB3cml0ZSBh
-IGNvbW1hbmQoMHgzMCkgdG8gdGhlIGZkIGJ1dCByZXR1cm4gMDsgVGhhdCBpcyBub3RoaW5nIGlz
-IHdyaXR0ZW4gdG8gdHR5UzAuDQoNCklmIEkgd3JpdGUgdGhlIHNhbWUgY29tbWFuZCAgaW4gdGhl
-ICBmdW5jdGlvbiB0ZXhhcyhpbnQgZmQsIHN0cnVjdCB1YXJ0X3QgKnUsIHN0cnVjdCB0ZXJtaW9z
-ICp0aSksIGl0IHN1Y2NlZWRzLg0KRnJvbSBibHVlei11dGlsZXMgSSBzZWUgdGhlIGZvbGxvd2lu
-ZyBjb2RlIHdoaWNoIG1heWJlIHRoZSByZWFzb24gd2h5IEkgY2FuJ3Qgd3JpdGUgdGhlIGNvbW1h
-bmQgdG8gdHR5UzAgYWZ0ZXIgcnVubmluZyBoY2lhdHRhY2ggdHR5UzAgdGV4YXMuDQoNCi8qIFNl
-dCBUVFkgdG8gTl9IQ0kgbGluZSBkaXNjaXBsaW5lICovDQogaSA9IE5fSENJOw0KIGlmIChpb2N0
-bChmZCwgVElPQ1NFVEQsICZpKSA8IDApIHsNCiAgcGVycm9yKCJDYW4ndCBzZXQgbGluZSBkaXNj
-aXBsaW5lIik7DQogIHJldHVybiAtMTsNCiB9DQoNCkl0IHNlZW1zIHRoZSBjb2RlcyBpcyB2ZXJ5
-IGltcG9ydGFudCAsYmVjYXVzZSBpZiBJIGRlbGV0ZSB0aGVzZSBjb2RlcywgdGhlIGZvbGxvd2lu
-ZyBjb2RlcyBjYW4ndCBydW4gYW55IG1vcmUuDQoNCklzIHRoZXJlIGFueSBtZXRob2QgdGhhdCBJ
-IGNhbiB3cml0ZSB0aGUgY29tbWFuZCB0byB0aGUgdHR5UzAgc3VjY2Vzc2Z1bGx5IGFmdGVyIHN0
-ZXAgMT8NCg0KcmVndXJkcywNCg0KRGF2aWQNCg==
+as far as the algorithm goes, I decided for the decoder that there were 
+basically two paths you could go down for optimizing:
 
-------=_NextPart_000_0016_01C5CD33.01560D10
-Content-Type: text/html;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
+  - keep the shifting of values around in each pass and unroll the loops 
+(in this case referencing the tables is optimized by the compiler to 
+literal values so unrolling eliminates an array access)
 
-PCFET0NUWVBFIEhUTUwgUFVCTElDICItLy9XM0MvL0RURCBIVE1MIDQuMCBUcmFuc2l0aW9uYWwv
-L0VOIj4NCjxIVE1MPjxIRUFEPg0KPE1FVEEgaHR0cC1lcXVpdj1Db250ZW50LVR5cGUgY29udGVu
-dD0idGV4dC9odG1sOyBjaGFyc2V0PWdiMjMxMiI+DQo8TUVUQSBjb250ZW50PSJNU0hUTUwgNi4w
-MC4yODAwLjE1MTUiIG5hbWU9R0VORVJBVE9SPg0KPFNUWUxFPjwvU1RZTEU+DQo8L0hFQUQ+DQo8
-Qk9EWSBiZ0NvbG9yPSNmZmZmZmY+DQo8RElWPjxGT05UIHNpemU9Mj5IaSBtYXJjZWwsPC9GT05U
-PjwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElWPg0KPERJVj48Rk9O
-VCBzaXplPTI+SSB3YW50IHRvIHdyaXRlJm5ic3A7c29tZSBjb21tYW5kcyZuYnNwO3RvIHRoZSB1
-YXJ0KHR0eVMwKSwgDQpidXQgaXQgZmFpbHMuIFRoZSZuYnNwO3N0ZXBzJm5ic3A7YXJlIGFzIGZv
-bGxvd3M6PC9GT05UPjwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElW
-Pg0KPERJVj48Rk9OVCBzaXplPTI+MS4gaGNpYXR0YWNoIHR0eVMwIHRleGFzPC9GT05UPjwvRElW
-Pg0KPERJVj48Rk9OVCBzaXplPTI+Mi4gT3BlbiB0dHlTMCBkZXZpY2UmbmJzcDthZ2FpbiZuYnNw
-O2FuZCBnZXQgYSBmZCwgDQppbml0Jm5ic3A7dHR5UzAgd2l0aCBzcGVlZCwgZmxvd19jdGwgYW5k
-IHNvIG9uLHRoZW4gd3JpdGUgYSZuYnNwO2NvbW1hbmQoMHgzMCkgDQp0byB0aGUgZmQmbmJzcDti
-dXQmbmJzcDtyZXR1cm4gMDsmbmJzcDtUaGF0IGlzJm5ic3A7bm90aGluZyBpcyB3cml0dGVuIHRv
-IA0KdHR5UzAuPC9GT05UPjwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNwOzwv
-RElWPg0KPERJVj48Rk9OVCBzaXplPTI+SWYgSSB3cml0ZSB0aGUgc2FtZSBjb21tYW5kJm5ic3A7
-IGluIHRoZSZuYnNwOyZuYnNwO2Z1bmN0aW9uIA0KdGV4YXMoaW50IGZkLCBzdHJ1Y3QgdWFydF90
-ICp1LCBzdHJ1Y3QgdGVybWlvcyAqdGkpLCBpdCBzdWNjZWVkcy48L0ZPTlQ+PC9ESVY+DQo8RElW
-PjxGT05UIHNpemU9Mj5Gcm9tIGJsdWV6LXV0aWxlcyBJIHNlZSZuYnNwO3RoZSBmb2xsb3dpbmcg
-Y29kZSANCndoaWNoJm5ic3A7bWF5YmUgdGhlJm5ic3A7cmVhc29uJm5ic3A7d2h5Jm5ic3A7SSZu
-YnNwO2Nhbid0IHdyaXRlIHRoZSBjb21tYW5kIHRvIA0KdHR5UzAgYWZ0ZXIgcnVubmluZyBoY2lh
-dHRhY2ggdHR5UzAgdGV4YXMuPC9GT05UPjxGT05UIHNpemU9Mj48L0RJVj48L0ZPTlQ+DQo8RElW
-PjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj4vKiBT
-ZXQgVFRZIHRvIE5fSENJIGxpbmUgZGlzY2lwbGluZSAqLzxCUj4mbmJzcDtpID0gDQpOX0hDSTs8
-QlI+Jm5ic3A7aWYgKGlvY3RsKGZkLCBUSU9DU0VURCwgJmFtcDtpKSAmbHQ7IDApIA0KezxCUj4m
-bmJzcDsmbmJzcDtwZXJyb3IoIkNhbid0IHNldCBsaW5lIGRpc2NpcGxpbmUiKTs8QlI+Jm5ic3A7
-Jm5ic3A7cmV0dXJuIA0KLTE7PEJSPiZuYnNwO308L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNp
-emU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj5JdCBzZWVtcyB0aGUg
-Y29kZXMgaXMgdmVyeSBpbXBvcnRhbnQgLGJlY2F1c2UgaWYgSSBkZWxldGUgDQp0aGVzZSBjb2Rl
-cywmbmJzcDt0aGUmbmJzcDtmb2xsb3dpbmcgY29kZXMmbmJzcDtjYW4ndCBydW4gYW55IG1vcmUu
-PC9GT05UPjwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElWPg0KPERJ
-Vj48Rk9OVCBzaXplPTI+SXMgdGhlcmUgYW55IG1ldGhvZCB0aGF0IEkgY2FuIHdyaXRlIHRoZSBj
-b21tYW5kIHRvIHRoZSB0dHlTMCANCnN1Y2Nlc3NmdWxseSBhZnRlciBzdGVwIDE/PC9GT05UPjwv
-RElWPg0KPERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElWPg0KPERJVj48Rk9OVCBz
-aXplPTI+cmVndXJkcyw8L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5i
-c3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj5EYXZpZDwvRk9OVD48L0RJVj4NCjxESVY+PEZP
-TlQgc2l6ZT0yPjwvRk9OVD4mbmJzcDs8L0RJVj48L0JPRFk+PC9IVE1MPg0K
+  - eliminate the shifting of values and don't unroll the loop, just 
+simplify the array index computations (the table access is different in 
+each pass depending on where the data would have been shifted around to 
+so unrolling is no win)
 
-------=_NextPart_000_0016_01C5CD33.01560D10--
+I ended up moving 8-subbands to the latter and I will move 4 too.
 
+For the decoder it's moot since anyone serious about decoding will be 
+doing it in CSR silicon, but there may be a parallel in the encoder.
 
+Brad
 
 
 -------------------------------------------------------
