@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <434A0EDC.3020902@cefriel.it>
-From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
-MIME-Version: 1.0
+From: david <gangchen@mobilesoft.com.cn>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] full duplex SCO communication for head set profile
-References: <loom.20051008T232205-496@post.gmane.org>
-In-Reply-To: <loom.20051008T232205-496@post.gmane.org>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <1128920934.2417.21.camel@localhost.localdomain>
+References: <1128920934.2417.21.camel@localhost.localdomain>
+Content-Type: text/plain; charset=GB2312
+Message-Id: <1128925625.2417.38.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: ttyS0 problem
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,79 +18,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Oct 2005 08:49:00 +0200
+Date: Mon, 10 Oct 2005 14:27:05 +0800
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi marcel,
 
-Hi Adam. I suppose that problem is size field of write syscall.
-count field of write() or len field of send() must be less or equal of
-sco MTU.
-if MTU is 64, you can't send a 1024 byte buffer, but you must write 64
-byte buffer for 16 times.
+=D4=DA 2005-10-10=D2=BB=B5=C4 13:08 +0800=A3=ACdavid=D0=B4=B5=C0=A3=BA
+>  Hi David,
+> =20
+>  > > What commands do you wanna send?
+>  > The command is HCI_GO_TO_SLEEP_IND(0x30) which is only one byte. It is=
+ a
+>  > vendor specific command used to ask the BT device to go to sleep. If B=
+T
+>  > device receives the command, maybe it would response
+>  > HCILL_GO_TO_SLEEP_ACK(0x31) command to the host.
+> =20
+>  do you have the specification of these vendor commands? Is this command
+>  according to the HCI specification or is it an extension of the H:4
+>  transport protocol?
+> =20
+>  > > after step 1, you  must use the HCI raw socket to send commands
+>  >=20
+>  > Is this means we cannot write command to ttyS0 directly through write(=
+)
+>  > function?
+> =20
+>  After calling hciattach the kernel takes over the serial port via the
+>  line discipline and the reads and writes are useless.
+> =20
+>  Regards
+> =20
+>  Marcel
 
-Cheers,
-Pizza
+The HCILL is a proprietary protocal, providng BRF6100 and the HOST with
+the deterministic way to independently  go into their standby mode.
+These commands are provided by BRF6100 Fireware Release, Vendor specific
+Command, HCI document of TI.=20
 
-Adam Ritter wrote:
-> Hi!
-> 
-> I try to use my computer as a headset for a mobile phone. The computer makes an
-> rfcomm connection and when the mobile makes an SCO connection to the computer,
-> it accepts it. The computer can read data from the SCO socket, but when it
-> writes to that socket, the write fails with error ,,Invalid argument''.  Do you
-> have any ideas what I should do to transfer sound from the computer to the
-> mobile with that profile?
-> 
-> Adam
-> 
-> 
-> # hciconfig -a
-> hci0:   Type: USB
->         BD Address: 00:02:72:B2:F6:72 ACL MTU: 192:8 SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN 
->         RX bytes:1362628 acl:313 sco:26537 events:543 errors:0
->         TX bytes:5706 acl:238 sco:0 commands:203 errors:0
->         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
->         Link policy: RSWITCH HOLD SNIFF PARK 
->         Link mode: SLAVE ACCEPT 
->         Name: 'BlueZ (0)'
->         Class: 0x3e0100
->         Service Classes: Networking, Rendering, Capturing
->         Device Class: Computer, Uncategorized
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
->         Manufacturer: Cambridge Silicon Radio (10)
-> 
-> bash-2.05b# hciconfig hci0 voice
-> hci0:   Type: USB
->         BD Address: 00:02:72:B2:F6:72 ACL MTU: 192:8 SCO MTU: 64:8
->         Voice setting: 0x0060 (Default Condition)
->         Input Coding: Linear
->         Input Data Format: 2's complement
->         Input Sample Size: 16 bit
->         # of bits padding at MSB: 0
->         Air Coding Format: CVSD
-> 
+Regards,
 
+David
 
-- --
-- -------------------------------------------
-Luca Pizzamiglio
-CEFRIEL - Embedded Systems Design Unit
-Via Fucini, 2 - 20133 MILANO (ITALY)
-Phone:		+39 02 23954 343
-e-mail:		pizzamiglio@cefriel.it
-ICQ:		5046978
-- -------------------------------------------
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.7 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFDSg7cAoUy56ORfbERAiCFAKCpmDdz+jFFWHwnEVuxNJsxGlrNhwCfX3Dh
-3GJUXRFQmNb6D1wGz87+Yio=
-=c/uV
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
