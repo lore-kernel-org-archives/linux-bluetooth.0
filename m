@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: david <gangchen@mobilesoft.com.cn>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1128920934.2417.21.camel@localhost.localdomain>
-References: <1128920934.2417.21.camel@localhost.localdomain>
-Content-Type: text/plain; charset=GB2312
-Message-Id: <1128925625.2417.38.camel@localhost.localdomain>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: ttyS0 problem
+Message-ID: <4349E683.4040709@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] a2play works with hp
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,47 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Oct 2005 14:27:05 +0800
+Date: Sun, 09 Oct 2005 21:56:51 -0600
 
-Hi marcel,
+Hey
 
-=D4=DA 2005-10-10=D2=BB=B5=C4 13:08 +0800=A3=ACdavid=D0=B4=B5=C0=A3=BA
->  Hi David,
-> =20
->  > > What commands do you wanna send?
->  > The command is HCI_GO_TO_SLEEP_IND(0x30) which is only one byte. It is=
- a
->  > vendor specific command used to ask the BT device to go to sleep. If B=
-T
->  > device receives the command, maybe it would response
->  > HCILL_GO_TO_SLEEP_ACK(0x31) command to the host.
-> =20
->  do you have the specification of these vendor commands? Is this command
->  according to the HCI specification or is it an extension of the H:4
->  transport protocol?
-> =20
->  > > after step 1, you  must use the HCI raw socket to send commands
->  >=20
->  > Is this means we cannot write command to ttyS0 directly through write(=
-)
->  > function?
-> =20
->  After calling hciattach the kernel takes over the serial port via the
->  line discipline and the reads and writes are useless.
-> =20
->  Regards
-> =20
->  Marcel
+Matthew Garrett was tweaking a2play and found some settings that finally 
+pace things properly for the hp headset when you use the rtc/pthread 
+timer (-p). I committed them to cvs. The issues now are
 
-The HCILL is a proprietary protocal, providng BRF6100 and the HOST with
-the deterministic way to independently  go into their standby mode.
-These commands are provided by BRF6100 Fireware Release, Vendor specific
-Command, HCI document of TI.=20
+  - glitches when X repaints stuff--maybe rtc ticks get lost
+  - a2play isn't closing things up after the stream ends
 
-Regards,
+but that's a big improvement over the last attempt at least :)
 
-David
-
+Brad
 
 
 -------------------------------------------------------
