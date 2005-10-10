@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4349E683.4040709@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] a2play works with hp
+Subject: Re: [Bluez-devel] ttyS0 problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1128909236.2417.20.camel@localhost.localdomain>
+References: <1128906830.2417.1.camel@localhost.localdomain>
+	 <1128909236.2417.20.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1128914355.19569.33.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,20 +19,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 09 Oct 2005 21:56:51 -0600
+Date: Mon, 10 Oct 2005 05:19:15 +0200
 
-Hey
+Hi David,
 
-Matthew Garrett was tweaking a2play and found some settings that finally 
-pace things properly for the hp headset when you use the rtc/pthread 
-timer (-p). I committed them to cvs. The issues now are
+> > What commands do you wanna send?
+> The command is HCI_GO_TO_SLEEP_IND(0x30) which is only one byte. It is a
+> vendor specific command used to ask the BT device to go to sleep. If BT
+> device receives the command, maybe it would response
+> HCILL_GO_TO_SLEEP_ACK(0x31) command to the host.
 
-  - glitches when X repaints stuff--maybe rtc ticks get lost
-  - a2play isn't closing things up after the stream ends
+do you have the specification of these vendor commands? Is this command
+according to the HCI specification or is it an extension of the H:4
+transport protocol?
 
-but that's a big improvement over the last attempt at least :)
+> > after step 1, you  must use the HCI raw socket to send commands
+> 
+> Is this means we cannot write command to ttyS0 directly through write()
+> function?
 
-Brad
+After calling hciattach the kernel takes over the serial port via the
+line discipline and the reads and writes are useless.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
