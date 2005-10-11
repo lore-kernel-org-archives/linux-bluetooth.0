@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Guylhem Aznar <bluez-devel@externe.net>
+Subject: Re: [Bluez-devel] hcid patch (remote name and connections)
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] a2play works with hp
-Message-ID: <20051012115548.GB22308@externe.net>
-References: <C70061B183DE09419568AB2060C52A95F1F2B0@arion.intra.local>
+In-Reply-To: <20051011195531.GA12935@localhost.localdomain>
+References: <e1effdeb0510110726k15f2bdx405606b1f6d3a297@mail.gmail.com>
+	 <1129053693.8229.1.camel@localhost.localdomain>
+	 <20051011192801.GA12571@localhost.localdomain> <434C164E.5090805@csr.com>
+	 <20051011195531.GA12935@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1129070919.6487.4.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <C70061B183DE09419568AB2060C52A95F1F2B0@arion.intra.local>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,35 +21,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 Oct 2005 07:55:48 -0400
+Date: Wed, 12 Oct 2005 00:48:38 +0200
 
-On Tuesday, 11 October 2005 at 13:48:54 (+0200), Victor Shcherbatyuk wrot=
-e:
-> Some guys here did work on a2play and have some good results. It works
-> on a number of headphones we have, so it might be the solution. The ide=
-a
-> is sending packs of packets with dynamically calculated sleep time in
-> between, but I didn't look into the code yet (and it is not mine
-> anyway). If they want to contribute (most probably the do :) ) then
-> maybe we should avoid doing same stuff....
+Hi Johan,
 
-Another suggestion: maybe a2play could have an option use libmad and
-libogg? I would find that interesting because sometimes mpg123 gives
-weird results. A consistant/reproductible setting is interesting.
+> > I'd recommend encapsulating the id in a structure rather than allocating
+> > sizeof(guint). It doesn't cost you much time now and if, in the future,
+> > you ever need to store any more information then the structure's already
+> > there.
+> > I noticed you already have a structure struct hci_dbus_data which
+> > contains just an integer. Did you mean to use that here or are they
+> > logically separate types (that just happen to be the same at the
+> > moment)?
+> 
+> The watch code is logically completely separate from the code that uses
+> the hci_dbus_data struct (the "id" variable refers to a GIOChannel id
+> while in the hci_dbus_data struct id refers to the device id). It is
+> also much simpler than the code that uses hci_dbus_data and I don't
+> think that anything besides the GIOChannel id needs to be passed to the
+> remove_watch function.
 
-That an the ability to send a stream close would be very interesting.
+the patch is in and I agree with you that it makes no sense to take care
+of this issue, because we will no longer use GIOChannel in bluetoothd in
+the future.
 
---=20
-Bien =E0 vous - Best regards,
-Guylhem P. Aznar
+Regards
 
---=20
-*@externe.net                                            http://externe.n=
-et
-P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
-un.org
-GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
-ey
+Marcel
+
+
 
 
 -------------------------------------------------------
