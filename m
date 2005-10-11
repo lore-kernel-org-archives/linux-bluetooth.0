@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] hcid patch (patch 00.13)
-Message-ID: <20051011100057.GA29401@localhost.localdomain>
-References: <e1effdeb0510060731s191b17bbrd52897af77622ba6@mail.gmail.com> <1128784148.5212.17.camel@blade> <e1effdeb0510081605p56bcd8fcob8fcd77f616c105d@mail.gmail.com> <1128896442.19569.26.camel@blade> <20051010195850.GA23080@localhost.localdomain> <1128977357.7352.1.camel@blade>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="ZPt4rx8FFjLCG7dd"
-In-Reply-To: <1128977357.7352.1.camel@blade>
+From: david <gangchen@mobilesoft.com.cn>
+To: bluez-devel <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1129012750.2346.33.camel@localhost.localdomain>
+References: <1129010637.2346.1.camel@localhost.localdomain>
+	 <1129012750.2346.33.camel@localhost.localdomain>
+Content-Type: text/plain; charset=gb2312
+Message-Id: <1129014353.2346.36.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: ttyS0 problem
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,168 +19,153 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Oct 2005 13:00:57 +0300
+Date: Tue, 11 Oct 2005 15:05:53 +0800
+
+Hi marcel,
+
+=D4=DA 2005-10-11=B6=FE=B5=C4 14:39 +0800=A3=ACdavid=D0=B4=B5=C0=A3=BA
+> Hi marcel,
+>=20
+> =D4=DA 2005-10-11=B6=FE=B5=C4 14:03 +0800=A3=ACdavid=D0=B4=B5=C0=A3=BA
+> >  Hi David,
+>=20
+> >  > I want to write some commands to the uart(ttyS0), but it fails.
+>  >  > The steps are as follows:
+>  >  > =20
+>  >  > 1. hciattach ttyS0 texas
+>  >  > 2. Open ttyS0 device again and get a fd, init ttyS0 with speed,
+>  >  > flow_ctl and so on,then write a command(0x30) to the fd but return
+>  >  > 0; That is nothing is written to ttyS0.
+>  >  > =20
+> > marcel write,=20
+> >  > > What commands do you wanna send?
+> >  > The command is HCI_GO_TO_SLEEP_IND(0x30) which is only one byte. It =
+is a
+> >  > vendor specific command used to ask the BT device to go to sleep. If=
+ BT
+> >  > device receives the command, maybe it would response
+> >  > HCILL_GO_TO_SLEEP_ACK(0x31) command to the host.
+> > =20
+> >  do you have the specification of these vendor commands? Is this comman=
+d
+> >  according to the HCI specification or is it an extension of the H:4
+> >  transport protocol?
+> > =20
+> >  > > after step 1, you  must use the HCI raw socket to send commands
+> >  >=20
+> >  > Is this means we cannot write command to ttyS0 directly through writ=
+e()
+> >  > function?
+> > =20
+> >  After calling hciattach the kernel takes over the serial port via the
+> >  line discipline and the reads and writes are useless.
+> > =20
+> >  Regards
+> > =20
+> >  Marcel
+>=20
+>=20
+>=20
+> Now, I can write command(0x30) to ttyS0 driectly after hciattach tty0
+> texas(assume step 1);
+> The function is as follows(assume step 2):
+>=20
+> static int write_cmd_to_ttyS0()
+>=20
+> {
+>                 int fdd;
+>                 int len;
+>                 char cmd[5];
+>                 int temp;
+>                 int dd;
+>    =20
+>                 fdd =3D open("/dev/ttyS0", O_RDWR | O_NOCTTY);
+>                 if (fdd < 0) {
+>                         printf("Can't open serial port, fd =3D %d\n",fdd)=
+;
+>                         return -1;
+>        		  }
+>                 else
+>                         printf("open serial ok, fd =3D %d\n", fdd);
+>              =20
+> 		  temp =3D 0;
+>                 if (ioctl(fdd, TIOCSETD, &temp) < 0) {
+>                         perror("Can't set line discipline");
+>                         return -1;
+>                   }
+>=20
+>                 cmd[0] =3D 0x30;//HCILL_GO_TO_SLEEP_IND
+>=20
+>                 len =3D write(fdd, cmd, 1);
+>                 printf("write %d byte\n", len);
+>                 len =3D read(fdd, cmd, 1);
+>                 printf("read %d byte cmd[0] =3D %d\n", len, cmd[0]);
+>=20
+>                 temp =3D N_HCI;
+>                 if (ioctl(fdd, TIOCSETD, &temp) < 0) {
+>                         perror("Can't set line discipline");
+>                         return -1;
+>                 }
+>                 if (ioctl(fdd, HCIUARTSETPROTO, 0) < 0) {
+>                         perror("Can't set device");
+>                         return -1;
+>                 }
+>  }            =20
+>=20
+> After step 2,  step3 and step 4 run successfully.=20
+>=20
+> step 3: hciconfig hci0 up
+> step 4: hcitool scan
+>=20
+> If I change the steps as follows, an error occures in step 4, the error
+> is "Device is not available". Do you know why? How can I step 4 can run
+> successfully after step 3?
+>=20
+> step 1: hciattach ttyS0 texas
+> Step 2: hciconfig hci0 up
+> step 3: write_cmd_to_ttyS0()
+> step 4: hcitool scan
+>=20
+> /*** cmd_scan() ****/
+>    if (dev_id < 0) {
+>                 dev_id =3D hci_get_route(NULL);
+>                 if (dev_id < 0) {
+>                         perror("Device is not available");
+>                         exit(1);
+>                 }
+>         }
+> /**********************/
+>=20
+>=20
+>=20
+>=20
+> Regards,
+>=20
+> David
+>=20
 
 
---ZPt4rx8FFjLCG7dd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I find hci0 is down after step 3. why?
 
-On Mon, Oct 10, 2005,  Marcel Holtmann wrote:
-> I applied the patch, but this can't be the final solution. It will
-> produce weird stuff on 64-bit machines:
+hciconfig -a
 
-Yeah, I suspected that could cause problems since
-sizeof(int) != sizeof(void *) on those machines. I don't think those
-compiler warnings are dangerous though, since they are probably meant to
-warn about possible loss of data which shouldn't happen to us since our
-values always fit within 2 bytes. I don't have a 64bit machine so I
-can't verify this fix, but I think that sizeof(long) should be the same
-as sizeof(void *) on both 32 and 64 bit machines. If that isn't the
-case, the last resort could be to make some automake makro to check the
-actual size of pointer types and add #defines to the code acordingly.
 
-Anyway, the attached patch uses long for the pointer<->integer
-typecasts. Let me know if it doesn't work.
+hci0:   Type: UART
+        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
+        DOWN
+        RX bytes:5 acl:0 sco:0 events:0 errors:1
+        TX bytes:0 acl:0 sco:0 commands:0 errors:0
+        Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DH1 HV1
+        Link policy:
+        Link mode: SLAVE ACCEPT
 
-Johan
 
---ZPt4rx8FFjLCG7dd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="dbus-cleanup2.patch"
 
-Index: hcid/dbus.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus.c,v
-retrieving revision 1.19
-diff -u -r1.19 dbus.c
---- hcid/dbus.c	10 Oct 2005 20:46:55 -0000	1.19
-+++ hcid/dbus.c	11 Oct 2005 09:43:21 -0000
-@@ -507,7 +507,7 @@
- {
- 	GIOCondition cond = G_IO_HUP | G_IO_ERR;
- 	GIOChannel *io;
--	guint id;
-+	gulong id;
- 	int fd, flags;
- 
- 	if (!dbus_watch_get_enabled(watch))
-@@ -520,7 +520,7 @@
- 	if (flags & DBUS_WATCH_READABLE) cond |= G_IO_IN;
- 	if (flags & DBUS_WATCH_WRITABLE) cond |= G_IO_OUT;
- 
--	id = g_io_add_watch(io, cond, watch_func, watch);
-+	id = (gulong) g_io_add_watch(io, cond, watch_func, watch);
- 
- 	dbus_watch_set_data(watch, (void *) id, NULL);
- 
-@@ -529,12 +529,12 @@
- 
- static void remove_watch(DBusWatch *watch, void *data)
- {
--	guint id = (guint) dbus_watch_get_data(watch);
-+	gulong id = (gulong) dbus_watch_get_data(watch);
- 
- 	dbus_watch_set_data(watch, NULL, NULL);
- 
- 	if (id)
--		g_io_remove_watch(id);
-+		g_io_remove_watch((guint)id);
- }
- 
- static void watch_toggled(DBusWatch *watch, void *data)
-@@ -728,7 +728,7 @@
- 
- 	syslog(LOG_INFO, "registering  -  path:%s - id:%d",path, id);
- 
--	if (!dbus_connection_register_object_path(conn, path, &obj_vtable, (void *)((uint32_t)id))) {
-+	if (!dbus_connection_register_object_path(conn, path, &obj_vtable, (void *)(long) id)) {
- 		syslog(LOG_ERR,"DBUS failed to register %s object", path);
- 		/* ignore, the path was already registered */
- 	}
-@@ -826,7 +826,7 @@
- 	const char *path;
- 	const char *rel_path;
- 	const char *tmp_iface = NULL;
--	const uint32_t udata = (uint32_t) data;
-+	long udata = (long) data;
- 	uint32_t result = BLUEZ_EDBUS_UNKNOWN_METHOD;
- 	DBusHandlerResult ret = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 	uint8_t found = 0;
-@@ -837,7 +837,7 @@
- 	method = dbus_message_get_member (msg);
- 	signature = dbus_message_get_signature(msg);
- 
--	syslog (LOG_INFO, "%s - path:%s, udata:0x%X", __PRETTY_FUNCTION__, path, udata);
-+	syslog (LOG_INFO, "%s - path:%s, udata:0x%X", __PRETTY_FUNCTION__, path, (guint) udata);
- 
- 	if (strcmp(path, DEVICE_PATH) == 0) {
- 		ptr_handlers = dev_services;
-@@ -918,7 +918,7 @@
- 	periodic_inquiry_cp inq_param;
- 	DBusMessageIter iter;
- 	DBusMessage *reply = NULL;
--	uint32_t udata = (uint32_t) data;
-+	long udata = (long) data;
- 	uint8_t length;
- 	uint8_t max_period;
- 	uint8_t min_period;
-@@ -933,7 +933,7 @@
- 		
- 		}
- 	} else
--		dev_id = udata;
-+		dev_id = (int) udata;
- 
- 	if ((sock = hci_open_dev(dev_id)) < 0) {
- 		syslog(LOG_ERR, "HCI device open failed");
-@@ -997,7 +997,7 @@
- {
- 	DBusMessageIter iter;
- 	DBusMessage *reply = NULL;
--	uint32_t udata = (uint32_t) data;
-+	long udata = (long) data;
- 	int sock = -1;
- 	int dev_id = -1;
- 
-@@ -1008,7 +1008,7 @@
- 			goto failed;
- 		}
- 	} else
--		dev_id = udata;
-+		dev_id = (int) udata;
- 
- 	if ((sock = hci_open_dev(dev_id)) < 0) {
- 		syslog(LOG_ERR, "HCI device open failed");
-@@ -1043,7 +1043,7 @@
- 	DBusMessageIter  struct_iter;
- 	DBusMessage *reply = NULL;
- 	inquiry_info *info = NULL;
--	uint32_t udata = (uint32_t) data;
-+	long udata = (long) data;
- 	const char *paddr = addr;
- 	int dev_id = -1;
- 	int i;
-@@ -1060,7 +1060,7 @@
- 			goto failed;
- 		}
- 	} else
--		dev_id = udata;
-+		dev_id = (int) udata;
- 
- 	dbus_message_iter_init(msg, &iter);
- 	dbus_message_iter_get_basic(&iter, &length);
-@@ -1112,7 +1112,7 @@
- 	DBusMessageIter iter;
- 	DBusMessage *reply = NULL;
- 	char *str_bdaddr = NULL;
--	const uint32_t udata = (uint32_t) data;
-+	long udata = (long) data;
- 	bdaddr_t bdaddr;
- 	uint8_t role;
- 	int dev_id = -1;
+Regards,
 
---ZPt4rx8FFjLCG7dd--
+David
+
 
 
 -------------------------------------------------------
