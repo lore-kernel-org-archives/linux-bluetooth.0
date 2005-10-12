@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <IO8PCW$C00B47722704FE0483FDB9347C7CAC74@libero.it>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-From: "cicciobueomarcio@inwind.it" <cicciobueomarcio@inwind.it>
-To: "bluez-users" <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] unsusbscribe please
+Subject: Re: [Bluez-users] Bluez pand and windows
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <386930200510112125i22b51638g94dfd0dbdc43cad2@mail.gmail.com>
+References: <386930200510112125i22b51638g94dfd0dbdc43cad2@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1129097664.4922.4.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,9 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 Oct 2005 11:07:44 +0200
+Date: Wed, 12 Oct 2005 08:14:24 +0200
 
--unsusbscribe please
+Hi Vijayakumar,
+
+> I am running "pand -s" in my linux system and i want to connect to
+> this
+> from a windows xp with a bluetooth dongle. Can you please 
+> tell me how to do it?
+
+look at the PAN howto, but what I think is missing is a running DHCP
+server for the PAN bridge or the BNEP interface. Maybe you also need to
+provide the DNS server.
+
+Regards
+
+Marcel
+
 
 
 
