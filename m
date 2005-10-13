@@ -1,18 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hcid patch (remote name and connections)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0510121414u3c1ae79k98c9ba17e99f4b31@mail.gmail.com>
-References: <e1effdeb0510110726k15f2bdx405606b1f6d3a297@mail.gmail.com>
-	 <1129053693.8229.1.camel@localhost.localdomain>
-	 <20051011192801.GA12571@localhost.localdomain> <434C164E.5090805@csr.com>
-	 <20051011195531.GA12935@localhost.localdomain>
-	 <1129070919.6487.4.camel@localhost.localdomain>
-	 <20051012193811.GA5505@localhost.localdomain>
-	 <e1effdeb0510121414u3c1ae79k98c9ba17e99f4b31@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1129196311.6543.5.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: "Esther Lopez" <esther.lopez@erzia.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Control of radiated power
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="US-ASCII"
+In-Reply-To: <20050929075906.1FFDF819@arbetsmyra.dyndns.org>
+Message-Id: <20051013075127.39BBE1DD104@mrelay2.st2.lyceu.net>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -24,26 +18,81 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 13 Oct 2005 11:38:31 +0200
+Date: Thu, 13 Oct 2005 09:52:20 +0200
 
-Hi Claudio,
+Hi Ronny
 
-> This is the patch to add remote name and display connections. I fixed
-> a bitwise operation in the error message function and the dbus message
-> handler.
-> 
-> Apply the segmentation fault  patch before!
-
-I applied both patches, but you should start looking at my changes to
-your previous patch. There are some ways to code the if clauses a little
-bit better using goto. This will make the code better readable. I might
-fix this up later anyhow, but at the moment my Internet connection is
-limited.
+Thanks for this information. Can you give me more details on it?
 
 Regards
 
-Marcel
+Esther
 
+-----Mensaje original-----
+De: bluez-devel-admin@lists.sourceforge.net
+[mailto:bluez-devel-admin@lists.sourceforge.net] En nombre de Ronny L
+Nilsson
+Enviado el: jueves, 29 de septiembre de 2005 9:57
+Para: bluez-devel@lists.sourceforge.net
+Asunto: Re: [Bluez-devel] Control of radiated power
+
+
+> My device is a Brainboxes PCMCIA card with BlueCore02 chipset. I have
+> asked them, and they are on it...
+
+Hi
+Yes it's possible to do transmitter power control with this chipset. I 
+have an alfa-patch for the bccmd utility which can do this. I haven't 
+tried it with PCMCIA though, but via USB and UART it seems to work 
+fine. My biggest problem now seem to be finding spare time to clean the 
+patch up according to Marcels quite high demand on codingstyle...  :) 
+
+
+> In the meanwhile... The LMP protocol is in charge of automatically
+> controlling the power level (isn't it?). Is is possible to deactivate
+> this power level control, leaving the radiated power at a fixed
+
+
+Yes, this is possible too.
+
+/Ronny
+
+
+
+> -----Mensaje original-----
+> De: bluez-devel-admin@lists.sourceforge.net
+> [mailto:bluez-devel-admin@lists.sourceforge.net] En nombre de Marcel
+> Holtmann
+> Enviado el: lunes, 26 de septiembre de 2005 11:19
+> Para: bluez-devel@lists.sourceforge.net
+> Asunto: Re: [Bluez-devel] Control of radiated power
+>
+> Hi Esther,
+>
+> > Just a fast question. Is there any software way (using BlueZ) for
+> > controlling the radiated power and setting it to a desired value? I
+> > have been investigating and having found anything
+>
+> not according to the Bluetooth HCI specification. You need to find a
+> vendor specific command for that. Ask you chip or dongle
+> manufacturer.
+>
+> Regards
+>
+> Marcel
+
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by:
+Power Architecture Resource Center: Free content, downloads, discussions,
+and more. http://solutions.newsforge.com/ibmarch.tmpl
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 
