@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <000401c5cff4$d138d620$6701a8c0@mainframe>
-From: "Jonathan Leong" <aptos@gmx.net>
-To: <bluez-users@lists.sourceforge.net>
-References: <001901c5cfe1$29a64180$6701a8c0@mainframe> <1129201609.6951.1.camel@localhost.localdomain>
 Subject: Re: [Bluez-users] Help with Digianswer protocol analyzer
-MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <001901c5cfe1$29a64180$6701a8c0@mainframe>
+References: <001901c5cfe1$29a64180$6701a8c0@mainframe>
+Content-Type: text/plain
+Message-Id: <1129201609.6951.1.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,43 +18,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 Oct 2005 20:51:21 +0800
+Date: Thu, 13 Oct 2005 13:06:49 +0200
 
-Hi Marcel,
+Hi Jonathan,
 
-> show me the content of /proc/bus/usb/devices and check if you have the
-> bpa10x kernel driver. If not then you might need to install a newer
-> kernel.
+> I have a digianswer protocol analyzer connected to my computer via
+> usb.
+> Problem is I can't seem to get it up running.
+>  
+> hciconfig -a , produces the following
+>  
+> hci0:    Type: USB
+>             BD Address: 00:00:00:00:00:00 ACL MTU: 0 :0 SCO MTU: 0:0
+>             DOWN
+>  
+> hciconfig hci0 up
+>  
+> Can't init device hci0: Commection timed out (110)
+>  
+> I am currently slackware 2.6.11.8, with bluez-libs 2.21 installed.
+>  
+> lsmod displays the following
+>  
+> hci_usb            14344    0
+> bluetooth          43268    1    hci_usb
+>  
+>  
+> I'm guessing it detects the device but I havent got the right driver
+> loaded?
 
-here we go, 
+show me the content of /proc/bus/usb/devices and check if you have the
+bpa10x kernel driver. If not then you might need to install a newer
+kernel.
 
-T:  Bus=02 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS= 8 #Cfgs=  1
-P:  Vendor=08fd ProdID=0001 Rev= 1.00
-C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr=300mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=00 Driver=hci_usb
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  16 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  16 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+Regards
 
-Meanwhile, I'll go upgrade my kernel to 2.6.13 and get it patch.
-I'll post the results in a bit.
-
-Warmest Regards,
-
-Jonathan Leong
+Marcel
 
 
 
