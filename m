@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <001901c5cfe1$29a64180$6701a8c0@mainframe>
-From: "Jonathan Leong" <aptos@gmx.net>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0016_01C5D024.3606E9F0"
-Subject: [Bluez-users] Help with Digianswer protocol analyzer
+Subject: Re: [Bluez-users] Logitech diNovo hub not recognized
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <434D4765.603@imap.cc>
+References: <434C6E2E.9070105@imap.cc>
+	 <1129097566.4922.1.camel@localhost.localdomain>  <434D4765.603@imap.cc>
+Content-Type: multipart/mixed; boundary="=-qUvpFziLlaaXMxX/UQp3"
+Message-Id: <1129195847.6543.1.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,110 +19,73 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 Oct 2005 18:30:39 +0800
-
-This is a multi-part message in MIME format.
-
-------=_NextPart_000_0016_01C5D024.3606E9F0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-Hello,
-
-I have a digianswer protocol analyzer connected to my computer via usb.
-Problem is I can't seem to get it up running.
-
-hciconfig -a , produces the following
-
-hci0:    Type: USB
-            BD Address: 00:00:00:00:00:00 ACL MTU: 0 :0 SCO MTU: 0:0
-            DOWN
-
-hciconfig hci0 up
-
-Can't init device hci0: Commection timed out (110)
-
-I am currently slackware 2.6.11.8, with bluez-libs 2.21 installed.
-
-lsmod displays the following
-
-hci_usb            14344    0
-bluetooth          43268    1    hci_usb
+Date: Thu, 13 Oct 2005 11:30:47 +0200
 
 
-I'm guessing it detects the device but I havent got the right driver =
-loaded?
+--=-qUvpFziLlaaXMxX/UQp3
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+Hi Alex,
+
+> Thanks much for your response. I compiled and installed bluez-libs-2.21 
+> and bluez-utils-2.21, removing the corresponding Fedora binary packages. 
+> Unfortunately, hid2hci and hciconfig -a produced exactly the same results.
+> 
+> Here is the output of /proc/bus/usb/devices, with only the Logitech 
+> receiver inserted:
+> 
+> T:  Bus=02 Lev=02 Prnt=02 Port=01 Cnt=02 Dev#=  3 Spd=1.5 MxCh= 0
+> D:  Ver= 1.10 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+> P:  Vendor=046d ProdID=c50c Rev=22.40
+> S:  Manufacturer=Logitech
+> S:  Product=USB Receiver
+> C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr= 98mA
+> I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=usbhid
+> E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
+> I:  If#= 1 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=usbhid
+> E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
+> 
+> T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480 MxCh=10
+> B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
+> D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS= 8 #Cfgs=  1
+> P:  Vendor=0000 ProdID=0000 Rev= 2.06
+> S:  Manufacturer=Linux 2.6.13-1.1526_av0 ehci_hcd
+> S:  Product=EHCI Host Controller
+> S:  SerialNumber=0000:00:02.1
+> C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
+> I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+> E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=256ms
+
+try the attached patch. Hopefully they haven't changed the protocol.
+
+Regards
+
+Marcel
 
 
-Warmest Regards,
+--=-qUvpFziLlaaXMxX/UQp3
+Content-Disposition: attachment; filename=patch
+Content-Type: text/x-patch; name=patch; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Jonathan Leong
-------=_NextPart_000_0016_01C5D024.3606E9F0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Index: hid2hci.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/tools/hid2hci.c,v
+retrieving revision 1.6
+diff -u -r1.6 hid2hci.c
+--- hid2hci.c	5 Jul 2005 21:15:53 -0000	1.6
++++ hid2hci.c	13 Oct 2005 09:28:09 -0000
+@@ -226,6 +226,7 @@
+ 	{ HCI, 0x046d, 0xc703, switch_logitech },
+ 	{ HCI, 0x046d, 0xc704, switch_logitech },
+ 	{ HCI, 0x046d, 0xc705, switch_logitech },
++	{ HCI, 0x046d, 0xc50c, switch_logitech },
+ 	{ -1 }
+ };
+ 
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2900.2604" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hello,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I have a digianswer protocol analyzer =
-connected to=20
-my computer via usb.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Problem is I can't seem to get it up=20
-running.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>hciconfig -a , produces the =
-following</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>hci0:&nbsp;&nbsp;&nbsp; Type: =
-USB</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;=20
-&nbsp;&nbsp;&nbsp; BD Address: 00:00:00:00:00:00 ACL MTU: 0 :0 SCO MTU:=20
-0:0</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;=20
-&nbsp;&nbsp;&nbsp; DOWN</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>hciconfig hci0 up</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Can't init device hci0: Commection =
-timed out=20
-(110)</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I am currently slackware 2.6.11.8, with =
-bluez-libs=20
-2.21 installed.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>lsmod displays the =
-following</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>hci_usb&nbsp;&nbsp;&nbsp; =
-&nbsp;&nbsp;&nbsp;=20
-&nbsp;&nbsp;&nbsp; 14344&nbsp;&nbsp;&nbsp; 0</FONT></DIV>
-<DIV><FONT face=3DArial=20
-size=3D2>bluetooth&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;43268&nbsp;&nbsp;&nbsp;=20
-1&nbsp;&nbsp;&nbsp; hci_usb</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I'm guessing it detects the device but =
-I havent got=20
-the right driver loaded?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Warmest Regards,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Jonathan =
-Leong</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0016_01C5D024.3606E9F0--
+--=-qUvpFziLlaaXMxX/UQp3--
 
 
 
