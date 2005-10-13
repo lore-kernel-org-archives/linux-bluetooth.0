@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <434EECDA.1020407@imap.cc>
-From: Alex Viskovatoff <viskovatoff@imap.cc>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Broadcom chipset and reverse engineering
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Logitech diNovo hub not recognized
-References: <434C6E2E.9070105@imap.cc>	 <1129097566.4922.1.camel@localhost.localdomain>  <434D4765.603@imap.cc>	 <1129195847.6543.1.camel@localhost.localdomain> <434E8EA3.4070101@imap.cc>	 <1129222062.5057.6.camel@localhost.localdomain> <434E9B57.2080808@imap.cc> <1129243610.5057.10.camel@localhost.localdomain>
-In-Reply-To: <1129243610.5057.10.camel@localhost.localdomain>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <434E9DCE.6090402@gmx.de>
+References: <434E9DCE.6090402@gmx.de>
+Content-Type: text/plain
+Message-Id: <1129244001.5057.17.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,30 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 Oct 2005 19:25:14 -0400
+Date: Fri, 14 Oct 2005 00:53:21 +0200
 
-Hi Marcel,
-> 
-> this is not the Bluetooth version of the diNovo.
->
+Hi Benjamin,
 
-Thank you for clearing up my misapprehension. I had been assuming that 
-any mouse or keyboard that uses radio would be using Bluetooth. (This 
-led me to be mystified over why the cordless Logitech keyboard & mouse I 
-bought was so much cheaper than the other models.) What I had not been 
-taking into account is that Logitech is a business: excluding Bluetooth, 
-while it does not lead to significantly lower production costs, does 
-allow Logitech to establish a lower "price point". I should have 
-expected this kind of behavior from them, given their refusal to release 
-their "proprietary" information to Linux developers.
+> I am using a Broadcom chipset based USB Bluetooth dongle (Belkin F8T008)
+> and I have a Logitech Mobile Pro Headset. Of course I am not able to use
+> that headset with BlueZ because the Broadcom chipset is not supported.
+> But it works without problems under Windows XP. I have read that the
+> BlueZ developers are not able to make it work with the Broadcom chipset
+> because they did not get any information about that chipset.
+> So here are my questions:
+> - Is it of any help if I try to log some of the USB traffic (I have
+> found this program for example:
+> http://sourceforge.net/projects/usbsnoop/) under my Windows XP system
+> when connecting the headset and sending audio to it?
+> - Is it allowed to sniff the traffic between the OS and the USB adapter
+> (Is reverse engineering allowed)?
 
-I'm sorry to have wasted your time. Now I'll reinsert my D-Link DBT-120 
-(which, together with my wireless keyboard/mouse, is still substantially 
-cheaper than the Bluetooth version). :)
+since they use H:2 as transport, you should start decoding the USBsnoop
+dumps by yourself. And yes it is legal in Germany for interop purpose.
 
-Best regards,
+Regards
 
-Alex
+Marcel
+
+
 
 
 -------------------------------------------------------
