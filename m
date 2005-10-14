@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Broadcom chipset and reverse engineering
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <loom.20051014T130900-929@post.gmane.org>
-References: <434E9DCE.6090402@gmx.de>
-	 <1129244001.5057.17.camel@localhost.localdomain>
-	 <loom.20051014T130900-929@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1129291016.5057.47.camel@localhost.localdomain>
+From: Benjamin Eikel <benjamin.eikel@gmx.de>
+Message-ID: <loom.20051014T130900-929@post.gmane.org>
+References: <434E9DCE.6090402@gmx.de> <1129244001.5057.17.camel@localhost.localdomain>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: Broadcom chipset and reverse engineering
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,33 +17,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 14 Oct 2005 13:56:56 +0200
+Date: Fri, 14 Oct 2005 11:27:53 +0000 (UTC)
 
-Hi Benjamin,
+Hi again!
 
-> > since they use H:2 as transport, you should start decoding the USBsnoop
-> > dumps by yourself. And yes it is legal in Germany for interop purpose.
-> > 
+Marcel Holtmann <marcel <at> holtmann.org> writes:
 > 
-> Sorry, but I am new to Bluetooth development. I just searched some information
-> about that 'H:2' transport and found out that this 'H:2' is the USB transport
-> layer which is used for the physical transport of the HCI packets.
+> since they use H:2 as transport, you should start decoding the USBsnoop
+> dumps by yourself. And yes it is legal in Germany for interop purpose.
 > 
-> Is there any program which could decode the HCI data automatically from the USB
-> data or do I have to decode every package by hand (I think there are about 6000
-> packets [and yes, only my headset was connected; no other Bluetooth devices])? 
-> 
-> Or perhaps there is an easier way: Is there any free tool that runs under
-> Windows XP (I have to use Windows because the headset only works there), which
-> can dump/log/sniff the HCI packets between the USB host controller and the USB
-> Bluetooth adapter?
 
-I always did it by hand.
+Sorry, but I am new to Bluetooth development. I just searched some information
+about that 'H:2' transport and found out that this 'H:2' is the USB transport
+layer which is used for the physical transport of the HCI packets.
 
-Regards
+Is there any program which could decode the HCI data automatically from the USB
+data or do I have to decode every package by hand (I think there are about 6000
+packets [and yes, only my headset was connected; no other Bluetooth devices])? 
 
-Marcel
+Or perhaps there is an easier way: Is there any free tool that runs under
+Windows XP (I have to use Windows because the headset only works there), which
+can dump/log/sniff the HCI packets between the USB host controller and the USB
+Bluetooth adapter?
 
+Regards,
+Benjamin Eikel
 
 
 
