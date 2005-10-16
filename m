@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] USB bluetooth dongle support
+Subject: Re: [Bluez-users] smartphone and bluez
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4351C1A5.4090204@felton.felton.ca.us>
-References: <4351C1A5.4090204@felton.felton.ca.us>
+In-Reply-To: <9c68c0a70510160023n116165c8s@mail.gmail.com>
+References: <9c68c0a70510160023n116165c8s@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1129469810.24835.12.camel@blade>
+Message-Id: <1129469468.24835.10.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,36 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 Oct 2005 15:36:50 +0200
+Date: Sun, 16 Oct 2005 15:31:08 +0200
 
-Hi Bob,
+Hi,
 
-> It would appear as though no support for my Zeevo, Inc.
-> USB bluetooth dongle exists for Linux.
+> I have a "dopod 565" and its os is smartphone.
+> I can't connect my phone with my linux PC.
 > 
-> dmesg shows:
-> ALSA sound/usb/usbaudio.c:1143: 9:1:1: cannot get freq at ep 0x5
-> ALSA sound/usb/usbaudio.c:1143: 9:1:2: cannot get freq at ep 0x5
-> input: USB HID v1.10 Device [Zeevo Bluetooth Audio Dongle] on 
-> usb-0000:00:1d.7-2
-> 
-> When I plug in.
-> 
-> lsusb shows:
-> ID 0b7a:0100 Zeevo, Inc.
-> AudioDongle: uniqueID: tCIZ.IGVSOCvzpxA
-> 
-> When I click in the lower right hand corner in the KDE panel on the 
-> bluetooth
-> ICON it states "No working Bluetooth adapter found.  Only local services 
-> will
-> be displayed.".
-> 
-> Please advise if I have any hope of getting this supported or if it is 
-> best I purchase
-> a supported dongle.   Apparently Zeevo has been bought out by Broadcom.
+> Does bluez support smartphone os?
+> If it does, how can i connect they?
 
-this looks like an A2DP Source Dongle and not a HCI dongle.
+be more specific what you are trying to achieve.
 
 Regards
 
