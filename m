@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Python/Gtk2 test application for the new D-BUS
-	interface
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20051016165415.GA31000@localhost.localdomain>
-References: <20051014210539.GA20633@localhost.localdomain>
-	 <1129469396.24835.8.camel@blade>
-	 <20051016165415.GA31000@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1129490655.24835.22.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Python/Gtk2 test application for the new D-BUS interface
+Message-ID: <20051016165415.GA31000@localhost.localdomain>
+References: <20051014210539.GA20633@localhost.localdomain> <1129469396.24835.8.camel@blade>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1129469396.24835.8.camel@blade>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,31 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 16 Oct 2005 21:24:15 +0200
+Date: Sun, 16 Oct 2005 19:54:15 +0300
 
-Hi Johan,
+On Sun, Oct 16, 2005, Marcel Holtmann wrote:
+> it crashes with the name resolve on AMD64, but it is a great starting
+> point.
 
-> > it crashes with the name resolve on AMD64, but it is a great starting
-> > point.
-> 
-> There are some small changes to how name resolving is done in the latest
-> version (0.2) available here:
-> http://www.iki.fi/~jhedberg/bluez-python/
-> 
-> If you still get the crash, could you perhaps send a backtrace of it? (I
-> don't have a 64bit machine to reproduce it on).
+There are some small changes to how name resolving is done in the latest
+version (0.2) available here:
+http://www.iki.fi/~jhedberg/bluez-python/
 
-it is still crashing. It also happens with the start of periodic inquiry
-and both are producing a segmentation fault. If I start the program and
-then call 'hcitool scan' the name resolving seems to work flawless.
+If you still get the crash, could you perhaps send a backtrace of it? (I
+don't have a 64bit machine to reproduce it on).
 
-So how do I create a backtrace with Python for you?
-
-Regards
-
-Marcel
-
-
+Johan
 
 
 -------------------------------------------------------
