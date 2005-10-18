@@ -1,15 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS-PATCH] new signals(DeviceAdded and
-	DeviceRemoved)
+Subject: Re: [Bluez-devel] [PATCH] Changes to Inquiry D-BUS method
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Cc: Claudio Takahasi <cktakahasi@gmail.com>
-In-Reply-To: <e1effdeb0510180413m6f88b23etdf98e16c530dbc4e@mail.gmail.com>
-References: <e1effdeb0510171437w1a668500kf963ae3acb55eb2f@mail.gmail.com>
-	 <20051018071545.GA7228@localhost.localdomain>
-	 <e1effdeb0510180413m6f88b23etdf98e16c530dbc4e@mail.gmail.com>
+In-Reply-To: <20051017195943.GA5200@localhost.localdomain>
+References: <20051017195943.GA5200@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1129656919.10721.44.camel@localhost.localdomain>
+Message-Id: <1129656858.10721.42.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -22,15 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 Oct 2005 19:35:19 +0200
+Date: Tue, 18 Oct 2005 19:34:18 +0200
 
-Hi Claudio,
+Hi Johan,
 
-> I removed the handle_inq_reply reply message fix to avoid 
-> conflict with the latest Johan's patch.
+> A major problem with the current Inquiry D-BUS method implementation is
+> that it blocks while the inquiry is in progress. What this means is that
+> e.g. InquiryResult signals aren't sent until the inquiry process
+> finishes.
+> 
+> I think that the easiest and cleanest way to solve this is to not return
+> the inquiry results in the D-BUS method return, but have the user listen
+> to the InquiryResult signals that hcid already emmits. The attached
+> patch does this change.
 
-the patch is in the CVS now. Send the cleanup patch, once the CVS update
-is propagated.
+the patch is applied and this is how this should work. We maybe need an
+extra method to get the inquiry cache or a list of previous seen
+devices.
 
 Regards
 
