@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Changes to Inquiry D-BUS method
+Subject: Re: [Bluez-devel] kernel/userspace communication interface
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20051017195943.GA5200@localhost.localdomain>
-References: <20051017195943.GA5200@localhost.localdomain>
+In-Reply-To: <e1effdeb0510180522l33037a86rbd0231a3ba1b7201@mail.gmail.com>
+References: <e1effdeb0510180522l33037a86rbd0231a3ba1b7201@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1129656858.10721.42.camel@localhost.localdomain>
+Message-Id: <1129657048.10721.48.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,23 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 Oct 2005 19:34:18 +0200
+Date: Tue, 18 Oct 2005 19:37:28 +0200
 
-Hi Johan,
+Hi Claudio,
 
-> A major problem with the current Inquiry D-BUS method implementation is
-> that it blocks while the inquiry is in progress. What this means is that
-> e.g. InquiryResult signals aren't sent until the inquiry process
-> finishes.
+> You wrote in an old email that a new communication interface between 
+> the kernel and the userspace has been developed. 
 > 
-> I think that the easiest and cleanest way to solve this is to not return
-> the inquiry results in the D-BUS method return, but have the user listen
-> to the InquiryResult signals that hcid already emmits. The attached
-> patch does this change.
+> Could you give us more information about that? What is the status,
+> how 
+> it will work...
+> 
+> We are facing some problems related to blocking operations(eg: remote 
+> name request and inquiry.) in the BlueZ D-Bus services.
+> 
+> The hcid D-Bus main loop can't be blocked and we wouldn't like open 
+> another hci raw socket.
 
-the patch is applied and this is how this should work. We maybe need an
-extra method to get the inquiry cache or a list of previous seen
-devices.
+I still doesn't had time to finally implement the first rough steps into
+this direction. Give some more time and I always to some thought about
+what you need between kernel and userspace. The kernel for example is
+already doing complete connection tracking and this means we don't need
+to re-implement it in userspace.
 
 Regards
 
