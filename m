@@ -1,79 +1,49 @@
-Return-Path: <cktakahasi@gmail.com>
-Message-ID: <e1effdeb0510190403h233043bch9d06b291e3662da@mail.gmail.com>
-Date: Wed, 19 Oct 2005 09:03:02 -0200
-From: Claudio Takahasi <cktakahasi@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [Bluez-devel] [DBUS-PATCH] new signals(DeviceAdded and DeviceRemoved)
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1129718124.5362.0.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_1026_13223427.1129719782309"
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [DBUS-PATCH] new signals(DeviceAdded and
+	DeviceRemoved)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+Cc: Claudio Takahasi <cktakahasi@gmail.com>
+In-Reply-To: <e1effdeb0510180413m6f88b23etdf98e16c530dbc4e@mail.gmail.com>
 References: <e1effdeb0510171437w1a668500kf963ae3acb55eb2f@mail.gmail.com>
 	 <20051018071545.GA7228@localhost.localdomain>
 	 <e1effdeb0510180413m6f88b23etdf98e16c530dbc4e@mail.gmail.com>
-	 <1129656919.10721.44.camel@localhost.localdomain>
-	 <e1effdeb0510181213x77832121t236cf91e83a6befa@mail.gmail.com>
-	 <1129718124.5362.0.camel@localhost.localdomain>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1129656919.10721.44.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 18 Oct 2005 19:35:19 +0200
 
-------=_Part_1026_13223427.1129719782309
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Claudio,
 
-Hi Marcel,
+> I removed the handle_inq_reply reply message fix to avoid 
+> conflict with the latest Johan's patch.
 
-This bug was already fixed in the latest Johan's patch (revision 1.26).
+the patch is in the CVS now. Send the cleanup patch, once the CVS update
+is propagated.
 
+Regards
 
-Regards,
-Claudio.
-
-On 10/19/05, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Claudio,
->
-> > Which cleanup patch are you asking for?
->
-> the handle_inq_reply() fix you were talking about.
->
-> Regards
->
-> Marcel
->
->
->
+Marcel
 
 
---
----------------------------------------------------------
-Claudio Takahasi
-Nokia's Institute of Technology - INdT
-claudio.takahasi@indt.org.br
 
-------=_Part_1026_13223427.1129719782309
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-Hi Marcel,<br>
-<br>
-This bug was already fixed in the latest Johan's patch (revision 1.26).<br>
-<br>
-<br>
-Regards,<br>
-Claudio.<br><br><div><span class=3D"gmail_quote">On 10/19/05, <b class=3D"g=
-mail_sendername">Marcel Holtmann</b> &lt;<a href=3D"mailto:marcel@holtmann.=
-org">marcel@holtmann.org</a>&gt; wrote:</span><blockquote class=3D"gmail_qu=
-ote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0p=
-t 0.8ex; padding-left: 1ex;">
-Hi Claudio,<br><br>&gt; Which cleanup patch are you asking for?<br><br>the =
-handle_inq_reply() fix you were talking about.<br><br>Regards<br><br>Marcel=
-<br><br><br></blockquote></div><br><br clear=3D"all"><br>-- <br>-----------=
-----------------------------------------------
-<br>Claudio Takahasi<br>Nokia's Institute of Technology - INdT<br><a href=
-=3D"mailto:claudio.takahasi@indt.org.br">claudio.takahasi@indt.org.br</a><b=
-r>
-
-------=_Part_1026_13223427.1129719782309--
+-------------------------------------------------------
+This SF.Net email is sponsored by:
+Power Architecture Resource Center: Free content, downloads, discussions,
+and more. http://solutions.newsforge.com/ibmarch.tmpl
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
