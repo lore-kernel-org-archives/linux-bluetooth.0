@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] kernel/userspace communication interface
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <435518F1.2070509@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0510180522l33037a86rbd0231a3ba1b7201@mail.gmail.com>
-References: <e1effdeb0510180522l33037a86rbd0231a3ba1b7201@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1129657048.10721.48.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] SBC Decoder Performance
+References: <20051018122257.47829.qmail@web34115.mail.mud.yahoo.com>
+In-Reply-To: <20051018122257.47829.qmail@web34115.mail.mud.yahoo.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,34 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 Oct 2005 19:37:28 +0200
+Date: Tue, 18 Oct 2005 09:46:57 -0600
 
-Hi Claudio,
+Joe,
 
-> You wrote in an old email that a new communication interface between 
-> the kernel and the userspace has been developed. 
-> 
-> Could you give us more information about that? What is the status,
-> how 
-> it will work...
-> 
-> We are facing some problems related to blocking operations(eg: remote 
-> name request and inquiry.) in the BlueZ D-Bus services.
-> 
-> The hcid D-Bus main loop can't be blocked and we wouldn't like open 
-> another hci raw socket.
+Your question did remind me that 4- and 8- subband decoding looked a lot
+different in the code (one was unrolled, one wasn't). i got around to
+making them look mostly the same so now they're ready for fixed point
+changes.
 
-I still doesn't had time to finally implement the first rough steps into
-this direction. Give some more time and I always to some thought about
-what you need between kernel and userspace. The kernel for example is
-already doing complete connection tracking and this means we don't need
-to re-implement it in userspace.
-
-Regards
-
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
