@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Message-ID: <e1effdeb0510190606x50364b25y52a5092847000105@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20051019140715.GA15123@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="OgqxwSJOaUobr8KG"
-Subject: [Bluez-devel] [PATCH] Make RemoteName D-BUS method non-blocking
+Content-Type: multipart/alternative;
+	boundary="----=_Part_1959_15563838.1129727167974"
+Subject: [Bluez-devel] Device Configuration D-Bus services
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,202 +17,156 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 19 Oct 2005 17:07:15 +0300
+Date: Wed, 19 Oct 2005 11:06:07 -0200
 
-
---OgqxwSJOaUobr8KG
-Content-Type: text/plain; charset=us-ascii
+------=_Part_1959_15563838.1129727167974
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Hi,
+Hi folks,
 
-Here's a patch which does a similar change RemoteName as my previous
-patch did to Inquiry. For the user to be able to know if the name
-request fails because of e.g. page timeout I have added a status
-paramer to the signal and forced the signal to be always sent (not just
-when evt->status == 0).
+I would like to bring up the device configuration services before start
+coding, I would like design how these services will work and receive
+comments.
 
-I also updated the pygtk testing program to work with this change:
-http://www.iki.fi/~jhedberg/bluez-python/bluez-python-0.4.tar.gz
+The services provided under these paths/interfaces will not be public. Only
+an administrator group or a root will be allowed to send messages. We don't
+need care about the configuration file rules now, it can be defined later.
 
-There is one problem when using hci_send_req with the inquiry and remote
-name HCI commands: they don't generate a command complete event, only a
-command status event. This means that hci_send_req will fail with
-ETIMEDOUT (I didn't notice it earlier since the UI status is immediately
-updated by the InquiryStarted signal). Using hci_send_cmd is also not
-(IMHO) an option since a failure status in the command status event
-should be detected and handled properly.
+In my opinion it's better use the same approach of the Manager. A main path
+object "/org/bluez/Manager" (FALLBACK) should catch messages sent to
+unregistered
+paths and handle services like:
+- DeviceList, displays UP/DOWN devices
+- UP
+- DOWN
+- RESET
 
-I can think of a couple of possible solutions to this:
-1. Change hci_send_req to detect the special cases that don't produce
-command complete event.
-2. Do the listening of command status event ourselves in dbus.c
-3. Check for ETIMEDOUT error and treat it as success
+The device based paths can provide services like:
+- SetProperty
+- GetProperty
+- Commands
+- Features
 
-I went with option 3 for now since it requires the least code changes,
-but it should probably not be the final solution since it doesn't catch
-the situation where command status event isn't received in time. Any
-suggestions for how this should be best fixed?
+Using SetProperty/GetProperty instead of define one method name for each
+property is more clean. However it is important keep in mind that the
+documentation of this service must be well-defined, because the method
+call/method reply arguments will have different argument number and types.
+In the method call, the first argument must be a byte(faster comparison)
+indicating the command code instead of use a string to represent the
+command.
 
-Johan
+Suggested paths and Interfaces:
+*** Main path
+path:
+/org/bluez/Devices
+interface: org.bluez.Devices
 
---OgqxwSJOaUobr8KG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="remote-name.patch"
+*** Device based
+path:
+/org/bluez/Devices/hciX
+interface: org.bluez.Devices
 
-Index: hcid/dbus.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus.c,v
-retrieving revision 1.27
-diff -u -r1.27 dbus.c
---- hcid/dbus.c	18 Oct 2005 17:31:32 -0000	1.27
-+++ hcid/dbus.c	19 Oct 2005 13:43:30 -0000
-@@ -466,7 +466,7 @@
- 	return;
- }
- 
--void hcid_dbus_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
-+void hcid_dbus_remote_name(bdaddr_t *local, uint8_t status, bdaddr_t *peer, char *name)
- {
- 	DBusMessage *message = NULL;
- 	char path[MAX_PATH_LENGTH];
-@@ -493,6 +493,7 @@
- 	}
- 
- 	dbus_message_append_args(message,
-+					DBUS_TYPE_BYTE, &status,
- 					DBUS_TYPE_STRING, &peer_addr,
- 					DBUS_TYPE_STRING, &name,
- 					DBUS_TYPE_INVALID);
-@@ -1253,7 +1254,7 @@
- 	rq.cparam = &cp;
- 	rq.clen = INQUIRY_CP_SIZE;
- 	
--	if (hci_send_req(dd, &rq, 100) < 0) {
-+	if (hci_send_req(dd, &rq, 100) < 0 && errno != ETIMEDOUT) {
- 		syslog(LOG_ERR, "Unable to start inquiry: %s", strerror(errno));
- 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
- 		goto failed;
-@@ -1325,8 +1326,6 @@
- 
- static DBusMessage* handle_remote_name_req(DBusMessage *msg, void *data)
- {
--	char name[64];
--	const char *pname = name;
- 	DBusMessageIter iter;
- 	DBusMessage *reply = NULL;
- 	struct hci_dbus_data *dbus_data = data;
-@@ -1334,6 +1333,8 @@
- 	int dd = -1;
- 	const char *str_bdaddr;
- 	bdaddr_t bdaddr;
-+	struct hci_request rq;
-+	remote_name_req_cp cp;
- 	
- 	dbus_message_iter_init(msg, &iter);
- 	dbus_message_iter_get_basic(&iter, &str_bdaddr);
-@@ -1346,27 +1347,38 @@
- 			reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
- 			goto failed;
- 		}
--	} else {
-+	} else
- 		dev_id = dbus_data->id;
-+
-+	dd = hci_open_dev(dev_id);
-+	if (dd < 0) {
-+		syslog(LOG_ERR, "Unable to open device %d: %s", dev_id, strerror(errno));
-+		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
-+		goto failed;
- 	}
- 
--	if ((dd = hci_open_dev(dev_id)) > 0) {
--	
--		if (hci_read_remote_name(dd, &bdaddr, sizeof(name), name, READ_REMOTE_NAME_TIMEOUT) ==0) {
--			reply = dbus_message_new_method_return(msg);
--			dbus_message_iter_init_append(reply, &iter);
--			dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &pname);
--		} else {
--			reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
--		}
--	} else {
-+	memset(&cp, 0, sizeof(cp));
-+	cp.bdaddr = bdaddr;
-+	cp.pscan_rep_mode = 0x01;
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LINK_CTL;
-+	rq.ocf = OCF_REMOTE_NAME_REQ;
-+	rq.cparam = &cp;
-+	rq.clen = REMOTE_NAME_REQ_CP_SIZE;
-+
-+	if (hci_send_req(dd, &rq, 100) < 0 && errno != ETIMEDOUT) {
-+		syslog(LOG_ERR, "Unable to send remote name request: %s", strerror(errno));
- 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
-+		goto failed;
- 	}
--	
--	if (dd > 0)
--		close (dd);
-+
-+	reply = dbus_message_new_method_return(msg);
- 
- failed:
-+	if (dd >= 0)
-+		hci_close_dev(dd);
-+
- 	return reply;
- }
- 
-Index: hcid/hcid.h
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/hcid.h,v
-retrieving revision 1.25
-diff -u -r1.25 hcid.h
---- hcid/hcid.h	9 Oct 2005 22:15:22 -0000	1.25
-+++ hcid/hcid.h	19 Oct 2005 13:43:31 -0000
-@@ -131,7 +131,7 @@
- void hcid_dbus_inquiry_start(bdaddr_t *local);
- void hcid_dbus_inquiry_complete(bdaddr_t *local);
- void hcid_dbus_inquiry_result(bdaddr_t *local, bdaddr_t *peer, uint32_t class, int8_t rssi);
--void hcid_dbus_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name);
-+void hcid_dbus_remote_name(bdaddr_t *local, uint8_t status, bdaddr_t *peer, char *name);
- void hcid_dbus_conn_complete(bdaddr_t *local, bdaddr_t *peer);
- void hcid_dbus_disconn_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t reason);
- #else
-Index: hcid/security.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/security.c,v
-retrieving revision 1.40
-diff -u -r1.40 security.c
---- hcid/security.c	6 Sep 2005 22:01:30 -0000	1.40
-+++ hcid/security.c	19 Oct 2005 13:43:32 -0000
-@@ -499,17 +499,16 @@
- 	char name[249];
- 	bdaddr_t dba;
- 
--	if (evt->status)
--		return;
-+	bacpy(&dba, &evt->bdaddr);
- 
- 	memset(name, 0, sizeof(name));
--	memcpy(name, evt->name, 248);
- 
--	bacpy(&dba, &evt->bdaddr);
--
--	hcid_dbus_remote_name(sba, &dba, name);
-+	if (evt->status == 0) {
-+		memcpy(name, evt->name, 248);
-+		write_device_name(sba, &dba, name);
-+	}
- 
--	write_device_name(sba, &dba, name);
-+	hcid_dbus_remote_name(sba, evt->status, &dba, name);
- }
- 
- static inline void remote_version_information(int dev, bdaddr_t *sba, void *ptr)
 
---OgqxwSJOaUobr8KG--
+Another point is the message handler function. Currently, there is only one
+function responsible for handle the messages. In my opinion it will be
+better
+create other DBusObjectPathVTable to address Device messages for make the
+logic more clear. For SetProperty/GetProperty will be required extract the
+first argument to get the command code in the message handle function.
+
+
+Is everything ok? Any comments?
+
+Regards,
+Claudio.
+
+--
+---------------------------------------------------------
+Claudio Takahasi
+Nokia's Institute of Technology - INdT
+claudio.takahasi@indt.org.br
+
+------=_Part_1959_15563838.1129727167974
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi folks,<br>
+<br>
+I would like to bring up the device configuration services before start <br=
+>
+coding, I would like design how these services will work and receive commen=
+ts.<br>
+<br>
+The services provided under these paths/interfaces will not be public. Only=
+ <br>
+an administrator group or a root will be allowed to send messages. We don't=
+ <br>
+need care about the configuration file rules now, it can be defined later.<=
+br>
+<br>
+In my opinion it's better use the same approach of the Manager. A main path=
+ <br>
+object &quot;/org/bluez/Manager&quot; (FALLBACK) should catch messages sent=
+ to unregistered <br>
+paths and handle services like:<br>
+- DeviceList, displays UP/DOWN devices<br>
+- UP<br>
+- DOWN<br>
+- RESET<br>
+<br>
+The device based paths can provide services like:<br>
+- SetProperty<br>
+- GetProperty<br>
+- Commands<br>
+- Features<br>
+<br>
+Using SetProperty/GetProperty instead of define one method name for each<br=
+>
+property is more clean. However it is important keep in mind that the <br>
+documentation of this service must be well-defined, because the method <br>
+call/method reply arguments will have different argument number and types.<=
+br>
+In the method call, the first argument must be a byte(faster comparison)<br=
+>
+indicating the command code instead of use a string to represent the comman=
+d.<br>
+<br>
+Suggested paths and Interfaces:<br>
+*** Main path<br>
+path:<br>
+/org/bluez/Devices<br>
+interface: org.bluez.Devices<br>
+<br>
+*** Device based<br>
+path:<br>
+/org/bluez/Devices/hciX<br>
+interface: org.bluez.Devices<br>
+<br>
+<br>
+Another point is the message handler function. Currently, there is only one=
+ <br>
+function responsible for handle the messages. In my opinion it will be bett=
+er<br>
+create other DBusObjectPathVTable to address Device messages for make the <=
+br>
+logic more clear. For SetProperty/GetProperty will be required extract the<=
+br>
+first argument to get the command code in the message handle function.<br>
+<br>
+<br>
+Is everything&nbsp; ok? Any comments?<br>
+<br>
+Regards,<br>
+Claudio.<br clear=3D"all"><br>-- <br>--------------------------------------=
+-------------------<br>Claudio Takahasi<br>Nokia's Institute of Technology =
+- INdT<br><a href=3D"mailto:claudio.takahasi@indt.org.br">claudio.takahasi@=
+indt.org.br
+</a><br>
+
+------=_Part_1959_15563838.1129727167974--
 
 
 -------------------------------------------------------
