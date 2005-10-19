@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: bluez-users@lists.sourceforge.net
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-0sJZ9kVCd2S8+yd4oy8r"
-Message-Id: <1129735973.3320.27.camel@baroque.rococosoft.com>
-Mime-Version: 1.0
-Subject: [Bluez-users] hciconfig inqmode
+Message-ID: <001401c5d49e$4cf45750$1801a8c0@IT>
+From: "rasco" <rasco.angel@gmail.com>
+To: <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0009_01C5D4BF.CD588620"
+Subject: [Bluez-users] Write BD_ADDR Linksys USB
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,36 +17,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 Oct 2005 16:32:53 +0100
+Date: Wed, 19 Oct 2005 15:14:29 +0400
 
+This is a multi-part message in MIME format.
 
---=-0sJZ9kVCd2S8+yd4oy8r
-Content-Type: text/plain
+------=_NextPart_000_0009_01C5D4BF.CD588620
+Content-Type: text/plain;
+	charset="koi8-r"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
-Can anyone point me at a reasonably-priced dongle which supports
-extended inquiry mode or inquiry with rssi?
+Hello,
 
-Thanks,
-Steve
---=20
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+Prompt please in what direction to search for the information on write =
+BD_ADDR in device Linksys BT100 CSR.=20
+I understand that this information "undoc", who can already faced this =
+problem?=20
 
---=-0sJZ9kVCd2S8+yd4oy8r
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
+Kind regards rasco
+------=_NextPart_000_0009_01C5D4BF.CD588620
+Content-Type: text/html;
+	charset="koi8-r"
+Content-Transfer-Encoding: quoted-printable
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dkoi8-r">
+<META content=3D"MSHTML 6.00.2900.2769" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Hello,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><!--StartFragment --><SPAN id=3Dr_text name=3D"r_text">Prompt =
+please in what=20
+direction to search for the information on&nbsp;write BD_ADDR in device =
+Linksys=20
+BT100 CSR. </SPAN></DIV>
+<DIV><SPAN name=3D"r_text">I understand that this information "undoc", =
+who can=20
+already faced this problem?</SPAN> </DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Kind regards =
+rasco</FONT></DIV></BODY></HTML>
 
-iD8DBQBDVmcllgMqgVzLyWcRArRFAJ9eniF+rNus0vn6Pic7JzKAkzjDJgCfUt/7
-b9DY8hqP+ZESwSIBIbghO6Q=
-=KJKJ
------END PGP SIGNATURE-----
-
---=-0sJZ9kVCd2S8+yd4oy8r--
+------=_NextPart_000_0009_01C5D4BF.CD588620--
 
 
 
