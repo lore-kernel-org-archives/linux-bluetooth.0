@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <001401c5d49e$4cf45750$1801a8c0@IT>
-From: "rasco" <rasco.angel@gmail.com>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0009_01C5D4BF.CD588620"
-Subject: [Bluez-users] Write BD_ADDR Linksys USB
+Subject: Re: [Bluez-users] Keyboard with Integrated trackball
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <43558812.7090202@stateye.homelinux.org>
+References: <43558812.7090202@stateye.homelinux.org>
+Content-Type: text/plain
+Message-Id: <1129718540.5362.5.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,50 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 Oct 2005 15:14:29 +0400
+Date: Wed, 19 Oct 2005 12:42:20 +0200
 
-This is a multi-part message in MIME format.
+Hi Anthony,
 
-------=_NextPart_000_0009_01C5D4BF.CD588620
-Content-Type: text/plain;
-	charset="koi8-r"
-Content-Transfer-Encoding: quoted-printable
+> In a previous thread concerning a keyboard with integrated trackball 
+> there was a reference that one should try using a patched kernel 
+> 2.6.11-mh2. What is the latest story on this, i.e. does it work? Or is 
+> there a more recent kernel that is more recommended. Also where would I 
+> find this patch, or the recommended one? linuxhq doesn't seem to have 
+> it. And finally are there any known restrictions if I'm using Suse 9.2?
 
-Hello,
+it should give you report mode protocol support and you find it on the
+BlueZ website.
 
-Prompt please in what direction to search for the information on write =
-BD_ADDR in device Linksys BT100 CSR.=20
-I understand that this information "undoc", who can already faced this =
-problem?=20
+Regards
 
-Kind regards rasco
-------=_NextPart_000_0009_01C5D4BF.CD588620
-Content-Type: text/html;
-	charset="koi8-r"
-Content-Transfer-Encoding: quoted-printable
+Marcel
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dkoi8-r">
-<META content=3D"MSHTML 6.00.2900.2769" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hello,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><!--StartFragment --><SPAN id=3Dr_text name=3D"r_text">Prompt =
-please in what=20
-direction to search for the information on&nbsp;write BD_ADDR in device =
-Linksys=20
-BT100 CSR. </SPAN></DIV>
-<DIV><SPAN name=3D"r_text">I understand that this information "undoc", =
-who can=20
-already faced this problem?</SPAN> </DIV>
-<DIV>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Kind regards =
-rasco</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0009_01C5D4BF.CD588620--
 
 
 
