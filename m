@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] [PATCH] Make RemoteName D-BUS method non-blocking
-Message-ID: <20051020070532.GA20546@localhost.localdomain>
-References: <20051019140715.GA15123@localhost.localdomain> <1129762736.2241.18.camel@blade>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="Kj7319i9nmIyA2yE"
-In-Reply-To: <1129762736.2241.18.camel@blade>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20051019140715.GA15123@localhost.localdomain>
+References: <20051019140715.GA15123@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1129762736.2241.18.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,188 +18,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Oct 2005 10:05:32 +0300
+Date: Thu, 20 Oct 2005 00:58:56 +0200
+
+Hi Johan,
+
+> Here's a patch which does a similar change RemoteName as my previous
+> patch did to Inquiry. For the user to be able to know if the name
+> request fails because of e.g. page timeout I have added a status
+> paramer to the signal and forced the signal to be always sent (not just
+> when evt->status == 0).
+
+I like to have this patch in, but it didn't apply cleanly. This might be
+my fault, because I did some coding style cleanups while I was without
+Internet and committed them today.
+
+Even if I repeat myself, but I take this whitespace thing serious and
+you should tell your editor to visualize tabs and spaces for you. This
+will make developing a lot easier.
+
+> There is one problem when using hci_send_req with the inquiry and remote
+> name HCI commands: they don't generate a command complete event, only a
+> command status event. This means that hci_send_req will fail with
+> ETIMEDOUT (I didn't notice it earlier since the UI status is immediately
+> updated by the InquiryStarted signal). Using hci_send_cmd is also not
+> (IMHO) an option since a failure status in the command status event
+> should be detected and handled properly.
+
+Why don't you set rq.event to EVT_CMD_STATUS?
+
+Regards
+
+Marcel
 
 
---Kj7319i9nmIyA2yE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi Marcel,
-
-On Thu, Oct 20, 2005, Marcel Holtmann wrote:
-> Even if I repeat myself, but I take this whitespace thing serious and
-> you should tell your editor to visualize tabs and spaces for you.
-
-I do too. Were there some whitespace problems with my patch? (I couldn't
-find any)
-
-> Why don't you set rq.event to EVT_CMD_STATUS?
-
-Because hci_send_req has a switch statement which handles the
-EVT_CMD_STATUS case separately and would never reach the case where it
-tests for hdr->evt == r->event.
-
-Attached is a new patch which should apply cleanly to CVS.
-
-Johan
-
---Kj7319i9nmIyA2yE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="remote-name2.patch"
-
-Index: hcid/dbus.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus.c,v
-retrieving revision 1.28
-diff -u -r1.28 dbus.c
---- hcid/dbus.c	19 Oct 2005 10:52:45 -0000	1.28
-+++ hcid/dbus.c	20 Oct 2005 06:54:41 -0000
-@@ -466,7 +466,7 @@
- 	return;
- }
- 
--void hcid_dbus_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name)
-+void hcid_dbus_remote_name(bdaddr_t *local, uint8_t status, bdaddr_t *peer, char *name)
- {
- 	DBusMessage *message = NULL;
- 	char path[MAX_PATH_LENGTH];
-@@ -493,6 +493,7 @@
- 	}
- 
- 	dbus_message_append_args(message,
-+					DBUS_TYPE_BYTE, &status,
- 					DBUS_TYPE_STRING, &peer_addr,
- 					DBUS_TYPE_STRING, &name,
- 					DBUS_TYPE_INVALID);
-@@ -1251,7 +1252,7 @@
- 	rq.cparam = &cp;
- 	rq.clen = INQUIRY_CP_SIZE;
- 
--	if (hci_send_req(dd, &rq, 100) < 0) {
-+	if (hci_send_req(dd, &rq, 100) < 0 && errno != ETIMEDOUT) {
- 		syslog(LOG_ERR, "Unable to start inquiry: %s", strerror(errno));
- 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
- 		goto failed;
-@@ -1322,8 +1323,6 @@
- 
- static DBusMessage* handle_remote_name_req(DBusMessage *msg, void *data)
- {
--	char name[64];
--	const char *pname = name;
- 	DBusMessageIter iter;
- 	DBusMessage *reply = NULL;
- 	struct hci_dbus_data *dbus_data = data;
-@@ -1331,6 +1330,8 @@
- 	int dd = -1;
- 	const char *str_bdaddr;
- 	bdaddr_t bdaddr;
-+	struct hci_request rq;
-+	remote_name_req_cp cp;
- 
- 	dbus_message_iter_init(msg, &iter);
- 	dbus_message_iter_get_basic(&iter, &str_bdaddr);
-@@ -1343,27 +1344,38 @@
- 			reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
- 			goto failed;
- 		}
--	} else {
-+	} else
- 		dev_id = dbus_data->id;
--	}
- 
- 	dd = hci_open_dev(dev_id);
--	if (dd >= 0) {
--		if (hci_read_remote_name(dd, &bdaddr, sizeof(name), name, READ_REMOTE_NAME_TIMEOUT) ==0) {
--			reply = dbus_message_new_method_return(msg);
--			dbus_message_iter_init_append(reply, &iter);
--			dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &pname);
--		} else {
--			reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
--		}
--	} else {
-+	if (dd < 0) {
-+		syslog(LOG_ERR, "Unable to open device %d: %s", dev_id, strerror(errno));
- 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
-+		goto failed;
- 	}
- 
--	if (dd > 0)
--		close(dd);
-+	memset(&cp, 0, sizeof(cp));
-+	cp.bdaddr = bdaddr;
-+	cp.pscan_rep_mode = 0x01;
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LINK_CTL;
-+	rq.ocf = OCF_REMOTE_NAME_REQ;
-+	rq.cparam = &cp;
-+	rq.clen = REMOTE_NAME_REQ_CP_SIZE;
-+
-+	if (hci_send_req(dd, &rq, 100) < 0 && errno != ETIMEDOUT) {
-+		syslog(LOG_ERR, "Unable to send remote name request: %s", strerror(errno));
-+		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
-+		goto failed;
-+	}
-+
-+	reply = dbus_message_new_method_return(msg);
- 
- failed:
-+	if (dd >= 0)
-+		hci_close_dev(dd);
-+
- 	return reply;
- }
- 
-Index: hcid/hcid.h
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/hcid.h,v
-retrieving revision 1.25
-diff -u -r1.25 hcid.h
---- hcid/hcid.h	9 Oct 2005 22:15:22 -0000	1.25
-+++ hcid/hcid.h	20 Oct 2005 06:54:41 -0000
-@@ -131,7 +131,7 @@
- void hcid_dbus_inquiry_start(bdaddr_t *local);
- void hcid_dbus_inquiry_complete(bdaddr_t *local);
- void hcid_dbus_inquiry_result(bdaddr_t *local, bdaddr_t *peer, uint32_t class, int8_t rssi);
--void hcid_dbus_remote_name(bdaddr_t *local, bdaddr_t *peer, char *name);
-+void hcid_dbus_remote_name(bdaddr_t *local, uint8_t status, bdaddr_t *peer, char *name);
- void hcid_dbus_conn_complete(bdaddr_t *local, bdaddr_t *peer);
- void hcid_dbus_disconn_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t reason);
- #else
-Index: hcid/security.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/security.c,v
-retrieving revision 1.40
-diff -u -r1.40 security.c
---- hcid/security.c	6 Sep 2005 22:01:30 -0000	1.40
-+++ hcid/security.c	20 Oct 2005 06:54:41 -0000
-@@ -499,17 +499,16 @@
- 	char name[249];
- 	bdaddr_t dba;
- 
--	if (evt->status)
--		return;
-+	bacpy(&dba, &evt->bdaddr);
- 
- 	memset(name, 0, sizeof(name));
--	memcpy(name, evt->name, 248);
- 
--	bacpy(&dba, &evt->bdaddr);
--
--	hcid_dbus_remote_name(sba, &dba, name);
-+	if (evt->status == 0) {
-+		memcpy(name, evt->name, 248);
-+		write_device_name(sba, &dba, name);
-+	}
- 
--	write_device_name(sba, &dba, name);
-+	hcid_dbus_remote_name(sba, evt->status, &dba, name);
- }
- 
- static inline void remote_version_information(int dev, bdaddr_t *sba, void *ptr)
-
---Kj7319i9nmIyA2yE--
 
 
 -------------------------------------------------------
