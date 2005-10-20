@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Write BD_ADDR Linksys USB
+Subject: Re: [Bluez-users] hciconfig inqmode
 From: Marcel Holtmann <marcel@holtmann.org>
-To: rasco <rasco.angel@gmail.com>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <005901c5d553$c26e2f50$1801a8c0@IT>
-References: <001401c5d49e$4cf45750$1801a8c0@IT>
-	 <1129737435.2241.0.camel@blade>  <005901c5d553$c26e2f50$1801a8c0@IT>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1129820779.3320.101.camel@baroque.rococosoft.com>
+References: <1129735973.3320.27.camel@baroque.rococosoft.com>
+	 <1129762373.2241.13.camel@blade>
+	 <1129820779.3320.101.camel@baroque.rococosoft.com>
 Content-Type: text/plain
-Message-Id: <1129822344.10327.13.camel@blade>
+Message-Id: <1129820951.2241.71.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,24 +20,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 20 Oct 2005 17:32:24 +0200
+Date: Thu, 20 Oct 2005 17:09:11 +0200
 
-Hi,
+Hi Steve,
 
-first of all, you ask on the mailing list, then you also reply to the
-mailing list.
+> > > Can anyone point me at a reasonably-priced dongle which supports
+> > > extended inquiry mode or inquiry with rssi?
+> > 
+> > every CSR based Bluetooth 1.2 dongle would work fine. You can upgrade
+> > the D-Link DBT-120 with the Apple firmware.
+> > 
+> > Don't get a Broadcom 1.2 dongle, because they don't support Inquiry with
+> > RSSI. The Silicon Wave is supported, but we needed a workaround, because
+> > they followed an old specification.
+> 
+> Do you think the DBT-122 is just a DBT-120 with 1.2 firmware?
+> http://www.expansys.com/product.asp?code=125370
+> 
+> It would save reflashing if it was.
 
-> Thanks for your answer. But that you have offered all does not give of the 
-> answer to my question, or contains the inexact information :(. Excuse that 
-> has disturbed.
-
-Second, my answer gave you all information you need. The topic of
-changing the BD_ADDR has been discussed some times on the mailing list
-and so you will find additional information and further links in the
-mailing list archive. If you start looking at the bluez-utils source
-code or CVS you might find a program for this task. If you need a stupid
-script kiddy step-by-step instruction then find another place to ask,
-because this is about serious development.
+I have no idea actually. Give it a try and if it contains a CSR chip you
+are on the safe side.
 
 Regards
 
