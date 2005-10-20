@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Mitja Pufic <raveer@section-one.org>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] hciconfig inqmode
-In-Reply-To: <1129820951.2241.71.camel@blade>
-Message-ID: <Pine.LNX.4.61.0510201841300.10554@cherokee.spacecom.si>
-References: <1129735973.3320.27.camel@baroque.rococosoft.com>
- <1129762373.2241.13.camel@blade>  <1129820779.3320.101.camel@baroque.rococosoft.com>
- <1129820951.2241.71.camel@blade>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Bluez-users] Write BD_ADDR Linksys USB
+From: Marcel Holtmann <marcel@holtmann.org>
+To: rasco <rasco.angel@gmail.com>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <005901c5d553$c26e2f50$1801a8c0@IT>
+References: <001401c5d49e$4cf45750$1801a8c0@IT>
+	 <1129737435.2241.0.camel@blade>  <005901c5d553$c26e2f50$1801a8c0@IT>
+Content-Type: text/plain
+Message-Id: <1129822344.10327.13.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,50 +20,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 20 Oct 2005 18:42:12 +0200 (CEST)
+Date: Thu, 20 Oct 2005 17:32:24 +0200
 
-Yes, DBT-122 is DBT-120 with firmware 18.2 wich is 1.2 capable.
+Hi,
 
-regards, Mitja
+first of all, you ask on the mailing list, then you also reply to the
+mailing list.
 
-On Thu, 20 Oct 2005, Marcel Holtmann wrote:
+> Thanks for your answer. But that you have offered all does not give of the 
+> answer to my question, or contains the inexact information :(. Excuse that 
+> has disturbed.
 
-> Hi Steve,
-> 
-> > > > Can anyone point me at a reasonably-priced dongle which supports
-> > > > extended inquiry mode or inquiry with rssi?
-> > > 
-> > > every CSR based Bluetooth 1.2 dongle would work fine. You can upgrade
-> > > the D-Link DBT-120 with the Apple firmware.
-> > > 
-> > > Don't get a Broadcom 1.2 dongle, because they don't support Inquiry with
-> > > RSSI. The Silicon Wave is supported, but we needed a workaround, because
-> > > they followed an old specification.
-> > 
-> > Do you think the DBT-122 is just a DBT-120 with 1.2 firmware?
-> > http://www.expansys.com/product.asp?code=125370
-> > 
-> > It would save reflashing if it was.
-> 
-> I have no idea actually. Give it a try and if it contains a CSR chip you
-> are on the safe side.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by:
-> Power Architecture Resource Center: Free content, downloads, discussions,
-> and more. http://solutions.newsforge.com/ibmarch.tmpl
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+Second, my answer gave you all information you need. The topic of
+changing the BD_ADDR has been discussed some times on the mailing list
+and so you will find additional information and further links in the
+mailing list archive. If you start looking at the bluez-utils source
+code or CVS you might find a program for this task. If you need a stupid
+script kiddy step-by-step instruction then find another place to ask,
+because this is about serious development.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
