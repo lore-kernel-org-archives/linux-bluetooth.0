@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH] Make RemoteName D-BUS method non-blocking
-Message-ID: <20051020133704.GA32755@localhost.localdomain>
-References: <20051019140715.GA15123@localhost.localdomain> <1129762736.2241.18.camel@blade> <20051020070532.GA20546@localhost.localdomain> <1129794748.2241.26.camel@blade> <20051020083703.GA23553@localhost.localdomain> <1129798977.2241.35.camel@blade> <20051020095035.GA26910@localhost.localdomain> <1129803367.2241.56.camel@blade> <20051020112153.GA31872@localhost.localdomain>
+From: Peter Wippich <pewi@gw-instruments.de>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Bluetooth-UPnP bridge
+In-Reply-To: <81FEC275650AE14EBD5245E624762B970215A519@ds07.tnoase.telecom.tno.nl>
+Message-ID: <Pine.LNX.4.33.0510201259220.10096-100000@redbean.intranet.gw-instruments.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20051020112153.GA31872@localhost.localdomain>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,18 +17,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Oct 2005 16:37:34 +0300
+Date: Thu, 20 Oct 2005 13:00:34 +0200 (CEST)
 
-Hi,
 
-Just thought that I'd inform that there is a new version of the pygtk
-testing program which works with the latest remote-name patch that I
-sent (from the usual place: http://www.iki.fi/~jhedberg/bluez-python/).
+Hi Antonio,
 
-I've also managed to get adding and removing of local bluetooth devices
-while the program is running working quite well.
+check the ESDP profile before starting soemthing new.
 
-Johan
+Best regards,
+
+Peter
+
+On Thu, 20 Oct 2005 A.J.P.S.Madureira@telecom.tno.nl wrote:
+
+> Hello.
+>
+> I need to do a bridge between Bluetooth and UPnP. For this I need to
+> develop a piece of software that mapps Bluetooth service context (L2CAP,
+> RFCOMM, etc) to UPnP context (3 TCP ports: control, event, and
+> presentation). I still didn't get to this part of the work, but do you
+> think this is going to be possible (I was thinking of doing it for the
+> headset profile as a demonstrator) and very generic (small development
+> effort to accommodate more profiles) ?
+>
+> Thank you very much for your comments.
+>
+> Kind regards, Antonio Madureira (from Delft).
+>
+
+|	Peter Wippich 			Voice: +49 30 46776411		|
+|	G&W Instruments GmbH		fax:   +49 30 46776419		|
+|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
+|	D-13355 Berlin  / Germany					|
+
+
 
 
 -------------------------------------------------------
