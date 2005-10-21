@@ -2,11 +2,10 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] dfutool - IBM X23 refuses to update ;)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4359178E.3080408@kernelconcepts.de>
+In-Reply-To: <43591455.7070005@kernelconcepts.de>
 References: <43591455.7070005@kernelconcepts.de>
-	 <4359178E.3080408@kernelconcepts.de>
 Content-Type: text/plain
-Message-Id: <1129912993.11428.20.camel@blade>
+Message-Id: <1129912213.11428.8.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,48 +18,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 21 Oct 2005 18:43:13 +0200
+Date: Fri, 21 Oct 2005 18:30:13 +0200
 
 Hi Nils,
 
-> Hmm... I just compared the original DFU and the upgrade DFU using the
-> verify option:
-> 
-> ./dfutool verify ITSE_00003_07_IBM_BDC_Firmware128_Rev310.dfu
-> Filename        ITSE_00003_07_IBM_BDC_Firmware128_Rev310.dfu
-> Filesize        338168
-> Checksum        b589a143
-> DFU suffix      10 03 ff ff ff ff 00 01 55 46 44 10 43 a1 89 b5
-> idVendor        ffff
-> idProduct       ffff
-> bcdDevice       310
-> bcdDFU          1.0
-> ucDfuSignature  DFU
-> bLength         16
-> dwCRC           b589a143
-> Firmware type   CSR-dfu1
-> Firmware check  valid checksum
-> 
-> ./dfutool verify org.dfu
-> Filename        org.dfu
-> Filesize        320480
-> Checksum        8c89a52e
-> DFU suffix      15 01 10 03 bf 04 00 01 55 46 44 10 2e a5 89 8c
-> idVendor        04bf
-> idProduct       0310
-> bcdDevice       115
-> bcdDFU          1.0
-> ucDfuSignature  DFU
-> bLength         16
-> dwCRC           8c89a52e
-> Firmware type   CSR-dfu1
-> Firmware check  valid checksum
-> 
-> 
-> Might the missing product and vendor ID be the problem with upgrade
-> file? Can/should I try to change those?
+> Some time ago I purchased an IBM X23 notebook (nice thing BTW) with
+> Bluetooth. The Bluetooth chip is, of course, a CSR one, labeled as ITSE.
+> IBM offers a Bluetooth firmware upgrade for it to help support of
+> multiple connections.
+> So I would like to upgrade my firmware using the dfutool. IBM's uprade
+> file can easily be unpacked and what you get is the, I guess, proper DFU
+> file for the upgrade.
 
-no, because dfutool simply ignores them.
+you can use "verify" to see if the DFU file is at least valid.
+
+> Using the dfutool I can nicely backup my firmware to a file - works like
+> charm!
+> But when I try to flash the new firmware the dfutool waits a couple of
+> seconds at "switching device to dfu mode", then sais "Dowloading
+> firmware" without progress indication and then sais "Can't get status:
+> Broken pipe (32)".
+
+The dfutool is not perfect. I only tested it with a small bunch of
+devices and most of them were BlueCore02 or later.
+
+> If it is of help I can provide the original and update firmware files.
+> Here is additonally what hciconfig tells me about my chip:
+> 
+> root@miu:~ # hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:80:98:24:80:BE ACL MTU: 128:8  SCO MTU: 64:8
+>         HCI 11.3
+>         Chip version: BlueCore01b
+>         SCO mapping:  HCI
+
+This is a very old firmware and maybe the boot loader on the chip is
+even older. Maybe it is broken and need some special tweaks to make it
+working. Sometimes increasing the timeouts inside the code might help,
+but you can also render your device useless.
 
 Regards
 
