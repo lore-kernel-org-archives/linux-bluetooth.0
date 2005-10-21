@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4359178E.3080408@kernelconcepts.de>
+Message-ID: <43591455.7070005@kernelconcepts.de>
 From: Nils Faerber <nils.faerber@kernelconcepts.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] dfutool - IBM X23 refuses to update ;)
-References: <43591455.7070005@kernelconcepts.de>
-In-Reply-To: <43591455.7070005@kernelconcepts.de>
 Content-Type: text/plain; charset=UTF-8
+Subject: [Bluez-devel] dfutool - IBM X23 refuses to update ;)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,47 +16,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 21 Oct 2005 18:30:06 +0200
+Date: Fri, 21 Oct 2005 18:16:21 +0200
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-Hmm... I just compared the original DFU and the upgrade DFU using the
-verify option:
+Hi all!
+Some time ago I purchased an IBM X23 notebook (nice thing BTW) with
+Bluetooth. The Bluetooth chip is, of course, a CSR one, labeled as ITSE.
+IBM offers a Bluetooth firmware upgrade for it to help support of
+multiple connections.
+So I would like to upgrade my firmware using the dfutool. IBM's uprade
+file can easily be unpacked and what you get is the, I guess, proper DFU
+file for the upgrade.
 
-./dfutool verify ITSE_00003_07_IBM_BDC_Firmware128_Rev310.dfu
-Filename        ITSE_00003_07_IBM_BDC_Firmware128_Rev310.dfu
-Filesize        338168
-Checksum        b589a143
-DFU suffix      10 03 ff ff ff ff 00 01 55 46 44 10 43 a1 89 b5
-idVendor        ffff
-idProduct       ffff
-bcdDevice       310
-bcdDFU          1.0
-ucDfuSignature  DFU
-bLength         16
-dwCRC           b589a143
-Firmware type   CSR-dfu1
-Firmware check  valid checksum
+Using the dfutool I can nicely backup my firmware to a file - works like
+charm!
+But when I try to flash the new firmware the dfutool waits a couple of
+seconds at "switching device to dfu mode", then sais "Dowloading
+firmware" without progress indication and then sais "Can't get status:
+Broken pipe (32)".
 
-./dfutool verify org.dfu
-Filename        org.dfu
-Filesize        320480
-Checksum        8c89a52e
-DFU suffix      15 01 10 03 bf 04 00 01 55 46 44 10 2e a5 89 8c
-idVendor        04bf
-idProduct       0310
-bcdDevice       115
-bcdDFU          1.0
-ucDfuSignature  DFU
-bLength         16
-dwCRC           8c89a52e
-Firmware type   CSR-dfu1
-Firmware check  valid checksum
+Pity, so close but yet so far ;)
+
+If it is of help I can provide the original and update firmware files.
+Here is additonally what hciconfig tells me about my chip:
+
+root@miu:~ # hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:80:98:24:80:BE ACL MTU: 128:8  SCO MTU: 64:8
+        HCI 11.3
+        Chip version: BlueCore01b
+        SCO mapping:  HCI
+
+root@miu:~ # hciconfig hci0 version
+hci0:   Type: USB
+        BD Address: 00:80:98:24:80:BE ACL MTU: 128:8  SCO MTU: 64:8
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x73 LMP Ver: 1.1 (0x1) LMP Subver: 0x73
+        Manufacturer: Cambridge Silicon Radio (10)
+
+And this is the name of the new firmware file
+	ITSE_00003_07_IBM_BDC_Firmware128_Rev310.dfu
 
 
-Might the missing product and vendor ID be the problem with upgrade
-file? Can/should I try to change those?
+So, does anyone have an idea how to debug or even fix this?
+If yes, I would be quite glad ;)
 
 Cheers
   nils faerber
@@ -72,9 +74,9 @@ D-57250 Netphen          Mob: +49-176-21024535
 Version: GnuPG v1.4.1 (GNU/Linux)
 Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFDWReOJXeIURG1qHgRAtC7AJ9iAvwadWMke5r0twPZ4G3ypUiUpQCdEPGa
-wmpwY6FRUXWUpRh8Zopeh4A=
-=cx8b
+iD8DBQFDWRRUJXeIURG1qHgRAj9zAJ44uxswEeiI7QGqOs/xTTHzZxWRbgCglEIE
+bH8E26NDvBvH0gev1KSCMlc=
+=XgsB
 -----END PGP SIGNATURE-----
 
 
