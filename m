@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43591455.7070005@kernelconcepts.de>
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
+Message-ID: <4359109D.9050502@csr.com>
+From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8
-Subject: [Bluez-devel] dfutool - IBM X23 refuses to update ;)
+Subject: Re: [Bluez-devel] SCO USB isoc transfer
+References: <de37400f0510210807s3df4b697sab237041cd30c6e1@mail.gmail.com>
+In-Reply-To: <de37400f0510210807s3df4b697sab237041cd30c6e1@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,68 +18,66 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 21 Oct 2005 18:16:21 +0200
+Date: Fri, 21 Oct 2005 17:00:29 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Tomasz Urbanowicz wrote:
+> Now I'm working on enabling SCO transfer which takes place over isochronous endpoints in
+> the usb device. Now to the point. After establishing the SCO connection when I read from
+> the device isoc endpoint I've noticed that the data that is returned sometimes starts
+> with the SCO header and sometimes it doesn't.When it doesn't the first SCO
+> Header appears somewhere later in the data.
 
-Hi all!
-Some time ago I purchased an IBM X23 notebook (nice thing BTW) with
-Bluetooth. The Bluetooth chip is, of course, a CSR one, labeled as ITSE.
-IBM offers a Bluetooth firmware upgrade for it to help support of
-multiple connections.
-So I would like to upgrade my firmware using the dfutool. IBM's uprade
-file can easily be unpacked and what you get is the, I guess, proper DFU
-file for the upgrade.
+This is a fundamental problem with SCO over USB.
 
-Using the dfutool I can nicely backup my firmware to a file - works like
-charm!
-But when I try to flash the new firmware the dfutool waits a couple of
-seconds at "switching device to dfu mode", then sais "Dowloading
-firmware" without progress indication and then sais "Can't get status:
-Broken pipe (32)".
+One HCI SCO packet is broken into three USB packet. Only the first of
+these packets has a header.
 
-Pity, so close but yet so far ;)
+Unfortuantely, the USB isochronous stream is not reliable and packets
+can get lost. This means that the header may not be where you expect
+them.
 
-If it is of help I can provide the original and update firmware files.
-Here is additonally what hciconfig tells me about my chip:
+For a single SCO link with 16 bit data, the Bluetooth spec recommends
+that the data be packed into HCI packets containing 48 payload bytes
+(24 samples). The three byte HCI header brings the total PDU size up to
+51 bytes. This is then split into three 17 byte packets which are sent
+on successive milliseconds.
 
-root@miu:~ # hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:80:98:24:80:BE ACL MTU: 128:8  SCO MTU: 64:8
-        HCI 11.3
-        Chip version: BlueCore01b
-        SCO mapping:  HCI
+The first packet contains the three byte header and 14 bytes of payload.
+The last two contain 17 bytes of payload.
 
-root@miu:~ # hciconfig hci0 version
-hci0:   Type: USB
-        BD Address: 00:80:98:24:80:BE ACL MTU: 128:8  SCO MTU: 64:8
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x73 LMP Ver: 1.1 (0x1) LMP Subver: 0x73
-        Manufacturer: Cambridge Silicon Radio (10)
+You will need generic resynchronisation code that detects that a header
+was not received where it was expected and then reads individual USB
+packets until it finds one that starts with a header.
 
-And this is the name of the new firmware file
-	ITSE_00003_07_IBM_BDC_Firmware128_Rev310.dfu
+If you wanted to be really robust, you'd look for a USB packet with a
+header followed by two without as, in theory, the header sequence could
+appear in the sample stream.
+
+In practice, if you just take the next packet with a header then if you
+did accidentally match in the packet stream, you'll probably find the
+next header isn't where you expected (as it's unlikely that the three
+bytes 48 bytes further along the data stream also match the header).
+You can then try and resynchronise again and keep trying until you get
+the right match (which should never take more than 3 attempts).
+
+> But it's not always like that. Somtimes the result buffer will start with
+> some garbage data, and the proper SCO header appears somewhere later in that
+> buffer. For example :
+>  **)
+> 22 10 22 10 22 10 22 10 22 10 22 10 22 10 22 10 22
+> 10 22 10 22 10 22 10 22 10 22 10 22 10 22 10 22 10
+> 2C 00 30 22 10 22 10 22 10 22 10 22 10 22 10 22 10
+>  Here first 34 bytes are not preceeded with the SCO Header. A properly
+> structured packet starts at the 3rd line here with 2C 00 30.
+
+34 bytes is 2 x 17 bytes which means you started reading from the second
+packet of the three making up the full HCI packet.
+
+	- Steven
+-- 
 
 
-So, does anyone have an idea how to debug or even fix this?
-If yes, I would be quite glad ;)
-
-Cheers
-  nils faerber
-
-- --
-kernel concepts          Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          Mob: +49-176-21024535
-- --
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFDWRRUJXeIURG1qHgRAj9zAJ44uxswEeiI7QGqOs/xTTHzZxWRbgCglEIE
-bH8E26NDvBvH0gev1KSCMlc=
-=XgsB
------END PGP SIGNATURE-----
+This message has been scanned for viruses by BlackSpider MailControl - www.blackspider.com
 
 
 -------------------------------------------------------
