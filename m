@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [D-BUS PATCH] HCI Errors
+Subject: Re: [Bluez-devel] [D-BUS PATCH] Authentication
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
 Cc: Claudio Takahasi <cktakahasi@gmail.com>
-In-Reply-To: <e1effdeb0510201310w7b09bd32i30961f75a21b4bb3@mail.gmail.com>
-References: <e1effdeb0510201310w7b09bd32i30961f75a21b4bb3@mail.gmail.com>
+In-Reply-To: <e1effdeb0510201045w5ebf17afh87897564184ce9f9@mail.gmail.com>
+References: <e1effdeb0510201045w5ebf17afh87897564184ce9f9@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1129986557.11428.38.camel@blade>
+Message-Id: <1129986496.11428.36.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,21 +19,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 22 Oct 2005 15:09:17 +0200
+Date: Sat, 22 Oct 2005 15:08:16 +0200
 
 Hi Claudio,
 
-> This patch makes possible create HCI D-Bus errors.
-> 
-> I removed the previous HCI errors code defined in "dbus.h", now I am 
-> using the codes defined in the "hci.h" file.
-> 
-> In a near future it should be better move the error related functions 
-> to another file or try implements internationalization.
+> This is the initial patch to support authentication. There are
+> improving points
+> that I am planning send soon if everybody agree with my proposal.
 
-I applied the patch. We can move the error stuff into a separate bunch
-of files, but the internationalization shouldn't be part of a daemon.
-This is pure application stuff.
+I applied the patch, but please do the coding style right. It seems that
+you still copy some parts for your old patches.
+
+	if (sock > 0)
+		close (sock);
+
+I first prefer to use "sk" instead of "sock", but this hasn't been used
+in full consistency and so I didn't corrected it. However you need to
+check for (sock >= 0) in case of a socket or file descriptor and we
+don't put a space between the function name and its parameters. So it
+must be called "close(sock);" in any case.
+
+It is also better to introduce more error labels than using another if
+statement to check for state of a file descriptor. We now if the file
+descriptor is valid or not.
 
 Regards
 
