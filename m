@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <435BDE1C.2070808@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Philippe Berini <philippe@berini.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth-Alsa: cannot pair the headset
-References: <435B72B0.5050309@libero.it>
-In-Reply-To: <435B72B0.5050309@libero.it>
-Content-Type: text/plain; charset=ISO-8859-15
+Message-ID: <20051023151215.GB31746@loulou-becane>
+References: <20051020135234.GC28731@loulou-becane> <20051023123808.GA14322@elmicha.333200002251-0001.dialin.t-online.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20051023123808.GA14322@elmicha.333200002251-0001.dialin.t-online.de>
+Subject: [Bluez-users] Re: Buetooth and SAMSUNG SGH-E340
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 23 Oct 2005 13:01:48 -0600
+Date: Sun, 23 Oct 2005 17:12:15 +0200
 
-hi
+* Michael Mauch <michael.mauch@gmx.de> [Sun, Oct 23, 2005 at 02:38:08PM +0200]:
 
-> # btsco -v 00:07:A4:14:0F:BF
-> btsco v0.4
-> Device is 2:0
-> Error: Failed to connect to SDP server: Permission denied
-> Assuming channel 2
+> If you can't get obexftp to work, you could try gnome-obex-send or
+> kde-bluetooth.
 
-It looks like you need to remove the link keys so the pairing can get
-reset. There's something about that in the http://bluetooth-alsa.sf.org
-page.
+Thanks for your answer. I do not want to use Gnome or KDE, but I'll give
+it a try on another machine. It'll be interesting anyway to see if that works.
 
-Brad
+I would have liked however to understand why it's not working in command
+line.
+
+-- 
+Philippe Berini                
 
 
 -------------------------------------------------------
