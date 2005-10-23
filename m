@@ -1,99 +1,43 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20051023210620.GA14179@localhost.localdomain>
+Return-Path: <tomlins@cam.org>
+From: Ed Tomlinson <tomlins@cam.org>
+To: Pavel Machek <pavel@ucw.cz>
+Subject: Re: Billionton bluetooth CF card: performance is 10KB/sec
+Date: Sun, 23 Oct 2005 08:53:13 -0400
+Cc: marcel@holtmann.org, maxk@qualcomm.com, bluez-devel@lists.sourceforge.net,
+   kernel list <linux-kernel@vger.kernel.org>
+References: <20051022173152.GA2573@elf.ucw.cz> <200510221801.49314.tomlins@cam.org> <20051023083535.GA1975@elf.ucw.cz>
+In-Reply-To: <20051023083535.GA1975@elf.ucw.cz>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="HlL+5n6rz5pIUxbD"
-Subject: [Bluez-devel] hci_send_req and EVT_CMD_STATUS
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Oct 2005 00:06:20 +0300
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200510230853.14484.tomlins@cam.org>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
+On Sunday 23 October 2005 04:35, Pavel Machek wrote:
+> > > Transmitted 1000000 bytes in 103.183640 seconds (9.464 kbytes/s)
+> >=20
+> > I see about the same with a bluetooth usb adapter. =A0Suspect that is a=
+bout what
+> > you should see with bluetooth - its not designed for speed. =A0It would=
+ be really=20
+> > nice to be wrong though...
+>=20
+> No, it is designed to do more. It should do around ~100 kbytes/sec
+> according to spec, and MSI dongle *does* do 25 kbytes/sec easily
+> against nokia 6230.
 
---HlL+5n6rz5pIUxbD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Pavel,
 
-Hi Marcel,
+Then the interesting test is to see if the delay is kernel or phone.   Are =
+you talking
+to the same phone with both adapters?  If so please copy me on any test pat=
+ches as
+I too have the same issue when talking to a pilot T3 using rfcomm using a "=
+0a12:0001=20
+Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)" usb dongle.
 
-I see that you changed hci_send_req so that it will never return
-cmd_status events with non-zero status (instead the function fails with
-EIO). If this was intentional (the fix I sent would have allowed getting
-the cmd status event in all circumstanses), please apply the attached
-patch since checking for rp.status after hci_send_req has successfully
-returned is unecessary.
+I would _love_ to get 25K/s
 
-Johan
+Thanks,
 
---HlL+5n6rz5pIUxbD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="cmd-status.patch"
-
-Index: dbus.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus.c,v
-retrieving revision 1.31
-diff -u -r1.31 dbus.c
---- dbus.c	22 Oct 2005 13:03:41 -0000	1.31
-+++ dbus.c	23 Oct 2005 19:55:39 -0000
-@@ -1374,12 +1374,6 @@
- 		goto failed;
- 	}
- 
--	if (rp.status) {
--		syslog(LOG_ERR, "Inquiry command failed with status 0x%02X", rp.status);
--		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + EIO);
--		goto failed;
--	}
--
- 	reply = dbus_message_new_method_return(msg);
- 
- failed:
-@@ -1496,12 +1490,6 @@
- 		goto failed;
- 	}
- 
--	if (rp.status) {
--		syslog(LOG_ERR, "Remote name command failed with status 0x%02X", rp.status);
--		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + EIO);
--		goto failed;
--	}
--
- 	reply = dbus_message_new_method_return(msg);
- 
- failed:
-@@ -1655,12 +1643,6 @@
- 		goto failed;
- 	}
- 
--	if (rp.status) {
--		syslog(LOG_ERR, "Authentication command failed with status 0x%02X", rp.status);
--		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + EIO);
--		goto failed;
--	}
--
- failed:
- 	if (sock >= 0)
- 		close(sock);
-
---HlL+5n6rz5pIUxbD--
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by the JBoss Inc.
-Get Certified Today * Register for a JBoss Training Course
-Free Certification Exam for All Training Attendees Through End of 2005
-Visit http://www.jboss.com/services/certification for more information
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Ed Tomlinson
