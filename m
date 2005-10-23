@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Philippe Berini <philippe@berini.org>
+From: Michael Mauch <michael.mauch@gmx.de>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20051023151215.GB31746@loulou-becane>
-References: <20051020135234.GC28731@loulou-becane> <20051023123808.GA14322@elmicha.333200002251-0001.dialin.t-online.de>
+Message-ID: <20051023123808.GA14322@elmicha.333200002251-0001.dialin.t-online.de>
+References: <20051020135234.GC28731@loulou-becane>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20051023123808.GA14322@elmicha.333200002251-0001.dialin.t-online.de>
+In-Reply-To: <20051020135234.GC28731@loulou-becane>
 Subject: [Bluez-users] Re: Buetooth and SAMSUNG SGH-E340
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,21 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 23 Oct 2005 17:12:15 +0200
+Date: Sun, 23 Oct 2005 14:38:08 +0200
 
-* Michael Mauch <michael.mauch@gmx.de> [Sun, Oct 23, 2005 at 02:38:08PM +0200]:
+Philippe Berini wrote:
 
-> If you can't get obexftp to work, you could try gnome-obex-send or
-> kde-bluetooth.
+> Any idea or pointer ?
 
-Thanks for your answer. I do not want to use Gnome or KDE, but I'll give
-it a try on another machine. It'll be interesting anyway to see if that works.
+If you can't get obexftp to work, you could try gnome-obex-send or
+kde-bluetooth.
 
-I would have liked however to understand why it's not working in command
-line.
-
--- 
-Philippe Berini                
+Regards...
+		Michael
 
 
 -------------------------------------------------------
