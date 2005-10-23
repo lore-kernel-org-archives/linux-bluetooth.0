@@ -1,43 +1,113 @@
-Return-Path: <tomlins@cam.org>
-From: Ed Tomlinson <tomlins@cam.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: Pavel Machek <pavel@ucw.cz>
-Subject: Re: Billionton bluetooth CF card: performance is 10KB/sec
-Date: Sun, 23 Oct 2005 08:53:13 -0400
-Cc: marcel@holtmann.org, maxk@qualcomm.com, bluez-devel@lists.sourceforge.net,
+Cc: maxk@qualcomm.com, bluez-devel@lists.sf.net,
    kernel list <linux-kernel@vger.kernel.org>
-References: <20051022173152.GA2573@elf.ucw.cz> <200510221801.49314.tomlins@cam.org> <20051023083535.GA1975@elf.ucw.cz>
-In-Reply-To: <20051023083535.GA1975@elf.ucw.cz>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200510230853.14484.tomlins@cam.org>
-List-ID: <bluez-devel.lists.sourceforge.net>
+In-Reply-To: <20051022173152.GA2573@elf.ucw.cz>
+References: <20051022173152.GA2573@elf.ucw.cz>
+Content-Type: text/plain
+Message-Id: <1130059941.11428.81.camel@blade>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: Billionton bluetooth CF card: performance is 10KB/sec
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Sun, 23 Oct 2005 11:32:21 +0200
 
-On Sunday 23 October 2005 04:35, Pavel Machek wrote:
-> > > Transmitted 1000000 bytes in 103.183640 seconds (9.464 kbytes/s)
-> >=20
-> > I see about the same with a bluetooth usb adapter. =A0Suspect that is a=
-bout what
-> > you should see with bluetooth - its not designed for speed. =A0It would=
- be really=20
-> > nice to be wrong though...
->=20
-> No, it is designed to do more. It should do around ~100 kbytes/sec
-> according to spec, and MSI dongle *does* do 25 kbytes/sec easily
-> against nokia 6230.
+Hi Pavel,
 
-Pavel,
+> Ping time is around 50msec, and that seems pretty much okay, but
+> 10KB/sec seems like way too low.
+> 
+> I am limited to 10KB/sec both on linux-to-linux bnetp transfers and it
+> limits my transfer rates using edge and n6230, too :-(.
 
-Then the interesting test is to see if the delay is kernel or phone.   Are =
-you talking
-to the same phone with both adapters?  If so please copy me on any test pat=
-ches as
-I too have the same issue when talking to a pilot T3 using rfcomm using a "=
-0a12:0001=20
-Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)" usb dongle.
+so you say that the Nokia 6230 has PAN Profile support and you don't
+need any PPP crap to get Internet access? This would be the first phone
+I have seen so far.
 
-I would _love_ to get 25K/s
+> Ping times during transfer:
+> 
+> 64 bytes from 10.1.0.3: icmp_seq=149 ttl=64 time=62.8 ms
+> 64 bytes from 10.1.0.3: icmp_seq=150 ttl=64 time=64.2 ms
+> 64 bytes from 10.1.0.3: icmp_seq=151 ttl=64 time=85.9 ms
+> 64 bytes from 10.1.0.3: icmp_seq=152 ttl=64 time=80.3 ms
+> 64 bytes from 10.1.0.3: icmp_seq=153 ttl=64 time=132.1 ms
+> 64 bytes from 10.1.0.3: icmp_seq=154 ttl=64 time=64.8 ms
+> 64 bytes from 10.1.0.3: icmp_seq=155 ttl=64 time=128.3 ms
+> 64 bytes from 10.1.0.3: icmp_seq=156 ttl=64 time=116.3 ms
+> 64 bytes from 10.1.0.3: icmp_seq=157 ttl=64 time=120.5 ms
+> 64 bytes from 10.1.0.3: icmp_seq=158 ttl=64 time=240.2 ms
+> 64 bytes from 10.1.0.3: icmp_seq=159 ttl=64 time=111.2 ms
+> 64 bytes from 10.1.0.3: icmp_seq=160 ttl=64 time=382.1 ms
+> 64 bytes from 10.1.0.3: icmp_seq=161 ttl=64 time=912.6 ms
+> 64 bytes from 10.1.0.3: icmp_seq=162 ttl=64 time=1612.1 ms
+> 64 bytes from 10.1.0.3: icmp_seq=163 ttl=64 time=4373.6 ms
+> 64 bytes from 10.1.0.3: icmp_seq=164 ttl=64 time=5128.8 ms
+> 64 bytes from 10.1.0.3: icmp_seq=165 ttl=64 time=7191.1 ms
+> 64 bytes from 10.1.0.3: icmp_seq=166 ttl=64 time=9473.1 ms
+> 64 bytes from 10.1.0.3: icmp_seq=167 ttl=64 time=8469.0 ms
+> 64 bytes from 10.1.0.3: icmp_seq=168 ttl=64 time=10040.7 ms
+> 64 bytes from 10.1.0.3: icmp_seq=169 ttl=64 time=9036.7 ms
+> 64 bytes from 10.1.0.3: icmp_seq=170 ttl=64 time=10681.1 ms
+> 64 bytes from 10.1.0.3: icmp_seq=171 ttl=64 time=9677.1 ms
+> 64 bytes from 10.1.0.3: icmp_seq=172 ttl=64 time=8673.0 ms
+> 64 bytes from 10.1.0.3: icmp_seq=173 ttl=64 time=10685.0 ms
+> 64 bytes from 10.1.0.3: icmp_seq=174 ttl=64 time=9681.0 ms
+> 64 bytes from 10.1.0.3: icmp_seq=175 ttl=64 time=8677.0 ms
+> 64 bytes from 10.1.0.3: icmp_seq=176 ttl=64 time=11997.2 ms
+> 64 bytes from 10.1.0.3: icmp_seq=177 ttl=64 time=10993.4 ms
+> 64 bytes from 10.1.0.3: icmp_seq=178 ttl=64 time=9989.3 ms
+> 64 bytes from 10.1.0.3: icmp_seq=179 ttl=64 time=13797.3 ms
+> 64 bytes from 10.1.0.3: icmp_seq=180 ttl=64 time=12793.3 ms
+> 64 bytes from 10.1.0.3: icmp_seq=181 ttl=64 time=11789.1 ms
+> 64 bytes from 10.1.0.3: icmp_seq=182 ttl=64 time=10784.9 ms
+> 64 bytes from 10.1.0.3: icmp_seq=183 ttl=64 time=9781.1 ms
 
-Thanks,
+The initial pings look good, the rest is very bad.
 
-Ed Tomlinson
+> Netdev watchdog complains a lot:
+> 
+> Oct 22 18:53:57 amd pand[2439]: Bluetooth PAN daemon version 2.19
+> Oct 22 18:53:57 amd pand[2439]: Connecting to <won't tell you>
+> Oct 22 18:53:58 amd pand[2439]: bnep0 connected
+> Oct 22 18:54:37 amd kernel: usb 3-1: USB disconnect, address 2
+> Oct 22 18:55:33 amd kernel: NETDEV WATCHDOG: bnep0: transmit timed out
+> Oct 22 18:55:59 amd last message repeated 2 times
+> Oct 22 18:56:51 amd last message repeated 5 times
+> Oct 22 18:57:55 amd last message repeated 3 times
+> Oct 22 18:59:03 amd last message repeated 7 times
+
+The transmit timeouts shouldn't be there. The question is now which side
+is at fault. The host or the phone?
+
+Please do a "hcitool info <won't tell you>" as root so I can see which
+what chip we are dealing. Also "hciconfig hci0 version" for your card
+would help.
+
+You can also use "hcidump -X -V" to analyze the traffic.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by the JBoss Inc.
+Get Certified Today * Register for a JBoss Training Course
+Free Certification Exam for All Training Attendees Through End of 2005
+Visit http://www.jboss.com/services/certification for more information
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
