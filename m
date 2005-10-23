@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michael Mauch <michael.mauch@gmx.de>
+Message-ID: <435B72B0.5050309@libero.it>
+From: jimmi <jimmi@libero.it>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20051023123808.GA14322@elmicha.333200002251-0001.dialin.t-online.de>
-References: <20051020135234.GC28731@loulou-becane>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20051020135234.GC28731@loulou-becane>
-Subject: [Bluez-users] Re: Buetooth and SAMSUNG SGH-E340
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: [Bluez-users] Bluetooth-Alsa: cannot pair the headset
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,17 +16,77 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 23 Oct 2005 14:38:08 +0200
+Date: Sun, 23 Oct 2005 13:23:28 +0200
 
-Philippe Berini wrote:
+Ciao,
 
-> Any idea or pointer ?
+I'm trying to use Jabra BT 250v with skype. The headset connect trough a
+USB-BT key, that  I know it's working because I  used already with other
+devices.
 
-If you can't get obexftp to work, you could try gnome-obex-send or
-kde-bluetooth.
+My laptop has  a Debian unstable, and I followed  the instruction of the
+Bluetooth-alsa  project. I  could load  the module  snd_bt_sco, and  the
+output of some commands are here:
 
-Regards...
-		Michael
+# hcitool scan
+Scanning ...
+        00:07:A4:14:0F:BF       Jabra BT 250v
+
+# btsco -v 00:07:A4:14:0F:BF
+btsco v0.4
+Device is 2:0
+Error: Failed to connect to SDP server: Permission denied
+Assuming channel 2
+
+Voice setting: 0x0060
+Can't connect RFCOMM channel: Permission denied
+
+# hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:11:95:7D:83:E9 ACL MTU: 192:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:244 acl:0 sco:0 events:30 errors:0
+        TX bytes:384 acl:0 sco:0 commands:22 errors:0
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'Titanic-0'
+        Class: 0x3e0100
+        Service Classes: Networking, Rendering, Capturing
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 
+0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
+
+# hciconfig hci0
+hci0:   Type: USB
+        BD Address: 00:11:95:7D:83:E9 ACL MTU: 192:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:521 acl:0 sco:0 events:33 errors:0
+        TX bytes:393 acl:0 sco:0 commands:25 errors:0
+
+# hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:11:95:7D:83:E9 ACL MTU: 192:8 SCO MTU: 64:8
+        HCI 16.4
+        Chip version: BlueCore02-External
+        Max key size: 56 bit
+        SCO mapping:  HCI
+
+# hcitool info 00:07:A4:14:0F:BF
+Requesting information ...
+Can't create connection: Input/output error
+
+I  searched for  the "SDP  server" error  but I  could not  get suitable
+informations. Has anybody an hint about?
+
+Thanks in advance
+--
+   ---         _   o        |     Sembra di sentirlo ancora dire al     |
+   / immi   ---  _/\_>      | mercante di liquori: tu che lo vendi cosa |
+(_/          -  O,> / O     |        ti compri di migliore? FdA         |
+
 
 
 -------------------------------------------------------
