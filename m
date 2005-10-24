@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <94e407f00510240734x12c64714qc791a991ddcd1426@mail.gmail.com>
-From: Arpit Rai <whalesurf@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <435C5FAB.9090605@bglug.it>
+From: jimmi <jimmi@bglug.it>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_10264_8829478.1130164475777"
-Subject: [Bluez-users] Link Quality between 2 Bluetooth USB Dongles
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Bluetooth-Alsa: cannot pair the headset
+References: <435B72B0.5050309@libero.it> <1891.128.59.13.6.1130107536.squirrel@webmail.cs.columbia.edu>
+In-Reply-To: <1891.128.59.13.6.1130107536.squirrel@webmail.cs.columbia.edu>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,59 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 24 Oct 2005 22:34:35 +0800
+Date: Mon, 24 Oct 2005 06:14:35 +0200
 
-------=_Part_10264_8829478.1130164475777
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+mv2147@cs.columbia.edu ha scritto:
+> Hi immi,
+> 
+>   Can you please tell me the usb dongle manufacturer, version and model no.
+> you are using? I am using a bluetake BT009si and it is not able to
 
-Hi!
- I'm doing a project on indoor positioning using bluetooth.
+I'm using a Dlink DBT120 with a kernel 2.6.11.
 
-I've installed Linux(Fedore Core 4) on my comp and the Bluez Protocol Stack
-to get the value of the signal strength between two Bluetooth USB dongles.
-I've connected two Bluetooth USB dongles to one computer(have the USB
-extension cables to increase the distance between the two dongles).When I
-run the command 'hcitool lq <bdaddr>' to get the value of the link quality
-between the two dongles,it is always 255.Even if I increase or decrease the
-distance between the two dongles,the LQ remains constant at 255.The RSSI
-value changes but this change is abrupt and does not seem like a good
-measure of the signal strength. Any idea as to what could be the possible
-problem with the LQ and any solutions?
- The adaptors I'm using are: Billionton Version 1.2 Bluetooth USB Adaptors
-(P/N: USBBT02 (UBTBR2-B)).
- Thanks
- Arpit
+> "unsupported manufacturer". Do you know if your dongle might work with
+> 2.6.11 fedora core 4 and BT400 G5 headset?
 
-------=_Part_10264_8829478.1130164475777
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+No, I never tested that.
 
-<div>Hi!</div>
-<div>&nbsp;</div>
-<div>I'm doing a project on indoor positioning using bluetooth.</div>
-<div><br><span>I've installed Linux(Fedore Core 4) on my&nbsp;comp and the =
-Bluez Protocol Stack to get the value of the signal strength between two Bl=
-uetooth USB dongles. I've connected two Bluetooth USB dongles to one comput=
-er(have the USB extension cables to increase the distance between the two d=
-ongles).When I run the command 'hcitool lq &lt;bdaddr&gt;' to get the value=
- of the link quality between the two dongles,it is always=20
-255.Even if I increase or decrease the distance between the two dongles,the=
- LQ remains constant at 255.The RSSI value changes but this change is abrup=
-t and does not seem like a good measure of the signal strength. Any idea as=
- to what could be the possible problem with the LQ and any solutions?
-</span></div>
-<div><span></span>&nbsp;</div>
-<div><span>The&nbsp;adaptors I'm using are: Billionton Version 1.2 Bluetoot=
-h USB Adaptors (P/N: USBBT02 (UBTBR2-B)).</span></div>
-<div><span></span>&nbsp;</div>
-<div><span>Thanks</span></div>
-<div><span></span>&nbsp;</div>
-<div><span>Arpit</span></div>
+Good luck ;)
 
-------=_Part_10264_8829478.1130164475777--
+Jimmi
 
 
 -------------------------------------------------------
