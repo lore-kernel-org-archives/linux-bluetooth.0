@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3013cac80510241423v12413009p7ad469a6d650d34@mail.gmail.com>
+Message-ID: <3013cac80510241400k2b71125ao7b8b4dfe5077a300@mail.gmail.com>
 From: Eduardo Rocha <folhabranca@gmail.com>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Device Configuration D-Bus services
-In-Reply-To: <3013cac80510241400k2b71125ao7b8b4dfe5077a300@mail.gmail.com>
+In-Reply-To: <e1effdeb0510190606x50364b25y52a5092847000105@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_Part_12585_21348324.1130188983671"
+	boundary="----=_Part_12525_2691919.1130187610913"
 References: <e1effdeb0510190606x50364b25y52a5092847000105@mail.gmail.com>
-	 <3013cac80510241400k2b71125ao7b8b4dfe5077a300@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,150 +19,116 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Oct 2005 18:23:03 -0300
+Date: Mon, 24 Oct 2005 18:00:10 -0300
 
-------=_Part_12585_21348324.1130188983671
+------=_Part_12525_2691919.1130187610913
 Content-Type: multipart/alternative;
-	boundary="----=_Part_12586_3751026.1130188983671"
+	boundary="----=_Part_12526_11724074.1130187610913"
 
-------=_Part_12586_3751026.1130188983671
+------=_Part_12526_11724074.1130187610913
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Sorry about the spaces. Here is the same patch without them ;).
+Hi Claudio and Marcel,
+
+here is the initial patch regarding /org/bluez/Devices. I keep it really
+simple so we can improve it in small steps. I've merged the Claudio's code
+for register and unregister a new path for a device in two funcions as this
+code is used in 3 different parts of the code. For now I've leaved the
+syslog call to register and unregister operations so we can see if every
+thing is going ok.
+My next step is to provide a list of registed devices (not only the devices
+that are up) through /org/bluez/Devices path.
+
+One question: the SetProperty and GetProperty will use an interger or a
+string constant to determing which operation will be used?
 
 BR,
-Eduardo.
-
-
-On 10/24/05, Eduardo Rocha <folhabranca@gmail.com> wrote:
->
-> Hi Claudio and Marcel,
->
-> here is the initial patch regarding /org/bluez/Devices. I keep it really
-> simple so we can improve it in small steps. I've merged the Claudio's cod=
-e
-> for register and unregister a new path for a device in two funcions as th=
-is
-> code is used in 3 different parts of the code. For now I've leaved the
-> syslog call to register and unregister operations so we can see if every
-> thing is going ok.
-> My next step is to provide a list of registed devices (not only the
-> devices that are up) through /org/bluez/Devices path.
->
-> One question: the SetProperty and GetProperty will use an interger or a
-> string constant to determing which operation will be used?
->
-> BR,
-> Eduardo
-> --
-> Eduardo Rocha
-> Instituto Nokia de Tecnologia - INdT
->
-> On 10/19/05, Claudio Takahasi <cktakahasi@gmail.com> wrote:
-> >
-> > Hi folks,
-> >
-> > I would like to bring up the device configuration services before start
-> > coding, I would like design how these services will work and receive
-> > comments.
-> >
-> > The services provided under these paths/interfaces will not be public.
-> > Only
-> > an administrator group or a root will be allowed to send messages. We
-> > don't
-> > need care about the configuration file rules now, it can be defined
-> > later.
-> >
-> > In my opinion it's better use the same approach of the Manager. A main
-> > path
-> > object "/org/bluez/Manager" (FALLBACK) should catch messages sent to
-> > unregistered
-> > paths and handle services like:
-> > - DeviceList, displays UP/DOWN devices
-> > - UP
-> > - DOWN
-> > - RESET
-> >
-> > The device based paths can provide services like:
-> > - SetProperty
-> > - GetProperty
-> > - Commands
-> > - Features
-> >
-> > Using SetProperty/GetProperty instead of define one method name for eac=
-h
-> > property is more clean. However it is important keep in mind that the
-> > documentation of this service must be well-defined, because the method
-> > call/method reply arguments will have different argument number and
-> > types.
-> > In the method call, the first argument must be a byte(faster comparison=
-)
-> > indicating the command code instead of use a string to represent the
-> > command.
-> >
-> > Suggested paths and Interfaces:
-> > *** Main path
-> > path:
-> > /org/bluez/Devices
-> > interface: org.bluez.Devices
-> >
-> > *** Device based
-> > path:
-> > /org/bluez/Devices/hciX
-> > interface: org.bluez.Devices
-> >
-> >
-> > Another point is the message handler function. Currently, there is only
-> > one
-> > function responsible for handle the messages. In my opinion it will be
-> > better
-> > create other DBusObjectPathVTable to address Device messages for make
-> > the
-> > logic more clear. For SetProperty/GetProperty will be required extract
-> > the
-> > first argument to get the command code in the message handle function.
-> >
-> >
-> > Is everything ok? Any comments?
-> >
-> > Regards,
-> > Claudio.
-> >
-> > --
-> > ---------------------------------------------------------
-> > Claudio Takahasi
-> > Nokia's Institute of Technology - INdT
-> > claudio.takahasi@indt.org.br
-> >
->
->
->
->
->
->
->
-
-
+Eduardo
 --
 Eduardo Rocha
 Instituto Nokia de Tecnologia - INdT
 
-------=_Part_12586_3751026.1130188983671
+On 10/19/05, Claudio Takahasi <cktakahasi@gmail.com> wrote:
+>
+> Hi folks,
+>
+> I would like to bring up the device configuration services before start
+> coding, I would like design how these services will work and receive
+> comments.
+>
+> The services provided under these paths/interfaces will not be public.
+> Only
+> an administrator group or a root will be allowed to send messages. We
+> don't
+> need care about the configuration file rules now, it can be defined later=
+.
+>
+> In my opinion it's better use the same approach of the Manager. A main
+> path
+> object "/org/bluez/Manager" (FALLBACK) should catch messages sent to
+> unregistered
+> paths and handle services like:
+> - DeviceList, displays UP/DOWN devices
+> - UP
+> - DOWN
+> - RESET
+>
+> The device based paths can provide services like:
+> - SetProperty
+> - GetProperty
+> - Commands
+> - Features
+>
+> Using SetProperty/GetProperty instead of define one method name for each
+> property is more clean. However it is important keep in mind that the
+> documentation of this service must be well-defined, because the method
+> call/method reply arguments will have different argument number and types=
+.
+> In the method call, the first argument must be a byte(faster comparison)
+> indicating the command code instead of use a string to represent the
+> command.
+>
+> Suggested paths and Interfaces:
+> *** Main path
+> path:
+> /org/bluez/Devices
+> interface: org.bluez.Devices
+>
+> *** Device based
+> path:
+> /org/bluez/Devices/hciX
+> interface: org.bluez.Devices
+>
+>
+> Another point is the message handler function. Currently, there is only
+> one
+> function responsible for handle the messages. In my opinion it will be
+> better
+> create other DBusObjectPathVTable to address Device messages for make the
+> logic more clear. For SetProperty/GetProperty will be required extract th=
+e
+> first argument to get the command code in the message handle function.
+>
+>
+> Is everything ok? Any comments?
+>
+> Regards,
+> Claudio.
+>
+> --
+> ---------------------------------------------------------
+> Claudio Takahasi
+> Nokia's Institute of Technology - INdT
+> claudio.takahasi@indt.org.br
+>
+
+------=_Part_12526_11724074.1130187610913
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Sorry about the spaces. Here is the same patch without them ;).<br>
-<br>
-BR,<br>
-Eduardo.<br>
-<br><br><div><span class=3D"gmail_quote">On 10/24/05, <b class=3D"gmail_sen=
-dername">Eduardo Rocha</b> &lt;<a href=3D"mailto:folhabranca@gmail.com">fol=
-habranca@gmail.com</a>&gt; wrote:</span><blockquote class=3D"gmail_quote" s=
-tyle=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8e=
-x; padding-left: 1ex;">
 Hi Claudio and Marcel,<br>
 <br>
 here is the initial patch regarding /org/bluez/Devices. I keep it
@@ -181,14 +146,12 @@ string constant to determing which operation will be used?<br>
 <br>
 BR,<br>
 Eduardo <br>
--- <br><span class=3D"sg">
+-- <br>
 Eduardo Rocha<br>
-Instituto Nokia de Tecnologia - INdT</span><div><span class=3D"e" id=3D"q_1=
-07246e5b677c944_2"><br><br><div><span class=3D"gmail_quote">On 10/19/05, <b=
- class=3D"gmail_sendername">Claudio Takahasi</b> &lt;<a href=3D"mailto:ckta=
-kahasi@gmail.com" target=3D"_blank" onclick=3D"return top.js.OpenExtLink(wi=
-ndow,event,this)">
-cktakahasi@gmail.com</a>&gt; wrote:</span>
+Instituto Nokia de Tecnologia - INdT<br><br><div><span class=3D"gmail_quote=
+">On 10/19/05, <b class=3D"gmail_sendername">Claudio Takahasi</b> &lt;<a hr=
+ef=3D"mailto:cktakahasi@gmail.com">cktakahasi@gmail.com</a>&gt; wrote:</spa=
+n>
 <blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(204, =
 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi folks,<br>
 <br>
@@ -257,25 +220,22 @@ first argument to get the command code in the message handle function.<br>
 Is everything&nbsp; ok? Any comments?<br>
 <br>
 Regards,<br>
-Claudio.<br clear=3D"all"><span><br>-- <br>--------------------------------=
--------------------------<br>Claudio Takahasi<br>Nokia's Institute of Techn=
-ology - INdT<br><a href=3D"mailto:claudio.takahasi@indt.org.br" target=3D"_=
-blank" onclick=3D"return top.js.OpenExtLink(window,event,this)">
-
+Claudio.<br clear=3D"all"><span class=3D"sg"><br>-- <br>-------------------=
+--------------------------------------<br>Claudio Takahasi<br>Nokia's Insti=
+tute of Technology - INdT<br><a href=3D"mailto:claudio.takahasi@indt.org.br=
+" target=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,event,this)=
+">
 claudio.takahasi@indt.org.br
 </a><br>
 
 </span></blockquote></div><br><br clear=3D"all"><br><br><br>
 
-</span></div><br clear=3D"all"></blockquote></div><br><br clear=3D"all"><br=
->-- <br>Eduardo Rocha<br>Instituto Nokia de Tecnologia - INdT<br><br>
+------=_Part_12526_11724074.1130187610913--
 
-------=_Part_12586_3751026.1130188983671--
-
-------=_Part_12585_21348324.1130188983671
-Content-Type: text/x-patch; name=dbus_device.patch; charset=us-ascii
+------=_Part_12525_2691919.1130187610913
+Content-Type: text/x-patch; name=dbus_devices.patch; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="dbus_device.patch"
+Content-Disposition: attachment; filename="dbus_devices.patch"
 
 --- bluez-cvs-old/utils/hcid/hcid.h	2005-10-24 15:29:36.204404720 -0300
 +++ bluez-cvs-new/utils/hcid/hcid.h	2005-10-24 15:34:58.774366632 -0300
@@ -341,7 +301,7 @@ Content-Disposition: attachment; filename="dbus_device.patch"
  		break;
  	}
 --- bluez-cvs-old/utils/hcid/dbus.c	2005-10-24 15:29:36.171409736 -0300
-+++ bluez-cvs-new/utils/hcid/dbus.c	2005-10-24 18:15:46.837638072 -0300
++++ bluez-cvs-new/utils/hcid/dbus.c	2005-10-24 17:21:54.264063952 -0300
 @@ -52,7 +52,7 @@
  #include "dbus.h"
  
@@ -359,18 +319,18 @@ Content-Disposition: attachment; filename="dbus_device.patch"
 +{
 +	struct hci_dbus_data *data;
 +	syslog(LOG_INFO,"Registering DBUS Path: %s", path);
-+	data = malloc(sizeof(struct hci_dbus_data));
-+	if (data == NULL) {
-+		syslog(LOG_ERR,"Failed to alloc memory to DBUS path register data (%s)", path);
-+		return FALSE;
++        data = malloc(sizeof(struct hci_dbus_data));
++        if (data == NULL) {
++        	syslog(LOG_ERR,"Failed to alloc memory to DBUS path register data (%s)", path);
++	    	return FALSE;
 +	}
-+	data->id = id;
++        data->id = id;
 +
 +	if (!dbus_connection_register_object_path(connection, path, &obj_vtable, data)) {
-+		syslog(LOG_ERR,"DBUS failed to register %s object", path);
++       		syslog(LOG_ERR,"DBUS failed to register %s object", path);
 +		free(data);
 +		return FALSE;
-+	}
++       	}
 +	return TRUE;
 +}
 +
@@ -567,7 +527,17 @@ Content-Disposition: attachment; filename="dbus_device.patch"
  	return ret;
  }
 
-------=_Part_12585_21348324.1130188983671--
+
+
+
+
+
+
+
+
+
+
+------=_Part_12525_2691919.1130187610913--
 
 
 -------------------------------------------------------
