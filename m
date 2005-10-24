@@ -1,6 +1,6 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <435D2C22.8050701@libero.it>
-From: jimmi <jimmi@libero.it>
+Message-ID: <435D16E9.9010705@bglug.it>
+From: jimmi <jimmi@bglug.it>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Bluetooth-Alsa: cannot pair the headset
@@ -18,7 +18,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 24 Oct 2005 20:46:58 +0200
+Date: Mon, 24 Oct 2005 19:16:25 +0200
 
 * Brad Midgley il 23/10/05 alle 13,01 ha scritto:
  > It   looks  like   you  need   to  remove   the  link   keys  so   the
@@ -28,7 +28,7 @@ Date: Mon, 24 Oct 2005 20:46:58 +0200
 It   didn't    help   either   removing    /etc/bluetooth/link_key   and
 /var/lib/bluetooth/[dir]. Thanks anyway Brad :)
 
--- 
+--
     ---         _   o       | If God had intended man to use the metric |
     / immi   ---  _/\_>     |   system, Jesus would have only had ten   |
 (_/          -  O,> / O    |                disciples.                 |
