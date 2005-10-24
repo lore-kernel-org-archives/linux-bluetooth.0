@@ -8,7 +8,7 @@ References: <20051020135234.GC28731@loulou-becane>
 	<20051023151215.GB31746@loulou-becane>
 Content-Type: text/plain;
 	charset=ISO-8859-1
-Message-Id: <1130191981.9463.13.camel@localhost.localdomain>
+Message-Id: <1130191352.9463.6.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,15 +21,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 24 Oct 2005 17:12:59 -0500
+Date: Mon, 24 Oct 2005 17:02:29 -0500
 
 El dom, 23-10-2005 a las 17:12 +0200, Philippe Berini escribi=F3:
-umm now think to i know what is your prloblem, you can't paring the
-devices because the pin helper by default is for X, for fix the problem
-you need change the /usr/local/bin/bluez-localpin, see [1], again is in
-spanish but you can read the config files and comands.
-[1] http://el-directorio.org/index.php/Bluetooth_en_debian
+Hi Michel
 
+You can see this page [1], ok it's in spanish but you can read the
+config files and comands
+[1]http://el-directorio.org/index.php/Bluetooth_Linux_y_Telefonos_Moviles
 > * Michael Mauch <michael.mauch@gmx.de> [Sun, Oct 23, 2005 at 02:38:08PM +=
 0200]:
 >=20
