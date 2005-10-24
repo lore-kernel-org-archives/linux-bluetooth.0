@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <435D604A.2050606@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Logitech diNovo Media Desktop Laser patch
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] fixed-point sbc decoder
+In-Reply-To: <e1c464970510241454m1f7165ceo51600d8cbf5e9441@mail.gmail.com>
+References: <e1c464970510241454m1f7165ceo51600d8cbf5e9441@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1130192694.7840.33.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,28 +18,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Oct 2005 16:29:30 -0600
+Date: Tue, 25 Oct 2005 00:24:54 +0200
 
-Victor,
+Hi Trevor,
 
-I was working on the fixed point decoder. I also found and reorganized
-the inner loop around another optimization... the code I've written
-works when using floating point but something is not right in the fixed
-point. Can you have a quick look?
+> --- back to the patch
+> Simple one-liners, the code just didn't know the ids it seems.
+> 
+> # bluez-utils patch against CVS ( Oct 21 '05 )
+> --- tools/hid2hci.c.orig        2005-10-21 23:40:20.000000000 -0400
+> +++ tools/hid2hci.c     2005-10-21 23:52:49.000000000 -0400
+> @@ -226,6 +226,7 @@
+>         { HCI, 0x046d, 0xc703, switch_logitech },
+>         { HCI, 0x046d, 0xc704, switch_logitech },
+>         { HCI, 0x046d, 0xc705, switch_logitech },
+> +       { HCI, 0x046d, 0x0b02, switch_logitech },
+>         { -1 }
+>  };
 
-What I do is
+this one is fine and in the CVS now.
 
-btsco$ make && ./sbc/sbcdec t1.sbc
+> # Kernel patch against 2.6.13-mh2
+> --- drivers/bluetooth/hci_usb.orig      2005-10-21 23:37:25.000000000 -0400
+> +++ drivers/bluetooth/hci_usb.c 2005-10-21 22:11:02.000000000 -0400
+> @@ -119,6 +119,9 @@
+>         /* Kensington Bluetooth USB adapter */
+>         { USB_DEVICE(0x047d, 0x105d), .driver_info = HCI_RESET },
+> 
+> +       /* Logitech diNovo Media Desktop Laser Transceiver for Bluetooth 2.0 */
+> +        { USB_DEVICE(0x046d, 0xc709), .driver_info = HCI_RESET },
+> +
+>         /* ISSC Bluetooth Adapter v3.1 */
+>         { USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET },
 
-I suspect I'm not be doing the 64 to 32 bit conversions right...
+Is this patch really needed?
 
-http://bluetooth-alsa.sf.net/fixed/fixed-decode.patch
-http://bluetooth-alsa.sf.net/fixed/t1.sbc
+Show me the content of /proc/bus/usb/devices before and after calling
+hid2hci. What does "hciconfig -a" say after the switching?
 
-The latter is just an audio file, but as a bonus it's a friend's band
-(and probably too noisy to be a good test :)
+Regards
 
-Brad
+Marcel
+
+
 
 
 -------------------------------------------------------
