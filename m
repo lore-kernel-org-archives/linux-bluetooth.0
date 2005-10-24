@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <94e407f00510240944k24a3f4f1re75377a1bffb8a7@mail.gmail.com>
-From: Arpit Rai <whalesurf@gmail.com>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Link Quality between 2 Bluetooth USB Dongles
-In-Reply-To: <1130164983.19317.54.camel@blade>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_11943_30073012.1130172277841"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <94e407f00510240734x12c64714qc791a991ddcd1426@mail.gmail.com>
 References: <94e407f00510240734x12c64714qc791a991ddcd1426@mail.gmail.com>
-	 <1130164983.19317.54.camel@blade>
+Content-Type: text/plain
+Message-Id: <1130164983.19317.54.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,78 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 25 Oct 2005 00:44:37 +0800
+Date: Mon, 24 Oct 2005 16:43:03 +0200
 
-------=_Part_11943_30073012.1130172277841
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Arpit,
 
-Hi Marcel
- Thanks for the reply.
- [root@174-242 ~]# hciconfig hci0 version
-hci0: Type: USB
-BD Address: 00:10:60:B3:2C:F7 ACL MTU: 377:10 SCO MTU: 16:0
-HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
-Manufacturer: Broadcom Corporation (15)
-[root@174-242 ~]# hciconfig -a
-hci0: Type: USB
-BD Address: 00:10:60:B3:2C:F7 ACL MTU: 377:10 SCO MTU: 16:0
-UP RUNNING PSCAN ISCAN
-RX bytes:412 acl:0 sco:0 events:19 errors:0
-TX bytes:318 acl:0 sco:0 commands:19 errors:0
-Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-Link policy: RSWITCH HOLD SNIFF PARK
-Link mode: SLAVE ACCEPT
-Name: '174-242.priv19.nus.edu.sg-0'
-Class: 0x120104
-Service Classes: Networking
-Device Class: Computer, Desktop workstation
-HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
-Manufacturer: Broadcom Corporation (15)
- What is the HCI build version in this case?And how does this help me?
- Regards
-Arpit
+> I've installed Linux(Fedore Core 4) on my comp and the Bluez Protocol
+> Stack to get the value of the signal strength between two Bluetooth
+> USB dongles. I've connected two Bluetooth USB dongles to one
+> computer(have the USB extension cables to increase the distance
+> between the two dongles).When I run the command 'hcitool lq <bdaddr>'
+> to get the value of the link quality between the two dongles,it is
+> always 255.Even if I increase or decrease the distance between the two
+> dongles,the LQ remains constant at 255.The RSSI value changes but this
+> change is abrupt and does not seem like a good measure of the signal
+> strength. Any idea as to what could be the possible problem with the
+> LQ and any solutions?
 
-------=_Part_11943_30073012.1130172277841
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+the link quality is vendor specific. Look at my pages to find out how
+CSR implemented it.
+ 
+> The adaptors I'm using are: Billionton Version 1.2 Bluetooth USB
+> Adaptors (P/N: USBBT02 (UBTBR2-B)).
 
-<div>Hi Marcel</div>
-<div>&nbsp;</div>
-<div>Thanks for the reply.</div>
-<div>&nbsp;</div>
-<div>[root@174-242 ~]# hciconfig hci0 version<br>hci0: &nbsp; Type: USB<br>=
-&nbsp; &nbsp; &nbsp; &nbsp;BD Address: 00:10:60:B3:2C:F7 ACL MTU: 377:10 SC=
-O MTU: 16:0<br>&nbsp; &nbsp; &nbsp; &nbsp;HCI Ver: 1.2 (0x2) HCI Rev: 0x0 L=
-MP Ver: 1.2 (0x2) LMP Subver: 0x309<br>&nbsp; &nbsp; &nbsp; &nbsp;Manufactu=
-rer: Broadcom Corporation (15)
-<br>[root@174-242 ~]# hciconfig -a<br>hci0: &nbsp; Type: USB<br>&nbsp; &nbs=
-p; &nbsp; &nbsp;BD Address: 00:10:60:B3:2C:F7 ACL MTU: 377:10 SCO MTU: 16:0=
-<br>&nbsp; &nbsp; &nbsp; &nbsp;UP RUNNING PSCAN ISCAN<br>&nbsp; &nbsp; &nbs=
-p; &nbsp;RX bytes:412 acl:0 sco:0 events:19 errors:0<br>&nbsp; &nbsp; &nbsp=
-; &nbsp;TX bytes:318 acl:0 sco:0 commands:19 errors:0
-<br>&nbsp; &nbsp; &nbsp; &nbsp;Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00=
- 0x00<br>&nbsp; &nbsp; &nbsp; &nbsp;Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV=
-1 HV2 HV3<br>&nbsp; &nbsp; &nbsp; &nbsp;Link policy: RSWITCH HOLD SNIFF PAR=
-K<br>&nbsp; &nbsp; &nbsp; &nbsp;Link mode: SLAVE ACCEPT<br>&nbsp; &nbsp; &n=
-bsp; &nbsp;Name: '174-242.priv19.nus.edu.sg-0
-'<br>&nbsp; &nbsp; &nbsp; &nbsp;Class: 0x120104<br>&nbsp; &nbsp; &nbsp; &nb=
-sp;Service Classes: Networking<br>&nbsp; &nbsp; &nbsp; &nbsp;Device Class: =
-Computer, Desktop workstation<br>&nbsp; &nbsp; &nbsp; &nbsp;HCI Ver: 1.2 (0=
-x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309<br>&nbsp; &nbsp; &nbs=
-p; &nbsp;Manufacturer: Broadcom Corporation (15)
-</div>
-<div>&nbsp;</div>
-<div>What is the HCI build version in this case?And how does this help me?<=
-/div>
-<div>&nbsp;</div>
-<div>Regards</div>
-<div>Arpit</div>
+What does "hciconfig hci0 version" tells you?
 
-------=_Part_11943_30073012.1130172277841--
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
