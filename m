@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Paul LeoNerd Evans <leonerd@leonerd.org.uk>
+From: Philippe Berini <philippe@berini.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Patching with Bluetooth Kernal patch 2.6.13-mh2?
-Message-ID: <20051025214057.29919074@nim.leo>
-In-Reply-To: <435DE949.2070407@insight.rr.com>
-References: <435DE949.2070407@insight.rr.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; boundary=Sig_SAf.6VosA3MdFgEk3HKsE1+;
- protocol="application/pgp-signature"; micalg=PGP-SHA1
+Message-ID: <20051025163115.GA29385@loulou-becane>
+References: <20051020135234.GC28731@loulou-becane> <20051023123808.GA14322@elmicha.333200002251-0001.dialin.t-online.de> <20051023151215.GB31746@loulou-becane> <1130191981.9463.13.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1130191981.9463.13.camel@localhost.localdomain>
+Subject: [Bluez-users] Re: Re: Buetooth and SAMSUNG SGH-E340
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,51 +18,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 25 Oct 2005 21:40:57 +0100
+Date: Tue, 25 Oct 2005 18:31:15 +0200
 
---Sig_SAf.6VosA3MdFgEk3HKsE1+
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+* Fredy P <digitalfredy@debiancolombia.org> [Mon, Oct 24, 2005 at 05:12:59PM -0500]:
 
-On Tue, 25 Oct 2005 04:14:01 -0400
-Daniel <Dstubbs@insight.rr.com> wrote:
+> El dom, 23-10-2005 a las 17:12 +0200, Philippe Berini escribió:
+> umm now think to i know what is your prloblem, you can't paring the
+> devices because the pin helper by default is for X, for fix the problem
+> you need change the /usr/local/bin/bluez-localpin, see [1], again is in
+> spanish but you can read the config files and comands.
+> [1] http://el-directorio.org/index.php/Bluetooth_en_debian
 
-> Im a linux noobie, can anyone tell me exactly what i need to do to
-> patch the Bluetooth kernel patch 2.6.13-mh2 into my kernal? If there is
-> a HowTo: on the forums, or any forums, can you link them.
->=20
-> Im using Ubuntu Breezy 5.10  on a Dell inspiron 6000 laptop
->=20
-> Any help would be useful thank you.
+I can read Spanish, no problem about that :-) 
 
-This isn't really the place for that sort of discussion...
+I can pair my devices, the mobile says it is paired. Obexftp still
+complains it can't connect (following the instructions given on both the
+web sites).
 
-A much better bet would be to find a discussion forum on your distro in
-particular, who will probably know much better how to build a custom
-kernel for it... Building any custom kernel is largely independent of any
-customisations you apply to it; they'll just be source patches of one
-sort or other...
+# obexftp -b 00:12:47:AB:AF:46 -B 7 -l
+Browsing 00:12:47:AB:AF:46 ...
+Channel: 7
+No custom transport
+Connecting...bt: -1
+failed: connect
 
---=20
-Paul "LeoNerd" Evans
 
-leonerd@leonerd.org.uk
-ICQ# 4135350       |  Registered Linux# 179460
-http://www.leonerd.org.uk/
+I am wondering if the problem does not lie there:
 
---Sig_SAf.6VosA3MdFgEk3HKsE1+
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
+# /etc/init.d/bluez-utils restart
+Restarting bluez-utils: hcid sdpdsyntax error line 25
+ rfcomm.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
+and the line 25 is as follows:
 
-iD8DBQFDXphdvcPg11V/1hgRAohdAJ9/mEp7Iubpo91vjpq88DwgjtkOhACcDLf7
-ZZeY68AQc9FotwYqhA0b3wk=
-=LcQV
------END PGP SIGNATURE-----
+vi /etc/init.d/bluez-utils
+[snip] 
+SDPD=/usr/sbin/sdpd
 
---Sig_SAf.6VosA3MdFgEk3HKsE1+--
+I can't see a syntax error...
+
+-- 
+Philippe Berini                
 
 
 -------------------------------------------------------
