@@ -1,8 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <01C5D98C.A66B35E0.emonturus@teltronic.es>
-From: Esteban Monturus <emonturus@teltronic.es>
-To: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Converting a PC in a multiradio access point
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C5D963.25F9C964"
+Message-ID: <81FEC275650AE14EBD5245E624762B970215A51E@ds07.tnoase.telecom.tno.nl>
+From: <A.J.P.S.Madureira@telecom.tno.nl>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] How to make use of a dongle
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -14,47 +17,70 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 25 Oct 2005 17:50:55 +0200
+Date: Tue, 25 Oct 2005 14:53:51 +0200
 
-	Hi all,
+This is a multi-part message in MIME format.
 
-	I have already posted this enquiry in the bluez-users list, but I think 
-this is a better place to ask, as I have not received answer to this issue 
-yet. My objective is to implement a multiradio PAN access point with a PC 
-and two USB Bluetooth dongles. After connecting both dongles in the 
-computer I enter:
+------_=_NextPart_001_01C5D963.25F9C964
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-	pand --listen --role NAP
+Hello.
 
-	To act as PANU I plug a third dongle in another computer. I establish the 
-first connection to one of the dongles of the multiradio access point. 
-However, when I try to establish a second connection from the same PANU to 
-the other dongle of the multiradio access point, an error ocurrs. In the 
-/var/log/messages of the multiradio access point appears the following:
+How can I make a client application to use a Headset profile capable
+Bluetooth dongle? Does anyone know of open source (linux) application
+that does this? What does it mean that a BT  dongle has headset support?
+Does it simplify the software development for the client application in
+the PC? And if the dongle does not have support for the headset is then
+not possible to use that dongle to connect to a BT headset?
 
-	Connection failed. File exists(17)
+Thank you very much, and sorry for the basic questions but I want to
+clarify these things.
 
-	If I plug another dongle in the PANU computer and try to establish the 
-second connection from this new dongle, everything goes well.	After 
-inspecting the pand source I have realised the function bnep_connectionadd 
-returns -1 when the second connection is tried and it gets aborted. It 
-seems that BlueZ can not distinguish between connections that it receives 
-from a Bluetooth device to two different dongles plugged to it. I have seen 
-pand opens an L2CAP socket when it waits for PAN connections. That socket 
-is then bound to 0.0.0.0 Bluetooth address. That must make BlueZ use always 
-the same dongle (the first that was plugged), which would explain the 
-error.
+Kind regards, Antonio.
 
-	I have modified the pand code to enter the local listening Bluetooth 
-address from the command line. I launch two pand processes, each one using 
-a socket bound to one of the two Bluetooth addresses and still get the 
-"connection failed" error. I have also tried to change the L2CAP channel 
-descriptors, but it seems to work only when the 0x0F channnel is used.
+------_=_NextPart_001_01C5D963.25F9C964
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-	Could someone help me? Thank you in advance.
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+6.5.7232.11">
+<TITLE>How to make use of a dongle</TITLE>
+</HEAD>
+<BODY>
+<!-- Converted from text/rtf format -->
 
-	Esteban.
+<P><SPAN LANG=3D"nl"><FONT SIZE=3D2 FACE=3D"Arial">Hello.</FONT></SPAN>
+</P>
 
+<P><SPAN LANG=3D"nl"><FONT SIZE=3D2 FACE=3D"Arial">How can I make a =
+client application to use a Headset profile capable Bluetooth dongle? =
+Does anyone know of open source (linux) application that does this? What =
+does it mean that a BT&nbsp; dongle has headset support? Does it =
+simplify the software development for the client application in the PC? =
+And if the dongle does not have support for the headset is then not =
+possible to use that dongle to connect to a BT =
+headset?</FONT></SPAN></P>
+
+<P><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Arial">Thank you very =
+much, and sorry for the basic questions but I want to clarify these =
+things.</FONT></SPAN>
+</P>
+
+<P><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Arial">Kind regards, =
+Antonio.</FONT></SPAN>
+</P>
+
+</BODY>
+</HTML>
+------_=_NextPart_001_01C5D963.25F9C964--
 
 
 -------------------------------------------------------
