@@ -1,16 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0510251203i7cb20240ua03a7f9aff38917d@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+Message-ID: <3013cac80510251130v5127dedbi3ceaa453a87216cd@mail.gmail.com>
+From: Eduardo Rocha <folhabranca@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [D-BUS PATCH] Authentication
-In-Reply-To: <1130159970.19317.28.camel@blade>
+Subject: Re: [Bluez-devel] Device Configuration D-Bus services
+In-Reply-To: <20051025120646.GA26339@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_Part_10207_30010227.1130267013264"
-References: <e1effdeb0510201045w5ebf17afh87897564184ce9f9@mail.gmail.com>
-	 <1129986496.11428.36.camel@blade>
-	 <e1effdeb0510240606l1998f61dhc2fe813c48b1e6db@mail.gmail.com>
-	 <1130159970.19317.28.camel@blade>
+	boundary="----=_Part_3010_17635.1130265021284"
+References: <e1effdeb0510190606x50364b25y52a5092847000105@mail.gmail.com>
+	 <3013cac80510241400k2b71125ao7b8b4dfe5077a300@mail.gmail.com>
+	 <1130189692.7840.21.camel@blade>
+	 <3013cac80510250452j702622acw98ed9abef758bca1@mail.gmail.com>
+	 <20051025120646.GA26339@localhost.localdomain>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,87 +23,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 25 Oct 2005 17:03:33 -0200
+Date: Tue, 25 Oct 2005 15:30:21 -0300
 
-------=_Part_10207_30010227.1130267013264
+------=_Part_3010_17635.1130265021284
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Hi,
+Hi Marcel,
 
-Here are the patches to send the authentication result, please DON'T
-commit it. Probably
-it will conflict with the latest Eduardo's patch.
+here is some code cleanup. This patch should be applied after the
+dbus_device.patch.
 
-Which approach do you preffer?
-1. Send a  signal
-2. Send a method return (peer message)
+BR,
+Eduardo.
 
-Regards,
-Claudio.
+--
+Eduardo Rocha
+Instituto Nokia de Tecnologia - INdT
 
-
-On 10/24/05, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Claudio,
+On 10/25/05, Johan Hedberg <johan.hedberg@nokia.com> wrote:
+> On Tue, Oct 25, 2005, Eduardo Rocha wrote:
+> > The point is, as we have merged the main operations in two functions (s=
+et
+> > and get), so we have to identify the operation by an integer or by a st=
+ring
+> > constant. It seems that a string is better for python binding (can anyo=
+ne
+> > confirm that?).
 >
-> > I will send a cleanup patch before send the authentication
-> > improvements patch.
-> > Regarding the variable name, It should be better change to "dd"
-> > instead of
-> > sock or sk. If you see the hcitool code standard you will notice
-> > that.
+> At least by using strings it would be much easier to understand what the
+> client code is doing, e.g. if you compare
+> SetProperty("page-timeout", 10)
+> vs.
+> SetProperty(3, 10)
 >
-> I am fine with dd. My point was to be consistent.
+> So, I vote for using strings instead of integers.
 >
-> > I noticed that there is a HCI raw socket created in the main.c file
-> > that belongs to hcid structure.
-> > Can I use it in the functions handle_display_conn_req and
-> > handle_get_devices_req instead of create
-> > a new one?
->
-> Open a new one, because the HCI filter is per descriptor and you don't
-> wanna mess with the filter of the HCI socket in main.c.
->
-> > I will try apply you other suggestions.
->
-> Cool.
->
-> > Another point is the reply method for authentication. We need discuss
-> > how we should design it.
-> > I am not a hcid expert therefore I would like ask you how we should
-> > implement the authentication stuff.
-> >
-> > Currently, the METHOD REPLY of the authentication doesn't consider the
-> > authentication complete event.
-> > In order to check it and reply after the authentication finishes it is
-> > required store some D-Bus message
-> > attributes(sender, serial, destination, ...). Another approach is send
-> > a SIGNAL. Which approach do you prefer
-> > send send a peer message(method reply) or a signal?
->
-> In generell everything authentication or encryption related should be
-> done inside the kernel. However the infrastructure is not there yet and
-> so keep it as simple as possible.
->
-> > Regarding the pin helper. Are you planning support the "normal" helper
-> > and the dbus helper? I am asking
-> > this because the call_pin_helper function is blocking. If you are
-> > planning support both, we have to try add
-> > the pin helper file descriptor inside the hcid main loop.
->
-> My plan is to require D-Bus for bluez-utils, but so far I haven't
-> received any comments on it. The main problem is that the distributions
-> must move to a decent version of D-Bus and Debian unstable is still on
-> D-Bus 0.23. Actually any D-Bus 0.3x will not work very good and so we
-> might need to support the "normal" PIN helper for some time. I am open
-> for changes, because the PIN helper code in generell is not that good.
->
-> Regards
->
-> Marcel
->
->
+> Johan
 >
 >
 > -------------------------------------------------------
@@ -116,308 +74,265 @@ On 10/24/05, Marcel Holtmann <marcel@holtmann.org> wrote:
 > https://lists.sourceforge.net/lists/listinfo/bluez-devel
 >
 
-
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
-
-------=_Part_10207_30010227.1130267013264
-Content-Type: application/octet-stream;
-	name=auth_complete_method_ret_01.patch
+------=_Part_3010_17635.1130265021284
+Content-Type: text/x-patch; name=dbus_cleanup.patch; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="auth_complete_method_ret_01.patch"
+Content-Disposition: attachment; filename="dbus_cleanup.patch"
 
---- bluez-utils-cvs.orig/hcid/dbus.h	2005-10-23 19:27:41.000000000 -0200
-+++ bluez-utils-cvs-hcid/hcid/dbus.h	2005-10-25 15:43:40.000000000 -0200
-@@ -30,8 +30,9 @@
-  
- #define __END_SIG__ DBUS_TYPE_INVALID_AS_STRING
+--- bluez-cvs-25102005/utils/hcid/dbus.c	2005-10-25 08:23:03.191337608 -0300
++++ bluez-cvs-new/utils/hcid/dbus.c	2005-10-25 15:19:53.656169024 -0300
+@@ -1215,11 +1215,12 @@
+ 	uint8_t length;
+ 	uint8_t max_period;
+ 	uint8_t min_period;
+-	int sock = -1;
++	int dd = -1;
+ 	int dev_id = -1;
  
-+#define BLUEZ_BUS_NAME		"org.bluez"
- #define BASE_PATH		"/org/bluez"
--#define BASE_INTERFACE		"org.bluez"
-+#define BASE_INTERFACE		BLUEZ_BUS_NAME	
+ 	if (dbus_data->id == DEFAULT_DEVICE_PATH_ID) {
+-		if ((dev_id = hci_get_route(NULL)) < 0) {
++		dev_id = hci_get_route(NULL);
++		if (dev_id < 0) {
+ 			syslog(LOG_ERR, "Bluetooth device is not available");
+ 			reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
+ 			goto failed;
+@@ -1228,8 +1229,8 @@
+ 	} else
+ 		dev_id =  dbus_data->id;
  
- #define DEVICE_PATH		BASE_PATH "/Device"
- #define DEVICE_INTERFACE	BASE_INTERFACE ".Device"
---- bluez-utils-cvs.orig/hcid/dbus.c	2005-10-23 19:27:41.000000000 -0200
-+++ bluez-utils-cvs-hcid/hcid/dbus.c	2005-10-25 15:54:24.000000000 -0200
-@@ -60,6 +60,7 @@
- #define MAX_PATH_LENGTH   (64)
- #define READ_REMOTE_NAME_TIMEOUT	(25000)
- #define MAX_CONN_NUMBER			(10)
-+#define MAX_SENDER_LEN			(16)
+-	sock = hci_open_dev(dev_id);
+-	if (sock < 0) {
++	dd = hci_open_dev(dev_id);
++	if (dd < 0) {
+ 		syslog(LOG_ERR, "HCI device open failed");
+ 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
+ 		goto failed;
+@@ -1260,14 +1261,14 @@
  
- #define PINAGENT_SERVICE_NAME BASE_INTERFACE ".PinAgent"
- #define PINAGENT_INTERFACE PINAGENT_SERVICE_NAME
-@@ -80,7 +81,9 @@
- };
+ 	inq_mode.mode = 1; //INQUIRY_WITH_RSSI;
  
- struct hci_dbus_data {
--	uint16_t id;
-+	uint16_t 	id;
-+	char 		sender[MAX_SENDER_LEN];
-+	dbus_uint32_t	serial;
- };
+-	if (hci_send_cmd(sock, OGF_HOST_CTL, OCF_WRITE_INQUIRY_MODE,
++	if (hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_INQUIRY_MODE,
+ 				WRITE_INQUIRY_MODE_CP_SIZE, &inq_mode) < 0) {
+ 		syslog(LOG_ERR, "Can't set inquiry mode:%s.", strerror(errno));
+ 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
+ 		goto failed;
+ 	}
  
- typedef int register_function_t(DBusConnection *conn, int dft_reg, uint16_t id);
-@@ -635,6 +638,82 @@
- {
+-	if (hci_send_cmd(sock, OGF_LINK_CTL, OCF_PERIODIC_INQUIRY,
++	if (hci_send_cmd(dd, OGF_LINK_CTL, OCF_PERIODIC_INQUIRY,
+ 				PERIODIC_INQUIRY_CP_SIZE, &inq_param) < 0) {
+ 		syslog(LOG_ERR, "Can't send HCI commands:%s.", strerror(errno));
+ 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
+@@ -1281,8 +1282,8 @@
+ 	}
+ 
+ failed:
+-	if (sock > 0)
+-		close(sock);
++	if (dd >= 0)
++		close(dd);
+ 
+ 	return reply;
  }
+@@ -1292,11 +1293,12 @@
+ 	DBusMessageIter iter;
+ 	DBusMessage *reply = NULL;
+ 	struct hci_dbus_data *dbus_data = data;
+-	int sock = -1;
++	int dd = -1;
+ 	int dev_id = -1;
  
-+void hcid_dbus_auth_complete(bdaddr_t *local, bdaddr_t *peer, const uint8_t status, const uint16_t handle)
-+{
-+	char *local_addr, *peer_addr;
-+	DBusMessage *message = NULL;
-+	struct hci_dbus_data *dbus_data = NULL;
-+	bdaddr_t tmp;
-+	char path[MAX_PATH_LENGTH];
-+	int id;
-+
-+	baswap(&tmp, local); local_addr = batostr(&tmp);
-+	baswap(&tmp, peer); peer_addr = batostr(&tmp);
-+
-+	id = hci_devid(local_addr);
-+	if (id < 0) {
-+		syslog(LOG_ERR, "No matching device id for %s", local_addr);
-+		goto failed;
-+	}
-+
-+	snprintf(path, sizeof(path), "%s/hci%d/%s", MANAGER_PATH, id, BLUEZ_HCI);
-+
-+	if (!dbus_connection_get_object_path_data(connection, path, (void*)&dbus_data)) 
-+		goto failed;
-+
-+	/* check if the auth request was triggered by a D-Bus client */
-+	if (!dbus_data || dbus_data->serial == 0)
-+		goto failed;
-+
-+	if (!status) {
-+
-+		message = dbus_message_new(DBUS_MESSAGE_TYPE_METHOD_RETURN); 
-+		if (message == NULL) 
-+			goto failed;
-+
-+		dbus_message_append_args(message,
-+				DBUS_TYPE_STRING, &peer_addr,
-+				DBUS_TYPE_UINT16, &handle,
-+				DBUS_TYPE_INVALID);
-+
-+	} else {
-+		const char *error_msg = bluez_dbus_error_to_str(status);
-+
-+		message = dbus_message_new(DBUS_MESSAGE_TYPE_ERROR);
-+		if (message == NULL)
-+			goto failed;
-+
-+		dbus_message_set_error_name(message, ERROR_INTERFACE);
-+		dbus_message_append_args(message, 
-+				DBUS_TYPE_STRING, &error_msg,
-+				DBUS_TYPE_INVALID);
-+	}
-+
-+	if (!dbus_message_set_destination(message, dbus_data->sender))
-+		goto failed;
-+
-+	dbus_message_set_no_reply (message, TRUE);
-+	if (!dbus_message_set_reply_serial (message, dbus_data->serial))
-+		goto failed;
-+	
-+	/* Clean the auth dbus_data */
-+	memset(dbus_data->sender, 0, MAX_SENDER_LEN);
-+	dbus_data->serial = 0;
-+
-+
-+	if (dbus_connection_send(connection, message, NULL) == FALSE)
-+		goto failed;
-+
-+	dbus_connection_flush(connection);
-+
-+failed:
-+	if (message)
-+		dbus_message_unref(message);
-+
-+	bt_free(local_addr);
-+	bt_free(peer_addr);
-+}
-+
- gboolean watch_func(GIOChannel *chan, GIOCondition cond, gpointer data)
- {
- 	DBusWatch *watch = (DBusWatch *) data;
-@@ -1681,10 +1760,18 @@
+ 	if (dbus_data->id == DEFAULT_DEVICE_PATH_ID) {
+-		if ((dev_id = hci_get_route(NULL)) < 0) {
++		dev_id = hci_get_route(NULL);
++		if (dev_id < 0) {
+ 			syslog(LOG_ERR, "Bluetooth device is not available");
+ 			reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
+ 			goto failed;
+@@ -1304,13 +1306,14 @@
+ 	} else
+ 		dev_id = dbus_data->id;
+ 
+-	if ((sock = hci_open_dev(dev_id)) < 0) {
++	dd = hci_open_dev(dev_id);
++	if (dd < 0) {
+ 		syslog(LOG_ERR, "HCI device open failed");
+ 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
+ 		goto failed;
+ 	}
+ 
+-	if (hci_send_cmd(sock, OGF_LINK_CTL, OCF_EXIT_PERIODIC_INQUIRY, 0 , NULL) < 0) {
++	if (hci_send_cmd(dd, OGF_LINK_CTL, OCF_EXIT_PERIODIC_INQUIRY, 0 , NULL) < 0) {
+ 		syslog(LOG_ERR, "Send hci command failed.");
+ 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
+ 	} else {
+@@ -1322,8 +1325,8 @@
+ 	}
+ 
+ failed:
+-	if (sock >= 0)
+-		close(sock);
++	if (dd >= 0)
++		close(dd);
+ 
+ 	return reply;
+ }
+@@ -1447,7 +1450,7 @@
+ 	bdaddr_t bdaddr;
+ 	uint8_t role;
+ 	int dev_id = -1;
+-	int sock = -1;
++	int dd = -1;
+ 
+ 	dbus_message_iter_init(msg, &iter);
+ 	dbus_message_iter_get_basic(&iter, &str_bdaddr);
+@@ -1470,14 +1473,14 @@
+ 		goto failed;
+ 	}
+ 
+-	sock = hci_open_dev(dev_id);
+-	if (sock < 0) {
++	dd = hci_open_dev(dev_id);
++	if (dd < 0) {
+ 		syslog(LOG_ERR, "HCI device open failed\n");
+ 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
+ 		goto failed;
+ 	}
+ 
+-	if (hci_switch_role(sock, &bdaddr, role, 10000) < 0) {
++	if (hci_switch_role(dd, &bdaddr, role, 10000) < 0) {
+ 		syslog(LOG_ERR, "Switch role request failed\n");
+ 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
+ 	} else {
+@@ -1511,7 +1514,8 @@
+ 	str2ba(str_bdaddr, &bdaddr);
+ 
+ 	if (dbus_data->id == DEFAULT_DEVICE_PATH_ID) {
+-		if ((dev_id = hci_get_route(&bdaddr)) < 0) {
++		dev_id = hci_get_route(&bdaddr);
++		if (dev_id  < 0) {
+ 			syslog(LOG_ERR, "Bluetooth device is not available");
+ 			reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
+ 			goto failed;
+@@ -1571,7 +1575,8 @@
+ 	int sk = -1;
+ 
+ 	if (dbus_data->id == DEFAULT_DEVICE_PATH_ID) {
+-		if ((dev_id = hci_get_route(NULL)) < 0) {
++		dev_id = hci_get_route(NULL);
++		if (dev_id < 0) {
+ 			syslog(LOG_ERR, "Bluetooth device is not available");
+ 			reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
+ 			goto failed;
+@@ -1621,7 +1626,7 @@
+ 	dbus_message_iter_close_container(&iter, &array_iter);
+ 
+ failed:
+-	if (sk >= 0)
++	if (sk > 0)
+ 		close(sk);
+ 
+ 	if (cl)
+@@ -1642,7 +1647,7 @@
+ 	struct hci_conn_info_req *cr = NULL;
+ 	bdaddr_t bdaddr;
+ 	int dev_id = -1;
+-	int sock = -1;
++	int dd = -1;
+ 
+ 	dbus_message_iter_init(msg, &iter);
+ 	dbus_message_iter_get_basic(&iter, &str_bdaddr);
+@@ -1660,8 +1665,8 @@
+ 		goto failed;
+ 	}
+ 
+-	sock = hci_open_dev(dev_id);
+-	if (sock < 0) {
++	dd = hci_open_dev(dev_id);
++	if (dd < 0) {
+ 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
+ 		goto failed;
+ 	}
+@@ -1675,7 +1680,7 @@
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 
+-	if (ioctl(sock, HCIGETCONNINFO, (unsigned long) cr) < 0) {
++	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
+ 		goto failed;
+ 	}
+@@ -1692,15 +1697,15 @@
  	rq.rlen = EVT_CMD_STATUS_SIZE;
  	rq.event = EVT_CMD_STATUS;
  
 -	if (hci_send_req(sock, &rq, 25000) < 0) {
-+	if (hci_send_req(sock, &rq, 100) < 0) {
++	if (hci_send_req(dd, &rq, 25000) < 0) {
  		syslog(LOG_ERR, "Unable to send authentication request: %s", strerror(errno));
  		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
  		goto failed;
-+	} else {
-+		const char *sender = dbus_message_get_sender(msg);
-+
-+		/* get the serial and the sender info to reply later */
-+		if (sender) {
-+			snprintf(dbus_data->sender, MAX_SENDER_LEN, "%s", sender);
-+			dbus_data->serial =  dbus_message_get_serial(msg);
-+		}
  	}
  
  failed:
---- bluez-utils-cvs.orig/hcid/security.c	2005-10-24 09:03:37.000000000 -0200
-+++ bluez-utils-cvs-hcid/hcid/security.c	2005-10-24 13:33:00.000000000 -0200
-@@ -644,6 +644,18 @@
- 	hcid_dbus_disconn_complete(sba, &dba, evt->reason);
- }
+-	if (sock >= 0)
+-		close(sock);
++	if (dd >= 0)
++		close(dd);
  
-+static inline void auth_complete(int dev, bdaddr_t *sba, void *ptr)
-+{
-+	evt_auth_complete *evt = ptr;
-+	bdaddr_t dba;
-+
-+	if (get_bdaddr(dev, sba, evt->handle, &dba) < 0) 
-+		return;
-+
-+	hcid_dbus_auth_complete(sba, &dba, evt->status, evt->handle);
-+}
-+
-+
- static gboolean io_security_event(GIOChannel *chan, GIOCondition cond, gpointer data)
- {
- 	unsigned char buf[HCI_MAX_EVENT_SIZE], *ptr = buf;
-@@ -726,6 +738,9 @@
- 	case EVT_DISCONN_COMPLETE:
- 		disconn_complete(dev, &di->bdaddr, ptr);
- 		break;
-+	case EVT_AUTH_COMPLETE:
-+		auth_complete(dev, &di->bdaddr, ptr);
-+		break;
+ 	if (cr)
+ 		free(cr);
+@@ -1725,7 +1730,7 @@
+ 	struct hci_dev_req *dr      = NULL;
+ 	struct hci_dev_info di;
+ 	int i;
+-	int sock = -1;
++	int sk = -1;
+ 
+ 	char aname[BLUETOOTH_DEVICE_NAME_LEN];
+ 	char aaddr[BLUETOOTH_DEVICE_ADDR_LEN];
+@@ -1734,8 +1739,8 @@
+ 	const char array_sig[] = HCI_DEVICE_STRUCT_SIGNATURE;
+ 
+ 	/* Create and bind HCI socket */
+-	sock = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+-	if (sock < 0) {
++	sk = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
++	if (sk < 0) {
+ 		syslog(LOG_ERR, "Can't open HCI socket: %s (%d)", strerror(errno), errno);
+ 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
+ 		goto failed;
+@@ -1751,7 +1756,7 @@
+ 	dl->dev_num = HCI_MAX_DEV;
+ 	dr = dl->dev_req;
+ 
+-	if (ioctl(sock, HCIGETDEVLIST, dl) < 0) {
++	if (ioctl(sk, HCIGETDEVLIST, dl) < 0) {
+ 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
+ 		goto failed;
  	}
+@@ -1769,7 +1774,7 @@
+ 		memset(&di, 0 , sizeof(struct hci_dev_info));
+ 		di.dev_id = dr->dev_id;
  
- 	if (hci_test_bit(HCI_SECMGR, &di->flags))
-@@ -789,6 +804,7 @@
- 	hci_filter_set_event(EVT_EXTENDED_INQUIRY_RESULT, &flt);
- 	hci_filter_set_event(EVT_CONN_COMPLETE, &flt);
- 	hci_filter_set_event(EVT_DISCONN_COMPLETE, &flt);
-+	hci_filter_set_event(EVT_AUTH_COMPLETE, &flt);
- 	if (setsockopt(dev, SOL_HCI, HCI_FILTER, &flt, sizeof(flt)) < 0) {
- 		syslog(LOG_ERR, "Can't set filter on hci%d: %s (%d)",
- 						hdev, strerror(errno), errno);
+-		if (ioctl(sock, HCIGETDEVINFO, &di) < 0)
++		if (ioctl(sk, HCIGETDEVINFO, &di) < 0)
+ 			continue;
+ 
+ 		strcpy(aname, di.name);
+@@ -1787,8 +1792,8 @@
+ 	dbus_message_iter_close_container(&iter, &array_iter);
+ 
+ failed:
+-	if (sock >= 0)
+-		close(sock);
++	if (sk > 0)
++		close(sk);
+ 
+ 	if (dl)
+ 		free(dl);
 
-------=_Part_10207_30010227.1130267013264
-Content-Type: application/octet-stream; name=auth_complete_signal_01.patch
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="auth_complete_signal_01.patch"
-
---- bluez-utils-cvs.orig/hcid/dbus.h	2005-10-23 19:27:41.000000000 -0200
-+++ bluez-utils-cvs-hcid/hcid/dbus.h	2005-10-24 14:06:43.000000000 -0200
-@@ -96,6 +96,7 @@
- #define BLUEZ_HCI_INQ_RESULT		"InquiryResult"
- #define BLUEZ_HCI_REMOTE_NAME		"RemoteName"
- #define BLUEZ_HCI_REMOTE_NAME_FAILED	"RemoteNameFailed"
-+#define BLUEZ_HCI_AUTH_COMPLETE		"AuthenticationComplete"
- 
- //HCI signals sent in the BLUEZ_HCI_PATH
- #define BLUEZ_HCI_DEV_ADDED		"DeviceAdded"
---- bluez-utils-cvs.orig/hcid/dbus.c	2005-10-23 19:27:41.000000000 -0200
-+++ bluez-utils-cvs-hcid/hcid/dbus.c	2005-10-24 14:02:13.000000000 -0200
-@@ -635,6 +635,54 @@
- {
- }
- 
-+void hcid_dbus_auth_complete(bdaddr_t *local, bdaddr_t *peer, const uint8_t status, const uint16_t handle)
-+{
-+	DBusMessage *message = NULL;
-+	char *local_addr, *peer_addr;
-+	bdaddr_t tmp;
-+	char path[MAX_PATH_LENGTH];
-+	int id;
-+
-+	baswap(&tmp, local); local_addr = batostr(&tmp);
-+	baswap(&tmp, peer); peer_addr = batostr(&tmp);
-+
-+	id = hci_devid(local_addr);
-+	if (id < 0) {
-+		syslog(LOG_ERR, "No matching device id for %s", local_addr);
-+		goto failed;
-+	}
-+
-+	snprintf(path, sizeof(path), "%s/hci%d/%s", MANAGER_PATH, id, BLUEZ_HCI);
-+
-+	message = dbus_message_new_signal(path,
-+			BLUEZ_HCI_INTERFACE, BLUEZ_HCI_AUTH_COMPLETE);
-+	if (message == NULL) {
-+		syslog(LOG_ERR, "Can't allocate D-BUS remote name message");
-+		goto failed;
-+	}
-+
-+	dbus_message_append_args(message,
-+			DBUS_TYPE_STRING, &peer_addr,
-+			DBUS_TYPE_BYTE, &status,
-+			DBUS_TYPE_UINT16, &handle,
-+			DBUS_TYPE_INVALID);
-+
-+	if (dbus_connection_send(connection, message, NULL) == FALSE) {
-+		syslog(LOG_ERR, "Can't send D-BUS remote name message");
-+		goto failed;
-+	}
-+
-+	dbus_connection_flush(connection);
-+
-+failed:
-+	if (message)
-+		dbus_message_unref(message);
-+
-+	bt_free(local_addr);
-+	bt_free(peer_addr);
-+
-+}
-+
- gboolean watch_func(GIOChannel *chan, GIOCondition cond, gpointer data)
- {
- 	DBusWatch *watch = (DBusWatch *) data;
---- bluez-utils-cvs.orig/hcid/security.c	2005-10-24 09:03:37.000000000 -0200
-+++ bluez-utils-cvs-hcid/hcid/security.c	2005-10-24 13:33:00.000000000 -0200
-@@ -644,6 +644,18 @@
- 	hcid_dbus_disconn_complete(sba, &dba, evt->reason);
- }
- 
-+static inline void auth_complete(int dev, bdaddr_t *sba, void *ptr)
-+{
-+	evt_auth_complete *evt = ptr;
-+	bdaddr_t dba;
-+
-+	if (get_bdaddr(dev, sba, evt->handle, &dba) < 0) 
-+		return;
-+
-+	hcid_dbus_auth_complete(sba, &dba, evt->status, evt->handle);
-+}
-+
-+
- static gboolean io_security_event(GIOChannel *chan, GIOCondition cond, gpointer data)
- {
- 	unsigned char buf[HCI_MAX_EVENT_SIZE], *ptr = buf;
-@@ -726,6 +738,9 @@
- 	case EVT_DISCONN_COMPLETE:
- 		disconn_complete(dev, &di->bdaddr, ptr);
- 		break;
-+	case EVT_AUTH_COMPLETE:
-+		auth_complete(dev, &di->bdaddr, ptr);
-+		break;
- 	}
- 
- 	if (hci_test_bit(HCI_SECMGR, &di->flags))
-@@ -789,6 +804,7 @@
- 	hci_filter_set_event(EVT_EXTENDED_INQUIRY_RESULT, &flt);
- 	hci_filter_set_event(EVT_CONN_COMPLETE, &flt);
- 	hci_filter_set_event(EVT_DISCONN_COMPLETE, &flt);
-+	hci_filter_set_event(EVT_AUTH_COMPLETE, &flt);
- 	if (setsockopt(dev, SOL_HCI, HCI_FILTER, &flt, sizeof(flt)) < 0) {
- 		syslog(LOG_ERR, "Can't set filter on hci%d: %s (%d)",
- 						hdev, strerror(errno), errno);
-
-------=_Part_10207_30010227.1130267013264--
+------=_Part_3010_17635.1130265021284--
 
 
 -------------------------------------------------------
