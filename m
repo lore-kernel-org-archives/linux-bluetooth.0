@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Philippe Berini <philippe@berini.org>
+Message-ID: <20051026194053.60184.qmail@web51305.mail.yahoo.com>
+From: lady jane <lady3jane2002@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20051026195956.GH7782@loulou-becane>
-References: <20051020135234.GC28731@loulou-becane> <20051023123808.GA14322@elmicha.333200002251-0001.dialin.t-online.de> <20051023151215.GB31746@loulou-becane> <1130191981.9463.13.camel@localhost.localdomain> <20051025163115.GA29385@loulou-becane> <1130342970.8178.5.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1130342970.8178.5.camel@localhost.localdomain>
-Subject: [Bluez-users] Re: Re: Re: Buetooth and SAMSUNG SGH-E340
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] bluez compact flash kernel compatability question
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 26 Oct 2005 21:59:56 +0200
+Date: Wed, 26 Oct 2005 12:40:53 -0700 (PDT)
 
-* Fredy P <digitalfredy@debiancolombia.org> [Wed, Oct 26, 2005 at 11:09:28AM -0500]:
+from what i can tell, the socket card seems to be well
+supported under both 2.4 and 2.6 kernels. can anyone
+confirm this? please specify revision code as well.
 
-> i attached my /etc/init.d/bluez-utils but i'm using sarge,
+i've held off on replacing my card (ambicom/ericsson)
+until now since it worked flawlessly on my zaurus
+under 2.4 but, given the amount of time i've spent
+with it, i could have replaced it with the SL-6000
+with built in btooth!
 
-Thanks, but I tried your file, and got the same error.
+thanks in advance!
 
-And I forgot to say that the mobile says it is paired, which is good,
-and then that it can't find the services.
 
-> and if you can write in the wiki (in spanish) how to config your
-> movile phone (down t610) 
-
-It would be my pleasure to do that, if my connection was working... As
-soon as I get it work, I'll add it to the wiki.
-
-Thanks anyway,
--- 
-Philippe Berini                
+		
+__________________________________ 
+Yahoo! FareChase: Search multiple travel sites in one click.
+http://farechase.yahoo.com
 
 
 -------------------------------------------------------
