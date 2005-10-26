@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Pavel Ruzicka <pavouk@pavouk.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1130405200.32634.28.camel@blade>
-Mime-Version: 1.0
-Subject: [Bluez-users] Bluetooth 2.0 + EDR dongles
+Subject: Re: [Bluez-users] bluez compact flash kernel compatability question
+Cc: lady jane <lady3jane2002@yahoo.com>
+References: <20051026194053.60184.qmail@web51305.mail.yahoo.com>
+In-Reply-To: <20051026194053.60184.qmail@web51305.mail.yahoo.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200510262304.21536.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,35 +20,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 27 Oct 2005 11:26:40 +0200
+Date: Wed, 26 Oct 2005 23:04:21 +0200
 
-Hi Folks,
+Hello,
 
-I spent some time searching and buying Enhanced Data Rate (EDR) capable
-dongles and besides the initial Cellink dongle I found some others. It
-seems they are out now and you will get two different types. The CSR
-based dongles with a BlueCore4 chip and the Broadcom based dongles with
-a BCM2045. I started writing up some notes about them and the first
-draft can be found at:
+> from what i can tell, the socket card seems to be well
+> supported under both 2.4 and 2.6 kernels. can anyone
+> confirm this? please specify revision code as well.
 
-	http://www.holtmann.org/linux/bluetooth/edr.html
+I have old revision F Socket CF bluetooth card.
+This card id Nokia dtl1 based and works under kernel 2.4
+and 2.6. Only one problem is, that driver doesn't support
+suspend/resume. After suspending is needed eject/insert
+by cardctl utility or physical reinsert.
 
-This is still an early version, but I am trying to put all information
-about my dongles there and I am happy if others would contribute, too.
+New revisions use serial.cs driver. There are needed patch
+for some 2.6 kernels, but I don't know if recent 2.6 kernel
+for Zaurus have this baudrate patch included.
 
-If you find this information useful and like me to keep buying other
-dongles then you might wanna donate some money:
+These cards are perfect, because they have built-in antena.
 
-	http://www.bluez.org/sponsors.html
+best regards,
 
-Most of them were around 25 EUR, but every Cent helps to test out new
-hardware.
-
-Regards
-
-Marcel
-
-
+Pavel Ruzicka
 
 
 -------------------------------------------------------
