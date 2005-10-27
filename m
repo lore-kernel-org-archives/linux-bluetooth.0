@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth 2.0 + EDR dongles
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Mitja Pufic <raveer@section-one.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.61.0510271900040.4364@cherokee.spacecom.si>
+Subject: Re: [Bluez-users] Bluetooth 2.0 + EDR dongles
+In-Reply-To: <1130405200.32634.28.camel@blade>
+Message-ID: <Pine.LNX.4.61.0510271900040.4364@cherokee.spacecom.si>
 References: <1130405200.32634.28.camel@blade>
-	 <Pine.LNX.4.61.0510271900040.4364@cherokee.spacecom.si>
-Content-Type: text/plain
-Message-Id: <1130433599.16380.4.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,19 +18,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 27 Oct 2005 19:19:59 +0200
+Date: Thu, 27 Oct 2005 19:09:19 +0200 (CEST)
 
-Hi Mitja,
+Hello Marcel,
 
-> Do you need any more info on Level1 MDU-0025USB dongle for your list?
+Do you need any more info on Level1 MDU-0025USB dongle for your list?
 
-send in the information.
-
-Regards
-
-Marcel
-
-
+regards, Mitja
 
 
 -------------------------------------------------------
