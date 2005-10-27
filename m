@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Mitja Pufic <raveer@section-one.org>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Bluetooth 2.0 + EDR dongles
+In-Reply-To: <1130433599.16380.4.camel@localhost.localdomain>
+Message-ID: <Pine.LNX.4.61.0510272132230.7582@cherokee.spacecom.si>
+References: <1130405200.32634.28.camel@blade>  <Pine.LNX.4.61.0510271900040.4364@cherokee.spacecom.si>
+ <1130433599.16380.4.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C5DBA7.819C9705"
-Message-ID: <4CA6E08AA4616B4FB0BAC7A889A3E9F0045EE90C@pdsmsx404>
-From: "Wu, Jieke" <jieke.wu@intel.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] BT-alsa with HT820(MOTO)
+Content-Type: MULTIPART/MIXED; BOUNDARY="315942193-1922170312-1130441646=:7582"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,523 +19,216 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Oct 2005 18:08:11 +0800
-
-This is a multi-part message in MIME format.
-
-------_=_NextPart_001_01C5DBA7.819C9705
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-Hi: all
-
-       I have enabled the link with HT820 on my 2.6.9 kernel (PC), also
-I can send the data with ACL to MOTO headset, below is something hcidump
-catched. But still no any audio output can be listened on headset part.
-Any one can deliver some hint? Thanks.
-
-=20
-
-=20
-
-> ACL data: handle 47 flags 0x02 dlen 8
-
-    L2CAP(d): cid 0x0041 len 4 [psm 25]
-
-      AVDTP(s): Discover rsp: transaction 0
-
-        ACP SEID 1 - Audio Sink
-
-< ACL data: handle 47 flags 0x02 dlen 7
-
-    L2CAP(d): cid 0x0051 len 3 [psm 25]
-
-      AVDTP(s): Capabilities cmd: transaction 1
-
-        ACP SEID 1
-
-> HCI Event: Number of Completed Packets (0x13) plen 5
-
-> ACL data: handle 47 flags 0x02 dlen 16
-
-    L2CAP(d): cid 0x0041 len 12 [psm 25]
-
-      AVDTP(s): Capabilities rsp: transaction 1
-
-        Media Transport
-
-        Media Codec - SBC
-
-          16kHz 32kHz 44.1kHz 48kHz=20
-
-          Mono DualChannel Stereo JointStereo=20
-
-          4 8 12 16 Blocks
-
-          4 8 Subbands
-
-          SNR Loudness=20
-
-          Bitpool Range 2-250
-
-< ACL data: handle 47 flags 0x02 dlen 18
-
-    L2CAP(d): cid 0x0051 len 14 [psm 25]
-
-      AVDTP(s): Set config cmd: transaction 2
-
-        ACP SEID 1 - INT SEID 1
-
-        Media Transport
-
-        Media Codec - SBC
-
-          44.1kHz=20
-
-          Stereo=20
-
-          16 Blocks
-
-          8 Subbands
-
-          SNR=20
-
-          Bitpool Range 2-250
-
-< ACL data: handle 47 flags 0x02 dlen 192
-
-< ACL data: handle 47 flags 0x01 dlen 192
-
-< ACL data: handle 47 flags 0x01 dlen 192
-
-< ACL data: handle 47 flags 0x01 dlen 49
-
-    L2CAP(d): cid 0x0052 len 621 [psm 25]
-
-      AVDTP(m): ver 2 cc 0 pt 1 seqn 2 time 128 ssrc 1
-
-> HCI Event: Number of Completed Packets (0x13) plen 5
-
-< ACL data: handle 47 flags 0x02 dlen 192
-
-> HCI Event: Number of Completed Packets (0x13) plen 5
-
-< ACL data: handle 47 flags 0x01 dlen 192
-
-< ACL data: handle 47 flags 0x01 dlen 192
-
-< ACL data: handle 47 flags 0x01 dlen 49
-
-    L2CAP(d): cid 0x0052 len 621 [psm 25]
-
-      AVDTP(m): ver 2 cc 0 pt 1 seqn 3 time 256 ssrc 1
-
-> HCI Event: Number of Completed Packets
-
-
-------_=_NextPart_001_01C5DBA7.819C9705
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
-xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns:st1=3D"urn:schemas-microsoft-com:office:smarttags" =
-xmlns=3D"http://www.w3.org/TR/REC-html40">
-
-<head>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
-<o:SmartTagType =
-namespaceuri=3D"urn:schemas-microsoft-com:office:smarttags"
- name=3D"PlaceType"/>
-<o:SmartTagType =
-namespaceuri=3D"urn:schemas-microsoft-com:office:smarttags"
- name=3D"PlaceName"/>
-<o:SmartTagType =
-namespaceuri=3D"urn:schemas-microsoft-com:office:smarttags"
- name=3D"place" downloadurl=3D"http://www.5iantlavalamp.com/"/>
-<!--[if !mso]>
-<style>
-st1\:*{behavior:url(#default#ieooui) }
-</style>
-<![endif]-->
-<style>
-<!--
- /* Font Definitions */
- @font-face
-	{font-family:&#23435;&#20307;;
-	panose-1:2 1 6 0 3 1 1 1 1 1;}
-@font-face
-	{font-family:"Comic Sans MS";
-	panose-1:3 15 7 2 3 3 2 2 2 4;}
-@font-face
-	{font-family:"\@&#23435;&#20307;";
-	panose-1:2 1 6 0 3 1 1 1 1 1;}
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0cm;
-	margin-bottom:.0001pt;
-	text-align:justify;
-	text-justify:inter-ideograph;
-	font-size:10.5pt;
-	font-family:"Times New Roman";}
-a:link, span.MsoHyperlink
-	{color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{color:purple;
-	text-decoration:underline;}
-span.EmailStyle17
-	{mso-style-type:personal-compose;
-	font-family:"Comic Sans MS";
-	color:windowtext;
-	font-weight:normal;
-	font-style:normal;
-	text-decoration:none none;}
- /* Page Definitions */
- @page Section1
-	{size:595.3pt 841.9pt;
-	margin:72.0pt 90.0pt 72.0pt 90.0pt;
-	layout-grid:15.6pt;}
-div.Section1
-	{page:Section1;}
--->
-</style>
-
-</head>
-
-<body lang=3DZH-CN link=3Dblue vlink=3Dpurple =
-style=3D'text-justify-trim:punctuation'>
-
-<div class=3DSection1 style=3D'layout-grid:15.6pt'>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>Hi: =
-all<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I
-have enabled the link with HT820 on my 2.6.9 kernel (PC), also I can =
-send the
-data with ACL to MOTO headset, below is something hcidump catched. But =
-still no
-any audio output can be listened on headset part. Any one can deliver =
-some
-hint? Thanks.<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&gt; ACL data: =
-handle 47
-flags 0x02 dlen 8<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;
-L2CAP(d): cid 0x0041 len 4 [psm 25]<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-AVDTP(s): Discover rsp: transaction 0<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-ACP SEID 1 - Audio Sink<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&lt; ACL data: =
-handle 47
-flags 0x02 dlen 7<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;
-L2CAP(d): cid 0x0051 len 3 [psm 25]<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-AVDTP(s): Capabilities cmd: transaction 1<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-ACP SEID 1<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&gt; HCI Event: =
-Number of
-Completed Packets (0x13) plen 5<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&gt; ACL data: =
-handle 47
-flags 0x02 dlen 16<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;
-L2CAP(d): cid 0x0041 len 12 [psm 25]<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-AVDTP(s): Capabilities rsp: transaction 1<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Media Transport<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Media Codec - SBC<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-16kHz 32kHz 44.1kHz 48kHz <o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Mono DualChannel Stereo JointStereo <o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-4 8 12 16 Blocks<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-4 8 Subbands<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-SNR Loudness <o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<st1:place w:st=3D"on"><st1:PlaceName =
-w:st=3D"on">Bitpool</st1:PlaceName> <st1:PlaceType
- w:st=3D"on">Range</st1:PlaceType></st1:place> =
-2-250<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&lt; ACL data: =
-handle 47
-flags 0x02 dlen 18<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;
-L2CAP(d): cid 0x0051 len 14 [psm 25]<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-AVDTP(s): Set config cmd: transaction 2<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&nbsp; =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ACP
-SEID 1 - INT SEID 1<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Media Transport<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Media Codec - SBC<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-44.1kHz <o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Stereo <o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-16 Blocks<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-8 Subbands<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-SNR <o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<st1:place w:st=3D"on"><st1:PlaceName =
-w:st=3D"on">Bitpool</st1:PlaceName> <st1:PlaceType
- w:st=3D"on">Range</st1:PlaceType></st1:place> =
-2-250<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&lt; ACL data: =
-handle 47
-flags 0x02 dlen 192<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&lt; ACL data: =
-handle 47
-flags 0x01 dlen 192<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&lt; ACL data: =
-handle 47
-flags 0x01 dlen 192<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&lt; ACL data: =
-handle 47
-flags 0x01 dlen 49<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;
-L2CAP(d): cid 0x0052 len 621 [psm 25]<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-AVDTP(m): ver 2 cc 0 pt 1 seqn 2 time 128 ssrc =
-1<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&gt; HCI Event: =
-Number of
-Completed Packets (0x13) plen 5<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&lt; ACL data: =
-handle 47
-flags 0x02 dlen 192<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&gt; HCI Event: =
-Number of
-Completed Packets (0x13) plen 5<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&lt; ACL data: =
-handle 47
-flags 0x01 dlen 192<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&lt; ACL data: =
-handle 47
-flags 0x01 dlen 192<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&lt; ACL data: =
-handle 47
-flags 0x01 dlen 49<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;
-L2CAP(d): cid 0x0052 len 621 [psm 25]<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans =
-MS"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-AVDTP(m): ver 2 cc 0 pt 1 seqn 3 time 256 ssrc =
-1<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3D"Comic Sans MS"><span =
-lang=3DEN-US
-style=3D'font-size:11.0pt;font-family:"Comic Sans MS"'>&gt; HCI Event: =
-Number of
-Completed Packets<o:p></o:p></span></font></p>
-
-</div>
-
-</body>
-
-</html>
-
-------_=_NextPart_001_01C5DBA7.819C9705--
+Date: Thu, 27 Oct 2005 21:34:06 +0200 (CEST)
+
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--315942193-1922170312-1130441646=:7582
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+
+Hello Marcel,
+
+I attached them as text, hope it is ok.
+
+Regards,
+
+Mitja
+
+> Hi Mitja,
+> 
+> > Do you need any more info on Level1 MDU-0025USB dongle for your list?
+> 
+> send in the information.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by the JBoss Inc.
+> Get Certified Today * Register for a JBoss Training Course
+> Free Certification Exam for All Training Attendees Through End of 2005
+> Visit http://www.jboss.com/services/certification for more information
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+--315942193-1922170312-1130441646=:7582
+Content-Type: TEXT/PLAIN; charset=US-ASCII; name="proc.usb"
+Content-Transfer-Encoding: BASE64
+Content-ID: <Pine.LNX.4.61.0510272134060.7582@cherokee.spacecom.si>
+Content-Description: 
+Content-Disposition: attachment; filename="proc.usb"
+
+VDogIEJ1cz0wMSBMZXY9MDEgUHJudD0wMSBQb3J0PTAwIENudD0wMSBEZXYj
+PSAgMyBTcGQ9MTIgIE14Q2g9IDANCkQ6ICBWZXI9IDIuMDAgQ2xzPWUwKHVu
+ay4gKSBTdWI9MDEgUHJvdD0wMSBNeFBTPTY0ICNDZmdzPSAgMQ0KUDogIFZl
+bmRvcj0wYTEyIFByb2RJRD0wMDAxIFJldj0xOS4xNQ0KQzoqICNJZnM9IDMg
+Q2ZnIz0gMSBBdHI9YzAgTXhQd3I9ICAwbUENCkk6ICBJZiM9IDAgQWx0PSAw
+ICNFUHM9IDMgQ2xzPWUwKHVuay4gKSBTdWI9MDEgUHJvdD0wMSBEcml2ZXI9
+aGNpX3VzYg0KRTogIEFkPTgxKEkpIEF0cj0wMyhJbnQuKSBNeFBTPSAgMTYg
+SXZsPTFtcw0KRTogIEFkPTAyKE8pIEF0cj0wMihCdWxrKSBNeFBTPSAgNjQg
+SXZsPTBtcw0KRTogIEFkPTgyKEkpIEF0cj0wMihCdWxrKSBNeFBTPSAgNjQg
+SXZsPTBtcw0KSTogIElmIz0gMSBBbHQ9IDAgI0VQcz0gMiBDbHM9ZTAodW5r
+LiApIFN1Yj0wMSBQcm90PTAxIERyaXZlcj1oY2lfdXNiDQpFOiAgQWQ9MDMo
+TykgQXRyPTAxKElzb2MpIE14UFM9ICAgMCBJdmw9MW1zDQpFOiAgQWQ9ODMo
+SSkgQXRyPTAxKElzb2MpIE14UFM9ICAgMCBJdmw9MW1zDQpJOiAgSWYjPSAx
+IEFsdD0gMSAjRVBzPSAyIENscz1lMCh1bmsuICkgU3ViPTAxIFByb3Q9MDEg
+RHJpdmVyPWhjaV91c2INCkU6ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQ
+Uz0gICA5IEl2bD0xbXMNCkU6ICBBZD04MyhJKSBBdHI9MDEoSXNvYykgTXhQ
+Uz0gICA5IEl2bD0xbXMNCkk6ICBJZiM9IDEgQWx0PSAyICNFUHM9IDIgQ2xz
+PWUwKHVuay4gKSBTdWI9MDEgUHJvdD0wMSBEcml2ZXI9aGNpX3VzYg0KRTog
+IEFkPTAzKE8pIEF0cj0wMShJc29jKSBNeFBTPSAgMTcgSXZsPTFtcw0KRTog
+IEFkPTgzKEkpIEF0cj0wMShJc29jKSBNeFBTPSAgMTcgSXZsPTFtcw0KSTog
+IElmIz0gMSBBbHQ9IDMgI0VQcz0gMiBDbHM9ZTAodW5rLiApIFN1Yj0wMSBQ
+cm90PTAxIERyaXZlcj1oY2lfdXNiDQpFOiAgQWQ9MDMoTykgQXRyPTAxKElz
+b2MpIE14UFM9ICAyNSBJdmw9MW1zDQpFOiAgQWQ9ODMoSSkgQXRyPTAxKElz
+b2MpIE14UFM9ICAyNSBJdmw9MW1zDQpJOiAgSWYjPSAxIEFsdD0gNCAjRVBz
+PSAyIENscz1lMCh1bmsuICkgU3ViPTAxIFByb3Q9MDEgRHJpdmVyPWhjaV91
+c2INCkU6ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gIDMzIEl2bD0x
+bXMNCkU6ICBBZD04MyhJKSBBdHI9MDEoSXNvYykgTXhQUz0gIDMzIEl2bD0x
+bXMNCkk6ICBJZiM9IDEgQWx0PSA1ICNFUHM9IDIgQ2xzPWUwKHVuay4gKSBT
+dWI9MDEgUHJvdD0wMSBEcml2ZXI9aGNpX3VzYg0KRTogIEFkPTAzKE8pIEF0
+cj0wMShJc29jKSBNeFBTPSAgNDkgSXZsPTFtcw0KRTogIEFkPTgzKEkpIEF0
+cj0wMShJc29jKSBNeFBTPSAgNDkgSXZsPTFtcw0KSTogIElmIz0gMiBBbHQ9
+IDAgI0VQcz0gMCBDbHM9ZmUoYXBwLiApIFN1Yj0wMSBQcm90PTAwIERyaXZl
+cj0obm9uZSkNCg==
+
+--315942193-1922170312-1130441646=:7582
+Content-Type: TEXT/PLAIN; charset=US-ASCII; name=hciconfig
+Content-Transfer-Encoding: BASE64
+Content-ID: <Pine.LNX.4.61.0510272134061.7582@cherokee.spacecom.si>
+Content-Description: 
+Content-Disposition: attachment; filename=hciconfig
+
+aGNpMDoJVHlwZTogVVNCDQoJQkQgQWRkcmVzczogMDA6MDk6REQ6NTA6MDE6
+QzggQUNMIE1UVTogMzg0OjggU0NPIE1UVTogNjQ6OA0KCVVQIFJVTk5JTkcg
+UFNDQU4gSVNDQU4gQVVUSCBFTkNSWVBUIA0KCVJYIGJ5dGVzOjE5NzkgYWNs
+OjAgc2NvOjAgZXZlbnRzOjU0IGVycm9yczowDQoJVFggYnl0ZXM6OTU4IGFj
+bDowIHNjbzowIGNvbW1hbmRzOjUzIGVycm9yczowDQoJRmVhdHVyZXM6IDB4
+ZmYgMHhmZiAweDhmIDB4ZmUgMHg5YiAweGY5IDB4MDAgMHg4MA0KCVBhY2tl
+dCB0eXBlOiBETTEgRE0zIERNNSBESDEgREgzIERINSBIVjEgSFYyIEhWMyAN
+CglMaW5rIHBvbGljeTogSE9MRCBTTklGRiBQQVJLIA0KCUxpbmsgbW9kZTog
+U0xBVkUgQUNDRVBUIA0KCU5hbWU6ICdSYWluZHJvcC0zQicNCglDbGFzczog
+MHgwMDAxMDANCglTZXJ2aWNlIENsYXNzZXM6IFVuc3BlY2lmaWVkDQoJRGV2
+aWNlIENsYXNzOiBDb21wdXRlciwgVW5jYXRlZ29yaXplZA0KCUhDSSBWZXI6
+IDIuMCAoMHgzKSBIQ0kgUmV2OiAweDc3YiBMTVAgVmVyOiAyLjAgKDB4Mykg
+TE1QIFN1YnZlcjogMHg3N2INCglNYW51ZmFjdHVyZXI6IENhbWJyaWRnZSBT
+aWxpY29uIFJhZGlvICgxMCkNCg0KaGNpMDoJVHlwZTogVVNCDQoJQkQgQWRk
+cmVzczogMDA6MDk6REQ6NTA6MDE6QzggQUNMIE1UVTogMzg0OjggU0NPIE1U
+VTogNjQ6OA0KCUhDSSAxOS4yDQoJQ2hpcCB2ZXJzaW9uOiBCbHVlQ29yZTQt
+RXh0ZXJuYWwNCglNYXgga2V5IHNpemU6IDU2IGJpdA0KCVNDTyBtYXBwaW5n
+OiAgSENJDQoNCmhjaTA6CVR5cGU6IFVTQg0KCUJEIEFkZHJlc3M6IDAwOjA5
+OkREOjUwOjAxOkM4IEFDTCBNVFU6IDM4NDo4IFNDTyBNVFU6IDY0OjgNCglG
+ZWF0dXJlczogMHhmZiAweGZmIDB4OGYgMHhmZSAweDliIDB4ZjkgMHgwMCAw
+eDgwDQoJCTwzLXNsb3QgcGFja2V0cz4gPDUtc2xvdCBwYWNrZXRzPiA8ZW5j
+cnlwdGlvbj4gPHNsb3Qgb2Zmc2V0PiANCgkJPHRpbWluZyBhY2N1cmFjeT4g
+PHJvbGUgc3dpdGNoPiA8aG9sZCBtb2RlPiA8c25pZmYgbW9kZT4gDQoJCTxw
+YXJrIHN0YXRlPiA8UlNTST4gPGNoYW5uZWwgcXVhbGl0eT4gPFNDTyBsaW5r
+PiA8SFYyIHBhY2tldHM+IA0KCQk8SFYzIHBhY2tldHM+IDx1LWxhdyBsb2c+
+IDxBLWxhdyBsb2c+IDxDVlNEPiA8cGFnaW5nIHNjaGVtZT4gDQoJCTxwb3dl
+ciBjb250cm9sPiA8dHJhbnNwYXJlbnQgU0NPPiA8YnJvYWRjYXN0IGVuY3J5
+cHQ+IA0KCQk8RURSIEFDTCAyIE1icHM+IDxFRFIgQUNMIDMgTWJwcz4gPGVu
+aGFuY2VkIGlzY2FuPiANCgkJPGludGVybGFjZWQgaXNjYW4+IDxpbnRlcmxh
+Y2VkIHBzY2FuPiA8aW5xdWlyeSB3aXRoIFJTU0k+IA0KCQk8ZXh0ZW5kZWQg
+U0NPPiA8RVY0IHBhY2tldHM+IDxFVjUgcGFja2V0cz4gPEFGSCBjYXAuIHNs
+YXZlPiANCgkJPEFGSCBjbGFzcy4gc2xhdmU+IDwzLXNsb3QgRURSIEFDTD4g
+PDUtc2xvdCBFRFIgQUNMPiANCgkJPEFGSCBjYXAuIG1hc3Rlcj4gPEFGSCBj
+bGFzcy4gbWFzdGVyPiA8RURSIGVTQ08gMiBNYnBzPiANCgkJPEVEUiBlU0NP
+IDMgTWJwcz4gPDMtc2xvdCBFRFIgZVNDTz4gPGV4dGVuZGVkIGZlYXR1cmVz
+PiANCg0KaGNpMDoJVHlwZTogVVNCDQoJQkQgQWRkcmVzczogMDA6MDk6REQ6
+NTA6MDE6QzggQUNMIE1UVTogMzg0OjggU0NPIE1UVTogNjQ6OA0KCUNvbW1h
+bmRzOiBPY3RldCAwICA9IDB4ZmYgKEJpdCAwIDEgMiAzIDQgNSA2IDcpDQoJ
+CSAgT2N0ZXQgMSAgPSAweGZmIChCaXQgMCAxIDIgMyA0IDUgNiA3KQ0KCQkg
+IE9jdGV0IDIgID0gMHhmZiAoQml0IDAgMSAyIDMgNCA1IDYgNykNCgkJICBP
+Y3RldCAzICA9IDB4MDMgKEJpdCAwIDEpDQoJCSAgT2N0ZXQgNCAgPSAweGZl
+IChCaXQgMSAyIDMgNCA1IDYgNykNCgkJICBPY3RldCA1ICA9IDB4ZmYgKEJp
+dCAwIDEgMiAzIDQgNSA2IDcpDQoJCSAgT2N0ZXQgNiAgPSAweGZmIChCaXQg
+MCAxIDIgMyA0IDUgNiA3KQ0KCQkgIE9jdGV0IDcgID0gMHhmZiAoQml0IDAg
+MSAyIDMgNCA1IDYgNykNCgkJICBPY3RldCA4ICA9IDB4ZmYgKEJpdCAwIDEg
+MiAzIDQgNSA2IDcpDQoJCSAgT2N0ZXQgOSAgPSAweGZmIChCaXQgMCAxIDIg
+MyA0IDUgNiA3KQ0KCQkgIE9jdGV0IDEwID0gMHhmZiAoQml0IDAgMSAyIDMg
+NCA1IDYgNykNCgkJICBPY3RldCAxMSA9IDB4ZmYgKEJpdCAwIDEgMiAzIDQg
+NSA2IDcpDQoJCSAgT2N0ZXQgMTIgPSAweGYzIChCaXQgMCAxIDQgNSA2IDcp
+DQoJCSAgT2N0ZXQgMTMgPSAweDBmIChCaXQgMCAxIDIgMykNCgkJICBPY3Rl
+dCAxNCA9IDB4ZjggKEJpdCAzIDQgNSA2IDcpDQoJCSAgT2N0ZXQgMTUgPSAw
+eGZmIChCaXQgMCAxIDIgMyA0IDUgNiA3KQ0KCQkgIE9jdGV0IDE2ID0gMHgz
+ZiAoQml0IDAgMSAyIDMgNCA1KQ0KCSdJbnF1aXJ5JyAnSW5xdWlyeSBDYW5j
+ZWwnICdQZXJpb2RpYyBJbnF1aXJ5IE1vZGUnIA0KCSdFeGl0IFBlcmlvZGlj
+IElucXVpcnkgTW9kZScgJ0NyZWF0ZSBDb25uZWN0aW9uJyAnRGlzY29ubmVj
+dCcgDQoJJ0FkZCBTQ08gQ29ubmVjdGlvbicgJ0NhbmNlbCBDcmVhdGUgQ29u
+bmVjdGlvbicgDQoJJ0FjY2VwdCBDb25uZWN0aW9uIFJlcXVlc3QnICdSZWpl
+Y3QgQ29ubmVjdGlvbiBSZXF1ZXN0JyANCgknTGluayBLZXkgUmVxdWVzdCBS
+ZXBseScgJ0xpbmsgS2V5IFJlcXVlc3QgTmVnYXRpdmUgUmVwbHknIA0KCSdQ
+SU4gQ29kZSBSZXF1ZXN0IFJlcGx5JyAnUElOIENvZGUgUmVxdWVzdCBOZWdh
+dGl2ZSBSZXBseScgDQoJJ0NoYW5nZSBDb25uZWN0aW9uIFBhY2tldCBUeXBl
+JyAnQXV0aGVudGljYXRpb24gUmVxdWVzdGVkJyANCgknU2V0IENvbm5lY3Rp
+b24gRW5jcnlwdGlvbicgJ0NoYW5nZSBDb25uZWN0aW9uIExpbmsgS2V5JyAN
+CgknTWFzdGVyIExpbmsgS2V5JyAnUmVtb3RlIE5hbWUgUmVxdWVzdCcgJ0Nh
+bmNlbCBSZW1vdGUgTmFtZSBSZXF1ZXN0JyANCgknUmVhZCBSZW1vdGUgU3Vw
+cG9ydGVkIEZlYXR1cmVzJyAnUmVhZCBSZW1vdGUgRXh0ZW5kZWQgRmVhdHVy
+ZXMnIA0KCSdSZWFkIFJlbW90ZSBWZXJzaW9uIEluZm9ybWF0aW9uJyAnUmVh
+ZCBDbG9jayBPZmZzZXQnIA0KCSdSZWFkIExNUCBIYW5kbGUnICdIb2xkIE1v
+ZGUnICdTbmlmZiBNb2RlJyAnRXhpdCBTbmlmZiBNb2RlJyANCgknUGFyayBT
+dGF0ZScgJ0V4aXQgUGFyayBTdGF0ZScgJ1FvUyBTZXR1cCcgJ1JvbGUgRGlz
+Y292ZXJ5JyANCgknU3dpdGNoIFJvbGUnICdSZWFkIExpbmsgUG9saWN5IFNl
+dHRpbmdzJyAnV3JpdGUgTGluayBQb2xpY3kgU2V0dGluZ3MnIA0KCSdSZWFk
+IERlZmF1bHQgTGluayBQb2xpY3kgU2V0dGluZ3MnIA0KCSdXcml0ZSBEZWZh
+dWx0IExpbmsgUG9saWN5IFNldHRpbmdzJyAnRmxvdyBTcGVjaWZpY2F0aW9u
+JyANCgknU2V0IEV2ZW50IE1hc2snICdSZXNldCcgJ1NldCBFdmVudCBGaWx0
+ZXInICdGbHVzaCcgJ1JlYWQgUElOIFR5cGUnIA0KCSdXcml0ZSBQSU4gVHlw
+ZScgJ0NyZWF0ZSBOZXcgVW5pdCBLZXknICdSZWFkIFN0b3JlZCBMaW5rIEtl
+eScgDQoJJ1dyaXRlIFN0b3JlZCBMaW5rIEtleScgJ0RlbGV0ZSBTdG9yZWQg
+TGluayBLZXknICdXcml0ZSBMb2NhbCBOYW1lJyANCgknUmVhZCBMb2NhbCBO
+YW1lJyAnUmVhZCBDb25uZWN0aW9uIEFjY2VwdCBUaW1lb3V0JyANCgknV3Jp
+dGUgQ29ubmVjdGlvbiBBY2NlcHQgVGltZW91dCcgJ1JlYWQgUGFnZSBUaW1l
+b3V0JyANCgknV3JpdGUgUGFnZSBUaW1lb3V0JyAnUmVhZCBTY2FuIEVuYWJs
+ZScgJ1dyaXRlIFNjYW4gRW5hYmxlJyANCgknUmVhZCBQYWdlIFNjYW4gQWN0
+aXZpdHknICdXcml0ZSBQYWdlIFNjYW4gQWN0aXZpdHknIA0KCSdSZWFkIElu
+cXVpcnkgU2NhbiBBY3Rpdml0eScgJ1dyaXRlIElucXVpcnkgU2NhbiBBY3Rp
+dml0eScgDQoJJ1JlYWQgQXV0aGVudGljYXRpb24gRW5hYmxlJyAnV3JpdGUg
+QXV0aGVudGljYXRpb24gRW5hYmxlJyANCgknUmVhZCBFbmNyeXB0aW9uIE1v
+ZGUnICdXcml0ZSBFbmNyeXB0aW9uIE1vZGUnICdSZWFkIENsYXNzIE9mIERl
+dmljZScgDQoJJ1dyaXRlIENsYXNzIE9mIERldmljZScgJ1JlYWQgVm9pY2Ug
+U2V0dGluZycgJ1dyaXRlIFZvaWNlIFNldHRpbmcnIA0KCSdSZWFkIEF1dG9t
+YXRpYyBGbHVzaCBUaW1lb3V0JyAnV3JpdGUgQXV0b21hdGljIEZsdXNoIFRp
+bWVvdXQnIA0KCSdSZWFkIE51bSBCcm9hZGNhc3QgUmV0cmFuc21pc3Npb25z
+JyANCgknV3JpdGUgTnVtIEJyb2FkY2FzdCBSZXRyYW5zbWlzc2lvbnMnICdS
+ZWFkIEhvbGQgTW9kZSBBY3Rpdml0eScgDQoJJ1dyaXRlIEhvbGQgTW9kZSBB
+Y3Rpdml0eScgJ1JlYWQgVHJhbnNtaXQgUG93ZXIgTGV2ZWwnIA0KCSdSZWFk
+IFN5bmNocm9ub3VzIEZsb3cgQ29udHJvbCBFbmFibGUnIA0KCSdXcml0ZSBT
+eW5jaHJvbm91cyBGbG93IENvbnRyb2wgRW5hYmxlJyANCgknU2V0IEhvc3Qg
+Q29udHJvbGxlciBUbyBIb3N0IEZsb3cgQ29udHJvbCcgJ0hvc3QgQnVmZmVy
+IFNpemUnIA0KCSdIb3N0IE51bWJlciBPZiBDb21wbGV0ZWQgUGFja2V0cycg
+J1JlYWQgTGluayBTdXBlcnZpc2lvbiBUaW1lb3V0JyANCgknV3JpdGUgTGlu
+ayBTdXBlcnZpc2lvbiBUaW1lb3V0JyAnUmVhZCBOdW1iZXIgb2YgU3VwcG9y
+dGVkIElBQycgDQoJJ1JlYWQgQ3VycmVudCBJQUMgTEFQJyAnV3JpdGUgQ3Vy
+cmVudCBJQUMgTEFQJyAnUmVzZXJ2ZWQnICdSZXNlcnZlZCcgDQoJJ1JlYWQg
+UGFnZSBTY2FuIE1vZGUnICdXcml0ZSBQYWdlIFNjYW4gTW9kZScgDQoJJ1Nl
+dCBBRkggQ2hhbm5lbCBDbGFzc2lmaWNhdGlvbicgJ1JlYWQgSW5xdWlyeSBT
+Y2FuIFR5cGUnIA0KCSdXcml0ZSBJbnF1aXJ5IFNjYW4gVHlwZScgJ1JlYWQg
+SW5xdWlyeSBNb2RlJyAnV3JpdGUgSW5xdWlyeSBNb2RlJyANCgknUmVhZCBQ
+YWdlIFNjYW4gVHlwZScgJ1dyaXRlIFBhZ2UgU2NhbiBUeXBlJyANCgknUmVh
+ZCBBRkggQ2hhbm5lbCBBc3Nlc3NtZW50IE1vZGUnICdXcml0ZSBBRkggQ2hh
+bm5lbCBBc3Nlc3NtZW50IE1vZGUnIA0KCSdSZWFkIExvYWNhbCBWZXJzaW9u
+IEluZm9ybWF0aW9uJyAnUmVzZXJ2ZWQnIA0KCSdSZWFkIExvY2FsIFN1cHBv
+cnRlZCBGZWF0dXJlcycgJ1JlYWQgTG9jYWwgRXh0ZW5kZWQgRmVhdHVyZXMn
+IA0KCSdSZWFkIEJ1ZmZlciBTaXplcicgJ1JlYWQgQ291bnRyeSBDb2RlJyAn
+UmVhZCBCRCBBRERSJyANCgknUmVhZCBGYWlsZWQgQ29udGFjdCBDb3VudGVy
+JyAnUmVzZXQgRmFpbGVkIENvbnRhY3QgQ291bnRlcicgDQoJJ0dldCBMaW5r
+IFF1YWxpdHknICdSZWFkIFJTU0knICdSZWFkIEFGSCBDaGFubmVsIE1hcCcg
+J1JlYWQgQkQgQ2xvY2snIA0KCSdSZWFkIExvb3BiYWNrIE1vZGUnICdXcml0
+ZSBMb29wYmFjayBNb2RlJyANCgknRW5hYmxlIERldmljZSBVbmRlciBUZXN0
+IE1vZGUnICdTZXR1cCBTeW5jaHJvbm91cyBDb25uZWN0aW9uJyANCgknQWNj
+ZXB0IFN5bmNocm9ub3VzIENvbm5lY3Rpb24nICdSZWplY3QgU3luY2hyb25v
+dXMgQ29ubmVjdGlvbicgDQo=
+
+--315942193-1922170312-1130441646=:7582--
 
 
 -------------------------------------------------------
