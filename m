@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <436072B2.3050201@cefriel.it>
-From: Luca Pizzamiglio <pizzamiglio@cefriel.it>
+Message-ID: <436066BC.4060501@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] big SCO packet
-References: <435FB0B1.6000707@cefriel.it> <1130345343.5391.19.camel@blade>
-In-Reply-To: <1130345343.5391.19.camel@blade>
+Subject: Re: [Bluez-devel] fixed-point sbc decoder
+References: <C70061B183DE09419568AB2060C52A950104B2D3@arion.intra.local> <43604483.7070109@xmission.com>
+In-Reply-To: <43604483.7070109@xmission.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,64 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 27 Oct 2005 08:24:50 +0200
+Date: Wed, 26 Oct 2005 23:33:48 -0600
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Victor,
 
-Ok. This is the proof!
+>>I'll take a look in coming days.
 
-hci0:   Type: USB
-        BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:117 acl:0 sco:0 events:15 errors:0
-        TX bytes:310 acl:0 sco:0 commands:14 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'Thor (0)'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x460 LMP Ver: 1.1 (0x1) LMP Subver:
-0x460
-        Manufacturer: Cambridge Silicon Radio (10)
+fwiw, I committed fixed point decoding such as it is to cvs after
+finding and eliminating some overflow problems. it's noisy but at least
+functional. so you can just check it out of cvs (I didn't want to commit
+what I had before that was nonfunctional but at least this is borderline)
 
+> #define SP8(val) (val/(1<<SCALE_PROTO8_TBL))
 
-Cheers,
-Pizza
+actually, I found this needs to look like
 
-Marcel Holtmann wrote:
-> Hi Luca,
-> 
-> 
->>I've a little question for Steven or Marcel.
-> 
-> 
-> before you expect an answer from Steven you should prove that you are
-> using a CSR based device ;)
-> 
-> Regards
-> 
-> Marcel
+#define SP8(val) (((int32_t)val)/(1<<SCALE_PROTO8_TBL))
 
-- -------------------------------------------
-Luca Pizzamiglio
-CEFRIEL - Embedded Systems Design Unit
-Via Fucini, 2 - 20133 MILANO (ITALY)
-Phone:		+39 02 23954 343
-e-mail:		pizzamiglio@cefriel.it
-ICQ:		5046978
-- -------------------------------------------
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.7 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+I guess because all the literals in the array init look like they're
+unsigned. This kind of fix may need to be applied in a few other places.
 
-iD8DBQFDYHKyAoUy56ORfbERAny3AJ9SafVkNMjkdxHatOm6a9tVAQravQCgpRoq
-kmoJPI3peunIfp+SI4pBpHE=
-=atLv
------END PGP SIGNATURE-----
+I am very proud of the latest optimization. I eliminated the shift/copy
+of the main array by reordering it. The result is going to benefit from
+unrolling since I was also able to make the array access into sbc_proto
+always the same in every pass.
+
+brad
 
 
 -------------------------------------------------------
