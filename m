@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <436066BC.4060501@xmission.com>
+Message-ID: <436044E9.8020703@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] fixed-point sbc decoder
-References: <C70061B183DE09419568AB2060C52A950104B2D3@arion.intra.local> <43604483.7070109@xmission.com>
-In-Reply-To: <43604483.7070109@xmission.com>
+Subject: Re: [Bluez-devel] Makefile.am dependency problem
+References: <435FFD9B.1030904@xmission.com> <1130364791.32634.1.camel@blade>
+In-Reply-To: <1130364791.32634.1.camel@blade>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,32 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 26 Oct 2005 23:33:48 -0600
+Date: Wed, 26 Oct 2005 21:09:29 -0600
 
-Victor,
+Marcel
 
->>I'll take a look in coming days.
+>>I noticed a strange dependency problem... it's common in bluez where a
+>>library is used. Header file changes don't force a recompile:
+> 
+> look at the bootstrap file. I forced this behavior.
 
-fwiw, I committed fixed point decoding such as it is to cvs after
-finding and eliminating some overflow problems. it's noisy but at least
-functional. so you can just check it out of cvs (I didn't want to commit
-what I had before that was nonfunctional but at least this is borderline)
+The principle of "least surprise" would suggest that 'make' always
+rebuilds everything as necessary. At least I would do that in my project
+if I could figure out how to do it in the autosplat stuff.
 
-> #define SP8(val) (val/(1<<SCALE_PROTO8_TBL))
-
-actually, I found this needs to look like
-
-#define SP8(val) (((int32_t)val)/(1<<SCALE_PROTO8_TBL))
-
-I guess because all the literals in the array init look like they're
-unsigned. This kind of fix may need to be applied in a few other places.
-
-I am very proud of the latest optimization. I eliminated the shift/copy
-of the main array by reordering it. The result is going to benefit from
-unrolling since I was also able to make the array access into sbc_proto
-always the same in every pass.
-
-brad
+Brad
 
 
 -------------------------------------------------------
