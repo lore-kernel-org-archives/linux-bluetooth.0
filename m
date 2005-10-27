@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43604483.7070109@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] [D-BUS PATCH] Authentication
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] fixed-point sbc decoder
-References: <C70061B183DE09419568AB2060C52A950104B2D3@arion.intra.local>
-In-Reply-To: <C70061B183DE09419568AB2060C52A950104B2D3@arion.intra.local>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <e1effdeb0510251203i7cb20240ua03a7f9aff38917d@mail.gmail.com>
+References: <e1effdeb0510201045w5ebf17afh87897564184ce9f9@mail.gmail.com>
+	 <1129986496.11428.36.camel@blade>
+	 <e1effdeb0510240606l1998f61dhc2fe813c48b1e6db@mail.gmail.com>
+	 <1130159970.19317.28.camel@blade>
+	 <e1effdeb0510251203i7cb20240ua03a7f9aff38917d@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1130373447.32634.8.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +22,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 26 Oct 2005 21:07:47 -0600
+Date: Thu, 27 Oct 2005 02:37:27 +0200
 
-Victor,
+Hi Claudio,
 
-> I'll take a look in coming days.
+> Here are the patches to send the authentication result, please DON'T
+> commit it. Probably
+> it will conflict with the latest Eduardo's patch.
+> 
+> Which approach do you preffer?
+> 1. Send a  signal
+> 2. Send a method return (peer message)
 
-thanks... for now I'm running floating and fixed point side-by-side and
-watching for sign errors to find overflow. I was putting too many
-precision bits in the fixed point synmatrix and it was overflowing and
-coming out with the wrong sign in the product...
+I think that a signal to inform the applications that a connection is
+now authenticated (and also encrypted) is a good idea.
 
-hey I noticed something that doesn't look right:
+Eduardos patches are now in the CVS. So you can re-create yours.
 
-#define SP8(val) (val >> SCALE_PROTO8_TBL)
+Regards
 
-this is used in the tables for the 32-bit encoder. but this is not right
-for negative values. Their sign will flip because it's a logical (not
-arithmetic) shift. it's safer to do something like:
+Marcel
 
-#define SP8(val) (val/(1<<SCALE_PROTO8_TBL))
 
-don't you think? the divide will be done at compile time and it will
-preserve the sign bit.
-
-Brad
 
 
 -------------------------------------------------------
