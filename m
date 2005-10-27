@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1130408837.4360ab85c798a@site.hu>
-From: Gabor LENGYEL <Lgaga@freemail.hu>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-2
-Subject: [Bluez-users] authentication question
+Content-Type: text/plain
+Message-Id: <1130405200.32634.28.camel@blade>
+Mime-Version: 1.0
+Subject: [Bluez-users] Bluetooth 2.0 + EDR dongles
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,33 +16,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 27 Oct 2005 12:27:17 +0200
+Date: Thu, 27 Oct 2005 11:26:40 +0200
 
-Hi!
+Hi Folks,
 
-I'm developing software where I need to make sure that a certain Bluetooth
-device (eg. a mobile phone) is near (present). Identification is based on
-bdaddr, a trivial approach is to check whether discovery finds it or not, or
-does it reply to l2 echo request or not.
+I spent some time searching and buying Enhanced Data Rate (EDR) capable
+dongles and besides the initial Cellink dongle I found some others. It
+seems they are out now and you will get two different types. The CSR
+based dongles with a BlueCore4 chip and the Broadcom based dongles with
+a BCM2045. I started writing up some notes about them and the first
+draft can be found at:
 
-However, an attacker can change a malicious device's bdaddr to whatever, thus
-impersonating the device i'm looking for. I implemented a simple
-challenge-response protocol between the mobile device (j2me) and the host, but
-i'm not sure if this is secure without application level encryption.
+	http://www.holtmann.org/linux/bluetooth/edr.html
 
-After reading quite a lot, i'm still confused about what security modes and
-pairing mean exactly. My simple protocol runs over l2cap, after previously
-pairing the mobile device and the host computer. But does pairing ensure
-authenticity? Or do i need application level encryption with an application
-level shared secret to authenticate the mobile device? This seems unnecessary,
-considering all the security measures taken by the Bluetooth protocol.
+This is still an early version, but I am trying to put all information
+about my dongles there and I am happy if others would contribute, too.
 
-Sorry for the long question, thank you!
-Gabor
+If you find this information useful and like me to keep buying other
+dongles then you might wanna donate some money:
+
+	http://www.bluez.org/sponsors.html
+
+Most of them were around 25 EUR, but every Cent helps to test out new
+hardware.
+
+Regards
+
+Marcel
 
 
----------------------------------------------------------------
-This mail sent through: www.site.hu - One Site to host them all
 
 
 -------------------------------------------------------
