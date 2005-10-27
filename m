@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <436044E9.8020703@xmission.com>
+Message-ID: <43604483.7070109@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Makefile.am dependency problem
-References: <435FFD9B.1030904@xmission.com> <1130364791.32634.1.camel@blade>
-In-Reply-To: <1130364791.32634.1.camel@blade>
+Subject: Re: [Bluez-devel] fixed-point sbc decoder
+References: <C70061B183DE09419568AB2060C52A950104B2D3@arion.intra.local>
+In-Reply-To: <C70061B183DE09419568AB2060C52A950104B2D3@arion.intra.local>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,18 +18,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 26 Oct 2005 21:09:29 -0600
+Date: Wed, 26 Oct 2005 21:07:47 -0600
 
-Marcel
+Victor,
 
->>I noticed a strange dependency problem... it's common in bluez where a
->>library is used. Header file changes don't force a recompile:
-> 
-> look at the bootstrap file. I forced this behavior.
+> I'll take a look in coming days.
 
-The principle of "least surprise" would suggest that 'make' always
-rebuilds everything as necessary. At least I would do that in my project
-if I could figure out how to do it in the autosplat stuff.
+thanks... for now I'm running floating and fixed point side-by-side and
+watching for sign errors to find overflow. I was putting too many
+precision bits in the fixed point synmatrix and it was overflowing and
+coming out with the wrong sign in the product...
+
+hey I noticed something that doesn't look right:
+
+#define SP8(val) (val >> SCALE_PROTO8_TBL)
+
+this is used in the tables for the 32-bit encoder. but this is not right
+for negative values. Their sign will flip because it's a logical (not
+arithmetic) shift. it's safer to do something like:
+
+#define SP8(val) (val/(1<<SCALE_PROTO8_TBL))
+
+don't you think? the divide will be done at compile time and it will
+preserve the sign bit.
 
 Brad
 
