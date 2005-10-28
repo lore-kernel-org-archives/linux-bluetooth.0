@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <436375B7.5050404@over-here.org>
-From: Eran <eran_l@over-here.org>
+Message-ID: <4362425D.5000402@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] AmbiCom BT2000E on a 2.6.13-mh2 kernel
+Subject: Re: [Bluez-users] BT-alsa with HT820(MOTO)
+References: <4CA6E08AA4616B4FB0BAC7A889A3E9F0045EE90C@pdsmsx404>
+In-Reply-To: <4CA6E08AA4616B4FB0BAC7A889A3E9F0045EE90C@pdsmsx404>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 Oct 2005 15:14:31 +0200
+Date: Fri, 28 Oct 2005 09:23:09 -0600
 
-Hello,
+Jieke
 
-I am trying to get my AmbiCom card to work under 2.6.13-mh2 kernel. I 
-have found references to LKML post where there's a description how to 
-make it work with serial_cs.
+You may need a current kernel like 2.6.13. Module api changes have
+happened from time to time that give us trouble.
 
-I have followed the steps, my pcmcia subsystems identifies the card 
-under /dev/ttyS1. setserial with a baud rate and hciattch with ericsson 
-as type works pretty well.
-However hciconfig shows a device with 00's as the address and hciconfig 
-hci0 up times out ("Can't init device hci0: Connection timed out (110)").
+It could also be your bluetooth adapter. read
+http://bluetooth-alsa.sf.net and go to the troubleshooting section. That
+will show you how to check the adapter.
 
-I have also tried with 57600 as the speed, to no avail. Can someone 
-assist? what am I doing wrong?
+>        I have enabled the link with HT820 on my 2.6.9 kernel (PC), also
+> I can send the data with ACL to MOTO headset, below is something hcidump
+> catched. But still no any audio output can be listened on headset part.
+> Any one can deliver some hint? Thanks.
+> 
 
-Thank you,
-ERan
+Brad
 
 
 -------------------------------------------------------
