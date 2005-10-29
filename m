@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] dbus.c cleanup
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20051029184820.GA26657@localhost.localdomain>
-References: <20051029175338.GA26114@localhost.localdomain>
-	 <1130609278.5396.48.camel@blade>
-	 <20051029184820.GA26657@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1130612847.5396.51.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] dbus.c cleanup
+Message-ID: <20051029184820.GA26657@localhost.localdomain>
+References: <20051029175338.GA26114@localhost.localdomain> <1130609278.5396.48.camel@blade>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1130609278.5396.48.camel@blade>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,26 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 29 Oct 2005 21:07:27 +0200
+Date: Sat, 29 Oct 2005 21:48:20 +0300
 
-Hi Johan,
+Hi Marcel,
 
-> > the patch is in the CVS now. Are there more cleanups coming?
-> 
-> At least not from me. However I'm not sure about the INdT guys.
+On Sat, Oct 29, 2005, Marcel Holtmann wrote:
+> the patch is in the CVS now. Are there more cleanups coming?
 
-I still consider the D-Bus interface as experimental and that we might
-change it with further notification, but it will be good to have a new
-release out there.
+At least not from me. However I'm not sure about the INdT guys.
 
-So I think that I will do some pending cleanups in the CVS and then
-release a new version.
-
-Regards
-
-Marcel
-
-
+Johan
 
 
 -------------------------------------------------------
