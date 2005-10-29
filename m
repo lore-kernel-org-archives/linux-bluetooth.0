@@ -1,15 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth 2.0 + EDR dongles
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <436375B7.5050404@over-here.org>
+From: Eran <eran_l@over-here.org>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.61.0510272132230.7582@cherokee.spacecom.si>
-References: <1130405200.32634.28.camel@blade>
-	 <Pine.LNX.4.61.0510271900040.4364@cherokee.spacecom.si>
-	 <1130433599.16380.4.camel@localhost.localdomain>
-	 <Pine.LNX.4.61.0510272132230.7582@cherokee.spacecom.si>
-Content-Type: text/plain
-Message-Id: <1130597623.5396.15.camel@blade>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] AmbiCom BT2000E on a 2.6.13-mh2 kernel
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,24 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 Oct 2005 16:53:43 +0200
+Date: Sat, 29 Oct 2005 15:14:31 +0200
 
-Hi Mitja,
+Hello,
 
-> I attached them as text, hope it is ok.
+I am trying to get my AmbiCom card to work under 2.6.13-mh2 kernel. I 
+have found references to LKML post where there's a description how to 
+make it work with serial_cs.
 
-it seems that the Level1 dongle is the same as the B-Speech dongle. The
-information for both are now online. Thanks.
+I have followed the steps, my pcmcia subsystems identifies the card 
+under /dev/ttyS1. setserial with a baud rate and hciattch with ericsson 
+as type works pretty well.
+However hciconfig shows a device with 00's as the address and hciconfig 
+hci0 up times out ("Can't init device hci0: Connection timed out (110)").
 
-More funny is that Level1 claims to support 128-bit, but the firmware on
-their dongle definitely don't support it. Hopefully they will fix this
-soon and provide a real 128-bit firmware.
+I have also tried with 57600 as the speed, to no avail. Can someone 
+assist? what am I doing wrong?
 
-Regards
-
-Marcel
-
-
+Thank you,
+ERan
 
 
 -------------------------------------------------------
