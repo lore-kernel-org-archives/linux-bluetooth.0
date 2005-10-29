@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Rene Mayrhofer <rene.mayrhofer@gibraltar.at>
+Subject: Re: [Bluez-devel] [PATCH] dbus.c cleanup
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart1180763.kL0HVBaoVS";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Message-Id: <200510301643.31873.rene.mayrhofer@gibraltar.at>
-Subject: [Bluez-devel] snd-bt-sco module prevents ACPI S3
+In-Reply-To: <20051029184820.GA26657@localhost.localdomain>
+References: <20051029175338.GA26114@localhost.localdomain>
+	 <1130609278.5396.48.camel@blade>
+	 <20051029184820.GA26657@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1130612847.5396.51.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,50 +20,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 30 Oct 2005 16:43:29 +0000
+Date: Sat, 29 Oct 2005 21:07:27 +0200
 
---nextPart1180763.kL0HVBaoVS
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Johan,
 
-Hi all,
+> > the patch is in the CVS now. Are there more cleanups coming?
+> 
+> At least not from me. However I'm not sure about the INdT guys.
 
-[Please CC me in replies, I am not subscribed to this list.]
+I still consider the D-Bus interface as experimental and that we might
+change it with further notification, but it will be good to have a new
+release out there.
 
-I am a happy user of the alsa bluetooth driver, i.e. snd-bt-sco and btsco.=
-=20
-There are just two things that seem to be broken in snd-bt-sco (CVS version=
-=20
-as of a month ago):
+So I think that I will do some pending cleanups in the CVS and then
+release a new version.
 
-1. It's name in the lsmod list is different from the module name, i.e.=20
-modprobe and rmmod must be used with different names.
-2. It breaks ACPI S3 (suspend to RAM), making it pretty much unusable on=20
-laptops where S3 is used (like mine). Unloading snd-bt-sco does not work (I=
-=20
-do that with a few other modules); as soon as it has been loaded once (even=
-=20
-if it has not been used and/or has been unloaded), the kernel (2.6.14-rc5) =
-is=20
-unable to enter ACPI S3.=20
+Regards
 
-with best regards,
-Rene
+Marcel
 
---nextPart1180763.kL0HVBaoVS
-Content-Type: application/pgp-signature
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2 (GNU/Linux)
-
-iD8DBQBDZPgzq7SPDcPCS94RAgneAJ0SRIJZWZc9Cbba/9fFGTbpPNnLawCfSn/6
-WxykKVyjrxHVZc14qCfeVJo=
-=vbpu
------END PGP SIGNATURE-----
-
---nextPart1180763.kL0HVBaoVS--
 
 
 -------------------------------------------------------
