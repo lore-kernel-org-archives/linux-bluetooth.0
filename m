@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43649779.3000803@libero.it>
-From: jimmi <jimmi@libero.it>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] pair problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth-Alsa: cannot pair the headset
-References: <435B72B0.5050309@libero.it>
-In-Reply-To: <435B72B0.5050309@libero.it>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+In-Reply-To: <9c68c0a70510292205td65b49bw@mail.gmail.com>
+References: <9c68c0a70510292205td65b49bw@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1130658058.5396.61.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,20 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Oct 2005 10:50:49 +0100
+Date: Sun, 30 Oct 2005 08:40:58 +0100
 
-* jimmi il 23/10/05 alle 13,23 ha scritto:
- > I searched  for the "SDP  server" error but  I could not  get suitable
- > informations. Has anybody an hint about?
+Hi,
 
-I fixed it with:
-         auth disable;
-                 encrypt disable;
-in /etc/bluetooth/hcid.config. It seems they are enable by default :)
---
-    ---         _   o       |     Sembra di sentirlo ancora dire al     |
-    / immi   ---  _/\_>     | mercante di liquori: tu che lo vendi cosa |
-(_/          -  O,> / O    |        ti compri di migliore? FdA         |
+> I can't pair my usb adapter with my phone(nokia 6670).
+> my kernel is 2.6.11
+> 
+> hcid.conf:
+> options {
+>         autoinit yes;
+> 
+>         security auto;
+> 
+>         pairing multi;
+> 
+>         pin_helper /etc/bluetooth/mypin;
+> }
+
+the original hcid.conf show this:
+
+        # Security Manager mode
+        #   none - Security manager disabled
+        #   auto - Use local PIN for incoming connections
+        #   user - Always ask user for a PIN
+        #
+        security auto;
+
+So if you use "auto" then the PIN for incoming connection comes
+from /etc/bluetooth/pin and by default this is "BlueZ" as your hcidump
+is showing it. Set it to "user" if you always wanna ask the PIN helper
+program.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
