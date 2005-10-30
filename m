@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4365579A.4080709@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+From: Rene Mayrhofer <rene.mayrhofer@gibraltar.at>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net, rene.mayrhofer@gibraltar.at
-Subject: Re: [Bluez-devel] snd-bt-sco module prevents ACPI S3
-References: <200510301643.31873.rene.mayrhofer@gibraltar.at>
-In-Reply-To: <200510301643.31873.rene.mayrhofer@gibraltar.at>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/signed;
+  boundary="nextPart1180763.kL0HVBaoVS";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <200510301643.31873.rene.mayrhofer@gibraltar.at>
+Subject: [Bluez-devel] snd-bt-sco module prevents ACPI S3
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,28 +19,50 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 30 Oct 2005 16:30:34 -0700
+Date: Sun, 30 Oct 2005 16:43:29 +0000
 
+--nextPart1180763.kL0HVBaoVS
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi all,
+
+[Please CC me in replies, I am not subscribed to this list.]
+
+I am a happy user of the alsa bluetooth driver, i.e. snd-bt-sco and btsco.=
+=20
+There are just two things that seem to be broken in snd-bt-sco (CVS version=
+=20
+as of a month ago):
+
+1. It's name in the lsmod list is different from the module name, i.e.=20
+modprobe and rmmod must be used with different names.
+2. It breaks ACPI S3 (suspend to RAM), making it pretty much unusable on=20
+laptops where S3 is used (like mine). Unloading snd-bt-sco does not work (I=
+=20
+do that with a few other modules); as soon as it has been loaded once (even=
+=20
+if it has not been used and/or has been unloaded), the kernel (2.6.14-rc5) =
+is=20
+unable to enter ACPI S3.=20
+
+with best regards,
 Rene
 
-> 1. It's name in the lsmod list is different from the module name, i.e. 
-> modprobe and rmmod must be used with different names.
+--nextPart1180763.kL0HVBaoVS
+Content-Type: application/pgp-signature
 
-Do you want to submit a patch (or at least tell us what the different
-names are?)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
 
-> 2. It breaks ACPI S3 (suspend to RAM), making it pretty much unusable on 
-> laptops where S3 is used (like mine). Unloading snd-bt-sco does not work (I 
-> do that with a few other modules); as soon as it has been loaded once (even 
-> if it has not been used and/or has been unloaded), the kernel (2.6.14-rc5) is 
-> unable to enter ACPI S3. 
+iD8DBQBDZPgzq7SPDcPCS94RAgneAJ0SRIJZWZc9Cbba/9fFGTbpPNnLawCfSn/6
+WxykKVyjrxHVZc14qCfeVJo=
+=vbpu
+-----END PGP SIGNATURE-----
 
-This may be the result of something we did but it's much more likely to
-be a change in the kernel.
-
-What exactly happens when you try & fail to go to S3?
-
-Brad
+--nextPart1180763.kL0HVBaoVS--
 
 
 -------------------------------------------------------
