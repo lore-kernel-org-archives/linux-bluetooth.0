@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <436509CA.9010503@bglug.it>
-From: jimmi <jimmi@bglug.it>
-MIME-Version: 1.0
+Message-ID: <20051030171430.78710.qmail@web32011.mail.mud.yahoo.com>
+From: Dani Camps <danicamps81@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth-Alsa: cannot pair the headset
-References: <435B72B0.5050309@libero.it> <43649779.3000803@libero.it> <4364D689.4010305@xmission.com>
-In-Reply-To: <4364D689.4010305@xmission.com>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Using bluetooth headset and microphone with BlueZ
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,18 +16,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Oct 2005 18:58:34 +0100
+Date: Sun, 30 Oct 2005 09:14:30 -0800 (PST)
 
-* Brad Midgley il 30/10/05 alle 07,19 ha scritto:
- > which distro defaults to auth and encrypt on? (or did you install from
- > source?)
+I have Fedora Core 3, a USB bluetooth adapter and I
+have just installed BlueZ 2.10.2. The basic system
+seems to be working.
 
-I'm using the  official package of Debian unstable.  Both were commented
-in the hcid.config, I uncommented them and changed to disable
---
-    ---         _   o       | If God had intended man to use the metric |
-    / immi   ---  _/\_>     |   system, Jesus would have only had ten   |
-(_/          -  O,> / O    |                disciples.                 |
+I have an integrated bluetooth headset and microphone,
+I have checked with tools like hciscan, and hcitool
+and I can detect it and ping it (l2ping). What I don't
+know now is how to actually use the headset and
+microphone to route the sound of my Linux box through
+bluetooth.
+
+Any suggestion ?
+
+Thanks
+
+Dani
+
+
+	
+		
+__________________________________ 
+Yahoo! Mail - PC Magazine Editors' Choice 2005 
+http://mail.yahoo.com
 
 
 -------------------------------------------------------
