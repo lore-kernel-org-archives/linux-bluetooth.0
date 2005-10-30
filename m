@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051030171430.78710.qmail@web32011.mail.mud.yahoo.com>
-From: Dani Camps <danicamps81@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4364D689.4010305@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Using bluetooth headset and microphone with BlueZ
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Bluetooth-Alsa: cannot pair the headset
+References: <435B72B0.5050309@libero.it> <43649779.3000803@libero.it>
+In-Reply-To: <43649779.3000803@libero.it>
+Content-Type: text/plain; charset=ISO-8859-15
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,31 +18,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Oct 2005 09:14:30 -0800 (PST)
+Date: Sun, 30 Oct 2005 07:19:53 -0700
 
-I have Fedora Core 3, a USB bluetooth adapter and I
-have just installed BlueZ 2.10.2. The basic system
-seems to be working.
+jimmi
 
-I have an integrated bluetooth headset and microphone,
-I have checked with tools like hciscan, and hcitool
-and I can detect it and ping it (l2ping). What I don't
-know now is how to actually use the headset and
-microphone to route the sound of my Linux box through
-bluetooth.
+i put a note in the docs about this.
 
-Any suggestion ?
+which distro defaults to auth and encrypt on? (or did you install from
+source?)
 
-Thanks
+brad
 
-Dani
+>> I searched  for the "SDP  server" error but  I could not  get suitable
+>> informations. Has anybody an hint about?
+> 
+> I fixed it with:
+>         auth disable;
+>                 encrypt disable;
+> in /etc/bluetooth/hcid.config. It seems they are enable by default :)
+> -- 
+>    ---         _   o       |     Sembra di sentirlo ancora dire al     |
+>    / immi   ---  _/\_>     | mercante di liquori: tu che lo vendi cosa |
+> (_/          -  O,> / O    |        ti compri di migliore? FdA         |
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by the JBoss Inc.
+> Get Certified Today * Register for a JBoss Training Course
+> Free Certification Exam for All Training Attendees Through End of 2005
+> Visit http://www.jboss.com/services/certification for more information
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-
-	
-		
-__________________________________ 
-Yahoo! Mail - PC Magazine Editors' Choice 2005 
-http://mail.yahoo.com
 
 
 -------------------------------------------------------
