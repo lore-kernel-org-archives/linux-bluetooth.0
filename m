@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] ISSC-stick not working when plugged-in at
-	boot-time
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20051030124135.80515.qmail@web54114.mail.yahoo.com>
+From: Martin Gerken <m_gerken@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20051030124135.80515.qmail@web54114.mail.yahoo.com>
-References: <20051030124135.80515.qmail@web54114.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1130676365.5396.71.camel@blade>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] ISSC-stick not working when plugged-in at boot-time
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,55 +16,57 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Oct 2005 13:46:05 +0100
+Date: Sun, 30 Oct 2005 13:41:35 +0100 (CET)
 
-Hi Martin,
+Hi there,
 
-> I have Debian Sarge 2.6.8-2-386 and bluez-utils 2.15-1.1
-> and a cheapo-BT-stick with this chip:
-> ID 1131:1001 Integrated System Solution Corp.
-> 
-> When it is plugged-in at boot-time it does not work. I have
-> to manually re-plug it, then everything is fine.
-> 
-> Booting with stick plugged-in results in LSMOD:
-> Module                  Size  Used by
-> uhci_hcd               29328  0
-> usbcore               104164  3 uhci_hcd
-> rfcomm                 34460  4
-> l2cap                  23172  5 rfcomm
-> bluetooth              44036  4 rfcomm,l2cap
-> 
-> and LSUSB:
-> Bus 002 Device 001: ID 0000:0000
-> Bus 001 Device 001: ID 0000:0000
-> 
-> 
-> After plug-out and plug-in of stick (then it works) gives
-> LSMOD:
-> Module                  Size  Used by
-> hci_usb                12928  2
-> uhci_hcd               29328  0
-> usbcore               104164  4 hci_usb,uhci_hcd
-> rfcomm                 34460  4
-> l2cap                  23172  5 rfcomm
-> bluetooth              44036  7 hci_usb,rfcomm,l2cap
-> 
-> and LSUSB:
-> Bus 002 Device 001: ID 0000:0000
-> Bus 001 Device 005: ID 1131:1001 Integrated System Solution
-> Corp.
-> Bus 001 Device 001: ID 0000:0000
-> 
-> How can I solve this problem?
+I have Debian Sarge 2.6.8-2-386 and bluez-utils 2.15-1.1
+and a cheapo-BT-stick with this chip:
+ID 1131:1001 Integrated System Solution Corp.
 
-install a 2.6.14 kernel and the latest bluez-utils.
+When it is plugged-in at boot-time it does not work. I have
+to manually re-plug it, then everything is fine.
 
-Regards
+Booting with stick plugged-in results in LSMOD:
+Module                  Size  Used by
+uhci_hcd               29328  0
+usbcore               104164  3 uhci_hcd
+rfcomm                 34460  4
+l2cap                  23172  5 rfcomm
+bluetooth              44036  4 rfcomm,l2cap
 
-Marcel
+and LSUSB:
+Bus 002 Device 001: ID 0000:0000
+Bus 001 Device 001: ID 0000:0000
 
 
+After plug-out and plug-in of stick (then it works) gives
+LSMOD:
+Module                  Size  Used by
+hci_usb                12928  2
+uhci_hcd               29328  0
+usbcore               104164  4 hci_usb,uhci_hcd
+rfcomm                 34460  4
+l2cap                  23172  5 rfcomm
+bluetooth              44036  7 hci_usb,rfcomm,l2cap
+
+and LSUSB:
+Bus 002 Device 001: ID 0000:0000
+Bus 001 Device 005: ID 1131:1001 Integrated System Solution
+Corp.
+Bus 001 Device 001: ID 0000:0000
+
+How can I solve this problem?
+
+Thanks, Martin
+
+
+	
+
+	
+		
+___________________________________________________________ 
+Gesendet von Yahoo! Mail - Jetzt mit 1GB Speicher kostenlos - Hier anmelden: http://mail.yahoo.de
 
 
 -------------------------------------------------------
