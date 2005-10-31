@@ -1,17 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0510310547m51a457f2m19f00ec5cf194289@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+From: Luca Capello <luca@pca.it>
+Subject: Re: [Bluez-devel] snd-bt-sco module prevents ACPI S3
+In-reply-to: <43660FED.6040000@grimmer.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH] dbus.c cleanup
-In-Reply-To: <1130760726.17124.17.camel@blade>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <20051029175338.GA26114@localhost.localdomain>
-	 <1130609278.5396.48.camel@blade>
-	 <20051029184820.GA26657@localhost.localdomain>
-	 <1130612847.5396.51.camel@blade>
-	 <e1effdeb0510310359g33724820y596b244076d08315@mail.gmail.com>
-	 <1130760726.17124.17.camel@blade>
+Message-id: <8764rdhmoi.fsf@gismo.pca.it>
+MIME-version: 1.0
+Content-type: multipart/signed; boundary="=-=-="; micalg=pgp-sha1;
+ protocol="application/pgp-signature"
+References: <200510301643.31873.rene.mayrhofer@gibraltar.at>
+ <4365579A.4080709@xmission.com> <43660FED.6040000@grimmer.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -23,94 +20,71 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 31 Oct 2005 11:47:53 -0200
-
-Hi Marcel,
-
-Regarding the dbus pin helper app,  I am trying develop a  app using
-python for test purpose, based on pygtk and pydbus.  However, there is
-an problem with asynchronous request, I sent an email to dbus mailing
-list, but according with the received answer, I think will be not easy
-implement the functionality that I want.
-
-On 10/31/05, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Claudio,
->
-> > I don't have cleanup patches to be sent. A new release can be good to
-> > receive the users/developers feedback.
->
-> I have to do some other small fixes in other parts of bluez-utils, but
-> the release is actually planned for today.
->
-> > Some cleanups/improvements suggestions for the next release:
-> > - find_conn is a shared function: put in a shared directory. It's used
-> > by hcitool.c and dbus.c
->
-> I know, but this has time. Maybe you wanna move it into lib.c inside the
-> hcid directory first.
-[Claudio Takahasi]
-Probably in the future when we start develop another features(rfcomm,
-pan, ...) we will find more shared functions. I will put the find_conn
-to a lib.c(inside de hcid) directory first according with your
-suggestion. In the future we can discuss it later again.
-Another file that I want create is the error.c
-
->
-> > - Disconnect signal: handle de disconnect signal sent when the
-> > dbus-daemon exits.
->
-> I have no idea what that means.
-[Claudio Takahasi]
-When the dbus-daemon exits, the hcid will receive a "Disconnect"
-signal. The hcid can start a task to re-establish the bus connection
-each X seconds or it can exit.
-Currently, hcid catches the signal, but there is no action associated
-with this signal.
-
->
-> > - split dbus.c file:
-> > - use session bus to send the PinRequest message: using the session
-> > bus it's possible start the dbus pin helper application automatically
->
-> This sounds like a good idea. Is anybody working on it? However the
-> bluez-pin package needs to updated to support the latest D-Bus version,
-> because we don't support the D-Bus 0.23 anymore.
-[Claudio Takahasi]
-I updated the bluez-pin perform authentication tests. I will analize
-it and send
-a patch to fix it.
-
->
-> > I think Eduardo is working on some services device configuration
-> > services. Maybe it should be better wait his patch. I will ask him and
-> > confirm soon.
->
-> There is plenty of time after the release. I don't consider the current
-> D-Bus API as stable.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> This SF.Net email is sponsored by the JBoss Inc.
-> Get Certified Today * Register for a JBoss Training Course
-> Free Certification Exam for All Training Attendees Through End of 2005
-> Visit http://www.jboss.com/services/certification for more information
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+Date: Mon, 31 Oct 2005 13:54:05 +0100
 
 
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+--=-=-=
+Content-Transfer-Encoding: quoted-printable
+
+Hello!
+
+On Mon 31 Oct 2005 13:37 +0100, Lenz Grimmer wrote:
+> Brad Midgley wrote:
+>
+>> > 1. It's name in the lsmod list is different from the module name,
+>> > i.e.  modprobe and rmmod must be used with different names.
+>>=20
+>> Do you want to submit a patch (or at least tell us what the
+>> different names are?)
+>
+> The module file is named "snd-bt-sco.ko", while "lsmod" displays it
+> as "snd_bt_sco". Not a biggie, but weird.
+
+AFAIK this is the normal situation for *any* ALSA driver:
+=3D=3D=3D=3D=3D
+gismo:/home/luca# lsmod | grep snd
+snd_intel8x0           30272  0=20
+snd_intel8x0m          17732  0=20
+snd_ac97_codec         72444  2 snd_intel8x0,snd_intel8x0m
+snd_pcm                78472  3
+snd_intel8x0,snd_intel8x0m,snd_ac97_codec
+snd_timer              21764  1 snd_pcm
+snd                    48100  5
+snd_intel8x0,snd_intel8x0m,snd_ac97_codec,snd_pcm,snd_timer
+soundcore               8800  1 snd
+snd_page_alloc          9604  3 snd_intel8x0,snd_intel8x0m,snd_pcm
+
+gismo:/home/luca# modinfo snd [TAB]
+snd                 snd-hpet            snd-mpu401
+snd-rawmidi         snd-seq-midi        snd-timer=20=20=20=20=20=20=20=20=
+=20=20=20
+snd-ac97-codec      snd-hwdep           snd-mpu401-uart
+snd-rtctimer        snd-seq-midi-emul   snd-usb-audio=20=20=20=20=20=20=20
+snd-emu10k1         snd-intel8x0        snd-page-alloc
+snd-seq             snd-seq-midi-event  snd-usb-lib=20=20=20=20=20=20=20=20=
+=20
+snd-emu10k1-synth   snd-intel8x0m       snd-pcm
+snd-seq-device      snd-seq-oss         snd-util-mem=20=20=20=20=20=20=20=20
+snd-emux-synth      snd-mixer-oss       snd-pcm-oss
+snd-seq-dummy       snd-seq-virmidi=20=20=20=20=20
+=3D=3D=3D=3D=3D
+
+I don't know why, but it's so :-(
+
+Thx, bye,
+Gismo / Luca
+
+--=-=-=
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+
+iD8DBQBDZhPvVAp7Xm10JmkRAmRDAKCCIiR1/FT8sLr6L/ImzptH6qgCgACghgGN
+DjyfKBPXwzgF/qJiSjGc3dk=
+=p4TB
+-----END PGP SIGNATURE-----
+--=-=-=--
 
 
 -------------------------------------------------------
