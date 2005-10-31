@@ -1,68 +1,73 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] hci_usb: add entry for FMWBA-101
-	Bluetooth usb-dongle
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050930184121.GA20072@l-t.ee>
-References: <20050928152415.GA11240@l-t.ee>
-	 <1127922285.5321.20.camel@localhost.localdomain>
-	 <20050928191714.GA17254@l-t.ee>
-	 <1127982561.5123.8.camel@localhost.localdomain>
-	 <20050930184121.GA20072@l-t.ee>
-Content-Type: text/plain
-Message-Id: <1128280010.5155.1.camel@blade>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 02 Oct 2005 21:06:50 +0200
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <efa8e58e0510311323j32639165y4c04deb28ecb47f@mail.gmail.com>
+From: =?UTF-8?Q?Rune_V=2E_Sj=C3=B8en?= <rvsjoen@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Problem with permissions
+In-Reply-To: <1130770569.8578.3.camel@blade>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+References: <efa8e58e0510310608s1ef3ddf2h78d11604f4090a31@mail.gmail.com>
+	 <1130770569.8578.3.camel@blade>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 31 Oct 2005 22:23:15 +0100
 
-Hi Marko,
-
-> > > > > This patch adds ID's for Fujitsu-Siemens FMWBA-101 Bluetooth
-> > > > > USB Adapter.
-> > > > > 
-> > > > > /proc/bus/usb/devices:
-> > > > > T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  7 Spd=12  MxCh= 0
-> > > > > D:  Ver= 1.10 Cls=0e(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> > > > > P:  Vendor=0bf8 ProdID=1003 Rev= 3.36
-> > > > > S:  Manufacturer=ALPS
-> > > > > S:  Product=BT USB
-> > > > 
-> > > > this is not needed, because the USB class is enough.
-> > > 
-> > > But it is not, the device won't be detected without this patch.
-> > 
-> > it must work without the patch. Otherwise there is something else broken
-> > on your side. Try the latest 2.6.14-rc2 kernel.
-> 
-> Now I tried with 2.6.14-rc2.  On another machine, as I cant
-> reboot the first one at will.  Same result - without the patch
-> hciconfig shows nothing.
-
-then your hotplug is broken. Fix it or send me the dongle, because none
-of these dongles need to be listed.
-
-Regards
-
-Marcel
-
-
+T24gMTAvMzEvMDUsIE1hcmNlbCBIb2x0bWFubiA8bWFyY2VsQGhvbHRtYW5uLm9yZz4gd3JvdGU6
+Cj4gSGkgUnVuZSwKPgo+ID4gSSd2ZSBiZWVuIGdvb2dsaW5nIGFyb3VuZCB0aGUgcGFzdCB3ZWVr
+IHRyeWluZyB0byBmaWd1cmUgb3V0IGEgd2F5IHRvIGRvIHRoaXMuLgo+ID4gSSBhbSBhYmxlIHRv
+IHJ1biBldmVyeXRoaW5nIGFzIHJvb3QsIGJ1dCB3aGVuIGl0IGNvbWVzIHRvIHJlZ3VsYXIKPiA+
+IHVzZXJzIGknbSBhYmxlIHRvIHJ1biAiaGNpdG9vbCBzY2FuIiBidXQgbm90ICJoY2l0b29sIGNj
+Cj4gPiBYWDpYWDpYWDpYWDpYWCIgb3IgImhjaWNvbmZpZyBoY2kwIHVwIiBiZWNhdXNlIG9wZXJh
+dGlvbiBpcyBub3QKPiA+IHBlcm1pdHRlZC4KPgo+IHRoZXNlIG9wZXJhdGlvbiBhcmUgcHJvdGVj
+dGVkIGJ5IENBUF9ORVRfUkFXIGFuZCBDQVBfTkVUX0FETUlOLgoKU28gdG8gbWFrZSB0aGF0IHdv
+cmsgSSBuZWVkIHRvIHByb3ZpZGUgYWNjZXNzIHRvIENBUF9ORVRfUkFXIGFuZApDQVBfTkVUX0FE
+TUlOIHVzaW5nIEFDTCdzID8gQWNjb3JkaW5nIHRvIGxjYXAgdGhlc2UgYXJlIGFscmVhZHkKYWxs
+b3dlZCwgdGhvdWdoIG1heWJlIG5vdCBmb3IgdGhlIGN1cnJlbnQgdXNlci4KCj4KPiA+IEkgdHJp
+ZWQgdXNpbmcgaG90cGx1ZyB0byBzZXQgdGhlIHBlcm1pc3Npb25zIG9uIHRoZSByZmNvbW1YIGRl
+dmljZXMsCj4gPiB3aXRob3V0IGx1Y2suIFRoZW4gaSBzd2l0Y2hlZCB0byB1ZGV2IGkgZ3JlYXQg
+aG9wZS4gQnV0IHRoZSBwcm9ibGVtcwo+ID4gc2VlbXMgdG8gcGVyc2lzdC4gVGhlIHJmY29tbVgg
+ZGV2aWNlIG5vZGVzIG5ldmVyIGdldCBjcmVhdGVkIHdpdGgKPiA+IHVkZXYsIEkgZG9udCBrbm93
+IGlmIHRoZXkgc2hvdWxkIHRob3VnaC4gTWF5YmUgc29tZW9uZSBoYXMgYSBiZXR0ZXIKPiA+IGFu
+c3dlci4uCj4KPiBZb3UgbmVlZCB0byB1c2UgcmZjb21tIHRvIGFjdHVhbGx5IGJpbmQgYSBUVFku
+IE90aGVyd2lzZSB0aGV5IHdpbGwgbm90Cj4gZXhpc3RzIGFuZCB0aHVzIG5vdCBjcmVhdGVkLgo+
+Cj4gPiBUaGUgcmVhc29uIGknbSB0cnlpbmcgdG8gZG8gdGhpcywgaXMgaSdtIHVzaW5nIGEgcmVn
+dWxhciB1c2VyIHRvCj4gPiBkZXZlbG9wIGEgamF2YSBhcHBsaWNhdGlvbiB1c2luZyB0aGUgamJs
+dWV6IHBhY2thZ2UsIHdoaWNoIHByb3ZpZGVzCj4gPiBhY2Nlc3MgdG8gdGhlIEJsdWVaIHN0YWNr
+LiBCdXQgSSBhbSB1bmFibGUgdG8gY3JlYXRlIGNvbm5lY3Rpb25zLgo+Cj4gVGhlIEJsdWV0b290
+aCBjb3JlIHdpbGwgY3JlYXRlIHRoZSBBQ0wgbGlua3MgZm9yIHlvdSwgc28geW91IGRvbid0IGhh
+dmUKPiB0byB3b3JyeSBhYm91dCB0aGVtLiBFdmVyeSB1c2VyIGNhbiBjcmVhdGUgTDJDQVAgYW5k
+IFJGQ09NTSBjb25uZWN0aW9ucy4KPgo+ID4gSSByZWFkIHNvbWV0aGluZyBhYm91dCBjaGFuZ2lu
+ZyB0aGUga2VybmVsIEhDSSBzZWN1cml0eSBmaWx0ZXIsIGJ1dCBpdAo+ID4gZGlkbid0IG1ha2Ug
+dG9vIG11Y2ggc2Vuc2UgdG8gbWUuLi4KPgo+IElmIHlvdSB3YW5uYSBkaWZmZXJlbnQgcmlnaHRz
+IHRoZW4geW91IG5lZWQgdG8gbW9kaWZ5IHRoaXMgZmlsdGVyLgo+Cj4gUmVnYXJkcwo+Cj4gTWFy
+Y2VsCj4KPgo+Cj4KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tCj4gVGhpcyBTRi5OZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5IHRoZSBKQm9z
+cyBJbmMuCj4gR2V0IENlcnRpZmllZCBUb2RheSAqIFJlZ2lzdGVyIGZvciBhIEpCb3NzIFRyYWlu
+aW5nIENvdXJzZQo+IEZyZWUgQ2VydGlmaWNhdGlvbiBFeGFtIGZvciBBbGwgVHJhaW5pbmcgQXR0
+ZW5kZWVzIFRocm91Z2ggRW5kIG9mIDIwMDUKPiBWaXNpdCBodHRwOi8vd3d3Lmpib3NzLmNvbS9z
+ZXJ2aWNlcy9jZXJ0aWZpY2F0aW9uIGZvciBtb3JlIGluZm9ybWF0aW9uCj4gX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiBCbHVlei11c2VycyBtYWlsaW5n
+IGxpc3QKPiBCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3Rz
+LnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo+CgoKLS0KLT08WD49
+LQpSdW5lIFYuIFNqw7hlbgpZb3UgYWx3YXlzIHBhc3MgZmFpbHVyZSBvbiB0aGUgd2F5IHRvIHN1
+Y2Nlc3MKCmh0dHA6Ly93d3cub3BlbnNvdXJjZXNvbHV0aW9ucy5ubwo=
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by:
-Power Architecture Resource Center: Free content, downloads, discussions,
-and more. http://solutions.newsforge.com/ibmarch.tmpl
+This SF.Net email is sponsored by the JBoss Inc.
+Get Certified Today * Register for a JBoss Training Course
+Free Certification Exam for All Training Attendees Through End of 2005
+Visit http://www.jboss.com/services/certification for more information
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
