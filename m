@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <34513.128.59.15.48.1130723041.squirrel@webmail.cs.columbia.edu>
-From: mv2147@cs.columbia.edu
+Message-ID: <20051031011023.65559.qmail@web30302.mail.mud.yahoo.com>
+From: Xinlei Roland Wang <wangxinlei@yahoo.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Subject: [Bluez-users] Re: hardware support and manual
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Transfer speed of a billionton class 1 USB dongle
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,23 +16,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Oct 2005 20:44:01 -0500 (EST)
+Date: Sun, 30 Oct 2005 17:10:23 -0800 (PST)
+
+I am using BlueZ with a billionton class 1 USB dongle.
+I found its upload speed (to a Nokia 6600) is slow
+(around 5-10K/s), and its download speed is pretty
+fast (around 30K/s). I google the web and found that
+bluetooth has two transmission mode: asymmetric and
+symmetric. I think my dongle is in asymmetric mode and
+I wonder how to switch it to symmetric mode, as I need
+fast upload speed.
+
+Thanks and regards,
+
+Roland
 
 
-Bluez Maintainers,
-
-     I wish there was more documentation for the end-users or application 
-developers on how to get the supported hardware working.... Nitty
-gritties like how to set the link-key for audio headsets,  "u will
-need to press that button on Jabra to request a connection", "don't
-do this.. do that" , I mean the extra 0.01% that will make it work if
-Bluez is to get critical acclaim and not go down the tube like
-openBT. Inclusion into linux is not cause for comfort. When you are
-building a airplane, please write a manual for the pilot as well,
-when you can write so many for the ground crew......
-Otherwise you are going to crash so many poor test pilots.
-
-M
+		
+__________________________________ 
+Yahoo! FareChase: Search multiple travel sites in one click.
+http://farechase.yahoo.com
 
 
 -------------------------------------------------------
