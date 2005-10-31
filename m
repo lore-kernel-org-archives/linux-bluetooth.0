@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051031011023.65559.qmail@web30302.mail.mud.yahoo.com>
-From: Xinlei Roland Wang <wangxinlei@yahoo.com>
+Message-ID: <34460.128.59.15.48.1130719127.squirrel@webmail.cs.columbia.edu>
+In-Reply-To: <435D2C22.8050701@libero.it>
+References: <435B72B0.5050309@libero.it> <435BDE1C.2070808@xmission.com>
+    <435D2C22.8050701@libero.it>
+Subject: Re: [Bluez-users] Bluetooth-Alsa: cannot pair the headset
+From: mv2147@cs.columbia.edu
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Transfer speed of a billionton class 1 USB dongle
+Content-Type: text/plain;charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,26 +19,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Oct 2005 17:10:23 -0800 (PST)
+Date: Sun, 30 Oct 2005 19:38:47 -0500 (EST)
 
-I am using BlueZ with a billionton class 1 USB dongle.
-I found its upload speed (to a Nokia 6600) is slow
-(around 5-10K/s), and its download speed is pretty
-fast (around 30K/s). I google the web and found that
-bluetooth has two transmission mode: asymmetric and
-symmetric. I think my dongle is in asymmetric mode and
-I wonder how to switch it to symmetric mode, as I need
-fast upload speed.
+Hi Jimmi,
 
-Thanks and regards,
+  Did you get the audio with Jabra BT-200 and Dlink 120 to work finally.
+Did any of the suggestions given by bluez work? If you can confirm it
+works, I would like to order them ASAP.
 
-Roland
+M
 
+> * Brad Midgley il 23/10/05 alle 13,01 ha scritto:
+>  > It   looks  like   you  need   to  remove   the  link   keys  so   the
+>  > pairing  can   get  reset.  There's   something  about  that   in  the
+>  > http://bluetooth-alsa.sf.org page.
+>
+> It   didn't    help   either   removing    /etc/bluetooth/link_key   and
+> /var/lib/bluetooth/[dir]. Thanks anyway Brad :)
+>
+> --
+>     ---         _   o       | If God had intended man to use the metric |
+>     / immi   ---  _/\_>     |   system, Jesus would have only had ten   |
+> (_/          -  O,> / O    |                disciples.                 |
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by the JBoss Inc.
+> Get Certified Today * Register for a JBoss Training Course
+> Free Certification Exam for All Training Attendees Through End of 2005
+> Visit http://www.jboss.com/services/certification for more information
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
-		
-__________________________________ 
-Yahoo! FareChase: Search multiple travel sites in one click.
-http://farechase.yahoo.com
 
 
 -------------------------------------------------------
