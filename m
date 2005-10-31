@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <efa8e58e0510311323j32639165y4c04deb28ecb47f@mail.gmail.com>
-From: =?UTF-8?Q?Rune_V=2E_Sj=C3=B8en?= <rvsjoen@gmail.com>
+Message-ID: <20051031175044.42762.qmail@web32008.mail.mud.yahoo.com>
+From: Dani Camps <danicamps81@yahoo.com>
+Subject: Re: [Bluez-users] Problems compiling btsco
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Problem with permissions
-In-Reply-To: <1130770569.8578.3.camel@blade>
+In-Reply-To: <436653CA.3040502@libero.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-References: <efa8e58e0510310608s1ef3ddf2h78d11604f4090a31@mail.gmail.com>
-	 <1130770569.8578.3.camel@blade>
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,47 +17,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 Oct 2005 22:23:15 +0100
+Date: Mon, 31 Oct 2005 09:50:43 -0800 (PST)
 
-T24gMTAvMzEvMDUsIE1hcmNlbCBIb2x0bWFubiA8bWFyY2VsQGhvbHRtYW5uLm9yZz4gd3JvdGU6
-Cj4gSGkgUnVuZSwKPgo+ID4gSSd2ZSBiZWVuIGdvb2dsaW5nIGFyb3VuZCB0aGUgcGFzdCB3ZWVr
-IHRyeWluZyB0byBmaWd1cmUgb3V0IGEgd2F5IHRvIGRvIHRoaXMuLgo+ID4gSSBhbSBhYmxlIHRv
-IHJ1biBldmVyeXRoaW5nIGFzIHJvb3QsIGJ1dCB3aGVuIGl0IGNvbWVzIHRvIHJlZ3VsYXIKPiA+
-IHVzZXJzIGknbSBhYmxlIHRvIHJ1biAiaGNpdG9vbCBzY2FuIiBidXQgbm90ICJoY2l0b29sIGNj
-Cj4gPiBYWDpYWDpYWDpYWDpYWCIgb3IgImhjaWNvbmZpZyBoY2kwIHVwIiBiZWNhdXNlIG9wZXJh
-dGlvbiBpcyBub3QKPiA+IHBlcm1pdHRlZC4KPgo+IHRoZXNlIG9wZXJhdGlvbiBhcmUgcHJvdGVj
-dGVkIGJ5IENBUF9ORVRfUkFXIGFuZCBDQVBfTkVUX0FETUlOLgoKU28gdG8gbWFrZSB0aGF0IHdv
-cmsgSSBuZWVkIHRvIHByb3ZpZGUgYWNjZXNzIHRvIENBUF9ORVRfUkFXIGFuZApDQVBfTkVUX0FE
-TUlOIHVzaW5nIEFDTCdzID8gQWNjb3JkaW5nIHRvIGxjYXAgdGhlc2UgYXJlIGFscmVhZHkKYWxs
-b3dlZCwgdGhvdWdoIG1heWJlIG5vdCBmb3IgdGhlIGN1cnJlbnQgdXNlci4KCj4KPiA+IEkgdHJp
-ZWQgdXNpbmcgaG90cGx1ZyB0byBzZXQgdGhlIHBlcm1pc3Npb25zIG9uIHRoZSByZmNvbW1YIGRl
-dmljZXMsCj4gPiB3aXRob3V0IGx1Y2suIFRoZW4gaSBzd2l0Y2hlZCB0byB1ZGV2IGkgZ3JlYXQg
-aG9wZS4gQnV0IHRoZSBwcm9ibGVtcwo+ID4gc2VlbXMgdG8gcGVyc2lzdC4gVGhlIHJmY29tbVgg
-ZGV2aWNlIG5vZGVzIG5ldmVyIGdldCBjcmVhdGVkIHdpdGgKPiA+IHVkZXYsIEkgZG9udCBrbm93
-IGlmIHRoZXkgc2hvdWxkIHRob3VnaC4gTWF5YmUgc29tZW9uZSBoYXMgYSBiZXR0ZXIKPiA+IGFu
-c3dlci4uCj4KPiBZb3UgbmVlZCB0byB1c2UgcmZjb21tIHRvIGFjdHVhbGx5IGJpbmQgYSBUVFku
-IE90aGVyd2lzZSB0aGV5IHdpbGwgbm90Cj4gZXhpc3RzIGFuZCB0aHVzIG5vdCBjcmVhdGVkLgo+
-Cj4gPiBUaGUgcmVhc29uIGknbSB0cnlpbmcgdG8gZG8gdGhpcywgaXMgaSdtIHVzaW5nIGEgcmVn
-dWxhciB1c2VyIHRvCj4gPiBkZXZlbG9wIGEgamF2YSBhcHBsaWNhdGlvbiB1c2luZyB0aGUgamJs
-dWV6IHBhY2thZ2UsIHdoaWNoIHByb3ZpZGVzCj4gPiBhY2Nlc3MgdG8gdGhlIEJsdWVaIHN0YWNr
-LiBCdXQgSSBhbSB1bmFibGUgdG8gY3JlYXRlIGNvbm5lY3Rpb25zLgo+Cj4gVGhlIEJsdWV0b290
-aCBjb3JlIHdpbGwgY3JlYXRlIHRoZSBBQ0wgbGlua3MgZm9yIHlvdSwgc28geW91IGRvbid0IGhh
-dmUKPiB0byB3b3JyeSBhYm91dCB0aGVtLiBFdmVyeSB1c2VyIGNhbiBjcmVhdGUgTDJDQVAgYW5k
-IFJGQ09NTSBjb25uZWN0aW9ucy4KPgo+ID4gSSByZWFkIHNvbWV0aGluZyBhYm91dCBjaGFuZ2lu
-ZyB0aGUga2VybmVsIEhDSSBzZWN1cml0eSBmaWx0ZXIsIGJ1dCBpdAo+ID4gZGlkbid0IG1ha2Ug
-dG9vIG11Y2ggc2Vuc2UgdG8gbWUuLi4KPgo+IElmIHlvdSB3YW5uYSBkaWZmZXJlbnQgcmlnaHRz
-IHRoZW4geW91IG5lZWQgdG8gbW9kaWZ5IHRoaXMgZmlsdGVyLgo+Cj4gUmVnYXJkcwo+Cj4gTWFy
-Y2VsCj4KPgo+Cj4KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tCj4gVGhpcyBTRi5OZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5IHRoZSBKQm9z
-cyBJbmMuCj4gR2V0IENlcnRpZmllZCBUb2RheSAqIFJlZ2lzdGVyIGZvciBhIEpCb3NzIFRyYWlu
-aW5nIENvdXJzZQo+IEZyZWUgQ2VydGlmaWNhdGlvbiBFeGFtIGZvciBBbGwgVHJhaW5pbmcgQXR0
-ZW5kZWVzIFRocm91Z2ggRW5kIG9mIDIwMDUKPiBWaXNpdCBodHRwOi8vd3d3Lmpib3NzLmNvbS9z
-ZXJ2aWNlcy9jZXJ0aWZpY2F0aW9uIGZvciBtb3JlIGluZm9ybWF0aW9uCj4gX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiBCbHVlei11c2VycyBtYWlsaW5n
-IGxpc3QKPiBCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3Rz
-LnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo+CgoKLS0KLT08WD49
-LQpSdW5lIFYuIFNqw7hlbgpZb3UgYWx3YXlzIHBhc3MgZmFpbHVyZSBvbiB0aGUgd2F5IHRvIHN1
-Y2Nlc3MKCmh0dHA6Ly93d3cub3BlbnNvdXJjZXNvbHV0aW9ucy5ubwo=
+Thanks for the reply,
+
+At the end I installed the bluez-lib-devel package, it
+installed the sources in /usr/include/bleutooth and
+everything worked fine.
+
+Let's see what's the next problem :-D
+
+Dani
+
+
+
+--- jimmi <jimmi@libero.it> wrote:
+
+> Dani Camps ha scritto:
+> > I have all the bluez packages installed, so what
+> am I
+> > missing ? What are these headers it can not find ?
+> 
+> libbluetooth1-dev
+> ;)
+> 
+> Jimmi
+> 
+> 
+> 
+>
+-------------------------------------------------------
+> This SF.Net email is sponsored by the JBoss Inc.
+> Get Certified Today * Register for a JBoss Training
+> Course
+> Free Certification Exam for All Training Attendees
+> Through End of 2005
+> Visit http://www.jboss.com/services/certification
+> for more information
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+
+
+
+		
+__________________________________ 
+Start your day with Yahoo! - Make it your home page! 
+http://www.yahoo.com/r/hs
 
 
 -------------------------------------------------------
