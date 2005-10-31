@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [D-BUS PATCH]bluez-pin
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0510311010x27fcd538w310b97f5999e7771@mail.gmail.com>
-References: <e1effdeb0510311010x27fcd538w310b97f5999e7771@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1130783112.5848.42.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Device configuration permissions
+Message-ID: <20051031182652.GA10891@localhost.localdomain>
+References: <e1effdeb0510310919t4fb1ec61mba79f035a15c98f0@mail.gmail.com> <1130779899.5848.28.camel@blade> <20051031180235.GA10264@localhost.localdomain> <1130782992.5848.39.camel@blade>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1130782992.5848.39.camel@blade>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,27 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 31 Oct 2005 19:25:12 +0100
+Date: Mon, 31 Oct 2005 20:26:52 +0200
 
-Hi Claudio,
+> > IMHO it would make it easier for the user to understand why some method
+> > doesn't work for him if the interface name had e.g. "admin" in it. I
+> > don't see how that makes the interface "horrible".
+> 
+> because if people try to use another security policy/rules, then the
+> names "admin" etc. are still present even if in their case these are no
+> longer commands where you need special rights. Don't try to dictate
+> security rules through the interface. We can split the interface in
+> logical parts, but not only for the reason of writing easy rules.
 
-> here is the patch removing the support for old dbus versions.
+Ok. That sounds sensible :-) Thanks for the explanation!
 
-that is great.
-
-> The code style is a little weird, but I kept the code style :)
-
-I know, but this is not my code ;)
-
-> Who is responsible for maintain the bluez-pin?
-
-You should mail the patch to Phil Blundell <philb@gnu.org>.
-
-Regards
-
-Marcel
-
-
+Johan
 
 
 -------------------------------------------------------
