@@ -1,12 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43660FED.6040000@grimmer.com>
-From: Lenz Grimmer <lenz@grimmer.com>
-MIME-Version: 1.0
+Message-ID: <3013cac80510310430y7f360672j32a39a213b039dbf@mail.gmail.com>
+From: Eduardo Rocha <folhabranca@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] snd-bt-sco module prevents ACPI S3
-References: <200510301643.31873.rene.mayrhofer@gibraltar.at> <4365579A.4080709@xmission.com>
-In-Reply-To: <4365579A.4080709@xmission.com>
+Subject: Re: [Bluez-devel] [PATCH] dbus.c cleanup
+In-Reply-To: <1130760862.17124.20.camel@blade>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
+References: <20051029175338.GA26114@localhost.localdomain>
+	 <1130609278.5396.48.camel@blade>
+	 <20051029184820.GA26657@localhost.localdomain>
+	 <1130612847.5396.51.camel@blade>
+	 <e1effdeb0510310359g33724820y596b244076d08315@mail.gmail.com>
+	 <20051031120753.GA31744@localhost.localdomain>
+	 <1130760862.17124.20.camel@blade>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,78 +24,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 31 Oct 2005 13:37:01 +0100
+Date: Mon, 31 Oct 2005 09:30:10 -0300
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Marcel,
 
-Hi,
+I've implemented the DeviceList function from /org/bluez/Devices. I've
+also made some code clean up in dbus.c. Right now I'm  hunting a
+segfault and as soon I have fixed this I'll send another patch.
 
-some input from me, as I noticed the same issues.
+BR,
+Eduardo.
 
-Brad Midgley wrote:
+--
+Eduardo Rocha
+Instituto Nokia de Tecnologia - INdT
 
-> > 1. It's name in the lsmod list is different from the module name, i.e. 
-> > modprobe and rmmod must be used with different names.
-> 
-> Do you want to submit a patch (or at least tell us what the different
-> names are?)
-
-The module file is named "snd-bt-sco.ko", while "lsmod" displays it as
-"snd_bt_sco". Not a biggie, but weird.
-
-> > 2. It breaks ACPI S3 (suspend to RAM), making it pretty much unusable on 
-> > laptops where S3 is used (like mine). Unloading snd-bt-sco does not work (I 
-> > do that with a few other modules); as soon as it has been loaded once (even 
-> > if it has not been used and/or has been unloaded), the kernel (2.6.14-rc5) is 
-> > unable to enter ACPI S3. 
-> 
-> This may be the result of something we did but it's much more likely to
-> be a change in the kernel.
-> 
-> What exactly happens when you try & fail to go to S3?
-
-I can confirm this here (SUSE Linux 10.0, Kernel 2.6.13) - suspending
-begins, but aborts at some point:
-
-PM: Preparing system for suspend
-Stopping tasks:
-==================================================================================================================================
-stopping tasks failed (1 tasks remaining)
-Restarting tasks...<6> Strange, snd-bt-scod not stopped
-done
-
-It has been reported as BUG#1218671 in the bug tracker on SourceForge
-some time ago:
-http://sourceforge.net/tracker/index.php?func=detail&aid=1218671&group_id=116589&atid=678258
-
-This report even contains a patch, but it does not seem to match/apply
-anymore.
-
-There is a second bug report, even though the subject line is misleading:
-http://sourceforge.net/tracker/index.php?func=detail&aid=1170421&group_id=116589&atid=678258
-
-Does anybody actually check the bug reports that are filed at Bug
-Tracking system at http://sourceforge.net/projects/bluetooth-alsa/ :
-http://sourceforge.net/tracker/?atid=678258&group_id=116589&func=browse
-
-There are about 27 open bugs.
-
-Bye,
-	LenZ
-- --
-- ------------------------------------------------------------------
- Lenz Grimmer <lenz@grimmer.com>                             -o)
- [ICQ: 160767607 | Jabber: LenZGr@jabber.org]                /\\
- http://www.lenzg.org/                                       V_V
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFDZg/rSVDhKrJykfIRAvzcAJ9YDcUCQtLlB1wDlikx1ZbK/6YOWgCfSnoc
-xRVkKjjRUYuNpps/PaR4C/4=
-=Ra14
------END PGP SIGNATURE-----
+On 10/31/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Johan,
+>
+> > > - use session bus to send the PinRequest message: using the session
+> > > bus it's possible start the dbus pin helper application automatically
+> >
+> > I don't think that's the right thing or even a possible thing to do.
+> > This is because hcid is a system-wide daemon and cannot know about user=
+s
+> > session busses.
+>
+> so this is not working out. Then we still need a program that starts a
+> session time. Does anyone work on a Bluetooth applet for Gnome that will
+> also handle the PIN requests?
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by the JBoss Inc.
+> Get Certified Today * Register for a JBoss Training Course
+> Free Certification Exam for All Training Attendees Through End of 2005
+> Visit http://www.jboss.com/services/certification for more information
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 
 -------------------------------------------------------
