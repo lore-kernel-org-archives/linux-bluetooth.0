@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43680DBC.1000409@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] addition to btsco
-References: <1130887860.4889.7.camel@panic>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
 In-Reply-To: <1130887860.4889.7.camel@panic>
-Content-Type: text/plain; charset=ISO-8859-1
+References: <1130887860.4889.7.camel@panic>
+Content-Type: text/plain
+Message-Id: <1130888636.5048.39.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,9 +18,9 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 01 Nov 2005 17:52:12 -0700
+Date: Wed, 02 Nov 2005 00:43:56 +0100
 
-Collin
+Hi Collin,
 
 > I hacked together an addition to btsco which is totally unrelated to
 > audio.
@@ -31,14 +31,18 @@ Collin
 > think otherwise I'm happy to send in a patch. Otherwise I will just make
 > an separate app. for just this.
 
-That is an interesting idea. Yet another remote control protocol? We've
-got at least sco, ericsson+AT, HID, AVRCP. :)
+please do a separate application for this. I like to switch the slides
+with my Bluespoon at the 22C3 in Berlin. This would be fun ;)
 
-Yes, make it a separate app and we'll put support for the other
-protocols in it too. We can also provide another delivery mechanism like
-dbus eventually.
+I still have the epox-presenter application laying around and someone
+might put the stuff for the SonyEricsson phones without HID in a similar
+application. All three input methods in one application would be great.
 
-Brad
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
