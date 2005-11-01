@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <436884DD.2060505@icmanage.com>
-From: Shiv Sikand <shiv@icmanage.com>
-MIME-Version: 1.0
+Message-ID: <20051101225201.40117.qmail@web54103.mail.yahoo.com>
+From: Martin Gerken <m_gerken@yahoo.com>
+Subject: Re:  [Bluez-users] Re: [BlueZ-Announce] Release of bluez-hcidump-1.27
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] rfcomm issues with newer distros ?
+In-Reply-To: <4367B4AF.9040902@laposte.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,44 +17,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 02 Nov 2005 01:20:29 -0800
-
-Hi,
-
-I have been using my Treo 650 with Bluetooth DUN on Mandrake 10.2 with
-no problems.
-
-I recently tried the same thing on Mandriva LE 2006  and SUSE 10 and
-both these distros have the same issues: when connecting to the Treo
-using /dev/rfcomm*, the modem does not respond to any AT commands.
-
-i.e.
-
-Mandrake 10.2:
-Modem Ready
-ATZ
-OK
-
-SUSE 10:
-Modem Ready
-ATZ
-[no response]
-
-and then rfcomm disconnects after a few seconds....
+Date: Tue, 1 Nov 2005 23:52:01 +0100 (CET)
 
 
-Kernel versions I observe are:
+--- henri lelong <hlelong@laposte.net> schrieb:
+> I would like to know if there is some hope that my
+> Bus 002 Device 007: ID 1131:1001 Integrated System
+> Solution Corp. 
+> works one happy day with linux
 
-Mandrake 10.2: 2.6.11-6mdk
-Mandriva 2006 : 2.6.12-12mdksmp
-SUSE 10: 2.6.13-5
+Hi Henri,
 
-Has anyone got any advice ?
+yes, it works - I have a device with the same chipset
+working (paired nicely with my Sony Clie for internet
+access).
+I have some USB problems, ie. the stick is only recognized
+when plugged into a running system - but not recognized
+when plugged in at boot-time.
 
-Thanks,
-Shiv
+Martin
 
 
+
+	
+
+	
+		
+___________________________________________________________ 
+Gesendet von Yahoo! Mail - Jetzt mit 1GB Speicher kostenlos - Hier anmelden: http://mail.yahoo.de
 
 
 -------------------------------------------------------
