@@ -1,18 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] dbus.c cleanup
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <e1effdeb0511010433x11bbef22q8648e30b565cf41c@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0510310547m51a457f2m19f00ec5cf194289@mail.gmail.com>
-References: <20051029175338.GA26114@localhost.localdomain>
-	 <1130609278.5396.48.camel@blade>
-	 <20051029184820.GA26657@localhost.localdomain>
-	 <1130612847.5396.51.camel@blade>
-	 <e1effdeb0510310359g33724820y596b244076d08315@mail.gmail.com>
-	 <1130760726.17124.17.camel@blade>
-	 <e1effdeb0510310547m51a457f2m19f00ec5cf194289@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1130850674.31561.65.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Some thoughts on the current D-BUS interface
+In-Reply-To: <20051031233610.GA14937@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <20051031224006.GA14057@localhost.localdomain>
+	 <1130799900.31561.38.camel@blade>
+	 <20051031233610.GA14937@localhost.localdomain>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -24,35 +20,67 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 01 Nov 2005 14:11:14 +0100
+Date: Tue, 1 Nov 2005 10:33:11 -0200
 
-Hi Claudio,
+Hi,
 
-> Probably in the future when we start develop another features(rfcomm,
-> pan, ...) we will find more shared functions. I will put the find_conn
-> to a lib.c(inside de hcid) directory first according with your
-> suggestion. In the future we can discuss it later again.
-> Another file that I want create is the error.c
+These changes are very nice! The effort to change the paths will be small.
 
-send me a separate patch for the move to the lib.c file.
+Now, /org/bluez/Device should be registered using a fallback approach
+and this "root" path should reply for messages sent to a
+invalid/unregistered device path. The Manager path, can be registered
+as a normal path without care about child paths.
 
-What do you wanna put into the error.c file. Explain me your idea behind
-it and the benefits.
+Considering that local and remote configuration tasks will be
+available under the same path, we need change the child path
+register/unregister action. When a device is turned DOWN the path
+can't be unregistered anymore.  We can use the attribute "status" of
+the struct "profile_obj_path_data" to control this. I think this
+attribute was initially added with this purpose :)
+Any comment? Does someone has another suggestion?
 
-> When the dbus-daemon exits, the hcid will receive a "Disconnect"
-> signal. The hcid can start a task to re-establish the bus connection
-> each X seconds or it can exit.
-> Currently, hcid catches the signal, but there is no action associated
-> with this signal.
+Remove the default device path good, a default path was inserting
+confusion when sending signals and replies.
 
-I see and it seems we need a patch to deal with the dbus-daemon exits in
-case of restarts or errors in it. Please come up with a patch for it.
-
-Regards
-
-Marcel
+Regards,
+Claudio.
 
 
+On 10/31/05, Johan Hedberg <johan.hedberg@nokia.com> wrote:
+> Hi Marcel,
+>
+> On Tue, Nov 01, 2005, Marcel Holtmann wrote:
+> > Feel free to send in a patch. For me these proposed changes are soundin=
+g
+> > perfectly sane and I am happy to try them out. However it would be grea=
+t
+> > if you can include some small test applications written in Python like
+> > Eduardo did.
+>
+> Thanks for your encouraging reply! I don't yet have a patch for the
+> changes, but I'll try to produce one during tommorow (Tuesday). I'll
+> also try to provide some small python test apps as well as update the
+> pygtk app I have been working on.
+>
+> Johan
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by the JBoss Inc.
+> Get Certified Today * Register for a JBoss Training Course
+> Free Certification Exam for All Training Attendees Through End of 2005
+> Visit http://www.jboss.com/services/certification for more information
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+
+
+--
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
