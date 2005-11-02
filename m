@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <00cd01c5dfc0$eecfae30$f3a265c3@Silicium>
-From: "Dan ABITBOL" <d.abitbol@bloophone.com>
-To: <bluez-users@lists.sourceforge.net>
+Message-ID: <436884DD.2060505@icmanage.com>
+From: Shiv Sikand <shiv@icmanage.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=response
-Subject: [Bluez-users] QOS issues
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] rfcomm issues with newer distros ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,53 +16,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 2 Nov 2005 16:20:08 +0100
+Date: Wed, 02 Nov 2005 01:20:29 -0800
 
-we are facing some issues concerning QOS requirements on a l2cap connection.
+Hi,
 
- Does Bluez fully support QOS  because in the setsockopt method or 
-getsockopt
- method, there's no QOS values to fill or retrieve ..
+I have been using my Treo 650 with Bluetooth DUN on Mandrake 10.2 with
+no problems.
 
- When the connection has been completed ,  we use the
- hci_send_request(..OGF_LINK_POLICY, OCF_QOS_SETUP....) primitives but we 
-get
- "protocol not available 92" error    with CSR class 1 and Broadcom class 1 
-USB dongles ?
+I recently tried the same thing on Mandriva LE 2006  and SUSE 10 and
+both these distros have the same issues: when connecting to the Treo
+using /dev/rfcomm*, the modem does not respond to any AT commands.
+
+i.e.
+
+Mandrake 10.2:
+Modem Ready
+ATZ
+OK
+
+SUSE 10:
+Modem Ready
+ATZ
+[no response]
+
+and then rfcomm disconnects after a few seconds....
 
 
- Here is the code in our L2CAP  listening method  once the connection has
- occured  and the socket already created
+Kernel versions I observe are:
 
-WORD handle = 0;
-struct l2cap_conninfo info;
-int infoSize = sizeof(info);
-if( getsockopt(my_connect_socket, SOL_L2CAP, L2CAP_CONNINFO, &info,
-(socklen_t*)&infoSize) < 0 ) {
-printf("Can't get L2CAP options. %s(%d)", strerror(errno), errno); return
-false;
-}
- handle = info.hci_handle;
- qos_setup_cp qosSetupParams;
- qosSetupParams.handle = handle;
- qosSetupParams.flags = 0;                          /* Reserved */
- qosSetupParams.qos.service_type = 0x02;            /* Guaranteed */
- qosSetupParams.qos.token_rate = 0x00004250;        /* 32kbps + overhead */
- qosSetupParams.qos.peak_bandwidth = 0xFFFFFFFF;    /* Unspecified bwdth */
- qosSetupParams.qos.latency = 4000;                 /* In microseconds */
- qosSetupParams.qos.delay_variation = 0xFFFFFFFF;   /* Do not care */
+Mandrake 10.2: 2.6.11-6mdk
+Mandriva 2006 : 2.6.12-12mdksmp
+SUSE 10: 2.6.13-5
 
- struct hci_request request;
- request.ogf = OGF_LINK_POLICY;
- request.ocf = OCF_QOS_SETUP;
- request.cparam = &qosSetupParams;
- request.clen = QOS_SETUP_CP_SIZE;
- if (hci_send_reqmy_connect_socket, &request, 1000) < 0) {
-  printf("Can't set QoS on connection. %s(%d)\n", strerror(errno), errno);
- }
+Has anyone got any advice ?
 
- printf("CBluetooth_Socket: connect() succeeded\n");
- return true;
+Thanks,
+Shiv
 
 
 
