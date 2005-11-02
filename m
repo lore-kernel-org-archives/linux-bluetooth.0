@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] addition to btsco
-From: "Collin R. Mulliner" <collin@betaversion.net>
+Message-ID: <43680DBC.1000409@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43680DBC.1000409@xmission.com>
-References: <1130887860.4889.7.camel@panic>  <43680DBC.1000409@xmission.com>
-Content-Type: text/plain
-Message-Id: <1130893737.6896.8.camel@panic>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] addition to btsco
+References: <1130887860.4889.7.camel@panic>
+In-Reply-To: <1130887860.4889.7.camel@panic>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,32 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 01 Nov 2005 17:08:57 -0800
+Date: Tue, 01 Nov 2005 17:52:12 -0700
 
-Brad,
+Collin
 
-> That is an interesting idea. Yet another remote control protocol? We've
-> got at least sco, ericsson+AT, HID, AVRCP. :)
+> I hacked together an addition to btsco which is totally unrelated to
+> audio.
 > 
-> Yes, make it a separate app and we'll put support for the other
-> protocols in it too. We can also provide another delivery mechanism like
-> dbus eventually.
+> It basically converts the volume keys into X key events, so you can use
+> your bluetooth headset to control presentations (slides). Is that
+> something that would go into btsco? I would guess not, but if you guys
+> think otherwise I'm happy to send in a patch. Otherwise I will just make
+> an separate app. for just this.
 
-I allready fingured that out with Marcel, I will put it into the
-epox-presenter app. for now.
+That is an interesting idea. Yet another remote control protocol? We've
+got at least sco, ericsson+AT, HID, AVRCP. :)
 
-BTW. I allready used my btsco-hack for a presentation at school today
-and the people where really amazed by me controlling the slides with my
-headset :-)
+Yes, make it a separate app and we'll put support for the other
+protocols in it too. We can also provide another delivery mechanism like
+dbus eventually.
 
-... Collin
-
---
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-All software sucks equally, but some software is more equal.
-
+Brad
 
 
 -------------------------------------------------------
