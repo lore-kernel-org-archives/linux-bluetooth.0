@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43681609.70603@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] addition to btsco
-References: <1130887860.4889.7.camel@panic>  <43680DBC.1000409@xmission.com> <1130893737.6896.8.camel@panic>
-In-Reply-To: <1130893737.6896.8.camel@panic>
-Content-Type: text/plain; charset=ISO-8859-1
+From: "Collin R. Mulliner" <collin@betaversion.net>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <43680DBC.1000409@xmission.com>
+References: <1130887860.4889.7.camel@panic>  <43680DBC.1000409@xmission.com>
+Content-Type: text/plain
+Message-Id: <1130893737.6896.8.camel@panic>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,21 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 01 Nov 2005 18:27:37 -0700
+Date: Tue, 01 Nov 2005 17:08:57 -0800
 
-Collin
+Brad,
 
-> BTW. I allready used my btsco-hack for a presentation at school today
-> and the people where really amazed by me controlling the slides with my
-> headset :-)
+> That is an interesting idea. Yet another remote control protocol? We've
+> got at least sco, ericsson+AT, HID, AVRCP. :)
+> 
+> Yes, make it a separate app and we'll put support for the other
+> protocols in it too. We can also provide another delivery mechanism like
+> dbus eventually.
 
-cool.
+I allready fingured that out with Marcel, I will put it into the
+epox-presenter app. for now.
 
-too bad sco voice quality is so poor or you could also use it to amplify
-your voice as you give your talk. maybe esco isn't so bad but i haven't
-tried it.
+BTW. I allready used my btsco-hack for a presentation at school today
+and the people where really amazed by me controlling the slides with my
+headset :-)
 
-brad
+... Collin
+
+--
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+All software sucks equally, but some software is more equal.
+
 
 
 -------------------------------------------------------
