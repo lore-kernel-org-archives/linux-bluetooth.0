@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43685D8D.2090706@nokia.com>
-From: Ville Tervo <ville.tervo@nokia.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] addition to btsco
+From: "Collin R. Mulliner" <collin@betaversion.net>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Some thoughts on the current D-BUS interface
-References: <20051031224006.GA14057@localhost.localdomain>	 <1130799900.31561.38.camel@blade>	 <20051031233610.GA14937@localhost.localdomain>	 <e1effdeb0511010433x11bbef22q8648e30b565cf41c@mail.gmail.com>	 <20051101155447.GA26044@localhost.localdomain>	 <1130863617.31561.74.camel@blade>	 <3013cac80511011105y2be7647bi4fb0994efd6f8a31@mail.gmail.com> <1130874835.5048.12.camel@blade>
-In-Reply-To: <1130874835.5048.12.camel@blade>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1130905768.5048.56.camel@blade>
+References: <1130887860.4889.7.camel@panic>  <43680DBC.1000409@xmission.com>
+	 <1130893737.6896.8.camel@panic>  <1130905768.5048.56.camel@blade>
+Content-Type: text/plain
+Message-Id: <1130907214.6896.30.camel@panic>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,27 +19,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 02 Nov 2005 08:32:45 +0200
+Date: Tue, 01 Nov 2005 20:53:33 -0800
 
-Hi Marcel,
+Marcel,
 
-ext Marcel Holtmann wrote:
-> Hi Eduardo,
-> 
-> 
->>here is the device Up and Down dbus methods.
-> 
-> 
-> the patch is in the CVS now. However I am not sure about the future of
-> any of these two methods. Do we really want the possibility to up and
-> down a Bluetooth adapter?
-> 
+> we need a better name when I put it into bluez-utils. So please come up
+> with some proposals.
 
-Yes. At least in embedded devices it's useful for example when you need 
-offline mode.
+what about: btpresenter, btclick, btslides (thats what I call my hack at
+the moment)
 
--- 
-Ville
+> > BTW. I allready used my btsco-hack for a presentation at school today
+> > and the people where really amazed by me controlling the slides with my
+> > headset :-)
+> 
+> Even using the EPoX Presenter and running around is quite amazing. The
+> good thing of this device is the integrated laser pointer. The new ones
+> are all HID based and so no "special" application is needed.
+
+Yes I know, but for those of us who only do very few presentations
+everyonce in a while the headset solution is way more cost efficient :-)
+
+... Collin
+
+PS: Maybe just getting a recent sonyericsson phone with builtin HID is
+the most efficient but thats a different story...
+
+--
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+Commander, there is no careful way to question a Klingon. --Odo
+
 
 
 -------------------------------------------------------
