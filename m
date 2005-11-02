@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <72176e700511021316x428bf98aw9ae8d36965a8f092@mail.gmail.com>
-From: =?ISO-8859-1?Q?Bart_Thom=E9e?= <bart.thomee@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <00cd01c5dfc0$eecfae30$f3a265c3@Silicium>
+From: "Dan ABITBOL" <d.abitbol@bloophone.com>
+To: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_6494_9310058.1130966214694"
-Subject: [Bluez-users] probe remote device for security mode
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=response
+Subject: [Bluez-users] QOS issues
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,89 +19,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 2 Nov 2005 22:16:54 +0100
+Date: Wed, 2 Nov 2005 16:20:08 +0100
 
-------=_Part_6494_9310058.1130966214694
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+we are facing some issues concerning QOS requirements on a l2cap connection.
 
-Is it possible to find out which security mode a remote device is in?
+ Does Bluez fully support QOS  because in the setsockopt method or 
+getsockopt
+ method, there's no QOS values to fill or retrieve ..
 
-Part of the project I am working on concerns sending messages to mobile
-phones, using the OBEX Object Push Service (the project has some bluejackin=
-g
-characteristics, but is inherently different). The OOP Service usually
-requires no authentication, but some phones have it turned on or some phone=
-s
-leave the possibility open to the user to turn it on or off.
+ When the connection has been completed ,  we use the
+ hci_send_request(..OGF_LINK_POLICY, OCF_QOS_SETUP....) primitives but we 
+get
+ "protocol not available 92" error    with CSR class 1 and Broadcom class 1 
+USB dongles ?
 
-Using my phone, HTC (Orange) C500 smartphone, as an example, I might be abl=
-e
-to clarify a little more what I'm trying to achieve.
-- with bluetooth turned on in discoverable mode and the 'authentication
-required' option turned off, I can easily send a message 'Hello' to the
-phone, which instantly lights up and says "Do you want to save 'Hello' to
-your phone?". Perfect, the message comes across.
-- with bluetooth still on but now 'authentication required' turned on,
-sending a message becomes a cumbersome undertaking, as the phone lights up
-and asks "Do you want to add [device] to your list of trusted devices?"...
-and then the devices first have to pair before the message can be sent.
-Since the project will send the messages in an automated fashion, the
-authentication is a horrible process, so I only want to send the messages t=
-o
-phones that do not require authentication/passkeys/pin codes/pairing, but i=
-s
-this possible to do? e.g. can you query for the authentication setting of a
-remote device, or is it just something that can't be done (i.e. you have to
-find out the hard way if authentication is required, if the message is sent
-straight on then it's apparently turned off, otherwise not). I know that yo=
-u
-can query your local device using hci_send_cmd and with a parameter that is
-called something like READ_AUTHENTICATION_ENABLE, so maybe there is a way t=
-o
-relay that request to a remote device?
 
-Thanks.
+ Here is the code in our L2CAP  listening method  once the connection has
+ occured  and the socket already created
 
-Bart
+WORD handle = 0;
+struct l2cap_conninfo info;
+int infoSize = sizeof(info);
+if( getsockopt(my_connect_socket, SOL_L2CAP, L2CAP_CONNINFO, &info,
+(socklen_t*)&infoSize) < 0 ) {
+printf("Can't get L2CAP options. %s(%d)", strerror(errno), errno); return
+false;
+}
+ handle = info.hci_handle;
+ qos_setup_cp qosSetupParams;
+ qosSetupParams.handle = handle;
+ qosSetupParams.flags = 0;                          /* Reserved */
+ qosSetupParams.qos.service_type = 0x02;            /* Guaranteed */
+ qosSetupParams.qos.token_rate = 0x00004250;        /* 32kbps + overhead */
+ qosSetupParams.qos.peak_bandwidth = 0xFFFFFFFF;    /* Unspecified bwdth */
+ qosSetupParams.qos.latency = 4000;                 /* In microseconds */
+ qosSetupParams.qos.delay_variation = 0xFFFFFFFF;   /* Do not care */
 
-------=_Part_6494_9310058.1130966214694
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+ struct hci_request request;
+ request.ogf = OGF_LINK_POLICY;
+ request.ocf = OCF_QOS_SETUP;
+ request.cparam = &qosSetupParams;
+ request.clen = QOS_SETUP_CP_SIZE;
+ if (hci_send_reqmy_connect_socket, &request, 1000) < 0) {
+  printf("Can't set QoS on connection. %s(%d)\n", strerror(errno), errno);
+ }
 
-Is it possible to find out which security mode a remote device is in?<br><b=
-r>Part of the project I am working on concerns sending messages to mobile p=
-hones, using the OBEX Object Push Service (the project has some bluejacking=
- characteristics, but is inherently different). The OOP Service usually req=
-uires no authentication, but some phones have it turned on or some phones l=
-eave the possibility open to the user to turn it on or off.
-<br><br>Using my phone, HTC (Orange) C500 smartphone, as an example, I migh=
-t be able to clarify a little more what I'm trying to achieve.<br>- with bl=
-uetooth turned on in discoverable mode and the 'authentication required' op=
-tion turned off, I can easily send a message 'Hello' to the phone, which in=
-stantly lights up and says &quot;Do you want to save 'Hello' to your phone?=
-&quot;. Perfect, the message comes across.
-<br>- with bluetooth still on but now 'authentication required' turned on, =
-sending a message becomes a cumbersome undertaking, as the phone lights up =
-and asks &quot;Do you want to add [device] to your list of trusted devices?=
-&quot;... and then the devices first have to pair before the message can be=
- sent.
-<br>Since the project will send the messages in an automated fashion, the a=
-uthentication is a horrible process, so I only want to send the messages to=
- phones that do not require authentication/passkeys/pin codes/pairing, but =
-is this possible to do?=20
-e.g. can you query for the authentication setting of a remote device, or is=
- it just something that can't be done (i.e. you have to find out the hard w=
-ay if authentication is required, if the message is sent straight on then i=
-t's apparently turned off, otherwise not). I know that you can query your l=
-ocal device using hci_send_cmd and with a parameter that is called somethin=
-g like READ_AUTHENTICATION_ENABLE, so maybe there is a way to relay that re=
-quest to a remote device?
-<br><br>Thanks.<br><br>Bart<br>
+ printf("CBluetooth_Socket: connect() succeeded\n");
+ return true;
 
-------=_Part_6494_9310058.1130966214694--
+
 
 
 -------------------------------------------------------
