@@ -1,18 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] dbus.c cleanup
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20051103101343.GA32081@localhost.localdomain>
-References: <20051103072032.GA28568@localhost.localdomain>
-	 <1131006878.6634.10.camel@localhost.localdomain>
-	 <20051103085436.GA31046@localhost.localdomain>
-	 <1131008886.6634.18.camel@localhost.localdomain>
-	 <20051103092350.GA31596@localhost.localdomain>
-	 <1131010917.6634.20.camel@localhost.localdomain>
-	 <20051103101343.GA32081@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1131014023.6634.22.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] dbus.c cleanup
+Message-ID: <20051103101343.GA32081@localhost.localdomain>
+References: <20051103072032.GA28568@localhost.localdomain> <1131006878.6634.10.camel@localhost.localdomain> <20051103085436.GA31046@localhost.localdomain> <1131008886.6634.18.camel@localhost.localdomain> <20051103092350.GA31596@localhost.localdomain> <1131010917.6634.20.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1131010917.6634.20.camel@localhost.localdomain>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -24,24 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 03 Nov 2005 11:33:42 +0100
+Date: Thu, 3 Nov 2005 12:13:43 +0200
 
-Hi Johan,
+On Thu, Nov 03, 2005, Marcel Holtmann wrote:
+> please include a list of available commands in the usage and I think we
+> should rename it to dbus-test.
 
-> > please include a list of available commands in the usage and I think we
-> > should rename it to dbus-test.
-> 
-> done:
-> http://www.iki.fi/~jhedberg/bluez-python/dbus-test
+done:
+http://www.iki.fi/~jhedberg/bluez-python/dbus-test
 
-it is in the CVS now and will also come with next source package, but it
-will never be installed.
-
-Regards
-
-Marcel
-
-
+Johan
 
 
 -------------------------------------------------------
