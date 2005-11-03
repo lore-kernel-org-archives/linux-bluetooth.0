@@ -1,11 +1,19 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Re: Re: Re: Buetooth and SAMSUNG SGH-E340
+From: Fredy Pulido =?ISO-8859-1?Q?L=F3pez?= <digitalfredy@debiancolombia.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <20051026195956.GH7782@loulou-becane>
+References: <20051020135234.GC28731@loulou-becane>
+	<20051023123808.GA14322@elmicha.333200002251-0001.dialin.t-online.de>
+	<20051023151215.GB31746@loulou-becane>
+	<1130191981.9463.13.camel@localhost.localdomain>
+	<20051025163115.GA29385@loulou-becane>
+	<1130342970.8178.5.camel@localhost.localdomain>
+	<20051026195956.GH7782@loulou-becane>
 Content-Type: text/plain;
-	charset="UTF-8"
-Subject: RE: [Bluez-users] Periodic noise on microphone with bt_sco (BTA-6030 Dongle, Motorola H500 Headset)
-Message-ID: <ABEB3642D355C64EADE83D978A7671FB813506@pdsmsx406>
-From: "Li, Lea" <lea.li@intel.com>
-To: <bluez-users@lists.sourceforge.net>
+	charset=iso-8859-1
+Message-Id: <1131007931.2415.2.camel@yoda.digitalfredy.org>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,50 +25,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 8 Nov 2005 09:08:27 +0800
+Date: Thu, 03 Nov 2005 03:52:11 -0500
 
-SGksDQoNCkp1c3Qgc29tZSBndWVzc2VzLiBJJ20gd29uZGVyaW5nIHdoZXRoZXIgdGhlIGF1ZGlv
-IGJ1ZmZlciBpcyBvZiB1bmRlcnJ1bi4gRm9yIGV4YW1wbGUsIG9uY2UgSSBtYWRlIGEgbWlzdGFr
-ZSBvZiByZWFkaW5nIGEgc2luZ2xlLWNoYW5uZWwgYXVkaW8gZnJvbSBtaWNyb3Bob25lIGFuZCBv
-dXRwdXR0aW5nIGl0IGxpa2UgYSBzdGVyZW8gc3RyZWFtLiBUaHVzIHRoZSAob3V0cHV0KSBhdWRp
-byBidWZmZXIgdW5kZXJyYW4gKGluIGhhbGYgb2YgdGhlIHRpbWUpIHBlcmlvZGljYWxseSBhbmQg
-cmVzdWx0ZWQgaW4gYSBsb3cgZnJlcXVlbmN5IG5vaXNlLg0KDQpUaGFua3MsIA0KTGVhDQrCoA0K
-QVAgMDUvMDYgQ0hHIFdQRSBNRw0KSW50ZWwgQ2hpbmEgTHRkLg0KU2hhbmdoYWkgQ2hpbmENCmlO
-ZXQ6IDgtNzUyLTM0NTINClRlbDogODYtMjEtNTI1NzQ1NDUtMzQ1Mg0KDQotLS0tLU9yaWdpbmFs
-IE1lc3NhZ2UtLS0tLQ0KRnJvbTogYmx1ZXotdXNlcnMtYWRtaW5AbGlzdHMuc291cmNlZm9yZ2Uu
-bmV0IFttYWlsdG86Ymx1ZXotdXNlcnMtYWRtaW5AbGlzdHMuc291cmNlZm9yZ2UubmV0XSBPbiBC
-ZWhhbGYgT2YgRGlyayBTdG9ja21hbm4NClNlbnQ6IDIwMDXlubQxMeaciDfml6UgMTc6MjANClRv
-OiBibHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQNClN1YmplY3Q6IFtCbHVlei11c2Vy
-c10gUGVyaW9kaWMgbm9pc2Ugb24gbWljcm9waG9uZSB3aXRoIGJ0X3NjbyAoQlRBLTYwMzAgRG9u
-Z2xlLCBNb3Rvcm9sYSBINTAwIEhlYWRzZXQpDQoNCi0tLS0tQkVHSU4gUEdQIFNJR05FRCBNRVNT
-QUdFLS0tLS0NCkhhc2g6IFNIQTENCg0KSGksDQoNCkkgaGF2ZSBzdWNjZXNzZnVsbHkgY29tcGls
-ZWQgYW5kIGluc3RhbGxlZCB0aGUgbmV3ZXN0IGJ0X3NjbyBkcml2ZXIgYW5kDQp1c2Vyc3BhY2Ug
-cHJvZ3JhbXMgb24gU3VTRSAxMC4wICgyLjYuMTMgS2VybmVsKS4gQW5kIGJhc2ljYWxseSBpdCB3
-b3Jrcw0KZ3JlYXQ6IHBsYXliYWNrIGlzIGZpbmUgYW5kIGFsc28gdGhlIG1pY3JvcGhvbmUgaXMg
-d29ya2luZy4NClRoZSBwcm9ibGVtIGlzIHRoYXQgdGhlIHNvdW5kIGNvbWluZyBmcm9tIHRoZSBt
-aWNyb3Bob25lIGlzIG92ZXJsYXllZA0Kd2l0aCBhIGFubm95aW5nIGJ1enouIFRoZSBidXp6IGlz
-IG5vdCB2ZXJ5IGxvdWQgYnV0IGNsZWFybHkgaGVhcmFibGUgYW5kDQpxdWl0ZSBkaXN0cmFjdGlu
-Zy4NClRoZSBiYXNlIGZyZXF1ZW5jeSBvZiB0aGUgYnV6eiBpcyBhYm91dCAyNjZIei4gSWYgdGhh
-dCBoZWxwcyBJIGNvdWxkDQpwb3N0IGEgc2hvcnQgcmVjb3JkZWQgc2FtcGxlLg0KSSB3b3VsZCBi
-ZSB2ZXJ5IGdyYXRlZnVsIHRvIGdldCBwb2ludGVycyB3aGF0IHRvIGRvIHRvIGdldCByaWQgb2Yg
-dGhhdA0KYnV6ei4gSSBhbSBhIGV4cGVyaWVuY2VkIHByb2dyYW1tZXIgd2l0aCBzb21lIGxvdy1s
-ZXZlbCBrZXJuZWwNCmtub3dsZWRnZSwgc28gSSB3b3VsZCBhbHNvIGludmVzdCBzb21lIHRpbWUg
-aW4gZGVidWdnaW5nIGlmIEkgd291bGQga25ldw0KZm9yIHdoYXQgSSBzaG91bGQgbG9vay4NCg0K
-VGhhbmtzLA0KRGlyaw0KLSAtLQ0KS2V5IGNhbiBiZSBmb3VuZCBvbjoNCmh0dHA6Ly9za3Mua2V5
-c2VydmVyLnBlbmd1aW4uZGUNCmhrcDovL3Nrcy5rZXlzZXJ2ZXIucGVuZ3Vpbi5kZQ0KLS0tLS1C
-RUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0NClZlcnNpb246IEdudVBHIHYxLjQuMiAoR05VL0xpbnV4
-KQ0KQ29tbWVudDogVXNpbmcgR251UEcgd2l0aCBUaHVuZGVyYmlyZCAtIGh0dHA6Ly9lbmlnbWFp
-bC5tb3pkZXYub3JnDQoNCmlENERCUUZEYnh3N0xpMlZSMmIxL3ZvUkFxektBSmluQXM4OVdhS2Nm
-MnZvNjdnQk1KYmUyUkxTQUp3UFQ2d3kNCnN1SDdzM1VMR1pWa2RwU1dFS2pOS1E9PQ0KPW02TkQN
-Ci0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0KDQoNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NClNGLk5ldCBlbWFpbCBpcyBzcG9uc29y
-ZWQgYnk6DQpUYW1lIHlvdXIgZGV2ZWxvcG1lbnQgY2hhbGxlbmdlcyB3aXRoIEFwYWNoZSdzIEdl
-cm9uaW1vIEFwcCBTZXJ2ZXIuIERvd25sb2FkDQppdCBmb3IgZnJlZSAtIC1hbmQgYmUgZW50ZXJl
-ZCB0byB3aW4gYSA0MiIgcGxhc21hIHR2IG9yIHlvdXIgdmVyeSBvd24NClNvbnkodG0pUFNQLiAg
-Q2xpY2sgaGVyZSB0byBwbGF5OiBodHRwOi8vc291cmNlZm9yZ2UubmV0L2dlcm9uaW1vLnBocA0K
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCkJsdWV6LXVz
-ZXJzIG1haWxpbmcgbGlzdA0KQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0DQpodHRw
-czovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycw0K
+El mi=E9, 26-10-2005 a las 21:59 +0200, Philippe Berini escribi=F3:
+> * Fredy P <digitalfredy@debiancolombia.org> [Wed, Oct 26, 2005 at 11:09:2=
+8AM -0500]:
+>=20
+> > i attached my /etc/init.d/bluez-utils but i'm using sarge,
+>=20
+> Thanks, but I tried your file, and got the same error.
+if you can made l2ping to your movil try with the obexftp version from
+testing or sarge
+>=20
+> And I forgot to say that the mobile says it is paired, which is good,
+> and then that it can't find the services.
+>=20
+> > and if you can write in the wiki (in spanish) how to config your
+> > movile phone (down t610)=20
+>=20
+> It would be my pleasure to do that, if my connection was working... As
+> soon as I get it work, I'll add it to the wiki.
+>=20
+> Thanks anyway,
+
 
 
 -------------------------------------------------------
