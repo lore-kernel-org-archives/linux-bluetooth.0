@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <436AE550.4090201@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] [DBUS PATCH] more cleanup
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] fixed-point sbc decoder working
+In-Reply-To: <e1effdeb0511030641k5b2dc809r3c76a146e0c5259c@mail.gmail.com>
+References: <e1effdeb0511030532w61ccb889haee2e766a631f618@mail.gmail.com>
+	 <1131026420.6634.26.camel@localhost.localdomain>
+	 <e1effdeb0511030641k5b2dc809r3c76a146e0c5259c@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1131029226.6634.33.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,18 +20,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 03 Nov 2005 21:36:32 -0700
+Date: Thu, 03 Nov 2005 15:47:06 +0100
 
-Hey
+Hi Claudio,
 
-I found I had introduced a problem into the x86 fixed point routines
-when working on stuff. After fixing the routine, the decoder started
-working like a charm.
+> It's done!
 
-I didn't unroll any loops but I'll leave that as an exercise for the
-user or the compiler...
+and it is applied.
 
-Brad
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
