@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Subject: Re: [Bluez-devel] [DBUS PATCH] more cleanup
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH] dbus.c cleanup
-Message-ID: <20051103142201.GA9983@localhost.localdomain>
-References: <20051103072032.GA28568@localhost.localdomain> <1131006878.6634.10.camel@localhost.localdomain> <20051103085436.GA31046@localhost.localdomain> <1131008886.6634.18.camel@localhost.localdomain> <20051103092350.GA31596@localhost.localdomain> <1131010917.6634.20.camel@localhost.localdomain> <20051103101343.GA32081@localhost.localdomain> <1131014023.6634.22.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="bp/iNruPH9dso1Pn"
-In-Reply-To: <1131014023.6634.22.camel@localhost.localdomain>
+Cc: Claudio Takahasi <cktakahasi@gmail.com>
+In-Reply-To: <e1effdeb0511030532w61ccb889haee2e766a631f618@mail.gmail.com>
+References: <e1effdeb0511030532w61ccb889haee2e766a631f618@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1131026420.6634.26.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,57 +19,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 3 Nov 2005 16:22:01 +0200
+Date: Thu, 03 Nov 2005 15:00:20 +0100
+
+Hi Claudio,
+
+> Here are some cleanups that I detected when I was reading the last modification.
+> 
+> 1. Fallback
+> I changed the return message when the path is not registered.
+> Currently, the dbus-daemon returns the following message: 'Error
+> org.freedesktop.DBus.Error.UnknownMethod: Method "Inquiry" with
+> signature "yy" on interface "org.bluez.Device" doesn't exist'
+> Now it's returning "Unknow D-Bus path when a client sent a message to
+> invalid path(the path was unregistered or wrong).
+> 
+> 2. msg unref
+>  It's not necessary check if the message is NULL, this verification is
+> already done inside the dbus_message_unref.
+> 
+> 3. up_adapters removed
+> 
+> 4. Added some comments
+> 
+> 5. device path checking
+>    It's not necessary check if the message belongs to the device path
+> hierarchy because we split the msg_func(msg_func_device and
+> msg_func_manager)
+
+I applied the patch, but I don't like the BTADDR_LEN thingy. The size of
+BD_ADDR in string representation is always 18 and so do addr[18] inside
+the code. That's just fine. Please send me a patch that removes the
+BTADDR_LEN stuff and replaces it with 18.
+
+Regards
+
+Marcel
 
 
---bp/iNruPH9dso1Pn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Thu, Nov 03, 2005, Marcel Holtmann wrote:
-> it is in the CVS now and will also come with next source package, but it
-> will never be installed.
-
-Thanks, and here's the first patch for it :-)
-
-Johan
-
---bp/iNruPH9dso1Pn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="dbus-test.patch"
-
-Index: dbus-test
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus-test,v
-retrieving revision 1.1
-diff -u -r1.1 dbus-test
---- dbus-test	3 Nov 2005 10:32:32 -0000	1.1
-+++ dbus-test	3 Nov 2005 14:19:00 -0000
-@@ -8,8 +8,9 @@
- from signal import *
- 
- mgr_cmds = [ "DeviceList", "DefaultDevice" ]
--dev_cmds = [ "Inquiry", "CancelInquiry", "PeriodicInquiry", "CancelPeriodic",
--             "RemoteName", "Connections", "Authenticate", "RoleSwitch" ]
-+dev_cmds = [ "Up", "Down", "Inquiry", "CancelInquiry", "PeriodicInquiry",
-+             "CancelPeriodic", "RemoteName", "Connections", "Authenticate",
-+             "RoleSwitch" ]
- 
- class Tester:
-     exit_events = []
-@@ -100,8 +101,8 @@
-         self.manager.connect_to_signal('DeviceRemoved', self.device_removed)
- 
-     def usage(self):
--        print 'Usage: %s [-i] [-l] [-h] <cmd> [arg1..]' % self.name
--        print '  -i <dev>   Specify device (e.g. "hci0" or "/dev/bluez/Device/hci0")'
-+        print 'Usage: %s [-i <dev>] [-l] [-h] <cmd> [arg1..]' % self.name
-+        print '  -i <dev>   Specify device (e.g. "hci0" or "/org/bluez/Device/hci0")'
-         print '  -l         Listen for events (no command required)'
-         print '  -h         Show this help'
-         print 'Manager commands:'
-
---bp/iNruPH9dso1Pn--
 
 
 -------------------------------------------------------
