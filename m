@@ -1,20 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] dbus.c cleanup
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20051103142201.GA9983@localhost.localdomain>
-References: <20051103072032.GA28568@localhost.localdomain>
-	 <1131006878.6634.10.camel@localhost.localdomain>
-	 <20051103085436.GA31046@localhost.localdomain>
-	 <1131008886.6634.18.camel@localhost.localdomain>
-	 <20051103092350.GA31596@localhost.localdomain>
-	 <1131010917.6634.20.camel@localhost.localdomain>
-	 <20051103101343.GA32081@localhost.localdomain>
-	 <1131014023.6634.22.camel@localhost.localdomain>
-	 <20051103142201.GA9983@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1131028590.6634.31.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] dbus.c cleanup
+Message-ID: <20051103142201.GA9983@localhost.localdomain>
+References: <20051103072032.GA28568@localhost.localdomain> <1131006878.6634.10.camel@localhost.localdomain> <20051103085436.GA31046@localhost.localdomain> <1131008886.6634.18.camel@localhost.localdomain> <20051103092350.GA31596@localhost.localdomain> <1131010917.6634.20.camel@localhost.localdomain> <20051103101343.GA32081@localhost.localdomain> <1131014023.6634.22.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="bp/iNruPH9dso1Pn"
+In-Reply-To: <1131014023.6634.22.camel@localhost.localdomain>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -26,22 +18,57 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 03 Nov 2005 15:36:30 +0100
-
-Hi Johan,
-
-> > it is in the CVS now and will also come with next source package, but it
-> > will never be installed.
-> 
-> Thanks, and here's the first patch for it :-)
-
-patch is in the CVS now.
-
-Regards
-
-Marcel
+Date: Thu, 3 Nov 2005 16:22:01 +0200
 
 
+--bp/iNruPH9dso1Pn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Thu, Nov 03, 2005, Marcel Holtmann wrote:
+> it is in the CVS now and will also come with next source package, but it
+> will never be installed.
+
+Thanks, and here's the first patch for it :-)
+
+Johan
+
+--bp/iNruPH9dso1Pn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="dbus-test.patch"
+
+Index: dbus-test
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/dbus-test,v
+retrieving revision 1.1
+diff -u -r1.1 dbus-test
+--- dbus-test	3 Nov 2005 10:32:32 -0000	1.1
++++ dbus-test	3 Nov 2005 14:19:00 -0000
+@@ -8,8 +8,9 @@
+ from signal import *
+ 
+ mgr_cmds = [ "DeviceList", "DefaultDevice" ]
+-dev_cmds = [ "Inquiry", "CancelInquiry", "PeriodicInquiry", "CancelPeriodic",
+-             "RemoteName", "Connections", "Authenticate", "RoleSwitch" ]
++dev_cmds = [ "Up", "Down", "Inquiry", "CancelInquiry", "PeriodicInquiry",
++             "CancelPeriodic", "RemoteName", "Connections", "Authenticate",
++             "RoleSwitch" ]
+ 
+ class Tester:
+     exit_events = []
+@@ -100,8 +101,8 @@
+         self.manager.connect_to_signal('DeviceRemoved', self.device_removed)
+ 
+     def usage(self):
+-        print 'Usage: %s [-i] [-l] [-h] <cmd> [arg1..]' % self.name
+-        print '  -i <dev>   Specify device (e.g. "hci0" or "/dev/bluez/Device/hci0")'
++        print 'Usage: %s [-i <dev>] [-l] [-h] <cmd> [arg1..]' % self.name
++        print '  -i <dev>   Specify device (e.g. "hci0" or "/org/bluez/Device/hci0")'
+         print '  -l         Listen for events (no command required)'
+         print '  -h         Show this help'
+         print 'Manager commands:'
+
+--bp/iNruPH9dso1Pn--
 
 
 -------------------------------------------------------
