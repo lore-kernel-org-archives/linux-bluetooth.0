@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <436BBCE5.60505@masaka.cs.ohiou.edu>
-From: Jim Wyllie <jwyllie@masaka.cs.ohiou.edu>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] Protocols over Bluetooth Baseband and disabiling Retransmissions
+Subject: Re: [Bluez-devel] Disconnecting after 54 seconds
+From: Marcel Holtmann <marcel@holtmann.org>
+To: matt@matthew.ath.cx
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <Pine.LNX.4.63.0511041547530.27685@illythia.matthew.ath.cx>
+References: <Pine.LNX.4.63.0511041142190.27685@illythia.matthew.ath.cx>
+	 <1131119129.11673.4.camel@localhost.localdomain>
+	 <Pine.LNX.4.63.0511041547530.27685@illythia.matthew.ath.cx>
+Content-Type: text/plain
+Message-Id: <1131122744.11673.12.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,34 +21,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 04 Nov 2005 14:56:21 -0500
+Date: Fri, 04 Nov 2005 17:45:44 +0100
 
-I am attempting to run an experimental protocol on top of a Bluetooth 
-connection to test our theories of reliability vs. the standard 
-Bluetooth retransmission scheme (mainly ARQ retransmissions).  We're 
-using BlueZ on Linux 2.6.12.5 to test this.
+Hi Matthew,
 
-I would like to "break" the retransmission mechanism for L2CAP Packets 
-(I am forced to use Java and JSR-82 for my testing, so I'm restricted to 
-L2CAP as the lowest accessible layer).  I looked through 
-[include/]net/bluetooth/l2cap.[hc] and the Bluetooth spec, and I could 
-easily set the default flush_to to 0x0001 (.625 milliseconds should be 
-effectively 0, and with no packet to retransmit, it should timeout the 
-retransmission).  Am I on the right track, and would just changing all 
-flush_to assignments to 0x0001 (including the default) work like I think 
-it would?  If I'm not on the right track, could someone point me to a 
-good way to achieve this?
+> >> Is there some sort of timeout happening here? I thought it might need
+> >> activity to keep the link up, but l2ping should do that. Has anyone else
+> >> seen anything similar?
+> >
+> > these are L2CAP echo packets and so this doesn't have to be reliable.
+> >
+> Having packets dropped I would expect, but I wouldn't expect the HCI
+> connection to be dropped regularly like this. This happens consistently
+> using hcitool as well, after 54 seconds a link created with hcitool cc
+> is dropped.
 
-Also, I looked into other solutions, such as shoe-horning Broadcast 
-packets to do this, but Java doesn't seem to support it.  I also 
-couldn't find a Java interface for SCO/e-SCO where I could frame my own 
-packets in the stream (not that that's a very good way to do it, IMHO). 
-  Anyone have any $.02 that he or she would like to offer to this?
+the "hcitool cc ..." and "l2ping" are for testing purpose only. Use real
+connection on RFCOMM level.
 
-Many thanks for your help,
-Jim Wyllie
-IRG Lab
-Ohio University
+> I've read over the FAQ and howtos on bluez.org and none of them appear
+> to address this. Are there any low-level protocol docs which would
+> suggest some sort of keep-alive which might be necessary? or is this
+> likely to be a problem with my phone?
+> 
+
+If the phone decides to drop your connection that is fine. From the
+security standpoint I would even encourage this.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
