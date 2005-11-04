@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Matthew Johnson <matt@matthew.ath.cx>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.63.0511041142190.27685@illythia.matthew.ath.cx>
+Message-ID: <436AE550.4090201@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Subject: [Bluez-devel] Disconnecting after 54 seconds
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] fixed-point sbc decoder working
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,31 +16,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 4 Nov 2005 11:49:47 +0000 (GMT)
+Date: Thu, 03 Nov 2005 21:36:32 -0700
 
-I have a nokia 6230 and a USB bluetooth dongle with a CSR chipset which
-I'm using to test an application I'm writing to monitor the connection
-to the phone. The application uses code from hcitool to bring up a
-connection to the phone. I'm finding that every minute or so the
-connection is dropped and I have to reconnect.
+Hey
 
-This is reproducible with l2ping. l2ping sends and receives pings fine,
-but then terminates with Connection reset by peer. Using time(1) to
-monitor this repeatedly it seems it happens almost exactly after 54
-seconds in every case (min 53.722, max 54.616, SD under 200ms).
+I found I had introduced a problem into the x86 fixed point routines
+when working on stuff. After fixing the routine, the decoder started
+working like a charm.
 
-Is there some sort of timeout happening here? I thought it might need
-activity to keep the link up, but l2ping should do that. Has anyone else
-seen anything similar?
+I didn't unroll any loops but I'll leave that as an exercise for the
+user or the compiler...
 
-(please reply to me as well, I'm not subscribed)
-
-Thanks,
-Matt
-
--- 
-Matthew Johnson
-http://www.matthew.ath.cx/
+Brad
 
 
 -------------------------------------------------------
