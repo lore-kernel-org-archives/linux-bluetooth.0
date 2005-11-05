@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec0511051410m6f0614dcnf1eb873c33e97a46@mail.gmail.com>
-From: Albert Huang <ashuang@gmail.com>
+Message-ID: <20051105120515.89752.qmail@web8309.mail.in.yahoo.com>
+From: manish pal <manu_ashishiitd@yahoo.co.in>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] what is libbluetooth library?
-In-Reply-To: <b47e603e0511050301i5e515811y58412c28aa581c8f@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_33799_3359720.1131228656739"
-References: <b47e603e0511050301i5e515811y58412c28aa581c8f@mail.gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Bluetooth on FLASH Drive
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,80 +16,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 5 Nov 2005 17:10:56 -0500
+Date: Sat, 5 Nov 2005 12:05:15 +0000 (GMT)
 
-------=_Part_33799_3359720.1131228656739
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+I installed linux on 32 MB Flash Drive.
+It only has busybox commands so GLIBC is not there.
 
-you need to install bluez-devel
+To incorporate bluetooth i recmpiled kernel on my PC 
+including the drivers in kernel itself and put the
+image in the /boot folder of flash
 
--albert
+Also I compiled the bluez binaries statically on my PC
+and put the binaries on flash drive.I had to compile
+statically because the linux running on flash doesn;t
+have GLIBC .
 
-On 11/5/05, George Friedman <george.friedman@gmail.com> wrote:
->
-> hi
->
-> i am installing pjbluez package (add on to jbluez) for location sensing.
-> source: http://www.mobilab.unina.it/PJBLUEZ.htm
->
-> when i run the shell script that can build the libraries for pjbluez, i
-> get an error saying,
->
-> checking bluetooth/bluetooth.h usability... no
-> checking bluetooth/bluetooth.h presence... no
-> checking for bluetooth/bluetooth.h... no
-> checking for hci_open_dev in -lbluetooth... no
-> configure: error: Sorry, you should install the libbluetooth library
-> before trying to compile this package
->
-> what does the last line mean?i have installed bluez and jbluez on fc 4 so
-> i don't understand what libbluetooth library i'm required to install
->
-> thank you
-> george
->
+After this when i run hciconfig by booting from flash
+i get the address of my USB Dongle.
+Also it can search for the bluetooth enabled devices
+in the vicinity.
+But when i run sdpd and sdptool add NAP
+it doesn;t say NAP service registered but when i run 
+the same executables on my PC it does say that.
 
-------=_Part_33799_3359720.1131228656739
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+My problem is how do i start the SDP server on Linux
+running on flash drive because the sdpd i compiled
+works fine on my Desktop PC 
 
-you need to install bluez-devel<br>
-<br>
--albert<br><br><div><span class=3D"gmail_quote">On 11/5/05, <b class=3D"gma=
-il_sendername">George Friedman</b> &lt;<a href=3D"mailto:george.friedman@gm=
-ail.com">george.friedman@gmail.com</a>&gt; wrote:</span><blockquote class=
-=3D"gmail_quote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin=
-: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-hi<br>
-<br>
-i am installing pjbluez package (add on to jbluez) for location sensing. so=
-urce: <a href=3D"http://www.mobilab.unina.it/PJBLUEZ.htm" target=3D"_blank"=
- onclick=3D"return top.js.OpenExtLink(window,event,this)">http://www.mobila=
-b.unina.it/PJBLUEZ.htm
-</a><br>
-<br>
-when i run the shell script that can build the libraries for pjbluez, i get=
- an error saying, <br>
-<br>
-checking bluetooth/bluetooth.h usability... no<br>
-checking bluetooth/bluetooth.h presence... no<br>
-checking for bluetooth/bluetooth.h... no<br>
-checking for hci_open_dev in -lbluetooth... no<br>
-configure: error: Sorry, you should install the libbluetooth library before=
- trying to compile this package<br>
-<br>
-what does the last line mean?i have installed bluez and jbluez on fc 4
-so i don't understand what libbluetooth library i'm required to install<br>
-<br>
-thank you<br><span class=3D"sg">
-george<br>
+Or is it a kernel problem
 
-</span></blockquote></div><br>
+Please Somebody help.
 
-------=_Part_33799_3359720.1131228656739--
+Manish
+
+
+		
+____________________________________________________
+Enjoy this Diwali with Y! India Click here http://in.promos.yahoo.com/fabmall/index.html
 
 
 -------------------------------------------------------
