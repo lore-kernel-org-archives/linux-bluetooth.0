@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051105120515.89752.qmail@web8309.mail.in.yahoo.com>
-From: manish pal <manu_ashishiitd@yahoo.co.in>
+Message-ID: <b47e603e0511050301i5e515811y58412c28aa581c8f@mail.gmail.com>
+From: George Friedman <george.friedman@gmail.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Bluetooth on FLASH Drive
+Content-Type: multipart/alternative;
+	boundary="----=_Part_9735_11590597.1131188480300"
+Subject: [Bluez-users] what is libbluetooth library?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,42 +17,62 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 5 Nov 2005 12:05:15 +0000 (GMT)
+Date: Sat, 5 Nov 2005 19:01:20 +0800
 
-I installed linux on 32 MB Flash Drive.
-It only has busybox commands so GLIBC is not there.
+------=_Part_9735_11590597.1131188480300
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-To incorporate bluetooth i recmpiled kernel on my PC 
-including the drivers in kernel itself and put the
-image in the /boot folder of flash
+hi
 
-Also I compiled the bluez binaries statically on my PC
-and put the binaries on flash drive.I had to compile
-statically because the linux running on flash doesn;t
-have GLIBC .
+i am installing pjbluez package (add on to jbluez) for location sensing.
+source: http://www.mobilab.unina.it/PJBLUEZ.htm
 
-After this when i run hciconfig by booting from flash
-i get the address of my USB Dongle.
-Also it can search for the bluetooth enabled devices
-in the vicinity.
-But when i run sdpd and sdptool add NAP
-it doesn;t say NAP service registered but when i run 
-the same executables on my PC it does say that.
+when i run the shell script that can build the libraries for pjbluez, i get
+an error saying,
 
-My problem is how do i start the SDP server on Linux
-running on flash drive because the sdpd i compiled
-works fine on my Desktop PC 
+checking bluetooth/bluetooth.h usability... no
+checking bluetooth/bluetooth.h presence... no
+checking for bluetooth/bluetooth.h... no
+checking for hci_open_dev in -lbluetooth... no
+configure: error: Sorry, you should install the libbluetooth library before
+trying to compile this package
 
-Or is it a kernel problem
+what does the last line mean?i have installed bluez and jbluez on fc 4 so i
+don't understand what libbluetooth library i'm required to install
 
-Please Somebody help.
+thank you
+george
 
-Manish
+------=_Part_9735_11590597.1131188480300
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
+hi<br>
+<br>
+i am installing pjbluez package (add on to jbluez) for location sensing. so=
+urce: <a href=3D"http://www.mobilab.unina.it/PJBLUEZ.htm">http://www.mobila=
+b.unina.it/PJBLUEZ.htm</a><br>
+<br>
+when i run the shell script that can build the libraries for pjbluez, i get=
+ an error saying, <br>
+<br>
+checking bluetooth/bluetooth.h usability... no<br>
+checking bluetooth/bluetooth.h presence... no<br>
+checking for bluetooth/bluetooth.h... no<br>
+checking for hci_open_dev in -lbluetooth... no<br>
+configure: error: Sorry, you should install the libbluetooth library before=
+ trying to compile this package<br>
+<br>
+what does the last line mean?i have installed bluez and jbluez on fc 4
+so i don't understand what libbluetooth library i'm required to install<br>
+<br>
+thank you<br>
+george<br>
 
-		
-____________________________________________________
-Enjoy this Diwali with Y! India Click here http://in.promos.yahoo.com/fabmall/index.html
+------=_Part_9735_11590597.1131188480300--
 
 
 -------------------------------------------------------
