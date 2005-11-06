@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <436E46E8.1060201@bglug.it>
+From: jimmi <jimmi@bglug.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Message-ID: <17262.45251.127138.103470@waldo.lisle.iphase.com>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] btsco + aplay produces only silence on headset
-From: bbosch@iphase.com
-In-Reply-To: <436E46E8.1060201@bglug.it>
-References: <17261.23534.882674.809679@waldo.lisle.iphase.com>
-	<436DB826.2090406@libero.it>
-	<17262.9574.50552.492352@waldo.lisle.iphase.com>
-	<436E46E8.1060201@bglug.it>
+References: <17261.23534.882674.809679@waldo.lisle.iphase.com>	<436DB826.2090406@libero.it> <17262.9574.50552.492352@waldo.lisle.iphase.com>
+In-Reply-To: <17262.9574.50552.492352@waldo.lisle.iphase.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,24 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 6 Nov 2005 19:41:23 -0600
+Date: Sun, 06 Nov 2005 19:09:44 +0100
 
-I found my problem.  It seems that somehow I missed the SCO option on
-the hci_usb driver the last X times I built the kernel!!  I have no
-idea why this didn't show up somewhere as an error message when I
-tried to use it.
+bbosch@iphase.com ha scritto:
+> for a long time.  Are you saying I also must configure the sound
+> system _not_ to be built as modules even from the 2.6.14 kernel
+> source?  In other words, must CONFIG_SND be set to "y" rather than
+> "m"?
 
-The kernel ALSA drivers do not need to be built in.  The 2.6.14
-ALSA modules work just fine but when I was reconfiguring the kernel to
-include non-modular ALSA support, I noticed my error so thanks jimmi!
+This was my interpretation; reading again the whole sentence you may be 
+rigth, but I would give it a trial ;)
 
-To summarize, I was just missing CONFIG_BT_HCIUSB_SCO=y in my .config file.
+Another tip: did you ever used the sound on that machine ? If not, run 
+alsamixer and enable the master.
 
-Now aplay works fine so my next step is to get it working with skype.
-
-Thanks again.
-
---Brad
+Jimmi
 
 
 -------------------------------------------------------
