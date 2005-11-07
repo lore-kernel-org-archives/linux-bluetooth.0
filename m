@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0511070401v66d86898n41277902d0fbfa9b@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+Subject: Re: [Bluez-devel] [PATCH] dbus.c: cleanup/fix method parameter
+	getting
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_27235_8468980.1131364861705"
-Subject: [Bluez-devel] [DBUS PATCH] Disconnect
+In-Reply-To: <20051107093436.GB6845@localhost.localdomain>
+References: <20051105124837.GA27883@localhost.localdomain>
+	 <1131315924.5824.14.camel@blade>
+	 <20051107093436.GB6845@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1131359661.5824.97.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,185 +21,68 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 7 Nov 2005 10:01:01 -0200
+Date: Mon, 07 Nov 2005 11:34:21 +0100
 
-------=_Part_27235_8468980.1131364861705
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Johan,
 
-Hi,
+> > we should do our own range check, because the intention is to design an
+> > API and not to simply map the Bluetooth HCI to D-Bus. If we have weird
+> > parameters that doesn't matter in real or are only for internal inside
+> > hcid or the kernel then we leave them out. If we wanna combine to HCI
+> > commands into one D-Bus method then we do this to. So please don't try
+> > to stick to the HCI specification. Try to design some logical API for
+> > Bluetooth.
+> 
+> Sure. However it would be nice to hear your opinions about e.g. the
+> level of abstraction we should strive for and if there are areas (e.g.
+> SDP) which should be abstracted more than others. At least for RFCOMM I
+> was thinking of doing a similar interface that we have in maemo [1],
+> where you could directly use identifiers such as "DUN" and "FTP" to
+> connect to a service without the need to do SDP separately. Of course
+> there should also be the possibility to use an exact UUID for less
+> common services.
 
-Here is patch do handle the dbus system "Disconnect" signal.
+I like that idea and since one of my advanced goals is to implement a
+full SDP client into bluetoothd, this would work out just fine. Actually
+the D-Bus interface should not use any kind of RFCOMM channel or L2CAP
+PSM numbers. I consider it more as an API to the Bluetooth profiles and
+not the protocols. So in the case of RFCOMM <-> TTY assignments we may
+only wanna use bdaddr + uuid as parameters. The UUID then can be a clear
+text value like "dun" or "ftp" or a hex value like "0x1111". For the
+BD_ADDR it would also make sense if this can be an alias or the remote
+name. Maybe changing the parameter name to device would be better.
 
-When the signal is received, a timer is started to try reconnect to
-the system bus each 5sec.
+Since the current SDP library is blocking, we would need some SDP client
+code that integrates nicely into an event loop.
+
+> > > Another thing with the inquiry and periodic inquiry methods is that the
+> > > inquiry method allows the caller to specify the num_responses parameter
+> > > while the periodic inquiry method has it hardcoded to 100 currently.
+> > > Should the parameter also be added to periodic inquiry or should it be
+> > > removed from normal inquiry?
+> > 
+> > See my comment above. The question here is if we need this parameter for
+> > any method call or should we make it a configurable option. So we have a
+> > sane default for num_responses and if somebody wants to use a different
+> > one that a second method to change it is needed.
+> 
+> Is there a reason to have a limit at all, i.e. why not always use the
+> value 0 (= unlimited number of responses)? Of course we can add a method
+> for setting another default, but can you give and example of a situation
+> where that would be needed?
+
+The num_responses and the IAC should be separate setting. It would be
+great if this setting is specific to the D-Bus session of the caller. In
+this case every D-Bus user can have its own settings. Do you think this
+is possible?
+
+For the time (length) of the inquiry I am not sure at the moment.
+
+Regards
+
+Marcel
 
 
-Regards,
-Claudio.
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
-
-------=_Part_27235_8468980.1131364861705
-Content-Type: text/x-patch; name=disconnect.patch; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="disconnect.patch"
-
---- bluez-utils-cvs.orig/hcid/dbus.c	2005-11-07 08:04:29.000000000 -0200
-+++ bluez-utils-cvs-hcid/hcid/dbus.c	2005-11-07 08:54:30.000000000 -0200
-@@ -28,10 +28,12 @@
- #include <stdio.h>
- #include <errno.h>
- #include <unistd.h>
-+#include <signal.h>
- #include <string.h>
- #include <syslog.h>
- #include <sys/ioctl.h>
- #include <sys/socket.h>
-+#include <sys/time.h>
- 
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/hci.h>
-@@ -50,6 +52,8 @@
- #define TIMEOUT				(30 * 1000)	/* 30 seconds */
- #define MAX_PATH_LENGTH			64
- #define MAX_CONN_NUMBER			10
-+#define DBUS_RECONNECT_TIMER		5000000 /* 5 sec */
-+
- 
- #define PINAGENT_SERVICE_NAME BASE_INTERFACE ".PinAgent"
- #define PINAGENT_INTERFACE PINAGENT_SERVICE_NAME
-@@ -890,18 +894,18 @@
- 	connection = dbus_bus_get(DBUS_BUS_SYSTEM, &error);
- 
- 	if (dbus_error_is_set(&error)) {
--		syslog(LOG_ERR, "Can't open system message bus connection: %s",
--								error.message);
-+		syslog(LOG_ERR, "dbus_bus_get: %s", error.message);
- 		dbus_error_free(&error);
- 		return FALSE;
- 	}
- 
-+	dbus_connection_set_exit_on_disconnect(connection, FALSE);
-+
- 	dbus_bus_request_name(connection, BASE_INTERFACE,
- 				DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT, &error);
- 
- 	if (dbus_error_is_set(&error)) {
--		syslog(LOG_ERR, "Can't get system message bus name: %s",
--								error.message);
-+		syslog(LOG_ERR, "dbus_bus_request_name: %s", error.message);
- 		dbus_error_free(&error);
- 		return FALSE;
- 	}
-@@ -1155,6 +1159,84 @@
- 
- /*****************************************************************
-  *  
-+ *    Section reserved to re-connection timer
-+ *     
-+ ******************************************************************/
-+void reconnect_timer_handler(int signum)
-+{
-+	struct hci_dev_list_req *dl = NULL;
-+	struct hci_dev_req *dr;
-+	int sk;
-+	int i;
-+
-+	if (hcid_dbus_init() == FALSE) 
-+		return;
-+
-+	/* stop the timer */
-+	sigaction(SIGALRM, NULL, NULL);
-+	setitimer(ITIMER_REAL, NULL, NULL);
-+
-+	/* register the device based paths */
-+
-+	/* Create and bind HCI socket */
-+	sk = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-+	if (sk < 0) {
-+		syslog(LOG_ERR, "Can't open HCI socket: %s (%d)", strerror(errno), errno);
-+		return;
-+	}
-+
-+	if (!(dl = malloc(HCI_MAX_DEV * sizeof(struct hci_dev_req) + sizeof(uint16_t)))) {
-+		syslog(LOG_INFO, "Can't allocate devlist buffer: %s (%d)",
-+		       strerror(errno), errno);
-+		return;
-+	}
-+	dl->dev_num = HCI_MAX_DEV;
-+	dr = dl->dev_req;
-+
-+	if (ioctl(sk, HCIGETDEVLIST, (void *) dl) < 0) {
-+		syslog(LOG_INFO, "Can't get device list: %s (%d)",
-+		       strerror(errno), errno);
-+		goto failed;
-+	}
-+
-+	/* reset the default device */
-+	default_dev = -1;
-+
-+	for (i = 0; i < dl->dev_num; i++, dr++) {
-+
-+		hcid_dbus_register_device(dr->dev_id);
-+
-+		if (hci_test_bit(HCI_UP, &dr->dev_opt))
-+			hcid_dbus_dev_up(dr->dev_id);
-+	}
-+failed:
-+	if (dl)
-+		free(dl);
-+
-+}
-+
-+void reconnect_timer_start(void)
-+{
-+	struct sigaction sa;
-+	struct itimerval timer;
-+
-+	memset (&sa, 0, sizeof (sa));
-+	sa.sa_handler = &reconnect_timer_handler;
-+	sigaction(SIGALRM, &sa, NULL);
-+
-+	/* expire after X  msec... */
-+	timer.it_value.tv_sec = 0;
-+	timer.it_value.tv_usec = DBUS_RECONNECT_TIMER;
-+
-+	/* ... and every x msec after that. */
-+	timer.it_interval.tv_sec = 0;
-+	timer.it_interval.tv_usec = DBUS_RECONNECT_TIMER;
-+
-+	setitimer(ITIMER_REAL, &timer, NULL);
-+}
-+
-+/*****************************************************************
-+ *  
-  *  Section reserved to HCI D-Bus services 
-  *  
-  *****************************************************************/
-@@ -1173,9 +1255,14 @@
- 	iface = dbus_message_get_interface(msg);
- 	method = dbus_message_get_member(msg);
- 
--	if (strcmp(iface, DBUS_INTERFACE_LOCAL) == 0) {
--		if (strcmp(method, "Disconnected") == 0)
--			ret = DBUS_HANDLER_RESULT_HANDLED;
-+	if ((strcmp(iface, DBUS_INTERFACE_LOCAL) == 0) && 
-+	    (strcmp(method, "Disconnected") == 0)) {
-+		syslog(LOG_ERR, "Got disconnected from the system message bus");
-+		dbus_connection_dispatch(conn);
-+		dbus_connection_close(conn);
-+		dbus_connection_unref(conn);
-+		reconnect_timer_start();
-+		ret = DBUS_HANDLER_RESULT_HANDLED;
- 	} else if (strcmp(iface, DBUS_INTERFACE_DBUS) == 0) {
- 		if (strcmp(method, "NameOwnerChanged") == 0)
- 			ret = DBUS_HANDLER_RESULT_HANDLED;
-
-------=_Part_27235_8468980.1131364861705--
 
 
 -------------------------------------------------------
