@@ -1,19 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] dbus.c: cleanup/fix method parameter
-	getting
+Subject: Re: [Bluez-devel] rfcomm + pppd Kernel oops
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20051107145430.GA12669@localhost.localdomain>
-References: <20051105124837.GA27883@localhost.localdomain>
-	 <1131315924.5824.14.camel@blade>
-	 <20051107093436.GB6845@localhost.localdomain>
-	 <1131359661.5824.97.camel@blade>
-	 <20051107121354.GA9950@localhost.localdomain>
-	 <1131368088.5824.116.camel@blade>
-	 <e1effdeb0511070612u7555e383kaaade3f1f0c7bbd1@mail.gmail.com>
-	 <20051107145430.GA12669@localhost.localdomain>
+In-Reply-To: <436F70C4.7060006@in.tum.de>
+References: <436F70C4.7060006@in.tum.de>
 Content-Type: text/plain
-Message-Id: <1131397067.5824.145.camel@blade>
+Message-Id: <1131377559.5824.131.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -26,47 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 07 Nov 2005 21:57:47 +0100
+Date: Mon, 07 Nov 2005 16:32:39 +0100
 
-Hi Johan,
+Hi Max,
 
-> > Use a per client connection identification will be nice if we have a
-> > peer responses instead of using signals. This will be nice when the
-> > kernel cache can be retrieved.
-> > 
-> > I didn't understand how the client id works.  Could you explain a
-> > little bit more?
-> 
-> The id I was talking about is in practice what you get when you call
-> dbus_message_get_sender for a received message. The D-BUS spec. calls it
-> "Unique name of the sending connection".
-> 
-> > Every time that a client establish a connection with the d-bus daemon
-> > the connection id changes.  Therefore control client id is useful only
-> > for clients that is always connected with the daemon.
-> 
-> True, and that was also one thing I was worried about when it comes to
-> the practicality of that solution (the settings wouldn't be persistent
-> enough). So, I think using the user id might be better in this respect.
+> when i try to tear down a Bluetooth rfcomm-ppp connection, this happens.
+> I hope, someone finds this interesting and knows what to do.
 
-I don't think so, because this options might be used not very often and
-so having them per unix user doesn't help. Two different applications
-running as them same user might have different needs. One wants to do
-inquiry with another IAC, the other with the general IAC. This tends to
-be a race condition.
+try a vanilla 2.6.14-git10 or 2.6.14-mh2 kernel and check if turning
+preempt helps.
 
-> However, let me now introduce a third option which we just discussed on
-> IRC with Claudio: optional D-BUS method parameters. It would be quite
-> easy to implement the methods so that the client could leave out most
-> parameters in which case hcid (or bluetoothd) would use some set of
-> default values. You could e.g. call the Inquiry method without any
-> parameters and it would just work (kind of the same way that dbus-test
-> allows doing "./dbus-test Inquiry" in which case it uses length=10 &
-> num_resp=100 as the default values). If the client insists on using its
-> own values for the method it would simply include them in the method
-> call.
-
-Let's do this proposal first.
+I don't think that this is your problem, but your kernel is tainted
+anyhow.
 
 Regards
 
