@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] dbus.c: cleanup/fix method parameter
-	getting
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20051107083749.GA6845@localhost.localdomain>
-References: <20051105124837.GA27883@localhost.localdomain>
-	 <1131313209.5824.4.camel@blade>
-	 <20051107083749.GA6845@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1131353817.5824.52.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] dbus.c: cleanup/fix method parameter getting
+Message-ID: <20051107083749.GA6845@localhost.localdomain>
+References: <20051105124837.GA27883@localhost.localdomain> <1131313209.5824.4.camel@blade>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1131313209.5824.4.camel@blade>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,26 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 07 Nov 2005 09:56:57 +0100
+Date: Mon, 7 Nov 2005 10:37:49 +0200
 
-Hi Johan,
+Hi Marcel,
 
-> > What do you think about using also tabs in dbus-test?
-> 
-> I have nothing fundamental against it. The primary reason why it uses
-> four spaces for indentation currently is that it's the setting I've
-> always had in my .vimrc for python code.
+On Sun, Nov 06, 2005, Marcel Holtmann wrote:
+> I decided to take both patches and hopefully the D-Bus Python support
+> will be fixed soon. However I applied another cleanup after your patches
+> that fixes some weird coding that ends up in unnecessary deep indented
+> lines. Please use this style for any loops and make use of labels for
+> the exit path in functions.
 
-the tabs makes it easy for people to change the visualization of them
-from four spaces to eight spaces (or others). This is why I prefer of
-having tabs, but since I am not really good in Python, I better not talk
-about that coding style ;)
+Will do.
 
-Regards
+> What do you think about using also tabs in dbus-test?
 
-Marcel
+I have nothing fundamental against it. The primary reason why it uses
+four spaces for indentation currently is that it's the setting I've
+always had in my .vimrc for python code.
 
-
+Johan
 
 
 -------------------------------------------------------
