@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <436F5602.1040105@web.de>
-From: Dirk Stockmann <dirk.stockmann@web.de>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Periodic noise on microphone with bt_sco
+	(BTA-6030 Dongle, Motorola H500 Headset)
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Periodic noise on microphone with bt_sco (BTA-6030
- Dongle, Motorola H500 Headset)
-References: <436F1C3B.5020002@web.de> <436F4D85.4030404@csr.com>
 In-Reply-To: <436F4D85.4030404@csr.com>
-Content-Type: text/plain; charset=ISO-8859-1
+References: <436F1C3B.5020002@web.de>  <436F4D85.4030404@csr.com>
+Content-Type: text/plain
+Message-Id: <1131368209.5824.118.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,53 +19,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 07 Nov 2005 14:26:26 +0100
+Date: Mon, 07 Nov 2005 13:56:49 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Steven,
 
-Hi,
-
-Steven Singer wrote:
-> At what rate are SCO packets transmitted in an HV3 link?
-
-thanks for your reply, this is already a good hint.
-
-> Based on the frequency, this looks (sounds?) like an electrical
-> problem. Many parts of the RF will have duty cycles of 266 Hz. Even
-> the current demand of the module will have a profile with this
-> frequency (it may pulse from a few milliamps up to 50 milliamps at
-> this rate, with sharp edges).
+> Oooh, this is just like Jeopardy.
 > 
-> I expect you're getting pickup from the electronics on the module onto
-> the microphone cables,or, more likely, the audio card in the PC -
-> they're notoriously badly shielded, you can even hear when you drag a
-> window round the screen.
+> I'll take Bluetooth for $500.
 
-But when the headset is connected to my Mobile Phone there is no noise,
-so it is unlikely that it is related to the headset itself. And I always
-thought (maybe wrong?) that the processing inside of the PC is pure
-digital. So there should be no noise on a recorded file. Besides from
-that my PC has a very good audio system with no noise at all.
+you just gave me an idea for another column of the conference game ;)
 
-I think that there is a problem with the processing of the received
-packets that creates the spikes in the signal.
+Regards
 
-Regards,
-Dirk
+Marcel
 
-- --
-Key can be found on:
-http://sks.keyserver.penguin.de
-hkp://sks.keyserver.penguin.de
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFDb1YCLi2VR2b1/voRAioJAKCJwmgPnCv6P4jHkKbXchrcFIAm3wCcCgne
-bIy5t7G4WMnZhGRZXJGI6qY=
-=4B9I
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
