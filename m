@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <436F1C3B.5020002@web.de>
-From: Dirk Stockmann <dirk.stockmann@web.de>
-MIME-Version: 1.0
+Message-ID: <2556509.1131351177494.JavaMail.dnedved@mac.com>
+From: David Nedved <dnedved@mac.com>
 To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Periodic noise on microphone with bt_sco (BTA-6030 Dongle, Motorola
- H500 Headset)
+Subject: [Bluez-users] choosing a bluetooth PCMCIA card
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,40 +16,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 07 Nov 2005 10:19:55 +0100
+Date: Mon, 07 Nov 2005 00:12:57 -0800
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi All,
 
-Hi,
+I've been browsing the list for a few days now, and I'm pretty sure I have an idea of the support status for the cards I've been looking at, but I've seen so many posts where people get a card that's listed and end up with questions, I hope you don't mind if I ask which of the following three cards will be the best choice for me BEFORE I buy:
 
-I have successfully compiled and installed the newest bt_sco driver and
-userspace programs on SuSE 10.0 (2.6.13 Kernel). And basically it works
-great: playback is fine and also the microphone is working.
-The problem is that the sound coming from the microphone is overlayed
-with a annoying buzz. The buzz is not very loud but clearly hearable and
-quite distracting.
-The base frequency of the buzz is about 266Hz. If that helps I could
-post a short recorded sample.
-I would be very grateful to get pointers what to do to get rid of that
-buzz. I am a experienced programmer with some low-level kernel
-knowledge, so I would also invest some time in debugging if I would knew
-for what I should look.
+- 3COM 3CRWB6096
 
-Thanks,
-Dirk
-- --
-Key can be found on:
-http://sks.keyserver.penguin.de
-hkp://sks.keyserver.penguin.de
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+Seems to be supported using bt3c_cs after firmware download.  Any issues with this one?  Seems to be a little harder to find than the other two as there's only one on ebay right now but a solid choice right?
 
-iD4DBQFDbxw7Li2VR2b1/voRAqzKAJinAs89WaKcf2vo67gBMJbe2RLSAJwPT6wy
-suH7s3ULGZVkdpSWEKjNKQ==
-=m6ND
------END PGP SIGNATURE-----
+- generic card with CSR BlueCore 02 main chip
+
+This card is everywhere.  It's the first hit you get when you google "PCMCIA bluetooth", it's all over ebay.  It has a retractable antenna, and it's always advertised as "Class 1" and "328 feet" but almost never has a manufacturer mentioned.  I see that CSR chips are on almost 50% of the supported cards... but there's only one post in the archive with this particular chip mentioned, but I don't quite understand the firmware version specific issues -- "firmware support between 14.3 and 16.4" -- what does that mean?  Will this one be a good choice?
+
+- Motorola BTPCM101
+
+Also all over ebay and CHEAP.  Might stick up and not be usable form factor for my application (see below) and the only comments in the archives are one person having trouble and Marcel saying "you must get it working with the serial_cs driver. The CIS of the card is weird ..." which doesn't sound promising.  Probably should pass on this one even though it's cheap, right?
+
+My application is that I need the PCMCIA bluetooth card to work mainly with serial support to talk to a GPS, but would also be very nice if it worked with other (non EDR) applications just for playing with such as headsets, phones, etc.  My machine is a Toshiba Libretto 110 which has two PCMCIA slots stacked on top of each other (and no serial or USB onboard).  I have an Orinoco Gold card in the top slot, which sticks out and up (out to the side and up towards the ceiling).  The bluetooth card must go in the slot under the Orinoco card, so it can stick out (to the side) but NOT up because the Orinoco card would block anything sticking up, slightly limiting my choices.  I'm running Gentoo and am stuck on kernel 2.6.12 for now until they get some PCMCIA/driver issues fixed with 2.6.13.  I have a strong preference for devices that are supported in kernel or at least in the portage tree, and most importantly are quick and painless to set up.
+
+Thanks in advance for any comments on the hardware!
+
+David
 
 
 -------------------------------------------------------
