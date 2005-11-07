@@ -1,12 +1,20 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Subject: Re: [Bluez-devel] [PATCH] dbus.c: cleanup/fix method parameter
+	getting
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH] dbus.c: cleanup/fix method parameter getting
-Message-ID: <20051107215732.GA19351@localhost.localdomain>
-References: <20051105124837.GA27883@localhost.localdomain> <1131315924.5824.14.camel@blade> <20051107093436.GB6845@localhost.localdomain> <1131359661.5824.97.camel@blade> <20051107121354.GA9950@localhost.localdomain> <1131368088.5824.116.camel@blade> <e1effdeb0511070612u7555e383kaaade3f1f0c7bbd1@mail.gmail.com> <20051107145430.GA12669@localhost.localdomain> <1131397067.5824.145.camel@blade>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1131397067.5824.145.camel@blade>
+In-Reply-To: <20051107145430.GA12669@localhost.localdomain>
+References: <20051105124837.GA27883@localhost.localdomain>
+	 <1131315924.5824.14.camel@blade>
+	 <20051107093436.GB6845@localhost.localdomain>
+	 <1131359661.5824.97.camel@blade>
+	 <20051107121354.GA9950@localhost.localdomain>
+	 <1131368088.5824.116.camel@blade>
+	 <e1effdeb0511070612u7555e383kaaade3f1f0c7bbd1@mail.gmail.com>
+	 <20051107145430.GA12669@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1131397067.5824.145.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,48 +26,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 7 Nov 2005 23:57:32 +0200
+Date: Mon, 07 Nov 2005 21:57:47 +0100
 
-Hi Marcel,
+Hi Johan,
 
-On Mon, Nov 07, 2005, Marcel Holtmann wrote:
-> > > Every time that a client establish a connection with the d-bus daemon
-> > > the connection id changes.  Therefore control client id is useful only
-> > > for clients that is always connected with the daemon.
+> > Use a per client connection identification will be nice if we have a
+> > peer responses instead of using signals. This will be nice when the
+> > kernel cache can be retrieved.
 > > 
-> > True, and that was also one thing I was worried about when it comes to
-> > the practicality of that solution (the settings wouldn't be persistent
-> > enough). So, I think using the user id might be better in this respect.
+> > I didn't understand how the client id works.  Could you explain a
+> > little bit more?
 > 
-> I don't think so, because this options might be used not very often and
-> so having them per unix user doesn't help. Two different applications
-> running as them same user might have different needs. One wants to do
-> inquiry with another IAC, the other with the general IAC. This tends to
-> be a race condition.
-
-Ok, I see your point. I didn't quite understand the use-case you were
-thinking of earlier. One extra requirement that the dbus-id settings has
-is that we will have to monitor the lifetime of a D-BUS client (by
-listening NameOwnerChanged D-BUS signals) and remove the corresponding
-entry from the settings table when an id gets removed from the bus.
-
-> > However, let me now introduce a third option which we just discussed on
-> > IRC with Claudio: optional D-BUS method parameters. It would be quite
-> > easy to implement the methods so that the client could leave out most
-> > parameters in which case hcid (or bluetoothd) would use some set of
-> > default values. You could e.g. call the Inquiry method without any
-> > parameters and it would just work (kind of the same way that dbus-test
-> > allows doing "./dbus-test Inquiry" in which case it uses length=10 &
-> > num_resp=100 as the default values). If the client insists on using its
-> > own values for the method it would simply include them in the method
-> > call.
+> The id I was talking about is in practice what you get when you call
+> dbus_message_get_sender for a received message. The D-BUS spec. calls it
+> "Unique name of the sending connection".
 > 
-> Let's do this proposal first.
+> > Every time that a client establish a connection with the d-bus daemon
+> > the connection id changes.  Therefore control client id is useful only
+> > for clients that is always connected with the daemon.
+> 
+> True, and that was also one thing I was worried about when it comes to
+> the practicality of that solution (the settings wouldn't be persistent
+> enough). So, I think using the user id might be better in this respect.
 
-Ok, I'll begin by doing a patch for Inquiry and PeriodicInquiry
-(probably during tomorrow).
+I don't think so, because this options might be used not very often and
+so having them per unix user doesn't help. Two different applications
+running as them same user might have different needs. One wants to do
+inquiry with another IAC, the other with the general IAC. This tends to
+be a race condition.
 
-Johan
+> However, let me now introduce a third option which we just discussed on
+> IRC with Claudio: optional D-BUS method parameters. It would be quite
+> easy to implement the methods so that the client could leave out most
+> parameters in which case hcid (or bluetoothd) would use some set of
+> default values. You could e.g. call the Inquiry method without any
+> parameters and it would just work (kind of the same way that dbus-test
+> allows doing "./dbus-test Inquiry" in which case it uses length=10 &
+> num_resp=100 as the default values). If the client insists on using its
+> own values for the method it would simply include them in the method
+> call.
+
+Let's do this proposal first.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
