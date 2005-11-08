@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Subject: Re: [Bluez-devel] [DBUS Patch] Device Property
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: [DBUS PATCH] Disconnect
-Message-ID: <20051108231118.GA13205@localhost.localdomain>
-References: <e1effdeb0511070401v66d86898n41277902d0fbfa9b@mail.gmail.com> <e1effdeb0511080829n4795636ewfb85de47383da57c@mail.gmail.com> <1131488528.5544.17.camel@blade>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1131488528.5544.17.camel@blade>
+In-Reply-To: <20051108222033.GA12368@localhost.localdomain>
+References: <3013cac80511040603k52c40da2gae5249abcba426d9@mail.gmail.com>
+	 <1131119054.11673.1.camel@localhost.localdomain>
+	 <e1effdeb0511081241w20503576id78ab38764b8b96b@mail.gmail.com>
+	 <20051108222033.GA12368@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1131489534.5544.20.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,20 +21,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 9 Nov 2005 01:11:18 +0200
+Date: Tue, 08 Nov 2005 23:38:54 +0100
 
-On Tue, Nov 08, 2005, Marcel Holtmann wrote:
-> > Do you have any comments about this patch?
+Hi Johan,
+
+> >   name       [name]  Get/Set local name
 > 
-> not yet, still looking at it.
+> This is good to have. A "local name changed" signal might also be useful
+> so that other applications can update their UI. Actually now that I
+> think about it, maybe thare should be a generic "property changed"
+> signal for all properties.
+
+sounds like a good idea and easy to extend in the future.
+
+> >   auth                   Enable/Disable Authentication
+> >   encrypt               Enable/Disable Encryption
+> >   secmgr               Enable/Disable Security Manager
+> >   piscan                Enable/Disable Page and Inquiry scan
+> >   iscan                  Enable/Disable Inquiry scan
+> >   pscan                 Enable/Disable Page scan
 > 
-> Johan, any comments from you?
+> I think the piscan can be dropped so that we have two boolean
+> properties: iscan and pscan.
+> 
+> Also, I think it would be good to have the possibility to set the
+> inquiry mode (standard, with RSSI, RSSI + extended inq. result).
+> Currently the mode is always set inquiry with rssi when PeriodicInquiry
+> is called (I'm thinking of sending a patch to remove it), but it should
+> probably be set once at device initialization and then changed only by
+> the SetProperty method call.
 
-Not really, except that it seems to work ;-)
+Totally agree.
 
-At least after a quick read-through the patch looks ok.
+Regards
 
-Johan
+Marcel
+
+
 
 
 -------------------------------------------------------
