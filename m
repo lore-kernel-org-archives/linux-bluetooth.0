@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] textfile.c find_key
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <e1effdeb0511081241w20503576id78ab38764b8b96b@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <CBBBD909D2D6D211B4700090273F9E6E04C49B66@polaris.hhn.com>
-References: <CBBBD909D2D6D211B4700090273F9E6E04C49B66@polaris.hhn.com>
-Content-Type: text/plain
-Message-Id: <1131488023.5544.9.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [DBUS Patch] Device Property
+In-Reply-To: <1131119054.11673.1.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <3013cac80511040603k52c40da2gae5249abcba426d9@mail.gmail.com>
+	 <1131119054.11673.1.camel@localhost.localdomain>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +19,70 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 08 Nov 2005 23:13:43 +0100
+Date: Tue, 8 Nov 2005 18:41:20 -0200
 
-Hi Robert,
+Hi,
 
-> Normally I would agree with you but I tried it and there came a NULL
-> -- to my great surprise.  I could have a bug in the kernel I'm using
-> or something else.  If you aren't sure you can always try it out
-> yourself and if I'm wrong there you go.  If you could let me know the
-> results you get I would appreciate it.
-> 
-> I ran textfile_get on a file that is size 0.  This should replicate
-> the bug for you.  I used test_textfile to test both the problem and
-> the 'fix' -- sadly, being that the mmap documentation says that 0
-> cannot be returned, I would say that the fix is a farce and mmap
-> should be fixed instead.
+In my opinion we can start playing with the feature below:
 
-I can't reproduce this problem. On a file with size 0 the textfile_get()
-returns NULL as it should be. No segmentation fault or any other problem
-so far. Maybe the kernel or your glibc is broken. What do you use?
+  up                      Open and initialize HCI device
+  down                  Close HCI device
 
-Regards
+  name       [name]  Get/Set local name
 
-Marcel
+  auth                   Enable/Disable Authentication
+  encrypt               Enable/Disable Encryption
+  secmgr               Enable/Disable Security Manager
+  piscan                Enable/Disable Page and Inquiry scan
+  iscan                  Enable/Disable Inquiry scan
+  pscan                 Enable/Disable Page scan
 
 
+Maybe we could analise the possibility of make the configuration
+permanent updating these values in the 'hcid.conf' configuration file.
+
+Regards,
+Claudio.
+
+
+On 11/4/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Eduardo,
+>
+> > here is the patch with the initial development of setproperty and
+> > getproperty for /org/bluez/Device/hciX. As this is only the fundation,
+>
+> I applied the patch to the CVS, but I don't wanna have a simply
+> hciconfig replacement. We need to think about the functions that we
+> wanna support over D-Bus.
+>
+> > I didn't update the python script.
+>
+> Please do so.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> SF.Net email is sponsored by:
+> Tame your development challenges with Apache's Geronimo App Server. Downl=
+oad
+> it for free - -and be entered to win a 42" plasma tv or your very own
+> Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+
+
+--
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
