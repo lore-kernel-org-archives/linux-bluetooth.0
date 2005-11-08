@@ -1,8 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20051108201719.07A04A933@innerdot.com>
-From: jims@innerdot.com (Jim Spring)
-Subject: [Bluez-users] bluez and a Macally BTMicro mouse (2.6.14 kernel)
+From: Stefan Quandt <Stefan.Quandt@bardenheuer.de>
+Message-ID: <dkqh8j$3ct$1@sea.gmane.org>
+References: <dkq0na$agk$1@sea.gmane.org> <1131454229.5824.163.camel@blade> <dkqb18$cek$1@sea.gmane.org> <1131460505.5824.183.camel@blade>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: Re: flooded with "SCO data: handle 0 dlen 0"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -14,52 +17,64 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue,  8 Nov 2005 12:17:19 -0800 (PST)
+Date: Tue, 08 Nov 2005 16:46:27 +0100
 
+Hi Marcel,
 
-I've been scouring around to see if there is a solution or any
-additional information regarding the problem, but I am at a 
-serious loss.
-
-I've got running on a thinkpad T43 w/ the 2.6.14 kernel.  The
-bluetooth adapter is a Zoom USB BT adapter.  I am able to use
-hcitool to scan for the mouse and it responds to ings using l2ping.
-However, I can't for the life of me figure out how to actually
-connect the device for use.  When I attempt to use:
-
-    rfcomm listen 0
-
-I get a "Connection refused message" and the following shows up
-on hcidump:
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Connect Complete (0x03) plen 11
-< ACL data: handle 6 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0040
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-> HCI Event: Command Complete (0x0e) plen 6
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 6 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 2 status 0
-      Connection refused - PSM not supported
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Disconn Complete (0x05) plen 4
-
-I've looked and looked and have not seen a satisfactory (or even
-remotey useful) piece of information as to what "Connection refused 
-- PSM not supported" means.  Can anyone shed any light on this?  Is
-there tweaking needed to the hcid.conf file?  Or what?
-
->From messages I have seen, this particular mouse works with FreeBSD
-and I've had no problems with it under OS X.  Just getting it to
-work with my linux system has not been successul.
-
-If there is additional information I can provide, I can get that too.
+doing "hciconfig -a" (a few seconds after connecting the dongle) gives me
+hci0:   Type: USB
+        BD Address: 00:0C:78:30:B9:1A ACL MTU: 339:4 SCO MTU: 60:9
+        UP RUNNING
+        RX bytes:441632 acl:0 sco:129750 events:27 errors:0
+        TX bytes:345 acl:0 sco:0 commands:24 errors:0
+        Features: 0xff 0xff 0x81 0x00 0x18 0x18 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'BlueZ (0)'
+        Class: 0x3e0100
+        Service Classes: Networking, Rendering, Capturing
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x222 LMP Ver: 1.2 (0x2) LMP Subver:
+0x222
+        Manufacturer: RTX Telecom A/S (21)
 
 Thanks
--Jim Spring
+   Stefan
+
+Marcel Holtmann wrote:
+
+> Hi Stefan,
+> 
+>> >> As soon as I connect my Bluetooth-Dongle (Abe UB 20S, BlueSoleil) my
+>> >> syslog are flooded with empty SCO packets.
+>> > check if this is a Silicon Wave based dongle.
+>> How may I do this?
+>> 
+>> http://www.holtmann.org/linux/bluetooth/features.html
+>> says the manufacturer is RTX Telecom.
+>> 
+>> Maybe this helps:
+>> /sys/bus/usb/devices/1-1/idProduct contains 080a
+>> /sys/bus/usb/devices/1-1/idVendor contains  0400
+> 
+> call "hciconfig -a".
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> SF.Net email is sponsored by:
+> Tame your development challenges with Apache's Geronimo App Server.
+> Download it for free - -and be entered to win a 42" plasma tv or your very
+> own
+> Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
+
+
 
 
 -------------------------------------------------------
