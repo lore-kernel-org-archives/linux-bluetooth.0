@@ -1,16 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0511080817j48cec525r8ba84a66fc6aaaf1@mail.gmail.com>
+Message-ID: <e1effdeb0511080829n4795636ewfb85de47383da57c@mail.gmail.com>
 From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH] Variable arguments to Inquiry and PeriodicInquiry D-BUS methods
-In-Reply-To: <1131462224.5824.198.camel@blade>
+In-Reply-To: <e1effdeb0511070401v66d86898n41277902d0fbfa9b@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-References: <20051108134311.GA7150@localhost.localdomain>
-	 <1131458070.5824.181.camel@blade>
-	 <20051108143016.GA7919@localhost.localdomain>
-	 <e1effdeb0511080645u30fb24dep3243ce434b0f07c2@mail.gmail.com>
-	 <1131462224.5824.198.camel@blade>
+References: <e1effdeb0511070401v66d86898n41277902d0fbfa9b@mail.gmail.com>
+Subject: [Bluez-devel] Re: [DBUS PATCH] Disconnect
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,73 +18,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 8 Nov 2005 14:17:44 -0200
+Date: Tue, 8 Nov 2005 14:29:23 -0200
 
-Hi,
+Hi Marcel,
 
-On 11/8/05, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Claudio,
->
-> > 1. It's better use the same method name used by device configuration.
-> > Currently, device configuration uses SetProperty and GetProperty, it
-> > should be better rename to Set and Get. Do you agree?
->
-> is HAL using something similar? If yes, then we should adapt their way.
-[Claudio Takahasi]
-HAL implements 5 different methods to set device properties.
-void SetProperty(string key, any value)
-void SetPropertyString(string key, string value)
-void SetPropertyInteger(string key, int32 value)
-void SetPropertyBoolean(string key, bool value)
-void SetPropertyDouble(string key, double value)
+Do you have any comments about this patch?
 
-We don't need use this approach because we are extracting/comparing
-the message signature before call the function responsible to execute
-the task. Our design of having the same method name with differents
-signatures is fine! Regarding the name, it's better use the same
-method name "SetProperty" or only "Set" for both(device configuration
-and Controller).
+In order to see how it works restart the dbus-daemon
+$/etc/init.d/dbus-1 stop
+$/etc/init.d/dbus-1 start
 
->
-> > 2. Does it make sense add an extra argument(device class) in order to
-> > be notified only by device class that the client wants? Maybe this
-> > enhancement should be applied when become possible retrieve the
-> > Inquiry cache using the new userspace/kernel communication interface.
->
-> We really need this lifetime monitoring. This shouldn't be an extra
-> parameter, but a general filter setting for inquiry would be a good
-> enhancement. And we can do it all in userspace.
->
-> > 3. Periodic inquiry is a concurrent task. Currently there isn't
-> > verification for PeriodicInquiry requested by more than one client. In
-> > this case how it should work?
->
-> It should fail with somekind in progress error indication. However the
-> kernel should set the INQUIRY flag is an inquiry is already in progress.
-> I know that this work for normal inquiries, but I never checked that for
-> the periodic inquiry.
-[Claudio Takahasi]
-ok. we need check how it is working now and try implement a policy for
-this case.
 
+Regards,
+Claudio.
+
+On 11/7/05, Claudio Takahasi <cktakahasi@gmail.com> wrote:
+> Hi,
 >
-> Regards
+> Here is patch do handle the dbus system "Disconnect" signal.
 >
-> Marcel
+> When the signal is received, a timer is started to try reconnect to
+> the system bus each 5sec.
 >
 >
+> Regards,
+> Claudio.
+> --
+> ---------------------------------------------------------
+> Claudio Takahasi
+> Instituto Nokia de Tecnologia - INdT
 >
 >
-> -------------------------------------------------------
-> SF.Net email is sponsored by:
-> Tame your development challenges with Apache's Geronimo App Server. Downl=
-oad
-> it for free - -and be entered to win a 42" plasma tv or your very own
-> Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 >
 
 
