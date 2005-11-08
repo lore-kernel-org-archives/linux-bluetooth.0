@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] C Program for Getting Link Quality
-From: Marcel Holtmann <marcel@holtmann.org>
+From: "Collin R. Mulliner" <collin@betaversion.net>
 To: bluez-devel@lists.sourceforge.net
 In-Reply-To: <94e407f00511080131u11f01d79x65d05cfe47ccbb7@mail.gmail.com>
 References: <94e407f00511080131u11f01d79x65d05cfe47ccbb7@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1131454195.5824.161.camel@blade>
+Message-Id: <1131443211.28995.12.camel@panic>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,34 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 08 Nov 2005 13:49:55 +0100
+Date: Tue, 08 Nov 2005 01:46:51 -0800
 
-Hi Arpit,
+I thought the link quality is useless because each manufacturer has
+different "quality" values and therefore the returned value is mostly
+useless ... or did that change?
 
+
+curious ... Collin
+
+On Tue, 2005-11-08 at 17:31 +0800, Arpit Rai wrote:
+> Hi
+> 
 > I've written a C program to help me get the link quality between two
 > bluetooth dongles. But, on compilation there are problems with the
 > definition: 
 > 
 > cr = (hci_conn_info_req *)malloc(sizeof(*cr) + sizeof(struct
 > hci_conn_info)); (Error: 'hci_conn_info_req' undeclared)
-> 
-> This the program I'm running:
-> 
-> //Program for finding LQ
-> #include <stdio.h>
-> #include <stdlib.h>
-> #include <unistd.h>
-> #include <bluetooth/bluetooth.h>
-> #include <bluetooth/hci.h>
-> #include <bluetooth/hci_lib.h>
 
-don't forget to include <sys/socket.h> before <bluetooth/bluetooth.h> or
-use a newer version of the Bluetooth library.
-
-Regards
-
-Marcel
-
+--
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+Ever used Mosaic?
 
 
 
