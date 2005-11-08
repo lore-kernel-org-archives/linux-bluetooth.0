@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS Patch] Device Property
+Subject: RE: [Bluez-devel] textfile.c find_key
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0511081241w20503576id78ab38764b8b96b@mail.gmail.com>
-References: <3013cac80511040603k52c40da2gae5249abcba426d9@mail.gmail.com>
-	 <1131119054.11673.1.camel@localhost.localdomain>
-	 <e1effdeb0511081241w20503576id78ab38764b8b96b@mail.gmail.com>
+In-Reply-To: <CBBBD909D2D6D211B4700090273F9E6E04C49B66@polaris.hhn.com>
+References: <CBBBD909D2D6D211B4700090273F9E6E04C49B66@polaris.hhn.com>
 Content-Type: text/plain
-Message-Id: <1131488427.5544.15.camel@blade>
+Message-Id: <1131488023.5544.9.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,44 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 08 Nov 2005 23:20:27 +0100
+Date: Tue, 08 Nov 2005 23:13:43 +0100
 
-Hi Claudio,
+Hi Robert,
 
-> In my opinion we can start playing with the feature below:
+> Normally I would agree with you but I tried it and there came a NULL
+> -- to my great surprise.  I could have a bug in the kernel I'm using
+> or something else.  If you aren't sure you can always try it out
+> yourself and if I'm wrong there you go.  If you could let me know the
+> results you get I would appreciate it.
 > 
->   up                      Open and initialize HCI device
->   down                  Close HCI device
+> I ran textfile_get on a file that is size 0.  This should replicate
+> the bug for you.  I used test_textfile to test both the problem and
+> the 'fix' -- sadly, being that the mmap documentation says that 0
+> cannot be returned, I would say that the fix is a farce and mmap
+> should be fixed instead.
 
-leave this for some other time. It is not that easy to do the up and
-down properly.
-
->   name       [name]  Get/Set local name
-
-And include the inquiry mode. We need to configure the name and the
-inquiry mode. I also wanna remove the inquiry mode setting inside the
-periodic inquiry call.
-
->   auth                   Enable/Disable Authentication
->   encrypt               Enable/Disable Encryption
->   secmgr               Enable/Disable Security Manager
-
-This is a no. We don't need to configure it. I am not going to support
-security mode 3 over the D-Bus interface. People are already doing
-enough mistakes right now with it.
-
->   piscan                Enable/Disable Page and Inquiry scan
->   iscan                  Enable/Disable Inquiry scan
->   pscan                 Enable/Disable Page scan
-
-This is all the same setting and the correct names for it are
-"connectable" and "discoverable". There is no need to expose the
-Bluetooth crappy names over the D-Bus interface.
-
-> Maybe we could analise the possibility of make the configuration
-> permanent updating these values in the 'hcid.conf' configuration file.
-
-Maybe or maybe not. Convince me that you can do it in sane way.
+I can't reproduce this problem. On a file with size 0 the textfile_get()
+returns NULL as it should be. No segmentation fault or any other problem
+so far. Maybe the kernel or your glibc is broken. What do you use?
 
 Regards
 
