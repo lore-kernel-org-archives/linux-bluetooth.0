@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] [DBUS Patch] Device Property
-Message-ID: <20051108222033.GA12368@localhost.localdomain>
-References: <3013cac80511040603k52c40da2gae5249abcba426d9@mail.gmail.com> <1131119054.11673.1.camel@localhost.localdomain> <e1effdeb0511081241w20503576id78ab38764b8b96b@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
 In-Reply-To: <e1effdeb0511081241w20503576id78ab38764b8b96b@mail.gmail.com>
+References: <3013cac80511040603k52c40da2gae5249abcba426d9@mail.gmail.com>
+	 <1131119054.11673.1.camel@localhost.localdomain>
+	 <e1effdeb0511081241w20503576id78ab38764b8b96b@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1131488427.5544.15.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,41 +20,50 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 9 Nov 2005 00:20:33 +0200
+Date: Tue, 08 Nov 2005 23:20:27 +0100
 
-On Tue, Nov 08, 2005, Claudio Takahasi wrote:
+Hi Claudio,
+
 > In my opinion we can start playing with the feature below:
 > 
 >   up                      Open and initialize HCI device
 >   down                  Close HCI device
 
-These we already have (through the Up and Down methods).
+leave this for some other time. It is not that easy to do the up and
+down properly.
 
 >   name       [name]  Get/Set local name
 
-This is good to have. A "local name changed" signal might also be useful
-so that other applications can update their UI. Actually now that I
-think about it, maybe thare should be a generic "property changed"
-signal for all properties.
+And include the inquiry mode. We need to configure the name and the
+inquiry mode. I also wanna remove the inquiry mode setting inside the
+periodic inquiry call.
 
 >   auth                   Enable/Disable Authentication
 >   encrypt               Enable/Disable Encryption
 >   secmgr               Enable/Disable Security Manager
+
+This is a no. We don't need to configure it. I am not going to support
+security mode 3 over the D-Bus interface. People are already doing
+enough mistakes right now with it.
+
 >   piscan                Enable/Disable Page and Inquiry scan
 >   iscan                  Enable/Disable Inquiry scan
 >   pscan                 Enable/Disable Page scan
 
-I think the piscan can be dropped so that we have two boolean
-properties: iscan and pscan.
+This is all the same setting and the correct names for it are
+"connectable" and "discoverable". There is no need to expose the
+Bluetooth crappy names over the D-Bus interface.
 
-Also, I think it would be good to have the possibility to set the
-inquiry mode (standard, with RSSI, RSSI + extended inq. result).
-Currently the mode is always set inquiry with rssi when PeriodicInquiry
-is called (I'm thinking of sending a patch to remove it), but it should
-probably be set once at device initialization and then changed only by
-the SetProperty method call.
+> Maybe we could analise the possibility of make the configuration
+> permanent updating these values in the 'hcid.conf' configuration file.
 
-Johan
+Maybe or maybe not. Convince me that you can do it in sane way.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
