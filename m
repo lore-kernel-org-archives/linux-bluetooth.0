@@ -1,9 +1,9 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="GB2312"
+	charset="UTF-8"
 Subject: RE: [Bluez-users] Periodic noise on microphone with bt_sco (BTA-6030 Dongle, Motorola H500 Headset)
-Message-ID: <ABEB3642D355C64EADE83D978A7671FB813533@pdsmsx406>
+Message-ID: <ABEB3642D355C64EADE83D978A7671FB813506@pdsmsx406>
 From: "Li, Lea" <lea.li@intel.com>
 To: <bluez-users@lists.sourceforge.net>
 Sender: bluez-users-admin@lists.sourceforge.net
@@ -17,84 +17,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 8 Nov 2005 09:26:07 +0800
+Date: Tue, 8 Nov 2005 09:08:27 +0800
 
-Also, since it is hard to address where the root cause is, maybe you =
-could divide the test into several steps to find it. Dump the audio =
-stream into a .pcm/.wav file, and then play the file to check where the =
-noise comes from - during the transferring process or during the playing =
-process.=20
-
-Thanks,=20
-Lea
-
------Original Message-----
-From: bluez-users-admin@lists.sourceforge.net =
-[mailto:bluez-users-admin@lists.sourceforge.net] On Behalf Of Dirk =
-Stockmann
-Sent: 2005=C4=EA11=D4=C27=C8=D5 22:11
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Periodic noise on microphone with bt_sco =
-(BTA-6030 Dongle, Motorola H500 Headset)
-
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
-
-Hi,
-
-Steven Singer wrote:
-> I agree with this diagnostic. If the headset doesn't generate noise
-> when attached to another device then the noise is probably not being
-> inserted at the headset end.
-
-No noise with two different mobile phones, but with two different =
-dongles.
-
-> One way to confirm whether it's electrical is to record digital signal
-> received from the dongle into a file, shut down the SCO link and then
-> play the file to the PC's loudspeakers.
-
-When I record "silence" from the microphone (as silent as possible) then
-there is clearly the noise with about -40db power.
-Is there a way to record the digital from the headset directly, before
-it is processed in alsa? Similar to the way hcidump works, maybe?
-
-> Are you sending a signal to the headset and, if so, are you hearing a
-> buzz in the headset's speaker? I'm wondering if a buzz in that
-> direction (coming from the sensitive microphone input on the PC) is
-> being looped through the air (or through the plastic) from the
-> headset's speaker to its microphone.
-
-Sound sent to the headset from the PC (e.g. an audiobook) is without the
-buzz. It is quite low quality (like on a phone) but clear.
-
-Regards,
-Dirk
-
-- --
-Key can be found on:
-http://sks.keyserver.penguin.de
-hkp://sks.keyserver.penguin.de
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFDb2CMLi2VR2b1/voRAsm4AJwJh4tySPRkrzk0V88aGjDqGyzZIgCfd2g8
-Q9zUy5UtvCTbifPGH9nSyzg=3D
-=3Dry8L
------END PGP SIGNATURE-----
-
-
--------------------------------------------------------
-SF.Net email is sponsored by:
-Tame your development challenges with Apache's Geronimo App Server. =
-Download
-it for free - -and be entered to win a 42" plasma tv or your very own
-Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGksDQoNCkp1c3Qgc29tZSBndWVzc2VzLiBJJ20gd29uZGVyaW5nIHdoZXRoZXIgdGhlIGF1ZGlv
+IGJ1ZmZlciBpcyBvZiB1bmRlcnJ1bi4gRm9yIGV4YW1wbGUsIG9uY2UgSSBtYWRlIGEgbWlzdGFr
+ZSBvZiByZWFkaW5nIGEgc2luZ2xlLWNoYW5uZWwgYXVkaW8gZnJvbSBtaWNyb3Bob25lIGFuZCBv
+dXRwdXR0aW5nIGl0IGxpa2UgYSBzdGVyZW8gc3RyZWFtLiBUaHVzIHRoZSAob3V0cHV0KSBhdWRp
+byBidWZmZXIgdW5kZXJyYW4gKGluIGhhbGYgb2YgdGhlIHRpbWUpIHBlcmlvZGljYWxseSBhbmQg
+cmVzdWx0ZWQgaW4gYSBsb3cgZnJlcXVlbmN5IG5vaXNlLg0KDQpUaGFua3MsIA0KTGVhDQrCoA0K
+QVAgMDUvMDYgQ0hHIFdQRSBNRw0KSW50ZWwgQ2hpbmEgTHRkLg0KU2hhbmdoYWkgQ2hpbmENCmlO
+ZXQ6IDgtNzUyLTM0NTINClRlbDogODYtMjEtNTI1NzQ1NDUtMzQ1Mg0KDQotLS0tLU9yaWdpbmFs
+IE1lc3NhZ2UtLS0tLQ0KRnJvbTogYmx1ZXotdXNlcnMtYWRtaW5AbGlzdHMuc291cmNlZm9yZ2Uu
+bmV0IFttYWlsdG86Ymx1ZXotdXNlcnMtYWRtaW5AbGlzdHMuc291cmNlZm9yZ2UubmV0XSBPbiBC
+ZWhhbGYgT2YgRGlyayBTdG9ja21hbm4NClNlbnQ6IDIwMDXlubQxMeaciDfml6UgMTc6MjANClRv
+OiBibHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQNClN1YmplY3Q6IFtCbHVlei11c2Vy
+c10gUGVyaW9kaWMgbm9pc2Ugb24gbWljcm9waG9uZSB3aXRoIGJ0X3NjbyAoQlRBLTYwMzAgRG9u
+Z2xlLCBNb3Rvcm9sYSBINTAwIEhlYWRzZXQpDQoNCi0tLS0tQkVHSU4gUEdQIFNJR05FRCBNRVNT
+QUdFLS0tLS0NCkhhc2g6IFNIQTENCg0KSGksDQoNCkkgaGF2ZSBzdWNjZXNzZnVsbHkgY29tcGls
+ZWQgYW5kIGluc3RhbGxlZCB0aGUgbmV3ZXN0IGJ0X3NjbyBkcml2ZXIgYW5kDQp1c2Vyc3BhY2Ug
+cHJvZ3JhbXMgb24gU3VTRSAxMC4wICgyLjYuMTMgS2VybmVsKS4gQW5kIGJhc2ljYWxseSBpdCB3
+b3Jrcw0KZ3JlYXQ6IHBsYXliYWNrIGlzIGZpbmUgYW5kIGFsc28gdGhlIG1pY3JvcGhvbmUgaXMg
+d29ya2luZy4NClRoZSBwcm9ibGVtIGlzIHRoYXQgdGhlIHNvdW5kIGNvbWluZyBmcm9tIHRoZSBt
+aWNyb3Bob25lIGlzIG92ZXJsYXllZA0Kd2l0aCBhIGFubm95aW5nIGJ1enouIFRoZSBidXp6IGlz
+IG5vdCB2ZXJ5IGxvdWQgYnV0IGNsZWFybHkgaGVhcmFibGUgYW5kDQpxdWl0ZSBkaXN0cmFjdGlu
+Zy4NClRoZSBiYXNlIGZyZXF1ZW5jeSBvZiB0aGUgYnV6eiBpcyBhYm91dCAyNjZIei4gSWYgdGhh
+dCBoZWxwcyBJIGNvdWxkDQpwb3N0IGEgc2hvcnQgcmVjb3JkZWQgc2FtcGxlLg0KSSB3b3VsZCBi
+ZSB2ZXJ5IGdyYXRlZnVsIHRvIGdldCBwb2ludGVycyB3aGF0IHRvIGRvIHRvIGdldCByaWQgb2Yg
+dGhhdA0KYnV6ei4gSSBhbSBhIGV4cGVyaWVuY2VkIHByb2dyYW1tZXIgd2l0aCBzb21lIGxvdy1s
+ZXZlbCBrZXJuZWwNCmtub3dsZWRnZSwgc28gSSB3b3VsZCBhbHNvIGludmVzdCBzb21lIHRpbWUg
+aW4gZGVidWdnaW5nIGlmIEkgd291bGQga25ldw0KZm9yIHdoYXQgSSBzaG91bGQgbG9vay4NCg0K
+VGhhbmtzLA0KRGlyaw0KLSAtLQ0KS2V5IGNhbiBiZSBmb3VuZCBvbjoNCmh0dHA6Ly9za3Mua2V5
+c2VydmVyLnBlbmd1aW4uZGUNCmhrcDovL3Nrcy5rZXlzZXJ2ZXIucGVuZ3Vpbi5kZQ0KLS0tLS1C
+RUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0NClZlcnNpb246IEdudVBHIHYxLjQuMiAoR05VL0xpbnV4
+KQ0KQ29tbWVudDogVXNpbmcgR251UEcgd2l0aCBUaHVuZGVyYmlyZCAtIGh0dHA6Ly9lbmlnbWFp
+bC5tb3pkZXYub3JnDQoNCmlENERCUUZEYnh3N0xpMlZSMmIxL3ZvUkFxektBSmluQXM4OVdhS2Nm
+MnZvNjdnQk1KYmUyUkxTQUp3UFQ2d3kNCnN1SDdzM1VMR1pWa2RwU1dFS2pOS1E9PQ0KPW02TkQN
+Ci0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0KDQoNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NClNGLk5ldCBlbWFpbCBpcyBzcG9uc29y
+ZWQgYnk6DQpUYW1lIHlvdXIgZGV2ZWxvcG1lbnQgY2hhbGxlbmdlcyB3aXRoIEFwYWNoZSdzIEdl
+cm9uaW1vIEFwcCBTZXJ2ZXIuIERvd25sb2FkDQppdCBmb3IgZnJlZSAtIC1hbmQgYmUgZW50ZXJl
+ZCB0byB3aW4gYSA0MiIgcGxhc21hIHR2IG9yIHlvdXIgdmVyeSBvd24NClNvbnkodG0pUFNQLiAg
+Q2xpY2sgaGVyZSB0byBwbGF5OiBodHRwOi8vc291cmNlZm9yZ2UubmV0L2dlcm9uaW1vLnBocA0K
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCkJsdWV6LXVz
+ZXJzIG1haWxpbmcgbGlzdA0KQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0DQpodHRw
+czovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycw0K
 
 
 -------------------------------------------------------
