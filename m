@@ -1,14 +1,23 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0511080645u30fb24dep3243ce434b0f07c2@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+Subject: Re: [Bluez-devel] [PATCH] dbus.c: cleanup/fix method parameter
+	getting
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH] Variable arguments to Inquiry and PeriodicInquiry D-BUS methods
-In-Reply-To: <20051108143016.GA7919@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <20051108134311.GA7150@localhost.localdomain>
-	 <1131458070.5824.181.camel@blade>
-	 <20051108143016.GA7919@localhost.localdomain>
+In-Reply-To: <20051108143127.GA7773@localhost.localdomain>
+References: <1131315924.5824.14.camel@blade>
+	 <20051107093436.GB6845@localhost.localdomain>
+	 <1131359661.5824.97.camel@blade>
+	 <20051107121354.GA9950@localhost.localdomain>
+	 <1131368088.5824.116.camel@blade>
+	 <e1effdeb0511070612u7555e383kaaade3f1f0c7bbd1@mail.gmail.com>
+	 <20051107145430.GA12669@localhost.localdomain>
+	 <1131397067.5824.145.camel@blade>
+	 <20051107215732.GA19351@localhost.localdomain>
+	 <1131457496.5824.172.camel@blade>
+	 <20051108143127.GA7773@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1131461076.5824.189.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,86 +29,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 8 Nov 2005 12:45:47 -0200
+Date: Tue, 08 Nov 2005 15:44:36 +0100
 
-Hi,
+Hi Johan,
 
-The interface for get/set the default values is fine!
+> > > Ok, I see your point. I didn't quite understand the use-case you were
+> > > thinking of earlier. One extra requirement that the dbus-id settings has
+> > > is that we will have to monitor the lifetime of a D-BUS client (by
+> > > listening NameOwnerChanged D-BUS signals) and remove the corresponding
+> > > entry from the settings table when an id gets removed from the bus.
+> > 
+> > this might be too much work for the current interface. Or do you think
+> > it can be easily implemented?
+> 
+> It will require a moderate amount of coding, so it wont be easy at least
+> in that respect. However, I think that implementing D-BUS client
+> lifetime monitoring is a feature that we will inevitably have to
+> implement at some point anyway. It may e.g. be needed for noticing if a
+> program which requested an RFCOMM connection suddenly died (in which
+> case hcid/bluetoothd should disconnect that connection). Also, I've
+> already done it once (for dbus 0.23.4 though) for the D-BUS API we have
+> in maemo, so there shouldn't come any "supprises" when implementing it.
 
-Some suggestions/comments...
-1. It's better use the same method name used by device configuration.
-Currently, device configuration uses SetProperty and GetProperty, it
-should be better rename to Set and Get. Do you agree?
+then lets do it. Or to be more precise, you do it ;)
 
-2. Does it make sense add an extra argument(device class) in order to
-be notified only by device class that the client wants? Maybe this
-enhancement should be applied when become possible retrieve the
-Inquiry cache using the new userspace/kernel communication interface.
+> > > Ok, I'll begin by doing a patch for Inquiry and PeriodicInquiry
+> > > (probably during tomorrow).
+> > 
+> > This would be great. For the next release I like to have the inquiry (or
+> > better name it device discovery) working. This will include some nice
+> > support for the extended inquiry. So you will get the remote name for
+> > free with a discovery. So is it possible to have different signatures
+> > for signals too?
+> 
+> Sure, and if the new signature differs only by having extra parameters
+> at the end it should even be backwards compatible (i.e.
+> dbus_message_get_args call for the old signature works also for the new
+> signature).
 
-3. Periodic inquiry is a concurrent task. Currently there isn't
-verification for PeriodicInquiry requested by more than one client. In
-this case how it should work?
+Then I think that I will include the device name in the inquiry response
+signal and leave further extensions to a different signature.
 
-Regards,
-Claudio.
+Regards
 
-On 11/8/05, Johan Hedberg <johan.hedberg@nokia.com> wrote:
-> Hi Marcel,
->
-> Attached is a new patch with some of your proposed changes (the ones I
-> agree with ;)
->
-> On Tue, Nov 08, 2005, Marcel Holtmann wrote:
-> > > The possible ways of calling the methods after applying this patch ar=
-e:
-> > >
-> > > Inquiry()
-> > > Inquiry(byte: length, byte: num_rsp, uint32: lap)
-> > > PeriodicInquiry(byte: length, uint16: min_period, uint16: max_period)
-> > > PeriodicInquiry(byte: length, uint16: min_period, uint16: max_period,
-> > >             byte: num_rsp, uint32: lap)
-> >
-> > please swap the lap and num_rsp (call it num_responses btw.) and make
-> > the num_responses also optional. It is more usual that you will specify
-> > a different lap instead of num_responses. The reason for this is,
-> > because the num_responses value is not really useful anymore. All chips
-> > in inquiry mode 1 or 2 tend to send results multiple times and this
-> > makes the num_responses value useless. It is only good for devices wher=
-e
-> > the memory storage for inquiry results is limited. Maybe we shouldn't
-> > use it at all.
->
-> I removed the num_responses parameter alltogether. If it's needed we can
-> always allow changing it through the default settings interface in the
-> future.
->
-> > Is it not better to call it access_code instead of lap?
->
-> Maybe. I called it lap since that's what your structs in hci.h and the
-> HCI spec calls it. Note that the terms we use in the code don't have to
-> the same what we put in the (yet to be created) public documentation of
-> the interface.
->
-> > The length parameter should also be in seconds and not the slot timing
-> > we get from the baseband.
->
-> Well, then it would always have to be rounded to the nearest 1.28 sec
-> multiple, so I'm not so sure how useful it would be (and it might be
-> even confusing for the user when the inquiry doesn't last the exact
-> amount of seconds that was given). I've left it unchanged for now. I can
-> send a new patch later specifically for it. If we do change it, should
-> it be an integer or a floating point number?
->
-> Johan
->
->
->
+Marcel
 
 
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
