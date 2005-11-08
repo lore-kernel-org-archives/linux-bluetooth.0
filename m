@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] flooded with "SCO data: handle 0 dlen 0"
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <dkq0na$agk$1@sea.gmane.org>
-References: <dkq0na$agk$1@sea.gmane.org>
-Content-Type: text/plain
-Message-Id: <1131454229.5824.163.camel@blade>
+From: Stefan Quandt <Stefan.Quandt@bardenheuer.de>
+Message-ID: <dkq0na$agk$1@sea.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] flooded with "SCO data: handle 0 dlen 0"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,20 +16,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 08 Nov 2005 13:50:29 +0100
+Date: Tue, 08 Nov 2005 12:04:10 +0100
 
-Hi Stefan,
+As soon as I connect my Bluetooth-Dongle (Abe UB 20S, BlueSoleil) my syslog
+are flooded with empty SCO packets.
+hcidump reports these with "SCO data: handle 0 dlen 0"
+I run OpenSuse-10.0 with bluez-2.21
 
-> As soon as I connect my Bluetooth-Dongle (Abe UB 20S, BlueSoleil) my syslog
-> are flooded with empty SCO packets.
-> hcidump reports these with "SCO data: handle 0 dlen 0"
-> I run OpenSuse-10.0 with bluez-2.21
+What goes wrong here?
 
-check if this is a Silicon Wave based dongle.
+Thanks 
+  Stefan
 
-Regards
-
-Marcel
 
 
 
