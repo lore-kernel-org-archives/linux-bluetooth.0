@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0511080829n4795636ewfb85de47383da57c@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+Subject: Re: [Bluez-devel] [PATCH] Variable arguments to Inquiry and
+	PeriodicInquiry D-BUS methods
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0511070401v66d86898n41277902d0fbfa9b@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <e1effdeb0511070401v66d86898n41277902d0fbfa9b@mail.gmail.com>
-Subject: [Bluez-devel] Re: [DBUS PATCH] Disconnect
+In-Reply-To: <e1effdeb0511080645u30fb24dep3243ce434b0f07c2@mail.gmail.com>
+References: <20051108134311.GA7150@localhost.localdomain>
+	 <1131458070.5824.181.camel@blade>
+	 <20051108143016.GA7919@localhost.localdomain>
+	 <e1effdeb0511080645u30fb24dep3243ce434b0f07c2@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1131462224.5824.198.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,44 +22,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 8 Nov 2005 14:29:23 -0200
+Date: Tue, 08 Nov 2005 16:03:44 +0100
 
-Hi Marcel,
+Hi Claudio,
 
-Do you have any comments about this patch?
+> 1. It's better use the same method name used by device configuration.
+> Currently, device configuration uses SetProperty and GetProperty, it
+> should be better rename to Set and Get. Do you agree?
 
-In order to see how it works restart the dbus-daemon
-$/etc/init.d/dbus-1 stop
-$/etc/init.d/dbus-1 start
+is HAL using something similar? If yes, then we should adapt their way.
+
+> 2. Does it make sense add an extra argument(device class) in order to
+> be notified only by device class that the client wants? Maybe this
+> enhancement should be applied when become possible retrieve the
+> Inquiry cache using the new userspace/kernel communication interface.
+
+We really need this lifetime monitoring. This shouldn't be an extra
+parameter, but a general filter setting for inquiry would be a good
+enhancement. And we can do it all in userspace.
+
+> 3. Periodic inquiry is a concurrent task. Currently there isn't
+> verification for PeriodicInquiry requested by more than one client. In
+> this case how it should work?
+
+It should fail with somekind in progress error indication. However the
+kernel should set the INQUIRY flag is an inquiry is already in progress.
+I know that this work for normal inquiries, but I never checked that for
+the periodic inquiry.
+
+Regards
+
+Marcel
 
 
-Regards,
-Claudio.
-
-On 11/7/05, Claudio Takahasi <cktakahasi@gmail.com> wrote:
-> Hi,
->
-> Here is patch do handle the dbus system "Disconnect" signal.
->
-> When the signal is received, a timer is started to try reconnect to
-> the system bus each 5sec.
->
->
-> Regards,
-> Claudio.
-> --
-> ---------------------------------------------------------
-> Claudio Takahasi
-> Instituto Nokia de Tecnologia - INdT
->
->
->
-
-
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
