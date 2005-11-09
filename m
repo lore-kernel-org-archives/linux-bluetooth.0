@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Subject: RE: [Bluez-devel] textfile.c find_key
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20051109121639.GA19566@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="VbJkn9YxBvnuCH5J"
-Subject: [Bluez-devel] [PATCH] dbus.c: use hci_send_req for periodic inquiry commands
+In-Reply-To: <CBBBD909D2D6D211B4700090273F9E6E04C49B68@polaris.hhn.com>
+References: <CBBBD909D2D6D211B4700090273F9E6E04C49B68@polaris.hhn.com>
+Content-Type: multipart/mixed; boundary="=-61KGt/Tdy/lVG17z//9T"
+Message-Id: <1131494589.5544.22.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,152 +18,61 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 9 Nov 2005 14:16:39 +0200
+Date: Wed, 09 Nov 2005 01:03:09 +0100
 
 
---VbJkn9YxBvnuCH5J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--=-61KGt/Tdy/lVG17z//9T
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Hi,
+Hi Robert,
 
-Here's a patch for the following changes:
+> It might possibly be.  I'm using an Arm processor with the kernel
+> version 2.6.10 for use with Busybox.  It's probably a safe bet that
+> not many people are using an Arm  processor so it could be something
+> about that.  I'll look around.
 
-1. Remove setting inquiry mode inte period inquiry mode function
-This should be done at device initialization and when the appropriate
-SetProperty method is called.
+okay lets check for (map == NULL). The attached patch would do it the
+right way.
 
-2. Use hci_send_req instead of hci_send_cmd for periodic inquiry and
-exit periodic inquiry commands. This way a failure status in command
-complete event can be catched and the apropriate error code returned.
+Regards
 
-Johan
+Marcel
 
---VbJkn9YxBvnuCH5J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="periodic-inq.patch"
 
-Index: hcid/dbus.c
+--=-61KGt/Tdy/lVG17z//9T
+Content-Disposition: attachment; filename=patch
+Content-Type: text/x-patch; name=patch; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+Index: textfile.c
 ===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus.c,v
-retrieving revision 1.52
-diff -u -r1.52 dbus.c
---- hcid/dbus.c	8 Nov 2005 14:54:58 -0000	1.52
-+++ hcid/dbus.c	9 Nov 2005 12:08:18 -0000
-@@ -1310,8 +1310,9 @@
- 
- static DBusMessage* handle_periodic_inq_req(DBusMessage *msg, void *data)
- {
--	write_inquiry_mode_cp inq_mode;
- 	periodic_inquiry_cp inq_param;
-+	struct hci_request rq;
-+	uint8_t status;
- 	DBusMessage *reply = NULL;
- 	struct hci_dbus_data *dbus_data = data;
- 	uint8_t length, num_rsp = 0;
-@@ -1359,19 +1360,23 @@
- 	inq_param.lap[1] = (lap >> 8) & 0xff;
- 	inq_param.lap[2] = (lap >> 16) & 0xff;
- 
--	inq_mode.mode = 1;	// INQUIRY_WITH_RSSI
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LINK_CTL;
-+	rq.ocf = OCF_PERIODIC_INQUIRY;
-+	rq.cparam = &inq_param;
-+	rq.clen = PERIODIC_INQUIRY_CP_SIZE;
-+	rq.rparam = &status;
-+	rq.rlen = sizeof(status);
- 
--	if (hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_INQUIRY_MODE,
--				WRITE_INQUIRY_MODE_CP_SIZE, &inq_mode) < 0) {
--		syslog(LOG_ERR, "Can't set inquiry mode: %s", strerror(errno));
-+	if (hci_send_req(dd, &rq, 100) < 0) {
-+		syslog(LOG_ERR, "Sending periodic inquiry command failed: %s", strerror(errno));
- 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
- 		goto failed;
+RCS file: /cvsroot/bluez/utils/common/textfile.c,v
+retrieving revision 1.9
+diff -u -r1.9 textfile.c
+--- textfile.c	29 Oct 2005 22:36:31 -0000	1.9
++++ textfile.c	9 Nov 2005 00:01:34 -0000
+@@ -149,7 +149,7 @@
  	}
  
--	if (hci_send_cmd(dd, OGF_LINK_CTL, OCF_PERIODIC_INQUIRY,
--				PERIODIC_INQUIRY_CP_SIZE, &inq_param) < 0) {
--		syslog(LOG_ERR, "Can't send HCI commands: %s", strerror(errno));
--		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
-+	if (status) {
-+		syslog(LOG_ERR, "Periodic inquiry failed with status %02X", status);
-+		reply = bluez_new_failure_msg(msg, BLUEZ_EBT_OFFSET + status);
- 		goto failed;
+ 	map = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_LOCKED, fd, 0);
+-	if (map == MAP_FAILED) {
++	if (!map || map == MAP_FAILED) {
+ 		err = errno;
+ 		goto unlock;
  	}
+@@ -243,7 +243,7 @@
+ 	size = st.st_size;
  
-@@ -1387,7 +1392,9 @@
- static DBusMessage* handle_cancel_periodic_inq_req(DBusMessage *msg, void *data)
- {
- 	DBusMessage *reply = NULL;
-+	struct hci_request rq;
- 	struct hci_dbus_data *dbus_data = data;
-+	uint8_t status;
- 	int dd = -1;
- 
- 	dd = hci_open_dev(dbus_data->dev_id);
-@@ -1397,12 +1404,25 @@
- 		goto failed;
+ 	map = mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
+-	if (map == MAP_FAILED) {
++	if (!map || map == MAP_FAILED) {
+ 		err = errno;
+ 		goto unlock;
  	}
- 
--	if (hci_send_cmd(dd, OGF_LINK_CTL, OCF_EXIT_PERIODIC_INQUIRY, 0 , NULL) < 0) {
--		syslog(LOG_ERR, "Send HCI command failed");
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LINK_CTL;
-+	rq.ocf = OCF_EXIT_PERIODIC_INQUIRY;
-+	rq.rparam = &status;
-+	rq.rlen = sizeof(status);
-+
-+	if (hci_send_req(dd, &rq, 100) < 0) {
-+		syslog(LOG_ERR, "Sending exit periodic inquiry command failed: %s",
-+				strerror(errno));
- 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
- 		goto failed;
- 	}
- 
-+	if (status) {
-+		syslog(LOG_ERR, "Exit periodic inquiry failed with status %02X", status);
-+		reply = bluez_new_failure_msg(msg, BLUEZ_EBT_OFFSET + status);
-+		goto failed;
-+	}
-+
- 	reply = dbus_message_new_method_return(msg);
- 
- failed:
-@@ -1479,6 +1499,7 @@
- 	DBusMessage *reply = NULL;
- 	struct hci_request rq;
- 	struct hci_dbus_data *dbus_data = data;
-+	uint8_t status;
- 	int dd = -1;
- 
- 	dd = hci_open_dev(dbus_data->dev_id);
-@@ -1492,13 +1513,21 @@
- 	memset(&rq, 0, sizeof(rq));
- 	rq.ogf = OGF_LINK_CTL;
- 	rq.ocf = OCF_INQUIRY_CANCEL;
-+	rq.rparam = &status;
-+	rq.rlen = sizeof(status);
- 
- 	if (hci_send_req(dd, &rq, 100) < 0) {
--		syslog(LOG_ERR, "Unable to cancel inquiry: %s", strerror(errno));
-+		syslog(LOG_ERR, "Sending cancel inquiry failed: %s", strerror(errno));
- 		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
- 		goto failed;
- 	}
- 
-+	if (status) {
-+		syslog(LOG_ERR, "Cancel inquiry failed with status %02X", status);
-+		reply = bluez_new_failure_msg(msg, BLUEZ_EBT_OFFSET + status);
-+		goto failed;
-+	}
-+
- 	reply = dbus_message_new_method_return(msg);
- 
- failed:
 
---VbJkn9YxBvnuCH5J--
+--=-61KGt/Tdy/lVG17z//9T--
+
 
 
 -------------------------------------------------------
