@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <1131707838.31419.247289599@webmail.messagingengine.com>
-From: "manish Verma" <manishverma@fastmail.fm>
+Subject: Re: [Bluez-devel] Moving D-BUS development to bluetoothd
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-Subject: [Bluez-devel] Two or three SCO connection
+In-Reply-To: <20051109132056.GA20741@localhost.localdomain>
+References: <20051109132056.GA20741@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1131577037.5544.148.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,18 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 11 Nov 2005 03:17:18 -0800
+Date: Wed, 09 Nov 2005 23:57:17 +0100
 
-Hello,
-Im trying to achieve two or three  SCO connection on linux kernel 2.6.x.
-(one master and two or three slaves). I like to know if this is possible
-? If yes on opensource with BlueZ and kernel patches and similar
-snd-bt-sco module then please let me know from where I can start.
-Regards,
-Manish 
+Hi Johan,
 
--- 
-http://www.fastmail.fm - A no graphics, no pop-ups email service
+> What kind of plans do you have with moving development over to
+> bluetoothd? I was planing to start implementing the dbus-id specific
+> settings and realized that dbus.c is starting to get quite "crowded"
+> with all the different features. It would be nice to be able to split it
+> up to different modules at some point.
+
+we need a good and race condition free implementation of our own event
+loop to get started with bluetoothd. I don't wanna depend on any other
+library for this. Feel free to suggest something.
+
+Regards
+
+Marcel
+
 
 
 
