@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Khaled" <khaled@ipbill.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: RE: [Bluez-users] bluez and asterisk
-Message-ID: <HCEOIFALKKLBLJPENPNOEEEICAAA.khaled@ipbill.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1131550526.5544.99.camel@blade>
+Subject: Re: [Bluez-users] Read out the security level from an active
+	connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <6410.1131549190@www43.gmx.net>
+References: <6410.1131549190@www43.gmx.net>
+Content-Type: text/plain
+Message-Id: <1131550388.5544.95.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,65 +19,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 9 Nov 2005 16:06:21 -0000
+Date: Wed, 09 Nov 2005 16:33:08 +0100
 
-Hi Marcel,
+Hi Nox,
 
-I do apologise...didn't mean to offend anyone :) especially in this hour of
-need! I suppose black and blue does resemble the beeting I have taken as a
-result of my efforts to get this implemented...
+> I checked the archiv to answer my questions but unfortunally i didn't find
+> anything which helps me, so please don't be irritated if tjis questions
+> already was asked.
+> 
+> My question is regarding the Bluetooth Security Levels 1, 2 and 3.
+> 
+> How can I see which one is actually used by an active connection ? With
+> hcidump maybe ? But what for I have to search than ?
+> 
+> So I want to read out the actually security level and also I want to change
+> it to see how my peer device will react.
 
-Any idea on my problem Marcel? I have been reading the list but cannot find
-much related to my issue; perhaps it is a good idea to discuss it...
-
-In other words, please help me!
-
-Khaled
-
-
-
------Original Message-----
-From: bluez-users-admin@lists.sourceforge.net
-[mailto:bluez-users-admin@lists.sourceforge.net]On Behalf Of Marcel
-Holtmann
-Sent: 09 November 2005 15:35
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] bluez and asterisk
-
-
-Hi,
-
-> I have been trying to tackle Theo Zourzouvillys' project on setting up
-> bluetooth support for Asterisk
-> (http://crazygreek.co.uk/content/chan_bluetooth), but have run into
-> problems and since his mailing list link does not work, I turn to you
-> at bluez-users.
-
-what about not using HTML emails or not using Outlook at all. There is
-no need to have black and blue text in an email. ASCII emails are still
-fine an appropriate for a open source mailing list ;)
+the is no difference between the security mode 1 and 2 and the presence
+security mode 3 is only visible with hcidump. However don't care about
+the security modes. They are an abstract definition for pairing and when
+authentication/encryption should be requested.
 
 Regards
 
 Marcel
 
-
-
-
--------------------------------------------------------
-SF.Net email is sponsored by:
-Tame your development challenges with Apache's Geronimo App Server. Download
-it for free - -and be entered to win a 42" plasma tv or your very own
-Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-______________________________________________________________________
-This email has been scanned by the MessageLabs Email Security System.
-For more information please visit http://www.messagelabs.com/email
-______________________________________________________________________
 
 
 
