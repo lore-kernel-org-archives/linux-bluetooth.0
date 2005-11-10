@@ -1,20 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Re: Re: Re: Buetooth and SAMSUNG SGH-E340
-From: Fredy Pulido =?ISO-8859-1?Q?L=F3pez?= <digitalfredy@debiancolombia.org>
+Subject: RE: [Bluez-users] bluez and asterisk
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20051109161839.GG21921@loulou-becane>
-References: <20051020135234.GC28731@loulou-becane>
-	<20051023123808.GA14322@elmicha.333200002251-0001.dialin.t-online.de>
-	<20051023151215.GB31746@loulou-becane>
-	<1130191981.9463.13.camel@localhost.localdomain>
-	<20051025163115.GA29385@loulou-becane>
-	<1130342970.8178.5.camel@localhost.localdomain>
-	<20051026195956.GH7782@loulou-becane>
-	<1131007931.2415.2.camel@yoda.digitalfredy.org>
-	<20051109161839.GG21921@loulou-becane>
-Content-Type: text/plain;
-	charset=iso-8859-1
-Message-Id: <1131668163.6367.15.camel@yoda.digitalfredy.org>
+In-Reply-To: <HCEOIFALKKLBLJPENPNOMEELCAAA.khaled@ipbill.com>
+References: <HCEOIFALKKLBLJPENPNOMEELCAAA.khaled@ipbill.com>
+Content-Type: text/plain
+Message-Id: <1131643489.25312.40.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -27,31 +18,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Nov 2005 19:16:03 -0500
+Date: Thu, 10 Nov 2005 18:24:49 +0100
 
-El mi=E9, 09-11-2005 a las 17:18 +0100, Philippe Berini escribi=F3:
-Try it:
-1)see your movile services (use your phone MAC) - are chanel 7 OBEX File
-Transfer?
-$ sdptool  browse AA:0A:D9:78:ED:AA=20
-2) remove the pc in your movil btdevices
-3) restart bluez -if get error send my your init.d/bluez-utils file for
-test it in my system
-4) use obexftp
+Hi Khaled,
 
-TIP: for use obexftp you not need /etc/bluetooth/rfcomm.conf
+> Thanks for your replies Marcel. Unfortunately I cannot find anything on the
+> net about hcidump reporting no traffic - I am completely lost!
+> 
+> My hcdump shows:
+> 
+> HCI sniffer - Bluetooth packet analyzer ver 1.27
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> 
+> Running: sdptool search --bdaddr 00:0E:6D:34:BD:B1 0x111F, gives:
+> 
+> Class 0x111F
+> Searching for 0x111F on 00:0E:6D:34:BD:B1 ...
+> Service Name: Voice Gateway
+> Service RecHandle: 0x10005
+> Service Class ID List:
+>   "Handfree Audio Gateway" (0x111f)
+>   "Generic Audio" (0x1203)
+> Protocol Descriptor List:
+>   "L2CAP" (0x0100)
+>   "RFCOMM" (0x0003)
+>     Channel: 13
+> Language Base Attr List:
+>   code_ISO639: 0x656e
+>   encoding:    0x6a
+>   base_offset: 0x100
+> Profile Descriptor List:
+>   "Handsfree" (0x111e)
+>     Version: 0x0100
+> 
+> Please see previous mails for more info about hciconfig -a, revision, etc
+> outputs.
+> How can I progress from this stage? Why is hcidump showing no traffic?
 
-> * Fredy Pulido L=F3pez <digitalfredy@debiancolombia.org> [Thu, Nov 03, 20=
-05 at 03:52:11AM -0500]:
->=20
-> > if you can made l2ping to your movil try with the obexftp version from
-> > testing or sarge
->=20
-> Yes, I can l2ping my mobile; I tried the obexftp versions from both
-> unstable and testing, but they fail miserably.
-> Never mind, one day I'll get it work by some magic :-)=20
-> Thanks.
->=20
+I am pretty sure that the PIN helper has a problem. So get hcidump
+running and look at your log files.
+
+Regards
+
+Marcel
+
 
 
 
