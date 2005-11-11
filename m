@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] sdptool and l2ping always return with "Host is
-	down"
-From: Marcel Holtmann <marcel@holtmann.org>
+From: "Nox Kua" <botswana23@gmx.de>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <5934.1131704223@www50.gmx.net>
+MIME-Version: 1.0
 References: <1131615893.25312.11.camel@blade>
-	 <5934.1131704223@www50.gmx.net>
-Content-Type: text/plain
-Message-Id: <1131704715.6984.3.camel@blade>
-Mime-Version: 1.0
+Subject: [Bluez-users] sdptool and l2ping always return with "Host is down"
+Message-ID: <5934.1131704223@www50.gmx.net>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,23 +17,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Nov 2005 11:25:15 +0100
+Date: Fri, 11 Nov 2005 11:17:03 +0100 (MET)
 
-Hi Nox,
+Hello,
 
-> my problem is that when I mada a hcitool inq I got a valid BTaddr 
-> from a BT device but after that if I make a l2ping or s sdptool always the
-> messsage returns with "...Host is down".
+my problem is that when I mada a hcitool inq I got a valid BTaddr 
+from a BT device but after that if I make a l2ping or s sdptool always the
+messsage returns with "...Host is down".
 
-as I said before, run "hcidump -X -V" you really see what's happening.
-However I speculate that device has inquiry scan of and page scan off or
-the role switch is failing.
+Some hint what it can be ?
 
-Regards
+Thanks
 
-Marcel
-
-
+-- 
+Lust, ein paar Euro nebenbei zu verdienen? Ohne Kosten, ohne Risiko!
+Satte Provisionen für GMX Partner: http://www.gmx.net/de/go/partner
 
 
 -------------------------------------------------------
