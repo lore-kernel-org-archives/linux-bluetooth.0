@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michael Mauch <michael.mauch@gmx.de>
+Subject: Re: [Bluez-users] sniff mode
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20051111190802.GB12636@elmicha.333200002251-0001.dialin.t-online.de>
-References: <20051111190417.GA12636@elmicha.333200002251-0001.dialin.t-online.de>
+In-Reply-To: <EFCD68F7BFDB06468769D4D9EAAA938709664693@scsmsx401.amr.corp.intel.com>
+References: 
+	 <EFCD68F7BFDB06468769D4D9EAAA938709664693@scsmsx401.amr.corp.intel.com>
+Content-Type: text/plain
+Message-Id: <1131736068.6542.0.camel@blade>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20051111190417.GA12636@elmicha.333200002251-0001.dialin.t-online.de>
-Subject: [Bluez-users] Re: OBEX push with ussp-push 0.5 (works, just for info)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,19 +19,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Nov 2005 20:08:02 +0100
+Date: Fri, 11 Nov 2005 20:07:48 +0100
 
-I wrote:
+Hi Trevor,
 
-> Or use the Bluetooth device name of the remote device (I don't know how
-> to show that with bluez-utils):
+> I'm trying to get sniff mode working between two devices.  My
+> understanding is that this is not directly supported by bluez
+> (http://mhonarc.axis.se/bluetooth-dev/msg03437.html), so I'm trying to
+> send the relevant HCI commands directly -- but I can't seem to get it to
+> work. A quick trace of all the information is below...  basically, it
+> seems to send the command ok, but it just comes back with an error
+> (which I think I have translated to just "HCI parameter error").  Any
+> thoughts on what might be going wrong?  
 
-% hcitool scan
+run "hcidump -X -V" in the back for the decoding.
 
-shows the BT device address and the device name.
+Regards
 
-Regards...
-		Michael
+Marcel
+
+
 
 
 -------------------------------------------------------
