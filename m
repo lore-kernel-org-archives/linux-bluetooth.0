@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-users] sniff mode
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Abu Hasnat Sayem <asayem@vt.edu>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <EFCD68F7BFDB06468769D4D9EAAA938709664754@scsmsx401.amr.corp.intel.com>
-References: 
-	 <EFCD68F7BFDB06468769D4D9EAAA938709664754@scsmsx401.amr.corp.intel.com>
-Content-Type: text/plain
-Message-Id: <1131738319.6542.4.camel@blade>
+Message-ID: <4374FFC9@zathras>
 Mime-Version: 1.0
+Content-Type: text/plain; charset="ISO-8859-1"
+Subject: [Bluez-users] Bluetooth 1.2 features in BlueZ...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,27 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Nov 2005 20:45:19 +0100
+Date: Fri, 11 Nov 2005 14:42:52 -0500
 
-Hi Trevor,
+I would like to know what features of Bluetooth 1.2 standard are incorporated 
+in the latest BlueZ patch..
+If anyone can point me some documents that would be nice...
+Any feedback will be greatly appreciated...
 
-> See the output below.  It says "Unsupported Feature of
-> Parameter value" -- so, I suppose this means either that the feature
-> isn't supported by my particular BT device, or that I'm getting
-> something wrong :-).  This is a fairly new SilliconWave dongle, so I
-> would assume it would work...   (I've also tried with other devices with
-> similar results).
-> 
-> The other question would be if I'm getting the parameters right, but...
-> I'm not quite sure how to figure that one out. I've tried a variety of
-> parameters, but they all end up the same.
 
-use the latest hcidump. It might decode the sniff request for you.
-
-Regards
-
-Marcel
-
+Thanks,
+Abu
 
 
 
