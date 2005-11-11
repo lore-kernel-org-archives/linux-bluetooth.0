@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Philippe Berini <philippe@berini.org>
+Subject: RE: [Bluez-users] sniff mode
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20051112124505.GI7787@loulou-becane>
-References: <20051020135234.GC28731@loulou-becane> <20051023123808.GA14322@elmicha.333200002251-0001.dialin.t-online.de> <20051023151215.GB31746@loulou-becane> <1130191981.9463.13.camel@localhost.localdomain> <20051025163115.GA29385@loulou-becane> <1130342970.8178.5.camel@localhost.localdomain> <20051026195956.GH7782@loulou-becane> <1131007931.2415.2.camel@yoda.digitalfredy.org> <20051109161839.GG21921@loulou-becane> <1131668163.6367.15.camel@yoda.digitalfredy.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1131668163.6367.15.camel@yoda.digitalfredy.org>
-Subject: [Bluez-users] Re: Re: Re: Re: Re: Buetooth and SAMSUNG SGH-E340
+In-Reply-To: <EFCD68F7BFDB06468769D4D9EAAA938709664754@scsmsx401.amr.corp.intel.com>
+References: 
+	 <EFCD68F7BFDB06468769D4D9EAAA938709664754@scsmsx401.amr.corp.intel.com>
+Content-Type: text/plain
+Message-Id: <1131738319.6542.4.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,46 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 12 Nov 2005 13:45:05 +0100
+Date: Fri, 11 Nov 2005 20:45:19 +0100
 
-* Fredy Pulido López <digitalfredy@debiancolombia.org> [Thu, Nov 10, 2005 at 07:16:03PM -0500]:
+Hi Trevor,
 
-> Try it:
-> 1)see your movile services (use your phone MAC) - are chanel 7 OBEX File
-> Transfer?
+> See the output below.  It says "Unsupported Feature of
+> Parameter value" -- so, I suppose this means either that the feature
+> isn't supported by my particular BT device, or that I'm getting
+> something wrong :-).  This is a fairly new SilliconWave dongle, so I
+> would assume it would work...   (I've also tried with other devices with
+> similar results).
+> 
+> The other question would be if I'm getting the parameters right, but...
+> I'm not quite sure how to figure that one out. I've tried a variety of
+> parameters, but they all end up the same.
 
-Yes:
+use the latest hcidump. It might decode the sniff request for you.
 
-# obexftp -b -l
-Scanning ...
-Using   00:12:47:AB:AF:46       SAMSUNG SGH-E340
-Browsing 00:12:47:AB:AF:46 ...
-Channel: 7
-No custom transport
-Connecting...failed: connect
+Regards
 
-
-> $ sdptool  browse AA:0A:D9:78:ED:AA 
-
-Nothing happens:
-
-# sdptool browse 00:12:47:AB:AF:46
-Browsing 00:12:47:AB:AF:46 ...
+Marcel
 
 
-> 2) remove the pc in your movil btdevices
-> 3) restart bluez -if get error send my your init.d/bluez-utils file for
-> test it in my system
-
-There is no error:
-
-# /etc/init.d/bluez-utils restart 
-Restarting bluez-utils: hidd hcid sdpd hidd rfcomm
-
-I believe we'd better forget it for now.
-
--- 
-Philippe Berini                
 
 
 -------------------------------------------------------
