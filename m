@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] sniff mode
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Michael Mauch <michael.mauch@gmx.de>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <EFCD68F7BFDB06468769D4D9EAAA938709664693@scsmsx401.amr.corp.intel.com>
-References: 
-	 <EFCD68F7BFDB06468769D4D9EAAA938709664693@scsmsx401.amr.corp.intel.com>
-Content-Type: text/plain
-Message-Id: <1131736068.6542.0.camel@blade>
+Message-ID: <20051111190417.GA12636@elmicha.333200002251-0001.dialin.t-online.de>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] OBEX push with ussp-push 0.5 (works, just for info)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,26 +16,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Nov 2005 20:07:48 +0100
+Date: Fri, 11 Nov 2005 20:04:17 +0100
 
-Hi Trevor,
+Hi,
 
-> I'm trying to get sniff mode working between two devices.  My
-> understanding is that this is not directly supported by bluez
-> (http://mhonarc.axis.se/bluetooth-dev/msg03437.html), so I'm trying to
-> send the relevant HCI commands directly -- but I can't seem to get it to
-> work. A quick trace of all the information is below...  basically, it
-> seems to send the command ok, but it just comes back with an error
-> (which I think I have translated to just "HCI parameter error").  Any
-> thoughts on what might be going wrong?  
+just a short note that ussp-push 0.5
+<http://www.xmailserver.org/ussp-push.html> works for me.
 
-run "hcidump -X -V" in the back for the decoding.
+You have to find the channel for OBEX Object Push, e.g. with:
 
-Regards
+% sdptool search OPUSH
 
-Marcel
+Then either use rfcomm bind, e.g.:
 
+% rfcomm bind /dev/rcomm0 00:11:22:33:44:55 10
+% ussp-push /dev/rfcomm0 localfile remotefile
 
+Or use the Bluetooth device name of the remote device (I don't know how
+to show that with bluez-utils):
+
+% ussp-push "BTDeviceName"@10 localfile remotefile
+
+There's already a Gentoo ebuild for ussp-push (I copied the examples
+from there).
+
+Regards...
+		Michael
 
 
 -------------------------------------------------------
