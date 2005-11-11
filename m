@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michael Mauch <michael.mauch@gmx.de>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20051111190417.GA12636@elmicha.333200002251-0001.dialin.t-online.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] OBEX push with ussp-push 0.5 (works, just for info)
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Message-ID: <EFCD68F7BFDB06468769D4D9EAAA938709664693@scsmsx401.amr.corp.intel.com>
+From: "Pering, Trevor" <trevor.pering@intel.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] sniff mode
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,32 +17,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Nov 2005 20:04:17 +0100
+Date: Fri, 11 Nov 2005 11:03:07 -0800
 
-Hi,
+Hello, I'm trying to get sniff mode working between two devices.  My
+understanding is that this is not directly supported by bluez
+(http://mhonarc.axis.se/bluetooth-dev/msg03437.html), so I'm trying to
+send the relevant HCI commands directly -- but I can't seem to get it to
+work. A quick trace of all the information is below...  basically, it
+seems to send the command ok, but it just comes back with an error
+(which I think I have translated to just "HCI parameter error").  Any
+thoughts on what might be going wrong? =20
 
-just a short note that ussp-push 0.5
-<http://www.xmailserver.org/ussp-push.html> works for me.
+Cheers,
+	Trevor
 
-You have to find the channel for OBEX Object Push, e.g. with:
 
-% sdptool search OPUSH
-
-Then either use rfcomm bind, e.g.:
-
-% rfcomm bind /dev/rcomm0 00:11:22:33:44:55 10
-% ussp-push /dev/rfcomm0 localfile remotefile
-
-Or use the Bluetooth device name of the remote device (I don't know how
-to show that with bluez-utils):
-
-% ussp-push "BTDeviceName"@10 localfile remotefile
-
-There's already a Gentoo ebuild for ussp-push (I copied the examples
-from there).
-
-Regards...
-		Michael
+stargate93:/root/ # hcitool con
+Connections:
+        < ACL 00:04:3E:01:83:C2 handle 7 state 1 lm MASTER=20
+stargate93:/root/ # cat sniff
+hcitool cmd 0x02 0x0003 0x00 0x07 0x02 0x02 0x01 0x01 0x01 0x02 0x03
+0x04
+stargate93:/root/ # ./sniff
+< HCI Command: ogf 0x02, ocf 0x0003, plen 10
+  00 07 02 02 01 01 01 02 03 04=20
+> HCI Event: 0x0f plen 4
+  11 01 03 08=20
+stargate93:/root/ # hciconfig -a
+hci0:   Type: USB
+        BD Address: AE:2D:00:23:01:96 ACL MTU: 120:20 SCO MTU: 64:0
+        UP RUNNING PSCAN ISCAN=20
+        RX bytes:4671 acl:70 sco:0 events:202 errors:0
+        TX bytes:2772 acl:70 sco:0 commands:84 errors:0
+        Features: 0xff 0xff 0x05 0x38 0x18 0x18 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3=20
+        Link policy: SNIFF=20
+        Link mode: SLAVE ACCEPT=20
+        Name: 'stargate-93@192.168.76.93'
+        Class: 0x820108
+        Service Classes: Networking
+        Device Class: Computer, Server
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver:
+0x757
+        Manufacturer: Silicon Wave (11)
+=20
 
 
 -------------------------------------------------------
