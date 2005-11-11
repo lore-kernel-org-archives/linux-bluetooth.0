@@ -3,7 +3,7 @@ MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="us-ascii"
 Subject: RE: [Bluez-users] sniff mode
-Message-ID: <EFCD68F7BFDB06468769D4D9EAAA93870966477E@scsmsx401.amr.corp.intel.com>
+Message-ID: <EFCD68F7BFDB06468769D4D9EAAA938709664754@scsmsx401.amr.corp.intel.com>
 From: "Pering, Trevor" <trevor.pering@intel.com>
 To: <bluez-users@lists.sourceforge.net>
 Sender: bluez-users-admin@lists.sourceforge.net
@@ -17,53 +17,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Nov 2005 11:40:23 -0800
-
-I answered one of my questions myself... looks like both devices should
-support sniff mode just fine...
-
-	Trevor
-
-stargate93:root/ # hciconfig hci0 features
-hci0:   Type: USB
-        BD Address: AE:2D:00:23:01:96 ACL MTU: 120:20 SCO MTU: 64:0
-        Features: 0xff 0xff 0x05 0x38 0x18 0x18 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot
-offset>=20
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-
-                <park state> <RSSI> <channel quality> <SCO link> <HV2
-packets>=20
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <power
-control>=20
-                <enhanced iscan> <interlaced iscan> <interlaced pscan>=20
-                <AFH cap. slave> <AFH class. slave> <AFH cap. master>=20
-                <AFH class. master>=20
-
-stargate93:root/ # hcitool info 00:04:3E:01:83:C2
-Requesting information ...
-        BD Address:  00:04:3E:01:83:C2
-        Device Name: ScoobyDoo (0)
-        LMP Version: 1.1 (0x1) LMP Subversion: 0x0
-        Manufacturer: Zeevo, Inc. (18)
-        Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot
-offset>=20
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-
-                <park state> <RSSI> <channel quality> <SCO link> <HV2
-packets>=20
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <power
-control>=20
-
-
------Original Message-----
-From: bluez-users-admin@lists.sourceforge.net
-[mailto:bluez-users-admin@lists.sourceforge.net] On Behalf Of Pering,
-Trevor
-Sent: Friday, November 11, 2005 11:34 AM
-To: bluez-users@lists.sourceforge.net
-Subject: RE: [Bluez-users] sniff mode
+Date: Fri, 11 Nov 2005 11:33:44 -0800
 
 Thanks, Marcel. See the output below.  It says "Unsupported Feature of
 Parameter value" -- so, I suppose this means either that the feature
@@ -124,18 +78,6 @@ Regards
 Marcel
 
 
-
-
--------------------------------------------------------
-SF.Net email is sponsored by:
-Tame your development challenges with Apache's Geronimo App Server.
-Download
-it for free - -and be entered to win a 42" plasma tv or your very own
-Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
