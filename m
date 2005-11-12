@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <45bf5ff80511120733m222f37b0u580167f357e3b282@mail.gmail.com>
-From: Artur Almeida <fidalgo.a@gmail.com>
-To: bluez-devel@lists.sourceforge.net, bluez-users@lists.sourceforge.net
+Message-ID: <4376020C.5050305@gmx.de>
+From: Maik Zumstrull <Maik.Zumstrull@gmx.de>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_5249_25870327.1131809590691"
-Subject: [Bluez-devel] rfcomm simultaneous connection
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] btsco: It works!
+References: <437514D5.7040300@gmx.de> <4375F049.6020300@gmx.de>
+In-Reply-To: <4375F049.6020300@gmx.de>
+Content-Type: text/plain; charset=UTF-8
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,68 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 12 Nov 2005 15:33:10 +0000
+Date: Sat, 12 Nov 2005 15:54:04 +0100
 
-------=_Part_5249_25870327.1131809590691
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Maik Zumstrull wrote:
+> Maik Zumstrull wrote:
+> 
+>>Okay, I'm in the situation I've seen reportet a few times on the List:
+>>
+>>Everything seems as if it were working, but I can't actually hear any
+>>sound sent to the Headset. I suspect it's the unsupported Bluetooth
+>>adapter in my laptop, which ist, unfortunately, Broadcom-based.
+> 
+> The good news: I just went and bought an additional BT dongle, nice and
+> CSR-based:
 
-Hi
- Can someone please confirm me that i have the correct understanding of the
-following:
-  Im trying to send a file over obex to device 1 a bt phone. He receives th=
-e
-prompt to accept the file and i dont answer.
-If i try to send another file to device 2 anoter btphone, bluez says no
-resources, but if i accept the file in device 1 and start to download it i
-can then prompt the device 2 to accept the file and transmit to both at the
-same time. Resuming when rfcomm is trying to connect to a device he haves t=
-o
-wait until that device gives a time out or accepts the connection before
-trying to connect to another device.
- Is this true? Can i control the timeout of the connection on the bluez
-side?
- Is there a way to establish several connections to many devices without
-depending between them?
- Thank you
- Regards
- Artur
-
-------=_Part_5249_25870327.1131809590691
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-<div>Hi</div>
-<div>&nbsp;</div>
-<div>Can someone please confirm me that i have the correct understanding of=
- the following:</div>
-<div>&nbsp;</div>
-<div>&nbsp;</div>
-<div>Im trying to send a file over obex&nbsp;to device 1 a bt phone. He rec=
-eives the prompt to accept the file and i dont answer.</div>
-<div>If i try to send another file to device 2 anoter btphone, bluez says n=
-o resources, but &nbsp;if i accept the file in device 1 and start to downlo=
-ad it i can then prompt the device 2 to accept the file and transmit to bot=
-h at the same time.&nbsp;Resuming when rfcomm is trying to connect to a dev=
-ice he haves to wait until that device gives a time out&nbsp;or accepts the=
- connection before trying to connect to another device.
-</div>
-<div>&nbsp;</div>
-<div>Is this true?&nbsp;Can i control the timeout of the connection on the =
-bluez side?&nbsp;</div>
-<div>&nbsp;</div>
-<div>Is there a way to establish several connections to many devices withou=
-t depending between them?</div>
-<div>&nbsp;</div>
-<div>Thank you</div>
-<div>&nbsp;</div>
-<div>Regards</div>
-<div>&nbsp;</div>
-<div>Artur</div>
-
-------=_Part_5249_25870327.1131809590691--
+...and after a little more fiddling, the headset now works as expected.
+Buttons and everything, tested against Skype. Thanks for writing a
+driver for this. :-)
 
 
 -------------------------------------------------------
