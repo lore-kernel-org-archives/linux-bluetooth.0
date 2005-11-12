@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43766239.30806@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] rfcomm simultaneous connection
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-References: <1131707838.31419.247289599@webmail.messagingengine.com>
-In-Reply-To: <1131707838.31419.247289599@webmail.messagingengine.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: Re: [Bluez-devel] Two or three SCO connection
+In-Reply-To: <45bf5ff80511121135o5ee92e8bn9cdf5317f25d6e6d@mail.gmail.com>
+References: <45bf5ff80511120733m222f37b0u580167f357e3b282@mail.gmail.com>
+	 <1131811109.29461.24.camel@blade>
+	 <45bf5ff80511121135o5ee92e8bn9cdf5317f25d6e6d@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1131828732.29461.29.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,25 +20,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 12 Nov 2005 14:44:25 -0700
+Date: Sat, 12 Nov 2005 21:52:12 +0100
 
-manish,
+Hi Artur,
 
-I only have an incomplete understanding of how this would work. It's in
-our wishlist for btsco and you may be able to make sense of the info
-I've collected on it:
+> t01:/# /usr/local/sbin/hcidump -X -V
+> HCI sniffer - Bluetooth packet analyzer ver 1.27
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:13:FD:BB:22:3F ptype 0xcc18 rswitch 0x01 clkoffset 0x0000 
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> > HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:14:60:01:23:45 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000 
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> > HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x0c ncmd 1
+>     Error: Command Disallowed
 
-http://sourceforge.net/tracker/index.php?func=detail&aid=1036737&group_id=116589&atid=678258
+you try to create both piconets at the same time. This can't work,
+because the Bluetooth chip can only page one. You must wait at least
+until one piconet is established.
 
-> Im trying to achieve two or three  SCO connection on linux kernel 2.6.x.
-> (one master and two or three slaves). I like to know if this is possible
-> ? If yes on opensource with BlueZ and kernel patches and similar
-> snd-bt-sco module then please let me know from where I can start.
-> Regards,
-> Manish 
-> 
+Regards
 
-brad
+Marcel
+
+
 
 
 -------------------------------------------------------
