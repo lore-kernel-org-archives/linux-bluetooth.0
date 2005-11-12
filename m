@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] rfcomm simultaneous connection
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <45bf5ff80511120733m222f37b0u580167f357e3b282@mail.gmail.com>
-References: <45bf5ff80511120733m222f37b0u580167f357e3b282@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1131811109.29461.24.camel@blade>
-Mime-Version: 1.0
+Message-ID: <45bf5ff80511120733m222f37b0u580167f357e3b282@mail.gmail.com>
+From: Artur Almeida <fidalgo.a@gmail.com>
+To: bluez-devel@lists.sourceforge.net, bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_5249_25870327.1131809590691"
+Subject: [Bluez-devel] rfcomm simultaneous connection
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,39 +17,68 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 12 Nov 2005 16:58:29 +0100
+Date: Sat, 12 Nov 2005 15:33:10 +0000
 
-Hi Artur,
+------=_Part_5249_25870327.1131809590691
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-no cross-posting. I mentioned that many times now.
+Hi
+ Can someone please confirm me that i have the correct understanding of the
+following:
+  Im trying to send a file over obex to device 1 a bt phone. He receives th=
+e
+prompt to accept the file and i dont answer.
+If i try to send another file to device 2 anoter btphone, bluez says no
+resources, but if i accept the file in device 1 and start to download it i
+can then prompt the device 2 to accept the file and transmit to both at the
+same time. Resuming when rfcomm is trying to connect to a device he haves t=
+o
+wait until that device gives a time out or accepts the connection before
+trying to connect to another device.
+ Is this true? Can i control the timeout of the connection on the bluez
+side?
+ Is there a way to establish several connections to many devices without
+depending between them?
+ Thank you
+ Regards
+ Artur
 
-> Can someone please confirm me that i have the correct understanding of
-> the following:
->  
->  
-> Im trying to send a file over obex to device 1 a bt phone. He receives
-> the prompt to accept the file and i dont answer.
-> If i try to send another file to device 2 anoter btphone, bluez says
-> no resources, but  if i accept the file in device 1 and start to
-> download it i can then prompt the device 2 to accept the file and
-> transmit to both at the same time. Resuming when rfcomm is trying to
-> connect to a device he haves to wait until that device gives a time
-> out or accepts the connection before trying to connect to another
-> device.
->  
-> Is this true? Can i control the timeout of the connection on the bluez
-> side? 
->  
-> Is there a way to establish several connections to many devices
-> without depending between them?
+------=_Part_5249_25870327.1131809590691
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-use "hcidump -X -V" to show what's going on.
+<div>Hi</div>
+<div>&nbsp;</div>
+<div>Can someone please confirm me that i have the correct understanding of=
+ the following:</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>Im trying to send a file over obex&nbsp;to device 1 a bt phone. He rec=
+eives the prompt to accept the file and i dont answer.</div>
+<div>If i try to send another file to device 2 anoter btphone, bluez says n=
+o resources, but &nbsp;if i accept the file in device 1 and start to downlo=
+ad it i can then prompt the device 2 to accept the file and transmit to bot=
+h at the same time.&nbsp;Resuming when rfcomm is trying to connect to a dev=
+ice he haves to wait until that device gives a time out&nbsp;or accepts the=
+ connection before trying to connect to another device.
+</div>
+<div>&nbsp;</div>
+<div>Is this true?&nbsp;Can i control the timeout of the connection on the =
+bluez side?&nbsp;</div>
+<div>&nbsp;</div>
+<div>Is there a way to establish several connections to many devices withou=
+t depending between them?</div>
+<div>&nbsp;</div>
+<div>Thank you</div>
+<div>&nbsp;</div>
+<div>Regards</div>
+<div>&nbsp;</div>
+<div>Artur</div>
 
-Regards
-
-Marcel
-
-
+------=_Part_5249_25870327.1131809590691--
 
 
 -------------------------------------------------------
