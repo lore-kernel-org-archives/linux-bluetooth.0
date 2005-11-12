@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4376020C.5050305@gmx.de>
+Message-ID: <4375FC34.3060704@gmx.de>
 From: Maik Zumstrull <Maik.Zumstrull@gmx.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] btsco: It works!
-References: <437514D5.7040300@gmx.de> <4375F049.6020300@gmx.de>
-In-Reply-To: <4375F049.6020300@gmx.de>
+Subject: Re: [Bluez-devel] btsco: Not working...but almost
+References: <437514D5.7040300@gmx.de>  <4375F049.6020300@gmx.de>	 <1131802872.29461.19.camel@blade>  <4375F60C.7090608@gmx.de> <1131805361.29461.22.camel@blade>
+In-Reply-To: <1131805361.29461.22.camel@blade>
 Content-Type: text/plain; charset=UTF-8
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,23 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 12 Nov 2005 15:54:04 +0100
+Date: Sat, 12 Nov 2005 15:29:08 +0100
 
-Maik Zumstrull wrote:
-> Maik Zumstrull wrote:
-> 
->>Okay, I'm in the situation I've seen reportet a few times on the List:
->>
->>Everything seems as if it were working, but I can't actually hear any
->>sound sent to the Headset. I suspect it's the unsupported Bluetooth
->>adapter in my laptop, which ist, unfortunately, Broadcom-based.
-> 
-> The good news: I just went and bought an additional BT dongle, nice and
-> CSR-based:
+Marcel Holtmann wrote:
 
-...and after a little more fiddling, the headset now works as expected.
-Buttons and everything, tested against Skype. Thanks for writing a
-driver for this. :-)
+>>Conceptronic Bluetooth 2.0 USB Adapter 200M
+>>Part-No CBT200U2
+> 
+> do you have a picture of it somewhere?
+
+http://www.conceptronic.net/site/DesktopDefault.aspx?tabindex=1&tabid=200&Cat=10&grp=1020&Prod_ID=1039&Prod=CBT200U2
+
+>>I got it for EUR 19,99 at my local Arlt.
+> 
+> Anyone in donation mood?
+
+Get my headset to work with my internal bluetooth adapter and you can
+have it. ;-)
+
+No, seriously. You could. But I guess that's not gonna happen anytime
+soon, without specs from Broadcom...
 
 
 -------------------------------------------------------
