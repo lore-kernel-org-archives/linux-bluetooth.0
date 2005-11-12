@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Steven Winston <spwinston@gmail.com>
+From: Philippe Berini <philippe@berini.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1131955693.3323.65.camel@Linux.localdoman.com>
-Mime-Version: 1.0
-Subject: [Bluez-users] help with headset
+Message-ID: <20051112124505.GI7787@loulou-becane>
+References: <20051020135234.GC28731@loulou-becane> <20051023123808.GA14322@elmicha.333200002251-0001.dialin.t-online.de> <20051023151215.GB31746@loulou-becane> <1130191981.9463.13.camel@localhost.localdomain> <20051025163115.GA29385@loulou-becane> <1130342970.8178.5.camel@localhost.localdomain> <20051026195956.GH7782@loulou-becane> <1131007931.2415.2.camel@yoda.digitalfredy.org> <20051109161839.GG21921@loulou-becane> <1131668163.6367.15.camel@yoda.digitalfredy.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1131668163.6367.15.camel@yoda.digitalfredy.org>
+Subject: [Bluez-users] Re: Re: Re: Re: Re: Buetooth and SAMSUNG SGH-E340
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +18,46 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Nov 2005 02:08:13 -0600
+Date: Sat, 12 Nov 2005 13:45:05 +0100
 
-I'm having some issues with using btsco.  Can someone please point me in
-the right direction to figure out what to do next?
-btsco 00:07:A4:47:B0:1D
-ALSA lib control.c:714:(snd_ctl_open_conf) symbol _snd_ctl_hw_open is
-not defined inside (null)
-Error: control open (hw:0): No such device or address
-Error: Can't find device. Bail
+* Fredy Pulido López <digitalfredy@debiancolombia.org> [Thu, Nov 10, 2005 at 07:16:03PM -0500]:
 
-Something in ALSA is definitely not setup right, I'm just not sure where
-to begin looking for it.  Thanks in advance.
+> Try it:
+> 1)see your movile services (use your phone MAC) - are chanel 7 OBEX File
+> Transfer?
+
+Yes:
+
+# obexftp -b -l
+Scanning ...
+Using   00:12:47:AB:AF:46       SAMSUNG SGH-E340
+Browsing 00:12:47:AB:AF:46 ...
+Channel: 7
+No custom transport
+Connecting...failed: connect
+
+
+> $ sdptool  browse AA:0A:D9:78:ED:AA 
+
+Nothing happens:
+
+# sdptool browse 00:12:47:AB:AF:46
+Browsing 00:12:47:AB:AF:46 ...
+
+
+> 2) remove the pc in your movil btdevices
+> 3) restart bluez -if get error send my your init.d/bluez-utils file for
+> test it in my system
+
+There is no error:
+
+# /etc/init.d/bluez-utils restart 
+Restarting bluez-utils: hidd hcid sdpd hidd rfcomm
+
+I believe we'd better forget it for now.
+
 -- 
-Steven Winston <spwinston@gmail.com>
-spwinston@gmail.com
-
+Philippe Berini                
 
 
 -------------------------------------------------------
