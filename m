@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Peter Wippich <pewi@gw-instruments.de>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] rfcomm simultaneous connection
-In-Reply-To: <1131828732.29461.29.camel@blade>
-Message-ID: <Pine.LNX.4.33.0511131501280.1406-100000@redbean.intranet.gw-instruments.de>
+Message-Id: <1131874795.8133.247381293@webmail.messagingengine.com>
+From: "manish Verma" <manishverma@fastmail.fm>
+To: bluez-devel@lists.sourceforge.net, bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+References: <1131707838.31419.247289599@webmail.messagingengine.com>
+   <43766239.30806@xmission.com>
+Subject: Re: [Bluez-devel] Two or three SCO connection
+In-Reply-To: <43766239.30806@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,65 +19,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 13 Nov 2005 15:03:00 +0100 (CET)
+Date: Sun, 13 Nov 2005 01:39:55 -0800
 
+Hello Brad,
+Thanks for your inputs. I have single SCO working using snd-bt-sco and
+btsco on my linux box with good voice quality on my headset. I'm very
+happy with single SCO performance and would like to achieve two or three
+SCO links. I would also like to put my efforts to see if we can achieve
+this. Just want to make sure that this is
+not going to be reinventing wheel. any pointers to start on multiple SCO
+link ??
+Regards,
+Manish
 
-
-Hi Marcel,
-
-or we need to change the HCI layer to enable it to queue the commands
-correctly ..... but this is not trivial.
-
-Could'nt resist ;-)..
-
-Peter
-
-On Sat, 12 Nov 2005, Marcel Holtmann wrote:
-
-> Hi Artur,
->
-> > t01:/# /usr/local/sbin/hcidump -X -V
-> > HCI sniffer - Bluetooth packet analyzer ver 1.27
-> > device: hci0 snap_len: 1028 filter: 0xffffffff
-> > < HCI Command: Create Connection (0x01|0x0005) plen 13
-> >     bdaddr 00:13:FD:BB:22:3F ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-> >     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> > > HCI Event: Command Status (0x0f) plen 4
-> >     Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> > < HCI Command: Create Connection (0x01|0x0005) plen 13
-> >     bdaddr 00:14:60:01:23:45 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-> >     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> > > HCI Event: Command Status (0x0f) plen 4
-> >     Create Connection (0x01|0x0005) status 0x0c ncmd 1
-> >     Error: Command Disallowed
->
-> you try to create both piconets at the same time. This can't work,
-> because the Bluetooth chip can only page one. You must wait at least
-> until one piconet is established.
->
-> Regards
->
-> Marcel
->
->
->
->
+On Sat, 12 Nov 2005 14:44:25 -0700, "Brad Midgley"
+<bmidgley@xmission.com> said:
+> manish,
+> 
+> I only have an incomplete understanding of how this would work. It's in
+> our wishlist for btsco and you may be able to make sense of the info
+> I've collected on it:
+> 
+> http://sourceforge.net/tracker/index.php?func=detail&aid=1036737&group_id=116589&atid=678258
+> 
+> > Im trying to achieve two or three  SCO connection on linux kernel 2.6.x.
+> > (one master and two or three slaves). I like to know if this is possible
+> > ? If yes on opensource with BlueZ and kernel patches and similar
+> > snd-bt-sco module then please let me know from where I can start.
+> > Regards,
+> > Manish 
+> > 
+> 
+> brad
+> 
+> 
 > -------------------------------------------------------
 > SF.Net email is sponsored by:
-> Tame your development challenges with Apache's Geronimo App Server. Download
+> Tame your development challenges with Apache's Geronimo App Server.
+> Download
 > it for free - -and be entered to win a 42" plasma tv or your very own
 > Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
 > _______________________________________________
 > Bluez-devel mailing list
 > Bluez-devel@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
 
-|	Peter Wippich 			Voice: +49 30 46776411		|
-|	G&W Instruments GmbH		fax:   +49 30 46776419		|
-|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
-|	D-13355 Berlin  / Germany					|
-
+-- 
+http://www.fastmail.fm - A no graphics, no pop-ups email service
 
 
 
