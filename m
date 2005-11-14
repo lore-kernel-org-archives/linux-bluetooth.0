@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4378E03C.90503@gmx.de>
-From: Maik Zumstrull <Maik.Zumstrull@gmx.de>
-MIME-Version: 1.0
+Message-Id: <1131966935.11561.247443316@webmail.messagingengine.com>
+From: "manish Verma" <manishverma@fastmail.fm>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Broadcom [Fwd: RE: Chipset specification [Fwd: Web Site Feedback/Support
- Request - Bluetooth - General]]
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+References: <1131964498.3323.77.camel@Linux.localdoman.com>
+Subject: Re: [Bluez-devel] btsco headset almost works
+In-Reply-To: <1131964498.3323.77.camel@Linux.localdoman.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,131 +18,87 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 14 Nov 2005 20:06:36 +0100
+Date: Mon, 14 Nov 2005 03:15:35 -0800
 
-My exchange with Broadcom regarding chipset specs. They want "BlueZ" to
-contact them directly. Not that you tried that or anything...
-
-
--------- Original Message --------
-Subject: RE: Chipset specification [Fwd: Web Site Feedback/Support
-Request - Bluetooth - General]
-Date: Mon, 14 Nov 2005 10:58:43 -0800
-From: Widcomm Support <support@widcomm.com>
-To: Maik Zumstrull <Maik.Zumstrull@gmx.de>
-
-We do not provide such info to 3rd party developers. If Bluez is looking
-for info so that they can use SCO on a Broadcom Bluetooth chipset then
-BlueZ should contact us directly for such info.
-
------Original Message-----
-From: Maik Zumstrull [mailto:Maik.Zumstrull@gmx.de]
-Sent: Monday, November 14, 2005 5:07 AM
-To: bt-support@broadcom.com
-Subject: Chipset specification [Fwd: Web Site Feedback/Support Request -
-Bluetooth - General]
-
-
-Thanks for obviously not even reading my message.
-
-I'm retrying with another contact address.
-
-As you can read in my original message, which is included below your
-automated reply, I would very much like to see the programming interface
-specifiction for your Bluetooth chipsets released to the public; or at
-least to the team developing the official Linux Bluetooth protocol
-stack, BlueZ.
-
-
--------- Original Message --------
-Subject: Web Site Feedback/Support Request - Bluetooth - General
-Date: 14 Nov 2005 11:49:46 -0000
-From: website_feedback_bluetooth@broadcom.com
-To: Maik.Zumstrull@gmx.de
-
-Thank you for your inquiry.  Broadcom Corporation acquired WIDCOMM Inc.
-software, which was licensed to various 3rd party companies who bundled
-our software with their Bluetooth devices. Unfortunately, some of these
-companies inadequately left Broadcom's support information in the
-software interface instead of replacing it with their own support
-information.
-
-
-
-Each of these companies customizes the software for their particular
-Bluetooth device therefore  our off-the-shelf standard version of the
-software would not work with most 3rd company devices. Please contact
-the manufacturer or distributor of your device to obtain software
-upgrades.
-
-
-
-For your convenience we have gathered contact information for some known
-OEMs of our software:
-
-
-
-* Micro-Star International (MSI): support@msi.com.tw
-
-* Acer: euro_help@acer-euro.com
-
-* Tecom (BT3030): support@tecom.com.tw
-
-* Tecom (BT3030) software upgrades, documentation, and other support go
-to: http://www.tecom.com.tw
-
-* Compaq technical support:
-http://thenew.hp.com/country/us/eng/support.html
-
-* BlueTake (BT100S): http://www.bluetake.com/support.htm
-
-* Epox (BT-GD02 or BT-MD01): support@epox.nl
-
-* Epox, Germany: support@elito-epox.com
-
-* Epox, UK: support@epox-uk.com
-
-* BlueLink (you must first register):
-http://www.wirelessnetworksinc.com/register.php
-
-* Billionton: http://www.billionton.com/english/index.html
-
-
-
-You can also access this information on the Bluetooth End-User Support
-section at:
-
-http://www.broadcom.com/products/bluetooth_supportlinks.php
-
-If this section does not answer your questions please see the
-Bluetooth/WIDCOMM Technical Support section at:
-http://www.broadcom.com/products/bluetooth_support.php
-
-
-
+Hi,
+what kind of wave file you are playing ? use aply --verbose -D
+plughw:headset M1F1.wav ( you can get PCM coded wav files
+M1F1-uint8WE-AFsp.wav from
+http://www.tsp.ece.mcgill.ca/MMSP/Documents/AudioFormats/WAVE/Samples.html
+).
+Hope this helps.
 Regards,
+Manish
 
-Broadcom Support Team
+On Mon, 14 Nov 2005 04:34:58 -0600, "Steven Winston"
+<spwinston@gmail.com> said:
+> I'm trying to get btsco to work with my headset.  Thus far, I've managed
+> to solve my first problem of having to reinstall ALSA libs; got
+> everything to compile and run fine.  btsco even starts and looks to be
+> running correctly.  HCIDUMP shows it connects correctly.
+> When I go to play a sound file, the device makes a distinctive sound
+> (incoming call style sound (wav file being played I guess corresponds to
+> the same sound)) I can hear the speaker in the headset turn on.  When I
+> stop playing a sound, the speaker turns off.  However, no sound is
+> actually played.
+> 
+> 
+> Anyone have a suggestion for what to try next?  Thanks in advance for
+> any help.
+> 
+> I have a motorola HS820 and a CompUSA USB Bluetooth Adapter
+> hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:10:60:AE:74:1E ACL MTU: 377:10 SCO MTU: 16:0
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:14130 acl:314 sco:0 events:790 errors:0
+>         TX bytes:8555 acl:307 sco:0 commands:244 errors:0
+>         Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'CW Service'
+>         Class: 0x500204
+>         Service Classes:
+>         Device Class: Phone, Cellular
+>         HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver:
+> 0x309
+>         Manufacturer: Broadcom Corporation (15)
+> 
+> hcitool info 00:07:A4:47:B0:1D
+> Requesting information ...
+>         BD Address:  00:07:A4:47:B0:1D
+>         Device Name: Motorola HS820
+>         LMP Version: 1.2 (0x2) LMP Subversion: 0x525
+>         Manufacturer: Cambridge Silicon Radio (10)
+>         Features: 0xff 0xff 0x0b 0x00 0x08 0x08 0x00 0x00
+>                 <3-slot packets> <5-slot packets> <encryption> <slot
+> offset>
+>                 <timing accuracy> <role switch> <hold mode> <sniff mode>
+>                 <park state> <RSSI> <channel quality> <SCO link> <HV2
+> packets>
+>                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging
+> scheme>
+>                 <transparent SCO> <AFH cap. slave> <AFH cap. master>
+> -- 
+> Steven Winston <spwinston@gmail.com>
+> spwinston@gmail.com
+> 
+> 
+> 
+> -------------------------------------------------------
+> SF.Net email is sponsored by:
+> Tame your development challenges with Apache's Geronimo App Server.
+> Download
+> it for free - -and be entered to win a 42" plasma tv or your very own
+> Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-Name: Maik Zumstrull
-Subject: Web Site Feedback/Support Request - Bluetooth - General Email
-Address: Maik.Zumstrull@gmx.de
-
-Feedback:
-Please release the complete specification of the Broadcom Bluetooth
-chipsets to the authors of the BlueZ Linux Bluetooth stack. At this
-point, important features, e.g. the use of Bluetooth Headsets, are not
-supported by BlueZ with Broadcom HCIs because it is unknown how to
-program the chips.
-
-
-
-I have a broadcom HCI in my laptop computer, but need to use an external
-dongle because SCO mapping can only be done with CSR HCIs under BlueZ at
-this point. According to the developers, this is due to lack of
-cooperation from your side.
-
-
+-- 
+http://www.fastmail.fm - mmm... Fastmail...
 
 
 
