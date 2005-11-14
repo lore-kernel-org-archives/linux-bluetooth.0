@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: "Rolf S. Dubitzky " <Dubitzky@physi.uni-heidelberg.de>
 To: bluez-users@lists.sourceforge.net
-References: <200511141452.23951.Dubitzky@physi.uni-heidelberg.de> <200511141705.51539.Dubitzky@physi.uni-heidelberg.de> <200511141913.48954.Dubitzky@physi.uni-heidelberg.de>
-In-Reply-To: <200511141913.48954.Dubitzky@physi.uni-heidelberg.de>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-  boundary="Boundary-00=_DjaeDwIFOYC8gVj"
-Message-Id: <200511151022.11133.Dubitzky@physi.uni-heidelberg.de>
-Subject: [Bluez-users] Re: hcid crashing on pin_code_request
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200511141452.23951.Dubitzky@physi.uni-heidelberg.de>
+Subject: [Bluez-users] hcid crashing on pin_code_request
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,92 +17,119 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 15 Nov 2005 10:22:05 +0100
-
---Boundary-00=_DjaeDwIFOYC8gVj
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
+Date: Mon, 14 Nov 2005 14:52:22 +0100
 
 Hi,
 
-I got it to work now.  For completeness:
+I try to pair my jabraBT200 headset with a USB-BT dongle on FedoraC4.  
+(details below) I used the dongle to communicate with the phone and that 
+works just fine.  The headset works fine with the phone as well.  I suspect, 
+that I have a compatibility problem with the package mix on my FC4 box (see 
+below), since when starting hcid -n I get the following backtrace in the very 
+second I try to communicate with the headset (e.g. l2ping and headset in 
+pairing mode): (I tried  security auto; and   security user; but the pin 
+helper isn't even started. hcid crashes before that I asume)
 
-1)  the bluez packages (see original post) in FedoraC4 are broken.  They 
-    don't work and crash in the way I posted.
-    => get latest version and compile yourself
+Thanx for any help, Rolf
 
-2)  the current version of bluez-utils (2.22) doesn't compile propperly on 
-    FC4.  The ./configure doesn't find the dbus libraries and just doesn't
-    compile with dbus support, but without dbus support bluez is unusable for
-    me.   I would concider this to be a bug in bluez, but ymmv.  
-    Now without dbus support sdp doesn't work, e.g. sdptool browse just 
-    returns
+# hcid -n
+hcid[28766]: Bluetooth HCI daemon
+hcid[28766]: Starting security manager 0
 
-     Failed to connect to SDP server on 00:07:A4:03:97:24: Connection timed 
-     out
+hcid[28766]: pin_code_request (sba=00:09:DD:10:53:4E, dba=00:07:A4:03:97:24)
+28766: arguments to dbus_type_is_basic() were incorrect, assertion 
+"_dbus_type_is_valid (typecode) || typecode == DBUS_TYPE_INVALID" failed in 
+file dbus-signature.c line 259.
+This is normally a bug in some application using the D-BUS library.
+type unknown isn't supported yet in dbus_message_append_args_valist
+*** buffer overflow detected ***: hcid: processing events terminated
+======= Backtrace: =========
+/lib/libc.so.6(__chk_fail+0x41)[0xf7ec45]
+hcid: processing events[0x891e8b]
+/usr/lib/libdbus-1.so.1[0x5ee155]
+/usr/lib/libdbus-1.so.1[0x5ce49b]
+/usr/lib/libdbus-1.so.1(dbus_connection_dispatch+0x20a)[0x5d2f37]
+hcid: processing events[0x8919c0]
+hcid: processing events[0x8918b0]
+hcid: processing events(main+0x4c5)[0x88dfef]
+/lib/libc.so.6(__libc_start_main+0xdf)[0xeb5d5f]
+hcid: processing events[0x88d071]
+======= Memory map: ========
+005c2000-0062b000 r-xp 00000000 03:01 4896232    /usr/lib/libdbus-1.so.1.0.0
+0062b000-00630000 rwxp 00069000 03:01 4896232    /usr/lib/libdbus-1.so.1.0.0
+0077d000-0077e000 r-xp 0077d000 00:00 0          [vdso]
+0088b000-00895000 r-xp 00000000 03:01 4256755    /usr/sbin/hcid
+00895000-00896000 rwxp 00009000 03:01 4256755    /usr/sbin/hcid
+008e5000-008f1000 r-xp 00000000 03:01 
+4265003    /usr/lib/libbluetooth.so.1.0.15
+008f1000-008f2000 rwxp 0000c000 03:01 
+4265003    /usr/lib/libbluetooth.so.1.0.15
+009f3000-00a05000 r-xp 00000000 03:01 3755952    /lib/libnsl-2.3.5.so
+00a05000-00a06000 r-xp 00011000 03:01 3755952    /lib/libnsl-2.3.5.so
+00a06000-00a07000 rwxp 00012000 03:01 3755952    /lib/libnsl-2.3.5.so
+00a07000-00a09000 rwxp 00a07000 00:00 0
+00aa7000-00ac1000 r-xp 00000000 03:01 3753769    /lib/ld-2.3.5.so
+00ac1000-00ac2000 r-xp 00019000 03:01 3753769    /lib/ld-2.3.5.so
+00ac2000-00ac3000 rwxp 0001a000 03:01 3753769    /lib/ld-2.3.5.so
+00df6000-00dff000 r-xp 00000000 03:01 
+3755943    /lib/libgcc_s-4.0.1-20050727.so.1
+00dff000-00e00000 rwxp 00009000 03:01 
+3755943    /lib/libgcc_s-4.0.1-20050727.so.1
+00ea1000-00fc4000 r-xp 00000000 03:01 3753771    /lib/libc-2.3.5.so
+00fc4000-00fc6000 r-xp 00123000 03:01 3753771    /lib/libc-2.3.5.so
+00fc6000-00fc8000 rwxp 00125000 03:01 3753771    /lib/libc-2.3.5.so
+00fc8000-00fca000 rwxp 00fc8000 00:00 0
+08650000-08671000 rw-p 08650000 00:00 0          [heap]
+b7f91000-b7f93000 rw-p b7f91000 00:00 0
+b7fb0000-b7fb1000 rw-p b7fb0000 00:00 0
+bf99b000-bf9b1000 rw-p bf99b000 00:00 0          [stack]
+Aborted
 
-    So if a tool doesn't work without dbus, I'd highly recommend to make dbus 
-    a requirement, not an option.
 
-    The problem with compiling on FC4 is that for some funky reason dbus 
-    headers are spread over two directories:
-      /usr/include/dbus-1.0/dbus/* (e.g. dbus.h)
-    and one other file in
-      /usr/lib/dbus-1.0/include/dbus/dbus-arch-deps.h
-    So you have to -I _both_ directories to make #include dbus/dbus.h compile.
-    
+-----
 
-Cheers, Rolf
+FC4 packages installed:
+
+dbus-glib-0.33-3.fc4.1
+dbus-0.33-3.fc4.1
+dbus-python-0.33-3.fc4.1
+dbus-x11-0.33-3.fc4.1
+bluez-hcidump-1.18-1
+bluez-utils-2.15-7
+bluez-libs-2.15-1
+bluez-libs-devel-2.15-1
+bluez-pin-0.24-2
+
+----
+
+# hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:09:DD:10:53:4E ACL MTU: 192:8 SCO MTU: 64:8
+        HCI 17.11
+        Chip version: BlueCore02
+        Max key size: 128 bit
+        SCO mapping:  HCI
 
 
---Boundary-00=_DjaeDwIFOYC8gVj
-Content-Type: text/html;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
+# hcitool scan
+Scanning ...
+        00:07:A4:03:97:24       JABRA BT200
 
-<html><head><meta name="qrichtext" content="1" /></head><body style="font-size:12pt;font-family:Courier">
-<p>Hi,</p>
-<p></p>
-<p>I got it to work now.  For completeness:</p>
-<p></p>
-<p>1)  the bluez packages (see original post) in FedoraC4 are broken.  They </p>
-<p>    don't work and crash in the way I posted.</p>
-<p>    =&gt; get latest version and compile yourself</p>
-<p></p>
-<p>2)  the current version of bluez-utils (2.22) doesn't compile propperly on </p>
-<p>    FC4.  The ./configure doesn't find the dbus libraries and just doesn't</p>
-<p>    compile with dbus support, but without dbus support bluez is unusable for</p>
-<p>    me.   I would concider this to be a bug in bluez, but ymmv.  </p>
-<p>    Now without dbus support sdp doesn't work, e.g. sdptool browse just </p>
-<p>    returns</p>
-<p></p>
-<p>     Failed to connect to SDP server on 00:07:A4:03:97:24: Connection timed </p>
-<p>     out</p>
-<p></p>
-<p>    So if a tool doesn't work without dbus, I'd highly recommend to make dbus </p>
-<p>    a requirement, not an option.</p>
-<p></p>
-<p>    The problem with compiling on FC4 is that for some funky reason dbus </p>
-<p>    headers are spread over two directories:</p>
-<p>      /usr/include/dbus-1.0/dbus/* (e.g. dbus.h)</p>
-<p>    and one other file in</p>
-<p>      /usr/lib/dbus-1.0/include/dbus/dbus-arch-deps.h</p>
-<p>    So you have to -I _both_ directories to make #include dbus/dbus.h compile.</p>
-<p>    </p>
-<p></p>
-<p>Cheers, Rolf</p>
-<p></p>
-<p></p>
-</body></html>
---Boundary-00=_DjaeDwIFOYC8gVj--
+# hcidump -X -V  (I can provide more, but I doubt it is informative)
+> HCI Event: PIN Code Request (0x16) plen 6
+    bdaddr 00:07:A4:03:97:24
+==> crash
+
+
+
+
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by the JBoss Inc.  Get Certified Today
-Register for a JBoss Training Course.  Free Certification Exam
-for All Training Attendees Through End of 2005. For more info visit:
-http://ads.osdn.com/?ad_id=7628&alloc_id=16845&op=click
+SF.Net email is sponsored by:
+Tame your development challenges with Apache's Geronimo App Server. Download
+it for free - -and be entered to win a 42" plasma tv or your very own
+Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
