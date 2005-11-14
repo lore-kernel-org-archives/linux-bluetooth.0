@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Steven Winston <spwinston@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Message-ID: <OFA5A05067.92F54E5C-ONC12570BA.003D30BC-C12570BA.0053751C@sagem.com>
-From: Matthieu CASTET <matthieu.castet@sagem.com>
-Content-Type: text/plain; charset="us-ascii"
-Subject: [Bluez-devel] uart driver
+Content-Type: text/plain
+Message-Id: <1131964498.3323.77.camel@Linux.localdoman.com>
+Mime-Version: 1.0
+Subject: [Bluez-devel] btsco headset almost works
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,37 +16,67 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 15 Nov 2005 16:11:17 +0100
+Date: Mon, 14 Nov 2005 04:34:58 -0600
 
-Hi,
-
-I have a uart driver that use non-standard read/write and can't be used by 
-the hci_ldisc.c driver.
-A hack was done in the hci_ldisc.c driver to use these non-standard 
-read/write functions and remove all the tty stuff.
-
-I want to clean it and write a standard uart driver for 2.6.
-
-But I don't know how to write it and what callbacks are needed.
-
-I look some example in driver/serial, but I don't how to implement all the 
-uart_ops callback and which are needed/optional.
-
-Have you got some pointers for how to write uart driver or an example uart 
-driver that is not too complex?
+I'm trying to get btsco to work with my headset.  Thus far, I've managed
+to solve my first problem of having to reinstall ALSA libs; got
+everything to compile and run fine.  btsco even starts and looks to be
+running correctly.  HCIDUMP shows it connects correctly.
+When I go to play a sound file, the device makes a distinctive sound
+(incoming call style sound (wav file being played I guess corresponds to
+the same sound)) I can hear the speaker in the headset turn on.  When I
+stop playing a sound, the speaker turns off.  However, no sound is
+actually played.
 
 
-Thanks,
+Anyone have a suggestion for what to try next?  Thanks in advance for
+any help.
 
-Matthieu
+I have a motorola HS820 and a CompUSA USB Bluetooth Adapter
+hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:10:60:AE:74:1E ACL MTU: 377:10 SCO MTU: 16:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:14130 acl:314 sco:0 events:790 errors:0
+        TX bytes:8555 acl:307 sco:0 commands:244 errors:0
+        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'CW Service'
+        Class: 0x500204
+        Service Classes:
+        Device Class: Phone, Cellular
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver:
+0x309
+        Manufacturer: Broadcom Corporation (15)
+
+hcitool info 00:07:A4:47:B0:1D
+Requesting information ...
+        BD Address:  00:07:A4:47:B0:1D
+        Device Name: Motorola HS820
+        LMP Version: 1.2 (0x2) LMP Subversion: 0x525
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xff 0xff 0x0b 0x00 0x08 0x08 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot
+offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park state> <RSSI> <channel quality> <SCO link> <HV2
+packets>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging
+scheme>
+                <transparent SCO> <AFH cap. slave> <AFH cap. master>
+-- 
+Steven Winston <spwinston@gmail.com>
+spwinston@gmail.com
 
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by the JBoss Inc.  Get Certified Today
-Register for a JBoss Training Course.  Free Certification Exam
-for All Training Attendees Through End of 2005. For more info visit:
-http://ads.osdn.com/?ad_id=7628&alloc_id=16845&op=click
+SF.Net email is sponsored by:
+Tame your development challenges with Apache's Geronimo App Server. Download
+it for free - -and be entered to win a 42" plasma tv or your very own
+Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
