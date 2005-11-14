@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Khaled" <khaled@ipbill.com>
-To: "Bluez-Users@Lists. Sourceforge. Net" <bluez-users@lists.sourceforge.net>
-Message-ID: <HCEOIFALKKLBLJPENPNOGEFBCAAA.khaled@ipbill.com>
+Message-ID: <4378BD70.8060002@libero.it>
+From: jimmi <jimmi@libero.it>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] asterisk, chan_bluetooth and bluez success, but...
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Re: hcid crashing on pin_code_request
+References: <200511141452.23951.Dubitzky@physi.uni-heidelberg.de> <200511141705.51539.Dubitzky@physi.uni-heidelberg.de>
+In-Reply-To: <200511141705.51539.Dubitzky@physi.uni-heidelberg.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,35 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Nov 2005 14:03:14 -0000
+Date: Mon, 14 Nov 2005 17:38:08 +0100
 
-Hello List,
+* Rolf S. Dubitzky  il 14/11/05 alle 17,05 ha scritto:
+ >  # /usr/local/bin/btsco -v -r -s 00:07:A4:03:97:24
+ >  btsco v0.4c
+ >  Device is 1:0
+ >  Error: Failed to connect to SDP server: Connection timed out
+ >  Assuming channel 2
+ >
+ >  Voice setting: 0x0060
+ >  Can't connect RFCOMM channel: Resource temporarily unavailable
 
-I have managed to successfully get chan_bluetooth and asterisk working with
-the bluez stack and am, inconsequence, able to invoke a call from the
-bluetooth connected phone out to another phone over the mobile network.
-However, I cannot here nor speak through the SIP phone after the call is
-made, I have to talk into the mobile connected via bluetooth.
-This does defy the point of this project, since it only enables me to 'dial'
-another mobile as opposed to physically dialling at the mobile phone itself.
-I am sure the point is so that communication is achieved from the SIP phone
-witht the mobile phone connected with bluetooth having the sole purpose of a
-'router'.
-
-Has anyone any idea, why this is happening and how my aim can be achieved?
-I can give much more info as requested.
-
-In anticipation of a quick response,
-
-Khaled
-
+I fixed this problem by including:
+         auth disable;
+         encrypt disable;
+in /etc/bluetooth/hcid.config. I hope ot works for you too :)
+--
+    ---         _   o       | If God had intended man to use the metric |
+    / immi   ---  _/\_>     |   system, Jesus would have only had ten   |
+(_/          -  O,> / O    |                disciples.                 |
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by the JBoss Inc.  Get Certified Today
-Register for a JBoss Training Course.  Free Certification Exam
-for All Training Attendees Through End of 2005. For more info visit:
-http://ads.osdn.com/?ad_id=7628&alloc_id=16845&op=click
+SF.Net email is sponsored by:
+Tame your development challenges with Apache's Geronimo App Server. Download
+it for free - -and be entered to win a 42" plasma tv or your very own
+Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
