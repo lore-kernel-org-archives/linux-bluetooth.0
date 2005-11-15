@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <1131966935.11561.247443316@webmail.messagingengine.com>
-From: "manish Verma" <manishverma@fastmail.fm>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-References: <1131964498.3323.77.camel@Linux.localdoman.com>
-Subject: Re: [Bluez-devel] btsco headset almost works
-In-Reply-To: <1131964498.3323.77.camel@Linux.localdoman.com>
+Message-ID: <OFFBED3F2B.F3FBB1C9-ONC12570BA.00595759-C12570BA.005ABF75@sagem.com>
+From: Matthieu CASTET <matthieu.castet@sagem.com>
+Content-Type: text/plain; charset="us-ascii"
+Subject: [Bluez-devel] =?ISO-8859-1?Q?R=E9f=2E_=3A_Re=3A_[Bluez-devel]_uart_driver?=
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,95 +16,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 14 Nov 2005 03:15:35 -0800
+Date: Tue, 15 Nov 2005 17:30:55 +0100
 
-Hi,
-what kind of wave file you are playing ? use aply --verbose -D
-plughw:headset M1F1.wav ( you can get PCM coded wav files
-M1F1-uint8WE-AFsp.wav from
-http://www.tsp.ece.mcgill.ca/MMSP/Documents/AudioFormats/WAVE/Samples.html
-).
-Hope this helps.
-Regards,
-Manish
+> Hi Mattieu,
+Hi peter,
 
-On Mon, 14 Nov 2005 04:34:58 -0600, "Steven Winston"
-<spwinston@gmail.com> said:
-> I'm trying to get btsco to work with my headset.  Thus far, I've managed
-> to solve my first problem of having to reinstall ALSA libs; got
-> everything to compile and run fine.  btsco even starts and looks to be
-> running correctly.  HCIDUMP shows it connects correctly.
-> When I go to play a sound file, the device makes a distinctive sound
-> (incoming call style sound (wav file being played I guess corresponds to
-> the same sound)) I can hear the speaker in the headset turn on.  When I
-> stop playing a sound, the speaker turns off.  However, no sound is
-> actually played.
-> 
-> 
-> Anyone have a suggestion for what to try next?  Thanks in advance for
-> any help.
-> 
-> I have a motorola HS820 and a CompUSA USB Bluetooth Adapter
-> hciconfig -a
-> hci0:   Type: USB
->         BD Address: 00:10:60:AE:74:1E ACL MTU: 377:10 SCO MTU: 16:0
->         UP RUNNING PSCAN ISCAN
->         RX bytes:14130 acl:314 sco:0 events:790 errors:0
->         TX bytes:8555 acl:307 sco:0 commands:244 errors:0
->         Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'CW Service'
->         Class: 0x500204
->         Service Classes:
->         Device Class: Phone, Cellular
->         HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver:
-> 0x309
->         Manufacturer: Broadcom Corporation (15)
-> 
-> hcitool info 00:07:A4:47:B0:1D
-> Requesting information ...
->         BD Address:  00:07:A4:47:B0:1D
->         Device Name: Motorola HS820
->         LMP Version: 1.2 (0x2) LMP Subversion: 0x525
->         Manufacturer: Cambridge Silicon Radio (10)
->         Features: 0xff 0xff 0x0b 0x00 0x08 0x08 0x00 0x00
->                 <3-slot packets> <5-slot packets> <encryption> <slot
-> offset>
->                 <timing accuracy> <role switch> <hold mode> <sniff mode>
->                 <park state> <RSSI> <channel quality> <SCO link> <HV2
-> packets>
->                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging
-> scheme>
->                 <transparent SCO> <AFH cap. slave> <AFH cap. master>
-> -- 
-> Steven Winston <spwinston@gmail.com>
-> spwinston@gmail.com
-> 
-> 
-> 
-> -------------------------------------------------------
-> SF.Net email is sponsored by:
-> Tame your development challenges with Apache's Geronimo App Server.
-> Download
-> it for free - -and be entered to win a 42" plasma tv or your very own
-> Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> you may use the PCMCIA card driver (btuart_cs) as a base and remove all
+> the PCMCIA specific stuff. Than modify the UART access for your 
+hardware.
 
--- 
-http://www.fastmail.fm - mmm... Fastmail...
+> You may also use our PCI driver and removed all PCI specific stuff.
+> this is based on the PCMCIA driver as well.
+> The attached version is for 2.6.x. For 2.4.x you can find one on our
+> website.
+I look in your pci driver, and is more or less what I did except that I 
+still use hci_h4 module.
+
+What I don't like with these scheme is that all PCI/PCMCIA/USB driver 
+duplicate some generic uart bluetooth code.
+
+What I wanted is to have a generic uart driver that know nothing about hci 
+and bluetooth, and then use hci_ldisc.c for the bluetooth part.
+
+Is the fact to use the tty layer between uart driver and bluetooth uart 
+module is too complex and have a high overhead ?
+
+
+If tty is too complex, why not doing a generic uart bluetooth driver with 
+simple inferface : send_packet/receive/init/close/... ?
+
+
+Matthieu
+
 
 
 
 -------------------------------------------------------
-SF.Net email is sponsored by:
-Tame your development challenges with Apache's Geronimo App Server. Download
-it for free - -and be entered to win a 42" plasma tv or your very own
-Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
+This SF.Net email is sponsored by the JBoss Inc.  Get Certified Today
+Register for a JBoss Training Course.  Free Certification Exam
+for All Training Attendees Through End of 2005. For more info visit:
+http://ads.osdn.com/?ad_id=7628&alloc_id=16845&op=click
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
