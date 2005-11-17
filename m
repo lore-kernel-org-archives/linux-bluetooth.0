@@ -1,18 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3013cac80511171252g4a4f1581l915e364a244ec8ea@mail.gmail.com>
+Message-ID: <3013cac80511171116n33c7faech6006e7264821fb16@mail.gmail.com>
 From: Eduardo Rocha <folhabranca@gmail.com>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] [DBUS Patch] Device Property
-In-Reply-To: <3013cac80511171116n33c7faech6006e7264821fb16@mail.gmail.com>
+In-Reply-To: <1131489534.5544.20.camel@blade>
 MIME-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_Part_14389_26197512.1132260752759"
+	boundary="----=_Part_14225_1678309.1132254970344"
 References: <3013cac80511040603k52c40da2gae5249abcba426d9@mail.gmail.com>
 	 <1131119054.11673.1.camel@localhost.localdomain>
 	 <e1effdeb0511081241w20503576id78ab38764b8b96b@mail.gmail.com>
 	 <20051108222033.GA12368@localhost.localdomain>
 	 <1131489534.5544.20.camel@blade>
-	 <3013cac80511171116n33c7faech6006e7264821fb16@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -24,103 +23,82 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Nov 2005 17:52:32 -0300
+Date: Thu, 17 Nov 2005 16:16:10 -0300
 
-------=_Part_14389_26197512.1132260752759
+------=_Part_14225_1678309.1132254970344
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Hi Marcel,
+Hi all,
 
-sorry about my last patch. I've left some syslog entries. Here is a new pat=
-ch.
+here is a patch with SetProperty and GetProperty for Name. I've also
+updated the dbus-test.
+Marcel, in the hciconfig you set the ext inquire parameter in the
+cmd_name function. Is this needed here?
+The "local name changed"  signal is still missing. I'll do that for
+the next patch.
 
-br,
+BR,
 Eduardo.
-
-
-On 11/17/05, Eduardo Rocha <folhabranca@gmail.com> wrote:
-> Hi all,
->
-> here is a patch with SetProperty and GetProperty for Name. I've also
-> updated the dbus-test.
-> Marcel, in the hciconfig you set the ext inquire parameter in the
-> cmd_name function. Is this needed here?
-> The "local name changed"  signal is still missing. I'll do that for
-> the next patch.
->
-> BR,
-> Eduardo.
->
-> --
-> Eduardo Rocha
-> Instituto Nokia de Tecnologia - INdT
->
->
-> On 11/8/05, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > Hi Johan,
-> >
-> > > >   name       [name]  Get/Set local name
-> > >
-> > > This is good to have. A "local name changed" signal might also be use=
-ful
-> > > so that other applications can update their UI. Actually now that I
-> > > think about it, maybe thare should be a generic "property changed"
-> > > signal for all properties.
-> >
-> > sounds like a good idea and easy to extend in the future.
-> >
-> > > >   auth                   Enable/Disable Authentication
-> > > >   encrypt               Enable/Disable Encryption
-> > > >   secmgr               Enable/Disable Security Manager
-> > > >   piscan                Enable/Disable Page and Inquiry scan
-> > > >   iscan                  Enable/Disable Inquiry scan
-> > > >   pscan                 Enable/Disable Page scan
-> > >
-> > > I think the piscan can be dropped so that we have two boolean
-> > > properties: iscan and pscan.
-> > >
-> > > Also, I think it would be good to have the possibility to set the
-> > > inquiry mode (standard, with RSSI, RSSI + extended inq. result).
-> > > Currently the mode is always set inquiry with rssi when PeriodicInqui=
-ry
-> > > is called (I'm thinking of sending a patch to remove it), but it shou=
-ld
-> > > probably be set once at device initialization and then changed only b=
-y
-> > > the SetProperty method call.
-> >
-> > Totally agree.
-> >
-> > Regards
-> >
-> > Marcel
-> >
-> >
-> >
-> >
-> > -------------------------------------------------------
-> > SF.Net email is sponsored by:
-> > Tame your development challenges with Apache's Geronimo App Server. Dow=
-nload
-> > it for free - -and be entered to win a 42" plasma tv or your very own
-> > Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
-> > _______________________________________________
-> > Bluez-devel mailing list
-> > Bluez-devel@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> >
->
->
->
-
 
 --
 Eduardo Rocha
 Instituto Nokia de Tecnologia - INdT
 
-------=_Part_14389_26197512.1132260752759
+
+On 11/8/05, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Johan,
+>
+> > >   name       [name]  Get/Set local name
+> >
+> > This is good to have. A "local name changed" signal might also be usefu=
+l
+> > so that other applications can update their UI. Actually now that I
+> > think about it, maybe thare should be a generic "property changed"
+> > signal for all properties.
+>
+> sounds like a good idea and easy to extend in the future.
+>
+> > >   auth                   Enable/Disable Authentication
+> > >   encrypt               Enable/Disable Encryption
+> > >   secmgr               Enable/Disable Security Manager
+> > >   piscan                Enable/Disable Page and Inquiry scan
+> > >   iscan                  Enable/Disable Inquiry scan
+> > >   pscan                 Enable/Disable Page scan
+> >
+> > I think the piscan can be dropped so that we have two boolean
+> > properties: iscan and pscan.
+> >
+> > Also, I think it would be good to have the possibility to set the
+> > inquiry mode (standard, with RSSI, RSSI + extended inq. result).
+> > Currently the mode is always set inquiry with rssi when PeriodicInquiry
+> > is called (I'm thinking of sending a patch to remove it), but it should
+> > probably be set once at device initialization and then changed only by
+> > the SetProperty method call.
+>
+> Totally agree.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> SF.Net email is sponsored by:
+> Tame your development challenges with Apache's Geronimo App Server. Downl=
+oad
+> it for free - -and be entered to win a 42" plasma tv or your very own
+> Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+
+------=_Part_14225_1678309.1132254970344
 Content-Type: text/x-patch; name=dbus_device_name.patch; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="dbus_device_name.patch"
@@ -172,7 +150,7 @@ Content-Disposition: attachment; filename="dbus_device_name.patch"
  
  #define DEV_GET_PROPERTY_SIGNATURE		DBUS_TYPE_STRING_AS_STRING \
 --- utils.17112005.orig/hcid/dbus.c	2005-11-17 12:57:42.000000000 -0300
-+++ utils.17112005/hcid/dbus.c	2005-11-17 14:48:45.000000000 -0300
++++ utils.17112005/hcid/dbus.c	2005-11-17 13:04:05.000000000 -0300
 @@ -272,59 +272,34 @@
  static DBusMessage* handle_device_down_req(DBusMessage *msg, void *data);
  static DBusMessage* handle_device_set_propety_req(DBusMessage *msg, void *data);
@@ -266,7 +244,7 @@ Content-Disposition: attachment; filename="dbus_device_name.patch"
  
  
  	dbus_message_iter_init(msg, &iter);
-@@ -2029,6 +2004,120 @@
+@@ -2029,6 +2004,123 @@
  	return reply;
  }
  
@@ -284,6 +262,9 @@ Content-Disposition: attachment; filename="dbus_device_name.patch"
 +	dbus_message_iter_init(msg, &iter);
 +	dbus_message_iter_next(&iter);
 +	dbus_message_iter_get_basic(&iter, &str_name);
++
++	syslog(LOG_INFO, "Setting hci%d name: %s",
++					dbus_data->dev_id, str_name);
 +
 +	if(strlen(str_name) == 0) {
 +		syslog(LOG_ERR, "HCI change name failed - Invalid Name!");
@@ -334,9 +315,9 @@ Content-Disposition: attachment; filename="dbus_device_name.patch"
 +	DBusMessageIter iter;
 +	DBusMessage *reply = NULL;
 +	int dd = -1;
-+	read_local_name_rp rp;
-+	struct hci_request rq;
-+	const char *pname = (char*) rp.name;
++        read_local_name_rp rp;
++        struct hci_request rq;
++	const char *pname = rp.name;
 +	char name[249];
 +
 +	dd = hci_open_dev(dbus_data->dev_id);
@@ -363,7 +344,7 @@ Content-Disposition: attachment; filename="dbus_device_name.patch"
 +		reply = bluez_new_failure_msg(msg, BLUEZ_EBT_OFFSET + rp.status);
 +		goto failed;
 +        }
-+
++	syslog(LOG_INFO, "Got hci%d name: %s",dbus_data->dev_id, rp.name);
 +	reply = dbus_message_new_method_return(msg);
 +	if (reply == NULL) {
 +		syslog(LOG_ERR, "Out of memory while calling dbus_message_new_method_return");
@@ -430,7 +411,7 @@ Content-Disposition: attachment; filename="dbus_device_name.patch"
          elif self.cmd == 'Inquiry':
              try:
 
-------=_Part_14389_26197512.1132260752759--
+------=_Part_14225_1678309.1132254970344--
 
 
 -------------------------------------------------------
