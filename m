@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43803CFE.7010601@gazelasport.sk>
-From: M <lists@gazelasport.sk>
+From: "Khaled" <khaled@ipbill.com>
+To: "Bluez-Users@Lists. Sourceforge. Net" <bluez-users@lists.sourceforge.net>
+Message-ID: <HCEOIFALKKLBLJPENPNOGEFBCAAA.khaled@ipbill.com>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
-Subject: [Bluez-users] Ultimate PAN howto. Where?
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Subject: [Bluez-users] asterisk, chan_bluetooth and bluez success, but...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +17,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 20 Nov 2005 10:08:14 +0100
+Date: Thu, 17 Nov 2005 14:03:14 -0000
 
-Hello, I'm trying to get PAN running, NAP on linux, 2 PANUs on windows. 
-There is no problem with the windows boxes, it gives me headaches to set 
-up the linux box however. I got everything running quite fine with just 
-one client using non-briged routing, now I would like to bridge bnepX 
-and eth0 interfaces so that:
+Hello List,
 
-- IP addresses are asigned by DHCP
-- it's possible to connect to internet from NAP box (after following one 
-howto it wasn't possible)
-- everything is automatic - after the setup anyone should be able to 
-turn on the NAP box and connect, even without an account.
+I have managed to successfully get chan_bluetooth and asterisk working with
+the bluez stack and am, inconsequence, able to invoke a call from the
+bluetooth connected phone out to another phone over the mobile network.
+However, I cannot here nor speak through the SIP phone after the call is
+made, I have to talk into the mobile connected via bluetooth.
+This does defy the point of this project, since it only enables me to 'dial'
+another mobile as opposed to physically dialling at the mobile phone itself.
+I am sure the point is so that communication is achieved from the SIP phone
+witht the mobile phone connected with bluetooth having the sole purpose of a
+'router'.
 
-Please, direct me to the right howto, tell me which parts to skip and 
-what to do another way.
+Has anyone any idea, why this is happening and how my aim can be achieved?
+I can give much more info as requested.
 
-Thank you
+In anticipation of a quick response,
+
+Khaled
+
 
 
 -------------------------------------------------------
