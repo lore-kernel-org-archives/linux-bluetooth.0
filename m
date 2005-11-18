@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <437ED509.6060607@xmission.com>
+Message-ID: <437E04A9.7030600@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] alsaplugin into btsco
+Subject: [Bluez-devel] strange results in a2dp alsa plugin
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,26 +16,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 19 Nov 2005 00:32:25 -0700
+Date: Fri, 18 Nov 2005 09:43:21 -0700
 
-Hi
+Marcel
 
-I decided to move the alsa plugin stuff into btsco cvs. Build it with
- ./configure --enable-alsaplugin
+I am getting some really strange stuff happening in my attempt to do an
+a2dp alsa plugin. About 90% of the time, the l2cap connection fails...
+but then if it does work, I get a segfault inside the sbc library. When
+I put a printf inside the library to figure out what was happening, the
+segfault went away (but still no audio)! argh.
 
-I actually think there's something fundamentally wrong about how I'm
-trying to make the bluetooth connection. The call that usually fails
-looks like:
+Would you have a look? Can you make sure rfcomm transport didn't get broken?
 
-DEBUG: connect_l2cap: Can't connect to AD:32:30:3C:0D:00 on psm 25.
-Interrupted system call(4)
+I'm basing my effort on your bluez/utils/alsa in the bluez cvs. My diffs
+against it are in:
 
-There is something going on with an io signal or something with pthreads
-that blows up the l2cap connection. I think we need to do the connection
-in another thread or inside a different part of the alsa plugin
-handler... any ideas?
+ http://bluetooth-alsa.sourceforge.net/avdtp.patch
 
-Brad
+I have made it default to a2dp but the rfcomm transport should work if
+you have "use_rfcomm" as a true boolean option inside .asoundrc
+
+My .asoundrc:
+
+pcm.headphone {
+        type a2dp
+        bdaddr "00:0D:3C:30:32:AD"
+}
+
+invoked as:
+
+aplay -B 1000000 -D pcm.headphone /usr/share/sounds/linphone/rings/rock.wav
+
+(fwiw, /usr/share/sounds/linphone/rings/rock.wav is reported as signed
+16 bit Little Endian, Rate 44100 Hz, Stereo)
+
+Thanks
 
 
 -------------------------------------------------------
