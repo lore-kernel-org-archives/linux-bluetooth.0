@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43815F5F.8030402@masaka.cs.ohiou.edu>
-From: Jim Wyllie <jwyllie@masaka.cs.ohiou.edu>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Sample protocol over L2CAP
+From: "Collin R. Mulliner" <collin@betaversion.net>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] Problem setting the flush timeout
+In-Reply-To: <437F87BC.2090907@gmail.com>
+References: <437F87BC.2090907@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1132431896.18447.8.camel@panic>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,26 +18,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 21 Nov 2005 00:47:11 -0500
+Date: Sat, 19 Nov 2005 12:24:56 -0800
 
-To whomever may be able to help:
+Alfredo,
 
-	I have been pulling my hair for quite some time at the 
-set-flush-timeout.c code segment I was referred to use to set the flush 
-timeout for a bluetooth device.  The call to hci_get_route( bdaddr_t* ) 
-is failing, even though I directly cut-and-pasted the code.  I verified 
-that the address I'm passing does exist on the system.  It's setting 
-errno to 19 and claiming that the device doesn't exist even though I'm 
-100% positive that it does (hcitool dev shows it's 00:11:95:4F:FD:22, 
-and cr -> bdaddr_t.b[5] through cr -> bdaddr_t.b[0] are the same values, 
-copied in using str2ba).  The device does definitely exist on the 
-system.  Any other idea why this might be happening?
+everything is done via sockets so just:
 
-Thanks for your help,
-Jim
+sock =3D socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
 
-Rather than flood your list, the code segment can be found at:
-http://people.csail.mit.edu/albert/bluez-intro/x556.html#bzi-l2cap-unreliable
+look at the bluez-utils/libs sources
+
+... Collin
+
+On Sat, 2005-11-19 at 18:14 -0200, Alfredo Dal'Ava J=FAnior wrote:
+> Hi All,
+>=20
+> I'm looking for a start point to develop a new protocol over the L2CAP.
+> Any of you have a sample code?
+>=20
+> Thanks,
+>=20
+> []s
+> Alfredo
+>=20
+>=20
+> -------------------------------------------------------
+> This SF.Net email is sponsored by the JBoss Inc.  Get Certified Today
+> Register for a JBoss Training Course.  Free Certification Exam
+> for All Training Attendees Through End of 2005. For more info visit:
+> http://ads.osdn.com/?ad_id=3D7628&alloc_id=3D16845&op=3Dclick
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+Privacy in residential applications is a desirable marketing option.
+(ETSI EN 300 175-7 Ch. A6)
+
 
 
 -------------------------------------------------------
