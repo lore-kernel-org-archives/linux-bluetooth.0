@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <437F87BC.2090907@gmail.com>
-From: =?ISO-8859-1?Q?Alfredo_Dal=27Ava_J=FAnior?= <alfredo.dalava@gmail.com>
-MIME-Version: 1.0
+From: "Collin R. Mulliner" <collin@betaversion.net>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] Sample protocol over L2CAP
+Content-Type: text/plain
+Message-Id: <1132390096.32715.4.camel@panic>
+Mime-Version: 1.0
+Subject: [Bluez-devel] new sobexsrv v1.0.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,17 +16,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 19 Nov 2005 18:14:52 -0200
+Date: Sat, 19 Nov 2005 00:48:16 -0800
 
-Hi All,
+FYI:
 
-I'm looking for a start point to develop a new protocol over the L2CAP.
-Any of you have a sample code?
+new sobexsrv version, now has an internal mode to do everyhing internal
+without scripting (scripting is still supported!!!). Also now multiple
+clients can be handled at the same time, more information is on the web.
 
-Thanks,
+http://www.mulliner.org/bluetooth/sobexsrv.php
 
-[]s
-Alfredo
+... Collin
+
+--
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+hack (hak) n., a clever solution to an interesting problem.
+
 
 
 -------------------------------------------------------
