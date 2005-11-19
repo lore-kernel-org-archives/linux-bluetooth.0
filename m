@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Collin R. Mulliner" <collin@betaversion.net>
+Message-ID: <437ED509.6060607@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1132390096.32715.4.camel@panic>
-Mime-Version: 1.0
-Subject: [Bluez-devel] new sobexsrv v1.0.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] alsaplugin into btsco
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,24 +16,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 19 Nov 2005 00:48:16 -0800
+Date: Sat, 19 Nov 2005 00:32:25 -0700
 
-FYI:
+Hi
 
-new sobexsrv version, now has an internal mode to do everyhing internal
-without scripting (scripting is still supported!!!). Also now multiple
-clients can be handled at the same time, more information is on the web.
+I decided to move the alsa plugin stuff into btsco cvs. Build it with
+ ./configure --enable-alsaplugin
 
-http://www.mulliner.org/bluetooth/sobexsrv.php
+I actually think there's something fundamentally wrong about how I'm
+trying to make the bluetooth connection. The call that usually fails
+looks like:
 
-... Collin
+DEBUG: connect_l2cap: Can't connect to AD:32:30:3C:0D:00 on psm 25.
+Interrupted system call(4)
 
---
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-hack (hak) n., a clever solution to an interesting problem.
+There is something going on with an io signal or something with pthreads
+that blows up the l2cap connection. I think we need to do the connection
+in another thread or inside a different part of the alsa plugin
+handler... any ideas?
 
+Brad
 
 
 -------------------------------------------------------
