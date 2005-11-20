@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <438088F9.1050307@schugy.de>
-From: Christian Schuglitsch <subjectbluez@schugy.de>
-MIME-Version: 1.0
+From: Matteo Centonza <matteo@sif.it>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-users] btsco locked up my kernel
+Content-Type: text/plain
+Message-Id: <1132493286.5669.6.camel@stout.metatype.it>
+Mime-Version: 1.0
+Subject: [Bluez-users] problems with dtl1_cs
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,33 +16,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 20 Nov 2005 15:32:25 +0100
+Date: Sun, 20 Nov 2005 14:28:06 +0100
 
-I use a Jabra BT200 Headset with an Epox DG3-Dongle.
-Usually it works this way:
+Hi,
 
-start application (xmms, TeamSpeak2, skype)
-btsco -v  uu:vv:ww:xx:yy:zz 2
-enter PIN
-enjoy the sound
+i'm using a legacy nokia dtl-4 connectivity card with bluez to link to
+my 3g phone (nokia 6680).
 
+The card binds, the pppd link come up, but after few minutes the system
+freeze and i need to power cycle the notebook. I haven't been able to
+narrow it down to a particular usage pattern. I've not managed to
+reproduce in terminal only mode
+(no X) but maybe it's probably a matter of time.
 
-When I enter the PIN before any application is started then the rfcomm 
-channel will be lost within 2 seconds.
-This time I was adjusting the volume with my mousewheel in gamix1.99 
-while the rfcomm channel became lost because there was no audio stream.
+After the reset, the syslog shows usually:
 
-This locked up the hole PC.
+Nov 20 10:10:22 stout kernel: dtl1_interrupt: RLSI
+Nov 20 10:10:22 stout kernel: rfcomm_recv_frame: bad checksum in packet
 
-Maybe there's someone who can code a workaround.
+but one time:
 
-Regards
-
-Schugy
-
-
+Nov 19 17:24:08 stout kernel: dtl1_interrupt: RLSI
+Nov 19 17:24:08 stout kernel: dtl1_receive: Unknown HCI packet with type
+0x13 received
 
 
+Few specs:
+Fedora core 4
+kernel 2.6.13-1.1626_FC5
+
+bluez-libs-devel-2.22-1
+bluez-pin-0.24-2
+bluez-utils-2.22-1
+bluez-libs-2.22-1
+bluez-bluefw-1.0-6
+bluez-hcidump-1.27-1
+
+Thanks for any insight,
+
+-m
 
 
 -------------------------------------------------------
