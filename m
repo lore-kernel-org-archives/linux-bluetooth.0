@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Arthur Breitman <arthur.breitman@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <7846f1440511211104p22ad2e23x719cc21ae6ea1d46@mail.gmail.com>
+From: Arthur Chiu <arthurchiu@gmail.com>
+To: Bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200511211803.35723.arthur.breitman@gmail.com>
-Subject: [Bluez-users] Everything seems normal yet...
+Content-Type: multipart/alternative;
+	boundary="----=_Part_25454_3970275.1132599881976"
+Subject: [Bluez-users] symbol lookup error
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,74 +17,226 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 21 Nov 2005 18:03:35 -0500
+Date: Mon, 21 Nov 2005 11:04:41 -0800
+
+------=_Part_25454_3970275.1132599881976
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
 Hi,
-I have a latitude X1 Dell. Bluetooth is reported to work out of the box for 
-this model, however I just can't make it work.
-I installed a kubuntu hoary on it, the kernel is linux 2.6.12-9.
-There is a toggle key on the keyboard for bluetooth, according to a led 
-indicator and dmesg it works. Better, KDE used to display an info message 
-saying the state had been changed.
-Well it said that and right after it would display a message complaining about 
-the class being set to 0x0...
-I went into hcid.conf as advised and saw the class was NOT 0x0... wtf? Well I 
-changed it along with the pin helper application.
-Didn't do anything, even after reboots etc.
-Finally I tried  hcid -f /etc/bluetooth/hcid.conf and "tada" it didn't 
-complain anymore. Well actually the info bubbles where gone too... seems like 
-KDE is not aware anymore of the bluetooth status.
 
-Anyway, here are some relevant informations
+I compiled blueZ libs and utils without a problem. (using ./configure for
+libs and ./configure --enable-test for utils)
+After this, I ran hciconfig hci0 up, then hciconfig, both ran fine:
+hci0: Type: USB
+BD Address: 00:11:67:0F:C0:E7 ACL MTU: 678:8 SCO MTU: 48:10
+UP RUNNING PSCAN ISCAN
+RX bytes:77 acl:0 sco:0 events:9 errors:0
+TX bytes:34 acl:0 sco:0 commands:9 errors:0
 
-root@coin:/# lsmod | grep blue
-bluetooth              43012  24 hidp,rfcomm,l2cap,hci_usb
+However, when I try to run hcitool -i hci0 inq:
 
-root@coin:/# dmesg | grep usb
-[4313920.766000] usb 2-1: new full speed USB device using uhci_hcd and address 
-21
+Inquiring ...
+00:0D:93:0F:32:F5 clock offset: 0x34fa class: 0x102104
+00:0D:93:17:D7:C1 clock offset: 0x15f1 class: 0x102104
+00:0E:07:15:64:B3 clock offset: 0x1069 class: 0x520204
+00:13:46:A7:12:CE clock offset: 0x4c61 class: 0x000000
+00:0D:93:19:E8:D4 clock offset: 0x2966 class: 0x102104
+00:0D:93:1C:2E:31 clock offset: 0x18cb class: 0x102104
+00:0D:93:16:49:33 clock offset: 0x38ca class: 0x102104
+hcitool: symbol lookup error: hcitool: undefined symbol: bt_free
+
+I get this symbol lookup error. Then when I try hcitool -i hci0 scan:
+
+Scanning ...
+hcitool: symbol lookup error: hcitool: undefined symbol:
+hci_read_remote_name_with_clock_offset
+
+Yet another lookup error.
+
+Dump for the inq:
+
+# hcidump -X
+HCI sniffer - Bluetooth packet analyzer ver 1.27
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+0000: 33 8b 9e 08 c8 3....
+> HCI Event: Command Status (0x0f) plen 4
+0000: 00 01 01 04 ....
+> HCI Event: Inquiry Result (0x02) plen 15
+0000: 01 31 2e 1c 93 0d 00 01 02 00 04 21 10 ca 18 .1.........!...
+> HCI Event: Inquiry Result (0x02) plen 15
+0000: 01 f5 32 0f 93 0d 00 01 02 00 04 21 10 fa 34 ..2........!..4
+> HCI Event: Inquiry Result (0x02) plen 15
+0000: 01 ce 12 a7 46 13 00 01 00 00 00 00 00 5d 4c ....F........]L
+> HCI Event: Inquiry Result (0x02) plen 15
+0000: 01 d4 e8 19 93 0d 00 01 02 00 04 21 10 66 29 ...........!.f)
+> HCI Event: Inquiry Result (0x02) plen 15
+0000: 01 33 49 16 93 0d 00 01 02 00 04 21 10 c9 38 .3I........!..8
+> HCI Event: Inquiry Complete (0x01) plen 1
+0000: 00
 
 
-root     10506  0.0  0.1   1920   820 ?        Ss   17:59   0:00 hcid: 
-processing events
-root     26060  0.0  0.1   1612   544 ?        Ss   16:35   
-0:00 /usr/sbin/sdpd
+Dump for the scan (very similar, i guess scan uses inquiry as well)
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+0000: 33 8b 9e 08 c8 3....
+> HCI Event: Command Status (0x0f) plen 4
+0000: 00 01 01 04 ....
+> HCI Event: Inquiry Result (0x02) plen 15
+0000: 01 f5 32 0f 93 0d 00 01 02 00 04 21 10 fa 34 ..2........!..4
+> HCI Event: Inquiry Result (0x02) plen 15
+0000: 01 d4 e8 19 93 0d 00 01 02 00 04 21 10 66 29 ...........!.f)
+> HCI Event: Inquiry Result (0x02) plen 15
+0000: 01 c1 d7 17 93 0d 00 01 02 00 04 21 10 f0 15 ...........!...
+> HCI Event: Inquiry Result (0x02) plen 15
+0000: 01 ce 12 a7 46 13 00 01 00 00 00 00 00 5c 4c ....F........\L
+> HCI Event: Inquiry Result (0x02) plen 15
+0000: 01 33 49 16 93 0d 00 01 02 00 04 21 10 c9 38 .3I........!..8
+> HCI Event: Inquiry Result (0x02) plen 15
+0000: 01 31 2e 1c 93 0d 00 01 02 00 04 21 10 c9 18 .1.........!...
+> HCI Event: Inquiry Complete (0x01) plen 1
+0000: 00
 
-root@coin:/# lsusb
-Bus 002 Device 021: ID 413c:8103 Dell Computer Corp.
+Would anyone know what might be wrong? Thanks.
 
-root@coin:/# hcitool dev
-Devices:
-        hci0    00:10:C6:64:69:6B
+Cheers,
 
-root@coin:/# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:10:C6:64:69:6B ACL MTU: 384:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:6478 acl:0 sco:0 events:722 errors:0
-        TX bytes:3721 acl:0 sco:0 commands:132 errors:0
-        Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'Bluetooth coin-0'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x679 LMP Ver: 1.2 (0x2) LMP Subver: 0x679
-        Manufacturer: Cambridge Silicon Radio (10)
-
-Now  everything looks right to me... unfortunately "hcitool scan" doesn't see 
-my motorola, which is in discoverable mode using the "find me" option... 
-similarly my motorola doesn't see my computer... also I liked the kde info 
-bubble. 
-
-What could be wrong? What haven't I checked?
-Thanks for your help,
 Arthur
 
+------=_Part_25454_3970275.1132599881976
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
+Hi,<br>
+<br>
+I compiled blueZ libs and utils without a problem. (using ./configure for l=
+ibs and ./configure --enable-test for utils)<br>
+After this, I ran hciconfig hci0 up, then hciconfig, both ran fine:<br>
+hci0:&nbsp;&nbsp; Type: USB<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:11:67:0F:C0:E7 AC=
+L MTU: 678:8 SCO MTU: 48:10<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:77 acl:0 sco:0 events:9=
+ errors:0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:34 acl:0 sco:0 commands=
+:9 errors:0<br>
+<br>
+However, when I try to run hcitool -i hci0 inq:<br>
+<br>
+Inquiring ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+00:0D:93:0F:32:F5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; clock offset:
+0x34fa&nbsp;&nbsp;&nbsp; class: 0x102104<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+00:0D:93:17:D7:C1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; clock offset:
+0x15f1&nbsp;&nbsp;&nbsp; class: 0x102104<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+00:0E:07:15:64:B3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; clock offset:
+0x1069&nbsp;&nbsp;&nbsp; class: 0x520204<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+00:13:46:A7:12:CE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; clock offset:
+0x4c61&nbsp;&nbsp;&nbsp; class: 0x000000<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+00:0D:93:19:E8:D4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; clock offset:
+0x2966&nbsp;&nbsp;&nbsp; class: 0x102104<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+00:0D:93:1C:2E:31&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; clock offset:
+0x18cb&nbsp;&nbsp;&nbsp; class: 0x102104<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+00:0D:93:16:49:33&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; clock offset:
+0x38ca&nbsp;&nbsp;&nbsp; class: 0x102104<br>
+hcitool: symbol lookup error: hcitool: undefined symbol: bt_free&nbsp; <br>
+<br>
+I get this symbol lookup error. Then when I try hcitool -i hci0 scan:<br>
+<br>
+Scanning ...<br>
+hcitool: symbol lookup error: hcitool: undefined symbol: hci_read_remote_na=
+me_with_clock_offset<br>
+<br>
+Yet another lookup error.<br>
+<br>
+Dump for the inq: <br>
+<br>
+# hcidump -X<br>
+HCI sniffer - Bluetooth packet analyzer ver 1.27<br>
+device: hci0 snap_len: 1028 filter: 0xffffffff<br>
+&lt; HCI Command: Inquiry (0x01|0x0001) plen 5<br>
+&nbsp; 0000: 33 8b 9e 08
+c8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+3....<br>
+&gt; HCI Event: Command Status (0x0f) plen 4<br>
+&nbsp; 0000: 00 01 01
+04&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;
+....<br>
+&gt; HCI Event: Inquiry Result (0x02) plen 15<br>
+&nbsp; 0000: 01 31 2e 1c 93 0d 00 01&nbsp; 02 00 04 21 10 ca 18&nbsp;&nbsp;=
+&nbsp;&nbsp; .1.........!...<br>
+&gt; HCI Event: Inquiry Result (0x02) plen 15<br>
+&nbsp; 0000: 01 f5 32 0f 93 0d 00 01&nbsp; 02 00 04 21 10 fa 34&nbsp;&nbsp;=
+&nbsp;&nbsp; ..2........!..4<br>
+&gt; HCI Event: Inquiry Result (0x02) plen 15<br>
+&nbsp; 0000: 01 ce 12 a7 46 13 00 01&nbsp; 00 00 00 00 00 5d 4c&nbsp;&nbsp;=
+&nbsp;&nbsp; ....F........]L<br>
+&gt; HCI Event: Inquiry Result (0x02) plen 15<br>
+&nbsp; 0000: 01 d4 e8 19 93 0d 00 01&nbsp; 02 00 04 21 10 66 29&nbsp;&nbsp;=
+&nbsp;&nbsp; ...........!.f)<br>
+&gt; HCI Event: Inquiry Result (0x02) plen 15<br>
+&nbsp; 0000: 01 33 49 16 93 0d 00 01&nbsp; 02 00 04 21 10 c9 38&nbsp;&nbsp;=
+&nbsp;&nbsp; .3I........!..8<br>
+&gt; HCI Event: Inquiry Complete (0x01) plen 1<br>
+&nbsp; 0000: 00<br>
+<br>
+<br>
+Dump for the scan (very similar, i guess scan uses inquiry as well)<br>
+&lt; HCI Command: Inquiry (0x01|0x0001) plen 5<br>
+&nbsp; 0000: 33 8b 9e 08
+c8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+3....<br>
+&gt; HCI Event: Command Status (0x0f) plen 4<br>
+&nbsp; 0000: 00 01 01
+04&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;
+....<br>
+&gt; HCI Event: Inquiry Result (0x02) plen 15<br>
+&nbsp; 0000: 01 f5 32 0f 93 0d 00 01&nbsp; 02 00 04 21 10 fa 34&nbsp;&nbsp;=
+&nbsp;&nbsp; ..2........!..4<br>
+&gt; HCI Event: Inquiry Result (0x02) plen 15<br>
+&nbsp; 0000: 01 d4 e8 19 93 0d 00 01&nbsp; 02 00 04 21 10 66 29&nbsp;&nbsp;=
+&nbsp;&nbsp; ...........!.f)<br>
+&gt; HCI Event: Inquiry Result (0x02) plen 15<br>
+&nbsp; 0000: 01 c1 d7 17 93 0d 00 01&nbsp; 02 00 04 21 10 f0 15&nbsp;&nbsp;=
+&nbsp;&nbsp; ...........!...<br>
+&gt; HCI Event: Inquiry Result (0x02) plen 15<br>
+&nbsp; 0000: 01 ce 12 a7 46 13 00 01&nbsp; 00 00 00 00 00 5c 4c&nbsp;&nbsp;=
+&nbsp;&nbsp; ....F........\L<br>
+&gt; HCI Event: Inquiry Result (0x02) plen 15<br>
+&nbsp; 0000: 01 33 49 16 93 0d 00 01&nbsp; 02 00 04 21 10 c9 38&nbsp;&nbsp;=
+&nbsp;&nbsp; .3I........!..8<br>
+&gt; HCI Event: Inquiry Result (0x02) plen 15<br>
+&nbsp; 0000: 01 31 2e 1c 93 0d 00 01&nbsp; 02 00 04 21 10 c9 18&nbsp;&nbsp;=
+&nbsp;&nbsp; .1.........!...<br>
+&gt; HCI Event: Inquiry Complete (0x01) plen 1<br>
+&nbsp; 0000: 00<br>
+<br>
+Would anyone know what might be wrong? Thanks.<br>
+<br>
+Cheers,<br>
+<br>
+&nbsp; Arthur<br>
+<br>
 
+------=_Part_25454_3970275.1132599881976--
 
 
 -------------------------------------------------------
