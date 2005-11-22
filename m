@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Why disabled BT SCO of BCM2035 with device id
-	equal 0x200a,but id  0x2009.
+Subject: Re: [Bluez-devel] uart driver
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <001901c5eeff$fc3e2710$6201a8c0@hujie>
-References: <20051120040407.20B5E1246E@sc8-sf-spam2.sourceforge.net>
-	 <001901c5eeff$fc3e2710$6201a8c0@hujie>
+In-Reply-To: <OFA5A05067.92F54E5C-ONC12570BA.003D30BC-C12570BA.0053751C@sagem.com>
+References: 
+	 <OFA5A05067.92F54E5C-ONC12570BA.003D30BC-C12570BA.0053751C@sagem.com>
 Content-Type: text/plain
-Message-Id: <1132657195.24113.4.camel@blade>
+Message-Id: <1132658619.28644.24.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,12 +19,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Nov 2005 11:59:55 +0100
+Date: Tue, 22 Nov 2005 12:23:39 +0100
 
-Hi Luchine,
+Hi Matthieu,
 
-the subject is not for questions. Use a decent subject and then form a
-full questions if you are really interested in an answer.
+> I have a uart driver that use non-standard read/write and can't be used by 
+> the hci_ldisc.c driver.
+> A hack was done in the hci_ldisc.c driver to use these non-standard 
+> read/write functions and remove all the tty stuff.
+> 
+> I want to clean it and write a standard uart driver for 2.6.
+> 
+> But I don't know how to write it and what callbacks are needed.
+> 
+> I look some example in driver/serial, but I don't how to implement all the 
+> uart_ops callback and which are needed/optional.
+> 
+> Have you got some pointers for how to write uart driver or an example uart 
+> driver that is not too complex?
+
+send in more details what this driver is about.
 
 Regards
 
