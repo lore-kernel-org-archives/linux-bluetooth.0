@@ -1,11 +1,22 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [DBUS Patch] Device Property
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Cc: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Message-ID: <OFC584E534.1FAAD75C-ONC12570C1.00476D61-C12570C1.00480347@sagem.com>
-From: Matthieu CASTET <matthieu.castet@sagem.com>
-Content-Type: text/plain; charset="us-ascii"
-Subject: [Bluez-devel] =?ISO-8859-1?Q?R=E9f=2E_=3A_Re=3A_[Bluez-devel]_uart_driver?=
+In-Reply-To: <3013cac80511180500h5539d5d9y3f19ce224f9e38b7@mail.gmail.com>
+References: <3013cac80511040603k52c40da2gae5249abcba426d9@mail.gmail.com>
+	 <1131119054.11673.1.camel@localhost.localdomain>
+	 <e1effdeb0511081241w20503576id78ab38764b8b96b@mail.gmail.com>
+	 <20051108222033.GA12368@localhost.localdomain>
+	 <1131489534.5544.20.camel@blade>
+	 <3013cac80511171116n33c7faech6006e7264821fb16@mail.gmail.com>
+	 <3013cac80511171252g4a4f1581l915e364a244ec8ea@mail.gmail.com>
+	 <20051118082828.GA16438@localhost.localdomain>
+	 <3013cac80511180251w1d2fa8f5s80ce1da7318327e7@mail.gmail.com>
+	 <20051118112611.GA17062@localhost.localdomain>
+	 <3013cac80511180500h5539d5d9y3f19ce224f9e38b7@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1132660308.28644.37.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,25 +28,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Nov 2005 14:06:00 +0100
+Date: Tue, 22 Nov 2005 12:51:48 +0100
 
-Hi,
+Hi Eduardo,
 
-> send in more details what this driver is about.
-My hardware is a simple uart, but which is managed by an extra processor.
-So the driver for the uart take buffers of characters and don't 
-send/receive character by character the data.
+> here is the patch with a better implementation of dbus-test
+> SetProperty. I've also changed the "pscan" to "connectable" and
+> "iscan" to "discoverable".
 
-My question was if there is an easy way to use hci_ldisc.c driver.
-I understood that I need to do a real uart driver in order to use 
-hci_ldisc.c. My question was how to make a real uart driver.
+I basically missed this thread, but from a first look at the attached
+patch, I can tell that the coding style is wrong. Fix it and re-send it.
 
-Also can't hci_ldisc.c be split to use tty or other external read/write 
-function ?
+Turn the whitespace visualization of editor on ;)
 
-Regards,
+Regards
 
-Matthieu
+Marcel
+
 
 
 
