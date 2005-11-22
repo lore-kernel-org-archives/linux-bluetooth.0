@@ -2,11 +2,11 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] uart driver
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <OFA5A05067.92F54E5C-ONC12570BA.003D30BC-C12570BA.0053751C@sagem.com>
+In-Reply-To: <Pine.LNX.4.33.0511151616400.4802-101000@redbean.intranet.gw-instruments.de>
 References: 
-	 <OFA5A05067.92F54E5C-ONC12570BA.003D30BC-C12570BA.0053751C@sagem.com>
+	 <Pine.LNX.4.33.0511151616400.4802-101000@redbean.intranet.gw-instruments.de>
 Content-Type: text/plain
-Message-Id: <1132658619.28644.24.camel@blade>
+Message-Id: <1132658587.28644.22.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,26 +19,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Nov 2005 12:23:39 +0100
+Date: Tue, 22 Nov 2005 12:23:07 +0100
 
-Hi Matthieu,
+Hi Peter,
 
-> I have a uart driver that use non-standard read/write and can't be used by 
-> the hci_ldisc.c driver.
-> A hack was done in the hci_ldisc.c driver to use these non-standard 
-> read/write functions and remove all the tty stuff.
+> you may use the PCMCIA card driver (btuart_cs) as a base and remove all
+> the PCMCIA specific stuff. Than modify the UART access for your hardware.
 > 
-> I want to clean it and write a standard uart driver for 2.6.
-> 
-> But I don't know how to write it and what callbacks are needed.
-> 
-> I look some example in driver/serial, but I don't how to implement all the 
-> uart_ops callback and which are needed/optional.
-> 
-> Have you got some pointers for how to write uart driver or an example uart 
-> driver that is not too complex?
+> You may also use our PCI driver and removed all PCI specific stuff.
+> this is based on the PCMCIA driver as well.
+> The attached version is for 2.6.x. For 2.4.x you can find one on our
+> website.
 
-send in more details what this driver is about.
+it will break on the latest 2.6 kernel, because the skb->pkt_type field
+is no longer used.
 
 Regards
 
