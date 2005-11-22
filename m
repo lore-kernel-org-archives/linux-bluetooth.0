@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Ultimate PAN howto. Where?
+Subject: Re: [Bluez-users] problems with dtl1_cs
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43803CFE.7010601@gazelasport.sk>
-References: <43803CFE.7010601@gazelasport.sk>
+In-Reply-To: <1132493286.5669.6.camel@stout.metatype.it>
+References: <1132493286.5669.6.camel@stout.metatype.it>
 Content-Type: text/plain
-Message-Id: <1132657962.28644.13.camel@blade>
+Message-Id: <1132657851.28644.10.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,29 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Nov 2005 12:12:42 +0100
+Date: Tue, 22 Nov 2005 12:10:51 +0100
 
-Hi,
+Hi Matteo,
 
-> I'm trying to get PAN running, NAP on linux, 2 PANUs on windows. 
-> There is no problem with the windows boxes, it gives me headaches to set 
-> up the linux box however. I got everything running quite fine with just 
-> one client using non-briged routing, now I would like to bridge bnepX 
-> and eth0 interfaces so that:
+> i'm using a legacy nokia dtl-4 connectivity card with bluez to link to
+> my 3g phone (nokia 6680).
 > 
-> - IP addresses are asigned by DHCP
-> - it's possible to connect to internet from NAP box (after following one 
-> howto it wasn't possible)
-> - everything is automatic - after the setup anyone should be able to 
-> turn on the NAP box and connect, even without an account.
+> The card binds, the pppd link come up, but after few minutes the system
+> freeze and i need to power cycle the notebook. I haven't been able to
+> narrow it down to a particular usage pattern. I've not managed to
+> reproduce in terminal only mode
+> (no X) but maybe it's probably a matter of time.
 > 
-> Please, direct me to the right howto, tell me which parts to skip and 
-> what to do another way.
+> After the reset, the syslog shows usually:
+> 
+> Nov 20 10:10:22 stout kernel: dtl1_interrupt: RLSI
+> Nov 20 10:10:22 stout kernel: rfcomm_recv_frame: bad checksum in packet
+> 
+> but one time:
+> 
+> Nov 19 17:24:08 stout kernel: dtl1_interrupt: RLSI
+> Nov 19 17:24:08 stout kernel: dtl1_receive: Unknown HCI packet with type
+> 0x13 received
 
-actually the automatic part is distribution specific, because you need
-to create the bridge at startup and run the dedicated DHCP server. You
-also need to make sure the bnepX devices are added/removed to the bridge
-when pand accepts a new connection.
+maybe the driver is at fault here. However I never had the full
+specification to write a really good driver. Ask Nokia or Socket for
+more details.
 
 Regards
 
