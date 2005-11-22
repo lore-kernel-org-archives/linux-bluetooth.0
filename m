@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43835FAE.4080505@csr.com>
-From: Steven Singer <steven.singer@csr.com>
+Message-ID: <438356EF.9010503@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: Everything seems normal yet...
-References: <200511211803.35723.arthur.breitman@gmail.com>	 <200511221106.42566.arthur.breitman@gmail.com> <1132675914.20713.18.camel@blade>
-In-Reply-To: <1132675914.20713.18.camel@blade>
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Bluez-users] Can the btsco module support muting the microphone?
+References: <loom.20051122T162417-540@post.gmane.org>
+In-Reply-To: <loom.20051122T162417-540@post.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,38 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Nov 2005 18:13:02 +0000
+Date: Tue, 22 Nov 2005 10:35:43 -0700
 
-Marcel Holtmann wrote:
-> Arthur Breitman wrote:
->> > HCI Event: Vendor (0xff) plen 7
->>   0000: cd 03 00 04 00 00 00                              .......
+Andre
+
+The driver probably does need a modification, but if you go down this
+route, you should find out how to support the actual mute operation that
+is failing.
+
+Brad
+
+> With the snd-intel8x0, I found that couldn't mute the capture control so I
+> switch the capture control between the microphone and line-in
+> (a non existent input source) to unmute and mute, respectively.  Is there a
+> strategy I can follow to mute the btsco microphone or do I need to add a fake
+> input source to the btsco module?
 > 
-> since this is a CSR chip, use "-m 10" as additional parameter to hcidump
-> to enable the decoding of CSR vendor events.
-
-That won't really help in this case. All it'll tell you is that it's the
-1 byte message 00 on subchannel 4 coming from a VM application running
-on the chip.
-
-Subchannels below 0x0080 are free for use by the VM application. So,
-without visibility of the VM application, it's difficult to know
-exactly what this message signifies.
-
-VM applications on dongles in HCI mode are fairly limited. They can
-detect Bluetooth activity, process messages from and send messages to
-the host, enable and disable the radio, reboot in another mode and a
-few other bits and pieces.
-
-So, it may simply be an indication from the dongle to the host that
-there's been some Bluetooth activity. The host might use this to flash
-a light or similar.
-
-	- Steven
--- 
-
-
-This message has been scanned for viruses by BlackSpider MailControl - www.blackspider.com
+> Thanks.
+> -andre.
 
 
 -------------------------------------------------------
