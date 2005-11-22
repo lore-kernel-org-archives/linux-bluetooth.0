@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Problem setting the flush timeout
+Subject: Re: [Bluez-devel] Authentication failure
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43815F5F.8030402@masaka.cs.ohiou.edu>
-References: <43815F5F.8030402@masaka.cs.ohiou.edu>
+In-Reply-To: <7.0.0.10.0.20051121130729.0122d150@impulsesoft.com>
+References: <7.0.0.10.0.20051121130729.0122d150@impulsesoft.com>
 Content-Type: text/plain
-Message-Id: <1132657745.28644.7.camel@blade>
+Message-Id: <1132657624.28644.5.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,23 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Nov 2005 12:09:05 +0100
+Date: Tue, 22 Nov 2005 12:07:04 +0100
 
-Hi Jim,
+Hi Pragya,
 
-> 	I have been pulling my hair for quite some time at the 
-> set-flush-timeout.c code segment I was referred to use to set the flush 
-> timeout for a bluetooth device.  The call to hci_get_route( bdaddr_t* ) 
-> is failing, even though I directly cut-and-pasted the code.  I verified 
-> that the address I'm passing does exist on the system.  It's setting 
-> errno to 19 and claiming that the device doesn't exist even though I'm 
-> 100% positive that it does (hcitool dev shows it's 00:11:95:4F:FD:22, 
-> and cr -> bdaddr_t.b[5] through cr -> bdaddr_t.b[0] are the same values, 
-> copied in using str2ba).  The device does definitely exist on the 
-> system.  Any other idea why this might be happening?
+> I have enabled authentication on BlueZ and I try to issue connection 
+> from another bluetooth device. I am seeing random behaviour with 
+> respect to authentication. Sometimes the authentication procedure 
+> goes through and a file "link_key" is created in /etc/bluetooth/.
+> 
+> But most of the times, I see a link key request and no response from BlueZ.
+> I am attaching the hcid.conf being used by me and also some logs (see 
+> below) collected using hcidump.
 
-if you wanna use hci_get_route() then use the code inside hcitool.c for
-any reference, because its usage is known to work.
+when using hcidump then use it with -X -V and as root. Nobody wants to
+decode the HCI commands and events by themself.
+
+If the link key requests are not answered, I suspect that hcid is not
+running. If it runs make sure only one instance is running.
+
+At some point we moved the link key storage to /var/lib/bluetooth and it
+is also a text file now.
 
 Regards
 
