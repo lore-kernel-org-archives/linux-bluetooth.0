@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <438356EF.9010503@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Re: Everything seems normal yet...
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Can the btsco module support muting the microphone?
-References: <loom.20051122T162417-540@post.gmane.org>
-In-Reply-To: <loom.20051122T162417-540@post.gmane.org>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <200511221106.42566.arthur.breitman@gmail.com>
+References: <200511211803.35723.arthur.breitman@gmail.com>
+	 <200511221106.42566.arthur.breitman@gmail.com>
+Content-Type: text/plain
+Message-Id: <1132675914.20713.18.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +19,64 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Nov 2005 10:35:43 -0700
+Date: Tue, 22 Nov 2005 17:11:54 +0100
 
-Andre
+Hi Arthur,
 
-The driver probably does need a modification, but if you go down this
-route, you should find out how to support the actual mute operation that
-is failing.
-
-Brad
-
-> With the snd-intel8x0, I found that couldn't mute the capture control so I
-> switch the capture control between the microphone and line-in
-> (a non existent input source) to unmute and mute, respectively.  Is there a
-> strategy I can follow to mute the btsco microphone or do I need to add a fake
-> input source to the btsco module?
+> trying to find the mobile phone:
 > 
-> Thanks.
-> -andre.
+> root@coin:/home/arthurb# hcidump -X -V
+> HCI sniffer - Bluetooth packet analyzer ver 1.23
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> < HCI Command: Inquiry (0x01|0x0001) plen 5
+>     lap 0x9e8b33 len 8 num 0
+> > HCI Event: Command Status (0x0f) plen 4
+>     Inquiry (0x01|0x0001) status 0x00 ncmd 1
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00
+>      .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00
+>      .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 
+> 00                                                                                           .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 
+> 00                                                                                           .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 
+> 00                                                                                           .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 
+> 00                                                                                           .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 
+> 00                                                                                           .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Inquiry Complete (0x01) plen 1
+>     status 0x00
+> 
+> 
+> Mobile phone trying to see the laptop:
+> nothing special except for 
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> but this seems to be going on all the time
+
+since this is a CSR chip, use "-m 10" as additional parameter to hcidump
+to enable the decoding of CSR vendor events.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
