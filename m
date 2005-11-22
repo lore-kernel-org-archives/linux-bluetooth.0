@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Authentication failure
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <7.0.0.10.0.20051121130729.0122d150@impulsesoft.com>
-References: <7.0.0.10.0.20051121130729.0122d150@impulsesoft.com>
-Content-Type: text/plain
-Message-Id: <1132657624.28644.5.camel@blade>
-Mime-Version: 1.0
+Message-ID: <001901c5eeff$fc3e2710$6201a8c0@hujie>
+From: "lcstudio@gmail" <lcstudio@gmail.com>
+To: <bluez-devel@lists.sourceforge.net>
+References: <20051120040407.20B5E1246E@sc8-sf-spam2.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="gb2312"
+Subject: [Bluez-devel] Why disabled BT SCO of BCM2035 with device id equal 0x200a,but id  0x2009.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,33 +18,11 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Nov 2005 12:07:04 +0100
-
-Hi Pragya,
-
-> I have enabled authentication on BlueZ and I try to issue connection 
-> from another bluetooth device. I am seeing random behaviour with 
-> respect to authentication. Sometimes the authentication procedure 
-> goes through and a file "link_key" is created in /etc/bluetooth/.
-> 
-> But most of the times, I see a link key request and no response from BlueZ.
-> I am attaching the hcid.conf being used by me and also some logs (see 
-> below) collected using hcidump.
-
-when using hcidump then use it with -X -V and as root. Nobody wants to
-decode the HCI commands and events by themself.
-
-If the link key requests are not answered, I suspect that hcid is not
-running. If it runs make sure only one instance is running.
-
-At some point we moved the link key storage to /var/lib/bluetooth and it
-is also a text file now.
+Date: Tue, 22 Nov 2005 08:59:20 +0800
 
 Regards
 
-Marcel
-
-
+Luchine
 
 
 -------------------------------------------------------
