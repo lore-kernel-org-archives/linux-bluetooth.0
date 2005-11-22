@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <7846f1440511221058lbfe6ff1g951ea529e4152af0@mail.gmail.com>
-From: Arthur Chiu <arthurchiu@gmail.com>
-To: Bluez-users@lists.sourceforge.net
+Message-ID: <43835FAE.4080505@csr.com>
+From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_36243_2827856.1132685934398"
-Subject: [Bluez-users] Create Services using BlueZ
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Re: Everything seems normal yet...
+References: <200511211803.35723.arthur.breitman@gmail.com>	 <200511221106.42566.arthur.breitman@gmail.com> <1132675914.20713.18.camel@blade>
+In-Reply-To: <1132675914.20713.18.camel@blade>
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,76 +18,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Nov 2005 10:58:54 -0800
+Date: Tue, 22 Nov 2005 18:13:02 +0000
 
-------=_Part_36243_2827856.1132685934398
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Marcel Holtmann wrote:
+> Arthur Breitman wrote:
+>> > HCI Event: Vendor (0xff) plen 7
+>>   0000: cd 03 00 04 00 00 00                              .......
+> 
+> since this is a CSR chip, use "-m 10" as additional parameter to hcidump
+> to enable the decoding of CSR vendor events.
 
-Hi,
+That won't really help in this case. All it'll tell you is that it's the
+1 byte message 00 on subchannel 4 coming from a VM application running
+on the chip.
 
-I am currently trying to create a server that will response to bluetooth
-request. The client will be in Java. Since the client need to search for
-devices and services before connecting, I need to create services on the
-server side. I am trying to have the client sending "Hello World" to the
-server.
+Subchannels below 0x0080 are free for use by the VM application. So,
+without visibility of the VM application, it's difficult to know
+exactly what this message signifies.
 
-My questions:
-1) Can I create custom services like "hello world service" or it must be
-from the list of services shown in sdptool? How can I do so?
-2) Which test or sample tool contain example that handles service requests
-(i saw sdptool only browses for services, not using them)
-3) What kind of headers would I need to attach in front of data if I want t=
-o
-communicate with standard devices (like phones). I see in l2test.c that the
-L2CAP format contains 4 bytes of sequence number and 2 bytes of data length=
-.
-What other information are there if I need to send things through SDP?
-4) Does L2CAP data format (those headers) =3D ACL data format? If not, what=
-'s
-the difference?
+VM applications on dongles in HCI mode are fairly limited. They can
+detect Bluetooth activity, process messages from and send messages to
+the host, enable and disable the radio, reboot in another mode and a
+few other bits and pieces.
 
-Thanks for spending time on all these questions.
+So, it may simply be an indication from the dongle to the host that
+there's been some Bluetooth activity. The host might use this to flash
+a light or similar.
 
-Cheers,
+	- Steven
+-- 
 
-Arthur
 
-------=_Part_36243_2827856.1132685934398
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi,<br>
-<br>
-I am currently trying to create a server that will response to
-bluetooth request. The client will be in Java. Since the client need to
-search for devices and services before connecting, I need to create
-services on the server side. I am trying to have the client sending
-&quot;Hello World&quot; to the server.<br>
-<br>
-My questions:<br>
-1) Can I create custom services like &quot;hello world service&quot; or it =
-must
-be from the list of services shown in sdptool? How can I do so?<br>
-2) Which test or sample tool contain example that handles service
-requests (i saw sdptool only browses for services, not using them)<br>
-3) What kind of headers would I need to attach in front of data if I
-want to communicate with standard devices (like phones). I see in
-l2test.c that the L2CAP format contains 4 bytes of sequence number and
-2 bytes of data length. What other information are there if I need to
-send things through SDP? <br>
-4) Does L2CAP data format (those headers) =3D ACL data format? If not, what=
-'s the difference? <br>
-<br>
-Thanks for spending time on all these questions. <br>
-<br>
-Cheers,<br>
-<br>
-&nbsp; Arthur<br>
-
-------=_Part_36243_2827856.1132685934398--
+This message has been scanned for viruses by BlackSpider MailControl - www.blackspider.com
 
 
 -------------------------------------------------------
