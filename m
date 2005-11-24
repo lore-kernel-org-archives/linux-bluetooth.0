@@ -1,12 +1,21 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [Patch] Samsung D600 (sdp, service discovery
-	deadlocks)
+Subject: Re: [Bluez-devel] [DBUS Patch] Device Property
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1132691970.9887.14.camel@localhost.localdomain>
-References: <1132691970.9887.14.camel@localhost.localdomain>
+In-Reply-To: <3013cac80511221152t2911f513jb28f3944097c1b09@mail.gmail.com>
+References: <3013cac80511040603k52c40da2gae5249abcba426d9@mail.gmail.com>
+	 <20051108222033.GA12368@localhost.localdomain>
+	 <1131489534.5544.20.camel@blade>
+	 <3013cac80511171116n33c7faech6006e7264821fb16@mail.gmail.com>
+	 <3013cac80511171252g4a4f1581l915e364a244ec8ea@mail.gmail.com>
+	 <20051118082828.GA16438@localhost.localdomain>
+	 <3013cac80511180251w1d2fa8f5s80ce1da7318327e7@mail.gmail.com>
+	 <20051118112611.GA17062@localhost.localdomain>
+	 <3013cac80511180500h5539d5d9y3f19ce224f9e38b7@mail.gmail.com>
+	 <1132660308.28644.37.camel@blade>
+	 <3013cac80511221152t2911f513jb28f3944097c1b09@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1132806128.5982.18.camel@blade>
+Message-Id: <1132805822.5982.15.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,32 +28,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Nov 2005 05:22:08 +0100
+Date: Thu, 24 Nov 2005 05:17:02 +0100
 
-Hi Victor,
+Hi Eduardo,
 
-> We experienced some deadlock in the bluez library for Samsund-D600 phone
-> during service discovery. This is due to incorrect SDP record set
-> returned on service inquiry request. The response from the SDP server
-> contains service records + some rubbish at the end. So when it tries to
-> parse it, sdp_extract_pdu() returns 0 recsize and locks the while()
-> loop.
+> here is the new patch. I've removed the spaces (I hope so). I've also
+> included the code for the dbus signal for the local name change event.
+> One thing that remainded open was the timeout for hci_send_req for
+> name write and name read ops. In the hciconfig this was 2s and 1s. Is
+> there a reason for this big number?
 
-the patch is in the CVS now. Thanks.
+you missed one whitespace/tab clash, but I fixed it. Opening a patch
+inside an editor with whitespace visualization helps a lot.
 
-> Samsung is informed, but I do not know if they will come up with
-> something (have no idea who provides the stack for them, they have a
-> Broadcom chip in there)
+The patch has been applied to the CVS and we should talk about some
+serious security setting for the D-Bus interface. Question is what a
+session user should be able to change?
 
-Don't expect anything.
-
-> P.S. I do not have the phone with me now, otherwise I would send in
-> hcidump output. It reports errors when trying to parse at the end of
-> response.
-
-I like to have these phones at home for further testing, but getting all
-the bad phones is quite an expensive hobby. The donations are not enough
-to buy them.
+The timeout is not really crucial for most local configuration settings
+and I think it was a bad idea to have it in the API anyhow. However the
+change local name command is tricky. Some older CSR chips for example
+are storing the name in the PS keys, which results writing it to flash
+or EEPROM. This simply can take time.
 
 Regards
 
