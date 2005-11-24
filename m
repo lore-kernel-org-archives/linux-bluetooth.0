@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Everything seems normal yet...
+Subject: Re: [Bluez-users] Create Services using BlueZ
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43835FAE.4080505@csr.com>
-References: <200511211803.35723.arthur.breitman@gmail.com>
-	 <200511221106.42566.arthur.breitman@gmail.com>
-	 <1132675914.20713.18.camel@blade>  <43835FAE.4080505@csr.com>
+In-Reply-To: <7846f1440511221058lbfe6ff1g951ea529e4152af0@mail.gmail.com>
+References: <7846f1440511221058lbfe6ff1g951ea529e4152af0@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1132806616.5982.30.camel@blade>
+Message-Id: <1132806449.5982.27.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,35 +18,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 24 Nov 2005 05:30:16 +0100
+Date: Thu, 24 Nov 2005 05:27:29 +0100
 
-Hi Steven,
+Hi Arthur,
 
-> >> > HCI Event: Vendor (0xff) plen 7
-> >>   0000: cd 03 00 04 00 00 00                              .......
-> > 
-> > since this is a CSR chip, use "-m 10" as additional parameter to hcidump
-> > to enable the decoding of CSR vendor events.
+> I am currently trying to create a server that will response to
+> bluetooth request. The client will be in Java. Since the client need
+> to search for devices and services before connecting, I need to create
+> services on the server side. I am trying to have the client sending
+> "Hello World" to the server.
 > 
-> That won't really help in this case. All it'll tell you is that it's the
-> 1 byte message 00 on subchannel 4 coming from a VM application running
-> on the chip.
-> 
-> Subchannels below 0x0080 are free for use by the VM application. So,
-> without visibility of the VM application, it's difficult to know
-> exactly what this message signifies.
-> 
-> VM applications on dongles in HCI mode are fairly limited. They can
-> detect Bluetooth activity, process messages from and send messages to
-> the host, enable and disable the radio, reboot in another mode and a
-> few other bits and pieces.
-> 
-> So, it may simply be an indication from the dongle to the host that
-> there's been some Bluetooth activity. The host might use this to flash
-> a light or similar.
+> My questions:
+> 1) Can I create custom services like "hello world service" or it must
+> be from the list of services shown in sdptool? How can I do so?
 
-this is unusual. I never saw any dongle transmitting continuously vendor
-events. There must be something wrong with this device.
+you need to create your own service record using your own UUID-128 for
+identification.
+
+> 2) Which test or sample tool contain example that handles service
+> requests (i saw sdptool only browses for services, not using them)
+
+The service records are only information about the service and not the
+service itself. Tools like l2test and rctest work without any service
+record descriptions.
+
+> 3) What kind of headers would I need to attach in front of data if I
+> want to communicate with standard devices (like phones). I see in
+> l2test.c that the L2CAP format contains 4 bytes of sequence number and
+> 2 bytes of data length. What other information are there if I need to
+> send things through SDP? 
+
+Nothing. The SDP doesn't contain any information about the protocol. I
+may tell you the L2CAP PSM or RFCOMM channel number, but that's it.
+
+> 4) Does L2CAP data format (those headers) = ACL data format? If not,
+> what's the difference? 
+
+You can use L2CAP as a SOCK_SEQPACKET and RFCOMM as SOCK_STREAM. For
+more information about L2CAP and RFCOMM in general, read the Bluetooth
+specification. For the rest check the source of l2test or rctest.
 
 Regards
 
