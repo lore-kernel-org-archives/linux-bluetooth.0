@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sco link problem
+Subject: Re: [Bluez-devel] [Patch] Samsung D600 (sdp, service discovery
+	deadlocks)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <000f01c5efcb$c4258540$6201a8c0@hujie>
-References: <20051122195412.F2DBC88BC7@sc8-sf-spam1.sourceforge.net>
-	 <000f01c5efcb$c4258540$6201a8c0@hujie>
+In-Reply-To: <1132691970.9887.14.camel@localhost.localdomain>
+References: <1132691970.9887.14.camel@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1132806217.5982.22.camel@blade>
+Message-Id: <1132806128.5982.18.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,22 +19,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Nov 2005 05:23:37 +0100
+Date: Thu, 24 Nov 2005 05:22:08 +0100
 
-Hi Luchine,
+Hi Victor,
 
-> I've problem by make SCO link using the dongle with BCM2035 chip.It's seemed
-> SCO link up,but NO any of data responsed.:(
-> hci_usb.c file, I found some piece like:
->     {USB_DEVICE(0x0a5c, 0x200a), .driver_info = HCI_RESET |
-> HCI_BROKEN_ISOC }
-> it's disabled all of BCM2035 dongle SCO driver with id by 0x0a5c &
-> 0x200a,what's idea about this? My dongle matchs this id.
-> Is Broadcom makes chip abnormally behavior with 0x0a5c,0x200a ?
+> We experienced some deadlock in the bluez library for Samsund-D600 phone
+> during service discovery. This is due to incorrect SDP record set
+> returned on service inquiry request. The response from the SDP server
+> contains service records + some rubbish at the end. So when it tries to
+> parse it, sdp_extract_pdu() returns 0 recsize and locks the while()
+> loop.
 
-last time I check one of these devices, the ISOC transfers were broken
-and they were making this device unusable. So I flagged it. Remove the
-quirk identify and try if it works.
+the patch is in the CVS now. Thanks.
+
+> Samsung is informed, but I do not know if they will come up with
+> something (have no idea who provides the stack for them, they have a
+> Broadcom chip in there)
+
+Don't expect anything.
+
+> P.S. I do not have the phone with me now, otherwise I would send in
+> hcidump output. It reports errors when trying to parse at the end of
+> response.
+
+I like to have these phones at home for further testing, but getting all
+the bad phones is quite an expensive hobby. The donations are not enough
+to buy them.
 
 Regards
 
