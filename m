@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Everything seems normal yet...
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Arthur Breitman <arthur.breitman@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200511241535.39842.arthur.breitman@gmail.com>
-References: <200511211803.35723.arthur.breitman@gmail.com>
-	 <43835FAE.4080505@csr.com> <1132806616.5982.30.camel@blade>
-	 <200511241535.39842.arthur.breitman@gmail.com>
-Content-Type: text/plain
-Message-Id: <1132872820.3170.1.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Re: Everything seems normal yet...
+References: <200511211803.35723.arthur.breitman@gmail.com> <43835FAE.4080505@csr.com> <1132806616.5982.30.camel@blade>
+In-Reply-To: <1132806616.5982.30.camel@blade>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200511241535.39842.arthur.breitman@gmail.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,25 +19,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 24 Nov 2005 23:53:40 +0100
+Date: Thu, 24 Nov 2005 15:35:39 -0500
 
-Hi Arthur,
+> this is unusual. I never saw any dongle transmitting continuously vendor
+> events. There must be something wrong with this device.
+>uy
+> Regards
+>
+> Marcel
 
-> > this is unusual. I never saw any dongle transmitting continuously vendor
-> > events. There must be something wrong with this device.
-> 
-> Hum, it works flawlessly with windows and is reported to work out of the box 
-> with bluez... as a matter of fact it looks perfectly recognized. Any idea how 
-> we could further debug this guy ?
-
-I have no idea. The chip inside shouldn't be a problem, because the
-BlueCore4 from CSR is fully supported.
-
-Regards
-
-Marcel
-
-
+Hum, it works flawlessly with windows and is reported to work out of the box 
+with bluez... as a matter of fact it looks perfectly recognized. Any idea how 
+we could further debug this guy ?
 
 
 -------------------------------------------------------
