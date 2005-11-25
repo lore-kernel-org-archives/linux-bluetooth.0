@@ -1,21 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0511250547o16e60b21y5c3a81a5639102cc@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+Subject: Re: [Bluez-devel] new sobexsrv v1.0.0
+From: "Collin R. Mulliner" <collin@betaversion.net>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [DBUS Patch] Device Property
-In-Reply-To: <1132872886.3170.3.camel@blade>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <3013cac80511040603k52c40da2gae5249abcba426d9@mail.gmail.com>
-	 <20051118082828.GA16438@localhost.localdomain>
-	 <3013cac80511180251w1d2fa8f5s80ce1da7318327e7@mail.gmail.com>
-	 <20051118112611.GA17062@localhost.localdomain>
-	 <3013cac80511180500h5539d5d9y3f19ce224f9e38b7@mail.gmail.com>
-	 <1132660308.28644.37.camel@blade>
-	 <3013cac80511221152t2911f513jb28f3944097c1b09@mail.gmail.com>
-	 <1132805822.5982.15.camel@blade>
-	 <3013cac80511241050o2f3d67aele639b2c69de41360@mail.gmail.com>
-	 <1132872886.3170.3.camel@blade>
+In-Reply-To: <1132658105.28644.16.camel@blade>
+References: <1132390096.32715.4.camel@panic>
+	 <1132658105.28644.16.camel@blade>
+Content-Type: text/plain
+Message-Id: <1132913814.2055.3.camel@panic>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -27,111 +19,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Nov 2005 11:47:34 -0200
+Date: Fri, 25 Nov 2005 02:16:54 -0800
 
-Hi,
+Hi Marcel and list,
 
-IMHO, it's enough two level of security. My suggestion is create a
-bluezadmin group to
-allow the device setup operations(write operations). Read operations
-can be allowed to
-bluezusers and bluezadmin. Another point is only the root can own the
-service, I mean,
-Only the root can run the hcid daemon.
+> the stuff is really cool, but please use a GCC 4.0 compiler and get rid
+> of the warnings.
 
-/org/bluez/Manager
-    - get default device
-    - list adapters
-/org/bluez/Device/hciX
-    - UP  (*)
-    - Down (*)
-    - SetProperty (*)
-    - GetProperty
-/org/bluez/Device/hciX/Controller
-/org/bluez/Device/hciX/Network
-/org/bluez/Device/hciX/Serial
+I fixed the warnings and used gcc4 to compile it (this is not fixed in
+the makefile, so you need to have gcc4 as your default compiler).
 
-Configuration file suggestion:
-<!DOCTYPE busconfig PUBLIC
- "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
- "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
-<busconfig>
+Also I fixed a security bug, description is on the website. 
 
-  <!-- This configuration file specifies the required security policies
-       for the BlueZ to work. -->
+And Debian packages are available too.
 
-  <!-- Only root can own the BlueZ service -->
-  <policy user=3D"root">
-    <allow own=3D"org.bluez"/>
-  </policy>
+For those who are to lazzy to search their email, here is the link:
+http://www.mulliner.org/bluetooth/sobexsrv.php
 
-  <policy group=3D"bluezadmin">
-    <allow receive_interface=3D"org.bluez.Manager"/>
-    <allow receive_interface=3D"org.bluez.Device"/>
-    <allow send_interface=3D"org.bluez.Manager"/>
-    <allow send_interface=3D"org.bluez.Device"/>
-  </policy>
 
-  <policy group=3D"bluezusers">
-    <allow receive_interface=3D"org.bluez.Manager"/>
-    <allow receive_interface=3D"org.bluez.Device"/>
-    <allow send_interface=3D"org.bluez.Manager"/>
-    <allow send_interface=3D"org.bluez.Device"/>
-    <deny send_interface=3D"org.bluez.Device" send_member=3D"Up"/>
-    <deny send_interface=3D"org.bluez.Device" send_member=3D"Down"/>
-    <deny send_interface=3D"org.bluez.Device" send_member=3D"SetProperty"/>
-  </policy>
-
-  <!-- Deny anyone to invoke methods on the Manager and Device interfaces -=
-->
-  <policy context=3D"default">
-    <deny own=3D"org.bluez"/>
-    <deny send_interface=3D"org.bluez.Manager"/>
-    <deny send_interface=3D"org.bluez.Device"/>
-    <deny receive_interface=3D"org.bluez.Manager"/>
-    <deny receive_interface=3D"org.bluez.Device"/>
-  </policy>
-
-</busconfig>
-
-Regards,
-Claudio
-
-On 11/24/05, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Eduardo,
->
-> > maybe we should create a bluetooth group and only allow users of that
-> > group to make write operations. I'll also check eht dbus auth to see
-> > if that can help. Do you have in mind any operation->"security level"
-> > map?
->
-> come up with some proposals. I have real clue, but we should have some
-> special rights for the current session user.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log fi=
-les
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-
+... Collin
 
 --
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+This signature was stolen from: 
+
 
 
 -------------------------------------------------------
