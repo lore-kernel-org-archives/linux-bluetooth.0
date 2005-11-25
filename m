@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] new sobexsrv v1.0.0
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1132913814.2055.3.camel@panic>
-References: <1132390096.32715.4.camel@panic>
-	 <1132658105.28644.16.camel@blade>  <1132913814.2055.3.camel@panic>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <1132941689.5577.16.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [DBUS Patch] Device Property
+Message-ID: <20051125165103.GA18967@localhost.localdomain>
+References: <3013cac80511171252g4a4f1581l915e364a244ec8ea@mail.gmail.com> <20051118082828.GA16438@localhost.localdomain> <3013cac80511180251w1d2fa8f5s80ce1da7318327e7@mail.gmail.com> <20051118112611.GA17062@localhost.localdomain> <3013cac80511180500h5539d5d9y3f19ce224f9e38b7@mail.gmail.com> <1132660308.28644.37.camel@blade> <3013cac80511221152t2911f513jb28f3944097c1b09@mail.gmail.com> <1132805822.5982.15.camel@blade> <3013cac80511241050o2f3d67aele639b2c69de41360@mail.gmail.com> <1132872886.3170.3.camel@blade>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1132872886.3170.3.camel@blade>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,64 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Nov 2005 19:01:29 +0100
+Date: Fri, 25 Nov 2005 18:51:03 +0200
 
-Hi Collin,
+Hi Marcel,
 
-> > the stuff is really cool, but please use a GCC 4.0 compiler and get r=
-id
-> > of the warnings.
->=20
-> I fixed the warnings and used gcc4 to compile it (this is not fixed in
-> the makefile, so you need to have gcc4 as your default compiler).
+On Thu, Nov 24, 2005, Marcel Holtmann wrote:
+> come up with some proposals. I have real clue, but we should have some
+> special rights for the current session user.
 
-my default compiler is a GCC 4.0 and you still see this on a 64-Bit
-machine:
+What do you mean by "current session user"?
 
-obexsrv.c: In function =E2=80=98security=E2=80=99:
-obexsrv.c:85: warning: cast to pointer from integer of different size
-obexsrv.c: In function =E2=80=98internal_handler=E2=80=99:
-obexsrv.c:329: warning: cast to pointer from integer of different size
-obexsrv.c: In function =E2=80=98scripting_handler=E2=80=99:
-obexsrv.c:583: warning: cast to pointer from integer of different size
-obexsrv.c:586: warning: cast to pointer from integer of different size
-obexsrv.c:612: warning: cast to pointer from integer of different size
-obexsrv.c: In function =E2=80=98cmd_connect=E2=80=99:
-obexsrv.c:670: warning: cast to pointer from integer of different size
-obexsrv.c:681: warning: cast to pointer from integer of different size
-obexsrv.c:694: warning: cast to pointer from integer of different size
-obexsrv.c:709: warning: cast to pointer from integer of different size
-obexsrv.c: In function =E2=80=98cmd_setpath=E2=80=99:
-obexsrv.c:828: warning: cast to pointer from integer of different size
-obexsrv.c: In function =E2=80=98cmd_get=E2=80=99:
-obexsrv.c:902: warning: cast to pointer from integer of different size
-obexsrv.c:905: warning: cast to pointer from integer of different size
-obexsrv.c: In function =E2=80=98cmd_put=E2=80=99:
-obexsrv.c:961: warning: cast to pointer from integer of different size
-obexsrv.c:992: warning: cast to pointer from integer of different size
-obexsrv.c:992: warning: cast to pointer from integer of different size
-obexsrv.c:995: warning: cast to pointer from integer of different size
-obexsrv.c:998: warning: cast to pointer from integer of different size
-obexsrv.c:1013: warning: cast to pointer from integer of different size
-obexsrv.c:1016: warning: cast to pointer from integer of different size
-obexsrv.c:1025: warning: cast to pointer from integer of different size
-obexsrv.c: In function =E2=80=98main=E2=80=99:
-obexsrv.c:1312: warning: cast to pointer from integer of different size
+I'd propose essentially a two level system where you have a level which
+is allowed to do everything, and another one which only allows "normal
+user" operations. root and users belonging to the "bluetooth" (or
+"btadmin" or whatever) group would be on the "everyting allowed" level,
+while everyone else would be on the other.
 
-fs.c: In function =E2=80=98lsdir=E2=80=99:
-fs.c:88: warning: cast from pointer to integer of different size
-fs.c:89: warning: cast from pointer to integer of different size
-fs.c:90: warning: cast from pointer to integer of different size
-fs.c:91: warning: cast from pointer to integer of different size
-fs.c:92: warning: cast from pointer to integer of different size
+Of course this doesn't mean that distributions couldn't replace the
+policy with a more flexible (and complex) one to suit their needs. I'm
+just proposing this to be the default that comes with bluez-utils.
 
-Please don't mix pointers and integers. This will kick back some day.
+Also, I don't think it makes sense for the default D-BUS policy (which
+comes with upstream with bluez-utils) to deny a normal user things that
+can anyway be done using libbluetooth directly (e.g. using the command
+line tools).
 
-Regards
-
-Marcel
-
-
+Johan
 
 
 -------------------------------------------------------
