@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Johan Hedberg <johan.hedberg@nokia.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [DBUS Patch] Device Property
-Message-ID: <20051125165103.GA18967@localhost.localdomain>
-References: <3013cac80511171252g4a4f1581l915e364a244ec8ea@mail.gmail.com> <20051118082828.GA16438@localhost.localdomain> <3013cac80511180251w1d2fa8f5s80ce1da7318327e7@mail.gmail.com> <20051118112611.GA17062@localhost.localdomain> <3013cac80511180500h5539d5d9y3f19ce224f9e38b7@mail.gmail.com> <1132660308.28644.37.camel@blade> <3013cac80511221152t2911f513jb28f3944097c1b09@mail.gmail.com> <1132805822.5982.15.camel@blade> <3013cac80511241050o2f3d67aele639b2c69de41360@mail.gmail.com> <1132872886.3170.3.camel@blade>
+Subject: Re: [Bluez-devel] Device scan property
+Message-ID: <20051125145657.GA18684@localhost.localdomain>
+References: <3013cac80511250643s30a3e836qb9559289e68ee75c@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1132872886.3170.3.camel@blade>
+In-Reply-To: <3013cac80511250643s30a3e836qb9559289e68ee75c@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,30 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Nov 2005 18:51:03 +0200
+Date: Fri, 25 Nov 2005 16:56:57 +0200
 
-Hi Marcel,
+Hi Eduardo,
 
-On Thu, Nov 24, 2005, Marcel Holtmann wrote:
-> come up with some proposals. I have real clue, but we should have some
-> special rights for the current session user.
+On Fri, Nov 25, 2005, Eduardo Rocha wrote:
+> I'm going to start the scan property implementation for device path
+> now. From early discussions, I think we have agreeded to split page
+> scan and inquire scan property. Starting to think in implementation
+> now, I realized that this imply in an extra getdeviceinfo, as we have
+> to now if the exactly page flag status to modify it. If we join this
+> two properties into scan property, with 2 boolean parameters for pscan
+> and iscan, we can eliminate this operation. What do you guys think?
 
-What do you mean by "current session user"?
-
-I'd propose essentially a two level system where you have a level which
-is allowed to do everything, and another one which only allows "normal
-user" operations. root and users belonging to the "bluetooth" (or
-"btadmin" or whatever) group would be on the "everyting allowed" level,
-while everyone else would be on the other.
-
-Of course this doesn't mean that distributions couldn't replace the
-policy with a more flexible (and complex) one to suit their needs. I'm
-just proposing this to be the default that comes with bluez-utils.
-
-Also, I don't think it makes sense for the default D-BUS policy (which
-comes with upstream with bluez-utils) to deny a normal user things that
-can anyway be done using libbluetooth directly (e.g. using the command
-line tools).
+I think we should have two boolean properties: "discoverable" and
+"connectable", even if that means doing an extra HCI_Read_Scan_Enable
+command when setting the value of either one.
 
 Johan
 
