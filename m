@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Mario Demontis <mario.demontis@email.it>
+Subject: Re: [Bluez-users] Multiple RFCOMM disconnection problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1132928387.3260.11.camel@localhost.localdomain>
+References: <1132928387.3260.11.camel@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1133028275.9123.29.camel@localhost.localdomain>
+Message-Id: <1132944279.5577.33.camel@blade>
 Mime-Version: 1.0
-Subject: [Bluez-users] Bluetooth connection too slow
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,78 +18,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 26 Nov 2005 19:04:35 +0100
+Date: Fri, 25 Nov 2005 19:44:39 +0100
 
-Hello
-I recently bought a Bluetooth 2.0 EDR USB adapter (Trust, BT-2200Tp),
-because I wanted to try it out with my new Motorola E1070 (UMTS phone).
+Hi Augustin,
 
-I tried it out with my Ubuntu linux. The device has been recognized
-properly. Then I tried the Internet connection (with UMTS you can have
-more than 30 kBytes/s). Unfortunately all I could see was a transfer
-rate (taken with wget downloading the kernel sources from a fast mirror)
-of about 9 kB/s. I also tried to do the same with Windows XP and there
-the transfer rate reached about 32 kB/s!! I did the same several times
-and all the times I had the same results.
-Furthermore, I tried to do the same under Linux with a USB connection,
-and I'm getting 32kB/s as well. This brought me to think the bottleneck
-is in the BT connection.
+> When I try to connect more than 2 RFCOMM connections (on different
+> ports), everything works fine until I disconnect the last connection:
+> 
+> In other words, I can create multiple RFCOMM connections on different
+> ports, but when I try and disconnect, the computer freezes (on fedora 4
+> kernel 2.6.11) or just displays a segfault and I can't kill the process
+> (o Knoppix kernel 2.6.14).
+> 
+> I tried with different USB dongles, updated to the last release of Bluez
+> (rfcomm version 2.22) and nothing changes...
+> 
+> This is a very strange problem... and only ocurrs when I try to connect
+> to more then 2 BT devices.
+> 
+> Here's what I do:
+> I have two computers, each one with one dongle. On the listener side I
+> run on different terminals:
+> 
+> >rfcomm listen 1 1
+> >rfcomm listen 2 2
+> >rfcomm listen 3 3
+> and so on...
+> 
+> on the client side I run
+> 
+> >rfcomm connect 1 <bdaddress> 1
+> >rfcomm connect 2 <bdaddress> 2
+> >rfcomm connect 3 <bdaddress> 3
+> 
+> everything works fine until I disconnect (CTRL+C from the client side)
+> the 3rd connection. I tried with more than 3 connections and the system
+> freezes when I disconnect the last connection.
+> 
+> I'd really appreciate any feedback on this problem... I am at a lost
+> here... Has this ever happened to you?
 
-This is how I'm setting the BT connection:
-$ sudo hcitool cc --role=m 00:0E:A1:45:1F:AE
-$ sudo hcitool auth 00:0E:A1:45:1F:AE
-$ sudo rfcomm bind 00:0E:A1:45:1F:AE
-$ sudo ln -sf /dev/rfcomm0 /dev/modem
+I need some details of your kernel. Send in "lsmod" and "modinfo rfcomm"
+and also "uname -a". Do you see an oops in the logs?
 
-To dial I'm using exactly the same procedure as when using the USB
-connection (with kppp).
+Regards
 
-I'm wondering if I need to tweak some parameter of the bluetooth
-connection. hciconfig gives me many info but I don't know how to
-interpret them and what options to give (where can I find
-documentation?).
-Here is what I'm getting with hciconfig:
-$ hciconfig hci0 -a
-hci0:   Type: USB
-        BD Address: 00:0E:A1:45:1F:AE ACL MTU: 1017:8  SCO MTU: 64:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:466 acl:0 sco:0 events:27 errors:0
-        TX bytes:378 acl:0 sco:0 commands:21 errors:0
-        Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'agnello-0'
-        Class: 0x100100
-        Service Classes: Object Transfer
-        Device Class: Computer, Uncategorized
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x2902 LMP Ver: 2.0 (0x3) LMP
-Subver: 0x4127
-        Manufacturer: Broadcom Corporation (15)
-
-Does anyone have some suggestion in order to help me to configure
-properly my BT dongle?
-
-Thanks
-Mario
+Marcel
 
 
-
- 
-
- 
-
- --
-
- Email.it, the professional e-mail, gratis per te: http://www.email.it/f
-
- 
-
- Sponsor:
-
- Per la casa dei tuoi sogni, la soluzione è un Credito Casa Findomestic, facile e senza anticipi!
-
- Clicca qui: http://adv.email.it/cgi-bin/foclick.cgi?mid=3939&d=26-11
 
 
 -------------------------------------------------------
