@@ -1,21 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS Patch] Device Property
+Subject: Re: [Bluez-devel] new sobexsrv v1.0.0
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0511250547o16e60b21y5c3a81a5639102cc@mail.gmail.com>
-References: <3013cac80511040603k52c40da2gae5249abcba426d9@mail.gmail.com>
-	 <20051118082828.GA16438@localhost.localdomain>
-	 <3013cac80511180251w1d2fa8f5s80ce1da7318327e7@mail.gmail.com>
-	 <20051118112611.GA17062@localhost.localdomain>
-	 <3013cac80511180500h5539d5d9y3f19ce224f9e38b7@mail.gmail.com>
-	 <1132660308.28644.37.camel@blade>
-	 <3013cac80511221152t2911f513jb28f3944097c1b09@mail.gmail.com>
-	 <1132805822.5982.15.camel@blade>
-	 <3013cac80511241050o2f3d67aele639b2c69de41360@mail.gmail.com>
-	 <1132872886.3170.3.camel@blade>
-	 <e1effdeb0511250547o16e60b21y5c3a81a5639102cc@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1132942092.5577.21.camel@blade>
+In-Reply-To: <1132913814.2055.3.camel@panic>
+References: <1132390096.32715.4.camel@panic>
+	 <1132658105.28644.16.camel@blade>  <1132913814.2055.3.camel@panic>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1132941689.5577.16.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -28,26 +19,58 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Nov 2005 19:08:12 +0100
+Date: Fri, 25 Nov 2005 19:01:29 +0100
 
-Hi Claudio,
+Hi Collin,
 
-> IMHO, it's enough two level of security. My suggestion is create a
-> bluezadmin group to
-> allow the device setup operations(write operations). Read operations
-> can be allowed to
-> bluezusers and bluezadmin. Another point is only the root can own the
-> service, I mean,
-> Only the root can run the hcid daemon.
+> > the stuff is really cool, but please use a GCC 4.0 compiler and get r=
+id
+> > of the warnings.
+>=20
+> I fixed the warnings and used gcc4 to compile it (this is not fixed in
+> the makefile, so you need to have gcc4 as your default compiler).
 
-I don't see any need of having a bluezusers group. There are tasks that
-everybody can execute and I don't see any problem with it.
+my default compiler is a GCC 4.0 and you still see this on a 64-Bit
+machine:
 
-For what do we need a special bluezadmin group? I think that the user
-should enter the root password for configuration or it should be console
-or session user.
+obexsrv.c: In function =E2=80=98security=E2=80=99:
+obexsrv.c:85: warning: cast to pointer from integer of different size
+obexsrv.c: In function =E2=80=98internal_handler=E2=80=99:
+obexsrv.c:329: warning: cast to pointer from integer of different size
+obexsrv.c: In function =E2=80=98scripting_handler=E2=80=99:
+obexsrv.c:583: warning: cast to pointer from integer of different size
+obexsrv.c:586: warning: cast to pointer from integer of different size
+obexsrv.c:612: warning: cast to pointer from integer of different size
+obexsrv.c: In function =E2=80=98cmd_connect=E2=80=99:
+obexsrv.c:670: warning: cast to pointer from integer of different size
+obexsrv.c:681: warning: cast to pointer from integer of different size
+obexsrv.c:694: warning: cast to pointer from integer of different size
+obexsrv.c:709: warning: cast to pointer from integer of different size
+obexsrv.c: In function =E2=80=98cmd_setpath=E2=80=99:
+obexsrv.c:828: warning: cast to pointer from integer of different size
+obexsrv.c: In function =E2=80=98cmd_get=E2=80=99:
+obexsrv.c:902: warning: cast to pointer from integer of different size
+obexsrv.c:905: warning: cast to pointer from integer of different size
+obexsrv.c: In function =E2=80=98cmd_put=E2=80=99:
+obexsrv.c:961: warning: cast to pointer from integer of different size
+obexsrv.c:992: warning: cast to pointer from integer of different size
+obexsrv.c:992: warning: cast to pointer from integer of different size
+obexsrv.c:995: warning: cast to pointer from integer of different size
+obexsrv.c:998: warning: cast to pointer from integer of different size
+obexsrv.c:1013: warning: cast to pointer from integer of different size
+obexsrv.c:1016: warning: cast to pointer from integer of different size
+obexsrv.c:1025: warning: cast to pointer from integer of different size
+obexsrv.c: In function =E2=80=98main=E2=80=99:
+obexsrv.c:1312: warning: cast to pointer from integer of different size
 
-And yes, hcid will always need to be run as root.
+fs.c: In function =E2=80=98lsdir=E2=80=99:
+fs.c:88: warning: cast from pointer to integer of different size
+fs.c:89: warning: cast from pointer to integer of different size
+fs.c:90: warning: cast from pointer to integer of different size
+fs.c:91: warning: cast from pointer to integer of different size
+fs.c:92: warning: cast from pointer to integer of different size
+
+Please don't mix pointers and integers. This will kick back some day.
 
 Regards
 
