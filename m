@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43890A1D.2060407@ketil.froyn.name>
-From: Ketil Froyn <lists@ketil.froyn.name>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Bluetooth connection too slow
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] cellphone as microphone/webcam?
+In-Reply-To: <1133029672.9123.34.camel@localhost.localdomain>
+References: <1133028275.9123.29.camel@localhost.localdomain>
+	 <1133028830.28718.19.camel@blade>
+	 <1133029672.9123.34.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1133029959.15981.0.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,23 +20,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Nov 2005 02:21:33 +0100
+Date: Sat, 26 Nov 2005 19:32:39 +0100
 
-Hi,
+Hi Mario,
 
-I have a Sony Ericsson Z800i cellphone, and I am wondering if it is 
-possible to use any of the devices on it from my computer over 
-bluetooth. I'm not expecting any answers on specifics of my cellphone 
-here (though if someone were to know something that would be useful), 
-but rather any pointers to documentation on how this can be done with 
-the bluez utilities.
+> > If you reach 32 kB/s then this is a good result. With Bluetooth prior
+> > EDR you will reach max something around 80 kB/s, but this is not really
+> > doable with PPP in between. The bottleneck can also be the UART inside
+> > your mobile phone.
+> 
+> That wouldn't explain the reason why under Windows I'm getting 32kB/s...
+> By the way, what I'm willing to do is just to have the same performance
+> under Linux
 
-Specifically, I would like to try to use the cellphone as a microphone 
-and webcam, so that I could store the audio/video on my computer. I'm 
-not sure this is even possible...
+try to tweak your PPP settings, because I don't think that RFCOMM is the
+bottleneck here. I could be, but I doubt it.
 
-Cheers,
-Ketil
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
