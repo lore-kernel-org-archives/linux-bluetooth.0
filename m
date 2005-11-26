@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Bluetooth connection too slow
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Mario Demontis <mario.demontis@email.it>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1133029672.9123.34.camel@localhost.localdomain>
-References: <1133028275.9123.29.camel@localhost.localdomain>
-	 <1133028830.28718.19.camel@blade>
-	 <1133029672.9123.34.camel@localhost.localdomain>
+In-Reply-To: <1133028830.28718.19.camel@blade>
+References: <1133028275.9123.29.camel@localhost.localdomain><1133028830.28718.19.camel@blade>
 Content-Type: text/plain
-Message-Id: <1133029959.15981.0.camel@blade>
+Message-Id: <1133029672.9123.34.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,27 +18,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 26 Nov 2005 19:32:39 +0100
+Date: Sat, 26 Nov 2005 19:27:52 +0100
 
-Hi Mario,
 
-> > If you reach 32 kB/s then this is a good result. With Bluetooth prior
-> > EDR you will reach max something around 80 kB/s, but this is not really
-> > doable with PPP in between. The bottleneck can also be the UART inside
-> > your mobile phone.
+> If you reach 32 kB/s then this is a good result. With Bluetooth prior
+> EDR you will reach max something around 80 kB/s, but this is not really
+> doable with PPP in between. The bottleneck can also be the UART inside
+> your mobile phone.
 > 
-> That wouldn't explain the reason why under Windows I'm getting 32kB/s...
-> By the way, what I'm willing to do is just to have the same performance
-> under Linux
 
-try to tweak your PPP settings, because I don't think that RFCOMM is the
-bottleneck here. I could be, but I doubt it.
+That wouldn't explain the reason why under Windows I'm getting 32kB/s...
+By the way, what I'm willing to do is just to have the same performance
+under Linux
 
-Regards
+Thanks and regards
+Mario
 
-Marcel
+ 
 
+ 
 
+ --
+
+ Email.it, the professional e-mail, gratis per te: http://www.email.it/f
+
+ 
+
+ Sponsor:
+
+ Solo 10 Euro per chiamare in tutto il mondo!! Scopri il vantaggio di Email Phone Card,        clicca subito
+
+ Clicca qui: http://adv.email.it/cgi-bin/foclick.cgi?mid=2685&d=26-11
 
 
 -------------------------------------------------------
