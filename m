@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Robert Siemer <Robert.Siemer@backsla.sh>
+Subject: Re: [Bluez-devel] multiple rfcomm listeners
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: Jumpy cursor with Wacom Graphire Bluetooth
-Message-ID: <20051127184902.GD15156@polar.elf12.net>
-References: <20051008132533.GA954@polar.elf12.net> <20051127174209.GB15156@polar.elf12.net> <1133115990.13629.1.camel@blade>
+In-Reply-To: <Pine.LNX.4.33.0511271455120.20980-100000@redbean.intranet.gw-instruments.de>
+References: 
+	 <Pine.LNX.4.33.0511271455120.20980-100000@redbean.intranet.gw-instruments.de>
+Content-Type: text/plain
+Message-Id: <1133116410.13629.6.camel@blade>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1133115990.13629.1.camel@blade>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,45 +19,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Nov 2005 19:49:02 +0100
+Date: Sun, 27 Nov 2005 19:33:30 +0100
 
-On Sun, Nov 27, 2005 at 07:26:30PM +0100, Marcel Holtmann wrote:
-> Hi Robert,
-> 
-> > I'm picking up this thread because it is still unresolved...
-> > 
-> > 1) Finally I could update from 2.6.12-mh3 to 2.6.14-mh2.
-> >    With that I can prove Marcel wrong without repeating myself once
-> >    again: the tablet works as bad as before; no visible difference
-> >    between these two patched kernels.
-> > 
-> > 2) I would like to get some answers to my questions below. Marcel,
-> >    why are you ignoring them?
-> 
-> I think that I need the tablet by myself to do any further analysis.
+Hi Peter,
 
-That's an option. You live in Germany? How much weeks do you estimate?
-What are you going to resolve? The tablet can be switched to a wacom
-mode where it actually reports absolute data and other details which
-makes it usable as a tablet...
+> > I've heard that bluetooth clients are supposed to check for the SP
+> > channel via sdp on every connect, but bluez doesn't do that in its
+> > rfcomm bindings, eh? Do other devices check the channel only when pairing?
+> This behaviour is completly implementation depended. The Widcom stack and
+> even some other implementaions do request the server channel number for a
+> service just before connection setup. Other implementations just store the
+> server channel during pairing. The SDP variant has the problem that it is
+> not realy possible to distinguish between two identical services which
+> only have different server channels, e.g. many mobile phones and some
+> other devices offer two SPP channels. With the SDP variant it is likely
+> that you connect to the wrong service.
+> The pairing variant has the drawback that you can not connect to a service
+> anymore if its server channel changes dynamicly. This again is
+> implementation depoendent on the client side. However, most devices I'm
+> aware off use fixed server channels.
 
-For me it wouldn't be my first kernel hacking, and I thought about
-"repairing" the HID mode first would be a good excersise before going
-further...
+this is a problem with the Bluetooth specification and its qualication.
+The SDP defines a time-to-live for the service record, but nobody uses
+it. However I can remember what's the default behavior if this attribute
+doesn't exists.
 
-Of course I could dig into all the details on my own, but I would be
-faster with a tutor. - So I actually don't understand why you still don't
-answer my questions. Should I copy them again?
+Regards
 
-
-> Try
-> to create a new hcidump which includes all HCI traffic. The latest
-> versions even decode HIDP for you. Send in the output of "hciconfig -a".
-
-I will do so in some minutes... Checking my hcidump version.
+Marcel
 
 
-Robert
 
 
 -------------------------------------------------------
