@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <438A2C5B.9050306@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Re: Jumpy cursor with Wacom Graphire Bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] multiple rfcomm listeners
-References: <Pine.LNX.4.33.0511271455120.20980-100000@redbean.intranet.gw-instruments.de>	 <1133116410.13629.6.camel@blade>  <438A21B2.40609@xmission.com> <1133128026.13629.18.camel@blade>
-In-Reply-To: <1133128026.13629.18.camel@blade>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <20051127213835.GF15156@polar.elf12.net>
+References: <20051008132533.GA954@polar.elf12.net>
+	 <20051127174209.GB15156@polar.elf12.net> <1133115990.13629.1.camel@blade>
+	 <20051127184902.GD15156@polar.elf12.net> <1133119580.13629.13.camel@blade>
+	 <20051127213835.GF15156@polar.elf12.net>
+Content-Type: text/plain
+Message-Id: <1133128569.13629.28.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,19 +21,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Nov 2005 14:59:55 -0700
+Date: Sun, 27 Nov 2005 22:56:09 +0100
+
+Hi Robert,
+
+> > maybe the HID inside the Wacom is broken and needs a special quirk. This
+> > wouldn't be the first time. However also the Linux HID code can be at
+> > fault here. You still haven't send in enough information about that
+> > device to tell.
+> > 
+> > Use "hcitool info..." and "sdptool browse --raw" to get some more
+> > information about the device.
+> 
+> panorama:/etc/udev# sdptool browse --raw
+> Inquiring ...
+> 
+> 
+> Should there be something? ("local" or the tablet address do the same:
+> empty)
+
+put in the address of the tablet. I need to see the full record.
+
+> My questions were:
+>  -Who is making the connectinon? (hidp kernel module?)
+
+The tablet is requesting the connection and hidd answers it and then
+hands over the socket descriptors to the hidp kernel module to run the
+HIDP on it.
+
+>  -Who can/could influence it's outcome? (hidd userspace daemon? Plays
+>   hcid an important role?)
+
+None of them has anything to do with it. The only important things are
+to enable rswitch and sniff in the link policy.
+
+>  -Has the latency thing something to do with it?
+
+Maybe, but I don't think so.
+
+>  -Which spec should I first dig into - Bluetooth or HID?
+
+I think it is all about HID, because the Bluetooth part is quite clear
+and simple.
+
+Regards
 
 Marcel
 
-> You can do whatever you like. Use UUID-128 to identify your service and
-> use PSM numbers starting with 4097 (0x1001).
 
-I'm trying to have it coexist with gps clients (like pocketpc pda) that
-are looking for the real rfcomm on psm 3. I suspect from looking in the
-kernel that the rfcomm kernel module really has to be unloaded before
-you can bind a server socket with psm 3. That's just a little too gross.
-
-Brad
 
 
 -------------------------------------------------------
