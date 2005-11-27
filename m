@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] multiple rfcomm listeners
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Robert Siemer <Robert.Siemer@backsla.sh>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <438A21B2.40609@xmission.com>
-References: 
-	 <Pine.LNX.4.33.0511271455120.20980-100000@redbean.intranet.gw-instruments.de>
-	 <1133116410.13629.6.camel@blade>  <438A21B2.40609@xmission.com>
-Content-Type: text/plain
-Message-Id: <1133128026.13629.18.camel@blade>
+Subject: Re: [Bluez-devel] Re: Jumpy cursor with Wacom Graphire Bluetooth
+Message-ID: <20051127213835.GF15156@polar.elf12.net>
+References: <20051008132533.GA954@polar.elf12.net> <20051127174209.GB15156@polar.elf12.net> <1133115990.13629.1.camel@blade> <20051127184902.GD15156@polar.elf12.net> <1133119580.13629.13.camel@blade>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1133119580.13629.13.camel@blade>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,43 +18,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Nov 2005 22:47:06 +0100
+Date: Sun, 27 Nov 2005 22:38:35 +0100
 
-Hi Brad,
+Hi Marcel!
 
-> >>>I've heard that bluetooth clients are supposed to check for the SP
-> >>>channel via sdp
-> > this is a problem with the Bluetooth specification and its qualication.
+> maybe the HID inside the Wacom is broken and needs a special quirk. This
+> wouldn't be the first time. However also the Linux HID code can be at
+> fault here. You still haven't send in enough information about that
+> device to tell.
 > 
-> this got me thinking that SP is the wrong service for gps. They should
-> have chosen a protocol that allows for multiple simultaneous plain l2cap
-> connections.
-> 
-> but... would it be possible for me to write an app that listens on an
-> l2cap socket on the right psm and implements a pseudo-rfcomm protocol
-> that allows for multiple simultaneous connections? if it can be done,
-> then sdp would just advertise a single SP service and multiple clients
-> could use it. they wouldn't even know about the fakery.
+> Use "hcitool info..." and "sdptool browse --raw" to get some more
+> information about the device.
 
-the L2CAP supports multiple connections to the same PSM from the same
-device (you need this for AVDTP). For RFCOMM these connections must come
-from a different device. Meaning that the underlying L2CAP link must be
-different.
-
-Actually the concept of RFCOMM was bad in the first place, because an
-L2CAP with flow control would have been solved almost everything.
-
-> it would be sort of gross, but as long as it doesn't require surgery to
-> the stack or unloading rfcomm.ko, it wouldn't be that bad, eh?
-
-You can do whatever you like. Use UUID-128 to identify your service and
-use PSM numbers starting with 4097 (0x1001).
-
-Regards
-
-Marcel
+panorama:/etc/udev# sdptool browse --raw
+Inquiring ...
 
 
+Should there be something? ("local" or the tablet address do the same:
+empty)
+
+panorama:/etc/udev# hcitool info 00:13:C2:00:11:2C
+Requesting information ...
+        BD Address:  00:13:C2:00:11:2C
+        Device Name: WACOM Pen Tablet
+        LMP Version: 1.2 (0x2) LMP Subversion: 0x5df
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
+                <3-slot packets> <5-slot packets> <encryption> <slot offset> 
+                <timing accuracy> <role switch> <hold mode> <sniff mode> 
+                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets> 
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme> 
+                <power control> <transparent SCO> <broadcast encrypt> 
+                <enhanced iscan> <interlaced iscan> <interlaced pscan> 
+                <inquiry with RSSI> <AFH cap. slave> <AFH class. slave> 
+                <AFH cap. master> <AFH class. master> <extended features> 
+
+
+My questions were:
+ -Who is making the connectinon? (hidp kernel module?)
+ -Who can/could influence it's outcome? (hidd userspace daemon? Plays
+  hcid an important role?)
+ -Has the latency thing something to do with it?
+ -Which spec should I first dig into - Bluetooth or HID?
+
+
+
+Thanks,
+		Robert
 
 
 -------------------------------------------------------
