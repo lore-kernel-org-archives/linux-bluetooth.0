@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: Jumpy cursor with Wacom Graphire Bluetooth
+Subject: Re: [Bluez-devel] SBC Decoder Performance
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20051127213835.GF15156@polar.elf12.net>
-References: <20051008132533.GA954@polar.elf12.net>
-	 <20051127174209.GB15156@polar.elf12.net> <1133115990.13629.1.camel@blade>
-	 <20051127184902.GD15156@polar.elf12.net> <1133119580.13629.13.camel@blade>
-	 <20051127213835.GF15156@polar.elf12.net>
+In-Reply-To: <438A22EE.1020504@xmission.com>
+References: <20051018062749.78971.qmail@web34106.mail.mud.yahoo.com>
+	 <4389D1EC.4070703@xmission.com> <1133116270.13629.3.camel@blade>
+	 <438A22EE.1020504@xmission.com>
 Content-Type: text/plain
-Message-Id: <1133128569.13629.28.camel@blade>
+Message-Id: <1133128269.13629.24.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,48 +20,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Nov 2005 22:56:09 +0100
+Date: Sun, 27 Nov 2005 22:51:09 +0100
 
-Hi Robert,
+Hi Brad,
 
-> > maybe the HID inside the Wacom is broken and needs a special quirk. This
-> > wouldn't be the first time. However also the Linux HID code can be at
-> > fault here. You still haven't send in enough information about that
-> > device to tell.
+> >>fwiw, we have a fixed-point decoder in the btsco cvs now. If you try it,
+> >>let me know how it goes.
 > > 
-> > Use "hcitool info..." and "sdptool browse --raw" to get some more
-> > information about the device.
+> > is there any need to keep the floating point decoder?
 > 
-> panorama:/etc/udev# sdptool browse --raw
-> Inquiring ...
-> 
-> 
-> Should there be something? ("local" or the tablet address do the same:
-> empty)
+> yeah, we should leave it in. The decoder and encoder are written as a
+> bunch of macro calls that are replaced at compile time by either
+> floating or fixed point math.
 
-put in the address of the tablet. I need to see the full record.
+but this is totally ugly.
 
-> My questions were:
->  -Who is making the connectinon? (hidp kernel module?)
+> also... floats runs a bit faster if you have an fpu and regression
+> testing would be easier with a decoder/encoder that we can "trust."
 
-The tablet is requesting the connection and hidd answers it and then
-hands over the socket descriptors to the hidp kernel module to run the
-HIDP on it.
+This is no real point. If you need a decoder for regression testing,
+then simply make a copy of it.
 
->  -Who can/could influence it's outcome? (hidd userspace daemon? Plays
->   hcid an important role?)
-
-None of them has anything to do with it. The only important things are
-to enable rswitch and sniff in the link policy.
-
->  -Has the latency thing something to do with it?
-
-Maybe, but I don't think so.
-
->  -Which spec should I first dig into - Bluetooth or HID?
-
-I think it is all about HID, because the Bluetooth part is quite clear
-and simple.
+If the fixed point decoder is too slow, then this needs to be fixed.
+Having too decoders won't really help.
 
 Regards
 
