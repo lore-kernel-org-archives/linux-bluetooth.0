@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <438A3135.6080208@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] multiple rfcomm listeners
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SBC Decoder Performance
-References: <20051018062749.78971.qmail@web34106.mail.mud.yahoo.com>	 <4389D1EC.4070703@xmission.com> <1133116270.13629.3.camel@blade>	 <438A22EE.1020504@xmission.com> <1133128269.13629.24.camel@blade>
-In-Reply-To: <1133128269.13629.24.camel@blade>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <438A2C5B.9050306@xmission.com>
+References: 
+	 <Pine.LNX.4.33.0511271455120.20980-100000@redbean.intranet.gw-instruments.de>
+	 <1133116410.13629.6.camel@blade>  <438A21B2.40609@xmission.com>
+	 <1133128026.13629.18.camel@blade>  <438A2C5B.9050306@xmission.com>
+Content-Type: text/plain
+Message-Id: <1133129290.13629.37.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,39 +21,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Nov 2005 15:20:37 -0700
+Date: Sun, 27 Nov 2005 23:08:10 +0100
+
+Hi Brad,
+
+> > You can do whatever you like. Use UUID-128 to identify your service and
+> > use PSM numbers starting with 4097 (0x1001).
+> 
+> I'm trying to have it coexist with gps clients (like pocketpc pda) that
+> are looking for the real rfcomm on psm 3. I suspect from looking in the
+> kernel that the rfcomm kernel module really has to be unloaded before
+> you can bind a server socket with psm 3. That's just a little too gross.
+
+as I said, you can have multiple connections to the same PSM. However
+these must be handled by the same listener. So you need to replace (or
+unload) the RFCOMM module. However this will not give you anything,
+because you still have to speak RFCOMM to these clients.
+
+What you might wanna do is to modify the sdpd server to handle out
+different service records (based on the remote BD_ADDR).
+
+Regards
 
 Marcel
 
->>bunch of macro calls that are replaced at compile time by either
->>floating or fixed point math.
-> 
-> but this is totally ugly.
 
-the macros are also how the inline arm assembly gets inserted, so there
-are potentially a bunch of implementation for each macro, especially
-since 32-bit fixed is still experimental:
-
- - floating
- - 64-bit fixed generic
- - arm 64-bit asm
- - 32-bit fixed generic
- - arm 32-bit asm
-
-it's ugly, but what should it look like? it doesn't look much better by
-removing floating from the list.
-
-> This is no real point. If you need a decoder for regression testing,
-> then simply make a copy of it.
-
-sure.
-
-> If the fixed point decoder is too slow, then this needs to be fixed.
-> Having too decoders won't really help.
-
-inline asm may help but the difference is probably in the noise level.
-
-brad
 
 
 -------------------------------------------------------
