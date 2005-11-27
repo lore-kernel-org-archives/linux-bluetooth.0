@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <438A22EE.1020504@xmission.com>
+Message-ID: <438A21B2.40609@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SBC Decoder Performance
-References: <20051018062749.78971.qmail@web34106.mail.mud.yahoo.com>	 <4389D1EC.4070703@xmission.com> <1133116270.13629.3.camel@blade>
-In-Reply-To: <1133116270.13629.3.camel@blade>
+Subject: Re: [Bluez-devel] multiple rfcomm listeners
+References: <Pine.LNX.4.33.0511271455120.20980-100000@redbean.intranet.gw-instruments.de> <1133116410.13629.6.camel@blade>
+In-Reply-To: <1133116410.13629.6.camel@blade>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,21 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Nov 2005 14:19:42 -0700
+Date: Sun, 27 Nov 2005 14:14:26 -0700
 
 Marcel
 
->>fwiw, we have a fixed-point decoder in the btsco cvs now. If you try it,
->>let me know how it goes.
-> 
-> is there any need to keep the floating point decoder?
+>>>I've heard that bluetooth clients are supposed to check for the SP
+>>>channel via sdp
+> this is a problem with the Bluetooth specification and its qualication.
 
-yeah, we should leave it in. The decoder and encoder are written as a
-bunch of macro calls that are replaced at compile time by either
-floating or fixed point math.
+this got me thinking that SP is the wrong service for gps. They should
+have chosen a protocol that allows for multiple simultaneous plain l2cap
+connections.
 
-also... floats runs a bit faster if you have an fpu and regression
-testing would be easier with a decoder/encoder that we can "trust."
+but... would it be possible for me to write an app that listens on an
+l2cap socket on the right psm and implements a pseudo-rfcomm protocol
+that allows for multiple simultaneous connections? if it can be done,
+then sdp would just advertise a single SP service and multiple clients
+could use it. they wouldn't even know about the fakery.
+
+it would be sort of gross, but as long as it doesn't require surgery to
+the stack or unloading rfcomm.ko, it wouldn't be that bad, eh?
 
 brad
 
