@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Ian Miller <ian@thetasig.fsnet.co.uk>
+Subject: Re: [Bluez-users] pairing Palm Vx (TDK Blue5) with Fedora Core 4
+	(FC4)
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] pairing Palm Vx (TDK Blue5) with Fedora Core 4 (FC4)
-Message-ID: <20051127210746.GA7517@janeway>
-References: <20051127175239.GA3911@janeway> <1133116533.13629.9.camel@blade>
+In-Reply-To: <20051127175239.GA3911@janeway>
+References: <20051127175239.GA3911@janeway>
+Content-Type: text/plain
+Message-Id: <1133116533.13629.9.camel@blade>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1133116533.13629.9.camel@blade>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,47 +19,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Nov 2005 21:07:46 +0000
+Date: Sun, 27 Nov 2005 19:35:33 +0100
 
-On Sun, Nov 27, 2005 at 07:35:33PM +0100, Marcel Holtmann wrote:
-> > 
-> > Any ideas? Rather than post a whole heap of diagnostic info that may
-> > well be useless to you, I throw myself on the mercy of the list to 
-> > suggest what diagnostics I should be supplying.
+Hi Ian,
+
+> Can anyone help me pair my Palm Vx (using a TDK Systems Blue5 attachment)
+> with FC4 (using a USB bluetooth dongle)?
 > 
-> run "hcidump -X -V" as root while trying to pair.
+> I've followed the instructions up to step 6 on this page (but no further,
+> since I'm not interested yet in getting Internet access, I just want to
+> pair and transfer files over bluetooth):
 > 
+> 	http://www.metacon.ca/bcs/view.php?page=bluetooth
+> 
+> I've got to the stage where I can see the linux box from the Palm, and 
+> I can see the Palm from the linux box, but I can't seem to work out 
+> how to get them to pair. 
+> 
+> When I select 'Pair' from the Palm menu, I get prompted for a Passkey,
+> and I give it the passkey in /etc/bluetooth/pin - but it always without
+> fail returns with either:
+> 
+> 	Bluetooth connect failed (L2CAP error) (0x801E)
+> or
+> 	Bluetooth timeout (0x803C)
+> 
+> I'm definitely giving it the right pin!
+> 
+> Any ideas? Rather than post a whole heap of diagnostic info that may
+> well be useless to you, I throw myself on the mercy of the list to 
+> suggest what diagnostics I should be supplying.
 
-Hi Marcel,
+run "hcidump -X -V" as root while trying to pair.
 
-This is what I get:
+> Is there any way to initiate the pair from the linux end?
 
-$ hcidump -X -V
-HCI sniffer - Bluetooth packet analyzer ver 1.18
-device: hci0 snap_len: 1028 filter: 0xffffffff
-> HCI Event: Connect Request (0x04) plen 10
-    bdaddr 00:06:56:01:21:61 class 0x020114 type ACL
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-    bdaddr 00:06:56:01:21:61 role 0x01
-    Role: Slave
-> HCI Event: Command Status (0x0f) plen 4
-    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
-> HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:06:56:01:21:61
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x22 handle 41 bdaddr 00:06:56:01:21:61 type ACL encrypt 0x00
-    Error: LMP Error Transaction Collision
+Yes, but in general Linux only pairs when needed. Send your data and if
+pairing is needed the PIN will be requested.
 
-The "HCI Event: PIN Code Request" comes up when I submit my PIN,
-then the Palm goes away for a few seconds and times out, and then
-several seconds later, I get the "HCI Event: Connect Complete".
+Regards
 
-I'm using the default hcid.conf:
+Marcel
 
-$Id: hcid.conf,v 1.7 2004/12/13 14:16:03 holtmann Exp $
-
-cheers,
-ian
 
 
 
