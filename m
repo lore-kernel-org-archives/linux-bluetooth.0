@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Thomas Keitzl <c3t0@yahoo.de>
+Subject: Re: [Bluez-users] driver support for sitecom cn-510 bluetooth usb
+	Adapter
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20051128215104.2d3e749a.c3t0@yahoo.de>
+In-Reply-To: <200511281541.06119.philipp.sandhaus@gmx.de>
+References: <200511281541.06119.philipp.sandhaus@gmx.de>
+Content-Type: text/plain
+Message-Id: <1133210331.31513.62.camel@blade>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] BlueZ on Sony Vaio notebook pcg-z1m
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,41 +19,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Nov 2005 21:51:04 +0100
+Date: Mon, 28 Nov 2005 21:38:51 +0100
 
-Hi,
-I'm new to this mailinglist and to be honest I'm also new to mailinglists at all.
+Hi Philipp,
 
-I recently bought a second-hand notebook (Sony Vaio PCG-Z1M) and I'm trying to get everything
-to work atm. Almost everything works quite fine except the bluetooth-device, which is
-built-in.
+> I've trouble getting an usb bluetooth adapter getting to work. When I plug the 
+> devvice into my computer it somehow get's recognized, because the modul 
+> hci_usb automatically get's loaded. However, I see nothing about that in the 
+> kernel log and "hcitool dev" doesn't list any devices. Any ideas, how I could 
+> get this thing to work? I've, that the sitecom cn-500 adapter is supported, 
+> but I didn't find anything about the cn-510 on the internet.
 
-I don't have problems turning the bluetooth-device on and off using sonypi and spicctrl
-as the blue led on the laptop, which indicates the bluetooth-device-status, reacts on my
-spicctrl commands. Unfortunatly the BlueZ-utils doesn't detect any bluetooth-device even 
-though I activated it via "spicctrl -l1" and loaded the hci-usb-modul (bluetooth itself 
-is compiled in the kernel).
+check with "hciconfig -a" and look at /proc/bus/usb/devices.
 
-If I try to put the device up anyway as it is done on this tutorial I found
-( http://www.holtmann.org/linux/bluetooth/vaio.html )
->> hciconfig hci0 up 
-I only receive this message
->> Can't get device info: No such device
+Regards
 
-I currently use linux-2.6.9 und slack-10.2.0. It would be great if someone was able to 
-help me because I just don't know what to do.
+Marcel
 
-Hopefully,
-Thomas Keitzl
-
-ps.: I also tried to compile bluetooth as a module.
-
-	
-
-	
-		
-___________________________________________________________ 
-Gesendet von Yahoo! Mail - Jetzt mit 1GB Speicher kostenlos - Hier anmelden: http://mail.yahoo.de
 
 
 
