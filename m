@@ -1,15 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Rutger Hendriks <Loial@home.nl>
+Subject: Re: [Bluez-devel] Re: Jumpy cursor with Wacom Graphire Bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Sending arbitrary data to a connected device
-References: <200511262023.23140.Loial@home.nl> <1133033547.15981.2.camel@blade>
-In-Reply-To: <1133033547.15981.2.camel@blade>
-MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart1625687.t0uqamrEyX";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Message-Id: <200511281620.55644.Loial@home.nl>
+In-Reply-To: <20051128102222.GN15156@polar.elf12.net>
+References: <20051127234927.GI15156@polar.elf12.net>
+	 <1133136167.13629.58.camel@blade> <20051128015303.GJ15156@polar.elf12.net>
+	 <1133143721.13629.67.camel@blade> <20051128022901.GK15156@polar.elf12.net>
+	 <1133146623.13629.74.camel@blade> <20051128084428.GL15156@polar.elf12.net>
+	 <1133168403.31513.2.camel@blade> <20051128092101.GM15156@polar.elf12.net>
+	 <1133170611.31513.27.camel@blade>  <20051128102222.GN15156@polar.elf12.net>
+Content-Type: text/plain
+Message-Id: <1133173741.31513.36.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,54 +23,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Nov 2005 16:20:49 +0100
+Date: Mon, 28 Nov 2005 11:29:01 +0100
 
---nextPart1625687.t0uqamrEyX
-Content-Type: text/plain;
-  charset="iso-8859-6"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Robert,
 
-On Saturday 26 November 2005 20:32, Marcel Holtmann wrote:
-> Hi Rutger,
->
-> > I have a bluetooth device here that has an LCD display. I want to be ab=
-le
-> > to send arbitrary data to the device. This way I can (hopefully) make
-> > text appear on the LCD display. The problem is, that I can not find
-> > enough documentation to send the arbitrary data. So I'm hoping to find
-> > some help here...
-> >
-> > But, now I'm stuck. What function can I call to send arbitrary hex data?
->
-> totally wrong direction. Use sdptool and its various option to discover
-> the services offered by this LCD device.
->
-> Regards
->
-> Marcel
+> > > > > > Don't even think about switching into security mode 3. Use the -E switch
+> > > > > > of hidd instead.
+> > > 
+> > > Why? What is the difference?
+> > 
+> > the security mode 3 comes with a lot of troubles and unless you really
+> > know what you are doing, don't use it. Period.
+> 
+> I don't yet "really know", but I would like to.
 
-Hi Marcel,
+check the mailing list archives for details.
 
-sdptool finds the LCD device supports the HID service (which I already=20
-knew :P ) What I do not know is how I can send data to the device (using=20
-HID). Any pointers to docs/example code ?
+> > You can check with "hcitool con" is the encryption for a link is active.
+> 
+> I thought so, too, but as it did not say neither "yes" nor "no"...
+> 
+> siemer@panorama:/var/lib/bluetooth$ hcitool con
+> Connections:
+>         > ACL 00:13:C2:00:11:2C handle 42 state 1 lm MASTER 
 
-Thanks!
-Rutger
+It will show ENCRYPT (and AUTH) for an encrypted link.
 
---nextPart1625687.t0uqamrEyX
-Content-Type: application/pgp-signature
+> > The new tools store the link keys under /var/lib/bluetooth and if the
+> > tablet is detected as mouse then maybe the encryption will never be
+> > requested by hidd.
+> 
+> How can I force hidd to try the encryption? I'm sure it sees the tablet
+> as a mouse...
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2 (GNU/Linux)
+I think you need to change the source code for it.
 
-iD8DBQBDiyBXZNkx8LIJzQ4RAtPVAJsFh8nCR5ED5Mag4+tJF+d+9hbGfwCePDxu
-Wh+/4xeyAxlF+NyXQWuY8g8=
-=tAB8
------END PGP SIGNATURE-----
+> Anyway: should be noted in /etc/bluetooth/hcid.conf as a comment to try
+> the (sometimes undocumented) "-E" switch instead of enableing it
+> there...
 
---nextPart1625687.t0uqamrEyX--
+Send in an patch for the hidd manual page.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
