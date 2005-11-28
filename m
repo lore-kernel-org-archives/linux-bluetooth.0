@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] BlueZ on Sony Vaio notebook pcg-z1m
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-From: Al <ojravadilla@yahoo.com>
-Message-ID: <loom.20051129T022104-305@post.gmane.org>
+In-Reply-To: <20051128215104.2d3e749a.c3t0@yahoo.de>
+References: <20051128215104.2d3e749a.c3t0@yahoo.de>
+Content-Type: text/plain
+Message-Id: <1133211371.31513.72.camel@blade>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Can't print with D600 phone
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,20 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Nov 2005 01:31:13 +0000 (UTC)
+Date: Mon, 28 Nov 2005 21:56:11 +0100
 
-Can somebody help me with this... I have a samsung D600 phone. It works with 
-opp, but will not work with bpp. It is okay with get printer attributes and 
-then when I try to print the image it says processing error. When I try to 
-capture the transaction done The phone tries to connect to the printer again 
-and then the printer will ok response, and the phone will send sdp to the 
-printer and the printer will send the sdp response and then The phone will 
-issue the disconnect request in the L2CAP and the printer will response 
-disconnect in the L2CAP and then the LMP transaction starts to appear. And the 
-phone will not connect again to send the create job. I have notice that the 
-LMP version of the phone is version1.2 while the printer has LMP verison1.1. 
-The printer is using bluez-lib-2.22 and bluez-util-2.22. Can somebody tell me 
-whats the problem? 
+Hi Thomas,
+
+> I'm new to this mailinglist and to be honest I'm also new to mailinglists at all.
+> 
+> I recently bought a second-hand notebook (Sony Vaio PCG-Z1M) and I'm trying to get everything
+> to work atm. Almost everything works quite fine except the bluetooth-device, which is
+> built-in.
+> 
+> I don't have problems turning the bluetooth-device on and off using sonypi and spicctrl
+> as the blue led on the laptop, which indicates the bluetooth-device-status, reacts on my
+> spicctrl commands. Unfortunatly the BlueZ-utils doesn't detect any bluetooth-device even 
+> though I activated it via "spicctrl -l1" and loaded the hci-usb-modul (bluetooth itself 
+> is compiled in the kernel).
+
+after activating the Bluetooth device, look at /proc/bus/usb/devices and
+check dmesg.
+
+Regards
+
+Marcel
+
 
 
 
