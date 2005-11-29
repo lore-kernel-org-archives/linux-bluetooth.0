@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <438CD881.8060405@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <ef9938ec0511291401p2b10092cx74cc8354cff921e@mail.gmail.com>
+From: Albert Huang <ashuang@gmail.com>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] avrcp start
-References: <438C8EDE.1010309@xmission.com> <1133296630.23817.5.camel@blade>
-In-Reply-To: <1133296630.23817.5.camel@blade>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/mixed;
+	boundary="----=_Part_75767_9234994.1133301720471"
+Subject: [Bluez-devel] l2ping manpage
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,26 +17,91 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 29 Nov 2005 15:38:57 -0700
+Date: Tue, 29 Nov 2005 17:02:00 -0500
 
-Marcel
+------=_Part_75767_9234994.1133301720471
+Content-Type: multipart/alternative;
+	boundary="----=_Part_75768_23302007.1133301720471"
 
-> you actually copied to much from on of the A2DP record handlers. The
-> specification definces the AVRCP CT service record like this:
-> You need the supported features attribute. The correct PSM and protocol
-> and profile descriptors.
+------=_Part_75768_23302007.1133301720471
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> Functions for both records are in the CVS now.
+the attached patch updates the l2ping manpage.
 
-thanks for straightening it out on sdp.
+-albert
 
-so I am making progress like I did with hammering out a2dp but i'm a
-little stuck. I am not finding constants for anything they talk about in
-AVRCP. Things like play/track back/track forward operands, opcodes for
-using passthrough, what the significance of "sub unit type 9" is... am I
-missing something? None of it appears in assigned numbers either.
+------=_Part_75768_23302007.1133301720471
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-brad
+the attached patch updates the l2ping manpage.<br>
+<br>
+-albert<br>
+
+------=_Part_75768_23302007.1133301720471--
+
+------=_Part_75767_9234994.1133301720471
+Content-Type: application/octet-stream; name=051129-albert-l2ping.1.diff
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="051129-albert-l2ping.1.diff"
+
+Index: l2ping.1
+===================================================================
+RCS file: /cvsroot/bluez/utils/tools/l2ping.1,v
+retrieving revision 1.2
+diff -u -r1.2 l2ping.1
+--- l2ping.1	11 Oct 2004 10:31:33 -0000	1.2
++++ l2ping.1	29 Nov 2005 22:00:24 -0000
+@@ -4,7 +4,7 @@
+ .SH SYNOPSIS
+ .B l2ping
+ [
+-.I -S source addr
++.I -i <hciX>
+ ] [
+ .I -s size
+ ] [
+@@ -23,8 +23,13 @@
+ given in dotted hex notation.
+ .SH OPTIONS
+ .TP
+-.I -S source addr
+-Select address to be used as source address for the request.
++.I -i " <hciX>"
++The command is applied to device
++.I
++hciX
++, which must be the name of an installed Bluetooth device (X = 0, 1, 2, ...)
++If not specified, the command will be sent to the first available Bluetooth
++device.
+ .TP
+ .I -s size
+ The
+@@ -36,10 +41,10 @@
+ .B count
+ number of packets then exit.
+ .TP
+-.I -c timeout
++.I -c \fBtimeout\fP
+ Wait
+-.B timeout
+-for the response.
++.B \fBtimeout\fP
++seconds for the response.
+ .TP
+ .I -f
+ Kind of flood ping. Use with care! It reduces the delay time between packets
+@@ -53,4 +58,4 @@
+ .SH AUTHORS
+ Written by Maxim Krasnyansky <maxk@qualcomm.com> and Marcel Holtmann <marcel@holtmann.org>
+ .PP
+-man page by Nils Faerber <nils@kernelconcepts.de>
++man page by Nils Faerber <nils@kernelconcepts.de>.
+
+------=_Part_75767_9234994.1133301720471--
 
 
 -------------------------------------------------------
