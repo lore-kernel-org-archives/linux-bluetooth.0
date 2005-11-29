@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec0511291401p2b10092cx74cc8354cff921e@mail.gmail.com>
-From: Albert Huang <ashuang@gmail.com>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_75767_9234994.1133301720471"
-Subject: [Bluez-devel] l2ping manpage
+Subject: Re: [Bluez-devel] avrcp start
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <438C8EDE.1010309@xmission.com>
+References: <438C8EDE.1010309@xmission.com>
+Content-Type: text/plain
+Message-Id: <1133296630.23817.5.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,91 +18,88 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 29 Nov 2005 17:02:00 -0500
+Date: Tue, 29 Nov 2005 21:37:10 +0100
 
-------=_Part_75767_9234994.1133301720471
-Content-Type: multipart/alternative;
-	boundary="----=_Part_75768_23302007.1133301720471"
+Hi Brad,
 
-------=_Part_75768_23302007.1133301720471
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+> I've started an avrcp receiver in the btsco cvs.
+> 
+> I hope it doesn't seem like a case of extreme laziness to put the sdp
+> stuff in sdptool. I suppose I should get serious and put it in my app
+> too. Did I write the patch right with regard to protocol names, etc?
+> 
+> Also, is there a separate UUID for AVRCP? I only found AVCTP UUID
+> definitions, but it seems like PID in the AVCTP header needs to indicate
+> AVRCP specifically.
+> 
+> With the changes above, I got my headset to connect but it seems to put
+> in the value "0e11" for the pid in the first AVRCP packet I got out of it.
 
-the attached patch updates the l2ping manpage.
+you actually copied to much from on of the A2DP record handlers. The
+specification definces the AVRCP CT service record like this:
 
--albert
+        Attribute 0x0000 - ServiceRecordHandle
+                UINT32 0x00010000
+        Attribute 0x0001 - ServiceClassIDList
+                Sequence
+                        UUID16 0x110e - RemoteControl
+        Attribute 0x0004 - ProtocolDescriptorList
+                Sequence
+                        Sequence
+                                UUID16 0x0100 - L2CAP
+                                UINT16 0x0017
+                        Sequence
+                                UUID16 0x0017 - AVCTP
+                                UINT16 0x0100
+        Attribute 0x0005 - BrowseGroupList
+                Sequence
+                        UUID16 0x1002 - PublicBrowseGroup
+        Attribute 0x0009 - BluetoothProfileDescriptorList
+                Sequence
+                        Sequence
+                                UUID16 0x110e - RemoteControl
+                                UINT16 0x0100
+        Attribute 0x0100
+                String AVRCP CT
+        Attribute 0x0311
+                UINT16 0x000f
 
-------=_Part_75768_23302007.1133301720471
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+You need the supported features attribute. The correct PSM and protocol
+and profile descriptors. The AVRCP TG looks like this:
 
-the attached patch updates the l2ping manpage.<br>
-<br>
--albert<br>
+        Attribute 0x0000 - ServiceRecordHandle
+                UINT32 0x00010001
+        Attribute 0x0001 - ServiceClassIDList
+                Sequence
+                        UUID16 0x110c - RemoteControlTarget
+        Attribute 0x0004 - ProtocolDescriptorList
+                Sequence
+                        Sequence
+                                UUID16 0x0100 - L2CAP
+                                UINT16 0x0017
+                        Sequence
+                                UUID16 0x0017 - AVCTP
+                                UINT16 0x0100
+        Attribute 0x0005 - BrowseGroupList
+                Sequence
+                        UUID16 0x1002 - PublicBrowseGroup
+        Attribute 0x0009 - BluetoothProfileDescriptorList
+                Sequence
+                        Sequence
+                                UUID16 0x110e - RemoteControl
+                                UINT16 0x0100
+        Attribute 0x0100
+                String AVRCP TG
+        Attribute 0x0311
+                UINT16 0x000f
 
-------=_Part_75768_23302007.1133301720471--
+Functions for both records are in the CVS now.
 
-------=_Part_75767_9234994.1133301720471
-Content-Type: application/octet-stream; name=051129-albert-l2ping.1.diff
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="051129-albert-l2ping.1.diff"
+Regards
 
-Index: l2ping.1
-===================================================================
-RCS file: /cvsroot/bluez/utils/tools/l2ping.1,v
-retrieving revision 1.2
-diff -u -r1.2 l2ping.1
---- l2ping.1	11 Oct 2004 10:31:33 -0000	1.2
-+++ l2ping.1	29 Nov 2005 22:00:24 -0000
-@@ -4,7 +4,7 @@
- .SH SYNOPSIS
- .B l2ping
- [
--.I -S source addr
-+.I -i <hciX>
- ] [
- .I -s size
- ] [
-@@ -23,8 +23,13 @@
- given in dotted hex notation.
- .SH OPTIONS
- .TP
--.I -S source addr
--Select address to be used as source address for the request.
-+.I -i " <hciX>"
-+The command is applied to device
-+.I
-+hciX
-+, which must be the name of an installed Bluetooth device (X = 0, 1, 2, ...)
-+If not specified, the command will be sent to the first available Bluetooth
-+device.
- .TP
- .I -s size
- The
-@@ -36,10 +41,10 @@
- .B count
- number of packets then exit.
- .TP
--.I -c timeout
-+.I -c \fBtimeout\fP
- Wait
--.B timeout
--for the response.
-+.B \fBtimeout\fP
-+seconds for the response.
- .TP
- .I -f
- Kind of flood ping. Use with care! It reduces the delay time between packets
-@@ -53,4 +58,4 @@
- .SH AUTHORS
- Written by Maxim Krasnyansky <maxk@qualcomm.com> and Marcel Holtmann <marcel@holtmann.org>
- .PP
--man page by Nils Faerber <nils@kernelconcepts.de>
-+man page by Nils Faerber <nils@kernelconcepts.de>.
+Marcel
 
-------=_Part_75767_9234994.1133301720471--
+
 
 
 -------------------------------------------------------
