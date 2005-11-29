@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Can't print with D600 phone
+Subject: Re: [Bluez-users] dinovo problem ... hid2hci
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <loom.20051129T022104-305@post.gmane.org>
-References: <loom.20051129T022104-305@post.gmane.org>
+In-Reply-To: <200511282246.02411.mgorbach@yahoo.com>
+References: <200511282246.02411.mgorbach@yahoo.com>
 Content-Type: text/plain
-Message-Id: <1133238581.27800.2.camel@blade>
+Message-Id: <1133238503.27800.1.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Nov 2005 05:29:41 +0100
+Date: Tue, 29 Nov 2005 05:28:23 +0100
 
-Hi Al,
+Hi Michael,
 
-> Can somebody help me with this... I have a samsung D600 phone. It works with 
-> opp, but will not work with bpp. It is okay with get printer attributes and 
-> then when I try to print the image it says processing error. When I try to 
-> capture the transaction done The phone tries to connect to the printer again 
-> and then the printer will ok response, and the phone will send sdp to the 
-> printer and the printer will send the sdp response and then The phone will 
-> issue the disconnect request in the L2CAP and the printer will response 
-> disconnect in the L2CAP and then the LMP transaction starts to appear. And the 
-> phone will not connect again to send the create job. I have notice that the 
-> LMP version of the phone is version1.2 while the printer has LMP verison1.1. 
-> The printer is using bluez-lib-2.22 and bluez-util-2.22. Can somebody tell me 
-> whats the problem? 
+> I more or less have my dinovo keyboard working under bluez and gentoo.
+> There are two problems I wanted to ask about:
+> 1. The dongle doesnt reset to HID mode when system is shut off ... so I have 
+> no ability to use the keyboard in grub! I need to write a script to reset it 
+> to hid mode when the system is shut off. How can i do this? The hid2hci 
+> program supposedly provides an option to switch back to hid mode ... but it 
+> doesn't work. I get the error "No devices in hid mode found" (obviously!).
 
-what has printer to do with BlueZ. I am lost and have no idea what you
-are talking about or trying to achieve.
+we don't know the magic sequence to switch it back into HID mode.
+
+> 2. The functions keys on my dinovo dont work (fn keys). The mouse is stuck in 
+> f-lock mode where the function keys are special keys ... but I want them to 
+> just work as f1 ... f12. What do i need to get the f-lock key working?
+
+What do the function keys have to do with the mouse. About what diNovo
+generation are we talking.
 
 Regards
 
