@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] dinovo problem ... hid2hci
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Michael Gorbach <mgorbach@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200511282246.02411.mgorbach@yahoo.com>
-References: <200511282246.02411.mgorbach@yahoo.com>
-Content-Type: text/plain
-Message-Id: <1133238503.27800.1.camel@blade>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200511282246.02411.mgorbach@yahoo.com>
+Subject: [Bluez-users] dinovo problem ... hid2hci
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,32 +17,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Nov 2005 05:28:23 +0100
+Date: Mon, 28 Nov 2005 22:46:02 -0500
 
-Hi Michael,
+I more or less have my dinovo keyboard working under bluez and gentoo.
+There are two problems I wanted to ask about:
+1. The dongle doesnt reset to HID mode when system is shut off ... so I have 
+no ability to use the keyboard in grub! I need to write a script to reset it 
+to hid mode when the system is shut off. How can i do this? The hid2hci 
+program supposedly provides an option to switch back to hid mode ... but it 
+doesn't work. I get the error "No devices in hid mode found" (obviously!).
 
-> I more or less have my dinovo keyboard working under bluez and gentoo.
-> There are two problems I wanted to ask about:
-> 1. The dongle doesnt reset to HID mode when system is shut off ... so I have 
-> no ability to use the keyboard in grub! I need to write a script to reset it 
-> to hid mode when the system is shut off. How can i do this? The hid2hci 
-> program supposedly provides an option to switch back to hid mode ... but it 
-> doesn't work. I get the error "No devices in hid mode found" (obviously!).
+2. The functions keys on my dinovo dont work (fn keys). The mouse is stuck in 
+f-lock mode where the function keys are special keys ... but I want them to 
+just work as f1 ... f12. What do i need to get the f-lock key working?
 
-we don't know the magic sequence to switch it back into HID mode.
-
-> 2. The functions keys on my dinovo dont work (fn keys). The mouse is stuck in 
-> f-lock mode where the function keys are special keys ... but I want them to 
-> just work as f1 ... f12. What do i need to get the f-lock key working?
-
-What do the function keys have to do with the mouse. About what diNovo
-generation are we talking.
-
-Regards
-
-Marcel
-
-
+Michael Gorbach
 
 
 -------------------------------------------------------
