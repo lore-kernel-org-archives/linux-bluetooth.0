@@ -1,15 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Sending arbitrary data to a connected device
-From: "Collin R. Mulliner" <collin@betaversion.net>
+Message-ID: <438C8EDE.1010309@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1133271543.5769.1.camel@localhost.localdomain>
-References: <200511262023.23140.Loial@home.nl>
-	 <200511291038.22058.Loial@home.nl> <1133259183.12447.4.camel@blade>
-	 <200511291146.42749.Loial@home.nl>
-	 <1133271543.5769.1.camel@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1133295378.20019.3.camel@panic>
-Mime-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="------------070004070102020900090000"
+Subject: [Bluez-devel] avrcp start
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,44 +17,121 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 29 Nov 2005 12:16:18 -0800
+Date: Tue, 29 Nov 2005 10:24:46 -0700
 
-You guys are not talking about implementing a software HID device, are
-you? I just did that over Thanksgiving ... sofar only a keyboard (so I
-can use my laptop as a BT keyboard for my 770). I'll have to do some
-testing and build a gui and stuff before I release anything.
+This is a multi-part message in MIME format.
+--------------070004070102020900090000
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-Collin
+Hi
 
-On Tue, 2005-11-29 at 14:39 +0100, Marcel Holtmann wrote:
-> Hi Rutger,
-> 
-> > > > I already saw you were using report ID 16 and 17, so I will try that too.
-> > >
-> > > You need to send and receive reports with ID 16 and 17. Both have fixed
-> > > length and 16 was for the short messages and 17 for the long messages if
-> > > I remember that correctly. They are the same we used for switching the
-> > > dongle from HID into HCI mode.
-> > >
-> > > The problem is to get these reports to the device. The HIDP kernel
-> > > module with the report protocol (see -mh patch) lacks hiddev support.
-> > 
-> > Is there a specific reason for the lack of hiddev support?
-> 
-> basically its because of lack of time and my report protocol patch is
-> still considered a hack by me.
-> 
-> Regards
-> 
-> Marcel
+I've started an avrcp receiver in the btsco cvs.
 
---
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-Never argue with an idiot. He brings you down to his level, then beats
-you with experience...
+I hope it doesn't seem like a case of extreme laziness to put the sdp
+stuff in sdptool. I suppose I should get serious and put it in my app
+too. Did I write the patch right with regard to protocol names, etc?
 
+Also, is there a separate UUID for AVRCP? I only found AVCTP UUID
+definitions, but it seems like PID in the AVCTP header needs to indicate
+AVRCP specifically.
+
+With the changes above, I got my headset to connect but it seems to put
+in the value "0e11" for the pid in the first AVRCP packet I got out of it.
+
+Brad
+
+--------------070004070102020900090000
+Content-Type: text/x-patch;
+ name="sdptool-avrcp.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="sdptool-avrcp.patch"
+
+Index: tools/sdptool.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/tools/sdptool.c,v
+retrieving revision 1.35
+diff -u -r1.35 sdptool.c
+--- tools/sdptool.c	16 Sep 2005 04:18:46 -0000	1.35
++++ tools/sdptool.c	29 Nov 2005 17:16:38 -0000
+@@ -2052,6 +2052,65 @@
+ 	return ret;
+ }
+ 
++static int add_avrcp(sdp_session_t *session, svc_info_t *si)
++{
++	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
++	uuid_t root_uuid, l2cap, avdtp, a2snk;
++	sdp_profile_desc_t profile[1];
++	sdp_list_t *aproto, *proto[2];
++	sdp_record_t record;
++	sdp_data_t *psm, *version;
++	uint16_t lp = 0x0019, ver = 0x0100;
++	int ret = 0;
++
++	memset((void *)&record, 0, sizeof(sdp_record_t));
++	record.handle = 0xffffffff;
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(0, &root_uuid);
++	sdp_set_browse_groups(&record, root);
++
++	sdp_uuid16_create(&a2snk, AV_REMOTE_TARGET_SVCLASS_ID);
++	svclass_id = sdp_list_append(0, &a2snk);
++	sdp_set_service_classes(&record, svclass_id);
++
++	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_TARGET_PROFILE_ID);
++	profile[0].version = 0x0100;
++	pfseq = sdp_list_append(0, &profile[0]);
++	sdp_set_profile_descs(&record, pfseq);
++
++	sdp_uuid16_create(&l2cap, L2CAP_UUID);
++	proto[0] = sdp_list_append(0, &l2cap);
++	psm = sdp_data_alloc(SDP_UINT16, &lp);
++	proto[0] = sdp_list_append(proto[0], psm);
++	apseq = sdp_list_append(0, proto[0]);
++
++	sdp_uuid16_create(&avdtp, AVDTP_UUID);
++	proto[1] = sdp_list_append(0, &avdtp);
++	version = sdp_data_alloc(SDP_UINT16, &ver);
++	proto[1] = sdp_list_append(proto[1], version);
++	apseq = sdp_list_append(apseq, proto[1]);
++
++	aproto = sdp_list_append(0, apseq);
++	sdp_set_access_protos(&record, aproto);
++
++	sdp_set_info_attr(&record, "AVRCP TG", 0, 0);
++
++	if (sdp_device_record_register(session, &interface, &record, SDP_RECORD_PERSIST) < 0) {
++		printf("Service Record registration failed\n");
++		ret = -1;
++		goto done;
++	}
++
++	printf("AVRCP service registered\n");
++
++done:
++	sdp_list_free(proto[0], 0);
++	sdp_list_free(proto[1], 0);
++	sdp_list_free(apseq, 0);
++	sdp_list_free(aproto, 0);
++	return ret;
++}
++
+ static unsigned char syncml_uuid[] = {	0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x10, 0x00,
+ 					0x80, 0x00, 0x00, 0x02, 0xEE, 0x00, 0x00, 0x02 };
+ 
+@@ -2350,6 +2409,8 @@
+ 	{ "A2SRC",	AUDIO_SOURCE_SVCLASS_ID,	add_a2source	},
+ 	{ "A2SNK",	AUDIO_SINK_SVCLASS_ID,		add_a2sink	},
+ 
++	{ "AVRCP",      AV_REMOTE_TARGET_SVCLASS_ID,    add_avrcp       },
++
+ 	{ "SYNCML",	0,				add_syncml,	syncml_uuid	},
+ 	{ "ACTIVESYNC",	0,				add_activesync,	async_uuid	},
+ 	{ "HOTSYNC",	0,				add_hotsync,	hotsync_uuid	},
+
+--------------070004070102020900090000--
 
 
 -------------------------------------------------------
