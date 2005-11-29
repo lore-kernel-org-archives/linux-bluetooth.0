@@ -1,14 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Sending arbitrary data to a connected device
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Rutger Hendriks <Loial@home.nl>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200511291038.22058.Loial@home.nl>
-References: <200511262023.23140.Loial@home.nl>
-	 <200511281620.55644.Loial@home.nl> <1133208749.31513.45.camel@blade>
-	 <200511291038.22058.Loial@home.nl>
-Content-Type: text/plain
-Message-Id: <1133259183.12447.4.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Sending arbitrary data to a connected device
+References: <200511262023.23140.Loial@home.nl> <200511281620.55644.Loial@home.nl> <1133208749.31513.45.camel@blade>
+In-Reply-To: <1133208749.31513.45.camel@blade>
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart1356146.ySBtQv3bmg";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <200511291038.22058.Loial@home.nl>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,46 +21,74 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 29 Nov 2005 11:13:03 +0100
+Date: Tue, 29 Nov 2005 10:38:17 +0100
 
-Hi Rutger,
+--nextPart1356146.ySBtQv3bmg
+Content-Type: text/plain;
+  charset="iso-8859-6"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> > > sdptool finds the LCD device supports the HID service (which I already
-> > > knew :P ) What I do not know is how I can send data to the device (using
-> > > HID). Any pointers to docs/example code ?
+On Monday 28 November 2005 21:12, Marcel Holtmann wrote:
+> Hi Rutger,
+>
+> > > > I have a bluetooth device here that has an LCD display. I want to be
+> > > > able to send arbitrary data to the device. This way I can (hopefull=
+y)
+> > > > make text appear on the LCD display. The problem is, that I can not
+> > > > find enough documentation to send the arbitrary data. So I'm hoping
+> > > > to find some help here...
+> > > >
+> > > > But, now I'm stuck. What function can I call to send arbitrary hex
+> > > > data?
+> > >
+> > > totally wrong direction. Use sdptool and its various option to discov=
+er
+> > > the services offered by this LCD device.
 > >
-> > don't tell me that it is one of the Logitech diNovo devices. If it is
-> > is, please see my comments about it on the mailing list. Otherwise send
-> > in details about that device.
-> 
-> Actually, it is one of the Logitech diNovo devices (the mediapad). I know you 
-> did some work on it (in december 2003) and that all information about it is 
-> lost, but I'm willing to try to redo your work. It will be a nice pastime, I 
-> hope :)
+> > sdptool finds the LCD device supports the HID service (which I already
+> > knew :P ) What I do not know is how I can send data to the device (using
+> > HID). Any pointers to docs/example code ?
+>
+> don't tell me that it is one of the Logitech diNovo devices. If it is
+> is, please see my comments about it on the mailing list. Otherwise send
+> in details about that device.
 
-why don't you tell us from the start what kind of device it is.
+Actually, it is one of the Logitech diNovo devices (the mediapad). I know y=
+ou=20
+did some work on it (in december 2003) and that all information about it is=
+=20
+lost, but I'm willing to try to redo your work. It will be a nice pastime, =
+I=20
+hope :)
 
-> I have searched the archives in the past and could not find anything, but now 
-> I looked again and I've finally found the messages in which you describe some 
-> of your findings!
-> 
-> I will read through all I can find and see if there is anything in there I can 
-> use, which will probably be the case :) I already saw you were using report ID 
-> 16 and 17, so I will try that too.
+I have searched the archives in the past and could not find anything, but n=
+ow=20
+I looked again and I've finally found the messages in which you describe so=
+me=20
+of your findings!
 
-You need to send and receive reports with ID 16 and 17. Both have fixed
-length and 16 was for the short messages and 17 for the long messages if
-I remember that correctly. They are the same we used for switching the
-dongle from HID into HCI mode.
+I will read through all I can find and see if there is anything in there I =
+can=20
+use, which will probably be the case :) I already saw you were using report=
+ ID=20
+16 and 17, so I will try that too.
 
-The problem is to get these reports to the device. The HIDP kernel
-module with the report protocol (see -mh patch) lacks hiddev support.
+Greetings
+Rutger
 
-Regards
+--nextPart1356146.ySBtQv3bmg
+Content-Type: application/pgp-signature
 
-Marcel
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
 
+iD8DBQBDjCGNZNkx8LIJzQ4RAgjdAJ9CHKqUcGFFhn1nCsV0M8S2gTZWUgCfTZmm
+9s5V0YeHH0ucujkcv9U8CKM=
+=bly/
+-----END PGP SIGNATURE-----
 
+--nextPart1356146.ySBtQv3bmg--
 
 
 -------------------------------------------------------
