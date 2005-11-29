@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <438D09A1.4030909@xmission.com>
+Message-ID: <438CD881.8060405@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] avrcp start
-References: <438C8EDE.1010309@xmission.com> <1133296630.23817.5.camel@blade> <438CD881.8060405@xmission.com>
-In-Reply-To: <438CD881.8060405@xmission.com>
+References: <438C8EDE.1010309@xmission.com> <1133296630.23817.5.camel@blade>
+In-Reply-To: <1133296630.23817.5.camel@blade>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,16 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 29 Nov 2005 19:08:33 -0700
+Date: Tue, 29 Nov 2005 15:38:57 -0700
 
-guys
+Marcel
 
-> little stuck. I am not finding constants for anything they talk about in
-> AVRCP. Things like play/track back/track forward operands, opcodes 
+> you actually copied to much from on of the A2DP record handlers. The
+> specification definces the AVRCP CT service record like this:
+> You need the supported features attribute. The correct PSM and protocol
+> and profile descriptors.
 
-i just found the snippet in the docs about how they piggyback on 1394
-for a lot of this stuff, so now i'm digging there. if nothing else, i'll
-look for the constants in the linux 1394 headers.
+> Functions for both records are in the CVS now.
+
+thanks for straightening it out on sdp.
+
+so I am making progress like I did with hammering out a2dp but i'm a
+little stuck. I am not finding constants for anything they talk about in
+AVRCP. Things like play/track back/track forward operands, opcodes for
+using passthrough, what the significance of "sub unit type 9" is... am I
+missing something? None of it appears in assigned numbers either.
 
 brad
 
