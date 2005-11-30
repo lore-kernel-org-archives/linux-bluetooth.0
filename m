@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] 2 Successive OBEX Connect Request
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20051130064037.90802.qmail@web32412.mail.mud.yahoo.com>
-References: <20051130064037.90802.qmail@web32412.mail.mud.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1133332988.18079.1.camel@blade>
-Mime-Version: 1.0
+Message-ID: <20051130064037.90802.qmail@web32412.mail.mud.yahoo.com>
+From: Arch Sayo <a12chi@yahoo.com>
+To: Bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-1683694770-1133332837=:86462"
+Subject: [Bluez-users] 2 Successive OBEX Connect Request
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,23 +16,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 30 Nov 2005 07:43:08 +0100
+Date: Tue, 29 Nov 2005 22:40:37 -0800 (PST)
 
-Hi Arch,
+--0-1683694770-1133332837=:86462
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-> I would like to ask the implications on BlueZ whenever a Bluetooth
-> device issues 2 Successive OBEX Connect Requests. This was done
-> without any OBEX Disconnect Request after the first Connect Request.
-> This is how the new Samsung D600 phone is doing a Bluetooth
-> transaction when you're doing a Bluetooth printing.
+Hi,
+   
+  I would like to ask the implications on BlueZ whenever a Bluetooth device issues 2 Successive OBEX Connect Requests. This was done without any OBEX Disconnect Request after the first Connect Request. This is how the new Samsung D600 phone is doing a Bluetooth transaction when you're doing a Bluetooth printing.
+   
+  Thank you.
+  Arch Sayo
 
-include "hcidump -X -V" to show what's going on there.
+		
+---------------------------------
+ Yahoo! Music Unlimited - Access over 1 million songs. Try it free.
+--0-1683694770-1133332837=:86462
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Regards
-
-Marcel
-
-
+<div>Hi,</div>  <div>&nbsp;</div>  <div>I would like to ask the implications on BlueZ whenever a Bluetooth device issues 2 Successive OBEX Connect Requests. This was done without any OBEX Disconnect Request after the first Connect Request. This is how the new Samsung D600 phone is doing a Bluetooth transaction when you're doing a Bluetooth printing.</div>  <div>&nbsp;</div>  <div>Thank you.</div>  <div>Arch Sayo</div><p>
+		<hr size=1> <a href="http://pa.yahoo.com/*http://us.rd.yahoo.com/evt=36035/*http://music.yahoo.com/unlimited/">Yahoo! Music Unlimited - Access over 1 million songs. Try it free.</a>
+--0-1683694770-1133332837=:86462--
 
 
 -------------------------------------------------------
