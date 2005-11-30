@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michael Gorbach <mgorbach@yahoo.com>
+Subject: Re: [Bluez-users] Correction
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200511302331.54537.mgorbach@yahoo.com>
-Subject: [Bluez-users] syncing a treo 650 w/bluetooth
+In-Reply-To: <200511301046.25700.mgorbach@yahoo.com>
+References: <200511301046.25700.mgorbach@yahoo.com>
+Content-Type: text/plain
+Message-Id: <1133371601.18079.39.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,16 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 30 Nov 2005 23:31:54 -0500
+Date: Wed, 30 Nov 2005 18:26:41 +0100
 
-OK ... it seems I have resolved the issue with f12. The media keys dont work 
-(I probably need the MH patch) ... but that doesn't matter for me right now. 
-I want to be able to sync my treo 650 with kpilot over bluetooth. I've found 
-some guides to do this but they seem to involve using ppp and establishing a 
-network connection. The treo 650 is detected OK and when I press hotsync on 
-it it starts a "bluetooth serial chat". Anyone know how to set up this sync?
+Hi Michael,
 
-Michael Gorbach
+> Sorry about a typo ... When i wrote "mouse" i meant keyboard. My dinovo 
+> keybord is stuck in f-lock mode after I run hid2hci. Actually ... the f-keys 
+> seem to be working in console mode (outside of x). Inside x, it xev shows a 
+> kepress of the event "f12" but nothing seems to happen. Weird isnt it?
+> Is it a problem with x keybindings? Also ... is there no way to put the device 
+> out of hci mode when the system shuts off so that I can have access to GRUB 
+> and my BIOS? The windows drivers seem to be OK doing this ...
+
+are you using the -mh patch?
+
+Try to sniff the sequence of setting the device back into HID mode and
+then we can add it to hid2hci.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
