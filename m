@@ -1,64 +1,51 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <433E7507.7040405@schugy.de>
-From: Christian Schuglitsch <subjectbluez@schugy.de>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] bluetooth 1.2 and 2.0 dongles support (I have AVM
- Bluefritz! V2.0)
-References: <01C5C5C9.58C8F330.emonturus@teltronic.es> <1128082981.4955.38.camel@localhost.localdomain>
-In-Reply-To: <1128082981.4955.38.camel@localhost.localdomain>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 01 Oct 2005 13:37:43 +0200
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] alsaplugin into btsco
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <438E0FDB.4050708@xmission.com>
+References: <437ED509.6060607@xmission.com>
+	 <1132658340.28644.18.camel@blade>  <438E0FDB.4050708@xmission.com>
+Content-Type: text/plain
+Message-Id: <1133387006.18079.42.camel@blade>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 30 Nov 2005 22:43:26 +0100
 
-Dear Linux Bluetooth users,
-I've bought a Bluefritz! V2.0 dongle because AVM has a page that says that
-this dongle works with Linux.
-This may be true for wireless ISDN/DSL but not for headsets/8khz duplex
-audio connections. After pairing I'm stuck.
+Hi Brad,
 
-Well, I've checked the CSR partners page but I haven't found any
-interesting vendor there.
+> >>DEBUG: connect_l2cap: Can't connect to AD:32:30:3C:0D:00 on psm 25.
+> >>Interrupted system call(4)
+> 
+> > try to use a non-blocking L2CAP socket.
+> 
+> is this set using opts.mode before the ioctl? I'm not having much luck
+> finding examples or docs.
 
-I've found some well known like MSI or Samsung but none of them reaches
-the quality of AVM ( including 5 year warranty).
-MSI sells graphics cards with wrong firmware, mainboards with disabled
-USB-Ports and Samsung device always fail ( DVD drive, HDD, DV camera).
-I don't trust them.
+use fcntl() and F_GETFL/F_SETFL as usual.
 
-And of course I like hardware that runs with open source drivers that
-don't require any firmware files. E.g. I've bought a Twinhan DVB card
-instead of a Avermedia 771. It's all about diversity and choice ;)
+Regards
 
-snd-bt-sco isn't compatible with Bluefritz but maybe there's someone in
-this world who can develop another driver module. I just wonder how this
-was done the Windows way ( I don't have Windows).
-I'm just a poor apprentice and I know it isn't very attractive if I
-donate 50¤ but I can't give more support :-(
-
-Thanks for reading
-
-Schugy
-
+Marcel
 
 
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by:
-Power Architecture Resource Center: Free content, downloads, discussions,
-and more. http://solutions.newsforge.com/ibmarch.tmpl
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
