@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] l2ping manpage
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <438D09A1.4030909@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <ef9938ec0511291401p2b10092cx74cc8354cff921e@mail.gmail.com>
-References: <ef9938ec0511291401p2b10092cx74cc8354cff921e@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1133321324.10213.1.camel@blade>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] avrcp start
+References: <438C8EDE.1010309@xmission.com> <1133296630.23817.5.camel@blade> <438CD881.8060405@xmission.com>
+In-Reply-To: <438CD881.8060405@xmission.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,20 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 30 Nov 2005 04:28:44 +0100
+Date: Tue, 29 Nov 2005 19:08:33 -0700
 
-Hi Albert,
+guys
 
-> the attached patch updates the l2ping manpage.
+> little stuck. I am not finding constants for anything they talk about in
+> AVRCP. Things like play/track back/track forward operands, opcodes 
 
-the patch is applied to the CVS. Thanks and keep these kind of updates
-coming :)
+i just found the snippet in the docs about how they piggyback on 1394
+for a lot of this stuff, so now i'm digging there. if nothing else, i'll
+look for the constants in the linux 1394 headers.
 
-Regards
-
-Marcel
-
-
+brad
 
 
 -------------------------------------------------------
