@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <438DD431.1090607@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] avrcp start
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] avrcp and dbus
+In-Reply-To: <438D09A1.4030909@xmission.com>
+References: <438C8EDE.1010309@xmission.com> <1133296630.23817.5.camel@blade>
+	 <438CD881.8060405@xmission.com>  <438D09A1.4030909@xmission.com>
+Content-Type: text/plain
+Message-Id: <1133321382.10213.3.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,29 +19,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 30 Nov 2005 09:32:49 -0700
+Date: Wed, 30 Nov 2005 04:29:42 +0100
 
-Hi
+Hi Brad,
 
-I have my test app ("avrecv") accepting connections and ack'ing
-passthrough commands. Most or all headsets are going to be sending
-passthrough only, but we will nak other commands when I figure out how
-the nak looks.
+> > little stuck. I am not finding constants for anything they talk about in
+> > AVRCP. Things like play/track back/track forward operands, opcodes 
+> 
+> i just found the snippet in the docs about how they piggyback on 1394
+> for a lot of this stuff, so now i'm digging there. if nothing else, i'll
+> look for the constants in the linux 1394 headers.
 
-If you have avrecv running when you start sending audio to the set, the
-headset will turn around and make the avrcp connection. I don't know how
-you use the play button to *initiate* the player however... :(
+if I am not mistaken, they refer to a document that you might can get if
+you ask nicely. However it is not part of the Bluetooth specification.
 
-I would like to make this app a multithreaded daemon and hook it up to
-dbus for both receiving events from headsets and relaying things back to
-the headset (eg volume changes). I will run one thread per connection
-and select() between data from the headset and dbus commands for the
-same l2cap connection...
+Regards
 
-Does the dbus approach sound reasonable? Any tips for where to start
-with dbus? (I've never written for it)
+Marcel
 
-Brad
+
 
 
 -------------------------------------------------------
