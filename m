@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <438E0FDB.4050708@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] avrcp and dbus
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] alsaplugin into btsco
-References: <437ED509.6060607@xmission.com> <1132658340.28644.18.camel@blade>
-In-Reply-To: <1132658340.28644.18.camel@blade>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <438DD431.1090607@xmission.com>
+References: <438DD431.1090607@xmission.com>
+Content-Type: text/plain
+Message-Id: <1133371554.18079.37.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,19 +18,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 30 Nov 2005 13:47:23 -0700
+Date: Wed, 30 Nov 2005 18:25:54 +0100
+
+Hi Brad,
+
+> I have my test app ("avrecv") accepting connections and ack'ing
+> passthrough commands. Most or all headsets are going to be sending
+> passthrough only, but we will nak other commands when I figure out how
+> the nak looks.
+> 
+> If you have avrecv running when you start sending audio to the set, the
+> headset will turn around and make the avrcp connection. I don't know how
+> you use the play button to *initiate* the player however... :(
+
+sounds promising. Keep up with it.
+
+> I would like to make this app a multithreaded daemon and hook it up to
+> dbus for both receiving events from headsets and relaying things back to
+> the headset (eg volume changes). I will run one thread per connection
+> and select() between data from the headset and dbus commands for the
+> same l2cap connection...
+> 
+> Does the dbus approach sound reasonable? Any tips for where to start
+> with dbus? (I've never written for it)
+
+I think it is far to earlier to think about D-Bus integration.
+
+Regards
 
 Marcel
 
->>DEBUG: connect_l2cap: Can't connect to AD:32:30:3C:0D:00 on psm 25.
->>Interrupted system call(4)
 
-> try to use a non-blocking L2CAP socket.
-
-is this set using opts.mode before the ioctl? I'm not having much luck
-finding examples or docs.
-
-Brad
 
 
 -------------------------------------------------------
