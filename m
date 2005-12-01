@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Beck <becka-HWo7H@acs.uni-duesseldorf.de>
+From: Thomas Keitzl <c3t0@yahoo.de>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] VOIP over Bluetooth-Bluez? Is it possible
-Message-ID: <20051201211014.GA7471@acs.uni-duesseldorf.de>
-References: <438EFD88.4020506@eridani.co.uk> <HCEOIFALKKLBLJPENPNOAEFKCAAA.khaled@ipbill.com>
+Subject: Re: [Bluez-users] BlueZ on Sony Vaio notebook pcg-z1m
+Message-Id: <20051201171752.1cb8ebac.c3t0@yahoo.de>
+In-Reply-To: <1133211371.31513.72.camel@blade>
+References: <20051128215104.2d3e749a.c3t0@yahoo.de>
+	<1133211371.31513.72.camel@blade>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <HCEOIFALKKLBLJPENPNOAEFKCAAA.khaled@ipbill.com>
+Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,42 +19,46 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 1 Dec 2005 22:10:14 +0100
+Date: Thu, 1 Dec 2005 17:17:52 +0100
 
-Khaled <khaled@ipbill.com> wrote:
-> How did you get IP setup over bluetooth?
-> What sound configuration did you setup?
-> OSS, ALSA?
-> I hope this isn't off-the-topic but Im having trouble getting IP to work
-> over bluetooth; SCO and ACL come into play 
+hey,
+thx for your answer.
+after I loaded bluetooth & hci-usb-module and activated the bluetooth-device (the blue led is now on),
+I neither find anything at /var/log/messages 
+nor anything at /proc/bus/usb/devices.
 
-No. Let's first look at how VoIP works in general
+nevertheless, here's the output:
 
+>cat /proc/bus/usb/devices
+>> T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480 MxCh= 6
+>> B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
+>> D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS= 8 #Cfgs=  1
+>> P:  Vendor=0000 ProdID=0000 Rev= 2.06
+>> S:  Manufacturer=Linux 2.6.9 ehci_hcd
+>> S:  Product=Intel Corp. 82801DB/DBM (ICH4/ICH4-M) USB 2.0 EHCI Controller
+>> S:  SerialNumber=0000:00:1d.7
+>> C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
+>> I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+>> E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=256ms
 
-Person 1 <--> Headset <--> PC <--> VoIP-Software <--> Networking-Stack
-Interface to Transport network <--> Transport Network <--> all the stuff
-backwards to Person 2.
+>dmesg
+>> Bluetooth: Core ver 2.6
+>> NET: Registered protocol family 31
+>> Bluetooth: HCI device and connection manager initialized
+>> Bluetooth: HCI socket layer initialized
+>> Bluetooth: HCI USB driver ver 2.7
+>> usbcore: registered new driver hci_usb
 
-Bluetooth can come into play at two places:
+Regards
+Thomas
 
-1. Between Headset and PC in case you are using a Bluetooth headset. 
-   For this you need
-   http://bluetooth-alsa.sourceforge.net/
-   It should as well contain a few helpers that make skype play nicely
-   with BT headsets like picking up and hanging up with the buttons and
-   switching between headset and main sound system.
-   I have successfully used this with Skype.
+	
 
-2. Between the Networking-Stack and the Transport Network (usually the
-   internet), in case you are using a bluetooth connection to connect to 
-   your uplink.
-   This is where you need other stuff depending on what your uplink is
-   like. E.g. the modem profile if connection via a BT-modem, the
-   network stuff, if connecting via antother BT-PC, ...
-   I haven't tried this, as I feel BT is inadequate for my bandwidth
-   needs.
+	
+		
+___________________________________________________________ 
+Gesendet von Yahoo! Mail - Jetzt mit 1GB Speicher kostenlos - Hier anmelden: http://mail.yahoo.de
 
-CU, Andy
 
 
 -------------------------------------------------------
