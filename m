@@ -2,11 +2,10 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] sdp seq of raw data
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1133431401.1037.33.camel@panic>
+In-Reply-To: <1133429978.1037.22.camel@panic>
 References: <1133429978.1037.22.camel@panic>
-	 <1133430940.1190.28.camel@blade>  <1133431401.1037.33.camel@panic>
 Content-Type: text/plain
-Message-Id: <1133433996.1190.48.camel@blade>
+Message-Id: <1133430940.1190.28.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,17 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 01 Dec 2005 11:46:36 +0100
+Date: Thu, 01 Dec 2005 10:55:40 +0100
 
 Hi Collin,
 
-> > this is a known (maybe only by me) problem. I fixed it for the receiving
-> > path, but not for the sending path. You need to patch the library.
+> I'm trying (for hours now) to put a raw binary string into a sdp
+> attribute so that it shows up like this:
 > 
-> so patching the TEXT_STR stuff would be the right way?
+> ---8<----
+> Data Sequence
+>       Data : 0B 0X 09 06 a1 01 85 01 05 07 19 e0 29 e7 15 00 25 01 75 01
+> 95 08 81 02 75 08 95 01 81 01 75 01 95 05 
+> 05 08 19 01 29 05 91 02 75 03 95 01 91 01 75 08 95 06 15 00 26 ff 00 05 
+> ------>8------
 
-it is actually the only way. You must make sure that unitSize is used
-and that it is used correctly.
+this is a known (maybe only by me) problem. I fixed it for the receiving
+path, but not for the sending path. You need to patch the library.
 
 Regards
 
