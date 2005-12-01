@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] sdp seq of raw data
-From: Marcel Holtmann <marcel@holtmann.org>
+From: "Collin R. Mulliner" <collin@betaversion.net>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1133436216.1037.35.camel@panic>
+In-Reply-To: <1133433996.1190.48.camel@blade>
 References: <1133429978.1037.22.camel@panic>
 	 <1133430940.1190.28.camel@blade>  <1133431401.1037.33.camel@panic>
-	 <1133433996.1190.48.camel@blade>  <1133436216.1037.35.camel@panic>
+	 <1133433996.1190.48.camel@blade>
 Content-Type: text/plain
-Message-Id: <1133436800.1190.62.camel@blade>
+Message-Id: <1133436216.1037.35.camel@panic>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,18 +20,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 01 Dec 2005 12:33:20 +0100
+Date: Thu, 01 Dec 2005 03:23:36 -0800
 
-Hi Collin,
+Do you accept a patch for this?
 
-> Do you accept a patch for this?
+> it is actually the only way. You must make sure that unitSize is used
+> and that it is used correctly.
+> 
+> Regards
+> 
+> Marcel
 
-yes :)
 
-Regards
+... Collin
 
-Marcel
-
+--
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+Life is getting harder all the time - now you even have to choose your
+own religion. --Carsten Wald
 
 
 
