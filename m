@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Encryption
-From: "Collin R. Mulliner" <collin@betaversion.net>
+Message-ID: <9d47cfd0512011325x4de6e0a6wbd78806c2072dc5f@mail.gmail.com>
+From: Abu hasnat Sayem <ahsayem@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <9d47cfd0512011325x4de6e0a6wbd78806c2072dc5f@mail.gmail.com>
-References: <9d47cfd0512011325x4de6e0a6wbd78806c2072dc5f@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1133500233.15695.3.camel@panic>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_33447_18514191.1133472331673"
+Subject: [Bluez-devel] Encryption
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,29 +17,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 01 Dec 2005 21:10:33 -0800
+Date: Thu, 1 Dec 2005 15:25:31 -0600
 
-Hi Abu,
+------=_Part_33447_18514191.1133472331673
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-On Thu, 2005-12-01 at 15:25 -0600, Abu hasnat Sayem wrote:
-> I am working on doing Encryption and Authentication at the RFCOMM and
-> L2CAP level using BlueZ. I would like to know if there exists certain
-> function calls to accompolish it or i have to incorporate new code in
-> it.
+I am working on doing Encryption and Authentication at the RFCOMM and L2CAP
+level using BlueZ. I would like to know if there exists certain function
+calls to accompolish it or i have to incorporate new code in it.
 
-this is done via setsockopt(2), take a look at: 
-/usr/src/bluez-utils-2.22/pand/main.c (search for SECURE)
+------=_Part_33447_18514191.1133472331673
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-or check sobexsrv (http://www.mulliner.org/bluetooth/sobexsrv.php)
+<font color=3D"#550055">I am working on doing Encryption and Authentication=
+ at the RFCOMM and&nbsp;L2CAP level using BlueZ. I would like to know if th=
+ere exists certain function calls to accompolish it or i have to incorporat=
+e new code in it.
+</font>
 
-... Collin
-
---
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-Don't talk just code!
-
+------=_Part_33447_18514191.1133472331673--
 
 
 -------------------------------------------------------
