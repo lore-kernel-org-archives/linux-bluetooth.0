@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <438EE54B.9050608@eridani.co.uk>
-From: Michael McConnell <soruk@eridani.co.uk>
-MIME-Version: 1.0
+Message-ID: <7aa80ced0512010332k58254045y61d0e3522f725095@mail.gmail.com>
+From: Mohan K <kmohangda@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] VOIP over Bluetooth-Bluez? Is it possible
-References: <7aa80ced0512010332k58254045y61d0e3522f725095@mail.gmail.com>
-In-Reply-To: <7aa80ced0512010332k58254045y61d0e3522f725095@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] VOIP over Bluetooth-Bluez? Is it possible
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,27 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 01 Dec 2005 11:58:03 +0000
+Date: Thu, 1 Dec 2005 17:02:55 +0530
 
-Mohan K wrote:
-> Hi All,
-> 
-> Is it possible to integrate VOIP and Bluetooth using Bluez?
-> 
-> Advanced thanks for your comments.
+Hi All,
 
-I don't see why not.
+Is it possible to integrate VOIP and Bluetooth using Bluez?
 
-Indeed last night my WinXP laptop was connected via Bluetooth to my 
-Linux desktop running Bluez, and I was in a call with a friend over 
-Skype. It worked rather well.
+Advanced thanks for your comments.
 
--- 
--- Michael "Soruk" McConnell
-    Eridani Star System
-
-    MailStripper - http://mailstripper.eridani.co.uk/
-    Mail Me Anywhere - http://www.mailmeanywhere.com/
+Regards,
+Mohan
 
 
 -------------------------------------------------------
