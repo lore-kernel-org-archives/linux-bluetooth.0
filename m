@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0512011117i730f7dd0p4ffc099d06a09cb8@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <438F2311.9050103@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] avrcp and dbus
+References: <438DD431.1090607@xmission.com> <1133371554.18079.37.camel@blade>
+In-Reply-To: <1133371554.18079.37.camel@blade>
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Remote name delay
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,55 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 1 Dec 2005 17:17:33 -0200
+Date: Thu, 01 Dec 2005 09:21:37 -0700
 
-Hi,
+Marcel
 
-I am developing a standalone application to perform real D-Bus
-services tests. The main features are:
-1. Running all the time in the systray
-2. Handle PIN Request
-3. Local adapter configuration
-4. Basic operations: Inquiry, Remote name, ...
+>>I have my test app ("avrecv") accepting connections and ack'ing
+>>passthrough commands.
+> 
+> sounds promising. Keep up with it.
 
-However I am facing a problem in the RemoteName service when a lot of
-inquiry replies is received. My app stores the inquired devices in a
-hash table and when the InquiryCompleted signal is received the app
-request the name for each device. The "hci_send_req" function is
-returning an Input/Output error. Looking the hcidump result, the
-"Command Disallowed" error is displayed :(
+Ok, well I found almost everything I need. The only thing I'm not
+finding is the format for a volume up/down sent back to the headset.
+Have you seen with your sniffer what those frames look like?
 
-HCIDUMP:
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x0c ncmd 1
-    Error: Command Disallowed
- <<<<<Indicates that the controller is in a state where it can process
-this command at this time.>>>>
+I'm assuming it's also sent as a passthrough to the panel device but I'm
+guessing/experimenting to find the value of the volume up/down operands :(
 
-I noticed the same problem using the hcitool with "--flush" option and
-removing the cached device information stored in the directory
-"/var/lib/bluetooth".
+Passthrough may not be right for volume changes... the headset neither
+acks nor naks those commands sent to its panel.
 
-Trying to fix this problem I did some changes in the hcid dbus
-RemoteName using the clock offset and page scan repetition mode.
-However I didn't reach significant improvements.
-* InquiryResult signal Changes
-   - Added clock offset
-   - Added pscan_rep_mode
-* RemoteName Changes
-   - Added clock offset
-   - Added pscan_rep_mode
+> I think it is far to earlier to think about D-Bus integration.
 
-I know that I can retrieve some entries from the file "names" in the
-storage directory. But without consider this, how can I reduce the
-remote name request time?
+Fine. Once we have real a2dp alsa integration then it'll be more clear
+how avrcp fits in.
 
-Regards,
-Claudio
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+brad
 
 
 -------------------------------------------------------
