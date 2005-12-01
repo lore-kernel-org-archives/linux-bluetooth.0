@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Thomas Keitzl <c3t0@yahoo.de>
+Message-ID: <438F054D.3030808@eridani.co.uk>
+From: Michael McConnell <soruk@eridani.co.uk>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] BlueZ on Sony Vaio notebook pcg-z1m
-Message-Id: <20051201171752.1cb8ebac.c3t0@yahoo.de>
-In-Reply-To: <1133211371.31513.72.camel@blade>
-References: <20051128215104.2d3e749a.c3t0@yahoo.de>
-	<1133211371.31513.72.camel@blade>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Bluez-users] VOIP over Bluetooth-Bluez? Is it possible
+References: <HCEOIFALKKLBLJPENPNOAEFKCAAA.khaled@ipbill.com>
+In-Reply-To: <HCEOIFALKKLBLJPENPNOAEFKCAAA.khaled@ipbill.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,46 +18,100 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 1 Dec 2005 17:17:52 +0100
+Date: Thu, 01 Dec 2005 14:14:37 +0000
 
-hey,
-thx for your answer.
-after I loaded bluetooth & hci-usb-module and activated the bluetooth-device (the blue led is now on),
-I neither find anything at /var/log/messages 
-nor anything at /proc/bus/usb/devices.
+Khaled wrote:
+> Hi Michael,
+> 
+> How did you get IP setup over bluetooth?
+> What sound configuration did you setup?
+> OSS, ALSA?
 
-nevertheless, here's the output:
+pand at the linux end (I'm not in front of my system atm so can't look 
+up the specifics), WinXP has built-in PAN support, which it offered me 
+when I plugged in my USB BT dongle.
 
->cat /proc/bus/usb/devices
->> T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480 MxCh= 6
->> B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
->> D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS= 8 #Cfgs=  1
->> P:  Vendor=0000 ProdID=0000 Rev= 2.06
->> S:  Manufacturer=Linux 2.6.9 ehci_hcd
->> S:  Product=Intel Corp. 82801DB/DBM (ICH4/ICH4-M) USB 2.0 EHCI Controller
->> S:  SerialNumber=0000:00:1d.7
->> C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
->> I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
->> E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=256ms
+No OSS or ALSA in this instance (though on my Linux partition on the 
+laptop ALSA is running as supplied in the kernel, but the sound is very 
+choppy in Skype, even on my fixed-line connection) as I was running 
+Skype under WinXP on the laptop.
 
->dmesg
->> Bluetooth: Core ver 2.6
->> NET: Registered protocol family 31
->> Bluetooth: HCI device and connection manager initialized
->> Bluetooth: HCI socket layer initialized
->> Bluetooth: HCI USB driver ver 2.7
->> usbcore: registered new driver hci_usb
+> I hope this isn't off-the-topic but Im having trouble getting IP to work
+> over bluetooth; SCO and ACL come into play and Ive been reading all over the
+> place and perhaps am a little confused right now!
 
-Regards
-Thomas
+I haven't tried attaching a BT headset to my laptop yet. I use a cabled 
+headset/microphone.
 
-	
+-- Michael
 
-	
-		
-___________________________________________________________ 
-Gesendet von Yahoo! Mail - Jetzt mit 1GB Speicher kostenlos - Hier anmelden: http://mail.yahoo.de
+>>-----Original Message-----
+>>From: bluez-users-admin@lists.sourceforge.net
+>>[mailto:bluez-users-admin@lists.sourceforge.net]On Behalf Of Michael
+>>McConnell
+>>Sent: 01 December 2005 13:41
+>>To: bluez-users@lists.sourceforge.net
+>>Subject: Re: [Bluez-users] VOIP over Bluetooth-Bluez? Is it possible
+>>
+>>
+>>Mohan K wrote:
+>>
+>>>Hi Michael,
+>>>
+>>>Did u connected the 2 PC's over Bluetooth and make calls between two?
+>>>If not, how could you tell that as a VOIP over Bluetooth, right?
+>>>
+>>>If I am anything wrong, please correct me.
+>>
+>>,------.                 ,---------.
+>>|Laptop|<--[Bluetooth]-->|Linux box|
+>>`------'                 `---------'
+>>                               |
+>>                               | (Internet)
+>>                               |
+>>                          ,-----------.
+>>                          |Friend's PC|
+>>                          `-----------'
+>>
+>>The laptop was connected to the Internet using IP over Bluetooth.
+>>Over this connection, Skype was used to chat with my friend.
+>>
+>>Hope that clarifies.
+>>
+>>-- Michael
+>>
+>>
+>>>On 12/1/05, Michael McConnell <soruk@eridani.co.uk> wrote:
+>>>
+>>>
+>>>>Mohan K wrote:
+>>>>
+>>>>
+>>>>>Hi All,
+>>>>>
+>>>>>Is it possible to integrate VOIP and Bluetooth using Bluez?
+>>>>>
+>>>>>Advanced thanks for your comments.
+>>>>
+>>>>I don't see why not.
+>>>>
+>>>>Indeed last night my WinXP laptop was connected via Bluetooth to my
+>>>>Linux desktop running Bluez, and I was in a call with a friend over
+>>>>Skype. It worked rather well.
+>>>>
+>>>>--
+>>>>-- Michael "Soruk" McConnell
+>>>>  Eridani Star System
+>>>>
+>>>>  MailStripper - http://mailstripper.eridani.co.uk/
+>>>>  Mail Me Anywhere - http://www.mailmeanywhere.com/
 
+-- 
+-- Michael "Soruk" McConnell
+    Eridani Star System
+
+    MailStripper - http://mailstripper.eridani.co.uk/
+    Mail Me Anywhere - http://www.mailmeanywhere.com/
 
 
 -------------------------------------------------------
