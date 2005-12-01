@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <438F2311.9050103@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <94e407f00512010820u6d621d8auca86ad91d9a704a7@mail.gmail.com>
+From: Arpit Rai <whalesurf@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] avrcp and dbus
-References: <438DD431.1090607@xmission.com> <1133371554.18079.37.camel@blade>
-In-Reply-To: <1133371554.18079.37.camel@blade>
-Content-Type: text/plain; charset=ISO-8859-1
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_11786_10252220.1133454027434"
+Subject: [Bluez-devel] Definition of hci_conn_info_req
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +17,58 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 01 Dec 2005 09:21:37 -0700
+Date: Fri, 2 Dec 2005 00:20:27 +0800
 
-Marcel
+------=_Part_11786_10252220.1133454027434
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
->>I have my test app ("avrecv") accepting connections and ack'ing
->>passthrough commands.
-> 
-> sounds promising. Keep up with it.
+Hi
 
-Ok, well I found almost everything I need. The only thing I'm not
-finding is the format for a volume up/down sent back to the headset.
-Have you seen with your sniffer what those frames look like?
+Another basic question.The statement below is a request to establish
+connection with a remote device,right?
 
-I'm assuming it's also sent as a passthrough to the panel device but I'm
-guessing/experimenting to find the value of the volume up/down operands :(
+struct hci_conn_info_req *cr;
+cr =3D malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
 
-Passthrough may not be right for volume changes... the headset neither
-acks nor naks those commands sent to its panel.
+Now,is &cr->bdaddr supposed to be the remote device bluetooth address?
 
-> I think it is far to earlier to think about D-Bus integration.
+When I convert this value to string and output it, it doesn't give me the
+correct value for the remote bluetooth device. It returns 08:04:9A:AC:00:00=
+.
+Doesn't make sense to me.
 
-Fine. Once we have real a2dp alsa integration then it'll be more clear
-how avrcp fits in.
+Regards
+Arpit
 
-brad
+------=_Part_11786_10252220.1133454027434
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi <br>
+<br>
+Another basic question.The statement below is a request to establish connec=
+tion with a remote device,right?<br>
+<br>
+struct hci_conn_info_req *cr;<br>
+cr =3D malloc(sizeof(*cr) + sizeof(struct hci_conn_info));<br>
+<br>
+Now,is &amp;cr-&gt;bdaddr supposed to be the remote device bluetooth addres=
+s?<br>
+<br>
+When I convert this value to string and output it, it doesn't give me
+the correct value for the remote bluetooth device. It returns
+08:04:9A:AC:00:00. Doesn't make sense to me.<br>
+<br>
+Regards<br>
+Arpit<br>
+<br>
+<br>
+<br>
+
+------=_Part_11786_10252220.1133454027434--
 
 
 -------------------------------------------------------
