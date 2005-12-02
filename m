@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] more sdp patches
+Subject: Re: [Bluez-devel] sdp seq of raw data
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1133509258.15695.8.camel@panic>
-References: <1133509258.15695.8.camel@panic>
+In-Reply-To: <1133437800.1037.40.camel@panic>
+References: <1133429978.1037.22.camel@panic>
+	 <1133430940.1190.28.camel@blade>  <1133431401.1037.33.camel@panic>
+	 <1133433996.1190.48.camel@blade>  <1133436216.1037.35.camel@panic>
+	 <1133436800.1190.62.camel@blade>  <1133437800.1037.40.camel@panic>
 Content-Type: text/plain
-Message-Id: <1133552877.24022.5.camel@blade>
+Message-Id: <1133552576.24022.0.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,41 +21,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 02 Dec 2005 20:47:57 +0100
+Date: Fri, 02 Dec 2005 20:42:56 +0100
 
 Hi Collin,
 
-> here is another patch for bluez-libs for sdp. I added:
-> 
-> int sdp_set_access_protos_attr(sdp_record_t *rec, const sdp_list_t
-> *proto, const uint16_t attr);
-> 
-> this is to add stuff like SDP_ATTR_ADD_PROTO_DESC_LIST, actually I
-> modified sdp_set_access_protos to take another parameter and made
-> sdp_set_access_protos do a call to sdp_set_access_protos_attr to keep
-> backward compatibility
+> here are the patches, one for include/sdp_lib.h and one src/for sdp.c.
+> It adds two new functions but stais backward compatible.
 
-this won't work, because the additional protocol descriptor list is a
-sequence of sequence of sequence. Compare this from my HCRP capable
-printer:
-
-Attribute 0x0004 - ProtocolDescriptorList
-        Sequence
-                Sequence
-                        UUID16 0x0100 - L2CAP
-                        UINT16 0x1003
-                Sequence
-                       UUID16 0x0012 - HardcopyControlChannel
-
-Attribute 0x000d - AdditionalProtocolDescriptorLists
-        Sequence
-                Sequence
-                        Sequence
-                                UUID16 0x0100 - L2CAP
-                                UINT16 0x1001
-                        Sequence
-                                UUID16 0x0014 - HardcopyDataChannel
-
+make it one patch and what does leng stands for? We don't use such weird
+abbreviations.
 
 Regards
 
