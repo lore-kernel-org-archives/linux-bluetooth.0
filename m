@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20051202072546.8845.qmail@web31106.mail.mud.yahoo.com>
-From: Jatin Nahar <jatin_nahar@yahoo.com>
+From: "Collin R. Mulliner" <collin@betaversion.net>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-104895615-1133508346=:7998"
-Subject: [Bluez-devel] vendor specific commands
+Content-Type: multipart/mixed; boundary="=-TOE9On/keFPmodVSqyZq"
+Message-Id: <1133509258.15695.8.camel@panic>
+Mime-Version: 1.0
+Subject: [Bluez-devel] more sdp patches
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,33 +16,82 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 1 Dec 2005 23:25:46 -0800 (PST)
+Date: Thu, 01 Dec 2005 23:40:58 -0800
 
---0-104895615-1133508346=:7998
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
 
-Hi,
-  I want to add support for few vendor specific commands to BlueZ, was wondering whats the best place in the source code to do that? I want to perform some hardware configuration before any other initialization happens.
-   
-  I am also trying to understand general BlueZ architecture for any enhancements or customizations, what would be the best place to start (I have been  looking at the code, but do not completely understand it especially the startup part).
-   
-  Also wondering whats BlueZ's policy regarding support for vendor specific commands/events? Is it possible to submit modifications for a particular vendor and get that incorporated in standard distributions.
-   
-  Thanks for the help.
-  Jatin
+--=-TOE9On/keFPmodVSqyZq
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-		
----------------------------------
- Yahoo! DSL Something to write home about. Just $16.99/mo. or less
---0-104895615-1133508346=:7998
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Hi Marcel,
 
-<DIV id=RTEContent>Hi,</DIV>  <DIV>I want to add support for few vendor specific commands to BlueZ, was wondering whats the best place in the source code to do that? I want to perform some hardware configuration before any other initialization happens.</DIV>  <DIV>&nbsp;</DIV>  <DIV>I am also trying to understand general BlueZ architecture for any enhancements or customizations,&nbsp;what would be the best place to start (I have been &nbsp;looking at the code, but do not completely understand it especially the startup part).</DIV>  <DIV>&nbsp;</DIV>  <DIV>Also wondering whats BlueZ's policy regarding support for vendor specific commands/events? Is it possible to submit modifications for a particular vendor and get that incorporated in standard distributions.</DIV>  <DIV>&nbsp;</DIV>  <DIV>Thanks for the help.</DIV>  <DIV>Jatin</DIV><p>
-		<hr size=1> <a href="http://pa.yahoo.com/*http://us.rd.yahoo.com/evt=37474/*http://promo.yahoo.com/broadband/ 
-">Yahoo! DSL</a> Something to write home about. Just $16.99/mo. or less
---0-104895615-1133508346=:7998--
+here is another patch for bluez-libs for sdp. I added:
+
+int sdp_set_access_protos_attr(sdp_record_t *rec, const sdp_list_t
+*proto, const uint16_t attr);
+
+this is to add stuff like SDP_ATTR_ADD_PROTO_DESC_LIST, actually I
+modified sdp_set_access_protos to take another parameter and made
+sdp_set_access_protos do a call to sdp_set_access_protos_attr to keep
+backward compatibility
+
+
+... Collin
+
+--
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+USS Enterprise Bumperstricker: Our other starship separates into 3
+pieces!
+
+--=-TOE9On/keFPmodVSqyZq
+Content-Disposition: attachment; filename=bluez_libs_add_access_inc
+Content-Type: text/plain; name=bluez_libs_add_access_inc; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+--- bluez-libs-2.22/include/sdp_lib.h	2005-10-29 16:04:28.000000000 -0700
++++ bluez-libs-2.22_new/include/sdp_lib.h	2005-12-01 22:54:36.000000000 -0800
+@@ -172,6 +174,7 @@
+  * Set the access protocols of the record to those specified in proto
+  */
+ int sdp_set_access_protos(sdp_record_t *rec, const sdp_list_t *proto);
++int sdp_set_access_protos_attr(sdp_record_t *rec, const sdp_list_t *proto, const uint16_t attr);
+ 
+ /*
+  * Get protocol port (i.e. PSM for L2CAP, Channel for RFCOMM) 
+
+--=-TOE9On/keFPmodVSqyZq
+Content-Disposition: attachment; filename=bluez_libs_add_access_src
+Content-Type: text/plain; name=bluez_libs_add_access_src; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+--- bluez-libs-2.22/src/sdp.c	2005-10-29 16:04:28.000000000 -0700
++++ bluez-libs-2.22_new/src/sdp.c	2005-12-01 22:55:27.000000000 -0800
+@@ -1742,6 +1772,11 @@
+  */
+ int sdp_set_access_protos(sdp_record_t *rec, const sdp_list_t *ap)
+ {
++	return(sdp_set_access_protos_attr(rec, ap, SDP_ATTR_PROTO_DESC_LIST));
++}
++
++int sdp_set_access_protos_attr(sdp_record_t *rec, const sdp_list_t *ap, const uint16_t attr)
++{
+ 	const sdp_list_t *p;
+ 	sdp_data_t *protos = 0;
+ 
+@@ -1749,7 +1784,7 @@
+ 		sdp_data_t *seq = access_proto_to_dataseq(rec, (sdp_list_t *)p->data);
+ 		protos = sdp_seq_append(protos, seq);
+ 	}
+-	sdp_attr_add(rec, SDP_ATTR_PROTO_DESC_LIST, protos);
++	sdp_attr_add(rec, attr, protos);
+ 	return 0;
+ }
+ 
+
+--=-TOE9On/keFPmodVSqyZq--
+
 
 
 -------------------------------------------------------
