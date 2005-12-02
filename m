@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Porting bluez onto different embedded systems
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20051202121947.73018.qmail@web36108.mail.mud.yahoo.com>
+From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20051202121947.73018.qmail@web36108.mail.mud.yahoo.com>
-References: <20051202121947.73018.qmail@web36108.mail.mud.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1133528475.20834.46.camel@blade>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-1314624375-1133525987=:72441"
+Subject: [Bluez-users] Porting bluez onto different embedded systems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,31 +16,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 02 Dec 2005 14:01:15 +0100
+Date: Fri, 2 Dec 2005 04:19:47 -0800 (PST)
 
-Hi Swathi,
+--0-1314624375-1133525987=:72441
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-> I doing research on porting the powerful bluetooth stack, bluez onto
-> different embedded systems. I went through the questions which were
-> being asked on porting bluez onto different embedded systems. Some of
-> the developers have said it is possible to port bluez onto different
-> platforms but it involves a lot of modifications have to be done. Can
-> someone provide me with useful links or informations which will be
-> helpful in porting bluez onto different OS.
-> All the comments are welcome as it will be helpful in doing my
-> research.
+Hello,
+  I doing research on porting the powerful bluetooth stack, bluez onto different embedded systems. I went through the questions which were being asked on porting bluez onto different embedded systems. Some of the developers have said it is possible to port bluez onto different platforms but it involves a lot of modifications have to be done. Can someone provide me with useful links or informations which will be helpful in porting bluez onto different OS.
+  All the comments are welcome as it will be helpful in doing my research.
+  Waarm Regards,
+  Swathi
 
-I think that it is badly spent time even trying to port it. Everything
-of BlueZ inside the kernel is fully kernel specific and the Bluetooth
-library depends on the interfaces offered by the Bluetooth subsystem
-inside the kernel. However feel free to try porting it, but keep in mind
-the every line of code is GPL and that any port must be GPL, too.
+		
+---------------------------------
+ Yahoo! Personals
+ Let fate take it's course directly to your email.
+ See who's waiting for you Yahoo! Personals
+--0-1314624375-1133525987=:72441
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Regards
-
-Marcel
-
-
+<DIV id=RTEContent>Hello,</DIV>  <DIV>I doing research on porting the powerful bluetooth stack, bluez onto different embedded systems. I went through the questions which were being asked on porting bluez onto different embedded systems. Some of the developers have said it is possible to port bluez onto different platforms but it involves a lot of modifications have to be done. Can someone provide me with useful links or informations which will be helpful in porting bluez onto different OS.</DIV>  <DIV>All the comments are welcome as it will be helpful in doing my research.</DIV>  <DIV>Waarm Regards,</DIV>  <DIV>Swathi</DIV><p>
+		<hr size=1> <B>Yahoo! Personals</B><BR> 
+Let fate take it's course directly to your email.<br> 
+See who's waiting for you <a href="http://us.rd.yahoo.com/evt=36106/*http://personals.yahoo.com 
+">Yahoo! Personals</a>
+--0-1314624375-1133525987=:72441--
 
 
 -------------------------------------------------------
