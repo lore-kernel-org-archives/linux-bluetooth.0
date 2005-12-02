@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Encryption
 From: "Collin R. Mulliner" <collin@betaversion.net>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: multipart/mixed; boundary="=-TOE9On/keFPmodVSqyZq"
-Message-Id: <1133509258.15695.8.camel@panic>
+In-Reply-To: <9d47cfd0512011325x4de6e0a6wbd78806c2072dc5f@mail.gmail.com>
+References: <9d47cfd0512011325x4de6e0a6wbd78806c2072dc5f@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1133500233.15695.3.camel@panic>
 Mime-Version: 1.0
-Subject: [Bluez-devel] more sdp patches
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,25 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 01 Dec 2005 23:40:58 -0800
+Date: Thu, 01 Dec 2005 21:10:33 -0800
 
+Hi Abu,
 
---=-TOE9On/keFPmodVSqyZq
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+On Thu, 2005-12-01 at 15:25 -0600, Abu hasnat Sayem wrote:
+> I am working on doing Encryption and Authentication at the RFCOMM and
+> L2CAP level using BlueZ. I would like to know if there exists certain
+> function calls to accompolish it or i have to incorporate new code in
+> it.
 
-Hi Marcel,
+this is done via setsockopt(2), take a look at: 
+/usr/src/bluez-utils-2.22/pand/main.c (search for SECURE)
 
-here is another patch for bluez-libs for sdp. I added:
-
-int sdp_set_access_protos_attr(sdp_record_t *rec, const sdp_list_t
-*proto, const uint16_t attr);
-
-this is to add stuff like SDP_ATTR_ADD_PROTO_DESC_LIST, actually I
-modified sdp_set_access_protos to take another parameter and made
-sdp_set_access_protos do a call to sdp_set_access_protos_attr to keep
-backward compatibility
-
+or check sobexsrv (http://www.mulliner.org/bluetooth/sobexsrv.php)
 
 ... Collin
 
@@ -42,55 +39,7 @@ backward compatibility
 Collin R. Mulliner <collin@betaversion.net>
 BETAVERSiON Systems [www.betaversion.net]
 info/pgp: finger collin@betaversion.net
-USS Enterprise Bumperstricker: Our other starship separates into 3
-pieces!
-
---=-TOE9On/keFPmodVSqyZq
-Content-Disposition: attachment; filename=bluez_libs_add_access_inc
-Content-Type: text/plain; name=bluez_libs_add_access_inc; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-
---- bluez-libs-2.22/include/sdp_lib.h	2005-10-29 16:04:28.000000000 -0700
-+++ bluez-libs-2.22_new/include/sdp_lib.h	2005-12-01 22:54:36.000000000 -0800
-@@ -172,6 +174,7 @@
-  * Set the access protocols of the record to those specified in proto
-  */
- int sdp_set_access_protos(sdp_record_t *rec, const sdp_list_t *proto);
-+int sdp_set_access_protos_attr(sdp_record_t *rec, const sdp_list_t *proto, const uint16_t attr);
- 
- /*
-  * Get protocol port (i.e. PSM for L2CAP, Channel for RFCOMM) 
-
---=-TOE9On/keFPmodVSqyZq
-Content-Disposition: attachment; filename=bluez_libs_add_access_src
-Content-Type: text/plain; name=bluez_libs_add_access_src; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-
---- bluez-libs-2.22/src/sdp.c	2005-10-29 16:04:28.000000000 -0700
-+++ bluez-libs-2.22_new/src/sdp.c	2005-12-01 22:55:27.000000000 -0800
-@@ -1742,6 +1772,11 @@
-  */
- int sdp_set_access_protos(sdp_record_t *rec, const sdp_list_t *ap)
- {
-+	return(sdp_set_access_protos_attr(rec, ap, SDP_ATTR_PROTO_DESC_LIST));
-+}
-+
-+int sdp_set_access_protos_attr(sdp_record_t *rec, const sdp_list_t *ap, const uint16_t attr)
-+{
- 	const sdp_list_t *p;
- 	sdp_data_t *protos = 0;
- 
-@@ -1749,7 +1784,7 @@
- 		sdp_data_t *seq = access_proto_to_dataseq(rec, (sdp_list_t *)p->data);
- 		protos = sdp_seq_append(protos, seq);
- 	}
--	sdp_attr_add(rec, SDP_ATTR_PROTO_DESC_LIST, protos);
-+	sdp_attr_add(rec, attr, protos);
- 	return 0;
- }
- 
-
---=-TOE9On/keFPmodVSqyZq--
+Don't talk just code!
 
 
 
