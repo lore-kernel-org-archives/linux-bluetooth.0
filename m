@@ -1,15 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20051203000701.qx95jgmadj5wkcso@admin.betaversion.net>
-From: "Collin R. Mulliner" <collin@betaversion.net>
+Subject: Re: [Bluez-devel] sdp seq of raw data
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] more sdp patches
-References: <1133509258.15695.8.camel@panic>
-	<1133552877.24022.5.camel@blade>
-In-Reply-To: <1133552877.24022.5.camel@blade>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset=ISO-8859-1;
-	format="flowed"
+In-Reply-To: <4390A648.1050506@csr.com>
+References: <1133429978.1037.22.camel@panic>
+	 <1133430940.1190.28.camel@blade>  <1133431401.1037.33.camel@panic>
+	 <1133433996.1190.48.camel@blade>  <1133436216.1037.35.camel@panic>
+	 <1133436800.1190.62.camel@blade>  <1133437800.1037.40.camel@panic>
+	 <1133552576.24022.0.camel@blade>  <4390A648.1050506@csr.com>
+Content-Type: text/plain
+Message-Id: <1133553995.24022.11.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,22 +22,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 03 Dec 2005 00:07:01 +0100
+Date: Fri, 02 Dec 2005 21:06:35 +0100
 
-Marcel,
+Hi Steven,
 
-Quoting Marcel Holtmann <marcel@holtmann.org>:
-> this won't work, because the additional protocol descriptor list is a
-> sequence of sequence of sequence. Compare this from my HCRP capable
-> printer:
+> >                     ... what does leng stands for? ...
+> 
+> The Plateau of Leng appears in the work of H.P. Lovecraft and is
+> inhabited by terrible monsters. Does that help :-)
 
-ah mmmh the code I send in works for me, so maybe it's just unclean :-(
+I assume it is short for length, but I like your explanation more :)
 
-About the "leng" issue, I thought you would tweak my patch anyway so I didn't
-bothered making it nice ... sorry!
+Regards
 
-
-... Collin
+Marcel
 
 
 
