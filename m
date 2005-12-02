@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4390D937.6070009@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Porting bluez onto different embedded systems
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] fujitsu internal bluetooth
+In-Reply-To: <20051202121947.73018.qmail@web36108.mail.mud.yahoo.com>
+References: <20051202121947.73018.qmail@web36108.mail.mud.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1133528475.20834.46.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,18 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 02 Dec 2005 16:31:03 -0700
+Date: Fri, 02 Dec 2005 14:01:15 +0100
 
-Hey
+Hi Swathi,
 
-I'm interested in a fujitsu (lifebook p1510d) but of course there's no
-way to find out from them which bluetooth chip they use internally. Does
-anyone have one of the fujitsu models with internal bluetooth? What are
-they using for internal bluetooth? (run "hciconfig hci0 revision" as
-root to see)
+> I doing research on porting the powerful bluetooth stack, bluez onto
+> different embedded systems. I went through the questions which were
+> being asked on porting bluez onto different embedded systems. Some of
+> the developers have said it is possible to port bluez onto different
+> platforms but it involves a lot of modifications have to be done. Can
+> someone provide me with useful links or informations which will be
+> helpful in porting bluez onto different OS.
+> All the comments are welcome as it will be helpful in doing my
+> research.
 
-thanks
-Brad
+I think that it is badly spent time even trying to port it. Everything
+of BlueZ inside the kernel is fully kernel specific and the Bluetooth
+library depends on the interfaces offered by the Bluetooth subsystem
+inside the kernel. However feel free to try porting it, but keep in mind
+the every line of code is GPL and that any port must be GPL, too.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
