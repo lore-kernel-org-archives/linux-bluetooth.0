@@ -1,16 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Remote name delay
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0512020833q3f319166lfe8e63e612a86c4e@mail.gmail.com>
-References: <e1effdeb0512011117i730f7dd0p4ffc099d06a09cb8@mail.gmail.com>
-	 <1133470780.18554.2.camel@blade>
-	 <e1effdeb0512020321g2b492f1cl5c553d7c3b24bfb8@mail.gmail.com>
-	 <1133523028.20834.8.camel@blade>
-	 <e1effdeb0512020833q3f319166lfe8e63e612a86c4e@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1133548573.20834.83.camel@blade>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="multipart/alternative";
+	boundary="----_=_NextPart_001_01C5F76E.6DEAC5FB"
+Message-ID: <A35A8D03A748B34A9DA2AB0335A3F93D40838F@rfsdmail.internal.rfmd.com>
+From: "Jatin Nahar" <jnahar@rfmd.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Vendor Specific Commands
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,110 +18,195 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 02 Dec 2005 19:36:13 +0100
+Date: Fri, 2 Dec 2005 10:30:09 -0800
 
-Hi Claudio,
+This is a multi-part message in MIME format.
 
-> > > > > I am developing a standalone application to perform real D-Bus
-> > > > > services tests. The main features are:
-> > > > > 1. Running all the time in the systray
-> > > > > 2. Handle PIN Request
-> > > > > 3. Local adapter configuration
-> > > > > 4. Basic operations: Inquiry, Remote name, ...
-> > > >
-> > > > cool idea. We really need something like this.
-> > >
-> > > I am not a good UI developer, but this application can be the start
-> > > point for other developers to improve it. I will sent the first
-> > > prototype to the list as soon as I get better icons :)
-> >
-> > is this for Gnome and in C? I like to create a bluez-gnome repository
-> > and then make a pre-release really soon.
-> 
-> Yes. I am using GladeXML object to load the widgets inside a XML file
-> description.
-> There are soem screenshot available at:
-> http://www.cin.ufpe.br/~ckt/gbluezconf/
+------_=_NextPart_001_01C5F76E.6DEAC5FB
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_002_01C5F76E.6DEAC5FB"
 
-looks very nice. Once you think it is ready for public review, drop me a
-note and I create a new repository for it.
 
-> > > > > However I am facing a problem in the RemoteName service when a lot of
-> > > > > inquiry replies is received. My app stores the inquired devices in a
-> > > > > hash table and when the InquiryCompleted signal is received the app
-> > > > > request the name for each device. The "hci_send_req" function is
-> > > > > returning an Input/Output error. Looking the hcidump result, the
-> > > > > "Command Disallowed" error is displayed :(
-> > > > >
-> > > > > HCIDUMP:
-> > > > > > HCI Event: Command Status (0x0f) plen 4
-> > > > >     Remote Name Request (0x01|0x0019) status 0x0c ncmd 1
-> > > > >     Error: Command Disallowed
-> > > > >  <<<<<Indicates that the controller is in a state where it can process
-> > > > > this command at this time.>>>>
-> > > > >
-> > > > > I noticed the same problem using the hcitool with "--flush" option and
-> > > > > removing the cached device information stored in the directory
-> > > > > "/var/lib/bluetooth".
-> > > >
-> > > > What kind of chip is in your dongle? Do you wait until the remote name
-> > > > complete event before asking for the next name? Every name request needs
-> > > > at least a partial baseband connection.
-> > >
-> > > Dongle - D-Link DBT-122
-> > >         Class: 0x3e0100
-> > >         Service Classes: Networking, Rendering, Capturing
-> > >         Device Class: Computer, Uncategorized
-> > >         HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
-> > >         Manufacturer: Broadcom Corporation (15)
-> > >
-> > > Yes, I am waiting for the RemoteNameComplete signal, for this case it
-> > > works fine. But I am testing simultaneous request. BlueZ D-Bus client
-> > > developers should not care about listen for RemoteNameComplete event
-> > > before send another request. We can try define a queue for
-> > > simultaneous request.  What do you think? What are the other
-> > > operations that we will find the same problem?
-> >
-> > You will always see this problem if the establishment of baseband
-> > connection is needed, meaning if you create an ACL link.
-> >
-> > The good thing is that extended inquiry will solve this almost, but for
-> > older devices the only possibility is to retrieve the name from a cache
-> > or queue the commands.
-> 
-> I know that the cache is available at:
-> /var/lib/bluetooth/AA:BB:CC:DD:EE:FF/names
-> 
-> I will analize this issue better in order to try improve the D-Bus
-> request name.
+------_=_NextPart_002_01C5F76E.6DEAC5FB
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-It is not worth it. This is a limitation we have to live with.
+Hi Marcel,
+Thanks for the response. I am using RFMD chipset, but I don't think it
+matters. The reason I need vendor specific commands/events support is
+for cases where there is no non volatile memory present and the host
+needs to send down configurations using vendor specific commands. An
+example of such a case would be mobile phone environment, where the host
+uses these to do simple things like write Bluetooth address or
+complicated things like configure registers.
+I know that general framework for these commands/events are already
+supported, but what I am trying to find is the right place to do this
+(which is the first thing that should  happen) and for that I am trying
+to understand the BlueZ model.
 
-> > > I will submit a patch to improve the remote name in order to consider
-> > > the clock offset and page scan parameters.
-> >
-> > Don't expose these commands over the D-Bus interface. We don't wanna
-> > deal with them there, because they should be internal only.
-> 
-> Is there a way to retrieve the clock offset and the page scan
-> parameters inside the hcid?
+Thanks,
+Jatin=20
 
-You can cache the inquiry results like the kernel is doing it.
 
-> ps: the inquiry result(clock offset and page scan parameters) is not
-> being cached before send the D-Bus signals.
-> Do you have any idea of how expensive is request the name without
-> consider the clock offset and page scan parameters?
 
-This depends on the firmware inside the chip. I still think that newer
-CSR firmwares are caching these values and replacing them internally
-when needed. However this is only speculation.
+From: Marcel Holtmann <marcel@ho...>=20
+/mailarchive/message.php?msg_id=3D14048991 <<Picture (Metafile)>> Re:
+vendor specific commands </mailarchive/message.php?msg_id=3D14048991> =20
+2005-12-02 00:46 =09
+Hi Jatin,
+
+> I want to add support for few vendor specific commands to BlueZ, was
+> wondering whats the best place in the source code to do that? I want
+> to perform some hardware configuration before any other initialization
+> happens.
+> =20
+> I am also trying to understand general BlueZ architecture for any
+> enhancements or customizations, what would be the best place to start
+> (I have been  looking at the code, but do not completely understand it
+> especially the startup part).
+> =20
+> Also wondering whats BlueZ's policy regarding support for vendor
+> specific commands/events? Is it possible to submit modifications for a
+> particular vendor and get that incorporated in standard distributions.
+
+this depends on, but in general it is no problem. However the Bluetooth
+core inside the Linux kernel stays vendor free at any price. But you
+should don't ask vague questions. Tell us what hardware you are talking
+about and what vendor specific stuff is needed in detail.
 
 Regards
 
-Marcel
+Marcel=09
 
 
+
+------_=_NextPart_002_01C5F76E.6DEAC5FB
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+6.5.7226.0">
+<TITLE>Vendor Specific Commands</TITLE>
+</HEAD>
+<BODY>
+<!-- Converted from text/rtf format -->
+
+<P><FONT SIZE=3D2 FACE=3D"Times New Roman">Hi Marcel,</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Times New Roman">Thanks for the response. I =
+am using RFMD chipset, but I don't think it matters. The reason I need =
+vendor specific commands/events support is for cases where there is no =
+non volatile memory present and the host needs to send down =
+configurations using vendor specific commands. An example of such a case =
+would be mobile phone environment, where the host uses these to do =
+simple things like write Bluetooth address or complicated things like =
+configure registers.</FONT></P>
+
+<P><FONT SIZE=3D2 FACE=3D"Times New Roman">I know that general framework =
+for these commands/events are already supported, but what I am trying to =
+find is the right place to do this (which is the first thing that =
+should&nbsp; happen) and for that I am trying to understand the BlueZ =
+model.</FONT></P>
+
+<P><FONT SIZE=3D2 FACE=3D"Times New Roman">Thanks,</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Times New Roman">Jatin </FONT>
+</P>
+<BR>
+<BR>
+
+<P><FONT FACE=3D"Times New Roman">From: Marcel Holtmann =
+&lt;marcel@ho...&gt;<BR>
+/mailarchive/message.php?msg_id=3D14048991</FONT><FONT FACE=3D"Arial" =
+SIZE=3D2 COLOR=3D"#000000">
+<IMG SRC=3D"No%20AttachName" alt=3D"Picture =
+(Metafile)"></FONT><B></B><B></B><B></B><A =
+HREF=3D"file:///mailarchive/message.php?msg_id=3D14048991"><B><U><FONT =
+COLOR=3D"#0000FF" FACE=3D"Times New Roman">Re: vendor specific =
+commands</FONT></U></B></A><B></B><FONT FACE=3D"Times New Roman"><BR>
+2005-12-02 00:46 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR>
+</FONT><FONT SIZE=3D2 FACE=3D"Courier New">Hi Jatin,</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Courier New">&gt; I want to add support for =
+few vendor specific commands to BlueZ, was</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">&gt; wondering whats the best =
+place in the source code to do that? I want</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">&gt; to perform some hardware =
+configuration before any other initialization</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">&gt; happens.</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">&gt;&nbsp; </FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">&gt; I am also trying to =
+understand general BlueZ architecture for any</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">&gt; enhancements or =
+customizations, what would be the best place to start</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">&gt; (I have been&nbsp; looking =
+at the code, but do not completely understand it</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">&gt; especially the startup =
+part).</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">&gt;&nbsp; </FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">&gt; Also wondering whats =
+BlueZ's policy regarding support for vendor</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">&gt; specific commands/events? =
+Is it possible to submit modifications for a</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">&gt; particular vendor and get =
+that incorporated in standard distributions.</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Courier New">this depends on, but in general =
+it is no problem. However the Bluetooth</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">core inside the Linux kernel =
+stays vendor free at any price. But you</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">should don't ask vague =
+questions. Tell us what hardware you are talking</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Courier New">about and what vendor specific =
+stuff is needed in detail.</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Courier New">Regards</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Courier New">Marcel&nbsp;<BR>
+</FONT>
+</P>
+
+</BODY>
+</HTML>
+------_=_NextPart_002_01C5F76E.6DEAC5FB--
+
+------_=_NextPart_001_01C5F76E.6DEAC5FB
+Content-Type: image/bmp;
+	name="ole0.bmp"
+Content-Transfer-Encoding: base64
+Content-Description: Picture (Metafile)
+Content-Location: No%20AttachName
+
+Qk1qAAAAAAAAADoAAAAoAAAACgAAAAwAAAABAAEAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAA////
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+
+------_=_NextPart_001_01C5F76E.6DEAC5FB--
 
 
 -------------------------------------------------------
