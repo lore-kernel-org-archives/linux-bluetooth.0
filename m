@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4390A648.1050506@csr.com>
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] more sdp patches
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] sdp seq of raw data
-References: <1133429978.1037.22.camel@panic>	 <1133430940.1190.28.camel@blade>  <1133431401.1037.33.camel@panic>	 <1133433996.1190.48.camel@blade>  <1133436216.1037.35.camel@panic>	 <1133436800.1190.62.camel@blade>  <1133437800.1037.40.camel@panic> <1133552576.24022.0.camel@blade>
-In-Reply-To: <1133552576.24022.0.camel@blade>
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1133509258.15695.8.camel@panic>
+References: <1133509258.15695.8.camel@panic>
+Content-Type: text/plain
+Message-Id: <1133552877.24022.5.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,21 +18,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 02 Dec 2005 19:53:44 +0000
+Date: Fri, 02 Dec 2005 20:47:57 +0100
 
-Marcel Holtmann wrote:
->                     ... what does leng stands for? ...
+Hi Collin,
 
-The Plateau of Leng appears in the work of H.P. Lovecraft and is
-inhabited by terrible monsters. Does that help :-)
+> here is another patch for bluez-libs for sdp. I added:
+> 
+> int sdp_set_access_protos_attr(sdp_record_t *rec, const sdp_list_t
+> *proto, const uint16_t attr);
+> 
+> this is to add stuff like SDP_ATTR_ADD_PROTO_DESC_LIST, actually I
+> modified sdp_set_access_protos to take another parameter and made
+> sdp_set_access_protos do a call to sdp_set_access_protos_attr to keep
+> backward compatibility
 
-See http://en.wikipedia.org/wiki/Plateau_of_Leng
+this won't work, because the additional protocol descriptor list is a
+sequence of sequence of sequence. Compare this from my HCRP capable
+printer:
 
-	- Steven
--- 
+Attribute 0x0004 - ProtocolDescriptorList
+        Sequence
+                Sequence
+                        UUID16 0x0100 - L2CAP
+                        UINT16 0x1003
+                Sequence
+                       UUID16 0x0012 - HardcopyControlChannel
+
+Attribute 0x000d - AdditionalProtocolDescriptorLists
+        Sequence
+                Sequence
+                        Sequence
+                                UUID16 0x0100 - L2CAP
+                                UINT16 0x1001
+                        Sequence
+                                UUID16 0x0014 - HardcopyDataChannel
 
 
-This message has been scanned for viruses by BlackSpider MailControl - www.blackspider.com
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
