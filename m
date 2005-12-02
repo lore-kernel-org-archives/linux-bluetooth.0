@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4390D50F.9020208@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <20051203000701.qx95jgmadj5wkcso@admin.betaversion.net>
+From: "Collin R. Mulliner" <collin@betaversion.net>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SBC Decoder Performance
-References: <20051018062749.78971.qmail@web34106.mail.mud.yahoo.com>	 <4389D1EC.4070703@xmission.com> <1133116270.13629.3.camel@blade>	 <438A22EE.1020504@xmission.com> <1133128269.13629.24.camel@blade> <438A3135.6080208@xmission.com>
-In-Reply-To: <438A3135.6080208@xmission.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [Bluez-devel] more sdp patches
+References: <1133509258.15695.8.camel@panic>
+	<1133552877.24022.5.camel@blade>
+In-Reply-To: <1133552877.24022.5.camel@blade>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset=ISO-8859-1;
+	format="flowed"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,23 +21,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 02 Dec 2005 16:13:19 -0700
+Date: Sat, 03 Dec 2005 00:07:01 +0100
 
 Marcel,
 
-> it's ugly, but what should it look like? it doesn't look much better by
-> removing floating from the list.
+Quoting Marcel Holtmann <marcel@holtmann.org>:
+> this won't work, because the additional protocol descriptor list is a
+> sequence of sequence of sequence. Compare this from my HCRP capable
+> printer:
 
-Unfortunately I've been noticing a difference in quality between fixed
-and floating. It is subtle, but high-frequency content is harsh and a
-little distorted with the fixed point encoder. I could encode some
-violin notes if you want to hear the difference.
+ah mmmh the code I send in works for me, so maybe it's just unclean :-(
 
-It would be nice to implement the objective quality measures suggested
-by Steven Singer so we could track this down more that's another thing
-on the todo list for now.
+About the "leng" issue, I thought you would tweak my patch anyway so I didn't
+bothered making it nice ... sorry!
 
-Brad
+
+... Collin
+
+
 
 
 -------------------------------------------------------
