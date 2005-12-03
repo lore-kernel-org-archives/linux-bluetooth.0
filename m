@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4391A0A9.5090706@ncoretech.com>
-From: Zaheer Ahamed <zaheer@ncoretech.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sf.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] sdpd deamon fails to start.
+Subject: Re: [Bluez-devel] more sdp patches
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20051203000701.qx95jgmadj5wkcso@admin.betaversion.net>
+References: <1133509258.15695.8.camel@panic>
+	 <1133552877.24022.5.camel@blade>
+	 <20051203000701.qx95jgmadj5wkcso@admin.betaversion.net>
+Content-Type: text/plain
+Message-Id: <1133586906.31106.12.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,27 +20,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 03 Dec 2005 19:12:01 +0530
+Date: Sat, 03 Dec 2005 06:15:06 +0100
 
-Hello All,
+Hi Collin,
 
-I have installed the bluez utilities on my embedded linux system.
-However when I start "sdpd" I get the following error.
+> > this won't work, because the additional protocol descriptor list is a
+> > sequence of sequence of sequence. Compare this from my HCRP capable
+> > printer:
+> 
+> ah mmmh the code I send in works for me, so maybe it's just unclean :-(
 
-Jan 31 03:32:31 Simputer daemon.info hcid[1298]: Bluetooth HCI daemon
-Jan 31 03:32:31 Simputer daemon.info hcid[1298]: HCI dev 0 up
-Jan 31 03:32:31 Simputer daemon.info hcid[1298]: Starting security manager 0
-Jan 31 03:32:33 Simputer daemon.err sdpd[1369]: init_server: binding 
-UNIX socket: No such file or directory
-Jan 31 03:32:33 Simputer daemon.err sdpd[1369]: main: Server 
-initialization failed
+show me how you use it.
 
-Can anyone point out to any missing steps.
-also can any body guide me to a documentation for using ObexFtp.
+> About the "leng" issue, I thought you would tweak my patch anyway so I didn't
+> bothered making it nice ... sorry!
 
-Warm Regards,
+Make it looks nice and re-send it. I like nice looking patches ;)
 
-Zaheer.
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
