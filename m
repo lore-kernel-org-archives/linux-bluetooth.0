@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sdpd deamon fails to start.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-Cc: bluez-devel@lists.sf.net
-In-Reply-To: <4391A0A9.5090706@ncoretech.com>
-References: <4391A0A9.5090706@ncoretech.com>
-Content-Type: text/plain
-Message-Id: <1133617090.31106.41.camel@blade>
-Mime-Version: 1.0
+Message-ID: <4391A0A9.5090706@ncoretech.com>
+From: Zaheer Ahamed <zaheer@ncoretech.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sf.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] sdpd deamon fails to start.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,29 +16,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 03 Dec 2005 14:38:10 +0100
+Date: Sat, 03 Dec 2005 19:12:01 +0530
 
-Hi Zaheer,
+Hello All,
 
-> I have installed the bluez utilities on my embedded linux system.
-> However when I start "sdpd" I get the following error.
-> 
-> Jan 31 03:32:31 Simputer daemon.info hcid[1298]: Bluetooth HCI daemon
-> Jan 31 03:32:31 Simputer daemon.info hcid[1298]: HCI dev 0 up
-> Jan 31 03:32:31 Simputer daemon.info hcid[1298]: Starting security manager 0
-> Jan 31 03:32:33 Simputer daemon.err sdpd[1369]: init_server: binding 
-> UNIX socket: No such file or directory
-> Jan 31 03:32:33 Simputer daemon.err sdpd[1369]: main: Server 
-> initialization failed
+I have installed the bluez utilities on my embedded linux system.
+However when I start "sdpd" I get the following error.
 
-it wants to create a Unix domain socket at /var/run/sdp and it must have
-permissions for that.
+Jan 31 03:32:31 Simputer daemon.info hcid[1298]: Bluetooth HCI daemon
+Jan 31 03:32:31 Simputer daemon.info hcid[1298]: HCI dev 0 up
+Jan 31 03:32:31 Simputer daemon.info hcid[1298]: Starting security manager 0
+Jan 31 03:32:33 Simputer daemon.err sdpd[1369]: init_server: binding 
+UNIX socket: No such file or directory
+Jan 31 03:32:33 Simputer daemon.err sdpd[1369]: main: Server 
+initialization failed
 
-Regards
+Can anyone point out to any missing steps.
+also can any body guide me to a documentation for using ObexFtp.
 
-Marcel
+Warm Regards,
 
-
+Zaheer.
 
 
 -------------------------------------------------------
