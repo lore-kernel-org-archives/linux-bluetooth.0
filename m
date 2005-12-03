@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4391B105.9060403@ncoretech.com>
-From: Zaheer Ahamed <zaheer@ncoretech.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] sdpd deamon fails to start.
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] obex command timing out.Unable to connect to sdpd server.
+In-Reply-To: <4391A6DF.4090603@ncoretech.com>
+References: <4391A0A9.5090706@ncoretech.com>
+	 <1133617090.31106.41.camel@blade>  <4391A6DF.4090603@ncoretech.com>
+Content-Type: text/plain
+Message-Id: <1133618956.31106.43.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,32 +19,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 03 Dec 2005 20:21:49 +0530
+Date: Sat, 03 Dec 2005 15:09:16 +0100
 
-Hello All,
+Hi Zaheer,
 
-After making the correction, the "sdpd" server starts up  successfully.
-Now when I try out the commands with obexftp  I get the error below,
-In the second case the device seems to get disconnected.
+> Can anybody point out to a step-by-step guide to use Obex-Ftp.
 
-*obexftp -b -l /root*
-Scanning ...
-Using   00:0B:0D:61:79:BE       BlueZ (0)
-Failed to connect to SDP server: Connection timed out
+what about a new email with the correct subject?
 
-or
-*obexftp -b -l*
-Scanning ...
-Using   00:0B:0D:61:79:BE       BlueZ (0)
-usb.c: USB disconnect on device <NULL>-1 address 4
-Failed to connect to SDP server: Software caused connection abort
+Regards
 
+Marcel
 
-A request to all for any step-by-step guide to Obexftp with Bluetooth.
-
-Warm Regards,
-
-Zaheer.
 
 
 
