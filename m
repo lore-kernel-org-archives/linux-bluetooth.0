@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] more sdp patches
+Subject: Re: [Bluez-devel] SBC Decoder Performance
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20051203000701.qx95jgmadj5wkcso@admin.betaversion.net>
-References: <1133509258.15695.8.camel@panic>
-	 <1133552877.24022.5.camel@blade>
-	 <20051203000701.qx95jgmadj5wkcso@admin.betaversion.net>
+In-Reply-To: <4390D50F.9020208@xmission.com>
+References: <20051018062749.78971.qmail@web34106.mail.mud.yahoo.com>
+	 <4389D1EC.4070703@xmission.com> <1133116270.13629.3.camel@blade>
+	 <438A22EE.1020504@xmission.com> <1133128269.13629.24.camel@blade>
+	 <438A3135.6080208@xmission.com>  <4390D50F.9020208@xmission.com>
 Content-Type: text/plain
-Message-Id: <1133586906.31106.12.camel@blade>
+Message-Id: <1133587030.31106.15.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,22 +21,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 03 Dec 2005 06:15:06 +0100
+Date: Sat, 03 Dec 2005 06:17:10 +0100
 
-Hi Collin,
+Hi Brad,
 
-> > this won't work, because the additional protocol descriptor list is a
-> > sequence of sequence of sequence. Compare this from my HCRP capable
-> > printer:
+> > it's ugly, but what should it look like? it doesn't look much better by
+> > removing floating from the list.
 > 
-> ah mmmh the code I send in works for me, so maybe it's just unclean :-(
+> Unfortunately I've been noticing a difference in quality between fixed
+> and floating. It is subtle, but high-frequency content is harsh and a
+> little distorted with the fixed point encoder. I could encode some
+> violin notes if you want to hear the difference.
 
-show me how you use it.
+no need to. I believe you if you say so. Anyhow I still think that there
+is no need to keep a floating point encoder/decoder.
 
-> About the "leng" issue, I thought you would tweak my patch anyway so I didn't
-> bothered making it nice ... sorry!
+> It would be nice to implement the objective quality measures suggested
+> by Steven Singer so we could track this down more that's another thing
+> on the todo list for now.
 
-Make it looks nice and re-send it. I like nice looking patches ;)
+Keep up the good work.
 
 Regards
 
