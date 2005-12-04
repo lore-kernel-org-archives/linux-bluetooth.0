@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <43932DE9.8050900@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: sean <seandarcy2@gmail.com>
-Message-ID: <dmvc45$5gn$1@sea.gmane.org>
+Subject: Re: [Bluez-users] Cellink BTA-6030 adapter of choice? usb & bt 2.0
 References: <dmtgch$4g9$1@sea.gmane.org> <1133681661.4427.0.camel@blade>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
 In-Reply-To: <1133681661.4427.0.camel@blade>
-Subject: [Bluez-users] Re: Cellink BTA-6030 adapter of choice? usb & bt 2.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,60 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 04 Dec 2005 13:21:56 -0500
+Date: Sun, 04 Dec 2005 10:56:57 -0700
 
-Marcel Holtmann wrote:
-> Hi Sean,
-> 
-> 
+Guys
+
 >>I'm looking for a bt usb Class 1 dongle with usb 2.0 and bt 2.0.
 >>
 >>I've gooten burned buying a zonet dongle which had a 
->>broadcom chip. Won't work with bluez.
->>
->>Anyone have this one working. It's supposed to hace the CSR 
->>BLue4 chip. Is that supported?
->>
->>Any other adapters out there that work with bluez?
-> 
-> 
+>>broadcom chip.
+
 > look at http://www.holtmann.org/linux/bluetooth/edr.html and the Cellink
 > is no longer the best EDR dongle, but it was the first.
-> 
-> Regards
-> 
-> Marcel
-> 
 
-Great.
+fwiw, if you're shopping in the US, you may find the only one in that
+list that is available currently is the broadcom-based card (anycom)
+which was the reason the original poster is still looking...
 
-Four listed:
-
-Cellink
-
-ANYCOM Blue USB-200/250 Bluetooth Dongle
-
-B-Speech Data Speed Bluetooth Dongle
-
-Level1 MDU-0025USB Bluetooth Dongle
-
-
-The ANYCOM dongle uses a Broadcom chip.  Will this work with 
-bluez?
-
-I couldn't find the B-Speech or the Level1 for sale in the 
-US. I can order the Level1 from the UK.
-
-I can't find the B-Speech available online anywhere.  Though 
-my school boy German may be to blame :)
-
-It looks like B-Speech is the preferred choice, and Level1 
-second.
-
-Any suggestions? Will ANYCOM work? Any url's for b-speech?
-
-sean
-
+brad
 
 
 -------------------------------------------------------
