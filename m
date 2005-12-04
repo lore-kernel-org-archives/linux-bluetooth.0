@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hcid errors
+Subject: Re: [Bluez-users] Cellink BTA-6030 adapter of choice? usb & bt 2.0
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200512032308.50356.mgorbach@yahoo.com>
-References: <20051204040506.D045A9426E@sc8-sf-spam1.sourceforge.net>
-	 <200512032308.50356.mgorbach@yahoo.com>
+In-Reply-To: <dmtgch$4g9$1@sea.gmane.org>
+References: <dmtgch$4g9$1@sea.gmane.org>
 Content-Type: text/plain
-Message-Id: <1133681788.4427.3.camel@blade>
+Message-Id: <1133681661.4427.0.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,14 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 04 Dec 2005 08:36:28 +0100
+Date: Sun, 04 Dec 2005 08:34:21 +0100
 
-Hi Michael,
+Hi Sean,
 
-> I'm using bluez-utils 2.22 on gentoo linux 2005.0.
+> I'm looking for a bt usb Class 1 dongle with usb 2.0 and bt 2.0.
+> 
+> I've gooten burned buying a zonet dongle which had a 
+> broadcom chip. Won't work with bluez.
+> 
+> Anyone have this one working. It's supposed to hace the CSR 
+> BLue4 chip. Is that supported?
+> 
+> Any other adapters out there that work with bluez?
 
-why don't you use the thread you started? Replying to the digest is not
-useful for anybody, because every answer will be out of context.
+look at http://www.holtmann.org/linux/bluetooth/edr.html and the Cellink
+is no longer the best EDR dongle, but it was the first.
 
 Regards
 
