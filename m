@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051205083440.79581.qmail@web32414.mail.mud.yahoo.com>
-From: Arch Sayo <a12chi@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <43937075.7080703@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-578106633-1133771680=:79534"
-Subject: [Bluez-users] Did not proceed with 2nd OBEX Connect request
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Re: Cellink BTA-6030 adapter of choice? usb & bt
+ 2.0
+References: <dmtgch$4g9$1@sea.gmane.org> <1133681661.4427.0.camel@blade> <dmvc45$5gn$1@sea.gmane.org>
+In-Reply-To: <dmvc45$5gn$1@sea.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,58 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 5 Dec 2005 00:34:40 -0800 (PST)
+Date: Sun, 04 Dec 2005 15:40:53 -0700
 
---0-578106633-1133771680=:79534
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+sean
 
-Hi Marcel,
-   
-  Yes, you're right. There was no OBEX Connect request following the SDP service request. What I was trying to ask is that supposed to be, there is another OBEX Connect request following the SDP service request. However as you have seen in the hcidump trace, this did not happen. The normal flow of the Bluetooth transaction on the client side is that after the SDP service request, there will be a 2nd OBEX Connect request (without a prior OBEX Disconnect request for the 1st OBEX Connect request). In this regard, is there something in BlueZ that prevents this from happening?
-   
-  Thank you so much,
-  Arch
-   
-  > Supposedly, after the L2CAP disconnection, the 
-Bluetooth device
-> (mobile phone) will issue another OBEX Connect 
-Request. However, as
-> you may see in this trace, the 2nd OBEX Connect 
-Request was not
-> issued. I hope to know more about what happened to 
-the connection and
-> why doesn't the transaction proceed.
+> The ANYCOM dongle uses a Broadcom chip.  Will this work with bluez?
 
-the first L2CAP is to PSM 3 to establish the RFCOMM 
-connection and then
-it establishes the OBEX connection on channel 5. The 
-second L2CAP is to
-PSM 1 for an SDP service request. There are no 
-multiple OBEX connection
-requests.
+it will, with the exception of sco audio.
 
-Regards
+> I couldn't find the B-Speech or the Level1 for sale in the US. I can
+> order the Level1 from the UK.
+> 
+> I can't find the B-Speech available online anywhere.  Though my school
+> boy German may be to blame :)
+> 
+> It looks like B-Speech is the preferred choice, and Level1 second.
+> 
+> Any suggestions? Will ANYCOM work? Any url's for b-speech?
 
-Marcel
-  
- 
+hmm. if you found level1 for export from the uk that's the best bet. i'm
+not in a hurry so i'll wait to see a domestic US offering.
 
-		
----------------------------------
- Yahoo! Personals
- Skip the bars and set-ups and start using Yahoo! Personals for free
---0-578106633-1133771680=:79534
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-<div>Hi Marcel,</div>  <div>&nbsp;</div>  <div>Yes, you're right. There was no OBEX&nbsp;Connect request&nbsp;following the SDP service request. What I was trying to ask is that <STRONG>supposed to be</STRONG>, there is another OBEX Connect request following the SDP service request. However as you have seen in the hcidump trace, this did not happen. The normal flow of the Bluetooth transaction on the client side is that after the SDP service request, there will be a 2nd OBEX Connect request (without a prior OBEX Disconnect request for the 1st OBEX Connect request). In this regard, is there something in BlueZ that prevents this from happening?</div>  <div>&nbsp;</div>  <div>Thank you so much,</div>  <div>Arch</div>  <div>&nbsp;</div>  <div>&gt; Supposedly, after the L2CAP disconnection, the <BR>Bluetooth device<BR>&gt; (mobile phone) will issue another OBEX Connect <BR>Request. However, as<BR>&gt; you may see in this trace, the 2nd OBEX Connect <BR>Request was not<BR>&gt; issu
- ed. I
- hope to know more about what happened to <BR>the connection and<BR>&gt; why doesn't the transaction proceed.<BR><BR>the first L2CAP is to PSM 3 to establish the RFCOMM <BR>connection and then<BR>it establishes the OBEX connection on channel 5. The <BR>second L2CAP is to<BR>PSM 1 for an SDP service request. There are no <BR>multiple OBEX connection<BR>requests.<BR><BR>Regards<BR><BR>Marcel</div>  <div><BR>&nbsp;</div><p>
-		<hr size=1> <B>Yahoo! Personals</B><BR> 
-Skip the bars and set-ups and <a href="http://us.rd.yahoo.com/evt=36107/*http://personals.yahoo.com/us/reg/free7days 
-">start using Yahoo! Personals for free</a>
---0-578106633-1133771680=:79534--
+brad
 
 
 -------------------------------------------------------
