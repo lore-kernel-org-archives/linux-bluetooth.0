@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43932DE9.8050900@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] hcid errors
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Cellink BTA-6030 adapter of choice? usb & bt 2.0
-References: <dmtgch$4g9$1@sea.gmane.org> <1133681661.4427.0.camel@blade>
-In-Reply-To: <1133681661.4427.0.camel@blade>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <200512032308.50356.mgorbach@yahoo.com>
+References: <20051204040506.D045A9426E@sc8-sf-spam1.sourceforge.net>
+	 <200512032308.50356.mgorbach@yahoo.com>
+Content-Type: text/plain
+Message-Id: <1133681788.4427.3.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,23 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 04 Dec 2005 10:56:57 -0700
+Date: Sun, 04 Dec 2005 08:36:28 +0100
 
-Guys
+Hi Michael,
 
->>I'm looking for a bt usb Class 1 dongle with usb 2.0 and bt 2.0.
->>
->>I've gooten burned buying a zonet dongle which had a 
->>broadcom chip.
+> I'm using bluez-utils 2.22 on gentoo linux 2005.0.
 
-> look at http://www.holtmann.org/linux/bluetooth/edr.html and the Cellink
-> is no longer the best EDR dongle, but it was the first.
+why don't you use the thread you started? Replying to the digest is not
+useful for anybody, because every answer will be out of context.
 
-fwiw, if you're shopping in the US, you may find the only one in that
-list that is available currently is the broadcom-based card (anycom)
-which was the reason the original poster is still looking...
+Regards
 
-brad
+Marcel
+
+
 
 
 -------------------------------------------------------
