@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Power Transmit Level
+Subject: Re: [Bluez-devel] hcitool feature patch
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <000801c5f9a8$c9c6fb50$44cfd29b@MONFLORITE>
-References: <000801c5f9a8$c9c6fb50$44cfd29b@MONFLORITE>
+In-Reply-To: <ef9938ec0512051044sc3b9cb4y535e2d709f87d714@mail.gmail.com>
+References: <43948373.9080606@masaka.cs.ohiou.edu>
+	 <ef9938ec0512051044sc3b9cb4y535e2d709f87d714@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1133818276.4559.2.camel@localhost.localdomain>
+Message-Id: <1133818210.4559.0.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,20 +19,14 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 05 Dec 2005 22:31:16 +0100
+Date: Mon, 05 Dec 2005 22:30:09 +0100
 
-Hi Israel,
+Hi Albert,
 
-> I am using bluez-libs and utils 2.22 to measure the current transmit
-> power level in my application. I get good results when the power level
-> is over zero, but when a negative value should be returned, I get
-> extremly high values instead; for example, 250. 
-> My opinion is that this value is treated as unsigned integer when it
-> is a signed integer. I am running on Debian, in case it matters.
-> If somebody has observed the same, please tell me so. I don't
-> know whether the problem is in my computer or in the stack.
+> better might be to patch the bluez-libs and then patch hcitool to call
+> a library function.
 
-take a look at the source code and the Bluetooth specification.
+correct and please use unified diffs.
 
 Regards
 
