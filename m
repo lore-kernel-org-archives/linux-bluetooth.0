@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec0512050819s3a34e44fic3256a56fdda3907@mail.gmail.com>
-From: Albert Huang <ashuang@gmail.com>
+Message-ID: <9d47cfd0512050808y8eee708maa10fca8f1cc7f4a@mail.gmail.com>
+From: Abu hasnat Sayem <ahsayem@gmail.com>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Encryption
-In-Reply-To: <9d47cfd0512050808y8eee708maa10fca8f1cc7f4a@mail.gmail.com>
+In-Reply-To: <1133500233.15695.3.camel@panic>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_30905_16361732.1133799582418"
+	boundary="----=_Part_36336_31025273.1133798925948"
 References: <9d47cfd0512011325x4de6e0a6wbd78806c2072dc5f@mail.gmail.com>
 	 <1133500233.15695.3.camel@panic>
-	 <9d47cfd0512050808y8eee708maa10fca8f1cc7f4a@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,139 +20,104 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 5 Dec 2005 11:19:42 -0500
+Date: Mon, 5 Dec 2005 10:08:45 -0600
 
-------=_Part_30905_16361732.1133799582418
+------=_Part_36336_31025273.1133798925948
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-replace L2CAP_LM_ENCRYPT with RFCOMM_LM_ENCRYPT, etc...
-also see dund
+Collin,
 
--albert
+pand does it at the L2CAP level, i am working to provide encryption at the
+RFCOMM level..
+Is it possible to do so via some function calls...
 
-On 12/5/05, Abu hasnat Sayem <ahsayem@gmail.com> wrote:
+Abu
+
+
+On 12/1/05, Collin R. Mulliner <collin@betaversion.net> wrote:
 >
-> Collin,
+> Hi Abu,
 >
-> pand does it at the L2CAP level, i am working to provide encryption at th=
-e
-> RFCOMM level..
-> Is it possible to do so via some function calls...
+> On Thu, 2005-12-01 at 15:25 -0600, Abu hasnat Sayem wrote:
+> > I am working on doing Encryption and Authentication at the RFCOMM and
+> > L2CAP level using BlueZ. I would like to know if there exists certain
+> > function calls to accompolish it or i have to incorporate new code in
+> > it.
 >
-> Abu
+> this is done via setsockopt(2), take a look at:
+> /usr/src/bluez-utils-2.22/pand/main.c (search for SECURE)
+>
+> or check sobexsrv (http://www.mulliner.org/bluetooth/sobexsrv.php)
+>
+> ... Collin
+>
+> --
+> Collin R. Mulliner <collin@betaversion.net>
+> BETAVERSiON Systems [www.betaversion.net]
+> info/pgp: finger collin@betaversion.net
+> Don't talk just code!
 >
 >
-> On 12/1/05, Collin R. Mulliner <collin@betaversion.net> wrote:
-> >
-> > Hi Abu,
-> >
-> > On Thu, 2005-12-01 at 15:25 -0600, Abu hasnat Sayem wrote:
-> > > I am working on doing Encryption and Authentication at the RFCOMM and
-> > > L2CAP level using BlueZ. I would like to know if there exists certain
-> > > function calls to accompolish it or i have to incorporate new code in
-> > > it.
-> >
-> > this is done via setsockopt(2), take a look at:
-> > /usr/src/bluez-utils-2.22/pand/main.c (search for SECURE)
-> >
-> > or check sobexsrv (http://www.mulliner.org/bluetooth/sobexsrv.php)
-> >
-> > ... Collin
-> >
-> > --
-> > Collin R. Mulliner <collin@betaversion.net>
-> > BETAVERSiON Systems [www.betaversion.net]
-> > info/pgp: finger collin@betaversion.net
-> > Don't talk just code!
-> >
-> >
-> >
-> > -------------------------------------------------------
-> > This SF.net email is sponsored by: Splunk Inc. Do you grep through log
-> > files
-> > for problems?  Stop!  Download the new AJAX search engine that makes
-> > searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> > http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
-> > _______________________________________________
-> > Bluez-devel mailing list
-> > Bluez-devel@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> >
 >
+> -------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc. Do you grep through log
+> files
+> for problems?  Stop!  Download the new AJAX search engine that makes
+> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+> http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 >
 
-------=_Part_30905_16361732.1133799582418
+------=_Part_36336_31025273.1133798925948
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-replace L2CAP_LM_ENCRYPT with RFCOMM_LM_ENCRYPT, etc...<br>
-also see dund<br>
-<br>
--albert<br><br><div><span class=3D"gmail_quote">On 12/5/05, <b class=3D"gma=
-il_sendername">Abu hasnat Sayem</b> &lt;<a href=3D"mailto:ahsayem@gmail.com=
-">ahsayem@gmail.com</a>&gt; wrote:</span><blockquote class=3D"gmail_quote" =
-style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8=
-ex; padding-left: 1ex;">
 <div>Collin,</div>
 <div>&nbsp;</div>
 <div>pand does it at the L2CAP level, i am working to provide encryption at=
  the RFCOMM level..</div>
-<div>Is it possible to do so via some function calls...</div><span class=3D=
-"sg">
+<div>Is it possible to do so via some function calls...</div>
 <div>&nbsp;</div>
-<div>Abu<br><br>&nbsp;</div></span><div><span class=3D"e" id=3D"q_107fbaf32=
-35b607c_2">
+<div>Abu<br><br>&nbsp;</div>
 <div><span class=3D"gmail_quote">On 12/1/05, <b class=3D"gmail_sendername">=
-Collin R. Mulliner</b> &lt;<a href=3D"mailto:collin@betaversion.net" target=
-=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,event,this)">collin=
-@betaversion.net
-</a>&gt; wrote:</span>
-<blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(204, =
-204, 204); margin: 0px 0px 0px 0.8ex; padding-left: 1ex;">Hi Abu,<br><br>On=
- Thu, 2005-12-01 at 15:25 -0600, Abu hasnat Sayem wrote:<br>&gt; I am worki=
-ng on doing Encryption and Authentication at the RFCOMM and
+Collin R. Mulliner</b> &lt;<a href=3D"mailto:collin@betaversion.net">collin=
+@betaversion.net</a>&gt; wrote:</span>
+<blockquote class=3D"gmail_quote" style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0=
+px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Hi Abu,<br><br>On Thu, 2005-12-0=
+1 at 15:25 -0600, Abu hasnat Sayem wrote:<br>&gt; I am working on doing Enc=
+ryption and Authentication at the RFCOMM and
 <br>&gt; L2CAP level using BlueZ. I would like to know if there exists cert=
 ain<br>&gt; function calls to accompolish it or i have to incorporate new c=
 ode in<br>&gt; it.<br><br>this is done via setsockopt(2), take a look at:
 <br>/usr/src/bluez-utils-2.22/pand/main.c (search for SECURE)<br><br>or che=
-ck sobexsrv (<a href=3D"http://www.mulliner.org/bluetooth/sobexsrv.php" tar=
-get=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,event,this)">htt=
-p://www.mulliner.org/bluetooth/sobexsrv.php
-</a>)<br><br>... Collin<br><br>
---<br>Collin R. Mulliner &lt;<a href=3D"mailto:collin@betaversion.net" targ=
-et=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,event,this)">coll=
+ck sobexsrv (<a href=3D"http://www.mulliner.org/bluetooth/sobexsrv.php">htt=
+p://www.mulliner.org/bluetooth/sobexsrv.php</a>)<br><br>... Collin<br><br>
+--<br>Collin R. Mulliner &lt;<a href=3D"mailto:collin@betaversion.net">coll=
 in@betaversion.net</a>&gt;<br>BETAVERSiON Systems [<a href=3D"http://www.be=
-taversion.net" target=3D"_blank" onclick=3D"return top.js.OpenExtLink(windo=
-w,event,this)">
-www.betaversion.net</a>]<br>info/pgp: finger <a href=3D"mailto:collin@betav=
-ersion.net" target=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,e=
-vent,this)">
+taversion.net">www.betaversion.net</a>]<br>info/pgp: finger <a href=3D"mail=
+to:collin@betaversion.net">
 collin@betaversion.net</a><br>Don't talk just code!<br><br><br><br>--------=
 -----------------------------------------------<br>This SF.net email is spo=
 nsored by: Splunk Inc. Do you grep through log files<br>for problems?&nbsp;=
 &nbsp;Stop!&nbsp;&nbsp;Download the new AJAX search engine that makes
 <br>searching your log files as easy as surfing the&nbsp;&nbsp;web.&nbsp;&n=
 bsp;DOWNLOAD SPLUNK!<br><a href=3D"http://ads.osdn.com/?ad_id=3D7637&amp;al=
-loc_id=3D16865&amp;op=3Dclick" target=3D"_blank" onclick=3D"return top.js.O=
-penExtLink(window,event,this)">
-http://ads.osdn.com/?ad_id=3D7637&amp;alloc_id=3D16865&amp;op=3Dclick</a><b=
-r>
+loc_id=3D16865&amp;op=3Dclick">http://ads.osdn.com/?ad_id=3D7637&amp;alloc_=
+id=3D16865&amp;op=3Dclick</a><br>
 _______________________________________________<br>Bluez-devel mailing list=
-<br><a href=3D"mailto:Bluez-devel@lists.sourceforge.net" target=3D"_blank" =
-onclick=3D"return top.js.OpenExtLink(window,event,this)">Bluez-devel@lists.=
-sourceforge.net
-</a><br><a href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-devel=
-" target=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,event,this)=
-">
+<br><a href=3D"mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.=
+sourceforge.net</a><br><a href=3D"https://lists.sourceforge.net/lists/listi=
+nfo/bluez-devel">
 https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br></blockquot=
 e></div><br>
 
-</span></div></blockquote></div><br>
-
-------=_Part_30905_16361732.1133799582418--
+------=_Part_36336_31025273.1133798925948--
 
 
 -------------------------------------------------------
