@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Did not proceed with 2nd OBEX Connect request
+Subject: Re: [Bluez-users] RFCOMM disconnect command from slave device
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20051205083440.79581.qmail@web32414.mail.mud.yahoo.com>
-References: <20051205083440.79581.qmail@web32414.mail.mud.yahoo.com>
+In-Reply-To: <20051205103257.18037.qmail@web32409.mail.mud.yahoo.com>
+References: <20051205103257.18037.qmail@web32409.mail.mud.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1133818488.4559.7.camel@localhost.localdomain>
+Message-Id: <1133818369.4559.5.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,23 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 05 Dec 2005 22:34:48 +0100
+Date: Mon, 05 Dec 2005 22:32:49 +0100
 
 Hi Arch,
 
-> Yes, you're right. There was no OBEX Connect request following the SDP
-> service request. What I was trying to ask is that supposed to be,
-> there is another OBEX Connect request following the SDP service
-> request. However as you have seen in the hcidump trace, this did not
-> happen. The normal flow of the Bluetooth transaction on the client
-> side is that after the SDP service request, there will be a 2nd OBEX
-> Connect request (without a prior OBEX Disconnect request for the 1st
-> OBEX Connect request). In this regard, is there something in BlueZ
-> that prevents this from happening?
+> I would like to ask if it is okay for a slave device to be the first
+> to issue a disconnect command in the RFCOMM layer rather than the
+> master device. Usually, after the OBEX Disconnect request of the
+> master device and the corresponding response of the slave device, the
+> master issues a disconnect command in the RFCOMM layer. However, the
+> slave device (running on BlueZ) is the first one to issue a disconnect
+> command in the RFCOMM layer, and the master device issues a disconnect
+> command (RFCOMM) after that of the slave device. Is this okay?
 
-additional SDP request can happen every time. For example to get
-information about a status channel or something else. Check the
-Bluetooth core or profile specifications for more details.
+I don't see any problem with that and so far there were no problems at
+all. However the ownership of connections is something that is unclear
+within the Bluetooth specification.
 
 Regards
 
