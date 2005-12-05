@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051205082921.35263.qmail@web36113.mail.mud.yahoo.com>
-From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
+Message-ID: <20051205083440.79581.qmail@web32414.mail.mud.yahoo.com>
+From: Arch Sayo <a12chi@yahoo.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] audio transfer from an pc and an headset (one way communication)
+Content-Type: multipart/alternative; boundary="0-578106633-1133771680=:79534"
+Subject: [Bluez-users] Did not proceed with 2nd OBEX Connect request
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,27 +16,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 5 Dec 2005 00:29:21 -0800 (PST)
+Date: Mon, 5 Dec 2005 00:34:40 -0800 (PST)
 
-Hello,
-I want to do an audio transfer from an PC to an
-headset and not from an headset to an PC. I think i
-don't need the ALSA module as i don't intend to play
-the audio file on my PC. Can someone tell me what all
-the modules needed to be installed and what are the
-commands needed to do an audio transfer.
-I have posted this question many times, so far it was
-in vain. I hope may be this time someone would take
-out their time in answering my query.
-Thanks and Warm Regards,
-Swathi 
+--0-578106633-1133771680=:79534
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
+Hi Marcel,
+   
+  Yes, you're right. There was no OBEX Connect request following the SDP service request. What I was trying to ask is that supposed to be, there is another OBEX Connect request following the SDP service request. However as you have seen in the hcidump trace, this did not happen. The normal flow of the Bluetooth transaction on the client side is that after the SDP service request, there will be a 2nd OBEX Connect request (without a prior OBEX Disconnect request for the 1st OBEX Connect request). In this regard, is there something in BlueZ that prevents this from happening?
+   
+  Thank you so much,
+  Arch
+   
+  > Supposedly, after the L2CAP disconnection, the 
+Bluetooth device
+> (mobile phone) will issue another OBEX Connect 
+Request. However, as
+> you may see in this trace, the 2nd OBEX Connect 
+Request was not
+> issued. I hope to know more about what happened to 
+the connection and
+> why doesn't the transaction proceed.
 
+the first L2CAP is to PSM 3 to establish the RFCOMM 
+connection and then
+it establishes the OBEX connection on channel 5. The 
+second L2CAP is to
+PSM 1 for an SDP service request. There are no 
+multiple OBEX connection
+requests.
+
+Regards
+
+Marcel
+  
+ 
 
 		
-__________________________________ 
-Start your day with Yahoo! - Make it your home page! 
-http://www.yahoo.com/r/hs
+---------------------------------
+ Yahoo! Personals
+ Skip the bars and set-ups and start using Yahoo! Personals for free
+--0-578106633-1133771680=:79534
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+<div>Hi Marcel,</div>  <div>&nbsp;</div>  <div>Yes, you're right. There was no OBEX&nbsp;Connect request&nbsp;following the SDP service request. What I was trying to ask is that <STRONG>supposed to be</STRONG>, there is another OBEX Connect request following the SDP service request. However as you have seen in the hcidump trace, this did not happen. The normal flow of the Bluetooth transaction on the client side is that after the SDP service request, there will be a 2nd OBEX Connect request (without a prior OBEX Disconnect request for the 1st OBEX Connect request). In this regard, is there something in BlueZ that prevents this from happening?</div>  <div>&nbsp;</div>  <div>Thank you so much,</div>  <div>Arch</div>  <div>&nbsp;</div>  <div>&gt; Supposedly, after the L2CAP disconnection, the <BR>Bluetooth device<BR>&gt; (mobile phone) will issue another OBEX Connect <BR>Request. However, as<BR>&gt; you may see in this trace, the 2nd OBEX Connect <BR>Request was not<BR>&gt; issu
+ ed. I
+ hope to know more about what happened to <BR>the connection and<BR>&gt; why doesn't the transaction proceed.<BR><BR>the first L2CAP is to PSM 3 to establish the RFCOMM <BR>connection and then<BR>it establishes the OBEX connection on channel 5. The <BR>second L2CAP is to<BR>PSM 1 for an SDP service request. There are no <BR>multiple OBEX connection<BR>requests.<BR><BR>Regards<BR><BR>Marcel</div>  <div><BR>&nbsp;</div><p>
+		<hr size=1> <B>Yahoo! Personals</B><BR> 
+Skip the bars and set-ups and <a href="http://us.rd.yahoo.com/evt=36107/*http://personals.yahoo.com/us/reg/free7days 
+">start using Yahoo! Personals for free</a>
+--0-578106633-1133771680=:79534--
 
 
 -------------------------------------------------------
