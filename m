@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43948373.9080606@masaka.cs.ohiou.edu>
-From: Jim Wyllie <jwyllie@masaka.cs.ohiou.edu>
-MIME-Version: 1.0
+Message-ID: <ef9938ec0512050819s3a34e44fic3256a56fdda3907@mail.gmail.com>
+From: Albert Huang <ashuang@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: multipart/mixed;
- boundary="------------080104080207010702060602"
-Subject: [Bluez-devel] hcitool feature patch
+Subject: Re: [Bluez-devel] Encryption
+In-Reply-To: <9d47cfd0512050808y8eee708maa10fca8f1cc7f4a@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_30905_16361732.1133799582418"
+References: <9d47cfd0512011325x4de6e0a6wbd78806c2072dc5f@mail.gmail.com>
+	 <1133500233.15695.3.camel@panic>
+	 <9d47cfd0512050808y8eee708maa10fca8f1cc7f4a@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,158 +21,139 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 05 Dec 2005 13:14:11 -0500
+Date: Mon, 5 Dec 2005 11:19:42 -0500
 
-This is a multi-part message in MIME format.
---------------080104080207010702060602
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+------=_Part_30905_16361732.1133799582418
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I had to write a program which changed the flush timeout for a Bluetooth 
-connection.  I integrated it into my version of hcitool since that 
-seemed the appropriate place for it.  The patch applies to hcitool in 
-bluez-utils 2.22, and adds the 'ftmo' option (for flush timeout).  Let 
-me know if you want me to make any changes.
+replace L2CAP_LM_ENCRYPT with RFCOMM_LM_ENCRYPT, etc...
+also see dund
 
-Jim Wyllie
-IRG Lab
-Ohio University
+-albert
 
---------------080104080207010702060602
-Content-Type: text/plain;
- name="hcitool.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="hcitool.patch"
+On 12/5/05, Abu hasnat Sayem <ahsayem@gmail.com> wrote:
+>
+> Collin,
+>
+> pand does it at the L2CAP level, i am working to provide encryption at th=
+e
+> RFCOMM level..
+> Is it possible to do so via some function calls...
+>
+> Abu
+>
+>
+> On 12/1/05, Collin R. Mulliner <collin@betaversion.net> wrote:
+> >
+> > Hi Abu,
+> >
+> > On Thu, 2005-12-01 at 15:25 -0600, Abu hasnat Sayem wrote:
+> > > I am working on doing Encryption and Authentication at the RFCOMM and
+> > > L2CAP level using BlueZ. I would like to know if there exists certain
+> > > function calls to accompolish it or i have to incorporate new code in
+> > > it.
+> >
+> > this is done via setsockopt(2), take a look at:
+> > /usr/src/bluez-utils-2.22/pand/main.c (search for SECURE)
+> >
+> > or check sobexsrv (http://www.mulliner.org/bluetooth/sobexsrv.php)
+> >
+> > ... Collin
+> >
+> > --
+> > Collin R. Mulliner <collin@betaversion.net>
+> > BETAVERSiON Systems [www.betaversion.net]
+> > info/pgp: finger collin@betaversion.net
+> > Don't talk just code!
+> >
+> >
+> >
+> > -------------------------------------------------------
+> > This SF.net email is sponsored by: Splunk Inc. Do you grep through log
+> > files
+> > for problems?  Stop!  Download the new AJAX search engine that makes
+> > searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+> > http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
+> > _______________________________________________
+> > Bluez-devel mailing list
+> > Bluez-devel@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> >
+>
+>
 
-966a967,1089
-> /* Alter connection timeout (for all connections, unfortunately) */
-> 
-> static struct option ftmo_options[] = {
-> 	{ "help",	0, 0, 'h' },
-> 	{ "tmout",	1, 0, 't' },
-> 	{ 0, 0, 0, 0 }
-> };
-> 
-> static char *ftmo_help =
-> 	"Usage:\n"
-> 	"\tftmo --tmout=value bdaddr\n"
-> 	"Sets the flush timeout value to 0.625msec * value for bdaddr\n"
-> 	"Will change reliability for all connections from microcontroller\n";
-> 
-> static void cmd_ftmo(int dev_id, int argc, char **argv)
-> {
-> 	int err = 0, dd, opt, timeout;
-> 	struct hci_conn_info_req *cr = 0;
-> 	struct hci_request rq = { 0 };
-> 	bdaddr_t *ba;
-> 
-> 	struct {
-> 		uint16_t handle;
-> 		uint16_t flush_timeout;
-> 	} cmd_param;
-> 
-> 	struct {
-> 		uint8_t  status;
-> 		uint16_t handle;
-> 	} cmd_response;
-> 
-> 	for_each_opt(opt, ftmo_options, NULL) {
-> 		switch (opt) {
-> 
-> 		case 't':
-> 			timeout = atoi( optarg );
-> 
-> 			if( timeout < 0) {
-> 				printf("Must be 1 or greater, or 0 for no timeout\n");
-> 				printf(ftmo_help);
-> 			}
-> 
-> 			break;
-> 			
-> 		default:
-> 			printf(ftmo_help);
-> 			return;
-> 		}
-> 	}
-> 
-> 	argc -= optind;
-> 	argv += optind;
-> 
-> 	if (argc < 1) {
-> 		printf(ftmo_help);
-> 		return;
-> 	}
-> 
-> 	ba = (bdaddr_t *)malloc( sizeof( bdaddr_t ) );
-> 	str2ba(argv[0], ba);
-> 
-> 	if (dev_id < 0) {
-> 		dev_id = hci_get_route(ba);
-> 		if (dev_id < 0) {
-> 			perror("Error in obtaining route to device\n");
-> 			return;
-> 		}
-> 	}
-> 
-> 	// find the connection handle to the specified bluetooth device
-> 	cr = (struct hci_conn_info_req*) malloc(
-> 	sizeof(struct hci_conn_info_req) + 
-> 	sizeof(struct hci_conn_info));
-> 	
-> 	bacpy( &cr->bdaddr, ba );
-> 	
-> 	cr->type = ACL_LINK;
-> 	
-> 	dd = hci_open_dev( dev_id );
-> 
-> 	if( dd < 0 ) {
-> 		err = dd;
-> 		goto cleanup;
-> 	}
-> 
-> 	err = ioctl(dd, HCIGETCONNINFO, (unsigned long) cr );
-> 
-> 	if( err ) {
-> 		fprintf(stderr, "Could not get connection handle, is one established yet?\n");
-> 		goto cleanup;
-> 	}
-> 
-> 	// build a command packet to send to the bluetooth microcontroller
-> 	cmd_param.handle = cr->conn_info->handle;
-> 	cmd_param.flush_timeout = htobs(timeout);
-> 	rq.ogf = OGF_HOST_CTL;
-> 	rq.ocf = 0x28;
-> 	rq.cparam = &cmd_param;
-> 	rq.clen = sizeof(cmd_param);
-> 	rq.rparam = &cmd_response;
-> 	rq.rlen = sizeof(cmd_response);
-> 	rq.event = EVT_CMD_COMPLETE;
-> 
-> 	// send the command and wait for the response
-> 	err = hci_send_req( dd, &rq, 0 );
-> 
-> 	if( err ) {
-> 		perror("Could not send request to the microcontroller");
-> 		goto cleanup;
-> 	}
-> 
-> 	if( cmd_response.status ) {
-> 		err = -1;
-> 		errno = bt_error(cmd_response.status);
-> 	}
-> 
-> 	cleanup:
-> 		free(cr);
-> 		if( dd >= 0) 
-> 		close(dd);
-> 		return;
-> }
-> 
-2055a2179
-> 	{ "ftmo",   cmd_ftmo,   "Modify microcontroller flush timeout" },
+------=_Part_30905_16361732.1133799582418
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
---------------080104080207010702060602--
+replace L2CAP_LM_ENCRYPT with RFCOMM_LM_ENCRYPT, etc...<br>
+also see dund<br>
+<br>
+-albert<br><br><div><span class=3D"gmail_quote">On 12/5/05, <b class=3D"gma=
+il_sendername">Abu hasnat Sayem</b> &lt;<a href=3D"mailto:ahsayem@gmail.com=
+">ahsayem@gmail.com</a>&gt; wrote:</span><blockquote class=3D"gmail_quote" =
+style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8=
+ex; padding-left: 1ex;">
+<div>Collin,</div>
+<div>&nbsp;</div>
+<div>pand does it at the L2CAP level, i am working to provide encryption at=
+ the RFCOMM level..</div>
+<div>Is it possible to do so via some function calls...</div><span class=3D=
+"sg">
+<div>&nbsp;</div>
+<div>Abu<br><br>&nbsp;</div></span><div><span class=3D"e" id=3D"q_107fbaf32=
+35b607c_2">
+<div><span class=3D"gmail_quote">On 12/1/05, <b class=3D"gmail_sendername">=
+Collin R. Mulliner</b> &lt;<a href=3D"mailto:collin@betaversion.net" target=
+=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,event,this)">collin=
+@betaversion.net
+</a>&gt; wrote:</span>
+<blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(204, =
+204, 204); margin: 0px 0px 0px 0.8ex; padding-left: 1ex;">Hi Abu,<br><br>On=
+ Thu, 2005-12-01 at 15:25 -0600, Abu hasnat Sayem wrote:<br>&gt; I am worki=
+ng on doing Encryption and Authentication at the RFCOMM and
+<br>&gt; L2CAP level using BlueZ. I would like to know if there exists cert=
+ain<br>&gt; function calls to accompolish it or i have to incorporate new c=
+ode in<br>&gt; it.<br><br>this is done via setsockopt(2), take a look at:
+<br>/usr/src/bluez-utils-2.22/pand/main.c (search for SECURE)<br><br>or che=
+ck sobexsrv (<a href=3D"http://www.mulliner.org/bluetooth/sobexsrv.php" tar=
+get=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,event,this)">htt=
+p://www.mulliner.org/bluetooth/sobexsrv.php
+</a>)<br><br>... Collin<br><br>
+--<br>Collin R. Mulliner &lt;<a href=3D"mailto:collin@betaversion.net" targ=
+et=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,event,this)">coll=
+in@betaversion.net</a>&gt;<br>BETAVERSiON Systems [<a href=3D"http://www.be=
+taversion.net" target=3D"_blank" onclick=3D"return top.js.OpenExtLink(windo=
+w,event,this)">
+www.betaversion.net</a>]<br>info/pgp: finger <a href=3D"mailto:collin@betav=
+ersion.net" target=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,e=
+vent,this)">
+collin@betaversion.net</a><br>Don't talk just code!<br><br><br><br>--------=
+-----------------------------------------------<br>This SF.net email is spo=
+nsored by: Splunk Inc. Do you grep through log files<br>for problems?&nbsp;=
+&nbsp;Stop!&nbsp;&nbsp;Download the new AJAX search engine that makes
+<br>searching your log files as easy as surfing the&nbsp;&nbsp;web.&nbsp;&n=
+bsp;DOWNLOAD SPLUNK!<br><a href=3D"http://ads.osdn.com/?ad_id=3D7637&amp;al=
+loc_id=3D16865&amp;op=3Dclick" target=3D"_blank" onclick=3D"return top.js.O=
+penExtLink(window,event,this)">
+http://ads.osdn.com/?ad_id=3D7637&amp;alloc_id=3D16865&amp;op=3Dclick</a><b=
+r>
+_______________________________________________<br>Bluez-devel mailing list=
+<br><a href=3D"mailto:Bluez-devel@lists.sourceforge.net" target=3D"_blank" =
+onclick=3D"return top.js.OpenExtLink(window,event,this)">Bluez-devel@lists.=
+sourceforge.net
+</a><br><a href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-devel=
+" target=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,event,this)=
+">
+https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br></blockquot=
+e></div><br>
+
+</span></div></blockquote></div><br>
+
+------=_Part_30905_16361732.1133799582418--
 
 
 -------------------------------------------------------
