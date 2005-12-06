@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051206072019.81758.qmail@web36102.mail.mud.yahoo.com>
+Message-ID: <20051206050255.28756.qmail@web36106.mail.mud.yahoo.com>
 From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] not able to create socket using any of the protocols ?
+Subject: [Bluez-users] Cannot send messages to my bluetooth enabled Phone using RFCOMM
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,63 +16,67 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 5 Dec 2005 23:20:19 -0800 (PST)
+Date: Mon, 5 Dec 2005 21:02:55 -0800 (PST)
 
 Hello,
-I tried creating sockets using all the three protocols
-but i get the error saying "no such file or directory"
+I am trying to send some data to my bluetooth enabled
+Sony Ericsson
+handphone T630 from my PC which has the bluez stack
+running on it, i am using the RFCOMM.
 
-My code is as below 
-------------------------------------------------
+I get the error message "Cant create socket" and "bad
+file descriptor" 
+
+Can someone help me in finding the mistake and in
+correcting the below code
+
+------------------------------------------------------------------
 #include <stdio.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <termios.h>
-#include <sys/wait.h>
-#include <sys/time.h>
-#include <sys/ioctl.h>
+#include <string.h>
 #include <sys/socket.h>
-
 #include <bluetooth/bluetooth.h>
-#include <bluetooth/hci.h>
-#include <bluetooth/hci_lib.h>
-#include <bluetooth/sco.h>
 #include <bluetooth/rfcomm.h>
-
-#include <unistd.h>
-#include <stdarg.h>     /* we need va_list */
-#include <errno.h>
 
 int main(int argc, char **argv)
 {
+   struct sockaddr_rc addr = { 0 };
+   int s, status;
+   char dest[18] = "00:0A:D9:4C:EB:9A";  // BD of my
+sony erricson phone
+   
+   //allocate a socket
+   s =
+socket(AF_BLUETOOTH,SOCK_SEQPACKET,BTPROTO_RFCOMM);
 
-	int s;
+   if (s < 0) {
+     printf("Cant create socket:\n");
+   }
 
-	if ((s = socket(PF_BLUETOOTH, SOCK_STREAM,
-BTPROTO_RFCOMM)) < 0) {
-		perror("What is wrong: \n");
-	}
-return 0;
+
+   //set the connection parameters(who to connect to)
+   addr.rc_family = AF_BLUETOOTH;
+   addr.rc_channel = (uint8_t) 1;
+   str2ba(dest,&addr.rc_bdaddr);
+
+  //connect to server
+  status = connect(s, (struct sockaddr
+*)&addr,sizeof(addr));
+
+  //send a message
+  if(status == 0)
+  {
+   status = write(s,"hello!",6);
+  }
+
+  if(status<0) perror("uh oh");
+  close(s);
+  return 0;
+
 }
 
-------------------------------------------------------
+------------------------------------------------------------------------
 
-even if i replace the above with the below 
-	if ((s = socket(PF_BLUETOOTH, SOCK_SEQPACKET,
-BTPROTO_SCO)) < 0) {
-		perror("What is wrong: \n");
-	}
 
-------------------------------------------------
-
-Struck with the socket creation. Can somebody identify
-the pblm ?
-
-Thanks & Warm Regards,
-Swathi.
 
 
 		
