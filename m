@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43959F07.2090105@pagestation.com>
-From: Jerry Geis <geisj@pagestation.com>
-MIME-Version: 1.0
+Message-ID: <20051206094558.26664.qmail@web36103.mail.mud.yahoo.com>
+From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] no audio on plantronics headset
+In-Reply-To: <20051205113634.GA5487@acs.uni-duesseldorf.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Bluetooth-alsa Project :::: Not clear documentation
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,72 +17,101 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 06 Dec 2005 09:24:07 -0500
+Date: Tue, 6 Dec 2005 01:45:58 -0800 (PST)
 
-I have a kensington usb bluetooth adapter 2.0 with a plantronics 510 headset.
-When a call is coming from asterisk (chan_bluetooth) with Dial(BLT/PLANTRONICS-HS)
-my headset hears the ringing. I press my answer call button and I get NO audio...
-I see below there is an error
+Hello,
+The site "http://bluetooth-alsa.sourceforge.net/"
+which discusses how to  use a bluetooth headset with
+Linux, the steps explained in it is not at all clear
+for example he asks us to 
+# Install or update the required packages:
 
-process_rfcomm_cmd: Unknown AT Command: 'AT+VGM=15' (+VGM=15)
+    * automake-1.7
+    * libbluetooth-dev (aka libbluetooth-devel or
+bluetooth-devel or bluez-libs)
+    * libasound2-dev (aka alsa-devel)
+    * a recent (2.6.11.7 or newer) kernel with
+*integrated* alsa enabled (it won't work with the
+"standalone" alsa drivers that are a separate download
+from the kernel) 
 
-What do I do???
+Can i know where can i download the packages
+libbluetooth-dev, libasound2-dev ?
 
-Thanks,
+2)Using SCO audio
 
-Jerry
+   1. insert the module (or better, set up the alsa
+configuration to load it)
+   modprobe snd_bt_sco
+
+Can somebody tell me where to find this snd_bt_sco
+modlue ?
 
 
-------------------------
+Pls somebody help me with this or give a clear picture
+of how to proceed as i am stuck.
 
- [HS] PLANTRONICS-HS < +CIND: ("service",(0,1)),("call",(0,1)),
-("callsetup",(0-4))
- [HS] PLANTRONICS-HS < OK
- [HS] PLANTRONICS-HS > AT+CIND?
- [HS] PLANTRONICS-HS < +CIND: 1,0,0
- [HS] PLANTRONICS-HS < OK
- [HS] PLANTRONICS-HS > AT+CMER=3, 0, 0, 1
- [HS] PLANTRONICS-HS < OK
- [HS] PLANTRONICS-HS > AT+VGS=00
- [HS] PLANTRONICS-HS < OK
+Thanks & Warm Regards,
+Swathi
 
-*CLI> bluetooth show peers
-BDAddr            Name       Role Status      A/C SCOCon/Fd/Th Sig
------------------ ---------- ---- ----------- --- ------------ ---
-00:03:89:53:FD:3A PLANTRONICS-HS HS   Ready       Yes -1/-1/0      N/A
-    -- Accepting UNAUTHENTICATED call from 192.168.1.10:
-       > requested format = gsm,
-       > requested prefs = (gsm),
-       > actual format = gsm,
-       > host prefs = (gsm),
-       > priority = mine
-    -- Executing Dial("IAX2/192.168.1.10:4569-1", "BLT/PLANTRONICS-HS")
-in new stack
- [HS] PLANTRONICS-HS < +CIEV: 3,1
- [HS] PLANTRONICS-HS < RING
-    -- Called PLANTRONICS-HS
-    -- BLT/PLANTRONICS-HS is ringing
- [HS] PLANTRONICS-HS > ATA
- [HS] PLANTRONICS-HS < +CIEV: 2,1
- [HS] PLANTRONICS-HS < +CIEV: 3,0
- [HS] PLANTRONICS-HS < OK
-    -- BLT/PLANTRONICS-HS answered IAX2/192.168.1.10:4569-1
-Dec  6 09:10:18 WARNING[3747]: chan_bluetooth/chan_bluetooth.c:621
-sco_thread: SCO thread started on f d 33, pid 3721
- [HS] PLANTRONICS-HS > AT+VGM=15
-Dec  6 09:10:19 WARNING[3736]: chan_bluetooth/chan_bluetooth.c:2381
-process_rfcomm_cmd: Unknown AT Command: 'AT+VGM=15' (+VGM=15)
- [HS] PLANTRONICS-HS < ERROR
-Dec  6 09:10:19 WARNING[3747]: chan_bluetooth/chan_bluetooth.c:685
-sco_thread: Wrote <48 to sco
-Dec  6 09:10:19 WARNING[3747]: chan_bluetooth/chan_bluetooth.c:685
-sco_thread: Wrote <48 to sco
-Dec  6 09:10:19 WARNING[3747]: chan_bluetooth/chan_bluetooth.c:685
-sco_thread: Wrote <48 to sco
-Dec  6 09:10:19 WARNING[3747]: chan_bluetooth/chan_bluetooth.c:685
-sco_thread: Wrote <48 to sco
-Dec  6 09:10:19 WARNING[3747]: chan_bluetooth/chan_bluetooth.c:685
-sco_thread: Wrote <48 to sco
+ 
+
+
+--- Andreas Beck <becka-bzus@bedatec.de> wrote:
+
+> Swathi Mathur80 <swathi_mathur80@yahoo.com> wrote:
+> > I want to do an audio transfer from an PC to an
+> > headset and not from an headset to an PC. 
+> 
+> Direction doesn't quite matter, as it is a
+> bidirectional link.
+> 
+> > I think i don't need the ALSA module as i don't
+> intend to play
+> > the audio file on my PC. 
+> 
+> Wrong. You need it, as the headset gets mapped as an
+> audio device
+> on the PC. 
+> 
+> > Can someone tell me what all the modules needed to
+> be installed 
+> 
+> Read the bluetooth-alsa pages at
+> http://bluetooth-alsa.sourceforge.net/
+> 
+> 
+> CU, Andy
+> 
+> -- 
+> = Andreas Beck                    |  Email : 
+> <becka-sig@bedatec.de>         =
+> 
+> 
+>
+-------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc. Do
+> you grep through log files
+> for problems?  Stop!  Download the new AJAX search
+> engine that makes
+> searching your log files as easy as surfing the 
+> web.  DOWNLOAD SPLUNK!
+>
+http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+
+
+
+		
+__________________________________________ 
+Yahoo! DSL – Something to write home about. 
+Just $16.99/mo. or less. 
+dsl.yahoo.com 
 
 
 
