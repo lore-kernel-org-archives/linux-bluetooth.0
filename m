@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
 Subject: RE: [Bluez-devel] Vendor Specific Commands
-Message-ID: <A35A8D03A748B34A9DA2AB0335A3F93D408835@rfsdmail.internal.rfmd.com>
-From: "Jatin Nahar" <jnahar@rfmd.com>
-To: <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <A35A8D03A748B34A9DA2AB0335A3F93D408823@rfsdmail.internal.rfmd.com>
+References: 
+	 <A35A8D03A748B34A9DA2AB0335A3F93D408823@rfsdmail.internal.rfmd.com>
+Content-Type: text/plain
+Message-Id: <1133903810.27209.23.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,23 +19,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 6 Dec 2005 13:25:10 -0800
+Date: Tue, 06 Dec 2005 22:16:50 +0100
 
-Marcel,
-Thanks for the reply, I'll get back to you once I have more info.
+Hi Jatin,
 
-Thanks,
-Jatin=20
-
-> I am using UART connection to the host. Currently I donot have the=20
-> chipset manual, but it should not matter because not all vendor=20
-> specific commands are related to hardware configuration.
->=20
-> I searched the source code little bit and I feel that hciattach might=20
-> be the place to put it since it already has some RFMD (swave) specific
-
+> I am using UART connection to the host. Currently I donot have the
+> chipset manual, but it should not matter because not all vendor specific
+> commands are related to hardware configuration.
+> 
+> I searched the source code little bit and I feel that hciattach might be
+> the place to put it since it already has some RFMD (swave) specific
 > code. am I correct? (In that case my original question might have been
-
 > worded incorrectly).
 
 as I said, this depends on. The only support for ROM chips that BlueZ
@@ -47,6 +43,7 @@ can't give you any information on the best way to handle it.
 Regards
 
 Marcel
+
 
 
 
