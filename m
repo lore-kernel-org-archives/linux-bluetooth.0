@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051206050255.28756.qmail@web36106.mail.mud.yahoo.com>
-From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
+Message-ID: <20051206015531.25270.qmail@web32002.mail.mud.yahoo.com>
+From: Paul Gustilo <pgustilo@yahoo.com>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <20051206014920.25823.qmail@web32007.mail.mud.yahoo.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Cannot send messages to my bluetooth enabled Phone using RFCOMM
+Subject: [Bluez-users] Can not print with sony ericson via blutooth opp the second time
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,66 +17,215 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 5 Dec 2005 21:02:55 -0800 (PST)
-
-Hello,
-I am trying to send some data to my bluetooth enabled
-Sony Ericsson
-handphone T630 from my PC which has the bluez stack
-running on it, i am using the RFCOMM.
-
-I get the error message "Cant create socket" and "bad
-file descriptor" 
-
-Can someone help me in finding the mistake and in
-correcting the below code
-
-------------------------------------------------------------------
-#include <stdio.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/rfcomm.h>
-
-int main(int argc, char **argv)
-{
-   struct sockaddr_rc addr = { 0 };
-   int s, status;
-   char dest[18] = "00:0A:D9:4C:EB:9A";  // BD of my
-sony erricson phone
-   
-   //allocate a socket
-   s =
-socket(AF_BLUETOOTH,SOCK_SEQPACKET,BTPROTO_RFCOMM);
-
-   if (s < 0) {
-     printf("Cant create socket:\n");
-   }
+Date: Mon, 5 Dec 2005 17:55:31 -0800 (PST)
 
 
-   //set the connection parameters(who to connect to)
-   addr.rc_family = AF_BLUETOOTH;
-   addr.rc_channel = (uint8_t) 1;
-   str2ba(dest,&addr.rc_bdaddr);
 
-  //connect to server
-  status = connect(s, (struct sockaddr
-*)&addr,sizeof(addr));
+--- Paul Gustilo <pgustilo@yahoo.com> wrote:
 
-  //send a message
-  if(status == 0)
-  {
-   status = write(s,"hello!",6);
-  }
-
-  if(status<0) perror("uh oh");
-  close(s);
-  return 0;
-
-}
-
-------------------------------------------------------------------------
-
+> Hi Marcel,
+> 
+> 
+> Im having a problem with sony ericson S700i. I can
+> send a picture using opp 
+> the first time but after it I can not send anymore.
+> The phone is saying 
+> Bluetooth busy. I believed that the connection was
+> not
+> freed... Im not sure 
+> about it. I need some help here.
+> 
+> Here is some traces from HCI dump...I just cut the
+> trace, I did not include 
+> the trace when the the phone is sending the image, I
+> guess from that point the 
+> transaction is still okay...
+> 
+> 
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 39
+>     L2CAP(d): cid 0x0040 len 35 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 29 fcs
+> 0x46 credits 0
+> < ACL data: handle 43 flags 0x02 dlen 11
+>     L2CAP(d): cid 0x004b len 7 [psm 3]
+>       RFCOMM(d): UIH: cr 0 dlci 8 pf 0 ilen 3 fcs
+> 0x80
+> < ACL data: handle 43 flags 0x02 dlen 9
+>     L2CAP(d): cid 0x004b len 5 [psm 3]
+>       RFCOMM(d): UIH: cr 0 dlci 8 pf 1 ilen 0 fcs
+> 0x9c
+> credits 30
+> > HCI Event: Number of Completed Packets (0x13) plen
+> 5
+>     handle 43 packets 1
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 39
+>     L2CAP(d): cid 0x0040 len 35 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 29 fcs
+> 0x46 credits 0
+> < ACL data: handle 43 flags 0x02 dlen 11
+>     L2CAP(d): cid 0x004b len 7 [psm 3]
+>       RFCOMM(d): UIH: cr 0 dlci 8 pf 0 ilen 3 fcs
+> 0x80
+> > HCI Event: Number of Completed Packets (0x13) plen
+> 5
+>     handle 43 packets 1
+> > ACL data: handle 43 flags 0x02 dlen 39
+>     L2CAP(d): cid 0x0040 len 35 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 29 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 1
+> > ACL data: handle 43 flags 0x02 dlen 39
+>     L2CAP(d): cid 0x0040 len 35 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 29 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 1
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 39
+>     L2CAP(d): cid 0x0040 len 35 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 29 fcs
+> 0x46 credits 0
+> < ACL data: handle 43 flags 0x02 dlen 9
+>     L2CAP(d): cid 0x004b len 5 [psm 3]
+>       RFCOMM(d): UIH: cr 0 dlci 8 pf 1 ilen 0 fcs
+> 0x9c
+> credits 30
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 1
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 39
+>     L2CAP(d): cid 0x0040 len 35 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 29 fcs
+> 0x46 credits 0
+> < ACL data: handle 43 flags 0x02 dlen 11
+>     L2CAP(d): cid 0x004b len 7 [psm 3]
+>       RFCOMM(d): UIH: cr 0 dlci 8 pf 0 ilen 3 fcs
+> 0x80
+> > ACL data: handle 43 flags 0x02 dlen 39
+>     L2CAP(d): cid 0x0040 len 35 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 29 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 1
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 39
+>     L2CAP(d): cid 0x0040 len 35 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 29 fcs
+> 0x46 credits 0
+> > HCI Event: Number of Completed Packets (0x13) plen
+> 5
+>     handle 43 packets 1
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 1
+> > ACL data: handle 43 flags 0x02 dlen 39
+>     L2CAP(d): cid 0x0040 len 35 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 29 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 1
+> < ACL data: handle 43 flags 0x02 dlen 9
+>     L2CAP(d): cid 0x004b len 5 [psm 3]
+>       RFCOMM(d): UIH: cr 0 dlci 8 pf 1 ilen 0 fcs
+> 0x9c
+> credits 30
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 1
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 1
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 39
+>     L2CAP(d): cid 0x0040 len 35 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 29 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 1
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 39
+>     L2CAP(d): cid 0x0040 len 35 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 29 fcs
+> 0x46 credits 0
+> < ACL data: handle 43 flags 0x02 dlen 11
+>     L2CAP(d): cid 0x004b len 7 [psm 3]
+>       RFCOMM(d): UIH: cr 0 dlci 8 pf 0 ilen 3 fcs
+> 0x80
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 329 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 39
+>     L2CAP(d): cid 0x0040 len 35 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 8 pf 1 ilen 29 fcs
+> 0x46 credits 0
+> > ACL data: handle 43 flags 0x02 dlen 339
+>     L2CAP(d): cid 0x0040 len 335 [psm 3]
+> 
+=== message truncated ===
 
 
 
