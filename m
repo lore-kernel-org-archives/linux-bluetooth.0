@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43966AC8.3080304@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: Cellink BTA-6030 adapter of choice? usb & bt
-   2.0
-References: <dmtgch$4g9$1@sea.gmane.org> <1133681661.4427.0.camel@blade> <dmvc45$5gn$1@sea.gmane.org> <43937075.7080703@xmission.com> <dn5mo9$k2t$1@sea.gmane.org>
-In-Reply-To: <dn5mo9$k2t$1@sea.gmane.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: sean <seandarcy2@gmail.com>
+Message-ID: <dn5mo9$k2t$1@sea.gmane.org>
+References: <dmtgch$4g9$1@sea.gmane.org> <1133681661.4427.0.camel@blade> <dmvc45$5gn$1@sea.gmane.org> <43937075.7080703@xmission.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <43937075.7080703@xmission.com>
+Subject: [Bluez-users] Re: Cellink BTA-6030 adapter of choice? usb & bt   2.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,25 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 06 Dec 2005 21:53:28 -0700
+Date: Tue, 06 Dec 2005 23:00:09 -0500
+
+Brad Midgley wrote:
+> sean
+> 
+> 
+>>The ANYCOM dongle uses a Broadcom chip.  Will this work with bluez?
+> 
+> 
+> it will, with the exception of sco audio.
+> 
+
+My main application is voip.  As I understand it, I need sco 
+audio.
+
+Right?
 
 sean
 
-> My main application is voip.  As I understand it, I need sco audio.
 > 
-> Right?
-
-yes
-
->> hmm. if you found level1 for export from the uk that's the best bet. i'm
->> not in a hurry so i'll wait to see a domestic US offering.
+>>I couldn't find the B-Speech or the Level1 for sale in the US. I can
+>>order the Level1 from the UK.
 >>
-> It's on ebay.
+>>I can't find the B-Speech available online anywhere.  Though my school
+>>boy German may be to blame :)
+>>
+>>It looks like B-Speech is the preferred choice, and Level1 second.
+>>
+>>Any suggestions? Will ANYCOM work? Any url's for b-speech?
+> 
+> 
+> hmm. if you found level1 for export from the uk that's the best bet. i'm
+> not in a hurry so i'll wait to see a domestic US offering.
+> 
 
-I'm curious... what search do you use? I've checked from time to time
-and never found any 2.0 adapters that have a clearly labeled manufacturer.
+It's on ebay.
 
-Brad
 
 
 -------------------------------------------------------
