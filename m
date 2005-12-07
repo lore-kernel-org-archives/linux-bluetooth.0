@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Khaled" <khaled@ipbill.com>
+To: <bluez-users@lists.sourceforge.net>
 Subject: RE: [Bluez-users] Bluetooth Voice Setting
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <HCEOIFALKKLBLJPENPNOGEGFCAAA.khaled@ipbill.com>
-References: <HCEOIFALKKLBLJPENPNOGEGFCAAA.khaled@ipbill.com>
-Content-Type: text/plain
-Message-Id: <1133955376.3752.7.camel@blade>
-Mime-Version: 1.0
+Message-ID: <HCEOIFALKKLBLJPENPNOGEGFCAAA.khaled@ipbill.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+In-Reply-To: <1133953711.3752.4.camel@blade>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,53 +18,64 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 07 Dec 2005 12:36:16 +0100
+Date: Wed, 7 Dec 2005 11:14:22 -0000
 
-Hi Khaled,
+Hi Marcel,
 
-> > > I was curious because I am not getting any sound through my machine
-> > > (configured as a headset - 0x200404 device class).
-> > > Also there are no service classes defined when I do hciconfig
-> > -a (as shown
-> > > below).
+> > > > Can someone tell me how to set the bluetooth voice settings
+> > > when using sco
+> > > > and what to set it to?
+> > > > My hcidump shows voice setting as (0x03|0x0025) - what does
+> > > this mean? Also,
+> > > > the hcidump shows that a connection is created for DM* and DH*
+> > > packet types:
+> > > > for sco, should this not be HV* packet types?
+> > >
+> > > you don't need to worry about it. The packet types and the
+> voice setting
+> > > are not related (from the HCI viewpoint). If you wanna know details
+> > > about it, look at the HCI part of the Bluetooth
+> specification. The value
+> > > is a bitmask and it is explained in detail there.
+> > >
 > >
-> > this is now the class of device. You are mixing things up here.
-> 
-> I understand but should there not be some services defined also - I dont
-> remember any of the example hciconfig -a outputs on the net without service
-> classes
+> > I was curious because I am not getting any sound through my machine
+> > (configured as a headset - 0x200404 device class).
+> > Also there are no service classes defined when I do hciconfig
+> -a (as shown
+> > below).
+>
+> this is now the class of device. You are mixing things up here.
 
-it is not a requirement. However maybe the decoding code in hciconfig is
-incomplete.
+I understand but should there not be some services defined also - I dont
+remember any of the example hciconfig -a outputs on the net without service
+classes
 
-> > > Although a headset icon appears on my 6310i and I get no sound
-> > at the actual
-> > > mobile phone (because the headset is connected), I still cannot
-> > hear or say
-> > > anything that can be heard from my computer.
-> > > Therefore, I am trying to study the hcidump output but its
-> > almost impossible
-> > > to interpret.
-> >
-> > No it is not. Use "hcidump -X -V" as stated almost everywhere in the
-> > mailing list archives.
-> 
-> Apologies Marcel - I should have told you before: I am using -X -V and as
-> the list archives suggest, I am in the process of reviewing the BT
-> specifications to help interpret the output. At first sight it is very
-> confusing.
-> 
-> Would you not expect to see '> SCO' lines in the hcidump output given that I
-> am (trying to) use SCO for voice transfer? Like you said in one of the
-> archives, hcidump shows payload of the SCO packets over hci?
 
-The Headset and Headfree profiles specify when the SCO channel has to be
-opened. Maybe your connection is not in that state. Post the output of
-hcidump, so we can see what's going on.
+> > Although a headset icon appears on my 6310i and I get no sound
+> at the actual
+> > mobile phone (because the headset is connected), I still cannot
+> hear or say
+> > anything that can be heard from my computer.
+> > Therefore, I am trying to study the hcidump output but its
+> almost impossible
+> > to interpret.
+>
+> No it is not. Use "hcidump -X -V" as stated almost everywhere in the
+> mailing list archives.
+
+Apologies Marcel - I should have told you before: I am using -X -V and as
+the list archives suggest, I am in the process of reviewing the BT
+specifications to help interpret the output. At first sight it is very
+confusing.
+
+Would you not expect to see '> SCO' lines in the hcidump output given that I
+am (trying to) use SCO for voice transfer? Like you said in one of the
+archives, hcidump shows payload of the SCO packets over hci?
 
 Regards
 
-Marcel
+Khaled
 
 
 
