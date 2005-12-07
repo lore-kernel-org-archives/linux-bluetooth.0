@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] not able to create socket using any of the
-	protocols ?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20051206072019.81758.qmail@web36102.mail.mud.yahoo.com>
-References: <20051206072019.81758.qmail@web36102.mail.mud.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1133946413.11247.8.camel@blade>
-Mime-Version: 1.0
+Message-ID: <20051207061807.73581.qmail@web50510.mail.yahoo.com>
+From: oj ravadilla <ojravadilla@yahoo.com>
+To: Bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Cant send bluetooth using my linux and bluez
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,68 +16,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 07 Dec 2005 10:06:53 +0100
+Date: Tue, 6 Dec 2005 22:18:07 -0800 (PST)
 
-Hi Swathi,
+Hi,
 
-> I tried creating sockets using all the three protocols
-> but i get the error saying "no such file or directory"
-> 
-> My code is as below 
-> ------------------------------------------------
-> #include <stdio.h>
-> #include <errno.h>
-> #include <fcntl.h>
-> #include <unistd.h>
-> #include <stdlib.h>
-> #include <signal.h>
-> #include <termios.h>
-> #include <sys/wait.h>
-> #include <sys/time.h>
-> #include <sys/ioctl.h>
-> #include <sys/socket.h>
-> 
-> #include <bluetooth/bluetooth.h>
-> #include <bluetooth/hci.h>
-> #include <bluetooth/hci_lib.h>
-> #include <bluetooth/sco.h>
-> #include <bluetooth/rfcomm.h>
-> 
-> #include <unistd.h>
-> #include <stdarg.h>     /* we need va_list */
-> #include <errno.h>
-> 
-> int main(int argc, char **argv)
-> {
-> 
-> 	int s;
-> 
-> 	if ((s = socket(PF_BLUETOOTH, SOCK_STREAM,
-> BTPROTO_RFCOMM)) < 0) {
-> 		perror("What is wrong: \n");
-> 	}
-> return 0;
-> }
-> 
-> ------------------------------------------------------
-> 
-> even if i replace the above with the below 
-> 	if ((s = socket(PF_BLUETOOTH, SOCK_SEQPACKET,
-> BTPROTO_SCO)) < 0) {
-> 		perror("What is wrong: \n");
-> 	}
-> 
-> ------------------------------------------------
-> 
-> Struck with the socket creation. Can somebody identify
-> the pblm ?
+I can not send bluetooth from my phone to my pc. I'm
+using linux kernel 2.6.0 and bluez-lib 2.22 and
+bluez-utils2.22. Can someone look at what's wrong...
 
-make sure the correct kernel modules are loaded.
+hcidump:
 
-Regards
+ # hcidump -X -V
+HCI sniffer - Bluetooth packet analyzer ver 1.23
+device: hci0 snap_len: 1028 filter: 0xffffffff
+hci_acldata_packet: hci0 ACL packet for unknown
+connection handle 41
+> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0048
 
-Marcel
 
+thanks!
+
+
+
+		
+__________________________________________ 
+Yahoo! DSL – Something to write home about. 
+Just $16.99/mo. or less. 
+dsl.yahoo.com 
 
 
 
