@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Cannot send messages to my bluetooth enabled
-	Phone using RFCOMM
+Subject: Re: [Bluez-users] not able to create socket using any of the
+	protocols ?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20051206050255.28756.qmail@web36106.mail.mud.yahoo.com>
-References: <20051206050255.28756.qmail@web36106.mail.mud.yahoo.com>
+In-Reply-To: <20051206072019.81758.qmail@web36102.mail.mud.yahoo.com>
+References: <20051206072019.81758.qmail@web36102.mail.mud.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1133946457.11247.10.camel@blade>
+Message-Id: <1133946413.11247.8.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,44 +19,63 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 07 Dec 2005 10:07:37 +0100
+Date: Wed, 07 Dec 2005 10:06:53 +0100
 
 Hi Swathi,
 
-> I am trying to send some data to my bluetooth enabled
-> Sony Ericsson
-> handphone T630 from my PC which has the bluez stack
-> running on it, i am using the RFCOMM.
+> I tried creating sockets using all the three protocols
+> but i get the error saying "no such file or directory"
 > 
-> I get the error message "Cant create socket" and "bad
-> file descriptor" 
-> 
-> Can someone help me in finding the mistake and in
-> correcting the below code
-> 
-> ------------------------------------------------------------------
+> My code is as below 
+> ------------------------------------------------
 > #include <stdio.h>
-> #include <string.h>
+> #include <errno.h>
+> #include <fcntl.h>
+> #include <unistd.h>
+> #include <stdlib.h>
+> #include <signal.h>
+> #include <termios.h>
+> #include <sys/wait.h>
+> #include <sys/time.h>
+> #include <sys/ioctl.h>
 > #include <sys/socket.h>
+> 
 > #include <bluetooth/bluetooth.h>
+> #include <bluetooth/hci.h>
+> #include <bluetooth/hci_lib.h>
+> #include <bluetooth/sco.h>
 > #include <bluetooth/rfcomm.h>
+> 
+> #include <unistd.h>
+> #include <stdarg.h>     /* we need va_list */
+> #include <errno.h>
 > 
 > int main(int argc, char **argv)
 > {
->    struct sockaddr_rc addr = { 0 };
->    int s, status;
->    char dest[18] = "00:0A:D9:4C:EB:9A";  // BD of my
-> sony erricson phone
->    
->    //allocate a socket
->    s =
-> socket(AF_BLUETOOTH,SOCK_SEQPACKET,BTPROTO_RFCOMM);
 > 
->    if (s < 0) {
->      printf("Cant create socket:\n");
->    }
+> 	int s;
+> 
+> 	if ((s = socket(PF_BLUETOOTH, SOCK_STREAM,
+> BTPROTO_RFCOMM)) < 0) {
+> 		perror("What is wrong: \n");
+> 	}
+> return 0;
+> }
+> 
+> ------------------------------------------------------
+> 
+> even if i replace the above with the below 
+> 	if ((s = socket(PF_BLUETOOTH, SOCK_SEQPACKET,
+> BTPROTO_SCO)) < 0) {
+> 		perror("What is wrong: \n");
+> 	}
+> 
+> ------------------------------------------------
+> 
+> Struck with the socket creation. Can somebody identify
+> the pblm ?
 
-the RFCOMM protocol is a SOCK_STREAM.
+make sure the correct kernel modules are loaded.
 
 Regards
 
