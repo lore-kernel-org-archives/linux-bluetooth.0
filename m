@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4396F911.40705@rumms.uni-mannheim.de>
-From: =?ISO-8859-15?Q?Andreas_F=E4rber?= <afaerber@rumms.uni-mannheim.de>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Inquiry Time
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-devel] Reading RSSI of non-connected devices
+In-Reply-To: <45bf5ff80512070503g6cfc5189hec21ab22768ed9cd@mail.gmail.com>
+References: <45bf5ff80512070503g6cfc5189hec21ab22768ed9cd@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1133961236.3752.27.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,29 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 07 Dec 2005 16:00:33 +0100
+Date: Wed, 07 Dec 2005 14:13:56 +0100
 
-Hello,
+Hi Artur,
 
-We are trying to programmatically read the signal strength of Bluetooth 
-devices at discovery time (not only for connections). Seeing through the 
-source code it appears that in some cases (BT 1.2?) an inquiry gets an 
-HCI response that includes the RSSI (struct inquiry_info_with_rssi). 
-This information appears to be cached in struct inquiry_data if 
-available, 0 otherwise. However the only way to access this information 
-seems to be to get a pointer to a hci_dev struct (e.g. through 
-hci_dev_get(int index)) and use its inq_cache member? Getting this 
-information from the client side is not possible right now?
+>  The Bt specification says that once you send a inquiry request, you
+> should get all the responses +-11 seconds. Many times i send an
+> inquiry and it lasts a lot more then that (Sometimes it goes over a
+> minute). Can someone explain how can i limit the inquiry time to the
+> 11 sec window? Why does this happens?  Also, where can i find a
+> detailed document with all the features and parameters of the
+> hciconfig?
 
-As I understand it from the code, the libBluetooth.so library does an 
-ioctl on an HCI socket with specific predefined commands such as HCIINQUIRY.
-How should we go about adding the functionality we need? Would we need 
-to define a custom HCI socket command and handle it somewhere in a 
-customized Kernel module? Or is there an easier way?
+what does "hciconfig -a" says? I never saw a problem like this.
 
-Thanks for any hints,
+Regards
 
-Andreas
+Marcel
+
 
 
 
