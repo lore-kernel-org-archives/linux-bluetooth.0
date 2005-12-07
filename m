@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Inquiry Time
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <45bf5ff80512070503g6cfc5189hec21ab22768ed9cd@mail.gmail.com>
+From: Artur Almeida <fidalgo.a@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <45bf5ff80512070503g6cfc5189hec21ab22768ed9cd@mail.gmail.com>
-References: <45bf5ff80512070503g6cfc5189hec21ab22768ed9cd@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1133961236.3752.27.camel@blade>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_4553_1386403.1133960603979"
+Subject: [Bluez-devel] Inquiry Time
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,25 +17,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 07 Dec 2005 14:13:56 +0100
+Date: Wed, 7 Dec 2005 13:03:23 +0000
 
-Hi Artur,
+------=_Part_4553_1386403.1133960603979
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
->  The Bt specification says that once you send a inquiry request, you
-> should get all the responses +-11 seconds. Many times i send an
-> inquiry and it lasts a lot more then that (Sometimes it goes over a
-> minute). Can someone explain how can i limit the inquiry time to the
-> 11 sec window? Why does this happens?  Also, where can i find a
-> detailed document with all the features and parameters of the
-> hciconfig?
+Dear All
 
-what does "hciconfig -a" says? I never saw a problem like this.
+ The Bt specification says that once you send a inquiry request, you should
+get all the responses +-11 seconds. Many times i send an inquiry and it
+lasts a lot more then that (Sometimes it goes over a minute). Can someone
+explain how can i limit the inquiry time to the 11 sec window? Why does thi=
+s
+happens?  Also, where can i find a detailed document with all the features
+and parameters of the hciconfig?
+
+Thank you
 
 Regards
 
-Marcel
+Artur
 
+------=_Part_4553_1386403.1133960603979
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
+<div>Dear All</div>
+<div>&nbsp;</div>
+<div>&nbsp;The Bt specification says that once you send a inquiry request, =
+you should get all the responses +-11 seconds. Many times i&nbsp;send an in=
+quiry and it lasts a lot more then that (Sometimes it goes over a minute). =
+Can someone explain how can i limit the inquiry time to the 11 sec window?&=
+nbsp;Why does this happens?&nbsp; Also, where can i find a detailed documen=
+t with all the features and parameters of the hciconfig?
+</div>
+<div>&nbsp;</div>
+<div>Thank you</div>
+<div>&nbsp;</div>
+<div>Regards</div>
+<div>&nbsp;</div>
+<div>Artur</div>
+<div>&nbsp;</div>
+
+------=_Part_4553_1386403.1133960603979--
 
 
 -------------------------------------------------------
