@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Cant send bluetooth using my linux and bluez
+Subject: Re: [Bluez-users] Cannot send messages to my bluetooth enabled
+	Phone using RFCOMM
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20051207061807.73581.qmail@web50510.mail.yahoo.com>
-References: <20051207061807.73581.qmail@web50510.mail.yahoo.com>
+In-Reply-To: <20051206050255.28756.qmail@web36106.mail.mud.yahoo.com>
+References: <20051206050255.28756.qmail@web36106.mail.mud.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1133946636.11247.13.camel@blade>
+Message-Id: <1133946457.11247.10.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,15 +19,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 07 Dec 2005 10:10:36 +0100
+Date: Wed, 07 Dec 2005 10:07:37 +0100
 
-Hi,
+Hi Swathi,
 
-> I can not send bluetooth from my phone to my pc. I'm
-> using linux kernel 2.6.0 and bluez-lib 2.22 and
-> bluez-utils2.22. Can someone look at what's wrong...
+> I am trying to send some data to my bluetooth enabled
+> Sony Ericsson
+> handphone T630 from my PC which has the bluez stack
+> running on it, i am using the RFCOMM.
+> 
+> I get the error message "Cant create socket" and "bad
+> file descriptor" 
+> 
+> Can someone help me in finding the mistake and in
+> correcting the below code
+> 
+> ------------------------------------------------------------------
+> #include <stdio.h>
+> #include <string.h>
+> #include <sys/socket.h>
+> #include <bluetooth/bluetooth.h>
+> #include <bluetooth/rfcomm.h>
+> 
+> int main(int argc, char **argv)
+> {
+>    struct sockaddr_rc addr = { 0 };
+>    int s, status;
+>    char dest[18] = "00:0A:D9:4C:EB:9A";  // BD of my
+> sony erricson phone
+>    
+>    //allocate a socket
+>    s =
+> socket(AF_BLUETOOTH,SOCK_SEQPACKET,BTPROTO_RFCOMM);
+> 
+>    if (s < 0) {
+>      printf("Cant create socket:\n");
+>    }
 
-for starters, why don't you use a recent 2.6.14 kernel.
+the RFCOMM protocol is a SOCK_STREAM.
 
 Regards
 
