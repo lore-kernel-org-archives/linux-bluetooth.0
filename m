@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4396F9AD.9020203@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <4396F636.4020400@csr.com>
+From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Bluetooth Voice Setting
-References: <HCEOIFALKKLBLJPENPNOKEGGCAAA.khaled@ipbill.com> <4396F636.4020400@csr.com>
-In-Reply-To: <4396F636.4020400@csr.com>
-Content-Type: text/plain; charset=ISO-8859-1
+References: <HCEOIFALKKLBLJPENPNOKEGGCAAA.khaled@ipbill.com>
+In-Reply-To: <HCEOIFALKKLBLJPENPNOKEGGCAAA.khaled@ipbill.com>
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,23 +18,72 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 07 Dec 2005 08:03:09 -0700
+Date: Wed, 07 Dec 2005 14:48:22 +0000
 
-Khaled,
+Khaled wrote:
+> From the following I understand that once the SCO link is established (when
+> a phone call is made), HV3 SCO packets are transmitted with voice data, but
+> then what do the subsequent mean? I assume they are incoming HV3 packets?
 
-Run "hciconfig hci0 revision" as root and show us the output.
+They're not SCO packets. They're RFCOMM packets. There are no SCO
+packets on the trace.
 
-Also see http://bluetooth-alsa.sourceforge.net/index.html#help
+At the AT command level, the sequence is (with explanation):
 
-Brad
+  < \r\nATD0208xxxxx13;\r\n  ; dial number (I've x'd out the number)
+  > \r\nOK\r\n               ; ok, will do
+  > \r\n+CIEV: 3,2\r\n       ; outgoing call setup in progress
+  [SCO link created at HCI]
+  > \r\n+CIEV: 3,3\r\n       ; remote party alerted
+  > \r\n+CIEV: 1,1\r\n       ; call active
+  > \r\n+CIEV: 3,0\r\n       ; no longer in call setup (now in call)
+  > \r\nERROR\r\n            ; something went wrong
+  > \r\n+CIEV: 1,0\r\n       ; call inactive
+  < \r\nAT+CHUP\r\n.         ; hangup
+  [SCO link disconnect started at HCI]
+  > \r\nOK\r\n               ; ok
+  [SCO link disconnect completes at HCI]
 
-Steven Singer wrote:
-> There are no SCO packets in the trace. Ar you sure your module is set
-> to route SCO over HCI (as opposed to over a PCM port). hciconfig
-> revision should tell you. You should also do hciconfig -a.
-> 
-> It may be that the other side has got upset that the SCO link is up
-> and it's connected to the remote side, but there has been no SCO data.
+It's worth noting that the local device splits AT messages across
+multiple RFCOMM frames. This is perfectly legal as RFCOMM is a byte
+stream not a packet stream so packet boundaries are meaningless [1].
+
+The key message is the "+CIEV: 1,0" from the other side. This indicates
+that the call has been dropped. The spec seems to imply that this in
+itself is sufficient for headset to know that the call has been
+dropped and that the AT+CHUP message is used only when the headset
+wants to initiate the disconnection. However, by this point the call
+is already down so it can't hurt.
+
+Presumably the preceeding "ERROR" indication is related. Unfortunately,
+it's not possible to tell what went wrong. All the spec says is:
+
+  * ERROR
+
+    Standard error indication code. It shall be issued on detection of
+    any syntax, format or procedure error condition. [...]
+
+Everything before the ERROR message exactly matches the reference
+message sequence chart in the spec.
+
+There are no SCO packets in the trace. Ar you sure your module is set
+to route SCO over HCI (as opposed to over a PCM port). hciconfig
+revision should tell you. You should also do hciconfig -a.
+
+It may be that the other side has got upset that the SCO link is up
+and it's connected to the remote side, but there has been no SCO data.
+
+	- Steven
+
+[1] Although it should be worth noting that certain very old headset/
+    Audio gateway implementations incorrectly expected AT commands to
+    come in a single RFCOMM frame. This doesn't appear to be anything
+    to do with what's happening here, I mention it merely for future
+    reference.
+-- 
+
+
+This message has been scanned for viruses by BlackSpider MailControl - www.blackspider.com
 
 
 -------------------------------------------------------
