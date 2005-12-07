@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4397087E.2070508@csr.com>
-From: Steven Singer <steven.singer@csr.com>
+From: "Khaled" <khaled@ipbill.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: RE: [Bluez-users] Bluetooth Voice Setting
+Message-ID: <HCEOIFALKKLBLJPENPNOCEGICAAA.khaled@ipbill.com>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth Voice Setting
-References: <HCEOIFALKKLBLJPENPNOGEGHCAAA.khaled@ipbill.com>
-In-Reply-To: <HCEOIFALKKLBLJPENPNOGEGHCAAA.khaled@ipbill.com>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain;
+	charset="iso-8859-1"
+In-Reply-To: <HCEOIFALKKLBLJPENPNOKEGHCAAA.khaled@ipbill.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,76 +18,147 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 07 Dec 2005 16:06:22 +0000
+Date: Wed, 7 Dec 2005 15:30:03 -0000
 
-Khaled wrote:
-> I have just checked hcidump again: when in an active call there is no output
-> on hcidump -X -V, the last trace is:
-> 
-> > ..+CIEV: 3,3..
-> > ..+CIEV: 1,1..
-> > ..+CIEV: 3,0..
-> 
-> The trace holds on this for as long as the call is active, then once the
-> destination (dialled phone) is hung up, still nothing happens untill about 5
-> seconds later when the call on the mobile phone dissappears, at which point
-> the next line in the trace (ERROR) appears:
-> 
-> > ..ERROR..
-> > ..+CIEV: 1,0..
+Hi Brad, Steven,
 
-Right. This looks like a perfectly normal connection and a perfectly
-normal disconnection (in response to a remote hangup). As far as all
-the signalling is concerned at all protocol levels on both sides, the
-SCO link was up and running normally in the bit in the middle.
+Further information:
 
-The problem is therefore something to do with getting the SCO data out
-of the module and into your app. You haven't said which app and which
-version of that app you're using.
+I have just checked hcidump again: when in an active call there is no output
+on hcidump -X -V, the last trace is:
 
-Anyway, this all looks more like Brad's department than mine :-) Maybe
-you have to run some command to get the USB subsystem to start polling
-the isochronous endpoints.
+> ACL data: handle 40 flags 0x02 dlen 22
+    L2CAP(d): cid 0x0040 len 18 [psm 0]
+      0000: 69 ef 1d 0d 0a 2b 43 49  45 56 3a 20 33 2c 33 0d  i....+CIEV:
+3,3.
+      0010: 0a 3e                                             .>
+> ACL data: handle 40 flags 0x02 dlen 22
+    L2CAP(d): cid 0x0040 len 18 [psm 0]
+      0000: 69 ef 1d 0d 0a 2b 43 49  45 56 3a 20 31 2c 31 0d  i....+CIEV:
+1,1.
+      0010: 0a 3e                                             .>
+> ACL data: handle 40 flags 0x02 dlen 22
+    L2CAP(d): cid 0x0040 len 18 [psm 0]
+      0000: 69 ef 1d 0d 0a 2b 43 49  45 56 3a 20 33 2c 30 0d  i....+CIEV:
+3,0.
+      0010: 0a 3e
 
-> Output from hciconfig -a:
-[...]
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver: 0x175
->         Manufacturer: Cambridge Silicon Radio (10)
-[...]
-> Output from hciconfig hcio revision:
-[...]
->         HCI 14.7
+The trace holds on this for as long as the call is active, then once the
+destination (dialled phone) is hung up, still nothing happens untill about 5
+seconds later when the call on the mobile phone dissappears, at which point
+the next line in the trace (ERROR) appears:
 
-That's very old firmware. You might want to consider upgrading to version
-16.4 or later. I don't think SCO over USB is completely broken in 14.7,
-it's just that there were a set of bug fixes between 14.7 and 16.4. I
-suspect 14.7 works sufficiently well to get some noises out of the
-system.
+> ACL data: handle 40 flags 0x02 dlen 17
+    L2CAP(d): cid 0x0040 len 13 [psm 0]
+      0000: 69 ef 13 0d 0a 45 52 52  4f 52 0d 0a 3e           i....ERROR..>
+> ACL data: handle 40 flags 0x02 dlen 22
+    L2CAP(d): cid 0x0040 len 18 [psm 0]
+      0000: 69 ef 1d 0d 0a 2b 43 49  45 56 3a 20 31 2c 30 0d  i....+CIEV:
+1,0.
+      0010: 0a 3e                                             .>
+< ACL data: handle 40 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 0]
+      0000: 6b ef 05 0d 0a e4                                 k.....
+< ACL data: handle 40 flags 0x02 dlen 15
+    L2CAP(d): cid 0x0040 len 11 [psm 0]
+      0000: 6b ef 0f 41 54 2b 43 48  55 50 e4                 k..AT+CHUP.
+< ACL data: handle 40 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 0]
+      0000: 6b ef 05 0d 0a e4
 
-Brad might know if anyone has successfully got SCO over USB working with
-BlueZ and 14.7 CSR firmware.
+Regards
 
-You might also want to check the output of /proc/bus/usb/devices and make
-sure the device has registered its isochronous endpoints correctly.
-
-> Any thoughts? I was wondering why then in the trace, is there references to
-> SCO? see below:
-[...]
->> HCI Event: Connect Complete (0x03) plen 11
->     status 0x00 handle 43 bdaddr 00:0E:6D:34:BD:B1 type SCO encrypt 0x01
-
-This means that a SCO connection was formed at the baseband. It says
-nothing about where the SCO data is going (or even whether there's any
-SCO data flowing across the link).
-
-Specifically, it does not say whether the USB isochronous endpoints are
-even being polled.
-
-	- Steven
--- 
+Khaled
 
 
-This message has been scanned for viruses by BlackSpider MailControl - www.blackspider.com
+
+> -----Original Message-----
+> From: bluez-users-admin@lists.sourceforge.net
+> [mailto:bluez-users-admin@lists.sourceforge.net]On Behalf Of Khaled
+> Sent: 07 December 2005 15:06
+> To: bluez-users@lists.sourceforge.net
+> Subject: RE: [Bluez-users] Bluetooth Voice Setting
+>
+>
+> Hi Brad,
+>
+> > Run "hciconfig hci0 revision" as root and show us the output.
+> >
+> > Also see http://bluetooth-alsa.sourceforge.net/index.html#help
+> >
+>
+> Some more information:
+>
+> **bluez packages were downloaded from the website
+>
+>
+> **[root@mdk10-voipgsm root]# hcitool info 00:0e:6d:34:bd:b1
+> Requesting information ...
+>         BD Address:  00:0e:6d:34:bd:b1
+>         Device Name: Nokia6310i
+>         LMP Version: 1.1 (0x1) LMP Subversion: 0x23b
+>         Manufacturer: Nokia Mobile Phones (1)
+>         Features: 0xbf 0x28 0x21 0x00 0x00 0x00 0x00 0x00
+>                 <3-slot packets> <5-slot packets> <encryption>
+> <slot offset>
+>                 <timing accuracy> <role switch> <sniff mode> <SCO link>
+>                 <HV3 packets> <CVSD> <flow control (MB)
+>
+> **[root@mdk10-voipgsm root]# uname -r
+> 2.6.3-7mdk (Mandrake 10)
+>
+> **
+>
+> [root@mdk10-voipgsm root]# hcitool con
+> Connections:
+>         < ACL 00:0E:6D:7A:B1:FA handle 40 state 1 lm MASTER
+> 	#When asterisk
+> is started and 6310i is initialised
+> [root@mdk10-voipgsm root]# hcitool con
+> Connections:
+>         > SCO 00:0E:6D:34:BD:B1 handle 46 state 1 lm SLAVE
+> 	#When a call is
+> made from the soft phone
+>         < ACL 00:0E:6D:34:BD:B1 handle 43 state 1 lm MASTER ENCRYPT
+> [root@mdk10-voipgsm root]# hcitool con
+> Connections:
+>         < ACL 00:0E:6D:34:BD:B1 handle 43 state 1 lm MASTER
+> ENCRYPT	#After
+> hangup of soft phone
+>
+>
+>
+> Kind Regards
+>
+> Khaled
+>
+>
+>
+>
+>
+>
+> -------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc. Do you grep
+> through log files
+> for problems?  Stop!  Download the new AJAX search engine that makes
+> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+> http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+> ______________________________________________________________________
+> This email has been scanned by the MessageLabs Email Security System.
+> For more information please visit http://www.messagelabs.com/email
+> ______________________________________________________________________
+>
+> ______________________________________________________________________
+> This email has been scanned by the MessageLabs Email Security System.
+> For more information please visit http://www.messagelabs.com/email
+> ______________________________________________________________________
+>
+
 
 
 -------------------------------------------------------
