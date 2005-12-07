@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051207061807.73581.qmail@web50510.mail.yahoo.com>
-From: oj ravadilla <ojravadilla@yahoo.com>
-To: Bluez-users@lists.sourceforge.net
+Message-ID: <43966AC8.3080304@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Cant send bluetooth using my linux and bluez
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Re: Cellink BTA-6030 adapter of choice? usb & bt
+   2.0
+References: <dmtgch$4g9$1@sea.gmane.org> <1133681661.4427.0.camel@blade> <dmvc45$5gn$1@sea.gmane.org> <43937075.7080703@xmission.com> <dn5mo9$k2t$1@sea.gmane.org>
+In-Reply-To: <dn5mo9$k2t$1@sea.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,35 +19,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 6 Dec 2005 22:18:07 -0800 (PST)
+Date: Tue, 06 Dec 2005 21:53:28 -0700
 
-Hi,
+sean
 
-I can not send bluetooth from my phone to my pc. I'm
-using linux kernel 2.6.0 and bluez-lib 2.22 and
-bluez-utils2.22. Can someone look at what's wrong...
+> My main application is voip.  As I understand it, I need sco audio.
+> 
+> Right?
 
-hcidump:
+yes
 
- # hcidump -X -V
-HCI sniffer - Bluetooth packet analyzer ver 1.23
-device: hci0 snap_len: 1028 filter: 0xffffffff
-hci_acldata_packet: hci0 ACL packet for unknown
-connection handle 41
-> ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0048
+>> hmm. if you found level1 for export from the uk that's the best bet. i'm
+>> not in a hurry so i'll wait to see a domestic US offering.
+>>
+> It's on ebay.
 
+I'm curious... what search do you use? I've checked from time to time
+and never found any 2.0 adapters that have a clearly labeled manufacturer.
 
-thanks!
-
-
-
-		
-__________________________________________ 
-Yahoo! DSL – Something to write home about. 
-Just $16.99/mo. or less. 
-dsl.yahoo.com 
-
+Brad
 
 
 -------------------------------------------------------
