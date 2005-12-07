@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth Voice Setting
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <HCEOIFALKKLBLJPENPNOGEGECAAA.khaled@ipbill.com>
-References: <HCEOIFALKKLBLJPENPNOGEGECAAA.khaled@ipbill.com>
-Content-Type: text/plain
-Message-Id: <1133952508.3752.1.camel@blade>
-Mime-Version: 1.0
+From: "Khaled" <khaled@ipbill.com>
+To: "Bluez-Users@Lists. Sourceforge. Net" <bluez-users@lists.sourceforge.net>
+Message-ID: <HCEOIFALKKLBLJPENPNOGEGECAAA.khaled@ipbill.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Subject: [Bluez-users] Bluetooth Voice Setting
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,25 +17,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 07 Dec 2005 11:48:28 +0100
+Date: Wed, 7 Dec 2005 10:17:50 -0000
 
-Hi Khaled,
+Hi,
 
-> Can someone tell me how to set the bluetooth voice settings when using sco
-> and what to set it to?
-> My hcidump shows voice setting as (0x03|0x0025) - what does this mean? Also,
-> the hcidump shows that a connection is created for DM* and DH* packet types:
-> for sco, should this not be HV* packet types?
+Can someone tell me how to set the bluetooth voice settings when using sco
+and what to set it to?
+My hcidump shows voice setting as (0x03|0x0025) - what does this mean? Also,
+the hcidump shows that a connection is created for DM* and DH* packet types:
+for sco, should this not be HV* packet types?
 
-you don't need to worry about it. The packet types and the voice setting
-are not related (from the HCI viewpoint). If you wanna know details
-about it, look at the HCI part of the Bluetooth specification. The value
-is a bitmask and it is explained in detail there.
+Any help is greatly appreciated.
 
-Regards
-
-Marcel
-
+Khaled
 
 
 
