@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] ISSC IVT USB dongle
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43982BAC.2030508@rambler.ru>
+From: Pavel Fedin <sonic_amiga@rambler.ru>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43982BAC.2030508@rambler.ru>
+Subject: Re: [Bluez-users] ISSC IVT USB dongle
 References: <43982224.6020208@rambler.ru> <1134044091.3752.87.camel@blade>
-	 <43982BAC.2030508@rambler.ru>
-Content-Type: text/plain
-Message-Id: <1134047622.3752.89.camel@blade>
-Mime-Version: 1.0
+In-Reply-To: <1134044091.3752.87.camel@blade>
+Content-Type: text/plain; charset=KOI8-R; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,32 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Dec 2005 14:13:42 +0100
+Date: Thu, 08 Dec 2005 15:48:44 +0300
 
-Hi Pavel,
+Marcel Holtmann wrote:
 
-> > looks like the funny dongle with BD_ADDR 22:22:22:22:22:22 I posted some
-> > minutes ago. Does lsusb shows something like this:
-> > 
-> > ID 1131:1001 Integrated System Solution Corp. KY-BT100 Bluetooth Adapter
+> looks like the funny dongle with BD_ADDR 22:22:22:22:22:22 I posted some
+> minutes ago. Does lsusb shows something like this:
 > 
->   Have no lsusb command installed and too lazy to search for it in the RPMs (Fedora Core 4).
+> ID 1131:1001 Integrated System Solution Corp. KY-BT100 Bluetooth Adapter
 
-come on, it is in usbutils.
+  Have no lsusb command installed and too lazy to search for it in the RPMs (Fedora Core 4).
 
-> 
-> > The extra line is for firmware upgrades and normally never attached to
-> > any driver. Your device has been successfully recognized.
-> 
->   Well, why does nothing work then?
+> The extra line is for firmware upgrades and normally never attached to
+> any driver. Your device has been successfully recognized.
 
-Check what "hciconfig -a" says and if hcid is running.
+  Well, why does nothing work then?
 
-Regards
-
-Marcel
-
-
+  Kind regards.
 
 
 -------------------------------------------------------
