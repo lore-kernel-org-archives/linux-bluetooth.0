@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43981FAA.80106@ncoretech.com>
-From: Zaheer Ahamed <zaheer@ncoretech.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] [Fwd: obex command timing out.Unable to connect to sdpd server.]
+Content-Type: text/plain
+Message-Id: <1134041014.3752.84.camel@blade>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Another funny dongle
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,51 +16,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 08 Dec 2005 17:27:30 +0530
+Date: Thu, 08 Dec 2005 12:23:34 +0100
 
-Hello All,
+Hi,
 
-Waiting for Any responses.
+I got another funny dongle. The chip inside is from ISSC and in general
+this device works without any problems, but it shows 22:22:22:22:22:22
+as its BD_ADDR.
 
-Warm Regards,
+hci0:   Type: USB
+        BD Address: 22:22:22:22:22:22 ACL MTU: 678:8 SCO MTU: 48:10
+        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <sniff mode> <RSSI>
+                <channel quality> <SCO link> <HV2 packets> <HV3 packets>
+                <u-law log> <A-law log> <CVSD> <power control>
+                <transparent SCO> <broadcast encrypt> <enhanced iscan>
+                <interlaced iscan> <interlaced pscan> <inquiry with RSSI>
+                <AFH cap. slave> <AFH cap. master> <AFH class. master>
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x1f4 LMP Ver: 1.2 (0x2) LMP Subver: 0x1f4
+        Manufacturer: Integrated System Solution Corp. (57)
 
-Zaheer.
+So either the dongle manufacturer forgot to set the addresses or this is
+a ROM device which needs a special initialization routine. Does anybody
+have some details about ISSC chips?
 
--------- Original Message --------
-Subject: 	obex command timing out.Unable to connect to sdpd server.
-Date: 	Sat, 03 Dec 2005 20:21:49 +0530
-From: 	Zaheer Ahamed <zaheer@ncoretech.com>
-Reply-To: 	zaheer@ncoretech.com
-Organization: 	Encore Software.
-To: 	bluez-devel@lists.sourceforge.net
+Regards
 
-
-
-Hello All,
-
-After making the correction, the "sdpd" server starts up  successfully.
-Now when I try out the commands with obexftp  I get the error below,
-In the second case the device seems to get disconnected.
-
-*obexftp -b -l /root*
-Scanning ...
-Using   00:0B:0D:61:79:BE       BlueZ (0)
-Failed to connect to SDP server: Connection timed out
-
-or
-*obexftp -b -l*
-Scanning ...
-Using   00:0B:0D:61:79:BE       BlueZ (0)
-usb.c: USB disconnect on device <NULL>-1 address 4
-Failed to connect to SDP server: Software caused connection abort
-
-
-A request to all for any step-by-step guide to Obexftp with Bluetooth.
-
-Warm Regards,
-
-Zaheer.
-
+Marcel
 
 
 
