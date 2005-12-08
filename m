@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] incorrect power level
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <9ec07a230512080854q1770cef1jcc17b16488ea3ca5@mail.gmail.com>
+References: <9ec07a230512080854q1770cef1jcc17b16488ea3ca5@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1134130542.10644.10.camel@blade>
+Message-Id: <1134074271.17592.16.camel@blade>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Preparing the next release
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,13 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 09 Dec 2005 13:15:42 +0100
+Date: Thu, 08 Dec 2005 21:37:51 +0100
 
-Hi guys,
+Hi Israel,
 
-my queue of things to fix before the next release is empty now and I
-think of creating the new release today. Did I missed anything or forgot
-to include a patch?
+> I am measuring the transmit power level by means of hcitool and whilst
+> the power level is over 0, there is no problem. However, when the
+> value should be negative, I get a rather odd value, 252 for example.
+> 
+> I don't konw where the problem is, but i think the value is trated as
+> unsigned integer when it is signed. Please, if somebody observed this,
+> tell me so.
+
+the code of hcitool is correct. Are you sure that you are using the
+latest version?
 
 Regards
 
