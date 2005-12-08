@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <439823BF.1@csr.com>
-From: Steven Singer <steven.singer@csr.com>
+Message-ID: <43981FAA.80106@ncoretech.com>
+From: Zaheer Ahamed <zaheer@ncoretech.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Inquiry Time
-References: <45bf5ff80512070503g6cfc5189hec21ab22768ed9cd@mail.gmail.com>
-In-Reply-To: <45bf5ff80512070503g6cfc5189hec21ab22768ed9cd@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] [Fwd: obex command timing out.Unable to connect to sdpd server.]
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,32 +16,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 08 Dec 2005 12:14:55 +0000
+Date: Thu, 08 Dec 2005 17:27:30 +0530
 
-Artur Almeida wrote:
->  The Bt specification says that once you send a inquiry request, you should
-> get all the responses +-11 seconds. Many times i send an inquiry and it
-> lasts a lot more then that (Sometimes it goes over a minute). Can someone
-> explain how can i limit the inquiry time to the 11 sec window? Why does this
-> happens?  Also, where can i find a detailed document with all the features
-> and parameters of the hciconfig?
+Hello All,
 
-I think the way the spec phrases it is that you must inquire for at least
-10.24 seconds to have a good probability of picking up all devices.
-However, it doesn't say that the inquiry process will stop after 10.24
-seconds. The host specifies how long it wants to inquire for in one of
-the parameters to HCI_Inquiry. If the host says to inquire for 30
-seconds (or whatever) then the chip quite happily will.
+Waiting for Any responses.
 
-hcidump -X -V should reveal the parameters to the HCI_Inquiry command.
->From there you should be able to work out how long the chip has been
-told to inquire for.
+Warm Regards,
 
-	- Steven
--- 
+Zaheer.
+
+-------- Original Message --------
+Subject: 	obex command timing out.Unable to connect to sdpd server.
+Date: 	Sat, 03 Dec 2005 20:21:49 +0530
+From: 	Zaheer Ahamed <zaheer@ncoretech.com>
+Reply-To: 	zaheer@ncoretech.com
+Organization: 	Encore Software.
+To: 	bluez-devel@lists.sourceforge.net
 
 
-This message has been scanned for viruses by BlackSpider MailControl - www.blackspider.com
+
+Hello All,
+
+After making the correction, the "sdpd" server starts up  successfully.
+Now when I try out the commands with obexftp  I get the error below,
+In the second case the device seems to get disconnected.
+
+*obexftp -b -l /root*
+Scanning ...
+Using   00:0B:0D:61:79:BE       BlueZ (0)
+Failed to connect to SDP server: Connection timed out
+
+or
+*obexftp -b -l*
+Scanning ...
+Using   00:0B:0D:61:79:BE       BlueZ (0)
+usb.c: USB disconnect on device <NULL>-1 address 4
+Failed to connect to SDP server: Software caused connection abort
+
+
+A request to all for any step-by-step guide to Obexftp with Bluetooth.
+
+Warm Regards,
+
+Zaheer.
+
+
+
 
 
 -------------------------------------------------------
