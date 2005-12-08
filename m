@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Inquiry Time
+Subject: RE: [Bluez-devel] Corrections in hciattach code
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <45bf5ff80512071633x7abfe08dnfccd0aee21b94008@mail.gmail.com>
-References: <45bf5ff80512070503g6cfc5189hec21ab22768ed9cd@mail.gmail.com>
-	 <1133961236.3752.27.camel@blade>
-	 <45bf5ff80512071633x7abfe08dnfccd0aee21b94008@mail.gmail.com>
+In-Reply-To: <A35A8D03A748B34A9DA2AB0335A3F93D408B70@rfsdmail.internal.rfmd.com>
+References: 
+	 <A35A8D03A748B34A9DA2AB0335A3F93D408B70@rfsdmail.internal.rfmd.com>
 Content-Type: text/plain
-Message-Id: <1134020618.3752.59.camel@blade>
+Message-Id: <1134020496.3752.56.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,15 +19,14 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 08 Dec 2005 06:43:38 +0100
+Date: Thu, 08 Dec 2005 06:41:36 +0100
 
-Hi Artur,
+Hi Jatin,
 
-> I have 3 dongles attached to my pc, in attach the hciconfig -a output:
+> You are correct about the specification but HCI reset is needed to have
+> the UART change working, even though there won't be any data loss.
 
-all of these devices are CSR chips with a decent firmware and I can't
-explain why this happens. However you should keep SNIFF and HOLD as link
-policy. Show us the output of "hcidump -X -V" for the problem.
+if you say so. The change is in the CVS now.
 
 Regards
 
