@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] UART bluetooth chip problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <7846f1440512071711x6c56c8er24edb8e3a8815ab9@mail.gmail.com>
-References: <7846f1440512071711x6c56c8er24edb8e3a8815ab9@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1134020677.3752.61.camel@blade>
-Mime-Version: 1.0
+Message-ID: <7846f1440512071711x6c56c8er24edb8e3a8815ab9@mail.gmail.com>
+From: Arthur Chiu <arthurchiu@gmail.com>
+To: Bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_5324_17120695.1134004318831"
+Subject: [Bluez-users] UART bluetooth chip problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,38 +17,74 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Dec 2005 06:44:37 +0100
+Date: Wed, 7 Dec 2005 17:11:58 -0800
 
-Hi Arthur,
+------=_Part_5324_17120695.1134004318831
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> I am currently using a bluetooth chip by bluegiga (www.bluegiga.com),
-> called WRAP THOR 2022-1-B2B. 
-> I set the configurations on the chip so that it is running at 115200
-> baud rate. After, I tried doing the following: 
-> 
-> # hcid
-> # hciattach -s 115200 /dev/ttyS1 any 115200 flow
-> # hciconfig
-> hci0:   Type: UART
->         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
->         DOWN INIT RUNNING
->         RX bytes:0 acl:0 sco:0 events:0 errors:0
->         TX bytes:4 acl:0 sco:0 commands:1 errors:0
-> # hciconfig hci0 up
-> Can't init device hci0: Connection timed out (145)
-> 
-> I checked and error code 145 indeed means Connection timed out on my
-> header files (errno.h). 
-> What might be wrong? 
+Hi, I am currently using a bluetooth chip by bluegiga (www.bluegiga.com),
+called WRAP THOR 2022-1-B2B.
+I set the configurations on the chip so that it is running at 115200 baud
+rate. After, I tried doing the following:
 
-first, you should ask you module manufacturer what chip they are using
-and then what transport they use.
+# hcid
+# hciattach -s 115200 /dev/ttyS1 any 115200 flow
+# hciconfig
+hci0:   Type: UART
+        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
+        DOWN INIT RUNNING
+        RX bytes:0 acl:0 sco:0 events:0 errors:0
+        TX bytes:4 acl:0 sco:0 commands:1 errors:0
+# hciconfig hci0 up
+Can't init device hci0: Connection timed out (145)
 
-Regards
+I checked and error code 145 indeed means Connection timed out on my header
+files (errno.h).
+What might be wrong?
 
-Marcel
+Thanks a lot.
 
+Cheers,
 
+  Arthur
+
+------=_Part_5324_17120695.1134004318831
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi, I am currently using a bluetooth chip by bluegiga (<a href=3D"http://ww=
+w.bluegiga.com">www.bluegiga.com</a>), called WRAP THOR 2022-1-B2B. <br>
+I set the configurations on the chip so that it is running at 115200 baud r=
+ate. After, I tried doing the following: <br>
+<br>
+# hcid<br>
+# hciattach -s 115200 /dev/ttyS1 any 115200 flow<br>
+# hciconfig<br>
+hci0:&nbsp;&nbsp; Type: UART<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:00:00:00:00:00 AC=
+L MTU: 0:0 SCO MTU: 0:0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DOWN INIT RUNNING<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:0 acl:0 sco:0 events:0 =
+errors:0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:4 acl:0 sco:0 commands:=
+1 errors:0<br>
+# hciconfig hci0 up<br>
+Can't init device hci0: Connection timed out (145)<br>
+<br>
+I checked and error code 145 indeed means Connection timed out on my header=
+ files (errno.h). <br>
+What might be wrong? <br>
+<br>
+Thanks a lot.<br>
+<br>
+Cheers,<br>
+<br>
+&nbsp; Arthur<br>
+
+------=_Part_5324_17120695.1134004318831--
 
 
 -------------------------------------------------------
