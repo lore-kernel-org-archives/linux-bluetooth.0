@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <7846f1440512081019g4bbf588cta4f4d395b7be0d74@mail.gmail.com>
-From: Arthur Chiu <arthurchiu@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] UART bluetooth chip problem
-In-Reply-To: <1134020677.3752.61.camel@blade>
+From: "Khaled" <khaled@ipbill.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: RE: [Bluez-users] Bluetooth Voice Setting
+Message-ID: <HCEOIFALKKLBLJPENPNOIEGLCAAA.khaled@ipbill.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_11866_16314357.1134065976690"
-References: <7846f1440512071711x6c56c8er24edb8e3a8815ab9@mail.gmail.com>
-	 <1134020677.3752.61.camel@blade>
+Content-Type: text/plain;
+	charset="iso-8859-1"
+In-Reply-To: <43984EAC.7080805@xmission.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,121 +18,74 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 8 Dec 2005 10:19:36 -0800
+Date: Thu, 8 Dec 2005 15:42:53 -0000
 
-------=_Part_11866_16314357.1134065976690
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Brad, Marcel, Steven,
 
-Hi Marcel, thanks for your reply.
+I've decided to go ahead with the kernel upgrade (unless of course you guys
+advise me not to) because:
+1. I think asterisk will require snd-bt-sco given my recent experience
+trying to troubleshoot sound settings for asterisk; asterisk does try to
+acces /dev/dsp on the machine...
+2. the sco packets from the hcidump call trace change with voice input at
+either end of the call (from the softphone and from the deskphone), despite
+there being no sound at either end, I am optimistic that I can achieve
+two-way audio should I have snd-bt-sco in the kernel.
 
-Since I can change the setting on the bluetooth chip, I am currently using
-UART H4 and baudrate 115200. As for what chip they are using, I suppose the=
-y
-manufacture their own bluetooh chip?
+Brad, when you said I should rebuild the kernel with a newer version, you
+said:
+>You'll have to rebuild sco_bt_snd too.
+How can I do this? I have never done this before...
 
-Thanks,
+Kind Regards
 
-  Arthur
+Khaled
 
-On 12/7/05, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Arthur,
->
-> > I am currently using a bluetooth chip by bluegiga (www.bluegiga.com),
-> > called WRAP THOR 2022-1-B2B.
-> > I set the configurations on the chip so that it is running at 115200
-> > baud rate. After, I tried doing the following:
-> >
-> > # hcid
-> > # hciattach -s 115200 /dev/ttyS1 any 115200 flow
-> > # hciconfig
-> > hci0:   Type: UART
-> >         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
-> >         DOWN INIT RUNNING
-> >         RX bytes:0 acl:0 sco:0 events:0 errors:0
-> >         TX bytes:4 acl:0 sco:0 commands:1 errors:0
-> > # hciconfig hci0 up
-> > Can't init device hci0: Connection timed out (145)
-> >
-> > I checked and error code 145 indeed means Connection timed out on my
-> > header files (errno.h).
-> > What might be wrong?
->
-> first, you should ask you module manufacturer what chip they are using
-> and then what transport they use.
->
-> Regards
->
-> Marcel
+> -----Original Message-----
+> From: bluez-users-admin@lists.sourceforge.net
+> [mailto:bluez-users-admin@lists.sourceforge.net]On Behalf Of Brad
+> Midgley
+> Sent: 08 December 2005 15:18
+> To: bluez-users@lists.sourceforge.net
+> Subject: Re: [Bluez-users] Bluetooth Voice Setting
 >
 >
+> Khaled
+>
+> What I'm saying is asterisk either connects to (eg) /dev/dsp1 or the
+> alsa device, invoking snd-bt-sco which sends/receives over bluetooth
+> sockets OR asterisk sends and receives over bluetooth sockets without
+> bothering with snd-bt-sco. Have a look at the code or ask the
+> asterisk guy.
+>
+> Brad
+>
+> > If I am trying to use voip, then wouldn't the application
+> (asterisk) require
+> > the snd_bt_sco module? Perhaps this is why I am not getting any
+> sound (as
+> > shown in the hcidump output of my last message).
+> > Is this a sensible assumption because I am using a softphone that is
+> > connected to the machine configured as a handsfree headset via voip?
 >
 >
 > -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log
-> files
+> This SF.net email is sponsored by: Splunk Inc. Do you grep
+> through log files
 > for problems?  Stop!  Download the new AJAX search engine that makes
 > searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
+> http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
 > _______________________________________________
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
 >
+> ______________________________________________________________________
+> This email has been scanned by the MessageLabs Email Security System.
+> For more information please visit http://www.messagelabs.com/email
+> ______________________________________________________________________
+>
 
-------=_Part_11866_16314357.1134065976690
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi Marcel, thanks for your reply.<br>
-<br>
-Since I can change the setting on the bluetooth chip, I am currently
-using UART H4 and baudrate 115200. As for what chip they are using, I
-suppose they manufacture their own bluetooh chip? <br>
-<br>
-Thanks,<br>
-<br>
-&nbsp; Arthur<br><br><div><span class=3D"gmail_quote">On 12/7/05, <b class=
-=3D"gmail_sendername">Marcel Holtmann</b> &lt;<a href=3D"mailto:marcel@holt=
-mann.org">marcel@holtmann.org</a>&gt; wrote:</span><blockquote class=3D"gma=
-il_quote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0=
-pt 0pt 0.8ex; padding-left: 1ex;">
-Hi Arthur,<br><br>&gt; I am currently using a bluetooth chip by bluegiga (<=
-a href=3D"http://www.bluegiga.com">www.bluegiga.com</a>),<br>&gt; called WR=
-AP THOR 2022-1-B2B.<br>&gt; I set the configurations on the chip so that it=
- is running at 115200
-<br>&gt; baud rate. After, I tried doing the following:<br>&gt;<br>&gt; # h=
-cid<br>&gt; # hciattach -s 115200 /dev/ttyS1 any 115200 flow<br>&gt; # hcic=
-onfig<br>&gt; hci0:&nbsp;&nbsp; Type: UART<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU:=
- 0:0
-<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DOWN INIT RUNNING<=
-br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:0 acl:0 sc=
-o:0 events:0 errors:0<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p; TX bytes:4 acl:0 sco:0 commands:1 errors:0<br>&gt; # hciconfig hci0 up<b=
-r>&gt; Can't init device hci0: Connection timed out (145)
-<br>&gt;<br>&gt; I checked and error code 145 indeed means Connection timed=
- out on my<br>&gt; header files (errno.h).<br>&gt; What might be wrong?<br>=
-<br>first, you should ask you module manufacturer what chip they are using
-<br>and then what transport they use.<br><br>Regards<br><br>Marcel<br><br><=
-br><br><br>-------------------------------------------------------<br>This =
-SF.net email is sponsored by: Splunk Inc. Do you grep through log files
-<br>for problems?&nbsp;&nbsp;Stop!&nbsp;&nbsp;Download the new AJAX search =
-engine that makes<br>searching your log files as easy as surfing the&nbsp;&=
-nbsp;web.&nbsp;&nbsp;DOWNLOAD SPLUNK!<br><a href=3D"http://ads.osdn.com/?ad=
-_id=3D7637&amp;alloc_id=3D16865&amp;op=3Dclick">
-http://ads.osdn.com/?ad_id=3D7637&amp;alloc_id=3D16865&amp;op=3Dclick</a><b=
-r>_______________________________________________<br>Bluez-users mailing li=
-st<br><a href=3D"mailto:Bluez-users@lists.sourceforge.net">Bluez-users@list=
-s.sourceforge.net
-</a><br><a href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-users=
-">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockqu=
-ote></div><br>
-
-------=_Part_11866_16314357.1134065976690--
 
 
 -------------------------------------------------------
