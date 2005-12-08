@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43983410.5010701@rambler.ru>
-From: Pavel Fedin <sonic_amiga@rambler.ru>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] ISSC IVT USB dongle
-References: <43982224.6020208@rambler.ru> <1134044091.3752.87.camel@blade>	 <43982BAC.2030508@rambler.ru> <1134047622.3752.89.camel@blade>
-In-Reply-To: <1134047622.3752.89.camel@blade>
-Content-Type: text/plain; charset=KOI8-R; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <43982BAC.2030508@rambler.ru>
+References: <43982224.6020208@rambler.ru> <1134044091.3752.87.camel@blade>
+	 <43982BAC.2030508@rambler.ru>
+Content-Type: text/plain
+Message-Id: <1134047622.3752.89.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,19 +19,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Dec 2005 16:24:32 +0300
+Date: Thu, 08 Dec 2005 14:13:42 +0100
 
-Marcel Holtmann wrote:
+Hi Pavel,
 
-> Check what "hciconfig -a" says and if hcid is running.
+> > looks like the funny dongle with BD_ADDR 22:22:22:22:22:22 I posted some
+> > minutes ago. Does lsusb shows something like this:
+> > 
+> > ID 1131:1001 Integrated System Solution Corp. KY-BT100 Bluetooth Adapter
+> 
+>   Have no lsusb command installed and too lazy to search for it in the RPMs (Fedora Core 4).
 
-  It reported that hci0 is in DOWN state. After hciconfig hci0 up everything worked fine! Thank you 
-very much!
-  In fact you saved my work. Windoze implementation doesn't work with RFCOMM. Just doesn't, noone 
-knows why. Of course i expect Linux to work pretty well.
-  BTW, how to set up my system then to bring up hci0 automatically?
+come on, it is in usbutils.
 
-  Kind regards.
+> 
+> > The extra line is for firmware upgrades and normally never attached to
+> > any driver. Your device has been successfully recognized.
+> 
+>   Well, why does nothing work then?
+
+Check what "hciconfig -a" says and if hcid is running.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
