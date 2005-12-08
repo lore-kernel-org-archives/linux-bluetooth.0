@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <9ec07a230512080854q1770cef1jcc17b16488ea3ca5@mail.gmail.com>
-From: =?ISO-8859-1?Q?Israel_Gu=EDo?= <israzar@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <439823BF.1@csr.com>
+From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_21471_1017124.1134060869677"
-Subject: [Bluez-devel] incorrect power level
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Inquiry Time
+References: <45bf5ff80512070503g6cfc5189hec21ab22768ed9cd@mail.gmail.com>
+In-Reply-To: <45bf5ff80512070503g6cfc5189hec21ab22768ed9cd@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,38 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 8 Dec 2005 17:54:29 +0100
+Date: Thu, 08 Dec 2005 12:14:55 +0000
 
-------=_Part_21471_1017124.1134060869677
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Artur Almeida wrote:
+>  The Bt specification says that once you send a inquiry request, you should
+> get all the responses +-11 seconds. Many times i send an inquiry and it
+> lasts a lot more then that (Sometimes it goes over a minute). Can someone
+> explain how can i limit the inquiry time to the 11 sec window? Why does this
+> happens?  Also, where can i find a detailed document with all the features
+> and parameters of the hciconfig?
 
-Hi all,
+I think the way the spec phrases it is that you must inquire for at least
+10.24 seconds to have a good probability of picking up all devices.
+However, it doesn't say that the inquiry process will stop after 10.24
+seconds. The host specifies how long it wants to inquire for in one of
+the parameters to HCI_Inquiry. If the host says to inquire for 30
+seconds (or whatever) then the chip quite happily will.
 
-I am measuring the transmit power level by means of hcitool and whilst the
-power level is over 0, there is no problem. However, when the value should
-be negative, I get a rather odd value, 252 for example.
+hcidump -X -V should reveal the parameters to the HCI_Inquiry command.
+>From there you should be able to work out how long the chip has been
+told to inquire for.
 
-I don't konw where the problem is, but i think the value is trated as
-unsigned integer when it is signed. Please, if somebody observed this, tell
-me so.
+	- Steven
+-- 
 
-Thanks.
 
-------=_Part_21471_1017124.1134060869677
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi all,<br><br>I am measuring the transmit power level by means of hcitool =
-and whilst the power level is over 0, there is no problem. However, when th=
-e value should be negative, I get a rather odd value, 252 for example.<br>
-<br>I don't konw where the problem is, but i think the value is trated as u=
-nsigned integer when it is signed. Please, if somebody observed this, tell =
-me so.<br><br>Thanks.<br>
-
-------=_Part_21471_1017124.1134060869677--
+This message has been scanned for viruses by BlackSpider MailControl - www.blackspider.com
 
 
 -------------------------------------------------------
