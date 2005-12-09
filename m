@@ -1,10 +1,20 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4303.128.59.13.26.1134166099.squirrel@webmail.cs.columbia.edu>
-From: mv2147@cs.columbia.edu
+Subject: Re: [Bluez-users] UART bluetooth chip problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Subject: [Bluez-users] bluetooth USB device Class for Audio Handoff.
+In-Reply-To: <7846f1440512091123p5abce553gff0ef4658bc5ee45@mail.gmail.com>
+References: <7846f1440512071711x6c56c8er24edb8e3a8815ab9@mail.gmail.com>
+	 <1134020677.3752.61.camel@blade>
+	 <7846f1440512081019g4bbf588cta4f4d395b7be0d74@mail.gmail.com>
+	 <1134074044.17592.13.camel@blade>
+	 <7846f1440512081510w4ffff8cdoe25ae369e677144@mail.gmail.com>
+	 <1134087822.17592.44.camel@blade>
+	 <7846f1440512090946n58fbf3e8gfecd3ebeb270bf58@mail.gmail.com>
+	 <1134154036.10644.18.camel@blade>
+	 <7846f1440512091123p5abce553gff0ef4658bc5ee45@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1134158505.10644.22.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,47 +26,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 9 Dec 2005 17:08:19 -0500 (EST)
+Date: Fri, 09 Dec 2005 21:01:45 +0100
 
+Hi Arthur,
 
+> I checked the firmware version and this is what it says:
+> "The chip reports version 1503 (0x05df):
+> bc02x_8unified_fl_bt1.2_18_200407161536_encr56 2004-07-16"
+> 
+> What should I ask the support group then? It seems like they verified
+> that the settings I used on the chip is sufficient to modify the chip
+> so that it fits the requirements of hciattach (baud_rate and setting
+> it to use external HCI provided by hcid). 
+> 
+> What other things would you suggest me to try? Hopefully you can help
+> me to get this to work. Thanks a lot!
 
-Hi everyone,
+I am not 100% sure, but I think the PS key for UART configuration and
+baud rate settings were with HCI 18.x firmware. Meaning that there
+exists per transport PS keys. However I might be also wrong here. Tell
+them to send you the pskeys.txt file.
 
-    I am developing a SIP based application for RTP audio handoff
-between bluetooth headsets while a call session is in progress.
-I am using Dlink DBT-120 adapters and Jabra-250v headsets.
-Unfortunately, the correct class of the Dlink DBT-120 is not being
-recognized. Though it is able to discover the headset, it is not able
-to connect the headset.
-I am able to change the class with....
+Regards
 
-hciconfig hci0 class 0x3e0100, but this does not help.
-
-Can someone help me out with the firmware upgrade or
-bluetooth setup?
-Please see below for details...
-root@lirr sipua]# btsco 00:07:A4:26:8D:3F
-Error: Failed to connect to SDP server: Function not implemented  !!!
-Assuming channel 2
-
-[root@lirr kernel]# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:13:46:4C:0B:8B ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:1570 acl:0 sco:0 events:59 errors:0
-        TX bytes:347 acl:0 sco:0 commands:40 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'lirr.cs.columbia.edu-0'
-        Class: 0x000000 --------------------------???!!!!!!
-        Service Classes: Unspecified --------------????!!!!
-        Device Class: Miscellaneous,--------------????!!!!
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
-0x20d
-        Manufacturer: Cambridge Silicon Radio (10)
-
+Marcel
 
 
 
