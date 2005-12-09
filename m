@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Ian Miller <ian@thetasig.fsnet.co.uk>
+Message-ID: <4303.128.59.13.26.1134166099.squirrel@webmail.cs.columbia.edu>
+From: mv2147@cs.columbia.edu
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20051210202307.GA9167@janeway>
-References: <4303.128.59.13.26.1134166099.squirrel@webmail.cs.columbia.edu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4303.128.59.13.26.1134166099.squirrel@webmail.cs.columbia.edu>
-Subject: [Bluez-users] bluez - a general plea for help :)
+MIME-Version: 1.0
+Content-Type: text/plain;charset=iso-8859-1
+Subject: [Bluez-users] bluetooth USB device Class for Audio Handoff.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,39 +16,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 10 Dec 2005 20:23:07 +0000
+Date: Fri, 9 Dec 2005 17:08:19 -0500 (EST)
 
 
-Hi folks,
 
-I posted a query here a while back, but then decided I didn't know 
-enough of what I was doing to continue, so went back to re-read 
-the HOWTOs. Having done that, however, I still find that I'm 
-none the wiser!
+Hi everyone,
 
-So, could you guys give me a few hints to get me started on the
-right track..? 
+    I am developing a SIP based application for RTP audio handoff
+between bluetooth headsets while a call session is in progress.
+I am using Dlink DBT-120 adapters and Jabra-250v headsets.
+Unfortunately, the correct class of the Dlink DBT-120 is not being
+recognized. Though it is able to discover the headset, it is not able
+to connect the headset.
+I am able to change the class with....
 
-Basically, I have a Palm Vx with a TDK Systems Blue5 attachment, and a 
-USB dongle connected to my linux box (running Fedora Core 4). What I 
-would like to do is set up a BT connection to transfer data back and 
-forth using pilot-link. My problem is, I don't know what the major
-high level steps towards achieving this goal are - e.g. what should
-actually happen when a pair is achieved? How is the data transfered -
-is it through the /dev/rfcomm0 device, as though this were a serial
-device?
+hciconfig hci0 class 0x3e0100, but this does not help.
 
-My current status is that I can see the Palm from the linux machine
-and vice versa - but I'm unable to get them to pair - however, from
-this point on, I've been going round in circles, primarily because 
-I don't really know what *should* happen when they *do* pair!
+Can someone help me out with the firmware upgrade or
+bluetooth setup?
+Please see below for details...
+root@lirr sipua]# btsco 00:07:A4:26:8D:3F
+Error: Failed to connect to SDP server: Function not implemented  !!!
+Assuming channel 2
 
-Any advice greatly appreciated!
+[root@lirr kernel]# hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:13:46:4C:0B:8B ACL MTU: 192:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:1570 acl:0 sco:0 events:59 errors:0
+        TX bytes:347 acl:0 sco:0 commands:40 errors:0
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'lirr.cs.columbia.edu-0'
+        Class: 0x000000 --------------------------???!!!!!!
+        Service Classes: Unspecified --------------????!!!!
+        Device Class: Miscellaneous,--------------????!!!!
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
+0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
 
-Yours in confusion,
-
-Ian
- 
 
 
 
