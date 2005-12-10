@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <478d26d00512101355g1bca6ab6g@mail.gmail.com>
-From: Toni Fiz <toni.fiz@gmail.com>
+From: Ian Miller <ian@thetasig.fsnet.co.uk>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_29181_22902844.1134251713551"
-Subject: [Bluez-users] Pair problems with nokia 6230
+Message-ID: <20051210202307.GA9167@janeway>
+References: <4303.128.59.13.26.1134166099.squirrel@webmail.cs.columbia.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4303.128.59.13.26.1134166099.squirrel@webmail.cs.columbia.edu>
+Subject: [Bluez-users] bluez - a general plea for help :)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,40 +18,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 10 Dec 2005 22:55:13 +0100
+Date: Sat, 10 Dec 2005 20:23:07 +0000
 
-------=_Part_29181_22902844.1134251713551
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-Hi
+Hi folks,
 
-I have problems pairing this phone (nokia 6230) with my PC
-I'm running ubuntu breezy (5.10) and other services like object push work
-properly so I think the problem is not on the bluetooth devidce or the
-phone.
-Of course, I enter the same pin in the mobile that is in the 'pin' file, an=
-d
-the hcid.conf security option is set to auto
+I posted a query here a while back, but then decided I didn't know 
+enough of what I was doing to continue, so went back to re-read 
+the HOWTOs. Having done that, however, I still find that I'm 
+none the wiser!
 
-Any idea?
+So, could you guys give me a few hints to get me started on the
+right track..? 
 
-Greetings from Spain
+Basically, I have a Palm Vx with a TDK Systems Blue5 attachment, and a 
+USB dongle connected to my linux box (running Fedora Core 4). What I 
+would like to do is set up a BT connection to transfer data back and 
+forth using pilot-link. My problem is, I don't know what the major
+high level steps towards achieving this goal are - e.g. what should
+actually happen when a pair is achieved? How is the data transfered -
+is it through the /dev/rfcomm0 device, as though this were a serial
+device?
 
-------=_Part_29181_22902844.1134251713551
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+My current status is that I can see the Palm from the linux machine
+and vice versa - but I'm unable to get them to pair - however, from
+this point on, I've been going round in circles, primarily because 
+I don't really know what *should* happen when they *do* pair!
 
-Hi<br><br>I have problems pairing this phone (nokia 6230) with my PC<br>I'm=
- running ubuntu breezy (5.10) and other services like object push work prop=
-erly so I think the problem is not on the bluetooth devidce or the phone.
-<br>Of course, I enter the same pin in the mobile that is in the 'pin' file=
-, and the hcid.conf security option is set to auto<br><br>Any idea?<br><br>=
-Greetings from Spain<br><br>
+Any advice greatly appreciated!
 
-------=_Part_29181_22902844.1134251713551--
+Yours in confusion,
+
+Ian
+ 
+
+
 
 
 -------------------------------------------------------
