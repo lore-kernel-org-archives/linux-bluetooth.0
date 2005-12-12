@@ -1,16 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] MSDUN failed. Connection timed out(110)
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <532f6c3c0512121336u36cae97av@mail.gmail.com>
+From: Beware of the Hare <hujumuju@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <532f6c3c0512121336u36cae97av@mail.gmail.com>
+Subject: Re: [Bluez-users] MSDUN failed. Connection timed out(110)
+In-Reply-To: <1134422155.429.16.camel@blade>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 References: <532f6c3c0512121211j3f1fa779r@mail.gmail.com>
 	 <1134418604.429.9.camel@blade>
 	 <532f6c3c0512121252r14ebe56bn@mail.gmail.com>
 	 <1134422155.429.16.camel@blade>
-	 <532f6c3c0512121336u36cae97av@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1134423827.6919.2.camel@blade>
-Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,36 +21,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 12 Dec 2005 22:43:47 +0100
+Date: Mon, 12 Dec 2005 22:36:45 +0100
 
-Hi,
+2005/12/12, Marcel Holtmann <marcel@holtmann.org>:
 
-> > the PDA sends AT commands and not the magic CLIENTSERVER string. So you
-> > may wanna try it without the --msdun switch.
-> 
-> Works without --msdun and with this magic at-cmd.pl script like a charm :) Thnx.
-> This was probably not server-side problem, but (terrible) bluetooth
-> stack upgrade on my pda.
-> 
-> Thnx one more time for a hint.
+> the PDA sends AT commands and not the magic CLIENTSERVER string. So you
+> may wanna try it without the --msdun switch.
 
-you are welcome.
+Works without --msdun and with this magic at-cmd.pl script like a charm :) =
+Thnx.
+This was probably not server-side problem, but (terrible) bluetooth
+stack upgrade on my pda.
 
-> BTW. You said it shoudn't be nessesary to register DUN service with
-> '/usr/local/bin/sdptool add DUN' on every bluetooth start? Well, i
-> cannot connect without it, but it should be done with dund, right?
+Thnx one more time for a hint.
 
-You don't need it, because dund is registering the record when it starts
-up. However it might be buggy. Use "sdptool browse --raw local" to see
-if there are any differences in the records. Make sure that you really
-start the sdpd and dund from bluez-utils-2.23 and don't have an old copy
-somewhere in /usr/bin or /usr/sbin.
-
-Regards
-
-Marcel
-
-
+BTW. You said it shoudn't be nessesary to register DUN service with
+'/usr/local/bin/sdptool add DUN' on every bluetooth start? Well, i
+cannot connect without it, but it should be done with dund, right?
 
 
 -------------------------------------------------------
