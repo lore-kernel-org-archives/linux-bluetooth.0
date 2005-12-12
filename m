@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <532f6c3c0512121252r14ebe56bn@mail.gmail.com>
-From: Beware of the Hare <hujumuju@gmail.com>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] MSDUN failed. Connection timed out(110)
-In-Reply-To: <1134418604.429.9.camel@blade>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <532f6c3c0512121211j3f1fa779r@mail.gmail.com>
 References: <532f6c3c0512121211j3f1fa779r@mail.gmail.com>
-	 <1134418604.429.9.camel@blade>
+Content-Type: text/plain
+Message-Id: <1134418604.429.9.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,70 +18,75 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 12 Dec 2005 21:52:15 +0100
+Date: Mon, 12 Dec 2005 21:16:44 +0100
 
-2005/12/12, Marcel Holtmann <marcel@holtmann.org>:
-> Hi,
->
-> > I am trying to connect my PocketPC 2003 to the internet via bluetooth.
-> >
-> > i have all needed modules
-> >
-> > -------------------
-> > rfcomm                 34972  3
-> > l2cap                  22404  5 rfcomm
-> > hci_usb                13192  2
-> > bluetooth              43012  7 rfcomm,l2cap,hci_usb
-> > --------------------------------
-> >
-> > and deamons ( HCID, SDPD, DUND) loaded (i think ;)
->
-> what version of bluez-utils is installed?
+Hi,
 
-bluez-utils-2.23
-bluez-libs-2.23
-bluez-hcidump-1.28
+> I am trying to connect my PocketPC 2003 to the internet via bluetooth.
+> 
+> i have all needed modules
+> 
+> -------------------
+> rfcomm                 34972  3
+> l2cap                  22404  5 rfcomm
+> hci_usb                13192  2
+> bluetooth              43012  7 rfcomm,l2cap,hci_usb
+> --------------------------------
+> 
+> and deamons ( HCID, SDPD, DUND) loaded (i think ;)
 
-> > dun-mda-bt peer file is:
-> >
-> > -------------------
-> > root@pajonk:/etc/ppp/peers # cat /etc/ppp/peers/dun-mda-bt
-> > 115200
-> > local
-> > noipdefault
-> > connect "/etc/ppp/at-cmd.pl -v"
-> > noauth
-> > nodefaultroute
-> > 192.168.1.1:192.168.1.10
-> > ms-dns 192.168.1.1
-> > ------------------
-> >
-> > /etc/ppp/at-cmd.pl is a perl script that "do talking":
->
-> I don't think that this is needed. The magic is done by the --msdun
-> switch.
+what version of bluez-utils is installed?
 
-Well....i succesfully made this connection earlier on another distro
-(fedora - now i am on ubuntu) with the same devices, same settings,
-and /etc/ppp/at-cmd.pl was "a must" to connect.
+> dun-mda-bt peer file is:
+> 
+> -------------------
+> root@pajonk:/etc/ppp/peers # cat /etc/ppp/peers/dun-mda-bt
+> 115200
+> local
+> noipdefault
+> connect "/etc/ppp/at-cmd.pl -v"
+> noauth
+> nodefaultroute
+> 192.168.1.1:192.168.1.10
+> ms-dns 192.168.1.1
+> ------------------
+> 
+> /etc/ppp/at-cmd.pl is a perl script that "do talking":
 
-Looks like this script isn't executed. At least it doesn't appear in
-log file as it should:
-http://wiki.xda-developers.com/index.php?pagename=3Dbluetoothnetworking
+I don't think that this is needed. The magic is done by the --msdun
+switch.
 
->
-> > DUN profile is registered by /usr/local/bin/sdptool add DUN
-> No need for that, because dund will do that for you if not told
-> otherwise.
+> DUN profile is registered by /usr/local/bin/sdptool add DUN
 
-Here are hcidump logs with and without DUN service registered before
-connection attempt:
+No need for that, because dund will do that for you if not told
+otherwise.
 
-http://grudziadz.org/hcidump_with_DUN_regietered.log
-http://grudziadz.org/hcidump_without_DUN_regietered.log
+> Device can be seen:
+> 
+> ---------------------------------
+> root@pajonk:/etc/ppp/peers # /usr/local/bin/hcitool scan
+> Scanning ...
+>         00:09:2D:4D:62:FE       MDAcompact
+> ---------------------------------
 
---
-Best regards
+This is unimportant.
+
+> Now i am trying to connect. Here is the log:
+> 
+> ==> /var/log/syslog <==
+> Dec 12 21:00:16 pajonk hcid[1952]: link_key_request
+> (sba=00:08:F4:00:70:D3, dba=00:09:2D:4D:62:FE)
+> Dec 12 21:00:26 pajonk dund[2035]: MSDUN failed. Connection timed out(110)
+> 
+> I have no idea what's wrong.
+
+Run "hcidump -X -V" in another terminal to see what happens.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
