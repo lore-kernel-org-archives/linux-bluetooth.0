@@ -1,10 +1,22 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <532f6c3c0512121211j3f1fa779r@mail.gmail.com>
-From: Beware of the Hare <hujumuju@gmail.com>
+Subject: Re: [Bluez-users] UART bluetooth chip problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] MSDUN failed. Connection timed out(110)
+In-Reply-To: <7846f1440512121021s65b57be7g30673fa6090df057@mail.gmail.com>
+References: <7846f1440512071711x6c56c8er24edb8e3a8815ab9@mail.gmail.com>
+	 <1134020677.3752.61.camel@blade>
+	 <7846f1440512081019g4bbf588cta4f4d395b7be0d74@mail.gmail.com>
+	 <1134074044.17592.13.camel@blade>
+	 <7846f1440512081510w4ffff8cdoe25ae369e677144@mail.gmail.com>
+	 <1134087822.17592.44.camel@blade>
+	 <7846f1440512090946n58fbf3e8gfecd3ebeb270bf58@mail.gmail.com>
+	 <1134154036.10644.18.camel@blade>
+	 <7846f1440512091123p5abce553gff0ef4658bc5ee45@mail.gmail.com>
+	 <1134158505.10644.22.camel@blade>
+	 <7846f1440512121021s65b57be7g30673fa6090df057@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1134416630.429.4.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,181 +28,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 12 Dec 2005 21:11:39 +0100
+Date: Mon, 12 Dec 2005 20:43:50 +0100
 
-Hi.
+Hi Arthur,
 
-I am trying to connect my PocketPC 2003 to the internet via bluetooth.
+> After the weekend I finally get a reply to the email that I sent
+> asking for pskeys.txt. 
+> 
+> "Unfortunately not. But I have pskeys.html instead. :) I hope that
+> will do.
+> Please do not pay attention to the default values mentioned in the
+> file, some 
+> of them may vary in out modules." 
+> 
+> I'm not sure whether I can attach files to this mailing list. So I
+> send the pskeys.html file to your personal email (marcel@holtmann.org)
+> seperately, hope that's fine. Once again, thanks a lot for your help. 
 
-i have all needed modules
+the pskeys.txt and pskeys.html contain the same information. I prefer a
+text file, instead of a HTML file. Everybody who uses a decent OS knows
+the reason for that ;)
 
--------------------
-rfcomm                 34972  3
-l2cap                  22404  5 rfcomm
-hci_usb                13192  2
-bluetooth              43012  7 rfcomm,l2cap,hci_usb
---------------------------------
+However I think that you need to configure PSKEY_UART_CONFIG_H4 if you
+wanna use H4 as transport. The problem actually are the values that
+differ from the default. The one thing that the bccmd is missing is
+support for SPI as transport otherwise it would read the non-default
+values and we would see what they did with their modules. The PSTool can
+actually do the same, but don't ask me how. I never did that before.
 
-and deamons ( HCID, SDPD, DUND) loaded (i think ;)
+Maybe using BCSP as transport will work much better, because they didn't
+fucked up its configuration.
 
--------------------
-HCID_EXEC=3D"`which $HCID_NAME || true`"
-SDPD_EXEC=3D"`which $SDPD_NAME || true`"
-HIDD_EXEC=3D"`which $HIDD_NAME || true`"
-HID2HCI_EXEC=3D"`which $HID2HCI_NAME || true`"
-RFCOMM_EXEC=3D"`which $RFCOMM_NAME || true`"
-PAND_EXEC=3D"`which $PAND_NAME || true`"
-DUND_EXEC=3D"`which $DUND_NAME || true`"
+Regards
 
-HCID_ENABLE=3Dtrue
-SDPD_ENABLE=3Dtrue
-HIDD_ENABLE=3Dfalse
-HID2HCI_ENABLE=3Dfalse
-RFCOMM_ENABLE=3Dfalse
-DUND_ENABLE=3Dtrue
-PAND_ENABLE=3Dfalse
+Marcel
 
-HCID_CONFIG=3D"/etc/bluetooth/hcid.conf"
-RFCOMM_CONFIG=3D"/etc/bluetooth/rfcomm.conf"
 
-HIDD_OPTIONS=3D""
-DUND_OPTIONS=3D"--listen --msdun call dun-mda-bt"
-PAND_OPTIONS=3D"--listen --role NAP"
--------------------
-
-dun-mda-bt peer file is:
-
--------------------
-root@pajonk:/etc/ppp/peers # cat /etc/ppp/peers/dun-mda-bt
-115200
-local
-noipdefault
-connect "/etc/ppp/at-cmd.pl -v"
-noauth
-nodefaultroute
-192.168.1.1:192.168.1.10
-ms-dns 192.168.1.1
-------------------
-
-/etc/ppp/at-cmd.pl is a perl script that "do talking":
-
-----------------------------
-root@pajonk:/etc/ppp/peers # cat /etc/ppp/at-cmd.pl
-#!/usr/bin/perl
-#
-# Copyright (c) 2004 Henk Vergonet
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-#
-# This script simulates an 'AT' modem command interface.
-# Some dial-up-networking clients (pocketPC 2003 ...) will insist on sendin=
-g
-# AT command strings before connecting via PPP.
-#
-# Example ppp/peers/dun script for connecting my MDA to the network.
-#  115200
-#  local
-#  noipdefault
-#  connect "/etc/ppp/at-cmd.pl -v"
-#  noauth
-#  nodefaultroute
-#  noipx
-#  10.10.10.10:10.10.10.11
-#  ms-dns 10.10.10.1
-#
-use strict;
-use Getopt::Std;
-use Sys::Syslog;
-use POSIX qw(strftime);
-
-my %opt;
-getopts('hv', \%opt);
-
-die "Fake at command parser\n\nusage:\n\t-v\tDebug messages in syslog\n"
-        if $opt{h};
-
-openlog($0, 'cons,pid', 'user') or die "openlog $!";
-END {
-        closelog();
-}
-
-$/ =3D "\r";
-while(<STDIN>)
-{
-        syslog('debug', "got: $_") if defined $opt{v};
-        $_ =3D uc;
-        if(/^ATD/) {
-                print "CONNECT\r";
-                syslog('debug', "send: CONNECT\r") if defined $opt{v};
-                exit(0);
-        } elsif(/^AT/) {
-                print "OK\r";
-                syslog('debug', "send: OK\r") if defined $opt{v};
-        }
-}
-
------------------------------
-
-DUN profile is registered by /usr/local/bin/sdptool add DUN
-
-----------------------
-root@pajonk:/etc/ppp/peers # /usr/local/bin/sdptool browse local
-Browsing FF:FF:FF:00:00:00 ...
-Service Name: Dial-Up Networking
-Service RecHandle: 0x10000
-Service Class ID List:
-  "Dialup Networking" (0x1103)
-  "Generic Networking" (0x1201)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 1
-Profile Descriptor List:
-  "Dialup Networking" (0x1103)
-    Version: 0x0100
-
-Service Name: Dial-Up Networking
-Service RecHandle: 0x10001
-Service Class ID List:
-  "Dialup Networking" (0x1103)
-  "Generic Networking" (0x1201)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 1
-Profile Descriptor List:
-  "Dialup Networking" (0x1103)
-    Version: 0x0100
-
--------------------------------------
-
-Device can be seen:
-
----------------------------------
-root@pajonk:/etc/ppp/peers # /usr/local/bin/hcitool scan
-Scanning ...
-        00:09:2D:4D:62:FE       MDAcompact
----------------------------------
-
-Now i am trying to connect. Here is the log:
-
-=3D=3D> /var/log/syslog <=3D=3D
-Dec 12 21:00:16 pajonk hcid[1952]: link_key_request
-(sba=3D00:08:F4:00:70:D3, dba=3D00:09:2D:4D:62:FE)
-Dec 12 21:00:26 pajonk dund[2035]: MSDUN failed. Connection timed out(110)
-
-I have no idea what's wrong.
-
-Thank you for any help
 
 
 -------------------------------------------------------
