@@ -1,21 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] UART bluetooth chip problem
+Subject: Re: [Bluez-users] MSDUN failed. Connection timed out(110)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <7846f1440512121306he45d777q72550620a293eab@mail.gmail.com>
-References: <7846f1440512071711x6c56c8er24edb8e3a8815ab9@mail.gmail.com>
-	 <1134074044.17592.13.camel@blade>
-	 <7846f1440512081510w4ffff8cdoe25ae369e677144@mail.gmail.com>
-	 <1134087822.17592.44.camel@blade>
-	 <7846f1440512090946n58fbf3e8gfecd3ebeb270bf58@mail.gmail.com>
-	 <1134154036.10644.18.camel@blade>
-	 <7846f1440512091123p5abce553gff0ef4658bc5ee45@mail.gmail.com>
-	 <1134158505.10644.22.camel@blade>
-	 <7846f1440512121021s65b57be7g30673fa6090df057@mail.gmail.com>
-	 <1134416630.429.4.camel@blade>
-	 <7846f1440512121306he45d777q72550620a293eab@mail.gmail.com>
+In-Reply-To: <532f6c3c0512121252r14ebe56bn@mail.gmail.com>
+References: <532f6c3c0512121211j3f1fa779r@mail.gmail.com>
+	 <1134418604.429.9.camel@blade>
+	 <532f6c3c0512121252r14ebe56bn@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1134422296.429.18.camel@blade>
+Message-Id: <1134422155.429.16.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -28,28 +20,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 12 Dec 2005 22:18:16 +0100
+Date: Mon, 12 Dec 2005 22:15:55 +0100
 
-Hi Arthur,
+Hi,
 
-> I tried the using the BCSP as the protocol and set the
-> PSKEY_UART_CONFIG_BCSP value as 0806, however, when I tried to attach
-> the chip again, using:
+> > > dun-mda-bt peer file is:
+> > >
+> > > -------------------
+> > > root@pajonk:/etc/ppp/peers # cat /etc/ppp/peers/dun-mda-bt
+> > > 115200
+> > > local
+> > > noipdefault
+> > > connect "/etc/ppp/at-cmd.pl -v"
+> > > noauth
+> > > nodefaultroute
+> > > 192.168.1.1:192.168.1.10
+> > > ms-dns 192.168.1.1
+> > > ------------------
+> > >
+> > > /etc/ppp/at-cmd.pl is a perl script that "do talking":
+> >
+> > I don't think that this is needed. The magic is done by the --msdun
+> > switch.
 > 
-> hciattach -s 115200 /dev/ttyS1 bcsp 115200 noflow
+> Well....i succesfully made this connection earlier on another distro
+> (fedora - now i am on ubuntu) with the same devices, same settings,
+> and /etc/ppp/at-cmd.pl was "a must" to connect.
 > 
-> I get BCSP initialization error. I tried using flow too but that
-> doesn't help. Finally, I used "any" for the type again and the
-> hciattach worked. However when i run hciconfig hci0 up i get another
-> connection timed out. :(
-> 
-> I have absolutely no idea what might be wrong... :( Hope you have some
-> clues. 
+> Looks like this script isn't executed. At least it doesn't appear in
+> log file as it should:
+> http://wiki.xda-developers.com/index.php?pagename=bluetoothnetworking
 
-I have no clue, because I don't know the settings of this module. The
-any identifier is too stupid to detect a working UART, but the csr and
-bcsp identifiers will do this. Maybe your UART is broken. Can you use
-PSTool over the UART?
+the PDA sends AT commands and not the magic CLIENTSERVER string. So you
+may wanna try it without the --msdun switch.
 
 Regards
 
