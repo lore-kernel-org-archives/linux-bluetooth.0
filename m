@@ -1,12 +1,21 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43A03888.5010105@rumms.uni-mannheim.de>
-From: Andreas Faerber <afaerber@rumms.uni-mannheim.de>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] [DBUS Patch] Device Property
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Reading RSSI of non-connected devices
-References: <4396F911.40705@rumms.uni-mannheim.de>	 <1133968124.3752.35.camel@blade>  <43970C1E.6020602@rumms.uni-mannheim.de> <1133973783.3752.47.camel@blade>
-In-Reply-To: <1133973783.3752.47.camel@blade>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <3013cac80512130927k1d83978ey33be0540e15a08ba@mail.gmail.com>
+References: <1132872886.3170.3.camel@blade> <1132944074.5577.28.camel@blade>
+	 <e1effdeb0511251152k3bafca4n21125fd1c9f9179@mail.gmail.com>
+	 <1132949177.10237.5.camel@blade>
+	 <3013cac80512010855v46eeb99dk3a53094238800621@mail.gmail.com>
+	 <1133471112.18554.8.camel@blade>
+	 <3013cac80512070429g5fb992b7i7131d570f9023086@mail.gmail.com>
+	 <20051207125556.GA13152@localhost.localdomain>
+	 <1133960579.3752.17.camel@blade>
+	 <3013cac80512070801o5b60cc20y7098dc36f2326458@mail.gmail.com>
+	 <3013cac80512130927k1d83978ey33be0540e15a08ba@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1134511385.24447.15.camel@blade>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,41 +27,76 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 14 Dec 2005 16:21:44 +0100
+Date: Tue, 13 Dec 2005 23:03:05 +0100
 
-Hi Marcel, Hi Arpit,
+Hi Eduardo,
 
-I've made some progress on our periodic scan test code. I didn't find 
-the example you referenced but I have managed to initiate a periodic 
-scan, to read some events and to stop the scan. Some things I noticed 
-however, for instance that when I ran my app twice a little time-shifted 
-the second process didn't get any events once the first process was 
-finished. Can I avoid this somehow? Currently I am catching the 
-EVT_CMD_COMPLETE event for OCF_EXIT_PERIODIC_INQUIRY and restarting the 
-search, but as I am not getting an event for the start of the periodic 
-inquiry that I could process it would seem that if I do e.g. a 3 second 
-period inquiry and during my scan afterwards someone else does e.g. a 30 
-second period inquiry then it will change this on a global level so that 
-I do not get my results as expected?
+> here is the patch with the send_property_changed_signal function included.
 
-Regarding the multitude of events, how do I distinguish between the 
-inquiry_info_with_rssi and inquiry_info_with_rssi_and_pscan_mode 
-structs? They appear to be using the same event but would be 
-incompatible due to the "inserted" pscan_mode member. Currently I am 
-testing with an HCI 1.1 device and getting only the inquiry_info struct. 
-Which of the other inquiry+RSSI events map to which HCI version? Is 
-inquiry_info_with_rssi HCI 1.2 and extended_inquiry_info HCI 2.0? Or do 
-these responses depend on anything else?
+nice, but please follow the coding style. I don't wanna correct the
+whitespaces in all patches. Some examples what should be changed:
 
-Oh, and is it not possible to send HCI commands as a non-root user? We 
-were getting EPERM from hci_send_cmd and had to setup a Linux box solely 
-for this purpose so that I could be root - admins wouldn't allow that on 
-the other University machines, and I'm concerned whether our potential 
-users would all be able to run our software as root...
+(void*)&pdata				==> (void *) &pdata
+= SCAN_PAGE|SCAN_INQUIRY;		==> = SCAN_PAGE | SCAN_INQUIRY;
+se = (rp.enable & SCAN_PAGE)?1:0;	se = (rp.enable & SCAN_PAGE) ? 1 : 0;
 
-Best regards,
+This is also bad coding style:
 
-Andreas
+       if (dd < 0) {
+               syslog(LOG_ERR, "HCI device open failed: hci%d", id);
+               goto failed;
+       } else {
+
+We don't need the else branch. I results in an needless indentation.
+
+I also think that we need some more newlines in your code, but I am
+going to fix it when applying the patch.
+
+This part might work, but I don't like it:
+
+       if (ispscan) {
+               if (scan && !(rp.enable & SCAN_PAGE))
+                       enable = (rp.enable & SCAN_INQUIRY) | SCAN_PAGE;
+               else if (!scan && (rp.enable & SCAN_PAGE))
+                       enable = (rp.enable & SCAN_INQUIRY);
+               else {
+                       reply = dbus_message_new_method_return(msg);
+                       goto failed;
+               }
+       } else {
+               if (scan && !(rp.enable & SCAN_INQUIRY))
+                       enable = (rp.enable & SCAN_PAGE) | SCAN_INQUIRY;
+               else if (!scan && (rp.enable & SCAN_INQUIRY))
+                       enable = (rp.enable & SCAN_PAGE);
+               else {
+                       reply = dbus_message_new_method_return(msg);
+                       goto failed;
+               }
+       }
+
+And this includes this:
+
+       if((rp.enable & SCAN_PAGE) != (old_data & SCAN_PAGE)) {
+               se = (rp.enable & SCAN_PAGE)?1:0;
+               send_property_changed_signal(id, DEV_PROPERTY_PSCAN, DBUS_TYPE_BOOLEAN, &se);
+       }
+       if ((rp.enable & SCAN_INQUIRY) != (old_data & SCAN_INQUIRY)) {
+               se = (rp.enable & SCAN_INQUIRY)?1:0;
+               send_property_changed_signal(id, DEV_PROPERTY_ISCAN, DBUS_TYPE_BOOLEAN, &se);
+       }
+       dbus_connection_flush(connection);
+
+I don't have any better idea to solve this at the moment, but if you
+read this code it takes too much time too understand what it is actually
+doing. And normally this is not a good idea. However we might fix it
+later and get the patch in now for further testing. So please correct
+the other parts and resend it.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
