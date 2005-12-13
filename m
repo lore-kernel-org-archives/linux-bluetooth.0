@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SyncML and Syncronization Profile
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <439E98E4.4010800@service2media.com>
+From: Herman Meerlo <herman@service2media.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <5000105b0512130020y1cb93ab2o3c2012c800616a88@mail.gmail.com>
-References: <5000105b0512130020y1cb93ab2o3c2012c800616a88@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1134471342.29210.11.camel@blade>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] Setting up two connections at the same time
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,20 +16,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 13 Dec 2005 11:55:42 +0100
+Date: Tue, 13 Dec 2005 10:48:20 +0100
 
-Hi Amit,
+Hi All,
 
-> Is it really required to develop a syncronization profile for
-> Bluetooth if some body have SynczML?
+I am trying to develop an application which performs an inquiry and will 
+then perform a service search on the found devices using multiple 
+threads. This fails however because these threads all try to setup a 
+connection at the same time which is not possible off course. I have 
+traced the problem down to the HCI layer which sends a Command Status 
+event for the first Create Connection request indicating that it has 
+started the connection setup. But the Command Status event indicates to 
+the host that it is ready to receive the next HCI command. However the 
+next command in the queue is the second Create Connection request which 
+is then sent to the HCI controller. The controller off course rejects 
+this request with a status 0x0C (Command Disallowed). This error is 
+propagated to the higher layers (l2cap and sdp) and eventually the 
+sdp_connect fails with errno set to EBADFD.
+What is the best way to handle this situation? The EBADFD doesn't really 
+indicate that the application can retry the request. Wouldn't it be 
+better to handle this at the host HCI layer? That is the only entity 
+which can possibly keep track of the HCI controller state and perform 
+the next connection request only when the Connection Complete event from 
+the previous request has been received. This way the requests could be 
+serialized. Or is this way too complex?
 
-and how do you know how to do SyncML over Bluetooth?
-
-Regards
-
-Marcel
-
-
+Regards,
+Herman Meerlo
 
 
 -------------------------------------------------------
