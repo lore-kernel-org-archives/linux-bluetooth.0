@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Cant send bluetooth using my linux and bluez
-From: Fredy P <digitalfredy@debiancolombia.org>
+Subject: Re: [Bluez-users] problem adding 1284 ID SDP attribute
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20051207061807.73581.qmail@web50510.mail.yahoo.com>
-References: <20051207061807.73581.qmail@web50510.mail.yahoo.com>
-Content-Type: text/plain;
-	charset=UTF-8
-Message-Id: <1134461983.10555.47.camel@localhost.localdomain>
+In-Reply-To: <20051213020124.42762.qmail@web50501.mail.yahoo.com>
+References: <20051213020124.42762.qmail@web50501.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1134452133.29210.3.camel@blade>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,55 +18,74 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 13 Dec 2005 03:19:41 -0500
+Date: Tue, 13 Dec 2005 06:35:33 +0100
 
-El mar, 06-12-2005 a las 22:18 -0800, oj ravadilla escribi=C3=B3:
-> Hi,
->=20
-> I can not send bluetooth from my phone to my pc. I'm
-> using linux kernel 2.6.0 and bluez-lib 2.22 and
-> bluez-utils2.22. Can someone look at what's wrong...
->=20
-For recive files you can use obexserver [1] or opd [2] more information
-about how to use it in [3]
+Hi,
 
-[1]http://www.frasunek.com/sources/unix/obexserver.c=20
-[2]http://oss.bdit.de/opd.html
-[3]http://es.wikibooks.org/wiki/Hacks_para_Bluetooth_en_Linux
+> I'm still having problems with the 1248 id. I already
+> used the bluez-lib-2.23 function
+> sdp_data_alloc_with_length for this. Im seeing nothing
+> still in my 1248 id. 
+> 
+> Her is the hcidump:
+> 
+> > ACL data: handle 41 flags 0x02 dlen 17
+>     L2CAP(d): cid 0x0040 len 13 [psm 1]
+>         SDP SS Req: tid 0x1 len 0x8
+>           pat uuid-16 0x1118
+>           max 65535
+>           cont 00
+> < ACL data: handle 41 flags 0x02 dlen 18
+>     L2CAP(d): cid 0x0072 len 14 [psm 1]
+>         SDP SS Rsp: tid 0x1 len 0x9
+>           count 1
+>           handle 0x10001
+>           cont 00
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 41 packets 1
+> > ACL data: handle 41 flags 0x02 dlen 33
+>     L2CAP(d): cid 0x0040 len 29 [psm 1]
+>         SDP SA Req: tid 0x2 len 0x18
+>           handle 0x10001
+>           max 1024
+>           aid(s) 0x0004 (ProtocolDescList) 0x000d
+> (IconURL) 0x0350 (unknown) 0x0358 (unknown) 0x035a
+> (unknown)
+>           cont 00
+> < ACL data: handle 41 flags 0x02 dlen 192
+> < ACL data: handle 41 flags 0x01 dlen 45
+>     L2CAP(d): cid 0x0072 len 233 [psm 1]
+>         SDP SA Rsp: tid 0x2 len 0xe4
+>           count 225
+>           aid 0x0004 (ProtocolDescList)
+>              < < uuid-16 0x0100 (L2CAP) > <
+>              uuid-16 0x0003 (RFCOMM) uint 0x2 > <
+>              uuid-16 0x0008 (OBEX) > >
+>           aid 0x000d (IconURL)
+>              < < uuid-16 0x0100 (L2CAP) > < uuid-16
+> 0x0003 (RFCOMM) uint 0x3 > < uuid-16 0x0008 (OBEX) > >
+>           aid 0x0350 (unknown)
+>              str
+> "application/vnd.pwg-xhtml-print+xml:0.95,application/vnd.pwg-multiplexed"
+>           aid 0x0358 (unknown)
+>              str ""
+>           aid 0x035a (unknown)
+>              str "My-Bluetooth"
+>           cont 00
+> _________
+> As seen in the trace --  aid 0x0358 (unknown) is blank
+> or data is nothing. Do you have any idea whats the
+> problem? How do I solve this problem? 
 
-> hcidump:
->=20
->  # hcidump -X -V
-> HCI sniffer - Bluetooth packet analyzer ver 1.23
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> hci_acldata_packet: hci0 ACL packet for unknown
-> connection handle 41
-> > ACL data: handle 41 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 1 scid 0x0048
->=20
->=20
-> thanks!
->=20
->=20
->=20
-> 	=09
-> __________________________________________=20
-> Yahoo! DSL =E2=80=93 Something to write home about.=20
-> Just $16.99/mo. or less.=20
-> dsl.yahoo.com=20
->=20
->=20
->=20
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log fi=
-les
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+I might haven't fixed the parts in hcidump to deal with binary strings.
+
+Add the 1284 ID with your tool and then run "sdptool browse --raw local"
+to see what has been added to the SDP server.
+
+Regards
+
+Marcel
+
 
 
 
