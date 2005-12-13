@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051213092433.81132.qmail@web32401.mail.mud.yahoo.com>
-From: Arch Sayo <a12chi@yahoo.com>
+Subject: Re: [Bluez-users] Pair problems with nokia 6230
+From: Fredy P <digitalfredy@debiancolombia.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1246805064-1134465873=:79156"
-Subject: [Bluez-users] Adding Additional Protocol Descriptor List
+In-Reply-To: <478d26d00512101355g1bca6ab6g@mail.gmail.com>
+References: <478d26d00512101355g1bca6ab6g@mail.gmail.com>
+Content-Type: text/plain;
+	charset=ISO-8859-1
+Message-Id: <1134462549.10555.54.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,41 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 13 Dec 2005 01:24:33 -0800 (PST)
+Date: Tue, 13 Dec 2005 03:29:07 -0500
 
---0-1246805064-1134465873=:79156
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+El s=E1b, 10-12-2005 a las 22:55 +0100, Toni Fiz escribi=F3:
+> Hi
+>=20
+> I have problems pairing this phone (nokia 6230) with my PC
+> I'm running ubuntu breezy (5.10) and other services like object push
+> work properly so I think the problem is not on the bluetooth devidce
+> or the phone.=20
+> Of course, I enter the same pin in the mobile that is in the 'pin'
+> file, and the hcid.conf security option is set to auto
+>=20
+> Any idea?
+>=20
+> Greetings from Spain
+Si hablas en espa=F1ol puedes revisar [1], yo soy el autor inicial del
+libro y te puedo asegurar que en ubuntu es igual que en debian por que
+yo lo he probado en ambos. Si puedes colaborar con la secc=F3n configurar
+el tel=E9fono colocando la del nokia 6230 te lo agradecer=EDa.
+[1]http://es.wikibooks.org/wiki/Hacks_para_Bluetooth_en_Linux
+>=20
 
-Hi Marcel,
-   
-  Thank you with that information on adding the 1284ID attribute.
-   
-  Now, I am trying to add the Additional Protocol Descriptor List to my sdp record. The Additional Protocol Descriptor List is almost similar to the Protocol Descriptor List. The only difference is that while the Protocol Descriptor List is a sequence of a sequence of data (2 levels),  the Additional Protocol Descriptor List is a sequence of a sequence of a sequence of data (3 levels) .I tried doing this using the function sdp_set_access_protos() and just substituting the Attribute ID in the function from SDP_ATTR_PROTO_DESC_LIST to SDP_ATTR_ADD_PROTO_DESC_LIST. However, as you may already know, this will not solve it since the Protocol Descriptor List is only a sequence of a sequence.
-   
-  In this regard, I would like to ask how I will be able to add a sequence of a sequence of a sequence of data to my sdp record. Or in other words, how will I add the Additional Protocol Descriptor List to my sdp record.
-   
-  Thank you for your time and effort.
-   
-  Sincerely,
-  Arch Sayo
-
-			
----------------------------------
-Yahoo! Shopping
- Find Great Deals on Holiday Gifts at Yahoo! Shopping 
---0-1246805064-1134465873=:79156
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-<div>Hi Marcel,</div>  <div>&nbsp;</div>  <div>Thank you with that information on adding the 1284ID attribute.</div>  <div>&nbsp;</div>  <div>Now, I am trying to add the Additional Protocol Descriptor List to my sdp record. The Additional Protocol Descriptor List is almost similar to the Protocol Descriptor&nbsp;List.&nbsp;The only difference is that while the Protocol Descriptor List is a sequence of a sequence of data (2 levels),&nbsp;&nbsp;the Additional Protocol Descriptor List is a sequence of a sequence of a sequence of data (3 levels)&nbsp;.I tried doing this using the function sdp_set_access_protos() and just substituting the Attribute ID in the function from SDP_ATTR_PROTO_DESC_LIST&nbsp;to SDP_ATTR_ADD_PROTO_DESC_LIST. However, as you may already know, this will not solve it since the Protocol Descriptor List is only a sequence of a sequence.</div>  <div>&nbsp;</div>  <div>In this regard, I would like to ask how&nbsp;I will be able to add a sequence of a sequence of
-  a
- sequence of data to my sdp record. Or in other words, how will I add the Additional Protocol Descriptor List to my sdp record.</div>  <div>&nbsp;</div>  <div>Thank you for your time and effort.</div>  <div>&nbsp;</div>  <div>Sincerely,</div>  <div>Arch Sayo</div><p>
-	
-		<hr size=1>Yahoo! Shopping<br> 
-Find Great Deals on Holiday Gifts at <a href="http://us.rd.yahoo.com/mail_us/footer/shopping/*http://shopping.yahoo.com/;_ylc=X3oDMTE2bzVzaHJtBF9TAzk1OTQ5NjM2BHNlYwNtYWlsdGFnBHNsawNob2xpZGF5LTA1 
-">Yahoo! Shopping</a> 
---0-1246805064-1134465873=:79156--
 
 
 -------------------------------------------------------
