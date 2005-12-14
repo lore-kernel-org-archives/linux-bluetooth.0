@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43A08642.5010300@rumms.uni-mannheim.de>
+Message-ID: <43A083E1.1050804@rumms.uni-mannheim.de>
 From: =?ISO-8859-15?Q?Andreas_F=E4rber?= <afaerber@rumms.uni-mannheim.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Reading RSSI of non-connected devices
-References: <4396F911.40705@rumms.uni-mannheim.de>	 <1133968124.3752.35.camel@blade>  <43970C1E.6020602@rumms.uni-mannheim.de>	 <1133973783.3752.47.camel@blade>  <43A03888.5010105@rumms.uni-mannheim.de>	 <1134573996.11064.56.camel@wyatt.hadess.net>	 <43A04C03.9030907@rumms.uni-mannheim.de> <1134580628.10473.8.camel@localhost>
-In-Reply-To: <1134580628.10473.8.camel@localhost>
+References: <4396F911.40705@rumms.uni-mannheim.de>	 <1133968124.3752.35.camel@blade>  <43970C1E.6020602@rumms.uni-mannheim.de>	 <1133973783.3752.47.camel@blade>  <43A03888.5010105@rumms.uni-mannheim.de>	 <1134577422.10473.1.camel@localhost>	 <43A04F30.7080600@rumms.uni-mannheim.de> <1134580410.10473.5.camel@localhost>
+In-Reply-To: <1134580410.10473.5.camel@localhost>
 Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,59 +18,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 14 Dec 2005 21:53:22 +0100
+Date: Wed, 14 Dec 2005 21:43:13 +0100
 
-Marcel Holtmann schrieb:
+Hi Marcel,
 
->Hi Andreas,
->
->  
->
->>>As Marcel mentioned earlier, the easiest is to use the D-Bus services in
->>>hcid to do that.
->>>
+>>>>Regarding the multitude of events, how do I distinguish between the 
+>>>>inquiry_info_with_rssi and inquiry_info_with_rssi_and_pscan_mode 
+>>>>structs? They appear to be using the same event but would be 
+>>>>incompatible due to the "inserted" pscan_mode member. Currently I am 
+>>>>testing with an HCI 1.1 device and getting only the inquiry_info struct. 
+>>>>Which of the other inquiry+RSSI events map to which HCI version? Is 
+>>>>inquiry_info_with_rssi HCI 1.2 and extended_inquiry_info HCI 2.0? Or do 
+>>>>these responses depend on anything else?
+>>>>        
+>>>>
+>>>The event code is different.
+>>> 
 >>>      
 >>>
->>He didn't. He said the safe way would be to use raw HCI sockets and (in 
->>other words) that the D-Bus interface was unstable. Also, I am currently 
->>testing this on desktop and notebook machines but it was actually 
->>supposed to run on mobile devices (Zaurus) where we would not be able to 
->>update the kernel and require the latest D-Bus/BlueZ interfaces.
+>>For the two I mentioned it is not, there is none defined for the latter. 
+>>Only its size is - in bluez-libs-2.22.tar.gz.
+>>But what about practical availability of those? When do we get which 
+>>response? Do you have any link on that or a short answer?
 >>    
 >>
 >
->the D-Bus interface has nothing to do with used kernel.
->
+>look again, because they are different and bluez-libs-2.22 even contains
+>the definitions for extended inquiry already.
 >  
 >
->>Nontheless we will evaluate D-Bus, but for the time being my boss is 
->>content with HCI sockets under root account.
->>I'm familiar with socket programming in general but haven't used D-Bus 
->>before and so we are worried whether introducing another layer such as 
->>D-Bus might be of disadvantage for our software which needs non-cached 
->>data, nearly in realtime (just as with HCI sockets). The D-Bus page 
->>itself says it's not stable yet and I did not find documentation on how 
->>to use it with BlueZ. The BlueZ library was very helpful in getting my 
->>code to work, whereas I have no clue on where to find any such hints for 
->>D-Bus both in the BlueZ 2.22 downloads and in the 2.6.13.4 kernel which 
->>were the latest respectively when I downloaded them some weeks ago. I 
->>can only guess from the examples at freedesktop.org that it'll be 
->>/org/bluez/something.
->>    
->>
->
->The D-Bus interface works quite good, but I won't guarantee a stable API
->at the moment. If needed, I am going to break it.
->  
->
-Yes, that's exactly how I understood your earlier post.
+No, all I was saying is that there was definately no 
+EVT_INQUIRY_RESULT_WITH_RSSI_AND_PSCAN_MODE defined in the 
+bluez-libs-2.22.tar.gz hci.h file, at least not anywhere near the 
+inquiry_info_with_rssi_and_pscan_mode struct. The extended_inquiry_info 
+struct on the other hand I even mentioned in the above quote, so I did 
+see it.
 
-But that does not give me any clue on how to use D-Bus either. I've seen 
-through the D-Bus specification, but it does not define anything 
-BlueZ-specific and I couldn't find anything related to D-Bus on the 
-BlueZ.org or Holtmann.org pages. Again, I have no clue on where to start 
-learning about specifically the BlueZ D-Bus interfaces - what path and 
-properties etc I can use with D-Bus to access the information we need.
+So you are saying that (theoretically) I should be able to distinguish 
+all responses by event code. In that case my question on when do I get 
+the respective event codes for an inquiry_info_with_rssi vs. 
+inquiry_info_with_rssi_and_pscan_mode vs. extended_inquiry_info still 
+stands...
+
+Kind regards,
 
 Andreas
 
