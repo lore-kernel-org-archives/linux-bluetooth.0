@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Reading RSSI of non-connected devices
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Bastien Nocera <hadess@hadess.net>
 To: bluez-devel@lists.sourceforge.net
 In-Reply-To: <43A03888.5010105@rumms.uni-mannheim.de>
 References: <4396F911.40705@rumms.uni-mannheim.de>
 	 <1133968124.3752.35.camel@blade>  <43970C1E.6020602@rumms.uni-mannheim.de>
 	 <1133973783.3752.47.camel@blade>  <43A03888.5010105@rumms.uni-mannheim.de>
 Content-Type: text/plain
-Message-Id: <1134577422.10473.1.camel@localhost>
+Message-Id: <1134573996.11064.56.camel@wyatt.hadess.net>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,10 +20,11 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 14 Dec 2005 17:23:42 +0100
+Date: Wed, 14 Dec 2005 15:26:36 +0000
 
-Hi Andreas,
-
+On Wed, 2005-12-14 at 16:21 +0100, Andreas Faerber wrote:
+> Hi Marcel, Hi Arpit,
+> 
 > I've made some progress on our periodic scan test code. I didn't find 
 > the example you referenced but I have managed to initiate a periodic 
 > scan, to read some events and to stop the scan. Some things I noticed 
@@ -36,10 +37,7 @@ Hi Andreas,
 > period inquiry and during my scan afterwards someone else does e.g. a 30 
 > second period inquiry then it will change this on a global level so that 
 > I do not get my results as expected?
-
-you don't need to stop the periodic inquiry. It will restart itself.
-That's the whole point behind it.
-
+> 
 > Regarding the multitude of events, how do I distinguish between the 
 > inquiry_info_with_rssi and inquiry_info_with_rssi_and_pscan_mode 
 > structs? They appear to be using the same event but would be 
@@ -48,21 +46,18 @@ That's the whole point behind it.
 > Which of the other inquiry+RSSI events map to which HCI version? Is 
 > inquiry_info_with_rssi HCI 1.2 and extended_inquiry_info HCI 2.0? Or do 
 > these responses depend on anything else?
-
-The event code is different.
-
+> 
 > Oh, and is it not possible to send HCI commands as a non-root user? We 
 > were getting EPERM from hci_send_cmd and had to setup a Linux box solely 
 > for this purpose so that I could be root - admins wouldn't allow that on 
 > the other University machines, and I'm concerned whether our potential 
 > users would all be able to run our software as root...
 
-The inquiry related commands and events are accessable by all users.
-Some other are protected by the HCI security inside the kernel.
+As Marcel mentioned earlier, the easiest is to use the D-Bus services in
+hcid to do that.
 
-Regards
-
-Marcel
+---
+Bastien Nocera <hadess@hadess.net> 
 
 
 
