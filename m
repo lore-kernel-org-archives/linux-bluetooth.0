@@ -2,14 +2,14 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Reading RSSI of non-connected devices
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43A04C03.9030907@rumms.uni-mannheim.de>
+In-Reply-To: <43A04F30.7080600@rumms.uni-mannheim.de>
 References: <4396F911.40705@rumms.uni-mannheim.de>
 	 <1133968124.3752.35.camel@blade>  <43970C1E.6020602@rumms.uni-mannheim.de>
 	 <1133973783.3752.47.camel@blade>  <43A03888.5010105@rumms.uni-mannheim.de>
-	 <1134573996.11064.56.camel@wyatt.hadess.net>
-	 <43A04C03.9030907@rumms.uni-mannheim.de>
+	 <1134577422.10473.1.camel@localhost>
+	 <43A04F30.7080600@rumms.uni-mannheim.de>
 Content-Type: text/plain
-Message-Id: <1134580628.10473.8.camel@localhost>
+Message-Id: <1134580410.10473.5.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -22,37 +22,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 14 Dec 2005 18:17:08 +0100
+Date: Wed, 14 Dec 2005 18:13:30 +0100
 
 Hi Andreas,
 
-> >As Marcel mentioned earlier, the easiest is to use the D-Bus services in
-> >hcid to do that.
+> >>Regarding the multitude of events, how do I distinguish between the 
+> >>inquiry_info_with_rssi and inquiry_info_with_rssi_and_pscan_mode 
+> >>structs? They appear to be using the same event but would be 
+> >>incompatible due to the "inserted" pscan_mode member. Currently I am 
+> >>testing with an HCI 1.1 device and getting only the inquiry_info struct. 
+> >>Which of the other inquiry+RSSI events map to which HCI version? Is 
+> >>inquiry_info_with_rssi HCI 1.2 and extended_inquiry_info HCI 2.0? Or do 
+> >>these responses depend on anything else?
 > >
-> He didn't. He said the safe way would be to use raw HCI sockets and (in 
-> other words) that the D-Bus interface was unstable. Also, I am currently 
-> testing this on desktop and notebook machines but it was actually 
-> supposed to run on mobile devices (Zaurus) where we would not be able to 
-> update the kernel and require the latest D-Bus/BlueZ interfaces.
+> >The event code is different.
+> >  
+> For the two I mentioned it is not, there is none defined for the latter. 
+> Only its size is - in bluez-libs-2.22.tar.gz.
+> But what about practical availability of those? When do we get which 
+> response? Do you have any link on that or a short answer?
 
-the D-Bus interface has nothing to do with used kernel.
+look again, because they are different and bluez-libs-2.22 even contains
+the definitions for extended inquiry already.
 
-> Nontheless we will evaluate D-Bus, but for the time being my boss is 
-> content with HCI sockets under root account.
-> I'm familiar with socket programming in general but haven't used D-Bus 
-> before and so we are worried whether introducing another layer such as 
-> D-Bus might be of disadvantage for our software which needs non-cached 
-> data, nearly in realtime (just as with HCI sockets). The D-Bus page 
-> itself says it's not stable yet and I did not find documentation on how 
-> to use it with BlueZ. The BlueZ library was very helpful in getting my 
-> code to work, whereas I have no clue on where to find any such hints for 
-> D-Bus both in the BlueZ 2.22 downloads and in the 2.6.13.4 kernel which 
-> were the latest respectively when I downloaded them some weeks ago. I 
-> can only guess from the examples at freedesktop.org that it'll be 
-> /org/bluez/something.
+> >>[...] is it not possible to send HCI commands as a non-root user? We 
+> >>were getting EPERM from hci_send_cmd [...]
+> >>
+> >The inquiry related commands and events are accessable by all users.
+> >Some other are protected by the HCI security inside the kernel.
+> >
+> As I said, hci_send_cmd for a HCI socket with OGF_LINK_CTL and 
+> OCF_PERIODIC_INQUIRY returned errno==EPERM for user and runs fine as 
+> root. Same for plugging in Bluetooth dongles - doesn't work for user 
+> (driver loaded in dmesg but not listed in hcitool dev), works fine for root.
 
-The D-Bus interface works quite good, but I won't guarantee a stable API
-at the moment. If needed, I am going to break it.
+Oh yes, the periodic inquiry must be started as root. If you recompile
+your kernel, you can of course change the HCI security filter and allows
+all commands by normal users.
 
 Regards
 
