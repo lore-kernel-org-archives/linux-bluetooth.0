@@ -1,18 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Reading RSSI of non-connected devices
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43A083E1.1050804@rumms.uni-mannheim.de>
-References: <4396F911.40705@rumms.uni-mannheim.de>
-	 <1133968124.3752.35.camel@blade>  <43970C1E.6020602@rumms.uni-mannheim.de>
-	 <1133973783.3752.47.camel@blade>  <43A03888.5010105@rumms.uni-mannheim.de>
-	 <1134577422.10473.1.camel@localhost>
-	 <43A04F30.7080600@rumms.uni-mannheim.de>
-	 <1134580410.10473.5.camel@localhost>
-	 <43A083E1.1050804@rumms.uni-mannheim.de>
-Content-Type: text/plain
-Message-Id: <1134623747.5198.8.camel@localhost>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Remote name delay
+Message-ID: <20051214215318.GA25332@localhost.localdomain>
+References: <e1effdeb0512011117i730f7dd0p4ffc099d06a09cb8@mail.gmail.com> <1133470780.18554.2.camel@blade> <e1effdeb0512020321g2b492f1cl5c553d7c3b24bfb8@mail.gmail.com> <1133523028.20834.8.camel@blade> <e1effdeb0512020833q3f319166lfe8e63e612a86c4e@mail.gmail.com> <1133548573.20834.83.camel@blade> <e1effdeb0512131359x7ff7a330j435a8bde0779e958@mail.gmail.com> <1134511532.24447.18.camel@blade> <e1effdeb0512141035w5cc40fach9d77ead5df00cf2@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <e1effdeb0512141035w5cc40fach9d77ead5df00cf2@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -24,64 +18,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Dec 2005 06:15:47 +0100
+Date: Wed, 14 Dec 2005 23:53:44 +0200
 
-Hi Andreas,
+Hi Claudio,
 
-> >>>>Regarding the multitude of events, how do I distinguish between the 
-> >>>>inquiry_info_with_rssi and inquiry_info_with_rssi_and_pscan_mode 
-> >>>>structs? They appear to be using the same event but would be 
-> >>>>incompatible due to the "inserted" pscan_mode member. Currently I am 
-> >>>>testing with an HCI 1.1 device and getting only the inquiry_info struct. 
-> >>>>Which of the other inquiry+RSSI events map to which HCI version? Is 
-> >>>>inquiry_info_with_rssi HCI 1.2 and extended_inquiry_info HCI 2.0? Or do 
-> >>>>these responses depend on anything else?
-> >>>>
-> >>>The event code is different.
-> >>>
-> >>For the two I mentioned it is not, there is none defined for the latter. 
-> >>Only its size is - in bluez-libs-2.22.tar.gz.
-> >>But what about practical availability of those? When do we get which 
-> >>response? Do you have any link on that or a short answer?
-> >
-> >look again, because they are different and bluez-libs-2.22 even contains
-> >the definitions for extended inquiry already.
-> >  
-> No, all I was saying is that there was definately no 
-> EVT_INQUIRY_RESULT_WITH_RSSI_AND_PSCAN_MODE defined in the 
-> bluez-libs-2.22.tar.gz hci.h file, at least not anywhere near the 
-> inquiry_info_with_rssi_and_pscan_mode struct. The extended_inquiry_info 
-> struct on the other hand I even mentioned in the above quote, so I did 
-> see it.
-> 
-> So you are saying that (theoretically) I should be able to distinguish 
-> all responses by event code. In that case my question on when do I get 
-> the respective event codes for an inquiry_info_with_rssi vs. 
-> inquiry_info_with_rssi_and_pscan_mode vs. extended_inquiry_info still 
-> stands...
+On Wed, Dec 14, 2005, Claudio Takahasi wrote:
+> ok. We will extend the GetProperty(string:info) returning the
+> following arguments:
+> - MAC Address: String
+> - Device Status: String(UP/DOWN)
+> - Manufacturer: String
+> - HCI Version: String
+> - HCI Revision: String
+> - LMP Version: String
+> - LMP Sub Version: String
 
-my bad and I totally forgot about it. This is an ugly hack for these
-stupid devices around that support inquiry with RSSI, but followed the
-0.7 version of the Bluetooth 1.2 specification instead of the final one.
-They removed page scan mode before they made the specification final and
-thus you have to hack around it. So far I've seen Silicon Wave based
-chips with this behavior (this includes AVM actually).
+Currently we have three different property types: string, boolean and
+byte. Are you proposing that the above information be bundled to one
+"info" property? That would create a fourth property type which, in my
+opinion, would complicate the code unecessarely. Maybe those pieces of
+information should be split into one property each (or maybe that's what
+you're suggesting, sorry if I misunderstood)? If there still exists a
+complelling reason to bundle all that info into one property, then I'd
+suggest creating a new property with the type DBUS_TYPE_STRUCT in order
+to maintain consistency with the parameters of the property signal and
+methods.
 
-So in general if you get an EVT_INQUIRY_RESULT_WITH_RSSI you should only
-expect to deal with inquiry_info_with_rssi. If you wanna really deal
-with a broken device then you need to compare the length of the event
-(don't forget the number of results) and then decide if you need to work
-around a broken device or not. Actually the kernel is doing this now,
-but I never implemented that in any userspace routine. However I think
-that I also made hcidump aware of it.
+Also, all of the above pieces of information, excluding the device
+status, are of a read-only nature so the SetProperty method and
+PropertyChanged signal don't really apply to them. Therefore the
+question should be asked whether the "properties" feature is the right
+one to use for them (I'm not saying it isn't, just that it should be
+questioned). E.g. you would need to think about what error should be
+returned if SetProperty is called for one of them.
 
-I personally won't bother with inquiry_info_with_rssi_and_pscan_mode ;)
+Thirdly, the device status information can already changed using the Up
+and Down methods and its changes can be tracked using the Up and Down
+signals, so adding it to the set of properties is probably not the right
+thing to do (or then the Up/Down signals and methods should be removed).
 
-Regards
-
-Marcel
-
-
+Johan
 
 
 -------------------------------------------------------
