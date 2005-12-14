@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Remote name delay
-Message-ID: <20051214215318.GA25332@localhost.localdomain>
-References: <e1effdeb0512011117i730f7dd0p4ffc099d06a09cb8@mail.gmail.com> <1133470780.18554.2.camel@blade> <e1effdeb0512020321g2b492f1cl5c553d7c3b24bfb8@mail.gmail.com> <1133523028.20834.8.camel@blade> <e1effdeb0512020833q3f319166lfe8e63e612a86c4e@mail.gmail.com> <1133548573.20834.83.camel@blade> <e1effdeb0512131359x7ff7a330j435a8bde0779e958@mail.gmail.com> <1134511532.24447.18.camel@blade> <e1effdeb0512141035w5cc40fach9d77ead5df00cf2@mail.gmail.com>
+Message-ID: <43A08642.5010300@rumms.uni-mannheim.de>
+From: =?ISO-8859-15?Q?Andreas_F=E4rber?= <afaerber@rumms.uni-mannheim.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <e1effdeb0512141035w5cc40fach9d77ead5df00cf2@mail.gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Reading RSSI of non-connected devices
+References: <4396F911.40705@rumms.uni-mannheim.de>	 <1133968124.3752.35.camel@blade>  <43970C1E.6020602@rumms.uni-mannheim.de>	 <1133973783.3752.47.camel@blade>  <43A03888.5010105@rumms.uni-mannheim.de>	 <1134573996.11064.56.camel@wyatt.hadess.net>	 <43A04C03.9030907@rumms.uni-mannheim.de> <1134580628.10473.8.camel@localhost>
+In-Reply-To: <1134580628.10473.8.camel@localhost>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,46 +18,62 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 14 Dec 2005 23:53:44 +0200
+Date: Wed, 14 Dec 2005 21:53:22 +0100
 
-Hi Claudio,
+Marcel Holtmann schrieb:
 
-On Wed, Dec 14, 2005, Claudio Takahasi wrote:
-> ok. We will extend the GetProperty(string:info) returning the
-> following arguments:
-> - MAC Address: String
-> - Device Status: String(UP/DOWN)
-> - Manufacturer: String
-> - HCI Version: String
-> - HCI Revision: String
-> - LMP Version: String
-> - LMP Sub Version: String
+>Hi Andreas,
+>
+>  
+>
+>>>As Marcel mentioned earlier, the easiest is to use the D-Bus services in
+>>>hcid to do that.
+>>>
+>>>      
+>>>
+>>He didn't. He said the safe way would be to use raw HCI sockets and (in 
+>>other words) that the D-Bus interface was unstable. Also, I am currently 
+>>testing this on desktop and notebook machines but it was actually 
+>>supposed to run on mobile devices (Zaurus) where we would not be able to 
+>>update the kernel and require the latest D-Bus/BlueZ interfaces.
+>>    
+>>
+>
+>the D-Bus interface has nothing to do with used kernel.
+>
+>  
+>
+>>Nontheless we will evaluate D-Bus, but for the time being my boss is 
+>>content with HCI sockets under root account.
+>>I'm familiar with socket programming in general but haven't used D-Bus 
+>>before and so we are worried whether introducing another layer such as 
+>>D-Bus might be of disadvantage for our software which needs non-cached 
+>>data, nearly in realtime (just as with HCI sockets). The D-Bus page 
+>>itself says it's not stable yet and I did not find documentation on how 
+>>to use it with BlueZ. The BlueZ library was very helpful in getting my 
+>>code to work, whereas I have no clue on where to find any such hints for 
+>>D-Bus both in the BlueZ 2.22 downloads and in the 2.6.13.4 kernel which 
+>>were the latest respectively when I downloaded them some weeks ago. I 
+>>can only guess from the examples at freedesktop.org that it'll be 
+>>/org/bluez/something.
+>>    
+>>
+>
+>The D-Bus interface works quite good, but I won't guarantee a stable API
+>at the moment. If needed, I am going to break it.
+>  
+>
+Yes, that's exactly how I understood your earlier post.
 
-Currently we have three different property types: string, boolean and
-byte. Are you proposing that the above information be bundled to one
-"info" property? That would create a fourth property type which, in my
-opinion, would complicate the code unecessarely. Maybe those pieces of
-information should be split into one property each (or maybe that's what
-you're suggesting, sorry if I misunderstood)? If there still exists a
-complelling reason to bundle all that info into one property, then I'd
-suggest creating a new property with the type DBUS_TYPE_STRUCT in order
-to maintain consistency with the parameters of the property signal and
-methods.
+But that does not give me any clue on how to use D-Bus either. I've seen 
+through the D-Bus specification, but it does not define anything 
+BlueZ-specific and I couldn't find anything related to D-Bus on the 
+BlueZ.org or Holtmann.org pages. Again, I have no clue on where to start 
+learning about specifically the BlueZ D-Bus interfaces - what path and 
+properties etc I can use with D-Bus to access the information we need.
 
-Also, all of the above pieces of information, excluding the device
-status, are of a read-only nature so the SetProperty method and
-PropertyChanged signal don't really apply to them. Therefore the
-question should be asked whether the "properties" feature is the right
-one to use for them (I'm not saying it isn't, just that it should be
-questioned). E.g. you would need to think about what error should be
-returned if SetProperty is called for one of them.
+Andreas
 
-Thirdly, the device status information can already changed using the Up
-and Down methods and its changes can be tracked using the Up and Down
-signals, so adding it to the set of properties is probably not the right
-thing to do (or then the Up/Down signals and methods should be removed).
-
-Johan
 
 
 -------------------------------------------------------
