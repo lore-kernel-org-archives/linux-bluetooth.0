@@ -1,19 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0512141035w5cc40fach9d77ead5df00cf2@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+Subject: Re: [Bluez-devel] Reading RSSI of non-connected devices
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Remote name delay
-In-Reply-To: <1134511532.24447.18.camel@blade>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <e1effdeb0512011117i730f7dd0p4ffc099d06a09cb8@mail.gmail.com>
-	 <1133470780.18554.2.camel@blade>
-	 <e1effdeb0512020321g2b492f1cl5c553d7c3b24bfb8@mail.gmail.com>
-	 <1133523028.20834.8.camel@blade>
-	 <e1effdeb0512020833q3f319166lfe8e63e612a86c4e@mail.gmail.com>
-	 <1133548573.20834.83.camel@blade>
-	 <e1effdeb0512131359x7ff7a330j435a8bde0779e958@mail.gmail.com>
-	 <1134511532.24447.18.camel@blade>
+In-Reply-To: <43A04C03.9030907@rumms.uni-mannheim.de>
+References: <4396F911.40705@rumms.uni-mannheim.de>
+	 <1133968124.3752.35.camel@blade>  <43970C1E.6020602@rumms.uni-mannheim.de>
+	 <1133973783.3752.47.camel@blade>  <43A03888.5010105@rumms.uni-mannheim.de>
+	 <1134573996.11064.56.camel@wyatt.hadess.net>
+	 <43A04C03.9030907@rumms.uni-mannheim.de>
+Content-Type: text/plain
+Message-Id: <1134580628.10473.8.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -25,71 +22,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 14 Dec 2005 16:35:44 -0200
+Date: Wed, 14 Dec 2005 18:17:08 +0100
 
-Hi Marcel,
+Hi Andreas,
 
-ok. We will extend the GetProperty(string:info) returning the
-following arguments:
-- MAC Address: String
-- Device Status: String(UP/DOWN)
-- Manufacturer: String
-- HCI Version: String
-- HCI Revision: String
-- LMP Version: String
-- LMP Sub Version: String
-
-The firmware revision was removed from the dialog because it's not
-possible get this info.
-
-
-Regards,
-Claudio
-
-On 12/13/05, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Claudio,
->
-> > There are some device properties I would like show in the adapter
-> > configuration dialog.
-> > http://www.cin.ufpe.br/~ckt/gbluezconf/config.gif
+> >As Marcel mentioned earlier, the easiest is to use the D-Bus services in
+> >hcid to do that.
 > >
-> > Do you agree provide D-Bus services to retrieve Manufacturer and
-> > firmware details? We can extend the GetProperty to support get these
-> > infos.
->
-> feel free to do it. That's fine with me.
->
-> > Currently I am solving some D-Bus signals filters and multiple dialogs
-> > issues. When it become stable I will send the first prototype. I have
-> > to send until next monday because I have vacations :)
->
-> Can't wait to give it a shoot. Will create a bluez-gnome CVS repository
-> then.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log fi=
-les
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+> He didn't. He said the safe way would be to use raw HCI sockets and (in 
+> other words) that the D-Bus interface was unstable. Also, I am currently 
+> testing this on desktop and notebook machines but it was actually 
+> supposed to run on mobile devices (Zaurus) where we would not be able to 
+> update the kernel and require the latest D-Bus/BlueZ interfaces.
+
+the D-Bus interface has nothing to do with used kernel.
+
+> Nontheless we will evaluate D-Bus, but for the time being my boss is 
+> content with HCI sockets under root account.
+> I'm familiar with socket programming in general but haven't used D-Bus 
+> before and so we are worried whether introducing another layer such as 
+> D-Bus might be of disadvantage for our software which needs non-cached 
+> data, nearly in realtime (just as with HCI sockets). The D-Bus page 
+> itself says it's not stable yet and I did not find documentation on how 
+> to use it with BlueZ. The BlueZ library was very helpful in getting my 
+> code to work, whereas I have no clue on where to find any such hints for 
+> D-Bus both in the BlueZ 2.22 downloads and in the 2.6.13.4 kernel which 
+> were the latest respectively when I downloaded them some weeks ago. I 
+> can only guess from the examples at freedesktop.org that it'll be 
+> /org/bluez/something.
+
+The D-Bus interface works quite good, but I won't guarantee a stable API
+at the moment. If needed, I am going to break it.
+
+Regards
+
+Marcel
 
 
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
