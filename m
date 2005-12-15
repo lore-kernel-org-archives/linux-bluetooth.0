@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] A blue chamaleon to be
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <op.s1tj7dd6xabado@portatilegio>
-References: <op.s1tgc9j9xabado@portatilegio>
-	 <1134636788.5198.42.camel@localhost> <op.s1tiptlkxabado@portatilegio>
-	 <1134638529.11856.1.camel@localhost>  <op.s1tj7dd6xabado@portatilegio>
-Content-Type: text/plain
-Message-Id: <1134642179.11856.30.camel@localhost>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] A blue chamaleon to be
+References: <op.s1tgc9j9xabado@portatilegio> <1134636788.5198.42.camel@localhost> <op.s1tiptlkxabado@portatilegio> <1134638529.11856.1.camel@localhost>
+From: "zio tom" <zio.tom@gmail.com>
+Content-Type: text/plain; format=flowed; delsp=yes; charset=iso-8859-15
+MIME-Version: 1.0
+Message-ID: <op.s1tj7dd6xabado@portatilegio>
+In-Reply-To: <1134638529.11856.1.camel@localhost>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,26 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 15 Dec 2005 11:22:59 +0100
+Date: Thu, 15 Dec 2005 10:48:39 +0100
 
-Hi Giovanni,
+In data Thu, 15 Dec 2005 10:22:08 +0100, Marcel Holtmann  
+<marcel@holtmann.org> ha scritto:
 
-> 2.19-5 is the number of the version installed.
+> Hi,
+> What version of bluez-utils is installed?
+>
+> Regards
+>
+> Marcel
 
-it would be better to upgrade to bluez-utils-2.23, because it fixed some
-stuff with the PIN helper handling and even the error reporting was
-improved.
-
-> And.. sorry, but for the  
-> moment I don't know actually how to reach my syslog.
-
-I will be somewhere in /var/log/.
-
-Regards
-
-Marcel
-
-
+Hi!
+2.19-5 is the number of the version installed. And.. sorry, but for the  
+moment I don't know actually how to reach my syslog.. Thank you again.
+Giovanni.
 
 
 -------------------------------------------------------
