@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <9ec07a230512150809y5933d62awc68f14cb5c19bb1c@mail.gmail.com>
-From: =?ISO-8859-1?Q?Israel_Gu=EDo?= <israzar@gmail.com>
+Message-ID: <5256d0b0512150731l30bdb521vc8436f46152fdddf@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] a2dp on maemo/nokia770
+In-Reply-To: <43A18AB3.2090507@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_11832_6668236.1134662963917"
-Subject: [Bluez-devel] dongles supporting sco
+Content-Type: text/plain; charset=ISO-8859-1
+References: <43A18AB3.2090507@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,35 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Dec 2005 17:09:23 +0100
+Date: Thu, 15 Dec 2005 15:31:33 +0000
 
-------=_Part_11832_6668236.1134662963917
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+On 12/15/05, Brad Midgley <bmidgley@xmission.com> wrote:
+> Hey
+>
+> Any nokia developers hanging out here?
+>
+> I would like to get A2DP audio working with the 770. The codec would
+> perform faster/better if it was a proper dsp task but that's beyond the
+> scope of a volunteer effort.
+>
+> Is nokia working on it?
 
-Hi all,
+Probably at a guess they are in preparation for the Internet Table
+2006 release so BT Headsets can be supported. They have been doing a
+fair amount of other work around some of the core infrastructure of BT
+for things like integration with dbus so they may not be at the
+BT-Audio stage yet. Its intersting to note thought that on their OS
+Website (here http://opensource.nokia.com/) they mention they are
+going to be releasing Affix (a bt protocol stack for linux)shortly.
 
-I must link two class-1 USB dongles and transmit audio between them. Can
-somebody tell me 3 or 4 class-1 dongles which support SCO? I have a 200M
-Conceptronic but it doesn't support it.
-
-Thanks.
-
-------=_Part_11832_6668236.1134662963917
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-<div>Hi all,</div>
-<div>&nbsp;</div>
-<div>I must link two class-1 USB dongles and transmit audio between them. C=
-an somebody tell me 3 or 4 class-1 dongles which support SCO? I have a 200M=
- Conceptronic but it doesn't support it.</div>
-<div>&nbsp;</div>
-<div>Thanks.&nbsp;</div>
-
-------=_Part_11832_6668236.1134662963917--
+Peter
 
 
 -------------------------------------------------------
