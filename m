@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5256d0b0512150845w2562afe3v939bd57ad11fef9f@mail.gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Remote name delay
+Message-ID: <20051215163313.GA30837@localhost.localdomain>
+References: <e1effdeb0512020321g2b492f1cl5c553d7c3b24bfb8@mail.gmail.com> <1133523028.20834.8.camel@blade> <e1effdeb0512020833q3f319166lfe8e63e612a86c4e@mail.gmail.com> <1133548573.20834.83.camel@blade> <e1effdeb0512131359x7ff7a330j435a8bde0779e958@mail.gmail.com> <1134511532.24447.18.camel@blade> <e1effdeb0512141035w5cc40fach9d77ead5df00cf2@mail.gmail.com> <20051214215318.GA25332@localhost.localdomain> <1134624339.5198.18.camel@localhost> <e1effdeb0512150817w6fc28193xe6a09d28cf1cab7a@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] More BT2+EDR Dongles
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <e1effdeb0512150817w6fc28193xe6a09d28cf1cab7a@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,16 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Dec 2005 16:45:15 +0000
+Date: Thu, 15 Dec 2005 18:33:13 +0200
 
-Hi All,
+Hi Claudio,
 
-For those interested IOGear has just announced a couple more BT2+EDR Dongle=
-s.
+On Thu, Dec 15, 2005, Claudio Takahasi wrote:
+> After your feedbacks, I think it's better remove the
+> "GetProperty('info')" in order to avoid confusion. We can create a new
+> method called "Info(void)" to retrieve read-only properties returning:
+> Address: String
+> Manufacturer: String
+> HCI Version: String, format TBD
+> LMP Version: String, format TBD
 
-Details here -> http://www.engadget.com/entry/1234000690072188/
+Sounds like a good idea.
 
-Pete
+Johan
 
 
 -------------------------------------------------------
