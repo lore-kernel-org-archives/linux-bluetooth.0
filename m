@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43A1A7DF.5060404@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-Id: <1513322956@web.de>
 MIME-Version: 1.0
+From: Wolfgang Krug <w-krug@web.de>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] More BT2+EDR Dongles
-References: <5256d0b0512150845w2562afe3v939bd57ad11fef9f@mail.gmail.com>
-In-Reply-To: <5256d0b0512150845w2562afe3v939bd57ad11fef9f@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-devel] Modify scotest?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,39 +16,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Dec 2005 10:29:03 -0700
+Date: Thu, 15 Dec 2005 18:10:41 +0100
 
-Peter
+Hi@ all!
 
-iogear is probably still using broadcom.
+I have the following problem, maybe you can help me.
 
-So is the zonet the first class 1, csr, bt2 adapter available in the US?
-(I'm guessing about csr since it looks like zonet has used csr for its
-other adapters.)
+I need to meassure the quality of a bluetooth SCO link, therefore I want to send a data file over a SCO Link like OBEX.
+So I want to see whats transmitted on client side, comparing with the original file, for the purpose to detect bit errors a.s.o.
+Is this possible with the scotest tool - actually it seems to me that I can only send a predetermined number of bytes through the SCO connection and receive them on the client side. 
+Or am I wrong and there is another solution for my  project ?
 
-http://zonet-usa.com/store/description.php?iddesc=23&id=89&cat=89&p=products
 
-Brad
+Regards
 
-Robinson wrote:
-> Hi All,
-> 
-> For those interested IOGear has just announced a couple more BT2+EDR Dongles.
-> 
-> Details here -> http://www.engadget.com/entry/1234000690072188/
-> 
-> Pete
-> 
-> 
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://ads.osdn.com/?ad_idv37&alloc_id865&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Wolfgang
+
+
+Ps. I have two Bluecore 3 Dongles, SCO is mapped to HCI - if its relevant.
+__________________________________________________________________
+Nur bis 31.12.: 1&1 DSL mit WEB.DE Preisvorteil! Jetzt einsteigen 
+und die Vorteile sichern! http://1und1dsl.web.de/?mc=021130
 
 
 
