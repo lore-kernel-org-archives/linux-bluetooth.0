@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] A blue chamaleon to be
+Subject: Re: [Bluez-users] just asking
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <op.s1tgc9j9xabado@portatilegio>
-References: <op.s1tgc9j9xabado@portatilegio>
+In-Reply-To: <20051215083533.98809.qmail@web50503.mail.yahoo.com>
+References: <20051215083533.98809.qmail@web50503.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1134636788.5198.42.camel@localhost>
+Message-Id: <1134636737.5198.41.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,23 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 15 Dec 2005 09:53:08 +0100
+Date: Thu, 15 Dec 2005 09:52:17 +0100
 
-Hi Giovanni,
+Hi OJ,
 
-> I'm new both to Linux (OpenSuSe 10.0) and to Bluez. I'm using a  
-> Tecom dongle since two years on win xp (sorry). Now I'd like to use it  
-> even in Linux, but I can't pair my mobile (Motorola v600) in any way I'm  
-> trying. Object push works well, in&out.. It's the pairing my only problem.  
-> I tried to set as "none" the pairing mode in hcid.conf, and to "user" the  
-> security mode, as I red in your archive on Gmane, but it doesn't work. I  
-> also tried to set the security as auto, and the pin file text as PIN:****  
-> and not just ****. Everytime I try to establish a connection in need of  
-> pairing, my mobile pops up with a request for a pin code I simply... don't  
-> know. Where and how should I write it before trying to establish a  
-> connection with my phone?
+> I'm just wondering if you conduct conventions/seminars
+> about bluez and bluetooth? 
 
-send in the output of "hcidump -X -V" while you are doing this.
+yes, I do, but obvious they are not for free. Contact me directly in a
+separate email, if you need any further details.
 
 Regards
 
