@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] More BT2+EDR Dongles
+Subject: Re: [Bluez-devel] Modify scotest?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43A1A7DF.5060404@xmission.com>
-References: <5256d0b0512150845w2562afe3v939bd57ad11fef9f@mail.gmail.com>
-	 <43A1A7DF.5060404@xmission.com>
+In-Reply-To: <1513322956@web.de>
+References: <1513322956@web.de>
 Content-Type: text/plain
-Message-Id: <1134675702.12505.19.camel@localhost>
+Message-Id: <1134675751.12505.21.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,14 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Dec 2005 20:41:42 +0100
+Date: Thu, 15 Dec 2005 20:42:31 +0100
 
-Hi Brad,
+Hi Wolfgang,
 
-> iogear is probably still using broadcom.
+> I need to meassure the quality of a bluetooth SCO link, therefore I want to send a data file over a SCO Link like OBEX.
+> So I want to see whats transmitted on client side, comparing with the original file, for the purpose to detect bit errors a.s.o.
+> Is this possible with the scotest tool - actually it seems to me that I can only send a predetermined number of bytes through the SCO connection and receive them on the client side. 
+> Or am I wrong and there is another solution for my  project ?
 
-I just bought a Belkin and it is Broadcom based. Can someone verify that
-for the IOGear or donate at least one.
+don't use SCO channel for data transmission, period.
 
 Regards
 
