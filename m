@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] dongles supporting sco
+Subject: Re: [Bluez-devel] a2dp on maemo/nokia770
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <9ec07a230512150809y5933d62awc68f14cb5c19bb1c@mail.gmail.com>
-References: <9ec07a230512150809y5933d62awc68f14cb5c19bb1c@mail.gmail.com>
+In-Reply-To: <5256d0b0512150731l30bdb521vc8436f46152fdddf@mail.gmail.com>
+References: <43A18AB3.2090507@xmission.com>
+	 <5256d0b0512150731l30bdb521vc8436f46152fdddf@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1134675621.12505.17.camel@localhost>
+Message-Id: <1134675567.12505.15.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,16 +19,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Dec 2005 20:40:21 +0100
+Date: Thu, 15 Dec 2005 20:39:27 +0100
 
-Hi Israel,
+Hi Peter,
 
-> I must link two class-1 USB dongles and transmit audio between them.
-> Can somebody tell me 3 or 4 class-1 dongles which support SCO? I have
-> a 200M Conceptronic but it doesn't support it.
+> Its intersting to note thought that on their OS
+> Website (here http://opensource.nokia.com/) they mention they are
+> going to be releasing Affix (a bt protocol stack for linux)shortly.
 
-actually all CSR based dongles support SCO. Try to get some of the
-BlueCore4 based ones with EDR support.
+the Affix stack (affix.sf.net) has been around since November 2001.
 
 Regards
 
