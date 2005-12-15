@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051215083533.98809.qmail@web50503.mail.yahoo.com>
-From: oj ravadilla <ojravadilla@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1134552546.14885.26.camel@localhost>
+From: "zio tom" <zio.tom@gmail.com>
+Content-Type: text/plain; format=flowed; delsp=yes; charset=iso-8859-15
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] just asking
+Message-ID: <op.s1tgc9j9xabado@portatilegio>
+Subject: [Bluez-users] A blue chamaleon to be
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,21 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 15 Dec 2005 00:35:33 -0800 (PST)
+Date: Thu, 15 Dec 2005 09:25:47 +0100
 
-Hi Marcel,
-
-
-I'm just wondering if you conduct conventions/seminars
-about bluez and bluetooth? 
-
-Thanks,
-OJ
-
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+Hello, I'm new both to Linux (OpenSuSe 10.0) and to Bluez. I'm using a  
+Tecom dongle since two years on win xp (sorry). Now I'd like to use it  
+even in Linux, but I can't pair my mobile (Motorola v600) in any way I'm  
+trying. Object push works well, in&out.. It's the pairing my only problem.  
+I tried to set as "none" the pairing mode in hcid.conf, and to "user" the  
+security mode, as I red in your archive on Gmane, but it doesn't work. I  
+also tried to set the security as auto, and the pin file text as PIN:****  
+and not just ****. Everytime I try to establish a connection in need of  
+pairing, my mobile pops up with a request for a pin code I simply... don't  
+know. Where and how should I write it before trying to establish a  
+connection with my phone?
+Thank for your great work,
+Giovanni.
 
 
 -------------------------------------------------------
