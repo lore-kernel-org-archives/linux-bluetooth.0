@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <1513322956@web.de>
-MIME-Version: 1.0
-From: Wolfgang Krug <w-krug@web.de>
+Message-ID: <5256d0b0512150845w2562afe3v939bd57ad11fef9f@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] Modify scotest?
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] More BT2+EDR Dongles
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,28 +16,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Dec 2005 18:10:41 +0100
+Date: Thu, 15 Dec 2005 16:45:15 +0000
 
-Hi@ all!
+Hi All,
 
-I have the following problem, maybe you can help me.
+For those interested IOGear has just announced a couple more BT2+EDR Dongle=
+s.
 
-I need to meassure the quality of a bluetooth SCO link, therefore I want to send a data file over a SCO Link like OBEX.
-So I want to see whats transmitted on client side, comparing with the original file, for the purpose to detect bit errors a.s.o.
-Is this possible with the scotest tool - actually it seems to me that I can only send a predetermined number of bytes through the SCO connection and receive them on the client side. 
-Or am I wrong and there is another solution for my  project ?
+Details here -> http://www.engadget.com/entry/1234000690072188/
 
-
-Regards
-
-Wolfgang
-
-
-Ps. I have two Bluecore 3 Dongles, SCO is mapped to HCI - if its relevant.
-__________________________________________________________________
-Nur bis 31.12.: 1&1 DSL mit WEB.DE Preisvorteil! Jetzt einsteigen 
-und die Vorteile sichern! http://1und1dsl.web.de/?mc=021130
-
+Pete
 
 
 -------------------------------------------------------
