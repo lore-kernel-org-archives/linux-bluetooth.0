@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Modify scotest?
+Subject: Re: [Bluez-devel] dongles supporting sco
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1513322956@web.de>
-References: <1513322956@web.de>
+In-Reply-To: <9ec07a230512150809y5933d62awc68f14cb5c19bb1c@mail.gmail.com>
+References: <9ec07a230512150809y5933d62awc68f14cb5c19bb1c@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1134675751.12505.21.camel@localhost>
+Message-Id: <1134675621.12505.17.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,16 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Dec 2005 20:42:31 +0100
+Date: Thu, 15 Dec 2005 20:40:21 +0100
 
-Hi Wolfgang,
+Hi Israel,
 
-> I need to meassure the quality of a bluetooth SCO link, therefore I want to send a data file over a SCO Link like OBEX.
-> So I want to see whats transmitted on client side, comparing with the original file, for the purpose to detect bit errors a.s.o.
-> Is this possible with the scotest tool - actually it seems to me that I can only send a predetermined number of bytes through the SCO connection and receive them on the client side. 
-> Or am I wrong and there is another solution for my  project ?
+> I must link two class-1 USB dongles and transmit audio between them.
+> Can somebody tell me 3 or 4 class-1 dongles which support SCO? I have
+> a 200M Conceptronic but it doesn't support it.
 
-don't use SCO channel for data transmission, period.
+actually all CSR based dongles support SCO. Try to get some of the
+BlueCore4 based ones with EDR support.
 
 Regards
 
