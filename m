@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] A blue chamaleon to be
-References: <op.s1tgc9j9xabado@portatilegio> <1134636788.5198.42.camel@localhost> <op.s1tiptlkxabado@portatilegio> <1134638529.11856.1.camel@localhost>
-From: "zio tom" <zio.tom@gmail.com>
-Content-Type: text/plain; format=flowed; delsp=yes; charset=iso-8859-15
-MIME-Version: 1.0
-Message-ID: <op.s1tj7dd6xabado@portatilegio>
-In-Reply-To: <1134638529.11856.1.camel@localhost>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <op.s1tiptlkxabado@portatilegio>
+References: <op.s1tgc9j9xabado@portatilegio>
+	 <1134636788.5198.42.camel@localhost>  <op.s1tiptlkxabado@portatilegio>
+Content-Type: text/plain
+Message-Id: <1134638529.11856.1.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,22 +19,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 15 Dec 2005 10:48:39 +0100
+Date: Thu, 15 Dec 2005 10:22:08 +0100
 
-In data Thu, 15 Dec 2005 10:22:08 +0100, Marcel Holtmann  
-<marcel@holtmann.org> ha scritto:
+Hi,
 
-> Hi,
-> What version of bluez-utils is installed?
+> > send in the output of "hcidump -X -V" while you are doing this.
+> 
+> thank you very much for you asnwering.
+> Here it is my output
 >
-> Regards
->
-> Marcel
+> > HCI Event: Link Key Request (0x17) plen 6
+>      bdaddr 00:0A:28:0C:D4:EF
+> < HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
+>      bdaddr 00:0A:28:0C:D4:EF
+> > HCI Event: Command Complete (0x0e) plen 10
+>      Link Key Request Negative Reply (0x01|0x000c) ncmd 1
+>      status 0x00 bdaddr 00:0A:28:0C:D4:EF
+> > HCI Event: PIN Code Request (0x16) plen 6
+>      bdaddr 00:0A:28:0C:D4:EF
+> < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+>      bdaddr 00:0A:28:0C:D4:EF
+> > HCI Event: Command Complete (0x0e) plen 10
+>      PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
+>      status 0x00 bdaddr 00:0A:28:0C:D4:EF
 
-Hi!
-2.19-5 is the number of the version installed. And.. sorry, but for the  
-moment I don't know actually how to reach my syslog.. Thank you again.
-Giovanni.
+look like the PIN helper program is not working and so hcid can't input
+the PIN code at all. Check your syslog about any errors from hcid.
+
+What version of bluez-utils is installed?
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
