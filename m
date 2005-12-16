@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051216103855.90185.qmail@web36113.mail.mud.yahoo.com>
-From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Re: A blue chamaleon to be
+References: <1134636788.5198.42.camel@localhost> <op.s1tiptlkxabado@portatilegio> <1134638529.11856.1.camel@localhost> <op.s1tj7dd6xabado@portatilegio> <1134642179.11856.30.camel@localhost> <op.s1t0xmg8xabado@portatilegio> <op.s1t2ws0rxabado@portatilegio> <op.s1t63hh3xabado@portatilegio> <20051215211716.GB12373@elmicha.333200002251-0001.dialin.t-online.de> <op.s1uu2mo1xabado@portatilegio> <20051216031937.GE12373@elmicha.333200002251-0001.dialin.t-online.de>
+Message-ID: <op.s1vdldx5xabado@portatilegio>
+From: "zio tom" <zio.tom@gmail.com>
+Content-Type: text/plain; format=flowed; delsp=yes; charset=iso-8859-15
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-824705396-1134729535=:89868"
-Subject: [Bluez-users] don't find the module "snd_bt_sco"
+In-Reply-To: <20051216031937.GE12373@elmicha.333200002251-0001.dialin.t-online.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,33 +18,89 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 16 Dec 2005 02:38:55 -0800 (PST)
+Date: Fri, 16 Dec 2005 10:21:03 +0100
 
---0-824705396-1134729535=:89868
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+In data Fri, 16 Dec 2005 04:19:37 +0100, Michael Mauch  
+<michael.mauch@gmx.de> ha scritto:
 
-Hello,
- I want to use my headset with my Linux PC(Fedora Core 4). I followed all the steps given in "http://bluetooth-alsa.sourceforge.net/". When it comes to the steps
- Using SCO Audio 
- I am unable to find the module "snd_bt_sco". Where can i find this module ?
- Do you think i might have made any mistake in any of the steps which are executed before.
- Can anyone help me with this.
- Regards,
- Swathi
- 
- 
+> What's the output of "rfcomm" now?
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
---0-824705396-1134729535=:89868
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+linux:/home/giovanni # rfcomm
+rfcomm0: 00:0A:28:0C:D4:EF channel 1 clean
 
-<div id="RTEContent">Hello,<br> I want to use my headset with my Linux PC(Fedora Core 4). I followed all the steps given in "http://bluetooth-alsa.sourceforge.net/". When it comes to the steps<br> Using SCO Audio <br> I am unable to find the module "snd_bt_sco". Where can i find this module ?<br> Do you think i might have made any mistake in any of the steps which are executed before.<br> Can anyone help me with this.<br> Regards,<br> Swathi<br> <br> </div><p>__________________________________________________<br>Do You Yahoo!?<br>Tired of spam?  Yahoo! Mail has the best spam protection around <br>http://mail.yahoo.com 
---0-824705396-1134729535=:89868--
+> That's all ok if "rfcomm" shows:
+
+>  rfcomm0: 00:0A:28:0C:D4:EF channel 1 clean
+
+> before you use wvdial.
+
+So, I use it and I obtain:
+
+linux:/home/giovanni # wvdial
+--> WvDial: Internet dialer version 1.54.0
+--> Cannot open /dev/rfcomm0: Connection refused
+--> Cannot open /dev/rfcomm0: Connection refused
+--> Cannot open /dev/rfcomm0: Permission denied
+linux:/home/giovanni #
+
+> Are you sure that the channel number 1 is correct? It's different on
+> each device. Did you lookup this channel on your device with "sdptool
+> browse 00:0A:28:0C:D4:EF" or (if that doesn't work) with "sdptool
+> records 00:0A:28:0C:D4:EF"?
+> Look for the "Service Name" and the "Channel" lines. I don't know for  
+> which
+> service name you should look, on my phone it's called "SSA" (I don't
+> know if these names come from the phone or from bluez). If you can't
+> figure out the suitable channel, post the output of "sdptool records
+> 00:0A:28:0C:D4:EF".
+
+linux:/home/giovanni # sdptool browse 00:0A:28:0C:D4:EF
+Browsing 00:0A:28:0C:D4:EF ...
+Service RecHandle: 0x0
+Service Class ID List:
+   "SDP Server" (0x1000)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "SDP" (0x0001)
+Profile Descriptor List:
+   "SDP Server" (0x1000)
+     Version: 0x0100
+
+Service Name: Dial-up networking Gateway
+Service Description: Dial-up networking Gateway
+Service Provider: Motorola
+Service RecHandle: 0x10001
+Service Class ID List:
+   "Dialup Networking" (0x1103)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 1
+Language Base Attr List:
+   code_ISO639: 0x656e
+   encoding:    0x6a
+   base_offset: 0x100
+   code_ISO639: 0x6672
+   encoding:    0x6a
+   base_offset: 0xd800
+   code_ISO639: 0x6465
+   encoding:    0x6a
+   base_offset: 0xd803
+   code_ISO639: 0x6974
+   encoding:    0x6a
+   base_offset: 0xd806
+   code_ISO639: 0x6573
+   encoding:    0x6a
+   base_offset: 0xd809
+   code_ISO639: 0x7472
+   encoding:    0x6a
+   base_offset: 0xd80c
+   code_ISO639: 0x656c
+   encoding:    0x6a
+   base_offset: 0xd80f
+Profile Descriptor List:
+   "Dialup Networking" (0x1103)
+     Version: 0x0100
 
 
 -------------------------------------------------------
