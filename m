@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <478d26d00512170311g3a4ac3c2g@mail.gmail.com>
-From: Toni Fiz <toni.fiz@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Pair problems with nokia 6230
-In-Reply-To: <1134462549.10555.54.camel@localhost.localdomain>
+Message-ID: <43A319B5.9040100@bglug.it>
+From: jimmi <jimmi@bglug.it>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_18559_4348310.1134817918804"
-References: <478d26d00512101355g1bca6ab6g@mail.gmail.com>
-	 <1134462549.10555.54.camel@localhost.localdomain>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] don't find the module "snd_bt_sco"
+References: <20051216103855.90185.qmail@web36113.mail.mud.yahoo.com>
+In-Reply-To: <20051216103855.90185.qmail@web36113.mail.mud.yahoo.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,96 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Dec 2005 12:11:58 +0100
+Date: Fri, 16 Dec 2005 20:47:01 +0100
 
-------=_Part_18559_4348310.1134817918804
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Swathi Mathur80 ha scritto:
+> I am unable to find the module "snd_bt_sco". Where can i find this module ?
+> Do you think i might have made any mistake in any of the steps which are 
+> executed before.
+> Can anyone help me with this.
 
-This seems to work
+I also had some problem because the "make install" couldn't copy the module.
 
-Here it is the solution (tranlated from spanish)
+If it was compiled correctly by "make" you may find the module 
+"snd-bt-sco.ko" under btsco/kernel
 
+You shall create the directory "/lib/modules/KERNELVERSION/extra", where 
+KERNELVERSION is the kernel that you booted, and copy inside it the 
+module. After that "modprobe snd-bt-sco" should work correctly.
 
-   - Create a text file with the PIN code in */etc/bluetooth/pin*
-   - Create the file /usr/local/bin/bluez-localpin with the content below
-
-
- #!/bin/sh
-echo "PIN":$(cat /etc/bluetooth/pin)
-
-
-   - Modify */*etc/bluetooth/hcid.conf in order to set this options
-
-options {
-
-        autoinit yes;
-        security auto;
-        pairing multi;
-        pin_helper /usr/local/bin/bluez-localpin; #este no es el que
-trae por defecto, ver arriba
-}
-device {
-        name "%h-%d";
-        class 0x3e0100;
-        iscan enable; pscan enable;
-        lm accept;
-        lp rswitch,hold,sniff,park;
-
-
-   - Restart daemon
-
-# /etc/init.d/bluez-utils restart
-
-------=_Part_18559_4348310.1134817918804
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-This seems to work<br>
-<br>
-Here it is the solution (tranlated from spanish)<br>
-<br>
-<ul>
-  <li><span style=3D"font-family: arial,sans-serif;">Create a text file wit=
-h the PIN code in </span><b style=3D"font-family: arial,sans-serif;">/etc/b=
-luetooth/pin</b></li>
-  <li><span style=3D"font-family: arial,sans-serif;">Create the file /usr/l=
-ocal/bin/bluez-localpin with the content below</span></li>
-</ul>
-<br style=3D"font-family: arial,sans-serif;">
-<div style=3D"margin-left: 40px; font-family: arial,sans-serif;">
-<pre>#!/bin/sh<br>echo &quot;PIN&quot;:$(cat /etc/bluetooth/pin)</pre>
-</div>
-<ul>
-  <li>Modify <b>/</b>etc/bluetooth/hcid.conf in order to set this options</=
-li>
-</ul>
-<div style=3D"margin-left: 40px;">options {<br>
-</div>
-<pre style=3D"font-family: arial,sans-serif; margin-left: 40px;">        au=
-toinit yes;<br>        security auto;<br>        pairing multi;<br>        =
-pin_helper /usr/local/bin/bluez-localpin; #este no es el que trae por defec=
-to, ver arriba
-<br>}<br>device {<br>        name &quot;%h-%d&quot;;<br>        class 0x3e0=
-100;<br>        iscan enable; pscan enable;<br>        lm accept;<br>      =
-  lp rswitch,hold,sniff,park;<br></pre>
-
-<ul>
-  <li>
-    <h4 style=3D"font-family: arial,sans-serif; font-weight: normal;">Resta=
-rt daemon</h4>
-  </li>
-</ul>
-<h4 style=3D"font-family: arial,sans-serif; font-weight: normal; margin-lef=
-t: 40px;"># /etc/init.d/bluez-utils restart<br>
-</h4>
-
-<br>
-
-
-------=_Part_18559_4348310.1134817918804--
+Jimmi
 
 
 -------------------------------------------------------
