@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-Id: <1516267928@web.de>
+MIME-Version: 1.0
+From: Wolfgang Krug <w-krug@web.de>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1134931244.6881.19.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Bluetooth and C#
+Subject: Re: [Bluez-devel] Modify scotest?
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,29 +16,56 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 18 Dec 2005 19:40:44 +0100
+Date: Sat, 17 Dec 2005 08:47:49 +0100
 
-Hi guys,
+Now  I have simply inserted a  recording option in scotest ( like in hstest). It seems to work, I can transmit audio from Dongle to Dongle and record it,
+ but do I have to use the correct format (8Khz / 8 Bit Sample)?
 
-I was playing a little bit with Mono and C# lately and I think we are
-really in need for some good C# Bluetooth bindings. I would expect that
-Microsoft already defined some, but I wasn't able to locate any good
-documentation about Windows Bluetooth programming with C#. I found some
-crap about the CE mobile/embedded stuff, but not for the desktop OS.
-However there exists some stuff from www.32feet.net which tries to
-provide a framework for Bluetooth, but I am not really sure if it is
-usable and if it would make sense to implement the same interface for
-Linux. Some example code of how to use it can be found here:
+ Have you already done that  - any experiences? 
 
-http://www.totalannihilation.dk/wordpress/code/BluetoothConsoleScanner.cs
 
-So does anybody used C# under Windows XP for Bluetooth programming so
-far or is the only option still C++?
+bluez-devel@lists.sourceforge.net schrieb am 16.12.05 09:51:22:
+> 
+> Hi Arnaud,
+> 
+> > Using SCO for quality measurement is a good idea if your bluetouth 
+> > device supports trasnparent audio, and if you configure them to use this 
+> > mode. If not, you can still try a configuration like ulaw on air, ulaw 
+> > on HCI (no conversion in theory)
+> 
+> no it is not a good idea. The chip will insert bits/bytes/frames as it
+> thinks it needs to. The transparent audio is not guaranteed. Read the
+> posts from the CSR guys for any details. 
+> 
+> > In this case, write a tool like scotest that always send FF.FF.FF...FF 
+> > frames (or anything you want) (write the same amount of data that you 
+> > receive). Then juste count zeros bits to detect BER, and 00.00.00...00 
+> > frames for PER.
+> 
+> Get a CSR development kit and get their BCCMD specification and use
+> their internals to get the BER values.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+> for problems?  Stop!  Download the new AJAX search engine that makes
+> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+> http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-Regards
 
-Marcel
-
+__________________________________________________________________________
+Erweitern Sie FreeMail zu einem noch leistungsstarkeren E-Mail-Postfach!		
+Mehr Infos unter http://freemail.web.de/home/landingpad/?mc=021131
 
 
 
