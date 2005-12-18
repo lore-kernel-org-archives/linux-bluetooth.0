@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bluetooth and C#
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43A5B7C2.2090103@rumms.uni-mannheim.de>
+From: =?ISO-8859-15?Q?Andreas_F=E4rber?= <afaerber@rumms.uni-mannheim.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43A5B7C2.2090103@rumms.uni-mannheim.de>
-References: <1134931244.6881.19.camel@localhost>
-	 <43A5B0BB.1070108@rumms.uni-mannheim.de>
-	 <1134933091.6881.29.camel@localhost>
-	 <43A5B7C2.2090103@rumms.uni-mannheim.de>
-Content-Type: text/plain
-Message-Id: <1134935481.6881.35.camel@localhost>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Bluetooth and C#
+References: <1134931244.6881.19.camel@localhost>	 <43A5B0BB.1070108@rumms.uni-mannheim.de> <1134933091.6881.29.camel@localhost>
+In-Reply-To: <1134933091.6881.29.camel@localhost>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,26 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 18 Dec 2005 20:51:21 +0100
+Date: Sun, 18 Dec 2005 20:25:54 +0100
 
-Hi Andreas,
+Marcel,
 
-> >>If you want to write a BlueZ#, then through P/Invoke you 
-> >>would be able to call into libbluetooth.so.
-> >
-> >I am not going to do this, because I am looking for a standard solution
-> >and not a home brewed one.
-> >
-> Every standard interface would need some kind of implementation - there 
-> is no Microsoft stack on Linux so that would be BlueZ in some way.
+>>If you want to write a BlueZ#, then through P/Invoke you 
+>>would be able to call into libbluetooth.so.
+>>    
+>>
+>
+>I am not going to do this, because I am looking for a standard solution
+>and not a home brewed one.
+>  
+>
+Every standard interface would need some kind of implementation - there 
+is no Microsoft stack on Linux so that would be BlueZ in some way.
 
-yes, but that are implementation details. And with a standard interface
-they are hidden.
+Regards,
 
-Regards
-
-Marcel
-
+Andreas
 
 
 
