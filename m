@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SDP records for HID and HCRP services
-From: "Collin R. Mulliner" <collin@betaversion.net>
+Subject: Re: [Bluez-devel] Bluetooth and C#
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1134931482.6881.22.camel@localhost>
-References: <1134931482.6881.22.camel@localhost>
+In-Reply-To: <43A5B7C2.2090103@rumms.uni-mannheim.de>
+References: <1134931244.6881.19.camel@localhost>
+	 <43A5B0BB.1070108@rumms.uni-mannheim.de>
+	 <1134933091.6881.29.camel@localhost>
+	 <43A5B7C2.2090103@rumms.uni-mannheim.de>
 Content-Type: text/plain
-Message-Id: <1134946334.16233.11.camel@panic>
+Message-Id: <1134935481.6881.35.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,30 +21,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 18 Dec 2005 23:52:14 +0100
+Date: Sun, 18 Dec 2005 20:51:21 +0100
 
-Hi Marcel,
+Hi Andreas,
 
-you know who it was :) Sure I'll make a HID patch as soon as I can
-veryfy that my "keyboard" is working within normal parameters *lol*
+> >>If you want to write a BlueZ#, then through P/Invoke you 
+> >>would be able to call into libbluetooth.so.
+> >
+> >I am not going to do this, because I am looking for a standard solution
+> >and not a home brewed one.
+> >
+> Every standard interface would need some kind of implementation - there 
+> is no Microsoft stack on Linux so that would be BlueZ in some way.
 
-... Collin
+yes, but that are implementation details. And with a standard interface
+they are hidden.
 
-On Sun, 2005-12-18 at 19:44 +0100, Marcel Holtmann wrote:
-> Hi guys,
-> 
-> some of you played with SDP records for HID and HCRP services lately and
-> I like to add support for them to sdptool. Anyone who wants to submit a
-> patch for them?
-> 
-> Regards
-> 
+Regards
 
---
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-Get a life! Start coding!
+Marcel
+
 
 
 
