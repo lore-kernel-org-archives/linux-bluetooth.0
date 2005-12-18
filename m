@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43A5B0BB.1070108@rumms.uni-mannheim.de>
-From: =?ISO-8859-15?Q?Andreas_F=E4rber?= <afaerber@rumms.uni-mannheim.de>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Bluetooth and C#
-References: <1134931244.6881.19.camel@localhost>
-In-Reply-To: <1134931244.6881.19.camel@localhost>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Type: text/plain
+Message-Id: <1134931482.6881.22.camel@localhost>
+Mime-Version: 1.0
+Subject: [Bluez-devel] SDP records for HID and HCRP services
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,40 +16,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 18 Dec 2005 19:55:55 +0100
+Date: Sun, 18 Dec 2005 19:44:42 +0100
 
-Hi Marcel,
+Hi guys,
 
->I was playing a little bit with Mono and C# lately and I think we are
->really in need for some good C# Bluetooth bindings.
->
-Good idea. If you want to write a BlueZ#, then through P/Invoke you 
-would be able to call into libbluetooth.so.
+some of you played with SDP records for HID and HCRP services lately and
+I like to add support for them to sdptool. Anyone who wants to submit a
+patch for them?
 
->I would expect that
->Microsoft already defined some
->
-No, not that I'm aware of - that is not in .NET Framework 1.0, 1.1 and 
-2.0. Also Mono does not currently ship any.
+Regards
 
->, but I wasn't able to locate any good
->documentation about Windows Bluetooth programming with C#. I found some
->crap about the CE mobile/embedded stuff, but not for the desktop OS.
->  
->
-There was something at OpenNETCF.org for the .NET CF but it has 
-dependencies on external COM interop components by InTheHand.
+Marcel
 
->So does anybody used C# under Windows XP for Bluetooth programming so
->far or is the only option still C++?
->  
->
-I am not aware of a free, widely used Bluetooth framework for .NET. If 
-you come upon any others, please let me know!
-
-Best regards,
-
-Andreas
 
 
 
