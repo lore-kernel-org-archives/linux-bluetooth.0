@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43A6647E.8080406@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] SDP records for HID and HCRP services
+From: "Collin R. Mulliner" <collin@betaversion.net>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] avrcp volume control
-References: <43A114D1.4000506@xmission.com> <1134636865.5198.44.camel@localhost> <43A189C3.6030700@xmission.com>
-In-Reply-To: <43A189C3.6030700@xmission.com>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <1134931482.6881.22.camel@localhost>
+References: <1134931482.6881.22.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1134946334.16233.11.camel@panic>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,16 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 19 Dec 2005 00:42:54 -0700
+Date: Sun, 18 Dec 2005 23:52:14 +0100
 
-guys
+Hi Marcel,
 
-> I do have an hp set that I will try this weekend.
+you know who it was :) Sure I'll make a HID patch as soon as I can
+veryfy that my "keyboard" is working within normal parameters *lol*
 
-I need to go back to square one on volume control. The HP similarly
-ignored the volume changes sent to its panel subdevice.
+... Collin
 
-Brad
+On Sun, 2005-12-18 at 19:44 +0100, Marcel Holtmann wrote:
+> Hi guys,
+> 
+> some of you played with SDP records for HID and HCRP services lately and
+> I like to add support for them to sdptool. Anyone who wants to submit a
+> patch for them?
+> 
+> Regards
+> 
+
+--
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+Get a life! Start coding!
+
 
 
 -------------------------------------------------------
