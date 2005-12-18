@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] compile problem with bluez-utils-2.23 (uint16_t,
-	.. missing)
+Subject: Re: [Bluez-devel] Bluetooth and C#
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <m3mziyxlv7.fsf@gondor.middle-earth.priv>
-References: <m3mziyxlv7.fsf@gondor.middle-earth.priv>
+In-Reply-To: <43A5B0BB.1070108@rumms.uni-mannheim.de>
+References: <1134931244.6881.19.camel@localhost>
+	 <43A5B0BB.1070108@rumms.uni-mannheim.de>
 Content-Type: text/plain
-Message-Id: <1134933248.6881.32.camel@localhost>
+Message-Id: <1134933091.6881.29.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,34 +19,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 18 Dec 2005 20:14:08 +0100
+Date: Sun, 18 Dec 2005 20:11:31 +0100
 
-Hi Christian,
+Hi Andreas,
 
-> I've tried to compile bluez-utils 2.23 and it failed with an error:
-> 
-> if gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common   -I/usr/include  -I/usr/include -O2 -fomit-frame-pointer -pipe -march=i586 -mtune=athlon -D_FORTIFY_SOURCE=2 -MT csr_usb.o -MD -MP -MF ".deps/csr_usb.Tpo" -c -o csr_usb.o csr_usb.c; \
-> then mv -f ".deps/csr_usb.Tpo" ".deps/csr_usb.Po"; else rm -f ".deps/csr_usb.Tpo"; exit 1; fi
-> In file included from csr_usb.c:34:
-> csr.h:500: error: syntax error before "def"
-> csr.h:501: error: syntax error before "id"
-> csr.h:502: error: syntax error before "ver"
-> csr.h:503: error: syntax error before "pskey"
-> csr.h:504: error: syntax error before "pskey"
-> csr.h:507: error: syntax error before "varid"
-> csr.h:508: error: syntax error before "varid"
-> csr.h:512: error: syntax error before "varid"
-> csr.h:513: error: syntax error before "varid"
-> csr.h:517: error: syntax error before "varid"
-> csr.h:518: error: syntax error before "varid"
-> 
-> It seems, that uint16_t, uint32_t, ... are not found.
+> >I was playing a little bit with Mono and C# lately and I think we are
+> >really in need for some good C# Bluetooth bindings.
+> >
+> Good idea. If you want to write a BlueZ#, then through P/Invoke you 
+> would be able to call into libbluetooth.so.
 
-what compiler do you use? I never had that problem.
+I am not going to do this, because I am looking for a standard solution
+and not a home brewed one.
 
-> I've solved the problem by including inttypes.h in csr.h:
+> >I would expect that
+> >Microsoft already defined some
+> >
+> No, not that I'm aware of - that is not in .NET Framework 1.0, 1.1 and 
+> 2.0. Also Mono does not currently ship any.
 
-I prefer using <stdint.h>. Does this also work for you?
+Too bad.
+
+> >, but I wasn't able to locate any good
+> >documentation about Windows Bluetooth programming with C#. I found some
+> >crap about the CE mobile/embedded stuff, but not for the desktop OS.
+> >  
+> There was something at OpenNETCF.org for the .NET CF but it has 
+> dependencies on external COM interop components by InTheHand.
+
+This is the stuff from www.32feet.net now.
 
 Regards
 
