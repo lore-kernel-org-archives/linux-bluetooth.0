@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5bab330d0512192018o281f89a6l242586c487297e8f@mail.gmail.com>
-From: Nigel Sim <nigel.sim@gmail.com>
+Subject: Re: [Bluez-devel] Re: Re: compile problem with bluez-utils-2.23
+	(uint16_t, .. missing)
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_1883_10274066.1135052294508"
-Subject: [Bluez-devel] A2DP w/ Blueant headset
+In-Reply-To: <m3acewyaat.fsf@gondor.middle-earth.priv>
+References: <m3acewyaat.fsf@gondor.middle-earth.priv>
+Content-Type: text/plain
+Message-Id: <1135033204.5236.4.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,101 +19,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Dec 2005 14:18:14 +1000
+Date: Tue, 20 Dec 2005 00:00:04 +0100
 
-------=_Part_1883_10274066.1135052294508
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Christian,
 
-A2DP with the bluetooth-alsa project doesn't work with the Blueant stereo
-headphones, and by looking at this page it appears that it might be because
-these headphones don't support AVDTP (
-http://www.robertwebbe.nl/extendedA2DP.html) Is this possible?
+> > > I've tried to compile bluez-utils 2.23 and it failed with an error:
+> > > 
+> > > if gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common   -I/usr/include  -I/usr/include -O2
+> >-fomit-frame-pointer -pipe -march=i586 -mtune=athlon -D_FORTIFY_SOURCE=2 -MT csr_usb.o -MD
+> >-MP -MF ".deps/csr_usb.Tpo" -c -o csr_usb.o csr_usb.c; \
+> > > then mv -f ".deps/csr_usb.Tpo" ".deps/csr_usb.Po"; else rm -f ".deps/csr_usb.Tpo"; exit
+> >1; fi
+> > > In file included from csr_usb.c:34:
+> > > csr.h:500: error: syntax error before "def"
+> > > csr.h:501: error: syntax error before "id"
+> > > csr.h:502: error: syntax error before "ver"
+> > > csr.h:503: error: syntax error before "pskey"
+> > > csr.h:504: error: syntax error before "pskey"
+> > > csr.h:507: error: syntax error before "varid"
+> > > csr.h:508: error: syntax error before "varid"
+> > > csr.h:512: error: syntax error before "varid"
+> > > csr.h:513: error: syntax error before "varid"
+> > > csr.h:517: error: syntax error before "varid"
+> > > csr.h:518: error: syntax error before "varid"
+> > > 
+> > > It seems, that uint16_t, uint32_t, ... are not found.
+> > 
+> > what compiler do you use? I never had that problem.
+> 
+> $ gcc --version
+> gcc-bin (GCC) 3.4.5
 
-I tried running using a2play (below) and sbcenc+rcplay. The second option
-doesn't crash out, but no sound is heard at the headphones. sco sound works
-fine, as does the mic.
+I bascially moved to GCC 4.x as default compiler and it seems there are
+some headers included by default, but you also got more warning as
+before.
 
-Is there anyone working on this area at the moment who could suggest
-something to try?
+> > > I've solved the problem by including inttypes.h in csr.h:
+> > 
+> > I prefer using <stdint.h>. Does this also work for you?
+> 
+> Yes, including stdint.h works as well.
 
-Thanks
+It's already in the CVS. Thanks.
 
-Bluez 2.23
-bluetooth-alsa CVS 20051220
+Regards
 
-mpg123 --au - /home/nigel/03\ -\ They\ Got\ Lost.mp3 | ./a2play
-00:0A:56:00:B5:91 - High Performance MPEG 1.0/2.0/2.5 Audio Player for Laye=
-r
-1, 2, and 3.
-Version 0.59q (2002/03/23). Written and copyrights by Joe Drew.
-...
-MPEG 1.0 layer III, 128 kbit/s, 44100 Hz stereo
-subbands =3D 8 blocks =3D 16 bitpool =3D 32
-
-len=3D2048
-Header size=3D28
-Sample Rate:44100
-Channels:2
-Using address: 00:0A:56:00:B5:91
-Found A2DP Sink
-
-Found A2DP Sink at the destination
-Connected [imtu 672, omtu 672, flush_to 65535]
-
-couldn't get avdtp_discover
-Sent the Stream End Point Discovery Command
-
-------=_Part_1883_10274066.1135052294508
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-A2DP with the bluetooth-alsa project doesn't work with the Blueant
-stereo headphones, and by looking at this page it appears that it might
-be because these headphones don't support AVDTP
-(<a href=3D"http://www.robertwebbe.nl/extendedA2DP.html" target=3D"_blank" =
-onclick=3D"return top.js.OpenExtLink(window,event,this)">http://www.robertw=
-ebbe.nl/extendedA2DP.html</a>) Is this possible? <br>
-<br>
-I tried running using a2play (below) and sbcenc+rcplay. The second
-option doesn't crash out, but no sound is heard at the headphones. sco
-sound works fine, as does the mic.<br>
-<br>
-Is there anyone working on this area at the moment who could suggest someth=
-ing to try?<br>
-<br>
-Thanks<br>
-<br>
-Bluez 2.23<br>
-bluetooth-alsa CVS 20051220<br>
-<br>
-mpg123 --au - /home/nigel/03\ -\ They\ Got\ Lost.mp3 | ./a2play
-00:0A:56:00:B5:91 - High Performance MPEG 1.0/2.0/2.5 Audio Player for
-Layer 1, 2, and 3.<br>
-Version 0.59q (2002/03/23). Written and copyrights by Joe Drew.<br>
-...<br>
-MPEG 1.0 layer III, 128 kbit/s, 44100 Hz stereo<br>
-subbands =3D 8 blocks =3D 16 bitpool =3D 32<br>
-<br>
-len=3D2048<br>
-Header size=3D28<br>
-Sample Rate:44100<br>
-Channels:2<br>
-Using address: 00:0A:56:00:B5:91<br>
-Found A2DP Sink<br>
-<br>
-Found A2DP Sink at the destination<br>
-Connected [imtu 672, omtu 672, flush_to 65535]<br>
-<br>
-couldn't get avdtp_discover<br>
-Sent the Stream End Point Discovery Command<br>
-<br>
-<br>
+Marcel
 
 
-------=_Part_1883_10274066.1135052294508--
 
 
 -------------------------------------------------------
