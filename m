@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] encrypt problem
+Subject: Re: [Bluez-users] problem pairing headset and pc(NONE OF THE
+	SOLUTION WORKED)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <9c68c0a70512182353u6028f3abw@mail.gmail.com>
-References: <9c68c0a70512182353u6028f3abw@mail.gmail.com>
+In-Reply-To: <20051219080204.30483.qmail@web36111.mail.mud.yahoo.com>
+References: <20051219080204.30483.qmail@web36111.mail.mud.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1134986709.24233.10.camel@localhost>
+Message-Id: <1134986638.24233.8.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,55 +19,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 19 Dec 2005 11:05:09 +0100
+Date: Mon, 19 Dec 2005 11:03:58 +0100
 
-Hi,
+Hi Swathi,
 
-> I install bluez on my arm board(super2410). And I want my Nokia 6670
-> to
-> connect to my arm-linux with a bluetooth adaptor. Since the gnubox on
-> Nokia 6670 need encrypt option, my command should have encrypt option:
+> I am unable to connect to my Nokia headset HS-11W from my linux PC. I
+> followed all the steps given in bluetooth alsa project aswell as tried
+> to solve the problem by taking some of the suggestions given in the
+> mailing list but nothing worked. Many people have faced the similar
+> problem but none of the solutions given on the mailing list worked. I
+> edited hcid.conf with
+> pin_helper /etc/bluetooth/pin;
+> edited rfcomm.conf for binding the headset device
+> I have installed bluez-libs and bluez-utils and PC is running Fedora
+> Core 4 having kernel-2.6.11. 
 > 
-> "dund --encrypt --listen -n"
-> 
-> but there is an error:
-> 
-> "Failed to set link mode. Protocol not available(92)."
-> 
-> If I do not use the "--encrypt" option it works well. The kernel I
-> used is 2.4.18 and 
-> I have used the patch downloaded on www.bluez.org.
-> Here is my kernel option:
-> 
-> <*> Bluetooth subsystem support
-> <*> L2CAP protocol support
-> <  > SCO links support
-> <*> RFCOMM protocol support
->  [*]       RFCOMM TTY support
-> <*> BNEP protocol support
->  [*]       Multicast filter support
->  [*]       Protocol filter support
-> <  > HIDP protocol support
-> 
-> 
-> <*> HCI USB driver
->  [  ]        SCO (voice) support
-> <*> HCI UART driver
->  [*]         UART (H4) protocol support
->  [*]         BCSP protocol support
->  [  ]         TRansmit CRC with every BCSP packet
-> <*> HCI BlueFRITZ! USB driver
-> <*> HCI VHCI (Virtual HCI device) driver
-> 
-> How can I make the --encrypt option workable?
+> CAN SOMEBODY PLS HELP ME AS I AM FACING THIS PROBLEM FROM LAST ONE
+> WEEK.
 
-update to a decent 2.6 kernel, because the 2.4.18 is not supported
-anymore and you have to pay me a lot of money to backport the encrypt
-support for it.
+stop this crap. There is absolut no need to start another thread with a
+different topic, but the same problem.
+
+And please stop using HTML based emails, because they make hcidump hard
+to read. And ASCII based emails are still fine.
 
 Regards
 
 Marcel
+
 
 
 
