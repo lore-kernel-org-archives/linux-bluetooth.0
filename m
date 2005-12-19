@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Can't connect RFCOMM channel: Resource
-	temporarily unavailable
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <9c68c0a70512182353u6028f3abw@mail.gmail.com>
+From: liang liping <lianglip@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20051219094442.64827.qmail@web36106.mail.mud.yahoo.com>
-References: <20051219094442.64827.qmail@web36106.mail.mud.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1134986417.24233.4.camel@localhost>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_1073_15613135.1134978820753"
+Subject: [Bluez-users] encrypt problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,43 +17,102 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 19 Dec 2005 11:00:17 +0100
+Date: Mon, 19 Dec 2005 15:53:40 +0800
 
-Hi Swathi,
+------=_Part_1073_15613135.1134978820753
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> As per your request i have attached the "hcidump -X -V" output when i
-> execute the command "btsco 00:08:C6:3E:54:2C 2"
-> 
-> output of hcidump -X -V
-> =====================================================
-> HCI sniffer - Bluetooth packet analyzer ver 1.18
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> < HCI Command: Read Voice Setting (0x03|0x0025) plen 0
-> > HCI Event: Command Complete (0x0e) plen 6
-> Read Voice Setting (0x03|0x0025) ncmd 1
-> status 0x00 voice setting 0x0060
-> < HCI Command: Create Connection (0x01|0x0005) plen 13
-> bdaddr 00:08:C6:3E:54:2C ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-> Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> > HCI Event: Command Status (0x0f) plen 4
-> Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> > HCI Event: PIN Code Request (0x16) plen 6
-> bdaddr 00:08:C6:3E:54:2C
-> > HCI Event: Connect Complete (0x03) plen 11
-> status 0x22 handle 41 bdaddr 00:08:C6:3E:54:2C type ACL encrypt 0x00
-> E rror: LMP Error Transaction Collision
-> =====================================================
-> 
-> I hope i will be able to get a solution for this.
+Hi.
+I install bluez on my arm board(super2410). And I want my Nokia 6670 to
+connect to my arm-linux with a bluetooth adaptor. Since the gnubox on
+Nokia 6670 need encrypt option, my command should have encrypt option:
 
-what does "hciconfig -a" and "hcitool info ..." say? What version of
-bluez-utils and bluez-hcidump do you use?
+"dund --encrypt --listen -n"
 
-Regards
+but there is an error:
 
-Marcel
+"Failed to set link mode. Protocol not available(92)."
+
+If I do not use the "--encrypt" option it works well. The kernel I used is
+2.4.18 and
+I have used the patch downloaded on www.bluez.org.
+Here is my kernel option:
+
+<*> Bluetooth subsystem support
+<*> L2CAP protocol support
+<  > SCO links support
+<*> RFCOMM protocol support
+ [*]       RFCOMM TTY support
+<*> BNEP protocol support
+ [*]       Multicast filter support
+ [*]       Protocol filter support
+<  > HIDP protocol support
 
 
+<*> HCI USB driver
+ [  ]        SCO (voice) support
+<*> HCI UART driver
+ [*]         UART (H4) protocol support
+ [*]         BCSP protocol support
+ [  ]         TRansmit CRC with every BCSP packet
+<*> HCI BlueFRITZ! USB driver
+<*> HCI VHCI (Virtual HCI device) driver
+
+How can I make the --encrypt option workable?
+Thank you!!
+
+------=_Part_1073_15613135.1134978820753
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi.<br>
+I install bluez on my arm board(super2410). And I want my Nokia 6670 to<br>
+connect to my arm-linux with a bluetooth adaptor. Since the gnubox on<br>
+Nokia 6670 need encrypt option, my command should have encrypt option:<br>
+<br>
+&quot;dund --encrypt --listen -n&quot;<br>
+<br>
+but there is an error:<br>
+<br>
+&quot;Failed to set link mode. Protocol not available(92).&quot;<br>
+<br>
+If I do not use the &quot;--encrypt&quot; option it works well. The kernel =
+I used is 2.4.18 and <br>
+I have used the patch downloaded on <a href=3D"http://www.bluez.org">www.bl=
+uez.org</a>.<br>
+Here is my kernel option:<br>
+<br>
+&lt;*&gt; Bluetooth subsystem support<br>
+&lt;*&gt; L2CAP protocol support<br>
+&lt;&nbsp; &gt; SCO links support<br>
+&lt;*&gt; RFCOMM protocol support<br>
+&nbsp;[*]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RFCOMM TTY support<br>
+&lt;*&gt; BNEP protocol support<br>
+&nbsp;[*]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Multicast filter support<br>
+&nbsp;[*]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Protocol filter support<br>
+&lt;&nbsp; &gt; HIDP protocol support<br>
+<br>
+<br>
+&lt;*&gt; HCI USB driver<br>
+&nbsp;[&nbsp; ]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SCO (voice) suppo=
+rt<br>
+&lt;*&gt; HCI UART driver<br>
+&nbsp;[*]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UART (H4) protoco=
+l support<br>
+&nbsp;[*]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BCSP protocol sup=
+port<br>
+&nbsp;[&nbsp; ]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TRansmit CR=
+C with every BCSP packet<br>
+&lt;*&gt; HCI BlueFRITZ! USB driver<br>
+&lt;*&gt; HCI VHCI (Virtual HCI device) driver<br>
+<br>
+How can I make the --encrypt option workable?<br>
+Thank you!!<br>
+
+------=_Part_1073_15613135.1134978820753--
 
 
 -------------------------------------------------------
