@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Ville Tervo <ville.tervo@nokia.com>
+Message-ID: <20051219132730.790t05fms68kkck8@webmail.rabas.info>
+From: stefan@rabas.info
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] a2dp on maemo/nokia770
-Message-ID: <20051219134257.GJ20677@null.research.nokia.com>
-References: <43A18AB3.2090507@xmission.com> <20051216130359.GD20677@null.research.nokia.com> <1134743177.4239.29.camel@localhost>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1134743177.4239.29.camel@localhost>
+Cc: can't@rabas.info, get@rabas.info, a2dp@rabas.info, to@rabas.info,
+        work@rabas.info
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset=ISO-8859-1
+Subject: [Bluez-devel] (no subject)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,47 +19,103 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 19 Dec 2005 15:42:57 +0200
+Date: Mon, 19 Dec 2005 13:27:30 +0100
 
-On Fri, Dec 16, 2005 at 03:26:17PM +0100, ext Marcel Holtmann wrote:
-> Hi Ville,
-> 
-> > > I would like to get A2DP audio working with the 770. The codec would
-> > > perform faster/better if it was a proper dsp task but that's beyond the
-> > > scope of a volunteer effort.
-> > > 
-> > > Is nokia working on it?
-> > 
-> > Currently we are working on basic hs support. A2DP is not yet under
-> > focus. However dsp-style approach is one of the possibilities.
-> > 
-> > Feel free to send any wishes, suggestion and ideas regarding bt audio
-> > support. We'll keep them in mind when we do decisions and plans.
-> 
-> since I've already seen Nokia phones with A2DP Source capabilities, the
-> question is now is this a bought solution or is developed inside Nokia.
-> If it is developed inside Nokia you might wanna share it or help us out
-> to get our SBC in shape and really good and fast.
-> 
+hello
 
-I wouldn't hold my breath to see that happening. Whan is the situation
-with current SBC? What is missing? Is performance optimal? I have
-followed discussions about it and there seems to be fixed point
-implementaion allready but that has poor quality compared to floating
-point version. 
+I have a problem getting my a2dp connection onto my headset to work on my linux
+machine.
+But the sco connection works (I didn't test the mic sofar).
 
+I searched the internet for a hint how to solve this matter, but didn't find
+anything.
+So I think this is the appropriate spot to post my problem.
 
-> The Nokia 770 is using a TI chip and basically nobody of us has real
-> experiences with these chips. I have seen them in an iPAQ and now the
-> 770, but that's it. Do you think Nokia is willing to donate some of the
-> TI development kits to BlueZ? Especially the SCO and eSCO stuff needs a
-> lot of testing and I would prefer to do it with an i386 or x86_86 based
-> system.
+  Sorry if I'm wrong.
 
-I'll try to arrange something.
+I'm running Debian Sarge with a newly compiled kernel 2.6.14.3.
+I got the whole bluetooth subsystem (except debugging I think) coded into the
+kernel,
+along with the ALSA system.
+Following packages are installed:
 
--- 
-Ville
+bluez-utils    2.15-1.1
+alsa-base      1.0.8-7
+alsa-utils     1.0.8-4
+
+The bluetooth-alsa version is the 0.4 from the cvs. It compiled without any
+error,
+along with the kernel snd-bt-sco module.
+
+To test the sco connection I did the following:
+
+-load snd-bt-sco
+-pair headset with computer ('hcitool cc <btaddr>' with auth and encrypt enabled
+in
+ hcid.conf, as I think a2dp requires both)
+-'btsco <btaddr>'
+-play audio using xmms with appropriate alsa-device
+
+After aborting btsco, but leaving the headset still paired I tryed to play audio
+via
+the command provided on the official bluetooth-alsa site:
+
+ >debian:/usr/src/btsco-0.4# hcitool con
+ >Connections:
+ >        < ACL 00:13:1B:00:50:32 handle 46 state 1 lm SLAVE AUTH ENCRYPT
+ >debian:/usr/src/btsco-0.4# mpg123 --au - smooth.mp3 | ./a2play
+00:13:1B:00:50:32
+ >High Performance MPEG 1.0/2.0/2.5 Audio Player for Layer 1, 2 and 3.
+ >Version 0.59r (1999/Jun/15). Written and copyrights by Michael Hipp.
+ ...(I Cut out part of the mpg123 output)
+ >Playing MPEG stream from smooth.mp3 ...
+ >Junk at the beginning 49443303
+ >MPEG 1.0 layer III, 192 kbit/s, 44100 Hz joint-stereo
+ >out of sync (0x2e)
+ >couldn't read header on -
+
+At next I tryed the seccond command provided on the site:
+
+ >debian:/usr/src/btsco-0.4# mpg123 --au - smooth.mp3 | sbc/sbcenc |
+./sbc/rcplay 00:13:1B:00:50:32
+ >High Performance MPEG 1.0/2.0/2.5 Audio Player for Layer 1, 2 and 3.
+ ...
+ >Playing MPEG stream from smooth.mp3 ...
+ >Junk at the beginning 49443303
+ >MPEG 1.0 layer III, 192 kbit/s, 44100 Hz joint-stereo
+ >Can't get channel number: Success
+
+I'm focussing on the "out of sync" error message now.
+The usage of a2play tells me that I'm able to define the input file directly.
+So I did:
+
+ >mpg123 --au - smooth.mp3 > smooth.au
+Now I got the song in sun audio format.
+
+I tried the following next:
+
+ >debian:/usr/src/btsco-0.4# ./a2play 00:13:1B:00:50:32 smooth.au
+ >out of sync (0x2e)
+ >couldn't read header on smooth.au
+
+Next up was a different audio format, and hey, the errorcode changed:
+
+ >debian:/usr/src/btsco-0.4# ./a2play 00:13:1B:00:50:32 smooth.mp3
+ >out of sync (0x49)
+ >couldn't read header on smooth.mp3
+
+So there must be something wrong with the audioformat, I guess.
+I seriously don't know which one works or should work.
+
+The headset istself is called "Cyber Headphone".
+At least it shows up that way when i do 'hcitool scan'
+The headset itself works fine with the a2dp connection running winXP and a
+Toshiba stack.
+
+Thanks for the help.
+
+Stefan Rabas
+
 
 
 -------------------------------------------------------
