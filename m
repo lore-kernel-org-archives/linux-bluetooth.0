@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] avrcp volume control
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43A6647E.8080406@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43A6647E.8080406@xmission.com>
-References: <43A114D1.4000506@xmission.com>
-	 <1134636865.5198.44.camel@localhost> <43A189C3.6030700@xmission.com>
-	 <43A6647E.8080406@xmission.com>
-Content-Type: text/plain
-Message-Id: <1134986269.24233.2.camel@localhost>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] avrcp volume control
+References: <43A114D1.4000506@xmission.com> <1134636865.5198.44.camel@localhost> <43A189C3.6030700@xmission.com>
+In-Reply-To: <43A189C3.6030700@xmission.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,26 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 19 Dec 2005 10:57:49 +0100
+Date: Mon, 19 Dec 2005 00:42:54 -0700
 
-Hi Brad,
+guys
 
-> > I do have an hp set that I will try this weekend.
-> 
-> I need to go back to square one on volume control. The HP similarly
-> ignored the volume changes sent to its panel subdevice.
+> I do have an hp set that I will try this weekend.
 
-the CSR one is not working at all. It connects back to the PSM 23, but
-it never sends any data or command.
+I need to go back to square one on volume control. The HP similarly
+ignored the volume changes sent to its panel subdevice.
 
-I also added a skeleton for AVCTP to hcidump. You might wanna fill it
-with actual decoding logic.
-
-Regards
-
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
