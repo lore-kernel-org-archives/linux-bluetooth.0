@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] palm & bluez
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20051219033229.26714.qmail@web36106.mail.mud.yahoo.com>
+From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43A62010.5090009@comcast.net>
-References: <43A62010.5090009@comcast.net>
-Content-Type: text/plain
-Message-Id: <1134982463.6881.50.camel@localhost>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-243070647-1134963149=:24654"
+Subject: [Bluez-users] Can't connect RFCOMM channel: Resource temporarily unavailable
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,49 +16,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 19 Dec 2005 09:54:23 +0100
+Date: Sun, 18 Dec 2005 19:32:29 -0800 (PST)
 
-Hi Dave,
+--0-243070647-1134963149=:24654
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-> I'm trying to pair my palm tungsten e2 with a 2.6.11-gentoo-r9 box. I 
-> currently use a bluetooth keyboard & mouse, so bluez is working on the 
-> gentoo box. I can discover the palm from linux..
-> 
-> myth1 ~ # hcitool scan
-> Scanning ...
->         00:07:E0:71:37:54       vsailer
-> 
-> 
-> and the palm discovers the bluetooth dongle.  On the palm I attempt to 
-> pair, typing in a passkey, which I then type on the gentoo box but back 
-> on the palm I get "Unable to add Myth1 BlueZ(0) to your trusted device 
-> list". hcidump gives me....
-> 
-> 
-> < HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
->     bdaddr 00:07:E0:71:37:54 len 1 pin '1'
->  > HCI Event: Command Complete (0x0e) plen 10
->     PIN Code Request Reply (0x01|0x000d) ncmd 1
->     status 0x00 bdaddr 00:07:E0:71:37:54
->  > HCI Event: Disconn Complete (0x05) plen 4
->     status 0x00 handle 47 reason 0x13
->     Reason: Remote User Terminated Connection
-> 
-> I know it appears the problem is with the palm, but I'm not sure what 
-> else to try here. Didn't find much in the palm newsgroups.
+ Hello,
+ When i try to pair my PC with the nokia headset-hs 11w, ie when i execute the below command 
+ btsco 00:08:C6:3E:54:2C 1
+ i get the below error. Can somebody point what might have went wrong ?
+ Can't connect RFCOMM channel: Resource temporarily unavailable
+ Regards,
+ Swathi
+ 
+ 
+ 
 
-I have no idea, because as you correctly said, the Palm is at fault here
-(if your PIN code was '1' on both sides).
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
+--0-243070647-1134963149=:24654
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-However don't try to pair at all. If an authentication is really needed
-you will asked for the PIN code at that time. Simply start to use your
-Palm.
-
-Regards
-
-Marcel
-
-
+<div id="RTEContent">&nbsp;Hello,<br> When i try to pair my PC with the nokia headset-hs 11w, ie when i execute the below command <br> btsco 00:08:C6:3E:54:2C 1<br> i get the below error. Can somebody point what might have went wrong ?<br> Can't connect RFCOMM channel: Resource temporarily unavailable<br> Regards,<br> Swathi<br> <br> <br> </div><p>__________________________________________________<br>Do You Yahoo!?<br>Tired of spam?  Yahoo! Mail has the best spam protection around <br>http://mail.yahoo.com 
+--0-243070647-1134963149=:24654--
 
 
 -------------------------------------------------------
