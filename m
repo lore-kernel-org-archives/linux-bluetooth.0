@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] a2dp on maemo/nokia770
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-From: Christian Krause <chkr@plauener.de>
-Message-ID: <m3acewyaat.fsf@gondor.middle-earth.priv>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Re: Re: compile problem with bluez-utils-2.23 (uint16_t, ..
- missing)
+In-Reply-To: <20051219134257.GJ20677@null.research.nokia.com>
+References: <43A18AB3.2090507@xmission.com>
+	 <20051216130359.GD20677@null.research.nokia.com>
+	 <1134743177.4239.29.camel@localhost>
+	 <20051219134257.GJ20677@null.research.nokia.com>
+Content-Type: text/plain
+Message-Id: <1135000982.31688.28.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,46 +21,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 19 Dec 2005 23:46:50 +0100
+Date: Mon, 19 Dec 2005 15:03:02 +0100
 
-Hi Marcel,
+Hi Ville,
 
-> > I've tried to compile bluez-utils 2.23 and it failed with an error:
-> > 
-> > if gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common   -I/usr/include  -I/usr/include -O2
->-fomit-frame-pointer -pipe -march=i586 -mtune=athlon -D_FORTIFY_SOURCE=2 -MT csr_usb.o -MD
->-MP -MF ".deps/csr_usb.Tpo" -c -o csr_usb.o csr_usb.c; \
-> > then mv -f ".deps/csr_usb.Tpo" ".deps/csr_usb.Po"; else rm -f ".deps/csr_usb.Tpo"; exit
->1; fi
-> > In file included from csr_usb.c:34:
-> > csr.h:500: error: syntax error before "def"
-> > csr.h:501: error: syntax error before "id"
-> > csr.h:502: error: syntax error before "ver"
-> > csr.h:503: error: syntax error before "pskey"
-> > csr.h:504: error: syntax error before "pskey"
-> > csr.h:507: error: syntax error before "varid"
-> > csr.h:508: error: syntax error before "varid"
-> > csr.h:512: error: syntax error before "varid"
-> > csr.h:513: error: syntax error before "varid"
-> > csr.h:517: error: syntax error before "varid"
-> > csr.h:518: error: syntax error before "varid"
-> > 
-> > It seems, that uint16_t, uint32_t, ... are not found.
+> > since I've already seen Nokia phones with A2DP Source capabilities, the
+> > question is now is this a bought solution or is developed inside Nokia.
+> > If it is developed inside Nokia you might wanna share it or help us out
+> > to get our SBC in shape and really good and fast.
 > 
-> what compiler do you use? I never had that problem.
+> I wouldn't hold my breath to see that happening. Whan is the situation
+> with current SBC? What is missing? Is performance optimal? I have
+> followed discussions about it and there seems to be fixed point
+> implementaion allready but that has poor quality compared to floating
+> point version. 
 
-$ gcc --version
-gcc-bin (GCC) 3.4.5
+this is what I know. Bard of course would have more details since I
+haven't done any SBC related work for some time. I am not a codec expert
+and so not really helpful, but I still think that fixed point is the
+only way to go. Some people at the UPFs acknowledge this, but of course
+without any details about actual code.
 
-> > I've solved the problem by including inttypes.h in csr.h:
+> > The Nokia 770 is using a TI chip and basically nobody of us has real
+> > experiences with these chips. I have seen them in an iPAQ and now the
+> > 770, but that's it. Do you think Nokia is willing to donate some of the
+> > TI development kits to BlueZ? Especially the SCO and eSCO stuff needs a
+> > lot of testing and I would prefer to do it with an i386 or x86_86 based
+> > system.
 > 
-> I prefer using <stdint.h>. Does this also work for you?
+> I'll try to arrange something.
 
-Yes, including stdint.h works as well.
+This would be great, thanks.
+
+Regards
+
+Marcel
 
 
-Best regards,
-Christian
 
 
 -------------------------------------------------------
