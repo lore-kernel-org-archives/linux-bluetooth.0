@@ -2,9 +2,9 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1135113339.26233.18.camel@localhost>
+Message-Id: <1135111693.26233.11.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Stuff for the next release
+Subject: [Bluez-devel] Cleaning up the D-Bus interface
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,14 +16,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Dec 2005 22:15:39 +0100
+Date: Tue, 20 Dec 2005 21:48:13 +0100
 
 Hi guys,
 
-the end of the year is near and my plan is to do a Christmas release as
-I did last year. The plan is to release the bluez-{libs|utils}-2.24
-version on December, 24th. Feel free to send me patches that should be
-included.
+I always said that the D-Bus interface won't have to be designed after
+any technical part of the Bluetooth specification and I think it is time
+to change the discoverable and connectable options.
+
+The Bluetooth specification and most devices allow you to set the device
+to discoverable, but not connectable. The combination actually makes no
+sense at all, because for the name resolving the remote device must be
+connectable. I would propose to have a "mode" property with actually
+three different states: Off, Connectable, Discoverable/Connectable. The
+Off state also makes the Up/Down functions obsolete, because they are
+BlueZ internal and in some embedded devices you might wanna also have
+deep sleep mode support. The internals should be all hidden from the
+userspace and for desktop devices the Off option could mean inquiry and
+page scan disabled.
+
+The other option that is needed is of course the device name. With the
+upcoming extended inquiry the question is now if we also wanna support a
+short name or if hcid/bluetoothd should shorten the name by itself if
+needed.
+
+We also have to deal with the major and minor part of the device class.
+The other bits would be set by sdpd if a specific profile has been
+registered.
+
+What else needs to be configurable?
 
 Regards
 
