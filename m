@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051221084109.16160.qmail@web36107.mail.mud.yahoo.com>
-From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
-Subject: Re: [Bluez-users] Can't connect RFCOMM channel: Resource temporarily unavailable
+Message-ID: <5307d89f0512201320g34b2d793p178bbd501d473e95@mail.gmail.com>
+From: Patrick Libert <patrick.libert@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1135080141.5236.45.camel@localhost>
+In-Reply-To: <5307d89f0512200011i7a6784dfie08a56569a90381d@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=ISO-8859-1
+References: <5307d89f0512200011i7a6784dfie08a56569a90381d@mail.gmail.com>
+Subject: [Bluez-users] Re: Info a2play
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,225 +18,66 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Dec 2005 00:41:09 -0800 (PST)
+Date: Tue, 20 Dec 2005 22:20:06 +0100
 
-Hello Marcel,
-I have installed all the bluez-packages and bt_sco
-module as a root. All the commands which are trying to
-establish a connection to my headset are being
-executed as a root. I login with root privilages and
-at this point if 
+I got it now fixed, I used an old version of a2play.
 
-i check the status of hcid it was showing as stopped.
-(below output)
-------------------------------------------------------
-[root@localhost /]# /etc/init.d/bluetooth status
-hcid is stopped
-sdpd (pid 1725) is running...
-------------------------------------------------------
+The following syntax works perfectly now!
+beep-media-player | sox -c 2 -t raw -r 44100 -w -s - -t au - |
+./a2play -p  00:0D:44:2A:14:66
 
-So i restarted the bluetooth and for the first time i
-got the below msg
-------------------------------------------------------
-[root@localhost /]# /etc/init.d/bluetooth restart
-Stopping Bluetooth services:                          
-    [FAILED]
-Starting Bluetooth services:                          
-    [  OK  ]
-------------------------------------------------------
+But there is still one problem: the music gets interrupted very often.
+I now used the -p option but that still doesn't help.
+On Windows XP and my cellphone, it works perfectly.
 
-For the second time, i was able to successfully stop
-and start BT services
-------------------------------------------------------
-[root@localhost /]# /etc/init.d/bluetooth restart
-Stopping Bluetooth services:                          
-    [  OK  ]
-Starting Bluetooth services:                          
-    [  OK  ]
-------------------------------------------------------
+Kind regards,
 
-cross checking the BT status again
-------------------------------------------------------
-[root@localhost /]# /etc/init.d/bluetooth status
-hcid (pid 2743) is running...
-sdpd (pid 2745) is running...
-------------------------------------------------------
+patrick
 
-If i execute the below command i get the same info, as
-yesterday
-------------------------------------------------------
-[root@localhost /]# btsco 00:08:C6:3E:54:2C -v
-btsco v0.4c
-Device is 1:0
-Error: Failed to connect to SDP server: Function not
-implemented
-Assuming channel 2
 
-Voice setting: 0x0060
-Can't connect RFCOMM channel: Resource temporarily
-unavailable
-------------------------------------------------------
-
-my “hcidump -X -V” has the below info
-------------------------------------------------------
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:08:C6:3E:54:2C ptype 0xcc18 rswitch 0x01
-clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:08:C6:3E:54:2C
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x22 handle 41 bdaddr 00:08:C6:3E:54:2C
-type ACL encrypt 0x00
-    Error: LMP Response Timeout
-< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
-> HCI Event: Command Complete (0x0e) plen 6
-    Read Voice Setting (0x03|0x0025) ncmd 1
-    status 0x00 voice setting 0x0060
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:08:C6:3E:54:2C ptype 0xcc18 rswitch 0x01
-clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:08:C6:3E:54:2C
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x22 handle 42 bdaddr 00:08:C6:3E:54:2C
-type ACL encrypt 0x00
-    Error: LMP Response Timeout
-------------------------------------------------------
-
-hcid is running, verified by
-------------------------------------------------------
-[root@localhost /]# /etc/init.d/bluetooth status
-hcid (pid 2743) is running...
-sdpd (pid 2745) is running...
-------------------------------------------------------
-
-Can you pls help me with this. The same type of pblm
-is being discussed on 
-http://ubuntuforums.org/printthread.php?t=52296&pp=10
-Tried but of no use for me.
-
-Regards,
-swathi
-
---- Marcel Holtmann <marcel@holtmann.org> wrote:
-
-> Hi Swathi,
-> 
-> > Few of the information requested by you as well as
-> > some of the things which  i thought might be
-> helpful
-> > for debugging.
-> > 
-> >
+On 12/20/05, Patrick Libert <patrick.libert@gmail.com> wrote:
+> Hello Bluez-Users
 >
-==============================================================
-> > hcid daemon is running on my system. 
-> > 
-> > [root@localhost /]# /etc/init.d/bluetooth status
-> > hcid (pid 2794) is running...
-> > sdpd (pid 2798) is running...
-> >
+> I saw on a website "LiveJournal" that it is possible to use beep-media-pl=
+ayer to stream your mp3 to a bluetooth stereo headset with a2play.
+> The syntax is like this:
 >
-==============================================================
-> > [root@localhost /]# btsco 00:08:C6:3E:54:2C -v -r
-> > btsco v0.4c
-> > Device is 1:0
-> > Error: Failed to connect to SDP server: Function
-> not
-> > implemented
-> > Assuming channel 2
-> > Voice setting: 0x0060
-> > Can't connect RFCOMM channel: Resource temporarily
-> > unavailable
-> > 
-> > What does it mean when it says "Function not
-> > implemented" ?
-> >
+>                        beep-media-player | sox -c 2 -t raw -r 44100 -w -s=
+ - -t au - | ./a2play -p  00:0D:44:2A:14:66
 >
-==============================================================
-> > 
-> > [root@localhost /]# hcidump -X -V
-> > HCI sniffer - Bluetooth packet analyzer ver 1.28
-> > device: hci0 snap_len: 1028 filter: 0xffffffff
-> > < HCI Command: Create Connection (0x01|0x0005)
-> plen 13
-> >     bdaddr 00:08:C6:3E:54:2C ptype 0xcc18 rswitch
-> 0x01
-> > clkoffset 0x0000
-> >     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> > > HCI Event: Command Status (0x0f) plen 4
-> >     Create Connection (0x01|0x0005) status 0x00
-> ncmd 1
-> > > HCI Event: PIN Code Request (0x16) plen 6
-> >     bdaddr 00:08:C6:3E:54:2C
-> > > HCI Event: Connect Complete (0x03) plen 11
-> >     status 0x22 handle 41 bdaddr 00:08:C6:3E:54:2C
-> > type ACL encrypt 0x00
-> >     Error: LMP Response Timeout
-> > < HCI Command: Read Voice Setting (0x03|0x0025)
-> plen 0
-> > > HCI Event: Command Complete (0x0e) plen 6
-> >     Read Voice Setting (0x03|0x0025) ncmd 1
-> >     status 0x00 voice setting 0x0060
-> > < HCI Command: Create Connection (0x01|0x0005)
-> plen 13
-> >     bdaddr 00:08:C6:3E:54:2C ptype 0xcc18 rswitch
-> 0x01
-> > clkoffset 0x0000
-> >     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> > > HCI Event: Command Status (0x0f) plen 4
-> >     Create Connection (0x01|0x0005) status 0x00
-> ncmd 1
-> > > HCI Event: PIN Code Request (0x16) plen 6
-> >     bdaddr 00:08:C6:3E:54:2C
-> > > HCI Event: Connect Complete (0x03) plen 11
-> >     status 0x22 handle 42 bdaddr 00:08:C6:3E:54:2C
-> > type ACL encrypt 0x00
-> >     Error: LMP Response Timeout
-> >
+> with this in the .asoundrc
 >
-==============================================================
-> 
-> according to the dump, it is not running. Did you
-> start hcid as root,
-> because it needs root rights to deal with the
-> authentication.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
+>           pcm.stdout {
+>                      type file
+>                      slave.pcm null
+>                      file /dev/stdout
 >
--------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do
-> you grep through log files
-> for problems?  Stop!  Download the new AJAX search
-> engine that makes
-> searching your log files as easy as surfing the 
-> web.  DOWNLOAD SPLUNK!
+>                    }
 >
-http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
 >
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
-
-
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+> When I do this I get an error:
+>
+>       couldn't open 00:08:E0:09:75:6F
+>
+> What does the option "-p" with a2play means?
+> If I do this without the "-p" option I get the following error:
+>
+>               out of sync (0x2e)
+>               couldn't read header on -
+>
+> When I do this:
+>
+>             mpg123 --au - file.mp3 | sbc/sbcenc - | ./a2play 00:08:E0:09:=
+75:6F
+> Then It works with my headset. But the music is interrupted sometimes. Ho=
+w does it come?
+>
+> I really appriciate if someone could help me.
+>
+> Kind regards,
+>
+> Patrick Libert
+>
 
 
 -------------------------------------------------------
