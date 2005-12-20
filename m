@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051220003211.36948.qmail@web50512.mail.yahoo.com>
-From: oj ravadilla <ojravadilla@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1134636737.5198.41.camel@localhost>
+Message-ID: <43A74C87.1070407@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] marcel@holtmann.org
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] No sound with SonyEricsson HBH-PV700
+References: <43A74833.90804@david-geiger.de>
+In-Reply-To: <43A74833.90804@david-geiger.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,58 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 19 Dec 2005 16:32:11 -0800 (PST)
+Date: Mon, 19 Dec 2005 17:12:55 -0700
 
-Hi Marcel,
+David
 
-Is there any scheduled convention for next year in the
-month of March or April? Will you be having it in
-asia? How much would it cost if I want to join?
+>     * Output from hciconfig hci0 revision (Run hciconfig as root)
+> hci0:   Type: USB
+>         BD Address: 00:0B:0D:32:5B:1A ACL MTU: 120:20 SCO MTU: 64:0
+>         Unsupported manufacturer
+> 
+>           o If it prints "SCO mapping: HCI" then your adapter should work.
+>           o If it prints "SCO mapping: PCM" then you might permanently
+> change the setting using a command like "pskey mapsco 0" using
+> bluez-utils-cvs but this is at your own risk.
+>           o If it doesn't print either of those, you probably need a
+> different bluetooth adapter (preferably "CSR" based)
+> Seems like it doesn't print either of those...? What exactly is the SCO
+> mapping and do I really need another bluetooth adapter?
 
-Thanks,
-OJ
+yes, you need a different adapter to do sco on linux. bluez only has
+drivers for csr chips, so "unsupported manufacterer" is all about the
+level of support in the kernel driver.
 
---- Marcel Holtmann <marcel@holtmann.org> wrote:
-
-> Hi OJ,
-> 
-> > I'm just wondering if you conduct
-> conventions/seminars
-> > about bluez and bluetooth? 
-> 
-> yes, I do, but obvious they are not for free.
-> Contact me directly in a
-> separate email, if you need any further details.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
->
--------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do
-> you grep through log files
-> for problems?  Stop!  Download the new AJAX search
-> engine that makes
-> searching your log files as easy as surfing the 
-> web.  DOWNLOAD SPLUNK!
->
-http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
-
-
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+brad
 
 
 -------------------------------------------------------
