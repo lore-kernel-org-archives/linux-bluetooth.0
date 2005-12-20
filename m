@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [PATCH]
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <pan.2005.12.20.13.54.45.442703@esaurito.net>
+References: <pan.2005.12.20.13.54.45.442703@esaurito.net>
 Content-Type: text/plain
-Message-Id: <1135111693.26233.11.camel@localhost>
+Message-Id: <1135105157.3627.13.camel@localhost.localdomain>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Cleaning up the D-Bus interface
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,35 +18,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Dec 2005 21:48:13 +0100
+Date: Tue, 20 Dec 2005 19:59:17 +0100
 
-Hi guys,
+Hi Filippo,
 
-I always said that the D-Bus interface won't have to be designed after
-any technical part of the Bluetooth specification and I think it is time
-to change the discoverable and connectable options.
+> dbus 0.60 has removed the DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT flag for
+> dbus_bus_request_name and now that is the default behaviour, the following
+> patch should work:
+> 
+> --- dbus.c      (revision 116)
+> +++ dbus.c      (working copy)
+> @@ -874,7 +874,7 @@
+>         dbus_connection_set_exit_on_disconnect(connection, FALSE);
+> 
+>         dbus_bus_request_name(connection, BASE_INTERFACE,
+> -                               DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT, &error);
+> +                               0, &error);
+> 
+>         if (dbus_error_is_set(&error)) {
+>                 syslog(LOG_ERR, "Can't get system message bus name: %s",
+> 
+> 
+> unfortunately I can't find a DBUS_VERSION #define to be backward
+> compatible with dbus < 0.60
 
-The Bluetooth specification and most devices allow you to set the device
-to discoverable, but not connectable. The combination actually makes no
-sense at all, because for the name resolving the remote device must be
-connectable. I would propose to have a "mode" property with actually
-three different states: Off, Connectable, Discoverable/Connectable. The
-Off state also makes the Up/Down functions obsolete, because they are
-BlueZ internal and in some embedded devices you might wanna also have
-deep sleep mode support. The internals should be all hidden from the
-userspace and for desktop devices the Off option could mean inquiry and
-page scan disabled.
+when D-Bus 1.0 has been released, I am going to drop support for older
+versions anyway. However what you need to add is something like:
 
-The other option that is needed is of course the device name. With the
-upcoming extended inquiry the question is now if we also wanna support a
-short name or if hcid/bluetoothd should shorten the name by itself if
-needed.
+#ifndef DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT
+#define DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT 0x00
+#endif
 
-We also have to deal with the major and minor part of the device class.
-The other bits would be set by sdpd if a specific profile has been
-registered.
-
-What else needs to be configurable?
+This will work perfect instead of using your patch and is still backward
+compatible.
 
 Regards
 
