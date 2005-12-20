@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0512201427g43906c29g78a8ce4fcdc3c71a@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] [gbluezconf] D-Bus client prototype
+Content-Type: text/plain
+Message-Id: <1135113339.26233.18.camel@localhost>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Stuff for the next release
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,30 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Dec 2005 20:27:27 -0200
+Date: Tue, 20 Dec 2005 22:15:39 +0100
 
-Hi Marcel,
+Hi guys,
 
-The first prototype is available at:
-http://www.cin.ufpe.br/~ckt/gbluezconf/gbluezconf-00.01.tar.gz
+the end of the year is near and my plan is to do a Christmas release as
+I did last year. The plan is to release the bluez-{libs|utils}-2.24
+version on December, 24th. Feel free to send me patches that should be
+included.
 
-Main features:
-1. D-Bus PIN client
-2. Search Dialog
+Regards
 
-Read to RELEASE_NOTES file to see the TODO list.
+Marcel
 
-Suggestions are wellcome!
-Please report bugs.
 
-Regards,
-Claudio.
-
-PS: There are a lot of features not implemented or with some dependencies.
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
