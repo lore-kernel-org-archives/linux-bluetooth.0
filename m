@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <43A78D40.7070209@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-From: Filippo Giunchedi <filippo@esaurito.net>
-Message-ID: <pan.2005.12.20.13.54.45.442703@esaurito.net>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] A2DP w/ Blueant headset
+References: <5bab330d0512192018o281f89a6l242586c487297e8f@mail.gmail.com>
+In-Reply-To: <5bab330d0512192018o281f89a6l242586c487297e8f@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] [PATCH]
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,32 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Dec 2005 14:54:46 +0100
+Date: Mon, 19 Dec 2005 21:49:04 -0700
 
-Hi,
-dbus 0.60 has removed the DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT flag for
-dbus_bus_request_name and now that is the default behaviour, the following
-patch should work:
+Nigel
 
---- dbus.c      (revision 116)
-+++ dbus.c      (working copy)
-@@ -874,7 +874,7 @@
-        dbus_connection_set_exit_on_disconnect(connection, FALSE);
+> A2DP with the bluetooth-alsa project doesn't work with the Blueant
+> stereo headphones, and by looking at this page it appears that it might
+> be because these headphones don't support AVDTP
+> (http://www.robertwebbe.nl/extendedA2DP.html) Is this possible?
 
-        dbus_bus_request_name(connection, BASE_INTERFACE,
--                               DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT, &error);
-+                               0, &error);
+if I remember my alphabet soup correctly, avdtp is a fundamental part of
+a2dp.
 
-        if (dbus_error_is_set(&error)) {
-                syslog(LOG_ERR, "Can't get system message bus name: %s",
+> couldn't get avdtp_discover
+> Sent the Stream End Point Discovery Command
 
+i'm not sure why it can't read this information back. perhaps the
+headset for some reason does not report any supported codecs?
 
-unfortunately I can't find a DBUS_VERSION #define to be backward
-compatible with dbus < 0.60
+i've improved the debug output somewhat. you could try it again.
 
-
-filippo
-
+brad
 
 
 -------------------------------------------------------
