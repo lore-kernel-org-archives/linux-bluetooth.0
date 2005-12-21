@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Re: [PATCH]
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-From: Filippo Giunchedi <filippo@esaurito.net>
-Message-ID: <pan.2005.12.21.15.28.25.525548@esaurito.net>
-References: <pan.2005.12.20.13.54.45.442703@esaurito.net> <1135105157.3627.13.camel@localhost.localdomain> <pan.2005.12.21.13.51.15.163756@esaurito.net> <1135174278.14627.3.camel@localhost>
+In-Reply-To: <pan.2005.12.21.13.51.15.163756@esaurito.net>
+References: <pan.2005.12.20.13.54.45.442703@esaurito.net>
+	 <1135105157.3627.13.camel@localhost.localdomain>
+	 <pan.2005.12.21.13.51.15.163756@esaurito.net>
+Content-Type: text/plain
+Message-Id: <1135174278.14627.3.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Re: Re: [PATCH]
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,20 +20,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 21 Dec 2005 16:28:25 +0100
+Date: Wed, 21 Dec 2005 15:11:18 +0100
 
-On Wed, 21 Dec 2005 15:11:18 +0100, Marcel Holtmann wrote:
-> it is already in the CVS. However I have some people doing the following
-> transition (instead of no flags):
+Hi Filippo,
+
+> > when D-Bus 1.0 has been released, I am going to drop support for older
+> > versions anyway. However what you need to add is something like:
+> > 
+> > #ifndef DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT
+> > #define DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT 0x00
+> > #endif
+> > 
+> > This will work perfect instead of using your patch and is still backward
+> > compatible.
 > 
-> DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT -> DBUS_NAME_FLAG_DO_NOT_QUEUE
-> 
-> Any comments on this?
+> that's right! thank you, are you going to merge the above define into the
+> next release of bluez?
 
-I think it makes sense not to wait for dbus name, so
-DBUS_NAME_FLAG_DO_NOT_QUEUE makes sense
+it is already in the CVS. However I have some people doing the following
+transition (instead of no flags):
 
-filippo
+DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT -> DBUS_NAME_FLAG_DO_NOT_QUEUE
+
+Any comments on this?
+
+Regards
+
+Marcel
+
 
 
 
