@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43A9B22A.9060604@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] connectionless L2CAP
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] No sound with SonyEricsson HBH-PV700
-References: <43A74833.90804@david-geiger.de> <43A74C87.1070407@xmission.com> <43A7F492.30608@david-geiger.de>
-In-Reply-To: <43A7F492.30608@david-geiger.de>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <43A95B0B.2040909@in.tum.de>
+References: <43A94B7B.70906@in.tum.de> <1135169114.26233.66.camel@localhost>
+	 <43A95B0B.2040909@in.tum.de>
+Content-Type: text/plain
+Message-Id: <1135173373.14627.0.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,41 +19,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Dec 2005 12:51:06 -0700
+Date: Wed, 21 Dec 2005 14:56:13 +0100
 
-David
+Hi Aleksandar,
 
-I would suggest you get a bluetooth 2.0 usb adapter using csr. There are
-a few that are selling in Germany. Check out the b-speech or level1
-adapters:
+> I'm actually trying to send a data packet between 2 bluetooth devices 
+> over 100 meters. I haven't went really deep into the bluetooth specs, 
+> but I assume that because of the long range a connection might not be 
+> possible, so that's why I just want to broadcast some packets and hope 
+> that some will arrive at the other end. Is this possible ?
 
-http://www.holtmann.org/linux/bluetooth/edr.html
+what's the problem with 100 meters range. Use a pair of class 1 dongles
+and you are fine.
 
-Brad
+> Btw./l2test with 00:00:00:00:00:00 fails too, but the bluetooth baseband 
+> specification section 3.3 says that "ACL packets not addressed to a 
+> specific slave are considered as broadcast packets and are read by every 
+> slave". I have 1 device in range (I can see it with hcitool scan, l2test 
+> succeeds with that device).
 
-> Brad Midgley wrote:
-> 
->> yes, you need a different adapter to do sco on linux. bluez only has
->> drivers for csr chips, so "unsupported manufacterer" is all about the
->> level of support in the kernel driver.
->>
->> brad
->>   
-> 
-> Can you tell me where to find information about the csr-sco-bluez topic
-> and what usb bluetooth dongles are valid or give me some recommendations?
-> 
-> 
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log
-> files
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+You still need the piconet. No piconet no data transfer over the air.
+
+Regards
+
+Marcel
+
 
 
 
