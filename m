@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43A9B384.5040202@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] [gbluezconf] D-Bus client prototype
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] A2DP w/ Blueant headset
-References: <5bab330d0512192018o281f89a6l242586c487297e8f@mail.gmail.com>	 <43A78D40.7070209@xmission.com> <5bab330d0512201659w8af0301r7fd09cba76c6ca92@mail.gmail.com>
-In-Reply-To: <5bab330d0512201659w8af0301r7fd09cba76c6ca92@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <e1effdeb0512211051i63f7e734jac900d5fd9ab70ca@mail.gmail.com>
+References: <e1effdeb0512201427g43906c29g78a8ce4fcdc3c71a@mail.gmail.com>
+	 <1135120979.26233.40.camel@localhost>
+	 <e1effdeb0512211051i63f7e734jac900d5fd9ab70ca@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1135192627.25328.8.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,77 +20,86 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 21 Dec 2005 12:56:52 -0700
+Date: Wed, 21 Dec 2005 20:17:07 +0100
 
-Nigel
+Hi Claudio,
 
-Your headset is misbehaving. We are supposed to be able to discover the
-stream endpoint id in the reply to the avdtp_discover request.
+> > For the device icons you should contact the Tango team or the Gnome Art
+> > team. Maybe they will come up with some.
+> >
+> > The program should start even if no Bluetooth adapter would be found. In
+> > this case only "About" and "Quit" should be visible.
+> 
+> I think it's better disable the options instead of remove the menu
+> item from the popup menu.
 
-You could try adding code to work around this problem and guess at the
-seid. The seid seems to always be 1 on my headsets.
+I would prefer to switch the visibility off, but you might check the
+Gnome HIG guidelines for this.
 
-Brad
+> > For the configuration dialog and multiple adapters we should maybe use
+> > the proposal from the bluetool screenshot (attached). I think it should
+> > include a page for default/common settings for all devices. And then
+> > some device specific parts that should have an extra check-box to
+> > activate their settings or use the common ones.
+> 
+> Ok I will analize the bluetool approach. Multiple adapter is not a
+> common scenario. Therefore we need avoid display unnecessary infos. I
+> try re-design the "Configuration" dialog to make it more
+> user-friendly.
 
-> OK, new cvs version, I get this:
-> mpg123 --au - /home/nigel/03\ -\ They\ Got\ Lost.mp3 | ./a2play
-> 00:0A:56:00:B5:91 -
-> subbands = 8 blocks = 16 bitpool = 32
-> High Performance MPEG 1.0/2.0/2.5 Audio Player for Layer 1, 2, and 3.
-> Version 0.59q (2002/03/23). Written and copyrights by Joe Drew.
-> ...
-> MPEG 1.0 layer III, 128 kbit/s, 44100 Hz stereo
-> len=2048
-> Header size=28
-> Sample Rate:44100
-> Channels:2
-> Using address: 00:0A:56:00:B5:91
-> Found A2DP Sink
-> Found A2DP Sink at the destination
-> Connected [imtu 672, omtu 672, flush_to 65535]
-> Sent the Stream End Point Discovery Command
-> couldn't get avdtp_discover (only 2 bytes read)
+I think that I gave this comment already. Having multiple adapters is
+the normal situation. The special case is only one adapter. You can't
+view it other way around.
+
+> > Don't forget to make the device name and class of device configurable.
 > 
-> On 12/20/05, *Brad Midgley* <bmidgley@xmission.com
-> <mailto:bmidgley@xmission.com>> wrote:
+> Device name changes is already possible. However change the device
+> class is not possible at the momment. We can extend the D-Bus services
+> soon.
+
+We should extend, but only major and minor class. Not the services
+classes, because they will depend on the registered services. Feel free
+to send me a patch for it.
+
+> > The search dialog shouldn't always start with zero devices if a previous
+> > inquiry has already taken place. However I think for this we need to
+> > implement a device cache inside hcid that could be requested up-front.
 > 
->     Nigel
+> When the kernel/userspace communication interface becomes available we
+> can improve this dialog. The remote name needs be improved too, we can
+> use the textfile_get function to  retrieve cached remote names.
+
+We can do already now if we know what is needed. Getting access to the
+cached devices names must go also through D-Bus and actually I prefer to
+make the name part of the device information. Proposals are welcome.
+
+> > Besides the inactivity of the icon if no adapter is attached or if no
+> > adapter is up, we maybe should change the icon if we have an active ACL
+> > link. We can also use a different icon or animation if the device is
+> > running an inquiry.
 > 
->     > A2DP with the bluetooth-alsa project doesn't work with the Blueant
->     > stereo headphones, and by looking at this page it appears that it
->     might
->     > be because these headphones don't support AVDTP
->     > (http://www.robertwebbe.nl/extendedA2DP.html
->     <http://www.robertwebbe.nl/extendedA2DP.html>) Is this possible?
+> I try suggest new icons for address these cases next year.
+
+Anyone from the Tango or Gnome Art team reading this mailing list?
+
+> > What do you think about creating an own CVS repository for it.
 > 
->     if I remember my alphabet soup correctly, avdtp is a fundamental part of
->     a2dp.
-> 
->     > couldn't get avdtp_discover
->     > Sent the Stream End Point Discovery Command
-> 
->     i'm not sure why it can't read this information back. perhaps the
->     headset for some reason does not report any supported codecs?
-> 
->     i've improved the debug output somewhat. you could try it again.
-> 
->     brad
-> 
-> 
->     -------------------------------------------------------
->     This SF.net email is sponsored by: Splunk Inc. Do you grep through
->     log files
->     for problems?  Stop!  Download the new AJAX search engine that makes
->     searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
->     http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
->     <http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click>
->     _______________________________________________
->     Bluez-devel mailing list
->     Bluez-devel@lists.sourceforge.net
->     <mailto:Bluez-devel@lists.sourceforge.net>
->     https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-> 
+> Do you mean create a new CVS root in BlueZ CVS repository? If yes, go ahead.
+> Currently, I am storing in my internal subversion server, but it's
+> better provide a public access.
+
+I will try to setup a repository for it next week, but be aware of that
+the directory layout would be changed a lot ;)
+
+> I will be on vacation until jan/15th. For D-Bus issues you can contact Eduardo.
+> For GBluezConf, I will return the activities in the next year only.
+
+Happy vacation.
+
+Regards
+
+Marcel
+
 
 
 
