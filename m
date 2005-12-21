@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: [PATCH]
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <pan.2005.12.21.13.51.15.163756@esaurito.net>
-References: <pan.2005.12.20.13.54.45.442703@esaurito.net>
-	 <1135105157.3627.13.camel@localhost.localdomain>
-	 <pan.2005.12.21.13.51.15.163756@esaurito.net>
-Content-Type: text/plain
-Message-Id: <1135174278.14627.3.camel@localhost>
+From: Filippo Giunchedi <filippo@esaurito.net>
+Message-ID: <pan.2005.12.21.13.51.15.163756@esaurito.net>
+References: <pan.2005.12.20.13.54.45.442703@esaurito.net> <1135105157.3627.13.camel@localhost.localdomain>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] Re: [PATCH]
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,34 +17,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 21 Dec 2005 15:11:18 +0100
+Date: Wed, 21 Dec 2005 14:51:15 +0100
 
-Hi Filippo,
-
-> > when D-Bus 1.0 has been released, I am going to drop support for older
-> > versions anyway. However what you need to add is something like:
-> > 
-> > #ifndef DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT
-> > #define DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT 0x00
-> > #endif
-> > 
-> > This will work perfect instead of using your patch and is still backward
-> > compatible.
+On Tue, 20 Dec 2005 19:59:17 +0100, Marcel Holtmann wrote:
+> when D-Bus 1.0 has been released, I am going to drop support for older
+> versions anyway. However what you need to add is something like:
 > 
-> that's right! thank you, are you going to merge the above define into the
-> next release of bluez?
+> #ifndef DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT
+> #define DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT 0x00
+> #endif
+> 
+> This will work perfect instead of using your patch and is still backward
+> compatible.
 
-it is already in the CVS. However I have some people doing the following
-transition (instead of no flags):
+that's right! thank you, are you going to merge the above define into the
+next release of bluez?
 
-DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT -> DBUS_NAME_FLAG_DO_NOT_QUEUE
-
-Any comments on this?
-
-Regards
-
-Marcel
-
+filippo
 
 
 
