@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] bcsp problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-From: Filippo Giunchedi <filippo@esaurito.net>
-Message-ID: <pan.2005.12.21.13.51.15.163756@esaurito.net>
-References: <pan.2005.12.20.13.54.45.442703@esaurito.net> <1135105157.3627.13.camel@localhost.localdomain>
+In-Reply-To: <F6E1228667B6D411BAAA00306E00F2A506A75557@pdc2.nestec.net>
+References: <F6E1228667B6D411BAAA00306E00F2A506A75557@pdc2.nestec.net>
+Content-Type: text/plain
+Message-Id: <1135163576.26233.60.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Re: [PATCH]
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,23 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 21 Dec 2005 14:51:15 +0100
+Date: Wed, 21 Dec 2005 12:12:56 +0100
 
-On Tue, 20 Dec 2005 19:59:17 +0100, Marcel Holtmann wrote:
-> when D-Bus 1.0 has been released, I am going to drop support for older
-> versions anyway. However what you need to add is something like:
+Hi Jibin,
+
+> 	I am using bluez stack.  I found a Bluetooth Problem with Mobile
+> 	 phone.
+>      It's happen when bluetooth device  connect to Mobile Phone for a long
+>      time,it shows the following error message.
 > 
-> #ifndef DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT
-> #define DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT 0x00
-> #endif
-> 
-> This will work perfect instead of using your patch and is still backward
-> compatible.
+>  	 bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+>  	 bcsp_pkt_cull: Peer acked invalid packet
+>  	
+>  	I Think thehe above messages shows that the  bluetooth device was
+>   reset during the 	communication with mobile.So the bluecore firmware
+>   embedded in the chip will start sending 	Sync packets again to bcsp
+>   stack to establish the link between bluecore and bcsp stack.
 
-that's right! thank you, are you going to merge the above define into the
-next release of bluez?
+run "hciconfig hci0 revision" (as root) and show us the output. What
+versions of the BlueZ packages and Linux kernel are you using?
 
-filippo
+Regards
+
+Marcel
+
 
 
 
