@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] connectionless L2CAP
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43A94B7B.70906@in.tum.de>
+From: Aleksandar Kanchev <kanchev@in.tum.de>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43A94B7B.70906@in.tum.de>
-References: <43A94B7B.70906@in.tum.de>
-Content-Type: text/plain
-Message-Id: <1135169114.26233.66.camel@localhost>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] connectionless L2CAP
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,27 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Dec 2005 13:45:14 +0100
+Date: Wed, 21 Dec 2005 13:32:59 +0100
 
-Hi Aleksandar,
+Hello,
 
-> how can I broadcast a data packet ?
-> And the connectionless mode of the l2test isn't actually connectionless, 
-> for example:
-> $ ./l2test -D -N 1 -s 00:04:3E:81:14:F8
-> l2test[1279]: Can't connect: Host is down (112)
-> 
-> I just want to broadcast a data packet and I don't care if the remote 
-> end got it or not (i.e. connectionless ACL). Will someone  please 
-> explain me how can I do that and also a programming example would be great.
+how can I broadcast a data packet ?
+And the connectionless mode of the l2test isn't actually connectionless, 
+for example:
+$ ./l2test -D -N 1 -s 00:04:3E:81:14:F8
+l2test[1279]: Can't connect: Host is down (112)
 
-this is not really working, because if there is no ACL link, then there
-exists no piconet. And without a piconet no air transmission.
+I just want to broadcast a data packet and I don't care if the remote 
+end got it or not (i.e. connectionless ACL). Will someone  please 
+explain me how can I do that and also a programming example would be great.
 
-Regards
-
-Marcel
-
+Thanks
 
 
 
