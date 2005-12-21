@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bcsp problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <F6E1228667B6D411BAAA00306E00F2A506A75557@pdc2.nestec.net>
-References: <F6E1228667B6D411BAAA00306E00F2A506A75557@pdc2.nestec.net>
-Content-Type: text/plain
-Message-Id: <1135163576.26233.60.camel@localhost>
-Mime-Version: 1.0
+Message-ID: <F6E1228667B6D411BAAA00306E00F2A506A75557@pdc2.nestec.net>
+From: JIBIN K <JIBINK@nestec.net>
+To: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Subject: [Bluez-devel] bcsp problem
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +17,48 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 21 Dec 2005 12:12:56 +0100
+Date: Wed, 21 Dec 2005 16:34:29 +0530
 
-Hi Jibin,
 
-> 	I am using bluez stack.  I found a Bluetooth Problem with Mobile
-> 	 phone.
->      It's happen when bluetooth device  connect to Mobile Phone for a long
->      time,it shows the following error message.
-> 
->  	 bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
->  	 bcsp_pkt_cull: Peer acked invalid packet
->  	
->  	I Think thehe above messages shows that the  bluetooth device was
->   reset during the 	communication with mobile.So the bluecore firmware
->   embedded in the chip will start sending 	Sync packets again to bcsp
->   stack to establish the link between bluecore and bcsp stack.
+Hi
 
-run "hciconfig hci0 revision" (as root) and show us the output. What
-versions of the BlueZ packages and Linux kernel are you using?
+
+	I am using bluez stack.  I found a Bluetooth Problem with Mobile
+	 phone.
+     It's happen when bluetooth device  connect to Mobile Phone for a long
+     time,it shows the following error message.
+
+ 	 bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+ 	 bcsp_pkt_cull: Peer acked invalid packet
+ 	
+ 	I Think thehe above messages shows that the  bluetooth device was
+  reset during the 	communication with mobile.So the bluecore firmware
+  embedded in the chip will start sending 	Sync packets again to bcsp
+  stack to establish the link between bluecore and bcsp stack.
+ 	
+ 	Why it is happening in bluez stack?
+ 	How to solve this problem ?
+
+  Please help me.pls send ur reply as soon as possible
+
+expecting ur reply
 
 Regards
+Jibin
 
-Marcel
 
 
+
+---------------------------------------------------------------------------
+       "This e-mail and any files transmitted with it are for the sole use
+of the intended recipient(s) and may contain confidential and privileged
+information. If you are not the intended recipient, please contact the
+sender by reply e-mail and destroy all copies of the original message.
+
+       Any unauthorized review, use, disclosure, dissemination, forwarding,
+printing or copying of this email or any action taken upon this e-mail is
+strictly prohibited and may be unlawful."
+---------------------------------------------------------------------------
 
 
 -------------------------------------------------------
