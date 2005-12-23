@@ -1,16 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3013cac80512230528y5b879d2bh2dbcb4e0fe18e974@mail.gmail.com>
+Message-ID: <3013cac80512230519t38047b25wcf25b46f25f33ee9@mail.gmail.com>
 From: Eduardo Rocha <folhabranca@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Cleaning up the D-Bus interface
-In-Reply-To: <1135271815.6002.96.camel@localhost>
+Subject: Re: [Bluez-devel] Auto-sniff
+In-Reply-To: <1135271896.6002.99.camel@localhost>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-References: <1135111693.26233.11.camel@localhost>
-	 <3013cac80512211216r3918594dv676e03480d83f5b3@mail.gmail.com>
-	 <1135196479.3781.10.camel@localhost>
-	 <3013cac80512220511u9ecac97haf7278614bfe085a@mail.gmail.com>
-	 <1135271815.6002.96.camel@localhost>
+References: <3013cac80512220514o71543396ye02a2848ad2c5df5@mail.gmail.com>
+	 <1135271896.6002.99.camel@localhost>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,34 +19,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 23 Dec 2005 10:28:49 -0300
+Date: Fri, 23 Dec 2005 10:19:35 -0300
 
 Hi Marcel,
 
-do you mean have both implementations (SetProperty("mode") and SetMode) ?
+I've done some initial research on this area, and I've found some
+proposals of algoritms for dynamic ajusting of sniff parameters based
+on traffic history of the link.  But before working with sniff
+parameters, is there anything that neeeds to be done in the sniff mode
+itself? Can you enumarate it?
 
 BR,
 Eduardo.
 
 
-
 On 12/22/05, Marcel Holtmann <marcel@holtmann.org> wrote:
 > Hi Eduardo,
 >
-> > any suggestion about  Discoverable/Connectable parameter string? Maybe =
-"Full" ?
+> > Is anyone working on auto-sniff support in bluez?
 >
-> besides the property thing, I like to see something like:
->
->         SetMode(uint8 mode)     [Method]
->         uint8 GetMode()         [Method]
->         ModeChanged(uint8)      [Signal]
->
->         mode 0x00       =3D Off (means down or deep-sleep)
->         mode 0x01       =3D Connectable
->         mode 0x02       =3D Connectable and Discoverable
->
-> What do you thing?
+> no and I never came around it. However this must be done inside the
+> kernel on HCI level. And you need to take sniff subrate from the Lisbon
+> specification into account now.
 >
 > Regards
 >
