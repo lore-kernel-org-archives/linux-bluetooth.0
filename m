@@ -1,17 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Cleaning up the D-Bus interface
+Subject: Re: [Bluez-devel] Auto-sniff
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1135350634.3985.2.camel@localhost>
-References: <1135111693.26233.11.camel@localhost>
-	 <3013cac80512211216r3918594dv676e03480d83f5b3@mail.gmail.com>
-	 <1135196479.3781.10.camel@localhost>
-	 <3013cac80512220511u9ecac97haf7278614bfe085a@mail.gmail.com>
-	 <1135271815.6002.96.camel@localhost>
-	 <3013cac80512230528y5b879d2bh2dbcb4e0fe18e974@mail.gmail.com>
-	 <1135350634.3985.2.camel@localhost>
+In-Reply-To: <3013cac80512230519t38047b25wcf25b46f25f33ee9@mail.gmail.com>
+References: <3013cac80512220514o71543396ye02a2848ad2c5df5@mail.gmail.com>
+	 <1135271896.6002.99.camel@localhost>
+	 <3013cac80512230519t38047b25wcf25b46f25f33ee9@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1135434294.1008.3.camel@localhost>
+Message-Id: <1135350704.3985.5.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -24,18 +20,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 24 Dec 2005 15:24:54 +0100
+Date: Fri, 23 Dec 2005 16:11:44 +0100
 
 Hi Eduardo,
 
-> > do you mean have both implementations (SetProperty("mode") and SetMode) ?
-> 
-> we can have both, but I would prefer the SetMode() stuff.
+> I've done some initial research on this area, and I've found some
+> proposals of algoritms for dynamic ajusting of sniff parameters based
+> on traffic history of the link.  But before working with sniff
+> parameters, is there anything that neeeds to be done in the sniff mode
+> itself? Can you enumarate it?
 
-and if a device is in Connectable only mode it would be great if we have
-another method that makes this device discoverable for a specific time.
-For example make it discoverable for 3 minutes, like the early Ericsson
-phones did.
+what do you mean by this? In sniff mode you normally don't have any data
+transfer at all. That's the only requirement. Thus you need a timer to
+detect when a link goes idle.
 
 Regards
 
