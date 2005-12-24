@@ -1,10 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Dirk Tilger <dirk@advtechme.com>
+Subject: Re: [Bluez-devel] Cleaning up the D-Bus interface
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20051226083810.GB48781@advtechme.com>
+In-Reply-To: <1135350634.3985.2.camel@localhost>
+References: <1135111693.26233.11.camel@localhost>
+	 <3013cac80512211216r3918594dv676e03480d83f5b3@mail.gmail.com>
+	 <1135196479.3781.10.camel@localhost>
+	 <3013cac80512220511u9ecac97haf7278614bfe085a@mail.gmail.com>
+	 <1135271815.6002.96.camel@localhost>
+	 <3013cac80512230528y5b879d2bh2dbcb4e0fe18e974@mail.gmail.com>
+	 <1135350634.3985.2.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1135434294.1008.3.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] What is "Generic Audio" (0x1203) / using Nokia 6230 as a headset
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,53 +24,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 26 Dec 2005 12:38:10 +0400
+Date: Sat, 24 Dec 2005 15:24:54 +0100
 
-Hi,
+Hi Eduardo,
 
-6 months back I was playing at a friends place with his collection of
-mobiles. Searching for headsets from a Windows CE driven Mobile phone
-I've seen my Nokia 6230 as a possible headset in its list. Since then
-I'm trying to use my phone as a headset from my laptop without success.
+> > do you mean have both implementations (SetProperty("mode") and SetMode) ?
+> 
+> we can have both, but I would prefer the SetMode() stuff.
 
-Connecting with btsco to my brings connection refused or similar
-messages and when I'm connected my phone indicates it is connected to a
-headset, instead of being one. I suspect missing code or code to be
-changed in btsco and I would like to implement that.
+and if a device is in Connectable only mode it would be great if we have
+another method that makes this device discoverable for a specific time.
+For example make it discoverable for 3 minutes, like the early Ericsson
+phones did.
 
-It is my understanding, that first of all I should be able to find my
-phone using 'sdptool search 0x1108'. I also understand, that I should
-not connect to the "Headset Audio Gateway" as this is for the headsets
-to connect to. 
+Regards
 
-| junge btsco # sdptool search --bdaddr $nokia 0x1108
-| Class 0x1108
-| Searching for 0x1108 on $nokia ...
-| Service Name: Audio Gateway
-| Service RecHandle: 0x1004c
-| Service Class ID List:
-|   "Headset Audio Gateway" (0x1112)
-|   "Generic Audio" (0x1203)
-| Protocol Descriptor List:
-|   "L2CAP" (0x0100)
-|   "RFCOMM" (0x0003)
-|     Channel: 12
-| Language Base Attr List:
-|   code_ISO639: 0x656e
-|   encoding:    0x6a
-|   base_offset: 0x100
-| Profile Descriptor List:
-|   "Headset" (0x1108)
-|     Version: 0x0100
+Marcel
 
->From the output above I can only suspect the "Generic Audio" class to be
-of some help. What is it? 
 
-Where can I find documentation on BlueTooth without subscribing to
-bluetooth.org?
-
-Thanks,
-Dirk.
 
 
 -------------------------------------------------------
