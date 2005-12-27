@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43B17C78.9050003@tootai.net>
-From: Administrator TOOTAI <admin@tootai.net>
-MIME-Version: 1.0
-To: Bluetooth <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-users] Btsco CVS failed on bootstrap
+Subject: Re: [Bluez-users] broadcasting
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <43AE7D8C.10608@in.tum.de>
+References: <43AE7D8C.10608@in.tum.de>
+Content-Type: text/plain
+Message-Id: <1135699332.3624.4.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,48 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 27 Dec 2005 18:40:08 +0100
+Date: Tue, 27 Dec 2005 17:02:12 +0100
 
-Hi list,
+Hi Aleksander,
 
-merry christmas and happy new year to all of you.
+> can someone give me an example of broadcasting a data packet to a piconet ?
+> The only way I see it is to open an ACL connection to each device, then 
+> open a raw socket and write a packet with BTADDR set to zero. Is this 
+> correct ?
 
-I compiled 9 monthes ago the alsa bluetooth module and it went fine. I 
-uploaded the today CVS and ./bootstrap give me following errors:
+you don't have any other choice and I am also not sure if BlueZ might
+not block the BDADDR_ANY.
 
-configure.in:9: warning: do not use m4_patsubst: use patsubst or 
-m4_bpatsubst
-aclocal.m4:610: AM_CONFIG_HEADER is expanded from...
-configure.in:9: the top level
-configure.in:46: warning: do not use m4_regexp: use regexp or m4_bregexp
-aclocal.m4:623: _AM_DIRNAME is expanded from...
-configure.in:46: the top level
-configure.in:9: warning: do not use m4_patsubst: use patsubst or 
-m4_bpatsubst
-aclocal.m4:610: AM_CONFIG_HEADER is expanded from...
-configure.in:9: the top level
-configure.in:46: warning: do not use m4_regexp: use regexp or m4_bregexp
-aclocal.m4:623: _AM_DIRNAME is expanded from...
-configure.in:46: the top level
-configure.in:8: your implementation of AM_INIT_AUTOMAKE comes from an
-configure.in:8: old Automake version.  You should recreate aclocal.m4
-configure.in:8: with aclocal and run automake again.
-/usr/share/automake-1.7/am/depend2.am: am__fastdepCC does not appear in 
-AM_CONDITIONAL
-/usr/share/automake-1.7/am/depend2.am: am__fastdepCC does not appear in 
-AM_CONDITIONAL
-/usr/share/automake-1.7/am/depend2.am: am__fastdepCC does not appear in 
-AM_CONDITIONAL
-/usr/share/automake-1.7/am/depend2.am: am__fastdepCC does not appear in 
-AM_CONDITIONAL
+Regards
 
-The configure file is *not* created. I'm running Debian SID 2.6.14, 
-automake 1.7.9, autoconf 2.59
+Marcel
 
-Does someone know what's the problem? Thanks for any hint.
 
--- 
-Daniel
 
 
 -------------------------------------------------------
