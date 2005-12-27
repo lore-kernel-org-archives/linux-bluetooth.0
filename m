@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] broadcasting
+Subject: Re: Fwd PLS HELP ME: Re: [Bluez-users] Can't connect RFCOMM
+	channel: Resource temporarily unavailable
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43AE7D8C.10608@in.tum.de>
-References: <43AE7D8C.10608@in.tum.de>
+In-Reply-To: <20051227081143.53072.qmail@web36104.mail.mud.yahoo.com>
+References: <20051227081143.53072.qmail@web36104.mail.mud.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1135699332.3624.4.camel@localhost.localdomain>
+Message-Id: <1135672816.25315.9.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,17 +19,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 27 Dec 2005 17:02:12 +0100
+Date: Tue, 27 Dec 2005 09:40:16 +0100
 
-Hi Aleksander,
+Hi Swathi,
 
-> can someone give me an example of broadcasting a data packet to a piconet ?
-> The only way I see it is to open an ACL connection to each device, then 
-> open a raw socket and write a packet with BTADDR set to zero. Is this 
-> correct ?
+> Pls someone help me in fixing this problem and getting
+> my headset pairing. Really i need to fix this problem
+> within a week or else i loose the project.
+> Pls pls somebody help me
 
-you don't have any other choice and I am also not sure if BlueZ might
-not block the BDADDR_ANY.
+seems like I missed that one. Happens some times. Answer is now on its
+way.
 
 Regards
 
