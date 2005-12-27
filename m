@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20051228114412.80313.qmail@web36105.mail.mud.yahoo.com>
-From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
-Subject: Re: [Bluez-users] Can't connect RFCOMM channel: Resource temporarily unavailable
+Message-Id: <7.0.0.16.0.20051227185442.01a979c8@unizar.es>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1135672776.25315.7.camel@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+From: Nacho Alastruey =?iso-8859-1?Q?Bened=E9?= <nacho.alastruey@unizar.es>
+Subject: Re: [Bluez-users] don't find the module "snd_bt_sco"
+In-Reply-To: <43A319B5.9040100@bglug.it>
+References: <20051216103855.90185.qmail@web36113.mail.mud.yahoo.com>
+ <43A319B5.9040100@bglug.it>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,185 +19,76 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Dec 2005 03:44:12 -0800 (PST)
+Date: Tue, 27 Dec 2005 19:01:16 +0100
 
-Hello Marcel,
-Yes, i am running btsco module on Fedora Core 4. What
-do you mean by your statement "if nothing else works
-try to switch it off".
-Warm Regards,
-Swathi
+Hello:
 
---- Marcel Holtmann <marcel@holtmann.org> wrote:
+I'm having the same problem. I try to install the=20
+last version of btsco but I cannot find the=20
+module"snd-bt-sco.ko" to follow the steps you provide.
 
-> Hi Swathi,
-> 
-> > As per your request i have pasted the result of
-> > “hciconfig -a” and “hcidump -X -V”. Along
-> with it
-> > someother information which i thought might be
-> helpful
-> > in debugging.
-> > 
-> > When i first started my pc if found that hcid
-> demon
-> > was not running. So i re-started the bluetooth
-> > services and made the hcid to run
-> >
->
--------------------------------------------------------
-> > [root@localhost bluetooth]# /etc/init.d/bluetooth
-> > status
-> > hcid is stopped
-> > sdpd (pid 1729) is running...
-> > [root@localhost bluetooth]# /etc/init.d/bluetooth
-> > restart
-> > Stopping Bluetooth services:                      
->    
-> >     [FAILED]
-> > Starting Bluetooth services:                      
->    
-> >     [  OK  ]
-> > [root@localhost bluetooth]# /etc/init.d/bluetooth
-> > restart
-> > Stopping Bluetooth services:                      
->    
-> >     [  OK  ]
-> > Starting Bluetooth services:                      
->    
-> >     [  OK  ]
-> >
->
--------------------------------------------------------
-> > 
-> > The headset is being put in the pairing mode.
-> Hcidump
-> > -X -V is running in the background. I execute the
-> > btsco command
-> >
->
--------------------------------------------------------
-> > [root@localhost /]# btsco 00:08:C6:3E:54:2C -v -r
-> > btsco v0.4c
-> > Device is 1:0
-> > Error: Failed to connect to SDP server: Function
-> not
-> > implemented
-> > Assuming channel 2
-> > 
-> > Voice setting: 0x0060
-> > Can't connect RFCOMM channel: Resource temporarily
-> > unavailable
-> >
->
--------------------------------------------------------
-> > 
-> > output of hcidump -X -V is as below
-> >
->
--------------------------------------------------------
-> > < HCI Command: Create Connection (0x01|0x0005)
-> plen 13
-> >     bdaddr 00:08:C6:3E:54:2C ptype 0xcc18 rswitch
-> 0x01
-> > clkoffset 0x0000
-> >     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> > > HCI Event: Command Status (0x0f) plen 4
-> >     Create Connection (0x01|0x0005) status 0x00
-> ncmd 1
-> > > HCI Event: PIN Code Request (0x16) plen 6
-> >     bdaddr 00:08:C6:3E:54:2C
-> > > HCI Event: Connect Complete (0x03) plen 11
-> >     status 0x22 handle 41 bdaddr 00:08:C6:3E:54:2C
-> > type ACL encrypt 0x00
-> >     Error: LMP Response Timeout
-> > < HCI Command: Read Voice Setting (0x03|0x0025)
-> plen 0
-> > > HCI Event: Command Complete (0x0e) plen 6
-> >     Read Voice Setting (0x03|0x0025) ncmd 1
-> >     status 0x00 voice setting 0x0060
-> > < HCI Command: Create Connection (0x01|0x0005)
-> plen 13
-> >     bdaddr 00:08:C6:3E:54:2C ptype 0xcc18 rswitch
-> 0x01
-> > clkoffset 0x0000
-> >     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> > > HCI Event: Command Status (0x0f) plen 4
-> >     Create Connection (0x01|0x0005) status 0x00
-> ncmd 1
-> > > HCI Event: PIN Code Request (0x16) plen 6
-> >     bdaddr 00:08:C6:3E:54:2C
-> > > HCI Event: Connect Complete (0x03) plen 11
-> >     status 0x22 handle 42 bdaddr 00:08:C6:3E:54:2C
-> > type ACL encrypt 0x00
-> >     Error: LMP Response Timeout
-> >
->
--------------------------------------------------------
-> 
-> run the next one with "hcidump -X -V -t" to get the
-> timestamps, but I am
-> quite sure that the hcid is not running.
-> 
-> >
->
--------------------------------------------------------
-> > [root@localhost mail]# /etc/init.d/bluetooth
-> status
-> > hcid (pid 3136) is running...
-> > sdpd (pid 3140) is running...
-> >
->
--------------------------------------------------------
-> > output of “ps x”
-> >  2714 ?        Ss     0:00 hcid: processing events
-> >  2716 ?        Ss     0:00 sdpd
-> >
->
--------------------------------------------------------
-> 
-> Are you 100% sure that these are running as root.
-> You might better check
-> with "ps -u root | grep hcid". The non-matching PIDs
-> make it a little
-> but suspicious.
-> 
-> Check /var/log/messages for any syslog output.
-> However since this looks
-> like a RedHat or Fedora distribution, it might be a
-> SELinux problem. If
-> nothing else works, try to switch it off.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
->
--------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do
-> you grep through log files
-> for problems?  Stop!  Download the new AJAX search
-> engine that makes
-> searching your log files as easy as surfing the 
-> web.  DOWNLOAD SPLUNK!
-> http://ads.osdn.com/?ad_idv37&alloc_id865&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+When I try to "modprobe snd-bt-sco" I get "Module snd_bt_sco not found"
 
+When I run "btsco" I get:
 
+  " Error: hwdep next device (hw:0): Operation not permitted
+    Error: hwdep next device (hw:1): Operation not permitted
+    Error: control open (hw:2): No such file or directory
+    Error: Can't find device. Bail"
 
-	
-		
-__________________________________ 
-Yahoo! for Good - Make a difference this year. 
-http://brand.yahoo.com/cybergivingweek2005/
+Thanks in advance for your help.
+
+Nacho
+
+At 20:47 16/12/2005, you wrote:
+>Swathi Mathur80 ha scritto:
+>>I am unable to find the module "snd_bt_sco". Where can i find this module=
+ ?
+>>Do you think i might have made any mistake in=20
+>>any of the steps which are executed before.
+>>Can anyone help me with this.
+>
+>I also had some problem because the "make install" couldn't copy the=
+ module.
+>
+>If it was compiled correctly by "make" you may=20
+>find the module "snd-bt-sco.ko" under btsco/kernel
+>
+>You shall create the directory=20
+>"/lib/modules/KERNELVERSION/extra", where=20
+>KERNELVERSION is the kernel that you booted, and=20
+>copy inside it the module. After that "modprobe=20
+>snd-bt-sco" should work correctly.
+>
+>Jimmi
+>
+>
+>-------------------------------------------------------
+>This SF.net email is sponsored by: Splunk Inc. Do you grep through log=
+ files
+>for problems?  Stop!  Download the new AJAX search engine that makes
+>searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+>http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--=20
+____________________________________________________________
+
+Nacho Alastruey Bened=E9
+
+Laboratorio de Redes y Servicios M=F3viles
+Instituto de Investigaci=F3n de Ingenier=EDa de Arag=F3n, I3A
+Laboratorios Universidad de Zaragoza P.T. Walqa
+Crrtra. Zaragoza Nacional 330a Km.566
+22197 Cuarte (HUESCA)
+Tfno.: +34 974 299207
+e-mail: nacho.alastruey@unizar.es
+http://redesmoviles.unizar.es
+_____________________________________________________________=20
+
 
 
 -------------------------------------------------------
