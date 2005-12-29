@@ -1,75 +1,66 @@
-Return-Path: <david@dgreaves.com>
-Message-ID: <43B41B63.3050406@dgreaves.com>
-Date: Thu, 29 Dec 2005 17:22:43 +0000
-From: David Greaves <david@dgreaves.com>
-MIME-Version: 1.0
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] pand connection problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Cc: marcel@holtmann.org
-Subject: Belkin F8T009 USB dongle uses Broadcom
-Content-Type: text/plain; charset=ISO-8859-1
-List-ID: <bluez-users.lists.sourceforge.net>
+In-Reply-To: <200512281907.56522.r.prewitt@gazeta.pl>
+References: <200512281907.56522.r.prewitt@gazeta.pl>
+Content-Type: text/plain
+Message-Id: <1135868088.6055.0.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 29 Dec 2005 15:54:48 +0100
 
-Hi
+Hi,
 
-I have a Nokia HDW-3 and a Belkin F8T009 USB dongle.
+> I have a problem with pand connection beetwen 2 linux boxes.
+> When I establish connection ping command works, ftp connection works too. But 
+> when i want list files on ftp server, connection crashes (after that ping 
+> don't work, pand -l still show connection).
+> Connection crashes also on other services like internet sharing, samba etc.
+> 
+> 
+> hci0:   Type: USB
+>         BD Address: 00:11:67:1B:14:76 ACL MTU: 678:8 SCO MTU: 48:10
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:3460 acl:55 sco:0 events:102 errors:0
+>         TX bytes:16018 acl:74 sco:0 commands:21 errors:0
+>         Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: MASTER
+>         Name: 'BlueZ lukidom'
+>         Class: 0x3e0100
+>         Service Classes: Networking, Rendering, Capturing
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.2 (0x2) HCI Rev: 0x1f4 LMP Ver: 1.2 (0x2) LMP Subver: 0x1f4
+>         Manufacturer: Integrated System Solution Corp. (57)
 
-This is mainly just a report that Belkin have reverted to using Broadcom
-chips
+I still think the ISSC chips are crap and at fault here. Get yourself
+some CSR based dongles and try again.
 
-I guess I'm returning this one since I wanted to use SCO to get a voice
-connection to my headset. It actually connects perfectly and I can see
-the button presses coming back - just no sound. Searching the archives
-seems to indicate that Broadcom =  no SCO = no sound (please yell if I'm
-wrong)
+Regards
 
-snd-bt-sco installed fine and I could run btsco and alsamixer picked up
-the Headset as hw1,0.
-Oh, it was a bit misleading that I get the following during the ./btsco
--v output:
-...
-i/o needed: connecting sco...
-connected SCO channel
-Done setting sco fd
-...
+Marcel
 
-it certainly implied that SCO was working.
 
-My system is running kernel 2.6.14.5.
 
-# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:0A:3A:68:47:68 ACL MTU: 377:10 SCO MTU: 16:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:17248 acl:517 sco:0 events:640 errors:0
-        TX bytes:9888 acl:499 sco:0 commands:59 errors:0
-        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'ash-0'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
-        Manufacturer: Broadcom Corporation (15)
-# hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:0A:3A:68:47:68 ACL MTU: 377:10 SCO MTU: 16:0
-        Firmware 0.3 / 9
 
-Marcel, cc'ed you in case you want to update the page on:
-  http://www.holtmann.org/linux/bluetooth/features.html
-
-Also, by the way, you say on:
-  http://www.holtmann.org/linux/bluetooth/devices.html
-"If the HCI Version field is filled in this table, then this device
-should also work perfect with Linux."
-You may want to change that since clearly only CSR chipsets (IIRC)
-support SCO.
-
-Also - thanks for all the work on BlueZ - I'm looking forward to getting
-another (CSR) dongle and getting it working.
-
-David
-
--- 
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
