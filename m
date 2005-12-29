@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hci connect and switch role modifications
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <loom.20051229T161453-986@post.gmane.org>
-References: <loom.20051229T161453-986@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1135882032.5426.0.camel@localhost.localdomain>
+From: Marcello e Fabio <capaianca@gmail.com>
+Message-ID: <loom.20051229T161453-986@post.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] hci connect and switch role modifications
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,29 +16,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Dec 2005 19:47:11 +0100
+Date: Thu, 29 Dec 2005 15:53:15 +0000 (UTC)
 
-Hi Marcello,
+Hi all,
+we are working with Bluetooth and BlueZ since two years, and during the
+development of a field failure data analysis of Bluetooth networks, we
+experienced some annoying and frequent runtime errors that could be avoided.
+Those errors concern the creation of a L2CAP connection via HCI and the role
+switch operation. However, we discovered how to prevent these errors from
+occurring, by adding a little amount of code in the hci_create_connection and
+hci_switch_role functions in hci.c.   
 
-> we are working with Bluetooth and BlueZ since two years, and during the
-> development of a field failure data analysis of Bluetooth networks, we
-> experienced some annoying and frequent runtime errors that could be avoided.
-> Those errors concern the creation of a L2CAP connection via HCI and the role
-> switch operation. However, we discovered how to prevent these errors from
-> occurring, by adding a little amount of code in the hci_create_connection and
-> hci_switch_role functions in hci.c.   
-> 
-> We would like to contribute to the development and let the community know and
-> evaluate these modifications.
-> 
-> If you are interested, let us know what is the procedure to contribute.
+We would like to contribute to the development and let the community know and
+evaluate these modifications.
 
-simply sent a unified diff against the latest CVS to the mailing list.
+If you are interested, let us know what is the procedure to contribute.
 
-Regards
+Best Regards,
 
-Marcel
+Marcello Cinque e Fabio Cornevilli,
 
+members of the MobiLab Research Group,
+www.mobilab.unina.it  
+
+
+
+
+ 
 
 
 
