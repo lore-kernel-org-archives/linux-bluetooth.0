@@ -1,84 +1,70 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Collin R. Mulliner" <collin@betaversion.net>
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1133429978.1037.22.camel@panic>
-Mime-Version: 1.0
-Subject: [Bluez-devel] sdp seq of raw data
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 01 Dec 2005 01:39:38 -0800
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <43B58827.1020102@mackintoshweb.com>
+From: Terry Mackintosh <terry@mackintoshweb.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] Authentication problem
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Fri, 30 Dec 2005 14:19:03 -0500
 
-Hi Marcel and list,
+Hi
 
-I'm trying (for hours now) to put a raw binary string into a sdp
-attribute so that it shows up like this:
+While I've read FAQs and HOWTOs on bluethooth until I'm about blue, the 
+solution to my problem evades me.
 
----8<----
-Data Sequence
-      Data : 0B 0X 09 06 a1 01 85 01 05 07 19 e0 29 e7 15 00 25 01 75 01
-95 08 81 02 75 08 95 01 81 01 75 01 95 05 
-05 08 19 01 29 05 91 02 75 03 95 01 91 01 75 08 95 06 15 00 26 ff 00 05 
------->8------
+What I have:
+Old PII laptop running ROCK Linux, 2.4.24 kernel
+Kensington USB bluetooth adapter.
+Motorola V710 picture phone, new
 
-I have tryed two methods, both failed:
+What I want to do:
+Get pictures off the phone and onto the laptop.
 
-SEQ8 method:
+Progress so far:
+The hardware all seems to be working.
+The software mostly seems to be working.
+The phone is seen from the laptop by the command line tools.
 
-unit8_t h_spec[] = { binary_crap };
-uint8_t dtd2 = SDP_UNIT8;
-uint8_t dtd_data = SDP_SEQ8;
-void *dtds[2];
-void *values[2];
+The problem:
+Any attempt to make a connection with the phone results in the phone 
+popping a dialog box that asks if it is OK to bond, followed by a 
+request for a PIN.
+No matter what PIN is given, it is always wrong. I have done "echo 1234 
+ > /etc/bluetooth/pin" to no avail.
+On the laptop side, the PIN aspect of the conversation is seen as an 
+"Invalid exchange" when doing:
 
+sdptool browse 00:15:A8:E4:F5:6B
 
-// this is a other uint8 value which gets placed correctly
-dtds[0] = &dtd2;
-values[0] = &h_spec_leng;
+When doing:
+hcitool cc 00:15:A8:E4:F5:6B
 
-for (i = 0; i < sizeof(h_spec); i++) {
- h_spec_data_lst[i] = sdp_data_alloc(dtd2, &h_spec[i]);
- h_spec_data_dtds[i] = &dtd_data;
-}
-// sometimes it crashes here...
-h_spec_data_list = sdp_seq_alloc(h_spec_data_dtds, 
-  (void**)h_spec_data_lst, sizeof(h_spec));
+it quits instantly complaining of a time out, but never waiting for any 
+response from the phone.
+The phone again pops a dialog asking "Bond with ...?", then a PIN 
+prompt, but the PIN fails and hcitool timed out long ago anyway.
 
-dtds[1] = &dtd_data;
-values[1] = h_spec_data_list;
-// sometimes it crashes here
-h_spec_lst = sdp_seq_alloc(dtds, values, 2);
-sdp_attr_add(sdp_record, SRV_ATTR_1, h_spec_lst);
+I looked at the log, it just confirmed the above in more detail.
 
-// and sometimes the attributes added after this one don't get
-displayed, and the binary string is only one byte long
+Any help greatly appreciated.
+Thanks
 
-
-TEXT_STR8 method:
-
-works fine but can't use binary, because of strcpy/strlen in sdp part of
-libbluetooth
-
-
-I couldn't find any matching example in all the BlueZ code...
-
-thanks ... Collin
-
---
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-It's a hardware problem!
-
+-- 
+Terry Mackintosh <terry@mackintoshweb.com>
+http://www.mackintoshweb.com/mars/ Mars Society, FL chapter.
+Proudly powered by ROCKLinux, Apache, PHP, PostgreSQL, etc.
+"If you don't know where you are going, how can you get there?"
 
 
 -------------------------------------------------------
@@ -87,6 +73,6 @@ for problems?  Stop!  Download the new AJAX search engine that makes
 searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
 http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
