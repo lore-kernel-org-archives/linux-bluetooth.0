@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43B5F992.7090403@comcast.net>
-From: dave sailer <d.sailer@comcast.net>
+Message-ID: <43B57594.90202@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] palm & bluez
-References: <43A62010.5090009@comcast.net> <1134982463.6881.50.camel@localhost> <43AECB35.7080308@comcast.net> <43AED852.7000708@comcast.net> <43AF0031.5060306@comcast.net>
-In-Reply-To: <43AF0031.5060306@comcast.net>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] fujitsu p1510d: CSR BC02
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,135 +16,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 30 Dec 2005 22:22:58 -0500
+Date: Fri, 30 Dec 2005 10:59:48 -0700
 
-dave sailer wrote:
+fyi
 
-> dave sailer wrote:
->
->> dave sailer wrote:
->>
->>> Marcel Holtmann wrote:
->>>
->>>> Hi Dave,
->>>>
->>>>  
->>>>
->>>>> I'm trying to pair my palm tungsten e2 with a 2.6.11-gentoo-r9 
->>>>> box. I currently use a bluetooth keyboard & mouse, so bluez is 
->>>>> working on the gentoo box. I can discover the palm from linux..
->>>>>
->>>>> myth1 ~ # hcitool scan
->>>>> Scanning ...
->>>>>        00:07:E0:71:37:54       vsailer
->>>>>
->>>>>
->>>>> and the palm discovers the bluetooth dongle.  On the palm I 
->>>>> attempt to pair, typing in a passkey, which I then type on the 
->>>>> gentoo box but back on the palm I get "Unable to add Myth1 
->>>>> BlueZ(0) to your trusted device list". hcidump gives me....
->>>>>
->>>>>
->>>>> < HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
->>>>>    bdaddr 00:07:E0:71:37:54 len 1 pin '1'
->>>>> > HCI Event: Command Complete (0x0e) plen 10
->>>>>    PIN Code Request Reply (0x01|0x000d) ncmd 1
->>>>>    status 0x00 bdaddr 00:07:E0:71:37:54
->>>>> > HCI Event: Disconn Complete (0x05) plen 4
->>>>>    status 0x00 handle 47 reason 0x13
->>>>>    Reason: Remote User Terminated Connection
->>>>>
->>>>> I know it appears the problem is with the palm, but I'm not sure 
->>>>> what else to try here. Didn't find much in the palm newsgroups.
->>>>>   
->>>>
->>>>
->>>>
->>>>
->>>> I have no idea, because as you correctly said, the Palm is at fault 
->>>> here
->>>> (if your PIN code was '1' on both sides).
->>>>
->>>> However don't try to pair at all. If an authentication is really 
->>>> needed
->>>> you will asked for the PIN code at that time. Simply start to use your
->>>> Palm.
->>>>
->>>> Regards
->>>>
->>>> Marcel
->>>>
->>>>
->>>>
->>>>
->>>> -------------------------------------------------------
->>>> This SF.net email is sponsored by: Splunk Inc. Do you grep through 
->>>> log files
->>>> for problems?  Stop!  Download the new AJAX search engine that makes
->>>> searching your log files as easy as surfing the  web.  DOWNLOAD 
->>>> SPLUNK!
->>>> http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
->>>> _______________________________________________
->>>> Bluez-users mailing list
->>>> Bluez-users@lists.sourceforge.net
->>>> https://lists.sourceforge.net/lists/listinfo/bluez-users
->>>>
->>>>  
->>>>
->>> I'm just learning the palm, but it appears you need to set up the 
->>> bluetooth connection in order to do anything with it. No matter 
->>> anyway, now I can't even get the palm to see the dongle or the linux 
->>> box to discover the palm. Arghhh! What have I done? (the palm still 
->>> has bluetooth on and the device is discoverable).
->>>
->>>
->>> -------------------------------------------------------
->>> This SF.net email is sponsored by: Splunk Inc. Do you grep through 
->>> log files
->>> for problems?  Stop!  Download the new AJAX search engine that makes
->>> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
->>> http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
->>> _______________________________________________
->>> Bluez-users mailing list
->>> Bluez-users@lists.sourceforge.net
->>> https://lists.sourceforge.net/lists/listinfo/bluez-users
->>>
->> ok, after resetting (turning off/on did not do it) the palm, I'm back 
->> to where I was. The devices discover eachother but the connection is 
->> failing at the palm. As I said, it appears I need to get a "trusted 
->> device" established on the palm before continuing.
->>
->>
->> -------------------------------------------------------
->> This SF.net email is sponsored by: Splunk Inc. Do you grep through 
->> log files
->> for problems?  Stop!  Download the new AJAX search engine that makes
->> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
->> http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
->> _______________________________________________
->> Bluez-users mailing list
->> Bluez-users@lists.sourceforge.net
->> https://lists.sourceforge.net/lists/listinfo/bluez-users
->>
-> I've tried this on both linux & windows xp with the same result. Is 
-> this problem related to "profiles" 
-> (http://www.bluetooth.com/help/trouble.asp). Seems likely since my 
-> dongle is for a microsoft keyboard & mouse. But surely "profiles" 
-> isn't a hardware issue, is it? How do I address this on the linux box?
->
->
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log 
-> files
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
-bump... anyone?
+My fujitsu subnotebook arrived and it's using a CSR bluecore02 with hci
+18.1 firmware.
+
+The adapter connects itself to the usb bus on power up. (Much more
+convenient than the acpi magic required on the toshiba m200 for example.)
+
+Fujitsu advertises the bluetooth option as a "Bluetooth wireless PAN v1.2"
+
+Brad
 
 
 -------------------------------------------------------
