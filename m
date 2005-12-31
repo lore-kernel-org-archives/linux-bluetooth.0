@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <9307f5f20512310649u5f3ee7eeo8285550d506cc0f1@mail.gmail.com>
-From: "P. Durante" <shackan@gmail.com>
+Message-ID: <20051231085734.52443.qmail@web33114.mail.mud.yahoo.com>
+From: Ahmet Salih Iscen <asiscen@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Sample C++ Code
-In-Reply-To: <20051231085734.52443.qmail@web33114.mail.mud.yahoo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <20051231085734.52443.qmail@web33114.mail.mud.yahoo.com>
+Content-Type: multipart/alternative; boundary="0-519307766-1136019454=:51732"
+Subject: [Bluez-devel] Sample C++ Code
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,21 +16,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 31 Dec 2005 15:49:16 +0100
+Date: Sat, 31 Dec 2005 00:57:34 -0800 (PST)
 
-> Can someone send me or direct me to a sample C++ code that uses BLUEZ?
+--0-519307766-1136019454=:51732
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-http://svn.berlios.de/viewcvs/bluetool/trunk/lib/bluetool/
+Can someone send me or direct me to a sample C++ code that uses BLUEZ?
+ Cheers 
+ 
 
-a C++ wrapper for bluez, I used it together with my C++ bindings for
-DBus (and my glib replacement) when writing my own dbus daemon, the
-code is largely UNMANTAINED and OUTDATED since I'm rewriting a new
-version from scratch, I don't even know if this old one still compiles
-even, so feel free to take a look but be warned it's still alpha
-stuff.
+		
+---------------------------------
+Yahoo! for Good - Make a difference this year. 
+--0-519307766-1136019454=:51732
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-regards,
-Paul
+<div id="RTEContent">Can someone send me or direct me to a sample C++ code that uses BLUEZ?<br> Cheers <br> </div><p>
+		<hr size=1>Yahoo! for Good - 
+<a href="http://us.rd.yahoo.com/mail_us/taglines/charity/*http://brand.yahoo.com/cybergivingweek2005/">Make a difference this year.</a> 
+--0-519307766-1136019454=:51732--
 
 
 -------------------------------------------------------
