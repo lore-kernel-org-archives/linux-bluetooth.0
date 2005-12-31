@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Andrew N. Balahonov" <sspp@cityline.ru>
+Message-ID: <9307f5f20512310649u5f3ee7eeo8285550d506cc0f1@mail.gmail.com>
+From: "P. Durante" <shackan@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20051231185308.E3D14130C8@sc8-sf-spam2.sourceforge.net>
-Message-ID: <Pine.LNX.4.63.0512312154150.23868@sundust>
-References: <20051231185308.E3D14130C8@sc8-sf-spam2.sourceforge.net>
+Subject: Re: [Bluez-devel] Sample C++ Code
+In-Reply-To: <20051231085734.52443.qmail@web33114.mail.mud.yahoo.com>
 MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="717440693-91372076-1136056222=:23868"
-Subject: [Bluez-devel] hci.c:885: storage size of `iv' isn't known
+Content-Type: text/plain; charset=ISO-8859-1
+References: <20051231085734.52443.qmail@web33114.mail.mud.yahoo.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,66 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 31 Dec 2005 22:10:22 +0300 (MSK)
+Date: Sat, 31 Dec 2005 15:49:16 +0100
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+> Can someone send me or direct me to a sample C++ code that uses BLUEZ?
 
---717440693-91372076-1136056222=:23868
-Content-Type: TEXT/PLAIN; charset=KOI8-R; format=flowed
-Content-Transfer-Encoding: quoted-printable
+http://svn.berlios.de/viewcvs/bluetool/trunk/lib/bluetool/
 
-Hello.
-Please suggest anything.
+a C++ wrapper for bluez, I used it together with my C++ bindings for
+DBus (and my glib replacement) when writing my own dbus daemon, the
+code is largely UNMANTAINED and OUTDATED since I'm rewriting a new
+version from scratch, I don't even know if this old one still compiles
+even, so feel free to take a look but be warned it's still alpha
+stuff.
 
-~/bluez/bluez-libs-2.24$ make -s
-Making all in include
-Making all in src
-mkdir .libs
-  gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../include -Wall -O2=20
--D_FORTIFY_SOURCE=3D2 -c bluetooth.c -Wp,-MD,.deps/bluetooth.TPlo  -fPIC=20
--DPIC -o .libs/bluetooth.o
-  gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../include -Wall -O2=20
--D_FORTIFY_SOURCE=3D2 -c bluetooth.c -Wp,-MD,.deps/bluetooth.TPlo -o=20
-bluetooth.o >/dev/null 2>&1
-  gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../include -Wall -O2=20
--D_FORTIFY_SOURCE=3D2 -c hci.c -Wp,-MD,.deps/hci.TPlo  -fPIC -DPIC -o=20
-.libs/hci.o
-hci.c: In function `hci_send_cmd':
-hci.c:885: storage size of `iv' isn't known
-hci.c:903: warning: implicit declaration of function `writev'
-hci.c:885: warning: unused variable `iv'
-make[2]: *** [hci.lo] =EF=DB=C9=C2=CB=C1 1
-make[1]: *** [all-recursive] =EF=DB=C9=C2=CB=C1 1
-make: *** [all] =EF=DB=C9=C2=CB=C1 2
-
-(sorry for cyrillic)
-
-from src/hci.c
-      881 int hci_send_cmd(int dd, uint16_t ogf, uint16_t ocf, uint8_t pl=
-en, void *param)
-      882 {
-      883         uint8_t type =3D HCI_COMMAND_PKT;
-      884         hci_command_hdr hc;
-      885         struct iovec iv[3];
-      886         int ivn;
-
-
-/usr/src/linux -> linux-2.4.31-ow1
-5.7K 2005-08-19 22:31 /usr/src/linux-2.4.31-ow1/include/net/bluetooth/blu=
-etooth.h
-$Id: bluetooth.h,v 1.9 2002/05/06 21:11:55 maxk Exp $
-
-18K  2004-08-08 03:26 /usr/src/linux-2.4.31-ow1/include/net/bluetooth/hci=
-.h
-$Id: hci.h,v 1.5 2002/06/27 17:29:30 maxk Exp $
-
-Thank you.
-
---=20
-Yours sincerely, Andrew N. Balahonov
-1024D/3C340684 94B4 C3C5 8936 9DF5 A2B8  3E5C DB3A CC66 3C34 0684
---717440693-91372076-1136056222=:23868--
+regards,
+Paul
 
 
 -------------------------------------------------------
