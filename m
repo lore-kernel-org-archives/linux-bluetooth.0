@@ -1,120 +1,91 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <6.2.0.14.0.20051101102405.027aa348@mail.bawue.de>
-To: bluez-users@lists.sourceforge.net
-From: Albert Schmid <aschmid@bawue.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; format=flowed
-Subject: [Bluez-users] No hci-Device available
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 01 Nov 2005 10:38:32 +0100
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: "Andrew N. Balahonov" <sspp@cityline.ru>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20051231185308.E3D14130C8@sc8-sf-spam2.sourceforge.net>
+Message-ID: <Pine.LNX.4.63.0512312154150.23868@sundust>
+References: <20051231185308.E3D14130C8@sc8-sf-spam2.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: MULTIPART/MIXED; BOUNDARY="717440693-91372076-1136056222=:23868"
+Subject: [Bluez-devel] hci.c:885: storage size of `iv' isn't known
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Sat, 31 Dec 2005 22:10:22 +0300 (MSK)
 
-Hello,
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-I tried to use a spare bluetooth stick at my older PC with
-Suse 7.3. I checked the kernel config to have USD and Bluetooth
-kernel modules available and compiled. Then I downloaded
-bluez-libs and bluez-utils software packages and compiled both
-successfully. I installed the libs and the utils on my machine
-and they seem to work so far (I got help messages,...).
+--717440693-91372076-1136056222=:23868
+Content-Type: TEXT/PLAIN; charset=KOI8-R; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-After than I tried the hcitool dev command, but no device is
-available. I used modprobe to start hci_usb.o module and I don't
-get any error message at the terminal. The lsmod command lists
-the modules of the kernel:
+Hello.
+Please suggest anything.
 
-Module                  Size  Used by
-...
-hci_usb                 5120   0
-hci                    17344   0  [hci_usb]
-bluetooth              17296   1
-...
-usb-ohci               17680   0  (unused)
-usbcore                47264   1  [hci_usb bluetooth usb-ohci]
-...
+~/bluez/bluez-libs-2.24$ make -s
+Making all in include
+Making all in src
+mkdir .libs
+  gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../include -Wall -O2=20
+-D_FORTIFY_SOURCE=3D2 -c bluetooth.c -Wp,-MD,.deps/bluetooth.TPlo  -fPIC=20
+-DPIC -o .libs/bluetooth.o
+  gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../include -Wall -O2=20
+-D_FORTIFY_SOURCE=3D2 -c bluetooth.c -Wp,-MD,.deps/bluetooth.TPlo -o=20
+bluetooth.o >/dev/null 2>&1
+  gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../include -Wall -O2=20
+-D_FORTIFY_SOURCE=3D2 -c hci.c -Wp,-MD,.deps/hci.TPlo  -fPIC -DPIC -o=20
+.libs/hci.o
+hci.c: In function `hci_send_cmd':
+hci.c:885: storage size of `iv' isn't known
+hci.c:903: warning: implicit declaration of function `writev'
+hci.c:885: warning: unused variable `iv'
+make[2]: *** [hci.lo] =EF=DB=C9=C2=CB=C1 1
+make[1]: *** [all-recursive] =EF=DB=C9=C2=CB=C1 1
+make: *** [all] =EF=DB=C9=C2=CB=C1 2
 
+(sorry for cyrillic)
 
-(Ireduced the list)
-
-It seems the bluetooth kernel support is available...
-
-Then I checked my syslog entries and found:
-
-Nov  1 10:53:33 bob kernel: hub.c: 2 ports detected
-Nov  1 10:53:33 bob kernel: hub.c: USB new device connect on bus1/2, 
-assigned device number 2
-Nov  1 10:53:33 bob kernel: usb.c: USB device 2 (vend/prod 0xa12/0x1) is 
-not claimed by any active driver.
-Nov  1 10:53:33 bob kernel: IPv6 v0.8 for NET4.0
-Nov  1 10:53:33 bob kernel: IPv6 over IPv4 tunneling driver
-Nov  1 10:53:33 bob kernel: bluetooth.c: USB Bluetooth support registered
-Nov  1 10:53:33 bob kernel: usb.c: registered new driver bluetooth
-Nov  1 10:53:33 bob kernel: bluetooth.c: found interrupt in
-Nov  1 10:53:33 bob kernel: bluetooth.c: found bulk out
-Nov  1 10:53:33 bob kernel: bluetooth.c: found bulk in
-Nov  1 10:53:33 bob kernel: bluetooth.c: USB Bluetooth converter detected
-Nov  1 10:53:33 bob kernel: bluetooth.c: Bluetooth converter now attached 
-to ttyUB0 (or usb/ttub/0 for devfs)
-Nov  1 10:53:33 bob kernel: bluetooth.c: usb_bluetooth_probe - improper 
-number of endpoints. Bluetooth driver not bound.
-Nov  1 10:53:33 bob last message repeated 6 times
-Nov  1 10:53:33 bob kernel: bluetooth.c: USB Bluetooth tty driver v0.12
-Nov  1 10:53:33 bob kernel: BlueZ HCI Core ver 1.1 Copyright (C) 2000,2001 
-Qualcomm Inc
-Nov  1 10:53:33 bob kernel: Written 2000,2001 by Maxim Krasnyansky 
-<maxk@qualcomm.com>
-Nov  1 10:53:33 bob kernel: BlueZ HCI USB driver ver 1.0 Copyright (C) 
-2000,2001 Qualcomm Inc
-Nov  1 10:53:33 bob kernel: Written 2000,2001 by Maxim Krasnyansky 
-<maxk@qualcomm.com>
-Nov  1 10:53:33 bob kernel: usb.c: registered new driver hci_usb
-Nov  1 10:53:33 bob kernel: bluetooth.c: usb_bluetooth_probe - improper 
-number of endpoints. Bluetooth driver not bound.
+from src/hci.c
+      881 int hci_send_cmd(int dd, uint16_t ogf, uint16_t ocf, uint8_t pl=
+en, void *param)
+      882 {
+      883         uint8_t type =3D HCI_COMMAND_PKT;
+      884         hci_command_hdr hc;
+      885         struct iovec iv[3];
+      886         int ivn;
 
 
-It seems that there is still something wrong with the driver.
+/usr/src/linux -> linux-2.4.31-ow1
+5.7K 2005-08-19 22:31 /usr/src/linux-2.4.31-ow1/include/net/bluetooth/blu=
+etooth.h
+$Id: bluetooth.h,v 1.9 2002/05/06 21:11:55 maxk Exp $
 
-Can anybody help me with the correct/missing /etc/modules.conf
-entries?
+18K  2004-08-08 03:26 /usr/src/linux-2.4.31-ow1/include/net/bluetooth/hci=
+.h
+$Id: hci.h,v 1.5 2002/06/27 17:29:30 maxk Exp $
 
-If the hci_usb-Driver is registered correctly, why do I haven't
-found any hci-device-file ind the /dev directory?
+Thank you.
 
-Do I really need to download 37MB for an newer 2.4.31 kernel to
-access the bloototh stick? - I use 2.4.10 compiled by Suse.
-
-I searched the mail-list*s archive but I haven't found any
-appropriete to my problem.
-
-Thank you in advance,
-
-Albert Schmid
-
-====================================================================
-     Albert Schmid                   aschmid@bawue.de
-                                     http://www.bawue.de/~aschmid
-====================================================================
-   PGP Fingerprint: 02 F4 E5 03 9A E3 84 57  93 A6 44 B6 C8 E2 AA D3
-GnuPG Fingerprint: 103F C8A5 C8FF 47E6 CBDA FCF3 829C 8EF3 C262 5CB3
-====================================================================
-
+--=20
+Yours sincerely, Andrew N. Balahonov
+1024D/3C340684 94B4 C3C5 8936 9DF5 A2B8  3E5C DB3A CC66 3C34 0684
+--717440693-91372076-1136056222=:23868--
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by the JBoss Inc.
-Get Certified Today * Register for a JBoss Training Course
-Free Certification Exam for All Training Attendees Through End of 2005
-Visit http://www.jboss.com/services/certification for more information
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
