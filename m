@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <29ee90ed0601030512i42aa27dtef1e65a88cc57375@mail.gmail.com>
-From: neo digits <neo.digits@gmail.com>
+Mime-Version: 1.0 (Apple Message framework v746.2)
+References: <1136205591.20731.42.camel@saag.bunker.heddley.com>
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <CD1B5315-1B8A-41E0-9D9B-766B3D59634E@shirishranjit.com>
+From: Shirish Ranjit <Shirish.Ranjit@shirishranjit.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] connection times out with hcitool
+Subject: [Bluez-users] Fwd: bluez util bluetooth dongle
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,48 +17,68 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 3 Jan 2006 18:42:05 +0530
+Date: Mon, 2 Jan 2006 11:03:51 -0500
 
-Hi everyone,
 
-I have an IISC (Integrated System Solution Corp) USB Bluetooth Dongle.
+>> I am working on bluetooth devices on a debian linux installed in  
+>> hp pavilion
+>> ze5460us machine.  I have a usb bluetooth dongle Actiontec BTM200B  
+>> that I use
+>> for working with bluetooth devices. I am working on learning  
+>> bluetooth
+>> programming with python with pybluez. However, the usb dongle  
+>> seems to
+>> disapper after once I do the query such as  
+>> bluetooth.discover_devices().
+>>
+>> I run the program once and then I have to reboot my debian linux  
+>> to run the
+>> program again. Once the dicover_devices() call fails, I try to to  
+>> the hcitool scan and it
+>> says time out.
+>>
+>> I have the latest debian linux installed through network install a  
+>> week ago.
+>> Following is the output from the uname
+>> uname -a
+>> Linux ranlinux 2.4.27-2-386 #1 Wed Aug 17 09:33:35 UTC 2005 i686  
+>> GNU/Linux
+>>
+>>
+>> Following is the error  from the bluetooth call
+>>
+>> performing inquiry...
+>> Traceback (most recent call last):
+>>     nearby_devices = bluetooth.discover_devices()
+>>   File "/usr/local/lib/python2.3/site-packages/bluetooth.py", line  
+>> 172, in
+>> discover_devices
+>>     raise BluetoothError("error communicating with local bluetooth  
+>> device")
+>> bluetooth.BluetoothError: error communicating with local bluetooth  
+>> device
+>> ----
+>>
+>> This is the output from the hciconfig -a
+>>
+>> ranlinux:/home/sranjit# hciconfig -a
+>> hci0:   Type: USB
+>>         BD Address: 00:20:E0:CC:2B:8D ACL MTU: 192:8 SCO MTU: 64:8
+>>         UP RUNNING PSCAN ISCAN
+>>         RX bytes:1570 acl:0 sco:0 events:41 errors:0
+>>         TX bytes:409 acl:0 sco:0 commands:30 errors:0
+>>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>>         Link policy: RSWITCH HOLD SNIFF PARK
+>>         Link mode: SLAVE ACCEPT
+>> Can't read local name on hci0: Connection timed out (110)
+>>
+>> !DSPAM:43b86354198356491211187!
+>>
+Regards,
 
-hciconfig -a output is as below :
-
-hci0:   Type: USB
-        BD Address: 22:22:22:22:22:22 ACL MTU: 678:8  SCO MTU: 48:10
-        UP RUNNING PSCAN ISCAN INQUIRY
-        RX bytes:1185 acl:0 sco:0 events:21 errors:0
-        TX bytes:75 acl:0 sco:0 commands:21 errors:0
-        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'ISSC-BTSPP'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x1f4 LMP Ver: 1.2 (0x2) LMP Subver: 0x=
-1f4
-        Manufacturer: Integrated System Solution Corp. (57)
-
-A. I have bluez-utils, bluez-libs, bluez-hcidump, bluez-hciemu,=20
-kbluetoothd installed
-B.  both daemons (hcid, sdpd) are running.
-C. Kernel version is 2.6.3
-
-Problem:
-
-When I try to scan for remote devices using hcitool the connection times ou=
-t .
-
-[neo@neo neo]$ hcitool -i hci0 scan
-Scanning ...
-Inquiry failed: Connection timed out
-
-would appreciate any clues or pointers about this.
-
-neo.
+Shirish Ranjit
+shirish.ranjit@shirishranjit.com
 
 
 -------------------------------------------------------
