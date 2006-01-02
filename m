@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060102050145.42459.qmail@web8406.mail.in.yahoo.com>
+Message-ID: <20060102044548.477.qmail@web8405.mail.in.yahoo.com>
 From: shankar marrapu <hifrom122@yahoo.co.in>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-619029103-1136178105=:41997"
-Subject: [Bluez-users] How can I get libjbluez.so file
+Content-Type: multipart/alternative; boundary="0-1031340042-1136177148=:23557"
+Subject: [Bluez-users] Can I implement Bluetooth Applications
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +16,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 2 Jan 2006 05:01:45 +0000 (GMT)
+Date: Mon, 2 Jan 2006 04:45:48 +0000 (GMT)
 
---0-619029103-1136178105=:41997
+--0-1031340042-1136177148=:23557
 Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
 
-hi,
-          How can I get libjbluez.so  and jbluez.jar files
+Hi,
+         Can I implement Bluetooth Applications (using JAVA API's) in Windows operating systems.I downloaded Jbluez package and i can't run some examples in windows O.S.it gave me some errors.and it needs libjbluez.so loader file.How can i get this loader file.Plz send me these details
+   
+   
+                                                                        by
+                                                                     .....
 
 Send instant messages to your online friends http://in.messenger.yahoo.com 
---0-619029103-1136178105=:41997
+--0-1031340042-1136177148=:23557
 Content-Type: text/html; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
 
-<DIV id=RTEContent>hi,</DIV>  <DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; How can I get libjbluez.so&nbsp; and jbluez.jar files</DIV><p>Send instant messages to your online friends http://in.messenger.yahoo.com 
---0-619029103-1136178105=:41997--
+<DIV id=RTEContent>Hi,</DIV>  <DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Can I implement Bluetooth Applications (using JAVA API's) in Windows operating systems.I downloaded Jbluez package and i can't run some examples in windows O.S.it gave me some errors.and it needs libjbluez.so loader file.How can i get this loader file.Plz send me these details</DIV>  <DIV>&nbsp;</DIV>  <DIV>&nbsp;</DIV>  <DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; by</DIV> 
+ <DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.....</DIV><p>Send instant messages to your online friends http://in.messenger.yahoo.com 
+--0-1031340042-1136177148=:23557--
 
 
 -------------------------------------------------------
