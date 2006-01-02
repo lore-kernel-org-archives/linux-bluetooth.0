@@ -3,7 +3,7 @@ MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="us-ascii"
 Subject: RE: [Bluez-users] SDP problem w/ WM 5 PDA BT stack
-Message-ID: <4B7168B4A1DDAE4C97D38B93A8450A188DD270@WEXMBGBWI001001.corp.internal.symbol.com>
+Message-ID: <4B7168B4A1DDAE4C97D38B93A8450A188DD22F@WEXMBGBWI001001.corp.internal.symbol.com>
 From: "Martinez, JuanAntonio" <JuanAntonio.Martinez@symbol.com>
 To: <bluez-users@lists.sourceforge.net>
 Sender: bluez-users-admin@lists.sourceforge.net
@@ -17,15 +17,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 2 Jan 2006 14:20:34 -0000
+Date: Mon, 2 Jan 2006 12:09:21 -0000
 
-Hi,
+Hi=20Marcel,
 
-Fyi,=20StoneStreet=20One's=20BT=20stack=20is=20commercially=20known=20as=20=
-bluetopia.
+I=20am=20afraid=20that=20you=20will=20need=20a=20Windows=20Mobile=205.0=20=
+PDA=20running=20SS1=20BT
+stack!
+Anyway,=20in=20the=20meantime=20we=20found=20a=20workaround.
 
-Regards
-
+Thanks
 
 -----Mensaje=20original-----
 De:=20bluez-users-admin@lists.sourceforge.net
