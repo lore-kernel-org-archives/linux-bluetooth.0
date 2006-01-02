@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v746.2)
-References: <1136205591.20731.42.camel@saag.bunker.heddley.com>
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <CD1B5315-1B8A-41E0-9D9B-766B3D59634E@shirishranjit.com>
-From: Shirish Ranjit <Shirish.Ranjit@shirishranjit.com>
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Fwd: bluez util bluetooth dongle
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Subject: RE: [Bluez-users] SDP problem w/ WM 5 PDA BT stack
+Message-ID: <4B7168B4A1DDAE4C97D38B93A8450A188DD28D@WEXMBGBWI001001.corp.internal.symbol.com>
+From: "Martinez, JuanAntonio" <JuanAntonio.Martinez@symbol.com>
+To: <bluez-users@lists.sourceforge.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,68 +17,75 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 2 Jan 2006 11:03:51 -0500
+Date: Mon, 2 Jan 2006 15:43:52 -0000
+
+Hi=20Marcel,
+
+Do=20you=20happen=20to=20have=20a=20Windows=20Mobile=202003=20PDA=20to=20t=
+est=20with?
+If=20so,=20there=20is=20a=20free=20BTExplorer=20Lite=20version=20you=20cou=
+ld=20use=20on=20this=20PDA
+and=20behaves=20the=20very=20same=20way.
+If=20you=20are=20interested=20(and=20you=20have=20the=20unit),=20please=20=
+let=20me=20know,=20so=20I
+can=20send=20it=20to=20you.
+
+On=20the=20other=20hand,=20BT=20device=20on=20Linux=20side=20(Bluez's)=20i=
+s=20a=20Socket=20USB
+Adapter=20BL4533-550.=20It=20works=20fine!=20So=20I=20guess=20it=20could=20=
+be=20worthy=20adding
+it=20to=20the=20hw=20list.
+
+Many=20thanks=20in=20advance
+Best=20regards,
+
+Juan
+
+-----Mensaje=20original-----
+De:=20bluez-users-admin@lists.sourceforge.net
+[mailto:bluez-users-admin@lists.sourceforge.net]=20En=20nombre=20de=20Marc=
+el
+Holtmann
+Enviado=20el:=20lunes,=2002=20de=20enero=20de=202006=2016:28
+Para:=20bluez-users@lists.sourceforge.net
+Asunto:=20RE:=20[Bluez-users]=20SDP=20problem=20w/=20WM=205=20PDA=20BT=20s=
+tack
+
+Hi,
+
+>=20Fyi,=20StoneStreet=20One's=20BT=20stack=20is=20commercially=20known=20=
+as=20bluetopia.
+
+this=20doesn't=20really=20help=20me,=20because=20I=20am=20not=20installing=
+=20a=20commercial
+Bluetooth=20stack.
+
+Regards
+
+Marcel
 
 
->> I am working on bluetooth devices on a debian linux installed in  
->> hp pavilion
->> ze5460us machine.  I have a usb bluetooth dongle Actiontec BTM200B  
->> that I use
->> for working with bluetooth devices. I am working on learning  
->> bluetooth
->> programming with python with pybluez. However, the usb dongle  
->> seems to
->> disapper after once I do the query such as  
->> bluetooth.discover_devices().
->>
->> I run the program once and then I have to reboot my debian linux  
->> to run the
->> program again. Once the dicover_devices() call fails, I try to to  
->> the hcitool scan and it
->> says time out.
->>
->> I have the latest debian linux installed through network install a  
->> week ago.
->> Following is the output from the uname
->> uname -a
->> Linux ranlinux 2.4.27-2-386 #1 Wed Aug 17 09:33:35 UTC 2005 i686  
->> GNU/Linux
->>
->>
->> Following is the error  from the bluetooth call
->>
->> performing inquiry...
->> Traceback (most recent call last):
->>     nearby_devices = bluetooth.discover_devices()
->>   File "/usr/local/lib/python2.3/site-packages/bluetooth.py", line  
->> 172, in
->> discover_devices
->>     raise BluetoothError("error communicating with local bluetooth  
->> device")
->> bluetooth.BluetoothError: error communicating with local bluetooth  
->> device
->> ----
->>
->> This is the output from the hciconfig -a
->>
->> ranlinux:/home/sranjit# hciconfig -a
->> hci0:   Type: USB
->>         BD Address: 00:20:E0:CC:2B:8D ACL MTU: 192:8 SCO MTU: 64:8
->>         UP RUNNING PSCAN ISCAN
->>         RX bytes:1570 acl:0 sco:0 events:41 errors:0
->>         TX bytes:409 acl:0 sco:0 commands:30 errors:0
->>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->>         Link policy: RSWITCH HOLD SNIFF PARK
->>         Link mode: SLAVE ACCEPT
->> Can't read local name on hci0: Connection timed out (110)
->>
->> !DSPAM:43b86354198356491211187!
->>
-Regards,
 
-Shirish Ranjit
-shirish.ranjit@shirishranjit.com
+
+-------------------------------------------------------
+This=20SF.net=20email=20is=20sponsored=20by:=20Splunk=20Inc.=20Do=20you=20=
+grep=20through=20log
+files
+for=20problems?=20=20Stop!=20=20Download=20the=20new=20AJAX=20search=20eng=
+ine=20that=20makes
+searching=20your=20log=20files=20as=20easy=20as=20surfing=20the=20=20web.=20=
+=20DOWNLOAD=20SPLUNK!
+http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
+_______________________________________________
+Bluez-users=20mailing=20list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+________________________________________________________________________
+This=20email=20has=20been=20scanned=20for=20computer=20viruses.
+
+________________________________________________________________________
+This=20email=20has=20been=20scanned=20for=20computer=20viruses.
 
 
 -------------------------------------------------------
