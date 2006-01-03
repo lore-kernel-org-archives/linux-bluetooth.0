@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060104052100.91663.qmail@web8401.mail.in.yahoo.com>
-From: shankar marrapu <hifrom122@yahoo.co.in>
+Subject: Re: [Bluez-users] connection times out with hcitool
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20060102050145.42459.qmail@web8406.mail.in.yahoo.com>
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1669828952-1136352060=:91329"
-Subject: [Bluez-users] how to set the path to LD_LIBRARY_PATH in windows xp.
+In-Reply-To: <29ee90ed0601030512i42aa27dtef1e65a88cc57375@mail.gmail.com>
+References: <29ee90ed0601030512i42aa27dtef1e65a88cc57375@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1136294238.20704.5.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,30 +18,52 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 4 Jan 2006 05:21:00 +0000 (GMT)
+Date: Tue, 03 Jan 2006 14:17:18 +0100
 
---0-1669828952-1136352060=:91329
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Hi,
 
-  Can anyone tell me how to set the path to LD_LIBRARY_PATH in windows xp. 
-  Thanks,
-  uma gowri shankar
+> I have an IISC (Integrated System Solution Corp) USB Bluetooth Dongle.
+> 
+> hciconfig -a output is as below :
+> 
+> hci0:   Type: USB
+>         BD Address: 22:22:22:22:22:22 ACL MTU: 678:8  SCO MTU: 48:10
+>         UP RUNNING PSCAN ISCAN INQUIRY
+>         RX bytes:1185 acl:0 sco:0 events:21 errors:0
+>         TX bytes:75 acl:0 sco:0 commands:21 errors:0
+>         Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy:
+>         Link mode: SLAVE ACCEPT
+>         Name: 'ISSC-BTSPP'
+>         Class: 0x000000
+>         Service Classes: Unspecified
+>         Device Class: Miscellaneous,
+>         HCI Ver: 1.2 (0x2) HCI Rev: 0x1f4 LMP Ver: 1.2 (0x2) LMP Subver: 0x1f4
+>         Manufacturer: Integrated System Solution Corp. (57)
+> 
+> A. I have bluez-utils, bluez-libs, bluez-hcidump, bluez-hciemu, 
+> kbluetoothd installed
+> B.  both daemons (hcid, sdpd) are running.
+> C. Kernel version is 2.6.3
+> 
+> Problem:
+> 
+> When I try to scan for remote devices using hcitool the connection times out .
+> 
+> [neo@neo neo]$ hcitool -i hci0 scan
+> Scanning ...
+> Inquiry failed: Connection timed out
+> 
+> would appreciate any clues or pointers about this.
 
-shankar marrapu <hifrom122@yahoo.co.in> wrote:
-    hi,
-          How can I get libjbluez.so  and jbluez.jar files
-  Send instant messages to your online friends http://in.messenger.yahoo.com 
+use the latest 2.6.15 kernel and everything will be fine.
+
+Regards
+
+Marcel
 
 
-
-Send instant messages to your online friends http://in.messenger.yahoo.com 
---0-1669828952-1136352060=:91329
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-<DIV id=RTEContent>  <div><A name=msg_f9cfd3b44810a527></A>Can anyone tell me how to set the path to <B style="COLOR: black; BACKGROUND-COLOR: #ffff66">LD_LIBRARY_PATH</B> in windows xp. <BR>  <div>Thanks,</div>  <div>uma gowri shankar<BR><BR><B><I>shankar marrapu &lt;hifrom122@yahoo.co.in&gt;</I></B> wrote:</div>  <BLOCKQUOTE class=replbq style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #1010ff 2px solid">  <DIV id=RTEContent>hi,</DIV>  <DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; How can I get libjbluez.so&nbsp; and jbluez.jar files</DIV>  <div>Send instant messages to your online friends http://in.messenger.yahoo.com </div></BLOCKQUOTE><BR></DIV><p>Send instant messages to your online friends http://in.messenger.yahoo.com 
---0-1669828952-1136352060=:91329--
 
 
 -------------------------------------------------------
