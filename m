@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] ms intellimouse/wheel
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <BAY24-F20084DBFE3577D788A970CF82F0@phx.gbl>
+From: "p er" <gupe275@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <BAY24-F20084DBFE3577D788A970CF82F0@phx.gbl>
-References: <BAY24-F20084DBFE3577D788A970CF82F0@phx.gbl>
-Content-Type: text/plain
-Message-Id: <1136420779.6652.30.camel@localhost>
 Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Subject: [Bluez-users] ms intellimouse/wheel
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Jan 2006 01:26:19 +0100
+Date: Thu, 05 Jan 2006 00:14:12 +0100
 
-Hi Per,
+Hi,
 
-> I have a MS Bluetooth IntelliMouse with a wheel.
-> To get the wheel working I have to patch the kernel with the -mh patch.
-> 
-> Will there be one for 2.6.15 as well?
+I have a MS Bluetooth IntelliMouse with a wheel.
+To get the wheel working I have to patch the kernel with the -mh patch.
 
-I need to update the previous one, but I am a little bit short of time
-right now. So it might take some days.
+Will there be one for 2.6.15 as well?
+Will those patches ever be officially merged into the kernel?
 
-> Will those patches ever be officially merged into the kernel?
+Thanks
+Per
 
-No. We need a generic HID subsystem.
-
-Regards
-
-Marcel
-
+_________________________________________________________________
+Express yourself instantly with MSN Messenger! Download today it's FREE! 
+http://messenger.msn.click-url.com/go/onm00200471ave/direct/01/
 
 
 
