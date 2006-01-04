@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Some fun with Apple devices
-From: Bastien Nocera <hadess@hadess.net>
+Subject: Re: [Bluez-devel] How to readout the clock offset between master
+	and slave
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1136374748.13931.17.camel@localhost>
-References: <1136374748.13931.17.camel@localhost>
-Content-Type: text/plain
-Message-Id: <1136375284.3711.29.camel@bnocera.surrey.redhat.com>
+In-Reply-To: <43BBA805.7000501@corscience.de>
+References: <43BBA805.7000501@corscience.de>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1136374855.13931.18.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,22 +19,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 04 Jan 2006 11:48:04 +0000
+Date: Wed, 04 Jan 2006 12:40:55 +0100
 
-On Wed, 2006-01-04 at 12:39 +0100, Marcel Holtmann wrote:
-> 
-> This means that the service on the phones initiates the protocol.
-> Seems
-> like another way to sync Symbian based phones under Linux. Nobody
-> really
-> uses the crappy mRouter stuff.
+Hi Felix,
 
-That looks very much like what gnokii does for Symbian phones, using
-gnapplet, although without the additional Bluetooth service.
+> I=C2=B4m new in programming with BlueZ. I=C2=B4m searching for a soluti=
+on to readout the offset between the master clock and the slaves clock on=
+ every point of time.
+> If this is possible with BlueZ, how it works.=20
 
----
-Bastien Nocera <hadess@hadess.net> 
-I was just a 15-year-old porn star. Big fucking deal. -- Traci Lords
+you get the clock offset from the inquiry responses and you can read it
+from an active connection with HCI_Read_Clock_Offset.
+
+Regards
+
+Marcel
+
 
 
 
