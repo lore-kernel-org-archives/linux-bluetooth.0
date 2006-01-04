@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: BT3C_CS broken in kernel 2.6.14? [Also with
-	2.6.15]
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <loom.20060104T122021-876@post.gmane.org>
-References: <loom.20051107T122754-207@post.gmane.org>
-	 <1131371019.5824.123.camel@blade> <loom.20060104T122021-876@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1136374995.13931.21.camel@localhost>
+From: Antti =?utf-8?b?TcOka2Vsw6Q=?= <zarhan@cs.tut.fi>
+Message-ID: <loom.20060104T122021-876@post.gmane.org>
+References: <loom.20051107T122754-207@post.gmane.org> <1131371019.5824.123.camel@blade>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: =?utf-8?b?QlQzQ19DUw==?= broken in kernel 2.6.14? [Also with 2.6.15]
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,26 +17,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 04 Jan 2006 12:43:15 +0100
+Date: Wed, 4 Jan 2006 11:22:21 +0000 (UTC)
 
-Hi Antti,
+Marcel Holtmann <marcel <at> holtmann.org> writes:
 
-> > remember what the real problem or even the solution was when it came up
-> > on LKML. Try to do some research on LKML by yourself and also check the
-> > latest 2.6.14-git10 kernel.
-> 
->   I tried now with 2.6.15 - Still not fixed. Can you point me to these LKML 
-> postings? I couldn't find then (tried searching with keywords bt3c, bluetooth 
-> and firmware - the latter two were too broad and the first did not give 
-> anything useful.)
+> remember what the real problem or even the solution was when it came up
+> on LKML. Try to do some research on LKML by yourself and also check the
+> latest 2.6.14-git10 kernel.
 
-it must have been something with the atmel_cs and request_firmware(),
-because the atmel_cs and bt3c_cs drivers had the same problem.
+  I tried now with 2.6.15 - Still not fixed. Can you point me to these LKML 
+postings? I couldn't find then (tried searching with keywords bt3c, bluetooth 
+and firmware - the latter two were too broad and the first did not give 
+anything useful.)
 
-Regards
-
-Marcel
-
+  Thanks.
 
 
 
