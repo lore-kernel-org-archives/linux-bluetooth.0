@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Trouble with Logitech BT mini-receiver
+Subject: Re: [Bluez-users] BTA-6030's SCO-mapping
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ronan Mullally <ronan@iol.ie>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.64.0601041542360.10948@office.4L>
-References: <Pine.LNX.4.64.0601041405030.11165@office.4L>
-	 <1136384925.24203.6.camel@localhost>
-	 <Pine.LNX.4.64.0601041542360.10948@office.4L>
-Content-Type: text/plain
-Message-Id: <1136413654.32043.12.camel@localhost>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAAuuMNK+pgjkuJXqgUuHJbswEAAAAA@cnu.ac.kr>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAAuuMNK+pgjkuJXqgUuHJbswEAAAAA@cnu.ac.kr>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1136385120.24203.9.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,19 +19,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 04 Jan 2006 23:27:34 +0100
+Date: Wed, 04 Jan 2006 15:32:00 +0100
 
-Hi Ronan,
+Hi,
 
-> > I only have the previous model and I think they might changed the
-> > switching command. I remember a similar discussion on the mailing list
-> > some time ago. Use VMware and usbmon or USBsnoppy to sniff what commands
-> > they used.
-> 
-> Done that, now what?
+I would be happy if you tell your Outlook to use 7bit ASCII emails
+instead of this crappy HTML junk.
 
-first of all, reply to the mailing list and not to me directly. And
-second you need to send me the results.
+> I bought the bluetooth USB dongle named BTA-6030. I expected to appear
+> the message. The message is=20
+>
+> Build 1500
+> Chip version: BlueCore4-External
+> Max key size: 56 bit
+> SCO mapping:  HCI
+>=20
+> when I type =E2=80=9Chciconfig hci0 revision=E2=80=9D. But, I can=E2=80=
+=99t see it.
+
+type this command as root.
 
 Regards
 
