@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY24-F20084DBFE3577D788A970CF82F0@phx.gbl>
-From: "p er" <gupe275@hotmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Trouble with Logitech BT mini-receiver
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ronan Mullally <ronan@iol.ie>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <Pine.LNX.4.64.0601041542360.10948@office.4L>
+References: <Pine.LNX.4.64.0601041405030.11165@office.4L>
+	 <1136384925.24203.6.camel@localhost>
+	 <Pine.LNX.4.64.0601041542360.10948@office.4L>
+Content-Type: text/plain
+Message-Id: <1136413654.32043.12.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Subject: [Bluez-users] ms intellimouse/wheel
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +21,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Jan 2006 00:14:12 +0100
+Date: Wed, 04 Jan 2006 23:27:34 +0100
 
-Hi,
+Hi Ronan,
 
-I have a MS Bluetooth IntelliMouse with a wheel.
-To get the wheel working I have to patch the kernel with the -mh patch.
+> > I only have the previous model and I think they might changed the
+> > switching command. I remember a similar discussion on the mailing list
+> > some time ago. Use VMware and usbmon or USBsnoppy to sniff what commands
+> > they used.
+> 
+> Done that, now what?
 
-Will there be one for 2.6.15 as well?
-Will those patches ever be officially merged into the kernel?
+first of all, reply to the mailing list and not to me directly. And
+second you need to send me the results.
 
-Thanks
-Per
+Regards
 
-_________________________________________________________________
-Express yourself instantly with MSN Messenger! Download today it's FREE! 
-http://messenger.msn.click-url.com/go/onm00200471ave/direct/01/
+Marcel
+
 
 
 
