@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: BTA-6030's SCO-mapping
+Subject: Re: [Bluez-users] Trouble with Logitech BT mini-receiver
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAA+8VrSRm/yUaildWjcTzu8gEAAAAA@cnu.ac.kr>
-References: 
-	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAA+8VrSRm/yUaildWjcTzu8gEAAAAA@cnu.ac.kr>
+In-Reply-To: <Pine.LNX.4.64.0601050125310.10948@office.4L>
+References: <Pine.LNX.4.64.0601041405030.11165@office.4L>
+	 <1136384925.24203.6.camel@localhost>
+	 <Pine.LNX.4.64.0601041542360.10948@office.4L>
+	 <1136413654.32043.12.camel@localhost>
+	 <Pine.LNX.4.64.0601050125310.10948@office.4L>
 Content-Type: text/plain
-Message-Id: <1136425729.6652.51.camel@localhost>
+Message-Id: <1136425593.6652.46.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,30 +22,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Jan 2006 02:48:49 +0100
+Date: Thu, 05 Jan 2006 02:46:33 +0100
 
-Hi,
+Hi Ronan,
 
-> I always do my job as root...
+> > > Done that, now what?
+> >
+> > first of all, reply to the mailing list and not to me directly. And
+> > second you need to send me the results.
 > 
-> I want to see "SCO mapping : HCI".
-> 
-> What do I do??
+> I figured the majority of the list would rather not see a 4 word
+> response...
 
-what does "hciconfig -a" say?
+this doesn't matter. This has been started on the mailing list and so
+keep it on the mailing list.
 
-> I modified my outlook's option...
-> 
-> But, I'm not sure that it is correct...T.T...
-> 
-> There isn't the '7-bit ASCII option'.
-> 
-> I didn't find that.
-> 
-> I hope this mail be made as '7-bit ASCII'...
+> Results are at http://www.4l.ie/usbsnoop.log.bz2
 
-It is way better and it is a plain ASCII email, but still some weird
-extra empty lines exists.
+Looks like you picked the wrong device. You need to use one of the HID
+devices and not the final Bluetooth device.
 
 Regards
 
