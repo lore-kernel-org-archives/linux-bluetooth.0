@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43BD536E.4070902@pagestation.com>
-From: Jerry Geis <geisj@pagestation.com>
+Message-ID: <43BD20A1.6020505@fastmail.fm>
+From: Niv <nivw2002@fastmail.fm>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: multipart/alternative;
- boundary="------------060504070805030809000802"
-Subject: [Bluez-users] btsco 0.4 and choke me.
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: [Bluez-users] logitech freedom mobile and Billionton USB dongle V.11 work
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,57 +16,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Jan 2006 12:12:14 -0500
+Date: Thu, 05 Jan 2006 15:35:29 +0200
 
-This is a multi-part message in MIME format.
---------------060504070805030809000802
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
+emm....
 
-I download btsco.0.4 and attempted to install on centos 4.2.
-I get an error on configure about failed program.
+IT WORKS!
 
-#ifndef __cplusplus
- choke me
-#endif
+sorry, but I put some effort in to see this happen. I finely can hear 
+mp3 in the BT headphone. Thanks A LOT hothead for starting this thread , 
+and Kalin for upgrading the bug.
 
-What do I do about that?
+I think I now need to report that a logitech freedom mobile and 
+Billionton USB dongle V.11 work!
 
-THanks,
+I had to use the same pin at /etc/bluetooth/pin , as my headset, but I 
+think I know how to solve it.
 
-Jerry
+Now , I just recived the BT-mini-hs from the geeks yesterday 
+http://www.geeks.com/details.asp?invtid=BT-MINI-HS
 
+it can talk to the cellular like a regulat BT headset , as well as use 
+the audio gateway profile, so I may use it for VoIP , aka. Skype
 
---------------060504070805030809000802
-Content-Type: text/html; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+But It also does high quality audio!
+I tested it on windows, and the resault is quite impressive, for a 28$ 
+headset.
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
-  <title></title>
-</head>
-<body bgcolor="#ffffff" text="#000000">
-<font size="+1">I download btsco.0.4 and attempted to install on centos
-4.2.<br>
-I get an error on configure about failed program.<br>
-<br>
-#ifndef __cplusplus<br>
-&nbsp;choke me<br>
-#endif<br>
-<br>
-What do I do about that?<br>
-<br>
-THanks,<br>
-<br>
-Jerry<br>
-<br>
-</font>
-</body>
-</html>
+thanks again ppl,
+Niv
 
---------------060504070805030809000802--
 
 
 -------------------------------------------------------
