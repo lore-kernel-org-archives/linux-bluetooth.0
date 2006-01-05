@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] btsco 0.4 and choke me.
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43BD6E9C.9040002@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43BD6E9C.9040002@xmission.com>
+Subject: Re: [Bluez-users] btsco 0.4 and choke me.
 References: <43BD536E.4070902@pagestation.com>
-	 <43BD6E9C.9040002@xmission.com>
-Content-Type: text/plain
-Message-Id: <1136488768.29496.0.camel@localhost>
-Mime-Version: 1.0
+In-Reply-To: <43BD536E.4070902@pagestation.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,25 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Jan 2006 20:19:28 +0100
+Date: Thu, 05 Jan 2006 12:08:12 -0700
 
-Hi Brad,
+Jerry
 
-> The "choke me" stuff is a delightful easter egg in autoconf.
+The "choke me" stuff is a delightful easter egg in autoconf.
+
+It might be complaining that your c compiler can't also do c++. It's too
+bad since we don't even have any c++ in our project. I'm not familiar
+enough with autoconf to be sure.
+
+Brad
+
+> I download btsco.0.4 and attempted to install on centos 4.2.
+> I get an error on configure about failed program.
 > 
-> It might be complaining that your c compiler can't also do c++. It's too
-> bad since we don't even have any c++ in our project. I'm not familiar
-> enough with autoconf to be sure.
-
-add the following before the check for AC_PROG_LIBTOOL:
-
-m4_define([_LT_AC_TAGCONFIG], [])
-m4_ifdef([AC_LIBTOOL_TAGS], [AC_LIBTOOL_TAGS([])])
-
-Regards
-
-Marcel
-
+> #ifndef __cplusplus
+>  choke me
+> #endif
+> 
+> What do I do about that?
+> 
+> THanks,
+> 
+> Jerry
+> 
 
 
 
