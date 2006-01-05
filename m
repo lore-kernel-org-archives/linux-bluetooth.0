@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Ronan Mullally <ronan@iol.ie>
+Subject: Re: [Bluez-users] ms intellimouse/wheel
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Trouble with Logitech BT mini-receiver
-In-Reply-To: <1136413654.32043.12.camel@localhost>
-Message-ID: <Pine.LNX.4.64.0601050125310.10948@office.4L>
-References: <Pine.LNX.4.64.0601041405030.11165@office.4L>
- <1136384925.24203.6.camel@localhost>  <Pine.LNX.4.64.0601041542360.10948@office.4L>
- <1136413654.32043.12.camel@localhost>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <BAY24-F20084DBFE3577D788A970CF82F0@phx.gbl>
+References: <BAY24-F20084DBFE3577D788A970CF82F0@phx.gbl>
+Content-Type: text/plain
+Message-Id: <1136420779.6652.30.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,22 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 5 Jan 2006 01:28:23 +0000 (GMT)
+Date: Thu, 05 Jan 2006 01:26:19 +0100
 
-On Wed, 4 Jan 2006, Marcel Holtmann wrote:
+Hi Per,
 
-> > Done that, now what?
->
-> first of all, reply to the mailing list and not to me directly. And
-> second you need to send me the results.
+> I have a MS Bluetooth IntelliMouse with a wheel.
+> To get the wheel working I have to patch the kernel with the -mh patch.
+> 
+> Will there be one for 2.6.15 as well?
 
-I figured the majority of the list would rather not see a 4 word
-response...
+I need to update the previous one, but I am a little bit short of time
+right now. So it might take some days.
 
-Results are at http://www.4l.ie/usbsnoop.log.bz2
+> Will those patches ever be officially merged into the kernel?
+
+No. We need a generic HID subsystem.
+
+Regards
+
+Marcel
 
 
--Ronan
 
 
 -------------------------------------------------------
