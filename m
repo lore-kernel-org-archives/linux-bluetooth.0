@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43BC81A6.3040800@pagestation.com>
-From: Jerry Geis <geisj@pagestation.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Re: BTA-6030's SCO-mapping
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: multipart/alternative;
- boundary="------------050909090404010203090102"
-Subject: [Bluez-users] not getting audio
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAA+8VrSRm/yUaildWjcTzu8gEAAAAA@cnu.ac.kr>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAA+8VrSRm/yUaildWjcTzu8gEAAAAA@cnu.ac.kr>
+Content-Type: text/plain
+Message-Id: <1136425729.6652.51.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,85 +19,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 04 Jan 2006 21:17:10 -0500
+Date: Thu, 05 Jan 2006 02:48:49 +0100
 
-This is a multi-part message in MIME format.
---------------050909090404010203090102
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi,
 
-all,
+> I always do my job as root...
+> 
+> I want to see "SCO mapping : HCI".
+> 
+> What do I do??
 
-I am using a kensington bluetooth adapter 2.0, with a plantronics 510 
-headset.
-I am using centos 4.2, asterisk 1.2.1 and chan_bluetooth. All that is 
-installed
-and I can place a call to my bluetooth headset. I hear the ring in my 
-ear I see
-the ring on the asterisk console. When I answer I hear NO audio.
+what does "hciconfig -a" say?
 
-The console gives errors "chan_bluetooth/chan_bluetooth.c:685 sco_thread 
-wrote <48 to sco".
+> I modified my outlook's option...
+> 
+> But, I'm not sure that it is correct...T.T...
+> 
+> There isn't the '7-bit ASCII option'.
+> 
+> I didn't find that.
+> 
+> I hope this mail be made as '7-bit ASCII'...
 
-I dont seem to have the hciconfig to run hciconfig -a.
+It is way better and it is a plain ASCII email, but still some weird
+extra empty lines exists.
 
-I am wondering what else I can give you so I might be able to get audio or
-is there something I just plane missed?
+Regards
 
-I can ping with l2ping my headset.
-
-Thanks,
-
-Jerry
+Marcel
 
 
-
-
-
---------------050909090404010203090102
-Content-Type: text/html; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
-  <title></title>
-</head>
-<body bgcolor="#ffffff" text="#000000">
-<font size="+1">all,<br>
-<br>
-I am using a kensington bluetooth adapter 2.0, with a plantronics 510
-headset.<br>
-I am using centos 4.2, asterisk 1.2.1 and chan_bluetooth. All that is
-installed<br>
-and I can place a call to my bluetooth headset. I hear the ring in my
-ear I see<br>
-the ring on the asterisk console. When I answer I hear NO audio.<br>
-<br>
-The console gives errors "chan_bluetooth/chan_bluetooth.c:685
-sco_thread wrote &lt;48 to sco".<br>
-<br>
-I dont seem to have the hciconfig to run hciconfig -a.<br>
-<br>
-I am wondering what else I can give you so I might be able to get audio
-or <br>
-is there something I just plane missed?<br>
-<br>
-I can ping with l2ping my headset.<br>
-<br>
-Thanks,<br>
-<br>
-Jerry<br>
-<br>
-<br>
-<br>
-<br>
-</font>
-</body>
-</html>
-
---------------050909090404010203090102--
 
 
 -------------------------------------------------------
