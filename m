@@ -1,16 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Trouble with Logitech BT mini-receiver
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.64.0601050125310.10948@office.4L>
-References: <Pine.LNX.4.64.0601041405030.11165@office.4L>
-	 <1136384925.24203.6.camel@localhost>
-	 <Pine.LNX.4.64.0601041542360.10948@office.4L>
-	 <1136413654.32043.12.camel@localhost>
-	 <Pine.LNX.4.64.0601050125310.10948@office.4L>
-Content-Type: text/plain
-Message-Id: <1136425593.6652.46.camel@localhost>
-Mime-Version: 1.0
+From: =?ks_c_5601-1987?B?x9HA58Hf?= <pdjj14@cnu.ac.kr>
+To: <bluez-users@lists.sourceforge.net>
+Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAA+8VrSRm/yUaildWjcTzu8gEAAAAA@cnu.ac.kr>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="ks_c_5601-1987"
+Subject: [Bluez-users] Re: BTA-6030's SCO-mapping
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,30 +17,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Jan 2006 02:46:33 +0100
+Date: Thu, 5 Jan 2006 10:09:55 +0900
 
-Hi Ronan,
 
-> > > Done that, now what?
-> >
-> > first of all, reply to the mailing list and not to me directly. And
-> > second you need to send me the results.
-> 
-> I figured the majority of the list would rather not see a 4 word
-> response...
+Well..
 
-this doesn't matter. This has been started on the mailing list and so
-keep it on the mailing list.
+I always do my job as root...
 
-> Results are at http://www.4l.ie/usbsnoop.log.bz2
+I want to see "SCO mapping : HCI".
 
-Looks like you picked the wrong device. You need to use one of the HID
-devices and not the final Bluetooth device.
+What do I do??
 
-Regards
 
-Marcel
 
+I modified my outlook's option...
+
+But, I'm not sure that it is correct...T.T...
+
+There isn't the '7-bit ASCII option'.
+
+I didn't find that.
+
+I hope this mail be made as '7-bit ASCII'...
 
 
 
