@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "pdjj14" <pdjj14@gmail.com>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAAOM1JOHBst0q7ZTbxEE486QEAAAAA@gmail.com>
+Message-ID: <20060105105234.25444.qmail@web53101.mail.yahoo.com>
+From: ermal mino <ermalmino1004@yahoo.it>
+Subject: Re: [Bluez-devel] inquiry frequency
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <66dc03c80601041139r7a44eb49w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="ks_c_5601-1987"
-In-Reply-To: <20060106055011.0AA19F94F@sc8-sf-spam2.sourceforge.net>
-Subject: [Bluez-devel] linux 2.4.20 & alsa 0.9.6
+Content-Type: multipart/alternative; boundary="0-698473558-1136458354=:21393"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,64 +17,65 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 6 Jan 2006 14:59:31 +0900
+Date: Thu, 5 Jan 2006 11:52:34 +0100 (CET)
 
-Hi~
- Thank you for your kindness. ^^
- I want to listen the music which be played at PC as BT headset.
- My environment is Redhat 9.0 + kernel 2.4.20-8 + bluez-utils-2.10 + bluez-
-libs-2.10 + bluez-hcidump-1.10 + alsa-dirver-0.9.6 + alsa-lib-0.9.6 +
-bluezsco-0.1.
+--0-698473558-1136458354=:21393
+Content-Type: text/plain; charset=iso-8859-1
 
- I want to play the music with alsa.
- When I installed the alsa, I referenced web page
-(http://www.dcs.gla.ac.uk/~jp/snd-bluez-sco/README)
- But, when I type 'bluezsco', I see the error message.
-	[root@wooki bluezsco-0.1]# ./bluezsco
-	Error: control open (hw:0): No such file or directory
-	Error: Can't find device. Bail
- Device hci0 is enable state.
- I always work as root.
- Necessary modules(rfcomm, sco, l2cap...) already loaded.
- I want to know if I miss somethings.
- I want to know method to succeed.
+Thank you Cesar,
+  it worked fine.
+  Regards.
 
- Another question is about hciconfig.
- When I type hciconfig -a, I see the message.
-	[root@wooki alsa-lib-0.9.6]# hciconfig -a
-	hci0:   Type: USB
-        BD Address: 00:0B:24:01:23:B3 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:3547 acl:49 sco:0 events:173 errors:0
-        TX bytes:2141 acl:101 sco:0 commands:46 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ (0)'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x33c LMP Ver: 1.1 (0x1) LMP Subver:
-0x33c
-        Manufacturer: Cambridge Silicon Radio (10)  When I type hciconfig
-hci0 revision, I see the message.
-	[root@wooki sco]# hciconfig hci0 revision
-	hci0:   Type: USB
-        BD Address: 00:0B:24:01:23:B3 ACL MTU: 192:8  SCO MTU: 64:8
-        HCI 16.14
-        Max key size: 16 bit
- The other's result different from mine.
- I want to see more informations as 'Chip version', 'SCO mapping'.
- My dongle is based on 'Cambridge Silicon Radio'.
- What do I do more to see more informations?
+Cezar Sá Espinola <cezarsa@gmail.com> ha scritto: 
+  Hi Ermal.
+Try to use the flag IREQ_CACHE_FLUSH with hci_inquiry().
 
- I can't change my environment as kernel version up.
- Because, at final, I will load the program to the target board.
- The target board's environment already be promised by co-workers.
- 
- Thank you...I will wait for your response. ^^
+regards,
+-
+Cezar
 
+2006/1/4, ermal mino :
+> Hi,
+>
+> I made a program wich searches for bluettooth devices continuously.
+> I saw that until about 20-30 seconds from the first inquiry the results
+> that were given to me were the same as the first one.
+>
+> I don't know if i explained it well, in a few words it makes a real inquiry
+> every 20-30 seconds.
+> How can i fix this or at least to make this delay smaller?
+>
+> regards,
+> Ermal Mino.
+>
+> ________________________________
+> Yahoo! Messenger: chiamate gratuite in tutto il mondo
+>
+>
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems? Stop! Download the new AJAX search engine that makes
+searching your log files as easy as surfing the web. DOWNLOAD SPLUNK!
+http://ads.osdn.com/?ad_idv37&alloc_id865&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+  
+
+
+		
+---------------------------------
+Yahoo! Mail: gratis 1GB per i messaggi, antispam, antivirus, POP3
+--0-698473558-1136458354=:21393
+Content-Type: text/html; charset=iso-8859-1
+
+<DIV>Thank you Cesar,</DIV>  <DIV>it worked fine.</DIV>  <DIV>Regards.<BR><BR><B><I>Cezar Sá Espinola &lt;cezarsa@gmail.com&gt;</I></B> ha scritto: </DIV>  <BLOCKQUOTE class=replbq style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #1010ff 2px solid">Hi Ermal.<BR>Try to use the flag IREQ_CACHE_FLUSH with hci_inquiry().<BR><BR>regards,<BR>-<BR>Cezar<BR><BR>2006/1/4, ermal mino <ERMALMINO1004@YAHOO.IT>:<BR>&gt; Hi,<BR>&gt;<BR>&gt; I made a program wich searches for bluettooth devices continuously.<BR>&gt; I saw that until about 20-30 seconds from the first inquiry the results<BR>&gt; that were given to me were the same as the first one.<BR>&gt;<BR>&gt; I don't know if i explained it well, in a few words it makes a real inquiry<BR>&gt; every 20-30 seconds.<BR>&gt; How can i fix this or at least to make this delay smaller?<BR>&gt;<BR>&gt; regards,<BR>&gt; Ermal Mino.<BR>&gt;<BR>&gt; ________________________________<BR>&gt; Yahoo! Messenger: chiamate gratuite in tutto il
+ mondo<BR>&gt;<BR>&gt;<BR><BR><BR>-------------------------------------------------------<BR>This SF.net email is sponsored by: Splunk Inc. Do you grep through log files<BR>for problems? Stop! Download the new AJAX search engine that makes<BR>searching your log files as easy as surfing the web. DOWNLOAD SPLUNK!<BR>http://ads.osdn.com/?ad_idv37&amp;alloc_id865&amp;op=click<BR>_______________________________________________<BR>Bluez-devel mailing list<BR>Bluez-devel@lists.sourceforge.net<BR>https://lists.sourceforge.net/lists/listinfo/bluez-devel<BR></BLOCKQUOTE>  <DIV><BR></DIV><p>
+		<hr size=1><font face="Arial" size="2"><a href="http://us.rd.yahoo.com/mail_it/taglines/*http://it.mail.yahoo.com"><b>Yahoo! Mail</b></a>: gratis 1GB per i messaggi, antispam, antivirus, POP3</font>
+--0-698473558-1136458354=:21393--
 
 
 -------------------------------------------------------
