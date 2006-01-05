@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43BD20A1.6020505@fastmail.fm>
-From: Niv <nivw2002@fastmail.fm>
+From: =?ks_c_5601-1987?B?x9HA58Hf?= <pdjj14@cnu.ac.kr>
+To: <bluez-users@lists.sourceforge.net>
+Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAAaFACs3GVjkKtATByYOMfAgEAAAAA@cnu.ac.kr>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Subject: [Bluez-users] logitech freedom mobile and Billionton USB dongle V.11 work
+Content-Type: text/plain;
+	charset="ks_c_5601-1987"
+Subject: [Bluez-users] linux 2.4.20 & alsa 0.9.6
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,34 +17,46 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Jan 2006 15:35:29 +0200
+Date: Thu, 5 Jan 2006 22:18:40 +0900
 
-emm....
 
-IT WORKS!
+ Hi~
+ Thank you for your kindness. ^^
+ I want to listen the music which be played at PC as BT headset.
+ My environment is Redhat 9.0 + kernel 2.4.20-8 + bluez-utils-2.10 + bluez-
+libs-2.10 + bluez-hcidump-1.10 + alsa-dirver-0.9.6 + alsa-lib-0.9.6 +
+bluezsco-0.1.
 
-sorry, but I put some effort in to see this happen. I finely can hear 
-mp3 in the BT headphone. Thanks A LOT hothead for starting this thread , 
-and Kalin for upgrading the bug.
+ I want to play the music with alsa.
+ When I installed the alsa, I referenced web page
+(http://www.dcs.gla.ac.uk/~jp/snd-bluez-sco/README)
+ But, when I type 'bluezsco', I see the error message.
+	[root@wooki bluezsco-0.1]# ./bluezsco
+	Error: control open (hw:0): No such file or directory
+	Error: Can't find device. Bail
+ Device hci0 is enable state.
+ I always work as root.
+ Necessary modules(rfcomm, sco, l2cap...) already loaded.
+ I want to know if I miss somethings.
+ I want to know method to succeed.
 
-I think I now need to report that a logitech freedom mobile and 
-Billionton USB dongle V.11 work!
+ Another question is about hciconfig.
+ When I type hciconfig hci0 revision, I see the message.
+	[root@wooki sco]# hciconfig hci0 revision
+	hci0:   Type: USB
+        BD Address: 00:0B:24:01:23:B3 ACL MTU: 192:8  SCO MTU: 64:8
+        HCI 16.14
+        Max key size: 16 bit
+ The other's result different mine.
+ I want to see more informations as 'Chip version', 'SCO mapping'.
+ My dongle is based on 'Cambridge Silicon Radio'.
+ What do I do more to see more informations?
 
-I had to use the same pin at /etc/bluetooth/pin , as my headset, but I 
-think I know how to solve it.
-
-Now , I just recived the BT-mini-hs from the geeks yesterday 
-http://www.geeks.com/details.asp?invtid=BT-MINI-HS
-
-it can talk to the cellular like a regulat BT headset , as well as use 
-the audio gateway profile, so I may use it for VoIP , aka. Skype
-
-But It also does high quality audio!
-I tested it on windows, and the resault is quite impressive, for a 28$ 
-headset.
-
-thanks again ppl,
-Niv
+ I can't change my environment as kernel version up.
+ Because, at final, I will load the program to the target board.
+ The target board's environment already be promised by co-workers.
+ 
+ Thank you...I will wait for your response. ^^
 
 
 
