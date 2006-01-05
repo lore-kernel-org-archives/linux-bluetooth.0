@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <cd7313c40601041841w42246153y829d84af5e1df81b@mail.gmail.com>
-From: Alexandre Coser <coser10@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <43BC81A6.3040800@pagestation.com>
+From: Jerry Geis <geisj@pagestation.com>
 MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
 Content-Type: multipart/alternative;
-	boundary="----=_Part_41164_17833612.1136428900841"
-Subject: [Bluez-users] Send_File
+ boundary="------------050909090404010203090102"
+Subject: [Bluez-users] not getting audio
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,44 +17,85 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 5 Jan 2006 00:41:40 -0200
+Date: Wed, 04 Jan 2006 21:17:10 -0500
 
-------=_Part_41164_17833612.1136428900841
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+This is a multi-part message in MIME format.
+--------------050909090404010203090102
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 
- Hi All,
-    Maybe this is a stupid question, but I`m new in Bluetooth so... Anyone
-can tell me if it is possible to use Hcitool command to send a file from a
-computer to another,  connecetd by bluetooth and working under linux ? What
-is the simpleminded way to send a file between to computers using bluetooth
-command ?
+all,
 
---
-Sds,
- Alexandre
+I am using a kensington bluetooth adapter 2.0, with a plantronics 510 
+headset.
+I am using centos 4.2, asterisk 1.2.1 and chan_bluetooth. All that is 
+installed
+and I can place a call to my bluetooth headset. I hear the ring in my 
+ear I see
+the ring on the asterisk console. When I answer I hear NO audio.
 
-------=_Part_41164_17833612.1136428900841
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+The console gives errors "chan_bluetooth/chan_bluetooth.c:685 sco_thread 
+wrote <48 to sco".
 
-<br clear=3D"all"><br>
-&nbsp;Hi All,<br>
-&nbsp;&nbsp;&nbsp; Maybe this is a stupid question, but I`m new in
-Bluetooth so... Anyone can tell me if it is possible to use Hcitool
-command to send a file from a computer to another,&nbsp; connecetd by
-bluetooth and working under linux ? What is the <span class=3D"headword">si=
-mpleminded</span> way to send a
-file between to computers using bluetooth command ?<br>
+I dont seem to have the hciconfig to run hciconfig -a.
+
+I am wondering what else I can give you so I might be able to get audio or
+is there something I just plane missed?
+
+I can ping with l2ping my headset.
+
+Thanks,
+
+Jerry
+
+
+
+
+
+--------------050909090404010203090102
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title></title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<font size="+1">all,<br>
 <br>
---<br>
-Sds,<br>
-&nbsp;Alexandre<br>
+I am using a kensington bluetooth adapter 2.0, with a plantronics 510
+headset.<br>
+I am using centos 4.2, asterisk 1.2.1 and chan_bluetooth. All that is
+installed<br>
+and I can place a call to my bluetooth headset. I hear the ring in my
+ear I see<br>
+the ring on the asterisk console. When I answer I hear NO audio.<br>
+<br>
+The console gives errors "chan_bluetooth/chan_bluetooth.c:685
+sco_thread wrote &lt;48 to sco".<br>
+<br>
+I dont seem to have the hciconfig to run hciconfig -a.<br>
+<br>
+I am wondering what else I can give you so I might be able to get audio
+or <br>
+is there something I just plane missed?<br>
+<br>
+I can ping with l2ping my headset.<br>
+<br>
+Thanks,<br>
+<br>
+Jerry<br>
+<br>
+<br>
+<br>
+<br>
+</font>
+</body>
+</html>
 
-
-------=_Part_41164_17833612.1136428900841--
+--------------050909090404010203090102--
 
 
 -------------------------------------------------------
