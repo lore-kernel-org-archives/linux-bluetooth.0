@@ -1,15 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Ronan Mullally <ronan@iol.ie>
+Message-ID: <cd7313c40601041841w42246153y829d84af5e1df81b@mail.gmail.com>
+From: Alexandre Coser <coser10@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Trouble with Logitech BT mini-receiver
-In-Reply-To: <1136425593.6652.46.camel@localhost>
-Message-ID: <Pine.LNX.4.64.0601051121350.11219@office.4L>
-References: <Pine.LNX.4.64.0601041405030.11165@office.4L>
- <1136384925.24203.6.camel@localhost>  <Pine.LNX.4.64.0601041542360.10948@office.4L>
-  <1136413654.32043.12.camel@localhost>  <Pine.LNX.4.64.0601050125310.10948@office.4L>
- <1136425593.6652.46.camel@localhost>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: multipart/alternative;
+	boundary="----=_Part_41164_17833612.1136428900841"
+Subject: [Bluez-users] Send_File
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,19 +17,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 5 Jan 2006 11:22:12 +0000 (GMT)
+Date: Thu, 5 Jan 2006 00:41:40 -0200
 
-On Thu, 5 Jan 2006, Marcel Holtmann wrote:
+------=_Part_41164_17833612.1136428900841
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> > Results are at http://www.4l.ie/usbsnoop.log.bz2
->
-> Looks like you picked the wrong device. You need to use one of the HID
-> devices and not the final Bluetooth device.
+ Hi All,
+    Maybe this is a stupid question, but I`m new in Bluetooth so... Anyone
+can tell me if it is possible to use Hcitool command to send a file from a
+computer to another,  connecetd by bluetooth and working under linux ? What
+is the simpleminded way to send a file between to computers using bluetooth
+command ?
 
-Okay, I've re-run it on what should be the keyboard.  Same URL.
+--
+Sds,
+ Alexandre
+
+------=_Part_41164_17833612.1136428900841
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+<br clear=3D"all"><br>
+&nbsp;Hi All,<br>
+&nbsp;&nbsp;&nbsp; Maybe this is a stupid question, but I`m new in
+Bluetooth so... Anyone can tell me if it is possible to use Hcitool
+command to send a file from a computer to another,&nbsp; connecetd by
+bluetooth and working under linux ? What is the <span class=3D"headword">si=
+mpleminded</span> way to send a
+file between to computers using bluetooth command ?<br>
+<br>
+--<br>
+Sds,<br>
+&nbsp;Alexandre<br>
 
 
--Ronan
+------=_Part_41164_17833612.1136428900841--
 
 
 -------------------------------------------------------
