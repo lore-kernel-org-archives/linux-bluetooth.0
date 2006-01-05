@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43BD6E9C.9040002@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <43BD536E.4070902@pagestation.com>
+From: Jerry Geis <geisj@pagestation.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] btsco 0.4 and choke me.
-References: <43BD536E.4070902@pagestation.com>
-In-Reply-To: <43BD536E.4070902@pagestation.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/alternative;
+ boundary="------------060504070805030809000802"
+Subject: [Bluez-users] btsco 0.4 and choke me.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,32 +17,57 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Jan 2006 12:08:12 -0700
+Date: Thu, 05 Jan 2006 12:12:14 -0500
+
+This is a multi-part message in MIME format.
+--------------060504070805030809000802
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
+
+I download btsco.0.4 and attempted to install on centos 4.2.
+I get an error on configure about failed program.
+
+#ifndef __cplusplus
+ choke me
+#endif
+
+What do I do about that?
+
+THanks,
 
 Jerry
 
-The "choke me" stuff is a delightful easter egg in autoconf.
 
-It might be complaining that your c compiler can't also do c++. It's too
-bad since we don't even have any c++ in our project. I'm not familiar
-enough with autoconf to be sure.
+--------------060504070805030809000802
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-Brad
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title></title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<font size="+1">I download btsco.0.4 and attempted to install on centos
+4.2.<br>
+I get an error on configure about failed program.<br>
+<br>
+#ifndef __cplusplus<br>
+&nbsp;choke me<br>
+#endif<br>
+<br>
+What do I do about that?<br>
+<br>
+THanks,<br>
+<br>
+Jerry<br>
+<br>
+</font>
+</body>
+</html>
 
-> I download btsco.0.4 and attempted to install on centos 4.2.
-> I get an error on configure about failed program.
-> 
-> #ifndef __cplusplus
->  choke me
-> #endif
-> 
-> What do I do about that?
-> 
-> THanks,
-> 
-> Jerry
-> 
-
+--------------060504070805030809000802--
 
 
 -------------------------------------------------------
