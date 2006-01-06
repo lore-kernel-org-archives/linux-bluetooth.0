@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth emulation
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <478d26d00601060519v1ac0f373h@mail.gmail.com>
+From: Toni Fiz <toni.fiz@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <478d26d00601060519v1ac0f373h@mail.gmail.com>
-References: <478d26d00601060519v1ac0f373h@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1136554019.4867.4.camel@localhost>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_71727_10208980.1136553568240"
+Subject: [Bluez-users] Bluetooth emulation
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,32 +17,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 06 Jan 2006 14:26:59 +0100
+Date: Fri, 6 Jan 2006 14:19:28 +0100
 
-Hi Toni,
+------=_Part_71727_10208980.1136553568240
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> Would it be possible to emulate a bluetooth device?
+My question is:
+Would it be possible to emulate a bluetooth device?
+I think it seems to have no sense to emulate a bluetooth device i mean the
+usb adapter.
+But I think in many nokia phones would be useful to transfer deta through
+the data cable (DKU-2 in example)
+I've installed the drivers to transfer data through a cable, and it install=
+s
+obex-file transfer, and meny other obex protocols to tansfer through cable.
+I thin we could access to the phone in the same way as bluetooth, but
+faster...
 
-you can use the virtual HCI of Bluetooth for it.
+Thanks four your attention
 
-> I think it seems to have no sense to emulate a bluetooth device i mean
-> the usb adapter.
-> But I think in many nokia phones would be useful to transfer deta
-> through the data cable (DKU-2 in example) 
-> I've installed the drivers to transfer data through a cable, and it
-> installs obex-file transfer, and meny other obex protocols to tansfer
-> through cable.
-> I thin we could access to the phone in the same way as bluetooth, but
-> faster... 
+Greets from Spain
 
-Not everything is about speed, but if you wanna do it, you have to write
-it by yourself.
+------=_Part_71727_10208980.1136553568240
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Regards
+My question is:<br>Would it be possible to emulate a bluetooth device?<br>I=
+ think it seems to have no sense to emulate a bluetooth device i mean the u=
+sb adapter.<br>But I think in many nokia phones would be useful to transfer=
+ deta through the data cable (DKU-2 in example)
+<br>I've installed the drivers to transfer data through a cable, and it ins=
+talls obex-file transfer, and meny other obex protocols to tansfer through =
+cable.<br>I thin we could access to the phone in the same way as bluetooth,=
+ but faster...
+<br><br>Thanks four your attention<br><br>Greets from Spain<br>
 
-Marcel
-
-
+------=_Part_71727_10208980.1136553568240--
 
 
 -------------------------------------------------------
