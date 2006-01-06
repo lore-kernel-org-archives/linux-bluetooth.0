@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] open obex multisession
-From: "Collin R. Mulliner" <collin@betaversion.net>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20060106143636.31846.qmail@web53110.mail.yahoo.com>
-References: <20060106143636.31846.qmail@web53110.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1136558831.31793.17.camel@panic>
-Mime-Version: 1.0
+From: "pdjj14" <pdjj14@gmail.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] linux 2.4.20 & alsa 0.9.6
+Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAADKpAtBuY3EiXO2W2Etn2/QEAAAAA@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="ks_c_5601-1987"
+In-Reply-To: <43BE0A84.4040007@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,55 +18,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 06 Jan 2006 15:47:11 +0100
+Date: Fri, 6 Jan 2006 15:42:14 +0900
 
-Hi,
+ Thank you Brad...
+ I have a question...
+ To communication between PC and Headset using the bluez, I don't work in
+my environment?
+ I can change bluez-utils' version, but, I can't change kernel version.
+ Are there other methods?
 
-> I tried to send a file to two cellphones at the same time using
-> ussp-push.
-long time ago since I used ussp-push, try some other tool like btobex or
-obexftp
+-----Original Message-----
+From: bluez-devel-admin@lists.sourceforge.net [mailto:bluez-devel-
+admin@lists.sourceforge.net] On Behalf Of Brad Midgley
+Sent: Friday, January 06, 2006 3:13 PM
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] linux 2.4.20 & alsa 0.9.6
 
-> I excecuted it in two different consoles. By this time the conections
-> freeze and i can't disconnect them anynmore, even using "hcitool dc".
-> The only way to disconnect is restart the pc or disconnect the usb
-> dongle.
-mmh did you get a kernel ups?
+pdjj14
 
-> It gives me the same problem when using two dongles at the same time.
-the second dongle musst be used explecite otherwise only the first
-dongle is used (right Marcel?)
+>  Thank you for your kindness. ^^
+>  I want to listen the music which be played at PC as BT headset.
+>  My environment is Redhat 9.0 + kernel 2.4.20-8 + bluez-utils-2.10 +
+bluez-
+> libs-2.10 + bluez-hcidump-1.10 + alsa-dirver-0.9.6 + alsa-lib-0.9.6 +
+> bluezsco-0.1.
 
-> I saw that in the ussp-push code it binds the local socket in 0
-> channel.
-> I modified it and tried with diffrent channels for each connection but
-> still nothing changed.
-there is not local channel on outgoing connections
+bluezsco has been unsupported for a long time. use btsco. Kernel 2.4.x
+is really tough to get workig with bluetooth audio. If you could use a
+current 2.6.x you will have better luck.
 
-> Is it possible what i am trying to do ?
-yes
+hciconfig is also old. i think that's why it doesn't report the sco mapping.
 
-> Acording to bluetooth specification i can make 7 connections
-> simultaneously being the master. I controled the connections and i was
-> the master.
-are you sure? maybe on of the devices tryed a role switch
- 
-> is it bluez or open obex responsible for this error?
-I guess you/ussp-push are/is the problem
+brad
 
-> what can i do to fi x it and send files to more than one phone at the
-> same time?
 
-run hcidump and see what happens on the lower layers when you send the
-files.
-
-... Collin
-
---
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-Commander, there is no careful way to question a Klingon. --Odo
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 
