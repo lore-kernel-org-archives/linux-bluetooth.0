@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth settings in debian
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20060106063533.35352.qmail@web60612.mail.yahoo.com>
-References: <20060106063533.35352.qmail@web60612.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1136540911.7429.3.camel@localhost>
-Mime-Version: 1.0
+Message-ID: <20060106063533.35352.qmail@web60612.mail.yahoo.com>
+From: ronny hidayat <kempyeng88@yahoo.com>
+To: bluez <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-921248465-1136529333=:32179"
+Subject: [Bluez-users] bluetooth settings in debian
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,32 +16,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 06 Jan 2006 10:48:31 +0100
+Date: Fri, 6 Jan 2006 06:35:33 +0000 (GMT)
 
-Hi Ronny,
+--0-921248465-1136529333=:32179
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-> I have Linux Debian 2.6, bluetooth & Bluez already installed.
-> But I don't know how to change setting for bluetooth (like friendly
-> name & services).
-> How / Where can I find those settings ?
+Hi all,
+   
+  I have Linux Debian 2.6, bluetooth & Bluez already installed.
+  But I don't know how to change setting for bluetooth (like friendly name & services).
+  How / Where can I find those settings ?
+   
+  I want to make program like rfcomm server that can receive connection up to 7 client and then sending messages between them.
+    Does bluez support this ?
+Maybe anyone has documentation or sample program for this ?
+   
+  Thanks
+  Ronny
 
-Look at /etc/bluetooth/hcid.conf.
- 
-> I want to make program like rfcomm server that can receive connection
-> up to 7 client and then sending messages between them.
-> Does bluez support this ?
+Send instant messages to your online friends http://uk.messenger.yahoo.com 
+--0-921248465-1136529333=:32179
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Yes.
-
-> Maybe anyone has documentation or sample program for this ?
-
-Look at the source code of bluez-utils.
-
-Regards
-
-Marcel
-
-
+<DIV id=RTEContent>Hi all,</DIV>  <DIV>&nbsp;</DIV>  <DIV>I have Linux Debian 2.6, bluetooth&nbsp;&amp; Bluez already installed.</DIV>  <DIV>But I don't know how to change setting for bluetooth (like friendly name &amp; services).</DIV>  <DIV>How / Where can I find those settings&nbsp;?</DIV>  <DIV>&nbsp;</DIV>  <DIV>I want to make program like rfcomm server that can receive connection up&nbsp;to 7 client and then sending messages between them.</DIV>  <DIV>  <DIV>Does&nbsp;bluez&nbsp;support this ?</DIV>Maybe anyone has documentation or sample program for this ?</DIV>  <DIV>&nbsp;</DIV>  <DIV>Thanks</DIV>  <DIV>Ronny</DIV><p>Send instant messages to your online friends http://uk.messenger.yahoo.com 
+--0-921248465-1136529333=:32179--
 
 
 -------------------------------------------------------
