@@ -1,44 +1,71 @@
-Return-Path: <karl.h.beckers@gmx.net>
-Subject: Re: Re: [Bluez-users] repairing required after each dialup
-From: "Karl H. Beckers" <karl.h.beckers@gmx.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <1136576435.17973.1.camel@localhost>
-References: <1136566815.17866.2.camel@localhost.localdomain>
-	 <1136576435.17973.1.camel@localhost>
-Content-Type: text/plain
-Date: Sat, 07 Jan 2006 11:33:40 +0100
-Message-Id: <1136630021.20800.1.camel@localhost.localdomain>
-Mime-Version: 1.0
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <10e392ce0601061203k45c59478j@mail.gmail.com>
+From: Cyberalex <cyberalexgm@gmail.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Problem with hcitool scan
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Fri, 6 Jan 2006 20:03:30 +0000
 
-Am Freitag, den 06.01.2006, 20:40 +0100 schrieb Marcel Holtmann:
-> Hi Karl,
-> 
-> > attached you'll find the dumps of:
-> > 1) me doing "ifdown ppp0" which for some reason also quits rfcomm
-> > (hcidump-drop-conn.txt)
-> > 2) me trying "rfcomm connect 0" again and getting "Connection refused"
-> > (hcidump-conn-refused.txt)
-> > 3) same thing this time after deleting the laptop from the phone's list
-> > before trying the connect
-> > (hcidump-conn-repaired.txt)
-> 
-> this really looks like a bug in the phone for me. You might wanna ask
-> them for a firmware update.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+I have a latitude x1 with integrated dongle connected by usb bus.
+I installed bluez-libs and bluez-utils and added modules (bluetooth
+l2cap rfcomm bnep hidp hci_usb)
+I start services and hciconfig -a return:
+tuxone ~ # hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:10:C6:D1:07:A1 ACL MTU: 384:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN AUTH ENCRYPT
+        RX bytes:697 acl:0 sco:0 events:55 errors:0
+        TX bytes:640 acl:0 sco:0 commands:32 errors:0
+        Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'BlueZ (0)'
+        Class: 0x3e0100
+        Service Classes: Networking, Rendering, Capturing
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x679 LMP Ver: 1.2 (0x2) LMP Subver: 0x=
+679
+        Manufacturer: Cambridge Silicon Radio (10)
+tuxone ~ #
 
-Thanks Marcel,
+The dongle led flash,it seems working.
+I have 2 nokia 3650 and an other pc with bluetooth and they work.
+If i enter hcitool scan from latitude :
 
-could you elaborate a little on what makes you think so. I suppose I'll
-need to substantiate my claim a little more when I turn to SE for a bug
-fix.
+tuxone ~ # hcitool scan
+Scanning ...
+tuxone ~ #
 
-Thanks,
+It doesn't recognize all bt hosts.
 
-Karl.
+If i do a scanning from an other host i can't recognize the notebook
+(but the led of its dongle flash with a different timed during the
+scanning).
+
+Can anyone help me?
+
+Alex
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
