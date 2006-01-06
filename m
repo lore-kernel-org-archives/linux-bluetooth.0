@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Karl H. Beckers" <karl.h.beckers@gmx.net>
+Subject: Re: [Bluez-users] bluetooth settings in debian
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <20060106063533.35352.qmail@web60612.mail.yahoo.com>
+References: <20060106063533.35352.qmail@web60612.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1136542299.20156.12.camel@localhost.localdomain>
+Message-Id: <1136540911.7429.3.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-users] repairing required after each dialup
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,32 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 06 Jan 2006 11:11:39 +0100
+Date: Fri, 06 Jan 2006 10:48:31 +0100
 
-Hi all,
+Hi Ronny,
 
-is there somebody around who uses a SE k700i for dialup?
+> I have Linux Debian 2.6, bluetooth & Bluez already installed.
+> But I don't know how to change setting for bluetooth (like friendly
+> name & services).
+> How / Where can I find those settings ?
 
-I have this effect where I can only dial if I do:
+Look at /etc/bluetooth/hcid.conf.
+ 
+> I want to make program like rfcomm server that can receive connection
+> up to 7 client and then sending messages between them.
+> Does bluez support this ?
 
-- remove computer from list in mobile phone
-- rfcomm connect /dev/rfcomm0 .... 1
-	(repairing here)
-- ifup ppp0
+Yes.
 
-After every disconnect (pppd drops the connection of I press CTRL-C with
-rfcomm) I need to repeat this or else will get "Connection refused" from
-rfcomm connect (and it took me a while to find this workaround).
+> Maybe anyone has documentation or sample program for this ?
 
-Can anybody comment on whether this is a known issue with either rfcomm
-or the k700i, if so with which, and whether there's a fix (fw upgrade
-perhaps).
+Look at the source code of bluez-utils.
 
-Or are there any other things I should look at?
+Regards
 
-TIA,
+Marcel
 
-Karl.
 
 
 
