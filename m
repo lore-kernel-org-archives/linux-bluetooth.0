@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060106100921.4675.qmail@web60620.mail.yahoo.com>
-From: ronny hidayat <kempyeng88@yahoo.com>
-Subject: Re: [Bluez-users] bluetooth settings in debian
+From: "Karl H. Beckers" <karl.h.beckers@gmx.net>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1136540911.7429.3.camel@localhost>
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1763682378-1136542161=:2188"
+Content-Type: text/plain
+Message-Id: <1136542299.20156.12.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-users] repairing required after each dialup
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,55 +16,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 6 Jan 2006 10:09:21 +0000 (GMT)
+Date: Fri, 06 Jan 2006 11:11:39 +0100
 
---0-1763682378-1136542161=:2188
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Hi all,
 
-Hello again,
-   
-  Do you know what command should I use to send/receive file via bluetooth ?
-  Where should I put PIN number ?
-  Are there any documentation too ?
-   
-  Thanks
-  Ronny
+is there somebody around who uses a SE k700i for dialup?
 
-Marcel Holtmann <marcel@holtmann.org> wrote:
-  Hi Ronny,
+I have this effect where I can only dial if I do:
 
-> I have Linux Debian 2.6, bluetooth & Bluez already installed.
-> But I don't know how to change setting for bluetooth (like friendly
-> name & services).
-> How / Where can I find those settings ?
+- remove computer from list in mobile phone
+- rfcomm connect /dev/rfcomm0 .... 1
+	(repairing here)
+- ifup ppp0
 
-Look at /etc/bluetooth/hcid.conf.
+After every disconnect (pppd drops the connection of I press CTRL-C with
+rfcomm) I need to repeat this or else will get "Connection refused" from
+rfcomm connect (and it took me a while to find this workaround).
 
-> I want to make program like rfcomm server that can receive connection
-> up to 7 client and then sending messages between them.
-> Does bluez support this ?
+Can anybody comment on whether this is a known issue with either rfcomm
+or the k700i, if so with which, and whether there's a fix (fw upgrade
+perhaps).
 
-Yes.
+Or are there any other things I should look at?
 
-> Maybe anyone has documentation or sample program for this ?
+TIA,
 
-Look at the source code of bluez-utils.
+Karl.
 
-Regards
-
-Marcel
-
-
-Send instant messages to your online friends http://uk.messenger.yahoo.com 
---0-1763682378-1136542161=:2188
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-<DIV>Hello again,</DIV>  <DIV>&nbsp;</DIV>  <DIV>Do you know what command should I use to send/receive file via bluetooth ?</DIV>  <DIV>Where should I put PIN number ?</DIV>  <DIV>Are there any documentation too ?</DIV>  <DIV>&nbsp;</DIV>  <DIV>Thanks</DIV>  <DIV>Ronny<BR><BR><B><I>Marcel Holtmann &lt;marcel@holtmann.org&gt;</I></B> wrote:</DIV>  <BLOCKQUOTE class=replbq style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #1010ff 2px solid">Hi Ronny,<BR><BR>&gt; I have Linux Debian 2.6, bluetooth &amp; Bluez already installed.<BR>&gt; But I don't know how to change setting for bluetooth (like friendly<BR>&gt; name &amp; services).<BR>&gt; How / Where can I find those settings ?<BR><BR>Look at /etc/bluetooth/hcid.conf.<BR><BR>&gt; I want to make program like rfcomm server that can receive connection<BR>&gt; up to 7 client and then sending messages between them.<BR>&gt; Does bluez support this ?<BR><BR>Yes.<BR><BR>&gt; Maybe anyone has documentation or sample program for t
- his
- ?<BR><BR>Look at the source code of bluez-utils.<BR><BR>Regards<BR><BR>Marcel<BR><BR></BLOCKQUOTE><p>Send instant messages to your online friends http://uk.messenger.yahoo.com 
---0-1763682378-1136542161=:2188--
 
 
 -------------------------------------------------------
