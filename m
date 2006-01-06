@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <10e392ce0601061234j12dcc8dfw@mail.gmail.com>
-From: Cyberalex <cyberalexgm@gmail.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <10e392ce0601061203k45c59478j@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <10e392ce0601061203k45c59478j@mail.gmail.com>
-Subject: [Bluez-users] Problem with hcitool scan
+Subject: Re: Re: [Bluez-users] repairing required after each dialup
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Karl H. Beckers" <karl.h.beckers@gmx.net>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <1136566815.17866.2.camel@localhost.localdomain>
+References: <1136566815.17866.2.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1136576435.17973.1.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,48 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 6 Jan 2006 20:34:03 +0000
+Date: Fri, 06 Jan 2006 20:40:35 +0100
 
-I have a latitude x1 with integrated dongle connected by usb bus.
-I installed bluez-libs and bluez-utils and added modules (bluetooth
-l2cap rfcomm bnep hidp hci_usb)
-I start services and hciconfig -a return:
-tuxone ~ # hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:10:C6:D1:07:A1 ACL MTU: 384:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-        RX bytes:697 acl:0 sco:0 events:55 errors:0
-        TX bytes:640 acl:0 sco:0 commands:32 errors:0
-        Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ (0)'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x679 LMP Ver: 1.2 (0x2) LMP Subver: 0x=
-679
-        Manufacturer: Cambridge Silicon Radio (10)
-tuxone ~ #
+Hi Karl,
 
-The dongle led flash,it seems working.
-I have 2 nokia 3650 and an other pc with bluetooth and they work.
-If i enter hcitool scan from latitude :
+> attached you'll find the dumps of:
+> 1) me doing "ifdown ppp0" which for some reason also quits rfcomm
+> (hcidump-drop-conn.txt)
+> 2) me trying "rfcomm connect 0" again and getting "Connection refused"
+> (hcidump-conn-refused.txt)
+> 3) same thing this time after deleting the laptop from the phone's list
+> before trying the connect
+> (hcidump-conn-repaired.txt)
 
-tuxone ~ # hcitool scan
-Scanning ...
-tuxone ~ #
+this really looks like a bug in the phone for me. You might wanna ask
+them for a firmware update.
 
-It doesn't recognize all bt hosts.
+Regards
 
-If i do a scanning from an other host i can't recognize the notebook
-(but the led of its dongle flash with a different timed during the
-scanning).
+Marcel
 
-Can anyone help me?
 
-Alex
 
 
 -------------------------------------------------------
