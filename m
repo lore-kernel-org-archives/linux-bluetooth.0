@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43C1356C.60109@in.tum.de>
-From: Aleksandar Kanchev <kanchev@in.tum.de>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-References: <BAY24-F20084DBFE3577D788A970CF82F0@phx.gbl> <1136420779.6652.30.camel@localhost> <dpotfk$832$1@sea.gmane.org>
-In-Reply-To: <dpotfk$832$1@sea.gmane.org>
+From: Nicolas STRANSKY <Nico@neo-lan.net>
+Message-ID: <dpotfk$832$1@sea.gmane.org>
+References: <BAY24-F20084DBFE3577D788A970CF82F0@phx.gbl> <1136420779.6652.30.camel@localhost>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] broadcast packets
+In-Reply-To: <1136420779.6652.30.camel@localhost>
+Subject: [Bluez-users] Re: ms intellimouse/wheel
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,16 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 08 Jan 2006 16:53:16 +0100
+Date: Sat, 07 Jan 2006 18:24:05 +0100
 
-Hello,
+Le 01/05/2006 01:26 AM, Marcel Holtmann a écrit :
 
-does bluez support broadcast packets ?
-I've tried to send a raw broadcast packet to hci and I could see the 
-remote bluetooth controller blinking as if it is receiving data but 
-hcidump didn't show anything.
-Before writing the packet I've connected the both devices with "hcitool 
-cc <addr>" and I wrote the packet from the connecting side (the master).
+>> Will those patches ever be officially merged into the kernel?
+> 
+> No. We need a generic HID subsystem.
+
+Do you mean that your patch prevents some other things from working ?
+
+-mh in the kernel would be really great !
+
+-- 
+Nico
+La politesse des incurables, c'est d'avoir des pansements propres.
+	-+- Gilbert Cesbron (1913-1979), de petites choses. -+-
 
 
 
