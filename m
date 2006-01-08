@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43C1A0E4.1050102@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+From: Dietmar Segbert <trebges@web.de>
+To: <bluez-users@lists.sourceforge.net>
+Message-ID: <9lVn5TEuSyB@trebges.web.de>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] a2play question
-References: <9lVn5TEuSyB@trebges.web.de>
-In-Reply-To: <9lVn5TEuSyB@trebges.web.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] a2play question
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,46 +16,99 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 08 Jan 2006 16:31:48 -0700
+Date: 08 Jan 2006 11:13:00 +0100
+
+Hello,
+
+since a week i am owner of the following bluetooth-devices:
+
+ovislink bt-201usb (dongle)
+ovislink stereo receiver bt-120ar
+ovislink transmitter bt-120aj
+I use slackware linux with a 2.4.26 kernel. All the modules for the
+bluetooth where compiled.
+
+
+I have installed the latest bluez-libs and -utils. Also is installed the
+latest alsa-libs.
+I start the bluetooth-system by a sehll-script:
+
+#!/bin/bash
+modprobe hci_usb
+hcid
+modprobe l2cap
+modprobe bnep
+modprobe sco
+sdpd
+hciconfig -a
+
+The commands hcitool dev and hcitool scan detectt the dongle and the
+stereo-receiver.
+
+The output of
+
+hcitools info 00:4F:62:05:53:8A
+
+looks like this:
+
+Requesting information ...	BD Address:  00:4F:62:05:53:8A	Device Name:
+Stereo Receiver	LMP Version: 1.2 (0x2) LMP Subversion: 0x3d	Manufacturer:
+Zeevo, Inc. (18)	Features: 0xff 0xff 0x05 0x78 0x18 0x18 0x00 0x80		<3- 
+slot packets> <5-slot packets> <encryption> <slot offset> 		<timing
+accuracy> <role switch> <hold mode> <sniff mode> 		<park state> <RSSI>
+<channel quality> <SCO link> <HV2 packets> 		<HV3 packets> <u-law log> <A- 
+law log> <CVSD> <power control> 		<enhanced iscan> <interlaced iscan>
+<interlaced pscan>
+		<inquiry with RSSI> <AFH cap. slave> <AFH class. slave>
+		<AFH cap. master> <AFH class. master> <extended features>
+
+
+The command "sdptool browse" produces the following output:
+
+Inquiring ...Browsing 00:4F:62:05:53:8A ...Service Name: Audio SinkService
+RecHandle: 0x110bService Class ID List:  "Audio Sink" (0x110b)Protocol
+Descriptor List:  "L2CAP" (0x0100)    PSM: 25  "AVDTP" (0x0019)    uint16:
+0x100Language Base Attr List:  code_ISO639: 0x656e  encoding:    0x6a   
+base_offset: 0x100Profile Descriptor List:  "Advanced Audio" (0x110d)     
+Version: 0x0100Service Name: HeadsetService RecHandle: 0x1108Service Class
+ID List:  "Headset" (0x1108)  "Generic Audio" (0x1203)Protocol Descriptor
+List:  "L2CAP" (0x0100)  "RFCOMM" (0x0003)    Channel: 8Language Base Attr
+List:  code_ISO639: 0x656e  encoding:    0x6a  base_offset: 0x100Profile
+Descriptor List:  "Headset" (0x1108)    Version: 0x0100Service Name:
+HandsfreeService RecHandle: 0x111eService Class ID List:  "Handsfree"
+(0x111e)  "Generic Audio" (0x1203)Protocol Descriptor List:  "L2CAP"
+(0x0100)  "RFCOMM" (0x0003)    Channel: 7Language Base Attr List:   
+code_ISO639: 0x656e  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "Handsfree" (0x111e)
+    Version: 0x0101
+
+
+I have downloaded the btsco-0.4 package. The progs a2play, sbcenc rcfplay
+compile correctly, also btsco and btsco2.
+If i do a make in the /kernel directory, it appears a errormessage /lib/ 
+modules/2.4.26/source cannot find such file. I can not find a kernelmodule
+btsco.
+
+The command
+
+mpg123 --au - musik.mp3 | a2play 00:4F:62:05:53:8A -
+
+produces no sound output only  error message.
+
+The command
+
+mpg123 --au - musik.mp3 | sbcenc - | a2play 00:4F:62:05:53:8A -
+
+produces sound, but it plays to fast.
+
+I will be happy, if you can help me.
+another question ist: Can i send output of mplayer to the stereo-receiver?
+
+Best regards.
 
 Dietmar
-
-> I have downloaded the btsco-0.4 package.
-
-I released a 0.41 package today so we have a more modern baseline.
-
-> If i do a make in the /kernel directory, it appears a errormessage /lib/ 
-> modules/2.4.26/source cannot find such file. I can not find a kernelmodule
-> btsco.
-
-The kernel module isn't required for stereo/a2dp audio.
-
-> 
-> The command
-> 
-> mpg123 --au - musik.mp3 | a2play 00:4F:62:05:53:8A -
-> 
-> produces no sound output only  error message.
-
-you should show us the error message
-
-> 
-> The command
-> 
-> mpg123 --au - musik.mp3 | sbcenc - | a2play 00:4F:62:05:53:8A -
-> 
-> produces sound, but it plays to fast.
-
-we may need to put your headset in the a2play list of noncompliant
-devices. Marcel coded that stuff.
-
-> another question ist: Can i send output of mplayer to the stereo-receiver?
-
-there is a hack to create an alsa plugin that simply writes to standard
-out. then the client can be run with its output piped to a2play. it's a
-rather gross workaround for our nonworking alsa plugin.
-
-brad
 
 
 -------------------------------------------------------
