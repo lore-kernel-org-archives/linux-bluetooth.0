@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Two "identical" laptops, same phone, one works,
-	one doesn't
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43C2F72C.3010502@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <37f261b0601090736w6d7157d6x6ea876ecafb3572e@mail.gmail.com>
-References: <37f261b0601090736w6d7157d6x6ea876ecafb3572e@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1136909308.7200.8.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] a2play question
+References: <43C1A0E4.1050102@xmission.com> <9lZoapieSyB@trebges.web.de>
+In-Reply-To: <9lZoapieSyB@trebges.web.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,31 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 Jan 2006 17:08:28 +0100
+Date: Mon, 09 Jan 2006 16:52:12 -0700
 
-Hi Hugo,
+Dietmar
 
-> This is driving me nuts. I have two Compaq nx6110 laptops here, I've
-> got one working fine, the other isn't working. I try:
-> 
-> rfcomm connect 0 00:12:47:1E:90:AE 3
-> 
-> For the one it works great, the other I get
-> 
-> Can't connect RFCOMM socket: Connection refused
-> 
-> How can I debug this problem? Will a hcidump help? (Should I attach
-> the two "hcidump -V" outputs to an email?)
-> 
-> Confused and frustrated after a day of struggling,
+> /dev/rtc open: no such device
 
-send in the output of "hcidump -X -V" for that problem.
+running:
+ modprobe rtc
+may be all you need. check your distro docs for the real-time-clock enable.
 
-Regards
-
-Marcel
-
-
+brad
 
 
 -------------------------------------------------------
