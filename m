@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+Message-ID: <20060109052519.14547.qmail@web37009.mail.mud.yahoo.com>
+From: Blue Hammer <bt_addr@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Browsing web on cell my phone through bluetooth
- connection to Linux desktop
-Message-Id: <20060109063602.04d7dfe0.henryk@ploetzli.ch>
-In-Reply-To: <20060109052519.14547.qmail@web37009.mail.mud.yahoo.com>
-References: <20060109052519.14547.qmail@web37009.mail.mud.yahoo.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-1292606206-1136784319=:3633"
+Subject: [Bluez-devel] Browsing web on cell my phone through bluetooth connection to Linux desktop
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,39 +16,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 9 Jan 2006 06:36:02 +0100
+Date: Sun, 8 Jan 2006 21:25:19 -0800 (PST)
 
-Moin,
+--0-1292606206-1136784319=:3633
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Am Sun, 8 Jan 2006 21:25:19 -0800 (PST) schrieb Blue Hammer:
+Greetings,
+ 
+ I am able to pair my bluetooth equipped cell phone with my linux desktop with Belkin USB and also exchange objects using OBEX tools. However, I could not find any clue on the Internet about how can I browse web on my cell phone using the bluetooth connection to my linux desktop.
+ 
+ My cell phone has a built in web browser that works with GSM Carrier's web service (not enabled in my plan) and I would like to use this browser and bluetooth connection to linux desktop to browse the web.
+ 
+ Any clue, direction to a document etc will be appreciated.
+ 
+ Regards,
+ Hammer
+ 
 
-> However, I could not find any clue on the Internet about how can I
-> browse web on my cell phone using the bluetooth connection to my
-> linux desktop. My cell phone has a built in web browser that works
-> with GSM Carrier's web service (not enabled in my plan) and I would
-> like to use this browser and bluetooth connection to linux desktop to
-> browse the web.
+		
+---------------------------------
+ Yahoo! DSL Something to write home about. Just $16.99/mo. or less
+--0-1292606206-1136784319=:3633
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Your question is severly lacking in detail. Especially it would be
-important to know _which_ cell phone you are talking about.
-
-The basic direction is to set up PAN and/or DUN on your linux box and
-then connect your cell phone to that. Information on this is easily
-found (http://www.holtmann.org/linux/bluetooth/ for example, although
-some of the links are dead by now), but if this works for your phone
-can not be generally answered. Read The Fine Manual of your phone.
-
-(Most of the phones, especially the less fancy ones, will not support
-such usage of course. Your carrier wants you to use his service after
-all. For some phones there are some hints to make this possible
-circulating on the internet which may or may not work and are best
-found through google.)
-
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+<div id="RTEContent">Greetings,<br> <br> I am able to pair my bluetooth equipped cell phone with my linux desktop with Belkin USB and also exchange objects using OBEX tools. However, I could not find any clue on the Internet about how can I browse web on my cell phone using the bluetooth connection to my linux desktop.<br> <br> My cell phone has a built in web browser that works with GSM Carrier's web service (not enabled in my plan) and I would like to use this browser and bluetooth connection to linux desktop to browse the web.<br> <br> Any clue, direction to a document etc will be appreciated.<br> <br> Regards,<br> Hammer<br> </div><p>
+		<hr size=1> <a href="http://pa.yahoo.com/*http://us.rd.yahoo.com/evt=37474/*http://promo.yahoo.com/broadband/ ">Yahoo! DSL</a> Something to write home about. Just $16.99/mo. or less
+--0-1292606206-1136784319=:3633--
 
 
 -------------------------------------------------------
