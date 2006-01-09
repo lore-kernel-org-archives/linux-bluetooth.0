@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Dietmar Segbert <trebges@web.de>
-To: <bluez-users@lists.sourceforge.net>
-Message-ID: <9lZoapieSyB@trebges.web.de>
-In-Reply-To: <43C1A0E4.1050102@xmission.com>
-References: <43C1A0E4.1050102@xmission.com>
-Subject: Re: [Bluez-users] a2play question
+Message-ID: <43C29D4B.9030608@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] a2play error...
+References: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAAwZyW1fiQXke0+pFdteryAwEAAAAA@gmail.com>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAAwZyW1fiQXke0+pFdteryAwEAAAAA@gmail.com>
+Content-Type: text/plain; charset=EUC-KR
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,31 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 09 Jan 2006 20:22:00 +0100
+Date: Mon, 09 Jan 2006 10:28:43 -0700
 
-Hello List,
-hello Brad,
+pdjj14
 
-thanks for your infos. I have downloaded the btsco-04.41 release
-./configure --enable-alsaplugin
-make
+>  My environment is 'Redhat9(kernel 2.4.20-8) + bluez-utils,-libs-2.24 +
+> bluez-hcidump-1.18 + alsa-libs-1.0.10 + btsco-0.41 + mpg123-0.59r-4'.
 
-and the package will compile.
+do you have to run 2.4.x? if you do, can you update it to 2.4.31 and
+apply mh1 from http://www.bluez.org/patches.html ?
 
-mpg123 --au - musik.mp3 | ./a2play 00:4F:62:05:53:8A -
+I don't believe a2play does anything that requires features in the new
+kernels but bluez will work better if you track something current.
 
-starts the connection and after a double-beep i can hear the music. But it
-is not a continous stream. it sounds as the music stops and begins.
+>  I am modifying the code 'a2play.c'.
+> 
+>  Is correct what I do?
+> 
+>  I want to know good methods.
 
-If i use the -p parameter for a2play, it comes a errormessage:
+I would try to update the kernel as much as you can first, then look at
+modifying a2play.c
 
-/dev/rtc open: no such device
+are you running on an x86 cpu?
 
-and i can not hear anything.
+>              write failed: Connection reset by peer
 
-Regards.
+this may be an underlying problem in bluez.
 
-Dietmar
+brad
 
 
 -------------------------------------------------------
