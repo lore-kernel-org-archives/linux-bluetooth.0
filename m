@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20060109052519.14547.qmail@web37009.mail.mud.yahoo.com>
-From: Blue Hammer <bt_addr@yahoo.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <43C1BD51.9090703@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1292606206-1136784319=:3633"
-Subject: [Bluez-devel] Browsing web on cell my phone through bluetooth connection to Linux desktop
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] linux 2.4.20 & alsa 0.9.6
+References: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAADKpAtBuY3EiXO2W2Etn2/QEAAAAA@gmail.com>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAADKpAtBuY3EiXO2W2Etn2/QEAAAAA@gmail.com>
+Content-Type: text/plain; charset=EUC-KR
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,34 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 8 Jan 2006 21:25:19 -0800 (PST)
+Date: Sun, 08 Jan 2006 18:33:05 -0700
 
---0-1292606206-1136784319=:3633
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+pdjj14
 
-Greetings,
- 
- I am able to pair my bluetooth equipped cell phone with my linux desktop with Belkin USB and also exchange objects using OBEX tools. However, I could not find any clue on the Internet about how can I browse web on my cell phone using the bluetooth connection to my linux desktop.
- 
- My cell phone has a built in web browser that works with GSM Carrier's web service (not enabled in my plan) and I would like to use this browser and bluetooth connection to linux desktop to browse the web.
- 
- Any clue, direction to a document etc will be appreciated.
- 
- Regards,
- Hammer
- 
+I understand there are a lot of embedded platforms that are still on
+kernel 2.4. You may be able to get audio working with 2.4.x using old
+versions of everything, but you aren't likely to get help on the mailing
+lists for doing that. Good luck.
 
-		
----------------------------------
- Yahoo! DSL Something to write home about. Just $16.99/mo. or less
---0-1292606206-1136784319=:3633
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Brad
 
-<div id="RTEContent">Greetings,<br> <br> I am able to pair my bluetooth equipped cell phone with my linux desktop with Belkin USB and also exchange objects using OBEX tools. However, I could not find any clue on the Internet about how can I browse web on my cell phone using the bluetooth connection to my linux desktop.<br> <br> My cell phone has a built in web browser that works with GSM Carrier's web service (not enabled in my plan) and I would like to use this browser and bluetooth connection to linux desktop to browse the web.<br> <br> Any clue, direction to a document etc will be appreciated.<br> <br> Regards,<br> Hammer<br> </div><p>
-		<hr size=1> <a href="http://pa.yahoo.com/*http://us.rd.yahoo.com/evt=37474/*http://promo.yahoo.com/broadband/ ">Yahoo! DSL</a> Something to write home about. Just $16.99/mo. or less
---0-1292606206-1136784319=:3633--
+>  Thank you Brad...
+>  I have a question...
+>  To communication between PC and Headset using the bluez, I don't work in
+> my environment?
+>  I can change bluez-utils' version, but, I can't change kernel version.
+>  Are there other methods?
 
 
 -------------------------------------------------------
