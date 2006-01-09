@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43C2F72C.3010502@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
+From: Dietmar Segbert <trebges@web.de>
+To: <bluez-users@lists.sourceforge.net>
+Message-ID: <9lZoapieSyB@trebges.web.de>
+In-Reply-To: <43C1A0E4.1050102@xmission.com>
+References: <43C1A0E4.1050102@xmission.com>
 Subject: Re: [Bluez-users] a2play question
-References: <43C1A0E4.1050102@xmission.com> <9lZoapieSyB@trebges.web.de>
-In-Reply-To: <9lZoapieSyB@trebges.web.de>
-Content-Type: text/plain; charset=ISO-8859-1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,17 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 09 Jan 2006 16:52:12 -0700
+Date: 09 Jan 2006 20:22:00 +0100
+
+Hello List,
+hello Brad,
+
+thanks for your infos. I have downloaded the btsco-04.41 release
+./configure --enable-alsaplugin
+make
+
+and the package will compile.
+
+mpg123 --au - musik.mp3 | ./a2play 00:4F:62:05:53:8A -
+
+starts the connection and after a double-beep i can hear the music. But it
+is not a continous stream. it sounds as the music stops and begins.
+
+If i use the -p parameter for a2play, it comes a errormessage:
+
+/dev/rtc open: no such device
+
+and i can not hear anything.
+
+Regards.
 
 Dietmar
-
-> /dev/rtc open: no such device
-
-running:
- modprobe rtc
-may be all you need. check your distro docs for the real-time-clock enable.
-
-brad
 
 
 -------------------------------------------------------
