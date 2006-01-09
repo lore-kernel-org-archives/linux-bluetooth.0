@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43C29D4B.9030608@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <37f261b0601090736w6d7157d6x6ea876ecafb3572e@mail.gmail.com>
+From: Hugo van der Merwe <hugovdm@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] a2play error...
-References: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAAwZyW1fiQXke0+pFdteryAwEAAAAA@gmail.com>
-In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAmaUem1Nm8k+FVVBwbPkbkcKAAAAQAAAAwZyW1fiQXke0+pFdteryAwEAAAAA@gmail.com>
-Content-Type: text/plain; charset=EUC-KR
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_25621_16309475.1136820978376"
+Subject: [Bluez-users] Two "identical" laptops, same phone, one works, one doesn't
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,35 +17,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 09 Jan 2006 10:28:43 -0700
+Date: Mon, 9 Jan 2006 17:36:18 +0200
 
-pdjj14
+------=_Part_25621_16309475.1136820978376
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
->  My environment is 'Redhat9(kernel 2.4.20-8) + bluez-utils,-libs-2.24 +
-> bluez-hcidump-1.18 + alsa-libs-1.0.10 + btsco-0.41 + mpg123-0.59r-4'.
+This is driving me nuts. I have two Compaq nx6110 laptops here, I've got on=
+e
+working fine, the other isn't working. I try:
 
-do you have to run 2.4.x? if you do, can you update it to 2.4.31 and
-apply mh1 from http://www.bluez.org/patches.html ?
+rfcomm connect 0 00:12:47:1E:90:AE 3
 
-I don't believe a2play does anything that requires features in the new
-kernels but bluez will work better if you track something current.
+For the one it works great, the other I get
 
->  I am modifying the code 'a2play.c'.
-> 
->  Is correct what I do?
-> 
->  I want to know good methods.
+Can't connect RFCOMM socket: Connection refused
 
-I would try to update the kernel as much as you can first, then look at
-modifying a2play.c
+How can I debug this problem? Will a hcidump help? (Should I attach the two
+"hcidump -V" outputs to an email?)
 
-are you running on an x86 cpu?
+Confused and frustrated after a day of struggling,
+Hugo van der Merwe
 
->              write failed: Connection reset by peer
+------=_Part_25621_16309475.1136820978376
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-this may be an underlying problem in bluez.
+This is driving me nuts. I have two Compaq nx6110 laptops here, I've got on=
+e working fine, the other isn't working. I try:<br>
+<br>
+rfcomm connect 0 00:12:47:1E:90:AE 3<br>
+<br>
+For the one it works great, the other I get<br>
+<br>
+Can't connect RFCOMM socket: Connection refused<br>
+<br>
+How can I debug this problem? Will a hcidump help? (Should I attach the two=
+ &quot;hcidump -V&quot; outputs to an email?)<br>
+<br>
+Confused and frustrated after a day of struggling,<br>
+Hugo van der Merwe<br>
 
-brad
+------=_Part_25621_16309475.1136820978376--
 
 
 -------------------------------------------------------
