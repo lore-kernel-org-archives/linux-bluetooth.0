@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jukka Laurila <jplauril@cc.hut.fi>
+Subject: RE: [Bluez-users] ISSC  USB dongle Bluetooth problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] sdptool browse fails with ISSC dongle and Nokia
- 6630 in Ubuntu Breezy
-In-Reply-To: <1136909841.7200.13.camel@localhost.localdomain>
-Message-ID: <Pine.GSO.4.61.0601110004590.8744@vipunen.hut.fi>
-References: <Pine.GSO.4.61.0601082205170.8744@vipunen.hut.fi>
- <1136909841.7200.13.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+In-Reply-To: <000a01c6162d$2598ad20$0200000a@EHABLAPTOP>
+References: <000a01c6162d$2598ad20$0200000a@EHABLAPTOP>
+Content-Type: text/plain
+Message-Id: <1136930560.4591.8.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,44 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 Jan 2006 00:06:50 +0200 (EET)
+Date: Tue, 10 Jan 2006 23:02:40 +0100
 
-On Tue, 10 Jan 2006, Marcel Holtmann wrote:
+Hi Ehab,
 
-> Hi Jukka,
->
->> When I do "sdptool browse 00:11:9F:C8:D9:36" (that's the
->> address of my Nokia 6630) sdptool gives the error:
->>
->>    Service Search failed: Connection timed out
->>
->> The following error appears in syslog:
->>
->>    sdptool: sdp_read_rsp: Client timed out
->
-> what module is in your laptop (hciconfig -a)?
+> I followed all the steps written in documentations.
+> Is there no other way simpler than this ?
+> I am using Redhat 9 with 2.4.20-8 Kernel
+> Upgrading the kernel is a big hassle
 
-It's not a laptop, it's a desktop. The laptop was a separate 
-machine I just browsed for testing purposes. On the desktop 
-that says:
+then you should buy yourself a CSR based dongle.
 
-hci0:   Type: USB
-         BD Address: 00:11:67:00:3A:5E ACL MTU: 678:12 SCO 
-MTU: 48:5
-         UP RUNNING PSCAN ISCAN
-         RX bytes:250069 acl:1993 sco:0 events:2976 errors:0
-         TX bytes:107334 acl:1737 sco:0 commands:464 errors:0
-         Features: 0xff 0xff 0x0d 0x00 0x00 0x00 0x00 0x00
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: SLAVE ACCEPT
-         Name: 'decoud-0'
-         Class: 0x3e0100
-         Service Classes: Networking, Rendering, Capturing
-         Device Class: Computer, Uncategorized
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x172 LMP Ver: 1.1 (0x1) 
-LMP Subver: 0x172
-         Manufacturer: Integrated System Solution Corp. (57)
+Regards
+
+Marcel
+
 
 
 
