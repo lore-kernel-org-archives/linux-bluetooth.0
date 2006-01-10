@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060111023702.65726.qmail@web34012.mail.mud.yahoo.com>
-From: Wai Jye Chang <wai_jye_0007@yahoo.com>
+From: Jukka Laurila <jplauril@cc.hut.fi>
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] sdptool browse fails with ISSC dongle and Nokia
+ 6630 in Ubuntu Breezy
+In-Reply-To: <1136909841.7200.13.camel@localhost.localdomain>
+Message-ID: <Pine.GSO.4.61.0601110004590.8744@vipunen.hut.fi>
+References: <Pine.GSO.4.61.0601082205170.8744@vipunen.hut.fi>
+ <1136909841.7200.13.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-414107878-1136947022=:60942"
-Subject: [Bluez-users] Newbie:) Is it a good suit for Embedded Linux OS
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,35 +20,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 Jan 2006 18:37:02 -0800 (PST)
+Date: Wed, 11 Jan 2006 00:06:50 +0200 (EET)
 
---0-414107878-1136947022=:60942
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+On Tue, 10 Jan 2006, Marcel Holtmann wrote:
 
- Hello Everybody,
- This will be my first question on Bluez. There is so much of hype about bluez ?
- I am a chinese student who is doing research on comparing which is the best bluetooth stack for embedded Linux ? do you think guys it is the bluez, if so can anyone tell me the reason 
- 
- 2. How much memory required to run the bluetooth module on the embedded linux ?
- 
- All the comments are welcome.
- Wai Jye
- 
- 
+> Hi Jukka,
+>
+>> When I do "sdptool browse 00:11:9F:C8:D9:36" (that's the
+>> address of my Nokia 6630) sdptool gives the error:
+>>
+>>    Service Search failed: Connection timed out
+>>
+>> The following error appears in syslog:
+>>
+>>    sdptool: sdp_read_rsp: Client timed out
+>
+> what module is in your laptop (hciconfig -a)?
 
-		
----------------------------------
-Yahoo! Photos – Showcase holiday pictures in hardcover
- Photo Books. You design it and we’ll bind it!
---0-414107878-1136947022=:60942
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+It's not a laptop, it's a desktop. The laptop was a separate 
+machine I just browsed for testing purposes. On the desktop 
+that says:
 
-<div id="RTEContent">&nbsp;Hello Everybody,<br> This will be my first question on Bluez. There is so much of hype about bluez ?<br> I am a chinese student who is doing research on comparing which is the best bluetooth stack for embedded Linux ? do you think guys it is the bluez, if so can anyone tell me the reason <br> <br> 2. How much memory required to run the bluetooth module on the embedded linux ?<br> <br> All the comments are welcome.<br> Wai Jye<br> <br> </div><p>
-		<hr size=1>Yahoo! Photos – Showcase holiday pictures in hardcover<br> 
-<a href="http://us.rd.yahoo.com/mail_us/taglines/photobooks/*http://pa.yahoo.com/*http://us.rd.yahoo.com/mail_us/taglines/photos/evt=38088/*http://pg.photos.yahoo.com/ph//page?.file=photobook_splash.html">Photo Books</a>. You design it and we’ll bind it!
---0-414107878-1136947022=:60942--
+hci0:   Type: USB
+         BD Address: 00:11:67:00:3A:5E ACL MTU: 678:12 SCO 
+MTU: 48:5
+         UP RUNNING PSCAN ISCAN
+         RX bytes:250069 acl:1993 sco:0 events:2976 errors:0
+         TX bytes:107334 acl:1737 sco:0 commands:464 errors:0
+         Features: 0xff 0xff 0x0d 0x00 0x00 0x00 0x00 0x00
+         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+         Link policy: RSWITCH HOLD SNIFF PARK
+         Link mode: SLAVE ACCEPT
+         Name: 'decoud-0'
+         Class: 0x3e0100
+         Service Classes: Networking, Rendering, Capturing
+         Device Class: Computer, Uncategorized
+         HCI Ver: 1.1 (0x1) HCI Rev: 0x172 LMP Ver: 1.1 (0x1) 
+LMP Subver: 0x172
+         Manufacturer: Integrated System Solution Corp. (57)
+
 
 
 -------------------------------------------------------
