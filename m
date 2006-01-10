@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: Re: [Bluez-users] repairing required after each dialup
+Subject: Re: [Bluez-users] sdptool browse fails with ISSC dongle and Nokia
+	6630 in Ubuntu Breezy
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Karl H. Beckers" <karl.h.beckers@gmx.net>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <1136630021.20800.1.camel@localhost.localdomain>
-References: <1136566815.17866.2.camel@localhost.localdomain>
-	 <1136576435.17973.1.camel@localhost>
-	 <1136630021.20800.1.camel@localhost.localdomain>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <Pine.GSO.4.61.0601082205170.8744@vipunen.hut.fi>
+References: <Pine.GSO.4.61.0601082205170.8744@vipunen.hut.fi>
 Content-Type: text/plain
-Message-Id: <1136909902.7200.15.camel@localhost.localdomain>
+Message-Id: <1136909841.7200.13.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,16 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 Jan 2006 17:18:22 +0100
+Date: Tue, 10 Jan 2006 17:17:20 +0100
 
-Hi Karl,
+Hi Jukka,
 
-> could you elaborate a little on what makes you think so. I suppose I'll
-> need to substantiate my claim a little more when I turn to SE for a bug
-> fix.
+> When I do "sdptool browse 00:11:9F:C8:D9:36" (that's the 
+> address of my Nokia 6630) sdptool gives the error:
+> 
+>    Service Search failed: Connection timed out
+> 
+> The following error appears in syslog:
+> 
+>    sdptool: sdp_read_rsp: Client timed out
 
-simply ask for an security update and tell them your Bluetooth is not
-working. In most cases this is enough.
+what module is in your laptop (hciconfig -a)?
 
 Regards
 
