@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43C3E565.6080605@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: Info a2play
-References: <5307d89f0512200011i7a6784dfie08a56569a90381d@mail.gmail.com> <5307d89f0512201320g34b2d793p178bbd501d473e95@mail.gmail.com>
-In-Reply-To: <5307d89f0512201320g34b2d793p178bbd501d473e95@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Re: [Bluez-users] repairing required after each dialup
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Karl H. Beckers" <karl.h.beckers@gmx.net>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <1136630021.20800.1.camel@localhost.localdomain>
+References: <1136566815.17866.2.camel@localhost.localdomain>
+	 <1136576435.17973.1.camel@localhost>
+	 <1136630021.20800.1.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1136909902.7200.15.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,25 +21,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 Jan 2006 09:48:37 -0700
+Date: Tue, 10 Jan 2006 17:18:22 +0100
 
-Patrick
+Hi Karl,
 
-> The following syntax works perfectly now!
-> beep-media-player | sox -c 2 -t raw -r 44100 -w -s - -t au - |
-> ./a2play -p  00:0D:44:2A:14:66
-> 
-> But there is still one problem: the music gets interrupted very often.
-> I now used the -p option but that still doesn't help.
-> On Windows XP and my cellphone, it works perfectly.
+> could you elaborate a little on what makes you think so. I suppose I'll
+> need to substantiate my claim a little more when I turn to SE for a bug
+> fix.
 
-Are you using nvidia drivers? My laptop with nvidia would chop up the
-audio every time I switched between windows. I think the nvidia driver
-is interfering with our rtc.
+simply ask for an security update and tell them your Bluetooth is not
+working. In most cases this is enough.
 
-My fujitsu w/ATI doesn't have the problem.
+Regards
 
-Brad
+Marcel
+
+
 
 
 -------------------------------------------------------
