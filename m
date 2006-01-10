@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] sdptool browse fails with ISSC dongle and Nokia
-	6630 in Ubuntu Breezy
+Subject: Re: [Bluez-users] hci_read_rssi command
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <Pine.GSO.4.61.0601082205170.8744@vipunen.hut.fi>
-References: <Pine.GSO.4.61.0601082205170.8744@vipunen.hut.fi>
+In-Reply-To: <20060109092540.65589.qmail@web50506.mail.yahoo.com>
+References: <20060109092540.65589.qmail@web50506.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1136909841.7200.13.camel@localhost.localdomain>
+Message-Id: <1136909383.7200.11.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,20 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 Jan 2006 17:17:20 +0100
+Date: Tue, 10 Jan 2006 17:09:42 +0100
 
-Hi Jukka,
+Hi Mahtab,
 
-> When I do "sdptool browse 00:11:9F:C8:D9:36" (that's the 
-> address of my Nokia 6630) sdptool gives the error:
+> My project is to work with rssi/tpl/lq. My initial goal is to read
+> them and show them graphically with some handy features!
 > 
->    Service Search failed: Connection timed out
+> I have gone through hcitool.c (most of the code) and tried to exactly
+> copy the necessary things only to retrieve RSSI. But, I couldn't call
+> "hci_read_rssi" as them. Compiling my program gave this error:
 > 
-> The following error appears in syslog:
-> 
->    sdptool: sdp_read_rsp: Client timed out
+> mySignalScan.c:102: warning: implicit declaration of function
+> `hci_read_rssi'
+> mySignalScan.c: At top level:
+> /tmp/cc4x36ri.o(.text+0x25b): In function `cmd_rssi':
+> : undefined reference to `hci_read_rssi'
+> collect2: ld returned 1 exit status
 
-what module is in your laptop (hciconfig -a)?
+looks like you need to install a newer bluez-libs package.
 
 Regards
 
