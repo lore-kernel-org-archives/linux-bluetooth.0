@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hci_read_rssi command
+Subject: Re: [Bluez-users] Two "identical" laptops, same phone, one works,
+	one doesn't
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20060109092540.65589.qmail@web50506.mail.yahoo.com>
-References: <20060109092540.65589.qmail@web50506.mail.yahoo.com>
+In-Reply-To: <37f261b0601090736w6d7157d6x6ea876ecafb3572e@mail.gmail.com>
+References: <37f261b0601090736w6d7157d6x6ea876ecafb3572e@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1136909383.7200.11.camel@localhost.localdomain>
+Message-Id: <1136909308.7200.8.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +19,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 Jan 2006 17:09:42 +0100
+Date: Tue, 10 Jan 2006 17:08:28 +0100
 
-Hi Mahtab,
+Hi Hugo,
 
-> My project is to work with rssi/tpl/lq. My initial goal is to read
-> them and show them graphically with some handy features!
+> This is driving me nuts. I have two Compaq nx6110 laptops here, I've
+> got one working fine, the other isn't working. I try:
 > 
-> I have gone through hcitool.c (most of the code) and tried to exactly
-> copy the necessary things only to retrieve RSSI. But, I couldn't call
-> "hci_read_rssi" as them. Compiling my program gave this error:
+> rfcomm connect 0 00:12:47:1E:90:AE 3
 > 
-> mySignalScan.c:102: warning: implicit declaration of function
-> `hci_read_rssi'
-> mySignalScan.c: At top level:
-> /tmp/cc4x36ri.o(.text+0x25b): In function `cmd_rssi':
-> : undefined reference to `hci_read_rssi'
-> collect2: ld returned 1 exit status
+> For the one it works great, the other I get
+> 
+> Can't connect RFCOMM socket: Connection refused
+> 
+> How can I debug this problem? Will a hcidump help? (Should I attach
+> the two "hcidump -V" outputs to an email?)
+> 
+> Confused and frustrated after a day of struggling,
 
-looks like you need to install a newer bluez-libs package.
+send in the output of "hcidump -X -V" for that problem.
 
 Regards
 
