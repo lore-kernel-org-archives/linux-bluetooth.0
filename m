@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Ehab El Maraghy" <e_elmaraghy@emajor.net>
+To: <bluez-users@lists.sourceforge.net>
 Subject: RE: [Bluez-users] ISSC  USB dongle Bluetooth problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <000a01c6162d$2598ad20$0200000a@EHABLAPTOP>
-References: <000a01c6162d$2598ad20$0200000a@EHABLAPTOP>
-Content-Type: text/plain
-Message-Id: <1136930560.4591.8.camel@localhost.localdomain>
-Mime-Version: 1.0
+Message-ID: <000a01c6162d$2598ad20$0200000a@EHABLAPTOP>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <1136928278.4591.6.camel@localhost.localdomain>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +18,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 Jan 2006 23:02:40 +0100
-
-Hi Ehab,
-
-> I followed all the steps written in documentations.
-> Is there no other way simpler than this ?
-> I am using Redhat 9 with 2.4.20-8 Kernel
-> Upgrading the kernel is a big hassle
-
-then you should buy yourself a CSR based dongle.
-
-Regards
+Date: Tue, 10 Jan 2006 23:30:54 +0200
 
 Marcel
-
+I followed all the steps written in documentations.
+Is there no other way simpler than this ?
+I am using Redhat 9 with 2.4.20-8 Kernel
+Upgrading the kernel is a big hassle
 
 
 
