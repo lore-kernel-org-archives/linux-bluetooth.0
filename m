@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hci_read_rssi command
+Subject: Re: [Bluez-users] broadcast packets
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20060111064537.14602.qmail@web50514.mail.yahoo.com>
-References: <20060111064537.14602.qmail@web50514.mail.yahoo.com>
+In-Reply-To: <43C4C236.5060100@in.tum.de>
+References: <BAY24-F20084DBFE3577D788A970CF82F0@phx.gbl>
+	 <1136420779.6652.30.camel@localhost> <dpotfk$832$1@sea.gmane.org>
+	 <43C1356C.60109@in.tum.de>  <43C4C236.5060100@in.tum.de>
 Content-Type: text/plain
-Message-Id: <1136968410.26114.5.camel@localhost.localdomain>
+Message-Id: <1136968575.26114.8.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,41 +20,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 Jan 2006 09:33:30 +0100
+Date: Wed, 11 Jan 2006 09:36:15 +0100
 
-Hi Mahtab,
+Hi Aleksandar,
 
-> You are right. I have fedora core 3 in my lab and I think it comes
-> with this version of bluez.
-> [root@70-52 mahtab]# rpm -qa bluez*
-> bluez-bluefw-1.0-6
-> bluez-pin-0.23-3
-> bluez-hcidump-1.11-1
-> bluez-utils-2.10-2
-> bluez-libs-devel-2.10-2
-> bluez-libs-2.10-2
-> bluez-utils-cups-2.10-2
-> 
-> I thought I had installed the recent bluez packages and was looking
-> into the codes of bluez-2.24 packages. That explains the error.
-> Anyway, I could solve the problem of my_hci_read_rssi function - it
-> was a stupid typo. I should have literally copied your hci_read_rssi
-> function rather than typing it myself. But again, I am not fond of
-> your choice of variables either (rq, rp etc. :P which was the reason
-> of my typo). :D
-> 
-> As I will be making a GUI version considering only RSSI, LQ & TPL
-> part, I think I will not go into installing the newer version of bluez
-> (I also work on my ancient Laptop which has bluez-2.4-1).
-> I have chosen GTK+ for dealing with the GUI version. Any suggestions
-> on that?
-> My work is to record RSSI, LQ and TPL correcponding to a location
-> (i.e. location fingerprint) in a user-friendly way!
+> Marcel, could you please answer me that ? :)
 
-since graphical applications are event driven you might wanna use the
-HCI raw interface directly instead of calling the API functions, but
-that would be only a minor detail. Otherwise there shouldn't be any big
-problems.
+I already told you everything I know and I have no idea why you still
+stick to the broadcast thing. Once you have established the piconet
+between two devices, you can use it to transfer data. Doing everything
+on HCI level is not a good idea. Use at least the L2CAP level for it,
+but you might need to add some kernel code to make it work properly. The
+broadcast stuff is not really used in any Bluetooth application so far.
 
 Regards
 
