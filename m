@@ -1,17 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] sdptool browse fails with ISSC dongle and Nokia
-	6630 in Ubuntu Breezy
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Jukka Laurila <jplauril@cc.hut.fi>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <Pine.GSO.4.61.0601111438030.8744@vipunen.hut.fi>
+Subject: Re: [Bluez-users] sdptool browse fails with ISSC dongle and Nokia
+ 6630 in Ubuntu Breezy
+In-Reply-To: <1136968254.26114.2.camel@localhost.localdomain>
+Message-ID: <Pine.GSO.4.61.0601111438030.8744@vipunen.hut.fi>
 References: <Pine.GSO.4.61.0601082205170.8744@vipunen.hut.fi>
-	 <1136909841.7200.13.camel@localhost.localdomain>
-	 <Pine.GSO.4.61.0601110004590.8744@vipunen.hut.fi>
-	 <1136968254.26114.2.camel@localhost.localdomain>
-	 <Pine.GSO.4.61.0601111438030.8744@vipunen.hut.fi>
-Content-Type: text/plain
-Message-Id: <1136988524.3825.23.camel@localhost.localdomain>
-Mime-Version: 1.0
+ <1136909841.7200.13.camel@localhost.localdomain> <Pine.GSO.4.61.0601110004590.8744@vipunen.hut.fi>
+ <1136968254.26114.2.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -23,29 +21,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 Jan 2006 15:08:44 +0100
+Date: Wed, 11 Jan 2006 14:43:24 +0200 (EET)
 
-Hi Jukka,
+On Wed, 11 Jan 2006, Marcel Holtmann wrote:
 
-> >>          Manufacturer: Integrated System Solution Corp. (57)
-> >
-> > not again this ISSC dongle. They seem to be really problematic and I
-> > have no idea why.
-> 
-> Fine, I'll throw it away and get a new one then. Any idea 
-> what dongles would work best in Linux? What chipset to look 
-> for etc.?
+>>          Manufacturer: Integrated System Solution Corp. (57)
+>
+> not again this ISSC dongle. They seem to be really problematic and I
+> have no idea why.
 
-if you don't return it, donate it to me and I might be able to sort the
-problems with dongles out. I personally prefer CSR based dongles. They
-work really great and we know a lot about them. Try to get the latest
-BlueCore4 based dongles. Look at my EDR page for some examples.
-
-Regards
-
-Marcel
-
-
+Fine, I'll throw it away and get a new one then. Any idea 
+what dongles would work best in Linux? What chipset to look 
+for etc.?
 
 
 -------------------------------------------------------
