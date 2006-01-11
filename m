@@ -1,52 +1,81 @@
-Return-Path: <wolfgang.walter@studentenwerk.mhn.de>
-From: Wolfgang Walter <wolfgang.walter@studentenwerk.mhn.de>
-To: bluez-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org
-Subject: patch: problem with sco
-Date: Thu, 12 Jan 2006 01:38:31 +0100
-Cc: marcel@holtmann.org, maxk@qualcomm.com
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200601120138.31791.wolfgang.walter@studentenwerk.mhn.de>
-List-ID: <bluez-devel.lists.sourceforge.net>
-
-A friend and I encountered a problem with sco transfers to a headset using
-linux (vanilla 2.6.15). While all sco packets sent by the headset were
-received there was no outgoing traffic.
-
-After switching debugging output on we found that actually sco_cnt was always
-zero in hci_sched_sco.
-
-hciconfig hci0 shows sco_mtu to be 64:0. Changing that to 64:8 did not help.
-
-This was because in hci_cc_info_param hdev->sco_pkts is set to zero. When we
-changed this line so that hdev->sco_pkts is set to 8 if bs->sco_max_pkt is 0
-sco transfer to the headset started to work just fine.
-
-
-Here the patch:
-
---- linux-2.6.15/net/bluetooth/hci_event.c	2006-01-03 04:21:10.000000000 +0100
-+++ linux-2.6.15-dbg/net/bluetooth/hci_event.c	2006-01-12 00:35:48.000000000 +0100
-@@ -322,7 +322,7 @@
- 		hdev->acl_mtu  = __le16_to_cpu(bs->acl_mtu);
- 		hdev->sco_mtu  = bs->sco_mtu ? bs->sco_mtu : 64;
- 		hdev->acl_pkts = hdev->acl_cnt = __le16_to_cpu(bs->acl_max_pkt);
--		hdev->sco_pkts = hdev->sco_cnt = __le16_to_cpu(bs->sco_max_pkt);
-+		hdev->sco_pkts = hdev->sco_cnt = (bs->sco_max_pkt ? __le16_to_cpu(bs->sco_max_pkt) : 8);
- 
- 		BT_DBG("%s mtu: acl %d, sco %d max_pkt: acl %d, sco %d", hdev->name,
- 			hdev->acl_mtu, hdev->sco_mtu, hdev->acl_pkts, hdev->sco_pkts);
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Developing a basic service for BlueTooth enabled
+	devices
+From: Stephen Crane <jscrane@maths.tcd.ie>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1136989762.3825.29.camel@localhost.localdomain>
+References: <20060111093621.14949.qmail@web37008.mail.mud.yahoo.com>
+	 <1136989762.3825.29.camel@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-Wmg2JxsFyInSEefwB9Lz"
+Message-Id: <1137006621.7489.20.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 11 Jan 2006 19:10:21 +0000
 
 
--- 
-Wolfgang Walter
-Studentenwerk München
-Anstalt des öffentlichen Rechts
-Leiter EDV
-Leopoldstraße 15
-80802 München
-Tel: +49 89 38196-276
-Fax: +49 89 38196-144
-wolfgang.walter@studentenwerk.mhn.de
-http://www.studentenwerk.mhn.de/
+--=-Wmg2JxsFyInSEefwB9Lz
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+Hello world,
+
+On Wed, 2006-01-11 at 15:29 +0100, Marcel Holtmann wrote:
+> > My first approach was to develep a web service with Apache for WAP
+> > enabled  browsers that would run locally on each Linux server boxes
+> > and serve WAP pages to the local ad-hoc mobile clients in order to
+> > eliminate the client side development effort. However, it looks like
+> > for many mobile devices I won't be able to do that. I have Motorola
+> > RAZR V3 Java enabled phone at home and I could not do this by
+> > establishing a piconet between my Kubuntu box and RAZR V3.=20
+> >=20
+> > What would be your suggestion? What kind of client/server platform
+> > would ease the work on the client side ?
+>=20
+> I don't see easy way to avoid work on the client side. However the Java
+> Bluetooth programming is not that big deal (RFCOMM channels only) from
+> what I heard. I never did it and so I might be wrong.
+
+JSR-82 (Java APIs for Bluetooth) provides access to L2CAP, RFCOMM and
+OBEX. You don't get OBEX on Symbian OS v7.0s though. Quite a lot of
+phones provide it these days.
+
+Cheers,
+Steve
+--=20
+Stephen Crane <jscrane@maths.tcd.ie>
+
+--=-Wmg2JxsFyInSEefwB9Lz
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+
+iD8DBQBDxVgdpsgfUm82ChQRAgyzAJ9zsVZh2iuQ52osOD88MxgvPAvUMwCfdSJ5
+5FcN2uWQzlNBsvyz7cWNge0=
+=yRNw
+-----END PGP SIGNATURE-----
+
+--=-Wmg2JxsFyInSEefwB9Lz--
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
