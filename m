@@ -1,15 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] sdptool browse fails with ISSC dongle and Nokia
-	6630 in Ubuntu Breezy
-From: Marcel Holtmann <marcel@holtmann.org>
+From: David Geiger <info@david-geiger.de>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <Pine.GSO.4.61.0601110004590.8744@vipunen.hut.fi>
-References: <Pine.GSO.4.61.0601082205170.8744@vipunen.hut.fi>
-	 <1136909841.7200.13.camel@localhost.localdomain>
-	 <Pine.GSO.4.61.0601110004590.8744@vipunen.hut.fi>
-Content-Type: text/plain
-Message-Id: <1136968254.26114.2.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] ISSC  USB dongle Bluetooth problem
+References: <000a01c6162d$2598ad20$0200000a@EHABLAPTOP> <1136930560.4591.8.camel@localhost.localdomain>
+In-Reply-To: <1136930560.4591.8.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart1628533.43KUpuyfLJ";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <200601111036.06776.info@david-geiger.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,51 +21,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 Jan 2006 09:30:54 +0100
+Date: Wed, 11 Jan 2006 10:35:58 +0100
 
-Hi Jukka,
+--nextPart1628533.43KUpuyfLJ
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> >> When I do "sdptool browse 00:11:9F:C8:D9:36" (that's the
-> >> address of my Nokia 6630) sdptool gives the error:
-> >>
-> >>    Service Search failed: Connection timed out
-> >>
-> >> The following error appears in syslog:
-> >>
-> >>    sdptool: sdp_read_rsp: Client timed out
-> >
-> > what module is in your laptop (hciconfig -a)?
-> 
-> It's not a laptop, it's a desktop. The laptop was a separate 
-> machine I just browsed for testing purposes. On the desktop 
-> that says:
-> 
-> hci0:   Type: USB
->          BD Address: 00:11:67:00:3A:5E ACL MTU: 678:12 SCO 
-> MTU: 48:5
->          UP RUNNING PSCAN ISCAN
->          RX bytes:250069 acl:1993 sco:0 events:2976 errors:0
->          TX bytes:107334 acl:1737 sco:0 commands:464 errors:0
->          Features: 0xff 0xff 0x0d 0x00 0x00 0x00 0x00 0x00
->          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->          Link policy: RSWITCH HOLD SNIFF PARK
->          Link mode: SLAVE ACCEPT
->          Name: 'decoud-0'
->          Class: 0x3e0100
->          Service Classes: Networking, Rendering, Capturing
->          Device Class: Computer, Uncategorized
->          HCI Ver: 1.1 (0x1) HCI Rev: 0x172 LMP Ver: 1.1 (0x1) 
-> LMP Subver: 0x172
->          Manufacturer: Integrated System Solution Corp. (57)
+Am Dienstag, 10. Januar 2006 23:02 schrieb Marcel Holtmann:
+> then you should buy yourself a CSR based dongle.
 
-not again this ISSC dongle. They seem to be really problematic and I
-have no idea why.
+Just a small question about that: I thought it isn't possible to use=20
+snd-bt-sco with a non-CSR dongle at all - independent of the kernel version=
+?!
+Did I miss something here?
 
-Regards
+Regards, David
+=2D-=20
+David Geiger
+info@david-geiger.de
 
-Marcel
+--nextPart1628533.43KUpuyfLJ
+Content-Type: application/pgp-signature
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
 
+iD8DBQBDxNGGzyma4ZJYXKIRAkj0AJ9C4uuNFLxlevcqLxSAX+9f8Kqg4ACggTz9
+fRfIPyof7geR0jh1hJ/jvSA=
+=V0cX
+-----END PGP SIGNATURE-----
+
+--nextPart1628533.43KUpuyfLJ--
 
 
 -------------------------------------------------------
