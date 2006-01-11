@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: David Geiger <info@david-geiger.de>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] ISSC  USB dongle Bluetooth problem
-References: <000a01c6162d$2598ad20$0200000a@EHABLAPTOP> <1136930560.4591.8.camel@localhost.localdomain>
-In-Reply-To: <1136930560.4591.8.camel@localhost.localdomain>
+Message-ID: <43C4C236.5060100@in.tum.de>
+From: Aleksandar Kanchev <kanchev@in.tum.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart1628533.43KUpuyfLJ";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Message-Id: <200601111036.06776.info@david-geiger.de>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] broadcast packets
+References: <BAY24-F20084DBFE3577D788A970CF82F0@phx.gbl> <1136420779.6652.30.camel@localhost> <dpotfk$832$1@sea.gmane.org> <43C1356C.60109@in.tum.de>
+In-Reply-To: <43C1356C.60109@in.tum.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,39 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 Jan 2006 10:35:58 +0100
+Date: Wed, 11 Jan 2006 09:30:46 +0100
 
---nextPart1628533.43KUpuyfLJ
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hello,
 
-Am Dienstag, 10. Januar 2006 23:02 schrieb Marcel Holtmann:
-> then you should buy yourself a CSR based dongle.
+Marcel, could you please answer me that ? :)
 
-Just a small question about that: I thought it isn't possible to use=20
-snd-bt-sco with a non-CSR dongle at all - independent of the kernel version=
-?!
-Did I miss something here?
+Thanks
 
-Regards, David
-=2D-=20
-David Geiger
-info@david-geiger.de
+Aleksandar Kanchev wrote:
 
---nextPart1628533.43KUpuyfLJ
-Content-Type: application/pgp-signature
+> Hello,
+>
+> does bluez support broadcast packets ?
+> I've tried to send a raw broadcast packet to hci and I could see the 
+> remote bluetooth controller blinking as if it is receiving data but 
+> hcidump didn't show anything.
+> Before writing the packet I've connected the both devices with 
+> "hcitool cc <addr>" and I wrote the packet from the connecting side 
+> (the master).
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2 (GNU/Linux)
 
-iD8DBQBDxNGGzyma4ZJYXKIRAkj0AJ9C4uuNFLxlevcqLxSAX+9f8Kqg4ACggTz9
-fRfIPyof7geR0jh1hJ/jvSA=
-=V0cX
------END PGP SIGNATURE-----
-
---nextPart1628533.43KUpuyfLJ--
 
 
 -------------------------------------------------------
