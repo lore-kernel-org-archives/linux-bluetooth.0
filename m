@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] OBEX data rate
+Subject: Re: [Bluez-devel] Developing a basic service for BlueTooth enabled
+	devices
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43C3F293.2030006@sacet.com>
-References: <43C3F293.2030006@sacet.com>
+In-Reply-To: <20060111093621.14949.qmail@web37008.mail.mud.yahoo.com>
+References: <20060111093621.14949.qmail@web37008.mail.mud.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1136990317.3825.37.camel@localhost.localdomain>
+Message-Id: <1136989762.3825.29.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,21 +19,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 Jan 2006 15:38:37 +0100
+Date: Wed, 11 Jan 2006 15:29:22 +0100
 
 Hi,
 
-> Is it possible to obtain the instantaneous data rate of a file transfer 
-> between two bluetooth devices on OBEX ?
+> I am trying to develop a simple service application that will run on
+> Linux boxes and serve ad hoc BlueTooth clients (mostly phones and
+> PDAs) using BlueZ stack. However, I want to eliminate the dev effort
+> on the client side as much as possible. There are many varieties of
+> platforms on the client side and I am by myself who is working on this
+> (at home). 
+> 
+> My first approach was to develep a web service with Apache for WAP
+> enabled  browsers that would run locally on each Linux server boxes
+> and serve WAP pages to the local ad-hoc mobile clients in order to
+> eliminate the client side development effort. However, it looks like
+> for many mobile devices I won't be able to do that. I have Motorola
+> RAZR V3 Java enabled phone at home and I could not do this by
+> establishing a piconet between my Kubuntu box and RAZR V3. 
+> 
+> What would be your suggestion? What kind of client/server platform
+> would ease the work on the client side ?
 
-no, you have to measure it by yourself.
-
-> Otherwise, which process manage the event callback of the OBEX layer ? 
-> When an OBEX event occurs, like OBEX_EV_PROGRESS in the program 
-> obex_test, how many bytes are transmitted ?
-
-This depends on the negotiated OBEX MTU and you need to do it all by
-yourself.
+I don't see easy way to avoid work on the client side. However the Java
+Bluetooth programming is not that big deal (RFCOMM channels only) from
+what I heard. I never did it and so I might be wrong.
 
 Regards
 
