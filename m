@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Developing a basic service for BlueTooth enabled
-	devices
-From: Stephen Crane <jscrane@maths.tcd.ie>
+Subject: Re: [Bluez-devel] OBEX data rate
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1136989762.3825.29.camel@localhost.localdomain>
-References: <20060111093621.14949.qmail@web37008.mail.mud.yahoo.com>
-	 <1136989762.3825.29.camel@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-Wmg2JxsFyInSEefwB9Lz"
-Message-Id: <1137006621.7489.20.camel@localhost.localdomain>
+In-Reply-To: <43C3F293.2030006@sacet.com>
+References: <43C3F293.2030006@sacet.com>
+Content-Type: text/plain
+Message-Id: <1136990317.3825.37.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,53 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 Jan 2006 19:10:21 +0000
+Date: Wed, 11 Jan 2006 15:38:37 +0100
 
+Hi,
 
---=-Wmg2JxsFyInSEefwB9Lz
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+> Is it possible to obtain the instantaneous data rate of a file transfer 
+> between two bluetooth devices on OBEX ?
 
-Hello world,
+no, you have to measure it by yourself.
 
-On Wed, 2006-01-11 at 15:29 +0100, Marcel Holtmann wrote:
-> > My first approach was to develep a web service with Apache for WAP
-> > enabled  browsers that would run locally on each Linux server boxes
-> > and serve WAP pages to the local ad-hoc mobile clients in order to
-> > eliminate the client side development effort. However, it looks like
-> > for many mobile devices I won't be able to do that. I have Motorola
-> > RAZR V3 Java enabled phone at home and I could not do this by
-> > establishing a piconet between my Kubuntu box and RAZR V3.=20
-> >=20
-> > What would be your suggestion? What kind of client/server platform
-> > would ease the work on the client side ?
->=20
-> I don't see easy way to avoid work on the client side. However the Java
-> Bluetooth programming is not that big deal (RFCOMM channels only) from
-> what I heard. I never did it and so I might be wrong.
+> Otherwise, which process manage the event callback of the OBEX layer ? 
+> When an OBEX event occurs, like OBEX_EV_PROGRESS in the program 
+> obex_test, how many bytes are transmitted ?
 
-JSR-82 (Java APIs for Bluetooth) provides access to L2CAP, RFCOMM and
-OBEX. You don't get OBEX on Symbian OS v7.0s though. Quite a lot of
-phones provide it these days.
+This depends on the negotiated OBEX MTU and you need to do it all by
+yourself.
 
-Cheers,
-Steve
---=20
-Stephen Crane <jscrane@maths.tcd.ie>
+Regards
 
---=-Wmg2JxsFyInSEefwB9Lz
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
+Marcel
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.0 (GNU/Linux)
-
-iD8DBQBDxVgdpsgfUm82ChQRAgyzAJ9zsVZh2iuQ52osOD88MxgvPAvUMwCfdSJ5
-5FcN2uWQzlNBsvyz7cWNge0=
-=yRNw
------END PGP SIGNATURE-----
-
---=-Wmg2JxsFyInSEefwB9Lz--
 
 
 
