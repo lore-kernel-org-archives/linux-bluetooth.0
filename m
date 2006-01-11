@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43C549AE.7060209@pagestation.com>
-From: Jerry Geis <geisj@pagestation.com>
-MIME-Version: 1.0
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: multipart/alternative;
- boundary="------------070903070403010502000803"
-Subject: [Bluez-users] btsco configure  gives "could not run ao test program"
+Subject: Re: [Bluez-users] SAP service connection problem
+Message-ID: <20060111175207.GA3775@localhost.localdomain>
+References: <9772C290CD0BDF4B91356C9102BA886A02D10A43@ftrdmel1.rd.francetelecom.fr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <9772C290CD0BDF4B91356C9102BA886A02D10A43@ftrdmel1.rd.francetelecom.fr>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,58 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 Jan 2006 13:08:46 -0500
+Date: Wed, 11 Jan 2006 19:52:07 +0200
 
-This is a multi-part message in MIME format.
---------------070903070403010502000803
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
+> I actually use a 16 digits pin code.
 
-I am using centos 4.2
+The next step I'd try is to disable auth and encrypt in hcid.conf since
+security mode 3 is probably not what you want. After that remove the
+link key and try again. The phone should initiate pairing when you try
+to connect to the SAP RFCOMM channel. Alternatively you can try to do
+the pairing manually before creating the RFCOMM connection (e.g. with
+HCI_Create_Connection and HCI_Authentication_Requested).
 
-./configure gives "Could not run ao test program"
-in the config.log
-
-conftest.c ao/ao.h no such file or directory.
-
-What am I missing that has this file?
-
-I have alsa 1.0.11rc2 installed.
-
-THanks,
-
-Jerry
-
---------------070903070403010502000803
-Content-Type: text/html; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
-  <title></title>
-</head>
-<body bgcolor="#ffffff" text="#000000">
-<font size="+1">I am using centos 4.2<br>
-<br>
-./configure gives "Could not run ao test program"<br>
-in the config.log<br>
-<br>
-conftest.c ao/ao.h no such file or directory.<br>
-<br>
-What am I missing that has this file?<br>
-<br>
-I have alsa 1.0.11rc2 installed.<br>
-<br>
-THanks,<br>
-<br>
-Jerry<br>
-</font>
-</body>
-</html>
-
---------------070903070403010502000803--
+Johan
 
 
 -------------------------------------------------------
