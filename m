@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060113090337.27122.qmail@webmaild.fe1.aruba.it>
-From: "Peppe Colicchia" <bluez.list@pc-labs.org>
+Subject: Re: [Bluez-users] bluetooth settings in debian
+From: Fredy Pulido =?ISO-8859-1?Q?L=F3pez?= <digitalfredy@debiancolombia.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <20060106100921.4675.qmail@web60620.mail.yahoo.com>
+References: <20060106100921.4675.qmail@web60620.mail.yahoo.com>
+Content-Type: text/plain; charset=iso-8859-1
+Message-Id: <1136943042.3165.23.camel@yoda.digitalfredy.org>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="iso-8859-1"
-Subject: [Bluez-users] cannot cat /dev/bluetooth/rfcomm/0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,63 +18,52 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Jan 2006 10:03:37 +0100
+Date: Tue, 10 Jan 2006 20:30:42 -0500
 
-Hi all,
-my ipaq 3870 (with a built-in bluetooth device) is running Familiar Linux 
-0.8.2 with OPIE, i would like to use it with a GPS device (Nemerix BT77 
-chipset). I was able to get NMEA output time ago, now i'm trying again but 
-maybe i'm missing something - so please tell me where i'm wrong: 
-
-root@h3600:~# hciconfig -a
-hci0:   Type: UART
-       BD Address: 00:02:C7:0C:AA:B5 ACL MTU: 128:8 SCO MTU: 64:8
-       UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-       RX bytes:929 acl:13 sco:0 events:34 errors:0
-       TX bytes:985 acl:12 sco:0 commands:16 errors:0
-       Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
-       Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-       Link policy: RSWITCH HOLD SNIFF PARK
-       Link mode: SLAVE ACCEPT
-       Name: 'No name'
-       Class: 0x120112
-       Service Classes: Networking
-       Device Class: Computer, Handheld
-       HCI Ver: 1.1 (0x1) HCI Rev: 0x72 LMP Ver: 1.1 (0x1) LMP Subver: 0x72
-       Manufacturer: Cambridge Silicon Radio (10)
-root@h3600:~# cat /etc/bluetooth/rfcomm.conf
-rfcomm0 {
-       bind yes;
-       device 00:08:1B:8C:3F:A2;
-       channel 1;
-       comment "BT device";
-}
-root@h3600:~# cat /etc/bluetooth/pin
-0000
-root@h3600:~# rfcomm
-rfcomm0: 00:08:1B:8C:3F:A2 channel 1 clean
-root@h3600:~# hcitool scan
-Scanning ...
-       00:08:1B:8C:3F:A2       BT GPS
-root@h3600:~# ps aux
- -cut-
- 788 root        584 S   hcid: processing events
- 794 root        532 S   /sbin/sdpd
- 988 root        368 S   hciattach -p /dev/ttySB0 bcsp 230400
- -cut-
-root@h3600:~# cat /dev/bluetooth/rfcomm/0 
-
-blank. nothing, no output. Time ago with the same O.S. version i was able to 
-see the NMEA output, so i used gpsd and a navigator. CTRL-C and... 
-
-root@h3600:~# rfcomm
-rfcomm0: 00:08:1B:8C:3F:A2 channel 1 closed 
-
-where is the mistake? any help is appreciated. I have not the hcidump tool 
-for my PDA (StrongARM cpu). 
-
-Regards,
-Peppe Colicchia 
+El vie, 06-01-2006 a las 10:09 +0000, ronny hidayat escribi=F3:
+> Hello again,
+> =20
+> Do you know what command should I use to send/receive file via
+> bluetooth ?
+> Where should I put PIN number ?
+The PIN number is in /etc/bluetooth/pin but if your pin_helper not read
+it (it's the default in debian) you needs change your pin_helper
+> Are there any documentation too ?
+> =20
+> Thanks
+> Ronny
+>=20
+> Marcel Holtmann <marcel@holtmann.org> wrote:
+>         Hi Ronny,
+>        =20
+>         > I have Linux Debian 2.6, bluetooth & Bluez already
+>         installed.
+>         > But I don't know how to change setting for bluetooth (like
+>         friendly
+>         > name & services).
+>         > How / Where can I find those settings ?
+>        =20
+>         Look at /etc/bluetooth/hcid.conf.
+>        =20
+>         > I want to make program like rfcomm server that can receive
+>         connection
+>         > up to 7 client and then sending messages between them.
+>         > Does bluez support this ?
+>        =20
+>         Yes.
+>        =20
+>         > Maybe anyone has documentation or sample program for t his ?
+>        =20
+>         Look at the source code of bluez-utils.
+>        =20
+>         Regards
+>        =20
+>         Marcel
+>        =20
+>=20
+> Send instant messages to your online friends
+> http://uk.messenger.yahoo.com=20
+>=20
 
 
 
