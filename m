@@ -1,11 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <19c2b3920601110619x37c6e4ck@mail.gmail.com>
-From: rangzen <lipare@gmail.com>
+Subject: Re: [Bluez-users] sdptool browse fails with ISSC dongle and Nokia
+	6630 in Ubuntu Breezy
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_57585_1133652.1136989146990"
-Subject: [Bluez-users] Strange things with SE K750i and remote control
+In-Reply-To: <Pine.GSO.4.61.0601111438030.8744@vipunen.hut.fi>
+References: <Pine.GSO.4.61.0601082205170.8744@vipunen.hut.fi>
+	 <1136909841.7200.13.camel@localhost.localdomain>
+	 <Pine.GSO.4.61.0601110004590.8744@vipunen.hut.fi>
+	 <1136968254.26114.2.camel@localhost.localdomain>
+	 <Pine.GSO.4.61.0601111438030.8744@vipunen.hut.fi>
+Content-Type: text/plain
+Message-Id: <1136988524.3825.23.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,89 +23,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 Jan 2006 15:19:06 +0100
+Date: Wed, 11 Jan 2006 15:08:44 +0100
 
-------=_Part_57585_1133652.1136989146990
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Jukka,
 
-Hello,
+> >>          Manufacturer: Integrated System Solution Corp. (57)
+> >
+> > not again this ISSC dongle. They seem to be really problematic and I
+> > have no idea why.
+> 
+> Fine, I'll throw it away and get a new one then. Any idea 
+> what dongles would work best in Linux? What chipset to look 
+> for etc.?
 
-i can upload/download files without any problem using bluetooth.
+if you don't return it, donate it to me and I might be able to sort the
+problems with dongles out. I personally prefer CSR based dongles. They
+work really great and we know a lot about them. Try to get the latest
+BlueCore4 based dongles. Look at my EDR page for some examples.
 
-But when i use the remote control fonction, i need to delete the device i
-want to use before use it if i used it before :/
+Regards
 
-For example :
-i have no device declared on the phone
-i choose remote control desktop
-the phone find my USB key device
-i choose yes yes yes yes in the menu and i can control my mouse, etc.
-everything fine
-i go out in the menu, send a sms, make a call or even nothing
-i go back to the remote control menu and choose the device found just befor=
-e
-the phone write "impossible to connect" and /var/log/daemon add
-a hcid[pid]: link_key_request sba USB dba MyPhone
-i go in the device known by the phone, delete the connexion
-i retry and it works again :/
+Marcel
 
-Exactly the same things if i make the connection from the PC
-only difference is
-#hidd --connect 00:phonebt:00
-Can't create HID control channel: Connection refused
 
-The phone is configured with "Always accept" from this device
-
-I have a Ubuntu 5.10 with
-
-Any idea ?
-
---
-libert=E9 - partage - respect
-freedom - share - respect
-
-------=_Part_57585_1133652.1136989146990
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hello,<br>
-<br>
-i can upload/download files without any problem using bluetooth.<br>
-<br>
-But when i use the remote control fonction, i need to delete the device i w=
-ant to use before use it if i used it before :/<br>
-<br>
-For example :<br>
-i have no device declared on the phone<br>
-i choose remote control desktop<br>
-the phone find my USB key device<br>
-i choose yes yes yes yes in the menu and i can control my mouse, etc.<br>
-everything fine<br>
-i go out in the menu, send a sms, make a call or even nothing<br>
-i go back to the remote control menu and choose the device found just befor=
-e<br>
-the phone write &quot;impossible to connect&quot; and /var/log/daemon add<b=
-r>
-a hcid[pid]: link_key_request sba USB dba MyPhone<br>
-i go in the device known by the phone, delete the connexion<br>
-i retry and it works again :/<br>
-<br>
-Exactly the same things if i make the connection from the PC<br>
-only difference is<br>
-#hidd --connect 00:phonebt:00<br>
-Can't create HID control channel: Connection refused<br>
-<br>
-The phone is configured with &quot;Always accept&quot; from this device<br>
-<br>
-I have a Ubuntu 5.10 with<br>
-<br>
-Any idea ?<br clear=3D"all"><br>-- <br>libert=E9 - partage - respect<br>fre=
-edom - share - respect
-
-------=_Part_57585_1133652.1136989146990--
 
 
 -------------------------------------------------------
