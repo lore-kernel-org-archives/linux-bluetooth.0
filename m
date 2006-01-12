@@ -3,7 +3,7 @@ MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="iso-8859-1"
 Subject: RE: [Bluez-users] SAP service connection problem
-Message-ID: <9772C290CD0BDF4B91356C9102BA886A02D10E48@ftrdmel1.rd.francetelecom.fr>
+Message-ID: <9772C290CD0BDF4B91356C9102BA886A02D10C19@ftrdmel1.rd.francetelecom.fr>
 From: "zze-eperspace HUE E ext RD-SIRP-CAE" <ehue.ext@rd.francetelecom.com>
 To: <bluez-users@lists.sourceforge.net>
 Sender: bluez-users-admin@lists.sourceforge.net
@@ -17,13 +17,10 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 12 Jan 2006 11:20:51 +0100
+Date: Thu, 12 Jan 2006 09:53:09 +0100
 
-I tried with an other USB dongle (TDK Bluetooth USB adapter II) and it's =
-working fine. Maybe the developpers will want to inquire about this =
-problem with the D-Link DBT-120 (hardware version B4).
-
-Thanks for your help.=20
+I tried all 4 combinations of auth and encrypt, and none worked. Pairing =
+works fine, but connection is still rejected on SAP channel.
 
 -----Message d'origine-----
 De : bluez-users-admin@lists.sourceforge.net =
