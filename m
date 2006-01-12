@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43C639EC.6080701@cs.bgu.ac.il>
-From: Niv <nivv@cs.bgu.ac.il>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-References: <43BD20A1.6020505@fastmail.fm>
-In-Reply-To: <43BD20A1.6020505@fastmail.fm>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Subject: [Bluez-users] suported bluetooth equipment for linux
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Subject: RE: [Bluez-users] SAP service connection problem
+Message-ID: <9772C290CD0BDF4B91356C9102BA886A02D10E48@ftrdmel1.rd.francetelecom.fr>
+From: "zze-eperspace HUE E ext RD-SIRP-CAE" <ehue.ext@rd.francetelecom.com>
+To: <bluez-users@lists.sourceforge.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,13 +17,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 12 Jan 2006 13:13:48 +0200
+Date: Thu, 12 Jan 2006 11:20:51 +0100
 
-Is there a page that has all dongles tested with bluez , and oher 
-equipment that work?
-I would be glad to help start a page like that that may help ppl.
+I tried with an other USB dongle (TDK Bluetooth USB adapter II) and it's =
+working fine. Maybe the developpers will want to inquire about this =
+problem with the D-Link DBT-120 (hardware version B4).
 
-Niv
+Thanks for your help.=20
+
+-----Message d'origine-----
+De : bluez-users-admin@lists.sourceforge.net =
+[mailto:bluez-users-admin@lists.sourceforge.net] De la part de Johan =
+Hedberg
+Envoy=E9 : mercredi 11 janvier 2006 18:52
+=C0 : bluez-users@lists.sourceforge.net
+Objet : Re: [Bluez-users] SAP service connection problem
+
+> I actually use a 16 digits pin code.
+
+The next step I'd try is to disable auth and encrypt in hcid.conf since =
+security mode 3 is probably not what you want. After that remove the =
+link key and try again. The phone should initiate pairing when you try =
+to connect to the SAP RFCOMM channel. Alternatively you can try to do =
+the pairing manually before creating the RFCOMM connection (e.g. with =
+HCI_Create_Connection and HCI_Authentication_Requested).
+
+Johan
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log =
+files for problems?  Stop!  Download the new AJAX search engine that =
+makes searching your log files as easy as surfing the  web.  DOWNLOAD =
+SPLUNK!
+http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
