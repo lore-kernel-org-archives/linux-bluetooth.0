@@ -1,59 +1,63 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Problems with smart phones when using a "silent"
-	kernel
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1137061188.5258.17.camel@localhost.localdomain>
-References: <1137061188.5258.17.camel@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1137072442.5013.3.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 12 Jan 2006 14:27:22 +0100
+Return-Path: <kaber@trash.net>
+Message-ID: <43C64B0C.2080903@trash.net>
+Date: Thu, 12 Jan 2006 13:26:52 +0100
+From: Patrick McHardy <kaber@trash.net>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Wolfgang Walter <wolfgang.walter@studentenwerk.mhn.de>,
+        bluez-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        maxk@qualcomm.com
+Subject: Re: patch: problem with sco
+References: <200601120138.31791.wolfgang.walter@studentenwerk.mhn.de> <1137057244.3955.3.camel@localhost.localdomain>
+In-Reply-To: <1137057244.3955.3.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Victor,
+Marcel Holtmann wrote:
+>>A friend and I encountered a problem with sco transfers to a headset using
+>>linux (vanilla 2.6.15). While all sco packets sent by the headset were
+>>received there was no outgoing traffic.
+>>
+>>After switching debugging output on we found that actually sco_cnt was always
+>>zero in hci_sched_sco.
 
-> I have a very strange problem here. When using a "silent" kernel
-> (CONFIG_CMDLINE="console=/dev/null quiet" instead of
-> CONFIG_CMDLINE="console=ttySAC0,115200") It is no longer possible to
-> pair with Microsoft smartphones. A phone reports "the connection failed
-> or pass key is incorrect". If a phone was already paired everything
-> works fine. Other phones work fine too. Any clue what can go wrong. All
-> this doesn't make much sence, but it is reality :) I've attached the
-> dumps for the same phone for both of the kernels (silent and not). We
-> use 2.6.13 with bluez 2.15 and there is no option to switch to something
-> more recent. Just wonder what can cause the problem.... From the log I
-> see that pairing actually went ok, cause it switched on encryption mode
-> and exchanged some AT's, might be something with our application as
-> well, but does not seem to be likelly...
+I'm seeing the exact same problem with a Logitech "mobile Freedom"
+headset. I'm using this patch to work around the problem:
 
-I don't see any strange inside the dump and I doubt that it really has
-something to do with the console option. Maybe your application can live
-if the console is /dev/null.
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1239,7 +1239,7 @@ static inline void hci_sched_sco(struct
 
-Regards
+         BT_DBG("%s", hdev->name);
 
-Marcel
+-       while (hdev->sco_cnt && (conn = hci_low_sent(hdev, SCO_LINK, 
+&quote))) {
++       while (/* hdev->sco_cnt && */ (conn = hci_low_sent(hdev, 
+SCO_LINK, &quote))) {
+                 while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
+                         BT_DBG("skb %p len %d", skb, skb->len);
+                         hci_send_frame(skb);
 
 
+> send in the information from "hciconfig -a" for this device, because
+> this is a hardware bug and you can't be sure that you can have eight
+> outstanding SCO packets.
 
+In my case:
 
--------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
-for problems?  Stop!  Download the new AJAX search engine that makes
-searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+hci0:   Type: USB
+         BD Address: 00:10:C6:86:64:27 ACL MTU: 377:10 SCO MTU: 48:64
+         UP RUNNING PSCAN ISCAN
+         RX bytes:622370 acl:27 sco:12167 events:69 errors:0
+         TX bytes:588454 acl:25 sco:11520 commands:35 errors:0
+         Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+         Link policy: RSWITCH HOLD SNIFF PARK
+         Link mode: SLAVE ACCEPT
+         Name: 'krusty-0'
+         Class: 0x3e0100
+         Service Classes: Networking, Rendering, Capturing
+         Device Class: Computer, Uncategorized
+         HCI Ver: 1.2 (0x2) HCI Rev: 0x11 LMP Ver: 1.2 (0x2) LMP Subver: 
+0x6963
+         Manufacturer: Broadcom Corporation (15)
