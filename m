@@ -1,100 +1,40 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: RE: [Bluez-devel] Problems with smart phones when using a "silent"kernel
-Message-ID: <C70061B183DE09419568AB2060C52A9501750326@arion.intra.local>
-From: "Victor Shcherbatyuk" <Victor.Shcherbatyuk@tomtom.com>
-To: <bluez-devel@lists.sourceforge.net>
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 12 Jan 2006 14:35:29 +0100
+Return-Path: <linux-kernel-owner+marcel=40holtmann.org-S1751165AbWALNbV@vger.kernel.org>
+Subject: Re: patch: problem with sco
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Patrick McHardy <kaber@trash.net>
+Cc: Wolfgang Walter <wolfgang.walter@studentenwerk.mhn.de>,
+        bluez-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        maxk@qualcomm.com
+In-Reply-To: <43C64B0C.2080903@trash.net>
+References: <200601120138.31791.wolfgang.walter@studentenwerk.mhn.de>
+	 <1137057244.3955.3.camel@localhost.localdomain>
+	 <43C64B0C.2080903@trash.net>
+Content-Type: text/plain
+Date: Thu, 12 Jan 2006 14:31:47 +0100
+Message-Id: <1137072707.5013.7.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-kernel-owner@vger.kernel.org
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Marcel,
+Hi Patrick,
 
-Well, there are some PSM not supported packets in the failing dump. But
-I still can not figure out what is wrong there... Thanks.
+> >>A friend and I encountered a problem with sco transfers to a headset using
+> >>linux (vanilla 2.6.15). While all sco packets sent by the headset were
+> >>received there was no outgoing traffic.
+> >>
+> >>After switching debugging output on we found that actually sco_cnt was always
+> >>zero in hci_sched_sco.
+> 
+> I'm seeing the exact same problem with a Logitech "mobile Freedom"
+> headset. I'm using this patch to work around the problem:
 
-Regards,
-    Victor.=20
+so it seems that Broadcom really messed the SCO MTU settings up and we
+have to workaround with some sane values.
 
------Original Message-----
-From: bluez-devel-admin@lists.sourceforge.net
-[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: Thursday, January 12, 2006 14:27 PM
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Problems with smart phones when using a
-"silent"kernel
-
-Hi Victor,
-
-> I have a very strange problem here. When using a "silent" kernel=20
-> (CONFIG_CMDLINE=3D"console=3D/dev/null quiet" instead of
-> CONFIG_CMDLINE=3D"console=3DttySAC0,115200") It is no longer possible t=
-o=20
-> pair with Microsoft smartphones. A phone reports "the connection=20
-> failed or pass key is incorrect". If a phone was already paired=20
-> everything works fine. Other phones work fine too. Any clue what can=20
-> go wrong. All this doesn't make much sence, but it is reality :) I've=20
-> attached the dumps for the same phone for both of the kernels (silent=20
-> and not). We use 2.6.13 with bluez 2.15 and there is no option to=20
-> switch to something more recent. Just wonder what can cause the=20
-> problem.... From the log I see that pairing actually went ok, cause it
-
-> switched on encryption mode and exchanged some AT's, might be=20
-> something with our application as well, but does not seem to be
-likelly...
-
-I don't see any strange inside the dump and I doubt that it really has
-something to do with the console option. Maybe your application can live
-if the console is /dev/null.
+Please also include the lspci for these devices.
 
 Regards
 
 Marcel
 
 
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc. Do you grep through log
-files for problems?  Stop!  Download the new AJAX search engine that
-makes searching your log files as easy as surfing the  web.  DOWNLOAD
-SPLUNK!
-http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
-This e-mail message contains information which is confidential and may be=
- privileged. It is intended for use by the addressee only. If you are not=
- the intended addressee, we request that you notify the sender immediatel=
-y and delete or destroy this e-mail message and any attachment(s), withou=
-t copying, saving, forwarding, disclosing or using its contents in any ot=
-her way. TomTom N.V., TomTom International BV or any other company belong=
-ing to the TomTom group of companies will not be liable for damage relati=
-ng to the communication by e-mail of data, documents or any other informa=
-tion.
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
-for problems?  Stop!  Download the new AJAX search engine that makes
-searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
