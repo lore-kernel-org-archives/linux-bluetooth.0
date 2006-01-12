@@ -1,332 +1,100 @@
-Return-Path: <kaber@trash.net>
-Message-ID: <43C65FF1.7060208@trash.net>
-Date: Thu, 12 Jan 2006 14:56:01 +0100
-From: Patrick McHardy <kaber@trash.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Wolfgang Walter <wolfgang.walter@studentenwerk.mhn.de>,
-        bluez-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-        maxk@qualcomm.com
-Subject: Re: patch: problem with sco
-References: <200601120138.31791.wolfgang.walter@studentenwerk.mhn.de>	 <1137057244.3955.3.camel@localhost.localdomain>	 <43C64B0C.2080903@trash.net> <1137072707.5013.7.camel@localhost.localdomain>
-In-Reply-To: <1137072707.5013.7.camel@localhost.localdomain>
-Content-Type: multipart/mixed;
- boundary="------------040104090204010103090504"
-List-ID: <bluez-devel.lists.sourceforge.net>
-
-This is a multi-part message in MIME format.
---------------040104090204010103090504
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-
-Marcel Holtmann wrote:
->>I'm seeing the exact same problem with a Logitech "mobile Freedom"
->>headset. I'm using this patch to work around the problem:
-> 
-> 
-> so it seems that Broadcom really messed the SCO MTU settings up and we
-> have to workaround with some sane values.
-> 
-> Please also include the lspci for these devices.
-
-Its an USB device. I've attached the output of "lsusb -v", in case
-that helps.
-
---------------040104090204010103090504
 Content-Type: text/plain;
- name="x"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="x"
+	charset="us-ascii"
+Subject: RE: [Bluez-devel] Problems with smart phones when using a "silent"kernel
+Message-ID: <C70061B183DE09419568AB2060C52A9501750326@arion.intra.local>
+From: "Victor Shcherbatyuk" <Victor.Shcherbatyuk@tomtom.com>
+To: <bluez-devel@lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 12 Jan 2006 14:35:29 +0100
 
-Bus 002 Device 003: ID 03f0:011d Hewlett-Packard 
-Device Descriptor:
-  bLength                18
-  bDescriptorType         1
-  bcdUSB               1.10
-  bDeviceClass          224 Wireless
-  bDeviceSubClass         1 Radio Frequency
-  bDeviceProtocol         1 Bluetooth
-  bMaxPacketSize0        64
-  idVendor           0x03f0 Hewlett-Packard
-  idProduct          0x011d 
-  bcdDevice            0.17
-  iManufacturer           1 Broadcom
-  iProduct                2 HP integrated Bluetooth module
-  iSerial                 0 
-  bNumConfigurations      1
-  Configuration Descriptor:
-    bLength                 9
-    bDescriptorType         2
-    wTotalLength          216
-    bNumInterfaces          4
-    bConfigurationValue     1
-    iConfiguration          0 
-    bmAttributes         0xe0
-      Self Powered
-      Remote Wakeup
-    MaxPower                0mA
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        0
-      bAlternateSetting       0
-      bNumEndpoints           3
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0 
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x81  EP 1 IN
-        bmAttributes            3
-          Transfer Type            Interrupt
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0010  1x 16 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x82  EP 2 IN
-        bmAttributes            2
-          Transfer Type            Bulk
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x02  EP 2 OUT
-        bmAttributes            2
-          Transfer Type            Bulk
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       0
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0 
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0000  1x 0 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0000  1x 0 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       1
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0 
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0009  1x 9 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0009  1x 9 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       2
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0 
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0011  1x 17 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0011  1x 17 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       3
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0 
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0020  1x 32 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0020  1x 32 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       4
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0 
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       5
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0 
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        2
-      bAlternateSetting       0
-      bNumEndpoints           2
-      bInterfaceClass       255 Vendor Specific Class
-      bInterfaceSubClass    255 Vendor Specific Subclass
-      bInterfaceProtocol    255 Vendor Specific Protocol
-      iInterface              0 
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x84  EP 4 IN
-        bmAttributes            2
-          Transfer Type            Bulk
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0020  1x 32 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x04  EP 4 OUT
-        bmAttributes            2
-          Transfer Type            Bulk
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0020  1x 32 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        3
-      bAlternateSetting       0
-      bNumEndpoints           0
-      bInterfaceClass       254 Application Specific Interface
-      bInterfaceSubClass      1 Device Firmware Update
-      bInterfaceProtocol      0 
-      iInterface              0 
-Device Status:     0x0001
-  Self Powered
+Marcel,
 
---------------040104090204010103090504--
+Well, there are some PSM not supported packets in the failing dump. But
+I still can not figure out what is wrong there... Thanks.
+
+Regards,
+    Victor.=20
+
+-----Original Message-----
+From: bluez-devel-admin@lists.sourceforge.net
+[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Marcel
+Holtmann
+Sent: Thursday, January 12, 2006 14:27 PM
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Problems with smart phones when using a
+"silent"kernel
+
+Hi Victor,
+
+> I have a very strange problem here. When using a "silent" kernel=20
+> (CONFIG_CMDLINE=3D"console=3D/dev/null quiet" instead of
+> CONFIG_CMDLINE=3D"console=3DttySAC0,115200") It is no longer possible t=
+o=20
+> pair with Microsoft smartphones. A phone reports "the connection=20
+> failed or pass key is incorrect". If a phone was already paired=20
+> everything works fine. Other phones work fine too. Any clue what can=20
+> go wrong. All this doesn't make much sence, but it is reality :) I've=20
+> attached the dumps for the same phone for both of the kernels (silent=20
+> and not). We use 2.6.13 with bluez 2.15 and there is no option to=20
+> switch to something more recent. Just wonder what can cause the=20
+> problem.... From the log I see that pairing actually went ok, cause it
+
+> switched on encryption mode and exchanged some AT's, might be=20
+> something with our application as well, but does not seem to be
+likelly...
+
+I don't see any strange inside the dump and I doubt that it really has
+something to do with the console option. Maybe your application can live
+if the console is /dev/null.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log
+files for problems?  Stop!  Download the new AJAX search engine that
+makes searching your log files as easy as surfing the  web.  DOWNLOAD
+SPLUNK!
+http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
+This e-mail message contains information which is confidential and may be=
+ privileged. It is intended for use by the addressee only. If you are not=
+ the intended addressee, we request that you notify the sender immediatel=
+y and delete or destroy this e-mail message and any attachment(s), withou=
+t copying, saving, forwarding, disclosing or using its contents in any ot=
+her way. TomTom N.V., TomTom International BV or any other company belong=
+ing to the TomTom group of companies will not be liable for damage relati=
+ng to the communication by e-mail of data, documents or any other informa=
+tion.
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
