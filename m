@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43C80A35.3000101@messagenetsystems.com>
-From: Jerry Geis <jgeis@messagenetsystems.com>
+Message-ID: <43C809DA.1050302@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] btsco.41 not compiling
-References: <43C69F77.8050701@pagestation.com> <43C7D767.8080501@xmission.com> <43C7D8B8.1060701@messagenetsystems.com> <43C7D992.7040401@xmission.com>
-In-Reply-To: <43C7D992.7040401@xmission.com>
-Content-Type: multipart/alternative;
- boundary="------------080708020901080402010106"
+Subject: Re: [Bluez-users] a2play question
+References: <43C1A15F.3040001@xmission.com> <9lorfQU9SyB@trebges.web.de>
+In-Reply-To: <9lorfQU9SyB@trebges.web.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,152 +18,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Jan 2006 15:14:45 -0500
+Date: Fri, 13 Jan 2006 13:13:14 -0700
 
-This is a multi-part message in MIME format.
---------------080708020901080402010106
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
+Dietmar
 
-Brad,
+> i have downloaded and installed btsco-0.41. I also have installed the rtc
+> module of the 2.4.26 kernel.
+> 
+> mpg123 --au - musik.mp3 | ./a2play -p 00:4F:62:05:53:8A
+> 
+> works, but after some seconds i can hear a dropout.
 
+does it drop out for a second or so and come back? i was noticing that a
+lot on a machine using nvidia drivers. i suspect they turn off
+interrupts in their driver.
 
-I backd off to 0.4 and it compiles. however, when I run depmod all is OK
-then run modprobe snd-bt-sco and I get an error about
+> Wiht the 2.4.32 kernel the dropouts are also to hear.
 
-snd_bt_sco: disagrees about version of symbol  snd_ctl_add
-unknown symbol snd_ctl_add.
+2.6.x may behave better
 
-There are a number of others also, snd_card_register, etccc....
+> Can or must i configure the headphone-profile with hcitool/sdptool, the
+> bt-120ar has an integrated microphon.
 
-What is wrong with that? alsa works fine on my machine...
+hcitool/sdptool is not how you make the mic work and it won't help with
+dropouts.
 
-Jerry Geis
-MessageNet Systems
-101 East Carmel Dr. Suite 105
-Carmel, IN 46032
-(317)566-1677
-(317)663-0808 Fax
-
-
-Brad Midgley wrote:
-
->Jerry Geis wrote:
->  
->
->>gcc -version reports 3.4.4
->>
->>I am running a redhat kernel uname -r gives 2.6.9.-22.0.1-EL
->>
->>My machine compiles alsa-drivers just fine. It has all kinds of
->>module_param_array statesments also....
->>Why would this be failing?
->>    
->>
->
->so it uses module_params_array similarly? is index declared in the same way?
->
->this stuff was part of a submission i accepted a few months ago to
->prevent the btsco adapter from making itself the first adapter. you
->could look in cvs for the version before the change.
->
->brad
->
->
->-------------------------------------------------------
->This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
->for problems?  Stop!  Download the new AJAX search engine that makes
->searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
->http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
->_______________________________________________
->Bluez-users mailing list
->Bluez-users@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
->  
->
-
---------------080708020901080402010106
-Content-Type: text/html; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
-  <title></title>
-</head>
-<body bgcolor="#ffffff" text="#000000">
-<font size="+1">Brad,<br>
-<br>
-<br>
-I backd off to 0.4 and it compiles. however, when I run depmod all is OK<br>
-then run modprobe snd-bt-sco and I get an error about<br>
-<br>
-snd_bt_sco: disagrees about version of symbol&nbsp; snd_ctl_add<br>
-unknown symbol snd_ctl_add.<br>
-<br>
-There are a number of others also, snd_card_register, etccc....<br>
-<br>
-What is wrong with that? alsa works fine on my machine...<br>
-</font>
-<div class="moz-signature"><font color="blue" face="Arial,Helvetica"><br>
-Jerry Geis
-<br>
-MessageNet Systems
-<br>
-101 East Carmel Dr. Suite 105
-<br>
-Carmel, IN 46032
-<br>
-(317)566-1677
-<br>
-(317)663-0808 Fax
-</font></div>
-<br>
-<br>
-Brad Midgley wrote:
-<blockquote cite="mid43C7D992.7040401@xmission.com" type="cite">
-  <pre wrap="">Jerry Geis wrote:
-  </pre>
-  <blockquote type="cite">
-    <pre wrap="">gcc -version reports 3.4.4
-
-I am running a redhat kernel uname -r gives 2.6.9.-22.0.1-EL
-
-My machine compiles alsa-drivers just fine. It has all kinds of
-module_param_array statesments also....
-Why would this be failing?
-    </pre>
-  </blockquote>
-  <pre wrap=""><!---->
-so it uses module_params_array similarly? is index declared in the same way?
-
-this stuff was part of a submission i accepted a few months ago to
-prevent the btsco adapter from making itself the first adapter. you
-could look in cvs for the version before the change.
+your headset runs in two modes: 2-way mono and 1-way stereo. the btsco
+app is for 2-way mono and a2play is for 1-way stereo. you can't run both
+the mic and stereo simultaneously on any of the headsets out there.
 
 brad
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
-for problems?  Stop!  Download the new AJAX search engine that makes
-searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-<a class="moz-txt-link-freetext" href="http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click">http://ads.osdn.com/?ad_id=7637&amp;alloc_id=16865&amp;op=click</a>
-_______________________________________________
-Bluez-users mailing list
-<a class="moz-txt-link-abbreviated" href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a>
-<a class="moz-txt-link-freetext" href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a>
-
-
-  </pre>
-</blockquote>
-</body>
-</html>
-
---------------080708020901080402010106--
 
 
 -------------------------------------------------------
