@@ -1,16 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Wolfgang Walter <wolfgang.walter@studentenwerk.mhn.de>
-Cc: bluez-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-        maxk@qualcomm.com
-In-Reply-To: <200601130031.22063.wolfgang.walter@studentenwerk.mhn.de>
-References: <200601120138.31791.wolfgang.walter@studentenwerk.mhn.de>
-	 <1137057244.3955.3.camel@localhost.localdomain>
-	 <200601130031.22063.wolfgang.walter@studentenwerk.mhn.de>
-Content-Type: text/plain
-Message-Id: <1137140826.3879.1.camel@localhost.localdomain>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: patch: problem with sco
+Message-ID: <43C6F96B.6080402@sonar-security.com>
+From: Michael Puchol <mpuchol@sonar-security.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] Multiple headsets with one dongle
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,21 +16,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 13 Jan 2006 09:27:05 +0100
+Date: Fri, 13 Jan 2006 01:50:51 +0100
 
-Hi Wolfgang,
+Hi everyone,
 
-> > send in the information from "hciconfig -a" for this device, because
-> > this is a hardware bug and you can't be sure that you can have eight
-> > outstanding SCO packets.
+Firs, I'd like to introduce myself, having just joined the list. I'm the 
+hardware engineer at Southwing, a Barcelona-based company that develops 
+Bluetooth headsets and carkits. We do both software and hardware design 
+in-house. We have a decent lab, and quite a nice range of phones, 
+dongles and headsets for testing. Most of our designs are based on the 
+BC3 AudioFlash, and now we're dwelling into the SiW3500 now, plus the 
+BC4 External. As far as coding goes, I can understand C code, cannot 
+really write it without following examples, and could modify code to do 
+simple things.
 
-does anything changes if you load the hci_usb driver with reset=1 ?
+I haven't studied the Bluetooth specs fully (not enough time!), but I 
+have begun playing with Asterisk, a BT dongle and a couple of headsets.
 
-Regards
+Asterisk is configured OK, with a 2.6 kernel on a CentOS 4.2 distro, 
+chan_bluetooth is working just fine, as is the BT stack. I have managed 
+to have two headsets paired with the dongle, and thus visible to 
+Asterisk, and either of them answer an incoming call, or dial a preset 
+number, but what I haven't been able to get working is one headset 
+calling the other. Well, actually, it *does* work, but the audio is 
+totally unusable.
 
-Marcel
+ From what I have been able to gather so far, the headsets are using 
+RFCOMM channel 2 (sdptool search --bdaddr 0x111E), and so when both are 
+communicating with the dongle at the same time, they most likely are 
+interfering each other. My questions are:
 
+1. Am I correct in thinking the RFCOMM channel is derived from the BT 
+address/MAC? If so, I could change the MAC of one of the headsets so 
+that it would use a different hop sequence.
 
+2. If 1) is incorrect, *where* is this RFCOMM channel configured in the 
+CSR pskeys?
+
+3. The dongle, configured as master, *should* support up to three slaves 
+using the handsfree profile?
+
+Best regards,
+
+Mike
 
 
 -------------------------------------------------------
