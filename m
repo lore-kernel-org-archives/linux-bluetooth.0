@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth settings in debian
-From: Fredy Pulido =?ISO-8859-1?Q?L=F3pez?= <digitalfredy@debiancolombia.org>
+Message-ID: <43C71C97.7090507@cs.bgu.ac.il>
+From: Niv <nivv@cs.bgu.ac.il>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20060106100921.4675.qmail@web60620.mail.yahoo.com>
-References: <20060106100921.4675.qmail@web60620.mail.yahoo.com>
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1136943042.3165.23.camel@yoda.digitalfredy.org>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] headset wont work <sdp?>
+References: <43C581DE.6030205@cs.bgu.ac.il> <43C69CA3.1060606@cs.bgu.ac.il> 	<43C6DBA0.9050002@cs.bgu.ac.il> <43C70696.4010307@cs.bgu.ac.il>
+In-Reply-To: <43C70696.4010307@cs.bgu.ac.il>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,53 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 Jan 2006 20:30:42 -0500
+Date: Fri, 13 Jan 2006 05:20:55 +0200
 
-El vie, 06-01-2006 a las 10:09 +0000, ronny hidayat escribi=F3:
-> Hello again,
-> =20
-> Do you know what command should I use to send/receive file via
-> bluetooth ?
-> Where should I put PIN number ?
-The PIN number is in /etc/bluetooth/pin but if your pin_helper not read
-it (it's the default in debian) you needs change your pin_helper
-> Are there any documentation too ?
-> =20
-> Thanks
-> Ronny
->=20
-> Marcel Holtmann <marcel@holtmann.org> wrote:
->         Hi Ronny,
->        =20
->         > I have Linux Debian 2.6, bluetooth & Bluez already
->         installed.
->         > But I don't know how to change setting for bluetooth (like
->         friendly
->         > name & services).
->         > How / Where can I find those settings ?
->        =20
->         Look at /etc/bluetooth/hcid.conf.
->        =20
->         > I want to make program like rfcomm server that can receive
->         connection
->         > up to 7 client and then sending messages between them.
->         > Does bluez support this ?
->        =20
->         Yes.
->        =20
->         > Maybe anyone has documentation or sample program for t his ?
->        =20
->         Look at the source code of bluez-utils.
->        =20
->         Regards
->        =20
->         Marcel
->        =20
->=20
-> Send instant messages to your online friends
-> http://uk.messenger.yahoo.com=20
->=20
+YES! so sweet!
 
+RTFM - (mailing list wise) did pay off
+
+1. I am using a bluetooth USB adaptor named: billionton V1.1 P/N 
+USBBT02-B (has the CSR core 02) the barcode reads 6  45988 25000  1
+2. I can hear music on my logitech mobile freedom V1.2 (also worked on a 
+V1.1 in the past) via btsco. I have also tested two way conversation via 
+skype.
+3. I can hear music on my *CC&C Technologies, Inc **BT-MINI-HS (picture 
+is here: http://www.geeks.com/details.asp?invtid=BT-MINI-HS ).*
+I also managed to hear high quality audio (A2DP) on them.
+
+Niv
+**
 
 
 -------------------------------------------------------
