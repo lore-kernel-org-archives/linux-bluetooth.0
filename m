@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43C82FB9.1030602@south-wing.com>
-From: Southwing - Miquel Puchol <miquel.puchol@south-wing.com>
+Message-ID: <43C80EBC.8040503@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Multiple headsets with one dongle
-References: <43C66070.5010601@labri.fr> <43C80EBC.8040503@xmission.com>
-In-Reply-To: <43C80EBC.8040503@xmission.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] AVDTP in BlueZ
+References: <43C66070.5010601@labri.fr>
+In-Reply-To: <43C66070.5010601@labri.fr>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,38 +18,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 13 Jan 2006 23:54:49 +0100
+Date: Fri, 13 Jan 2006 13:34:04 -0700
 
-Hi Brad,
+Martin
 
-Thanks for your reply!
+> According to the mailing archive (since september 2005) and the Todo
+> List there is no implementation of avdtp in BlueZ.
+> Is this right ?
 
- >> The rfcomm channel communication is not where interference
- >> happens. It's when both headsets try to build the sco
- >> connection at the same time.
+it is true in that you can't create an avdtp "socket" like you can an
+l2cap socket. but we can still build up avdtp signaling in userspace
+using l2cap connections.
 
-OK, that gives me some point where to start looking.
+> I am planning to implement audio streaming (ogg) over bluetooth. If I
+> understand correctly (reading the mailing archive) there were attemps
+> to consider the bluetooth device as a soundcard using alsa. Is this
+> working ? Would this fit my purpose ? Would it replace avdtp in BlueZ ?
 
- >> I'm not totally sure how to do this anyway. Marcel has hinted
- >> at it and apparently there's a boot-time parameter to set
- >> something to allow two sco connections. I tried to capture
- >> everything in the btsco bug for multiple headsets, but this
- >> is all I come up with there:
+we only have a prototype that runs in userspace and accepts audio data
+from stdin if you want to stream stuff.
 
-This would be boot-time for the dongle's boot, or the actual machine's boot?
+i've been tinkering with an alsa plugin.
 
- >> Marcel adds: "To get more than one SCO channel working the
- >> hci_usb driver must be fixed to dynamicaly change the
- >> alternate settting."
+> My idea was to implement an icecast plugin/patch to send the data over
+> bluetooth and then implement a reader on the phone/pda/some device.
+> Do you think it is doable ? Is someone already working on this ?
+> 
+> Do you any idea about that ?
 
-Also, fixed as in repaired, or as in set to something permanent? I'll 
-take a look at the archives and bug log.
+you are going to implement an a2dp sink in the phone? it is probably
+doable and we do have code for it but it will take some adapting to put
+it on another platform and it will require a decent-powered arm cpu.
+(many phones have a dsp where the encoder could run a lot more
+efficiently, but it's a big job to write a dsp task.)
 
-Best regards,
-
-Mike
-
-
+brad
 
 
 -------------------------------------------------------
