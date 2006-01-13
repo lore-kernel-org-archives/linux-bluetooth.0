@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Dietmar Segbert <trebges@web.de>
-To: <bluez-users@lists.sourceforge.net>
-Message-ID: <9lorfQU9SyB@trebges.web.de>
-In-Reply-To: <43C1A15F.3040001@xmission.com>
-References: <43C1A15F.3040001@xmission.com>
-Subject: Re: [Bluez-users] a2play question
+Message-ID: <43C7D992.7040401@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] btsco.41 not compiling
+References: <43C69F77.8050701@pagestation.com> <43C7D767.8080501@xmission.com> <43C7D8B8.1060701@messagenetsystems.com>
+In-Reply-To: <43C7D8B8.1060701@messagenetsystems.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 13 Jan 2006 20:32:00 +0100
+Date: Fri, 13 Jan 2006 09:47:14 -0700
 
-Hello Brad,
-hello list,
+Jerry Geis wrote:
+> gcc -version reports 3.4.4
+> 
+> I am running a redhat kernel uname -r gives 2.6.9.-22.0.1-EL
+> 
+> My machine compiles alsa-drivers just fine. It has all kinds of
+> module_param_array statesments also....
+> Why would this be failing?
 
-i have downloaded and installed btsco-0.41. I also have installed the rtc
-module of the 2.4.26 kernel.
+so it uses module_params_array similarly? is index declared in the same way?
 
-mpg123 --au - musik.mp3 | ./a2play -p 00:4F:62:05:53:8A
+this stuff was part of a submission i accepted a few months ago to
+prevent the btsco adapter from making itself the first adapter. you
+could look in cvs for the version before the change.
 
-works, but after some seconds i can hear a dropout.
-
-Wiht the 2.4.32 kernel the dropouts are also to hear.
-
-Can or must i configure the headphone-profile with hcitool/sdptool, the
-bt-120ar has an integrated microphon.
-
-Regards.
-
-Dietmar
+brad
 
 
 -------------------------------------------------------
