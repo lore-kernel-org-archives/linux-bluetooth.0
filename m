@@ -1,6 +1,6 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43C8FB45.8010209@libero.it>
-From: jimmi <jimmi@libero.it>
+Message-ID: <43C8D66D.7080403@bglug.it>
+From: jimmi <jimmi@bglug.it>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain; charset=ISO-8859-15; format=flowed
@@ -16,7 +16,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 14 Jan 2006 14:23:17 +0100
+Date: Sat, 14 Jan 2006 11:46:05 +0100
 
 Hi,
 
@@ -30,7 +30,7 @@ and   I  could   get  the   device   working  again   by  deleting   the
 bluetooth-alsa page.
 
 Thanks again for your job guys :)
--- 
+--
     ---        _   o        |   Perche' denunciare il reddito dopo il   |
     / immi   --  _/\_>      |         bene che vi ha fatto? MM          |
 (_/         -  O,> / O     |                                           |
