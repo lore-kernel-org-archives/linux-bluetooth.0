@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43C9629D.8010405@emajor.net>
-From: Ehab El Maraghy <e_elmaraghy@emajor.net>
+Message-ID: <43C94CB8.3080207@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] ISSC USB dongle Bluetooth problem (Patching the Kernel)
+Subject: Re: [Bluez-users] BTSCO problems
+References: <20060114084456.68918.qmail@web15010.mail.cnb.yahoo.com>
+In-Reply-To: <20060114084456.68918.qmail@web15010.mail.cnb.yahoo.com>
+Content-Type: text/plain; charset=GB2312
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,36 +18,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 14 Jan 2006 22:44:13 +0200
+Date: Sat, 14 Jan 2006 12:10:48 -0700
 
-Hi All
-I have sent a mail couple of days ago concerning that ISSC chip is not 
-able to operate on Kernel 2.4.20-8
-One thing I did not try at that time which is patching the kernel
-I downloaded the patch ¨patch-2.4.20-mh18.gz¨
-Trying to apply the patch I got the following message
+Chenghua
 
-[root@Ehab src]# patch -p0 < patch-2.4.20-mh18.gz
-can't find file to patch at input line 4
-Perhaps you used the wrong -p or --strip option?
-The text leading up to this was:
---------------------------
-|diff -urN linux-2.4.20/arch/sparc64/kernel/ioctl32.c 
-linux-2.4.20-mh18/arch/sparc64/kernel/ioctl32.c
-|--- linux-2.4.20/arch/sparc64/kernel/ioctl32.c 2002-11-29 
-00:53:12.000000000 +0100
-|+++ linux-2.4.20-mh18/arch/sparc64/kernel/ioctl32.c    2004-08-01 
-16:31:28.000000000 +0200
---------------------------
-File to patch:
+> I am now using btsco to make my pc and headset connect.The maker of
+> the Dangle i use is ISSC
 
-Kernel source is in folder called linux-2.4.20-8 not 2.4.20
-should I change overy instant in the patch file to add -8 ?
+sorry linux only supports CSR dongles for audio.
 
-Whats the next step ?  make menuconfig ?
-
-
-
+brad
 
 
 -------------------------------------------------------
