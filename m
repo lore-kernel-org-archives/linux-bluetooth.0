@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43C94CB8.3080207@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <43C94820.4040006@schugy.de>
+From: Christian Schuglitsch <subjectbluez@schugy.de>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] BTSCO problems
-References: <20060114084456.68918.qmail@web15010.mail.cnb.yahoo.com>
-In-Reply-To: <20060114084456.68918.qmail@web15010.mail.cnb.yahoo.com>
-Content-Type: text/plain; charset=GB2312
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: [Bluez-users] usb_hci, Belkin tetra hub and ehci-hcd errors
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,16 +16,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 14 Jan 2006 12:10:48 -0700
+Date: Sat, 14 Jan 2006 19:51:12 +0100
 
-Chenghua
+I have bought Belkin tetra hubs that have a TT-chip for every USB port 
+and plugged my Epox BT DG03 dongle into it. The problem is that the 
+usb_hci-driver doesn't work when the tetra hubs do what they are 
+designed for: Splitting 480 EHCI-MBit into 4 12 OHCI-MBit. If I use the 
+ohci-hcd driver instead everything works fine. There're two drivers for 
+my hardware that aren't compatible with EHCI translation, usb_hci and 
+pwc (from saillard.org).
 
-> I am now using btsco to make my pc and headset connect.The maker of
-> the Dangle i use is ISSC
+Regards
 
-sorry linux only supports CSR dongles for audio.
+Schugy
 
-brad
 
 
 -------------------------------------------------------
