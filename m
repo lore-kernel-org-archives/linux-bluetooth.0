@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY103-W384F0CD67A81C73CE7167F7260@phx.gbl>
+Message-ID: <43C84388.4080504@cs.bgu.ac.il>
+From: Niv <nivv@cs.bgu.ac.il>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="_acdb1c71-1ce9-413d-874d-b647266eb24a_"
-From: "Verber Seti" <verber_s@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] sendto give invalid argument
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] no audio what to do
+References: <43BE9BB9.5070801@pagestation.com>
+In-Reply-To: <43BE9BB9.5070801@pagestation.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,99 +18,280 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Jan 2006 18:15:42 -0500
+Date: Sat, 14 Jan 2006 02:19:20 +0200
 
---_acdb1c71-1ce9-413d-874d-b647266eb24a_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Pls run:
 
-Hello, I'm new to using Bluez. I need to create a simple program to send te=
-xt over a specific type of port (SOCK_DGRAM, BTPROTO_L2CAP). The code compi=
-les fine, but when I run it i get the following error (from then sendto fun=
-ction). Send Failed: Invalid argument What might the problem be? My code is=
- shown below. Thank-you so much for any help that you can offer.,verber #in=
-clude <stdio.h>#include <stdlib.h>#include <errno.h>#include <string.h> #in=
-clude <bluetooth/bluetooth.h>#include <bluetooth/l2cap.h>#include <bluetoot=
-h/hci.h>#include <bluetooth/hci_lib.h> #include "l2cap_msg_send.h" int fd; =
-int send_msg(){	/* SETTING UP SOCKET */	struct sockaddr_l2 addr;    unsigne=
-d int psm =3D 0x1001;        fd =3D socket(AF_BLUETOOTH, SOCK_DGRAM, BTPROT=
-O_L2CAP);    if (fd =3D=3D -1) {        fprintf(stderr, "Could not open soc=
-ket: %s\n", strerror(errno));		exit(1);    }    addr.l2_family =3D AF_BLUET=
-OOTH;    bacpy(&addr.l2_bdaddr, BDADDR_ANY);    addr.l2_psm    =3D htobs(ps=
-m);     if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {       =
- fprintf(stderr, "Could not bind socket: %s\n", strerror(errno));		exit(1);=
-    }    /* END: SETTING UP SOCKET*/        /* SET UP MSG */    char recv_a=
-ddr[18] =3D "00:0A:3A:53:1C:42";        struct sockaddr_l2 recipient;    re=
-cipient.l2_family =3D AF_BLUETOOTH;    str2ba(recv_addr,&(recipient.l2_bdad=
-dr));    recipient.l2_psm =3D htobs(psm);        char message[] =3D "57 123=
- 189";    /* END: SET UP MSG */ 	/* SEND MSG */    int ret; 	socklen_t len;=
-	len=3Dsizeof(recipient.l2_bdaddr);		size_t msg_len;	msg_len=3Dsizeof(messa=
-ge);     ret =3D sendto(fd, &message, msg_len,0, (struct sockaddr *) &recip=
-ient, len);    printf("%d\n",ret);    if( ret < 0 ) fprintf(stderr,"Send Fa=
-iled: %s\n",strerror(errno));	/* END: SEND MSG */ //	close(fd);       retur=
-n 0;}
-_________________________________________________________________
-Express yourself instantly with MSN Messenger! Download today it's FREE!
-http://messenger.msn.click-url.com/go/onm00200471ave/direct/01/=
+# hciconfig -a
 
---_acdb1c71-1ce9-413d-874d-b647266eb24a_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
 
-<html>=0A=
-<head>=0A=
-<style>=0A=
-P=0A=
-{=0A=
-margin:0px;=0A=
-padding:0px=0A=
-}=0A=
-body=0A=
-{=0A=
-FONT-SIZE: 10pt;=0A=
-FONT-FAMILY:Tahoma=0A=
-}=0A=
-</style>=0A=
-</head>=0A=
-<body><P>Hello,</P><P> </P><P>I'm new to using Bluez. I need to create a si=
-mple program to send text over a specific type of port (SOCK_DGRAM, BTPROTO=
-_L2CAP). The code compiles fine, but when I run it i get the following erro=
-r (from then sendto function).</P><P> </P><P>Send Failed: Invalid argument<=
-/P><P> </P><P>What might the problem be? My code is shown below. Thank-you =
-so much for any help that you can offer.</P><P>,verber</P><P> </P><P>#inclu=
-de &lt;stdio.h&gt;</P><P>#include &lt;stdlib.h&gt;</P><P>#include &lt;errno=
-.h&gt;</P><P>#include &lt;string.h&gt;</P><P> </P><P>#include &lt;bluetooth=
-/bluetooth.h&gt;</P><P>#include &lt;bluetooth/l2cap.h&gt;</P><P>#include &l=
-t;bluetooth/hci.h&gt;</P><P>#include &lt;bluetooth/hci_lib.h&gt;</P><P> </P=
-><P>#include &quot;l2cap_msg_send.h&quot;</P><P> </P><P>int fd;</P><P> </P>=
-<P>int send_msg()</P><P>{</P><P>	/* SETTING UP SOCKET */</P><P>	struct sock=
-addr_l2 addr;</P><P>    unsigned int psm =3D 0x1001;</P><P>    </P><P>    f=
-d =3D socket(AF_BLUETOOTH, SOCK_DGRAM, BTPROTO_L2CAP);</P><P>    if (fd =3D=
-=3D -1) {</P><P>        fprintf(stderr, &quot;Could not open socket: %s\n&q=
-uot;, strerror(errno));</P><P>		exit(1);</P><P>    }</P><P>    addr.l2_fami=
-ly =3D AF_BLUETOOTH;</P><P>    bacpy(&amp;addr.l2_bdaddr, BDADDR_ANY);</P><=
-P>    addr.l2_psm    =3D htobs(psm);</P><P> </P><P>    if (bind(fd, (struct=
- sockaddr *) &amp;addr, sizeof(addr)) &lt; 0) {</P><P>        fprintf(stder=
-r, &quot;Could not bind socket: %s\n&quot;, strerror(errno));</P><P>		exit(=
-1);</P><P>    }</P><P>    /* END: SETTING UP SOCKET*/</P><P>    </P><P>    =
-/* SET UP MSG */</P><P>    char recv_addr[18] =3D &quot;00:0A:3A:53:1C:42&q=
-uot;;</P><P>    </P><P>    struct sockaddr_l2 recipient;</P><P>    recipien=
-t.l2_family =3D AF_BLUETOOTH;</P><P>    str2ba(recv_addr,&amp;(recipient.l2=
-_bdaddr));</P><P>    recipient.l2_psm =3D htobs(psm);</P><P>    </P><P>    =
-char message[] =3D &quot;57 123 189&quot;;</P><P>    /* END: SET UP MSG */<=
-/P><P> </P><P>	/* SEND MSG */</P><P>    int ret;</P><P> </P><P>	socklen_t l=
-en;</P><P>	len=3Dsizeof(recipient.l2_bdaddr);</P><P>	</P><P>	size_t msg_len=
-;</P><P>	msg_len=3Dsizeof(message);</P><P> </P><P>    ret =3D sendto(fd, &a=
-mp;message, msg_len,0, (struct sockaddr *) &amp;recipient, len);</P><P>    =
-printf(&quot;%d\n&quot;,ret);</P><P>    if( ret &lt; 0 ) fprintf(stderr,&qu=
-ot;Send Failed: %s\n&quot;,strerror(errno));</P><P>	/* END: SEND MSG */</P>=
-<P> </P><P>//	close(fd);   </P><P>    return 0;</P><P>}</P><br /><hr />Expr=
-ess yourself instantly with MSN Messenger! <a href=3D'http://clk.atdmt.com/=
-AVE/go/onm00200471ave/direct/01/' target=3D'_new'>MSN Messenger</a></body>=
-=0A=
-</html>=
+and tell us , what gives
 
---_acdb1c71-1ce9-413d-874d-b647266eb24a_--
+
+Niv
+
+
+Jerry Geis wrote:
+
+> All
+>
+> I have a centos 4.2, plantronics 510 and kensington 2.0 dongle.
+> I am using chan_bluetooth on asterisk and everything starts to
+> work, I hear the ring in the headset I just get no audio.
+>
+> Below is the hcidump -X -V
+>
+> Thanks for any suggestion.
+>
+> Jerry
+>
+> ---------------
+> HCI sniffer - Bluetooth packet analyzer ver 1.28
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> < ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0042 len 6 [psm 0]
+>       0000: 13 ef 05 0d 0a 65                                 .....e
+> < ACL data: handle 12 flags 0x02 dlen 18
+>     L2CAP(d): cid 0x0042 len 14 [psm 0]
+>       0000: 13 ef 15 2b 43 49 45 56  3a 20 33 2c 31 65        ...+CIEV: 3,1e
+> < ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0042 len 6 [psm 0]
+>       0000: 13 ef 05 0d 0a 65                                 .....e
+> < ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0042 len 6 [psm 0]
+>       0000: 13 ef 05 0d 0a 65                                 .....e
+> < ACL data: handle 12 flags 0x02 dlen 12
+>     L2CAP(d): cid 0x0042 len 8 [psm 0]
+>       0000: 13 ef 09 52 49 4e 47 65                           ...RINGe
+> < ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0042 len 6 [psm 0]
+>       0000: 13 ef 05 0d 0a 65                                 .....e
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 1
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 2
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 2
+> > ACL data: handle 12 flags 0x02 dlen 9
+>     L2CAP(d): cid 0x0040 len 5 [psm 0]
+>       0000: 11 ff 01 08 a3                                    .....
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 1
+> < ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0042 len 6 [psm 0]
+>       0000: 13 ef 05 0d 0a 65                                 .....e
+> < ACL data: handle 12 flags 0x02 dlen 12
+>     L2CAP(d): cid 0x0042 len 8 [psm 0]
+>       0000: 13 ef 09 52 49 4e 47 65                           ...RINGe
+> < ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0042 len 6 [psm 0]
+>       0000: 13 ef 05 0d 0a 65                                 .....e
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 3
+> > ACL data: handle 12 flags 0x02 dlen 13
+>     L2CAP(d): cid 0x0040 len 9 [psm 0]
+>       0000: 11 ff 09 05 41 54 41 0d  a3                       ....ATA..
+> < ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0042 len 6 [psm 0]
+>       0000: 13 ef 05 0d 0a 65                                 .....e
+> < ACL data: handle 12 flags 0x02 dlen 18
+>     L2CAP(d): cid 0x0042 len 14 [psm 0]
+>       0000: 13 ef 15 2b 43 49 45 56  3a 20 32 2c 31 65        ...+CIEV: 2,1e
+> < ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0042 len 6 [psm 0]
+>       0000: 13 ef 05 0d 0a 65                                 .....e
+> < ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0042 len 6 [psm 0]
+>       0000: 13 ef 05 0d 0a 65                                 .....e
+> < ACL data: handle 12 flags 0x02 dlen 18
+>     L2CAP(d): cid 0x0042 len 14 [psm 0]
+>       0000: 13 ef 15 2b 43 49 45 56  3a 20 33 2c 30 65        ...+CIEV: 3,0e
+> < ACL data: handle 12 flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0042 len 6 [psm 0]
+>       0000: 13 ef 05 0d 0a 65                                 .....e
+> < HCI Command: Add SCO Connection (0x01|0x0007) plen 4
+>     handle 12 ptype 0x00e0
+>     Packet type: HV1 HV2 HV3 
+> < ACL data: handle 12 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0042 len 10 [psm 0]
+>       0000: 13 ef 0d 0d 0a 4f 4b 0d  0a 65                    .....OK..e
+> > HCI Event: Command Status (0x0f) plen 4
+>     Add SCO Connection (0x01|0x0007) status 0x00 ncmd 1
+> > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x00 handle 1 bdaddr 00:03:89:53:FD:3A type SCO encrypt 0x01
+> > SCO data: handle 1 dlen 48
+>     0000: 43 06 de 04 23 05 24 06  e6 03 9b 03 eb 02 00 00  C...#.$.........
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 ff ff 00 00  ................
+>     0020: ff ff ff ff 02 00 02 00  01 00 01 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 01 00 ff ff ff ff 00 00  ff ff 00 00 ff ff 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+> > SCO data: handle 1 dlen 48
+>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+>
+> break in output as was still 0's
+>
+> > SCO data: handle 1 dlen 48
+>     0000: 5a fe dc ff 94 ff b2 fe  32 fe 51 fd 85 fc 3e fd  Z.......2.Q...>.
+>     0010: 55 fd 30 fc 0e f9 0b f2  c9 ef 41 f1 11 f0 c2 ee  U.0.......A.....
+>     0020: b9 ee fc ef cc f1 a9 f2  a0 f3 a5 f4 01 f7 51 fa  ..............Q.
+> > SCO data: handle 1 dlen 48
+>     0000: bb fc 6e fe bc fe 66 ff  6f 02 c8 04 2f 06 13 06  ..n...f.o.../...
+>     0010: a1 06 4f 0a 16 0d 01 0e  48 0e 04 0d 19 0d fc 0e  ..O.....H.......
+>     0020: 52 10 70 0f 75 0c 02 0b  aa 0a 9a 0b 4e 0c 34 0b  R.p.u.......N.4.
+> > SCO data: handle 1 dlen 48
+>     0000: 0a 0c 89 0d b4 0c bc 0b  01 0c 7a 0a f9 07 56 06  ..........z...V.
+>     0010: be 04 39 04 e6 03 62 03  a6 04 04 05 eb 04 2d 05  ..9...b.......-.
+>     0020: 99 05 25 05 e3 03 95 03  03 04 bc 02 51 02 3c 02  ..%.........Q.<.
+> > SCO data: handle 1 dlen 48
+>     0000: e2 00 a4 00 86 01 93 03  8b 05 ed 08 9e 0d 1a 0f  ................
+>     0010: bf 0e 68 11 c0 11 2c 0f  14 0e 1d 0d 16 0d ac 0c  ..h...,.........
+>     0020: 12 0c 83 09 62 05 1a 04  41 03 03 02 72 00 3b fe  ....b...A...r.;.
+> > SCO data: handle 1 dlen 48
+>     0000: f7 fb af f9 c5 f7 fd f6  9d f4 46 f3 0f f5 7e f5  ..........F...~.
+>     0010: 2a f5 de f3 70 f1 9c f1  d0 f3 2a f5 18 f5 b8 f5  *...p.....*.....
+>     0020: 63 f5 68 f4 b2 f5 08 f7  6c f6 47 f6 bf f6 28 f6  c.h.....l.G...(.
+> > SCO data: handle 1 dlen 48
+>     0000: ff f7 f0 f8 db f7 36 f9  c2 fa ec fb 08 fc b6 fc  ......6.........
+>     0010: 88 fd d7 fd 40 fd 1c fd  77 fc 81 fb 04 fb 7d fb  ....@...w.....}.
+>     0020: ac fc a1 fc c4 fd 86 fe  ad fe 5d fe 56 fd bd f8  ..........].V...
+> > SCO data: handle 1 dlen 48
+>     0000: fe f2 eb f0 26 f0 6b ee  4c ee 6b ef 0b f1 2c f3  ....&.k.L.k...,.
+>     0010: 8e f3 09 f4 b1 f3 7d f5  f4 f9 47 fb 6e fc 12 fd  ......}...G.n...
+>     0020: 0c fe 8b 00 ea 02 2d 05  53 07 d0 09 49 0c 45 0d  ......-.S...I.E.
+> > SCO data: handle 1 dlen 48
+>     0000: 4d 0e f5 0c 19 0b d2 0b  dc 0c 29 0c 8b 0c 92 0d  M.........).....
+>     0010: 30 0c f4 0b 00 0e 09 0d  08 0b 11 0c 1f 0d cd 0c  0...............
+>     0020: a3 0b 0c 09 64 07 3e 07  8a 06 03 07 95 07 f1 07  ....d.>.........
+> > SCO data: handle 1 dlen 48
+>     0000: 5b 07 85 06 49 05 29 03  af 03 6e 04 90 03 ba 02  [...I.)...n.....
+>     0010: 10 02 7a 02 33 04 8a 04  63 03 9d 02 84 00 3f 01  ..z.3...c.....?.
+>     0020: 57 03 18 04 52 06 1b 0a  f3 0c f7 0e 51 10 44 11  W...R.......Q.D.
+> > SCO data: handle 1 dlen 48
+>     0000: 28 10 d6 0e ad 0e c8 0e  d4 0d 71 0a d4 07 11 06  (.........q.....
+>     0010: c8 03 18 03 72 02 26 00  0f fe 64 fd e7 fb 2e fa  ....r.&...d.....
+>     0020: ee f8 93 f5 f3 f2 bd f3  73 f3 f9 f2 0b f3 29 f3  ........s.....).
+> > SCO data: handle 1 dlen 48
+>     0000: 49 f3 42 f5 00 f7 fd f5  ad f5 ef f6 9e f5 4b f4  I.B...........K.
+>
+
 
 
 -------------------------------------------------------
