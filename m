@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43CA54A1.4030209@pagestation.com>
-From: Jerry Geis <geisj@pagestation.com>
+Message-ID: <43CA1B5E.7080104@cs.bgu.ac.il>
+From: NIV VAIZER <nivv@cs.bgu.ac.il>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] no audio what to do
-References: <43BE9BB9.5070801@pagestation.com> 	<43C84388.4080504@cs.bgu.ac.il> <43C9B8BC.4080202@pagestation.com> <43CA1AAB.50702@cs.bgu.ac.il>
-In-Reply-To: <43CA1AAB.50702@cs.bgu.ac.il>
+Subject: Re: [Bluez-users] Logitech BT headphones at 30$ AR
+References: <43C9629D.8010405@emajor.net> 	<200601150016.58417.yann.morin.1998@anciens.enib.fr> 	<43C98C3F.8060204@cs.bgu.ac.il> <43C9CA45.4070601@xmission.com>
+In-Reply-To: <43C9CA45.4070601@xmission.com>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,504 +18,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 15 Jan 2006 08:56:49 -0500
+Date: Sun, 15 Jan 2006 11:52:30 +0200
 
-Niv,
+Hi Brad,
+As soon as I receive them, I will drop a line here.
+I would be happy to supply you with the data you need
 
-THanks, What from the hciconfig -a tells you that audio will work or 
-will not work?
+Niv
 
-What usb make/model dongle do you use? looking at the info on 
-bluetooth-alsa.sourceforge.net gives
-headsets not the USB dongles.
+Brad Midgley wrote:
 
-THanks again.
+>Niv
+>
+>  
+>
+>>In case any of you are looking for a deal on a pair of headphones,
+>>I suggest you look in this post over at fatwallet.
+>>http://www.fatwallet.com/forums/messageview.php?start=0&catid=18&threadid=567739
+>>
+>>I got them after a 10% cupon making it 81$ before the 50$ rebate.
+>>free shipping and even 2% off using the fatwallet link.
+>>
+>>hope the quality is acceptable.
+>>    
+>>
+>
+>This hp/logitech set is the whole reason we have a timer option to use
+>the realtime clock. It's very picky about timing, but that keeps us honest.
+>
+>Hopefully since it comes through logitech they have windows drivers? I'd
+>like someone to help me figure out the avrcp commands to raise and lower
+>the set's volume. (Marcel suggested a way to snoop the usb bus for hci
+>traffic when running windows inside vmware)
+>
+>Brad
+>
+>
+>-------------------------------------------------------
+>This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+>for problems?  Stop!  Download the new AJAX search engine that makes
+>searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+>http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>  
+>
 
-Jerry
-
-NIV VAIZER wrote:
-
-> well, according to some posts here and my own expirience, dongles that 
-> have the broadcomm chip , as yourself dont do voice.
-> they do, however do data.
-> One may look in to some snapshots from windows enviroment, and try to 
-> sort this throu.
-> Otherwise get a CSR based dongle,
->
-> Niv
-> Jerry Geis wrote:
->
->> Niv,
->>
->> here is the ouput...
->>
->> hci0:    Type: USB
->>     BD Address: 00:03:C9:AF:21:95 ACL MTU: 1017:8 SCO MTU: 64:0
->>     UP RUNNING PSCAN ISCAN     RX bytes:241394 acl:36 sco:4706 
->> events:55 errors:0
->>     TX bytes:1354 acl:51 sco:0 commands:27 errors:0
->>     Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
->>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3     Link policy: 
->> RSWITCH HOLD SNIFF PARK     Link mode: SLAVE ACCEPT     Name: 'BlueZ 
->> (0)'
->>     Class: 0x3e0100
->>     Service Classes: Networking, Rendering, Capturing
->>     Device Class: Computer, Uncategorized
->>     HCI Ver: 2.0 (0x3) HCI Rev: 0x2000 LMP Ver: 2.0 (0x3) LMP Subver: 
->> 0x4127
->>     Manufacturer: Broadcom Corporation (15)
->>
->>
->>
->>
->>
->> Niv wrote:
->>
->>> Pls run:
->>>
->>> # hciconfig -a
->>>
->>>
->>> and tell us , what gives
->>>
->>>
->>> Niv
->>>
->>>
->>> Jerry Geis wrote:
->>>
->>>> All
->>>>
->>>> I have a centos 4.2, plantronics 510 and kensington 2.0 dongle.
->>>> I am using chan_bluetooth on asterisk and everything starts to
->>>> work, I hear the ring in the headset I just get no audio.
->>>>
->>>> Below is the hcidump -X -V
->>>>
->>>> Thanks for any suggestion.
->>>>
->>>> Jerry
->>>>
->>>> ---------------
->>>> HCI sniffer - Bluetooth packet analyzer ver 1.28
->>>> device: hci0 snap_len: 1028 filter: 0xffffffff
->>>> < ACL data: handle 12 flags 0x02 dlen 10
->>>>     L2CAP(d): cid 0x0042 len 6 [psm 0]
->>>>       0000: 13 ef 05 0d 0a 65                                 .....e
->>>> < ACL data: handle 12 flags 0x02 dlen 18
->>>>     L2CAP(d): cid 0x0042 len 14 [psm 0]
->>>>       0000: 13 ef 15 2b 43 49 45 56  3a 20 33 2c 31 65        
->>>> ...+CIEV: 3,1e
->>>> < ACL data: handle 12 flags 0x02 dlen 10
->>>>     L2CAP(d): cid 0x0042 len 6 [psm 0]
->>>>       0000: 13 ef 05 0d 0a 65                                 .....e
->>>> < ACL data: handle 12 flags 0x02 dlen 10
->>>>     L2CAP(d): cid 0x0042 len 6 [psm 0]
->>>>       0000: 13 ef 05 0d 0a 65                                 .....e
->>>> < ACL data: handle 12 flags 0x02 dlen 12
->>>>     L2CAP(d): cid 0x0042 len 8 [psm 0]
->>>>       0000: 13 ef 09 52 49 4e 47 65                           ...RINGe
->>>> < ACL data: handle 12 flags 0x02 dlen 10
->>>>     L2CAP(d): cid 0x0042 len 6 [psm 0]
->>>>       0000: 13 ef 05 0d 0a 65                                 .....e
->>>> > HCI Event: Number of Completed Packets (0x13) plen 5
->>>>     handle 12 packets 1
->>>> > HCI Event: Number of Completed Packets (0x13) plen 5
->>>>     handle 12 packets 2
->>>> > HCI Event: Number of Completed Packets (0x13) plen 5
->>>>     handle 12 packets 2
->>>> > ACL data: handle 12 flags 0x02 dlen 9
->>>>     L2CAP(d): cid 0x0040 len 5 [psm 0]
->>>>       0000: 11 ff 01 08 a3                                    .....
->>>> > HCI Event: Number of Completed Packets (0x13) plen 5
->>>>     handle 12 packets 1
->>>> < ACL data: handle 12 flags 0x02 dlen 10
->>>>     L2CAP(d): cid 0x0042 len 6 [psm 0]
->>>>       0000: 13 ef 05 0d 0a 65                                 .....e
->>>> < ACL data: handle 12 flags 0x02 dlen 12
->>>>     L2CAP(d): cid 0x0042 len 8 [psm 0]
->>>>       0000: 13 ef 09 52 49 4e 47 65                           ...RINGe
->>>> < ACL data: handle 12 flags 0x02 dlen 10
->>>>     L2CAP(d): cid 0x0042 len 6 [psm 0]
->>>>       0000: 13 ef 05 0d 0a 65                                 .....e
->>>> > HCI Event: Number of Completed Packets (0x13) plen 5
->>>>     handle 12 packets 3
->>>> > ACL data: handle 12 flags 0x02 dlen 13
->>>>     L2CAP(d): cid 0x0040 len 9 [psm 0]
->>>>       0000: 11 ff 09 05 41 54 41 0d  a3                       
->>>> ....ATA..
->>>> < ACL data: handle 12 flags 0x02 dlen 10
->>>>     L2CAP(d): cid 0x0042 len 6 [psm 0]
->>>>       0000: 13 ef 05 0d 0a 65                                 .....e
->>>> < ACL data: handle 12 flags 0x02 dlen 18
->>>>     L2CAP(d): cid 0x0042 len 14 [psm 0]
->>>>       0000: 13 ef 15 2b 43 49 45 56  3a 20 32 2c 31 65        
->>>> ...+CIEV: 2,1e
->>>> < ACL data: handle 12 flags 0x02 dlen 10
->>>>     L2CAP(d): cid 0x0042 len 6 [psm 0]
->>>>       0000: 13 ef 05 0d 0a 65                                 .....e
->>>> < ACL data: handle 12 flags 0x02 dlen 10
->>>>     L2CAP(d): cid 0x0042 len 6 [psm 0]
->>>>       0000: 13 ef 05 0d 0a 65                                 .....e
->>>> < ACL data: handle 12 flags 0x02 dlen 18
->>>>     L2CAP(d): cid 0x0042 len 14 [psm 0]
->>>>       0000: 13 ef 15 2b 43 49 45 56  3a 20 33 2c 30 65        
->>>> ...+CIEV: 3,0e
->>>> < ACL data: handle 12 flags 0x02 dlen 10
->>>>     L2CAP(d): cid 0x0042 len 6 [psm 0]
->>>>       0000: 13 ef 05 0d 0a 65                                 .....e
->>>> < HCI Command: Add SCO Connection (0x01|0x0007) plen 4
->>>>     handle 12 ptype 0x00e0
->>>>     Packet type: HV1 HV2 HV3 < ACL data: handle 12 flags 0x02 dlen 14
->>>>     L2CAP(d): cid 0x0042 len 10 [psm 0]
->>>>       0000: 13 ef 0d 0d 0a 4f 4b 0d  0a 65                    
->>>> .....OK..e
->>>> > HCI Event: Command Status (0x0f) plen 4
->>>>     Add SCO Connection (0x01|0x0007) status 0x00 ncmd 1
->>>> > HCI Event: Connect Complete (0x03) plen 11
->>>>     status 0x00 handle 1 bdaddr 00:03:89:53:FD:3A type SCO encrypt 
->>>> 0x01
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 43 06 de 04 23 05 24 06  e6 03 9b 03 eb 02 00 00  
->>>> C...#.$.........
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 ff ff 00 00  
->>>> ................
->>>>     0020: ff ff ff ff 02 00 02 00  01 00 01 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 01 00 ff ff ff ff 00 00  ff ff 00 00 ff ff 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  
->>>> ................
->>>>
->>>> break in output as was still 0's
->>>>
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 5a fe dc ff 94 ff b2 fe  32 fe 51 fd 85 fc 3e fd  
->>>> Z.......2.Q...>.
->>>>     0010: 55 fd 30 fc 0e f9 0b f2  c9 ef 41 f1 11 f0 c2 ee  
->>>> U.0.......A.....
->>>>     0020: b9 ee fc ef cc f1 a9 f2  a0 f3 a5 f4 01 f7 51 fa  
->>>> ..............Q.
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: bb fc 6e fe bc fe 66 ff  6f 02 c8 04 2f 06 13 06  
->>>> ..n...f.o.../...
->>>>     0010: a1 06 4f 0a 16 0d 01 0e  48 0e 04 0d 19 0d fc 0e  
->>>> ..O.....H.......
->>>>     0020: 52 10 70 0f 75 0c 02 0b  aa 0a 9a 0b 4e 0c 34 0b  
->>>> R.p.u.......N.4.
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 0a 0c 89 0d b4 0c bc 0b  01 0c 7a 0a f9 07 56 06  
->>>> ..........z...V.
->>>>     0010: be 04 39 04 e6 03 62 03  a6 04 04 05 eb 04 2d 05  
->>>> ..9...b.......-.
->>>>     0020: 99 05 25 05 e3 03 95 03  03 04 bc 02 51 02 3c 02  
->>>> ..%.........Q.<.
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: e2 00 a4 00 86 01 93 03  8b 05 ed 08 9e 0d 1a 0f  
->>>> ................
->>>>     0010: bf 0e 68 11 c0 11 2c 0f  14 0e 1d 0d 16 0d ac 0c  
->>>> ..h...,.........
->>>>     0020: 12 0c 83 09 62 05 1a 04  41 03 03 02 72 00 3b fe  
->>>> ....b...A...r.;.
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: f7 fb af f9 c5 f7 fd f6  9d f4 46 f3 0f f5 7e f5  
->>>> ..........F...~.
->>>>     0010: 2a f5 de f3 70 f1 9c f1  d0 f3 2a f5 18 f5 b8 f5  
->>>> *...p.....*.....
->>>>     0020: 63 f5 68 f4 b2 f5 08 f7  6c f6 47 f6 bf f6 28 f6  
->>>> c.h.....l.G...(.
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: ff f7 f0 f8 db f7 36 f9  c2 fa ec fb 08 fc b6 fc  
->>>> ......6.........
->>>>     0010: 88 fd d7 fd 40 fd 1c fd  77 fc 81 fb 04 fb 7d fb  
->>>> ....@...w.....}.
->>>>     0020: ac fc a1 fc c4 fd 86 fe  ad fe 5d fe 56 fd bd f8  
->>>> ..........].V...
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: fe f2 eb f0 26 f0 6b ee  4c ee 6b ef 0b f1 2c f3  
->>>> ....&.k.L.k...,.
->>>>     0010: 8e f3 09 f4 b1 f3 7d f5  f4 f9 47 fb 6e fc 12 fd  
->>>> ......}...G.n...
->>>>     0020: 0c fe 8b 00 ea 02 2d 05  53 07 d0 09 49 0c 45 0d  
->>>> ......-.S...I.E.
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 4d 0e f5 0c 19 0b d2 0b  dc 0c 29 0c 8b 0c 92 0d  
->>>> M.........).....
->>>>     0010: 30 0c f4 0b 00 0e 09 0d  08 0b 11 0c 1f 0d cd 0c  
->>>> 0...............
->>>>     0020: a3 0b 0c 09 64 07 3e 07  8a 06 03 07 95 07 f1 07  
->>>> ....d.>.........
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 5b 07 85 06 49 05 29 03  af 03 6e 04 90 03 ba 02  
->>>> [...I.)...n.....
->>>>     0010: 10 02 7a 02 33 04 8a 04  63 03 9d 02 84 00 3f 01  
->>>> ..z.3...c.....?.
->>>>     0020: 57 03 18 04 52 06 1b 0a  f3 0c f7 0e 51 10 44 11  
->>>> W...R.......Q.D.
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 28 10 d6 0e ad 0e c8 0e  d4 0d 71 0a d4 07 11 06  
->>>> (.........q.....
->>>>     0010: c8 03 18 03 72 02 26 00  0f fe 64 fd e7 fb 2e fa  
->>>> ....r.&...d.....
->>>>     0020: ee f8 93 f5 f3 f2 bd f3  73 f3 f9 f2 0b f3 29 f3  
->>>> ........s.....).
->>>> > SCO data: handle 1 dlen 48
->>>>     0000: 49 f3 42 f5 00 f7 fd f5  ad f5 ef f6 9e f5 4b f4  
->>>> I.B...........K.
->>>>
->>>
->>>
->>>
->>> -------------------------------------------------------
->>> This SF.net email is sponsored by: Splunk Inc. Do you grep through 
->>> log files
->>> for problems?  Stop!  Download the new AJAX search engine that makes
->>> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
->>> http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
->>> _______________________________________________
->>> Bluez-users mailing list
->>> Bluez-users@lists.sourceforge.net
->>> https://lists.sourceforge.net/lists/listinfo/bluez-users
->>>
->>>
->>
->>
->> -------------------------------------------------------
->> This SF.net email is sponsored by: Splunk Inc. Do you grep through 
->> log files
->> for problems?  Stop!  Download the new AJAX search engine that makes
->> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
->> http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
->> _______________________________________________
->> Bluez-users mailing list
->> Bluez-users@lists.sourceforge.net
->> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
->
->
->
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log 
-> files
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
 
 
 -------------------------------------------------------
