@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <45bf5ff80601151440w47f2f38bs80a68fafc8e8fdf1@mail.gmail.com>
+From: Artur Almeida <fidalgo.a@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----_=_NextPart_001_01C61AAF.C419DC4F"
-Subject: RE: [Bluez-devel] Problems with smart phones when using a"silent"kernel
-Message-ID: <C70061B183DE09419568AB2060C52A950177D435@arion.intra.local>
-From: "Victor Shcherbatyuk" <Victor.Shcherbatyuk@tomtom.com>
-To: <bluez-devel@lists.sourceforge.net>
+Content-Type: multipart/alternative;
+	boundary="----=_Part_122025_13836310.1137364810301"
+Subject: [Bluez-devel] Time Between Rfcomm Connections
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,141 +17,58 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 16 Jan 2006 16:13:57 +0100
+Date: Sun, 15 Jan 2006 22:40:10 +0000
 
-This is a multi-part message in MIME format.
-
-------_=_NextPart_001_01C61AAF.C419DC4F
-Content-Type: text/plain;
-	charset="us-ascii"
+------=_Part_122025_13836310.1137364810301
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
-X-NAIMIME-Disclaimer: 1
-X-NAIMIME-Modified: 1
+Content-Disposition: inline
 
-Marcel,
+Hi
 
-This fixes the problem with console redirected to /dev/null.
+ Im testing a few dongles that i bought but none of them is able to achieve
+7 simultaneous rfcomm connections in a piconet. Im a master in all
+comunications and i initiate the connections with the mobile phones,
+depending on the ship provider the max number of communications i managed t=
+o
+establish was 5, in a 1.2  broadcom bluetooth dongle, tipcally i can only
+establish 4 in a silicon wave or Csr dongle (All 1.2). Also, the delay that
+i have to force between rfcomm connections varies from 2 to 3 sec depending
+on the ship provider, otherwise i get resource busy messages. Can someone
+point me a bluetooth usb dongle that is able to establish 7 rfcomm
+connections? I thought this was a mandatory request from the bluetooth spec
+but i tested more then 15 diferent dongles and the best i got was 5.
+Concerning the delay between rfcomm connections , is this something
+controled by bluez or some limitation in the ship provider?
 
-Regards,
-    Victor.
-
------Original Message-----
-From: bluez-devel-admin@lists.sourceforge.net
-[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Victor
-Shcherbatyuk
-Sent: Friday, January 13, 2006 14:02 PM
-To: bluez-devel@lists.sourceforge.net
-Subject: RE: [Bluez-devel] Problems with smart phones when using
-a"silent"kernel
-
-I've checked, it is running, so the only option it has some issues with
-console redirected to /dev/null... Will check the logs...
-
-Regards,
-    Victor.=20
-
------Original Message-----
-From: bluez-devel-admin@lists.sourceforge.net
-[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: Friday, January 13, 2006 13:13 PM
-To: bluez-devel@lists.sourceforge.net
-Subject: RE: [Bluez-devel] Problems with smart phones when using
-a"silent"kernel
-
-Hi Victor,
-
-> Small update. I've tried to connect with rfcomm tool - the same=20
-> behaviour. With the silent kernel it does not connect to Windows=20
-> Mobile phones. The logs show attempts to connect to the phone with
-"normal"
-> kernel (connection successful) and "silent" one (fails). PSM Not=20
-> Supported is something that probably goes wrong...
-
-these stupid Microsoft devices. Everytime they get a connection, they
-connect back to the SDP server of that device and this fails. So it
-seems to me that the SDP daemon is not running or have problems with the
-console redirected to /dev/null. Check in the log files for errors from
-sdpd. Or you might need to use strace to track it.
+Thank You
 
 Regards
 
-Marcel
+Artur
 
+------=_Part_122025_13836310.1137364810301
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
+Hi<br><br>&nbsp;Im testing a few dongles that i bought but none of them is =
+able to achieve 7 simultaneous rfcomm connections in a piconet. Im a master=
+ in all comunications and i initiate the connections with the mobile phones=
+, depending on the ship provider the max number of communications i managed=
+ to establish was 5, in a=20
+1.2&nbsp; broadcom bluetooth dongle, tipcally i can only establish 4 in a s=
+ilicon wave or Csr dongle (All 1.2). Also, the delay that i have to force b=
+etween rfcomm connections varies from 2 to 3 sec depending on the ship prov=
+ider, otherwise i get resource busy messages. Can someone point me a blueto=
+oth usb dongle that is able to establish 7 rfcomm connections? I thought th=
+is was a mandatory request from the bluetooth spec&nbsp; but i tested more =
+then 15 diferent dongles and the best i got was 5. Concerning the delay bet=
+ween rfcomm connections , is this something controled by bluez or some limi=
+tation in the ship provider?=20
+<br><br>Thank You<br><br>Regards<br><br>Artur<br>&nbsp;<br>
 
-
--------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc. Do you grep through log
-files for problems?  Stop!  Download the new AJAX search engine that
-makes searching your log files as easy as surfing the  web.  DOWNLOAD
-SPLUNK!
-http://ads.osdn.com/?ad_id=3D7637&alloc_id=3D16865&op=3Dclick
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
-This e-mail message contains information which is confidential and may
-be privileged. It is intended for use by the addressee only. If you are
-not the intended addressee, we request that you notify the sender
-immediately and delete or destroy this e-mail message and any
-attachment(s), without copying, saving, forwarding, disclosing or using
-its contents in any other way. TomTom N.V., TomTom International BV or
-any other company belonging to the TomTom group of companies will not be
-liable for damage relating to the communication by e-mail of data,
-documents or any other information.
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc. Do you grep through log
-files for problems?  Stop!  Download the new AJAX search engine that
-makes searching your log files as easy as surfing the  web.  DOWNLOAD
-SPLUNK!
-http://ads.osdn.com/?ad_idv37&alloc_id=16865&op=3Dick
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
-This e-mail message contains information which is confidential and may be=
- privileged. It is intended for use by the addressee only. If you are not=
- the intended addressee, we request that you notify the sender immediatel=
-y and delete or destroy this e-mail message and any attachment(s), withou=
-t copying, saving, forwarding, disclosing or using its contents in any ot=
-her way. TomTom N.V., TomTom International BV or any other company belong=
-ing to the TomTom group of companies will not be liable for damage relati=
-ng to the communication by e-mail of data, documents or any other informa=
-tion.
-
-------_=_NextPart_001_01C61AAF.C419DC4F
-Content-Type: application/octet-stream;
-	name="sdpd_noconsole.patch"
-Content-Transfer-Encoding: base64
-Content-Description: sdpd_noconsole.patch
-Content-Disposition: attachment;
-	filename="sdpd_noconsole.patch"
-
-PyBzZHBkX25vY29uc29sZS5wYXRjaApJbmRleDogc2RwZC9tYWluLmMKPT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1Mg
-ZmlsZTogL2N2c3Jvb3QvYmx1ZXovdXRpbHMvc2RwZC9tYWluLmMsdgpyZXRyaWV2aW5nIHJldmlz
-aW9uIDEuMTMKZGlmZiAtdSAtcjEuMTMgbWFpbi5jCi0tLSBzZHBkL21haW4uYwkzIEphbiAyMDA2
-IDEzOjI5OjAxIC0wMDAwCTEuMTMKKysrIHNkcGQvbWFpbi5jCTE2IEphbiAyMDA2IDE1OjA0OjQ0
-IC0wMDAwCkBAIC0zNSw5ICszNSwxMSBAQAogI2luY2x1ZGUgPHNpZ25hbC5oPgogI2luY2x1ZGUg
-PHN5c2xvZy5oPgogI2luY2x1ZGUgPGdldG9wdC5oPgorI2luY2x1ZGUgPGZjbnRsLmg+CiAjaW5j
-bHVkZSA8c3lzL3N0YXQuaD4KICNpbmNsdWRlIDxzeXMvaW9jdGwuaD4KICNpbmNsdWRlIDxzeXMv
-c29ja2V0Lmg+CisjaW5jbHVkZSA8c3lzL3R5cGVzLmg+CiAKICNpbmNsdWRlIDxibHVldG9vdGgv
-Ymx1ZXRvb3RoLmg+CiAjaW5jbHVkZSA8Ymx1ZXRvb3RoL2wyY2FwLmg+CkBAIC0zMDEsOCArMzAz
-LDEzIEBACiAJCQlyZXR1cm4gMDsKIAkJc2V0c2lkKCk7CiAJfQotCWZvciAoZmQgPSAwOyBmZCA8
-IDM7IGZkKyspCi0JCWNsb3NlKGZkKTsKKwlpZiAoKGZkID0gb3BlbigiL2Rldi9udWxsIiwgT19S
-RFdSLCAwKSkgIT0gLTEpIHsKKwkJZHVwMihmZCwgU1RESU5fRklMRU5PKTsKKwkJZHVwMihmZCwg
-U1RET1VUX0ZJTEVOTyk7CisJCWR1cDIoZmQsIFNUREVSUl9GSUxFTk8pOworCQlpZiAoZmQgPiBT
-VERFUlJfRklMRU5PKQorCQkJY2xvc2UoZmQpOworCX0KIAogCWNoZGlyKCIvIik7CiAJcmV0dXJu
-IDE7Cg==
-
-------_=_NextPart_001_01C61AAF.C419DC4F--
+------=_Part_122025_13836310.1137364810301--
 
 
 -------------------------------------------------------
