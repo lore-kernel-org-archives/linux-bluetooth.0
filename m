@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] sco mtu: 64: 0
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43CBB6AE.4020007@cs.bgu.ac.il>
+From: Niv <nivv@cs.bgu.ac.il>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43CBA230.6080403@pagestation.com>
-References: <43CBA230.6080403@pagestation.com>
-Content-Type: text/plain
-Message-Id: <1137428636.6324.61.camel@localhost.localdomain>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: [Bluez-users] Can't find device
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,25 +16,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 16 Jan 2006 17:23:56 +0100
+Date: Mon, 16 Jan 2006 17:07:26 +0200
 
-Hi Jerry,
+Problem:  $ btsco -v 00:0D:44:33:E1:63
+btsco v0.41
+Error: control open (hw:4): No such device
+Error: Can't find device. Bail
 
-first of all, please use standard plain text ASCII emails in this
-mailing list. I don't need extra big fonts and prefer to choose the size
-of my fonts by myself and not by a weird HTML email.
 
-> I saw that an SCO MTU: 16:0 should work for audio.
-> What about an SCO MTU: 64: 0 - will that work?
+diagnoz:
 
-At the moment I am collection information about the Broadcom dongles and
-how to integrate a quirk for them. Please include the output of lsusb
-for this device.
+Worked fine yesterday. I switched to alsa modules aka alsa-driver.
 
-Regards
+snd-bt-sco modprobe loads fine
 
-Marcel
+I even compiled the emu10k1, which has a function that is used.
 
+
+$ cat /proc/asound/cards
+ 0 [V8237          ]: VIA8237 - VIA 8237
+                      VIA 8237 with CMI9761 at 0xe800, irq 10
+ 1 [Bt878          ]: Bt87x - Brooktree Bt878
+                      Brooktree Bt878 at 0xe8101000, irq 11
+ 2 [Audio          ]: USB-Audio - USB Audio
+                      C-Media INC. USB Audio at usb-0000:00:10.3-2, full 
+speed
+ 3 [Headset        ]: Bluetooth SCO - BT Headset
+                      BT Headset 1
+
+
+
+ l2ping 00:0D:44:33:E1:63
+Ping: 00:0D:44:33:E1:63 from 00:10:60:A8:86:A3 (data size 44) ...
+44 bytes from 00:0D:44:33:E1:63 id 0 time 42.46ms
+44 bytes from 00:0D:44:33:E1:63 id 1 time 41.56ms
+44 bytes from 00:0D:44:33:E1:63 id 2 time 34.55ms
+44 bytes from 00:0D:44:33:E1:63 id 3 time 50.53ms
+44 bytes from 00:0D:44:33:E1:63 id 4 time 49.51ms
+5 sent, 5 received, 0% loss
+
+
+Niv
 
 
 
