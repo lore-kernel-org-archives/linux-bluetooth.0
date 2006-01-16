@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <af7b4eb20601161058u7988a5d7xfac0d9002240c404@mail.gmail.com>
-From: Rodrigo Nascimento <nascimento.rp@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <43CBEB78.9070306@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Bluetooth and Development
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] BTSCO question
+References: <20060116072925.48073.qmail@web15009.mail.cnb.yahoo.com>
+In-Reply-To: <20060116072925.48073.qmail@web15009.mail.cnb.yahoo.com>
+Content-Type: text/plain; charset=GB2312
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,27 +18,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 16 Jan 2006 16:58:59 -0200
+Date: Mon, 16 Jan 2006 11:52:40 -0700
 
-Hi All,
+Chenghua
 
-I'm a student and I'd like to learn about how to develop applications
-that uses the Bluetooth technology. I saw, in Sun's website, something
-about JSR-82, but I don't like of Java programming and I'd like to
-develop in C language.
+> I use btsco to let my PC reach my headset,the dangle's maker is ISSC.
+> What should I do next?
 
-I have a doubt:
+buy a new dongle using a CSR chip.
 
-- I have a linux box, what I need to do for develop a application to
-send a message for my cell phone, for example?
-
-My idea is to start with a simple application, if it's works fine, I
-need to give a shape for my idea with this technology.
-
-Thanks,
-
---
-Rodrigo Nascimento
+brad
 
 
 -------------------------------------------------------
