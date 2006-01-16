@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Time Between Rfcomm Connections
+Subject: Re: [Bluez-devel] Patch to add a --dailup option to dund, needed
+	to make TomTomGo navigators connect to linux
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <45bf5ff80601151440w47f2f38bs80a68fafc8e8fdf1@mail.gmail.com>
-References: <45bf5ff80601151440w47f2f38bs80a68fafc8e8fdf1@mail.gmail.com>
+In-Reply-To: <1137340560.3001.21.camel@laptopd505.fenrus.org>
+References: <1137340560.3001.21.camel@laptopd505.fenrus.org>
 Content-Type: text/plain
-Message-Id: <1137451317.24817.7.camel@localhost>
+Message-Id: <1137451092.24817.2.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,32 +19,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 16 Jan 2006 23:41:57 +0100
+Date: Mon, 16 Jan 2006 23:38:12 +0100
 
-Hi Artur,
+Hi Arjan,
 
->  Im testing a few dongles that i bought but none of them is able to
-> achieve 7 simultaneous rfcomm connections in a piconet. Im a master in
-> all comunications and i initiate the connections with the mobile
-> phones, depending on the ship provider the max number of
-> communications i managed to establish was 5, in a 1.2  broadcom
-> bluetooth dongle, tipcally i can only establish 4 in a silicon wave or
-> Csr dongle (All 1.2). Also, the delay that i have to force between
-> rfcomm connections varies from 2 to 3 sec depending on the ship
-> provider, otherwise i get resource busy messages. Can someone point me
-> a bluetooth usb dongle that is able to establish 7 rfcomm connections?
-> I thought this was a mandatory request from the bluetooth spec  but i
-> tested more then 15 diferent dongles and the best i got was 5.
-> Concerning the delay between rfcomm connections , is this something
-> controled by bluez or some limitation in the ship provider? 
+> Below is a patch to dund that adds a -dailup option. This option changes
+> the class that is advertized by dund to be "dailup", TomTom Go
+> navigators require this to connect to (they only want to connect to
+> phones normally ;)
+> 
+> http://www.fenrus.org/tomtom has a howto-in-progress on how to use the
+> linux bluez stack to connect a tomtom go to the internet, this patch is
+> one of the more hairy aspects of this, so it'd be nice if this got
+> merged...
+> 
+> In addition I suspect that tomtom isn't the only one wanting a dailup
+> device, so it ought to be a pretty generic feature.
 
-I am unsure about the other manufacturer, but I thought that CSR chips
-with at least HCI 18.x are capable of it. And actually I pretty sure I
-already had such weird setups with a bunch of mouse and keyboard
-devices. However nothing in the specification mandates that you have to
-support this number of devices in a piconet. It is the maximal possible
-number of device,s because they use only 3 bits to identify an active
-device in a piconet.
+nice patch, but do you mind redoing it and change "dailup" into "dialup"
+for some nicer English ;)
 
 Regards
 
