@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060116110016.27927.qmail@webmaild.fe1.aruba.it>
-References: <20060113090337.27122.qmail@webmaild.fe1.aruba.it>
-            <43C842F9.3090409@cs.bgu.ac.il>
-In-Reply-To: <43C842F9.3090409@cs.bgu.ac.il>
-From: "Peppe Colicchia" <bluez.list@pc-labs.org>
+Subject: Re: [Bluez-users] Cellink BTA-3120 for Kernel 2.6.15
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <20060116091447.674C01F0164@mrelay2.st2.lyceu.net>
+References: <20060116091447.674C01F0164@mrelay2.st2.lyceu.net>
+Content-Type: text/plain
+Message-Id: <1137405129.10090.2.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="iso-8859-1"
-Subject: [Bluez-users] Re: cannot cat /dev/bluetooth/rfcomm/0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,44 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 16 Jan 2006 12:00:15 +0100
+Date: Mon, 16 Jan 2006 10:52:09 +0100
 
-> what does this do: 
-> 
-> # l2ping 00:08:1B:8C:3F:A2
+Hi Franz,
 
-root@h3600:~# l2ping 00:08:1B:8C:3F:A2
-Ping: 00:08:1B:8C:3F:A2 from 00:02:C7:0C:AA:B5 (data size 20) ...
-44 bytes from 00:08:1B:8C:3F:A2 id 0 time 50.98ms
-44 bytes from 00:08:1B:8C:3F:A2 id 1 time 38.50ms
-44 bytes from 00:08:1B:8C:3F:A2 id 2 time 33.82ms
-44 bytes from 00:08:1B:8C:3F:A2 id 3 time 32.46ms
-44 bytes from 00:08:1B:8C:3F:A2 id 4 time 31.29ms
-5 sent, 5 received, 0% loss 
+> To use the Cellink BTA-3120 USB dongle in Kernel 2.6.15 I had to apply the
+> following patch:
 
-> I would also look if they actually are paired
+I don't think so. Please provide the content of /proc/bus/usb/devices.
 
-I think the devices are paired: isn't it an operation that i have to do only 
-once? I say this cause i was able to use the GPS receiver without problems. 
-Now i'm trying several version of Familiar (from 0.8.2-stable to 
-0.8.3-snapshots and release candidate) without luck. 
+Regards
 
-How could i pair again the devices? 
+Marcel
 
-> 
-> Niv 
-> 
 
-Thanks Niv. 
-
-> 
-> P.s. 
-> 
-> First replay to ML 
-> 
-> 
-
-Regards, Peppe Colicchia
 
 
 -------------------------------------------------------
