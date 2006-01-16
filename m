@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Cellink BTA-3120 for Kernel 2.6.15
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20060116091447.674C01F0164@mrelay2.st2.lyceu.net>
-References: <20060116091447.674C01F0164@mrelay2.st2.lyceu.net>
-Content-Type: text/plain
-Message-Id: <1137405129.10090.2.camel@localhost>
-Mime-Version: 1.0
+From: "Franz Furbass" <franz.furbass@erzia.com>
+To: <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Message-Id: <20060116091447.674C01F0164@mrelay2.st2.lyceu.net>
+Subject: [Bluez-users] Cellink BTA-3120 for Kernel 2.6.15
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,19 +17,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 16 Jan 2006 10:52:09 +0100
+Date: Mon, 16 Jan 2006 10:16:50 +0100
 
-Hi Franz,
+Hello all,
 
-> To use the Cellink BTA-3120 USB dongle in Kernel 2.6.15 I had to apply the
-> following patch:
+To use the Cellink BTA-3120 USB dongle in Kernel 2.6.15 I had to apply the
+following patch:
 
-I don't think so. Please provide the content of /proc/bus/usb/devices.
 
-Regards
 
-Marcel
+--- linux-2.6.15/drivers/bluetooth/hci_usb.c    2006-01-16
+09:54:53.000000000 +0100
++++ linux-2.6.15/drivers/bluetooth/hci_usb.c    2006-01-13
+16:09:00.000000000 +0100
+@@ -95,6 +95,9 @@
+        /* Ericsson with non-standard id */
+        { USB_DEVICE(0x0bdb, 0x1002) },
 
++       /* Cellink USB dongle BTA 3120 */
++       { USB_DEVICE(0x0c10, 0x0000) },
++
+        { }     /* Terminating entry */
+ };
+
+
+
+Regards,
+Franz
+ 
 
 
 
