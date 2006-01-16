@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] UDEV data missing after hid2hci
-From: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
+Message-ID: <20060116072925.48073.qmail@web15009.mail.cnb.yahoo.com>
+From: Chenghua Yan <hua9008@yahoo.com.cn>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1137164677.7780.10.camel@pc-05.ycom.ch>
-References: <1137164677.7780.10.camel@pc-05.ycom.ch>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <1137402066.8173.0.camel@pc-05.ycom.ch>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-743602839-1137396565=:46747"
+Subject: [Bluez-users] BTSCO question
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,81 +16,52 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 16 Jan 2006 10:01:06 +0100
+Date: Mon, 16 Jan 2006 15:29:25 +0800 (CST)
 
-No one ?
+--0-743602839-1137396565=:46747
+Content-Type: text/plain; charset=gb2312
+Content-Transfer-Encoding: 8bit
 
-Le vendredi 13 janvier 2006 =C3=A0 16:04 +0100, Alexandre Ghisoli a =C3=A9=
-crit :
-> Hi,=20
->=20
-> I've a bug with my DiNovo keyb and mice.
->=20
-> I cannot force the device name in udev to link against xorg
-> configuration.
->=20
-> Fixed device name is required for the Xorg configuration, since kernel
-> and udev change device numbers at reconnect, after a Bluetooth stop to
-> save batteries.
->=20
-> Example :
->=20
-> /dev/input/event0	-> mouse at startup (in usb mode)
-> /dev/input/event1	-> keyboard (in usb mode)=20
-> /dev/input/event3	-> mouse in BT mode, if I touch mice first
-> /dev/input/event4	-> keyboard in BT mode
->=20
-> After a while without using mouse, hidd will stop session with device.
-> Touching the mouse re-enable the link, but device number could be
-> event5 !
->=20
->=20
-> So, I want to fix the device name with a udev script. Testing :=20
-> KERNEL=3D=3D"event[0-9]*"  SYSFS{idVendor}=3D=3D"046d",
-> SYSFS{idProduct}=3D=3D"b001", NAME=3D=3D"input/ev-mx900", MODE=3D=3D"06=
-64"
->=20
-> Not working !!
->=20
->=20
-> /proc/bus/input/devices gives :=20
-> I: Bus=3D0005 Vendor=3D046d Product=3Db001 Version=3D2200
-> N: Name=3D"Bluetooth HID Boot Protocol Device"
-> P: Phys=3D
-> S: Sysfs=3D/class/input/input3
-> H: Handlers=3Dmouse1 event3
-> B: EV=3D7
-> B: KEY=3D1f0000 0 0 0 0 0 0 0 0
-> B: REL=3D103
->=20
->=20
->=20
-> So both vendor and device ID are correct.
->=20
-> I check by udev :=20
-> udevinfo -a -p /sys/class/input/event3
->=20
-> device '/sys/class/input/input3/event3' has major:minor 13:67
->   looking at class device '/sys/class/input/input3/event3':
->     KERNEL=3D=3D"event3"
->     SUBSYSTEM=3D=3D"input"
->     SYSFS{dev}=3D=3D"13:67"
->=20
->=20
->=20
->=20
->=20
-> This mean that the udev struct is not filled with all needed infos to
-> match udev rules.
->=20
-> Any help to make it working ?
->=20
-> Oh, BTW, tested with linux-2.6.15
->=20
-> Thanks
->=20
->=20
+Hi all
+   
+  I use btsco to let my PC reach my headset,the dangle's maker is ISSC.
+  Run such command:
+   
+  # btsco -v headset_bdaddr
+   
+  It appears:
+   
+  btsco v0.4
+  Voice setting : 0x0060
+  RFCOMM channel 1 connected
+   
+  What should I do next?
+  I open the other terminate to run 
+   
+  # aplay -B 1000000 -D plughw: *.wav
+   
+  But there's no sound in my headset,I want to know why.
+  And I want to know what to do next to reach my destination.
+   
+  Thanks a lot.
 
+
+
+		
+---------------------------------
+ —≈ª¢1G√‚∑—” œ‰∞Ÿ∑÷∞Ÿ∑¿¿¨ª¯–≈
+ —≈ª¢÷˙ ÷-À—À˜°¢…±∂æ°¢∑¿…ß»≈  
+--0-743602839-1137396565=:46747
+Content-Type: text/html; charset=gb2312
+Content-Transfer-Encoding: 8bit
+
+<DIV id=RTEContent>Hi all</DIV>  <DIV>&nbsp;</DIV>  <DIV>I use btsco to let my PC reach my headset,the dangle's maker is ISSC.</DIV>  <DIV>Run such command:</DIV>  <DIV>&nbsp;</DIV>  <DIV># btsco -v headset_bdaddr</DIV>  <DIV>&nbsp;</DIV>  <DIV>It appears:</DIV>  <DIV>&nbsp;</DIV>  <DIV>btsco v0.4</DIV>  <DIV>Voice setting : 0x0060</DIV>  <DIV>RFCOMM channel 1 connected</DIV>  <DIV>&nbsp;</DIV>  <DIV>What should I do next?</DIV>  <DIV>I open the other terminate to run </DIV>  <DIV>&nbsp;</DIV>  <DIV># aplay -B 1000000 -D plughw: *.wav</DIV>  <DIV>&nbsp;</DIV>  <DIV>But there's no sound in my headset,I want to know why.</DIV>  <DIV>And I want to know what to do next to reach my destination.</DIV>  <DIV>&nbsp;</DIV>  <DIV>Thanks a lot.</DIV><BR><BR><p>
+		<hr size=1><a href="http://cn.mail.yahoo.com" target=blank> 
+—≈ª¢1G√‚∑—” œ‰∞Ÿ∑÷∞Ÿ∑¿¿¨ª¯–≈</a><br> 
+<a href="http://cn.zs.yahoo.com" target=blank>—≈ª¢÷˙ ÷-À—À˜°¢…±∂æ°¢∑¿…ß»≈</a> 
+ 
+
+--0-743602839-1137396565=:46747--
 
 
 -------------------------------------------------------
