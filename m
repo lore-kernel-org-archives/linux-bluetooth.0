@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Patch to add a --dailup option to dund, needed
-	to make TomTomGo navigators connect to linux
-From: Marcel Holtmann <marcel@holtmann.org>
+Subject: RE: [Bluez-devel] Problems with smart phones when using
+	a"silent"kernel
+From: Bastien Nocera <hadess@hadess.net>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1137340560.3001.21.camel@laptopd505.fenrus.org>
-References: <1137340560.3001.21.camel@laptopd505.fenrus.org>
+In-Reply-To: <1137428510.6324.58.camel@localhost.localdomain>
+References: <C70061B183DE09419568AB2060C52A950177D435@arion.intra.local>
+	 <1137428510.6324.58.camel@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1137451092.24817.2.camel@localhost>
+Message-Id: <1137432461.7949.0.camel@wyatt.hadess.net>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,29 +20,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 16 Jan 2006 23:38:12 +0100
+Date: Mon, 16 Jan 2006 17:27:41 +0000
 
-Hi Arjan,
-
-> Below is a patch to dund that adds a -dailup option. This option changes
-> the class that is advertized by dund to be "dailup", TomTom Go
-> navigators require this to connect to (they only want to connect to
-> phones normally ;)
+On Mon, 2006-01-16 at 17:21 +0100, Marcel Holtmann wrote:
+> Hi Victor,
 > 
-> http://www.fenrus.org/tomtom has a howto-in-progress on how to use the
-> linux bluez stack to connect a tomtom go to the internet, this patch is
-> one of the more hairy aspects of this, so it'd be nice if this got
-> merged...
+> > This fixes the problem with console redirected to /dev/null.
 > 
-> In addition I suspect that tomtom isn't the only one wanting a dailup
-> device, so it ought to be a pretty generic feature.
+> I applied your patch to the CVS, but is this the best way to redirect
+> stdin, stdout and stderr to /dev/null?
 
-nice patch, but do you mind redoing it and change "dailup" into "dialup"
-for some nicer English ;)
+As Dimitry mentioned, daemon(3) should help:
+       Unless  the  argument noclose is non-zero, daemon() will redirect
+stan-
+       dard input, standard output and standard error to /dev/null.
 
-Regards
 
-Marcel
+---
+Bastien Nocera <hadess@hadess.net> 
 
 
 
