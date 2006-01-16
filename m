@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Problems with smart phones when using
 	a"silent"kernel
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1137428510.6324.58.camel@localhost.localdomain>
+In-Reply-To: <C70061B183DE09419568AB2060C52A950177D435@arion.intra.local>
 References: <C70061B183DE09419568AB2060C52A950177D435@arion.intra.local>
-	 <1137428510.6324.58.camel@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1137432461.7949.0.camel@wyatt.hadess.net>
+Message-Id: <1137428510.6324.58.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,24 +19,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 16 Jan 2006 17:27:41 +0000
+Date: Mon, 16 Jan 2006 17:21:50 +0100
 
-On Mon, 2006-01-16 at 17:21 +0100, Marcel Holtmann wrote:
-> Hi Victor,
-> 
-> > This fixes the problem with console redirected to /dev/null.
-> 
-> I applied your patch to the CVS, but is this the best way to redirect
-> stdin, stdout and stderr to /dev/null?
+Hi Victor,
 
-As Dimitry mentioned, daemon(3) should help:
-       Unless  the  argument noclose is non-zero, daemon() will redirect
-stan-
-       dard input, standard output and standard error to /dev/null.
+> This fixes the problem with console redirected to /dev/null.
 
+I applied your patch to the CVS, but is this the best way to redirect
+stdin, stdout and stderr to /dev/null?
 
----
-Bastien Nocera <hadess@hadess.net> 
+Regards
+
+Marcel
 
 
 
