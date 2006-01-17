@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] The state machine of LMP
+Subject: Re: [Bluez-devel] linkkeys on jffs2
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <005e01c61b2b$d7bdc640$6ceda8c0@accelsemi>
-References: <005e01c61b2b$d7bdc640$6ceda8c0@accelsemi>
+In-Reply-To: <38907.62.33.148.3.1137487338.squirrel@62.33.148.3>
+References: <38907.62.33.148.3.1137487338.squirrel@62.33.148.3>
 Content-Type: text/plain
-Message-Id: <1137495468.21629.0.camel@localhost>
+Message-Id: <1137495220.5688.7.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,14 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 17 Jan 2006 11:57:48 +0100
+Date: Tue, 17 Jan 2006 11:53:40 +0100
 
-Hi,
+Hi Andrey,
 
->     I encounter a problem during the implementation of LMP layer of BT protocol stack in a project: The states of LMP layer are so many that the structure of doing it is big.
->     The BT core spec doesn't provide a full state machine.Who can give me some advices about LMP implementation .
+> Got a problem with hcid storing link keys on jffs2 file system.
+> Hcid is able to store only one link key, all subsequent keys doesn't
+> appear in linkkeys file.
+> After looking into sources I find out in common/textfile.c call of mmap()
+> with MAP_SHARED flag which is not suported on jffs2.
+> As mmap is used only for seeking keys in maped memory not for storing into
+> file seems it's good idea to use MAP_PRIVATE flag. In this case there are
+> no error on jffs2
 
-the BlueZ implementation is a host stack and doesn't deal with LMP.
+if you inline the patch, make sure your mail client doesn't do line
+breaks in that area. Otherwise attach it.
+
+However the patch is in the CVS now. Thanks.
 
 Regards
 
