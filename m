@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Patch to add a --dailup option to dund, needed
-	to make TomTomGo navigators connect to linux
+Subject: RE: [Bluez-devel] Problems with smart phones when using
+	a"silent"kernel
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1137483993.3005.10.camel@laptopd505.fenrus.org>
-References: <20060117040805.07FFC134B1@sc8-sf-spam2.sourceforge.net>
-	 <1137483993.3005.10.camel@laptopd505.fenrus.org>
+In-Reply-To: <C70061B183DE09419568AB2060C52A95017BED92@arion.intra.local>
+References: <C70061B183DE09419568AB2060C52A95017BED92@arion.intra.local>
 Content-Type: text/plain
-Message-Id: <1137494965.5688.4.camel@localhost>
+Message-Id: <1137494637.5688.2.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,17 +19,13 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 17 Jan 2006 11:49:25 +0100
+Date: Tue, 17 Jan 2006 11:43:57 +0100
 
-Hi Arjan,
+Hi Victor,
 
-> > nice patch, but do you mind redoing it and change "dailup" into
-> > "dialup" for some nicer English ;)
-> 
-> oh woops
+> Now using daemon(3) .
 
-and you forgot the manual page, but I fixed that. Patch is in the CVS
-now. Thanks.
+the patch is in the CVS now. Thanks.
 
 Regards
 
