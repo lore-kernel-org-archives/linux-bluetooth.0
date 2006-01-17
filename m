@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0601170535yadd5f6fy93c3a5ea64a8499f@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
-To: bluez-devel@lists.sourceforge.net, Claudio Takahasi <cktakahasi@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] D-Bus tasks planning
+Subject: Re: [Bluez-devel] The state machine of LMP
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <005e01c61b2b$d7bdc640$6ceda8c0@accelsemi>
+References: <005e01c61b2b$d7bdc640$6ceda8c0@accelsemi>
+Content-Type: text/plain
+Message-Id: <1137495468.21629.0.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,47 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 17 Jan 2006 11:35:46 -0200
+Date: Tue, 17 Jan 2006 11:57:48 +0100
 
-Hi guys,
+Hi,
 
-I've just started planning the activities for this year. I would like
-receive feedbacks/comments about the items below. There are some tasks
-suggested and a lot of clouds :)  I consider these tasks essential to
-make the D-Bus services usable and necessary to start the development
-of Network, Serial, HID, ... services over D-Bus.
+>     I encounter a problem during the implementation of LMP layer of BT protocol stack in a project: The states of LMP layer are so many that the structure of doing it is big.
+>     The BT core spec doesn't provide a full state machine.Who can give me some advices about LMP implementation .
 
-* Move hcid to bluetoothd
+the BlueZ implementation is a host stack and doesn't deal with LMP.
 
-* BlueZ SDP D-Bus
-    - How design it?  According with an old discussion, the SDP should
-be implemented inside the bluetoothd completelly, because this gives
-the possibility of SDP record caching. Considering this assumption,
-what are the drawbacks and the side-effects to the current
-applications?
+Regards
 
-* Kernel/Userspace communication interface
-    - kernel inquiry cache. At the momment, one important enhancement
-is provide a easy access and non-blocking inquiry operation.
-    - probably this communication interface will be usefull to avoid
-another blocking operations. eg: connection control stuffs.
+Marcel
 
 
-Others planned tasks:
-* Continue GBlueZConf: Check Gnome UI guidelines, create CVS
-repository, support for local adapter setup, ...
-* Force authentication: Make possible re-pairing.
-* Remote Name: use text file stored data to solve instead of use LMP
-command for every request.
-
-
-Regards,
-Claudio.
-
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
