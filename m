@@ -1,15 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] D-Bus tasks planning
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43CD6921.9060603@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Cc: Claudio Takahasi <cktakahasi@gmail.com>
-In-Reply-To: <9307f5f20601171158ke41d974l29149adc20d8cd6c@mail.gmail.com>
-References: <e1effdeb0601170535yadd5f6fy93c3a5ea64a8499f@mail.gmail.com>
-	 <1137505788.28239.18.camel@localhost>
-	 <9307f5f20601171158ke41d974l29149adc20d8cd6c@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1137538397.27630.1.camel@localhost>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] libsbc refactoring
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,29 +16,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 17 Jan 2006 23:53:17 +0100
+Date: Tue, 17 Jan 2006 15:01:05 -0700
 
-Hi Paul,
+Victor,
 
-> I'm happy to see the DBus issue again on the list.
-> Even if I've already been told you don't like c++, I've got some code
-> which does exactly what you're looking for so maybe it may be of some
-> use, unfortunately I'm a student and
-> this leaves me with little for fun activities (like coding) so the
-> code hasn't been touched for a while(=months), I've started a complete
-> rewrite but I don't know how long this is going to take, in the
-> meantime I hope the old version will be useful, at least to grab some
-> ideas
+I've been meaning to try to simplify the 64-bit fixed point by
+eliminating the struct that combines two 32-bit values. So now we depend
+on the compiler to do all 64-bit math. The arm assembly goes out.
 
-using C++ for hcid or bluetoothd is no option, but for the clients that
-communicate over D-Bus, I don't care. Make them use C++, Mono/C# or
-whatever language binding is supported by D-Bus.
+Can you try this and make sure it's still performing well on arm?
 
-Regards
+This makes all the different flavors of math look the same in the basic ops:
 
-Marcel
+#define SBC_FIXED_0(val) {val = 0;}
+#define ADD(dst, src)  {dst += src;}
+#define SUB(dst, src)  {dst -= src;}
+#define MUL(dst, a, b) {dst = (sbc_fixed_t)a * b;}
+#define MULA(dst, a, b)  {dst += (sbc_fixed_t)a * b;}
 
+so we could even eliminate these macros. I know Marcel would be happy to
+see them go ;)
 
+Brad
 
 
 -------------------------------------------------------
