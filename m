@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <9307f5f20601171158ke41d974l29149adc20d8cd6c@mail.gmail.com>
-From: "P. Durante" <shackan@gmail.com>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] D-Bus tasks planning
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
 Cc: Claudio Takahasi <cktakahasi@gmail.com>
-In-Reply-To: <1137505788.28239.18.camel@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <e1effdeb0601170535yadd5f6fy93c3a5ea64a8499f@mail.gmail.com>
 References: <e1effdeb0601170535yadd5f6fy93c3a5ea64a8499f@mail.gmail.com>
-	 <1137505788.28239.18.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1137505788.28239.18.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,64 +19,56 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 17 Jan 2006 20:58:36 +0100
+Date: Tue, 17 Jan 2006 14:49:48 +0100
 
-Hi there,
-I'm happy to see the DBus issue again on the list.
-Even if I've already been told you don't like c++, I've got some code
-which does exactly what you're looking for so maybe it may be of some
-use, unfortunately I'm a student and
-this leaves me with little for fun activities (like coding) so the
-code hasn't been touched for a while(=3Dmonths), I've started a complete
-rewrite but I don't know how long this is going to take, in the
-meantime I hope the old version will be useful, at least to grab some
-ideas
+Hi Claudio,
 
->
-> The problem with the current SDP API is that it is blocking and at some
-> places really horrible. We need an event driven API and if we don't
-> wanna use threads, we have to rewrite it.
->
-sdp api:
-http://svn.berlios.de/viewcvs/bluetool/trunk/lib/bluetool/include/bluetool/=
-sdpclient.h?view=3Dmarkup
-http://svn.berlios.de/viewcvs/bluetool/trunk/lib/bluetool/src/linux/sdpclie=
-nt.cpp?view=3Dmarkup
+> I've just started planning the activities for this year. I would like
+> receive feedbacks/comments about the items below. There are some tasks
+> suggested and a lot of clouds :)  I consider these tasks essential to
+> make the D-Bus services usable and necessary to start the development
+> of Network, Serial, HID, ... services over D-Bus.
+> 
+> * Move hcid to bluetoothd
 
-http://svn.berlios.de/viewcvs/bluetool/trunk/lib/bluetool/include/bluetool/=
-sdprecord.h?view=3Dmarkup
-http://svn.berlios.de/viewcvs/bluetool/trunk/lib/bluetool/src/linux/sdpreco=
-rd.cpp?view=3Dmarkup
-http://svn.berlios.de/viewcvs/bluetool/trunk/lib/bluetool/src/linux/sdpreco=
-rd_p.h?view=3Dmarkup
+since I don't wanna use threads, we need a good and safe event loop
+implementation that integrates nicely with D-Bus. The one from Glib is
+no option.
 
-http://svn.berlios.de/viewcvs/bluetool/trunk/lib/bluetool/include/bluetool/=
-sdperror.h?view=3Dmarkup
-http://svn.berlios.de/viewcvs/bluetool/trunk/lib/bluetool/src/linux/sdperro=
-r.cpp?view=3Dmarkup
+> * BlueZ SDP D-Bus
+>     - How design it?  According with an old discussion, the SDP should
+> be implemented inside the bluetoothd completelly, because this gives
+> the possibility of SDP record caching. Considering this assumption,
+> what are the drawbacks and the side-effects to the current
+> applications?
 
-glue between the sdp api and dbus:
-http://svn.berlios.de/viewcvs/bluetool/trunk/bin/daemon/src/sdp/sdp_browser=
-.h?view=3Dmarkup
-http://svn.berlios.de/viewcvs/bluetool/trunk/bin/daemon/src/sdp/sdp_browser=
-.cpp?view=3Dmarkup
+The problem with the current SDP API is that it is blocking and at some
+places really horrible. We need an event driven API and if we don't
+wanna use threads, we have to rewrite it.
 
-http://svn.berlios.de/viewcvs/bluetool/trunk/bin/daemon/src/sdp/sdp_record.=
-h?view=3Dmarkup
-http://svn.berlios.de/viewcvs/bluetool/trunk/bin/daemon/src/sdp/sdp_record.=
-cpp?view=3Dmarkup
+> * Kernel/Userspace communication interface
+>     - kernel inquiry cache. At the momment, one important enhancement
+> is provide a easy access and non-blocking inquiry operation.
+>     - probably this communication interface will be usefull to avoid
+> another blocking operations. eg: connection control stuffs.
 
->
-> since I don't wanna use threads, we need a good and safe event loop
-> implementation that integrates nicely with D-Bus. The one from Glib is
-> no option.
->
-I've got an alternative which does not depend on glib (in the same
-repository) but it's not very clean and safe so I'll spare you the
-horror :-)
+The first thing is to fully implement the kernel internal security
+manager and make the new bluetoothd handle the PIN code and link key
+requests/notification send over this new interface.
 
-regards,
-Paul
+At the moment we do that all inside hcid in userspace. It works great,
+but the code to keep track of new devices etc. is not really what I like
+to have in the future. It is actually not bad, but why should we do it
+inside the kernel and again outside the kernel. The kernel HCI layer is
+already capable of handling all the tasks of tracking HCI message flow.
+We only need to define a nice interface to give the userspace access to
+this information.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
