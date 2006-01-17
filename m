@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] linkkeys on jffs2
+Subject: Re: [Bluez-devel] Patch to add a --dailup option to dund, needed
+	to make TomTomGo navigators connect to linux
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <38907.62.33.148.3.1137487338.squirrel@62.33.148.3>
-References: <38907.62.33.148.3.1137487338.squirrel@62.33.148.3>
+In-Reply-To: <1137483993.3005.10.camel@laptopd505.fenrus.org>
+References: <20060117040805.07FFC134B1@sc8-sf-spam2.sourceforge.net>
+	 <1137483993.3005.10.camel@laptopd505.fenrus.org>
 Content-Type: text/plain
-Message-Id: <1137495220.5688.7.camel@localhost>
+Message-Id: <1137494965.5688.4.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,23 +20,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 17 Jan 2006 11:53:40 +0100
+Date: Tue, 17 Jan 2006 11:49:25 +0100
 
-Hi Andrey,
+Hi Arjan,
 
-> Got a problem with hcid storing link keys on jffs2 file system.
-> Hcid is able to store only one link key, all subsequent keys doesn't
-> appear in linkkeys file.
-> After looking into sources I find out in common/textfile.c call of mmap()
-> with MAP_SHARED flag which is not suported on jffs2.
-> As mmap is used only for seeking keys in maped memory not for storing into
-> file seems it's good idea to use MAP_PRIVATE flag. In this case there are
-> no error on jffs2
+> > nice patch, but do you mind redoing it and change "dailup" into
+> > "dialup" for some nicer English ;)
+> 
+> oh woops
 
-if you inline the patch, make sure your mail client doesn't do line
-breaks in that area. Otherwise attach it.
-
-However the patch is in the CVS now. Thanks.
+and you forgot the manual page, but I fixed that. Patch is in the CVS
+now. Thanks.
 
 Regards
 
