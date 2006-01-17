@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth and Development
+Subject: Re: [Bluez-users] Re: Cellink BTA-3120 for Kernel 2.6.15
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <af7b4eb20601161058u7988a5d7xfac0d9002240c404@mail.gmail.com>
-References: <af7b4eb20601161058u7988a5d7xfac0d9002240c404@mail.gmail.com>
+In-Reply-To: <20060116163025.0E1411DE931@mrelay2.st2.lyceu.net>
+References: <20060116163025.0E1411DE931@mrelay2.st2.lyceu.net>
 Content-Type: text/plain
-Message-Id: <1137495818.21629.5.camel@localhost>
+Message-Id: <1137495785.21629.4.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,24 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Jan 2006 12:03:38 +0100
+Date: Tue, 17 Jan 2006 12:03:05 +0100
 
-Hi Rodrigo,
+Hi Franz,
 
-> I'm a student and I'd like to learn about how to develop applications
-> that uses the Bluetooth technology. I saw, in Sun's website, something
-> about JSR-82, but I don't like of Java programming and I'd like to
-> develop in C language.
-> 
-> I have a doubt:
-> 
-> - I have a linux box, what I need to do for develop a application to
-> send a message for my cell phone, for example?
-> 
-> My idea is to start with a simple application, if it's works fine, I
-> need to give a shape for my idea with this technology.
+> T:  Bus=02 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  6 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0c10 ProdID=0000 Rev=20.05
+> S:  Manufacturer=Bluetooth Device
+> S:  Product=Bluetooth Device
+> S:  SerialNumber=538815940A00
 
-the bluez-utils package is full of example code.
+you don't have to change the device list inside the driver. The D: line
+is correct and if the USB subsystem doesn't load the hci_usb driver,
+complain on the USB mailing list.
 
 Regards
 
