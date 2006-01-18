@@ -1,37 +1,69 @@
-Return-Path: <greg@kroah.com>
-Date: Wed, 18 Jan 2006 12:46:00 -0800
-From: Greg KH <greg@kroah.com>
-To: Oliver Neukum <oliver@neukum.org>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-        linux-usb-devel@lists.sourceforge.net, marcel@holtmann.org,
-        maxk@qualcomm.com, linux-kernel@vger.kernel.org,
-        bluez-devel@lists.sourceforge.net
-Subject: Re: [linux-usb-devel] Re: [PATCH] hci_usb: implement suspend/resume
-Message-ID: <20060118204600.GB18902@kroah.com>
-References: <1137540084.4543.15.camel@localhost> <200601181425.35524.oliver@neukum.org> <1137593621.4543.22.camel@localhost> <200601181634.08869.oliver@neukum.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] D-Bus tasks planning
+From: Charles Bueche <bueche@netnea.com>
+To: bluez-devel@lists.sourceforge.net
+Cc: Claudio Takahasi <cktakahasi@gmail.com>
+In-Reply-To: <1137590308.27515.14.camel@localhost>
+References: <e1effdeb0601170535yadd5f6fy93c3a5ea64a8499f@mail.gmail.com>
+	 <1137505788.28239.18.camel@localhost>
+	 <1137569915.12927.9.camel@bluez.bueche.ch>
+	 <1137590308.27515.14.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1137597512.12930.30.camel@bluez.bueche.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <200601181634.08869.oliver@neukum.org>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 18 Jan 2006 16:18:31 +0100
 
-On Wed, Jan 18, 2006 at 04:34:08PM +0100, Oliver Neukum wrote:
-> Am Mittwoch, 18. Januar 2006 15:13 schrieb Johannes Berg:
-> > On Wed, 2006-01-18 at 14:25 +0100, Oliver Neukum wrote:
-> > 
-> > > This patch is wrong. usb_kill_urb() will sleep. You must not use it under
-> > > a spinlock.
-> > 
-> > Whoops. Good catch. I'll have to analyse the logic with the lists being
-> > used here (and probably add a temporary list). Will try to get a new
-> > patch until tomorrow.
-> > 
-> > [side note: how about adding might_sleep() to usb_kill_urb? Then I'd at
-> > least have noticed this right away]
+On mer, 2006-01-18 at 14:18 +0100, Marcel Holtmann wrote:
+> Hi Charles,
 > 
-> Good idea.
+> > > > I've just started planning the activities for this year. I would like
+> > > > receive feedbacks/comments about the items below. There are some tasks
+> > > > suggested and a lot of clouds :)  I consider these tasks essential to
+> > > > make the D-Bus services usable and necessary to start the development
+> > > > of Network, Serial, HID, ... services over D-Bus.
+> > > > 
+> > > > * Move hcid to bluetoothd
+> > > 
+> > > since I don't wanna use threads, 
+> > ...
+> > 
+> > I'm not knowledgeable about threads in C and within bluez, but during my
+> > projects in Perl, I have found them a valuable asset. For my curiosity,
+> > what are the reasons behind your decision ?
+> 
+> since the bluetoothd should also run on any embedded system, it is a
+> good idea to not use thread, because they might not be as portable as an
+> event loop.
 
-Done.
+this is a very good reason, I didn't think about embedded systems.
 
-thanks,
+OT : around 1990, I have been developing software for embedded systems
+as well, and I can remember it was good fun. We had to work with stuff
+like vrtx, so not much opensource/Linux nor TCP/IP, but it was a good
+time anyway. Then, I switched to Sun sysadmin. The two areas are merging
+again :-)
 
-greg k-h
+Charles
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
