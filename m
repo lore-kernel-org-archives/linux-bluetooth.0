@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] patch: custom devup script
+Subject: Re: [Bluez-devel] D-Bus tasks planning
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43CD92AE.20006@fillibach.de>
-References: <43C29249.3020008@fillibach.de>
-	 <1136909256.7200.6.camel@localhost.localdomain>
-	 <43CD92AE.20006@fillibach.de>
+Cc: Claudio Takahasi <cktakahasi@gmail.com>
+In-Reply-To: <1137569915.12927.9.camel@bluez.bueche.ch>
+References: <e1effdeb0601170535yadd5f6fy93c3a5ea64a8499f@mail.gmail.com>
+	 <1137505788.28239.18.camel@localhost>
+	 <1137569915.12927.9.camel@bluez.bueche.ch>
 Content-Type: text/plain
-Message-Id: <1137590415.27515.17.camel@localhost>
+Message-Id: <1137590308.27515.14.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,20 +21,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 18 Jan 2006 14:20:15 +0100
+Date: Wed, 18 Jan 2006 14:18:28 +0100
 
-Hi Kosta,
+Hi Charles,
 
-> As my zeroconf implementation is incomplete (only generates an IP 
-> address, but does not check for conflicts), I instead added an option to 
-> run a custom devup script instead of /etc/bluetooth/pan/dev-up.
+> > > I've just started planning the activities for this year. I would like
+> > > receive feedbacks/comments about the items below. There are some tasks
+> > > suggested and a lot of clouds :)  I consider these tasks essential to
+> > > make the D-Bus services usable and necessary to start the development
+> > > of Network, Serial, HID, ... services over D-Bus.
+> > > 
+> > > * Move hcid to bluetoothd
+> > 
+> > since I don't wanna use threads, 
+> ...
 > 
-> Why? Because the mobile phone running embedded linux has a read-only 
-> /etc. This way, I can move my devup-script anywhere I want, without 
-> needing to recompile if its location changes.
+> I'm not knowledgeable about threads in C and within bluez, but during my
+> projects in Perl, I have found them a valuable asset. For my curiosity,
+> what are the reasons behind your decision ?
 
-your email client eats all the whitespaces and tabs. Please resend it
-and attach it this time or use another (working) email client.
+since the bluetoothd should also run on any embedded system, it is a
+good idea to not use thread, because they might not be as portable as an
+event loop.
 
 Regards
 
