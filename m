@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0601180937q11f65498r18ea21be597fb587@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+Subject: Re: [Bluez-devel] Star Key 2.0 (3X Faster) Broadcom based USB
+	Device
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] patch: custom devup script
-In-Reply-To: <1137590415.27515.17.camel@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <43C29249.3020008@fillibach.de>
-	 <1136909256.7200.6.camel@localhost.localdomain>
-	 <43CD92AE.20006@fillibach.de> <1137590415.27515.17.camel@localhost>
+In-Reply-To: <20060118151928.5283cd3f@localhost.localdomain>
+References: <20060118151928.5283cd3f@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1137595830.4776.10.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,66 +19,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 18 Jan 2006 15:37:35 -0200
+Date: Wed, 18 Jan 2006 15:50:30 +0100
 
-Hi guys,
+Hi Andreas,
 
-Some comments about zeroconf. I didn't read you whole discussion,
-sorry I am writing someting irrelevant.
+> I got the MSI "Star Key 2.0 (3X Faster)" in my hands:
+> 
+> http://www.msi.com.tw/program/products/communication/cmu/pro_cmu_detail.php?UID=618
+> 
+> The work ok for what I do with them, just a bit slower in cc that csr based devices...
+>
+> I have 4 of them and could donate one if you are interested, just let me know.
 
-If you want add support to a seamless local IP link address assigment
-to pand daemon. IMHO, it's better use a stable daemon like:
-- HOWL (autoipd)
-- UDHCP + zeroconf patch
+this would be great. Thank you. I think you still have my postal
+address.
 
-I did some test with udhcp integrated to pand, it is working fine. I
-preffer UDHCP approach because it assign a local link address, but if
-a DHCP is available the IP local link address(zeroconf) will be
-overwritten and address conflict is supported.
+As a side note. I got best results with the B-Speech and Level1 dongles.
+Both are CSR based and they have a decent firmware on it. Even the flash
+chip on them is quite good and so re-flashing them is reliable and quite
+fast.
 
-Regards,
-Claudio.
+I am interested in the Toshiba dongles, but it seems you can't get them
+here in Germany/Europe.
 
-On 1/18/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Kosta,
->
-> > As my zeroconf implementation is incomplete (only generates an IP
-> > address, but does not check for conflicts), I instead added an option t=
-o
-> > run a custom devup script instead of /etc/bluetooth/pan/dev-up.
-> >
-> > Why? Because the mobile phone running embedded linux has a read-only
-> > /etc. This way, I can move my devup-script anywhere I want, without
-> > needing to recompile if its location changes.
->
-> your email client eats all the whitespaces and tabs. Please resend it
-> and attach it this time or use another (working) email client.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log fi=
-les
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D103432&bid=3D230486&dat=
-=3D121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+Regards
+
+Marcel
 
 
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
