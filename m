@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Apple mouse gives me various "Can't get device
-	information" troubles
+Subject: Re: [Bluez-users] rfcomm connect error Too many links(31)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1137558415.7455.20.camel@localhost.localdomain>
-References: <1137558415.7455.20.camel@localhost.localdomain>
+In-Reply-To: <20060118123739.GA39259@rucus.ru.ac.za>
+References: <20060118123739.GA39259@rucus.ru.ac.za>
 Content-Type: text/plain
-Message-Id: <1137590078.27515.10.camel@localhost>
+Message-Id: <1137588481.21191.5.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,21 +18,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 Jan 2006 14:14:38 +0100
+Date: Wed, 18 Jan 2006 13:48:01 +0100
 
-Hi Sunnan,
+Hi David,
 
-> I'm trying to pair my Apple wireless mouse on my Ubuntu 5.10 iBook with
-> built in bt; it's been out of use for a while and now nothing works
-> (maybe some packages messed up or something; the hidd daemon doesn't
-> start by default anymore, for one). I'm still using bluez-utils 2.20,
-> hope that's fine.
+> I am trying to write a program that forwards one rfcomm connection to
+> another connection, but each time I try make a 2nd connection out I get a
+> "Too many links(31)" error. Attached is my code but here is some simple
+> "psedo code" of it:
 > 
-> If I understand correctly, hidd --connect is used for pairing and only
-> has to be done once (unless it resets somehow), right? Well, it resetted
-> somehow and now I try to --connect it again.
+> rcsocklisten = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)
+> bind(rcsocklisten, (struct sockaddr *) &loc_addr, sizeof(loc_addr)
+> listen(rcsocklisten, 4)
+> rcsockin = accept(rcsocklisten, (struct sockaddr *)&rem_addr, &opt)
+> rcsockout = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)
+> bind(rcsockout, (struct sockaddr *) &addr, sizeof(addr)
+> connect(rcsockout, (struct sockaddr *)&addr, sizeof(addr)
+> --ERROR here--
+> 
+> hcidump -V -x shows the following:
+> 
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:80:C8:26:FD:6D ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> > HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x09 handle 0 bdaddr 00:80:C8:26:FD:6D type ACL encrypt 0x00
+>     Error: Connection Limit Exceeded
+> 
+> The "Connection Limit Exceeded" is worry and confusing me as I have run
+> mutiple rfcomm connections through this chip before.
 
-run "hcidump -X -V" while trying to connect and show us the output.
+but maybe not multiple ACL connections and this is what you need in your
+case. So you need at least a CSR chip with HCI 18.x firmware or you
+might wanna simply use another dongle. One for the incoming data and one
+for the outgoing data.
 
 Regards
 
