@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Dongle order and maximum
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43CE4655.9030805@service2media.com>
+From: Herman Meerlo <herman@service2media.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43CE4655.9030805@service2media.com>
-References: <43CE4655.9030805@service2media.com>
-Content-Type: text/plain
-Message-Id: <1137592446.27515.32.camel@localhost>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Dongle order and maximum
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,30 +16,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 Jan 2006 14:54:06 +0100
+Date: Wed, 18 Jan 2006 14:44:53 +0100
 
-Hi Herman,
+Hi Guys,
 
-> 1. What is the maximum number of USB dongles that I can connect (if 
-> there is a maximum at all)?
+I have two questions:
 
-Inside the kernel there is no real limitation. Except that the internal
-ID is a uint16. The underlaying bus (USB etc.) is more of a limit.
+1. What is the maximum number of USB dongles that I can connect (if 
+there is a maximum at all)?
+2. Is the ordering of the device ID's of the dongles guaranteed? I.e. 
+when I reboot the system does hci0 always point to the same device or is 
+the ordering random?
 
->>From the userspace tools we support 16 devices.
-
-> 2. Is the ordering of the device ID's of the dongles guaranteed? I.e. 
-> when I reboot the system does hci0 always point to the same device or is 
-> the ordering random?
-
-The order is random. You need to identify the devices with their
-BD_ADDR.
-
-Regards
-
-Marcel
-
-
+Regards,
+Herman Meerlo
 
 
 -------------------------------------------------------
