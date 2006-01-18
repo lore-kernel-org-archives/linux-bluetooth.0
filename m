@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43CE15E1.7030602@labri.fr>
-From: Martin Raspaud <mraspaud@labri.fr>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] D-Bus tasks planning
+From: Charles Bueche <bueche@netnea.com>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Re: AVDTP in BlueZ
+Cc: Claudio Takahasi <cktakahasi@gmail.com>
+In-Reply-To: <1137505788.28239.18.camel@localhost>
+References: <e1effdeb0601170535yadd5f6fy93c3a5ea64a8499f@mail.gmail.com>
+	 <1137505788.28239.18.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1137569915.12927.9.camel@bluez.bueche.ch>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,20 +20,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 18 Jan 2006 11:18:09 +0100
+Date: Wed, 18 Jan 2006 08:38:35 +0100
 
-Thanks for you answer, Brad.
+On mar, 2006-01-17 at 14:49 +0100, Marcel Holtmann wrote:
+> Hi Claudio,
+> 
+> > I've just started planning the activities for this year. I would like
+> > receive feedbacks/comments about the items below. There are some tasks
+> > suggested and a lot of clouds :)  I consider these tasks essential to
+> > make the D-Bus services usable and necessary to start the development
+> > of Network, Serial, HID, ... services over D-Bus.
+> > 
+> > * Move hcid to bluetoothd
+> 
+> since I don't wanna use threads, 
+...
 
-The reply gave me a more precise insight on what I would have to do to
-implement my project.
-Maybe some students of mine will hang on to that project before I do,
-though.
+Hi,
 
-I'll see what I can do anyway.
+I'm not knowledgeable about threads in C and within bluez, but during my
+projects in Perl, I have found them a valuable asset. For my curiosity,
+what are the reasons behind your decision ?
 
-Thanks again.
+Not that I would suggest you to use them, you have probably good reasons
+behind the decision.
 
-Martin
+Charles
 
 
 
