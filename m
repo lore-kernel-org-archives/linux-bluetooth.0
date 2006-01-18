@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Sunnan <sunnan@handgranat.org>
+Subject: Re: [Bluez-users] Logitech Bluetooth Travel Mouse on Sony VAIO t370
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <51809.199.118.135.220.1137617728.squirrel@www.blisster.com>
+References: <51698.199.118.135.220.1137612095.squirrel@www.blisster.com>
+	 <1137616238.7000.24.camel@localhost>
+	 <51809.199.118.135.220.1137617728.squirrel@www.blisster.com>
 Content-Type: text/plain
-Message-Id: <1137629054.7455.30.camel@localhost.localdomain>
+Message-Id: <1137618382.7000.29.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-users] Re: Apple mouse gives me various "Can't get device information"
- troubles
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,57 +20,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Jan 2006 01:04:14 +0100
+Date: Wed, 18 Jan 2006 22:06:22 +0100
 
-Hi,
-(Sorry that this message doesn't contain the thread headers; I read the
-list from the web archives and am not subscribed at the moment.)
+Hi Robert,
 
-Here's the output of hcidump -X -V
-HCI sniffer - Bluetooth packet analyzer ver 1.23
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0A:95:01:5F:57 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x05 handle 45 bdaddr 00:0A:95:01:5F:57 type ACL encrypt 0x00
-    Error: Authentication Failure
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0A:95:01:5F:57 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x05 handle 46 bdaddr 00:0A:95:01:5F:57 type ACL encrypt 0x00
-    Error: Authentication Failure
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0A:95:01:5F:57 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x05 handle 47 bdaddr 00:0A:95:01:5F:57 type ACL encrypt 0x00
-    Error: Authentication Failure
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0A:95:01:5F:57 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x05 handle 48 bdaddr 00:0A:95:01:5F:57 type ACL encrypt 0x00
-    Error: Authentication Failure
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0A:95:01:5F:57 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x05 handle 45 bdaddr 00:0A:95:01:5F:57 type ACL encrypt 0x00
-    Error: Authentication Failure
+> Thanks I assume what you meant by that is to change my hcid.conf from
+> security none to security auto cause that seems to make it work.
 
-Sunnan
+leave the security setting as it was and disable auth and encrypt. Don't
+change anything if you don't have any idea what these options mean or
+without checking the manual page.
+
+>   I needed to manually modprobe hci_usb, and hidp and manually start
+> hidd --server.
+> 
+>   What is the best way to have this all atomatically start up?
+
+Call "chkconfig bluetooth on".
+
+Regards
+
+Marcel
+
 
 
 
