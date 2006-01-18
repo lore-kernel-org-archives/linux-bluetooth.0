@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: David Mackie <D.Mackieru.ac.za@rucus.ru.ac.za>
+Subject: Re: [Bluez-users] Dongle order and maximum
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] rfcomm connect error Too many links(31)
-Message-ID: <20060118144029.GA60664@rucus.ru.ac.za>
-References: <20060118123739.GA39259@rucus.ru.ac.za> <1137588481.21191.5.camel@localhost>
+In-Reply-To: <43CE4655.9030805@service2media.com>
+References: <43CE4655.9030805@service2media.com>
+Content-Type: text/plain
+Message-Id: <1137592446.27515.32.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1137588481.21191.5.camel@localhost>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,22 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 Jan 2006 16:40:29 +0200
+Date: Wed, 18 Jan 2006 14:54:06 +0100
 
-On Wed 2006-01-18 (13:48), Marcel Holtmann wrote:
-> but maybe not multiple ACL connections and this is what you need in your
-> case. So you need at least a CSR chip with HCI 18.x firmware or you
-> might wanna simply use another dongle. One for the incoming data and one
-> for the outgoing data.
+Hi Herman,
 
-Thanks Marcel for the quick answer. Though you are the messenger with the
-bad news... It had not crossed my mind that this could be a problem. Do
-you know where I can find some reference to this online?
+> 1. What is the maximum number of USB dongles that I can connect (if 
+> there is a maximum at all)?
 
--David
+Inside the kernel there is no real limitation. Except that the internal
+ID is a uint16. The underlaying bus (USB etc.) is more of a limit.
 
--- 
- David Mackie
+>>From the userspace tools we support 16 devices.
+
+> 2. Is the ordering of the device ID's of the dongles guaranteed? I.e. 
+> when I reboot the system does hci0 always point to the same device or is 
+> the ordering random?
+
+The order is random. You need to identify the devices with their
+BD_ADDR.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
