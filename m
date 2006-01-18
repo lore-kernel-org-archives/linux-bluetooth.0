@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm connect error Too many links(31)
-From: Marcel Holtmann <marcel@holtmann.org>
+From: David Mackie <D.Mackieru.ac.za@rucus.ru.ac.za>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20060118144029.GA60664@rucus.ru.ac.za>
-References: <20060118123739.GA39259@rucus.ru.ac.za>
-	 <1137588481.21191.5.camel@localhost>
-	 <20060118144029.GA60664@rucus.ru.ac.za>
-Content-Type: text/plain
-Message-Id: <1137595604.4776.5.camel@localhost>
+Subject: Re: [Bluez-users] rfcomm connect error Too many links(31)
+Message-ID: <20060118144029.GA60664@rucus.ru.ac.za>
+References: <20060118123739.GA39259@rucus.ru.ac.za> <1137588481.21191.5.camel@localhost>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1137588481.21191.5.camel@localhost>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,28 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 Jan 2006 15:46:44 +0100
+Date: Wed, 18 Jan 2006 16:40:29 +0200
 
-Hi David,
+On Wed 2006-01-18 (13:48), Marcel Holtmann wrote:
+> but maybe not multiple ACL connections and this is what you need in your
+> case. So you need at least a CSR chip with HCI 18.x firmware or you
+> might wanna simply use another dongle. One for the incoming data and one
+> for the outgoing data.
 
-> > but maybe not multiple ACL connections and this is what you need in your
-> > case. So you need at least a CSR chip with HCI 18.x firmware or you
-> > might wanna simply use another dongle. One for the incoming data and one
-> > for the outgoing data.
-> 
-> Thanks Marcel for the quick answer. Though you are the messenger with the
-> bad news... It had not crossed my mind that this could be a problem. Do
-> you know where I can find some reference to this online?
+Thanks Marcel for the quick answer. Though you are the messenger with the
+bad news... It had not crossed my mind that this could be a problem. Do
+you know where I can find some reference to this online?
 
-you can look at my page for the CSR chips and their firmware. Besides
-this I don't think that you will find any further details. Use a second
-dongle and this problem goes away.
+-David
 
-Regards
-
-Marcel
-
-
+-- 
+ David Mackie
 
 
 -------------------------------------------------------
