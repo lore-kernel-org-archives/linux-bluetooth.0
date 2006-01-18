@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43CE4655.9030805@service2media.com>
-From: Herman Meerlo <herman@service2media.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Apple mouse gives me various "Can't get device
+	information" troubles
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Dongle order and maximum
+In-Reply-To: <1137558415.7455.20.camel@localhost.localdomain>
+References: <1137558415.7455.20.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1137590078.27515.10.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,20 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 Jan 2006 14:44:53 +0100
+Date: Wed, 18 Jan 2006 14:14:38 +0100
 
-Hi Guys,
+Hi Sunnan,
 
-I have two questions:
+> I'm trying to pair my Apple wireless mouse on my Ubuntu 5.10 iBook with
+> built in bt; it's been out of use for a while and now nothing works
+> (maybe some packages messed up or something; the hidd daemon doesn't
+> start by default anymore, for one). I'm still using bluez-utils 2.20,
+> hope that's fine.
+> 
+> If I understand correctly, hidd --connect is used for pairing and only
+> has to be done once (unless it resets somehow), right? Well, it resetted
+> somehow and now I try to --connect it again.
 
-1. What is the maximum number of USB dongles that I can connect (if 
-there is a maximum at all)?
-2. Is the ordering of the device ID's of the dongles guaranteed? I.e. 
-when I reboot the system does hci0 always point to the same device or is 
-the ordering random?
+run "hcidump -X -V" while trying to connect and show us the output.
 
-Regards,
-Herman Meerlo
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
