@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <002d01c61d48$d4317660$adb10454@claudia>
-From: "Michel Leconte" <leconte.michel@cegetel.net>
-To: <bluez-users@lists.sourceforge.net>
+From: "Jayathilake LS E/00/102" <sanjeewa.e00@ee.pdn.ac.lk>
+To: bluez-users@lists.sourceforge.net
+Message-Id: <20060119193328.M28016@ee.pdn.ac.lk>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_002A_01C61D51.31D5F5E0"
-Subject: [Bluez-users] Search a Bluetooth Baseband Controller
+Content-Type: text/plain;
+	charset=iso-8859-1
+Subject: [Bluez-users] linux 2.4.20 & alsa 0.9.6
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,67 +17,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Jan 2006 23:36:39 +0100
-
-This is a multi-part message in MIME format.
-
-------=_NextPart_000_002A_01C61D51.31D5F5E0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-Hi all,
-I'm looking for a bluetooth baseband controller (compliant v1.2)=20
-an integrated circuit which not contains the transceiver part.
-
-Does someone know a company which sells this kind of product ?
-
-Most of bluetooth products integrate the baseband controller and the =
-transceiver
-part for cost and form factor reasons.=20
+Date: Fri, 20 Jan 2006 01:36:10 +0600
 
 
-many thanks.
 
-Michel  =20
+Hi,
 
-------=_NextPart_000_002A_01C61D51.31D5F5E0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+anybody having problem with sending voice to a headset with linux 2.4.20 and
+alsa 0.9.6 , Please contact me , we have already done that for CSR chips.
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2800.1106" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi all,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I'm looking for a bluetooth baseband =
-controller=20
-(compliant v1.2)&nbsp;</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>an integrated circuit which not =
-contains the=20
-transceiver part.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Does someone know&nbsp;a company which=20
-sells&nbsp;this kind of product ?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Most of&nbsp;bluetooth products =
-integrate=20
-the&nbsp;baseband controller and the transceiver</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>part for cost and form factor=20
-reasons.&nbsp;</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>many thanks.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Michel&nbsp;&nbsp;&nbsp;</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV></BODY></HTML>
+my email  sanjeewa.e00@ee.pdn.ac.lk
 
-------=_NextPart_000_002A_01C61D51.31D5F5E0--
+
+Lasantha
 
 
 
