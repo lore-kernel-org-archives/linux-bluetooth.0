@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Dongle with a strange configuration
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43D01438.5000409@south-wing.com>
+From: Southwing - Miquel Puchol <miquel.puchol@south-wing.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43D01438.5000409@south-wing.com>
-References: <43D01438.5000409@south-wing.com>
-Content-Type: text/plain
-Message-Id: <1137719696.17336.137.camel@localhost>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] Dongle with a strange configuration
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,35 +16,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 20 Jan 2006 02:14:56 +0100
+Date: Thu, 19 Jan 2006 23:35:36 +0100
 
-Hi Mike,
+Hi all,
 
-> I'm trying out this Billionton dongle (CSR-based, class 1), and it's 
-> curious that:
-> 
-> Name: 'James-1711....'  (I guess James what one of the developers)
-> Class: 0x000000
-> HCI Ver: 1.1 (0x1) HCI Rev: 0x460 LMP Ver: 1.1 (0x1) LMP Subver: 0x460
+I'm trying out this Billionton dongle (CSR-based, class 1), and it's 
+curious that:
 
-are you sure this is a CSR dongle? The build id is a little bit too high
-for a Bluetooth 1.1 dongle from CSR.
+Name: 'James-1711....'  (I guess James what one of the developers)
+Class: 0x000000
+HCI Ver: 1.1 (0x1) HCI Rev: 0x460 LMP Ver: 1.1 (0x1) LMP Subver: 0x460
 
-> The problem is that when I start hcid, it doesn't configure the dongle 
-> with the values in hcid.conf, but the ones above. I've tried various 
-> combinations of inserting, then starting hcid, having hcid running then 
-> insert, etc.
-> 
-> Can anyone give me an insight as to why this is happening? How can I get 
-> the dongle to init with the right settings?
+The problem is that when I start hcid, it doesn't configure the dongle 
+with the values in hcid.conf, but the ones above. I've tried various 
+combinations of inserting, then starting hcid, having hcid running then 
+insert, etc.
 
-Run "hcidump -X -V" before you start hcid and look out what it tells
-you.
+Can anyone give me an insight as to why this is happening? How can I get 
+the dongle to init with the right settings?
 
-Regards
+Regards,
 
-Marcel
-
+Mike
 
 
 
