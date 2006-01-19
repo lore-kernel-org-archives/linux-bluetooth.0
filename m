@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43D01438.5000409@south-wing.com>
-From: Southwing - Miquel Puchol <miquel.puchol@south-wing.com>
+Message-ID: <43D0066A.6030803@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] Dongle with a strange configuration
+Subject: Re: [Bluez-devel] libsbc refactoring
+References: <C70061B183DE09419568AB2060C52A95017EAF33@arion.intra.local>	 <43CFC015.80005@xmission.com> <1137705822.393.4.camel@localhost.localdomain>
+In-Reply-To: <1137705822.393.4.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,29 +18,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 19 Jan 2006 23:35:36 +0100
+Date: Thu, 19 Jan 2006 14:36:42 -0700
 
-Hi all,
+Victor
 
-I'm trying out this Billionton dongle (CSR-based, class 1), and it's 
-curious that:
+I will roll it back if we know that is happening with gcc.
 
-Name: 'James-1711....'  (I guess James what one of the developers)
-Class: 0x000000
-HCI Ver: 1.1 (0x1) HCI Rev: 0x460 LMP Ver: 1.1 (0x1) LMP Subver: 0x460
+If it isn't too hard to modify the arm assembly for doing the basic ops
+using an int64_t instead of the int32_t/uint32_t I'd like to see that.
 
-The problem is that when I start hcid, it doesn't configure the dongle 
-with the values in hcid.conf, but the ones above. I've tried various 
-combinations of inserting, then starting hcid, having hcid running then 
-insert, etc.
+Where should I pick up with the 32-bit code? I think I saw this in a header
 
-Can anyone give me an insight as to why this is happening? How can I get 
-the dongle to init with the right settings?
+#define SP4(val) (val >> SCALE_PROTO4_TBL)
 
-Regards,
+and I was thinking it should look more like
 
-Mike
+#define SP4(val) (((int32_t)val)/(1<<SCALE_PROTO4_TBL))
 
+To preserve negative values. Does that seem reasonable? I didn't do
+anything with this idea yet.
+
+I think the (int32_t) cast was necessary because the tables use a
+positive-looking hex constant for negative values.
+
+Brad
+
+> I think (may be mistakenly) gcc does not use all the optimizations, only
+> generic ones and, probably, the 32x32 -> 64 register multiplication is
+> not among them. It might be that the arm compiler does this kind of
+> optimizations, but it needs licensing I guess.
+> 
+> Regards,
+>     Victor.
 
 
 -------------------------------------------------------
