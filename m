@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Jayathilake LS E/00/102" <sanjeewa.e00@ee.pdn.ac.lk>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <20060119193328.M28016@ee.pdn.ac.lk>
+Message-ID: <43CF9800.6050005@dgreaves.com>
+From: David Greaves <david@dgreaves.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset=iso-8859-1
-Subject: [Bluez-users] linux 2.4.20 & alsa 0.9.6
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] No audio with Nokia HDW-3
+References: <43CF16E5.1020406@blueyonder.co.uk>
+In-Reply-To: <43CF16E5.1020406@blueyonder.co.uk>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,19 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 20 Jan 2006 01:36:10 +0600
+Date: Thu, 19 Jan 2006 13:45:36 +0000
+
+Sid Boyce wrote:
+
+> I've been battling with the HDW-3 since 2.6.15 on SuSE 10.0 x86_64,
+> the device is recognised. 
+
+<snip>
+
+> I also tried with a2play.
+> Any ideas welcomed.
+> Regards
+> Sid.
+
+what does:
+  hciconfig hci0 revision
+show?
+
+(I had this exact problem with my dongle.
+I bought a new usb dongle (CS base) and it all works fine...)
+
+David
 
 
-
-Hi,
-
-anybody having problem with sending voice to a headset with linux 2.4.20 and
-alsa 0.9.6 , Please contact me , we have already done that for CSR chips.
-
-my email  sanjeewa.e00@ee.pdn.ac.lk
-
-
-Lasantha
+-- 
 
 
 
