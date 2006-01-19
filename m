@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060119043024.47723.qmail@web15005.mail.cnb.yahoo.com>
-From: Chenghua Yan <hua9008@yahoo.com.cn>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <43CF16E5.1020406@blueyonder.co.uk>
+From: Sid Boyce <sboyce@blueyonder.co.uk>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1691789102-1137645024=:46561"
-Subject: [Bluez-users] Questions about btsco
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] No audio with Nokia HDW-3
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,39 +16,109 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Jan 2006 12:30:24 +0800 (CST)
+Date: Thu, 19 Jan 2006 04:34:45 +0000
 
---0-1691789102-1137645024=:46561
-Content-Type: text/plain; charset=gb2312
-Content-Transfer-Encoding: 8bit
+I've been battling with the HDW-3 since 2.6.15 on SuSE 10.0 x86_64, the 
+device is recognised.
+# hciconfig hci0 voice 0x0060
+# btsco -v 00:03:89:60:F9:CF
+btsco v0.41
+Device is 1:0
+Voice setting: 0x0060
+RFCOMM channel 1 connected
+speaker volume: 7 mic volume: 15
+i/o needed: connecting sco...
+connected SCO channel
+Done setting sco fd
+recieved AT+VGS=07
+Sending up speaker change 7
+speaker volume: 7 mic volume: 15
+driver is not in use
+disconnected SCO channel
+speaker volume: 7 mic volume: 15
+i/o needed: connecting sco...
+connected SCO channel
+Done setting sco fd
+recieved AT+VGS=07
+Sending up speaker change 7
+speaker volume: 7 mic volume: 15
+driver is not in use
+disconnected SCO channel
+speaker volume: 7 mic volume: 15
+speaker volume: 7 mic volume: 15
+recieved AT+CKPD=200
 
-Hi all
-   
-  When I run the command
-  # btsco -v bdaddr
-  I have thouble with it.
-  It stops by the line:
-  " ret=poll(pfds,nfds,-1); "
-  The parameters it returns are:
-  ret=-1,error=4,EINTR=4
-  Is it related with my USB Dangle(it is ISSC,not CSR)?
-  Or any other reasons?
-  If it is,then what should I do ?
-   
-  Thanks.
-   
-   
+Modules
+=======
+sco 15240 0
+snd_bt_sco 15232 0
+snd_hwdep 11144 2 snd_usb_audio,snd_bt_sco
+bluetooth 51236 8 sco,rfcomm,l2cap,hci_usb
+snd_pcm 95116 5 
+snd_usb_audio,snd_bt_sco,snd_pcm_oss,snd_via82xx,snd_ac97_codec
+snd_page_alloc 11408 3 snd_bt_sco,snd_via82xx,snd_pcm
+snd 62016 15 
+snd_usb_audio,snd_bt_sco,snd_hwdep,snd_pcm_oss,snd_mixer_oss,snd_seq,snd_via82xx,snd_ac97_co
+dec,snd_pcm,snd_timer,snd_mpu401_uart,snd_rawmidi,snd_seq_device
 
-		
----------------------------------
-无限容量雅虎相册，原图等大下载，超快速度，赶快抢注！ 
---0-1691789102-1137645024=:46561
-Content-Type: text/html; charset=gb2312
-Content-Transfer-Encoding: 8bit
+crw------- 1 boycie audio 14, 3 2006-01-16 14:31 /dev/dsp
+crw-rw---- 1 boycie audio 14, 19 2006-01-16 15:35 /dev/dsp1 (HDW-3)
 
-<DIV id=RTEContent>Hi all</DIV>  <DIV>&nbsp;</DIV>  <DIV>When I run the command</DIV>  <DIV># btsco -v bdaddr</DIV>  <DIV>I have thouble with it.</DIV>  <DIV>It stops by the line:</DIV>  <DIV>" ret=poll(pfds,nfds,-1); "</DIV>  <DIV>The parameters it returns are:</DIV>  <DIV>ret=-1,error=4,EINTR=4</DIV>  <DIV>Is&nbsp;it related with my USB Dangle(it is ISSC,not CSR)?</DIV>  <DIV>Or any other reasons?</DIV>  <DIV>If it is,then what should I do ?</DIV>  <DIV>&nbsp;</DIV>  <DIV>Thanks.</DIV>  <DIV>&nbsp;</DIV>  <DIV>&nbsp;</DIV><p>
-		<hr size=1><a href="https://reg.cn.yahoo.com/cnreg/cnreg_first?id=78999&.prop=photo" target=blank>无限容量雅虎相册，原图等大下载，超快速度，赶快抢注！</a> 
---0-1691789102-1137645024=:46561--
+ From "ps fax"
+20343 ?        Ss     0:00 /usr/bin/hidd --server
+20331 ?        Ss     0:00 hcid: processing events
+
+
+I get no recording or playback. Skype sound device problem report and on 
+wengophone test, no audio.
+# arecord -D hw:1,0 -r 8000 -c 1 -f S16_LE | aplay -
+# arecord -D hw:1,0 -r 8000 -c 1 -f S16_LE ZZZ.wav
+# aplay -D hw:1,0 /XXX.wav (pre-recorded with plugin mic)
+
+ From /var/log/messages
+------------------------
+snd-bt-sco revision 1.6 $
+snd-bt-sco: snd-bt-scod thread starting
+Bluetooth: L2CAP ver 2.8
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM TTY layer initialized
+Bluetooth: RFCOMM ver 1.6
+snd-bt-sco: capture_open
+snd-bt-sco: playback_open
+snd-bt-sco: capture_open
+snd-bt-sco: playback_open
+Bluetooth: SCO (Voice Link) ver 0.5
+Bluetooth: SCO socket layer initialized
+snd-bt-sco: capture_open
+snd-bt-sco: playback_open
+snd-bt-sco: capture_open
+snd-bt-sco: playback_open
+snd-bt-sco: capture_open
+snd-bt-sco: playback_open
+snd-bt-sco: capture_open
+snd-bt-sco: playback_open
+snd-bt-sco: capture_open
+snd-bt-sco: playback_open
+snd-bt-sco: Disposing of previous socket count 2
+
+Looks like it should work but it doesn't, qamix doesn't display any 
+mixer controls for the HDW-3.
+
+# arecord -D plughw:Headset -f S16_LE|aplay -
+Recording WAVE 'stdout' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
+Playing WAVE 'stdin' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
+arecord: pcm_read:1263: read error: Input/output error
+
+I also tried with a2play.
+Any ideas welcomed.
+Regards
+Sid.
+-- 
+Sid Boyce ... Hamradio License G3VBV, Licensed Private Pilot
+Retired IBM/Amdahl Mainframes and Sun/Fujitsu Servers Tech Support 
+Specialist, Cricket Coach
+Microsoft Windows Free Zone - Linux used for all Computing Tasks
 
 
 -------------------------------------------------------
