@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] libsbc refactoring
-From: Victor Shchebatyuk <victor@win.tue.nl>
+From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43CFC015.80005@xmission.com>
-References: <C70061B183DE09419568AB2060C52A95017EAF33@arion.intra.local>
-	 <43CFC015.80005@xmission.com>
-Content-Type: text/plain
-Message-Id: <1137705822.393.4.camel@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1137698545.22814.11.camel@localhost.localdomain>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Question concerning l2cap_parse_conf_req()
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,47 +16,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 19 Jan 2006 22:23:42 +0100
+Date: Thu, 19 Jan 2006 20:22:24 +0100
 
-Brad
+Hello together,
 
-I think (may be mistakenly) gcc does not use all the optimizations, only
-generic ones and, probably, the 32x32 -> 64 register multiplication is
-not among them. It might be that the arm compiler does this kind of
-optimizations, but it needs licensing I guess.
+I'm partly rewriting the l2cap_parse_conf_req() function but there's
+something that I do not quite understand and perhaps one from this list
+has an idea.
+In this mentioned function we use a while() loop that checks the length
+of the remaining configuration request; inside the loop the length field
+is continuously decreased. Now my question comes into play: Why do we
+need this while loop? As we are already in a configuration request (code
+0x04), I can't see anything in the current specification that we might
+have more than one =C2=BBConfiguration Options=C2=AB within one Configurati=
+on
+Request packet. The Continuation flag (C) has a different meaning:
+	=C2=BBWhen all configuration options cannot fit into a Configuration=20
+	 Request with length that does not exceed the receiver's=20
+	 MTUsig, the options shall be passed in multiple configuration=20
+	 command packets.=C2=AB (page 48 of BLUETOOTH SPECIFICATION Version=20
+	 2.0 + EDR [vol 4])
+I see that we can have multiple commands in one L2CAP packet (see page
+41), but if we parse only one Configuration Request that shouldn't
+apply.
 
-Regards,
-    Victor.
+Any ideas?
 
-On Thu, 2006-01-19 at 09:36 -0700, Brad Midgley wrote:
-> Victor
-> 
-> > I think there were macros relying on the copiler to handle 64-bit math
-> > and, as I remember, it was 2 times slower than arm specific code. But
-> > I'll check anyway. Altough 32-bit math should be enough, but it probably
-> > needs some good thinking and smart tricks (or may be not).
-> 
-> I want to have a look at unifying on 32-bit but I was hoping this would
-> be ok to clean things up a bit.
-> 
-> I can see why assembly would be better than working with two 32-bit
-> values. You don't have a way to get at the add-with-carry assembly
-> instruction for example. But the compiler has got to be doing something
-> wrong if basic math ops on a native c type (int64_t) are only half as
-> fast as hand-coded assembly. :(
-> 
-> Brad
-> 
-> 
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Martin
 
 
 
