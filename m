@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Sunnan <sunnan@handgranat.org>
+Subject: Re: [Bluez-users] Re: Apple mouse gives me various "Can't get
+	device information" troubles
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1137629054.7455.30.camel@localhost.localdomain>
+References: <1137629054.7455.30.camel@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1137635164.7455.63.camel@localhost.localdomain>
+Message-Id: <1137631682.14557.20.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-users] Re: Apple mouse gives me various "Can't get device information"
- troubles
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,35 +19,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Jan 2006 02:46:03 +0100
+Date: Thu, 19 Jan 2006 01:48:02 +0100
 
-Hi, Marcel;
-The only modification to hcid.conf I can remember doing was to set the
-pin_helper to a shell script that just echoes PIN:1234 (I don't remember
-what the pin is supposed to be; I got the number from /etc/bluetooth/pin
-but isn't this resettable somehow?) regardless of it's arguments,
-because regular bluepin crashes with the familiar(? at least that's what
-I gather from various mailing lists) xserver permission problem.
+Hi Sunnan,
 
-My output from hciconfig -a says:
-hci0:   Type: USB
-        BD Address: 00:0D:93:04:19:15 ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:318 acl:0 sco:0 events:36 errors:0
-        TX bytes:502 acl:0 sco:0 commands:26 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x18 0x18 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'slowstorm-0'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x385 LMP Ver: 1.1 (0x1) LMP Subver:
-0x385
-        Manufacturer: Cambridge Silicon Radio (10)
+> Here's the output of hcidump -X -V
+> HCI sniffer - Bluetooth packet analyzer ver 1.23
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:0A:95:01:5F:57 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> > HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x05 handle 45 bdaddr 00:0A:95:01:5F:57 type ACL encrypt 0x00
+>     Error: Authentication Failure
 
-Sunnan
+what does "hciconfig -a" tells you. If you modified hcid.conf then undo
+your modifications.
+
+Regards
+
+Marcel
+
 
 
 
