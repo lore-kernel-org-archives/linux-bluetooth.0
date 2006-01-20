@@ -1,16 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] patch: custom devup script
+Subject: Re: [Bluez-devel] Dongle with a strange configuration
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <op.s3lrneii2fbw7g@no-home>
-References: <43C29249.3020008@fillibach.de>
-	 <1136909256.7200.6.camel@localhost.localdomain>
-	 <43CD92AE.20006@fillibach.de> <1137590415.27515.17.camel@localhost>
-	 <e1effdeb0601180937q11f65498r18ea21be597fb587@mail.gmail.com>
-	 <op.s3lhk3t7e8fkrv@auth.smtp.kundenserver.de>
-	 <1137631888.14557.23.camel@localhost>  <op.s3lrneii2fbw7g@no-home>
+In-Reply-To: <43D01438.5000409@south-wing.com>
+References: <43D01438.5000409@south-wing.com>
 Content-Type: text/plain
-Message-Id: <1137721430.17336.147.camel@localhost>
+Message-Id: <1137719696.17336.137.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -23,21 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 20 Jan 2006 02:43:50 +0100
+Date: Fri, 20 Jan 2006 02:14:56 +0100
 
-Hi Kosta,
+Hi Mike,
 
-> > I like the idea. However I prefer to remove any default devup script at
-> > all and only call it when specified on the command line. Can you provide
-> > me with a patch for that?
+> I'm trying out this Billionton dongle (CSR-based, class 1), and it's 
+> curious that:
 > 
-> Sure :)
+> Name: 'James-1711....'  (I guess James what one of the developers)
+> Class: 0x000000
+> HCI Ver: 1.1 (0x1) HCI Rev: 0x460 LMP Ver: 1.1 (0x1) LMP Subver: 0x460
 
-your patch never applied to the latest CVS and so I had to fix up
-everything by hand. Next time make sure the patch is against the CVS and
-not some old version you use.
+are you sure this is a CSR dongle? The build id is a little bit too high
+for a Bluetooth 1.1 dongle from CSR.
 
-The stuff is now in and you might wanna test it.
+> The problem is that when I start hcid, it doesn't configure the dongle 
+> with the values in hcid.conf, but the ones above. I've tried various 
+> combinations of inserting, then starting hcid, having hcid running then 
+> insert, etc.
+> 
+> Can anyone give me an insight as to why this is happening? How can I get 
+> the dongle to init with the right settings?
+
+Run "hcidump -X -V" before you start hcid and look out what it tells
+you.
 
 Regards
 
