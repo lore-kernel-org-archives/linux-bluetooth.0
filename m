@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Apple mouse gives me various "Can't get
-	device information" troubles
+Subject: Re: [Bluez-users] Search a Bluetooth Baseband Controller
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1137635164.7455.63.camel@localhost.localdomain>
-References: <1137635164.7455.63.camel@localhost.localdomain>
+In-Reply-To: <002d01c61d48$d4317660$adb10454@claudia>
+References: <002d01c61d48$d4317660$adb10454@claudia>
 Content-Type: text/plain
-Message-Id: <1137719835.17336.141.camel@localhost>
+Message-Id: <1137719763.17336.139.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,19 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 20 Jan 2006 02:17:15 +0100
+Date: Fri, 20 Jan 2006 02:16:03 +0100
 
-Hi Sunnan,
+Hi Michel,
 
-> The only modification to hcid.conf I can remember doing was to set the
-> pin_helper to a shell script that just echoes PIN:1234 (I don't remember
-> what the pin is supposed to be; I got the number from /etc/bluetooth/pin
-> but isn't this resettable somehow?) regardless of it's arguments,
-> because regular bluepin crashes with the familiar(? at least that's what
-> I gather from various mailing lists) xserver permission problem.
+> I'm looking for a bluetooth baseband controller (compliant v1.2) 
+> an integrated circuit which not contains the transceiver part.
+>  
+> Does someone know a company which sells this kind of product ?
+>  
+> Most of bluetooth products integrate the baseband controller and the
+> transceiver
+> part for cost and form factor reasons. 
 
-the PIN of the Apple mouse is "0000", but you might have changed it.
-Check its manual for a reset switch.
+this is actually the wrong mailing list for such request, because BlueZ
+is about the host stack.
 
 Regards
 
