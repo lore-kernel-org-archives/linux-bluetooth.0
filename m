@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Jayathilake LS E/00/102" <sanjeewa.e00@ee.pdn.ac.lk>
 To: bluez-users@lists.sourceforge.net
-From: Sunnan <sunnan@handgranat.org>
-Message-ID: <loom.20060121T004726-720@post.gmane.org>
-References: <1137635164.7455.63.camel@localhost.localdomain> <1137719835.17336.141.camel@localhost>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Apple mouse gives me various "Can't get device information" troubles
+Message-Id: <20060120084602.M85826@ee.pdn.ac.lk>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset=iso-8859-1
+Subject: [Bluez-users] voice over sco using SiW3000 (Silicon Wave)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,27 +17,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 20 Jan 2006 23:54:54 +0000 (UTC)
+Date: Fri, 20 Jan 2006 14:45:51 +0600
 
-Hi,
-Marcel Holtmann <marcel <at> holtmann.org> writes:
-> the PIN of the Apple mouse is "0000", but you might have changed it.
 
-I don't know how or if it can be changed. I've switched my shellscript to echo
-PIN:0000 instead now (and restarted the various bluez userland daemons).
 
-> Check its manual for a reset switch.
+Hi
 
-Apparently, it resets everytime the batteries are replaced.
-Additionally, the red light underneath the mouse blinks in various patterns
-indicating various things; I currently see a creepy, waltz-like "blink blink
-pause, blink blink pause, blink blink pause" that supposedly means:
-"the mouse is looking for a computer to pair with" according to 
-http://docs.info.apple.com/article.html?artnum=86474
+I am strugling with sending voice to a bluetooth headset via linux pc 
+(with USB dongle). currently I have linux box with RedHat 9 install and 
+ kernal is 2.4.20(patch with patch-2.4.20-mh6)  .and also I have 
+ installed bluez-2.12, further did some modification to the hci_usb.c.
+ I am using bluezsco and alsa-0.9.6
+ 
+ finally we could send voice to headset via USB dongle(CSR) no problem ,
+ 
+ 1. But with dongle (Silicon wave) it was not working .
+ 2. also setups are quite same with other one(CSR) but only the noise can 
+    be heard.
+ 3. seems to me sco channal was the problem .
+ 4. when I see use hcidump I could see there are no sco packets comming.
+ 
+ If u can please send me why this is not working , do these two types 
+ different  and it will be a great help if u can send me a solution
 
-I still get the same "permission denied" (or, once in a while, "host is down")
-message from hidd --connect.
-hcidump still says "Error: Authentication Failure".
+Lasantha
 
 
 
