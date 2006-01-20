@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Jayathilake LS E/00/102" <sanjeewa.e00@ee.pdn.ac.lk>
+Subject: Re: [Bluez-users] Need HELP  in JavaBluetooth API
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20060120084602.M85826@ee.pdn.ac.lk>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset=iso-8859-1
-Subject: [Bluez-users] voice over sco using SiW3000 (Silicon Wave)
+In-Reply-To: <20060119120727.60487.qmail@web8404.mail.in.yahoo.com>
+References: <20060119120727.60487.qmail@web8404.mail.in.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1137720016.17336.144.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,30 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 20 Jan 2006 14:45:51 +0600
+Date: Fri, 20 Jan 2006 02:20:16 +0100
+
+Hi,
+
+>            I am implementing Bluetooth stack(inindows XP Using
+> javaBluetooth API(jsr-82)  as part of final year project.i face
+> following errors while executing demo programs which are in your
+> JavaBluetooth API(JSR-82).
+>   
+>               Is there any package related to javax.comm to execute
+> Bluetooth in
+>   Windows environment?
+
+the JaveBluetooth thing has nothing to do with BlueZ and thus this is
+actually the wrong mailing list to ask questions. And please don't ask
+question about Windows on a Linux mailing list ;)
+
+Regards
+
+Marcel
 
 
-
-Hi
-
-I am strugling with sending voice to a bluetooth headset via linux pc 
-(with USB dongle). currently I have linux box with RedHat 9 install and 
- kernal is 2.4.20(patch with patch-2.4.20-mh6)  .and also I have 
- installed bluez-2.12, further did some modification to the hci_usb.c.
- I am using bluezsco and alsa-0.9.6
- 
- finally we could send voice to headset via USB dongle(CSR) no problem ,
- 
- 1. But with dongle (Silicon wave) it was not working .
- 2. also setups are quite same with other one(CSR) but only the noise can 
-    be heard.
- 3. seems to me sco channal was the problem .
- 4. when I see use hcidump I could see there are no sco packets comming.
- 
- If u can please send me why this is not working , do these two types 
- different  and it will be a great help if u can send me a solution
-
-Lasantha
 
 
 
