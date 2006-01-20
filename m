@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Need HELP  in JavaBluetooth API
+Subject: Re: [Bluez-users] Re: Apple mouse gives me various "Can't get
+	device information" troubles
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20060119120727.60487.qmail@web8404.mail.in.yahoo.com>
-References: <20060119120727.60487.qmail@web8404.mail.in.yahoo.com>
+In-Reply-To: <1137635164.7455.63.camel@localhost.localdomain>
+References: <1137635164.7455.63.camel@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1137720016.17336.144.camel@localhost>
+Message-Id: <1137719835.17336.141.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,27 +19,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 20 Jan 2006 02:20:16 +0100
+Date: Fri, 20 Jan 2006 02:17:15 +0100
 
-Hi,
+Hi Sunnan,
 
->            I am implementing Bluetooth stack(inindows XP Using
-> javaBluetooth API(jsr-82)  as part of final year project.i face
-> following errors while executing demo programs which are in your
-> JavaBluetooth API(JSR-82).
->   
->               Is there any package related to javax.comm to execute
-> Bluetooth in
->   Windows environment?
+> The only modification to hcid.conf I can remember doing was to set the
+> pin_helper to a shell script that just echoes PIN:1234 (I don't remember
+> what the pin is supposed to be; I got the number from /etc/bluetooth/pin
+> but isn't this resettable somehow?) regardless of it's arguments,
+> because regular bluepin crashes with the familiar(? at least that's what
+> I gather from various mailing lists) xserver permission problem.
 
-the JaveBluetooth thing has nothing to do with BlueZ and thus this is
-actually the wrong mailing list to ask questions. And please don't ask
-question about Windows on a Linux mailing list ;)
+the PIN of the Apple mouse is "0000", but you might have changed it.
+Check its manual for a reset switch.
 
 Regards
 
 Marcel
-
 
 
 
