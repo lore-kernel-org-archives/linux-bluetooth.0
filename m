@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] ActiveSync
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Martin Lipocky <mlipocky@atlas.sk>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200601220324.36252.mlipocky@atlas.sk>
-References: <200601220324.36252.mlipocky@atlas.sk>
-Content-Type: text/plain
-Message-Id: <1137898151.20856.152.camel@localhost>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200601220328.00979.mlipocky@atlas.sk>
+Subject: [Bluez-devel] bluez is uncompilable
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,21 +17,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 22 Jan 2006 03:49:11 +0100
+Date: Sun, 22 Jan 2006 03:28:00 +0100
 
-Hi Martin,
 
-> When I read `man dund` I caught my sight at --activesync option. This is 
-> exactly what I need. But this option is not available or it is unknown to 
-> dund v2.19.
+I now downloaded the latest bluez and I cannot compile the stuff, no matter 
+what version of gcc I try. There must be a complete mess in the code.
 
-if you read the ChangeLog then you would see that it has been introduced
-in bluez-utils-2.20 for the first time.
-
-Regards
-
-Marcel
-
+gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common   -I/usr/include  -I/usr/include 
+-Wall -O2 -D_FORTIFY_SOURCE=2 -c `test -f 'sdptool.c' || echo './'`sdptool.c
+sdptool.c: In function `print_raw_data':
+sdptool.c:590: warning: unknown conversion type character `j' in format
+sdptool.c:590: warning: too many arguments for format
+sdptool.c:605: warning: unknown conversion type character `j' in format
+sdptool.c:605: warning: too many arguments for format
+sdptool.c: In function `add_isync':
+sdptool.c:2621: `APPLE_AGENT_SVCLASS_ID' undeclared (first use in this 
+function)
+sdptool.c:2621: (Each undeclared identifier is reported only once
+sdptool.c:2621: for each function it appears in.)
+sdptool.c: At top level:
+sdptool.c:2681: `APPLE_AGENT_SVCLASS_ID' undeclared here (not in a function)
+sdptool.c:2681: initializer element is not constant
+sdptool.c:2681: (near initialization for `service[30].class')
+make[2]: *** [sdptool.o] Error 1
+make[2]: Leaving directory 
+`/home/mlipocky/install/synce/bluez-utils-2.25/tools'
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory `/home/mlipocky/install/synce/bluez-utils-2.25'
+make: *** [all] Error 2
 
 
 
