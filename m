@@ -1,11 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: =?iso-8859-1?Q?Esther_L=F3pez_Casariego?= <esther.lopez@erzia.com>
-To: <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0036_01C6210F.85C40540"
-Message-Id: <20060124165440.07A131F9441@mrelay2.st2.lyceu.net>
-Subject: [Bluez-devel] Golden Range
+Subject: Re: [Bluez-devel] [DBUS] remote name patch
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb0601231054q2a3e1ec1q6f0e2c90a48c05e3@mail.gmail.com>
+References: <e1effdeb0601201037y4d6eccdem6a9cbca135196520@mail.gmail.com>
+	 <1137808123.20856.122.camel@localhost>
+	 <e1effdeb0601230833t25905a64he7ca62c7d1ab48cf@mail.gmail.com>
+	 <1138036115.7327.14.camel@localhost>
+	 <e1effdeb0601231054q2a3e1ec1q6f0e2c90a48c05e3@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1138047251.3750.6.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,173 +22,65 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 Jan 2006 17:56:36 +0100
+Date: Mon, 23 Jan 2006 21:14:11 +0100
 
-This is a multi-part message in MIME format.
+Hi Claudio,
 
-------=_NextPart_000_0036_01C6210F.85C40540
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+> > Regarding the name, we might simply say the hcid/bluetoothd always sends
+> > a remote name signal if something changes. So it might get the short
+> > name from the extended inquiry first and after that it receives the full
+> > remote name. We can also always send the cached name and we update that
+> > name on every service discovery, because then it is at zero cost.
+> 
+> The remote name is triggered by D-Bus clients. hcid/bluetoothd doesn't
+> request the remote when the inquiry finishes. For EIR, are you
+> suggesting send the "InquiryResult" signal followed by a "RemoteName"?
 
-=20
+this sounds like a sane and backward compatible way of doing this.
 
-Hello you all
+> If we send the "RemoteName" with the short name, probably D-Bus
+> clients will not request the RemoteName to retrieve the complete name.
+> D-Bus clients should not distinguish short/complete name.
 
-=20
+It is up to hcid/bluetoothd to update the remote when the client
+requests a service discovery.
 
-Just a fast (and hope easy) question
+> Regarding the RemoteName request service signature. Do you agree with
+> my initial proprosal? (see the first e-mail sent: have an alternative
+> to force send the HCI remote name and another using the cache)
 
-=20
+No. We don't need any extra stuff. The client asks for a name and we
+give them a name. That's it and all the rest is implementation specific
+to hcid/bluetoothd.
 
-Is there any way to know the Golden Range defined for a Bluetooth =
-device??
-(I have search the list of HCI commands and haven=92t found it)
+> > So we have one device name. This maybe a cached, a remote or a shortened
+> > name. The application doesn't really have to care and it gets updates as
+> > soon as hcid/bluetoothd knows them.
+> >
+> > Besides the device name, we should implement an alias name. This name is
+> > associated with the BD_ADDR and can be changed by the user if he/she
+> > doesn't like the device name. Implementing this alias through the D-Bus
+> > interface makes it available for all applications and we can store the
+> > aliases in /var/lib/bluetooth/<bdaddr>/aliases.
+> 
+> When a client requests a RemoteName, which value should be returned?
+> The value stored in the aliases file or the value stored in the names
+> file? Or are you suggesting create a property 
+> "GetProperty("alias")/SetProperty("alias", "value")?
 
-=20
+When they request the remote name or device name, then they get the
+device name that is valid at the moment. This will maybe a cached name,
+but that doesn't matter. If hcid/bluetoothd knows better they will send
+out a remote name signal to tell them.
 
-Thanks in advance!!
+The alias name is totally different and independent. It is application
+choice to use the alias name or not. If the alias name is empty they can
+use the remote/device name.
 
-=20
+Regards
 
-Esther=20
+Marcel
 
-=20
-
-
-------=_NextPart_000_0036_01C6210F.85C40540
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-
-<head>
-<meta http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered)">
-<style>
-<!--
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0cm;
-	margin-bottom:.0001pt;
-	font-size:11.0pt;
-	font-family:Arial;}
-h1
-	{margin-top:9.0pt;
-	margin-right:0cm;
-	margin-bottom:6.0pt;
-	margin-left:39.6pt;
-	text-align:justify;
-	text-indent:-21.6pt;
-	page-break-after:avoid;
-	font-size:16.0pt;
-	font-family:Arial;}
-h2
-	{margin-top:6.0pt;
-	margin-right:0cm;
-	margin-bottom:6.0pt;
-	margin-left:46.8pt;
-	text-align:justify;
-	text-indent:-28.8pt;
-	page-break-after:avoid;
-	font-size:14.0pt;
-	font-family:Arial;
-	font-style:italic;}
-h3
-	{margin-top:12.0pt;
-	margin-right:0cm;
-	margin-bottom:3.0pt;
-	margin-left:54.0pt;
-	text-indent:-36.0pt;
-	page-break-after:avoid;
-	font-size:13.0pt;
-	font-family:Arial;}
-a:link, span.MsoHyperlink
-	{color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{color:purple;
-	text-decoration:underline;}
-span.estilocorreo17
-	{font-family:Arial;
-	color:windowtext;}
-span.EstiloCorreo18
-	{font-family:Arial;
-	color:navy;}
-@page Section1
-	{size:21.0cm 841.95pt;
-	margin:70.9pt 3.0cm 70.9pt 3.0cm;}
-div.Section1
-	{page:Section1;}
- /* List Definitions */
- ol
-	{margin-bottom:0cm;}
-ul
-	{margin-bottom:0cm;}
--->
-</style>
-
-</head>
-
-<body lang=3DES link=3Dblue vlink=3Dpurple>
-
-<div class=3DSection1>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:11.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt'>Hello
-you all</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>Just a fast (and hope easy) question</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>Is there any way to know the Golden Range defined for a =
-Bluetooth
-device?? (I have search the list of HCI commands and haven&#8217;t found =
-it)</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>Thanks in advance!!</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><b><font size=3D2 color=3Dnavy face=3DArial><span =
-lang=3DEN-GB
-style=3D'font-size:10.0pt;color:navy;font-weight:bold'>Esther =
-</span></font></b></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-11.0pt'>&nbsp;</span></font></p>
-
-</div>
-
-</body>
-
-</html>
-
-------=_NextPart_000_0036_01C6210F.85C40540--
 
 
 
