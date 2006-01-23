@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43D5331F.9060909@hasborg.com>
-From: Joshua Wright <jwright@hasborg.com>
-MIME-Version: 1.0
+From: Joseph Dunn <joseph.dunn@colorado.edu>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Inconsistencies in hcitool inq output
-References: <20060122205013.dvksy2wkrzk04s08@optimist.hostomega.com> <43D4BDDF.5060907@csr.com>
-In-Reply-To: <43D4BDDF.5060907@csr.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <20060123122802.280f747e@taco>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR chipset? (in USA)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,28 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 Jan 2006 14:48:47 -0500
+Date: Mon, 23 Jan 2006 12:28:02 -0700
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+I currently have an IOGear Broadcom-based dongle because I didnt know
+what to look for.  Now that I know my only real chance of SCO working
+with linux is a CSR chipset.... well, I want one.  I was reading the
+archives of this mailing list and saw that the suggestion was to get a
+Cellink BlueCore4 based dongle with EDR support.  However, it isn't
+looking like I can get hold of one in the USA.  Any other suggestions?  
 
-Ouch, my bad.  My eyes focused on the first 2 bytes of the BD_ADDR and I
-was mesmorized by the rest. :)
-
-Thanks,
-
-- -Josh
-
-Steven Singer wrote:
-> Huh. I'm confused. Your description doesn't match your log. If we gather
-> the results together by device address using:
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-
-iD8DBQFD1TMfTS8i9jZYpL8RAnutAKC6xW5u+BiZ0uXuFVz3CHFolrgRUQCfU5CW
-AjgLONW5/pE6HP0DDcCCVro=
-=RmZJ
------END PGP SIGNATURE-----
+-Joe
 
 
 -------------------------------------------------------
