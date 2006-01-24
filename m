@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43D6CF2D.1040903@masaka.cs.ohiou.edu>
-From: Jim Wyllie <jwyllie@masaka.cs.ohiou.edu>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] vendor/manufacture id
-References: <43D69967.3060704@yall.nl> <1138143376.2616.5.camel@localhost>
-In-Reply-To: <1138143376.2616.5.camel@localhost>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <43D69967.3060704@yall.nl>
+References: <43D69967.3060704@yall.nl>
+Content-Type: text/plain
+Message-Id: <1138143376.2616.5.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +18,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 Jan 2006 20:06:53 -0500
+Date: Tue, 24 Jan 2006 23:56:16 +0100
 
+Hi Michiel,
 
-> Nobody spent the time to run something like that by me. So actually
-> there is no real good JSR-82 implementation for BlueZ.
+> I posted almost the same email to the bluez-user mailing list, but its more developer related I think;
 > 
-> Regards
+> I use the outdated jBluez native Java API and got a question about the manufacture 
+> id's.
 > 
-> Marcel
+> When getting version info for a remote device using the Java API wich is native corresponding with Bluez a manufacture 
+> id is retreived and stored. This is great but I don't have or can't find any list corresponding with 
+> these manufacture id's. I browsed some Bluez c code and did see some manufacture id such as 10 (Nokia) being stored and used in functions.
 
-I've tested all of the JSR-82 options out there that are available for 
-free on Linux: the only thing I got to work is Avetana's JSR-82 spec 
-(GPL code on Linux).  You can grab it from SourceForge here:
+the company id 10 stands for CSR. Take a look at the Bluetooth assigned
+numbers documents from their website.
 
-http://sourceforge.net/projects/avetanabt/
+> Another question which is proberbly asked many times before, but I just can't 
+> settle with it, yet:
+> 
+> - Is there a good, can be simple but good and maintened opensource Java API for Bluez?
 
-The build instructions are unusual and the latest release is poorly put 
-together (possibly by me), but if you read through the documentation, 
-you should be able to get it up and running.  There's some example code 
-in the project.
+Nobody spent the time to run something like that by me. So actually
+there is no real good JSR-82 implementation for BlueZ.
 
-Lastly, if you have any other option besides JSR-82, I suggest you take 
-it -- you'll save yourself many headaches.
+Regards
 
-Jim
+Marcel
+
+
 
 
 -------------------------------------------------------
