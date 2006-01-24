@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] vendor/manufacture id
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Michiel van Hulst <michiel@yall.nl>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43D69967.3060704@yall.nl>
-References: <43D69967.3060704@yall.nl>
-Content-Type: text/plain
-Message-Id: <1138143376.2616.5.camel@localhost>
-Mime-Version: 1.0
+Message-id: <43D69967.3060704@yall.nl>
+MIME-version: 1.0
+Content-type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] vendor/manufacture id
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,34 +16,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 Jan 2006 23:56:16 +0100
+Date: Tue, 24 Jan 2006 22:17:27 +0100
 
-Hi Michiel,
+Hi there,
 
-> I posted almost the same email to the bluez-user mailing list, but its more developer related I think;
-> 
-> I use the outdated jBluez native Java API and got a question about the manufacture 
-> id's.
-> 
-> When getting version info for a remote device using the Java API wich is native corresponding with Bluez a manufacture 
-> id is retreived and stored. This is great but I don't have or can't find any list corresponding with 
-> these manufacture id's. I browsed some Bluez c code and did see some manufacture id such as 10 (Nokia) being stored and used in functions.
+I posted almost the same email to the bluez-user mailing list, but its more developer related I think;
 
-the company id 10 stands for CSR. Take a look at the Bluetooth assigned
-numbers documents from their website.
+I use the outdated jBluez native Java API and got a question about the manufacture 
+id's.
 
-> Another question which is proberbly asked many times before, but I just can't 
-> settle with it, yet:
-> 
-> - Is there a good, can be simple but good and maintened opensource Java API for Bluez?
+When getting version info for a remote device using the Java API wich is native corresponding with Bluez a manufacture 
+id is retreived and stored. This is great but I don't have or can't find any list corresponding with 
+these manufacture id's. I browsed some Bluez c code and did see some manufacture id such as 10 (Nokia) being stored and used in functions.
 
-Nobody spent the time to run something like that by me. So actually
-there is no real good JSR-82 implementation for BlueZ.
+So:
 
-Regards
+- Is there a list available which vendors/manufactures correspond with these id's?
+- Or which algoritme/function should I use to findout which device vendor I found?
 
-Marcel
+Another question which is proberbly asked many times before, but I just can't 
+settle with it, yet:
 
+- Is there a good, can be simple but good and maintened opensource Java API for Bluez?
+
+Thanks & Cheers,
+
+Michiel van Hulst
+
+-- 
+regards,
+
+M.P.A. (Michiel) van Hulst
+
+Y'All . http://www.yall.nl
+Grotestraat 182 5141 HD Waalwijk . The Netherlands
+Tel: +31 (0) 416 340 019  . Fax. : +31 (0) 416 340 019 
+
+Information in this message may be confidential and is intended for
+the recipient only. Please do not use the content of this message
+if you receive this unintentionally and notify us by return mail.
 
 
 
