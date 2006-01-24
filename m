@@ -1,7 +1,7 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Michiel van Hulst <michiel@yall.nl>
-To: bluez-users@lists.sourceforge.net
-Message-id: <200601241118.45504.michiel@yall.nl>
+To: bluez-users@lists.sf.net
+Message-id: <200601241054.53144.michiel@yall.nl>
 MIME-version: 1.0
 Content-type: text/plain; charset=iso-8859-1
 Subject: [Bluez-users] jbluez and vedor/manufacture id
@@ -16,7 +16,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 24 Jan 2006 11:18:45 +0100
+Date: Tue, 24 Jan 2006 10:54:53 +0100
 
 Hi there,
 
