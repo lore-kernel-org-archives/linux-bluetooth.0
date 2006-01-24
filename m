@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: <darrylkuhn@cox.net>
+From: =?iso-8859-1?Q?Esther_L=F3pez_Casariego?= <esther.lopez@erzia.com>
 To: <bluez-users@lists.sourceforge.net>
+Subject: RE: [Bluez-users] (no subject)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <20060124174123.RKWZ15695.fed1rmmtao01.cox.net@[172.18.180.8]>
-Subject: [Bluez-users] Bluetooth on d610
+Content-Type: text/plain;
+	charset="iso-8859-1"
+In-Reply-To: <43D615A8.1010102@csr.com>
+Message-Id: <20060124165652.2231F1F3B73@mrelay2.st2.lyceu.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,37 +18,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 24 Jan 2006 12:42:21 -0500
+Date: Tue, 24 Jan 2006 17:58:48 +0100
 
-To all,
+Thanks Steven.=20
 
-Greetings. I'm new to the group and very much interested in getting bluetooth up and running on my dell D610. I've searched the mailing list for some hints and found a conversation between Marcel and Tomas Honzak, but have been unable to piece together exactly how the problem was solved. So here are some details on my box and if there are any suggestions I'd be much obliged...
+regards
 
-uname -a:
-Linux vannevar 2.6.10 #1 Fri Jul 8 14:33:24 PDT 2005 i686 GNU/Linux
+-----Mensaje original-----
+De: bluez-users-admin@lists.sourceforge.net
+[mailto:bluez-users-admin@lists.sourceforge.net] En nombre de Steven =
+Singer
+Enviado el: martes, 24 de enero de 2006 12:55
+Para: bluez-users@lists.sourceforge.net
+Asunto: Re: [Bluez-users] (no subject)
 
-dpkg -l | grep bluez:
-ii  bluez-bcm203x  2.10-5         Firmware loader for Broadcom 203x based Blue
-ii  bluez-firmware 1.0-2          Firmware for Bluetooth devices
-ii  bluez-hcidump  1.12-1         Analyses Bluetooth HCI packets
-ii  bluez-pin      0.24-1         Bluetooth PIN helper with D-BUS support
-ii  bluez-utils    2.24-1         Bluetooth tools and daemons
+Esther L=F3pez Casariego wrote:
+> Is there any way to know the Golden Range defined for a Bluetooth =
+device??
+> (I have search the list of HCI commands and haven=92t found it)
 
-lsusb:
-Bus 005 Device 001: ID 0000:0000
-Bus 004 Device 001: ID 0000:0000
-Bus 003 Device 001: ID 0000:0000
-Bus 002 Device 007: ID 413c:8103 Dell Computer Corp.
-Bus 002 Device 001: ID 0000:0000
-Bus 001 Device 001: ID 0000:0000
+There's no easy and portable way.
 
-(it's my understanding that Bus 002 Device 007: ID 413c:8103 Dell Computer Corp. is the bloothdevice)
+The spec tells you where it's allowed to be, but finding out exactly
+where it is for a given device is tricky. You'll need some vendor
+specific commands and probably a pile of documentation.
 
-hciconfig:
-gives me nothing (d'oh)
+	- Steven
+--=20
 
-Thanks in advance!
--Darryl
+
+To access the latest news from CSR copy this link into a web browser:
+http://www.csr.com/email_sig.html
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log =
+files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://sel.as-us.falkag.net/sel?cmd=3Dk&kid=103432&bid#0486&dat=121642
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 
