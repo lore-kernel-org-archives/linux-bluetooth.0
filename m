@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?iso-8859-1?Q?Esther_L=F3pez_Casariego?= <esther.lopez@erzia.com>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0018_01C620E0.CF04CFC0"
-Message-Id: <20060124112008.99F041F76A6@mrelay2.st2.lyceu.net>
-Subject: [Bluez-users] (no subject)
+From: Michiel van Hulst <michiel@yall.nl>
+To: bluez-users@lists.sourceforge.net
+Message-id: <200601241118.45504.michiel@yall.nl>
+MIME-version: 1.0
+Content-type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] jbluez and vedor/manufacture id
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,164 +16,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 24 Jan 2006 12:22:13 +0100
+Date: Tue, 24 Jan 2006 11:18:45 +0100
 
-This is a multi-part message in MIME format.
+Hi there,
 
-------=_NextPart_000_0018_01C620E0.CF04CFC0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+I use the outdated jBluez native Java API and got a question about manufact=
+ure=20
+id's.
 
-Hello you all
+When getting version info for a remote device using the Java API a manufact=
+ure=20
+id is stored. This is great but I don't have any list corresponding with=20
+these id's. I browsed some Bluez code and dit see some ID being store and=20
+checked on.
 
-=20
+=2D Is there a list availble to which vendors correspond to these id's?
 
-Just a fast (and hope easy) question
+Another question which is proberbly asked many times before, but I just can=
+'t=20
+settle with it yet:
 
-=20
+=2D Is there a good, can be simple but good and maintened Java API for Bleu=
+z?
 
-Is there any way to know the Golden Range defined for a Bluetooth =
-device??
-(I have search the list of HCI commands and haven=92t found it)
+Regards,
 
-=20
+Michiel van Hulst
+=2D-=20
+regards,
 
-Thanks in advance!!
+M.P.A. (Michiel) van Hulst
 
-=20
+Y'All . http://www.yall.nl
+Grotestraat 182 5141 HD Waalwijk . The Netherlands
+Tel: +31 (0) 416 340 019 =A0. Fax. : +31 (0) 416 340 019=20
 
-Esther=20
-
-=20
-
-
-------=_NextPart_000_0018_01C620E0.CF04CFC0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-
-<head>
-<meta http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered)">
-<style>
-<!--
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0cm;
-	margin-bottom:.0001pt;
-	font-size:11.0pt;
-	font-family:Arial;}
-h1
-	{margin-top:9.0pt;
-	margin-right:0cm;
-	margin-bottom:6.0pt;
-	margin-left:39.6pt;
-	text-align:justify;
-	text-indent:-21.6pt;
-	page-break-after:avoid;
-	font-size:16.0pt;
-	font-family:Arial;}
-h2
-	{margin-top:6.0pt;
-	margin-right:0cm;
-	margin-bottom:6.0pt;
-	margin-left:46.8pt;
-	text-align:justify;
-	text-indent:-28.8pt;
-	page-break-after:avoid;
-	font-size:14.0pt;
-	font-family:Arial;
-	font-style:italic;}
-h3
-	{margin-top:12.0pt;
-	margin-right:0cm;
-	margin-bottom:3.0pt;
-	margin-left:54.0pt;
-	text-indent:-36.0pt;
-	page-break-after:avoid;
-	font-size:13.0pt;
-	font-family:Arial;}
-a:link, span.MsoHyperlink
-	{color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{color:purple;
-	text-decoration:underline;}
-span.EstiloCorreo17
-	{font-family:Arial;
-	color:windowtext;}
-@page Section1
-	{size:21.0cm 841.95pt;
-	margin:70.9pt 3.0cm 70.9pt 3.0cm;}
-div.Section1
-	{page:Section1;}
- /* List Definitions */
- ol
-	{margin-bottom:0cm;}
-ul
-	{margin-bottom:0cm;}
--->
-</style>
-
-</head>
-
-<body lang=3DES link=3Dblue vlink=3Dpurple>
-
-<div class=3DSection1>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt'>Hello
-you all</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>Just a fast (and hope easy) question</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>Is there any way to know the Golden Range defined for a =
-Bluetooth
-device?? (I have search the list of HCI commands and haven&#8217;t found =
-it)</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>Thanks in advance!!</span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
-style=3D'font-size:
-10.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><b><font size=3D2 color=3Dnavy face=3DArial><span =
-lang=3DEN-GB
-style=3D'font-size:10.0pt;color:navy;font-weight:bold'>Esther =
-</span></font></b></p>
-
-<p class=3DMsoNormal><span lang=3DEN-GB>&nbsp;</span></p>
-
-</div>
-
-</body>
-
-</html>
-
-------=_NextPart_000_0018_01C620E0.CF04CFC0--
-
+Information in this message may be confidential and is intended for
+the recipient only. Please do not use the content of this message
+if you receive this unintentionally and notify us by return mail.
 
 
 -------------------------------------------------------
