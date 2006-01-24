@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Michiel van Hulst <michiel@yall.nl>
-To: bluez-devel@lists.sourceforge.net
-Message-id: <43D69967.3060704@yall.nl>
-MIME-version: 1.0
-Content-type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] vendor/manufacture id
+From: =?iso-8859-1?Q?Esther_L=F3pez_Casariego?= <esther.lopez@erzia.com>
+To: <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0036_01C6210F.85C40540"
+Message-Id: <20060124165440.07A131F9441@mrelay2.st2.lyceu.net>
+Subject: [Bluez-devel] Golden Range
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,45 +17,173 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 Jan 2006 22:17:27 +0100
+Date: Tue, 24 Jan 2006 17:56:36 +0100
 
-Hi there,
+This is a multi-part message in MIME format.
 
-I posted almost the same email to the bluez-user mailing list, but its more developer related I think;
+------=_NextPart_000_0036_01C6210F.85C40540
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-I use the outdated jBluez native Java API and got a question about the manufacture 
-id's.
+=20
 
-When getting version info for a remote device using the Java API wich is native corresponding with Bluez a manufacture 
-id is retreived and stored. This is great but I don't have or can't find any list corresponding with 
-these manufacture id's. I browsed some Bluez c code and did see some manufacture id such as 10 (Nokia) being stored and used in functions.
+Hello you all
 
-So:
+=20
 
-- Is there a list available which vendors/manufactures correspond with these id's?
-- Or which algoritme/function should I use to findout which device vendor I found?
+Just a fast (and hope easy) question
 
-Another question which is proberbly asked many times before, but I just can't 
-settle with it, yet:
+=20
 
-- Is there a good, can be simple but good and maintened opensource Java API for Bluez?
+Is there any way to know the Golden Range defined for a Bluetooth =
+device??
+(I have search the list of HCI commands and haven=92t found it)
 
-Thanks & Cheers,
+=20
 
-Michiel van Hulst
+Thanks in advance!!
 
--- 
-regards,
+=20
 
-M.P.A. (Michiel) van Hulst
+Esther=20
 
-Y'All . http://www.yall.nl
-Grotestraat 182 5141 HD Waalwijk . The Netherlands
-Tel: +31 (0) 416 340 019  . Fax. : +31 (0) 416 340 019 
+=20
 
-Information in this message may be confidential and is intended for
-the recipient only. Please do not use the content of this message
-if you receive this unintentionally and notify us by return mail.
+
+------=_NextPart_000_0036_01C6210F.85C40540
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered)">
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:Arial;}
+h1
+	{margin-top:9.0pt;
+	margin-right:0cm;
+	margin-bottom:6.0pt;
+	margin-left:39.6pt;
+	text-align:justify;
+	text-indent:-21.6pt;
+	page-break-after:avoid;
+	font-size:16.0pt;
+	font-family:Arial;}
+h2
+	{margin-top:6.0pt;
+	margin-right:0cm;
+	margin-bottom:6.0pt;
+	margin-left:46.8pt;
+	text-align:justify;
+	text-indent:-28.8pt;
+	page-break-after:avoid;
+	font-size:14.0pt;
+	font-family:Arial;
+	font-style:italic;}
+h3
+	{margin-top:12.0pt;
+	margin-right:0cm;
+	margin-bottom:3.0pt;
+	margin-left:54.0pt;
+	text-indent:-36.0pt;
+	page-break-after:avoid;
+	font-size:13.0pt;
+	font-family:Arial;}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.estilocorreo17
+	{font-family:Arial;
+	color:windowtext;}
+span.EstiloCorreo18
+	{font-family:Arial;
+	color:navy;}
+@page Section1
+	{size:21.0cm 841.95pt;
+	margin:70.9pt 3.0cm 70.9pt 3.0cm;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+ ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+
+</head>
+
+<body lang=3DES link=3Dblue vlink=3Dpurple>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:11.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt'>Hello
+you all</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>Just a fast (and hope easy) question</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>Is there any way to know the Golden Range defined for a =
+Bluetooth
+device?? (I have search the list of HCI commands and haven&#8217;t found =
+it)</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>Thanks in advance!!</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><b><font size=3D2 color=3Dnavy face=3DArial><span =
+lang=3DEN-GB
+style=3D'font-size:10.0pt;color:navy;font-weight:bold'>Esther =
+</span></font></b></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+11.0pt'>&nbsp;</span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------=_NextPart_000_0036_01C6210F.85C40540--
 
 
 
