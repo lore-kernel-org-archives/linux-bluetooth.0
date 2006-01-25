@@ -1,108 +1,87 @@
-Return-Path: <michiel@yall.nl>
-Date: Wed, 25 Jan 2006 10:12:37 +0100
-From: Michiel van Hulst <michiel@yall.nl>
-Subject: Re: [Bluez-devel] vendor/manufacture id
-In-reply-to: <1138143376.2616.5.camel@localhost>
-To: Jim Wyllie <jwyllie@masaka.cs.ohiou.edu>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc: bluez-devel@lists.sourceforge.net
-Message-id: <200601251012.38001.michiel@yall.nl>
-MIME-version: 1.0
-Content-type: text/plain; charset=utf-8
-References: <43D69967.3060704@yall.nl> <1138143376.2616.5.camel@localhost>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <43D7270C.5020805@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] alsa plugin progress
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 25 Jan 2006 00:21:48 -0700
 
-Hi Marcel, Jim,
+Marcel,
 
-Thanks for the reply,
+I've been tweaking the alsa plugin. How close was it when you had it?
 
-> the company id 10 stands for CSR. Take a look at the Bluetooth assigned
-> numbers documents from their website.
-The tool hcitool using the option "info <btaddr>" prints out Manufacture:=20
-Cambridge Silicon Radio (10) or Nokia Mobile Phones (1) and so on. So in th=
-e=20
-tool code should be a mapping for these numbers? Trough JBluez I only recei=
-ve=20
-the manufacture number (1) and (10) in this example.
+For now, I am setting the socket to nonblocking and polling until the
+connect succeeds (I keep trying when errno is EAGAIN). I can connect and
+things seem to be working but there is no audio. It looks like there's a
+mismatch with audio settings but I'm not sure where that's happening.
 
-Is there a list availible or array in c code which has these mappings?=20
+Brad
 
-My program should respond deferent on every bluetooth manafacture device it=
-=20
-detects, so I'm looking for the manufacture id's from the Bluetooth device=
-=20
-market leaders
+DEBUG: _snd_pcm_a2dp_open: name pcm.headphone mode 0
+DEBUG: _snd_pcm_a2dp_open: bdaddr/dest is 00:08:F4:46:03:1C
+DEBUG: a2dp_alloc: init
+DEBUG: a2dp_connect: a2dp 0x805ac80
+DEBUG: connect_l2cap: Can't connect to 1C:03:46:F4:08:00 on psm 25.
+Resource temporarily unavailable(11)
+DEBUG: connect_l2cap: Can't connect to 1C:03:46:F4:08:00 on psm 25.
+Resource temporarily unavailable(11)
+DEBUG: connect_l2cap: Can't connect to 1C:03:46:F4:08:00 on psm 25.
+Resource temporarily unavailable(11)
+DEBUG: connect_l2cap: Connected [imtu 672, omtu 672, flush_to 65535]
+DEBUG: connect_stream: Sent the Stream End Point Discovery Command
+DEBUG: connect_stream: retrying discover response read...
+DEBUG: connect_stream: Got a Stream End Point Discovery Response
+DEBUG: connect_stream: received 1 capabilities
+DEBUG: process_seid: SEID = 1
+DEBUG: process_seid: Requested Capabilities for SEID = 1
+DEBUG: process_seid: Got capabilities response
+DEBUG: process_seid: headset does not support this channel mode
+DEBUG: process_seid: headset does not support this frequency
+DEBUG: process_seid: headset does not support this allocation_method
+DEBUG: process_seid: headset does not support this subbands setting
+DEBUG: process_seid: Sent set configurations command
+DEBUG: process_seid: Set configurations command rejected
+DEBUG: process_seid: Sent open stream command
+DEBUG: process_seid: Got open stream confirm
+DEBUG: connect_l2cap: Can't connect to 1C:03:46:F4:08:00 on psm 25.
+Resource temporarily unavailable(11)
+DEBUG: connect_l2cap: Connected [imtu 672, omtu 0, flush_to 65535]
+DEBUG: connect_stream: Sent stream start
+DEBUG: connect_stream: Got start stream confirm
+DEBUG: a2dp_constraint: a2dp 0x805ac80
+Playing WAVE '/usr/lib/openoffice2/share/gallery/sounds/pluck.wav' :
+Signed 16 bit Little Endian, Rate 11025 Hz, Mono
+Warning: rate is not accurate (requested = 11025Hz, got = 44100Hz)
+         please, try the plug plugin (-Dplug:pcm.headphone)
+DEBUG: a2dp_params: a2dp 0x805ac80
+DEBUG: a2dp_params: format S16_LE rate 44100 channels 1
+DEBUG: a2dp_params: frame_bytes 2 period_bytes 8192 period_size 4096
+buffer_size 8192
+DEBUG: a2dp_prepare: a2dp 0x805ac80
+DEBUG: a2dp_drain: a2dp 0x805ac80
+DEBUG: a2dp_stop: a2dp 0x805ac80
+DEBUG: a2dp_stop: a2dp 0x805ac80
+DEBUG: a2dp_close: a2dp 0x805ac80
 
-> I've tested all of the JSR-82 options out there that are available for
-> free on Linux: the only thing I got to work is Avetana's JSR-82 spec
-> (GPL code on Linux).  You can grab it from SourceForge here:
->
-> http://sourceforge.net/projects/avetanabt/
-Great! The project release date is much more promecing ;-). I downloaded th=
-is=20
-project and its seems the include a prebuild version of the .jar and .so I'=
-m=20
-going to test this for sure
 
-Cheers,
-
-Michiel
-
-On Tuesday 24 January 2006 23:56, Marcel Holtmann wrote:
-> Hi Michiel,
->
-> > I posted almost the same email to the bluez-user mailing list, but its
-> > more developer related I think;
-> >
-> > I use the outdated jBluez native Java API and got a question about the
-> > manufacture id's.
-> >
-> > When getting version info for a remote device using the Java API wich is
-> > native corresponding with Bluez a manufacture id is retreived and store=
-d.
-> > This is great but I don't have or can't find any list corresponding with
-> > these manufacture id's. I browsed some Bluez c code and did see some
-> > manufacture id such as 10 (Nokia) being stored and used in functions.
->
-> the company id 10 stands for CSR. Take a look at the Bluetooth assigned
-> numbers documents from their website.
->
-> > Another question which is proberbly asked many times before, but I just
-> > can't settle with it, yet:
-> >
-> > - Is there a good, can be simple but good and maintened opensource Java
-> > API for Bluez?
->
-> Nobody spent the time to run something like that by me. So actually
-> there is no real good JSR-82 implementation for BlueZ.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log
-> files for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D103432&bid=3D230486&dat=
-=3D121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-=2D-=20
-regards,
-
-M.P.A. (Michiel) van Hulst
-
-Y'All . http://www.yall.nl
-Grotestraat 182 5141 HD Waalwijk . The Netherlands
-Tel: +31 (0) 416 340 019 =C2=A0. Fax. : +31 (0) 416 340 019=20
-
-Information in this message may be confidential and is intended for
-the recipient only. Please do not use the content of this message
-if you receive this unintentionally and notify us by return mail.
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
