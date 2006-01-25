@@ -1,5 +1,5 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <002101c6220a$074e09d0$c800a8c0@kazama>
+Message-ID: <002401c6220a$1e4a4900$c800a8c0@kazama>
 From: "Sir Graham (Terra)" <sir__graham@terra.es>
 To: <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
