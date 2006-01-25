@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43D7F5C4.70101@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Bluetooth on d610
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Talkie-Walkie application
-References: <001f01c6212d$bfb82880$34208958@claudia>
-In-Reply-To: <001f01c6212d$bfb82880$34208958@claudia>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <20060125165101.VOSE17690.fed1rmmtao04.cox.net@[172.18.180.8]>
+References: <20060125165101.VOSE17690.fed1rmmtao04.cox.net@[172.18.180.8]>
+Content-Type: text/plain
+Message-Id: <1138209291.5782.89.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,55 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Jan 2006 15:03:48 -0700
+Date: Wed, 25 Jan 2006 18:14:51 +0100
 
-Michel
+Hi Darryl,
 
-It sounds like you have the luxury of not worrying too much about
-latency. Audio is one-way for a walkie-talkie function. Also, you're
-writing the code on both ends so you don't have to use any specific
-protocol. Choose accordingly.
+> So I've done the following in a further attempt to get bluez corectly installed and working on my system:
+> 
+> downloaded
+>     * bluez-libs-2.25.tar.gz
+>     * bluez-utils-2.25.tar.gz
+>     * bluez-firmware-1.1.tar.gz
+>     * bluez-hcidump-1.29.tar.gz
+> 
+> untar, configure, make, make install...
+> 
+> No errors on any part of the process
+> 
+> Still when I  modprobe usb_hci I get "FATAL: Module usb_hci not found." and a "locate usb_hci" turns up nothing - I'm a bit at a loss here.
 
-You could model something after the sco test in bluez or you could model
-it after the a2play/a2recv in the btsco project.
+the usual name of the module is "hci_usb", but you maybe try "hciusb"
+and if this works you should get yourself another distribution ;)
 
-sco advantages:
- 2-way audio
- low-latency
- low cpu use
+Regards
 
-a2dp advantages:
- higher quality audio, even stereo
- one-way audio
+Marcel
 
-The SCO transport driver is only completely working for CSR chips.
-
-Brad
-
-> I 'm working on the feasability of a Talkie-Walkie Application
-> with two dongles.
->  
->  
-> Does somebody knows some books or other documentation which
-> can give me information on how to make an audio application with bluez ?
->  
-> In your opinion, what is (are) the main(s) problem(s) to realize such
-> application ?
->  
->  
-> As I have read on the mailing list, the best way to work with SCO
-> links under linux
-> is to use CSR Chipset. Does anyone know why these chipset is so suited
-> to work with linux and so bluez ?
->  
->  
-> thanks very much
->  
->  
-> Michel  
->  
->  
->   
 
 
 
