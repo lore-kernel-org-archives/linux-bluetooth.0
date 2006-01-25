@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43D72204.606@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Problems compiling btso.
-References: <dr73je$gt8$1@sea.gmane.org>
-In-Reply-To: <dr73je$gt8$1@sea.gmane.org>
+From: "Christopher E. Granade" <cgranade@greens.org>
+Message-ID: <dr73je$gt8$1@sea.gmane.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] Problems compiling btso.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,28 +16,63 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 25 Jan 2006 00:00:20 -0700
+Date: Tue, 24 Jan 2006 20:50:36 -0900
 
-Christopher
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
 
-> When I download and attempt to install the CVS version of btsco (as
-> recommended on the bluetooth-alsa project site, I got the following
-> errors from ./bootstrap:
-> 
-> /usr/share/aclocal/libxosd.m4:9: warning: underquoted definition of
-> AM_PATH_LIBXOSD
->   run info '(automake)Extending aclocal'
->   or see http://sources.redhat.com/automake/automake.html#Extending-aclocal
-> configure.in: installing `./install-sh'
-> configure.in: installing `./missing'
-> alsa-plugins/Makefile.am:5: Libtool library used but `LIBTOOL' is undefined
+When I download and attempt to install the CVS version of btsco (as
+recommended on the bluetooth-alsa project site, I got the following
+errors from ./bootstrap:
 
-You could try the 0.41 snapshot. It comes pre-bootstrapped. fwiw, I
-think it's basically in sync with the cvs sources.
+/usr/share/aclocal/libxosd.m4:9: warning: underquoted definition of
+AM_PATH_LIBXOSD
+  run info '(automake)Extending aclocal'
+  or see http://sources.redhat.com/automake/automake.html#Extending-aclocal
+configure.in: installing `./install-sh'
+configure.in: installing `./missing'
+alsa-plugins/Makefile.am:5: Libtool library used but `LIBTOOL' is undefined
+alsa-plugins/Makefile.am:5:
+alsa-plugins/Makefile.am:5: The usual way to define `LIBTOOL' is to add
+`AC_PROG_LIBTOOL'
+alsa-plugins/Makefile.am:5: to `configure.in' and run `aclocal' and
+`autoconf' again.
+alsa-plugins/Makefile.am: installing `./depcomp'
 
-I'm not sure what is up with bootstrapping.
 
-Brad
+Any help that you can offer would be greatly appreciated.
+
+- --Chris
+
+- -----------------------------
+Information on system:
+$ uname -r
+2.6.14-1.1656_FC4
+
+$ autoconf --version
+autoconf (GNU Autoconf) 2.59
+
+$ automake --version
+automake (GNU automake) 1.9.5
+
+$ gcc --version
+gcc (GCC) 4.0.2 20051125 (Red Hat 4.0.2-8)
+
+$ make --version
+GNU Make 3.80
+
+$ rpm -qa | grep libtool
+libtool-ltdl-1.5.20-4.99_14.rhfc4.at
+- -----------------------------
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iD8DBQFD1xGr0dXuuZr00J4RA793AJ9WmZefttV7tZcf9uRE83Leh1MmeACfexDd
+gCF7l/I56/IQwy/dNBt2jL4=
+=1COJ
+-----END PGP SIGNATURE-----
+
 
 
 -------------------------------------------------------
