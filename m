@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <43D6CF2D.1040903@masaka.cs.ohiou.edu>
+From: Jim Wyllie <jwyllie@masaka.cs.ohiou.edu>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-From: "Christopher E. Granade" <cgranade@greens.org>
-Message-ID: <dr73je$gt8$1@sea.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Problems compiling btso.
+Subject: Re: [Bluez-devel] vendor/manufacture id
+References: <43D69967.3060704@yall.nl> <1138143376.2616.5.camel@localhost>
+In-Reply-To: <1138143376.2616.5.camel@localhost>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,63 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 Jan 2006 20:50:36 -0900
-
------BEGIN PGP SIGNED MESSAGE-----
-Hash: RIPEMD160
-
-When I download and attempt to install the CVS version of btsco (as
-recommended on the bluetooth-alsa project site, I got the following
-errors from ./bootstrap:
-
-/usr/share/aclocal/libxosd.m4:9: warning: underquoted definition of
-AM_PATH_LIBXOSD
-  run info '(automake)Extending aclocal'
-  or see http://sources.redhat.com/automake/automake.html#Extending-aclocal
-configure.in: installing `./install-sh'
-configure.in: installing `./missing'
-alsa-plugins/Makefile.am:5: Libtool library used but `LIBTOOL' is undefined
-alsa-plugins/Makefile.am:5:
-alsa-plugins/Makefile.am:5: The usual way to define `LIBTOOL' is to add
-`AC_PROG_LIBTOOL'
-alsa-plugins/Makefile.am:5: to `configure.in' and run `aclocal' and
-`autoconf' again.
-alsa-plugins/Makefile.am: installing `./depcomp'
+Date: Tue, 24 Jan 2006 20:06:53 -0500
 
 
-Any help that you can offer would be greatly appreciated.
+> Nobody spent the time to run something like that by me. So actually
+> there is no real good JSR-82 implementation for BlueZ.
+> 
+> Regards
+> 
+> Marcel
 
-- --Chris
+I've tested all of the JSR-82 options out there that are available for 
+free on Linux: the only thing I got to work is Avetana's JSR-82 spec 
+(GPL code on Linux).  You can grab it from SourceForge here:
 
-- -----------------------------
-Information on system:
-$ uname -r
-2.6.14-1.1656_FC4
+http://sourceforge.net/projects/avetanabt/
 
-$ autoconf --version
-autoconf (GNU Autoconf) 2.59
+The build instructions are unusual and the latest release is poorly put 
+together (possibly by me), but if you read through the documentation, 
+you should be able to get it up and running.  There's some example code 
+in the project.
 
-$ automake --version
-automake (GNU automake) 1.9.5
+Lastly, if you have any other option besides JSR-82, I suggest you take 
+it -- you'll save yourself many headaches.
 
-$ gcc --version
-gcc (GCC) 4.0.2 20051125 (Red Hat 4.0.2-8)
-
-$ make --version
-GNU Make 3.80
-
-$ rpm -qa | grep libtool
-libtool-ltdl-1.5.20-4.99_14.rhfc4.at
-- -----------------------------
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iD8DBQFD1xGr0dXuuZr00J4RA793AJ9WmZefttV7tZcf9uRE83Leh1MmeACfexDd
-gCF7l/I56/IQwy/dNBt2jL4=
-=1COJ
------END PGP SIGNATURE-----
-
+Jim
 
 
 -------------------------------------------------------
