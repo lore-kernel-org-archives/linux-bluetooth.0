@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <5fed34b0601260131r23576c32g89a96f05bd8e6f10@mail.gmail.com>
-From: Javier Ema <jemamena@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <43D80AB1.4080706@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_13911_32697743.1138267860067"
-Subject: [Bluez-users] Best Evaluation Kit
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Talkie-Walkie application
+References: <001f01c6212d$bfb82880$34208958@claudia> <43D7F5C4.70101@xmission.com>
+In-Reply-To: <43D7F5C4.70101@xmission.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,40 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Jan 2006 10:31:00 +0100
+Date: Wed, 25 Jan 2006 16:33:05 -0700
 
-------=_Part_13911_32697743.1138267860067
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Michel
 
-Hello,
-I would like to know if anyone could help me in buying an evaluation kit. I
-want an evaluation kit to develop an application with Bluez and to see
-different parameters like RSSI, link quality or Transmit power Control in
-different devices. If anyone can advise me, I'd be very grateful. I'd like
-to know also different prices and where to buy them.
-Thank for helping me.
+I forgot to also mention that a2dp works on any linux-supported adapter,
+not just CSR.
 
-Javier Ema Mena
+> sco advantages:
+>  2-way audio
+>  low-latency
+>  low cpu use
+> 
+> a2dp advantages:
+>  higher quality audio, even stereo
+>  one-way audio
 
-------=_Part_13911_32697743.1138267860067
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-<div>Hello,</div>
-<div>I would like to know if anyone could help me in buying an evaluation k=
-it. I want an evaluation kit to develop an application with Bluez and to se=
-e different parameters like RSSI, link quality or Transmit power Control in=
- different devices. If anyone can advise me, I'd be very grateful. I'd like=
- to&nbsp;know also different prices and where to buy&nbsp;them.
-</div>
-<div>Thank for helping me.</div>
-<div>&nbsp;</div>
-<div>Javier Ema Mena&nbsp;</div>
-
-------=_Part_13911_32697743.1138267860067--
+Brad
 
 
 -------------------------------------------------------
