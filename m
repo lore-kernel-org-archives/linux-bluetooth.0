@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <a63d67fe0601260006y5d252801n@mail.gmail.com>
-From: Dan Carpenter <error27@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Patch manpage
+Message-Id: <s3d89943.023@DBNWEBACC1.ukzn.ac.za>
+From: "Poovern Govender" <203507269@ukzn.ac.za>
+To: <bluez-devel@lists.sourceforge.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-devel] Bluetooth headset
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,30 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Jan 2006 00:06:21 -0800
+Date: Thu, 26 Jan 2006 09:41:12 +0200
 
-Before:
-$ whatis sdpd
-sdpd (8)             - SDP daemon
+Im a student working on a vacation work project which involves =20
+ getting a bluetooth headset working with a PDA please send any =20
+ latest sco driver or alsa driver available and any information you
+ might have on this topic. =20
+ Any information will be highly appreciated.
 
-After:
-$ whatis sdpd
-sdpd (8)             - Bluetooth SDP daemon
 
-regards,
-dan carpenter
 
---- sdpd/sdpd.8 31 Mar 2004 21:39:10 -0000      1.1
-+++ sdpd/sdpd.8 26 Jan 2006 07:58:05 -0000
-@@ -53,7 +53,7 @@
- .ta 8n 16n 24n 32n 40n 48n 56n 64n 72n
- .TH "sdpd" "8"
- .SH "NAME"
--sdpd \(em SDP daemon
-+sdpd \(em Bluetooth SDP daemon
- .SH "SYNOPSIS"
- .PP
- \fBsdpd\fR [\fIoptions\fR]
+--------------------------------------------------------------------
+Please find our disclaimer at http://www.ukzn.ac.za/disclaimer
+--------------------------------------------------------------------
+<<<<gwavasig>>>>
 
 
 -------------------------------------------------------
