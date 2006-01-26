@@ -1,18 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Cleaning up the D-Bus interface
+Subject: Re: [Bluez-devel] [DBUS] remote name patch
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0601251054m6ac203ceu4901dca319212d2@mail.gmail.com>
-References: <1135111693.26233.11.camel@localhost>
-	 <3013cac80512211216r3918594dv676e03480d83f5b3@mail.gmail.com>
-	 <1135196479.3781.10.camel@localhost>
-	 <3013cac80512220511u9ecac97haf7278614bfe085a@mail.gmail.com>
-	 <1135271815.6002.96.camel@localhost>
-	 <3013cac80512230528y5b879d2bh2dbcb4e0fe18e974@mail.gmail.com>
-	 <1135350634.3985.2.camel@localhost> <1135434294.1008.3.camel@localhost>
-	 <e1effdeb0601251054m6ac203ceu4901dca319212d2@mail.gmail.com>
+In-Reply-To: <e1effdeb0601260609n644c313u91d193b8f5df89bb@mail.gmail.com>
+References: <e1effdeb0601201037y4d6eccdem6a9cbca135196520@mail.gmail.com>
+	 <1137808123.20856.122.camel@localhost>
+	 <e1effdeb0601230833t25905a64he7ca62c7d1ab48cf@mail.gmail.com>
+	 <1138036115.7327.14.camel@localhost>
+	 <e1effdeb0601231054q2a3e1ec1q6f0e2c90a48c05e3@mail.gmail.com>
+	 <1138047251.3750.6.camel@localhost.localdomain>
+	 <e1effdeb0601260609n644c313u91d193b8f5df89bb@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1138304710.5901.106.camel@localhost>
+Message-Id: <1138298602.5901.78.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -25,24 +24,98 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Jan 2006 20:45:10 +0100
+Date: Thu, 26 Jan 2006 19:03:22 +0100
 
 Hi Claudio,
 
-> This patch is based on your discussion, but there are some changes:
-> 1. The scan enable values are based on the Bluetooth Spec in order to
-> make the logic more clear:
-> mode 0x00       = Off (means down or deep-sleep)
-> mode 0x01       = Discoverable (NOT ALLOWED)
-> mode 0x02       = Connectable
-> mode 0x03       = Connectable and Discoverable
+> > > > Regarding the name, we might simply say the hcid/bluetoothd always sends
+> > > > a remote name signal if something changes. So it might get the short
+> > > > name from the extended inquiry first and after that it receives the full
+> > > > remote name. We can also always send the cached name and we update that
+> > > > name on every service discovery, because then it is at zero cost.
+> > >
+> > > The remote name is triggered by D-Bus clients. hcid/bluetoothd doesn't
+> > > request the remote when the inquiry finishes. For EIR, are you
+> > > suggesting send the "InquiryResult" signal followed by a "RemoteName"?
+> >
+> > this sounds like a sane and backward compatible way of doing this.
+> 
+> I did some tests and discovered that if we add extra fields at the
+> ending we can keep the
+> backward compatibility if applications check the signature partially.
+> The functions dbus_message_get_args and dbus_message_get_basic can be
+> used to extract the first three signal fields(bdaddr, class, rssi)
+> without broke. For python applications add an extra signal handler
+> function with the new signature is enough.
+> 
+> Therefore, we have another option: Add the name at the ending of the
+> "InquiryResult" signal arguments.
 
-actually I didn't used the values from the specification on purpose. On
-future idea is that we support discoverable for them time and the client
-doesn't have to take care when to switch inquiry scan off again. As I
-sometimes mentioned, it might be good to not follow the specification
-for the D-Bus API. The hcid/bluetoothd will hide all implementation
-details.
+even if I wrote a backward compatibility, I actually don't care, because
+I mentioned sometimes that I don't consider the D-Bus stable unless we
+at least have D-Bus 1.0 finally released.
+
+> > > If we send the "RemoteName" with the short name, probably D-Bus
+> > > clients will not request the RemoteName to retrieve the complete name.
+> > > D-Bus clients should not distinguish short/complete name.
+> >
+> > It is up to hcid/bluetoothd to update the remote when the client
+> > requests a service discovery.
+> >
+> > > Regarding the RemoteName request service signature. Do you agree with
+> > > my initial proprosal? (see the first e-mail sent: have an alternative
+> > > to force send the HCI remote name and another using the cache)
+> >
+> > No. We don't need any extra stuff. The client asks for a name and we
+> > give them a name. That's it and all the rest is implementation specific
+> > to hcid/bluetoothd.
+> 
+> Sorry I didn't understand your proposal. Which logic do you want?
+> When the hcid/bluetoothd receives the RemoteName(bdaddr) request,
+> which steps should be done?
+> 
+> This is the patch approach:
+> name = get_device_name(local, bdaddr); /* retrieving from names file */
+> if (name == NULL) {
+>    /* send HCI remote name request */
+> }
+> ...
+> Which modifications must be done on this patch?
+
+If the client ask for a name and we have a cached one, it gets the
+cached name. If we don't have a cached name hcid/bluetoothd will take
+care of filling the cache.
+
+The same applies to the device discovery. If we don't get any EIR
+information it is the job of hcid/bluetoothd to fill the name cache.
+
+> > > > So we have one device name. This maybe a cached, a remote or a shortened
+> > > > name. The application doesn't really have to care and it gets updates as
+> > > > soon as hcid/bluetoothd knows them.
+> > > >
+> > > > Besides the device name, we should implement an alias name. This name is
+> > > > associated with the BD_ADDR and can be changed by the user if he/she
+> > > > doesn't like the device name. Implementing this alias through the D-Bus
+> > > > interface makes it available for all applications and we can store the
+> > > > aliases in /var/lib/bluetooth/<bdaddr>/aliases.
+> > >
+> > > When a client requests a RemoteName, which value should be returned?
+> > > The value stored in the aliases file or the value stored in the names
+> > > file? Or are you suggesting create a property
+> > > "GetProperty("alias")/SetProperty("alias", "value")?
+> >
+> > When they request the remote name or device name, then they get the
+> > device name that is valid at the moment. This will maybe a cached name,
+> > but that doesn't matter. If hcid/bluetoothd knows better they will send
+> > out a remote name signal to tell them.
+> >
+> > The alias name is totally different and independent. It is application
+> > choice to use the alias name or not. If the alias name is empty they can
+> > use the remote/device name.
+> 
+> Is there someone working on this stuff?
+
+Not that I know of.
 
 Regards
 
