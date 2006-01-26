@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43D8A743.1060506@in.tum.de>
-From: Maximilian Michel <michel@in.tum.de>
+Message-ID: <43D8A247.8050306@3max.de>
+From: Maximilian Michel <max@3max.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-devel] PAN with DLink Access Point DBT-900AP
+Subject: [Bluez-devel] Re: PAN with DLink Access Point DBT-900AP
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,53 +16,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Jan 2006 11:41:07 +0100
+Date: Thu, 26 Jan 2006 11:19:51 +0100
 
-Hi,
+I think now it's a PIN problem.
 
-I have a problem with connecting to this access point.
-
-I do following:
-
-fry ~ # hcitool scan
-Scanning ...
-         00:0D:88:9F:38:A5       DBT-900AP
-
-fry ~ # pand --service NAP -Q -n
-pand[7714]: Bluetooth PAN daemon version 2.24
-pand[7714]: Inquiring
-pand[7714]: Searching for NAP on 00:0D:88:9F:38:A5
-pand[7714]: Failed to connect to the SDP server. Function not 
-implemented(38)
-
-
-fry ~ # pand --connect 00:0D:88:9F:38:A5 -n
-pand[7904]: Bluetooth PAN daemon version 2.24
-pand[7904]: Connecting to 00:0D:88:9F:38:A5
-pand[7904]: Connect to 00:0D:88:9F:38:A5 failed. Function not 
-implemented(38)
-fry ~ #
-
-Is it possible to connect my pc to this ap or is impossible due to an 
-unimplemented bluetooth requirement?
-I'm using gentoo with
-net-wireless/bluez-libs 2.24
-net-wireless/bluez-utils 2.24
-
-Maybe it is a PIN problem:
-As i can see from hcidump
+as i can see from hcidump
 < HCI Command: Create Connection (0x01|0x0005) plen 13
      bdaddr 00:0D:88:9F:38:A5 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
      Packet type: DM1 DM3 DM5 DH1 DH3 DH5
  > HCI Event: Command Status (0x0f) plen 4
  > HCI Event: Role Change (0x12) plen 8
  > HCI Event: PIN Code Request (0x16) plen 6
-...
+
 the establishment of the connection requires a PIN, but no pin_helper or 
 anything else is opened. What do i have to change?
 
-
 Thanks,
+
 Maximilian
 
 
