@@ -1,17 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0601260609n644c313u91d193b8f5df89bb@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [DBUS] remote name patch
-In-Reply-To: <1138047251.3750.6.camel@localhost.localdomain>
+Message-ID: <43D8C89B.4050705@3max.de>
+From: Maximilian Michel <max@3max.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <e1effdeb0601201037y4d6eccdem6a9cbca135196520@mail.gmail.com>
-	 <1137808123.20856.122.camel@localhost>
-	 <e1effdeb0601230833t25905a64he7ca62c7d1ab48cf@mail.gmail.com>
-	 <1138036115.7327.14.camel@localhost>
-	 <e1effdeb0601231054q2a3e1ec1q6f0e2c90a48c05e3@mail.gmail.com>
-	 <1138047251.3750.6.camel@localhost.localdomain>
+To: bluez-devel@lists.sourceforge.net
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature"; micalg=sha1; boundary="------------ms020209040509000208040600"
+Subject: [Bluez-devel] Re: Re: Re: PAN with DLink Access Point DBT-900AP
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -23,128 +16,81 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Jan 2006 12:09:41 -0200
+Date: Thu, 26 Jan 2006 14:03:23 +0100
 
-Hi Marcel,
+This is a cryptographically signed message in MIME format.
 
-On 1/23/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Claudio,
->
-> > > Regarding the name, we might simply say the hcid/bluetoothd always se=
-nds
-> > > a remote name signal if something changes. So it might get the short
-> > > name from the extended inquiry first and after that it receives the f=
-ull
-> > > remote name. We can also always send the cached name and we update th=
-at
-> > > name on every service discovery, because then it is at zero cost.
-> >
-> > The remote name is triggered by D-Bus clients. hcid/bluetoothd doesn't
-> > request the remote when the inquiry finishes. For EIR, are you
-> > suggesting send the "InquiryResult" signal followed by a "RemoteName"?
->
-> this sounds like a sane and backward compatible way of doing this.
-[Claudio Takahasi]
-I did some tests and discovered that if we add extra fields at the
-ending we can keep the
-backward compatibility if applications check the signature partially.
-The functions dbus_message_get_args and dbus_message_get_basic can be
-used to extract the first three signal fields(bdaddr, class, rssi)
-without broke. For python applications add an extra signal handler
-function with the new signature is enough.
+--------------ms020209040509000208040600
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Therefore, we have another option: Add the name at the ending of the
-"InquiryResult" signal arguments.
+the bluez-util stuff in gentoo is really strange sometimes. after 
+restarting it several times suddenly the request for a PIN worked...
 
->
-> > If we send the "RemoteName" with the short name, probably D-Bus
-> > clients will not request the RemoteName to retrieve the complete name.
-> > D-Bus clients should not distinguish short/complete name.
->
-> It is up to hcid/bluetoothd to update the remote when the client
-> requests a service discovery.
->
-> > Regarding the RemoteName request service signature. Do you agree with
-> > my initial proprosal? (see the first e-mail sent: have an alternative
-> > to force send the HCI remote name and another using the cache)
->
-> No. We don't need any extra stuff. The client asks for a name and we
-> give them a name. That's it and all the rest is implementation specific
-> to hcid/bluetoothd.
-[Claudio Takahasi]
-Sorry I didn't understand your proposal. Which logic do you want?
-When the hcid/bluetoothd receives the RemoteName(bdaddr) request,
-which steps should be done?
+Thanks!
 
-This is the patch approach:
-name =3D get_device_name(local, bdaddr); /* retrieving from names file */
-if (name =3D=3D NULL) {
-   /* send HCI remote name request */
-}
-...
-Which modifications must be done on this patch?
+Maximilian
 
->
-> > > So we have one device name. This maybe a cached, a remote or a shorte=
-ned
-> > > name. The application doesn't really have to care and it gets updates=
- as
-> > > soon as hcid/bluetoothd knows them.
-> > >
-> > > Besides the device name, we should implement an alias name. This name=
- is
-> > > associated with the BD_ADDR and can be changed by the user if he/she
-> > > doesn't like the device name. Implementing this alias through the D-B=
-us
-> > > interface makes it available for all applications and we can store th=
-e
-> > > aliases in /var/lib/bluetooth/<bdaddr>/aliases.
-> >
-> > When a client requests a RemoteName, which value should be returned?
-> > The value stored in the aliases file or the value stored in the names
-> > file? Or are you suggesting create a property
-> > "GetProperty("alias")/SetProperty("alias", "value")?
->
-> When they request the remote name or device name, then they get the
-> device name that is valid at the moment. This will maybe a cached name,
-> but that doesn't matter. If hcid/bluetoothd knows better they will send
-> out a remote name signal to tell them.
->
-> The alias name is totally different and independent. It is application
-> choice to use the alias name or not. If the alias name is empty they can
-> use the remote/device name.
-[Claudio Takahasi]
-Is there someone working on this stuff?
+--------------ms020209040509000208040600
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Regards,
-Claudio.
-
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log fi=
-les
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D103432&bid=3D230486&dat=
-=3D121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-
-
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIICzCC
+AmAwggHJoAMCAQICAw65NjANBgkqhkiG9w0BAQQFADBiMQswCQYDVQQGEwJaQTElMCMGA1UE
+ChMcVGhhd3RlIENvbnN1bHRpbmcgKFB0eSkgTHRkLjEsMCoGA1UEAxMjVGhhd3RlIFBlcnNv
+bmFsIEZyZWVtYWlsIElzc3VpbmcgQ0EwHhcNMDUwNTE3MDYwMzAzWhcNMDYwNTE3MDYwMzAz
+WjBeMQ8wDQYDVQQEEwZNaWNoZWwxEzARBgNVBCoTCk1heGltaWxpYW4xGjAYBgNVBAMTEU1h
+eGltaWxpYW4gTWljaGVsMRowGAYJKoZIhvcNAQkBFgttYXhAM21heC5kZTCBnzANBgkqhkiG
+9w0BAQEFAAOBjQAwgYkCgYEAuKz77uRgojv4nIfBMec/F7Vs+fnKIuoLS5j5O8Sa27usBjLh
+3C8+DcN5fqDnltlQJs13fQbOR0fTbS1UMd4PU1CB/ral2nche2o7+w9e6ZUc0YbupY4DK2nk
+UvS7tbqkpZc+/gKE8vMco7GGW039uAwiAZ4sQ5ocxuSw1TNC6lkCAwEAAaMoMCYwFgYDVR0R
+BA8wDYELbWF4QDNtYXguZGUwDAYDVR0TAQH/BAIwADANBgkqhkiG9w0BAQQFAAOBgQBE4neI
+VuYMr7tn5nZoUni3hiaKEPidiC4z4hRSxqV62TrH+ydbYtPF+BWRPzPBuXV+pR2hAUgeU4wL
+fMjANNghwmrFYBHCY4uymUuHvd+zwS7ycGUmz4GBLZQ8C9wFHzunKTUqafs1VKAJgz2mLO8h
+/zozZibGhdWtTU7iZY+PmzCCAmAwggHJoAMCAQICAw65NjANBgkqhkiG9w0BAQQFADBiMQsw
+CQYDVQQGEwJaQTElMCMGA1UEChMcVGhhd3RlIENvbnN1bHRpbmcgKFB0eSkgTHRkLjEsMCoG
+A1UEAxMjVGhhd3RlIFBlcnNvbmFsIEZyZWVtYWlsIElzc3VpbmcgQ0EwHhcNMDUwNTE3MDYw
+MzAzWhcNMDYwNTE3MDYwMzAzWjBeMQ8wDQYDVQQEEwZNaWNoZWwxEzARBgNVBCoTCk1heGlt
+aWxpYW4xGjAYBgNVBAMTEU1heGltaWxpYW4gTWljaGVsMRowGAYJKoZIhvcNAQkBFgttYXhA
+M21heC5kZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAuKz77uRgojv4nIfBMec/F7Vs
++fnKIuoLS5j5O8Sa27usBjLh3C8+DcN5fqDnltlQJs13fQbOR0fTbS1UMd4PU1CB/ral2nch
+e2o7+w9e6ZUc0YbupY4DK2nkUvS7tbqkpZc+/gKE8vMco7GGW039uAwiAZ4sQ5ocxuSw1TNC
+6lkCAwEAAaMoMCYwFgYDVR0RBA8wDYELbWF4QDNtYXguZGUwDAYDVR0TAQH/BAIwADANBgkq
+hkiG9w0BAQQFAAOBgQBE4neIVuYMr7tn5nZoUni3hiaKEPidiC4z4hRSxqV62TrH+ydbYtPF
++BWRPzPBuXV+pR2hAUgeU4wLfMjANNghwmrFYBHCY4uymUuHvd+zwS7ycGUmz4GBLZQ8C9wF
+HzunKTUqafs1VKAJgz2mLO8h/zozZibGhdWtTU7iZY+PmzCCAz8wggKooAMCAQICAQ0wDQYJ
+KoZIhvcNAQEFBQAwgdExCzAJBgNVBAYTAlpBMRUwEwYDVQQIEwxXZXN0ZXJuIENhcGUxEjAQ
+BgNVBAcTCUNhcGUgVG93bjEaMBgGA1UEChMRVGhhd3RlIENvbnN1bHRpbmcxKDAmBgNVBAsT
+H0NlcnRpZmljYXRpb24gU2VydmljZXMgRGl2aXNpb24xJDAiBgNVBAMTG1RoYXd0ZSBQZXJz
+b25hbCBGcmVlbWFpbCBDQTErMCkGCSqGSIb3DQEJARYccGVyc29uYWwtZnJlZW1haWxAdGhh
+d3RlLmNvbTAeFw0wMzA3MTcwMDAwMDBaFw0xMzA3MTYyMzU5NTlaMGIxCzAJBgNVBAYTAlpB
+MSUwIwYDVQQKExxUaGF3dGUgQ29uc3VsdGluZyAoUHR5KSBMdGQuMSwwKgYDVQQDEyNUaGF3
+dGUgUGVyc29uYWwgRnJlZW1haWwgSXNzdWluZyBDQTCBnzANBgkqhkiG9w0BAQEFAAOBjQAw
+gYkCgYEAxKY8VXNV+065yplaHmjAdQRwnd/p/6Me7L3N9VvyGna9fww6YfK/Uc4B1OVQCjDX
+AmNaLIkVcI7dyfArhVqqP3FWy688Cwfn8R+RNiQqE88r1fOCdz0Dviv+uxg+B79AgAJk16em
+u59l0cUqVIUPSAR/p7bRPGEEQB5kGXJgt/sCAwEAAaOBlDCBkTASBgNVHRMBAf8ECDAGAQH/
+AgEAMEMGA1UdHwQ8MDowOKA2oDSGMmh0dHA6Ly9jcmwudGhhd3RlLmNvbS9UaGF3dGVQZXJz
+b25hbEZyZWVtYWlsQ0EuY3JsMAsGA1UdDwQEAwIBBjApBgNVHREEIjAgpB4wHDEaMBgGA1UE
+AxMRUHJpdmF0ZUxhYmVsMi0xMzgwDQYJKoZIhvcNAQEFBQADgYEASIzRUIPqCy7MDaNmrGcP
+f6+svsIXoUOWlJ1/TCG4+DYfqi2fNi/A9BxQIJNwPP2t4WFiw9k6GX6EsZkbAMUaC4J0niVQ
+lGLH2ydxVyWN3amcOY6MIE9lX5Xa9/eH1sYITq726jTlEBpbNU1341YheILcIRk13iSx0x1G
+/11fZU8xggK6MIICtgIBATBpMGIxCzAJBgNVBAYTAlpBMSUwIwYDVQQKExxUaGF3dGUgQ29u
+c3VsdGluZyAoUHR5KSBMdGQuMSwwKgYDVQQDEyNUaGF3dGUgUGVyc29uYWwgRnJlZW1haWwg
+SXNzdWluZyBDQQIDDrk2MAkGBSsOAwIaBQCgggGnMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0B
+BwEwHAYJKoZIhvcNAQkFMQ8XDTA2MDEyNjEzMDMyM1owIwYJKoZIhvcNAQkEMRYEFC29HEkq
+pcBOBU07IYQD6D0YvTaJMFIGCSqGSIb3DQEJDzFFMEMwCgYIKoZIhvcNAwcwDgYIKoZIhvcN
+AwICAgCAMA0GCCqGSIb3DQMCAgFAMAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEoMHgGCSsGAQQB
+gjcQBDFrMGkwYjELMAkGA1UEBhMCWkExJTAjBgNVBAoTHFRoYXd0ZSBDb25zdWx0aW5nIChQ
+dHkpIEx0ZC4xLDAqBgNVBAMTI1RoYXd0ZSBQZXJzb25hbCBGcmVlbWFpbCBJc3N1aW5nIENB
+AgMOuTYwegYLKoZIhvcNAQkQAgsxa6BpMGIxCzAJBgNVBAYTAlpBMSUwIwYDVQQKExxUaGF3
+dGUgQ29uc3VsdGluZyAoUHR5KSBMdGQuMSwwKgYDVQQDEyNUaGF3dGUgUGVyc29uYWwgRnJl
+ZW1haWwgSXNzdWluZyBDQQIDDrk2MA0GCSqGSIb3DQEBAQUABIGAB8tNXTXO9TkMByH7yeen
+HofduTr6lD1km5kmRdBQnpWRG4MymQMLE58bGGryvwbVxIgyZC0NKSh6Im5hKp4tlex0stUK
+kERVVMp0hwLBUUXSiO8rlVTctntgv6PWNjoM7ZTpE0nieuJCQdGWWgxCi8YuHzHZwBNxBJ3N
+tgYQI14AAAAAAAA=
+--------------ms020209040509000208040600--
 
 
 -------------------------------------------------------
