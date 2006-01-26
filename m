@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] alsa plugin progress
+Subject: Re: [Bluez-devel] Patch manpage
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43D7270C.5020805@xmission.com>
-References: <43D7270C.5020805@xmission.com>
+In-Reply-To: <a63d67fe0601260006y5d252801n@mail.gmail.com>
+References: <a63d67fe0601260006y5d252801n@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1138270383.5901.25.camel@localhost>
+Message-Id: <1138270078.5901.16.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,22 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Jan 2006 11:13:03 +0100
+Date: Thu, 26 Jan 2006 11:07:58 +0100
 
-Hi Brad,
+Hi Dan,
 
-> I've been tweaking the alsa plugin. How close was it when you had it?
+> Before:
+> $ whatis sdpd
+> sdpd (8)             - SDP daemon
 > 
-> For now, I am setting the socket to nonblocking and polling until the
-> connect succeeds (I keep trying when errno is EAGAIN). I can connect and
-> things seem to be working but there is no audio. It looks like there's a
-> mismatch with audio settings but I'm not sure where that's happening.
+> After:
+> $ whatis sdpd
+> sdpd (8)             - Bluetooth SDP daemon
+> 
+> regards,
+> dan carpenter
+> 
+> --- sdpd/sdpd.8 31 Mar 2004 21:39:10 -0000      1.1
+> +++ sdpd/sdpd.8 26 Jan 2006 07:58:05 -0000
+> @@ -53,7 +53,7 @@
+>  .ta 8n 16n 24n 32n 40n 48n 56n 64n 72n
+>  .TH "sdpd" "8"
+>  .SH "NAME"
+> -sdpd \(em SDP daemon
+> +sdpd \(em Bluetooth SDP daemon
+>  .SH "SYNOPSIS"
+>  .PP
+>  \fBsdpd\fR [\fIoptions\fR]
 
-it was working somehow and sometimes I totally messed it up. The ALSA
-plugins are really designed for sound cards and for some options I
-actually have no idea how to translate them correctly into A2DP. Maybe
-you should simply play with different options and then might ask the
-gurus from the ALSA mailing list.
+applied. Thanks.
 
 Regards
 
