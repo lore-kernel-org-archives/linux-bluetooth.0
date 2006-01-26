@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Patch manpage
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43D89EBB.3060908@gmx.net>
+From: Maximilian Michel <pinky99@gmx.net>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <a63d67fe0601260006y5d252801n@mail.gmail.com>
-References: <a63d67fe0601260006y5d252801n@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1138270078.5901.16.camel@localhost>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: [Bluez-devel] PAN with DLink Access Point DBT-900AP
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,40 +16,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Jan 2006 11:07:58 +0100
+Date: Thu, 26 Jan 2006 11:04:43 +0100
 
-Hi Dan,
+Hi,
 
-> Before:
-> $ whatis sdpd
-> sdpd (8)             - SDP daemon
-> 
-> After:
-> $ whatis sdpd
-> sdpd (8)             - Bluetooth SDP daemon
-> 
-> regards,
-> dan carpenter
-> 
-> --- sdpd/sdpd.8 31 Mar 2004 21:39:10 -0000      1.1
-> +++ sdpd/sdpd.8 26 Jan 2006 07:58:05 -0000
-> @@ -53,7 +53,7 @@
->  .ta 8n 16n 24n 32n 40n 48n 56n 64n 72n
->  .TH "sdpd" "8"
->  .SH "NAME"
-> -sdpd \(em SDP daemon
-> +sdpd \(em Bluetooth SDP daemon
->  .SH "SYNOPSIS"
->  .PP
->  \fBsdpd\fR [\fIoptions\fR]
+I have a problem with connecting to this access point.
 
-applied. Thanks.
+I do following:
 
-Regards
+fry ~ # hcitool scan
+Scanning ...
+         00:0D:88:9F:38:A5       DBT-900AP
 
-Marcel
+fry ~ # pand --service NAP -Q -n
+pand[7714]: Bluetooth PAN daemon version 2.24
+pand[7714]: Inquiring
+pand[7714]: Searching for NAP on 00:0D:88:9F:38:A5
+pand[7714]: Failed to connect to the SDP server. Function not 
+implemented(38)
 
 
+fry ~ # pand --connect 00:0D:88:9F:38:A5 -n
+pand[7904]: Bluetooth PAN daemon version 2.24
+pand[7904]: Connecting to 00:0D:88:9F:38:A5
+pand[7904]: Connect to 00:0D:88:9F:38:A5 failed. Function not 
+implemented(38)
+fry ~ #
+
+Is it possible to connect my pc to this ap or is impossible due to an 
+unimplemented bluetooth requirement?
+I'm using gentoo with
+net-wireless/bluez-libs 2.24
+net-wireless/bluez-utils 2.24
+
+
+Thanks,
+Maximilian
 
 
 -------------------------------------------------------
