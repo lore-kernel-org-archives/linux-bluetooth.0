@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problem trying to connect second PANU
+Subject: Re: [Bluez-users] Best Evaluation Kit
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <6916dea20601251400g667d13edm@mail.gmail.com>
-References: <6916dea20601251400g667d13edm@mail.gmail.com>
+In-Reply-To: <5fed34b0601260131r23576c32g89a96f05bd8e6f10@mail.gmail.com>
+References: <5fed34b0601260131r23576c32g89a96f05bd8e6f10@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1138270257.5901.22.camel@localhost>
+Message-Id: <1138270160.5901.19.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,39 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Jan 2006 11:10:57 +0100
+Date: Thu, 26 Jan 2006 11:09:20 +0100
 
-Hi Alexandre,
+Hi Javier,
 
-> I have 3 laptop computers running Debian Linux Kernel 2.6 and Bluez.
-> My scenario is as following:
-> 
-> PANU1------->GN<----------PANU2
-> 
-> I created the connection by:
-> 
-> GN:
-> pand --listen --role GN
-> ifconfig bnep0 10.0.0.1
-> 
-> PANU1
-> pand --connect <GN_ADDR>
-> ifconfig bnep0 10.0.0.2
-> 
-> This connection went well and I "pinged" both each other.
-> 
-> So, I tried to connect the PANU2 to GN by:
-> pand --connect <GN_ADDR>
-> ifconfig bnep0 10.0.0.3
-> 
-> But I could not ping GN (10.0.0.1) anymore from PANU2.
-> I tried to ifconfig bnep1 10.0.0.4 and ping it from PANU2 and no
-> answer too.
-> So the second slave to the piconet is no established (the first one is
-> ok yet).
+> I would like to know if anyone could help me in buying an evaluation
+> kit. I want an evaluation kit to develop an application with Bluez and
+> to see different parameters like RSSI, link quality or Transmit power
+> Control in different devices. If anyone can advise me, I'd be very
+> grateful. I'd like to know also different prices and where to
+> buy them.
 
-every PAN connection gets its own bnepX device and of you have multiple
-on one side (like the GN) you need to bridge them.
+I personally love my CSR Casira development kits, but you might get away
+with a bunch of USB dongles.
 
 Regards
 
