@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43D8A247.8050306@3max.de>
-From: Maximilian Michel <max@3max.de>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] PAN with DLink Access Point DBT-900AP
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-devel] Re: PAN with DLink Access Point DBT-900AP
+In-Reply-To: <43D89EBB.3060908@gmx.net>
+References: <43D89EBB.3060908@gmx.net>
+Content-Type: text/plain
+Message-Id: <1138270503.5901.28.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,24 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Jan 2006 11:19:51 +0100
+Date: Thu, 26 Jan 2006 11:15:03 +0100
 
-I think now it's a PIN problem.
+Hi Maximilian,
 
-as i can see from hcidump
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-     bdaddr 00:0D:88:9F:38:A5 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Role Change (0x12) plen 8
- > HCI Event: PIN Code Request (0x16) plen 6
+> I have a problem with connecting to this access point.
+> 
+> I do following:
+> 
+> fry ~ # hcitool scan
+> Scanning ...
+>          00:0D:88:9F:38:A5       DBT-900AP
 
-the establishment of the connection requires a PIN, but no pin_helper or 
-anything else is opened. What do i have to change?
+check with "sdptool browse --l2cap --raw 00:0D:88:9F:38:A5" what this
+device really supports. Run "hcidump -X -V" in another terminal if you
+encounter any problems.
 
-Thanks,
+Regards
 
-Maximilian
+Marcel
+
+
 
 
 -------------------------------------------------------
