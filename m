@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060127081807.37283.qmail@web50509.mail.yahoo.com>
-From: Mahtab Hossain <mahtab_hossain2002@yahoo.com>
-To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1635045577-1138349887=:37066"
-Subject: [Bluez-users] hci_create_connection
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C62303.6F7EFC90"
+Message-ID: <72E45C253B3AEC45B17C71D5C145B93615F6BE@CNSCNXMS02.ap.sony.com>
+From: "Ye, Bird" <Bird.Ye@sony.com.cn>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] bluetooth suspend/resume support
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,46 +17,126 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 27 Jan 2006 00:18:07 -0800 (PST)
+Date: Fri, 27 Jan 2006 13:35:08 +0800
 
---0-1635045577-1138349887=:37066
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+This is a multi-part message in MIME format.
 
-I know this has been discussed a lot of times in  this list and the conclusion was that, only use "hci_create_connection"  for debugging purpose.
-  
-  I created the connections with "hci_create_connection" and the  connection gets lost everytime after 40-50 seconds just like the  following email from this list (mine are BroadCom based Dongles):
-  
-  
-"I am connecting a Armadillo CF card to a TDK PC card using "hcitool cc
- <BD_ADDR>".  The connection appears fine, but after a short period (40 sec
- or so) seems to drop off.  I am running a script to monitor the RSSI values.
- This worked fine with a 3Com card, but connection drops with the TDK.
- 
- Any ideas why?
- 
- Tim"
- 
-  I didn't see any follow-ups to this email. Any insights on why this  should happen. I know "hci_create_connection" makes link-level  connections without taking into account the transport level protocols  (like L2CAP) running on the host. But for the RSSI, TPL etc.  extraction, I need to create only link-level connection so  "hci_create_connection" would have been perfect choice for me without  that problem. Any explanation?
-  If not successful, I have to work around it by creating higher transport level connections it seems.
-  
-  Thanks
-  Mahtab
-  
+------_=_NextPart_001_01C62303.6F7EFC90
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-			
----------------------------------
- Yahoo! Autos. Looking for a sweet ride? Get pricing, reviews, & more on new and used cars.
---0-1635045577-1138349887=:37066
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Hi all,=20
 
-<div id="RTEContent">I know this has been discussed a lot of times in  this list and the conclusion was that, only use "hci_create_connection"  for debugging purpose.<br>  <br>  I created the connections with "hci_create_connection" and the  connection gets lost everytime after 40-50 seconds just like the  following email from this list (mine are BroadCom based Dongles):<br>  <br>  <pre>"I am connecting a Armadillo CF card to a TDK PC card using "hcitool cc<br> &lt;BD_ADDR&gt;".  The connection appears fine, but after a short period (40 sec<br> or so) seems to drop off.  I am running a script to monitor the RSSI values.<br> This worked fine with a 3Com card, but connection drops with the TDK.<br> <br> Any ideas why?<br> <br> Tim"<br> </pre>  I didn't see any follow-ups to this email. Any insights on why this  should happen. I know "hci_create_connection" makes link-level  connections without taking into account the transport level protocols  (like L2CAP) running on the host. 
- But for
- the RSSI, TPL etc.  extraction, I need to create only link-level connection so  "hci_create_connection" would have been perfect choice for me without  that problem. Any explanation?<br>  If not successful, I have to work around it by creating higher transport level connections it seems.<br>  <br>  Thanks<br>  Mahtab<br>  </div><p>
-	
-		<hr size=1> <a href="http://us.rd.yahoo.com/evt=38381/ ylc=X3oDMTEzcGlrdGY5BF9TAzk3MTA3MDc2BHNlYwNtYWlsdGFncwRzbGsDMWF1dG9z/*http://autos.yahoo.com/index.html ">Yahoo! Autos</a>. Looking for a sweet ride? Get pricing, reviews, & more on new and used cars.
---0-1635045577-1138349887=:37066--
+Is the newest bluez or the linux 2.6 bluetooth protocol support the
+suspend and resume function?
+
+=20
+
+Bird ~
+
+=20
+
+=20
+
+
+------_=_NextPart_001_01C62303.6F7EFC90
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dus-ascii">
+<meta name=3DGenerator content=3D"Microsoft Word 10 (filtered)">
+
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:SimSun;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+@font-face
+	{font-family:SimSun;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	font-size:10.5pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{font-family:"Courier New";
+	color:windowtext;
+	font-weight:normal;
+	font-style:normal;
+	text-decoration:none none;}
+ /* Page Definitions */
+ @page Section1
+	{size:595.3pt 841.9pt;
+	margin:72.0pt 90.0pt 72.0pt 90.0pt;
+	layout-grid:15.6pt;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=3DZH-CN link=3Dblue vlink=3Dpurple =
+style=3D'text-justify-trim:punctuation'>
+
+<div class=3DSection1 style=3D'layout-grid:15.6pt'>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.5pt;font-family:"Courier New"'>Hi all, =
+</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.5pt;font-family:"Courier New"'>Is the newest bluez =
+or the linux
+2.6 bluetooth protocol support the suspend and resume =
+function?</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.5pt;font-family:"Courier =
+New"'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.5pt;font-family:"Courier New"'>Bird =
+~</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.5pt;font-family:"Courier =
+New"'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal align=3Dleft =
+style=3D'margin-left:21.0pt;text-align:left;
+text-autospace:none'><font size=3D2 face=3D"Times New Roman"><span =
+lang=3DEN-US>&nbsp;</span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------_=_NextPart_001_01C62303.6F7EFC90--
 
 
 -------------------------------------------------------
