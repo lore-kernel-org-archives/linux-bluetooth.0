@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Question concerning l2cap_parse_conf_req()
+Subject: Re: [Bluez-devel] possible minor bug in l2cap.c
 From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1137698545.22814.11.camel@localhost.localdomain>
-References: <1137698545.22814.11.camel@localhost.localdomain>
+In-Reply-To: <1137082576.20029.8.camel@localhost.localdomain>
+References: <1137082576.20029.8.camel@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Message-Id: <1138354614.7949.11.camel@localhost.localdomain>
+Message-Id: <1138353979.7949.1.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,46 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 27 Jan 2006 10:36:54 +0100
+Date: Fri, 27 Jan 2006 10:26:19 +0100
 
-Am Donnerstag, den 19.01.2006, 20:22 +0100 schrieb Martin R=C3=B6hricht:
-> I'm partly rewriting the l2cap_parse_conf_req() function but there's
-> something that I do not quite understand and perhaps one from this list
-> has an idea.
-> In this mentioned function we use a while() loop that checks the length
-> of the remaining configuration request; inside the loop the length field
-> is continuously decreased. Now my question comes into play: Why do we
-> need this while loop? As we are already in a configuration request (code
-> 0x04), I can't see anything in the current specification that we might
-> have more than one =C2=BBConfiguration Options=C2=AB within one Configura=
-tion
-> Request packet. The Continuation flag (C) has a different meaning:
-> 	=C2=BBWhen all configuration options cannot fit into a Configuration=20
-> 	 Request with length that does not exceed the receiver's=20
-> 	 MTUsig, the options shall be passed in multiple configuration=20
-> 	 command packets.=C2=AB (page 48 of BLUETOOTH SPECIFICATION Version=20
-> 	 2.0 + EDR [vol 4])
-> I see that we can have multiple commands in one L2CAP packet (see page
-> 41), but if we parse only one Configuration Request that shouldn't
-> apply.
+Am Donnerstag, den 12.01.2006, 17:16 +0100 schrieb Martin R=C3=B6hricht:
+> Hello together,
+>=20
+> I was wondering if there is an uninitialised variable in use:
+> In function l2cap_config_req() we declare =C2=BBu8 rsp[64];=C2=AB and cal=
+l it only
+> twice:
+> 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
+> 		l2cap_build_conf_rsp(sk, rsp, NULL), rsp);
+> 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
+> 		l2cap_build_conf_rsp(sk, rsp, &result), rsp);
+>=20
+> In l2cap_build_conf_rsp() (rsp changed its name to data) we access it
+> like that:
+> 	struct l2cap_conf_rsp *rsp =3D data;
+>         void *ptr =3D rsp->data;
+>=20
+> I think whatever is going to be in ptr is from now on undefined, right?
+> But maybe I'm just wrong and someone could help me out?!
 
-I think I changed my point of view. In figure 4.6 (Configuration Request
-Packet) on page 48 the specification treats =C2=BBConfiguration
-options=C2=AB (plural form) and later they say:
-	=C2=BBEach configuration request shall contain an integral number of=20
-	 options. [...] The result of the configuration transaction is=20
-	 the union of all the result values.=C2=AB
-So I think it's still not 100% clear from the specification but I would
-assume that a configuration request packet may contain more than only on
-configuration option, e.g. MTU + QoS + RFC.=20
-But what happens if the configuration request contains one of these
-options more than once? Let's say the remote peer sends MTU + MTU.
-Should we use the last value? What happens if the remote peer sends a
-config request with one option that we do not know of, e.g. MTU + RFC --
-shall we process the MTU or reject the whole request? In best case, the
-remote peer took it's information from an information request, but
-that's not mandatory.=20
-I think the specification is not precise enough in some points.
+I was wrong -- ptr is set some lines later. Everything should be fine
+with it so far.
 
 Martin
 
