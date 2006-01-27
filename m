@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hci_create_connection
+Subject: Re: [Bluez-users] Casira development kit
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20060127081807.37283.qmail@web50509.mail.yahoo.com>
-References: <20060127081807.37283.qmail@web50509.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1138356749.25397.14.camel@localhost>
+In-Reply-To: <5fed34b0601270055p4874eabfm82bd65273b83e263@mail.gmail.com>
+References: <5fed34b0601270055p4874eabfm82bd65273b83e263@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1138356657.25397.11.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,30 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 27 Jan 2006 11:12:29 +0100
+Date: Fri, 27 Jan 2006 11:10:57 +0100
 
-Hi Mahtab,
+Hi Javier,
 
-> I know this has been discussed a lot of times in this list and the
-> conclusion was that, only use "hci_create_connection" for debugging
-> purpose.
+> I have seen the characteristics of the casira evaluation kit and seems
+> good enough, but it is really expensive (around 3000 =E2=82=AC). I have=
+ seen
+> also the BlueCore Host Software Evaluation Kit and it still goes out
+> of my budget. If you could advise me something cheaper where I can
+> develop and see those parameters, it would be much better, because if
+> I can use usb dongles, I would just need a good software to develop
+> and see how those usb dongles work. I prefer that much more, specially
+> because it would be much cheaper.=20
 
-then stick with it.
-
-> I created the connections with "hci_create_connection" and the
-> connection gets lost everytime after 40-50 seconds just like the
-> following email from this list (mine are BroadCom based Dongles):
-> 
-> "I am connecting a Armadillo CF card to a TDK PC card using "hcitool cc
->  <BD_ADDR>".  The connection appears fine, but after a short period (40 sec
->  or so) seems to drop off.  I am running a script to monitor the RSSI values.
->  This worked fine with a 3Com card, but connection drops with the TDK.
->  
->  Any ideas why?
-
-we should a device keep a not used ACL link open. This costs power. I
-also don't think that this is a problem of your card. It is a problem of
-your target device. In general BlueZ doesn't drop connections.
+as I said, you might get away we a bunch of CSR based USB dongles.
 
 Regards
 
