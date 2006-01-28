@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43DC6114.70103@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Jean-Claude Repetto <jrepetto@free.fr>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] 32-bit sbc now in CVS
+Message-id: <52492.192.168.0.2.1138486931.squirrel@jcr.homelinux.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=iso-8859-1
+Subject: [Bluez-devel] dund needs pppd
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,34 +16,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 28 Jan 2006 23:30:44 -0700
+Date: Sat, 28 Jan 2006 23:22:11 +0100 (CET)
 
-guys
+May be it is an evidence for a bluetooth developper, but, as a beginner in
+the bluetooth area,  I spend a lot of time trying to establish a
+connection with a bluetooth device before I looked at the source code of
+dund and realized it needed pppd installed on the computer.
 
-FYI, I worked through the scaling to get 32-bit decoding to work. I
-committed this and made the 32-bit encoder/decoder the default when you
-enable fixed-point.
+dund reports no error message !
 
-It turns out that we are counting on undefined compiler behavior in
-several places.
+I think it should be nice for future users to add an error message like
+that :
 
- signed_var >> x
+diff -ru bluez-utils-2.19.orig/dund/dun.c bluez-utils-2.19/dund/dun.c
+--- bluez-utils-2.19.orig/dund/dun.c    2006-01-28 22:33:47.000000000 +0100
++++ bluez-utils-2.19/dund/dun.c 2006-01-28 22:31:10.000000000 +0100
+@@ -175,6 +175,7 @@
+                close(fd);
 
-Is not necessarily defined to perform an arithmetic shift. It *could* be
-replaced by:
+        execvp(prog, args);
++        syslog(LOG_INFO, "Error while executing %s\n", prog);
+        exit(1);
+ }
 
- signed_var / (1 << x)
+Thanks,
 
-And while this will always produce the correct value, we can't count on
-it being performed optimally (ie, it could really generate a heavyweight
-division op)
+Jean-Claude
 
-I'm inclined to leave it as-is. Maybe there's an autoconf test to
-confirm this compiler behavior, boiling down to:
 
- ASSERT(-2 >> 1 == -1)
 
-Brad
+
 
 
 -------------------------------------------------------
