@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000801c62521$5b400ab0$211ea8c0@asif>
-From: "Asif Khan" <u2002029@giki.edu.pk>
-To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <43DC6114.70103@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0005_01C6254B.4341F9D0"
-Subject: [Bluez-devel] Function for setting user friendly name of bluetooh node
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] 32-bit sbc now in CVS
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,50 +16,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 30 Jan 2006 03:14:20 +0500
+Date: Sat, 28 Jan 2006 23:30:44 -0700
 
-This is a multi-part message in MIME format.
+guys
 
-------=_NextPart_000_0005_01C6254B.4341F9D0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+FYI, I worked through the scaling to get 32-bit decoding to work. I
+committed this and made the 32-bit encoder/decoder the default when you
+enable fixed-point.
 
-Hello Guys!!
-                  Whats the function for setting/changing the user =
-friendly name of the bluetooth node=20
-                   and how to put a unit in inquiry scan mode (like =
-hci_inquiry is for inquiry)
-------=_NextPart_000_0005_01C6254B.4341F9D0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+It turns out that we are counting on undefined compiler behavior in
+several places.
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2800.1106" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hello Guys!!</FONT></DIV>
-<DIV><FONT face=3DArial=20
-size=3D2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
-Whats the function for setting/changing the user friendly name of the =
-bluetooth=20
-node </FONT></DIV>
-<DIV><FONT face=3DArial=20
-size=3D2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
-and how to put a unit in inquiry scan mode (like hci_inquiry is for=20
-inquiry)</FONT></DIV></BODY></HTML>
+ signed_var >> x
 
-------=_NextPart_000_0005_01C6254B.4341F9D0--
+Is not necessarily defined to perform an arithmetic shift. It *could* be
+replaced by:
 
+ signed_var / (1 << x)
 
+And while this will always produce the correct value, we can't count on
+it being performed optimally (ie, it could really generate a heavyweight
+division op)
 
+I'm inclined to leave it as-is. Maybe there's an autoconf test to
+confirm this compiler behavior, boiling down to:
+
+ ASSERT(-2 >> 1 == -1)
+
+Brad
 
 
 -------------------------------------------------------
