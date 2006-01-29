@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060129115802.46051.qmail@web8412.mail.in.yahoo.com>
-From: shankar marrapu <hifrom122@yahoo.co.in>
-To: bluez-users@lists.sf.net
+Message-ID: <37f261b0601282344k416742d1j@mail.gmail.com>
+From: Hugo van der Merwe <hugovdm@gmail.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <37f261b0601120821t3b0449f4me94b7b73707d49a8@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1142756951-1138535882=:42886"
-Subject: [Bluez-users] Need Bluetooth stack code
+Content-Type: text/plain; charset=ISO-8859-1
+References: <37f261b0601090736w6d7157d6x6ea876ecafb3572e@mail.gmail.com>
+	 <37f261b0601120320n516e7466ld95aa0b2d1ac9f83@mail.gmail.com>
+	 <37f261b0601120821t3b0449f4me94b7b73707d49a8@mail.gmail.com>
+Subject: [Bluez-users] Re: Two "identical" laptops, same phone, one works, one doesn't
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,60 +20,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 29 Jan 2006 11:58:02 +0000 (GMT)
+Date: Sun, 29 Jan 2006 09:44:19 +0200
 
---0-1142756951-1138535882=:42886
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+For the record, for future reference by other people having similar
+problems, I've solved this problem, with the help of a tip from a
+friend. He said I should wipe /var/lib/bluetooth/* to start from
+scratch. That solved the problem.
 
-  Hai,
-   
-            I  am doing Blue Tooth project( File transferring between two systems using BlueTooth). I need help regarding execution of JAVA Blue Tooth API’s demo programs 
-   
-   I have
-  1) downloaded JAVA Blue Tooth API’s from the site 
-  2) downloaded JAVAX.comm 2.0 win 32 
-   
-  I am using
-   
-    J2ME CLDC version 1.0 ,   MIDP
-    J2ME wireless Toolkit 2.2
-    Jdk1.5.0
-  Linux
-   
-   
-  Please suggest the necessary configuration if any, and also guide me how to execute JAVA Blue Tooth API’s demo programs in J2ME under the configuration mentioned above.
-   
-  If you have BlueTooth Stack code please send to me. 
-   
-    Reply as soon as possible.
-   
-  Thanking you ,
-   
-  Yoursfaithfully,
-  Gowri Shankar.
-   
+Very odd, iirc: the bluetooth directory contained one directory, which
+was the bdaddr of a second phone I tested, not the one I'm now using
+with the laptop. Surprised that /var/lib/bluetooth/* could have
+anything to do with it then...
 
+Anyway, the tip of wiping /var/lib/bluetooth/* was as a solution to
+the "Can't connect RFCOMM socket: Connection refused" error message.
 
-				
----------------------------------
- Jiyo cricket on Yahoo! India cricket
---0-1142756951-1138535882=:42886
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-<DIV id=RTEContent>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT face="Times New Roman" size=3>Hai,</FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman">&nbsp;<?xml:namespace prefix = o ns = "urn:schemas-microsoft-com:office:office" /><o:p></o:p></FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman"><SPAN style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </SPAN>I<SPAN style="mso-spacerun: yes">&nbsp; </SPAN>am doing Blue Tooth project( File transferring between two systems using BlueTooth). I need help regarding execution of JAVA Blue Tooth API’s demo programs </FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman">&nbsp;<o:p></o:p></FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman"><SPAN style="mso-spacerun:
- yes">&nbsp;</SPAN>I have</FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT face="Times New Roman" size=3>1) downloaded JAVA Blue Tooth API’s from the site </FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT face="Times New Roman" size=3>2) downloaded JAVAX.comm 2.0 win 32 </FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman">&nbsp;<o:p></o:p></FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT face="Times New Roman" size=3>I am using</FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman">&nbsp;<o:p></o:p></FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman"><SPAN style="mso-spacerun: yes">&nbsp; </SPAN>J2ME CLDC version 1.0 ,<SPAN style="mso-spacerun: yes">&nbsp;&nbsp; </SPAN>MIDP</FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt">
- <FONT
- size=3><FONT face="Times New Roman"><SPAN style="mso-spacerun: yes">&nbsp; </SPAN>J2ME wireless Toolkit 2.2</FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman"><SPAN style="mso-spacerun: yes">&nbsp; </SPAN>Jdk1.5.0</FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman"><SPAN style="mso-spacerun: yes">Linux</SPAN></FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman">&nbsp;<o:p></o:p></FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman">&nbsp;<o:p></o:p></FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT face="Times New Roman" size=3>Please suggest the necessary configuration if any, and also guide me how to execute JAVA Blue Tooth API’s demo programs in J2ME under the configuration mentioned above.</FONT></div>  <div
- class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman">&nbsp;<o:p></o:p></FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT face="Times New Roman" size=3>If you have BlueTooth Stack code please send to me. </FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman">&nbsp;<o:p></o:p></FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman"><SPAN style="mso-spacerun: yes">&nbsp; </SPAN>Reply as soon as possible.</FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman">&nbsp;<o:p></o:p></FONT></FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT face="Times New Roman" size=3>Thanking you ,</FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman">&nbsp;<o:p></o:p></FONT></FONT></div>  <div class=MsoNormal
- style="MARGIN: 0in 0in 0pt"><FONT face="Times New Roman" size=3>Yoursfaithfully,</FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT face="Times New Roman" size=3>Gowri Shankar.</FONT></div>  <div class=MsoNormal style="MARGIN: 0in 0in 0pt"><FONT size=3><FONT face="Times New Roman">&nbsp;<o:p></o:p></FONT></FONT></div></DIV><p>
-	
-
-	
-		<hr size=1> 
-Jiyo cricket on <a href="http://us.rd.yahoo.com/mail/in/mailcricket/*http://in.sports.yahoo.com/cricket/">Yahoo! India cricket</a>
---0-1142756951-1138535882=:42886--
+Thanks,
+Hugo
 
 
 -------------------------------------------------------
