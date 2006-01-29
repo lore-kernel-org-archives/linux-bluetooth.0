@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43DD3738.1070700@darkmetatron.de>
-From: =?ISO-8859-1?Q?Sebastian_Be=DFler?= <webmaster@darkmetatron.de>
-MIME-Version: 1.0
+From: Robert Siemer <Robert.Siemer@backsla.sh>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Boot Protocol Problem with Microsoft Keyboard/Mouse
-References: <4348E48C.5070305@darkmetatron.de> <43DD1E98.5010907@darkmetatron.de> <20060129210356.GQ12615@polar.elf12.net>
-In-Reply-To: <20060129210356.GQ12615@polar.elf12.net>
+Message-ID: <20060129210356.GQ12615@polar.elf12.net>
+References: <4348E48C.5070305@darkmetatron.de> <43DD1E98.5010907@darkmetatron.de>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <43DD1E98.5010907@darkmetatron.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 29 Jan 2006 22:44:24 +0100
+Date: Sun, 29 Jan 2006 22:03:56 +0100
 
-Robert Siemer wrote:
->> My question now is:
->> Is there a kernel-patch to come for 2.6.15 or what should/could I do to
->> get it work again? I don't wanna downgrade to <2.6.15 if it isn't really
->> necessary.
-> 
-> a) wait
-> b) try to apply the 2.6.14 patch
+> My question now is:
+> Is there a kernel-patch to come for 2.6.15 or what should/could I do to
+> get it work again? I don't wanna downgrade to <2.6.15 if it isn't really
+> necessary.
 
-I assume i have to take a) because b) only gave me "Reversed (or
-previously applied) patch detected!"-messages.
+a) wait
+b) try to apply the 2.6.14 patch
 
-If nothing other goes i search for my USB-mouse, because I really miss
-my scrollwheel.
 
-Sebastian
+I have not looked at it, but b) will probably work if the kernel didn't
+changed too much in that region...
+
+
+Robert
 
 
 -------------------------------------------------------
