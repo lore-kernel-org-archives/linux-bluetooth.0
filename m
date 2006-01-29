@@ -1,43 +1,64 @@
-Return-Path: <karl.h.beckers@gmx.net>
-Subject: Re: Re: [Bluez-users] repairing required after each dialup
-From: "Karl H. Beckers" <karl.h.beckers@gmx.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <1136576435.17973.1.camel@localhost>
-References: <1136566815.17866.2.camel@localhost.localdomain>
-	 <1136576435.17973.1.camel@localhost>
-Content-Type: text/plain
-Date: Sun, 29 Jan 2006 21:16:01 +0100
-Message-Id: <1138565761.8768.1.camel@localhost.localdomain>
-Mime-Version: 1.0
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <43DD1A28.5090909@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] ekiga and BTSCO
+References: <43DD162D.3060602@cs.bgu.ac.il>
+In-Reply-To: <43DD162D.3060602@cs.bgu.ac.il>
+Content-Type: text/plain; charset=UTF-8
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sun, 29 Jan 2006 12:40:24 -0700
 
-Am Freitag, den 06.01.2006, 20:40 +0100 schrieb Marcel Holtmann:
-> Hi Karl,
+Niv
+
+Can you try recording your voice using something like 'arecord' and see
+if the problem still happens in a simpler scenario?
+
+Brad
+
+> I started using Ekiga (gnomemeeting 2.0) with the BTSCO,
 > 
-> > attached you'll find the dumps of:
-> > 1) me doing "ifdown ppp0" which for some reason also quits rfcomm
-> > (hcidump-drop-conn.txt)
-> > 2) me trying "rfcomm connect 0" again and getting "Connection refused"
-> > (hcidump-conn-refused.txt)
-> > 3) same thing this time after deleting the laptop from the phone's list
-> > before trying the connect
-> > (hcidump-conn-repaired.txt)
+> I can hear my father , who is using x-lite SIP client perfectly,
 > 
-> this really looks like a bug in the phone for me. You might wanna ask
-> them for a firmware update.
+> however he heres me very badly, noise and cut-ups.
 > 
-> Regards
+> Does anyone have any experience using the two?
 > 
-> Marcel
+> 
+> Niv
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc. Do you grep through log
+> files
+> for problems?  Stop!  Download the new AJAX search engine that makes
+> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-Hi,
 
-tried raising the issue with SE ... to not much avail, yet.
 
-Doesn't it also sound a lot like "4. Re: Strange things with SE K750i
-and remote control (rangzen)" ?
-
-Cheers,
-
-Karl.
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
