@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Need Bluetooth stack code
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Martin Stolle <mstoll@sus.mcgill.ca>
 To: bluez-users@lists.sourceforge.net
-Cc: bluez-users@lists.sf.net
-In-Reply-To: <20060129115802.46051.qmail@web8412.mail.in.yahoo.com>
-References: <20060129115802.46051.qmail@web8412.mail.in.yahoo.com>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <1138556876.3801.1.camel@localhost.localdomain>
+Subject: Re: [Bluez-users] Re: Two "identical" laptops, same phone, one works, one doesn't
+Message-ID: <20060129143304.GA7562@sus.mcgill.ca>
+References: <37f261b0601090736w6d7157d6x6ea876ecafb3572e@mail.gmail.com> <37f261b0601120320n516e7466ld95aa0b2d1ac9f83@mail.gmail.com> <37f261b0601120821t3b0449f4me94b7b73707d49a8@mail.gmail.com> <37f261b0601282344k416742d1j@mail.gmail.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <37f261b0601282344k416742d1j@mail.gmail.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,33 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 29 Jan 2006 18:47:56 +0100
+Date: Sun, 29 Jan 2006 09:33:07 -0500
 
-Hi,
+On Sun, Jan 29, 2006 at 09:44:19AM +0200, Hugo van der Merwe wrote:
+> For the record, for future reference by other people having similar
+> problems, I've solved this problem, with the help of a tip from a
+> friend. He said I should wipe /var/lib/bluetooth/* to start from
+> scratch. That solved the problem.
+> 
 
->=20
->           I  am doing Blue Tooth project( File transferring between
-> two systems using BlueTooth). I need help regarding execution of JAVA
-> Blue Tooth API=E2=80=99s demo programs=20
-> =20
->  I have
-> 1) downloaded JAVA Blue Tooth API=E2=80=99s from the site=20
-> 2) downloaded JAVAX.comm 2.0 win 32=20
-> =20
-> I am using
-> =20
->   J2ME CLDC version 1.0 ,   MIDP
->   J2ME wireless Toolkit 2.2
->   Jdk1.5.0
+I've also had similar problems with RFCOMM, that were solved my wiping
+that directory.  In particular, I could communicate with my phone once,
+during the original pairing, and after that, future connections were
+refused.  Deleting the pairing on the phone (a Nokia 6310i), would allow
+me to re-pair, but any subsequent connections after the initial re-pair
+connection would fail until I deleted the pairing on the phone.
 
-your request has nothing to do with BlueZ and so this is the wrong
-mailing list for it.
+After a lot of grief, I finally found some random forum post about
+the /var/lib/bluetooth directory.  Is there any documentation on this?
+It seems like it stores the cryptographic keys for the pairing, and this
+mechanism changed recently in bluez?  Unfortunately, none of the man
+pages hint at this at all and the bluez webpage doesn't have any
+official documentation either.  Where should I have looked?
 
-Regards
-
-Marcel
-
-
+Martin
 
 
 
