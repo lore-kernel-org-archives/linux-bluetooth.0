@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43DD162D.3060602@cs.bgu.ac.il>
-From: Niv <nivv@cs.bgu.ac.il>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Need Bluetooth stack code
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Subject: [Bluez-users] ekiga and BTSCO
+Cc: bluez-users@lists.sf.net
+In-Reply-To: <20060129115802.46051.qmail@web8412.mail.in.yahoo.com>
+References: <20060129115802.46051.qmail@web8412.mail.in.yahoo.com>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1138556876.3801.1.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,20 +19,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 29 Jan 2006 21:23:25 +0200
+Date: Sun, 29 Jan 2006 18:47:56 +0100
 
 Hi,
 
-I started using Ekiga (gnomemeeting 2.0) with the BTSCO,
+>=20
+>           I  am doing Blue Tooth project( File transferring between
+> two systems using BlueTooth). I need help regarding execution of JAVA
+> Blue Tooth API=E2=80=99s demo programs=20
+> =20
+>  I have
+> 1) downloaded JAVA Blue Tooth API=E2=80=99s from the site=20
+> 2) downloaded JAVAX.comm 2.0 win 32=20
+> =20
+> I am using
+> =20
+>   J2ME CLDC version 1.0 ,   MIDP
+>   J2ME wireless Toolkit 2.2
+>   Jdk1.5.0
 
-I can hear my father , who is using x-lite SIP client perfectly,
+your request has nothing to do with BlueZ and so this is the wrong
+mailing list for it.
 
-however he heres me very badly, noise and cut-ups.
+Regards
 
-Does anyone have any experience using the two?
+Marcel
 
 
-Niv
 
 
 
