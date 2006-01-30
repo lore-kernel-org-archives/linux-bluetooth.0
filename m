@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <43DE617D.1010807@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: Gabriel Wicke <lists@wikidev.net>
-Message-ID: <pan.2006.01.30.19.35.06.850476@wikidev.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Subject: [Bluez-users] [micro-howto] Ericsson K700i as hid device (hidd options)
+Subject: Re: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR chipset?
+ (in USA)
+References: <20060123122802.280f747e@taco> <43D55AC7.6040500@xmission.com> <5f30e2610601301026l14b8354dne9a6eca4d0f98eea@mail.gmail.com>
+In-Reply-To: <5f30e2610601301026l14b8354dne9a6eca4d0f98eea@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,37 +19,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 30 Jan 2006 20:35:07 +0100
+Date: Mon, 30 Jan 2006 11:57:01 -0700
 
-Hi,
+Jeff
 
-I just got my Ericsson k700i to work with hidd 2.24 (Ubuntu Dapper) and
-would like to share what i needed to do:
+You could probably get something on Marcel's list from one of the UK
+retailers if you don't mind paying more... I am hoping to come across a
+domestic offering that is easy to recommend.
 
-If you never paired the phone with your computer before:
-* edit /etc/bluetooth/pin, remember the number
-If you did pair it before, but it's failing now (was the case after a
-firmware upgrade in my case), remove the old pairing information in
-/var/lib/bluetooth/<deviveId>
+Neither zonet nor bluetake have replied to emails asking what is in
+there. There's got to be someone with these who could check :(
 
-* edit /etc/default/bluez-utils
-------------
-HIDD_ENABLED=1
+I do know that the mainstream offerings: belkin, kensington, iogear are
+not using CSR.
 
-# -D (nosdp) special hack for k700i (and similar Ericsson phones afaik)
-# -Z (nocheck) also needed in the setup procedure
-HIDD_OPTIONS="--master --server -D -Z" 
-------------
-* sudo /etc/init.d/bluez-utils restart
+Brad
 
-Now you should be able to connect from your phone's remote control menu-
-enjoy!
-
-Thanks to everybody who made this possible!
--- 
-Gabriel Wicke
-
-
+> I'm also in the market for USB adapters (in the US).  Any advice for
+> which have CSR chipsets?  Am I reading you right -- are you saying
+> that bluecore4 is not yet available in a USB dongle?  That's too bad. 
+> What about other form factors?  PCI?  PCMCIA?
+> 
+> Patrick, do you know if Epox is available to the US market?
+> 
+>      thanks,
+>       jw
+> 
+> 
+> On 1/23/06, Brad Midgley <bmidgley@xmission.com> wrote:
+> 
+>>Joseph
+>>
+>>fwiw, I've been shopping around too, but I'm also looking for class 1.
+>>The best candidates for edr, class 1 csr...
+>>
+>>Zonet ZUB6201C:
+>>
+>> http://www.newegg.com/Product/Product.asp?Item=N82E16833130026
+>>
+>>And bluetake bt007ex:
+>>
+>> http://www.btboutique.com/product_info.php?cPath=26&products_id=176
+>>
+>>but I never found out from anyone if it is CSR like both of these
+>>manufacturers have used in the past. Does anyone have either of these
+>>adapters?
+>>
+>>Does anyone else think something is going on with CSR adoption rates?
+>>Vendors seem to have ignored bluecore4 and waited for broadcom edr to
+>>show up before going to bluetooth 2.0. Even those that were using
+>>bluecore2 before, like belkin, did this...
+>>
+>>Brad
 
 
 -------------------------------------------------------
