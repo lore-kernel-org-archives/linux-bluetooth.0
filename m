@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Wake-On-Bluetooth Support
+Subject: Re: Fw: [Bluez-devel] Question about the SPDTOOL and the
+	sdp_service_search_attr_req
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <44BDAFB888F59F408FAE3CC35AB4704102E49BF4@orsmsx409>
-References: <44BDAFB888F59F408FAE3CC35AB4704102E49BF4@orsmsx409>
-Content-Type: text/plain
-Message-Id: <1138731818.3968.10.camel@localhost.localdomain>
+In-Reply-To: <001701c625ed$d4921c60$c800a8c0@kazama>
+References: <001701c625ed$d4921c60$c800a8c0@kazama>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1138731763.3968.8.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,17 +19,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 31 Jan 2006 19:23:38 +0100
+Date: Tue, 31 Jan 2006 19:22:43 +0100
 
 Hi,
 
-> Does anybody know the current status of the Wake-On-Bluetooth support?  
-> For example, if I put the host into S1, can I wake it up by sending it a Bluetooth event?  
-> If this is not implemented, could someone give me a pointer on where I should be 
-> looking at for this?  
+> Have problems with the SDPTOOL . It don=C2=B4t show all services of the=
+=20
+> devices...
+>=20
+> Some can say any about this....??
+>=20
+> the sdp_service_search_attr_req function works the same...  =C2=BF?
+>=20
+> What=C2=B4s happend with BlueZ and the SDP ?
 
-this actually depends on the chip and so far I haven't seen anything
-like this. I only heard rumors about Apple doing it.
+if the remote device doesn't support the public browse group you won't
+see anything. That isn't a problem of BlueZ. However you can work around
+it with specifying --l2cap as additional option.
 
 Regards
 
