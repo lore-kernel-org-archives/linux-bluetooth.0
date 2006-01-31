@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] 32-bit libsbc
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43DF951D.6080500@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43DF951D.6080500@xmission.com>
-References: <43DF951D.6080500@xmission.com>
-Content-Type: text/plain
-Message-Id: <1138731594.3968.2.camel@localhost.localdomain>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] 32-bit libsbc
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,23 +16,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 31 Jan 2006 19:19:54 +0100
+Date: Tue, 31 Jan 2006 09:49:33 -0700
 
-Hi Brad,
+Marcel,
 
-> I cleaned up and simplified the sbc stuff. It uses a single math
-> implementation, 32-bit ints, and has no assembly. All library
-> misbehavior such as printf, exit, etc is gone.
+I cleaned up and simplified the sbc stuff. It uses a single math
+implementation, 32-bit ints, and has no assembly. All library
+misbehavior such as printf, exit, etc is gone.
 
-this sounds great. However because of the UPF, I won't have time to look
-at it until next week or so. Please remind me to set up the SBC project
-access for you.
+It still has macros for multiply and multiply-add ops but these are very
+useful for hunting down overflows. I suspect there may be situations
+where a input stream can cause an overflow so I'd like to leave those in.
 
-Regards
+The files are in btsco cvs under the subdir "sbc32"
 
-Marcel
+I dropped sbc.c, sbc_math.h, sbc_tables.h in the sbc project lib dir and
+sbc.h in its include dir and everything builds and installs just great.
 
+Do the test/util apps like sbcenc, sbcdec, sbcinfo belong somewhere in
+the libsbc project?
 
+Brad
 
 
 -------------------------------------------------------
