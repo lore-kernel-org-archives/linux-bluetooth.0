@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43DFFE2C.2050403@pagestation.com>
-From: Jerry Geis <geisj@pagestation.com>
+Message-ID: <43DFDE87.4070708@schugy.de>
+From: Christian Schuglitsch <subjectbluez@schugy.de>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] getting error on btsco of hw:3 no such device
+Subject: Re: [Bluez-users] ISSC  USB dongle Bluetooth problem
+References: <000a01c6162d$2598ad20$0200000a@EHABLAPTOP>	 <1136930560.4591.8.camel@localhost.localdomain>	 <200601111036.06776.info@david-geiger.de> <1136990233.3825.34.camel@localhost.localdomain>
+In-Reply-To: <1136990233.3825.34.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,33 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 31 Jan 2006 19:17:48 -0500
+Date: Tue, 31 Jan 2006 23:02:47 +0100
 
-I am doing the following and getting an error at btsco stage.
 
-export MACADDRESS="00:0C:55:0A:8C:51"
-
-modprobe -f snd-bt-sco
-esdctl stop
-
-rfcomm bind rfcomm0 $MACADDRESS
-sdptool search --bdaddr $MACADDRESS 0x111E
-
-hciconfig hci0 revision
-hciconfig hci0 voice 0x0060
-btsco $MACADDRESS
-
-At this point I get an error of:
-Error: control open (hw:3): No such device
-Error: Can't find device. Bail
-
-I have a USB bluetooth adapter F8T001
-I have a motorola headset
-
-What have I not done or what might be the problem.
-
-Jerry
-
+>in general it should work with every dongle, but so far the best results
+>are still with CSR based dongles. However I am happy for any patch that
+>makes other dongles work, too.
+>
+>Regards
+>
+>Marcel
+>
+>  
+>
+That's my only chance to make my bluefritz!2.0 dongle work some day. I 
+haven't used it so far...
 
 
 -------------------------------------------------------
