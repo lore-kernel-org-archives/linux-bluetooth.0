@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: RE: [Bluez-devel] Wake-On-Bluetooth Support
-Message-ID: <44BDAFB888F59F408FAE3CC35AB4704102E4A509@orsmsx409>
-From: "Zou, Yixiong" <yixiong.zou@intel.com>
-To: <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Wake-On-Bluetooth Support
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <44BDAFB888F59F408FAE3CC35AB4704102E49BF4@orsmsx409>
+References: <44BDAFB888F59F408FAE3CC35AB4704102E49BF4@orsmsx409>
+Content-Type: text/plain
+Message-Id: <1138731818.3968.10.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,50 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 31 Jan 2006 10:32:30 -0800
+Date: Tue, 31 Jan 2006 19:23:38 +0100
+
+Hi,
+
+> Does anybody know the current status of the Wake-On-Bluetooth support?  
+> For example, if I put the host into S1, can I wake it up by sending it a Bluetooth event?  
+> If this is not implemented, could someone give me a pointer on where I should be 
+> looking at for this?  
+
+this actually depends on the chip and so far I haven't seen anything
+like this. I only heard rumors about Apple doing it.
+
+Regards
+
+Marcel
 
 
->-----Original Message-----
->From: bluez-devel-admin@lists.sourceforge.net=20
->[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of=20
->Marcel Holtmann
->Sent: Tuesday, January 31, 2006 10:24 AM
->To: bluez-devel@lists.sourceforge.net
->Subject: Re: [Bluez-devel] Wake-On-Bluetooth Support
->
->Hi,
->
->> Does anybody know the current status of the=20
->Wake-On-Bluetooth support? =20
->> For example, if I put the host into S1, can I wake it up by=20
->sending it a Bluetooth event? =20
->> If this is not implemented, could someone give me a pointer=20
->on where I should be=20
->> looking at for this? =20
->
->this actually depends on the chip and so far I haven't seen anything
->like this. I only heard rumors about Apple doing it.
->
->Regards
->
->Marcel
->
-
-Can you tell me what type of capability is needed in the chip for this =
-to work?  I thought it is just a matter of not powering down the =
-Bluetooth device while in S1 and then send out a generic wake-up event =
-to the PCI bus or something. =20
-
-Thank you.=20
-
------------------------------------
-
-Yixiong Zou (yixiong.zou@intel.com)
-Open Source Technology Center
-Intel Corp.
-
-
- =20
 
 
 -------------------------------------------------------
