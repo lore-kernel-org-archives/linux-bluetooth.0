@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: Fw: [Bluez-devel] Question about the SPDTOOL and the
-	sdp_service_search_attr_req
+Subject: Re: [Bluez-devel] 32-bit libsbc
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <001701c625ed$d4921c60$c800a8c0@kazama>
-References: <001701c625ed$d4921c60$c800a8c0@kazama>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <1138731763.3968.8.camel@localhost.localdomain>
+In-Reply-To: <43DF951D.6080500@xmission.com>
+References: <43DF951D.6080500@xmission.com>
+Content-Type: text/plain
+Message-Id: <1138731594.3968.2.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,23 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 31 Jan 2006 19:22:43 +0100
+Date: Tue, 31 Jan 2006 19:19:54 +0100
 
-Hi,
+Hi Brad,
 
-> Have problems with the SDPTOOL . It don=C2=B4t show all services of the=
-=20
-> devices...
->=20
-> Some can say any about this....??
->=20
-> the sdp_service_search_attr_req function works the same...  =C2=BF?
->=20
-> What=C2=B4s happend with BlueZ and the SDP ?
+> I cleaned up and simplified the sbc stuff. It uses a single math
+> implementation, 32-bit ints, and has no assembly. All library
+> misbehavior such as printf, exit, etc is gone.
 
-if the remote device doesn't support the public browse group you won't
-see anything. That isn't a problem of BlueZ. However you can work around
-it with specifying --l2cap as additional option.
+this sounds great. However because of the UPF, I won't have time to look
+at it until next week or so. Please remind me to set up the SBC project
+access for you.
 
 Regards
 
