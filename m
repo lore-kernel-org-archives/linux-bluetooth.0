@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43DFDE87.4070708@schugy.de>
-From: Christian Schuglitsch <subjectbluez@schugy.de>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Bluetooth with Latitude X1
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] ISSC  USB dongle Bluetooth problem
-References: <000a01c6162d$2598ad20$0200000a@EHABLAPTOP>	 <1136930560.4591.8.camel@localhost.localdomain>	 <200601111036.06776.info@david-geiger.de> <1136990233.3825.34.camel@localhost.localdomain>
-In-Reply-To: <1136990233.3825.34.camel@localhost.localdomain>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+In-Reply-To: <200601310012.39402.arthur.breitman@gmail.com>
+References: <200601310012.39402.arthur.breitman@gmail.com>
+Content-Type: text/plain
+Message-Id: <1138731692.3968.5.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +18,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 31 Jan 2006 23:02:47 +0100
+Date: Tue, 31 Jan 2006 19:21:32 +0100
+
+Hi Arthur,
+
+> I already asked questions about this, without any success. I am retrying.
+> Here are the informations.
+> I have a Dell Latitude X1 Notebook. Bluetooth works flawlessly on windows and 
+> is reported to work fine on this notebook on the internet.
+> I believe I have installed and loaded all the necessary modules.
+> 
+> if I set my mobile phone in discovery mode and starts a scan on the laptop:
+> 
+> arthurb@coin:~$ sudo hcidump  -V -X
+> HCI sniffer - Bluetooth packet analyzer ver 1.28
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> < HCI Command: Inquiry (0x01|0x0001) plen 5
+>     lap 0x9e8b33 len 8 num 0
+> > HCI Event: Command Status (0x0f) plen 4
+>     Inquiry (0x01|0x0001) status 0x00 ncmd 1
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Vendor (0xff) plen 7
+>   0000: cd 03 00 04 00 00 00                              .......
+> > HCI Event: Inquiry Complete (0x01) plen 1
+>     status 0x00
+
+since this is a CSR chip, call "hcidump -X -V -m 10" and see what it
+tells you when you scan again.
+
+Regards
+
+Marcel
 
 
->in general it should work with every dongle, but so far the best results
->are still with CSR based dongles. However I am happy for any patch that
->makes other dongles work, too.
->
->Regards
->
->Marcel
->
->  
->
-That's my only chance to make my bluefritz!2.0 dongle work some day. I 
-haven't used it so far...
 
 
 -------------------------------------------------------
