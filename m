@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Microsoft Optical Desktop Elite for Bluetooth
-	and dual booting
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43E09717.4040405@gmail.com>
+From: JoKo <jokogr@gmail.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43E09717.4040405@gmail.com>
-References: <43E09717.4040405@gmail.com>
-Content-Type: text/plain
-Message-Id: <1138812167.3806.1.camel@localhost.localdomain>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-7; format=flowed
+Subject: [Bluez-users] Microsoft Optical Desktop Elite for Bluetooth and dual booting
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,36 +16,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 01 Feb 2006 17:42:47 +0100
+Date: Wed, 01 Feb 2006 13:10:15 +0200
 
-Hi John,
+Hi,
 
-> For the last past months I have been searching for a way to use my 
-> bluetooth keyboard and mouse in both Windows and Linux with no luck. 
-> Most of times I wasn't able to choose Linux with GRUB since the keyboard 
-> wasn't working during booting and if I was working in Linux, on the next 
-> boot in Windows, I had to re-authenticate my keyboard in order to work.
-> 
-> So, I have to ask one last time before I get another keyboard and mouse: 
-> Is there any way to properly use my desktop set in both OSes?
-> 
-> Please don't tell me to search anywhere to find a solution. If you have 
-> a suggestion, just write it as explicitly as possible. I promise to 
-> write a guide for bluetooth keyboards and dual booting if I finally find 
-> a solution.
+For the last past months I have been searching for a way to use my 
+bluetooth keyboard and mouse in both Windows and Linux with no luck. 
+Most of times I wasn't able to choose Linux with GRUB since the keyboard 
+wasn't working during booting and if I was working in Linux, on the next 
+boot in Windows, I had to re-authenticate my keyboard in order to work.
 
-pair your device with Linux and then write the link key to the Bluetooth
-chip with hciconfig. After that it should be possible to use the device
-in both operating systems.
+So, I have to ask one last time before I get another keyboard and mouse: 
+Is there any way to properly use my desktop set in both OSes?
 
-It is of course also possible to transfer the link keys between both
-operating systems, but this can get very ugly.
-
-Regards
-
-Marcel
+Please don't tell me to search anywhere to find a solution. If you have 
+a suggestion, just write it as explicitly as possible. I promise to 
+write a guide for bluetooth keyboards and dual booting if I finally find 
+a solution.
 
 
+Thanks in advance,
+
+John
 
 
 -------------------------------------------------------
