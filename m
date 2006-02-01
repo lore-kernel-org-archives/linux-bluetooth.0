@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Microsoft Optical Desktop Elite for
-	Bluetooth	and dual booting
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43E0F8F7.9070009@gmail.com>
+From: JoKo <jokogr@gmail.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43E0F8F7.9070009@gmail.com>
-References: <43E09717.4040405@gmail.com>
-	 <1138812167.3806.1.camel@localhost.localdomain>
-	 <43E0F8F7.9070009@gmail.com>
-Content-Type: text/plain
-Message-Id: <1138821481.3806.21.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Microsoft Optical Desktop Elite for Bluetooth	and
+ dual booting
+References: <43E09717.4040405@gmail.com> <1138812167.3806.1.camel@localhost.localdomain>
+In-Reply-To: <1138812167.3806.1.camel@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1253; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,27 +19,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 01 Feb 2006 20:18:01 +0100
+Date: Wed, 01 Feb 2006 20:07:51 +0200
 
-Hi John,
+Marcel Holtmann wrote:
+> pair your device with Linux and then write the link key to the Bluetooth
+> chip with hciconfig. 
+Hello again,
 
-> And thanks for your quick reply. Having watched some replies in this 
-> mailing list I totally agree that transferring the link key from one OS 
-> to the other can be difficult.
-> 
-> So, let's get back on the first solution: since sometimes I can use my 
-> keyboard in Linux, I suppose my device is sometimes paired, right? If 
-> not, which commands exactly I have to use? Then, how to write the link 
-> key to the bluetooth chip? Could you make an example of the command 
-> hciconfig for writing this key to the chip?
+And thanks for your quick reply. Having watched some replies in this 
+mailing list I totally agree that transferring the link key from one OS 
+to the other can be difficult.
 
-use "hciconfig hci0 putkey ..." after you paired your keyboard with your
-Linux machine.
+So, let's get back on the first solution: since sometimes I can use my 
+keyboard in Linux, I suppose my device is sometimes paired, right? If 
+not, which commands exactly I have to use? Then, how to write the link 
+key to the bluetooth chip? Could you make an example of the command 
+hciconfig for writing this key to the chip?
 
-Regards
-
-Marcel
-
+> After that it should be possible to use the device
+> in both operating systems.
+And the use of link keys? Both OSes should have the same link keys? I suppose no...
 
 
 
