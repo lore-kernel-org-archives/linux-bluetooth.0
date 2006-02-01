@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43E0F8F7.9070009@gmail.com>
-From: JoKo <jokogr@gmail.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Microsoft Optical Desktop Elite for Bluetooth
+	and dual booting
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Microsoft Optical Desktop Elite for Bluetooth	and
- dual booting
-References: <43E09717.4040405@gmail.com> <1138812167.3806.1.camel@localhost.localdomain>
-In-Reply-To: <1138812167.3806.1.camel@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1253; format=flowed
+In-Reply-To: <43E09717.4040405@gmail.com>
+References: <43E09717.4040405@gmail.com>
+Content-Type: text/plain
+Message-Id: <1138812167.3806.1.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,26 +19,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 01 Feb 2006 20:07:51 +0200
+Date: Wed, 01 Feb 2006 17:42:47 +0100
 
-Marcel Holtmann wrote:
-> pair your device with Linux and then write the link key to the Bluetooth
-> chip with hciconfig. 
-Hello again,
+Hi John,
 
-And thanks for your quick reply. Having watched some replies in this 
-mailing list I totally agree that transferring the link key from one OS 
-to the other can be difficult.
+> For the last past months I have been searching for a way to use my 
+> bluetooth keyboard and mouse in both Windows and Linux with no luck. 
+> Most of times I wasn't able to choose Linux with GRUB since the keyboard 
+> wasn't working during booting and if I was working in Linux, on the next 
+> boot in Windows, I had to re-authenticate my keyboard in order to work.
+> 
+> So, I have to ask one last time before I get another keyboard and mouse: 
+> Is there any way to properly use my desktop set in both OSes?
+> 
+> Please don't tell me to search anywhere to find a solution. If you have 
+> a suggestion, just write it as explicitly as possible. I promise to 
+> write a guide for bluetooth keyboards and dual booting if I finally find 
+> a solution.
 
-So, let's get back on the first solution: since sometimes I can use my 
-keyboard in Linux, I suppose my device is sometimes paired, right? If 
-not, which commands exactly I have to use? Then, how to write the link 
-key to the bluetooth chip? Could you make an example of the command 
-hciconfig for writing this key to the chip?
+pair your device with Linux and then write the link key to the Bluetooth
+chip with hciconfig. After that it should be possible to use the device
+in both operating systems.
 
-> After that it should be possible to use the device
-> in both operating systems.
-And the use of link keys? Both OSes should have the same link keys? I suppose no...
+It is of course also possible to transfer the link keys between both
+operating systems, but this can get very ugly.
+
+Regards
+
+Marcel
+
 
 
 
