@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Gabriel Wicke <lists@wikidev.net>
-Message-ID: <pan.2006.02.01.22.31.45.423887@wikidev.net>
-References: <pan.2006.01.30.19.35.06.850476@wikidev.net> <19c2b3920601310536l77bdc32ay@mail.gmail.com> <pan.2006.02.01.09.16.29.862248@wikidev.net> <19c2b3920602010218m5da411ek@mail.gmail.com>
+From: Charles Bueche <charles@bueche.ch>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1138828972.1806.1.camel@bluez.bueche.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Subject: [Bluez-users] Re: Re: [micro-howto] Ericsson K700i as hid device (hidd options)
+Subject: [Bluez-users] V270 mouse is Speedy Gonzales
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,17 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 01 Feb 2006 23:31:45 +0100
+Date: Wed, 01 Feb 2006 22:22:52 +0100
 
-On Wed, 01 Feb 2006 11:18:15 +0100, rangzen wrote:
+Hi,
 
-> I've a "one shot" bluetooth device :D
+Just got my Logitech V270, it worked out of the box. However, its speed
+is too fast. I can't find any way to make it go slower. Any hint from
+other users ?
 
-;-) I don't know nearly enough about bluez to be of much help in
-your case, but maybe somebody else can shed some light on this.
+xorg.conf don't seem to provide anything in this area.
+
+TIA,
+Charles
+
 -- 
-Gabriel Wicke
-
+Charles Bueche <charles@bueche.ch>
+sand, snow, wave, wind and net -surfer
 
 
 
