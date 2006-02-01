@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 To: bluez-users@lists.sourceforge.net
 From: Gabriel Wicke <lists@wikidev.net>
-Message-ID: <pan.2006.02.01.22.39.25.363613@wikidev.net>
-References: <1138828972.1806.1.camel@bluez.bueche.ch>
+Message-ID: <pan.2006.02.01.22.31.45.423887@wikidev.net>
+References: <pan.2006.01.30.19.35.06.850476@wikidev.net> <19c2b3920601310536l77bdc32ay@mail.gmail.com> <pan.2006.02.01.09.16.29.862248@wikidev.net> <19c2b3920602010218m5da411ek@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Subject: [Bluez-users] Re: V270 mouse is Speedy Gonzales
+Subject: [Bluez-users] Re: Re: [micro-howto] Ericsson K700i as hid device (hidd options)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,22 +17,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 01 Feb 2006 23:39:25 +0100
+Date: Wed, 01 Feb 2006 23:31:45 +0100
 
-On Wed, 01 Feb 2006 22:22:52 +0100, Charles Bueche wrote:
+On Wed, 01 Feb 2006 11:18:15 +0100, rangzen wrote:
 
-> Hi,
-> 
-> Just got my Logitech V270, it worked out of the box. However, its speed
-> is too fast. I can't find any way to make it go slower. Any hint from
-> other users ?
-> 
-> xorg.conf don't seem to provide anything in this area.
+> I've a "one shot" bluetooth device :D
 
-If it's your only pointing device the small config apps that both Gnome
-and KDE offer might suffice. Not sure about generic per-device settings-
-my laptops's touchpad has a section with speed modifiers in xorg.conf, but
-that might just be a special feature.
+;-) I don't know nearly enough about bluez to be of much help in
+your case, but maybe somebody else can shed some light on this.
 -- 
 Gabriel Wicke
 
