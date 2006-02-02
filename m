@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: V270 mouse is Speedy Gonzales
-From: Charles Bueche <bueche@netnea.com>
+From: Charles Bueche <charles@bueche.ch>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <pan.2006.02.01.22.39.25.363613@wikidev.net>
-References: <1138828972.1806.1.camel@bluez.bueche.ch>
-	 <pan.2006.02.01.22.39.25.363613@wikidev.net>
 Content-Type: text/plain
-Message-Id: <1138872214.8714.14.camel@bluez.bueche.ch>
+Message-Id: <1138872805.21953.20.camel@bluez.bueche.ch>
 Mime-Version: 1.0
+Subject: [Bluez-users] udev rules entry for bluetooth mouse
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,32 +16,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 02 Feb 2006 10:23:34 +0100
+Date: Thu, 02 Feb 2006 10:33:25 +0100
 
-Thanks, 
+Hi,
 
-meanwhile, I have seen that "Resolution" in xorg.conf does nothing good.
+I would like my new Logitech V270 to exists under /dev/input/v270,
+instead of a changing /dev/input/mouseN.
+
+The goal is to be able to use one of the Logitech control utilities,
+which need a device to operate on.
+
+% hidd --show
+00:07:61:3B:9B:7C Logitech Bluetooth Mouse [046d:b002] connected
+
+% cat /proc/bus/input/devices
+...snipp...
+I: Bus=0005 Vendor=046d Product=b002 Version=4809
+N: Name="Logitech Bluetooth Mouse"
+P: Phys=00:10:C6:22:54:AF
+H: Handlers=mouse4 event4 
+B: EV=f 
+B: KEY=ff0000 0 0 0 0 0 0 0 0 
+B: REL=103 
+B: ABS=300 0 
+...snipp...
+
+How does this translate to a udev rule ? My attempts so far are failing.
 
 Charles
 
-On mer, 2006-02-01 at 23:39 +0100, Gabriel Wicke wrote:
-> On Wed, 01 Feb 2006 22:22:52 +0100, Charles Bueche wrote:
-> 
-> > Hi,
-> > 
-> > Just got my Logitech V270, it worked out of the box. However, its speed
-> > is too fast. I can't find any way to make it go slower. Any hint from
-> > other users ?
-> > 
-> > xorg.conf don't seem to provide anything in this area.
-> 
-> If it's your only pointing device the small config apps that both Gnome
-> and KDE offer might suffice. Not sure about generic per-device settings-
-> my laptops's touchpad has a section with speed modifiers in xorg.conf, but
-> that might just be a special feature.
 -- 
-Charles Bueche <bueche@netnea.com>
-www.netnea.com : your best source for ultra-geeks !
+Charles Bueche <charles@bueche.ch>
+sand, snow, wave, wind and net -surfer
 
 
 
