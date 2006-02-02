@@ -1,21 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Cleaning up the D-Bus interface
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43E216F4.2030405@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0601300944i45664a73v999c155298825117@mail.gmail.com>
-References: <1135111693.26233.11.camel@localhost>
-	 <3013cac80512211216r3918594dv676e03480d83f5b3@mail.gmail.com>
-	 <1135196479.3781.10.camel@localhost>
-	 <3013cac80512220511u9ecac97haf7278614bfe085a@mail.gmail.com>
-	 <1135271815.6002.96.camel@localhost>
-	 <3013cac80512230528y5b879d2bh2dbcb4e0fe18e974@mail.gmail.com>
-	 <1135350634.3985.2.camel@localhost> <1135434294.1008.3.camel@localhost>
-	 <e1effdeb0601251054m6ac203ceu4901dca319212d2@mail.gmail.com>
-	 <1138304710.5901.106.camel@localhost>
-	 <e1effdeb0601300944i45664a73v999c155298825117@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1138902761.3750.7.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] TODO list
+References: <43E17EF7.50801@purdue.edu> <43E183B5.4040006@xmission.com> <20060202091530.ug1gx9wn7bfos0ks@etumail.u-bordeaux1.fr>
+In-Reply-To: <20060202091530.ug1gx9wn7bfos0ks@etumail.u-bordeaux1.fr>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -27,47 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 02 Feb 2006 18:52:41 +0100
+Date: Thu, 02 Feb 2006 07:28:04 -0700
 
-Hi Claudio,
+Chi-minh
 
-> Here is the patch following your suggestion.
+> We're a group of 4 french students and we have a project to do
 
-cool, but the patch has some issues.
+The bluetooth audio has todo items (moving into alsa/gstreamer plugins).
+I've done some of the stereo transmission work without any headset by
+sending from one pc to another, so it doesn't require special hardware.
 
-Don't refer to the Bluetooth specification for the mode values, because
-we define our own.
-
-Please name the modes like following:
-
-#define MODE_OFF           0x00
-#define MODE_CONNECTABLE   0x01
-#define MODE_DISCOVERABLE  0x02
-
-The discoverable mode of course includes connectable mode.
-
-In the handle_device_get_mode_req(), the switch statement always sets
-the mode to 0xff. Please add the breaks and if you write a fall through
-statement, then comment it.
-
-> Now, we introduced a problem. How handle scenarios where other
-> application/or hciconfig changes the scan mode, enabling the Inquiry
-> Scan only? :) In the current patch, I am ignoring the HCI command
-> complete event for this case.
-
-We need to track the scan mode command complete event and if the mode
-changes, we need to send out a mode change signal.
-
-> When we close this discussion I can start play with the discoverable time stuff.
-
-That would be really great, because this feature could come in handy for
-any graphical application.
-
-Regards
-
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
