@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43E216F4.2030405@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <5256d0b0602020621w60cc415cg9ecfdd12a15f31be@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] TODO list
-References: <43E17EF7.50801@purdue.edu> <43E183B5.4040006@xmission.com> <20060202091530.ug1gx9wn7bfos0ks@etumail.u-bordeaux1.fr>
-In-Reply-To: <20060202091530.ug1gx9wn7bfos0ks@etumail.u-bordeaux1.fr>
+Subject: Re: [Bluez-devel] snd-bt-sco on SF
+In-Reply-To: <43E213EC.2080902@xmission.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
+References: <05626BC2-3DD2-499D-B32C-970327109DCD@dark-reality.de>
+	 <43E213EC.2080902@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,17 +19,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 02 Feb 2006 07:28:04 -0700
+Date: Thu, 2 Feb 2006 14:21:36 +0000
 
-Chi-minh
+> Lars
+>
+> > I've bee involved in the snd-bt-sco project a while ago (is it nearly
+> > two years, already?), but since I'm not a student any more, I don't
+> > have enough time right nowadays to contribute.
+>
+> thanks for what you did help out with... I'll fix the docs so people
+> don't email you.
+>
+> (hey, aren't you supposed to have *more* time for side projects after
+> you finish school? :)
 
-> We're a group of 4 french students and we have a project to do
+Yep, except if you replace 'school' with 'work' :-)
 
-The bluetooth audio has todo items (moving into alsa/gstreamer plugins).
-I've done some of the stereo transmission work without any headset by
-sending from one pc to another, so it doesn't require special hardware.
-
-Brad
+Pete
 
 
 -------------------------------------------------------
