@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43E1E11F.8040501@ycom.ch>
-From: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Re: V270 mouse is Speedy Gonzales
+From: Charles Bueche <bueche@netnea.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] udev rules entry for bluetooth mouse
-References: <1138872805.21953.20.camel@bluez.bueche.ch>
-In-Reply-To: <1138872805.21953.20.camel@bluez.bueche.ch>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <pan.2006.02.01.22.39.25.363613@wikidev.net>
+References: <1138828972.1806.1.camel@bluez.bueche.ch>
+	 <pan.2006.02.01.22.39.25.363613@wikidev.net>
+Content-Type: text/plain
+Message-Id: <1138872214.8714.14.camel@bluez.bueche.ch>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,60 +19,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 02 Feb 2006 11:38:23 +0100
+Date: Thu, 02 Feb 2006 10:23:34 +0100
 
-Charles Bueche a =E9crit :
-> Hi,
->
-> I would like my new Logitech V270 to exists under /dev/input/v270,
-> instead of a changing /dev/input/mouseN.
->
->  =20
-Charles,
+Thanks, 
 
-I've posted few weeks ago the same request, without any luck.
+meanwhile, I have seen that "Resolution" in xorg.conf does nothing good.
 
-The trick come with the hid2hci, and the udev struct that is not updated.
-With the recent udev-081, struct is somewhat updated, and I'm able to=20
-have a fixed device, but without using event driver (witch I want to=20
-use, but I still cannot write udev rules).
+Charles
 
-By now, with the rule :
-KERNEL=3D=3D"mouse*"        SYSFS{name}=3D=3D"Bluetooth HID Boot Protocol=
-=20
-Device", NAME=3D=3D"input/bt-mx900", MODE=3D=3D"0664"
-
-i'm able to get a FIXED device at /dev/input/bt-mx900 working mouse.
-
-Now, next problem is when the bluetooth stack goes standby (for exemple,=20
-let my PC running while lunch), when I touch the mouse to reconnect=20
-(hidd setup the link, correct device name is recreated), X lost my=20
-mouse, and I'm forced to close / open session to get it working again.
-
-
-> % hidd --show
-> 00:07:61:3B:9B:7C Logitech Bluetooth Mouse [046d:b002] connected
->
-> % cat /proc/bus/input/devices
-> ...snipp...
-> I: Bus=3D0005 Vendor=3D046d Product=3Db002 Version=3D4809
-> N: Name=3D"Logitech Bluetooth Mouse"
-> P: Phys=3D00:10:C6:22:54:AF
-> H: Handlers=3Dmouse4 event4=20
-> B: EV=3Df=20
-> B: KEY=3Dff0000 0 0 0 0 0 0 0 0=20
-> B: REL=3D103=20
-> B: ABS=3D300 0=20
-> ...snipp...
->
->  =20
-To show udev properties, use
-
-udevinfo -a -p /sys/class/input/event4 (as seen in your dump before)
-
-Regards
---Alexandre
-
+On mer, 2006-02-01 at 23:39 +0100, Gabriel Wicke wrote:
+> On Wed, 01 Feb 2006 22:22:52 +0100, Charles Bueche wrote:
+> 
+> > Hi,
+> > 
+> > Just got my Logitech V270, it worked out of the box. However, its speed
+> > is too fast. I can't find any way to make it go slower. Any hint from
+> > other users ?
+> > 
+> > xorg.conf don't seem to provide anything in this area.
+> 
+> If it's your only pointing device the small config apps that both Gnome
+> and KDE offer might suffice. Not sure about generic per-device settings-
+> my laptops's touchpad has a section with speed modifiers in xorg.conf, but
+> that might just be a special feature.
+-- 
+Charles Bueche <bueche@netnea.com>
+www.netnea.com : your best source for ultra-geeks !
 
 
 
