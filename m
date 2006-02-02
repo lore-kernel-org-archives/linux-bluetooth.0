@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43E213EC.2080902@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Mime-Version: 1.0 (Apple Message framework v746.2)
+Message-Id: <05626BC2-3DD2-499D-B32C-970327109DCD@dark-reality.de>
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] snd-bt-sco on SF
-References: <05626BC2-3DD2-499D-B32C-970327109DCD@dark-reality.de>
-In-Reply-To: <05626BC2-3DD2-499D-B32C-970327109DCD@dark-reality.de>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Lars Grunewaldt <lgw@dark-reality.de>
+Subject: [Bluez-devel] snd-bt-sco on SF
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,21 +16,50 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 02 Feb 2006 07:15:08 -0700
+Date: Thu, 2 Feb 2006 14:32:28 +0100
 
-Lars
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> I've bee involved in the snd-bt-sco project a while ago (is it nearly 
-> two years, already?), but since I'm not a student any more, I don't 
-> have enough time right nowadays to contribute.
+Hi there,
 
-thanks for what you did help out with... I'll fix the docs so people
-don't email you.
+I've bee involved in the snd-bt-sco project a while ago (is it nearly  
+two years, already?), but since I'm not a student any more, I don't  
+have enough time right nowadays to contribute.
 
-(hey, aren't you supposed to have *more* time for side projects after
-you finish school? :)
+My problem is that I keep getting mails from users who look for  
+information about snd-bt-sco, so maybe it would be possible to put a  
+paragraph on the snd-bt-sco-page on SourceForge that people should  
+use this list (or, the appropriate user mailing list for bluez)  
+instead of writing the people below directly.
 
-Brad
+Would be great to put that paragraph in bold directly above the list  
+of supporters, so people might notice ;)
+
+I'm fine with keeping my name and email address on the page, maybe a  
+little "inactive" remark would be nice.
+
+best regards, keep up the nice work, good luck & I hope I can re-join  
+later.
+- - Lars
+
+- --
+Lars Grunewaldt - Dipl. Inf. (FH)
+* software development
+* multimedia design
+skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
+web: http://www.dark-reality.de
+mail: lgw@dark-reality.de
+
+
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (Darwin)
+
+iD8DBQFD4gnxISCS20rPIYsRAqd/AKDJ/5j/2r58U8A0lkCuDmPjWS2rfQCfVUTX
+WCYAVjB9CJiue2TAP/GASmM=
+=hv9m
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
