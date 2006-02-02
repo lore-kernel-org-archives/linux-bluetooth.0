@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f64f4e8a0602012031sba6af2aj1db7633e9865de91@mail.gmail.com>
-From: zhu yong <zhuyong0003@gmail.com>
-To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_26456_28261702.1138854689675"
-Subject: [Bluez-users] help me! bluetooth usb dongle can not up in uclinux 2.24.
+	boundary="----_=_NextPart_001_01C6278E.6EC46D29"
+Message-ID: <06CCEA2EB1B80A4A937ED59005FA8551880482@svits26.main.ad.rit.edu>
+From: "Christopher E Piggott" <cepasp@rit.edu>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Why does rfcomm cause a repairing?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,152 +17,156 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 2 Feb 2006 12:31:29 +0800
+Date: Wed, 1 Feb 2006 19:20:12 -0500
 
-------=_Part_26456_28261702.1138854689675
-Content-Type: text/plain; charset=ISO-8859-1
+This is a multi-part message in MIME format.
+
+------_=_NextPart_001_01C6278E.6EC46D29
+Content-Type: text/plain;
+	charset="US-ASCII"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-hi,everyone
-     I want to use my bluetooth usb dongle in my s3c44b0x board. system is
-uclinux 2.24.
-     I use "hciconfig" command, it can find the devices, info as follows
-     "# ./hciconfig
-hci0:   Type: USB
-        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
-        DOWN
-        RX bytes:12 acl:0 sco:0 events:0 errors:0
-        TX bytes:9 acl:0 sco:0 commands:3 errors:0"
-     but, I use "hciconfig hci0 up", it timeout, info as follows
-     "Can't init device hci0: Connection timed out (110)"
-     I find I have no "devices" file in "/proc/bus/usb" directory.
-     so I mount it use "mount -t usbdevfs none /proc/bus/usb" command. but =
-I
-still can not up the devices.
-     I post the info of "cat /proc/bus/usb/devices ", any suggestion is
-help!
-    "# cat /proc/bus/usb/devices
-T:  Bus=3D01 Lev=3D00 Prnt=3D00 Port=3D00 Cnt=3D00 Dev#=3D  1 Spd=3D12  MxC=
-h=3D 1
-B:  Alloc=3D  0/900 us ( 0), #Int=3D  0, #Iso=3D  0
-D:  Ver=3D 1.10 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 MxPS=3D 8 #Cfgs=3D  1
-P:  Vendor=3D0000 ProdID=3D0000 Rev=3D 0.00
-S:  Product=3DUSB SL811HS Root Hub
-S:  SerialNumber=3D0
-C:* #Ifs=3D 1 Cfg#=3D 1 Atr=3D40 MxPwr=3D  0mA
-I:  If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 Driver=
-=3Dhub
-E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D   8 Ivl=3D255ms
-T:  Bus=3D01 Lev=3D01 Prnt=3D01 Port=3D00 Cnt=3D01 Dev#=3D  2 Spd=3D12  MxC=
-h=3D 0
-D:  Ver=3D 1.10 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 MxPS=3D16 #Cfgs=3D  1
-P:  Vendor=3D1131 ProdID=3D1001 Rev=3D 3.73
-C:* #Ifs=3D 3 Cfg#=3D 1 Atr=3Dc0 MxPwr=3D  0mA
-I:  If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
-E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-I:  If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-I:  If#=3D 2 Alt=3D 0 #EPs=3D 0 Cls=3Dfe(app. ) Sub=3D01 Prot=3D00 Driver=
-=3D(none)
-# "
+Hi,
+=20
+I am setting up bluez on an embedded Geode system.  The system is pretty
+small; only a 64MB flash disk.
+=20
+What I want is to have rfcomm listening for incoming connections from my
+Dell Axim.  When it gets a connection, a separate program I wrote will
+spit out NMEA-0183 messages over that rfcomm.
+=20
+I do this:
+    start hcid
+    start sdpd
+    sdptool add SP
+=20
+    Have the handheld scan for bluetooth devices.  it finds it.
+    Have it connect.  It works and it sees the serial device
+=20
+    rfcomm listen 0 1
+=20
+    go back to the axim and tell it to connect to COM7 which is the
+virtual device it mapped to the server I just set up
+=20
+What happens next is weird (at least to me).  First, my server now
+attempts to RE-PAIR to my handheld.  It says that the computer wants to
+connect to me, and it prompts me for the PIN again.  Why would it do
+this, when we have already paired?
+=20
+Then, I enter the PIN.  After a little while the rfcomm listener
+disconnects, and the pairing fails.  I go back on my axim to the
+bluetooth config and it doesn't think it's paired any more.
+=20
+Meanwhile, there is still a set of files in /var/lib/bluetooth under the
+ID of my handheld, including linkkeys and names.
+=20
+What is going wrong?
+=20
+--Chris
+=20
 
-------=_Part_26456_28261702.1138854689675
-Content-Type: text/html; charset=ISO-8859-1
+------_=_NextPart_001_01C6278E.6EC46D29
+Content-Type: text/html;
+	charset="US-ASCII"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-<div>hi,everyone</div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp; I want to use my bluetooth usb dongle in my s=
-3c44b0x board. system is uclinux 2.24.</div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp; I use &quot;hciconfig&quot; command, it can f=
-ind the devices, info as follows</div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp; &quot;# ./hciconfig<br>hci0:&nbsp;&nbsp; Type=
-: USB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:00:00:00=
-:00:00 ACL MTU: 0:0 SCO MTU: 0:0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp; DOWN<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:12 acl:0 sc=
-o:0 events:0 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX byte=
-s:9 acl:0 sco:0 commands:3 errors:0&quot;
-</div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp; but, I use &quot;hciconfig hci0 up&quot;, it =
-timeout, info as follows</div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp; &quot;Can't init device hci0: Connection time=
-d out (110)&quot;</div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp; I find I have no &quot;devices&quot; file in =
-&quot;/proc/bus/usb&quot; directory.</div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;so I mount it use &quot;mount -t usbdevf=
-s none /proc/bus/usb&quot; command. but I still can not up the devices.</di=
-v>
-<div>&nbsp;&nbsp;&nbsp;&nbsp; I post the info of &quot;cat /proc/bus/usb/de=
-vices&nbsp;&quot;, any suggestion is help!</div>
-<div>&nbsp;&nbsp;&nbsp; &quot;# cat /proc/bus/usb/devices<br>T:&nbsp; Bus=
-=3D01 Lev=3D00 Prnt=3D00 Port=3D00 Cnt=3D00 Dev#=3D&nbsp; 1 Spd=3D12&nbsp; =
-MxCh=3D 1<br>B:&nbsp; Alloc=3D&nbsp; 0/900 us ( 0), #Int=3D&nbsp; 0, #Iso=
-=3D&nbsp; 0<br>D:&nbsp; Ver=3D 1.10 Cls=3D09(hub&nbsp; ) Sub=3D00 Prot=3D00=
- MxPS=3D 8 #Cfgs=3D&nbsp; 1
-<br>P:&nbsp; Vendor=3D0000 ProdID=3D0000 Rev=3D 0.00<br>S:&nbsp; Product=3D=
-USB SL811HS Root Hub<br>S:&nbsp; SerialNumber=3D0<br>C:* #Ifs=3D 1 Cfg#=3D =
-1 Atr=3D40 MxPwr=3D&nbsp; 0mA<br>I:&nbsp; If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=
-=3D09(hub&nbsp; ) Sub=3D00 Prot=3D00 Driver=3Dhub<br>E:&nbsp; Ad=3D81(I) At=
-r=3D03(Int.) MxPS=3D&nbsp;&nbsp; 8 Ivl=3D255ms
-<br>T:&nbsp; Bus=3D01 Lev=3D01 Prnt=3D01 Port=3D00 Cnt=3D01 Dev#=3D&nbsp; 2=
- Spd=3D12&nbsp; MxCh=3D 0<br>D:&nbsp; Ver=3D 1.10 Cls=3De0(unk. ) Sub=3D01 =
-Prot=3D01 MxPS=3D16 #Cfgs=3D&nbsp; 1<br>P:&nbsp; Vendor=3D1131 ProdID=3D100=
-1 Rev=3D 3.73<br>C:* #Ifs=3D 3 Cfg#=3D 1 Atr=3Dc0 MxPwr=3D&nbsp; 0mA<br>I:&=
-nbsp; If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-<br>E:&nbsp; Ad=3D81(I) Atr=3D03(Int.) MxPS=3D&nbsp; 16 Ivl=3D1ms<br>E:&nbs=
-p; Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D&nbsp; 64 Ivl=3D0ms<br>E:&nbsp; Ad=3D82=
-(I) Atr=3D02(Bulk) MxPS=3D&nbsp; 64 Ivl=3D0ms<br>I:&nbsp; If#=3D 1 Alt=3D 0=
- #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=3Dhci_usb<br>E:&nbsp; =
-Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D&nbsp;&nbsp; 0 Ivl=3D1ms
-<br>E:&nbsp; Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D&nbsp;&nbsp; 0 Ivl=3D1ms<br>I=
-:&nbsp; If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driv=
-er=3Dhci_usb<br>E:&nbsp; Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D&nbsp;&nbsp; 9 Iv=
-l=3D1ms<br>E:&nbsp; Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D&nbsp;&nbsp; 9 Ivl=3D1=
-ms<br>I:&nbsp; If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D=
-01 Driver=3Dhci_usb
-<br>E:&nbsp; Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D&nbsp; 17 Ivl=3D1ms<br>E:&nbs=
-p; Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D&nbsp; 17 Ivl=3D1ms<br>I:&nbsp; If#=3D =
-1 Alt=3D 3 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=3Dhci_usb<br=
->E:&nbsp; Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D&nbsp; 25 Ivl=3D1ms<br>E:&nbsp; =
-Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D&nbsp; 25 Ivl=3D1ms
-<br>I:&nbsp; If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01=
- Driver=3Dhci_usb<br>E:&nbsp; Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D&nbsp; 33 Iv=
-l=3D1ms<br>E:&nbsp; Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D&nbsp; 33 Ivl=3D1ms<br=
->I:&nbsp; If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Dr=
-iver=3Dhci_usb
-<br>E:&nbsp; Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D&nbsp; 49 Ivl=3D1ms<br>E:&nbs=
-p; Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D&nbsp; 49 Ivl=3D1ms<br>I:&nbsp; If#=3D =
-2 Alt=3D 0 #EPs=3D 0 Cls=3Dfe(app. ) Sub=3D01 Prot=3D00 Driver=3D(none)<br>=
-# &quot;</div>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dus-ascii">
+<META content=3D"MSHTML 6.00.2900.2802" name=3DGENERATOR></HEAD>
+<BODY>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006>Hi,</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D170371300-02022006>I am =
+setting up=20
+bluez on an embedded Geode system.&nbsp; The system is pretty small; =
+only a 64MB=20
+flash disk.</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D170371300-02022006>What I =
+want is to=20
+have rfcomm listening for incoming connections from my Dell Axim.&nbsp; =
+When it=20
+gets a connection, a separate program I wrote will spit out NMEA-0183 =
+messages=20
+over that rfcomm.</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D170371300-02022006>I do=20
+this:</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D170371300-02022006>&nbsp;&nbsp;&nbsp;=20
+start hcid</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D170371300-02022006>&nbsp;&nbsp;&nbsp;=20
+start sdpd</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D170371300-02022006>&nbsp;&nbsp;&nbsp;=20
+sdptool add SP</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D170371300-02022006>&nbsp;&nbsp;&nbsp;=20
+Have the handheld scan for bluetooth devices.&nbsp; it finds=20
+it.</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D170371300-02022006>&nbsp;&nbsp;&nbsp;=20
+Have it connect.&nbsp; It works and it sees the serial=20
+device</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D170371300-02022006>&nbsp;&nbsp;&nbsp;=20
+rfcomm listen 0 1</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D170371300-02022006>&nbsp;&nbsp;&nbsp;=20
+go back to the axim and tell it to connect to COM7 which is the virtual =
+device=20
+it mapped to the server I just set up</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D170371300-02022006>What =
+happens next is=20
+weird (at least to me).&nbsp; First, my server now attempts to RE-PAIR =
+to my=20
+handheld.&nbsp; It says that the computer wants to connect to me, and it =
+prompts=20
+me for the PIN again.&nbsp; Why would it do this, when we have already=20
+paired?</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D170371300-02022006>Then, =
+I enter the=20
+PIN.&nbsp; After a little while the rfcomm listener disconnects, and the =
+pairing=20
+fails.&nbsp; I go back on my axim to the bluetooth config and it doesn't =
+think=20
+it's paired any more.</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D170371300-02022006>Meanwhile, there is=20
+still a set of files in /var/lib/bluetooth under the ID of my handheld,=20
+including linkkeys and names.</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D170371300-02022006>What =
+is going=20
+wrong?</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006>--Chris</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D170371300-02022006></SPAN></FONT>&nbsp;</DIV></BODY></HTML>
 
-------=_Part_26456_28261702.1138854689675--
+------_=_NextPart_001_01C6278E.6EC46D29--
 
 
 -------------------------------------------------------
