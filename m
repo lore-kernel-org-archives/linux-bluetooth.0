@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Charles Bueche <charles@bueche.ch>
+Message-ID: <43E1CC41.4020602@gmail.com>
+From: JoKo <jokogr@gmail.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1138872805.21953.20.camel@bluez.bueche.ch>
-Mime-Version: 1.0
-Subject: [Bluez-users] udev rules entry for bluetooth mouse
+Subject: Re: [Bluez-users] Microsoft Optical Desktop Elite for	Bluetooth	and
+ dual booting
+References: <43E09717.4040405@gmail.com>	 <1138812167.3806.1.camel@localhost.localdomain>	 <43E0F8F7.9070009@gmail.com> <1138821481.3806.21.camel@localhost.localdomain>
+In-Reply-To: <1138821481.3806.21.camel@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1253; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,39 +19,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 02 Feb 2006 10:33:25 +0100
+Date: Thu, 02 Feb 2006 11:09:21 +0200
 
-Hi,
+Hi again,
 
-I would like my new Logitech V270 to exists under /dev/input/v270,
-instead of a changing /dev/input/mouseN.
+Marcel Holtmann wrote:
+> use "hciconfig hci0 putkey ..." after you paired your keyboard with your
+> Linux machine.
+>   
 
-The goal is to be able to use one of the Logitech control utilities,
-which need a device to operate on.
+Unfortunately, I get the following message:
 
-% hidd --show
-00:07:61:3B:9B:7C Logitech Bluetooth Mouse [046d:b002] connected
+Can't find link key for etc.
 
-% cat /proc/bus/input/devices
-...snipp...
-I: Bus=0005 Vendor=046d Product=b002 Version=4809
-N: Name="Logitech Bluetooth Mouse"
-P: Phys=00:10:C6:22:54:AF
-H: Handlers=mouse4 event4 
-B: EV=f 
-B: KEY=ff0000 0 0 0 0 0 0 0 0 
-B: REL=103 
-B: ABS=300 0 
-...snipp...
-
-How does this translate to a udev rule ? My attempts so far are failing.
-
-Charles
-
--- 
-Charles Bueche <charles@bueche.ch>
-sand, snow, wave, wind and net -surfer
-
+However, I can still use and ping (l2ping) my keyboard. Is it possible 
+that the link key gets erased after the reboot/shutdown?
 
 
 -------------------------------------------------------
