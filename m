@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Benjamin Eikel <benjamin@eikel.org>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----_=_NextPart_001_01C6285A.6EF83017"
-Message-ID: <06CCEA2EB1B80A4A937ED59005FA855151165B@svits26.main.ad.rit.edu>
-References: <06CCEA2EB1B80A4A937ED59005FA85518804B0@svits26.main.ad.rit.edu> <e1effdeb0602020920i240838a0jd1e6e1b6ee76f27e@mail.gmail.com>
-From: "Christopher E Piggott" <cepasp@rit.edu>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] rfcomm-getty
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200602022157.52386.benjamin@eikel.org>
+Subject: [Bluez-users] Pairing a bluetooth keyboard
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,96 +17,145 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 2 Feb 2006 19:36:36 -0500
+Date: Thu, 2 Feb 2006 21:57:51 +0100
 
-This is a multi-part message in MIME format.
+Hello!
 
-------_=_NextPart_001_01C6285A.6EF83017
-Content-Type: text/plain;
-	charset="iso-8859-15"
-Content-Transfer-Encoding: quoted-printable
+I am trying to pair a Bluetooth keyboard (Logitech Cordless Elite Keyboard for 
+Bluetooth, address XX:XX:XX:XX:XX:XX in the following text) with my laptop 
+(Bluetooth USB adapter: Belkin F8T008, , address ZZ:ZZ:ZZ:ZZ:ZZ:ZZ in the 
+following text) for some time now. 
 
-I found a script that appears to start a getty on an rfcomm device, =
-which is exactly what I want to do.  I gather this is part of =
-bluez-utils-2.7 but I can't seem to log into cvs (even anonymously) to =
-get it.  Aside from that, the script does:
+I am using a Bluetooth mouse (Logitech MX900, address YY:YY:YY:YY:YY:YY in the 
+following text) too. I am running Debian GNU/Linux unstable, self-compiled 
+Linux kernel 2.6.15.2, bluez-utils package 2.24-1.
 
-	rfcomm show rfcomm0 > /dev/null 2> /dev/null
-	if [ "$?" !=3D "1" ] ; then
-		/sbin/getty -w -L rfcomm0 115200 vt100;
-	fi
+My config file '/etc/bluetooth/hcid.conf':
+#
+# HCI daemon configuration file.
+#
 
-Why does it use 'show' ?  I did it a different way: rfcomm listen, wait =
-for that to indicate that somebody connected, then start getty.  Does =
-the above assume something else has happened first?
+# HCId options
+options {
+        # Automatically initialize new devices
+        autoinit yes;
 
---Chris
+        # Security Manager mode
+        #   none - Security manager disabled
+        #   auto - Use local PIN for incoming connections
+        #   user - Always ask user for a PIN
+        #
+        security user;
+
+        # Pairing mode
+        #   none  - Pairing disabled
+        #   multi - Allow pairing with already paired devices
+        #   once  - Pair once and deny successive attempts
+        pairing multi;
+
+        # PIN helper
+        #pin_helper /usr/bin/bluez-pin;
+        pin_helper /usr/lib/kdebluetooth/kbluepin;
+
+        # D-Bus PIN helper
+        #dbus_pin_helper;
+}
+
+# Default settings for HCI devices
+device {
+        # Local device name
+        #   %d - device id
+        #   %h - host name
+        name "%h-%d";
+
+        # Local device class
+        class 0x3e0100;
+
+        # Default packet type
+        #pkt_type DH1,DM1,HV1;
+
+        # Inquiry and Page scan
+        iscan enable; pscan enable;
+
+        # Default link mode
+        #   none   - no specific policy
+        #   accept - always accept incoming connections
+        #   master - become master on incoming connections,
+        #            deny role switch on outgoing connections
+        lm accept;
+
+        # Default link policy
+        #   none    - no specific policy
+        #   rswitch - allow role switch
+        #   hold    - allow hold mode
+        #   sniff   - allow sniff mode
+        #   park    - allow park mode
+        lp rswitch,hold,sniff,park;
+
+        # Authentication and Encryption (Security Mode 3)
+        #auth enable;
+        #encrypt enable;
+}
+
+What I am doing:
+
+1. I press the "connect" button on the bottom of the keyboard.
+
+2. I run 'hidd --connect XX:XX:XX:XX:XX:XX'.
+Output in '/var/log/syslog':
+Feb  2 21:21:37 host hidd: New HID device XX:XX:XX:XX:XX:XX (Logitech 
+Bluetooth Keyboard)
+Feb  2 21:21:37 host kernel: input: Bluetooth HID Boot Protocol Device 
+as /class/input/input9
+
+3. I run 'hcitool con'.
+Output:
+Connections:
+        < ACL XX:XX:XX:XX:XX:XX handle 7 state 1 lm MASTER
+        > ACL YY:YY:YY:YY:YY:YY handle 6 state 1 lm MASTER
+
+I can use the keyboard now. Everything works.
+
+4. I run 'hcitool auth XX:XX:XX:XX:XX:XX'.
+Output:
+0000
+HCI authentication request failed: Connection timed out
+
+When I enter this command my pinhelper kbluepin shows up and I enter the pin 
+0000. I enter the same pin on the keyboard. But as you can see at the output 
+above the pin is not used in the correct way but send as keyboard input to 
+the laptop. Somehow the keyboard seems not be in pin entry mode.
 
 
-------_=_NextPart_001_01C6285A.6EF83017
-Content-Type: application/ms-tnef;
-	name="winmail.dat"
-Content-Transfer-Encoding: base64
 
-eJ8+Ih8AAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAA5AQAAAAAAADoAAEIgAcAGAAAAElQTS5NaWNy
-b3NvZnQgTWFpbC5Ob3RlADEIAQ2ABAACAAAAAgACAAEEgAEADQAAAHJmY29tbS1nZXR0eQDeBAEF
-gAMADgAAANYHAgACABMAJAAkAAQAQAEBIIADAA4AAADWBwIAAgATACgAHgAEAD4BAQmAAQAhAAAA
-RjRCREM4MkQ4QjcyQkQ0RkJFRDdGMzJEOUNGOTg0MDcAkwcBA5AGALALAAA4AAAAAwA2AAAAAABA
-ADkAKK3l41koxgEeAD0AAQAAAAEAAAAAAAAAAgFHAAEAAAAsAAAAYz11czthPSA7cD1SSVQ7bD1T
-VklUUzI2LTA2MDIwMzAwNDAzMFotNzkzNQAeAEkAAQAAAB8AAABSZTogW0JsdWV6LXVzZXJzXSBE
-YnVzIHN1cHBvcnQAAEAATgCA5w7/HCjGAR4AWgABAAAAKAAAAGJsdWV6LXVzZXJzLWFkbWluQGxp
-c3RzLnNvdXJjZWZvcmdlLm5ldAACAVsAAQAAAG0AAAAAAAAAgSsfpL6jEBmdbgDdAQ9UAgAAAABi
-bHVlei11c2Vycy1hZG1pbkBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQAU01UUABibHVlei11c2Vycy1h
-ZG1pbkBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQAAAAAAgFcAAEAAAAtAAAAU01UUDpCTFVFWi1VU0VS
-Uy1BRE1JTkBMSVNUUy5TT1VSQ0VGT1JHRS5ORVQAAAAAHgBdAAEAAAARAAAAQ2xhdWRpbyBUYWth
-aGFzaQAAAAACAV4AAQAAAEMAAAAAAAAAgSsfpL6jEBmdbgDdAQ9UAgAAAABDbGF1ZGlvIFRha2Fo
-YXNpAFNNVFAAY2t0YWthaGFzaUBnbWFpbC5jb20AAAIBXwABAAAAGgAAAFNNVFA6Q0tUQUtBSEFT
-SUBHTUFJTC5DT00AAAAeAGYAAQAAAAUAAABTTVRQAAAAAB4AZwABAAAAKAAAAGJsdWV6LXVzZXJz
-LWFkbWluQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAAeAGgAAQAAAAUAAABTTVRQAAAAAB4AaQABAAAA
-FQAAAGNrdGFrYWhhc2lAZ21haWwuY29tAAAAAB4AcAABAAAADQAAAHJmY29tbS1nZXR0eQAAAAAC
-AXEAAQAAABsAAAABxigd0IHsoyczVCdESq96wZblhsWfAA8E2X8AHgB0AAEAAAAiAAAAYmx1ZXot
-dXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0AAAAHgAaDAEAAAAWAAAAQ2hyaXN0b3BoZXIgRSBQ
-aWdnb3R0AAAAHgAdDgEAAAANAAAAcmZjb21tLWdldHR5AAAAAAIBCRABAAAAaQQAAGUEAAB8CQAA
-TFpGdcCJBKUDAAoAcmNwZzEyNYIyA0NodG1sMQMwPwEDAfcKgAKkA+MCAGNowQrAc2V0MCAHEwKA
-/xADAFAEVghVB7IR1Q5RAwHdENcyBgAGwxHVMwRGENlvEusR4wjvCfc7GM8OMDU7EdIMYGMAUAsJ
-AWQzNpMRYAulNCAQAipcDrK9AZBnFPAKoxHjHeg0FPAAPCFET0NUWVAARSBIVE1MIFAAVUJMSUMg
-Ii0gLy9XM0MhgERUIkQglDMuMiGARU6cIj4e7R6PI8ExOB/wbyCiIw8kHyaQMx2AJXBFfEFEJc0O
-8SbvKW8k9DZBDvA8TUVUQQewQTEsYD0iRwnwBJBhdEUFsCIS0E9OVCLQVBMs8AXhRXgQ8W5nZT0G
-UnYTMS9BAJACICA2AC41Ljc2MzguTjEi/irPJQM3Nx/wVFBJVExFJc40DvBSIGU6IFtCCkF6LYZ1
-ETARIF0gRGI1cGAgc3VwcBhxJG41/R/wLzNPMX8mRTSRN8AoTwsmnzuUNRFgPEJPRE5ZOw0c8Twv
-ZzYoEVB3OwA7cwAhIAAAQIURYEmCIAIQdW5kIGE2IK0FBHQRAAVAYTZQZRER/UKwbzYgAZAAIEIh
-LuACQGx5IC/RA5FyEOADcG0KIAEAdg3gZSwgd/JoDeBoIAQAHZwdgD7U5GV4ANB0bESARfBC4R1B
-sHcAcEKhQ6Bkby4FOys4HYAmbmJzcOMCgEB3XCdhAUBBJ0Gh+mctYGgTMULARlFGUQqxXQVAb0Dg
-CjI1UXQDEHP8LTIwME3gTlBBoUaPPvLaYwBwJwVAETBlRVBDkZ0YYGdGQAIwQ6BjdgQgfihFgAnw
-RMECIAbACGBz3UggKUOCREFGQHRJb0p//UuMQQCQAQBBwANhQrNF0L9PXz7yTKFCRklAB5A6QHb/
-CqJAZwpyVacKsVvYEWA7Ky8BwDexQEEkfDIlUVBS/zOBQHkLChJBC/EDMEEnQH/HYpIBkUT2c2hv
-B+BFBFNdbVTyZ3RVeT5LuS+hRXEvbnVsAyAyZZ/TZq9nv1xsC4BlCoFkEicGkDTwIVAkPy2gIT3r
-IVAwkCA1wDtCsQnwbBpRZAMvc2ILgC9ERC1NB+AtINBlFjExDkAwcRFgdnQxcVAZ4GwpZv8AoAqx
-YsZbOiR8HNBecmALf1s4HZw+vz/PXF9ir0FjVy5oRIBaIlPhIDVxICdxZMInID9o71U/S51k/1cw
-fOJCMIDwASAEkAnwBUD9SMB5NOBFBWwgQ8AJ8EXR/wtwBUBYL3gSAhBM0kLhQ5FfC4CA8FCggxBC
-tHMDcGXtBuBkRIAFoG4tMEgACYB/RdBuIkO1RENUH37vS4xE33yyWXKDv3gSAaBvL0BCID0EEHUH
-gIaTTPEu0CBl/06ALvARAAQgEQBDIS0wQhDzcqARIHQ/Wn9bj1yfXa8PPc93/3kPQPotLUNo/wUQ
-EMCQz5Hfku+T/5UPlh/3nn889CVRLz2PO9+iRTMRCzqwJZN9pLAAAAAeADUQAQAAAEEAAAA8MDZD
-Q0VBMkVCMUI4MEE0QTkzN0VENTkwMDVGQTg1NTE1MTE2NUJAc3ZpdHMyNi5tYWluLmFkLnJpdC5l
-ZHU+AAAAAB4AORABAAAAfwAAADwwNkNDRUEyRUIxQjgwQTRBOTM3RUQ1OTAwNUZBODU1MTg4MDRC
-MEBzdml0czI2Lm1haW4uYWQucml0LmVkdT4gPGUxZWZmZGViMDYwMjAyMDkyMGkyNDA4MzhhMGpk
-MWU2ZTFiNmVlNzZmMjdlQG1haWwuZ21haWwuY29tPgAAHgBHEAEAAAAPAAAAbWVzc2FnZS9yZmM4
-MjIAAAsA8hABAAAAHwDzEAEAAAAiAAAAcgBmAGMAbwBtAG0ALQBnAGUAdAB0AHkALgBFAE0ATAAA
-AAAACwD2EAAAAABAAAcw0Erj41koxgFAAAgwFX4Gb1ooxgEDAN4/vW8AAAMA8T8JBAAAHgD4PwEA
-AAAUAAAAQ2hyaXN0b3BoZXIgUGlnZ290dAACAfk/AQAAAEIAAAAAAAAA3KdAyMBCEBq0uQgAKy/h
-ggEAAAAAAAAAL089UklUL09VPUlUUy9DTj1SRUNJUElFTlRTL0NOPUNFUEFTUAAAAB4A+j8BAAAA
-FQAAAFN5c3RlbSBBZG1pbmlzdHJhdG9yAAAAAAIB+z8BAAAAHgAAAAAAAADcp0DIwEIQGrS5CAAr
-L+GCAQAAAAAAAAAuAAAAAwD9P+QEAAADABlAAAAAAAMAGkAAAAAAAwAdQAAAAAADAB5AAAAAAB4A
-MEABAAAABwAAAENFUEFTUAAAHgAxQAEAAAAHAAAAQ0VQQVNQAAAeADJAAQAAACgAAABibHVlei11
-c2Vycy1hZG1pbkBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQAHgAzQAEAAAAVAAAAY2t0YWthaGFzaUBn
-bWFpbC5jb20AAAAAHgA4QAEAAAAHAAAAQ0VQQVNQAAAeADlAAQAAAAIAAAAuAAAAAwB2QP////8L
-ACkAAAAAAAsAIwAAAAAAAwAGEBVOykcDAAcQtwEAAAMAEBAAAAAAAwAREAAAAAAeAAgQAQAAAGUA
-AABJRk9VTkRBU0NSSVBUVEhBVEFQUEVBUlNUT1NUQVJUQUdFVFRZT05BTlJGQ09NTURFVklDRSxX
-SElDSElTRVhBQ1RMWVdIQVRJV0FOVFRPRE9JR0FUSEVSVEhJU0lTUEFSVE9GAAAAAAIBfwABAAAA
-QQAAADwwNkNDRUEyRUIxQjgwQTRBOTM3RUQ1OTAwNUZBODU1MTUxMTY1QkBzdml0czI2Lm1haW4u
-YWQucml0LmVkdT4AAAAAbys=
+So I change my approach. I remove the comment in the last lines of my 
+'/etc/bluetooth/hcid.conf' so that I have:
+auth enable;
+encrypt enable;
 
-------_=_NextPart_001_01C6285A.6EF83017--
+Then I run '/etc/init.d/bluetooth restart'.
+Output: Restarting bluetooth: hidd hcid sdpd hidd rfcomm.
+
+When I enter something on the Bluetooth keyboard now, kbluepin shows up again 
+and I enter the same pin on my laptop keyboard and the bluetooth keyboard (I 
+tried the normal numeric keys and the keypad). But this does not work 
+somehow.
+Output from '/var/log/syslog':
+Feb  2 21:42:30 belt hcid[9127]: link_key_request (sba=ZZ:ZZ:ZZ:ZZ:ZZ:ZZ, 
+dba=XX:XX:XX:XX:XX:XX)
+Feb  2 21:42:30 belt hcid[9127]: pin_code_request (sba=ZZ:ZZ:ZZ:ZZ:ZZ:ZZ, 
+dba=XX:XX:XX:XX:XX:XX)
+
+Of course the mouse is not working too, because I get the pin entry window 
+every time I move it. I already tried another pin helpers, i.e. a script 
+which echoes 'PIN:pin'.
+
+
+What am I doing wrong? Can you please give me some hints? If you need more 
+data, please tell me.
+
+Regards,
+Benjamin Eikel
 
 
 -------------------------------------------------------
