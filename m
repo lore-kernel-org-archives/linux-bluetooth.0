@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43E378FC.5020405@xmission.com>
+Message-ID: <43E2F126.9040605@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Re: btsco occasional loud bursts of static
-References: <43E2BD4E.7060905@purdue.edu> <43E2F126.9040605@xmission.com>
-In-Reply-To: <43E2F126.9040605@xmission.com>
+References: <43E2BD4E.7060905@purdue.edu>
+In-Reply-To: <43E2BD4E.7060905@purdue.edu>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,23 +18,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 03 Feb 2006 08:38:36 -0700
+Date: Thu, 02 Feb 2006 22:59:02 -0700
 
-Chase,
+Chase
 
->>I'd love to hlp in any way I can. I'm not sure where this code is that you
->>wrote of. Could you point me in the right direction? Also, I am going to
->>need
->>some kind of documentation on the sco protocol. Do you know where I
->>could find
->>these?
+> I'd love to hlp in any way I can. I'm not sure where this code is that you
+> wrote of. Could you point me in the right direction? Also, I am going to
+> need
+> some kind of documentation on the sco protocol. Do you know where I
+> could find
+> these?
 
-Go sign up for a free account at bluetooth.org and download
-documentation there.
+This is currently all in the kernel.
 
-Do not use the search page to find documents. After several frustrating
-attempts, I found out the search returns urls that you're not allowed to
-open using the free account.
+In the btsco project, you'll see in kernel/btsco.c where sock_recvmsg()
+gets data from the set and is followed immediately by some
+AUTO_FIXUP_BYTESHIFT code. This is the workaround for the problem.
+
+The sco generic transport is implemented in the kernel source in
+drivers/net/bluetooth/sco.c.
+
+The hardware interaction is in net/bluetooth/hci_{conn,core,event}.c and
+I suspect this is where things may need work. This is also where hacks
+for broadcom sco would probably end up.
 
 Brad
 
