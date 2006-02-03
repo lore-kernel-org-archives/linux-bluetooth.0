@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C628DB.2FF13418"
-Message-ID: <06CCEA2EB1B80A4A937ED59005FA8551880528@svits26.main.ad.rit.edu>
-From: "Christopher E Piggott" <cepasp@rit.edu>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Multiple SP services
+Mime-Version: 1.0 (Apple Message framework v746.2)
+Message-Id: <C51EAF6C-EE61-4B77-BC7F-3FADB91E923B@epfl.ch>
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+To: bluez-users@lists.sourceforge.net
+From: Thomas Lochmatter <thomas.lochmatter@epfl.ch>
+Subject: [Bluez-users] Concurrent access
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,55 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 3 Feb 2006 11:02:08 -0500
+Date: Fri, 3 Feb 2006 10:08:08 +0100
 
-This is a multi-part message in MIME format.
+Hi
 
-------_=_NextPart_001_01C628DB.2FF13418
-Content-Type: text/plain;
-	charset="US-ASCII"
-Content-Transfer-Encoding: quoted-printable
+We have several devices (robots) that we want to access at the same  
+time from several processes via bluetooth (rfcomm virtual serial  
+port). Each process first opens a connection to one robot (/dev/ 
+rfcommNN), then communicates with the robot for a while and finally  
+disconnects.
 
-Can sdpd somehow advertise that you have more than one serial port
-channel to offer?  Maybe the limitation isn't what I think it is ...
-perhaps my Axim and wm5 are only capable of attaching to one per
-partnership.
-=20
-=20
+When I launch several processes (about 3-5) at the same time, usually  
+only one of them succeeds to connect. If I constantly try to open the  
+devices (in a loop, wait a second and call "open" again), a couple of  
+them are connected after a while, but not all. Is there a way to make  
+that work? Does anyone else have experience with concurrent access to  
+the bluetooth libs?
 
-------_=_NextPart_001_01C628DB.2FF13418
-Content-Type: text/html;
-	charset="US-ASCII"
-Content-Transfer-Encoding: quoted-printable
+Thomas
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD><TITLE>Re: [Bluez-users] Dbus support</TITLE>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dus-ascii">
-<META content=3D"MSHTML 6.00.2900.2802" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV dir=3Dltr align=3Dleft><SPAN class=3D991530016-03022006><FONT =
-face=3DArial><FONT=20
-color=3D#0000ff><FONT size=3D2>C<SPAN class=3D991530016-03022006>an sdpd =
-somehow=20
-advertise that you have&nbsp;more than one serial port channel to =
-offer?&nbsp;=20
-Maybe the limitation isn't what I think it is ... perhaps my Axim and =
-wm5 are=20
-only capable of attaching to one per=20
-partnership.</SPAN></FONT></FONT></FONT></SPAN></DIV>
-<DIV dir=3Dltr align=3Dleft><SPAN class=3D991530016-03022006><FONT =
-face=3DArial><FONT=20
-color=3D#0000ff><FONT size=3D2><SPAN=20
-class=3D991530016-03022006></SPAN></FONT></FONT></FONT></SPAN>&nbsp;</DIV=
->
-<DIV dir=3Dltr align=3Dleft><SPAN class=3D991530016-03022006><FONT =
-face=3DArial><FONT=20
-color=3D#0000ff><FONT size=3D2><SPAN=20
-class=3D991530016-03022006></SPAN></FONT></FONT></FONT></SPAN>&nbsp;</DIV=
-></BODY></HTML>
-
-------_=_NextPart_001_01C628DB.2FF13418--
 
 
 -------------------------------------------------------
