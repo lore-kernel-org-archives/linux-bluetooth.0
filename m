@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43E673FD.8040005@in.tum.de>
-From: Aleksandar Kanchev <kanchev@in.tum.de>
-MIME-Version: 1.0
+Message-ID: <BAY114-F6DB2D39DF285EB6E71FC8950F0@phx.gbl>
+From: "Peter Scott" <peter_scottie@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] broadcast packets
-References: <BAY24-F20084DBFE3577D788A970CF82F0@phx.gbl>	 <1136420779.6652.30.camel@localhost> <dpotfk$832$1@sea.gmane.org>	 <43C1356C.60109@in.tum.de>  <43C4C236.5060100@in.tum.de> <1136968575.26114.8.camel@localhost.localdomain>
-In-Reply-To: <1136968575.26114.8.camel@localhost.localdomain>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Subject: [Bluez-users] HT820 pairing causes crash of hcid
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,92 +16,83 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 05 Feb 2006 22:54:05 +0100
+Date: Mon, 06 Feb 2006 08:10:56 +1100
 
-Hi Marcel,
+Hello there,
 
-I was away for a while :) But here's what I'm trying to do:
-I'm using 2 laptops with 2 Belkin class 2 USB bluetooth dongles. Both 
-laptops are running linux with bluez.
-I want to broadcast packets from the one side to the other. To do that 
-I'm connection both laptops with the hcitool and then from the master 
-side I'm using the following code:
-  int dd, i, ret = -1, hci_dev;
-  u_short handle, flags;
+I have version 2.15 of hcid running on a fedora core 4 complied kernal 
+2.6.15-1.1830_FC4.
 
-  char buf[HCI_ACL_HDR_SIZE + L2CAP_SIZE];
-  hci_acl_hdr *acl_hdr = (hci_acl_hdr *) buf;
-  l2cap_hdr *l2hdr = (l2cap_hdr *) (buf + HCI_ACL_HDR_SIZE);
-  uint16_t *psm = (uint16_t *) (((char *) l2hdr) + L2CAP_HDR_SIZE);
-  char *l2cap_data = ((char *) psm) + sizeof(uint16_t);
+I have successfully managed to pair with my mobile phone, and copy files to 
+it.
 
-  struct iovec iv[2];
-  uint8_t type = HCI_ACLDATA_PKT;
+However when i try to pair with a motorola headset ht820 hcid crashes. here 
+are some printouts from hcid.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/usr/sbin/hcid -n
+hcid[4266]: Bluetooth HCI daemon
+hcid[4266]: Starting security manager 0
+hcid[4266]: pin_code_request (sba=00:10:60:AD:6D:DC, dba=00:07:A4:B6:1F:AB)
+4266: arguments to dbus_type_is_basic() were incorrect, assertion 
+"_dbus_type_is_valid (typecode) || typecode == DBUS_TYPE_INVALID" f ailed in 
+file dbus-signature.c line 259.
+This is normally a bug in some application using the D-BUS library.
+type unknown isn't supported yet in dbus_message_append_args_valist
+*** buffer overflow detected ***: hcid: processing events terminated
+======= Backtrace: =========
+/lib/libc.so.6(__chk_fail+0x41)[0x85bc45]
+hcid: processing events[0xcf6e8b]
+/usr/lib/libdbus-1.so.1[0xb1b155]
+/usr/lib/libdbus-1.so.1[0xafb49b]
+/usr/lib/libdbus-1.so.1(dbus_connection_dispatch+0x20a)[0xafff37]
+hcid: processing events[0xcf69c0]
+hcid: processing events[0xcf68b0]
+hcid: processing events(main+0x4c5)[0xcf2fef]
+/lib/libc.so.6(__libc_start_main+0xdf)[0x792d5f]
+hcid: processing events[0xcf2071]
+======= Memory map: ========
+00156000-0015f000 r-xp 00000000 03:03 2540282    
+/lib/libgcc_s-4.0.2-20051126.so.1
+0015f000-00160000 rwxp 00009000 03:03 2540282    
+/lib/libgcc_s-4.0.2-20051126.so.1
+0077e000-008a1000 r-xp 00000000 03:03 2541235    /lib/libc-2.3.5.so
+008a1000-008a3000 r-xp 00123000 03:03 2541235    /lib/libc-2.3.5.so
+008a3000-008a5000 rwxp 00125000 03:03 2541235    /lib/libc-2.3.5.so
+008a5000-008a7000 rwxp 008a5000 00:00 0
+00aef000-00b58000 r-xp 00000000 03:03 2706238    /usr/lib/libdbus-1.so.1.0.0
+00b58000-00b5d000 rwxp 00069000 03:03 2706238    /usr/lib/libdbus-1.so.1.0.0
+00bd0000-00bd1000 r-xp 00bd0000 00:00 0          [vdso]
+00cf0000-00cfa000 r-xp 00000000 03:03 2708464    /usr/sbin/hcid
+00cfa000-00cfb000 rwxp 00009000 03:03 2708464    /usr/sbin/hcid
+00d50000-00d5c000 r-xp 00000000 03:03 2701357    
+/usr/lib/libbluetooth.so.1.0.15
+00d5c000-00d5d000 rwxp 0000c000 03:03 2701357    
+/usr/lib/libbluetooth.so.1.0.15
+00e70000-00e82000 r-xp 00000000 03:03 2541236    /lib/libnsl-2.3.5.so
+00e82000-00e83000 r-xp 00011000 03:03 2541236    /lib/libnsl-2.3.5.so
+00e83000-00e84000 rwxp 00012000 03:03 2541236    /lib/libnsl-2.3.5.so
+00e84000-00e86000 rwxp 00e84000 00:00 0
+00f30000-00f4a000 r-xp 00000000 03:03 2541234    /lib/ld-2.3.5.so
+00f4a000-00f4b000 r-xp 00019000 03:03 2541234    /lib/ld-2.3.5.so
+00f4b000-00f4c000 rwxp 0001a000 03:03 2541234    /lib/ld-2.3.5.so
+0887f000-088a0000 rw-p 0887f000 00:00 0          [heap]
+b7f64000-b7f66000 rw-p b7f64000 00:00 0
+b7f81000-b7f82000 rw-p b7f81000 00:00 0
+bff6d000-bff82000 rw-p bff6d000 00:00 0          [stack]
+Aborted
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  hci_dev = hci_get_route(NULL);
-  dd = hci_open_dev(hci_dev);
+I know that other people have managed to pair with this device, and would 
+apreaciate any comments or helpful tips.
 
-  handle = 1;
-  flags |= ACL_START;
-  flags |= ACL_ACTIVE_BCAST;
-  acl_hdr->handle = htobs(acl_handle_pack(handle, flags));
-  acl_hdr->dlen = htobs(L2CAP_SIZE);
+If there is anything I can do to help please let me know.
 
-  l2hdr->len = htobs(sizeof(uint16_t) + L2CAP_DATA_SIZE);
-  l2hdr->cid = htobs(0x0002);
-  *psm = htobs(4097);
+Many thanks
+Peter Scott
 
-  for (i = 0; i < L2CAP_DATA_SIZE; i++)
-    l2cap_data[i] = 'A';
-
-  iv[0].iov_base = &type;
-  iv[0].iov_len = 1;
-  iv[1].iov_base = buf;
-  iv[1].iov_len = sizeof(buf);
-  writev(dd, iv, 2);
-
-I can see the packet being transmitted on the local master side (with 
-hcidump) but the other end doesn't seem to see it. At least hcidump is 
-not dumping the packet.
-
-Thanks
-
-Marcel Holtmann wrote:
-
->Hi Aleksandar,
->
->  
->
->>Marcel, could you please answer me that ? :)
->>    
->>
->
->I already told you everything I know and I have no idea why you still
->stick to the broadcast thing. Once you have established the piconet
->between two devices, you can use it to transfer data. Doing everything
->on HCI level is not a good idea. Use at least the L2CAP level for it,
->but you might need to add some kernel code to make it work properly. The
->broadcast stuff is not really used in any Bluetooth application so far.
->
->Regards
->
->Marcel
->
->
->
->
->-------------------------------------------------------
->This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
->for problems?  Stop!  Download the new AJAX search engine that makes
->searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
->http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
->_______________________________________________
->Bluez-users mailing list
->Bluez-users@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->  
->
+_________________________________________________________________
+New year, new job – there's more than 100,00 jobs at SEEK 
+http://a.ninemsn.com.au/b.aspx?URL=http%3A%2F%2Fninemsn%2Eseek%2Ecom%2Eau&_t=752315885&_r=Jan05_tagline&_m=EXT
 
 
 
