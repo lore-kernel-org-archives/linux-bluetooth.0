@@ -1,16 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Joseph Dunn <joseph.dunn@colorado.edu>
+Message-ID: <537e39c90602061146m6c9253f7i@mail.gmail.com>
+From: Jordi Jaen Pallares <jordijp@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR chipset?
- (in USA)
-Message-ID: <20060206174308.73b53329@taco>
-In-Reply-To: <43DE617D.1010807@xmission.com>
-References: <20060123122802.280f747e@taco>
-	<43D55AC7.6040500@xmission.com>
-	<5f30e2610601301026l14b8354dne9a6eca4d0f98eea@mail.gmail.com>
-	<43DE617D.1010807@xmission.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Bluez-users] Adding services
+In-Reply-To: <06CCEA2EB1B80A4A937ED59005FA8551880572@svits26.main.ad.rit.edu>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_18897_22616733.1139255204905"
+References: <06CCEA2EB1B80A4A937ED59005FA8551880572@svits26.main.ad.rit.edu>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,32 +19,79 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 6 Feb 2006 17:43:08 -0700
+Date: Mon, 6 Feb 2006 20:46:44 +0100
 
-On Mon, 30 Jan 2006 11:57:01 -0700
-Brad Midgley <bmidgley@xmission.com> wrote:
+------=_Part_18897_22616733.1139255204905
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> Neither zonet nor bluetake have replied to emails asking what is in
-> there. There's got to be someone with these who could check :(
-I guess they just don't like you =).  Seriously though, bad news from
-Zonet tech support:
+Hi Christopher,
 
-Hi, 
-The ZUB6201C uses the Broadcom chipset.
+check this site to find some examples:
 
-Zonet Tech Support
-email: zonet_tech@zonetusa.com
-Zonet USA Corp.
- 
-> I do know that the mainstream offerings: belkin, kensington, iogear are
-> not using CSR.
-Now we know Zonet's newest is also not CSR based.  I'm still looking
-for a Bluetooth 1.2 (or 2.0) class 1 dongle that I can use with bluez
-and my 3com headset.  Anyone, anyone?  Are those crickets I hear in the
-distance?
+http://people.csail.mit.edu/albert/bluez-intro/x601.html#bzi-sdp-register
 
-> Brad
--Joe
+Regards,
+
+Jordi
+
+
+2006/2/6, Christopher E Piggott <cepasp@rit.edu>:
+>
+> Is there example code that shows how to add new/custom service offerings
+> to SDPD?
+>
+>
+> -------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc. Do you grep through log
+> files
+> for problems?  Stop!  Download the new AJAX search engine that makes
+> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+> http://sel.as-us.falkag.net/sel?cmdlnk&kid=103432&bid#0486&dat=121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+------=_Part_18897_22616733.1139255204905
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi Christopher,<br>
+<br>
+check this site to find some examples:<br>
+<br>
+<a href=3D"http://people.csail.mit.edu/albert/bluez-intro/x601.html#bzi-sdp=
+-register">http://people.csail.mit.edu/albert/bluez-intro/x601.html#bzi-sdp=
+-register</a><br>
+<br>
+Regards,<br>
+<br>
+Jordi<br><br><div><span class=3D"gmail_quote"><br>
+2006/2/6, Christopher E Piggott &lt;<a href=3D"mailto:cepasp@rit.edu">cepas=
+p@rit.edu</a>&gt;:</span><blockquote class=3D"gmail_quote" style=3D"border-=
+left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left=
+: 1ex;">
+Is there example code that shows how to add new/custom service offerings<br=
+>to SDPD?<br><br><br>------------------------------------------------------=
+-<br>This SF.net email is sponsored by: Splunk Inc. Do you grep through log=
+ files
+<br>for problems?&nbsp;&nbsp;Stop!&nbsp;&nbsp;Download the new AJAX search =
+engine that makes<br>searching your log files as easy as surfing the&nbsp;&=
+nbsp;web.&nbsp;&nbsp;DOWNLOAD SPLUNK!<br><a href=3D"http://sel.as-us.falkag=
+.net/sel?cmdlnk&amp;kid=103432&amp;bid#0486&amp;dat=121642">
+http://sel.as-us.falkag.net/sel?cmdlnk&amp;kid=103432&amp;bid#0486&amp;dat=
+=121642</a><br>_______________________________________________<br>Bluez-use=
+rs mailing list<br><a href=3D"mailto:Bluez-users@lists.sourceforge.net">Blu=
+ez-users@lists.sourceforge.net
+</a><br><a href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-users=
+">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockqu=
+ote></div><br>
+
+------=_Part_18897_22616733.1139255204905--
 
 
 -------------------------------------------------------
