@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] conceptronic CBT100U with scala-500 headset
-	pairing problem!
-From: Tamer Higazi <tamer23@myrealbox.com>
+Subject: Re: [Bluez-users] udev rules entry for bluetooth mouse
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1139310335.15160.1.camel@localhost>
-References: <1139079892.13219.11.camel@localhost>
-	 <20060205071057.GA11171@163.com>  <1139310335.15160.1.camel@localhost>
+In-Reply-To: <1139331334.12556.3.camel@pc-05.ycom.ch>
+References: <1138872805.21953.20.camel@bluez.bueche.ch>
+	 <43E1E11F.8040501@ycom.ch>  <1138880751.21953.38.camel@bluez.bueche.ch>
+	 <1139331334.12556.3.camel@pc-05.ycom.ch>
 Content-Type: text/plain
-Message-Id: <1139369217.14164.1.camel@localhost>
+Message-Id: <1139351059.22790.63.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,47 +20,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 08 Feb 2006 03:26:57 +0000
+Date: Tue, 07 Feb 2006 23:24:19 +0100
 
-as you said... "encryption"! 
-As soon I disabled "encrypion", connection pairing was possible!
+Hi Alexandre,
 
-Thanks for the advise 
+> > Did you contact the hotplug team about this issue ?
+> 
+> I got the folowing answer from hotplug ML : 
+> 
+> Kay Sievers <kay.sievers@vrfy.org>
+> 
+> The kernel driver needs to set the "struct device", to get a "device"
+> link
+> in sysfs pointing to the physical device, otherwise the USB devices are
+> not
+> reachable and udev can't match.
 
-Tamer
+and we don't have a "struct device", because the current integration of
+the Bluetooth subsystem is a class device under /sys/class. It seems we
+need to wait until the /sys/device unification found its way into the
+kernel.
 
-On Tue, 2006-02-07 at 12:05 +0100, Marcel Holtmann wrote:
-> Hi,
-> 
-> > > Requesting information ...
-> > > Can't create connection: Input/output error
-> > You must enable authenticate in /etc/bluetooth/hcid.conf, restart hcid
-> > whereafter. The default PIN code of your headset could be 0000, which
-> > you must put into /etc/bluetooth/pin, or enter manually. The
-> > communication between your computer and headset is encrypted enforced
-> > by the headset.
-> 
-> don't give the advice to set a device into security mode 3. This is
-> never the solution to a problem. Run "hcidump -X -V" to analyze the real
-> problem.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+Regards
+
+Marcel
+
 
 
 
