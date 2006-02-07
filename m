@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Multiple SP services
+Subject: Re: [Bluez-users] conceptronic CBT100U with scala-500 headset
+	pairing problem!
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <06CCEA2EB1B80A4A937ED59005FA8551880528@svits26.main.ad.rit.edu>
-References: <06CCEA2EB1B80A4A937ED59005FA8551880528@svits26.main.ad.rit.edu>
+In-Reply-To: <20060205071057.GA11171@163.com>
+References: <1139079892.13219.11.camel@localhost>
+	 <20060205071057.GA11171@163.com>
 Content-Type: text/plain
-Message-Id: <1139310493.15160.6.camel@localhost>
+Message-Id: <1139310335.15160.1.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,17 +20,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 07 Feb 2006 12:08:13 +0100
+Date: Tue, 07 Feb 2006 12:05:35 +0100
 
-Hi Christopher,
+Hi,
 
-> Can sdpd somehow advertise that you have more than one serial port
-> channel to offer?  Maybe the limitation isn't what I think it is ...
-> perhaps my Axim and wm5 are only capable of attaching to one per
-> partnership.
+> > Requesting information ...
+> > Can't create connection: Input/output error
+> You must enable authenticate in /etc/bluetooth/hcid.conf, restart hcid
+> whereafter. The default PIN code of your headset could be 0000, which
+> you must put into /etc/bluetooth/pin, or enter manually. The
+> communication between your computer and headset is encrypted enforced
+> by the headset.
 
-this is not a BlueZ problem. The sdpd can offer as many services as you
-like.
+don't give the advice to set a device into security mode 3. This is
+never the solution to a problem. Run "hcidump -X -V" to analyze the real
+problem.
 
 Regards
 
