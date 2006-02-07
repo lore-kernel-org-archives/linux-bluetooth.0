@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43E86165.2060805@cs.bgu.ac.il>
-From: NIV VAIZER <nivv@cs.bgu.ac.il>
+Message-ID: <43E7F9BF.5050103@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] proximity monitor
+Subject: Re: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR chipset?
+ (in USA)
+References: <20060123122802.280f747e@taco>	<43D55AC7.6040500@xmission.com>	<5f30e2610601301026l14b8354dne9a6eca4d0f98eea@mail.gmail.com>	<43DE617D.1010807@xmission.com> <20060206174308.73b53329@taco>
+In-Reply-To: <20060206174308.73b53329@taco>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +19,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 07 Feb 2006 10:59:17 +0200
+Date: Mon, 06 Feb 2006 18:37:03 -0700
 
-Hay,
-One of the cool tricks BT could be used for is the proximity monitor.
-MonkeyBox 
-<http://gentoo-wiki.com/index.php?title=User:MonkeyBox&action=edit> 
-wrote this: http://gentoo-wiki.com/TIP_Bluetooth_Proximity_Monitor
+Joe
 
-which basically pools my cellular for RSSI. if my RSSI decreases, It 
-"know" I am leaving the pc.
-I was wondering if its possible to receive these RSSI indications in an 
-event driven manner , thus, reducing the pooling work.
+I'm glad you got through to zonet.
 
-I dont know python :-( can any one hint me where I may ask for help on this?
+I got a "generic" class 1 bt1.1 or maybe 1.2 adapter a while back from
+compusa that was csr based. Sadly for us, CSR used to be more common and
+it's become less so.
 
-Niv
+Brad
 
 
 -------------------------------------------------------
