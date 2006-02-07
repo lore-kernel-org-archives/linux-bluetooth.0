@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] udev rules entry for bluetooth mouse
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43E918D8.1010206@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1139331334.12556.3.camel@pc-05.ycom.ch>
-References: <1138872805.21953.20.camel@bluez.bueche.ch>
-	 <43E1E11F.8040501@ycom.ch>  <1138880751.21953.38.camel@bluez.bueche.ch>
-	 <1139331334.12556.3.camel@pc-05.ycom.ch>
-Content-Type: text/plain
-Message-Id: <1139351059.22790.63.camel@localhost>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR chipset?
+ (in USA)
+References: <20060123122802.280f747e@taco>
+In-Reply-To: <20060123122802.280f747e@taco>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,32 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 07 Feb 2006 23:24:19 +0100
+Date: Tue, 07 Feb 2006 15:02:00 -0700
 
-Hi Alexandre,
+Joe
 
-> > Did you contact the hotplug team about this issue ?
-> 
-> I got the folowing answer from hotplug ML : 
-> 
-> Kay Sievers <kay.sievers@vrfy.org>
-> 
-> The kernel driver needs to set the "struct device", to get a "device"
-> link
-> in sysfs pointing to the physical device, otherwise the USB devices are
-> not
-> reachable and udev can't match.
+I am going to order a bluetake bt007ex today. It seems that it is using
+bluecore4 (CSR). No, bluetake has not gotten back to me on this simple
+question, but the software installer is "Toshiba bluetooth stack for
+windows by CSR"
 
-and we don't have a "struct device", because the current integration of
-the Bluetooth subsystem is a class device under /sys/class. It seems we
-need to wait until the /sys/device unification found its way into the
-kernel.
+http://www.bluetake.com/Manuals/BT007Ex/BT007Ex_QSG_EN.pdf
 
-Regards
+sheesh. I'll let you know what shows up...
 
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
