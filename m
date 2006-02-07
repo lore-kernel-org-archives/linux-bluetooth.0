@@ -1,11 +1,20 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] magic constants in sdptool.c
+Subject: Re: [Bluez-devel] Cleaning up the D-Bus interface
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <06CCEA2EB1B80A4A937ED59005FA85518805BE@svits26.main.ad.rit.edu>
-References: <06CCEA2EB1B80A4A937ED59005FA85518805BE@svits26.main.ad.rit.edu>
+In-Reply-To: <e1effdeb0602021311l50c9cfb5o7ceab3e80a131f54@mail.gmail.com>
+References: <1135111693.26233.11.camel@localhost>
+	 <3013cac80512220511u9ecac97haf7278614bfe085a@mail.gmail.com>
+	 <1135271815.6002.96.camel@localhost>
+	 <3013cac80512230528y5b879d2bh2dbcb4e0fe18e974@mail.gmail.com>
+	 <1135350634.3985.2.camel@localhost> <1135434294.1008.3.camel@localhost>
+	 <e1effdeb0601251054m6ac203ceu4901dca319212d2@mail.gmail.com>
+	 <1138304710.5901.106.camel@localhost>
+	 <e1effdeb0601300944i45664a73v999c155298825117@mail.gmail.com>
+	 <1138902761.3750.7.camel@localhost.localdomain>
+	 <e1effdeb0602021311l50c9cfb5o7ceab3e80a131f54@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1139309295.7633.2.camel@localhost>
+Message-Id: <1139308823.7633.0.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,20 +27,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 07 Feb 2006 11:48:15 +0100
+Date: Tue, 07 Feb 2006 11:40:23 +0100
 
-Hi Christopher,
+Hi Claudio,
 
-> static int cmd_records(int argc, char **argv)
-> {
->     ...
->     uint32_t base[] = { 0x10000, 0x1002e, 0x110b };
->     ...
-> }
->  
-> Where do these magic constants come from?
+> here is the new patch!
+> 
+> You can use the command below or the dbus-test script to test this feature.
+> $dbus-send --system --print-reply --type=method_call --dest=org.bluez
+> /org/bluez/Device/hci0 org.bluez.Device.SetMode byte:0
+> 
+> $dbus-send --system --print-reply --type=method_call --dest=org.bluez
+> /org/bluez/Device/hci0 org.bluez.Device.GetMode
 
-these are record handles found in the available devices on the market.
+the patch has been applied to the CVS now.
 
 Regards
 
