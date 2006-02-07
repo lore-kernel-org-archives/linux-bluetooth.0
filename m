@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] GBlueZConf Prototype
+Subject: Re: [Bluez-devel] magic constants in sdptool.c
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0602060950y29834100ge178776b1dbdf665@mail.gmail.com>
-References: <e1effdeb0602060950y29834100ge178776b1dbdf665@mail.gmail.com>
+In-Reply-To: <06CCEA2EB1B80A4A937ED59005FA85518805BE@svits26.main.ad.rit.edu>
+References: <06CCEA2EB1B80A4A937ED59005FA85518805BE@svits26.main.ad.rit.edu>
 Content-Type: text/plain
-Message-Id: <1139309340.7633.4.camel@localhost>
+Message-Id: <1139309295.7633.2.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,14 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 07 Feb 2006 11:49:00 +0100
+Date: Tue, 07 Feb 2006 11:48:15 +0100
 
-Hi Claudio,
+Hi Christopher,
 
-> Here is a new GBlueZConf version.
-> http://www.cin.ufpe.br/~ckt/gbluezconf/gbluezconf-00.08.tar.gz
+> static int cmd_records(int argc, char **argv)
+> {
+>     ...
+>     uint32_t base[] = { 0x10000, 0x1002e, 0x110b };
+>     ...
+> }
+>  
+> Where do these magic constants come from?
 
-this now compiles without any problems. Keep on the good work.
+these are record handles found in the available devices on the market.
 
 Regards
 
