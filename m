@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Help, Connection Reset by peer.
+Subject: Re: [Bluez-devel] Oops on removing bluetooth CF card while in use
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20060204172632.37736.qmail@web53104.mail.yahoo.com>
-References: <20060204172632.37736.qmail@web53104.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1139310447.15160.4.camel@localhost>
+Cc: bluez-devel@lists.sf.net
+In-Reply-To: <20060204223527.GA1903@elf.ucw.cz>
+References: <20060204223527.GA1903@elf.ucw.cz>
+Content-Type: multipart/mixed; boundary="=-kjS8box5ccr5pw4IFvSt"
+Message-Id: <1139310158.13048.4.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,57 +19,50 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 07 Feb 2006 12:07:27 +0100
+Date: Tue, 07 Feb 2006 12:02:38 +0100
 
-Hi,
 
-> I know bluez supports max 7 rfcomm connections at one
-> time, and so it works.
-> I implemented obex push profile(a part of it) and i
-> use it to send files to cellphones over rfcomm.
-> The strange thing is that sometimes when more than one
-> connection are working at the same time without any
-> particular apparent reason fail and some of the
-> connections or both of them stay open.
-> 
-> i close these connections using "hcitool dc"
-> 
-> when i try to browse the services it gives me:
-> Failed to connect SDP server: Connection reset by peer
-> 
-> i also stop my application
-> i restart hcid,sdpd
-> but still the same error,
-> then i have to reboot to make it work again.
-> 
-> any idea about what can it be the reason?
-> it happens rarely,randomly without any particular
-> condition except of the fact that there are two open
-> connections working, and i use kernel 2.4.27 or 2.4.29
-> 
-> is there any way to reset the device without needing
-> to reboot the system?
-> 
-> I must say that the only thing my application does is,
-> 
-> while true
-> 1-search for devices,
-> 2-for every device 
->      find the service channel
->      start a new thread with the sendfile function
-> goto while
-> 
-> so i don't think my application is the problem.
+--=-kjS8box5ccr5pw4IFvSt
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-I wouldn't bet on it, but this can also be a kernel problem. The old 2.4
-kernel series is no longer actively maintained and you might consider
-switching to the latest 2.6 kernel. And you run "hcidump -X -V" to see
-what really happens.
+Hi Pavel,
+
+> I'm getting small saga with CF bluetooth card... can anyone help?
+> 
+> http://bugzilla.kernel.org/show_bug.cgi?id=5958
+
+do you have the full oops message for me? However it has been a while
+since I worked with serial line disciplines and the serial subsystem is
+changing too often, that I lost track. Does the attached patch helps or
+is the problem another one. Do we need to keep track of the hangup in
+the serial subsystem?
 
 Regards
 
 Marcel
 
+
+--=-kjS8box5ccr5pw4IFvSt
+Content-Disposition: attachment; filename=patch
+Content-Type: text/x-patch; name=patch; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 613673b..3366bba 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -192,7 +192,7 @@ static int hci_uart_flush(struct hci_dev
+ 
+ 	/* Flush any pending characters in the driver and discipline. */
+ 	tty_ldisc_flush(tty);
+-	if (tty->driver->flush_buffer)
++	if (tty->driver && tty->driver->flush_buffer)
+ 		tty->driver->flush_buffer(tty);
+ 
+ 	if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
+
+--=-kjS8box5ccr5pw4IFvSt--
 
 
 
