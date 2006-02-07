@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v746.2)
-In-Reply-To: <1139310563.15160.8.camel@localhost>
-References: <C51EAF6C-EE61-4B77-BC7F-3FADB91E923B@epfl.ch> <1139310563.15160.8.camel@localhost>
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <FA0D666C-A3CF-47DE-9297-7E91421840BD@epfl.ch>
-From: Thomas Lochmatter <thomas.lochmatter@epfl.ch>
-Subject: Re: [Bluez-users] Concurrent access
+Subject: Re: [Bluez-users] Compiling bluez-utils for MIPS
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <d6db2b820601281404q11cb9ba0k21116724a9047d7f@mail.gmail.com>
+References: <d6db2b820601281404q11cb9ba0k21116724a9047d7f@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1139311187.15160.21.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,70 +18,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 7 Feb 2006 13:15:51 +0100
+Date: Tue, 07 Feb 2006 12:19:47 +0100
 
->> We have several devices (robots) that we want to access at the same
->> time from several processes via bluetooth (rfcomm virtual serial
->> port). Each process first opens a connection to one robot (/dev/
->> rfcommNN), then communicates with the robot for a while and finally
->> disconnects.
->>
->> When I launch several processes (about 3-5) at the same time, usually
->> only one of them succeeds to connect. If I constantly try to open the
->> devices (in a loop, wait a second and call "open" again), a couple of
->> them are connected after a while, but not all. Is there a way to make
->> that work? Does anyone else have experience with concurrent access to
->> the bluetooth libs?
->
-> the baseband of a Bluetooth chip is only capable of paging one  
-> device at
-> a time. We already had this discussion. You should better look at the
-> mailing list archive.
+Hi Michael,
 
-I found a thread regarding concurrent access where the solution was  
-to switch to kernel 2.6. However, I am already working on kernel 2.6  
-(RH).
+> I'm trying to compile bluez-utils-2.24 project for Linux 2.4.20 that
+> runs on MIPS. This cross-compilation was done on my desktop
+> Linux 2.6.12. All needed drivers (HCI, RFCOMM, L2CAP) were uploaded to
+> the > MIPS-board early (after some patches for kernel 2.4.20 that I
+> found in internet). I configured the environment with the following
+> variables: 
+> export PLATFORM=mipsel-uclibc 
+> export BUILD=i386-pc-linux-gnu 
+> export HOSTCC=gcc 
+> export CROSS_COMPILE=mipsel-uclibc- 
+> export LDFLAGS=-Wl,-dynamic-linker,/lib/ld-uClibc.so.0,-soname=libc.so.0 
+> and runned ./configure mipsel-linux --build=$BUILD.  
+> Making the project was OK, it used "mipsel-linux-gcc", etc., so
+> it seemed OK. After uploading all the bluez utilities on the
+> MIPS-board, each call  for these utilities (i.e. "hciconfig") failed
+> with such a prompt: 
+> libc.so.6: aborted attempt to load hciconfig!
+> To my understanding, it still used my desktop standard library
+> (cause  "libc.so.6" is a symbolic link in /usr/local/lib on my PC)
+> instead the libc.so.0 on the MIPS-board. 
+> I tryied adding LDFLAG "-soname=libc.so.0", but it did
+> not force defining the right library in building executables.
+> Could someone help me in configuring this project? What did I miss?
 
-I don't think it is a chip limitation issue. In between, I modified  
-my program to maintain several connections in the same process/thread  
-and that works perfectly. To be more specific, the following works
+I've never done this and I am not a cross-compiling expert.
 
-	Process 1:
-	open /dev/rfcomm23
-	open /dev/rfcomm45
-	send something to rfcomm23
-	read from rfcomm23
-	send something to rfcomm45
-	read from rfcomm45
-	close rfcomm23
-	close rfcomm45
+Regards
 
-In the multiprocess version, the following two processes run at the  
-same time:
+Marcel
 
-	Process 1:
-	open /dev/rfcomm23 until success
-	send something to rfcomm23
-	read from rfcomm23
-	close rfcomm23
-
-	Process 2:
-	open /dev/rfcomm45 until success
-	send something to rfcomm45
-	read from rfcomm45
-	close rfcomm45
-
-While process 1 is trying to open a connection to rfcomm23, the other  
-process obviously has to wait until the connection is established  
-(that might be a chip limitation). However, as soon as the connection  
-is established, the other process should be able to open rfcomm45  
-before process 1 closes rfcomm23 ...? Because with all being done in  
-the same process, it works as well ...
-
-Thanks in advance for your help. If you already discussed this, I'm  
-happy to get a pointer to the corresponding thread.
-
-Thomas
 
 
 
