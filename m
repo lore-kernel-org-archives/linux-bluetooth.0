@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth with Latitude X1
+Subject: Re: [Bluez-users] Concurrent access
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200602041607.32467.arthur.breitman@gmail.com>
-References: <200601310012.39402.arthur.breitman@gmail.com>
-	 <1138731692.3968.5.camel@localhost.localdomain>
-	 <200602041607.32467.arthur.breitman@gmail.com>
+In-Reply-To: <C51EAF6C-EE61-4B77-BC7F-3FADB91E923B@epfl.ch>
+References: <C51EAF6C-EE61-4B77-BC7F-3FADB91E923B@epfl.ch>
 Content-Type: text/plain
-Message-Id: <1139310791.15160.13.camel@localhost>
+Message-Id: <1139310563.15160.8.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,28 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 07 Feb 2006 12:13:11 +0100
+Date: Tue, 07 Feb 2006 12:09:23 +0100
 
-Hi Arthur,
+Hi Thomas,
 
-> Hi, I was away for a while, here are the results
+> We have several devices (robots) that we want to access at the same  
+> time from several processes via bluetooth (rfcomm virtual serial  
+> port). Each process first opens a connection to one robot (/dev/ 
+> rfcommNN), then communicates with the robot for a while and finally  
+> disconnects.
 > 
-> 
-> arthurb@coin:~$ sudo hcidump -X -V -m 10
-> Password:
-> HCI sniffer - Bluetooth packet analyzer ver 1.28
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> < HCI Command: Inquiry (0x01|0x0001) plen 5
->     lap 0x9e8b33 len 8 num 0
-> > HCI Event: Command Status (0x0f) plen 4
->     Inquiry (0x01|0x0001) status 0x00 ncmd 1
-> > HCI Event: Vendor (0xff) plen 7
->     CSR: VM (channel 13)
->     0000: 03 00 04 00 00 00                                 ......
+> When I launch several processes (about 3-5) at the same time, usually  
+> only one of them succeeds to connect. If I constantly try to open the  
+> devices (in a loop, wait a second and call "open" again), a couple of  
+> them are connected after a while, but not all. Is there a way to make  
+> that work? Does anyone else have experience with concurrent access to  
+> the bluetooth libs?
 
-so the VM is sending you something. I haven't checked if these might be
-in a specific format defined by CSR or if it is free form. However you
-might wanna take this up to Dell.
+the baseband of a Bluetooth chip is only capable of paging one device at
+a time. We already had this discussion. You should better look at the
+mailing list archive.
 
 Regards
 
