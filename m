@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SCO link problem
+Subject: Re: [Bluez-devel] Help, Connection Reset by peer.
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <9ec07a230602020153mfe5d62ckb447916a94f04d04@mail.gmail.com>
-References: <9ec07a230602020153mfe5d62ckb447916a94f04d04@mail.gmail.com>
+In-Reply-To: <20060204172632.37736.qmail@web53104.mail.yahoo.com>
+References: <20060204172632.37736.qmail@web53104.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1139310644.15160.10.camel@localhost>
+Message-Id: <1139310447.15160.4.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,18 +18,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 07 Feb 2006 12:10:44 +0100
+Date: Tue, 07 Feb 2006 12:07:27 +0100
 
-Hi Israel,
+Hi,
 
-> I'm developing an application for voice transmission over a SCO link.
-> My first step was to compile and probe the utility scotest provided in
-> bluez-utils packet. However, I see in hcidump that I am sending the
-> correct frames(0x7f), but in receiver end, I get nothing but 0's or
-> f's. I don't really know where the problem is, so please help me.
+> I know bluez supports max 7 rfcomm connections at one
+> time, and so it works.
+> I implemented obex push profile(a part of it) and i
+> use it to send files to cellphones over rfcomm.
+> The strange thing is that sometimes when more than one
+> connection are working at the same time without any
+> particular apparent reason fail and some of the
+> connections or both of them stay open.
+> 
+> i close these connections using "hcitool dc"
+> 
+> when i try to browse the services it gives me:
+> Failed to connect SDP server: Connection reset by peer
+> 
+> i also stop my application
+> i restart hcid,sdpd
+> but still the same error,
+> then i have to reboot to make it work again.
+> 
+> any idea about what can it be the reason?
+> it happens rarely,randomly without any particular
+> condition except of the fact that there are two open
+> connections working, and i use kernel 2.4.27 or 2.4.29
+> 
+> is there any way to reset the device without needing
+> to reboot the system?
+> 
+> I must say that the only thing my application does is,
+> 
+> while true
+> 1-search for devices,
+> 2-for every device 
+>      find the service channel
+>      start a new thread with the sendfile function
+> goto while
+> 
+> so i don't think my application is the problem.
 
-the over the air codec is CVSD and not transparent. In the end this is a
-voice connection and not a data connection.
+I wouldn't bet on it, but this can also be a kernel problem. The old 2.4
+kernel series is no longer actively maintained and you might consider
+switching to the latest 2.6 kernel. And you run "hcidump -X -V" to see
+what really happens.
 
 Regards
 
