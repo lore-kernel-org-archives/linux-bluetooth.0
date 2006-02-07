@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43E918D8.1010206@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] udev rules entry for bluetooth mouse
+From: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR chipset?
- (in USA)
-References: <20060123122802.280f747e@taco>
-In-Reply-To: <20060123122802.280f747e@taco>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <1138880751.21953.38.camel@bluez.bueche.ch>
+References: <1138872805.21953.20.camel@bluez.bueche.ch>
+	 <43E1E11F.8040501@ycom.ch>  <1138880751.21953.38.camel@bluez.bueche.ch>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1139331334.12556.3.camel@pc-05.ycom.ch>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,20 +19,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 07 Feb 2006 15:02:00 -0700
+Date: Tue, 07 Feb 2006 17:55:34 +0100
 
-Joe
+Le jeudi 02 f=C3=A9vrier 2006 =C3=A0 12:45 +0100, Charles Bueche a =C3=A9=
+crit :
+> Hi Alexandre,
+>=20
+> I have found your post on 13.1.2006.
+>=20
+> I don't exactly understand who is faulty :
+>=20
+> - is it hidd which should add the mouse details to a data structure ?
+> - or udev which doesn't search for the info ?
+>=20
+> Did you contact the hotplug team about this issue ?
 
-I am going to order a bluetake bt007ex today. It seems that it is using
-bluecore4 (CSR). No, bluetake has not gotten back to me on this simple
-question, but the software installer is "Toshiba bluetooth stack for
-windows by CSR"
+I got the folowing answer from hotplug ML :=20
 
-http://www.bluetake.com/Manuals/BT007Ex/BT007Ex_QSG_EN.pdf
+Kay Sievers <kay.sievers@vrfy.org>
 
-sheesh. I'll let you know what shows up...
+The kernel driver needs to set the "struct device", to get a "device"
+link
+in sysfs pointing to the physical device, otherwise the USB devices are
+not
+reachable and udev can't match.
 
-Brad
+Kay
+
+
+So seems to be a Bluez stack problem.
+
+
+--=20
+        Alexandre
+
 
 
 -------------------------------------------------------
