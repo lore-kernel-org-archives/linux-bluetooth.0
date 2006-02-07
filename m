@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Wake-On-Bluetooth Support
+Subject: Re: [Bluez-devel] SCO link problem
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <44BDAFB888F59F408FAE3CC35AB4704102E4A509@orsmsx409>
-References: <44BDAFB888F59F408FAE3CC35AB4704102E4A509@orsmsx409>
+In-Reply-To: <9ec07a230602020153mfe5d62ckb447916a94f04d04@mail.gmail.com>
+References: <9ec07a230602020153mfe5d62ckb447916a94f04d04@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1139310850.15160.15.camel@localhost>
+Message-Id: <1139310644.15160.10.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,14 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 07 Feb 2006 12:14:10 +0100
+Date: Tue, 07 Feb 2006 12:10:44 +0100
 
-Hi,
+Hi Israel,
 
-> Can you tell me what type of capability is needed in the chip for this to work?  I thought it is just a matter of not powering down the Bluetooth device while in S1 and then send out a generic wake-up event to the PCI bus or something.  
+> I'm developing an application for voice transmission over a SCO link.
+> My first step was to compile and probe the utility scotest provided in
+> bluez-utils packet. However, I see in hcidump that I am sending the
+> correct frames(0x7f), but in receiver end, I get nothing but 0's or
+> f's. I don't really know where the problem is, so please help me.
 
-actually I have no idea. Maybe you need a special HID proxy version for
-this. Ask Apple how they implemented it.
+the over the air codec is CVSD and not transparent. In the end this is a
+voice connection and not a data connection.
 
 Regards
 
