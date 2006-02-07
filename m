@@ -1,13 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43E7F9BF.5050103@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Joseph Dunn <joseph.dunn@colorado.edu>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR chipset?
  (in USA)
-References: <20060123122802.280f747e@taco>	<43D55AC7.6040500@xmission.com>	<5f30e2610601301026l14b8354dne9a6eca4d0f98eea@mail.gmail.com>	<43DE617D.1010807@xmission.com> <20060206174308.73b53329@taco>
-In-Reply-To: <20060206174308.73b53329@taco>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <20060206174308.73b53329@taco>
+In-Reply-To: <43DE617D.1010807@xmission.com>
+References: <20060123122802.280f747e@taco>
+	<43D55AC7.6040500@xmission.com>
+	<5f30e2610601301026l14b8354dne9a6eca4d0f98eea@mail.gmail.com>
+	<43DE617D.1010807@xmission.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,17 +22,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Feb 2006 18:37:03 -0700
+Date: Mon, 6 Feb 2006 17:43:08 -0700
 
-Joe
+On Mon, 30 Jan 2006 11:57:01 -0700
+Brad Midgley <bmidgley@xmission.com> wrote:
 
-I'm glad you got through to zonet.
+> Neither zonet nor bluetake have replied to emails asking what is in
+> there. There's got to be someone with these who could check :(
+I guess they just don't like you =).  Seriously though, bad news from
+Zonet tech support:
 
-I got a "generic" class 1 bt1.1 or maybe 1.2 adapter a while back from
-compusa that was csr based. Sadly for us, CSR used to be more common and
-it's become less so.
+Hi, 
+The ZUB6201C uses the Broadcom chipset.
 
-Brad
+Zonet Tech Support
+email: zonet_tech@zonetusa.com
+Zonet USA Corp.
+ 
+> I do know that the mainstream offerings: belkin, kensington, iogear are
+> not using CSR.
+Now we know Zonet's newest is also not CSR based.  I'm still looking
+for a Bluetooth 1.2 (or 2.0) class 1 dongle that I can use with bluez
+and my 3com headset.  Anyone, anyone?  Are those crickets I hear in the
+distance?
+
+> Brad
+-Joe
 
 
 -------------------------------------------------------
