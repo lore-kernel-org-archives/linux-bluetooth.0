@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Compiling bluez-utils for MIPS
+Subject: Re: [Bluez-users] Bluetooth with Latitude X1
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <d6db2b820601281404q11cb9ba0k21116724a9047d7f@mail.gmail.com>
-References: <d6db2b820601281404q11cb9ba0k21116724a9047d7f@mail.gmail.com>
+In-Reply-To: <200602041607.32467.arthur.breitman@gmail.com>
+References: <200601310012.39402.arthur.breitman@gmail.com>
+	 <1138731692.3968.5.camel@localhost.localdomain>
+	 <200602041607.32467.arthur.breitman@gmail.com>
 Content-Type: text/plain
-Message-Id: <1139311187.15160.21.camel@localhost>
+Message-Id: <1139310791.15160.13.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,35 +20,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 07 Feb 2006 12:19:47 +0100
+Date: Tue, 07 Feb 2006 12:13:11 +0100
 
-Hi Michael,
+Hi Arthur,
 
-> I'm trying to compile bluez-utils-2.24 project for Linux 2.4.20 that
-> runs on MIPS. This cross-compilation was done on my desktop
-> Linux 2.6.12. All needed drivers (HCI, RFCOMM, L2CAP) were uploaded to
-> the > MIPS-board early (after some patches for kernel 2.4.20 that I
-> found in internet). I configured the environment with the following
-> variables: 
-> export PLATFORM=mipsel-uclibc 
-> export BUILD=i386-pc-linux-gnu 
-> export HOSTCC=gcc 
-> export CROSS_COMPILE=mipsel-uclibc- 
-> export LDFLAGS=-Wl,-dynamic-linker,/lib/ld-uClibc.so.0,-soname=libc.so.0 
-> and runned ./configure mipsel-linux --build=$BUILD.  
-> Making the project was OK, it used "mipsel-linux-gcc", etc., so
-> it seemed OK. After uploading all the bluez utilities on the
-> MIPS-board, each call  for these utilities (i.e. "hciconfig") failed
-> with such a prompt: 
-> libc.so.6: aborted attempt to load hciconfig!
-> To my understanding, it still used my desktop standard library
-> (cause  "libc.so.6" is a symbolic link in /usr/local/lib on my PC)
-> instead the libc.so.0 on the MIPS-board. 
-> I tryied adding LDFLAG "-soname=libc.so.0", but it did
-> not force defining the right library in building executables.
-> Could someone help me in configuring this project? What did I miss?
+> Hi, I was away for a while, here are the results
+> 
+> 
+> arthurb@coin:~$ sudo hcidump -X -V -m 10
+> Password:
+> HCI sniffer - Bluetooth packet analyzer ver 1.28
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> < HCI Command: Inquiry (0x01|0x0001) plen 5
+>     lap 0x9e8b33 len 8 num 0
+> > HCI Event: Command Status (0x0f) plen 4
+>     Inquiry (0x01|0x0001) status 0x00 ncmd 1
+> > HCI Event: Vendor (0xff) plen 7
+>     CSR: VM (channel 13)
+>     0000: 03 00 04 00 00 00                                 ......
 
-I've never done this and I am not a cross-compiling expert.
+so the VM is sending you something. I haven't checked if these might be
+in a specific format defined by CSR or if it is free form. However you
+might wanna take this up to Dell.
 
 Regards
 
