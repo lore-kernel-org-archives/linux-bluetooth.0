@@ -2,11 +2,10 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] pci bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.33.0602071928150.1035-100000@redbean.intranet.gw-instruments.de>
-References: 
-	 <Pine.LNX.4.33.0602071928150.1035-100000@redbean.intranet.gw-instruments.de>
+In-Reply-To: <43E8DC7D.60603@xmission.com>
+References: <43E8DC7D.60603@xmission.com>
 Content-Type: text/plain
-Message-Id: <1139350904.22790.60.camel@localhost>
+Message-Id: <1139350819.22790.57.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,18 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 07 Feb 2006 23:21:44 +0100
+Date: Tue, 07 Feb 2006 23:20:19 +0100
 
-Hi Peter,
+Hi Brad,
 
-> use a google search for "Bluetooth PCI" or contact me by mail.
+> are there any [m]pci bluetooth adapters supported by bluez? just noticed
+> this:
+> 
+> http://www.msicomputer.com/product/p_spec.asp?model=MP54GBT2&class=com
+> 
+> I'm guessing the "warning" that it's only for their laptops is probably
+> because they don't want to deliver drivers for everyone else. If done
+> right, would it show up as a uart on pci that would have to be
+> initialized with hciattach?
 
-I am actually looking for a mini-PCI card with an USB host controller on
-it and then one (or two) Bluetooth chips attached to it.
-
-This was the best I could find on the Internet:
-
-http://www.interfacemasters.com/products/usb/mini_pci_3_ports/
+I have one of these cards. The Bluetooth chip is attached via USB, but
+the card doesn't contain an USB host controller. So it uses at least two
+PIN of the mini-PCI contacts to put them through an USB host controller
+of the laptop. This is why it is not working. However the WiFi part of
+the card works with every laptop.
 
 Regards
 
