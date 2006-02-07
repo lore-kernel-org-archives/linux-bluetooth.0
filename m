@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sdp_record_register()
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <e44ae5e0602071501h650f1f1dl@mail.gmail.com>
+From: Keith Bannister <keith.bannister@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1139312694.8422.19.camel@localhost.localdomain>
-References: <1139312694.8422.19.camel@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1139356568.22790.73.camel@localhost>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_6511_21446249.1139353270122"
+Subject: [Bluez-devel] Developing Broadcom driver support
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,25 +17,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 08 Feb 2006 00:56:08 +0100
+Date: Tue, 7 Feb 2006 23:01:10 +0000
 
-Hi Ari,
+------=_Part_6511_21446249.1139353270122
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> Function call:
-> err = sdp_record_register(session, record, 0);
-> returns zero and error is 'Illegal seek'.
-> Arguments should be ok (session is return value of successful call to
-> sdp_connect() and record works ok with another function calls).
-> What might be wrong?
+Hi All,
 
-the sdp_connect() has been done to the local SDP server, right. You
-can't register SDP records for remote connections.
+I've struggled to follow all the discussion on the lack of information
+coming from broadcom. Sourceforge forum seems difficult to drive.
 
-Regards
+I'd add that I'm happy to spend some time capturing the windows driver
+behaviour with snoopyPRO (http://usbsnoop.sourceforge.net/) if that would
+help.
 
-Marcel
+Any takers?
 
+K
 
+--
+Keith Bannister
+
+------=_Part_6511_21446249.1139353270122
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi All,<br>
+<br>
+I've struggled to follow all the discussion on the lack of information
+coming from broadcom. Sourceforge forum seems difficult to drive.<br>
+<br>
+I'd add that I'm happy to spend some time capturing the windows driver
+behaviour with snoopyPRO (<a href=3D"http://usbsnoop.sourceforge.net/">http=
+://usbsnoop.sourceforge.net/</a>) if that
+would help.<br>
+<br>
+Any takers?<br>
+<br>
+K<br clear=3D"all"><br>-- <br>Keith Bannister
+
+------=_Part_6511_21446249.1139353270122--
 
 
 -------------------------------------------------------
