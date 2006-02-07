@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Jean-Claude Repetto <jrepetto@free.fr>
-Subject: Re: [Bluez-devel] dund needs pppd
-In-reply-to: <1139311118.15160.19.camel@localhost>
+From: Ari Paavilainen <arip@iki.fi>
 To: bluez-devel@lists.sourceforge.net
-Message-id: <33574.84.98.162.18.1139312824.squirrel@jcr.homelinux.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=iso-8859-1
-References: <52492.192.168.0.2.1138486931.squirrel@jcr.homelinux.com>
- <1139311118.15160.19.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1139312694.8422.19.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-devel] sdp_record_register()
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,24 +16,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 07 Feb 2006 12:47:04 +0100 (CET)
+Date: Tue, 07 Feb 2006 13:44:53 +0200
 
-Hello Marcel,
+Hi,
 
-Marcel Holtmann wrote :
->
-> good catch, but your patch has some problems. It should be LOG_ERR
-> instead of LOG_INFO and you don't need a "\n" at the end when calling
-> syslog().
+Function call:
+err = sdp_record_register(session, record, 0);
+returns zero and error is 'Illegal seek'.
+Arguments should be ok (session is return value of successful call to
+sdp_connect() and record works ok with another function calls).
+What might be wrong?
 
-OK. I didn't know about the "\n".
-
-> However this is fixed in the CVS now.
-
-Thanks.
-
-Regards,
-Jean-Claude
+-Ari
 
 
 
