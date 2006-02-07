@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43E9419B.30203@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] sdp_record_register()
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Developing Broadcom driver support
-References: <e44ae5e0602071501h650f1f1dl@mail.gmail.com>
-In-Reply-To: <e44ae5e0602071501h650f1f1dl@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <1139312694.8422.19.camel@localhost.localdomain>
+References: <1139312694.8422.19.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1139356568.22790.73.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,27 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 07 Feb 2006 17:55:55 -0700
+Date: Wed, 08 Feb 2006 00:56:08 +0100
 
-Keith
+Hi Ari,
 
-I wasn't following closely, but it seems that the broadcom was
-erroneously returning a 0 in an mtu field. Something we need to work
-around or am I off base?
+> Function call:
+> err = sdp_record_register(session, record, 0);
+> returns zero and error is 'Illegal seek'.
+> Arguments should be ok (session is return value of successful call to
+> sdp_connect() and record works ok with another function calls).
+> What might be wrong?
 
-> I've struggled to follow all the discussion on the lack of information
-> coming from broadcom. Sourceforge forum seems difficult to drive.
-> 
-> I'd add that I'm happy to spend some time capturing the windows driver
-> behaviour with snoopyPRO (http://usbsnoop.sourceforge.net/) if that
-> would help.
-> 
-> Any takers?
-> 
-> K
-> 
-> -- 
-> Keith Bannister
+the sdp_connect() has been done to the local SDP server, right. You
+can't register SDP records for remote connections.
+
+Regards
+
+Marcel
+
 
 
 
