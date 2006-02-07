@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] proximity monitor
-From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-users] udev rules entry for bluetooth mouse
+From: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43E86165.2060805@cs.bgu.ac.il>
-References: <43E86165.2060805@cs.bgu.ac.il>
-Content-Type: text/plain
-Message-Id: <1139309396.7633.6.camel@localhost>
+In-Reply-To: <1138880751.21953.38.camel@bluez.bueche.ch>
+References: <1138872805.21953.20.camel@bluez.bueche.ch>
+	 <43E1E11F.8040501@ycom.ch>  <1138880751.21953.38.camel@bluez.bueche.ch>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1139303730.7059.2.camel@pc-05.ycom.ch>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,27 +19,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 07 Feb 2006 11:49:56 +0100
+Date: Tue, 07 Feb 2006 10:15:30 +0100
 
-Hi Niv,
+Le jeudi 02 f=C3=A9vrier 2006 =C3=A0 12:45 +0100, Charles Bueche a =C3=A9=
+crit :
+> Hi Alexandre,
 
-> One of the cool tricks BT could be used for is the proximity monitor.
-> MonkeyBox 
-> <http://gentoo-wiki.com/index.php?title=User:MonkeyBox&action=edit> 
-> wrote this: http://gentoo-wiki.com/TIP_Bluetooth_Proximity_Monitor
-> 
-> which basically pools my cellular for RSSI. if my RSSI decreases, It 
-> "know" I am leaving the pc.
-> I was wondering if its possible to receive these RSSI indications in an 
-> event driven manner , thus, reducing the pooling work.
+Charles,=20
 
-no. You have to be connected to that device or you need a device that is
-discoverable and a local dongle with Inquiry with RSSI support.
 
-Regards
+> I don't exactly understand who is faulty :
+>=20
+> - is it hidd which should add the mouse details to a data structure ?
+> - or udev which doesn't search for the info ?
 
-Marcel
+I've no ideas who is faulty too.=20
+With udev 084, I got :
 
+udevinfo -a -p /sys/class/input/mouse1
+
+--cut--
+  looking at device '/class/input/input4/mouse1':
+    KERNEL=3D=3D"mouse1"
+    SUBSYSTEM=3D=3D"input"
+    SYSFS{dev}=3D=3D"13:33"
+
+  looking at device '/class/input/input4':
+    ID=3D=3D"input4"
+    BUS=3D=3D"input"
+    DRIVER=3D=3D""
+    SYSFS{uniq}=3D=3D""
+    SYSFS{phys}=3D=3D""
+    SYSFS{name}=3D=3D"Bluetooth HID Boot Protocol Device"
+
+So very few infos.
+
+
+> Did you contact the hotplug team about this issue ?
+
+I'm doing this right now, thanks for the tip.
+
+Best regards
+
+--Alexandre
 
 
 
