@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e44ae5e0602071501h650f1f1dl@mail.gmail.com>
-From: Keith Bannister <keith.bannister@gmail.com>
+Subject: Re: [Bluez-devel] pci bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_6511_21446249.1139353270122"
-Subject: [Bluez-devel] Developing Broadcom driver support
+In-Reply-To: <Pine.LNX.4.33.0602071928150.1035-100000@redbean.intranet.gw-instruments.de>
+References: 
+	 <Pine.LNX.4.33.0602071928150.1035-100000@redbean.intranet.gw-instruments.de>
+Content-Type: text/plain
+Message-Id: <1139350904.22790.60.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,49 +19,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 7 Feb 2006 23:01:10 +0000
+Date: Tue, 07 Feb 2006 23:21:44 +0100
 
-------=_Part_6511_21446249.1139353270122
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Peter,
 
-Hi All,
+> use a google search for "Bluetooth PCI" or contact me by mail.
 
-I've struggled to follow all the discussion on the lack of information
-coming from broadcom. Sourceforge forum seems difficult to drive.
+I am actually looking for a mini-PCI card with an USB host controller on
+it and then one (or two) Bluetooth chips attached to it.
 
-I'd add that I'm happy to spend some time capturing the windows driver
-behaviour with snoopyPRO (http://usbsnoop.sourceforge.net/) if that would
-help.
+This was the best I could find on the Internet:
 
-Any takers?
+http://www.interfacemasters.com/products/usb/mini_pci_3_ports/
 
-K
+Regards
 
---
-Keith Bannister
+Marcel
 
-------=_Part_6511_21446249.1139353270122
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-Hi All,<br>
-<br>
-I've struggled to follow all the discussion on the lack of information
-coming from broadcom. Sourceforge forum seems difficult to drive.<br>
-<br>
-I'd add that I'm happy to spend some time capturing the windows driver
-behaviour with snoopyPRO (<a href=3D"http://usbsnoop.sourceforge.net/">http=
-://usbsnoop.sourceforge.net/</a>) if that
-would help.<br>
-<br>
-Any takers?<br>
-<br>
-K<br clear=3D"all"><br>-- <br>Keith Bannister
-
-------=_Part_6511_21446249.1139353270122--
 
 
 -------------------------------------------------------
