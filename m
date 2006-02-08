@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sdp_record_register()
-From: Ari Paavilainen <arip@iki.fi>
+Subject: Re: [Bluez-devel] GBlueZConf Prototype
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1139356568.22790.73.camel@localhost>
-References: <1139312694.8422.19.camel@localhost.localdomain>
-	 <1139356568.22790.73.camel@localhost>
+In-Reply-To: <e1effdeb0602060950y29834100ge178776b1dbdf665@mail.gmail.com>
+References: <e1effdeb0602060950y29834100ge178776b1dbdf665@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1139398021.8573.17.camel@localhost.localdomain>
+Message-Id: <1139365565.31545.16.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,33 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 08 Feb 2006 13:27:00 +0200
+Date: Wed, 08 Feb 2006 03:26:05 +0100
 
-On Wed, 2006-02-08 at 00:56 +0100, Marcel Holtmann wrote:
-> Hi Ari,
-> 
-> > Function call:
-> > err = sdp_record_register(session, record, 0);
-> > returns zero and error is 'Illegal seek'.
-> > Arguments should be ok (session is return value of successful call to
-> > sdp_connect() and record works ok with another function calls).
-> > What might be wrong?
-> 
-> the sdp_connect() has been done to the local SDP server, right. You
-> can't register SDP records for remote connections.
-> 
+Hi Claudio,
 
-In sdp_record_register() there is:
+> Here is a new GBlueZConf version.
+> http://www.cin.ufpe.br/~ckt/gbluezconf/gbluezconf-00.08.tar.gz
 
-        if (!session->local) {
-          errno = EREMOTE;
-          return -1;
-        }
+some comments from me after playing with it a little bit.
 
-Did you mean this by the remote connection (the program passes this test)? 
-Anyway, it seems to be that the only way to sdp_record_register() return ESPIPE (Illegal seek) error is when call to sdp_send_req_w4_rsp() fails. Does this give any hint?
+The integration of the notifications is really great. The insert and
+removal bubbles for an adapter are cool. However I prefer not to show
+the the path. We should choose the address or name. Maybe we need to
+cache some of these information for the removal event. I also think that
+the timeout for disappearing is quite long.
 
--Ari
+For the PIN code input we might wanna open the PIN input dialog anyway
+if someone hits the bubble. Adding a reject option to the bubble might
+also be a good idea. It should however not disappear until the user
+clicked it or the authentication timed out. Please also display the name
+and not the address if available.
+
+The icon stays the same even when we run an inquiry or when a connection
+is established. Is this a missing feature or a bug?
+
+Is it possible to integrate the applet to appear in the "Add to panel"
+dialog.
+
+Regards
+
+Marcel
 
 
 
