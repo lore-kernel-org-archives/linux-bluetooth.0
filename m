@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: NIV VAIZER <nivv@cs.bgu.ac.il>
+Message-ID: <e1effdeb0602081108n1535b609s43fa48b4c03ac842@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.44.0602082335310.13414-100000@lvs-rs3>
+Subject: Re: [Bluez-users] bluez and dbus
+In-Reply-To: <43EA3E0D.5030005@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] a2play stops when scanning
+Content-Type: text/plain; charset=ISO-8859-1
+References: <43EA3E0D.5030005@gmail.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,26 +18,70 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Feb 2006 23:40:56 +0200 (IST)
+Date: Wed, 8 Feb 2006 17:08:00 -0200
 
-Hi Brad,
-I am sure it was reported before, but just to make sure:
-while playing mpg321 ->a2play I ran hcitool
-that caused a2play to exit and tell me that the SDP returned bad value.
-I can quote the excat phrase if you need it, but the idea is that a 
-discovery drops a2play.
-In windows it is suggested this may cause disturbance.
+Hi Doug,
 
+The lastest bluez-utils is compliant with d-bus >=3D 0.35
+According with our info, I think that the dbus-daemon is not running.
 
-Thanks again for allowing me to listen to BT , while my room-mate goes to 
-sleep :->
+Check the following items:
+1. Verify if the dbus-daemon is running. There are two instances: one
+running in the session bus and another running in the system bus.
+BlueZ needs the system bus.
 
-Niv
-
-P.S.
-the Ekiga issue aint btsco fault.
+2. Check if the BlueZ D-Bus configuration file(bluez-hcid.conf )
+belongs to the D-Bus system configuration files directory
+"/etc/dbus-1/system.d/"
 
 
+Regards,
+Claudio
+
+
+
+On 2/8/06, nix4me@gmail.com <nix4me@gmail.com> wrote:
+> Hello,
+> To start off, I am trying to use bluez on a slackware 10.2, 2.6.15
+> system. I've managed to pair my system
+> with a microsoft keyboard, and my motorolla v551 phone. My plantronics
+> m2500 is another story.
+>
+> To successfully connect to the phone, and the keyboard, I have to not
+> use authentication. hcid refuses to
+> start, giving the following error in my syslog: Failed to connect to
+> socket /var/run/dbus/system_bus_socket: No
+> such file or directory.
+>
+> I have tried using dbus-0.23 through .60. Bluez-libs, and utils, 2.21,
+> 2.24, 2.25, both slack packages and
+> compiling them myself. I'm assuming this has nothing to do with bluez,
+> but dbus?
+>
+> I have been at this for week's, someone please help.
+>
+> Best regards
+> Doug
+>
+>
+> -------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc. Do you grep through log fi=
+les
+> for problems?  Stop!  Download the new AJAX search engine that makes
+> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D103432&bid=3D230486&dat=
+=3D121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+
+--
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
