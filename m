@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <495ce9180602080745y146974c4t@mail.gmail.com>
-From: Mario Temporary <mario.temporary@gmail.com>
+Message-ID: <32800.192.168.3.2.1139408221.squirrel@mailsrv.atlantico.com.br>
+From: renan@atlantico.com.br
 To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] btsco with an HP embedded bluetooth adapter
+Content-Type: text/plain;charset=iso-8859-1
+Subject: [Bluez-devel] hidd deamon
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,36 +16,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 8 Feb 2006 16:45:49 +0100
+Date: Wed, 8 Feb 2006 12:17:01 -0200 (BRST)
 
-Hi all,
-I'm trying to use my plantronics Voyager 510 with the embedded
-Bluetooth adapter of my HP Pavillion notebook.
-I'm using btsco 0.41 e it seems to work with my external USB D-Link
-DBT-120 adapter.
+Hi !
 
-With the internal BT adapter I can record my voice but I'm not able to
-ear anything (only noise...).
-I've read the following on the project page:
------------------
-Output from hciconfig hci0 revision (Run hciconfig as root)
-    * If it prints "SCO mapping: HCI" then your adapter should work.
-    * If it prints "SCO mapping: PCM" then you might permanently
-change the setting using a command like "pskey mapsco 0" using
-bluez-utils-cvs but this is at your own risk.
-    * If it doesn't print either of those, you probably need a
-different bluetooth adapter (preferably "CSR" based)
------------------
-This is the (censored) output on my (internal adapter):
-root@legolas:~# hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:10:C6:XX:XX:XX ACL MTU: 377:10 SCO MTU: 16:0
-        Firmware 2.105 / 97
+I am trying to connect my Nokia N90 cell phone to Linux through Bluez
+"hidd" deamon. I am trying to run an J2ME app that make the cell phone to
+act as a HID mouse.
 
-Is this the problem? Should I forget the idea to use it? :(
+I had to offset the default PSMs under Linux because the range allowed in
+the JSR82 is 0x1001 to 0xFFFF. I did this modification, compiled and
+installed the bluez-utils again. After, I execute "hidd -d" (starting the
+server mode).
 
-Thanks,
-Mario
+Whenever I run the application in the cell phone I notice, sniffing the
+HCI interface with "hcidump -x", that the keys are being received, but th=
+e
+mouse pointing is not moving nor showing the pop-up menus in the X.
+
+Does anybody know how to solve this problem?
+
+
+
 
 
 -------------------------------------------------------
