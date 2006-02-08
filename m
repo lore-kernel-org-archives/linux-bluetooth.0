@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS]Cleanup
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43E9419B.30203@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0602070534h7c56eb0ck9dcf80b30896cd46@mail.gmail.com>
-References: <e1effdeb0602070534h7c56eb0ck9dcf80b30896cd46@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1139361878.20030.28.camel@localhost>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Developing Broadcom driver support
+References: <e44ae5e0602071501h650f1f1dl@mail.gmail.com>
+In-Reply-To: <e44ae5e0602071501h650f1f1dl@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,24 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 08 Feb 2006 02:24:38 +0100
+Date: Tue, 07 Feb 2006 17:55:55 -0700
 
-Hi Claudio,
+Keith
 
-> This patch fix two issues:
-> 1. Suppose a scenario where there more than one adapter attached. If
-> the user removes the default device, the hcid is not updating the
-> default!
+I wasn't following closely, but it seems that the broadcom was
+erroneously returning a 0 in an mtu field. Something we need to work
+around or am I off base?
+
+> I've struggled to follow all the discussion on the lack of information
+> coming from broadcom. Sourceforge forum seems difficult to drive.
 > 
-> 2. The scan mode doesn't need be configured. It's already being
-> changed in the configure_device function in the main.c file.
-
-the patch is applied to the CVS now.
-
-Regards
-
-Marcel
-
+> I'd add that I'm happy to spend some time capturing the windows driver
+> behaviour with snoopyPRO (http://usbsnoop.sourceforge.net/) if that
+> would help.
+> 
+> Any takers?
+> 
+> K
+> 
+> -- 
+> Keith Bannister
 
 
 
