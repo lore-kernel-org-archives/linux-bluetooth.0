@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43EA22A5.5000105@hasborg.com>
-From: Joshua Wright <jwright@hasborg.com>
-MIME-Version: 1.0
+Message-ID: <495ce9180602080745y146974c4t@mail.gmail.com>
+From: Mario Temporary <mario.temporary@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-References: <87hd7agci8.fsf@gismo.pca.it>
-In-Reply-To: <87hd7agci8.fsf@gismo.pca.it>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] CVS not allowing anonymous authentication for checkout
+Subject: [Bluez-devel] btsco with an HP embedded bluetooth adapter
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,36 +16,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 08 Feb 2006 11:56:05 -0500
+Date: Wed, 8 Feb 2006 16:45:49 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi all,
+I'm trying to use my plantronics Voyager 510 with the embedded
+Bluetooth adapter of my HP Pavillion notebook.
+I'm using btsco 0.41 e it seems to work with my external USB D-Link
+DBT-120 adapter.
 
-It appears that the BlueZ CVS repository is not allowing anonymous
-access any longer:
+With the internal BT adapter I can record my voice but I'm not able to
+ear anything (only noise...).
+I've read the following on the project page:
+-----------------
+Output from hciconfig hci0 revision (Run hciconfig as root)
+    * If it prints "SCO mapping: HCI" then your adapter should work.
+    * If it prints "SCO mapping: PCM" then you might permanently
+change the setting using a command like "pskey mapsco 0" using
+bluez-utils-cvs but this is at your own risk.
+    * If it doesn't print either of those, you probably need a
+different bluetooth adapter (preferably "CSR" based)
+-----------------
+This is the (censored) output on my (internal adapter):
+root@legolas:~# hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:10:C6:XX:XX:XX ACL MTU: 377:10 SCO MTU: 16:0
+        Firmware 2.105 / 97
 
-$ cvs -d:pserver:anonymous@cvs.bluez.org:/cvsroot/bluez login
-Logging in to :pserver:anonymous@cvs.bluez.org:2401/cvsroot/bluez
-CVS password: <CR>
-cvs login: authorization failed: server cvs.bluez.org rejected access to
-/cvsroot/bluez for user anonymous
-
-Also, the web interface to the CVS repository is returning a 502 Proxy
-Error.
-
-Other sf.net projects are not exhibiting these same errors.  Has the CVS
-repository for BlueZ been marked private?
+Is this the problem? Should I forget the idea to use it? :(
 
 Thanks,
-
-- -Josh
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-
-iD8DBQFD6iKlTS8i9jZYpL8RAsGPAKC1SvmX3HWPDw0XWJStGA8/NBoTSACfY5ww
-8DIBXOIrFIKe1eSk42NmPXY=
-=6dE5
------END PGP SIGNATURE-----
+Mario
 
 
 -------------------------------------------------------
