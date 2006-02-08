@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth with Latitude X1
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Arthur Breitman <arthur.breitman@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200602081725.19094.arthur.breitman@gmail.com>
-References: <200601310012.39402.arthur.breitman@gmail.com>
-	 <200602041607.32467.arthur.breitman@gmail.com>
-	 <1139310791.15160.13.camel@localhost>
-	 <200602081725.19094.arthur.breitman@gmail.com>
-Content-Type: text/plain
-Message-Id: <1139437843.30502.12.camel@localhost>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Bluetooth with Latitude X1
+References: <200601310012.39402.arthur.breitman@gmail.com> <200602041607.32467.arthur.breitman@gmail.com> <1139310791.15160.13.camel@localhost>
+In-Reply-To: <1139310791.15160.13.camel@localhost>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200602081725.19094.arthur.breitman@gmail.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,24 +19,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 08 Feb 2006 23:30:43 +0100
+Date: Wed, 8 Feb 2006 17:25:18 -0500
 
-Hi Arthur,
+... I think Dell's answer will look like this:
+"Go to the windows configuration panel...." etc
+..also bluetooth *works* on a windows boot...  
+...also many people claim that this model is working under linux...
 
-> ... I think Dell's answer will look like this:
-> "Go to the windows configuration panel...." etc
-> ..also bluetooth *works* on a windows boot...  
-> ...also many people claim that this model is working under linux...
-> 
-> So what should I exactly tell Dell ?
-
-I don't have this machine at hand. Tell them to send me one :)
-
-Regards
-
-Marcel
-
-
+So what should I exactly tell Dell ?
 
 
 -------------------------------------------------------
