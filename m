@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <32800.192.168.3.2.1139408221.squirrel@mailsrv.atlantico.com.br>
-From: renan@atlantico.com.br
+Subject: Re: [Bluez-devel] sdp_record_register()
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Subject: [Bluez-devel] hidd deamon
+In-Reply-To: <1139398021.8573.17.camel@localhost.localdomain>
+References: <1139312694.8422.19.camel@localhost.localdomain>
+	 <1139356568.22790.73.camel@localhost>
+	 <1139398021.8573.17.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1139402899.29208.10.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,26 +20,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 8 Feb 2006 12:17:01 -0200 (BRST)
+Date: Wed, 08 Feb 2006 13:48:19 +0100
 
-Hi !
+Hi Ari,
 
-I am trying to connect my Nokia N90 cell phone to Linux through Bluez
-"hidd" deamon. I am trying to run an J2ME app that make the cell phone to
-act as a HID mouse.
+> > > Function call:
+> > > err = sdp_record_register(session, record, 0);
+> > > returns zero and error is 'Illegal seek'.
+> > > Arguments should be ok (session is return value of successful call to
+> > > sdp_connect() and record works ok with another function calls).
+> > > What might be wrong?
+> > 
+> > the sdp_connect() has been done to the local SDP server, right. You
+> > can't register SDP records for remote connections.
+> > 
+> 
+> In sdp_record_register() there is:
+> 
+>         if (!session->local) {
+>           errno = EREMOTE;
+>           return -1;
+>         }
+> 
+> Did you mean this by the remote connection (the program passes this test)? 
+> Anyway, it seems to be that the only way to sdp_record_register() return ESPIPE (Illegal seek) error is when call to sdp_send_req_w4_rsp() fails. Does this give any hint?
 
-I had to offset the default PSMs under Linux because the range allowed in
-the JSR82 is 0x1001 to 0xFFFF. I did this modification, compiled and
-installed the bluez-utils again. After, I execute "hidd -d" (starting the
-server mode).
+make sure that sdpd process is running. Follow the examples from sdptool
+or pand.
 
-Whenever I run the application in the cell phone I notice, sniffing the
-HCI interface with "hcidump -x", that the keys are being received, but th=
-e
-mouse pointing is not moving nor showing the pop-up menus in the X.
+Regards
 
-Does anybody know how to solve this problem?
-
+Marcel
 
 
 
