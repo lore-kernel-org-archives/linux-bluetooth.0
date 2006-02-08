@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Arthur Breitman <arthur.breitman@gmail.com>
+From: NIV VAIZER <nivv@cs.bgu.ac.il>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth with Latitude X1
-References: <200601310012.39402.arthur.breitman@gmail.com> <200602041607.32467.arthur.breitman@gmail.com> <1139310791.15160.13.camel@localhost>
-In-Reply-To: <1139310791.15160.13.camel@localhost>
+Subject: Re: [Bluez-users] proximity monitor
+In-Reply-To: <1139309396.7633.6.camel@localhost>
+Message-ID: <Pine.LNX.4.44.0602082342210.13414-100000@lvs-rs3>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200602081725.19094.arthur.breitman@gmail.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,14 +17,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Feb 2006 17:25:18 -0500
+Date: Wed, 8 Feb 2006 23:43:09 +0200 (IST)
 
-... I think Dell's answer will look like this:
-"Go to the windows configuration panel...." etc
-..also bluetooth *works* on a windows boot...  
-...also many people claim that this model is working under linux...
+10x mate
 
-So what should I exactly tell Dell ?
+any other clever tricks you are aware of?
+
+Niv
+
+
+On Tue, 7 Feb 2006, Marcel Holtmann wrote:
+
+> Hi Niv,
+> 
+> > One of the cool tricks BT could be used for is the proximity monitor.
+> > MonkeyBox 
+> > <http://gentoo-wiki.com/index.php?title=User:MonkeyBox&action=edit> 
+> > wrote this: http://gentoo-wiki.com/TIP_Bluetooth_Proximity_Monitor
+> > 
+> > which basically pools my cellular for RSSI. if my RSSI decreases, It 
+> > "know" I am leaving the pc.
+> > I was wondering if its possible to receive these RSSI indications in an 
+> > event driven manner , thus, reducing the pooling work.
+> 
+> no. You have to be connected to that device or you need a device that is
+> discoverable and a local dongle with Inquiry with RSSI support.
+> 
+> Regards
+> 
+> Marcel
+> 
+
 
 
 -------------------------------------------------------
