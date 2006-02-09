@@ -1,16 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] udev rules entry for bluetooth mouse
-From: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
+Message-ID: <3611f8600602090350w6e45325eyec3b85bab18e25a2@mail.gmail.com>
+From: Gaby Lence <gabriel.lence@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1139411355.8712.24.camel@bluez.bueche.ch>
-References: <1138872805.21953.20.camel@bluez.bueche.ch>
-	 <43E1E11F.8040501@ycom.ch>  <1138880751.21953.38.camel@bluez.bueche.ch>
-	 <1139331334.12556.3.camel@pc-05.ycom.ch>
-	 <1139351059.22790.63.camel@localhost>
-	 <1139411355.8712.24.camel@bluez.bueche.ch>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <1139489430.7543.7.camel@pc-05.ycom.ch>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] obexftp & nokia 6680
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,47 +16,82 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 09 Feb 2006 13:50:30 +0100
+Date: Thu, 9 Feb 2006 12:50:27 +0100
 
-Le mercredi 08 f=C3=A9vrier 2006 =C3=A0 16:09 +0100, Charles Bueche a =C3=
-=A9crit :
+Hi
+I can put files in my nokia 6680 using obexftp.
+Instead I didn't get anything when I try to get files using
+$ obexftpd -b
+No custom transport
+Waiting for connection...
+Handling connection...
+Handling connection...
+...
 
-> Hi all,
->=20
-> thanks for the analysis and explanations. From what I have read and
-> tested, here is a resum=C3=A9 of the Logitech V270 situation :
->=20
-> - Logitech ignore Linux (this is not new, but need to be repeated)
-> - the V270 mouse basically works as expected HID input device, but is
-> overly sensible (probably due to its high resolution)
-> - the mouse events go into /dev/input/mice by default
-> - if evdev is loaded, mouse events go to /dev/input/event{1..N}
-> - udev doesn't have the info to create a rule in 10-local.rules so the
-> V270 get mapped to a fix name like /dev/input/v270
-> - none of the tools I tried (locomo, logitech-applet) know the V270 for
-> now. I tried to change some of them, but failed, due to lacking know-ho=
-w
-> in HID/USB/etc
-> - KDE control center or xset cannot reduce the mouse sensibility enough
-> to make it usuable (at least for my 40 years muscles control ability)
+This is hcidump just in case someone has deal
+with it previously.
 
+$ hcidump
+HCI sniffer - Bluetooth packet analyzer ver 1.28
+device: hci0 snap_len: 1028 filter: 0xffffffff
+> HCI Event: Connect Request (0x04) plen 10
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Connect Complete (0x03) plen 11
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+> HCI Event: Command Complete (0x0e) plen 6
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Max Slots Change (0x1b) plen 3
+> ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0046
+< ACL data: handle 7 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0046 result 0 status 0
+      Connection successful
+> ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
+< ACL data: handle 7 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0046 flags 0x00 result 0 clen 0
+      Success
+< ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0046 flags 0x00 clen 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 7 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+> ACL data: handle 7 flags 0x02 dlen 17
+    L2CAP(d): cid 0x0040 len 13 [psm 1]
+        SDP SS Req: tid 0x1 len 0x8
+          pat uuid-16 0x1105 (OBEXObjPush)
+          max 65535
+          cont 00
+< ACL data: handle 7 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0046 len 10 [psm 1]
+        SDP SS Rsp: tid 0x1 len 0x5
+          count 0
+          cont 00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 7 flags 0x02 dlen 17
+    L2CAP(d): cid 0x0040 len 13 [psm 1]
+        SDP SS Req: tid 0x2 len 0x8
+          pat uuid-16 0x111b (ImagingResp)
+          max 65535
+          cont 00
+< ACL data: handle 7 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0046 len 10 [psm 1]
+        SDP SS Rsp: tid 0x2 len 0x5
+          count 0
+          cont 00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0046
+< ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0046
+> HCI Event: Number of Completed Packets (0x13) plen 5
+---------------------------------------------------------------
 
-Thanks for this good resum=C3=A9, you point out the major current issue.
-
-I just can add about udev-rules, Marcel and UDEV team are searching for
-a better solution to add more infos on the udev struct, to let user
-creates good rules with devices.
-
-We can expect a workaround not so far :)
-
-And about Linux support on Logitech product, I've several friends
-working for this compagny, and with some insiders informations, I can
-tell that Logitech try  now to make better software. They are aware of
-the poor quality of their driver / software.
-Just hope they can spend some time to change their devs :)
-
-
-
+Where can I get some help for this?
+Thanks.
 
 
 -------------------------------------------------------
