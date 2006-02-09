@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <fd87b6160602081733j5d439ce1oa3fed18924b3f0f6@mail.gmail.com>
+From: John McCabe-Dansted <gmatht@gmail.com>
 To: bluez-users@lists.sourceforge.net
-From: Heba <Heba.Khamis@csiro.au>
-Message-ID: <loom.20060209T033130-898@post.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Belkin F8T009 and Linux
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Re: rmmoding snd-bt-sco (so we can hibernate)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,43 +16,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 9 Feb 2006 02:48:02 +0000 (UTC)
+Date: Thu, 9 Feb 2006 14:33:09 +1300
 
-I am developing an application for automatic network discovery using bluetooth
-i.e. Running the application will result in connections to any other computers
-running the same application:
-- Each application is running a server which accepts connections (once a
-connection is made, the connection is maintained until a transmission 
-error occcurs or the socket is closed by either party); 
-- and a client which repeatedly queries for bluetooth devices to connect to.
+On 2/9/06, John McCabe-Dansted <gmatht@gmail.com> wrote:
+> Is there anyway to rmmod snd-bt-sco when it claims that it is in use?
+> (So e.g. I can hibernate). I have tried killall btsco and physically
+> removing the usb bluetooth card but the kernel still claims it is in
+> use.
 
-So in total an application makes and 
-maintains 2*(#other applications) connections.
+Ah, kmix was locking the kernel module snd_bt_sco. For Kubuntu 5.10
+"Breezy" it appears to be sufficient to add
 
-This causes no problems when using the Belkin F8T003 Bluetooth USB Adaptor
-(this is a bluetooth v1.1 compliant device).
+  killall kmix
+  killall btsco
+  rmmod -w snd_bt_sco &
 
-However, when using the Belkin F8T009 Bluetooth USB Adaptor 
-(this is a bluetooth v1.2 compliant device) 
-"Device or Resource Busy" errors are observed 
-when the application tries to query 
-when there are 3 or more connections maintained by it.
+to the beginning of /usr/sbin/hibernate, to allow use of Suspend2 in
+conjunction with bluez. BTW, I am not sure that the "killall btsco"
+line is neccesary. It doesn't seem to be, but I don't see how btsco
+can function without locking the kernel module if even kmix cannot.
 
-Is this a bluetooth hardware issue, 
-a Bluez stack issue, 
-or does Bluez just not support this particular device??
-
-I have installed all the latest versions:
-- Bluez-lib
-- Bluez-hcidump
-I am running Fedora core 4 with the latest available updates of the kernel.
-
-Please advise if I am overlooking something, or if this is not a Bluez issue,
-could you please direct me to the appropriate contact.
-
-Thanks
-Heba
-
+--
+John C. McCabe-Dansted
+Master's Student
 
 
 -------------------------------------------------------
