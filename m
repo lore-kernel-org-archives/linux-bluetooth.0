@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <3611f8600602090350w6e45325eyec3b85bab18e25a2@mail.gmail.com>
-From: Gaby Lence <gabriel.lence@gmail.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] obexftp & nokia 6680
+From: Benjamin Eikel <benjamin@eikel.org>
+Message-ID: <loom.20060209T124135-748@post.gmane.org>
+References: <200602022157.52386.benjamin@eikel.org> <loom.20060205T233729-763@post.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: Pairing a bluetooth keyboard
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,82 +17,62 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 9 Feb 2006 12:50:27 +0100
+Date: Thu, 9 Feb 2006 11:45:11 +0000 (UTC)
 
-Hi
-I can put files in my nokia 6680 using obexftp.
-Instead I didn't get anything when I try to get files using
-$ obexftpd -b
-No custom transport
-Waiting for connection...
-Handling connection...
-Handling connection...
-...
+>
 
-This is hcidump just in case someone has deal
-with it previously.
+Hello again,
 
-$ hcidump
-HCI sniffer - Bluetooth packet analyzer ver 1.28
-device: hci0 snap_len: 1028 filter: 0xffffffff
-> HCI Event: Connect Request (0x04) plen 10
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Connect Complete (0x03) plen 11
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-> HCI Event: Command Complete (0x0e) plen 6
-< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Max Slots Change (0x1b) plen 3
-> ACL data: handle 7 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0046
-< ACL data: handle 7 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0046 result 0 status 0
-      Connection successful
-> ACL data: handle 7 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-< ACL data: handle 7 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0046 flags 0x00 result 0 clen 0
-      Success
-< ACL data: handle 7 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0046 flags 0x00 clen 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 7 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-> ACL data: handle 7 flags 0x02 dlen 17
-    L2CAP(d): cid 0x0040 len 13 [psm 1]
-        SDP SS Req: tid 0x1 len 0x8
-          pat uuid-16 0x1105 (OBEXObjPush)
-          max 65535
-          cont 00
-< ACL data: handle 7 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0046 len 10 [psm 1]
-        SDP SS Rsp: tid 0x1 len 0x5
-          count 0
-          cont 00
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 7 flags 0x02 dlen 17
-    L2CAP(d): cid 0x0040 len 13 [psm 1]
-        SDP SS Req: tid 0x2 len 0x8
-          pat uuid-16 0x111b (ImagingResp)
-          max 65535
-          cont 00
-< ACL data: handle 7 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0046 len 10 [psm 1]
-        SDP SS Rsp: tid 0x2 len 0x5
-          count 0
-          cont 00
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 7 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0046
-< ACL data: handle 7 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0046
-> HCI Event: Number of Completed Packets (0x13) plen 5
----------------------------------------------------------------
+I am wondering why nobody responds to my questions. If I am doing anything wrong
+please tell me. I really do not know why this is not working and I did not find
+anything about that on this mailing list or in the BlueZ documentation files.
 
-Where can I get some help for this?
-Thanks.
+Maybe you need more information so I logged some data with 'hcidump -X -V'. I
+uploaded the log files because I do not want to post such a long text on this
+mailing list. If this behaviour is not right, please tell me and I will post the
+logs here.
+I am using the same laptop, Bluetooth dongle and keyboard as in my first post.
+First I did:
+
+root@host:~# hcitool scan
+Scanning ...
+        00:KE:YB:OA:RD:00       Logitech Elite Keyboard
+root@host:~# hidd --connect 00:KE:YB:OA:RD:00
+
+The log is here: http://www.eikel.org/temp/hcidump-connect.log
+After that I was able to type on the Bluetooth keyboard and everything was
+working. Then I wanted to authorize and encrypt the connection:
+
+root@host:~# hcitool auth 00:KE:YB:OA:RD:00
+0000
+HCI authentication request failed: Connection timed out
+
+Same problem as in my first post, but I have logged it. Here is the file:
+http://www.eikel.org/temp/hcidump-auth.log
+
+Of course I have read these logs but I do not get any useful information from
+it. There are two errors in the second log.
+First:
+> HCI Event: Command Complete (0x0e) plen 10
+    PIN Code Request Reply (0x01|0x000d) ncmd 1
+    status 0x02 bdaddr 00:KE:YB:OA:RD:00
+    Error: Unknown Connection Identifier
+
+Second:
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+    status 0x1f handle 7 ptype 0x0008
+    Error: Unspecified Error
+
+But I do not know what these error messages want to tell me and what I could do
+to get this working.
+
+Maybe someone of you could be so friendly to tell me what I should do to get
+this encryption working. Or tell me that it is impossible. Or tell me that I am
+wrong here and where I should ask instead.
+
+Regards,
+Benjamin Eikel
+
 
 
 -------------------------------------------------------
