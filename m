@@ -1,20 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS] remote name patch
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43EB6415.60509@fillibach.de>
+From: Kosta Welke <kosta@fillibach.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0602090555u507a1567tb0b3dcb8b1369f1a@mail.gmail.com>
-References: <e1effdeb0601201037y4d6eccdem6a9cbca135196520@mail.gmail.com>
-	 <1137808123.20856.122.camel@localhost>
-	 <e1effdeb0601230833t25905a64he7ca62c7d1ab48cf@mail.gmail.com>
-	 <1138036115.7327.14.camel@localhost>
-	 <e1effdeb0601231054q2a3e1ec1q6f0e2c90a48c05e3@mail.gmail.com>
-	 <1138047251.3750.6.camel@localhost.localdomain>
-	 <e1effdeb0601260609n644c313u91d193b8f5df89bb@mail.gmail.com>
-	 <1138298602.5901.78.camel@localhost>
-	 <e1effdeb0602090555u507a1567tb0b3dcb8b1369f1a@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1139500618.17280.30.camel@localhost>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] BlueZ newbi
+References: <695f62bb0602090713t41c606e0x@mail.gmail.com>
+In-Reply-To: <695f62bb0602090713t41c606e0x@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -26,27 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 09 Feb 2006 16:56:58 +0100
+Date: Thu, 09 Feb 2006 16:47:33 +0100
 
-Hi Claudio,
+Olivier Arnaud wrote:
+> For that it will be very helpful, if I could have some sort of API 
+> and/or Interface description.
 
-> According with your request, I am sending the patch again.
-> The function get_device_name should be moved to a common library.
+As far as I know, there is no documentation available, except for the 
+few comments in the source code. The best info on how to use the API is 
+by looking at the source code of bluez-utils.
 
-we maybe need to create a storage plugin which can be replaced very
-easily, but for now it is fine.
+I was able to convince my boss to buy me a book about the bluez stack, 
+but there is none. Theres only this basic howto for bluez and python, 
+which should get you started.
 
-> Basically, this patch try retrieve the remote name from the
-> cache(names file) instead of send the HCI command everytime.
+http://people.csail.mit.edu/albert/bluez-intro/
 
-The pscan_rep_mode must be 0x02 if you don't have any cached value from
-an inquiry result. I fixed it and committed it to the CVS.
+If anyone has any helpful howto/documentation links, please share :)
 
-Regards
-
-Marcel
-
-
+HTH,
+Kosta
 
 
 -------------------------------------------------------
