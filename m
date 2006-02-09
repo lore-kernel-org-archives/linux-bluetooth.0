@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY114-F2083A114D64FAFD1F75F6095030@phx.gbl>
-From: "Peter Scott" <peter_scottie@hotmail.com>
 To: bluez-users@lists.sourceforge.net
+From: Mick Wever <mick@wever.org>
+Message-ID: <pan.2006.02.09.19.37.28.802680@wever.org>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Subject: [Bluez-users] Thanks
+Content-Type: text/plain; charset=UTF-8
+Subject: [Bluez-users] No device listing under hciconfig on Lifebook E8020
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,21 +16,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Feb 2006 07:46:06 +1100
+Date: Thu, 09 Feb 2006 20:37:29 +0100
 
-Hello there,
+I cannot get any device listed using hciconfig.
+Trying both the internal bluetooth to the Fujitsu-Siemens Lifebook E8020
 
-I recently wrote with a question about my ht820 causing hcid to crash.
+cat /proc/bus/usb/devices | grep -e^[TPD] | grep -e Cls=e0 -B1 -A1
+T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=044e ProdID=3001 Rev=11.68
 
-i would like to thank you for your reply
 
-Many thanks
-Peter
-Ps i will take it up with fedora.
+And a external Bluetooth USB dongle:
 
-_________________________________________________________________
-New year, new job – there's more than 100,00 jobs at SEEK 
-http://a.ninemsn.com.au/b.aspx?URL=http%3A%2F%2Fninemsn%2Eseek%2Ecom%2Eau&_t=752315885&_r=Jan05_tagline&_m=EXT
+T:  Bus=03 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0a12 ProdID=0001 Rev= 5.25
+
+
+I'm running Gentoo GNU/Linux: 2.6.14-gentoo-r5
+Using bluez-libs-2.25 and bluez-utils-2.25
+
+Most frustrating is I cannot find any errors anywhere (dmesg).
+
+Can anybody help me?
+
+mck
 
 
 
