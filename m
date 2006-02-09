@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Belkin F8T009 and Linux
+From: Tamer Higazi <tamer23@myrealbox.com>
 To: bluez-users@lists.sourceforge.net
-From: Benjamin Eikel <benjamin@eikel.org>
-Message-ID: <loom.20060209T124135-748@post.gmane.org>
-References: <200602022157.52386.benjamin@eikel.org> <loom.20060205T233729-763@post.gmane.org>
+In-Reply-To: <loom.20060209T033130-898@post.gmane.org>
+References: <loom.20060209T033130-898@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1139467748.10136.2.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Pairing a bluetooth keyboard
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,61 +18,69 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 9 Feb 2006 11:45:11 +0000 (UTC)
+Date: Thu, 09 Feb 2006 06:49:08 +0000
 
->
+Dear Heba!
+Why don't you sniff the traffic by opening a 2nd shell, by writing: 
 
-Hello again,
+hcidump -X -V
 
-I am wondering why nobody responds to my questions. If I am doing anything wrong
-please tell me. I really do not know why this is not working and I did not find
-anything about that on this mailing list or in the BlueZ documentation files.
 
-Maybe you need more information so I logged some data with 'hcidump -X -V'. I
-uploaded the log files because I do not want to post such a long text on this
-mailing list. If this behaviour is not right, please tell me and I will post the
-logs here.
-I am using the same laptop, Bluetooth dongle and keyboard as in my first post.
-First I did:
+and post it in the news! Or try finding at bluez "docu" to find more
+about the output, the shell would give you to analyze the problem at
+all. The out put could tell much more... 
 
-root@host:~# hcitool scan
-Scanning ...
-        00:KE:YB:OA:RD:00       Logitech Elite Keyboard
-root@host:~# hidd --connect 00:KE:YB:OA:RD:00
 
-The log is here: http://www.eikel.org/temp/hcidump-connect.log
-After that I was able to type on the Bluetooth keyboard and everything was
-working. Then I wanted to authorize and encrypt the connection:
+Tamer
 
-root@host:~# hcitool auth 00:KE:YB:OA:RD:00
-0000
-HCI authentication request failed: Connection timed out
-
-Same problem as in my first post, but I have logged it. Here is the file:
-http://www.eikel.org/temp/hcidump-auth.log
-
-Of course I have read these logs but I do not get any useful information from
-it. There are two errors in the second log.
-First:
-> HCI Event: Command Complete (0x0e) plen 10
-    PIN Code Request Reply (0x01|0x000d) ncmd 1
-    status 0x02 bdaddr 00:KE:YB:OA:RD:00
-    Error: Unknown Connection Identifier
-
-Second:
-> HCI Event: Connection Packet Type Changed (0x1d) plen 5
-    status 0x1f handle 7 ptype 0x0008
-    Error: Unspecified Error
-
-But I do not know what these error messages want to tell me and what I could do
-to get this working.
-
-Maybe someone of you could be so friendly to tell me what I should do to get
-this encryption working. Or tell me that it is impossible. Or tell me that I am
-wrong here and where I should ask instead.
-
-Regards,
-Benjamin Eikel
+On Thu, 2006-02-09 at 02:48 +0000, Heba wrote:
+> I am developing an application for automatic network discovery using bluetooth
+> i.e. Running the application will result in connections to any other computers
+> running the same application:
+> - Each application is running a server which accepts connections (once a
+> connection is made, the connection is maintained until a transmission 
+> error occcurs or the socket is closed by either party); 
+> - and a client which repeatedly queries for bluetooth devices to connect to.
+> 
+> So in total an application makes and 
+> maintains 2*(#other applications) connections.
+> 
+> This causes no problems when using the Belkin F8T003 Bluetooth USB Adaptor
+> (this is a bluetooth v1.1 compliant device).
+> 
+> However, when using the Belkin F8T009 Bluetooth USB Adaptor 
+> (this is a bluetooth v1.2 compliant device) 
+> "Device or Resource Busy" errors are observed 
+> when the application tries to query 
+> when there are 3 or more connections maintained by it.
+> 
+> Is this a bluetooth hardware issue, 
+> a Bluez stack issue, 
+> or does Bluez just not support this particular device??
+> 
+> I have installed all the latest versions:
+> - Bluez-lib
+> - Bluez-hcidump
+> I am running Fedora core 4 with the latest available updates of the kernel.
+> 
+> Please advise if I am overlooking something, or if this is not a Bluez issue,
+> could you please direct me to the appropriate contact.
+> 
+> Thanks
+> Heba
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+> for problems?  Stop!  Download the new AJAX search engine that makes
+> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
 
 
 
