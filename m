@@ -1,20 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0602090555u507a1567tb0b3dcb8b1369f1a@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [DBUS] remote name patch
-In-Reply-To: <1138298602.5901.78.camel@localhost>
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_12384_31495989.1139493326466"
-References: <e1effdeb0601201037y4d6eccdem6a9cbca135196520@mail.gmail.com>
-	 <1137808123.20856.122.camel@localhost>
-	 <e1effdeb0601230833t25905a64he7ca62c7d1ab48cf@mail.gmail.com>
-	 <1138036115.7327.14.camel@localhost>
-	 <e1effdeb0601231054q2a3e1ec1q6f0e2c90a48c05e3@mail.gmail.com>
-	 <1138047251.3750.6.camel@localhost.localdomain>
-	 <e1effdeb0601260609n644c313u91d193b8f5df89bb@mail.gmail.com>
-	 <1138298602.5901.78.camel@localhost>
+Content-Type: multipart/mixed; boundary="=-L09hnqOG/YqzE00A6xL4"
+Message-Id: <1139482797.2349.32.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-devel] L2CAP Flow Control
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -26,320 +16,335 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 9 Feb 2006 11:55:26 -0200
+Date: Thu, 09 Feb 2006 11:59:56 +0100
 
-------=_Part_12384_31495989.1139493326466
-Content-Type: text/plain; charset=ISO-8859-1
+
+--=-L09hnqOG/YqzE00A6xL4
+Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-Hi Marcel,
+Hello together,
 
-According with your request, I am sending the patch again.
-The function get_device_name should be moved to a common library.
+I'm currently trying to implement Flow Control on the L2CAP layer. I
+already made some good progress but before things become too complicated
+all of a sudden, I send my first lines of code to the list to give
+everyone the opportuntiy to get an understanding of what I am doing.
+So this =BBpatch=AB doesn't bring Flow Control into play, yet. But it
+shouldn't break connections either.
 
-Basically, this patch try retrieve the remote name from the
-cache(names file) instead of send the HCI command everytime.
+I am only working on l2cap.h and l2cap.c
+I added some basic constants to the header file as well as two macros
+=BBSET_BIT=AB and =BBHAS_BIT=AB which I need later to determine whether one=
+ of
+the four possible options in a request has already been seen in this
+request (imagine a request consisting of MTU + QoS + MTU). Further more
+I added all the different parameter fields for our channel and socket
+(struct l2cap_pinfo): o stands for outgoing, i for incoming and conf
+reflects the parameters sent in a configuration request. Later on we
+will have to deal with these conf parameters, compare them to reasonable
+values and so on.
+In l2cap.c I removed the function =BBl2cap_get_conf_opt=AB because I think
+we would run into trouble on Big Endian machines with this code. The
+problem is that the basic MTU option consists of only one 16 bit wide
+parameter so we can use __le16_to_cpu() for that, but in case of QoS or
+my Flow Control, we have a bunch of unfortunately unaligned data fields.
+Therefore I access those data fields directly (e.g. cap->conf_mode =3D
+*(__u8*)(ptr + 2);).=20
+The result flag corresponds to the result values of a configuration
+request. We need more than just one, because to be standard compliant we
+need to let the other side know, which options are unknown (in such a
+case) or which parameters are unacceptable of which particular option.
+So we have one basic result code for our responds (result[0]) -- this is
+like the max function of {success; Failure/unacceptable parameters;
+Failure/rejected; Failure/unknown options}. But we need to keep track of
+our failures for a good responds.
+The while loop extracts all options of a single request. We have some
+basic error check mechanisms to avoid buffer overflow attacks by
+corrupted requests.
+Inside each option parser we use the HAS_BIT macro to make sure we will
+only consider the first of possible multiple options of similar type
+within one request. The hint is not processed yet.
 
-Regards,
-Claudio.
+This is only basic stuff to detect the different options and parse them
+correctly. Now it becomes more complicated as we have to keep track of
+all possible failures, parameters, result codes etc. I would write a
+function l2cap_check_conf_opt(struct sock *sk, int option) to check the
+individual parameters of a particular option. It gets harder to build
+the configuration response individually.
 
-On 1/26/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Claudio,
->
-> > > > > Regarding the name, we might simply say the hcid/bluetoothd alway=
-s sends
-> > > > > a remote name signal if something changes. So it might get the sh=
-ort
-> > > > > name from the extended inquiry first and after that it receives t=
-he full
-> > > > > remote name. We can also always send the cached name and we updat=
-e that
-> > > > > name on every service discovery, because then it is at zero cost.
-> > > >
-> > > > The remote name is triggered by D-Bus clients. hcid/bluetoothd does=
-n't
-> > > > request the remote when the inquiry finishes. For EIR, are you
-> > > > suggesting send the "InquiryResult" signal followed by a "RemoteNam=
-e"?
-> > >
-> > > this sounds like a sane and backward compatible way of doing this.
-> >
-> > I did some tests and discovered that if we add extra fields at the
-> > ending we can keep the
-> > backward compatibility if applications check the signature partially.
-> > The functions dbus_message_get_args and dbus_message_get_basic can be
-> > used to extract the first three signal fields(bdaddr, class, rssi)
-> > without broke. For python applications add an extra signal handler
-> > function with the new signature is enough.
-> >
-> > Therefore, we have another option: Add the name at the ending of the
-> > "InquiryResult" signal arguments.
->
-> even if I wrote a backward compatibility, I actually don't care, because
-> I mentioned sometimes that I don't consider the D-Bus stable unless we
-> at least have D-Bus 1.0 finally released.
->
-> > > > If we send the "RemoteName" with the short name, probably D-Bus
-> > > > clients will not request the RemoteName to retrieve the complete na=
-me.
-> > > > D-Bus clients should not distinguish short/complete name.
-> > >
-> > > It is up to hcid/bluetoothd to update the remote when the client
-> > > requests a service discovery.
-> > >
-> > > > Regarding the RemoteName request service signature. Do you agree wi=
-th
-> > > > my initial proprosal? (see the first e-mail sent: have an alternati=
-ve
-> > > > to force send the HCI remote name and another using the cache)
-> > >
-> > > No. We don't need any extra stuff. The client asks for a name and we
-> > > give them a name. That's it and all the rest is implementation specif=
-ic
-> > > to hcid/bluetoothd.
-> >
-> > Sorry I didn't understand your proposal. Which logic do you want?
-> > When the hcid/bluetoothd receives the RemoteName(bdaddr) request,
-> > which steps should be done?
-> >
-> > This is the patch approach:
-> > name =3D get_device_name(local, bdaddr); /* retrieving from names file =
-*/
-> > if (name =3D=3D NULL) {
-> >    /* send HCI remote name request */
-> > }
-> > ...
-> > Which modifications must be done on this patch?
->
-> If the client ask for a name and we have a cached one, it gets the
-> cached name. If we don't have a cached name hcid/bluetoothd will take
-> care of filling the cache.
->
-> The same applies to the device discovery. If we don't get any EIR
-> information it is the job of hcid/bluetoothd to fill the name cache.
->
-> > > > > So we have one device name. This maybe a cached, a remote or a sh=
-ortened
-> > > > > name. The application doesn't really have to care and it gets upd=
-ates as
-> > > > > soon as hcid/bluetoothd knows them.
-> > > > >
-> > > > > Besides the device name, we should implement an alias name. This =
-name is
-> > > > > associated with the BD_ADDR and can be changed by the user if he/=
-she
-> > > > > doesn't like the device name. Implementing this alias through the=
- D-Bus
-> > > > > interface makes it available for all applications and we can stor=
-e the
-> > > > > aliases in /var/lib/bluetooth/<bdaddr>/aliases.
-> > > >
-> > > > When a client requests a RemoteName, which value should be returned=
-?
-> > > > The value stored in the aliases file or the value stored in the nam=
-es
-> > > > file? Or are you suggesting create a property
-> > > > "GetProperty("alias")/SetProperty("alias", "value")?
-> > >
-> > > When they request the remote name or device name, then they get the
-> > > device name that is valid at the moment. This will maybe a cached nam=
-e,
-> > > but that doesn't matter. If hcid/bluetoothd knows better they will se=
-nd
-> > > out a remote name signal to tell them.
-> > >
-> > > The alias name is totally different and independent. It is applicatio=
-n
-> > > choice to use the alias name or not. If the alias name is empty they =
-can
-> > > use the remote/device name.
-> >
-> > Is there someone working on this stuff?
->
-> Not that I know of.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log fi=
-les
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D103432&bid=3D230486&dat=
-=3D121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+That's it for now.
 
+Martin
 
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
-
-------=_Part_12384_31495989.1139493326466
-Content-Type: text/x-patch; name=remote_name_cache02.patch; charset=us-ascii
+--=-L09hnqOG/YqzE00A6xL4
+Content-Disposition: attachment; filename=patch-2.6.14-mr
+Content-Type: text/plain; name=patch-2.6.14-mr; charset=ISO-8859-15
 Content-Transfer-Encoding: 7bit
-X-Attachment-Id: f_ejgyb9kg
-Content-Disposition: attachment; filename="remote_name_cache02.patch"
 
---- bluez-utils-cvs.orig/hcid/dbus.c	2006-02-07 23:22:31.000000000 -0200
-+++ bluez-utils-cvs-remotename/hcid/dbus.c	2006-02-09 08:43:46.000000000 -0200
-@@ -45,6 +45,7 @@
+--- linux-2.6.14-mh2/include/net/bluetooth/l2cap.h	2005-12-23 21:14:59.000000000 +0100
++++ linux-2.6.14-mr/include/net/bluetooth/l2cap.h	2006-02-09 10:54:57.000000000 +0100
+@@ -28,6 +28,8 @@
+ /* L2CAP defaults */
+ #define L2CAP_DEFAULT_MTU	672
+ #define L2CAP_DEFAULT_FLUSH_TO	0xFFFF
++#define L2CAP_MIN_TXW		1
++#define L2CAP_MAX_TXW		32
  
- #include "hcid.h"
- #include "dbus.h"
-+#include "textfile.h"
+ #define L2CAP_CONN_TIMEOUT	(HZ * 40)
  
- #ifndef DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT
- #define DBUS_NAME_FLAG_PROHIBIT_REPLACEMENT	0x00
-@@ -98,6 +99,19 @@
- 	unregister_function_t	*unreg_func;
- 	get_svc_table_func_t	*get_svc_table;	/* return the service table */
+@@ -47,6 +49,10 @@
+ 	__u8  mode;
  };
-+/*
-+ * Utility functions
-+ */
-+static char *get_device_name(const bdaddr_t *local, const bdaddr_t *peer)
-+{
-+	char filename[PATH_MAX + 1], addr[18];
-+
-+	ba2str(local, addr);
-+	snprintf(filename, PATH_MAX, "%s/%s/names", STORAGEDIR, addr);
-+
-+	ba2str(peer, addr);
-+	return textfile_get(filename, addr);
-+}
  
- /*
-  * D-Bus error messages functions and declarations.
-@@ -1707,50 +1721,92 @@
- static DBusMessage* handle_remote_name_req(DBusMessage *msg, void *data)
++#define L2CAP_MODE_BASIC	0x00
++#define L2CAP_MDOE_RET		0x01
++#define L2CAP_MODE_FLOW		0x02
++
+ #define L2CAP_CONNINFO	0x02
+ struct l2cap_conninfo {
+ 	__u16 hci_handle;
+@@ -129,8 +135,10 @@
+ 	__u8       data[0];
+ } __attribute__ ((packed));
+ 
+-#define L2CAP_CONF_SUCCESS	0x00
+-#define L2CAP_CONF_UNACCEPT	0x01
++#define L2CAP_CONF_SUCCESS	0x0000
++#define L2CAP_CONF_UNACCEPT	0x0001
++#define L2CAP_CONF_REJ		0x0002
++#define L2CAP_CONF_UNKNOWN	0x0003
+ 
+ struct l2cap_conf_opt {
+ 	__u8       type;
+@@ -144,7 +152,8 @@
+ #define L2CAP_CONF_QOS		0x03
+ #define L2CAP_CONF_RFC		0x04
+ 
+-#define L2CAP_CONF_MAX_SIZE	22
++#define SET_BIT(x, v) ((x) |= 1 << (v))
++#define HAS_BIT(x, v) (((x) & (1 << (v))) != 0)
+ 
+ struct l2cap_disconn_req {
+ 	__le16     dcid;
+@@ -220,6 +229,31 @@
+ 	__u8		conf_retry;
+ 	__u16		conf_mtu;
+ 
++	/* Configuration Request RFC Options */
++	__u8		conf_mode;
++	__u8		conf_txw;
++	__u8		conf_maxt;
++	__u16		conf_ret_to;
++	__u16		conf_mon_to;
++	__u16		conf_mps;
++	
++	/* incoming RFC Options */
++	__u8		imode;
++	__u8		itxw;
++	__u8		imaxt;
++	__u16		iret_to;
++	__u16		imon_to;
++	__u16		imps;
++
++	/* outgoing RFC Options */
++	__u8		omode;
++	__u8		otxw;
++	__u8		omaxt;
++	__u16		oret_to;
++	__u16		omon_to;
++	__u16		omps;
++
++	
+ 	__u8		ident;
+ 
+ 	struct l2cap_conn	*conn;
+--- linux-2.6.14-mh2/net/bluetooth/l2cap.c	2006-01-20 12:05:17.000000000 +0100
++++ linux-2.6.14-mr/net/bluetooth/l2cap.c	2006-02-09 11:26:17.000000000 +0100
+@@ -850,7 +850,7 @@
+ 		opts.imtu     = l2cap_pi(sk)->imtu;
+ 		opts.omtu     = l2cap_pi(sk)->omtu;
+ 		opts.flush_to = l2cap_pi(sk)->flush_to;
+-		opts.mode     = 0x00;
++		opts.mode     = L2CAP_MODE_BASIC;
+ 
+ 		len = min_t(unsigned int, len, sizeof(opts));
+ 		if (copy_to_user(optval, (char *) &opts, len))
+@@ -1236,74 +1236,105 @@
+ 	return NULL;
+ }
+ 
+-static inline int l2cap_get_conf_opt(void **ptr, int *type, int *olen, unsigned long *val)
+-{
+-	struct l2cap_conf_opt *opt = *ptr;
+-	int len;
+-
+-	len = L2CAP_CONF_OPT_SIZE + opt->len;
+-	*ptr += len;
+-
+-	*type = opt->type;
+-	*olen = opt->len;
+-
+-	switch (opt->len) {
+-	case 1:
+-		*val = *((__u8 *) opt->val);
+-		break;
+-
+-	case 2:
+-		*val = __le16_to_cpu(*((__le16 *) opt->val));
+-		break;
+-
+-	case 4:
+-		*val = __le32_to_cpu(*((__le32 *) opt->val));
+-		break;
+-
+-	default:
+-		*val = (unsigned long) opt->val;
+-		break;
+-	}
+-
+-	BT_DBG("type 0x%2.2x len %d val 0x%lx", *type, opt->len, *val);
+-	return len;
+-}
+ 
+ static inline void l2cap_parse_conf_req(struct sock *sk, void *data, u16 len)
  {
- 	DBusMessage *reply = NULL;
-+	DBusMessage *signal = NULL;
- 	struct hci_dbus_data *dbus_data = data;
--	int dd = -1;
- 	const char *str_bdaddr;
-+	char *name;
-+	char path[MAX_PATH_LENGTH];
- 	bdaddr_t bdaddr;
-+	struct hci_dev_info di;
- 	struct hci_request rq;
- 	remote_name_req_cp cp;
- 	evt_cmd_status rp;
-+	int dd = -1;
- 
- 	dbus_message_get_args(msg, NULL,
- 					DBUS_TYPE_STRING, &str_bdaddr,
- 					DBUS_TYPE_INVALID);
- 
- 	str2ba(str_bdaddr, &bdaddr);
+-	int type, hint, olen; 
+-	unsigned long val;
+-	void *ptr = data;
 -
--	dd = hci_open_dev(dbus_data->dev_id);
--	if (dd < 0) {
--		syslog(LOG_ERR, "Unable to open device %d: %s (%d)",
--					dbus_data->dev_id, strerror(errno), errno);
--		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
-+	if (hci_devinfo(dbus_data->dev_id, &di) < 0) {
-+		syslog(LOG_ERR, "Can't get device info");
-+		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
- 		goto failed;
++	struct l2cap_pinfo *cap = l2cap_pi(sk);
++	int type, hint; 
++	u8 *ptr = data;
++	u8 options = 0; /* bit flag that indicates which options are set */
++	u8 result[5]; /* result codes for all 4 possible options plus result[0] */
++	unsigned int i;
++	
+ 	BT_DBG("sk %p len %d", sk, len);
+ 
++	for (i = 0; i < len; ++i)
++		printk("%02X ", ptr[i]);
++	printk("\n");
++
++	result[0] = L2CAP_CONF_SUCCESS;
++	
+ 	while (len >= L2CAP_CONF_OPT_SIZE) {
+-		len -= l2cap_get_conf_opt(&ptr, &type, &olen, &val);
+ 		u8 req_len = *(u8*)(ptr + 1);
+ 
++		/* Bail out if req length > packet length */
++		if (len < req_len) return;
++
++		len -= req_len + 2;
++		type = *(u8*)(ptr + 0);
++
+ 		hint  = type & 0x80;
+ 		type &= 0x7f;
+ 
+ 		BT_DBG("Type: %d len: %d", type, req_len);
++		
+ 		switch (type) {
+ 		case L2CAP_CONF_MTU:
+-			l2cap_pi(sk)->conf_mtu = val;
++			if (HAS_BIT(options, L2CAP_CONF_MTU)) break;
++			if (req_len != 2) {
++				result[0] = L2CAP_CONF_REJ;
++				break;
++			}
++			cap->conf_mtu = __le16_to_cpup((__le16*)(ptr + 2));
++			SET_BIT(options, L2CAP_CONF_MTU);
+ 			break;
+ 
++		/* Flush TO not supported yet */
+ 		case L2CAP_CONF_FLUSH_TO:
+-			l2cap_pi(sk)->flush_to = val;
++			if (HAS_BIT(options, L2CAP_CONF_FLUSH_TO)) break;
++#if 0
++			if (req_len != 2) {
++				result[0] = L2CAP_CONF_REJ;
++				break;
++			}
++			cap->flush_to = __le16_to_cpup((__le16*)(ptr + 2));
++#endif
++			result[0] = L2CAP_CONF_UNKNOWN;
++			result[L2CAP_CONF_FLUSH_TO] = L2CAP_CONF_UNKNOWN;
++			SET_BIT(options, L2CAP_CONF_FLUSH_TO);
+ 			break;
+ 
++		/* QoS not supported yet */
+ 		case L2CAP_CONF_QOS:
++			if (HAS_BIT(options, L2CAP_CONF_QOS)) break;
++#if 0
++			if (req_len != 22) {
++				result[0] = L2CAP_CONF_REJ;
++				break;
++			}
++#endif
++			result[0] = L2CAP_CONF_UNKNOWN;
++			result[L2CAP_CONF_QOS] = L2CAP_CONF_UNKNOWN;
++			SET_BIT(options, L2CAP_CONF_QOS);
+ 			break;
+ 
++		case L2CAP_CONF_RFC: {
++			if (HAS_BIT(options, L2CAP_CONF_RFC)) break;
++			if (req_len != 9) {
++				result[0] = L2CAP_CONF_REJ;
++				break;
++			}
++			cap->conf_mode = *(__u8*)(ptr + 2);
++			cap->conf_txw  = *(__u8*)(ptr + 3);
++			cap->conf_maxt = *(__u8*)(ptr + 4);
++			cap->conf_ret_to = __le16_to_cpup((__le16*)(ptr + 5));
++			cap->conf_mon_to = __le16_to_cpup((__le16*)(ptr + 7));
++			cap->conf_mps    = __le16_to_cpup((__le16*)(ptr + 9));
++			SET_BIT(options, L2CAP_CONF_RFC);
++			break;
++		}
++	
+ 		default:
++			result[0] = L2CAP_CONF_REJ;
+ 			if (hint)
+ 				break;
+ 
+ 			/* FIXME: Reject unknown option */
+ 			break;
+ 		}
++
++		/* Go to start of (possible) next request */
++		ptr += req_len;
  	}
+ }
  
--	memset(&cp, 0, sizeof(cp));
--	cp.bdaddr = bdaddr;
--	cp.pscan_rep_mode = 0x01;
-+	/* Try retrieve from local cache */
-+	name = get_device_name(&di.bdaddr, &bdaddr);
-+	if (name) {
+@@ -1361,16 +1392,15 @@
+ static inline int l2cap_conf_output(struct sock *sk, void **ptr)
+ {
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
+-	int result = 0;
++	int result = L2CAP_CONF_SUCCESS;
  
--	memset(&rq, 0, sizeof(rq));
--	rq.ogf    = OGF_LINK_CTL;
--	rq.ocf    = OCF_REMOTE_NAME_REQ;
--	rq.cparam = &cp;
--	rq.clen   = REMOTE_NAME_REQ_CP_SIZE;
--	rq.rparam = &rp;
--	rq.rlen   = EVT_CMD_STATUS_SIZE;
--	rq.event  = EVT_CMD_STATUS;
-+		reply = dbus_message_new_method_return(msg);
+ 	/* Configure output options and let the other side know
+ 	 * which ones we don't like. */
+ 	if (pi->conf_mtu < pi->omtu) {
+ 		l2cap_add_conf_opt(ptr, L2CAP_CONF_MTU, 2, pi->omtu);
+ 		result = L2CAP_CONF_UNACCEPT;
+-	} else {
++	} else
+ 		pi->omtu = pi->conf_mtu;
+-	}
  
--	if (hci_send_req(dd, &rq, 100) < 0) {
--		syslog(LOG_ERR, "Unable to send remote name request: %s (%d)",
--							strerror(errno), errno);
--		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
--		goto failed;
-+		snprintf(path, sizeof(path), "%s/hci%d/%s", DEVICE_PATH, dbus_data->dev_id, BLUEZ_HCI);
-+
-+		signal = dbus_message_new_signal(path, DEV_HCI_INTERFACE,
-+						 BLUEZ_HCI_REMOTE_NAME);
-+
-+		dbus_message_append_args(signal,
-+					 DBUS_TYPE_STRING, &str_bdaddr,
-+					 DBUS_TYPE_STRING, &name,
-+					 DBUS_TYPE_INVALID);
-+
-+		if (dbus_connection_send(connection, signal, NULL) == FALSE) {
-+			syslog(LOG_ERR, "Can't send D-BUS remote name signal message");
-+			goto failed;
-+		}
-+
-+		dbus_message_unref(signal);
-+		free(name);
-+
-+	} else {
-+
-+		/* Send HCI command */
-+		dd = hci_open_dev(dbus_data->dev_id);
-+		if (dd < 0) {
-+			syslog(LOG_ERR, "Unable to open device %d: %s (%d)",
-+						dbus_data->dev_id, strerror(errno), errno);
-+			reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
-+			goto failed;
-+		}
-+
-+		memset(&cp, 0, sizeof(cp));
-+		cp.bdaddr = bdaddr;
-+		cp.pscan_rep_mode = 0x01;
-+
-+		memset(&rq, 0, sizeof(rq));
-+		rq.ogf    = OGF_LINK_CTL;
-+		rq.ocf    = OCF_REMOTE_NAME_REQ;
-+		rq.cparam = &cp;
-+		rq.clen   = REMOTE_NAME_REQ_CP_SIZE;
-+		rq.rparam = &rp;
-+		rq.rlen   = EVT_CMD_STATUS_SIZE;
-+		rq.event  = EVT_CMD_STATUS;
-+
-+		if (hci_send_req(dd, &rq, 100) < 0) {
-+			syslog(LOG_ERR, "Unable to send remote name request: %s (%d)",
-+						strerror(errno), errno);
-+			reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET | errno);
-+			goto failed;
-+		}
-+
-+		if (rp.status) {
-+			syslog(LOG_ERR, "Remote name request failed");
-+			reply = bluez_new_failure_msg(msg, BLUEZ_EBT_OFFSET | rp.status);
-+			goto failed;
-+		}
- 	}
+ 	BT_DBG("sk %p result %d", sk, result);
+ 	return result;
+@@ -1548,7 +1578,7 @@
+ 	l2cap_parse_conf_req(sk, req->data, cmd_len - sizeof(*req));
  
- 	reply = dbus_message_new_method_return(msg);
--
- failed:
- 	if (dd >= 0)
- 		hci_close_dev(dd);
+ 	if (flags & 0x0001) {
+-		/* Incomplete config. Send empty response. */
++		/* Incomplete config (not supported). Send empty response. */
+ 		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
+ 				l2cap_build_conf_rsp(sk, rsp, NULL), rsp);
+ 		goto unlock;
 
-------=_Part_12384_31495989.1139493326466--
+--=-L09hnqOG/YqzE00A6xL4--
+
 
 
 -------------------------------------------------------
