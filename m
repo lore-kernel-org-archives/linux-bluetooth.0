@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Martin Stolle <mstoll@sus.mcgill.ca>
+Message-ID: <20060209125112.12551.qmail@web36111.mail.mud.yahoo.com>
+From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20060209170111.GB24087@sus.mcgill.ca>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Logitech v270
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] How does data flow from USB Core to the bluetooth protocol stack
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,17 +16,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 9 Feb 2006 12:01:15 -0500
+Date: Thu, 9 Feb 2006 04:51:12 -0800 (PST)
 
-Hi,
+Hello,
+I am a research student and i am trying to trace the
+working of Bluez. 
+I was able to find out how the communication between
+the bluetooth USB adapter and host takes place. ie how
+the bluetooth device driver gets loaded and how the
+data collected in the bluetooth device driver is being
+passed onto the actual USB driver. 
+I was not able to find out how the USB core passes the
+data which it collected from the bluetooth device
+driver onto the bluetooth protocol stack. ie how the
+kernel knows that this data belongs to bluez
 
-I am thinking about buying the Logitech v270 mouse for my laptop.  I
-read on the mailing list that it was too fast and no way to adjust.  Has
-a solutino been found for that problem?  Is there hope and should I just
-buy it?
+I would appreciate if someone helps me with the above 
 
-Martin
+Warm Regards,
+Swathi
 
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
