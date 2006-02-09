@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060209125112.12551.qmail@web36111.mail.mud.yahoo.com>
-From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
+Subject: Re: [Bluez-users] udev rules entry for bluetooth mouse
+From: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] How does data flow from USB Core to the bluetooth protocol stack
+In-Reply-To: <1139411355.8712.24.camel@bluez.bueche.ch>
+References: <1138872805.21953.20.camel@bluez.bueche.ch>
+	 <43E1E11F.8040501@ycom.ch>  <1138880751.21953.38.camel@bluez.bueche.ch>
+	 <1139331334.12556.3.camel@pc-05.ycom.ch>
+	 <1139351059.22790.63.camel@localhost>
+	 <1139411355.8712.24.camel@bluez.bueche.ch>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1139489430.7543.7.camel@pc-05.ycom.ch>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,30 +22,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 9 Feb 2006 04:51:12 -0800 (PST)
+Date: Thu, 09 Feb 2006 13:50:30 +0100
 
-Hello,
-I am a research student and i am trying to trace the
-working of Bluez. 
-I was able to find out how the communication between
-the bluetooth USB adapter and host takes place. ie how
-the bluetooth device driver gets loaded and how the
-data collected in the bluetooth device driver is being
-passed onto the actual USB driver. 
-I was not able to find out how the USB core passes the
-data which it collected from the bluetooth device
-driver onto the bluetooth protocol stack. ie how the
-kernel knows that this data belongs to bluez
+Le mercredi 08 f=C3=A9vrier 2006 =C3=A0 16:09 +0100, Charles Bueche a =C3=
+=A9crit :
 
-I would appreciate if someone helps me with the above 
+> Hi all,
+>=20
+> thanks for the analysis and explanations. From what I have read and
+> tested, here is a resum=C3=A9 of the Logitech V270 situation :
+>=20
+> - Logitech ignore Linux (this is not new, but need to be repeated)
+> - the V270 mouse basically works as expected HID input device, but is
+> overly sensible (probably due to its high resolution)
+> - the mouse events go into /dev/input/mice by default
+> - if evdev is loaded, mouse events go to /dev/input/event{1..N}
+> - udev doesn't have the info to create a rule in 10-local.rules so the
+> V270 get mapped to a fix name like /dev/input/v270
+> - none of the tools I tried (locomo, logitech-applet) know the V270 for
+> now. I tried to change some of them, but failed, due to lacking know-ho=
+w
+> in HID/USB/etc
+> - KDE control center or xset cannot reduce the mouse sensibility enough
+> to make it usuable (at least for my 40 years muscles control ability)
 
-Warm Regards,
-Swathi
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+Thanks for this good resum=C3=A9, you point out the major current issue.
+
+I just can add about udev-rules, Marcel and UDEV team are searching for
+a better solution to add more infos on the udev struct, to let user
+creates good rules with devices.
+
+We can expect a workaround not so far :)
+
+And about Linux support on Logitech product, I've several friends
+working for this compagny, and with some insiders informations, I can
+tell that Logitech try  now to make better software. They are aware of
+the poor quality of their driver / software.
+Just hope they can spend some time to change their devs :)
+
+
+
 
 
 -------------------------------------------------------
