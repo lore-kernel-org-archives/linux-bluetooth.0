@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] No device listing under hciconfig on Lifebook
-	E8020
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <BAY114-F2083A114D64FAFD1F75F6095030@phx.gbl>
+From: "Peter Scott" <peter_scottie@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <pan.2006.02.09.19.37.28.802680@wever.org>
-References: <pan.2006.02.09.19.37.28.802680@wever.org>
-Content-Type: text/plain
-Message-Id: <1139533006.17280.35.camel@localhost>
 Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Subject: [Bluez-users] Thanks
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,38 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Feb 2006 01:56:46 +0100
+Date: Fri, 10 Feb 2006 07:46:06 +1100
 
-Hi Mick,
+Hello there,
 
-> I cannot get any device listed using hciconfig.
-> Trying both the internal bluetooth to the Fujitsu-Siemens Lifebook E8020
-> 
-> cat /proc/bus/usb/devices | grep -e^[TPD] | grep -e Cls=e0 -B1 -A1
-> T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=044e ProdID=3001 Rev=11.68
-> 
-> 
-> And a external Bluetooth USB dongle:
-> 
-> T:  Bus=03 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0a12 ProdID=0001 Rev= 5.25
-> 
-> 
-> I'm running Gentoo GNU/Linux: 2.6.14-gentoo-r5
-> Using bluez-libs-2.25 and bluez-utils-2.25
-> 
-> Most frustrating is I cannot find any errors anywhere (dmesg).
+I recently wrote with a question about my ht820 causing hcid to crash.
 
-show us the complete devices entry for these two adapters. And make sure
-that hci_usb is loaded.
+i would like to thank you for your reply
 
-Regards
+Many thanks
+Peter
+Ps i will take it up with fedora.
 
-Marcel
-
+_________________________________________________________________
+New year, new job – there's more than 100,00 jobs at SEEK 
+http://a.ninemsn.com.au/b.aspx?URL=http%3A%2F%2Fninemsn%2Eseek%2Ecom%2Eau&_t=752315885&_r=Jan05_tagline&_m=EXT
 
 
 
