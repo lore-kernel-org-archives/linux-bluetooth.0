@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43EB6415.60509@fillibach.de>
-From: Kosta Welke <kosta@fillibach.de>
-MIME-Version: 1.0
+Message-ID: <695f62bb0602090713t41c606e0x@mail.gmail.com>
+From: Olivier Arnaud <oarnaud79.linux@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] BlueZ newbi
-References: <695f62bb0602090713t41c606e0x@mail.gmail.com>
-In-Reply-To: <695f62bb0602090713t41c606e0x@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_2994_1392163.1139498000929"
+Subject: [Bluez-devel] BlueZ newbi
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,26 +17,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 09 Feb 2006 16:47:33 +0100
+Date: Thu, 9 Feb 2006 16:13:20 +0100
 
-Olivier Arnaud wrote:
-> For that it will be very helpful, if I could have some sort of API 
-> and/or Interface description.
+------=_Part_2994_1392163.1139498000929
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-As far as I know, there is no documentation available, except for the 
-few comments in the source code. The best info on how to use the API is 
-by looking at the source code of bluez-utils.
+Hi All,
 
-I was able to convince my boss to buy me a book about the bluez stack, 
-but there is none. Theres only this basic howto for bluez and python, 
-which should get you started.
+I want to use the BlueZ stack with an home made soft.
+For that it will be very helpful, if I could have some sort of API and/or
+Interface description.
+Can someone help me?
 
-http://people.csail.mit.edu/albert/bluez-intro/
+Thanks,
+br,
+Olivier
 
-If anyone has any helpful howto/documentation links, please share :)
+------=_Part_2994_1392163.1139498000929
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-HTH,
-Kosta
+Hi All,<br><br>I want to use the BlueZ stack with an home made soft.<br>For=
+ that it will be very helpful, if I could have some sort of API and/or Inte=
+rface description.<br>Can someone help me?<br><br>Thanks,<br>br,<br>Olivier
+<br>
+
+------=_Part_2994_1392163.1139498000929--
 
 
 -------------------------------------------------------
