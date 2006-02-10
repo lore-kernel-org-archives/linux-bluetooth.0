@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43ECCAC9.9050402@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] modprobe snd_bt_sco fails with: FATAL: Error inserting
- snd_bt_sco
-References: <200602100311.35870.christophbaechtle@web.de>
-In-Reply-To: <200602100311.35870.christophbaechtle@web.de>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Mick Wever <mick@wever.org>
+Message-ID: <pan.2006.02.10.09.31.37.98335@wever.org>
+References: <pan.2006.02.09.19.37.28.802680@wever.org> <1139533006.17280.35.camel@localhost>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Subject: [Bluez-users] Re: No device listing under hciconfig on Lifebook	E8020
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,27 +17,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Feb 2006 10:18:01 -0700
+Date: Fri, 10 Feb 2006 10:31:37 +0100
 
-Christoph
 
-> snd_bt_sco: Unknown symbol there_is_no_init_MUTEX_LOCKED_for_RT_semaphores
-> 
-> 
-> does anybody know how to solve this?
-> I am using suse 10.0 with kde3.5 and kernel 2.6.15-jad2
+> .... And make sure
+> that hci_usb is loaded.
 
- init_MUTEX_LOCKED(&bt_sco->thread_sem);
+A combination of kernel upgrade to 2.6.15 and loading hci_usb fixed the
+problem.
+Thanks the the immediate help!
+mck
 
-needed to be changed to:
-
- init_MUTEX(&bt_sco->thread_sem);
- down(&bt_sco->thread_sem);
-
-This builds ok for me but my headset is having other problems. can you
-get it from cvs and check it out?
-
-Brad
 
 
 -------------------------------------------------------
