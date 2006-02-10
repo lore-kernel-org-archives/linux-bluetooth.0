@@ -1,15 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sdp_record_register()
-From: Ari Paavilainen <arip@iki.fi>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1139402899.29208.10.camel@localhost>
-References: <1139312694.8422.19.camel@localhost.localdomain>
-	 <1139356568.22790.73.camel@localhost>
-	 <1139398021.8573.17.camel@localhost.localdomain>
-	 <1139402899.29208.10.camel@localhost>
-Content-Type: text/plain
-Message-Id: <1139571910.8700.7.camel@localhost.localdomain>
+From: Stephane Travostino <neuromancer@paranoici.org>
+Message-ID: <loom.20060210T014446-0@post.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Motorola V620 phone and bluetooth PIN pairing
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,41 +16,85 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Feb 2006 13:45:10 +0200
+Date: Fri, 10 Feb 2006 01:08:26 +0000 (UTC)
 
-On Wed, 2006-02-08 at 13:48 +0100, Marcel Holtmann wrote:
-> Hi Ari,
-> 
-> > > > Function call:
-> > > > err = sdp_record_register(session, record, 0);
-> > > > returns zero and error is 'Illegal seek'.
-> > > > Arguments should be ok (session is return value of successful call to
-> > > > sdp_connect() and record works ok with another function calls).
-> > > > What might be wrong?
-> > > 
-> > > the sdp_connect() has been done to the local SDP server, right. You
-> > > can't register SDP records for remote connections.
-> > > 
-> > 
-> > In sdp_record_register() there is:
-> > 
-> >         if (!session->local) {
-> >           errno = EREMOTE;
-> >           return -1;
-> >         }
-> > 
-> > Did you mean this by the remote connection (the program passes this test)? 
-> > Anyway, it seems to be that the only way to sdp_record_register() return ESPIPE (Illegal seek) error is when call to sdp_send_req_w4_rsp() fails. Does this give any hint?
-> 
-> make sure that sdpd process is running. Follow the examples from sdptool
-> or pand.
-> 
+Hello,
+I have a Motorola V620 phone which provides Bluetooth support, and a working
+Bluetooth USB dongle.
+Phone -> PC and PC -> Phone transfers work correctly, but whenever I try to
+create a rfcomm connection to the phone, I get a "Connection refused" error
+message.
+This is how I setup the RFCOMM:
 
-sdpd is running. In 'sdptool.c' there is no call to
-'sdp_record_register()'. Is there any other examples of registering a
-service record?
+$ sudo rfcomm bind 0 00:15:A8:3B:EA:F0 1
+$ sudo rfcomm
+rfcomm0: 00:15:A8:3B:EA:F0 channel 1 clean
 
--Ari
+When I try to do a simple command on /dev/rfcomm0 the command freezes, or 
+I get a "connection refused" message.
+
+$ echo AT > /dev/rfcomm0
+(After waiting some time, I press Ctrl-C)
+bash: /dev/rfcomm0: Interrupted system call
+
+or
+
+$ cat /dev/rfcomm0
+cat: /dev/rfcomm0: Connection refused
+
+I tried to do a hcidump and it stucks on the line:
+
+-> HCI Event: Link Key Request (0x17) plen 6
+
+when the command freezes, or
+
+-> HCI Event: Link Key Request (0x17) plen 6
+<- HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+-> HCI Event: Command Complete (0x0e) plen 10
+-> ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73
+<- ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+<- ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+-> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+<- ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+-> HCI Event: Number of Completed Packets (0x13) plen 5
+-> HCI Event: Number of Completed Packets (0x13) plen 5
+-> HCI Event: Number of Completed Packets (0x13) plen 5
+-> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+-> ACL data: handle 41 flags 0x02 dlen 14
+    L2CAP(s): Command rej: reason 2 dcid 0x0040 scid 0x0040
+      Invalid CID in request
+<- HCI Command: Disconnect (0x01|0x0006) plen 3
+-> HCI Event: Command Status (0x0f) plen 4
+-> HCI Event: Disconn Complete (0x05) plen 4
+
+when the connection gets refused.
+
+The only way to make it working is to remove the detected computer on the phone,
+and execute the command (echo, cat, wvdial, whatever) so the phone asks you the
+pairing PIN (because once asked, the phone saves it and doesn't ask you anymore,
+and no way to change this behaviour).
+
+The strange thing is that if I run wvdial many times, I don't have to do this,
+but I can't run multiple times the "echo AT > /dev/rfcomm0" without repairing
+the devices.
+
+On Windows I can make it work without any problem.
+
+My configuration is the following:
+rfcomm 2.20
+bluez-utils 2.20-0ubuntu3
+Kernel 2.6.12-10-386
+Ubuntu 5.10 Breezy Badger
+
+Thanks, and sorry for my bad English :-)
 
 
 
