@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Christoph =?iso-8859-1?q?B=E4chtle?= <christophbaechtle@web.de>
+Subject: Re: [Bluez-users] How does data flow from USB Core to the
+	bluetooth protocol stack
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200602100311.35870.christophbaechtle@web.de>
-Subject: [Bluez-users] modprobe snd_bt_sco fails with: FATAL: Error inserting snd_bt_sco
+In-Reply-To: <20060209125112.12551.qmail@web36111.mail.mud.yahoo.com>
+References: <20060209125112.12551.qmail@web36111.mail.mud.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1139533252.17280.40.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,37 +19,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Feb 2006 03:11:35 +0100
+Date: Fri, 10 Feb 2006 02:00:52 +0100
 
-Hi
+Hi Swathi,
 
-When I try to load the snd_bt_sco module I get the following error message:
+> I am a research student and i am trying to trace the
+> working of Bluez. 
+> I was able to find out how the communication between
+> the bluetooth USB adapter and host takes place. ie how
+> the bluetooth device driver gets loaded and how the
+> data collected in the bluetooth device driver is being
+> passed onto the actual USB driver. 
+> I was not able to find out how the USB core passes the
+> data which it collected from the bluetooth device
+> driver onto the bluetooth protocol stack. ie how the
+> kernel knows that this data belongs to bluez
 
-FATAL: Error inserting snd_bt_sco 
-(/lib/modules/2.6.15-jad2-default/extra/snd-bt-sco.ko): Unknown symbol in 
-module, or unknown parameter (see dmesg)
+the hci_usb driver attaches to the USB core and the Bluetooth core and
+deals with all these things. Start looking at the source code.
 
-and dmesg tells me:
+Regards
 
-[...]
-cdrom: This disc doesn't have any tracks I recognize!
-scsi: unknown opcode 0x01
-snd_bt_sco: Unknown symbol there_is_no_init_MUTEX_LOCKED_for_RT_semaphores
-snd_bt_sco: Unknown symbol there_is_no_init_MUTEX_LOCKED_for_RT_semaphores
-snd_bt_sco: Unknown symbol there_is_no_init_MUTEX_LOCKED_for_RT_semaphores
-hci_cmd_task: hci0 command tx timeout
-hci_cmd_task: hci0 command tx timeout
-hci_cmd_task: hci0 command tx timeout
-hci_cmd_task: hci0 command tx timeout
-snd_bt_sco: Unknown symbol there_is_no_init_MUTEX_LOCKED_for_RT_semaphores
-hci_cmd_task: hci0 command tx timeout
-snd_bt_sco: Unknown symbol there_is_no_init_MUTEX_LOCKED_for_RT_semaphores
+Marcel
 
 
-does anybody know how to solve this?
-I am using suse 10.0 with kde3.5 and kernel 2.6.15-jad2
-
-christoph
 
 
 -------------------------------------------------------
