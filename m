@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] csr + edr + class 1 *finally* in US
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] CVS not allowing anonymous authentication for checkout
-Message-ID: <20060210021621.GA16348@163.com>
-References: <87hd7agci8.fsf@gismo.pca.it> <43EA22A5.5000105@hasborg.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <43EA22A5.5000105@hasborg.com>
-From: Amateur <ztl.post@gmail.com>
+In-Reply-To: <43EBCB5D.7070300@xmission.com>
+References: <43EBCB5D.7070300@xmission.com>
+Content-Type: text/plain
+Message-Id: <1139532923.17280.33.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,57 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Feb 2006 10:19:31 +0800
+Date: Fri, 10 Feb 2006 01:55:23 +0100
 
-On Wed, Feb 08, 2006 at 11:56:05AM -0500, Joshua Wright wrote:
-> 
-> -----BEGIN PGP SIGNED MESSAGE-----
-> Hash: SHA1
-> 
-> It appears that the BlueZ CVS repository is not allowing anonymous
-> access any longer:
-> 
-> $ cvs -d:pserver:anonymous@cvs.bluez.org:/cvsroot/bluez login
-> Logging in to :pserver:anonymous@cvs.bluez.org:2401/cvsroot/bluez
-> CVS password: <CR>
-> cvs login: authorization failed: server cvs.bluez.org rejected access to
-> /cvsroot/bluez for user anonymous
-I tried 'cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa
-co btsco' a few days ago, and it worked.
+Hi Brad,
 
+> We've had to wait long enough I suppose. Now these can be purchased
+> finally. It's in the Bluetake bt007ex:
 > 
-> Also, the web interface to the CVS repository is returning a 502 Proxy
-> Error.
+> http://www.btboutique.com/product_info.php?products_id=176
 > 
-> Other sf.net projects are not exhibiting these same errors.  Has the CVS
-> repository for BlueZ been marked private?
+> It also comes with windows & mac drivers so I'm going to try to use it
+> to get avrcp fully figured out... (is there a way in macos to spy on usb?)
 > 
-> Thanks,
-> 
-> - -Josh
-> -----BEGIN PGP SIGNATURE-----
-> Version: GnuPG v1.2.4 (GNU/Linux)
-> 
-> iD8DBQFD6iKlTS8i9jZYpL8RAsGPAKC1SvmX3HWPDw0XWJStGA8/NBoTSACfY5ww
-> 8DIBXOIrFIKe1eSk42NmPXY=
-> =6dE5
-> -----END PGP SIGNATURE-----
-> 
-> 
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
--------------------------
+> jag:/home/bmidgley# hciconfig hci1 revision
+> hci1:   Type: USB
+>         BD Address: 50:00:20:F4:00:6F ACL MTU: 384:8 SCO MTU: 64:8
+>         HCI 19.2
+>         Chip version: BlueCore4-ROM
+>         Max key size: 128 bit
+>         SCO mapping:  HCI
 
--- 
-You will be audited by the Internal Revenue Service.
+cool, the first one with really 128 bit encryption. You can also call
+"bccmd buildname" to get the full build name.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
