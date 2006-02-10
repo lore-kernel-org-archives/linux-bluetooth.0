@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] obexftp & nokia 6680
+From: Fredy P <digitalfredy@debiancolombia.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <3611f8600602090350w6e45325eyec3b85bab18e25a2@mail.gmail.com>
+References: <3611f8600602090350w6e45325eyec3b85bab18e25a2@mail.gmail.com>
 Content-Type: text/plain;
-	charset="us-ascii"
-Message-ID: <09D3F703EF3B0A4CBE28449EA9F3D320020AB455@nicta-atp-mail.in.nicta.com.au>
-From: "Marco Candiago" <Marco.Candiago@nicta.com.au>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Strange Behaviour
+	charset=ISO-8859-1
+Message-Id: <1139550190.7791.2.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,97 +19,99 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Feb 2006 16:49:12 +1100
+Date: Fri, 10 Feb 2006 00:43:08 -0500
 
+El jue, 09-02-2006 a las 12:50 +0100, Gaby Lence escribi=F3:
+read this:
+http://es.wikibooks.org/wiki/Hacks_para_Unix-like:Bluetooth_en_Linux
+> Hi
+> I can put files in my nokia 6680 using obexftp.
+> Instead I didn't get anything when I try to get files using
+> $ obexftpd -b
+try obexftp -b -l
+> No custom transport
+> Waiting for connection...
+> Handling connection...
+> Handling connection...
+> ...
+>=20
+> This is hcidump just in case someone has deal
+> with it previously.
+>=20
+> $ hcidump
+> HCI sniffer - Bluetooth packet analyzer ver 1.28
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> > HCI Event: Connect Request (0x04) plen 10
+> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+> > HCI Event: Command Status (0x0f) plen 4
+> > HCI Event: Connect Complete (0x03) plen 11
+> < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+> > HCI Event: Command Complete (0x0e) plen 6
+> < HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+> > HCI Event: Command Status (0x0f) plen 4
+> > HCI Event: Max Slots Change (0x1b) plen 3
+> > ACL data: handle 7 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0046
+> < ACL data: handle 7 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0046 result 0 status 0
+>       Connection successful
+> > ACL data: handle 7 flags 0x02 dlen 12
+>     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
+> < ACL data: handle 7 flags 0x02 dlen 14
+>     L2CAP(s): Config rsp: scid 0x0046 flags 0x00 result 0 clen 0
+>       Success
+> < ACL data: handle 7 flags 0x02 dlen 12
+>     L2CAP(s): Config req: dcid 0x0046 flags 0x00 clen 0
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+> > ACL data: handle 7 flags 0x02 dlen 14
+>     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+>       Success
+> > ACL data: handle 7 flags 0x02 dlen 17
+>     L2CAP(d): cid 0x0040 len 13 [psm 1]
+>         SDP SS Req: tid 0x1 len 0x8
+>           pat uuid-16 0x1105 (OBEXObjPush)
+>           max 65535
+>           cont 00
+> < ACL data: handle 7 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0046 len 10 [psm 1]
+>         SDP SS Rsp: tid 0x1 len 0x5
+>           count 0
+>           cont 00
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+> > ACL data: handle 7 flags 0x02 dlen 17
+>     L2CAP(d): cid 0x0040 len 13 [psm 1]
+>         SDP SS Req: tid 0x2 len 0x8
+>           pat uuid-16 0x111b (ImagingResp)
+>           max 65535
+>           cont 00
+> < ACL data: handle 7 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0046 len 10 [psm 1]
+>         SDP SS Rsp: tid 0x2 len 0x5
+>           count 0
+>           cont 00
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+> > ACL data: handle 7 flags 0x02 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0046
+> < ACL data: handle 7 flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0046
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+> ---------------------------------------------------------------
+>=20
+> Where can I get some help for this?
+> Thanks.
+>=20
+>=20
+> -------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc. Do you grep through log fi=
+les
+> for problems?  Stop!  Download the new AJAX search engine that makes
+> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=103432&bid#0486&dat=121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-Hello,
-
-I'm currently experiencing some strange behaviour with my embedded BT
-device. =0D
-I'm trying to connect to a BT enabled weight scale with a CSR V1.1 BT
-chip. =0D
-The weighscale is PIN enabled.
-
-On my embedded BT device, Ican connect to the weight scale initially.
-However=0D
-when I disconnect and try to reconnect with hcitool I get "Can't create=0D
-connection:  Input/output error.  In order to connect again to the=0D
-weighscale, I have to get another BT device to connect to the
-weighscale. =0D
-This other BT device has no problems with multiple connections to the
-weigh=0D
-scale. =0D
-
-Bellow is a dump of what I am doing.  Can any one shed any light on this
-
-problem.  Any help would be greatly appreciated.
-
-Marco
-
-/ # hcitool cc 00:02:5B:00:A5:A4
-/ # hcitool dc 00:02:5B:00:A5:A4
-/ # hcitool cc 00:02:5B:00:A5:A4
-Can't create connection: Input/output error
-=0D
-
-/ # hcidump -aV
-HCI sniffer - Bluetooth packet analyzer ver 1.29
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:02:5B:00:A5:A4 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:02:5B:00:A5:A4
-< HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
-    bdaddr 00:02:5B:00:A5:A4 len 3 pin 'bsl'
-> HCI Event: Command Complete (0x0e) plen 10
-    PIN Code Request Reply (0x01|0x000d) ncmd 1
-    status 0x00 bdaddr 00:02:5B:00:A5:A4
-> HCI Event: Link Key Notification (0x18) plen 23
-    bdaddr 00:02:5B:00:A5:A4 key 30BFBB49D88BB6C482C1EEE92E976903 type 0
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 41 bdaddr 00:02:5B:00:A5:A4 type ACL encrypt 0x00
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-    handle 41 policy 0x0f
-    Link policy: RSWITCH HOLD SNIFF PARK
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-    bdaddr 00:02:5B:00:A5:A4 mode 1
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 41 slots 5
-> HCI Event: Command Complete (0x0e) plen 6
-    Write Link Policy Settings (0x02|0x000d) ncmd 1
-    status 0x00 handle 41
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 41 reason 0x13
-    Reason: Remote User Terminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 41 reason 0x16
-    Reason: Connection Terminated by Local Host
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:02:5B:00:A5:A4 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1=0D
-                > HCI Event: Connect Complete (0x03) plen 11
-    status 0x05 handle 42 bdaddr 00:02:5B:00:A5:A4 type ACL encrypt 0x00
-    Error: Authentication Failure
-
-
-
-
---------------------------------------------------------------------------
-This email and any attachments may be confidential. They may contain=
- legally
-privileged information or copyright material. You should not read, copy,
-use or disclose them without authorisation. If you are not an intended
-recipient, please contact us at once by return email and then delete both
-messages. We do not accept liability in connection with computer virus,
-data corruption, delay, interruption, unauthorised access or unauthorised
-amendment. This notice should not be removed.
 
 
 -------------------------------------------------------
