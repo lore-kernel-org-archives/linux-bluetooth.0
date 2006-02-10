@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Daniel Drake <dsd@gentoo.org>
-Cc: bluez-devel@lists.sf.net
-In-Reply-To: <43ECC82B.80400@gentoo.org>
-References: <43ECC82B.80400@gentoo.org>
-Content-Type: text/plain
-Message-Id: <1139591157.26234.52.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: bt3c_cs hang when card is inserted
+Message-ID: <43ECB0D4.0@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Re: btsco with an HP embedded bluetooth adapter
+References: <495ce9180602080745y146974c4t@mail.gmail.com>	 <495ce9180602080858i118c037ap@mail.gmail.com>	 <43EB9B59.1010107@xmission.com> <495ce9180602100543q4f65bef3p@mail.gmail.com>
+In-Reply-To: <495ce9180602100543q4f65bef3p@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,29 +18,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Feb 2006 18:05:57 +0100
+Date: Fri, 10 Feb 2006 08:27:16 -0700
 
-Hi Daniel,
+Mario
 
-> There is a bug in the Gentoo bugzilla about a BUG() caused by plugging 
-> in a cardbus bluetooth card.
+>>Did you try this patch?
+>>
+>>http://sourceforge.net/mailarchive/message.php?msg_id=14450798
 > 
-> http://bugs.gentoo.org/show_bug.cgi?id=120937
 > 
-> There is a patch there, apparently written by yourself. I'm just 
-> wondering on the status there - is that the final fix? I noticed it is 
-> not yet included in Linus' tree and is not in your bluetooth git tree on 
-> kernel.org either.
+> I've tried it (but I've to say that I forgot to recompile the
+> snd-bt-sco module; is it important?) without success.  Should I see a
+> different output of 'hciconfig hci0 revision' with this patch?
 
-it is the final one and it is waiting in my repository to be send
-upstream, but so far I haven't had time to finally do it. I was way to
-busy with other work.
+the patch only modifies the low-level bluetooth module (offhand not sure
+which). but it will require you to make modules_install to overwrite the
+old modules
 
-Regards
+> 
+> root@legolas:~# hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:10:C6:59:7A:FC ACL MTU: 377:10 SCO MTU: 16:0
+>         Firmware 2.105 / 97
 
-Marcel
+this won't change. (I updated the bluetooth-alsa.sf.net page to link to
+the patch by the way)
 
+> 
+> Is my Broadcom chipset supported or not? :|
+> 
+> If you say that this patch could work, I can try a second time.
 
+it might work with this fix, but I've only heard one success story so
+far (from the patch author)
+
+Brad
 
 
 -------------------------------------------------------
