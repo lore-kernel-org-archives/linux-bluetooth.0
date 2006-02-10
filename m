@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <495ce9180602100543q4f65bef3p@mail.gmail.com>
-From: Mario <mario.temporary@gmail.com>
+Subject: Re: [Bluez-devel] sdp_record_register()
+From: Bastien Nocera <hadess@hadess.net>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: btsco with an HP embedded bluetooth adapter
-In-Reply-To: <43EB9B59.1010107@xmission.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <495ce9180602080745y146974c4t@mail.gmail.com>
-	 <495ce9180602080858i118c037ap@mail.gmail.com>
-	 <43EB9B59.1010107@xmission.com>
+In-Reply-To: <1139571910.8700.7.camel@localhost.localdomain>
+References: <1139312694.8422.19.camel@localhost.localdomain>
+	 <1139356568.22790.73.camel@localhost>
+	 <1139398021.8573.17.camel@localhost.localdomain>
+	 <1139402899.29208.10.camel@localhost>
+	 <1139571910.8700.7.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1139572417.6949.3.camel@bnocera.surrey.redhat.com>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,30 +22,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Feb 2006 14:43:54 +0100
+Date: Fri, 10 Feb 2006 11:53:37 +0000
 
-2006/2/9, Brad Midgley <bmidgley@xmission.com>:
-> Maybe the mtu is only messed up for adapter->headset traffic.
->
-> Did you try this patch?
->
-> http://sourceforge.net/mailarchive/message.php?msg_id=3D14450798
+On Fri, 2006-02-10 at 13:45 +0200, Ari Paavilainen wrote:
+> On Wed, 2006-02-08 at 13:48 +0100, Marcel Holtmann wrote:
+> > Hi Ari,
+> > 
+> > > > > Function call:
+> > > > > err = sdp_record_register(session, record, 0);
+> > > > > returns zero and error is 'Illegal seek'.
+> > > > > Arguments should be ok (session is return value of successful call to
+> > > > > sdp_connect() and record works ok with another function calls).
+> > > > > What might be wrong?
+> > > > 
+> > > > the sdp_connect() has been done to the local SDP server, right. You
+> > > > can't register SDP records for remote connections.
+> > > > 
+> > > 
+> > > In sdp_record_register() there is:
+> > > 
+> > >         if (!session->local) {
+> > >           errno = EREMOTE;
+> > >           return -1;
+> > >         }
+> > > 
+> > > Did you mean this by the remote connection (the program passes this test)? 
+> > > Anyway, it seems to be that the only way to sdp_record_register() return ESPIPE (Illegal seek) error is when call to sdp_send_req_w4_rsp() fails. Does this give any hint?
+> > 
+> > make sure that sdpd process is running. Follow the examples from sdptool
+> > or pand.
+> > 
+> 
+> sdpd is running. In 'sdptool.c' there is no call to
+> 'sdp_record_register()'. Is there any other examples of registering a
+> service record?
 
-I've tried it (but I've to say that I forgot to recompile the
-snd-bt-sco module; is it important?) without success.  Should I see a
-different output of 'hciconfig hci0 revision' with this patch?
+This is the code to register Obex push support for GNOME's Bluetooth
+utilities:
+http://cvs.gnome.org/viewcvs/libbtctl/src/obexsdp.c?view=markup
 
-root@legolas:~# hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:10:C6:59:7A:FC ACL MTU: 377:10 SCO MTU: 16:0
-        Firmware 2.105 / 97
+---
+Bastien Nocera <hadess@hadess.net> 
+How can you be so serious on a film where you are dodging explosions and
+running away with [...] an eight-foot monkey on this side, and the
+eight-foot monkey is the one flying the spaceship? -- Mark Hamill
 
-Is my Broadcom chipset supported or not? :|
-
-If you say that this patch could work, I can try a second time.
-
-Thanks for your reply.
-Mario
 
 
 -------------------------------------------------------
