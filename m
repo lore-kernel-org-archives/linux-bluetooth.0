@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Christoph =?iso-8859-1?q?B=E4chtle?= <christophbaechtle@web.de>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] modprobe snd_bt_sco fails with: FATAL: Error inserting snd_bt_sco
-References: <200602100311.35870.christophbaechtle@web.de> <200602102017.41136.christophbaechtle@web.de> <43ECF652.4000902@xmission.com>
-In-Reply-To: <43ECF652.4000902@xmission.com>
+Message-ID: <43EE5B20.2090200@cs.bgu.ac.il>
+From: Niv <nivv@cs.bgu.ac.il>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200602112247.48075.christophbaechtle@web.de>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] proximity monitor
+References: <Pine.LNX.4.44.0602082342210.13414-100000@lvs-rs3>
+In-Reply-To: <Pine.LNX.4.44.0602082342210.13414-100000@lvs-rs3>
+Content-Type: text/plain; charset=windows-1255; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,38 +18,67 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 11 Feb 2006 22:47:47 +0100
+Date: Sat, 11 Feb 2006 23:46:08 +0200
 
-ok, thanks, it worked
+Thanks ppl for the new 0,25 version
+the formar used to drop rssi after two minutes from above zero to minus.
+now I am getting a stady signal
 
-christoph
+Niv
 
-Am Freitag, 10. Februar 2006 21:23 schrieb Brad Midgley:
-> Christoph
+
+NIV VAIZER wrote:
+
+>10x mate
 >
-> if you are using cvs, you just need to update.
+>any other clever tricks you are aware of?
 >
-> if you used the 0.41 release, open btsco/kernel/btsco.c and change the
-> only occurrence of init_MUTEX_LOCKED
+>Niv
 >
-> brad
 >
-> >> init_MUTEX_LOCKED(&bt_sco->thread_sem);
-> >>
-> >>needed to be changed to:
-> >>
-> >> init_MUTEX(&bt_sco->thread_sem);
-> >> down(&bt_sco->thread_sem);
+>On Tue, 7 Feb 2006, Marcel Holtmann wrote:
 >
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log
-> files for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>  
+>
+>>Hi Niv,
+>>
+>>    
+>>
+>>>One of the cool tricks BT could be used for is the proximity monitor.
+>>>MonkeyBox 
+>>><http://gentoo-wiki.com/index.php?title=User:MonkeyBox&action=edit> 
+>>>wrote this: http://gentoo-wiki.com/TIP_Bluetooth_Proximity_Monitor
+>>>
+>>>which basically pools my cellular for RSSI. if my RSSI decreases, It 
+>>>"know" I am leaving the pc.
+>>>I was wondering if its possible to receive these RSSI indications in an 
+>>>event driven manner , thus, reducing the pooling work.
+>>>      
+>>>
+>>no. You have to be connected to that device or you need a device that is
+>>discoverable and a local dongle with Inquiry with RSSI support.
+>>
+>>Regards
+>>
+>>Marcel
+>>
+>>    
+>>
+>
+>
+>
+>-------------------------------------------------------
+>This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+>for problems?  Stop!  Download the new AJAX search engine that makes
+>searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+>http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>  
+>
+
 
 
 -------------------------------------------------------
