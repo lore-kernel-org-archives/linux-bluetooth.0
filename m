@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43EE5A8F.6090303@cs.bgu.ac.il>
-From: Niv <nivv@cs.bgu.ac.il>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Re: bluez and dbus
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] a2play stops when scanning
-References: <Pine.LNX.4.44.0602082335310.13414-100000@lvs-rs3> <43EA8708.1060302@xmission.com>
-In-Reply-To: <43EA8708.1060302@xmission.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <43ECFB21.3030101@gmail.com>
+References: <43ECFB21.3030101@gmail.com>
+Content-Type: text/plain
+Message-Id: <1139629676.2098.3.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,75 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 11 Feb 2006 23:43:43 +0200
+Date: Sat, 11 Feb 2006 04:47:56 +0100
 
-I tried to recreate it.
-managed to stop the audio when I ran the scan, but afterward it came back.
-I will test it better soon
-can you pls test if you can hear this mp3 using:
-mpg321 --au - Letters.mp3 |/uar/bin/a2play <bdaddr>
+Hi Doug,
 
-http://www.cs.bgu.ac.il/~nivv/Letters.mp3
+> >it should be started from /etc/init.d/bluetooth depending on your Linux
+> >distribution. You get a connection once you press a key on your
+> >keyboard.
+> 
+> I happen to have the m$ dongle that came with the keyboard.
+> It does have a CCR chip, so is it flashable for HID proxy support?
 
-It brakes up here.
-Niv
+in general yes, but this particular one is not flashable. You will
+render it useless. Trust I already did this.
 
-Brad Midgley wrote:
+> also the DBT-122 that I have, sais the HCI version is 1.2, which would 
+> make it a (RevB3)
+> but all the other info I see on it seem's to say otherwise?
+> http://www.holtmann.org/linux/bluetooth/features.html
+> 
+> if it really is (RevB3), isn't this chip also able to be upgraded to HID 
+> proxy support?
 
->NIV
->
->Can I get the exact error message? Strange that sdp should even be
->concerned after it's playing... is a2play telling you that or hcitool?
->
->Brad
->
->  
->
->>Hi Brad,
->>I am sure it was reported before, but just to make sure:
->>while playing mpg321 ->a2play I ran hcitool
->>that caused a2play to exit and tell me that the SDP returned bad value.
->>I can quote the excat phrase if you need it, but the idea is that a 
->>discovery drops a2play.
->>In windows it is suggested this may cause disturbance.
->>
->>
->>Thanks again for allowing me to listen to BT , while my room-mate goes to 
->>sleep :->
->>
->>Niv
->>
->>P.S.
->>the Ekiga issue aint btsco fault.
->>
->>
->>
->>
->>-------------------------------------------------------
->>This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
->>for problems?  Stop!  Download the new AJAX search engine that makes
->>searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
->>http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
->>_______________________________________________
->>Bluez-users mailing list
->>Bluez-users@lists.sourceforge.net
->>https://lists.sourceforge.net/lists/listinfo/bluez-users
->>    
->>
->
->
->
->-------------------------------------------------------
->This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
->for problems?  Stop!  Download the new AJAX search engine that makes
->searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
->http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
->_______________________________________________
->Bluez-users mailing list
->Bluez-users@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-users
->  
->
+If you grap the GenericCSR.dfu firmware from Apple, then you can upgrade
+this one with an HID proxy capable firmware.
+
+Regards
+
+Marcel
+
 
 
 
