@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43EDA1BB.4040909@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] [DBUS PATCH] BlueZ D-Bus redesign
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] more AVRCP tinkering
+In-Reply-To: <20060210230043.GA15483@localhost.localdomain>
+References: <e1effdeb0602101029v4f1b6e9dw8a0a75a4daf6ba55@mail.gmail.com>
+	 <1139596810.26234.73.camel@localhost>
+	 <20060210230043.GA15483@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1139630105.2098.10.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,27 +20,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 11 Feb 2006 01:35:07 -0700
+Date: Sat, 11 Feb 2006 04:55:05 +0100
 
-Hey
+Hi Johan,
 
-I found a better alternative to listening for AVRCP "callbacks" from the
-headset. The "callback" connection to the computer is only made after
-the a2dp stream starts and is always torn down when the stream closes.
+> > wow. These are a lot of changes in one patch. I would personally prefer
+> > to only get the Manager interface right at the moment and do the Device
+> > interface stuff after that. However it might make sense to do a clean
+> > cut and apply this patch and then start from there.
+> > 
+> > Johan, what do you think?
+> 
+> Well, it is a big patch. However, while it would be easier to follow if
+> it was split into several parts (e.g. manager, discovery, bonding, etc),
+> we need to get most things in the new API document commited anyway
+> before next release, so I don't have anything against applying Claudio's
+> patch and continuing work from there.
 
-I can open the l2cap connection at any time going from the computer to
-headset (even before playing something) and this connection isn't ever
-torn down by the headset. It's conceivable that this mode of operation
-could be used to start the stream up in addition to controlling a
-running a2dp stream.
+it is in the CVS now. Let's be maverick :)
 
-Still no luck sending volup/down to the headset (not even a nak).
+> Btw Marcel, the API document should probably be added to CVS or
+> published on this list since AFAIK currently you, I, Claudio and Eduardo
+> are the only ones in posession of it.
 
-Committed to cvs in a new app "avsnd" that takes the mac addr as its
-only argument. Currently coded to try sending volup after every
-interaction with the headset.
+Actually I wanted to wait until it is in a better shape, but since they
+mentioned it several times on the mailing list, we should make it public
+anyway. Please do a last review and then I commit it to the CVS.
 
-Brad
+> > Should we split the Manager interface and the Device interface into two
+> > separate files?
+> 
+> I think that would make sense. That way you could also define clearer
+> interfaces between them in the code (function wise).
+
+Any proposals on how we gonna do the split?
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
