@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Can't discover device
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <94e407f00602120041s3f64513dm642715738db38d10@mail.gmail.com>
+From: Arpit Rai <whalesurf@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <94e407f00602120041s3f64513dm642715738db38d10@mail.gmail.com>
-References: <94e407f00602120041s3f64513dm642715738db38d10@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1139734129.4292.4.camel@localhost>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_12693_11225259.1139733711525"
+Subject: [Bluez-devel] Can't discover device
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,27 +17,48 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 12 Feb 2006 09:48:49 +0100
+Date: Sun, 12 Feb 2006 16:41:51 +0800
 
-Hi Arpit,
+------=_Part_12693_11225259.1139733711525
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> I'm running two computers on Fedora Core 4. Both have one USB
-> bluetooth adaptor connected to them.
-> 
-> The problem is from one computer if I do a hcitool scan, I can see the
-> other computer but from the other computer, if I do a hcitool scan I
-> don't see anything. 
-> 
-> Any idea on what could be wrong here?
+Hi
 
-check if PSCAN (page scan) and ISCAN (inquiry scan) is activated on both
-sides.
+I'm running two computers on Fedora Core 4. Both have one USB bluetooth
+adaptor connected to them.
+
+The problem is from one computer if I do a hcitool scan, I can see the othe=
+r
+computer but from the other computer, if I do a hcitool scan I don't see
+anything.
+
+Any idea on what could be wrong here?
 
 Regards
+Arpit
 
-Marcel
+------=_Part_12693_11225259.1139733711525
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
+Hi<br>
+<br>
+I'm running two computers on Fedora Core 4. Both have one USB bluetooth ada=
+ptor connected to them.<br>
+<br>
+The problem is from one computer if I do a hcitool scan, I can see the
+other computer but from the other computer, if I do a hcitool scan I
+don't see anything. <br>
+<br>
+Any idea on what could be wrong here?<br>
+<br>
+Regards<br>
+Arpit<br>
 
+------=_Part_12693_11225259.1139733711525--
 
 
 -------------------------------------------------------
