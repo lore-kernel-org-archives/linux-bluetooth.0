@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Subject: FW: [Bluez-users] Belkin F8T009 and Linux
-Message-ID: <BF94750921492E4AA5B825026FCE6A247B6AFD@exnswn1-syd.nexus.csiro.au>
-References: <loom.20060209T033130-898@post.gmane.org> <1139467748.10136.2.camel@localhost>
-From: <Heba.Khamis@csiro.au>
-To: <bluez-users@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
+From: Benjamin Eikel <benjamin@eikel.org>
+Message-ID: <loom.20060212T160856-775@post.gmane.org>
+References: <200602022157.52386.benjamin@eikel.org> <loom.20060205T233729-763@post.gmane.org> <loom.20060209T124135-748@post.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: Pairing a bluetooth keyboard
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,78 +17,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 13 Feb 2006 10:23:12 +1100
+Date: Sun, 12 Feb 2006 15:17:11 +0000 (UTC)
 
-SGksDQogDQpJJ20gc3RpbGwgdW5zdXJlIGFzIHRvIHdoeSB0aGUgaGNpX2lucXVpcnkgaXMgZmFp
-bGluZyAocGVycm9yIHRlbGxzIG1lICJEZXZpY2Ugb3IgUmVzb3VyY2UgQnVzeSIpLg0KIA0KSSd2
-ZSB1c2VkIGhjaWR1bXAgdG8gdHJ5IGFuZCBmaWd1cmUgaXQgb3V0LCBidXQgYWxsIGl0IHRlbGxz
-IG1lIGlzOg0KPCBIQ0kgQ29tbWFuZDogSW5xdWlyeSAoMHgwMXwweDAwMDEpIHBsZW4gNSANCiAg
-IGxhcCAweDllOGIzMyBsZW4gOCBudW0gMjU1IA0KPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVz
-ICgweDBmKSBwbGVuIDQNCiAgSW5xdWlyeSAoMHgwMXwweDAwMDEpIHN0YXR1cyAweDBjIG5jbWQg
-MSANCiAgIEVycm9yOiBDb21tYW5kIERpc2FsbG93ZWQgDQogDQpUaGlzIHJlYWxseSBkb2Vzbid0
-IGhlbHAgbWUgdG8gdW5kZXJzdGFuZCB3aHkgdGhpcyBpcyBoYXBwZW5pbmcuDQpUaGUgc3RhdHVz
-IG9mIHRoYXQgcGFydGljdWxhciBibHVldG9vdGggZGV2aWNlIChhIEJlbGtpbiBGOFQwMDMgQmx1
-ZXRvb3RoIFVTQiBibHVldG9vdGggdjEuMSBjb21wbGlhbnQgQWRhcHRvcikgd2hlbiB0aGUgZXJy
-b3Igb2NjdXJzIGlzIGFzIGZvbGxvd3M6DQogICBhIGxvY2FsIHNlcnZlciBzb2NrZXQgaXMgbGlz
-dGVuaW5nIGZvciBjb25uZWN0aW9ucw0KICAgdHdvIHJlbW90ZSBjbGllbnRzIGFyZSBjb25uZWN0
-ZWQgdG8gdGhlIGRldmljZQ0KICAgYSBsb2NhbCBjbGllbnQgdGhyZWFkIGlzIGF0dGVtcHRpbmcg
-dG8gcXVlcnkgb3RoZXIgZGV2aWNlcyB1c2luZyBoY2lfaW5xdWlyeQ0KIA0KDQoJLS0tLS1Pcmln
-aW5hbCBNZXNzYWdlLS0tLS0gDQoJRnJvbTogYmx1ZXotdXNlcnMtYWRtaW5AbGlzdHMuc291cmNl
-Zm9yZ2UubmV0IG9uIGJlaGFsZiBvZiBUYW1lciBIaWdhemkgDQoJU2VudDogVGh1IDkvMDIvMjAw
-NiA1OjQ5IFBNIA0KCVRvOiBibHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQgDQoJQ2M6
-IA0KCVN1YmplY3Q6IFJlOiBbQmx1ZXotdXNlcnNdIEJlbGtpbiBGOFQwMDkgYW5kIExpbnV4DQoJ
-DQoJDQoNCglEZWFyIEhlYmEhDQoJV2h5IGRvbid0IHlvdSBzbmlmZiB0aGUgdHJhZmZpYyBieSBv
-cGVuaW5nIGEgMm5kIHNoZWxsLCBieSB3cml0aW5nOg0KCQ0KCWhjaWR1bXAgLVggLVYNCgkNCgkN
-CglhbmQgcG9zdCBpdCBpbiB0aGUgbmV3cyEgT3IgdHJ5IGZpbmRpbmcgYXQgYmx1ZXogImRvY3Ui
-IHRvIGZpbmQgbW9yZQ0KCWFib3V0IHRoZSBvdXRwdXQsIHRoZSBzaGVsbCB3b3VsZCBnaXZlIHlv
-dSB0byBhbmFseXplIHRoZSBwcm9ibGVtIGF0DQoJYWxsLiBUaGUgb3V0IHB1dCBjb3VsZCB0ZWxs
-IG11Y2ggbW9yZS4uLg0KCQ0KCQ0KCVRhbWVyDQoJDQoJT24gVGh1LCAyMDA2LTAyLTA5IGF0IDAy
-OjQ4IPGovrAsIEhlYmEgd3JvdGU6DQoJPiBJIGFtIGRldmVsb3BpbmcgYW4gYXBwbGljYXRpb24g
-Zm9yIGF1dG9tYXRpYyBuZXR3b3JrIGRpc2NvdmVyeSB1c2luZyBibHVldG9vdGgNCgk+IGkuZS4g
-UnVubmluZyB0aGUgYXBwbGljYXRpb24gd2lsbCByZXN1bHQgaW4gY29ubmVjdGlvbnMgdG8gYW55
-IG90aGVyIGNvbXB1dGVycw0KCT4gcnVubmluZyB0aGUgc2FtZSBhcHBsaWNhdGlvbjoNCgk+IC0g
-RWFjaCBhcHBsaWNhdGlvbiBpcyBydW5uaW5nIGEgc2VydmVyIHdoaWNoIGFjY2VwdHMgY29ubmVj
-dGlvbnMgKG9uY2UgYQ0KCT4gY29ubmVjdGlvbiBpcyBtYWRlLCB0aGUgY29ubmVjdGlvbiBpcyBt
-YWludGFpbmVkIHVudGlsIGEgdHJhbnNtaXNzaW9uDQoJPiBlcnJvciBvY2NjdXJzIG9yIHRoZSBz
-b2NrZXQgaXMgY2xvc2VkIGJ5IGVpdGhlciBwYXJ0eSk7DQoJPiAtIGFuZCBhIGNsaWVudCB3aGlj
-aCByZXBlYXRlZGx5IHF1ZXJpZXMgZm9yIGJsdWV0b290aCBkZXZpY2VzIHRvIGNvbm5lY3QgdG8u
-DQoJPg0KCT4gU28gaW4gdG90YWwgYW4gYXBwbGljYXRpb24gbWFrZXMgYW5kDQoJPiBtYWludGFp
-bnMgMiooI290aGVyIGFwcGxpY2F0aW9ucykgY29ubmVjdGlvbnMuDQoJPg0KCT4gVGhpcyBjYXVz
-ZXMgbm8gcHJvYmxlbXMgd2hlbiB1c2luZyB0aGUgQmVsa2luIEY4VDAwMyBCbHVldG9vdGggVVNC
-IEFkYXB0b3INCgk+ICh0aGlzIGlzIGEgYmx1ZXRvb3RoIHYxLjEgY29tcGxpYW50IGRldmljZSku
-DQoJPg0KCT4gSG93ZXZlciwgd2hlbiB1c2luZyB0aGUgQmVsa2luIEY4VDAwOSBCbHVldG9vdGgg
-VVNCIEFkYXB0b3INCgk+ICh0aGlzIGlzIGEgYmx1ZXRvb3RoIHYxLjIgY29tcGxpYW50IGRldmlj
-ZSkNCgk+ICJEZXZpY2Ugb3IgUmVzb3VyY2UgQnVzeSIgZXJyb3JzIGFyZSBvYnNlcnZlZA0KCT4g
-d2hlbiB0aGUgYXBwbGljYXRpb24gdHJpZXMgdG8gcXVlcnkNCgk+IHdoZW4gdGhlcmUgYXJlIDMg
-b3IgbW9yZSBjb25uZWN0aW9ucyBtYWludGFpbmVkIGJ5IGl0Lg0KCT4NCgk+IElzIHRoaXMgYSBi
-bHVldG9vdGggaGFyZHdhcmUgaXNzdWUsDQoJPiBhIEJsdWV6IHN0YWNrIGlzc3VlLA0KCT4gb3Ig
-ZG9lcyBCbHVleiBqdXN0IG5vdCBzdXBwb3J0IHRoaXMgcGFydGljdWxhciBkZXZpY2U/Pw0KCT4N
-Cgk+IEkgaGF2ZSBpbnN0YWxsZWQgYWxsIHRoZSBsYXRlc3QgdmVyc2lvbnM6DQoJPiAtIEJsdWV6
-LWxpYg0KCT4gLSBCbHVlei1oY2lkdW1wDQoJPiBJIGFtIHJ1bm5pbmcgRmVkb3JhIGNvcmUgNCB3
-aXRoIHRoZSBsYXRlc3QgYXZhaWxhYmxlIHVwZGF0ZXMgb2YgdGhlIGtlcm5lbC4NCgk+DQoJPiBQ
-bGVhc2UgYWR2aXNlIGlmIEkgYW0gb3Zlcmxvb2tpbmcgc29tZXRoaW5nLCBvciBpZiB0aGlzIGlz
-IG5vdCBhIEJsdWV6IGlzc3VlLA0KCT4gY291bGQgeW91IHBsZWFzZSBkaXJlY3QgbWUgdG8gdGhl
-IGFwcHJvcHJpYXRlIGNvbnRhY3QuDQoJPg0KCT4gVGhhbmtzDQoJPiBIZWJhDQoJPg0KCT4NCgk+
-DQoJPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tDQoJPiBUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6IFNwbHVuayBJbmMuIERv
-IHlvdSBncmVwIHRocm91Z2ggbG9nIGZpbGVzDQoJPiBmb3IgcHJvYmxlbXM/ICBTdG9wISAgRG93
-bmxvYWQgdGhlIG5ldyBBSkFYIHNlYXJjaCBlbmdpbmUgdGhhdCBtYWtlcw0KCT4gc2VhcmNoaW5n
-IHlvdXIgbG9nIGZpbGVzIGFzIGVhc3kgYXMgc3VyZmluZyB0aGUgIHdlYi4gIERPV05MT0FEIFNQ
-TFVOSyENCgk+IGh0dHA6Ly9zZWwuYXMtdXMuZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZraWQ9MTAz
-NDMyJmJpZD0yMzA0ODYmZGF0PTEyMTY0Mg0KCT4gX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX18NCgk+IEJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdA0KCT4gQmx1
-ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0DQoJPiBodHRwczovL2xpc3RzLnNvdXJjZWZv
-cmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycw0KCT4NCgkNCgkNCgkNCgktLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQoJVGhpcyBT
-Ri5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBTcGx1bmsgSW5jLiBEbyB5b3UgZ3JlcCB0aHJv
-dWdoIGxvZyBmaWxlcw0KCWZvciBwcm9ibGVtcz8gIFN0b3AhICBEb3dubG9hZCB0aGUgbmV3IEFK
-QVggc2VhcmNoIGVuZ2luZSB0aGF0IG1ha2VzDQoJc2VhcmNoaW5nIHlvdXIgbG9nIGZpbGVzIGFz
-IGVhc3kgYXMgc3VyZmluZyB0aGUgIHdlYi4gIERPV05MT0FEIFNQTFVOSyENCglodHRwOi8vc2Vs
-LmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lkPTEwMzQzMiZiaWQ9MjMwNDg2JmRhdD0x
-MjE2NDINCglfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0K
-CUJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdA0KCUJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdl
-Lm5ldA0KCWh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6
-LXVzZXJzDQoJDQoNCg==
+>
+
+With some hints from Patrik Kullman (his page: http://linux.yes.nu/diNovo/) I
+got it working. It was easier than expected. I just enabled authentication and
+encryption in the 'hcid.conf'. After that I restarted the Bluetooth system
+(Debian: '/etc/init.d/bluetooth restart'). I had a ssh connection from another
+computer to be able to change the pin in '/etc/bluetooth/pin'. I used a script
+as pin helper which just outputs the content of this file with the prefix
+'PIN:'. I wrote a random number into the pin file and hit a button on the
+bluetooth keyboard. The keyboard tried to connect to the computer and I typed
+the random pin from the pin file on the keyboard and hit enter. Then the
+keyboard was connected. I did the same with the keypad. At last I did it with
+the mouse and used the pin '0000'. At first this did not seem to work with the
+mouse. I pressed the connect button under the mouse and did a 'hidd --connect
+<mouseaddr>' by hand and then it worked too. Now 'hcitool con' shows that all
+three connections are authorized and encrypted. Nice! :-)
+
 
 
 -------------------------------------------------------
