@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43F12002.9090509@cs.bgu.ac.il>
-From: Niv <nivv@cs.bgu.ac.il>
+Message-ID: <43F10BA8.8090900@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR 			chipset?(inUSA)
-References: <20060123122802.280f747e@taco> <43D55AC7.6040500@xmission.com> 			<5f30e2610601301026l14b8354dne9a6eca4d0f98eea@mail.gmail.com> 		<43DE617D.1010807@xmission.com> <43EFD2D8.5030300@cs.bgu.ac.il> 	<43F00CE4.2070808@xmission.com> <43F0E26D.9000505@cs.bgu.ac.il> <43F10AED.7050703@xmission.com>
-In-Reply-To: <43F10AED.7050703@xmission.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] how using stereo-headset with suse 9.3
+References: <1139849894.9628.16.camel@johannes_01.kapune.local>
+In-Reply-To: <1139849894.9628.16.camel@johannes_01.kapune.local>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,79 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 14 Feb 2006 02:10:42 +0200
+Date: Mon, 13 Feb 2006 15:43:52 -0700
 
-Dear Brad,
+Johannes
 
-1. Well, according to this thread the only SCR adaptor that is >=V 1.2  
-are V. 2 adaptors.
+> My question: I want to hear some music with this headphone. Do I need
+> the complete bluetooth-alsa-project
 
+you don't need the kernel modules under kernel/ but you will need
+everything else.
 
-2. Do you have a pair of headphnes? which?
+> Does suse 9.3 support something I want to do?
+> What is the minimum I need for this?
 
-If they are the logitech / HP - how did you reinforce the plastic strap 
-from braking up?
+probably. check the build document at bluetooth-alsa.sf.net for the
+specifics.
 
-Did you see any V.2 headphones?
-
-Do they give better quality?
-
-
-Niv
-
-Brad Midgley wrote:
-
->Niv
->
->  
->
->>As far as I read the V.w Bus is 12 Mb, which is way more then the 0.7M
->>the V.1 offers
->>
->>does that mean I can use a V.2 adaptor to stream A2DP while using the
->>earpeace and mouse - without hearing braek-ups in the headphones?
->>
->>I currently get brake-ups if I run the proximity script during A2DP
->>playback.
->>
->>gentoo-wiki.com/TIP_Bluetooth_Proximity_Monitor
->>    
->>
->
->you won't have breaks in the audio because of the usb bandwidth. You're
-> likely to have breaks when...
->
->- you have a scatternet--because one device has to switch between master
->and slave
->
->- you run wifi traffic alongside a pre-bt1.2 adapter
->
->- you use a timer other than rtc
->
->- you run the rtc timer on a machine with nvidia drivers
->
->- you hijack the radio with a proximity scan or any other paging activity :)
->
->bluetooth v2 is unlikely to help with proximity scanning. the real
->problem is the bluetooth radio can only be on one frequency at a time
->and the proximity scan needs to take it over briefly to check each
->frequency.
->
->Brad
->
->
->-------------------------------------------------------
->This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
->for problems?  Stop!  Download the new AJAX search engine that makes
->searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
->http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
->_______________________________________________
->Bluez-users mailing list
->Bluez-users@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-users
->  
->
-
+brad
 
 
 -------------------------------------------------------
