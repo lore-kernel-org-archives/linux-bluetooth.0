@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Johannes Kapune <listen@kapune.de>
+Message-ID: <43F00CE4.2070808@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1139849894.9628.16.camel@johannes_01.kapune.local>
-Mime-Version: 1.0
-Subject: [Bluez-users] how using stereo-headset with suse 9.3
+Subject: Re: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR 	chipset?(in
+ USA)
+References: <20060123122802.280f747e@taco> <43D55AC7.6040500@xmission.com> 	<5f30e2610601301026l14b8354dne9a6eca4d0f98eea@mail.gmail.com> <43DE617D.1010807@xmission.com> <43EFD2D8.5030300@cs.bgu.ac.il>
+In-Reply-To: <43EFD2D8.5030300@cs.bgu.ac.il>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,30 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 13 Feb 2006 17:58:14 +0100
+Date: Sun, 12 Feb 2006 21:36:52 -0700
 
-Hello,
-I'm not shure if I'm on the right list but I hope I get an answer.
+Niv
 
-I use suse 9.3 and all of the hci-stuff seems to be all right. If
-necessary I post some outputs.
-My headphone is a "hama BST-150" named in Linux: "BTST-9300" "Cambridge
-Silikon Radio (10)"
+> that is way my next dongle would be V.2
+> with CSR
 
-My question: I want to hear some music with this headphone. Do I need
-the complete bluetooth-alsa-project or is it possible only to use
-somethng like
-   mpg123 --au - file.mp3 | sdp/Headset - | ./sdp/rcplay
-(my_headphone_adress) ?
-There is a device that supports something like this?
+I don't know about availability in Israel, but Bluetake BT007EX is the
+best dongle we've come across... it also has 128-bit encryption in the
+shipping firmware. It is class 1 even though this page doesn't say:
 
-Does suse 9.3 support something I want to do?
-What is the minimum I need for this?
+http://www.btboutique.com/product_info.php?products_id=176
 
-Thanks
-
-Johannes
-
+brad
 
 
 -------------------------------------------------------
