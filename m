@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS PATCH] scan mode
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Johannes Kapune <listen@kapune.de>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0602130950x5834aa71lb6eeeec3fc5bb4cd@mail.gmail.com>
-References: <e1effdeb0602130950x5834aa71lb6eeeec3fc5bb4cd@mail.gmail.com>
+In-Reply-To: <1139849894.9628.16.camel@johannes_01.kapune.local>
+References: <1139849894.9628.16.camel@johannes_01.kapune.local>
 Content-Type: text/plain
-Message-Id: <1139902844.21873.2.camel@localhost>
+Message-Id: <1139859516.12885.0.camel@johannes_01.kapune.local>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Re: [Bluez-users] how using stereo-headset with suse 9.3
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +18,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 14 Feb 2006 08:40:44 +0100
+Date: Mon, 13 Feb 2006 20:38:36 +0100
 
-Hi Claudio,
-
-> This patch add/fix the following services:
-> 1. Changed GetMode/SetMode arguments to string, instead of use byte
-> 2. Added IsConnectable
-> 3. Added IsDiscoverable
-
-I applied the patch to keep it going, but we need to rework the data
-object associated with the device path. Using it like this
-
-	const uint8_t hci_mode = dbus_data->path_data;
-
-won't work forever and actually it is bad coding.
-
-> Next action:
-> - Discoverable timout functions.
-
-Go ahead. I really like to see this in action.
-
-Regards
-
-Marcel
-
+Am Montag, den 13.02.2006, 17:58 +0100 schrieb Johannes Kapune:
+> Hello,
+> I'm not shure if I'm on the right list but I hope I get an answer.
+> 
+> I use suse 9.3 and all of the hci-stuff seems to be all right. If
+> necessary I post some outputs.
+> My headphone is a "hama BST-150" named in Linux: "BTST-9300" "Cambridge
+> Silikon Radio (10)"
+> 
+> My question: I want to hear some music with this headphone. Do I need
+> the complete bluetooth-alsa-project or is it possible only to use
+> somethng like
+>    mpg123 --au - file.mp3 | sdp/Headset - | ./sdp/rcplay
+> (my_headphone_adress) ?
+> There is a device that supports something like this?
+> 
+> Does suse 9.3 support something I want to do?
+> What is the minimum I need for this?
+> 
+> Thanks
+> 
+> Johannes
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+> for problems?  Stop!  Download the new AJAX search engine that makes
+> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
 
 
 
