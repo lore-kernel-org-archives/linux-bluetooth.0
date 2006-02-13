@@ -1,5 +1,5 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43F0E26D.9000505@cs.bgu.ac.il>
+Message-ID: <43F0E147.5000305@cs.bgu.ac.il>
 From: Niv <nivv@cs.bgu.ac.il>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
@@ -18,28 +18,11 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 13 Feb 2006 21:47:57 +0200
+Date: Mon, 13 Feb 2006 21:43:03 +0200
 
-Oh ya,
+the level one V.2 sells at 30$ which is a decent price
 
-As far as I read the V.w Bus is 12 Mb, which is way more then the 0.7M 
-the V.1 offers
-
-does that mean I can use a V.2 adaptor to stream A2DP while using the 
-earpeace and mouse - without hearing braek-ups in the headphones?
-
-I currently get brake-ups if I run the proximity script during A2DP 
-playback.
-
-gentoo-wiki.com/TIP_Bluetooth_Proximity_Monitor
-
-
-
-Niv
-
-
-
-
+Thanks
 
 Brad Midgley wrote:
 
