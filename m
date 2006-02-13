@@ -1,16 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Can't discover device
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <94e407f00602120655k516a58a6lbc83956c269fe4cf@mail.gmail.com>
-References: <94e407f00602120041s3f64513dm642715738db38d10@mail.gmail.com>
-	 <1139734129.4292.4.camel@localhost>
-	 <94e407f00602120058o147272a0je15daf044d3b6047@mail.gmail.com>
-	 <1139734934.4292.6.camel@localhost>
-	 <94e407f00602120655k516a58a6lbc83956c269fe4cf@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1139819436.5547.9.camel@localhost>
+Message-Id: <1139819179.5547.7.camel@localhost>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Deprecating some hcid.conf options
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,16 +16,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 13 Feb 2006 09:30:36 +0100
+Date: Mon, 13 Feb 2006 09:26:19 +0100
 
-Hi Arpit,
+Hi,
 
-> That fixed the problem. But its funny, coz everytime I restart the
-> computer I have to run piscan.Hmm.
+while working on the D-Bus interface, I came along some unneeded complex
+functionality inside hcid and its configuration options. The questions
+is now what options are really used and what haven't been changed by
+anyone.
 
-I've seen this race conditions with some dongles, but not with all of
-them and it seems the HCI flow control is broken on these. However I
-never fully investigated why this happens.
+Does someone uses hcid with autoinit disabled?
+
+What about the security and pairing option? What do we really need?
+
+The iscan and pscan will combined into a new mode option.
+
+Changing the pkt_type is useless and will be removed no matter what.
+
+The auth and encrypt options will also be removed, because we don't
+support security mode 3 anymore.
+
+Do we need link policy setting or should hcid calculate the best setting
+from the supported features?
 
 Regards
 
