@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0602140426x662ffa26id1fb386397280da8@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [DBUS PATCH] scan mode
-In-Reply-To: <1139902844.21873.2.camel@localhost>
+Message-ID: <43F1CA4F.8030102@yahoo.com>
+From: Pedro Monjo Florit <pmonjo2000@yahoo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <e1effdeb0602130950x5834aa71lb6eeeec3fc5bb4cd@mail.gmail.com>
-	 <1139902844.21873.2.camel@localhost>
+To: bluez-devel@lists.sourceforge.net
+References: <43F1B8DE.3060206@yahoo.com>
+In-Reply-To: <43F1B8DE.3060206@yahoo.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] Re: Possible bug in sdp.c
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,85 +18,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 14 Feb 2006 10:26:34 -0200
+Date: Tue, 14 Feb 2006 13:17:19 +0100
 
-Hi Marcel,
+Pedro Monjo Florit wrote:
+> Hi,
+>=20
+> I have seen what *may* be a possible bug in sdp.c. If there is an error=
+=20
+> in a SDP PDU sent by a bluetooth device, it seems that the SDP parsing=20
+> code in sdp.c enters an infinite loop filling syslog with the following=
+=20
+> message: "Unknown sequence type, aborting".
+>=20
+> I have been tracking down the cause and I have found where the problem=20
+> might be. The function sdp_extract_seqtype() may return 0 in case of=20
+> unrecognized data, but this case does not seem to be handled in the=20
+> calls to this function (for example, in sdp_service_search_attr_req() o=
+r=20
+> in sdp_extract_pdu()).
+>=20
+> Could anybody tell me whether am I right or wrong? Has anybody seen a=20
+> similar behaviour?
+>=20
 
-On 2/14/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Claudio,
->
-> > This patch add/fix the following services:
-> > 1. Changed GetMode/SetMode arguments to string, instead of use byte
-> > 2. Added IsConnectable
-> > 3. Added IsDiscoverable
->
-> I applied the patch to keep it going, but we need to rework the data
-> object associated with the device path. Using it like this
->
->         const uint8_t hci_mode =3D dbus_data->path_data;
->
-> won't work forever and actually it is bad coding.
-[Claudio Takahasi]
-I don't know exactly what is problem, but I guess it should be related
-to uint32 to uint8 casting.
-
-I will change the path_data to a device settings structure, where I
-want store the scan mode and the discoverable timeout. In my opinion
-the discoverable timeout should be unique for each local adapter. Do
-you have any comments or suggestion?
-
-
- struct device_settings {
-         uint32_t discoverable_to;
-         uint8_t  scan_mode;
- };
-
- struct hci_dbus_data {
-         uint16_t dev_id;
-         uint16_t path_id;
-         struct device_settings dev_settings;
- };
-
->
-> > Next action:
-> > - Discoverable timout functions.
->
-> Go ahead. I really like to see this in action.
-[Claudio Takahasi]
-I am planning use the SIGALARM. Another option is integrate inside the
-main loop, using a poll timeout. However it is a little bit more
-complicated.
-Do you agree with this approach?
+I have been doing some further research and it is a Samsung. In previous=20
+posts, there have been some bug reports regarding this brands, such as=20
+raising SIGSEGV while looking up for DUN service. Lo=EFc Lefort sent a=20
+patch that works pretty well with many phones, but there seems to be a=20
+new Samsung phone that sends other unexpected SDP data, but I still do=20
+not know which model.
 
 Regards,
-Claudio.
 
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc. Do you grep through log fi=
-les
-> for problems?  Stop!  Download the new AJAX search engine that makes
-> searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D103432&bid=3D230486&dat=
-=3D121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-
-
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+Pedro
 
 
 -------------------------------------------------------
