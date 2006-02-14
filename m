@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <bd72c4b0602141948w3bacbf30q49f933551f56b40a@mail.gmail.com>
-From: Gareth Bradley <gareth.bradley.nz@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <43F20511.4030700@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_20331_7650452.1139975301112"
-Subject: [Bluez-users] SCO syncronization taking down USB dongle
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Ogg flavored A2DP
+References: <43F12646.9090301@cs.bgu.ac.il>
+In-Reply-To: <43F12646.9090301@cs.bgu.ac.il>
+Content-Type: text/plain; charset=UTF-8
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,70 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 14 Feb 2006 15:48:21 -1200
+Date: Tue, 14 Feb 2006 09:28:01 -0700
 
-------=_Part_20331_7650452.1139975301112
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Niv
 
-Hello. I am currently writing code for voice connections using a Motorla
-HS850 headset and the BlueZ stack on a Intrinsyc Cerf 255PXA board (a small
-form mobile PC). I can currently make successful SCO connections to the
-headset, but they sometimes crash, and take the whole USB dongle with it.
-(Running 'hciconfig hci0 up' fixes it).
+> BTW , couldnt get the line in to stream to the headphones. I used the
+> syntax at the README
 
-Here is the crash printout:
-usb.c: USB disconnect on device 2
-Receive failed: Broken pipe
-hub.c: USB new device connect on bus1/2, assigned device number 3
+I haven't tried this in a while. The only change I've made recently was
+so -s would skip over backlogged packets without forcing -d behavior.
+That shouldn't make any difference.
 
-I have a stream of incoming voice (from a Windows PDA) which is buffered. I
-read from the SCO connection stream (and consistently get 48 byte packets),
-and write in an amount from the receive buffer into the headset. This coice
-connection works fine.
-
-I've tried using FD_ZERO, FD_SET and FD_ISSET before all read and writes,
-but still to no avail. I am able to get it to crash within a minute if I
-deliberately write data chunks slightly out with the amount read from the
-device (read 48, then write 47, or 46, or 49...).
-
-I notice that flow (and error) control appear on the Todo list, but is ther=
-e
-some way to guard against the whole dongle being taken down?
-
-------=_Part_20331_7650452.1139975301112
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hello. I am currently writing code for voice connections using a
-Motorla HS850 headset and the BlueZ stack on a Intrinsyc Cerf 255PXA
-board (a small form mobile PC). I can currently make successful SCO
-connections to the headset, but they sometimes crash, and take the
-whole USB dongle with it. (Running 'hciconfig hci0 up' fixes it).<br>
-<br>
-Here is the crash printout:<br>
-usb.c: USB disconnect on device 2<br>
-Receive failed: Broken pipe<br>
-hub.c: USB new device connect on bus1/2, assigned device number 3<br>
-<br>
-I have a stream of incoming voice (from a Windows PDA) which is
-buffered. I read from the SCO connection stream (and consistently get
-48 byte packets), and write in an amount from the receive buffer into
-the headset. This coice connection works fine.<br>
-<br>
-I've tried using FD_ZERO, FD_SET and FD_ISSET before all read and
-writes, but still to no avail. I am able to get it to crash within a
-minute if I deliberately write data chunks slightly out with the amount rea=
-d from
-the device (read 48, then write 47, or 46, or 49...).<br>
-<br>
-I notice that flow (and error) control appear on the Todo list, but is
-there some way to guard against the whole dongle being taken down?<br>
-<br>
-
-------=_Part_20331_7650452.1139975301112--
+Brad
 
 
 -------------------------------------------------------
