@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43F1B8DE.3060206@yahoo.com>
-From: Pedro Monjo Florit <pmonjo2000@yahoo.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] [DBUS PATCH] scan mode
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] Possible bug in sdp.c
+In-Reply-To: <e1effdeb0602130950x5834aa71lb6eeeec3fc5bb4cd@mail.gmail.com>
+References: <e1effdeb0602130950x5834aa71lb6eeeec3fc5bb4cd@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1139902844.21873.2.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,27 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 14 Feb 2006 12:02:54 +0100
+Date: Tue, 14 Feb 2006 08:40:44 +0100
 
-Hi,
+Hi Claudio,
 
-I have seen what *may* be a possible bug in sdp.c. If there is an error 
-in a SDP PDU sent by a bluetooth device, it seems that the SDP parsing 
-code in sdp.c enters an infinite loop filling syslog with the following 
-message: "Unknown sequence type, aborting".
+> This patch add/fix the following services:
+> 1. Changed GetMode/SetMode arguments to string, instead of use byte
+> 2. Added IsConnectable
+> 3. Added IsDiscoverable
 
-I have been tracking down the cause and I have found where the problem 
-might be. The function sdp_extract_seqtype() may return 0 in case of 
-unrecognized data, but this case does not seem to be handled in the 
-calls to this function (for example, in sdp_service_search_attr_req() or 
-in sdp_extract_pdu()).
+I applied the patch to keep it going, but we need to rework the data
+object associated with the device path. Using it like this
 
-Could anybody tell me whether am I right or wrong? Has anybody seen a 
-similar behaviour?
+	const uint8_t hci_mode = dbus_data->path_data;
 
-Regards,
+won't work forever and actually it is bad coding.
 
-Pedro
+> Next action:
+> - Discoverable timout functions.
+
+Go ahead. I really like to see this in action.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
