@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43F20459.5070508@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <43F197B7.5060900@teleline.es>
+From: Pedro Monjo Florit <pmonjo@teleline.es>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] class 1 bluetooth 1.2 dongles with CSR 			chipset?(inUSA)
-References: <20060123122802.280f747e@taco> <43D55AC7.6040500@xmission.com> 			<5f30e2610601301026l14b8354dne9a6eca4d0f98eea@mail.gmail.com> 		<43DE617D.1010807@xmission.com> <43EFD2D8.5030300@cs.bgu.ac.il> 	<43F00CE4.2070808@xmission.com> <43F0E26D.9000505@cs.bgu.ac.il> <43F10AED.7050703@xmission.com> <43F12002.9090509@cs.bgu.ac.il>
-In-Reply-To: <43F12002.9090509@cs.bgu.ac.il>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Bluetooth bandwidth (OT)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,38 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 14 Feb 2006 09:24:57 -0700
+Date: Tue, 14 Feb 2006 09:41:27 +0100
 
-Niv
+Hi,
 
-> 1. Well, according to this thread the only SCR adaptor that is >=V 1.2 
-> are V. 2 adaptors.
+This is a rather off topic question. I am interested in any 
+research/papers/whatever related to bluetooth bandwidth. It is very 
+common in computer science or telecommunication engineering studies to 
+study the behaviour of Aloha, Slotted Aloha, CSMA/CD, etc. and I want 
+something similar for bluetooth: what happens with the bandwidth when 
+there are many devices/many piconets together.
 
-There are 1.2 adapters out there but it's best to find a v2 adapter if
-you're buying new. Apple sells a d-link with 1.2 iirc.
+I have been searching in the Internet, but have found very little. I 
+would greatly appreciate any pointers.
 
-> 2. Do you have a pair of headphnes? which?
+Thanks,
 
-I have iphono mini right now. I've used and developed with hp, iTech,
-and iphono "non-mini" in the past.
-
-> If they are the logitech / HP - how did you reinforce the plastic strap
-> from braking up?
-
-I lent out my set but I haven't heard of this problem.
-
-> Did you see any V.2 headphones?
-
-no. bluespoon may come out with a class 1 headset for better range but
-no one is talking about v2.
-
-> Do they give better quality?
-
-I would say v2 would not be a significant improvement in headset
-operation, but it would improve battery life and allow for better
-throughput overall in the piconet.
-
-Brad
+Pedro
 
 
 -------------------------------------------------------
