@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
+Subject: Re: [Bluez-devel] [DBUS PATCH] scan mode
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_m2n8DDDRA9GlHNM"
-Message-Id: <200602151102.30162.denis.kenzior@trolltech.com>
-Subject: [Bluez-devel] sdptool/hciconfig patches
+In-Reply-To: <e1effdeb0602140426x662ffa26id1fb386397280da8@mail.gmail.com>
+References: <e1effdeb0602130950x5834aa71lb6eeeec3fc5bb4cd@mail.gmail.com>
+	 <1139902844.21873.2.camel@localhost>
+	 <e1effdeb0602140426x662ffa26id1fb386397280da8@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1139921486.21873.18.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,290 +20,65 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Feb 2006 11:02:30 +1000
+Date: Tue, 14 Feb 2006 13:51:26 +0100
 
---Boundary-00=_m2n8DDDRA9GlHNM
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Claudio,
 
-=2D Fix a small bug in hciconfig which prevents it from displaying the corr=
-ect=20
-category of =A0Peripheral or Imaging or Uncategorized device class devices=
-=20
-(reports as invalid)
-=2D Capability for sdptool to perform searches by 16/32/128 bit uuids
+> > I applied the patch to keep it going, but we need to rework the data
+> > object associated with the device path. Using it like this
+> >
+> >         const uint8_t hci_mode = dbus_data->path_data;
+> >
+> > won't work forever and actually it is bad coding.
+> 
+> I don't know exactly what is problem, but I guess it should be related
+> to uint32 to uint8 casting.
 
-=2DDenis
+the casting is not that big problem. It is a misuse of the variable,
+because the name is not clear. In other code paths you might use the
+path_data variable too and then it clashes. These things are really hard
+to debug.
 
---Boundary-00=_m2n8DDDRA9GlHNM
-Content-Type: text/x-diff;
-  charset="iso-8859-1";
-  name="bluez-libs.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="bluez-libs.patch"
+> I will change the path_data to a device settings structure, where I
+> want store the scan mode and the discoverable timeout. In my opinion
+> the discoverable timeout should be unique for each local adapter. Do
+> you have any comments or suggestion?
+> 
+> 
+>  struct device_settings {
+>          uint32_t discoverable_to;
+>          uint8_t  scan_mode;
+>  };
+> 
+>  struct hci_dbus_data {
+>          uint16_t dev_id;
+>          uint16_t path_id;
+>          struct device_settings dev_settings;
+>  };
 
-Index: include/sdp_lib.h
-===================================================================
-RCS file: /cvsroot/bluez/libs/include/sdp_lib.h,v
-retrieving revision 1.14
-diff -u -r1.14 sdp_lib.h
---- include/sdp_lib.h	3 Jan 2006 12:56:09 -0000	1.14
-+++ include/sdp_lib.h	15 Feb 2006 00:46:21 -0000
-@@ -442,6 +442,8 @@
- int sdp_svclass_uuid2strn(const uuid_t *uuid, char *str, size_t n);
- int sdp_profile_uuid2strn(const uuid_t *uuid, char *str, size_t n);
- 
-+int sdp_extract_uuid_from_string(uint128_t *dst, const char *str);
-+
- /*
-  * In all the sdp_get_XXX(handle, XXX *xxx) functions below, 
-  * the XXX * is set to point to the value, should it exist
-Index: src/sdp.c
-===================================================================
-RCS file: /cvsroot/bluez/libs/src/sdp.c,v
-retrieving revision 1.37
-diff -u -r1.37 sdp.c
---- src/sdp.c	17 Jan 2006 10:39:37 -0000	1.37
-+++ src/sdp.c	15 Feb 2006 00:46:21 -0000
-@@ -2031,6 +2031,89 @@
- 	sdp_attr_add_new(rec, SDP_ATTR_ICON_URL, SDP_URL_STR8, icon);
- }
- 
-+/* Extract a 128-bit number from a UUID formed string
-+   returns -1 on failure, 0 on success
-+*/
-+int sdp_extract_uuid_from_string(uint128_t *dst, const char *str)
-+{
-+	char baseStr[128];
-+	int delim = '-';
-+	unsigned long dataLongValue;
-+	char *delimPtr;
-+	char *dataPtr;
-+	char temp[10];
-+	int toBeCopied;
-+	uint8_t *data;
-+
-+	if (str == NULL)
-+		return -1;
-+
-+	if (dst == NULL)
-+		return -1;
-+
-+	strcpy(baseStr, str);
-+	data = dst->data;
-+	memset(data, '\0', sizeof(uint128_t));
-+	memset(temp, '\0', 10);
-+	dataPtr = baseStr;
-+	delimPtr = NULL;
-+	delimPtr = strchr(dataPtr, delim);
-+	toBeCopied = delimPtr - dataPtr;
-+	if (toBeCopied != 8) {
-+		SDPDBG("To be copied(1) : %d\n", toBeCopied);
-+		return -1;
-+	}
-+	strncpy(temp, dataPtr, toBeCopied);
-+	dataLongValue = htonl(strtoul(temp, NULL, 16));
-+	memcpy(&data[0], &dataLongValue, 4);
-+
-+	/*
-+	 * Get the next 4 bytes (note that there is a "-"
-+	 * between them now)
-+	 */
-+	memset(temp, '\0', 10);
-+	dataPtr = delimPtr + 1;
-+	delimPtr = strchr(dataPtr, delim);
-+	toBeCopied = delimPtr - dataPtr;
-+	if (toBeCopied != 4) {
-+		SDPDBG("To be copied(2) : %d\n", toBeCopied);
-+		return -1;
-+	}
-+	strncpy(temp, dataPtr, toBeCopied);
-+	dataPtr = delimPtr + 1;
-+	delimPtr = strchr(dataPtr, delim);
-+	toBeCopied = delimPtr - dataPtr;
-+	if (toBeCopied != 4) {
-+		SDPDBG("To be copied(3) : %d\n", toBeCopied);
-+		return -1;
-+	}
-+	strncat(temp, dataPtr, toBeCopied);
-+	dataLongValue = htonl(strtoul(temp, NULL, 16));
-+	memcpy(&data[4], &dataLongValue, 4);
-+
-+	/*
-+	 * Get the last 4 bytes (note that there are 6 bytes
-+	 * after the last separator, which is truncated (2+4)
-+	 */
-+	memset(temp, '\0', 10);
-+	dataPtr = delimPtr + 1;
-+	dataPtr = delimPtr + 1;
-+	delimPtr = strchr(dataPtr, delim);
-+	toBeCopied = delimPtr - dataPtr;
-+	if (toBeCopied != 4) {
-+		SDPDBG("To be copied(4) : %d\n", toBeCopied);
-+		return -1;
-+	}
-+	strncpy(temp, dataPtr, toBeCopied);
-+	strncat(temp, (delimPtr + 1), 4);
-+	dataLongValue = htonl(strtoul(temp, NULL, 16));
-+	memcpy(&data[8], &dataLongValue, 4);
-+	dataLongValue = htonl(strtoul(delimPtr + 5, NULL, 16));
-+	memcpy(&data[12], &dataLongValue, 4);
-+
-+	return 0;
-+}
-+
- /*
-  * The code in this function is executed only once per
-  * thread. We compute the actual bit value of the Bluetooth
-@@ -2043,77 +2126,15 @@
-  */
- uint128_t *sdp_create_base_uuid(void)
- {
--	char baseStr[128];
--	int delim = '-';
--	unsigned long dataLongValue;
--	char *delimPtr;
--	char *dataPtr;
--	char temp[10];
--	int toBeCopied;
--	uint8_t *data;
--
- 	if (bluetooth_base_uuid == NULL) {
--		strcpy(baseStr, BASE_UUID);
- 		bluetooth_base_uuid = (uint128_t *)malloc(sizeof(uint128_t));
--		data = bluetooth_base_uuid->data;
--		memset(data, '\0', sizeof(uint128_t));
--		memset(temp, '\0', 10);
--		dataPtr = baseStr;
--		delimPtr = NULL;
--		delimPtr = strchr(dataPtr, delim);
--		toBeCopied = delimPtr - dataPtr;
--		if (toBeCopied != 8) {
--			SDPDBG("To be copied(1) : %d\n", toBeCopied);
-+		if (sdp_extract_uuid_from_string(bluetooth_base_uuid, BASE_UUID) != 0) {
-+			free(bluetooth_base_uuid);
-+			bluetooth_base_uuid = NULL;
- 			return NULL;
- 		}
--		strncpy(temp, dataPtr, toBeCopied);
--		dataLongValue = htonl(strtoul(temp, NULL, 16));
--		memcpy(&data[0], &dataLongValue, 4);
--
--		/*
--		 * Get the next 4 bytes (note that there is a "-"
--		 * between them now)
--		 */
--		memset(temp, '\0', 10);
--		dataPtr = delimPtr + 1;
--		delimPtr = strchr(dataPtr, delim);
--		toBeCopied = delimPtr - dataPtr;
--		if (toBeCopied != 4) {
--			SDPDBG("To be copied(2) : %d\n", toBeCopied);
--			return NULL;
--		}
--		strncpy(temp, dataPtr, toBeCopied);
--		dataPtr = delimPtr + 1;
--		delimPtr = strchr(dataPtr, delim);
--		toBeCopied = delimPtr - dataPtr;
--		if (toBeCopied != 4) {
--			SDPDBG("To be copied(3) : %d\n", toBeCopied);
--			return NULL;
--		}
--		strncat(temp, dataPtr, toBeCopied);
--		dataLongValue = htonl(strtoul(temp, NULL, 16));
--		memcpy(&data[4], &dataLongValue, 4);
--
--		/*
--		 * Get the last 4 bytes (note that there are 6 bytes
--		 * after the last separator, which is truncated (2+4)
--		 */
--		memset(temp, '\0', 10);
--		dataPtr = delimPtr + 1;
--		dataPtr = delimPtr + 1;
--		delimPtr = strchr(dataPtr, delim);
--		toBeCopied = delimPtr - dataPtr;
--		if (toBeCopied != 4) {
--			SDPDBG("To be copied(4) : %d\n", toBeCopied);
--			return NULL;
--		}
--		strncpy(temp, dataPtr, toBeCopied);
--		strncat(temp, (delimPtr + 1), 4);
--		dataLongValue = htonl(strtoul(temp, NULL, 16));
--		memcpy(&data[8], &dataLongValue, 4);
--		dataLongValue = htonl(strtoul(delimPtr + 5, NULL, 16));
--		memcpy(&data[12], &dataLongValue, 4);
- 	}
-+
- 	return bluetooth_base_uuid;
- }
- 
+I don't see any need for another nested structure. Actually I would
+prefer using something like this:
 
---Boundary-00=_m2n8DDDRA9GlHNM
-Content-Type: text/x-diff;
-  charset="iso-8859-1";
-  name="bluez-utils.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="bluez-utils.patch"
+	struct hci_dbus_data {
+		uint16_t dev_id;
+		uint16_t path_id;
+		uint8_t mode;
+		uint32_t discoverable_timeout;
+	}
 
-Index: tools/hciconfig.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/tools/hciconfig.c,v
-retrieving revision 1.76
-diff -u -r1.76 hciconfig.c
---- tools/hciconfig.c	3 Jan 2006 13:29:03 -0000	1.76
-+++ tools/hciconfig.c	15 Feb 2006 00:46:39 -0000
-@@ -676,7 +676,7 @@
- 		} else
- 			printf("Unspecified");
- 		printf("\n\tDevice Class: ");
--		if ((cls[1] & 0x1f) > sizeof(*major_devices))
-+		if ((cls[1] & 0x1f) >= sizeof(major_devices) / sizeof(*major_devices))
- 			printf("Invalid Device Class!\n");
- 		else
- 			printf("%s, %s\n", major_devices[cls[1] & 0x1f],
-Index: tools/sdptool.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/tools/sdptool.c,v
-retrieving revision 1.54
-diff -u -r1.54 sdptool.c
---- tools/sdptool.c	8 Feb 2006 11:16:47 -0000	1.54
-+++ tools/sdptool.c	15 Feb 2006 00:46:40 -0000
-@@ -989,7 +989,10 @@
- 
- 	sdp_uuid2strn(uuid, UUID_str, MAX_LEN_UUID_STR);
- 	sdp_svclass_uuid2strn(uuid, ServiceClassUUID_str, MAX_LEN_SERVICECLASS_UUID_STR);
--	printf("  \"%s\" (0x%s)\n", ServiceClassUUID_str, UUID_str);
-+        if (uuid->type != SDP_UUID128)
-+		printf("  \"%s\" (0x%s)\n", ServiceClassUUID_str, UUID_str);
-+	else
-+		printf("  UUID 128: %s\n", UUID_str);
- }
- 
- static void print_service_desc(void *value, void *user)
-@@ -3485,6 +3488,7 @@
- {
- 	struct search_context context;
- 	unsigned char *uuid = NULL;
-+        uint128_t uuid128;
- 	uint32_t class = 0;
- 	bdaddr_t bdaddr;
- 	int has_addr = 0;
-@@ -3529,6 +3533,9 @@
- 		sscanf(context.svc + 2, "%X", &num);
- 		class = num;
- 		printf("Class 0x%X\n", class);
-+	}
-+	else if (sdp_extract_uuid_from_string(&uuid128, context.svc) == 0) {
-+		uuid = uuid128.data;
- 	} else {
- 		/* Convert class name to an UUID */
- 
+> I am planning use the SIGALARM. Another option is integrate inside the
+> main loop, using a poll timeout. However it is a little bit more
+> complicated.
 
---Boundary-00=_m2n8DDDRA9GlHNM--
+In the end we might need to integrate it into the main loop, because
+this looks like the cleanest approach to me. However for now it might be
+enough to use SIGALARM.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
