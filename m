@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] SuSE 10.0 BlueZ and wvdial
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43F12646.9090301@cs.bgu.ac.il>
+From: Niv <nivv@cs.bgu.ac.il>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43F0EF07.20208@ibdcon.org.br>
-References: <d6db2b820602131319u1658f2fn40823df3c623c500@mail.gmail.com>
-	 <43F0EF07.20208@ibdcon.org.br>
-Content-Type: text/plain
-Message-Id: <1139903616.21873.5.camel@localhost>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: [Bluez-users] Ogg flavored A2DP
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,28 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 14 Feb 2006 08:53:36 +0100
+Date: Tue, 14 Feb 2006 02:37:26 +0200
 
-Hi Paulo,
+Just a note to all how want to stream OGG to their headphones. here is 
+the syntax:
 
-> i did install SuSE 10.0, BlueZ and paired my gprs phone. Ok, it worked.
-> But when i try to use wvdial to connect to the internet using the GPRS
-> service, through rfcomm0 port,  i get the following message:
-> --> WvDial: Internet dialer version 1.54.0
-> --> Cannot open /dev/rfcomm0: Cannot get information for serial port.
-> --> Cannot open /dev/rfcomm0: Input/output error
-> --> Cannot open /dev/rfcomm0: Cannot get information for serial port.
-> Does anyone knows what could be happening?
+ogg123 -d au -f - <file> | /usr/bin/a2play -v <HEADPHONES_ADDRESS>
 
-I've seen this before and this is specific to the wvdial package with
-SuSE. Actually to make them happy we need to implement some specific TTY
-ioctl() which I haven't really got around.
+BTW , couldnt get the line in to stream to the headphones. I used the 
+syntax at the README
 
-Regards
-
-Marcel
-
-
+Niv
 
 
 -------------------------------------------------------
