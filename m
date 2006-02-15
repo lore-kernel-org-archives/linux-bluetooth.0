@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Logitech diNovo Media Desktop Laser BT Mini
-	Receiver
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43F3379F.8090306@cs.bgu.ac.il>
+From: Niv <nivv@cs.bgu.ac.il>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43F3379F.8090306@cs.bgu.ac.il>
-References: <43F3235B.9080007@xs4all.nl>  <43F3379F.8090306@cs.bgu.ac.il>
-Content-Type: text/plain
-Message-Id: <1140013283.26072.82.camel@localhost>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Logitech diNovo Media Desktop Laser BT Mini Receiver
+References: <43F3235B.9080007@xs4all.nl>
+In-Reply-To: <43F3235B.9080007@xs4all.nl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,22 +18,10 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 15 Feb 2006 15:21:23 +0100
+Date: Wed, 15 Feb 2006 16:15:59 +0200
 
-Hi,
-
-> I am kind of new to this ML. Are there any keyboard that do work with 
-> bluez - "out of the box"?
-
-this is not an issue with the keyboard, it is a dongle problem. However
-actually any Bluetooth keyboard should work (at least in boot protocol
-mode).
-
-Regards
-
-Marcel
-
-
+I am kind of new to this ML. Are there any keyboard that do work with 
+bluez - "out of the box"?
 
 
 -------------------------------------------------------
