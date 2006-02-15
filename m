@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Unsafe handling of -e option in pand
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <495ce9180602150202m3fcf8e93v@mail.gmail.com>
+From: Mario <mario.temporary@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43F2F577.6090804@ubuntu.com>
-References: <43F2E0C4.4040204@ubuntu.com>
-	 <1139991875.26072.14.camel@localhost>  <43F2F577.6090804@ubuntu.com>
-Content-Type: text/plain
-Message-Id: <1139997734.26072.32.camel@localhost>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Re: Developing Broadcom driver support
+In-Reply-To: <43F0C174.2060909@xmission.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <e44ae5e0602111105n6bacb4e8i@mail.gmail.com>
+	 <43F0C174.2060909@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,29 +19,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Feb 2006 11:02:14 +0100
+Date: Wed, 15 Feb 2006 11:02:04 +0100
 
-Hi Charles,
-
-> While we at that, there is another possible vuln...
-> 
-> http://www.securityfocus.com/archive/1/archive/1/424133/100/0/threaded
-> 
-> Tested in Ubuntu bluez-utils-2.24 and 2.20
-> 
-> Any fix ideas?
-
-it is already fixed in the CVS, but don't get me started on this one
-again. However to remind people. The hcidump tool is a development tool
-and not for daily use in any production system. Non of the parsers are
-bullet proof and actually never will be. The Bluetooth code inside the
-Linux kernel however is robust against these kind of attacks.
-
-Regards
-
-Marcel
+I have to say that usually fix "hciconfig hci0 scomtu 64:8" usually
+works but sometime it stops to work. It is not so stable and I have to
+use the command every time.
 
 
+2006/2/13, Brad Midgley <bmidgley@xmission.com>:
+>  http://bluetooth-alsa.sourceforge.net/sco-mtu.patch
+
+This kind of patch (I've tried to use the constants 64 & 8) seems to
+work not good as the command-line fix.
+
+Mario
 
 
 -------------------------------------------------------
