@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth bandwidth (OT)
+Subject: Re: [Bluez-users] SCO syncronization taking down USB dongle
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43F197B7.5060900@teleline.es>
-References: <43F197B7.5060900@teleline.es>
+In-Reply-To: <bd72c4b0602141948w3bacbf30q49f933551f56b40a@mail.gmail.com>
+References: <bd72c4b0602141948w3bacbf30q49f933551f56b40a@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1139992900.26072.19.camel@localhost>
+Message-Id: <1139992509.26072.16.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,24 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 15 Feb 2006 09:41:40 +0100
+Date: Wed, 15 Feb 2006 09:35:09 +0100
 
-Hi Pedro,
+Hi Gareth,
 
-> This is a rather off topic question. I am interested in any 
-> research/papers/whatever related to bluetooth bandwidth. It is very 
-> common in computer science or telecommunication engineering studies to 
-> study the behaviour of Aloha, Slotted Aloha, CSMA/CD, etc. and I want 
-> something similar for bluetooth: what happens with the bandwidth when 
-> there are many devices/many piconets together.
+> Hello. I am currently writing code for voice connections using a
+> Motorla HS850 headset and the BlueZ stack on a Intrinsyc Cerf 255PXA
+> board (a small form mobile PC). I can currently make successful SCO
+> connections to the headset, but they sometimes crash, and take the
+> whole USB dongle with it. (Running 'hciconfig hci0 up' fixes it).
 > 
-> I have been searching in the Internet, but have found very little. I 
-> would greatly appreciate any pointers.
+> Here is the crash printout:
+> usb.c: USB disconnect on device 2
+> Receive failed: Broken pipe
+> hub.c: USB new device connect on bus1/2, assigned device number 3
 
-I don't know of any particular papers that are covering the bandwidth
-behavior of Bluetooth when a lot of devices are around. However for
-Bluetooth all of them must be active participating in a piconet and
-sending data, because other they don't consume any "bandwidth" at all.
+the dongle gets disconnected from the USB bus. What kind of dongle is
+this? Maybe you need to get yourself a better one, because a disconnect
+from the USB is nothing we can really work around.
+
+> I notice that flow (and error) control appear on the Todo list, but is
+> there some way to guard against the whole dongle being taken down?
+
+It only protects the host stack and not the dongle. The flow control
+towards the HCI of the dongle is always used.
 
 Regards
 
