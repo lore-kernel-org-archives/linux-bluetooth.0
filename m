@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43F39EF7.6010902@xs4all.nl>
-From: Laurens <masterpe@xs4all.nl>
-MIME-Version: 1.0
+From: Agustin Jose Fusaro <afusaro@apexar.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Logitech diNovo Media Desktop Laser BT Mini	Receiver
-References: <43F3235B.9080007@xs4all.nl> <1140010364.26072.55.camel@localhost>
-In-Reply-To: <1140010364.26072.55.camel@localhost>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <200512021834.19314.mgorbach@yahoo.com>
+References: <20051202220703.C04EF953BA@sc8-sf-spam1.sourceforge.net>
+	 <200512021834.19314.mgorbach@yahoo.com>
+Content-Type: text/plain
+Message-Id: <1140037472.3336.5.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-users] Cannot compile bluez-utils-2.25
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,37 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 15 Feb 2006 22:36:55 +0100
+Date: Wed, 15 Feb 2006 18:04:31 -0300
 
-Marcel Holtmann wrote:
-> Hi Lawrence,
->
->   
->> I've got this shiny new Logitech diNovo set but I'm unable to get my BT
->> working with it under Linux. I did see this message:
->> http://sourceforge.net/mailarchive/message.php?msg_id=14366312 and I
->> seem to have the same issue. Is there any way I can help getting this
->> thing up and running without having to code?
->>
->> I also suspect that it might have something to do with the fact that
->> Logitech uses Widcomm BTW 5.0 on this receiver and that it has no RFComm
->> support. Any thoughts?
->>     
->
-> you need to find the magic sequence to make it switch from HID into HCI
-> mode and an USB sniffer is the way to go. I don't have this device and
-> so I am not able to help here.
->
-> Regards
->
-> Marcel
->
->   
-Any ideas on how I could sniff the required data for you?
+Hi everybody,
 
-Regards,
+I'm having trouble installing the bluez-utils-2.25 package. I've already
+installed the bluez-libs-2.25 package without any problem, but now, when
+I try to ' make ' the new utils I get an undefined reference to
+`dbus_connection_close' error in file dbus.c. It seems not to be defined
+in this file.
 
-Lawrence
+Has anybody had this problem?
+
+By the way, I've been working with the bluez library and utils (2.22)
+for a while and had some strange problems (rfcomm mostly)... so I just
+wanted to make sure that I have the latest version before making further
+questions.
+
+Thanks a lot!
+
+Agustin Fusaro
+
 
 
 -------------------------------------------------------
