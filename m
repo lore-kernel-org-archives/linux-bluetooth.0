@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Unsafe handling of -e option in pand
+Subject: Re: [Bluez-devel] sdptool/hciconfig patches
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43F2E0C4.4040204@ubuntu.com>
-References: <43F2E0C4.4040204@ubuntu.com>
+In-Reply-To: <200602151102.30162.denis.kenzior@trolltech.com>
+References: <200602151102.30162.denis.kenzior@trolltech.com>
 Content-Type: text/plain
-Message-Id: <1139991875.26072.14.camel@localhost>
+Message-Id: <1139991066.26072.10.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,19 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Feb 2006 09:24:35 +0100
+Date: Wed, 15 Feb 2006 09:11:06 +0100
 
-Hi Charles,
+Hi Denis,
 
->  From this bug report :
-> 
-> https://launchpad.net/distros/ubuntu/+source/bluez-utils/+bug/6714
+> - Fix a small bug in hciconfig which prevents it from displaying the correct 
+> category of  Peripheral or Imaging or Uncategorized device class devices 
+> (reports as invalid)
+> - Capability for sdptool to perform searches by 16/32/128 bit uuids
 
-I actually reworked the complete patch. The variable names and the
-coding style was not acceptable. We use tabs instead of whitespaces.
-
-And of course strncpy doesn't include the \0 character, so you need to
-take care of this too. However a patch for it is in the CVS now.
+I picked the hciconfig and the first hunk for sdptool. Please redo the
+other changes and resend them. And we use tabs instead of whitespaces.
 
 Regards
 
