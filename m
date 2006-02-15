@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43F2E0C4.4040204@ubuntu.com>
-From: Charles Majola <charles@ubuntu.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Re: Possible bug in sdp.c
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] [PATCH] Unsafe handling of -e option in pand
+In-Reply-To: <43F1CA4F.8030102@yahoo.com>
+References: <43F1B8DE.3060206@yahoo.com>  <43F1CA4F.8030102@yahoo.com>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1139990590.26072.8.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,70 +18,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Feb 2006 10:05:24 +0200
+Date: Wed, 15 Feb 2006 09:03:10 +0100
 
- From this bug report :
+Hi Pedro,
 
-https://launchpad.net/distros/ubuntu/+source/bluez-utils/+bug/6714
+> > I have seen what *may* be a possible bug in sdp.c. If there is an err=
+or=20
+> > in a SDP PDU sent by a bluetooth device, it seems that the SDP parsin=
+g=20
+> > code in sdp.c enters an infinite loop filling syslog with the followi=
+ng=20
+> > message: "Unknown sequence type, aborting".
+> >=20
+> > I have been tracking down the cause and I have found where the proble=
+m=20
+> > might be. The function sdp_extract_seqtype() may return 0 in case of=20
+> > unrecognized data, but this case does not seem to be handled in the=20
+> > calls to this function (for example, in sdp_service_search_attr_req()=
+ or=20
+> > in sdp_extract_pdu()).
+> >=20
+> > Could anybody tell me whether am I right or wrong? Has anybody seen a=
+=20
+> > similar behaviour?
+> >=20
+>=20
+> I have been doing some further research and it is a Samsung. In previou=
+s=20
+> posts, there have been some bug reports regarding this brands, such as=20
+> raising SIGSEGV while looking up for DUN service. Lo=C3=AFc Lefort sent=
+ a=20
+> patch that works pretty well with many phones, but there seems to be a=20
+> new Samsung phone that sends other unexpected SDP data, but I still do=20
+> not know which model.
 
---- bluez-utils/pand/bnep.c	
-+++ bluez-utils/pand/bnep.c	
-@@ -184,13 +184,13 @@
- {
- 	struct bnep_connadd_req req;
- 
--	strcpy(req.device, dev);
-+	strncpy(req.device, dev, 16);
- 	req.sock = sk;
- 	req.role = role;
- 	req.flow_label = 0;     /* 0 == Best Effort QoS */
- 	if (ioctl(ctl, bnepconnadd, &req))
- 		return -1;
--	strcpy(dev, req.device);
-+	strncpy(dev, req.device, 16);
- 	return 0;
- }
- 
+I actually thought we fixed that problem, but SDP is a horrible protocol
+anyway, so expect more bugs. I don't have a Samsung phone and so I can't
+easily reproduce it. However you need to send in a binary hcidump log
+for the crash.
 
-=== modified file 'bluez-utils/pand/main.c'
---- bluez-utils/pand/main.c	
-+++ bluez-utils/pand/main.c	
-@@ -182,6 +182,8 @@
- 	while (!terminate) {
- 		socklen_t alen = sizeof(l2a);
- 		int nsk;
-+                char this_netdev[16];
-+                
- 		nsk = accept(sk, (struct sockaddr *) &l2a, &alen);
- 		if (nsk < 0) {
- 			syslog(LOG_ERR, "Accept failed. %s(%d)", strerror(errno), errno);
-@@ -197,14 +199,14 @@
- 			close(nsk);
- 			continue;
- 		}
--
--		if (!bnep_accept_connection(nsk, role, netdev)) {
-+                strncpy(this_netdev, netdev, 16);
-+		if (!bnep_accept_connection(nsk, role, this_netdev)) {
- 			char str[40];
- 			ba2str(&l2a.l2_bdaddr, str);
- 
- 			syslog(LOG_INFO, "New connection from %s %s", str, netdev);
- 
--			run_devup(netdev, str, sk, nsk);
-+			run_devup(this_netdev, str, sk, nsk);
- 		} else {
- 			syslog(LOG_ERR, "Connection failed. %s(%d)",
- 					strerror(errno), errno);
-@@ -608,7 +610,7 @@
- 			break;
- 
- 		case 'e':
--			strcpy(netdev, optarg);
-+			strncpy(netdev, optarg, 16);
- 			break;
- 
- 		case 'n':
+Regards
+
+Marcel
+
 
 
 
