@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <bd72c4b0602151628v14d53ae7vab573412bb56d6c@mail.gmail.com>
-From: Gareth Bradley <gareth.bradley.nz@gmail.com>
+Subject: Re: [Bluez-devel] multiple connection problem
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_12046_11861357.1140049701223"
-Subject: [Bluez-devel] Slow connect time for devices
+In-Reply-To: <3ac394050602151127l1ec3a30bo7008905058cd8c6a@mail.gmail.com>
+References: <3ac394050602151127l1ec3a30bo7008905058cd8c6a@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1140031917.26072.103.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,92 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Feb 2006 12:28:21 -1200
+Date: Wed, 15 Feb 2006 20:31:57 +0100
 
-------=_Part_12046_11861357.1140049701223
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Irfan,
 
-Hello. I'm working on a project on a Intel XScale processor, connecting to
-bluetooth heart rate monitors and headsets. Connections currently have 7
-attempts to work, though leaving a debug flag on (which slows the handshake
-down) gets a near-instant connection. I would like to get the connections
-normal without slowing down the BT device after the connection is made.
+> I am working on a software for bluetooth scatternet formation and
+> routing. 
+> 
+> When I try to accept two connections from different BT devices, the
+> second device gives a page fault error.
 
-Any normal connection, regardless of whether there's an authorization
-segment, will fail (errors 104 & 110 - 'Connection timed out' and
-'Connection reset by peer') 7 times before connecting. It'll usually
-alternate between the two errors, and the 7 is fairly constant.
+what does "hciconfig hci0 version revision" tells you about your local
+Bluetooth devices?
 
-I have found that I can get the total connection time by reducing these two
-variables down to 2 seconds each. It still takes seven attempts. Once the
-first device is connected, any others will either be instant or have one
-timeout/reset.
+Regards
 
-(rfcomm.h)
-#define RFCOMM_CONN_TIMEOUT (HZ * 2)
-#define RFCOMM_DISC_TIMEOUT (HZ * 2)
+Marcel
 
-I later found that enabling a debug flag will give me instant connections
-(how I assume things should be), because it is slowing down the process. Th=
-e
-flag is HCI_CORE_DEBUG in bluetooth.h, which affects the fines hci_core.c,
-hci_conn.c and hci_event.c. I have isolated it to the hci_core.c file that
-needs to be slowed down.
 
-I can't, however, leave the prints on or a loop to slow it down or sleep, a=
-s
-the SCO voice connection becomes unusable with them on once it is connected=
-.
-
-Can someone please suggest an approach to targeting and slowing down the
-handshake and the not the resulting connection?
-
-gjb.
-
-------=_Part_12046_11861357.1140049701223
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hello. I'm working on a project on a Intel XScale processor, connecting
-to bluetooth heart rate monitors and headsets. Connections currently
-have 7 attempts to work, though leaving a debug flag on (which slows
-the handshake down) gets a near-instant connection. I would like to get
-the connections normal without slowing down the BT device after the
-connection is made.<br>
-<br>
-Any normal connection, regardless of whether there's an authorization
-segment, will fail (errors 104 &amp; 110 - 'Connection timed out' and
-'Connection reset by peer') 7 times before connecting. It'll usually
-alternate between the two errors, and the 7 is fairly constant.<br>
-<br>
-I have found that I can get the total connection time by reducing these
-two variables down to 2 seconds each. It still takes seven attempts.
-Once the first device is connected, any others will either be instant
-or have one timeout/reset.<br>
-<br>
-(rfcomm.h)<br>
-#define RFCOMM_CONN_TIMEOUT (HZ * 2)<br>
-#define RFCOMM_DISC_TIMEOUT (HZ * 2)<br>
-<br>
-I later found that enabling a debug flag will give me instant
-connections (how I assume things should be), because it is slowing down
-the process. The flag is HCI_CORE_DEBUG in bluetooth.h, which affects
-the fines hci_core.c, hci_conn.c and hci_event.c. I have isolated it to
-the hci_core.c file that needs to be slowed down.<br>
-<br>
-I can't, however, leave the prints on or a loop to slow it down or
-sleep, as the SCO voice connection becomes unusable with them on once
-it is connected.<br>
-<br>
-Can someone please suggest an approach to targeting and slowing down the ha=
-ndshake and the not the resulting connection?<br>
-<br>
-gjb.<br>
-
-------=_Part_12046_11861357.1140049701223--
 
 
 -------------------------------------------------------
