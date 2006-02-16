@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Belkin USB Adaptors and Failing hci_inquiry
+Subject: Re: [Bluez-devel] Slow connect time for devices
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <loom.20060216T015926-491@post.gmane.org>
-References: <loom.20060216T015926-491@post.gmane.org>
+In-Reply-To: <bd72c4b0602151628v14d53ae7vab573412bb56d6c@mail.gmail.com>
+References: <bd72c4b0602151628v14d53ae7vab573412bb56d6c@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1140070087.29234.13.camel@localhost>
+Message-Id: <1140070041.29234.11.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,57 +18,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 16 Feb 2006 07:08:07 +0100
+Date: Thu, 16 Feb 2006 07:07:21 +0100
 
-Hi Heba,
+Hi Gareth,
 
-> I am developing an application for automatic network discovery using bluetooth 
-> i.e. Running the application will result in connections to any other computers
-> running the same application:
->   - Each application is running a server which accepts connections (once a
->   connection is made, the connection is maintained until a transmission
->   error occcurs or the socket is closed by either party);
->   - and a client which repeatedly queries for bluetooth devices to connect to.
+> I'm working on a project on a Intel XScale processor, connecting to
+> bluetooth heart rate monitors and headsets. Connections currently have
+> 7 attempts to work, though leaving a debug flag on (which slows the
+> handshake down) gets a near-instant connection. I would like to get
+> the connections normal without slowing down the BT device after the
+> connection is made.
 > 
-> So in total an application makes and
-> maintains 2*(#other applications) connections.
->         
-> This causes no problems when using the Belkin F8T003 Bluetooth USB Adaptor
-> (this is a bluetooth v1.1 compliant device).
->         
-> However, when using the Belkin F8T009 Bluetooth USB Adaptor
-> (this is a bluetooth v1.2 compliant device)
-> "Device or Resource Busy" errors are observed
-> when the application tries to query
-> when there are 3 or more connections maintained by it.
+> Any normal connection, regardless of whether there's an authorization
+> segment, will fail (errors 104 & 110 - 'Connection timed out' and
+> 'Connection reset by peer') 7 times before connecting. It'll usually
+> alternate between the two errors, and the 7 is fairly constant.
 > 
-> Is this a bluetooth hardware issue,
-> a Bluez stack issue,
-> or does Bluez just not support this particular device??
->         
-> I have installed all the latest versions:
->   - Bluez-lib
->   - Bluez-hcidump
-> I am running Fedora core 4 with the latest available updates of the kernel.
+> I have found that I can get the total connection time by reducing
+> these two variables down to 2 seconds each. It still takes seven
+> attempts. Once the first device is connected, any others will either
+> be instant or have one timeout/reset.
 > 
-> I've used hcidump to try and figure it out, but all it tells me is:
->    HCI Command: Inquiry (0x01|0x0001) plen 5
->      lap 0x9e8b33 len 8 num 255
->    HCI Event: Command Status (0x0f) plen 4
->     Inquiry (0x01|0x0001) status 0x0c ncmd 1
->      Error: Command Disallowed
+> (rfcomm.h)
+> #define RFCOMM_CONN_TIMEOUT (HZ * 2)
+> #define RFCOMM_DISC_TIMEOUT (HZ * 2)
 > 
-> This really doesn't help me to understand why this is happening.
-> The status of that particular bluetooth device (a Belkin F8T003 Bluetooth USB 
-> bluetooth v1.1 compliant Adaptor) when the error occurs is as follows:
->    a local server socket is listening for connections
->    two remote clients are connected to the device
->    a local client thread is attempting to query other devices using hci_inquiry
+> I later found that enabling a debug flag will give me instant
+> connections (how I assume things should be), because it is slowing
+> down the process. The flag is HCI_CORE_DEBUG in bluetooth.h, which
+> affects the fines hci_core.c, hci_conn.c and hci_event.c. I have
+> isolated it to the hci_core.c file that needs to be slowed down.
 > 
-> Please advise if I am overlooking something, or if this is not a Bluez issue,
-> could you please direct me to the appropriate contact.
+> I can't, however, leave the prints on or a loop to slow it down or
+> sleep, as the SCO voice connection becomes unusable with them on once
+> it is connected.
+> 
+> Can someone please suggest an approach to targeting and slowing down
+> the handshake and the not the resulting connection?
 
-send in the "hciconfig -a" output for both devices.
+this looks like a hardware limitation. What kind of dongles/chips are
+you using?
 
 Regards
 
