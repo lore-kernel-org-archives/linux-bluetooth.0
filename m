@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3ac394050602160549v2e7b7ebds2690192c067e3b2c@mail.gmail.com>
-From: Irfan Ahmad <irfan.amd@gmail.com>
+Subject: Re: [Bluez-devel] Belkin USB Adaptors and Failing hci_inquiry
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_14342_13207942.1140097749686"
-Subject: [Bluez-devel] multiple connection problem
+In-Reply-To: <loom.20060216T015926-491@post.gmane.org>
+References: <loom.20060216T015926-491@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1140070087.29234.13.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,51 +18,63 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 16 Feb 2006 18:49:09 +0500
+Date: Thu, 16 Feb 2006 07:08:07 +0100
 
-------=_Part_14342_13207942.1140097749686
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Heba,
 
-Dear Marcel,
+> I am developing an application for automatic network discovery using bluetooth 
+> i.e. Running the application will result in connections to any other computers
+> running the same application:
+>   - Each application is running a server which accepts connections (once a
+>   connection is made, the connection is maintained until a transmission
+>   error occcurs or the socket is closed by either party);
+>   - and a client which repeatedly queries for bluetooth devices to connect to.
+> 
+> So in total an application makes and
+> maintains 2*(#other applications) connections.
+>         
+> This causes no problems when using the Belkin F8T003 Bluetooth USB Adaptor
+> (this is a bluetooth v1.1 compliant device).
+>         
+> However, when using the Belkin F8T009 Bluetooth USB Adaptor
+> (this is a bluetooth v1.2 compliant device)
+> "Device or Resource Busy" errors are observed
+> when the application tries to query
+> when there are 3 or more connections maintained by it.
+> 
+> Is this a bluetooth hardware issue,
+> a Bluez stack issue,
+> or does Bluez just not support this particular device??
+>         
+> I have installed all the latest versions:
+>   - Bluez-lib
+>   - Bluez-hcidump
+> I am running Fedora core 4 with the latest available updates of the kernel.
+> 
+> I've used hcidump to try and figure it out, but all it tells me is:
+>    HCI Command: Inquiry (0x01|0x0001) plen 5
+>      lap 0x9e8b33 len 8 num 255
+>    HCI Event: Command Status (0x0f) plen 4
+>     Inquiry (0x01|0x0001) status 0x0c ncmd 1
+>      Error: Command Disallowed
+> 
+> This really doesn't help me to understand why this is happening.
+> The status of that particular bluetooth device (a Belkin F8T003 Bluetooth USB 
+> bluetooth v1.1 compliant Adaptor) when the error occurs is as follows:
+>    a local server socket is listening for connections
+>    two remote clients are connected to the device
+>    a local client thread is attempting to query other devices using hci_inquiry
+> 
+> Please advise if I am overlooking something, or if this is not a Bluez issue,
+> could you please direct me to the appropriate contact.
 
-Thank you for ur feed back and help. I had stated in my previous mail that
-these dongles are working fine with other bluez functions/commands, but
-gives an error when a unit becomes slave of multiple masters. So is it just
-because of the hardware or it has some other reasons as well?
+send in the "hciconfig -a" output for both devices.
 
-Secondly I had a question about piconets. As slaves in piconet cannot
-directly communicate with each other and the master will act as a bridge fo=
-r
-their communication. Now is this bridging facility provided by bluez libs?
-or do we have to implement it in our program (using Berkley Socket
-Interface) meant for piconet communication?
+Regards
 
-Thanks
+Marcel
 
-------=_Part_14342_13207942.1140097749686
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-Dear Marcel,<br><br>Thank you for ur feed back and help. I had stated in my=
- previous mail that these dongles are working fine with other <span style=
-=3D"font-weight: bold;">bluez functions/commands</span>, but gives an error=
- when a unit becomes=20
-<span style=3D"font-weight: bold;">slave </span>of multiple <span style=3D"=
-font-weight: bold;">masters. </span>So is it just because of the hardware o=
-r it has some other reasons as well?<br><br>Secondly I had a question about=
- piconets. As slaves in piconet cannot directly communicate with each other=
- and the master will act as a=20
-<span style=3D"font-weight: bold;">bridge</span> for their communication. N=
-ow is this bridging facility provided by <span style=3D"font-weight: bold;"=
->bluez libs</span>? or do we have to implement it in our program (using Ber=
-kley Socket Interface) meant for=20
-<span style=3D"font-weight: bold;">piconet communication?  <br><br></span>T=
-hanks<br><br><br>
-
-------=_Part_14342_13207942.1140097749686--
 
 
 -------------------------------------------------------
