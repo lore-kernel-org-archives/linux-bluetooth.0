@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43F4BED6.5010802@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <3ac394050602160549v2e7b7ebds2690192c067e3b2c@mail.gmail.com>
+From: Irfan Ahmad <irfan.amd@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] snd-bt-sco and internal broadcom adapter
-References: <1140016859.5595.25.camel@localhost.localdomain>
-In-Reply-To: <1140016859.5595.25.camel@localhost.localdomain>
-Content-Type: text/plain; charset=ISO-8859-1
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_14342_13207942.1140097749686"
+Subject: [Bluez-devel] multiple connection problem
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,25 +17,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 16 Feb 2006 11:05:10 -0700
+Date: Thu, 16 Feb 2006 18:49:09 +0500
 
-Erik
+------=_Part_14342_13207942.1140097749686
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Thanks for the response. The patch is a proof of concept... I believe
-Marcel is cooking up a way for it to fit in more cleanly. Hopefully
-broadcom will work out of the box soon :)
+Dear Marcel,
 
-Brad
+Thank you for ur feed back and help. I had stated in my previous mail that
+these dongles are working fine with other bluez functions/commands, but
+gives an error when a unit becomes slave of multiple masters. So is it just
+because of the hardware or it has some other reasons as well?
 
-> I have a Lenovo x41 laptop with an internal bluetooth-adapter from
-> broadcom. Applying "patch to force sco mtu values" from the
-> bluetooth-alsa project page enabled me to use my Jabra BT205-headset.
-> Before applying the patch recording from the headset worked, but i could
-> not send any sound to it (hciconfig reported TX sco: 0).
-> 
-> Kernel used: 2.6.15.3
-> 
-> //Erik
+Secondly I had a question about piconets. As slaves in piconet cannot
+directly communicate with each other and the master will act as a bridge fo=
+r
+their communication. Now is this bridging facility provided by bluez libs?
+or do we have to implement it in our program (using Berkley Socket
+Interface) meant for piconet communication?
+
+Thanks
+
+------=_Part_14342_13207942.1140097749686
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Dear Marcel,<br><br>Thank you for ur feed back and help. I had stated in my=
+ previous mail that these dongles are working fine with other <span style=
+=3D"font-weight: bold;">bluez functions/commands</span>, but gives an error=
+ when a unit becomes=20
+<span style=3D"font-weight: bold;">slave </span>of multiple <span style=3D"=
+font-weight: bold;">masters. </span>So is it just because of the hardware o=
+r it has some other reasons as well?<br><br>Secondly I had a question about=
+ piconets. As slaves in piconet cannot directly communicate with each other=
+ and the master will act as a=20
+<span style=3D"font-weight: bold;">bridge</span> for their communication. N=
+ow is this bridging facility provided by <span style=3D"font-weight: bold;"=
+>bluez libs</span>? or do we have to implement it in our program (using Ber=
+kley Socket Interface) meant for=20
+<span style=3D"font-weight: bold;">piconet communication?  <br><br></span>T=
+hanks<br><br><br>
+
+------=_Part_14342_13207942.1140097749686--
 
 
 -------------------------------------------------------
