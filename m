@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0602170645o1875b413h641fb4f7af364613@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+Message-ID: <bd72c4b0602161927o48736a32haf0749102896e04b@mail.gmail.com>
+From: "Gareth Bradley" <gareth.bradley.nz@gmail.com>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20060217012201.74E3A13EE3@sc8-sf-spam2.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_7530_28874379.1140187532560"
-Subject: [Bluez-devel] [DBUS PATCH] main loop bug fix - remove watches
+Content-Type: multipart/alternative;
+	boundary="----=_Part_481_10818879.1140146872630"
+References: <20060217012201.74E3A13EE3@sc8-sf-spam2.sourceforge.net>
+Subject: [Bluez-devel] Re: Bluez-devel digest, Vol 1 #1908 - 6 msgs
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,131 +19,69 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 17 Feb 2006 12:45:32 -0200
+Date: Thu, 16 Feb 2006 15:27:52 -1200
 
-------=_Part_7530_28874379.1140187532560
+------=_Part_481_10818879.1140146872630
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Hi Marcel,
+> this looks like a hardware limitation. What kind of dongles/chips are
+> you using?
+>
+> Regards
+>
+> Marcel
+>
 
+I am using a rebranded dongle from DSE (our equivilent of Radio Shack). I
+have also tried it with an ePox DG-03. The former is described at
+http://www.dse.co.nz/cgi-bin/dse.storefront/43f536790af241f0273fc0a87f99074=
+2/Product/View/XH6881,
+on the off chance you are able to recognise its original manufacturer.
 
-Here is the patch to fix the problem I told you in the last e-mail.
-The g_io_remove_watch was wrong and I fixed some leaks too.
+I am beginning to have concerns about the 2.4.19 kernel we are using. Havin=
+g
+looked it up, it is the last release that Intrinsyc /Familiar released for
+our CerfCube255 board. There is also a 2.6.7, though it doesn't have USB
+support.
 
-Now we can handle the D-Bus Disconnect signal properly.
+Anyway, if someone can shed some light on the BT messages that are poassed
+through hci_conn.c that are unique to the handshake, I'm hoping I can clear
+up this problem of mine.
 
-Regards,
-Claudio.
+gjb.
 
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+------=_Part_481_10818879.1140146872630
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-------=_Part_7530_28874379.1140187532560
-Content-Type: text/x-patch; name=watches01.patch; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Attachment-Id: f_ejsfk2ju
-Content-Disposition: attachment; filename="watches01.patch"
+<br>
+<div><blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(=
+204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">this looks l=
+ike a hardware limitation. What kind of dongles/chips are<br>
+you using?<br><br>Regards<br><br>Marcel<br></blockquote></div><br>
+I am using a rebranded dongle from DSE (our equivilent of Radio Shack).
+I have also tried it with an ePox DG-03. The former is described at
+<a href=3D"http://www.dse.co.nz/cgi-bin/dse.storefront/43f536790af241f0273f=
+c0a87f990742/Product/View/XH6881">http://www.dse.co.nz/cgi-bin/dse.storefro=
+nt/43f536790af241f0273fc0a87f990742/Product/View/XH6881</a>
+, on the off chance you are able to recognise its original manufacturer.<br=
+>
+<br>
+I am beginning to have concerns about the 2.4.19 kernel we are using.
+Having looked it up, it is the last release that Intrinsyc /Familiar
+released for our CerfCube255 board. There is also a 2.6.7, though it
+doesn't have USB support.<br>
+<br>
+Anyway, if someone can shed some light on the BT messages that are
+poassed through hci_conn.c that are unique to the handshake, I'm hoping
+I can clear up this problem of mine.<br>
+<br>
+gjb.<br>
 
---- bluez-utils-cvs.orig/common/glib-ectomy.c	2006-02-16 09:17:41.000000000 -0200
-+++ bluez-utils-cvs-watches/common/glib-ectomy.c	2006-02-17 09:20:15.000000000 -0200
-@@ -92,7 +92,7 @@
- {
- 	struct watch *w, *p;
- 
--	for (p = &watch_head, w = watch_head.next; w; w = w->next)
-+	for (p = &watch_head, w = watch_head.next; w; p = w, w = w->next)
- 		if (w->id == id) {
- 			p->next = w->next;
- 			free (w);
-@@ -181,5 +181,12 @@
- 
- void g_main_loop_quit(GMainLoop *loop)
- {
-+	struct watch *w;
-+
- 	loop->bail = 1;
-+
-+	for (w = watch_head.next; w; w = w->next) {
-+		watch_head.next = w->next;
-+		free (w);
-+	}
- }
---- bluez-utils-cvs.orig/hcid/security.c	2006-02-16 09:17:41.000000000 -0200
-+++ bluez-utils-cvs-watches/hcid/security.c	2006-02-17 09:26:03.000000000 -0200
-@@ -51,7 +51,12 @@
- #include "hcid.h"
- #include "lib.h"
- 
--static GIOChannel *io_chan[HCI_MAX_DEV];
-+struct g_io_info {
-+	GIOChannel	*channel;
-+	int		watch_id;
-+};
-+static struct g_io_info io_data[HCI_MAX_DEV];
-+
- 
- static int pairing;
- 
-@@ -701,7 +706,7 @@
- 
- void start_security_manager(int hdev)
- {
--	GIOChannel *chan = io_chan[hdev];
-+	GIOChannel *chan = io_data[hdev].channel;
- 	struct hci_dev_info *di;
- 	struct hci_filter flt;
- 	read_stored_link_key_cp cp;
-@@ -761,10 +766,10 @@
- 	}
- 
- 	chan = g_io_channel_unix_new(dev);
--	g_io_add_watch(chan, G_IO_IN | G_IO_NVAL | G_IO_HUP | G_IO_ERR,
--			io_security_event, (void *) di);
-+	io_data[hdev].watch_id = g_io_add_watch(chan, G_IO_IN | G_IO_NVAL | G_IO_HUP | G_IO_ERR,
-+						io_security_event, (void *) di);
- 
--	io_chan[hdev] = chan;
-+	io_data[hdev].channel = chan;
- 
- 	if (hci_test_bit(HCI_RAW, &di->flags))
- 		return;
-@@ -778,7 +783,7 @@
- 
- void stop_security_manager(int hdev)
- {
--	GIOChannel *chan = io_chan[hdev];
-+	GIOChannel *chan = io_data[hdev].channel;
- 
- 	if (!chan)
- 		return;
-@@ -789,7 +794,9 @@
- 	   loop to call us right back with G_IO_NVAL set, at which
- 	   point we will see it and clean things up */
- 	close(g_io_channel_unix_get_fd(chan));
--	io_chan[hdev] = NULL;
-+	g_io_remove_watch(io_data[hdev].watch_id);
-+	io_data[hdev].watch_id = -1;
-+	io_data[hdev].channel = NULL;
- }
- 
- void init_security_data(void)
---- bluez-utils-cvs.orig/hcid/main.c	2006-02-16 09:17:41.000000000 -0200
-+++ bluez-utils-cvs-watches/hcid/main.c	2006-02-17 07:06:38.000000000 -0200
-@@ -666,6 +666,7 @@
- 	set_title("processing events");
- 
- 	ctl_io = g_io_channel_unix_new(hcid.sock);
-+
- 	g_io_add_watch(ctl_io, G_IO_IN, io_stack_event, NULL);
- 
- 	/* Start event processor */
-
-
-------=_Part_7530_28874379.1140187532560--
+------=_Part_481_10818879.1140146872630--
 
 
 -------------------------------------------------------
