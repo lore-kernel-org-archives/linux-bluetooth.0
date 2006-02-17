@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43F6C7E4.6060307@gmail.com>
-From: nix4me@gmail.com
+Message-ID: <43F62ECF.7040702@hasborg.com>
+From: Joshua Wright <jwright@hasborg.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Re: DBT-120
+Subject: Re: [Bluez-users] hcidump version 1.30 and DBT-120 version B-4
+References: <20060217195408.21336.qmail@web61223.mail.yahoo.com>
+In-Reply-To: <20060217195408.21336.qmail@web61223.mail.yahoo.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 18 Feb 2006 00:08:20 -0700
+Date: Fri, 17 Feb 2006 15:15:11 -0500
 
-Hi Marcell,
-I had someone with a OS X system, grab me the 
-"BluetoothFWUpdate1.2.dmg", but this doesn't seem to contain
-the "GenericCSR.dfu"?
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-Is it maybe an older  mac  fwupdate  I should be looking for?
-thank's again for your previous help with my "bluez and dbus" issue.
+Deva,
 
-Regard's
-Doug
+deva seetharam wrote:
+> i am trying to run hcidump to sniff bluetooth packets. for some
+> reason, hcidump doesn't produce any output eventhough the there is
+> plenty of bluetooth  traffic in the vicinity (i have verified it
+> using MAC OS bluetooth packet logger).
 
--- 
-----------------------------------------------------------
-The box said: "Requires Windows 98/2000/XP/NT, or better."
-So, I installed LINUX!
-----------------------------------------------------------
+hcidump is a local sniffer, it only is capable of sniffing local HCI
+messages.  Because Bluetooth is based on FHSS, sniffing traffic out of
+the air is a bit more challenging.
 
+The Frontline Test Equipment FTS4BT sniffer is designed to help
+developers troubleshoot Bluetooth applications and does give you the
+ability to sniff Bluetooth frames.  www.fte.com
+
+- -Josh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFD9i7PTS8i9jZYpL8RAoVSAKDT0wELkbN2ZHP+Ax1z3VH0163lIQCg6pEv
+/yB8S42w2/iQCS3y0ivj7h0=
+=i66O
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
