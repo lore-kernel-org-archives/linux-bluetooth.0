@@ -1,11 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0602171007p5c34580ahe93f1023694b68e5@mail.gmail.com>
-From: Claudio Takahasi <cktakahasi@gmail.com>
+Subject: Re: [Bluez-devel] [DBUS PATCH] scan mode timeout
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_356_9788531.1140199641830"
-Subject: [Bluez-devel] [DBUS PATCH] BondingCreated && BondingFailed
+In-Reply-To: <e1effdeb0602170948g37751aaeg7784484f5564eef2@mail.gmail.com>
+References: <e1effdeb0602150611s60763bb4u6362fd401cafd4ba@mail.gmail.com>
+	 <1140013222.26072.80.camel@localhost>
+	 <e1effdeb0602150831j55ae6d68p856bbc3761ecab00@mail.gmail.com>
+	 <e1effdeb0602150918y7b8ce5a8xe0cad1c72aa53a5e@mail.gmail.com>
+	 <1140025571.26072.94.camel@localhost>
+	 <e1effdeb0602161041i14382295l2eda08be4a515e3d@mail.gmail.com>
+	 <e1effdeb0602170948g37751aaeg7784484f5564eef2@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1140199094.4850.46.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,63 +24,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 17 Feb 2006 16:07:21 -0200
+Date: Fri, 17 Feb 2006 18:58:14 +0100
 
-------=_Part_356_9788531.1140199641830
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Claudio,
 
-Hi Marcel,
+> Here is a patch to fix a small bug that skipped :)
+> I was not able to check this because the patch to fix the remove watch
+>  was required. When I sent the patch(timeout03.patch) the solution for
+> fix the remove watch function was not ready.
+> 
+> This patch fix the following bug:
+> With the hcid running restart the dbus-daemon before the discoverable
+> timeout expires. When the dbus-daemon is restarted the paths are
+> registered again, thefore the dbus_data stored in the path is
+> overwritten and the handler_timeout pointer becomes NULL.
+> The side-effect is turn off the timer and the discoverable mode will
+> be changed to connectable mode!
 
-Here is another small patch...
+the patch is in the CVS now. Thanks.
 
-According with the BlueZ D-Bus API the bonding result must be sent
-using the BondingCreated and BondingFailed signals.
+Regards
 
-In the current code, the bonding result the status is added in the
-signal argument.
-
-The next step is start the development of the missing bonding
-services: RemoveBonding, HasBonding and ListBonding.
-
-
-Regards,
-Claudio.
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
-
-------=_Part_356_9788531.1140199641830
-Content-Type: text/x-patch; name=bonding01.patch; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Attachment-Id: f_ejsmt89e
-Content-Disposition: attachment; filename="bonding01.patch"
-
---- bluez-utils-cvs.orig/hcid/dbus.c	2006-02-17 11:31:06.000000000 -0200
-+++ bluez-utils-cvs-bonding/hcid/dbus.c	2006-02-17 12:57:18.000000000 -0200
-@@ -457,16 +457,14 @@
- 	snprintf(path, sizeof(path), "%s/hci%d", DEVICE_PATH, id);
- 
- 	message = dbus_message_new_signal(path, DEVICE_INTERFACE,
--						DEV_SIG_BONDING_CREATED);
-+						(!status?DEV_SIG_BONDING_CREATED:DEV_SIG_BONDING_FAILED));
- 	if (message == NULL) {
- 		syslog(LOG_ERR, "Can't allocate D-BUS remote name message");
- 		goto failed;
- 	}
- 
--	/*FIXME: create the signal based on status value - BondingCreated or BondingFailed*/
- 	dbus_message_append_args(message,
- 					DBUS_TYPE_STRING, &peer_addr,
--					DBUS_TYPE_BYTE, &status,
- 					DBUS_TYPE_INVALID);
- 
- 	if (dbus_connection_send(connection, message, NULL) == FALSE) {
+Marcel
 
 
-------=_Part_356_9788531.1140199641830--
 
 
 -------------------------------------------------------
