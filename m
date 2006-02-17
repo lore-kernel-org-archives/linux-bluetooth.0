@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <fd77e5b50602170747t3a53819bpb9401203b972a804@mail.gmail.com>
-From: Asif Khan <asifkhan.sb@gmail.com>
+Subject: Re: [Bluez-devel] [DBUS PATCH] main loop bug fix - remove watches
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_13124_1843793.1140191226780"
-Subject: [Bluez-devel] Any large scale Scatternet implemented yet!!
+In-Reply-To: <e1effdeb0602170645o1875b413h641fb4f7af364613@mail.gmail.com>
+References: <e1effdeb0602170645o1875b413h641fb4f7af364613@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1140189720.4850.0.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,55 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 17 Feb 2006 20:47:06 +0500
+Date: Fri, 17 Feb 2006 16:22:00 +0100
 
-------=_Part_13124_1843793.1140191226780
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Claudio,
 
-Hello All!
-              Is there any practical large scale scatternet implemented yet=
-.
-I mean hundreds of topologies are suggested in research papers and also
-simulations tested but I dont think such a scatternet is ever developed yet=
-.
-Because switching b/w so many piconets is yet not attained. I would love to
-hear if I m wrong.
+> Here is the patch to fix the problem I told you in the last e-mail.
+> The g_io_remove_watch was wrong and I fixed some leaks too.
+> 
+> Now we can handle the D-Bus Disconnect signal properly.
 
-Let say 1.Piconet is with master m1 and slaves a,b,c         and there is
-another piconet with master M2 and slaves X,Y,Z . Now, is it possible to
-form a streaming connection between a and Z???? (I guess the problem in thi=
-s
-would be that one unit would have to act as bridge node and switch from one
-piconet to the second piconet for delivering each packet which I dont think
-any node will be able to do!!)
--Asif
+both patches are applied to the CVS. Thanks.
 
-------=_Part_13124_1843793.1140191226780
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Regards
 
-Hello All!<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;
-Is there any practical large scale scatternet implemented yet. I mean
-hundreds of topologies are suggested in research papers and also
-simulations tested but I dont think such a scatternet is ever developed
-yet. Because switching b/w so many piconets is yet not attained. I
-would love to hear if I m wrong.<br>
-<br>
-Let say 1.Piconet is with master m1 and slaves
-a,b,c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and there is
-another piconet with master M2 and slaves X,Y,Z . Now, is it possible
-to form a streaming connection between a and Z???? (I guess the problem
-in this would be that one unit would have to act as bridge node and
-switch from one piconet to the second piconet for delivering each
-packet which I dont think any node will be able to do!!)<br>
--Asif<br>
+Marcel
 
-------=_Part_13124_1843793.1140191226780--
+
 
 
 -------------------------------------------------------
