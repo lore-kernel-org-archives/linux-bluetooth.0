@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [DBUS PATCH] BondingCreated && BondingFailed
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-From: Vikulov Yuriy <vikulov@rscenter.ru>
-Message-ID: <loom.20060219T145816-98@post.gmane.org>
+In-Reply-To: <e1effdeb0602171007p5c34580ahe93f1023694b68e5@mail.gmail.com>
+References: <e1effdeb0602171007p5c34580ahe93f1023694b68e5@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1140201999.4747.16.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Multiply connections to different phones via different dongles at same time
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,21 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 19 Feb 2006 14:10:03 +0000 (UTC)
+Date: Fri, 17 Feb 2006 19:46:39 +0100
 
-Hello everybody! 
- 
-I have problem.  
-I can't create more than one connection to different phones. 
-It means that I create rfcomm connection to one phone and no more to others. 
-I'm using forks. I can find all devices, all phones and needed rfcomm channel 
-May be someone can help me and give me a piece of source code for solving my 
-problem? or give me some advices? 
- 
-Thanks for reading and answers 
- 
-P.S. 
-Sorry for my english 
+Hi Claudio,
+
+> Here is another small patch...
+> 
+> According with the BlueZ D-Bus API the bonding result must be sent
+> using the BondingCreated and BondingFailed signals.
+> 
+> In the current code, the bonding result the status is added in the
+> signal argument.
+
+do something like
+
+signal = status ? DEV_SIG_BONDING_CREATED : DEV_SIG_BONDING_FAILED;
+
+and then call it with dbus_message_new_signal(..., signal).
+
+This end up in cleaner code and is easier to understand later.
+
+> The next step is start the development of the missing bonding
+> services: RemoveBonding, HasBonding and ListBonding.
+
+The textfile library should have all stuff for it all ready. So it
+should be really easy to add.
+
+Regards
+
+Marcel
+
 
 
 
