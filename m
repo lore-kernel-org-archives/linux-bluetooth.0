@@ -1,5 +1,5 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43F6D873.6030105@gmail.com>
+Message-ID: <43F6C7E4.6060307@gmail.com>
 From: nix4me@gmail.com
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
@@ -16,19 +16,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 18 Feb 2006 01:18:59 -0700
+Date: Sat, 18 Feb 2006 00:08:20 -0700
 
-Marcel,
-I responded too quickly with my last message. Shortly there after, 
-someone else from my LUG mailing
-list, was able to extract the "GenericSCR.dfu" from the mac file with 
-the pacifist app I guess.
+Hi Marcell,
+I had someone with a OS X system, grab me the 
+"BluetoothFWUpdate1.2.dmg", but this doesn't seem to contain
+the "GenericCSR.dfu"?
 
-Anyway, I now have the required file. Could you possibly give me any 
-pointer's on flashing this dongle?
+Is it maybe an older  mac  fwupdate  I should be looking for?
+thank's again for your previous help with my "bluez and dbus" issue.
 
 Regard's
-Doug Chalmers
+Doug
 
 -- 
 ----------------------------------------------------------
