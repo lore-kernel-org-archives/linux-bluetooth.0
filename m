@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] (no subject)
-From: Fredy P <digitalfredy@debiancolombia.org>
+Subject: Re: [Bluez-users] how using stereo-headset with suse 9.3
+From: Johannes Kapune <listen@kapune.de>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200602182237.43269.annaeus@gmx.de>
-References: <200602182237.43269.annaeus@gmx.de>
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1140330636.3799.1.camel@PINGU>
+In-Reply-To: <43F10BA8.8090900@xmission.com>
+References: <1139849894.9628.16.camel@johannes_01.kapune.local>
+	 <43F10BA8.8090900@xmission.com>
+Content-Type: text/plain
+Message-Id: <1140301773.7451.2.camel@johannes_01.kapune.local>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,31 +19,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 19 Feb 2006 01:30:29 -0500
+Date: Sat, 18 Feb 2006 23:29:33 +0100
 
-El s=E1b, 18-02-2006 a las 22:37 +0100, Florian Schmid escribi=F3:
+Hello,
+Am Montag, den 13.02.2006, 15:43 -0700 schrieb Brad Midgley:
+> Johannes
+> 
+> > My question: I want to hear some music with this headphone. Do I need
+> > the complete bluetooth-alsa-project
+> 
+> you don't need the kernel modules under kernel/ but you will need
+> everything else.
+> 
+> > Does suse 9.3 support something I want to do?
+> > What is the minimum I need for this?
+> 
+> probably. check the build document at bluetooth-alsa.sf.net for the
+> specifics.
 
-please write a subject for your messages
-> At least I was succesfull with Pairing, by using the KDE BT Manager.
->=20
-> But now I`m having th following Problem:
-> When I play a soundfile in xmms und I want to stream the Output to the=20
-> Headset, I get the following Error:
->=20
-> btsco -v 00:14:41:00:10:54
-> btsco v0.41
-> Device is 1:0
-> Voice setting: 0x0060
-> RFCOMM channel 1 connected
-> Using interface hci0
-> speaker volume: 12 mic volume: 0
-> i/o needed: connecting sco...
-> Can't connect SCO audio channel
-> : Device or resource busy
->=20
-> Maybe, that someone had the same error und solved it succesful?
->=20
-> Thanks.
+excuse me please, maybe I'm a little blind but can you specify the path
+of the document please.
+
+Thanks
+Johannes
 
 
 
