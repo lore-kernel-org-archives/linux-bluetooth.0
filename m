@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] how using stereo-headset with suse 9.3
-From: Johannes Kapune <listen@kapune.de>
+From: Florian Schmid <annaeus@gmx.de>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43F10BA8.8090900@xmission.com>
-References: <1139849894.9628.16.camel@johannes_01.kapune.local>
-	 <43F10BA8.8090900@xmission.com>
-Content-Type: text/plain
-Message-Id: <1140301773.7451.2.camel@johannes_01.kapune.local>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart1770692.K8JbSIl5xl";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <200602182237.43269.annaeus@gmx.de>
+Subject: [Bluez-users] (no subject)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,30 +19,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 18 Feb 2006 23:29:33 +0100
+Date: Sat, 18 Feb 2006 22:37:25 +0100
 
-Hello,
-Am Montag, den 13.02.2006, 15:43 -0700 schrieb Brad Midgley:
-> Johannes
-> 
-> > My question: I want to hear some music with this headphone. Do I need
-> > the complete bluetooth-alsa-project
-> 
-> you don't need the kernel modules under kernel/ but you will need
-> everything else.
-> 
-> > Does suse 9.3 support something I want to do?
-> > What is the minimum I need for this?
-> 
-> probably. check the build document at bluetooth-alsa.sf.net for the
-> specifics.
+--nextPart1770692.K8JbSIl5xl
+Content-Type: text/plain;
+  charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-excuse me please, maybe I'm a little blind but can you specify the path
-of the document please.
+At least I was succesfull with Pairing, by using the KDE BT Manager.
 
-Thanks
-Johannes
+But now I`m having th following Problem:
+When I play a soundfile in xmms und I want to stream the Output to the=20
+Headset, I get the following Error:
 
+btsco -v 00:14:41:00:10:54
+btsco v0.41
+Device is 1:0
+Voice setting: 0x0060
+RFCOMM channel 1 connected
+Using interface hci0
+speaker volume: 12 mic volume: 0
+i/o needed: connecting sco...
+Can't connect SCO audio channel
+: Device or resource busy
+
+Maybe, that someone had the same error und solved it succesful?
+
+Thanks.
+
+--nextPart1770692.K8JbSIl5xl
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQBD95OnX/3fbLg4U5MRAtTPAJ9pCHady4xaDitsSnspnDeaf2/baACeMtTr
++aNVsqx1MoOsDCmmBQ2J/rw=
+=PkHj
+-----END PGP SIGNATURE-----
+
+--nextPart1770692.K8JbSIl5xl--
 
 
 -------------------------------------------------------
