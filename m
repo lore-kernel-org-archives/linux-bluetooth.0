@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Florian Schmid <annaeus@gmx.de>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <43F7EC6D.8060003@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart5570790.dIUFOPZIBn";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Message-Id: <200602191048.03448.annaeus@gmx.de>
-Subject: [Bluez-users] Sucessfully paired and used Broadcom BT-Dongle an BTH-100 Headset
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] how using stereo-headset with suse 9.3
+References: <1139849894.9628.16.camel@johannes_01.kapune.local>	 <43F10BA8.8090900@xmission.com> <1140301773.7451.2.camel@johannes_01.kapune.local>
+In-Reply-To: <1140301773.7451.2.camel@johannes_01.kapune.local>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,52 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 19 Feb 2006 10:47:52 +0100
+Date: Sat, 18 Feb 2006 20:56:29 -0700
 
---nextPart5570790.dIUFOPZIBn
-Content-Type: text/plain;
-  charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Johannes
 
-Hi,
-at least got it.
-By applying this patch http://bluetooth-alsa.sourceforge.net/sco-mtu.patch =
-to=20
-Kernelsourcews 2.6.12, I was able to change=20
+>>probably. check the build document at bluetooth-alsa.sf.net for the
+>>specifics.
+> 
+> 
+> excuse me please, maybe I'm a little blind but can you specify the path
+> of the document please.
 
-hciconfig hci0 revision
-hci0: =C2=A0 Type: USB
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 BD Address: 00:0B:0D:4A:53:0F ACL MTU: 1017:8 S=
-CO MTU: 64:0
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 Firmware 8285.65 / 33
+http://bluetooth-alsa.sf.net/
 
-into:
+there's still a lot of overlap between btsco and a2dp docs. I'll be
+separating these out before long.
 
-hciconfig hci0 revision
-hci0: =C2=A0 Type: USB
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 BD Address: 00:0B:0D:4A:53:0F ACL MTU: 1017:8 S=
-CO MTU: 64:8
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 Firmware 8285.65 / 33
-
-and also to hear sound by using xmms. (But I had to btsco -v 00:00:00:00:00=
-=20
-about three times, before a connection was established.)
-
-Hope this helps somebody.
-
---nextPart5570790.dIUFOPZIBn
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQBD+D7TX/3fbLg4U5MRAjEGAKCT4zIae3iulgToIcDO7NuGmnd+KQCgoJPC
-m/GJUM5UBRRBiEdMLkno5dw=
-=kbvI
------END PGP SIGNATURE-----
-
---nextPart5570790.dIUFOPZIBn--
+Brad
 
 
 -------------------------------------------------------
