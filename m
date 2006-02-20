@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0602201044v32058889w46985145313b81ba@mail.gmail.com>
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
+Message-ID: <ef9938ec0602200818i38950849pbde9c9ed404590e6@mail.gmail.com>
+From: "Albert Huang" <ashuang@gmail.com>
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] sdp_record_register()
+In-Reply-To: <26872589.1140424746785.JavaMail.tomcat@pne-ps5-sn2>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_9152_10714551.1140461058718"
-Subject: [Bluez-devel] [DBUS PATCH] HasBonding
+Content-Type: multipart/alternative;
+	boundary="----=_Part_7972_8881066.1140452313537"
+References: <26872589.1140424746785.JavaMail.tomcat@pne-ps5-sn2>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,108 +19,62 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 20 Feb 2006 15:44:18 -0300
+Date: Mon, 20 Feb 2006 11:18:33 -0500
 
-------=_Part_9152_10714551.1140461058718
+------=_Part_7972_8881066.1140452313537
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Hi Marcel,
+> I found following thing in sdp_record_register():
+> The comment in source code tells that the function returns non-null
+> pointer on
+> success and -1 on failure. I have investigated the code and found out tha=
+t
+> the
+> function returns only 0 or -1:
 
-Here is the patch to check if there is a link key available for a remote de=
-vice.
-Do you have suggestions/comments?
 
-Regards,
-Claudio.
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+what version of bluez are you using?  The latest versions don't say this, i=
+n
+either sdp.h or sdp_lib.h
 
-------=_Part_9152_10714551.1140461058718
-Content-Type: text/x-patch; name=has-bonding01.patch; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Attachment-Id: f_ejwygjfw
-Content-Disposition: attachment; filename="has-bonding01.patch"
+There are two return commands in the function: return -1; and return status=
+;
+> and for status: status=3D-1; and status =3D sdp_send_req_w4_rsp(...); In
+> sdp_send_req_w4_rsp() there is three times return -1; and one return 0;
+> So, is the return value zero success here?
+>
 
---- bluez-utils-cvs.orig/hcid/hcid.h	2006-02-12 03:49:17.000000000 -0200
-+++ bluez-utils-cvs-has-bonding/hcid/hcid.h	2006-02-20 12:38:29.000000000 -0300
-@@ -154,6 +154,7 @@
- int stop_device(uint16_t dev_id);
- 
- int get_device_address(uint16_t dev_id, char *address, size_t size);
-+int get_device_bluetooth_address(uint16_t dev_id, bdaddr_t *ba);
- int get_device_version(uint16_t dev_id, char *version, size_t size);
- int get_device_revision(uint16_t dev_id, char *revision, size_t size);
- int get_device_manufacturer(uint16_t dev_id, char *manufacturer, size_t size);
---- bluez-utils-cvs.orig/hcid/device.c	2006-02-12 04:33:18.000000000 -0200
-+++ bluez-utils-cvs-has-bonding/hcid/device.c	2006-02-20 12:38:06.000000000 -0300
-@@ -227,6 +227,19 @@
- 	return ba2str(&dev->bdaddr, address);
- }
- 
-+int get_device_bluetooth_address(uint16_t dev_id, bdaddr_t *ba)
-+{
-+	struct hci_dev *dev;
-+
-+	ASSERT_DEV_ID;
-+
-+	dev = &devices[dev_id];
-+
-+	memcpy(ba, &dev->bdaddr, sizeof(dev->bdaddr));
-+
-+	return 0;
-+}
-+
- int get_device_version(uint16_t dev_id, char *version, size_t size)
- {
- 	struct hci_dev *dev;
---- bluez-utils-cvs.orig/hcid/dbus-device.c	2006-02-15 15:44:38.000000000 -0200
-+++ bluez-utils-cvs-has-bonding/hcid/dbus-device.c	2006-02-20 12:37:40.000000000 -0300
-@@ -735,8 +735,37 @@
- 
- static DBusMessage* handle_dev_has_bonding_req(DBusMessage *msg, void *data)
- {
--	/*FIXME: */
--	return bluez_new_failure_msg(msg, BLUEZ_EDBUS_NOT_IMPLEMENTED);
-+	unsigned char key[16];
-+	struct hci_dbus_data *dbus_data = data;
-+	DBusMessage *reply = NULL;
-+	const char *str_bdaddr;
-+	bdaddr_t dba;
-+	bdaddr_t sba;
-+	dbus_bool_t result = FALSE;
-+
-+	dbus_message_get_args(msg, NULL,
-+			      DBUS_TYPE_STRING, &str_bdaddr,
-+			      DBUS_TYPE_INVALID);
-+
-+	/* basic arguments validation */
-+	if (!str_bdaddr || strlen(str_bdaddr) != 17)
-+		return bluez_new_failure_msg(msg, BLUEZ_EDBUS_WRONG_PARAM);
-+
-+	str2ba(str_bdaddr, &dba);
-+
-+	/* get the local Bluetooth Address */
-+	get_device_bluetooth_address(dbus_data->dev_id, &sba);
-+
-+	/* check if there is a link key associated to the remote device */
-+	if(!read_link_key(&sba, &dba, key))
-+		result = TRUE;
-+
-+	reply = dbus_message_new_method_return(msg);
-+
-+	dbus_message_append_args(reply, DBUS_TYPE_BOOLEAN, &result,
-+					DBUS_TYPE_INVALID);
-+
-+	return reply;
- }
- 
- static DBusMessage* handle_dev_remove_bonding_req(DBusMessage *msg, void *data)
+yes.
 
-------=_Part_9152_10714551.1140461058718--
+-albert
+
+------=_Part_7972_8881066.1140452313537
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+<br>
+<div><blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(=
+204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">I found foll=
+owing thing in sdp_record_register():<br>
+The comment in source code tells that the function returns non-null pointer=
+ on<br>success and -1 on failure. I have investigated the code and found ou=
+t that the<br>function returns only 0 or -1:</blockquote><div><br>
+what version of bluez are you using?&nbsp; The latest versions don't say th=
+is, in either sdp.h or sdp_lib.h<br>
+</div><br><blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid=
+ rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">There a=
+re two return commands in the function: return -1; and return status;<br>an=
+d for status: status=3D-1; and status =3D sdp_send_req_w4_rsp(...); In
+<br>sdp_send_req_w4_rsp() there is three times return -1; and one return 0;=
+<br>So, is the return value zero success here?<br></blockquote></div><br>
+yes.&nbsp; <br>
+<br>
+-albert<br>
+
+------=_Part_7972_8881066.1140452313537--
 
 
 -------------------------------------------------------
