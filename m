@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <24211728.1140452481530.JavaMail.www@wwinf1613>
-From: Isabelle Ravot <isabelle.ravot@wanadoo.fr>
+Subject: Re: [Bluez-devel] [DBUS PATCH] BondingCreated && BondingFailed
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb0602200558l7946fa17ubdb3042e5014dc9e@mail.gmail.com>
+References: <e1effdeb0602171007p5c34580ahe93f1023694b68e5@mail.gmail.com>
+	 <1140201999.4747.16.camel@aeonflux.holtmann.net>
+	 <e1effdeb0602200558l7946fa17ubdb3042e5014dc9e@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1140444617.7047.21.camel@localhost>
 Mime-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_154847_23691384.1140452481509"
-Subject: [Bluez-devel] Sim Access Profile
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,25 +20,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 20 Feb 2006 17:21:21 +0100 (CET)
+Date: Mon, 20 Feb 2006 15:10:17 +0100
 
-------=_Part_154847_23691384.1140452481509
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Hi Claudio,
 
-Hi all,
-Does an implementation of the Sim Acces profile for the BlueZ stack already exists?
-Many thanks in advance for your answer,
-Isabelle
-------=_Part_154847_23691384.1140452481509
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+> > signal = status ? DEV_SIG_BONDING_CREATED : DEV_SIG_BONDING_FAILED;
+> >
+> > and then call it with dbus_message_new_signal(..., signal).
+> >
+> > This end up in cleaner code and is easier to understand later.
+> 
+> Modification done!
 
-<P>Hi all,</P>
-<P>Does an implementation of the Sim Acces profile for the BlueZ stack already exists?</P>
-<P>Many thanks in advance for your answer,</P>
-<P>Isabelle</P>
-------=_Part_154847_23691384.1140452481509--
+and patch is applied to the CVS.
+
+> > > The next step is start the development of the missing bonding
+> > > services: RemoveBonding, HasBonding and ListBonding.
+> >
+> > The textfile library should have all stuff for it all ready. So it
+> > should be really easy to add.
+> 
+> I've never checked the textfile functions. I will try understand the
+> implemented functions and send you new patches soon.
+
+Take a look at the GetAlias function. This will give you a nice example
+on how easy this will be.
+
+Regards
+
+Marcel
 
 
 
