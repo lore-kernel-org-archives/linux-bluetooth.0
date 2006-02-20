@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0602201155u3b3177b6w7c057368d542119b@mail.gmail.com>
+Message-ID: <e1effdeb0602201044v32058889w46985145313b81ba@mail.gmail.com>
 From: "Claudio Takahasi" <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_Part_10408_8971999.1140465342741"
-Subject: [Bluez-devel] [DBUS PATCH] ListBondings
+	boundary="----=_Part_9152_10714551.1140461058718"
+Subject: [Bluez-devel] [DBUS PATCH] HasBonding
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,17 +17,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 20 Feb 2006 16:55:42 -0300
+Date: Mon, 20 Feb 2006 15:44:18 -0300
 
-------=_Part_10408_8971999.1140465342741
+------=_Part_9152_10714551.1140461058718
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
 Hi Marcel,
 
-This is the patch to list bonded devices.
-
+Here is the patch to check if there is a link key available for a remote de=
+vice.
 Do you have suggestions/comments?
 
 Regards,
@@ -37,65 +37,88 @@ Claudio.
 Claudio Takahasi
 Instituto Nokia de Tecnologia - INdT
 
-------=_Part_10408_8971999.1140465342741
-Content-Type: text/x-patch; name=list-bondings01.patch; charset=us-ascii
+------=_Part_9152_10714551.1140461058718
+Content-Type: text/x-patch; name=has-bonding01.patch; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-X-Attachment-Id: f_ejx0zejk
-Content-Disposition: attachment; filename="list-bondings01.patch"
+X-Attachment-Id: f_ejwygjfw
+Content-Disposition: attachment; filename="has-bonding01.patch"
 
---- bluez-utils-cvs.orig/hcid/dbus-device.c	2006-02-15 15:44:38.000000000 -0200
-+++ bluez-utils-cvs-list-bondings/hcid/dbus-device.c	2006-02-20 13:46:54.000000000 -0300
-@@ -41,6 +41,15 @@
+--- bluez-utils-cvs.orig/hcid/hcid.h	2006-02-12 03:49:17.000000000 -0200
++++ bluez-utils-cvs-has-bonding/hcid/hcid.h	2006-02-20 12:38:29.000000000 -0300
+@@ -154,6 +154,7 @@
+ int stop_device(uint16_t dev_id);
  
- #include "textfile.h"
+ int get_device_address(uint16_t dev_id, char *address, size_t size);
++int get_device_bluetooth_address(uint16_t dev_id, bdaddr_t *ba);
+ int get_device_version(uint16_t dev_id, char *version, size_t size);
+ int get_device_revision(uint16_t dev_id, char *revision, size_t size);
+ int get_device_manufacturer(uint16_t dev_id, char *manufacturer, size_t size);
+--- bluez-utils-cvs.orig/hcid/device.c	2006-02-12 04:33:18.000000000 -0200
++++ bluez-utils-cvs-has-bonding/hcid/device.c	2006-02-20 12:38:06.000000000 -0300
+@@ -227,6 +227,19 @@
+ 	return ba2str(&dev->bdaddr, address);
+ }
  
-+
-+static void append_bonding_devices(char *key, char *value, void *data)
++int get_device_bluetooth_address(uint16_t dev_id, bdaddr_t *ba)
 +{
-+	DBusMessageIter *iter = data;
++	struct hci_dev *dev;
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &key);
++	ASSERT_DEV_ID;
 +
++	dev = &devices[dev_id];
++
++	memcpy(ba, &dev->bdaddr, sizeof(dev->bdaddr));
++
++	return 0;
 +}
 +
- static char *get_peer_name(const bdaddr_t *local, const bdaddr_t *peer)
+ int get_device_version(uint16_t dev_id, char *version, size_t size)
  {
- 	char filename[PATH_MAX + 1], addr[18];
-@@ -729,8 +738,30 @@
+ 	struct hci_dev *dev;
+--- bluez-utils-cvs.orig/hcid/dbus-device.c	2006-02-15 15:44:38.000000000 -0200
++++ bluez-utils-cvs-has-bonding/hcid/dbus-device.c	2006-02-20 12:37:40.000000000 -0300
+@@ -735,8 +735,37 @@
  
- static DBusMessage* handle_dev_list_bondings_req(DBusMessage *msg, void *data)
+ static DBusMessage* handle_dev_has_bonding_req(DBusMessage *msg, void *data)
  {
 -	/*FIXME: */
 -	return bluez_new_failure_msg(msg, BLUEZ_EDBUS_NOT_IMPLEMENTED);
-+	char filename[PATH_MAX + 1];
++	unsigned char key[16];
 +	struct hci_dbus_data *dbus_data = data;
-+	DBusMessage *reply;
-+	DBusMessageIter iter;
-+	DBusMessageIter array_iter;
-+	char addr[18];
++	DBusMessage *reply = NULL;
++	const char *str_bdaddr;
++	bdaddr_t dba;
++	bdaddr_t sba;
++	dbus_bool_t result = FALSE;
 +
-+	get_device_address(dbus_data->dev_id, addr, sizeof(addr));
++	dbus_message_get_args(msg, NULL,
++			      DBUS_TYPE_STRING, &str_bdaddr,
++			      DBUS_TYPE_INVALID);
 +
-+	snprintf(filename, PATH_MAX, "%s/%s/linkkeys", STORAGEDIR, addr);
++	/* basic arguments validation */
++	if (!str_bdaddr || strlen(str_bdaddr) != 17)
++		return bluez_new_failure_msg(msg, BLUEZ_EDBUS_WRONG_PARAM);
++
++	str2ba(str_bdaddr, &dba);
++
++	/* get the local Bluetooth Address */
++	get_device_bluetooth_address(dbus_data->dev_id, &sba);
++
++	/* check if there is a link key associated to the remote device */
++	if(!read_link_key(&sba, &dba, key))
++		result = TRUE;
 +
 +	reply = dbus_message_new_method_return(msg);
 +
-+	dbus_message_iter_init_append(reply, &iter);
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-+						DBUS_TYPE_STRING_AS_STRING, &array_iter);
-+
-+
-+	textfile_foreach(filename, &append_bonding_devices, &array_iter);
-+
-+	dbus_message_iter_close_container(&iter, &array_iter);
++	dbus_message_append_args(reply, DBUS_TYPE_BOOLEAN, &result,
++					DBUS_TYPE_INVALID);
 +
 +	return reply;
-+
  }
  
- static DBusMessage* handle_dev_has_bonding_req(DBusMessage *msg, void *data)
+ static DBusMessage* handle_dev_remove_bonding_req(DBusMessage *msg, void *data)
 
-------=_Part_10408_8971999.1140465342741--
+------=_Part_9152_10714551.1140461058718--
 
 
 -------------------------------------------------------
