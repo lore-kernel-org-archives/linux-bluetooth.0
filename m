@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Problems with USB 2.0 hub and ehci_usb/hci_usb
+Subject: Re: [Bluez-devel] Sim Access Profile
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <43F99D99.1030007@service2media.com>
-References: <43F99D99.1030007@service2media.com>
+In-Reply-To: <24211728.1140452481530.JavaMail.www@wwinf1613>
+References: <24211728.1140452481530.JavaMail.www@wwinf1613>
 Content-Type: text/plain
-Message-Id: <1140467939.7047.46.camel@localhost>
+Message-Id: <1140467871.7047.44.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,26 +18,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 20 Feb 2006 21:38:59 +0100
+Date: Mon, 20 Feb 2006 21:37:51 +0100
 
-Hi Herman,
+Hi Isabelle,
 
-> I hope one of you can help me... I am trying to use a USB 2.0 bluetooth 
-> dongle (Belkin F8T012) through a USB 2.0 hub. The problem I have is that 
-> whenever I insert the BT dongle the kernel reports the following error:
-> 
-> hci_usb_intr_rx_submit: hci- intr rx submit failed urb df265514 err -28
-> 
-> I have seen a conversation in which Marcel participated on the linux 
-> kernel mailing lists which referred to a similar problem, but the 
-> discussion was never really finished so no solution was given (see 
-> http://lkml.org/lkml/2004/8/20/62). The problem seems to appear only 
-> when using the ehci_hcd USB module. Because when I use the uhci_hcd 
-> module (by rmmod ehci_hcd) it works. Does anyone have any idea what the 
-> source of this problem is and how I might be able to solve it?
+> Does an implementation of the Sim Acces profile for the BlueZ stack
+> already exists?
 
-and again this seems to be an USB issue and not a Bluetooth issue. Take
-it up with the USB guys and make sure you run the latest 2.6 kernel.
+we don't have any open source implementation for the SIM Access Profile,
+but the Nokia 770 however has a binary and limited only SAP client.
 
 Regards
 
