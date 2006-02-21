@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Agustin Jose Fusaro <afusaro@apexar.com>
+Message-ID: <fd87b6160602211505n2edd9d11q9fcc6545c26edc2b@mail.gmail.com>
+From: "John McCabe-Dansted" <gmatht@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200512021834.19314.mgorbach@yahoo.com>
-References: <20051202220703.C04EF953BA@sc8-sf-spam1.sourceforge.net>
-	 <200512021834.19314.mgorbach@yahoo.com>
-Content-Type: text/plain
-Message-Id: <1140563120.11852.7.camel@localhost.localdomain>
-Mime-Version: 1.0
-Subject: [Bluez-users] Link quality measurement
+Subject: Re: [Bluez-users] Btsco refuse to hibernate
+In-Reply-To: <43FB7C2C.2030203@tootai.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <43FB7C2C.2030203@tootai.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,20 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 21 Feb 2006 20:05:20 -0300
+Date: Wed, 22 Feb 2006 12:05:59 +1300
 
-Hi everybody,
+I found that killing all running kmix processes allowed me to shutdown.
+this can be done by typing from the command line:
+        killall kmix
+        killall -9 kmix
 
-I'm using 'hcitool lq bdaddr' to obtain the link quality of an rfcomm
-connection. I wanted to know how this 'quality' is measured, i.e., what
-does the number (raging from 0 to 255) mean?
-Does anybody has any idea about this? What would be the typical or
-optimal link quality measurement?
+Does this help? What desktop are you using? (E.g. KDE or Gnome)
 
-Thanks a lot,
+On 2/22/06, Administrator TOOTAI <admin@tootai.net> wrote:
+> Hi all,
+>
+> I face a problem using Suspend2+hibernate with snd-bt-sco and latest
+> 2.6.15-4 from Debian SID.
+>
+> Feb 21 21:29:32 nomade kernel: Stopping tasks failed.
+> Feb 21 21:29:32 nomade kernel: Tasks that refused to be refrigerated and
+> haven't since exited:
+> Feb 21 21:29:32 nomade kernel:  - snd-bt-scod (#2708) signalled and todo
+> list empty.
 
-Agustin Fusaro - Apexar Technologies
-
+--
+John C. McCabe-Dansted
+Master's Student
 
 
 -------------------------------------------------------
