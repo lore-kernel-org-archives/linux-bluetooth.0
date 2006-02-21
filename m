@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43FBAEBD.5090406@prolly.org>
-From: Douglas Ward <douglas.ward@prolly.org>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Connection attempt timeout
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8
-Subject: [Bluez-users] Logitech BT mini-receiver
+In-Reply-To: <1140559259.11852.4.camel@localhost.localdomain>
+References: <20051202220703.C04EF953BA@sc8-sf-spam1.sourceforge.net>
+	 <200512021834.19314.mgorbach@yahoo.com>
+	 <1140559259.11852.4.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1140564558.22767.29.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,39 +20,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 21 Feb 2006 19:22:21 -0500
+Date: Wed, 22 Feb 2006 00:29:18 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Agustin,
 
-I can't seem to get an hci device with this device. it came with my
-Logitech Cordless desktop mx 5000. It does the whole hid proxy thing so
-i tried to run hid2hci and got:
+> I'm developing an application using the bluetooth libraries provided by
+> Marcel. I'm working with rfcomm connections. After looking at the
+> function cmd_connect (in the file 'main.c',in the rfcomm directory of
+> the bluez-utils-2.25) I realized that (using this function) there's no
+> way to set the connection attempt timeout (the time the connection
+> attempt will last if the remote device is, for example, turned off).
 
-Switching device 046d:0b02 to HCI mode was successful
+what do you mean by connection attempt timeout. I think the correct term
+is page timeout and you can of course set it with hciconfig.
 
-but when i run hciconfig i get nothing. dmesg shows nothing.
+Regards
 
-any ideas?
-- --
-Douglas K Ward
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2.1 (GNU/Linux)
+Marcel
 
-iQIVAwUBQ/uuvFKDmmHy9Q32AQKTHg//So1qVzD2G60rxzXGfddHXzGEEjFUHLc8
-ORTY5PIgIO2mRy0UxgvpuOqSMPSO5irUfs45XAVyPdqdmHJHvUFeg4C2vns4yvbD
-2xCpZh1pnYlg/GTMvIHxyUqM/8HeARZDHdbB1yvIkiwJyyPUCIQbBPRBH4Mg+sKX
-jevkb3wVZ9+wChWU1Rd3kmaa/yvthq02DzLEZHriofMSTk1gLOpkG7sS0hxeE4F+
-VyDaGdVceGO7hu70iEwrZg03V6OCta4/SS6xMlNmeYXFyRIwuGdm6jNVrMDt+ilA
-9yxwaqFXggnUrqV8WkWVcAx55TbWR2679FY9kqnTCFfcMey2823CNxNogj+0bwr9
-QFouGfLlEUHxiUzLx58gyFqeAKksOtYSXqt0dOWlLdfDsCl1EBoFuFzNrKYocWVe
-FKQb2jYy+Ixk2o8/ejrIhuGB1QWsbQD1kUmavgkAsVjQHrydZFumyiOrZvQmgDMS
-yp4e7frqrG1Njr7y9jxZuEpvlYIsNa47IPN67UvxsPNNf2kiKgmov9T/41XcbsmS
-OPSOcjJh1oDFO25MzB5NO8Nia8GMVNZVeE9kx0dFVsKl0ojJiM0o8f7MKEYugs+/
-W07KA/AvE6G5Yh111sw7mGivt9Zlq+PMtvijhARYC9nR3NHEwU+UNV4tHh0FNDH2
-PrlNzWjbEVQ=
-=88li
------END PGP SIGNATURE-----
+
 
 
 -------------------------------------------------------
