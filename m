@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Agustin Jose Fusaro <afusaro@apexar.com>
+Message-ID: <43FB7F8F.3030707@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200512021834.19314.mgorbach@yahoo.com>
-References: <20051202220703.C04EF953BA@sc8-sf-spam1.sourceforge.net>
-	 <200512021834.19314.mgorbach@yahoo.com>
-Content-Type: text/plain
-Message-Id: <1140559259.11852.4.camel@localhost.localdomain>
-Mime-Version: 1.0
-Subject: [Bluez-users] Connection attempt timeout
+Subject: Re: [Bluez-users] Btsco refuse to hibernate
+References: <43FB7C2C.2030203@tootai.net>
+In-Reply-To: <43FB7C2C.2030203@tootai.net>
+Content-Type: text/plain; charset=ISO-8859-15
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,25 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 21 Feb 2006 19:00:59 -0300
+Date: Tue, 21 Feb 2006 14:01:03 -0700
 
-Hi everybody,
+Hi
 
-I'm developing an application using the bluetooth libraries provided by
-Marcel. I'm working with rfcomm connections. After looking at the
-function cmd_connect (in the file 'main.c',in the rfcomm directory of
-the bluez-utils-2.25) I realized that (using this function) there's no
-way to set the connection attempt timeout (the time the connection
-attempt will last if the remote device is, for example, turned off).
+This is a known problem. It sounds like stopping the btsco userspace app
+first doesn't necessarily help (but it might). We might just be missing
+something small... we need help here from someone who is motivated to
+dig into the problem.
 
-My question is, Is there a way to set this time? (maybe using the
-properties of the sockets involved in this connection)
+Brad
 
-If anyone knows this answer, it'd be great!
-
-Thanks very much!
-
-Agustin Fusaro - Apexar Technologies
+> I face a problem using Suspend2+hibernate with snd-bt-sco and latest
+> 2.6.15-4 from Debian SID.
+> 
+> Feb 21 21:29:32 nomade kernel: Stopping tasks failed.
+> Feb 21 21:29:32 nomade kernel: Tasks that refused to be refrigerated and
+> haven't since exited:
+> Feb 21 21:29:32 nomade kernel:  - snd-bt-scod (#2708) signalled and todo
+> list empty.
+> 
+> Thanks for any hint.
+> 
 
 
 
