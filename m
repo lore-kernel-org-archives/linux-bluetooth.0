@@ -2,15 +2,15 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Implementing the PIN helper support
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0602210440p141b4b7cta5c51ca87d135bde@mail.gmail.com>
+In-Reply-To: <20060221122147.GA10892@localhost.localdomain>
 References: <1140468298.7047.52.camel@localhost>
 	 <20060220211402.GA6466@localhost.localdomain>
 	 <1140471085.7047.63.camel@localhost>
 	 <20060221093118.GA10267@localhost.localdomain>
 	 <1140521700.10008.8.camel@localhost>
-	 <e1effdeb0602210440p141b4b7cta5c51ca87d135bde@mail.gmail.com>
+	 <20060221122147.GA10892@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1140526960.10008.25.camel@localhost>
+Message-Id: <1140526566.10008.18.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -23,51 +23,66 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 21 Feb 2006 14:02:40 +0100
+Date: Tue, 21 Feb 2006 13:56:06 +0100
 
-Hi Claudio,
+Hi Johan,
 
-> Let me try expose some D-Bus features that can help us design the PIN
-> Agent better...
+> > > Using org.bluez.Manager interface for registering the default handler
+> > > seems to me extending too much its purpose compared to hald where we
+> > > copied it from. The only purpose of the manager interface there is to
+> > > allow local device discovery. Placing the default handler registration
+> > > method at the interface org.bluez.Device (or org.bluez.Device.PinAgent)
+> > > and object path /org/bluez/Device should be enough in my opinion. If you
+> > > want to register a handler only for a specific local device then the
+> > > exact path for that device (e.g. /org/bluez/Device/hci0) could be used.
+> > 
+> > For the default handler the Manager interface makes perfect sense to me.
+> > It has nothing to do with any device and it can be present even if no
+> > Bluetooth device is attached at all. From me perspective we put every
+> > non device specific things into the Manager interface. However I might
+> > be missing something.
 > 
-> Currently PinAgent uses the system bus connection. D-Bus is able to
-> start applications automatically. Applications with user interfaces
-> can't be started by system dbus-daemon, only the session can run this
-> kind of applications. Using the session bus connection,  it is not
-> necessary has a applet/or a application always active. The D-Bus
-> starts the application when the first message is sent to the path.
-> For more information read the section "Message Bus Starting Services":
-> http://dbus.freedesktop.org/doc/dbus-specification.html
-
-I don't think that this is the right way to go. We will have a Bluetooth
-applet running (like NetworkManager etc.) and this can handle the tasks
-of PIN input. It only needs to tell hcid/bluetoothd that it exists and
-where to call it.
-
-If no PIN helper has been registered then the default action will be to
-reject every PIN request. This is a clean approach and we can remove a
-lot of code from hcid that tries to handle PIN input nicely. And if they
-wanna have a fixed PIN then they need to write a PIN helper, but the
-whole communication must go over D-Bus. And once version 1.0 of D-Bus is
-out, I will make it mandatory for bluez-utils.
-
-> > > > my current idea is to have a default handler that the applications have
-> > > > to register over org.bluez.Manager and that they can have multiple other
-> > > > PIN handlers registered via the org.bluez.Device interface for specific
-> > > > devices. While the default handler is permanent, all other PIN handlers
-> > > > may expire and get removed automatically.
-> > >
-> > > I think you'll still need a way to unregister the default handler, when
-> > > e.g. a user logs out from his session (so the next user that logs in can
-> > > register his own default handler).
+> Well, it depends how we define the purpose of the Manager interface :)
+> If we say it's for "all stuff which is not device specific" then what you
+> propose is ok. If we say it's only for local device discovery, as in
+> hald, then the default handler registration shouldn't be in Manager.
 > 
-> Remember that we can register fallback path(hierarchical path), where
-> the root level can handle messages not handled by the child paths.
-> Therefore, the default PIN Agent can be the base and the user defined
-> can child paths.
+> In my opinion non-device specific things could just use the root device
+> path (/org/bluez/Device), while device specific stuff would use the
+> exact device paths (e.g. /org/bluez/Device/hci0). But, I don't have any
+> really strong opinion about this, so if you still insist on using
+> Manager I wont complain anymore ;)
 
-I don't like this. The default action if no handler is registered must
-be to reject the PIN request. Lets keep hcid/bluetoothd totally stupid.
+at the moment I don't have a strong opinion in any direction. I think we
+need to choose something that looks sane from the client code.
+
+> > > > Do we really only need the object path? I really like to get the default
+> > > > handler thing implemented very soon.
+> > > 
+> > > For the handler registration the object path should be enough. However
+> > > we should probably rethink the org.bluez.PinAgent interface which
+> > > currently consists of only one method: PinRequest.
+> > > 
+> > > The PinRequest method currently takes two arguments: remote device
+> > > address and a boolean indicating whether the connection is incomming or
+> > > outgoing. A third parameter should probably be added for object path of
+> > > the local device, since that information could be used for e.g. querying
+> > > the name of the remote device.
+> > 
+> > The interface must change. We use strings for the BD_ADDR now a clean
+> > break is a good thing. Can you propose something?
+> 
+> I'm not so convinced about the necessity of the "outgoing" boolean
+> parameter, so depending on whether you want to keep it or not (we could
+> add another device method for getting this information later) I'd
+> propose one of the following:
+> PinRequest(string bt_addr, string device_path)
+> PinRequest(string bt_addr, string device_path, boolean outgoing)
+> 
+> So a call could look like:
+> PinRequest("11:22:33:44:55:66", "/org/bluez/Device/hci0")
+
+the connection direction is not really helpful. Lets drop it for now.
 
 Regards
 
