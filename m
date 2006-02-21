@@ -3,7 +3,7 @@ From: Peter Wippich <pewi@gw-instruments.de>
 To: <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] MTU limited to 672
 In-Reply-To: <43FB1B2A.4060104@masaka.cs.ohiou.edu>
-Message-ID: <Pine.LNX.4.33.0602211504300.21864-100000@redbean.intranet.gw-instruments.de>
+Message-ID: <Pine.LNX.4.33.0602211459130.21864-100000@redbean.intranet.gw-instruments.de>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
@@ -17,22 +17,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 21 Feb 2006 15:09:28 +0100 (CET)
+Date: Tue, 21 Feb 2006 15:02:17 +0100 (CET)
 
 
-Sorry, MTU size larger than 672 is possible in general. But it is not
-guaranteed that the remote device will support it. The minimum MTU is 48
-Bytes. Most devices support MTU sizes up to 672 bytes (the default value).
-
-Maximum MTU size is negotiated during L2CAP connection setup. See L2CAP
-specification. So what happens is that you tried to connect to a remote
-device with an MTU size larger than the remote device supports.
-
-You should check L2CAP implementation and HCI.
+The Limitation of a maximum MTU size of 672 is a limitation enforced by
+the Bluetooth specification. You can not use an MTU larger than 672.
 
 Ciao,
 
 Peter
+
 
 On Tue, 21 Feb 2006, Jim Wyllie wrote:
 
