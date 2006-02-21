@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
+Message-ID: <9098730.1140507906477.JavaMail.tomcat@pne-ps5-sn2>
+From: <ari.paavilainen@pp.inet.fi>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_sEt+DaC2BnwJq2D"
-Message-Id: <200602211837.00121.denis.kenzior@trolltech.com>
-Subject: [Bluez-devel] Possible Patch: list paired devices
+Subject: Vs: Re: [Bluez-devel] sdp_record_register()
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_36273_14229281.1140507906476"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,126 +17,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 21 Feb 2006 18:36:59 +1000
+Date: Tue, 21 Feb 2006 08:45:06 +0100 (MET)
 
---Boundary-00=_sEt+DaC2BnwJq2D
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+------=_Part_36273_14229281.1140507906476
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Marcel,
+----Alkuper=C3=A4inen viesti----L=C3=A4hett=C3=A4j=C3=A4: ashuang@gmail.com=
+P=C3=A4iv=C3=A4m=C3=A4=C3=A4r=C3=A4: Feb 20, 2006 5:18:33 PMVastaanottaja: =
+bluez-devel@lists.sourceforge.netAihe: Re: [Bluez-devel] sdp_record_registe=
+r()I found following thing in sdp_record_register():The comment in source c=
+ode tells that the function returns non-null pointer onsuccess and -1 on fa=
+ilure. I have investigated the code and found out that thefunction returns =
+only 0 or -1:> what version of bluez are you using?  The latest versions do=
+n't say this, in either sdp.h or sdp_lib.hThe version of bluez is 2.10 (the=
+ one which you get when you google 'sdp_record_register').-Ari
+------=_Part_36273_14229281.1140507906476
+Content-Type: text/html;charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I noticed that there is no way to list paired devices from hcitool/hciconfig, 
-at least I couldn't find a way to do so.   Here is a proposed patch to 
-hcitool which will show a list of paired devices.  
+<br/><br/><blockquote><br/>----Alkuper=C3=A4inen viesti----<br/>L=C3=A4hett=
+=C3=A4j=C3=A4: ashuang@gmail.com<br/>P=C3=A4iv=C3=A4m=C3=A4=C3=A4r=C3=A4: F=
+eb 20, 2006 5:18:33 PM<br/>Vastaanottaja: bluez-devel@lists.sourceforge.net=
+<br/>Aihe: Re: [Bluez-devel] sdp_record_register()<br/><br/><br/><br/><div>=
+<blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(204, =
+204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">I found following=
+ thing in sdp_record_register():<br/><br/>The comment in source code tells =
+that the function returns non-null pointer on<br/>success and -1 on failure=
+. I have investigated the code and found out that the<br/>function returns =
+only 0 or -1:</blockquote><div><br/><br/>> what version of bluez are you us=
+ing?&nbsp; The latest versions don't say this, in either sdp.h or sdp_lib.h=
+<br/><br/><br/>The version of bluez is 2.10 (the one which you get when you=
+ google 'sdp_record_register').<br/><br/>-Ari
+------=_Part_36273_14229281.1140507906476--
 
-I'm not sure if this is the right solution, since it requires hcitool to be 
-run with effective permissions to access the linkkeys file (e.g. root on my 
-system).  If there is a better way let me know.
-
-Also, will the patch for 128 bit UUID searching in sdptool get merged into 
-CVS, or did I mess something up again?
-
-Regards,
--Denis
-
---Boundary-00=_sEt+DaC2BnwJq2D
-Content-Type: text/x-diff;
-  charset="us-ascii";
-  name="bluez-hcitool.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="bluez-hcitool.patch"
-
-Index: tools/hcitool.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/tools/hcitool.c,v
-retrieving revision 1.85
-diff -u -r1.85 hcitool.c
---- tools/hcitool.c	18 Jan 2006 17:45:51 -0000	1.85
-+++ tools/hcitool.c	21 Feb 2006 08:25:45 -0000
-@@ -1865,6 +1865,70 @@
- 	free(cr);
- }
- 
-+static int dev_paired(int dd, int dev_id, long arg)
-+{
-+	void print_key(char *key, char *value, void *data)
-+	{
-+		printf("%s\n", key);
-+	}
-+
-+	struct hci_dev_info di = { dev_id: dev_id };
-+	char filename[PATH_MAX + 1];
-+	char addr[18];
-+	
-+	if (ioctl(dd, HCIGETDEVINFO, (void *) &di))
-+		return 0;
-+
-+	ba2str(&di.bdaddr, addr);
-+
-+	snprintf(filename, PATH_MAX, "%s/%s/linkkeys", STORAGEDIR, addr);
-+
-+	printf("Devices paired to %s:\n", addr);
-+	textfile_foreach(filename, print_key, NULL);
-+	printf("\n");
-+
-+	return 0;
-+}
-+
-+/* List pairings */
-+
-+static struct option paired_options[] = {
-+	{ "help",	0, 0, 'h' },
-+	{ 0, 0, 0, 0 }
-+};
-+
-+static char *paired_help =
-+	"Usage:\n"
-+	"\tpaired\n";
-+
-+static void cmd_paired(int dev_id, int argc, char **argv)
-+{
-+	int dd, opt;
-+
-+	for_each_opt(opt, cc_options, NULL) {
-+		switch (opt) {
-+		default:
-+			printf(paired_help);
-+			return;
-+		}
-+	}
-+
-+	if (dev_id < 0) {
-+		hci_for_each_dev(HCI_UP, dev_paired, 0);
-+		return;
-+	}
-+
-+	dd = hci_open_dev(dev_id);
-+	if (dd < 0) {
-+		perror("HCI device open failed");
-+		exit(1);
-+	}
-+
-+	dev_paired(dd, dev_id, 0);
-+
-+	hci_close_dev(dd);
-+}
-+
- /* Read clock offset */
- 
- static struct option clkoff_options[] = {
-@@ -2051,6 +2115,7 @@
- 	{ "auth",   cmd_auth,   "Request authentication"               },
- 	{ "enc",    cmd_enc,    "Set connection encryption"            },
- 	{ "key",    cmd_key,    "Change connection link key"           },
-+	{ "paired", cmd_paired, "Show paired devices"                  },
- 	{ "clkoff", cmd_clkoff, "Read clock offset"                    },
- 	{ "clock",  cmd_clock,  "Read local or remote clock"           },
- 	{ NULL, NULL, 0 }
-
---Boundary-00=_sEt+DaC2BnwJq2D--
 
 
 -------------------------------------------------------
