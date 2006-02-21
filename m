@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43FB7F8F.3030707@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <43FB7C2C.2030203@tootai.net>
+From: Administrator TOOTAI <admin@tootai.net>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Btsco refuse to hibernate
-References: <43FB7C2C.2030203@tootai.net>
-In-Reply-To: <43FB7C2C.2030203@tootai.net>
-Content-Type: text/plain; charset=ISO-8859-15
+To: Bluetooth <bluez-users@lists.sourceforge.net>,
+        Suspend2 list <Suspend2-users@lists.suspend2.net>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: [Bluez-users] Btsco refuse to hibernate
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,29 +17,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 21 Feb 2006 14:01:03 -0700
+Date: Tue, 21 Feb 2006 21:46:36 +0100
 
-Hi
+Hi all,
 
-This is a known problem. It sounds like stopping the btsco userspace app
-first doesn't necessarily help (but it might). We might just be missing
-something small... we need help here from someone who is motivated to
-dig into the problem.
+I face a problem using Suspend2+hibernate with snd-bt-sco and latest 
+2.6.15-4 from Debian SID.
 
-Brad
+Feb 21 21:29:32 nomade kernel: Stopping tasks failed.
+Feb 21 21:29:32 nomade kernel: Tasks that refused to be refrigerated and 
+haven't since exited:
+Feb 21 21:29:32 nomade kernel:  - snd-bt-scod (#2708) signalled and todo 
+list empty.
 
-> I face a problem using Suspend2+hibernate with snd-bt-sco and latest
-> 2.6.15-4 from Debian SID.
-> 
-> Feb 21 21:29:32 nomade kernel: Stopping tasks failed.
-> Feb 21 21:29:32 nomade kernel: Tasks that refused to be refrigerated and
-> haven't since exited:
-> Feb 21 21:29:32 nomade kernel:  - snd-bt-scod (#2708) signalled and todo
-> list empty.
-> 
-> Thanks for any hint.
-> 
+Thanks for any hint.
 
+-- 
+Daniel
 
 
 -------------------------------------------------------
