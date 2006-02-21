@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43FB7B60.3030500@cs.bgu.ac.il>
+Message-ID: <43FB7A01.1020702@cs.bgu.ac.il>
 From: Niv <nivv@cs.bgu.ac.il>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Subject: [Bluez-users] bluetooth matrix
+Subject: [Bluez-users] cant use headset
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,23 +16,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 21 Feb 2006 22:43:12 +0200
+Date: Tue, 21 Feb 2006 22:37:21 +0200
 
-Hay,
+I am getting this wierd probelm the last couple of days.
 
-To address the common problem of "what adaptor to buy"
+I had it before switching to the new ebuild of bluetooth-kernel.
 
-I started a matrix in the gentoo-wiki here:
+I am running gentoo on 2.6.15-ck3-r1
 
-http://gentoo-wiki.com/HOWTO_use_a_bluetooth_headset
+I modprobe snd-bt-sco fine and see it in alsamixer -c 3
 
-I see that you got on hell of a matrix , but I am missing the pictures 
-there.
+I can l2ping the headset.
 
-I may copy it to the wiki but there are too many pictures to gather.
+I removed the linkkeys file and did:
+
+hcitool scan - and discovered the headset
+
+then l2ping it succsefully
+
+then hcitool cc <addr>
+
+then hcitool dc <addr>
+
+then: btsco -v 00:0D:44:33:E1:63
+
+btsco v0.41
+Error: control open (hw:4): No such device
+Error: Can't find device. Bail
 
 
-Niv
+I ran hcidump -X -V, but there is no output during the btsco
+
+Help me pls,
+
+NIv
 
 
 
