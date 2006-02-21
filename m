@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43FB92B8.70502@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Agustin Jose Fusaro <afusaro@apexar.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] bluetooth matrix
-References: <43FB7B60.3030500@cs.bgu.ac.il>
-In-Reply-To: <43FB7B60.3030500@cs.bgu.ac.il>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <200512021834.19314.mgorbach@yahoo.com>
+References: <20051202220703.C04EF953BA@sc8-sf-spam1.sourceforge.net>
+	 <200512021834.19314.mgorbach@yahoo.com>
+Content-Type: text/plain
+Message-Id: <1140559259.11852.4.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-users] Connection attempt timeout
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +19,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 21 Feb 2006 15:22:48 -0700
+Date: Tue, 21 Feb 2006 19:00:59 -0300
 
-Niv
+Hi everybody,
 
-> To address the common problem of "what adaptor to buy"
-> 
-> I started a matrix in the gentoo-wiki here:
-> 
-> http://gentoo-wiki.com/HOWTO_use_a_bluetooth_headset
-> 
-> I see that you got on hell of a matrix , but I am missing the pictures
-> there.
+I'm developing an application using the bluetooth libraries provided by
+Marcel. I'm working with rfcomm connections. After looking at the
+function cmd_connect (in the file 'main.c',in the rfcomm directory of
+the bluez-utils-2.25) I realized that (using this function) there's no
+way to set the connection attempt timeout (the time the connection
+attempt will last if the remote device is, for example, turned off).
 
-Nice... fyi Marcel also keeps some data on his features/revisions page...
+My question is, Is there a way to set this time? (maybe using the
+properties of the sockets involved in this connection)
 
-http://www.holtmann.org/linux/bluetooth/features.html
+If anyone knows this answer, it'd be great!
 
-Brad
+Thanks very much!
+
+Agustin Fusaro - Apexar Technologies
+
 
 
 -------------------------------------------------------
