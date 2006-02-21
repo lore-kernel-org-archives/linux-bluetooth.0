@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Implementing the PIN helper support
-Message-ID: <20060221122147.GA10892@localhost.localdomain>
-References: <1140468298.7047.52.camel@localhost> <20060220211402.GA6466@localhost.localdomain> <1140471085.7047.63.camel@localhost> <20060221093118.GA10267@localhost.localdomain> <1140521700.10008.8.camel@localhost>
+Message-ID: <43FAFB6F.3040308@service2media.com>
+From: Herman Meerlo <herman@service2media.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1140521700.10008.8.camel@localhost>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Problems with USB 2.0 hub and ehci_usb/hci_usb
+References: <43F99D99.1030007@service2media.com> <1140467939.7047.46.camel@localhost>
+In-Reply-To: <1140467939.7047.46.camel@localhost>
+Content-Type: multipart/alternative;
+ boundary="------------060301060901020902060202"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,62 +19,100 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 21 Feb 2006 14:21:47 +0200
+Date: Tue, 21 Feb 2006 12:37:19 +0100
 
-On Tue, Feb 21, 2006, Marcel Holtmann wrote:
-> > Using org.bluez.Manager interface for registering the default handler
-> > seems to me extending too much its purpose compared to hald where we
-> > copied it from. The only purpose of the manager interface there is to
-> > allow local device discovery. Placing the default handler registration
-> > method at the interface org.bluez.Device (or org.bluez.Device.PinAgent)
-> > and object path /org/bluez/Device should be enough in my opinion. If you
-> > want to register a handler only for a specific local device then the
-> > exact path for that device (e.g. /org/bluez/Device/hci0) could be used.
-> 
-> For the default handler the Manager interface makes perfect sense to me.
-> It has nothing to do with any device and it can be present even if no
-> Bluetooth device is attached at all. From me perspective we put every
-> non device specific things into the Manager interface. However I might
-> be missing something.
+This is a multi-part message in MIME format.
+--------------060301060901020902060202
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Well, it depends how we define the purpose of the Manager interface :)
-If we say it's for "all stuff which is not device specific" then what you
-propose is ok. If we say it's only for local device discovery, as in
-hald, then the default handler registration shouldn't be in Manager.
+Hi Marcel,
 
-In my opinion non-device specific things could just use the root device
-path (/org/bluez/Device), while device specific stuff would use the
-exact device paths (e.g. /org/bluez/Device/hci0). But, I don't have any
-really strong opinion about this, so if you still insist on using
-Manager I wont complain anymore ;)
+Marcel Holtmann wrote:
+> Hi Herman,
+>
+>   
+>> I hope one of you can help me... I am trying to use a USB 2.0 bluetooth 
+>> dongle (Belkin F8T012) through a USB 2.0 hub. The problem I have is that 
+>> whenever I insert the BT dongle the kernel reports the following error:
+>>
+>> hci_usb_intr_rx_submit: hci- intr rx submit failed urb df265514 err -28
+>>
+>> I have seen a conversation in which Marcel participated on the linux 
+>> kernel mailing lists which referred to a similar problem, but the 
+>> discussion was never really finished so no solution was given (see 
+>> http://lkml.org/lkml/2004/8/20/62). The problem seems to appear only 
+>> when using the ehci_hcd USB module. Because when I use the uhci_hcd 
+>> module (by rmmod ehci_hcd) it works. Does anyone have any idea what the 
+>> source of this problem is and how I might be able to solve it?
+>>     
+>
+> and again this seems to be an USB issue and not a Bluetooth issue. Take
+> it up with the USB guys and make sure you run the latest 2.6 kernel.
+>
+> Regards
+>
+> Marcel
+>
+>   
+You are absolutely right off course. And upgrading the kernel did the 
+trick. Sorry for bothering you with this.
 
-> > > Do we really only need the object path? I really like to get the default
-> > > handler thing implemented very soon.
-> > 
-> > For the handler registration the object path should be enough. However
-> > we should probably rethink the org.bluez.PinAgent interface which
-> > currently consists of only one method: PinRequest.
-> > 
-> > The PinRequest method currently takes two arguments: remote device
-> > address and a boolean indicating whether the connection is incomming or
-> > outgoing. A third parameter should probably be added for object path of
-> > the local device, since that information could be used for e.g. querying
-> > the name of the remote device.
-> 
-> The interface must change. We use strings for the BD_ADDR now a clean
-> break is a good thing. Can you propose something?
+Regards,
+Herman
 
-I'm not so convinced about the necessity of the "outgoing" boolean
-parameter, so depending on whether you want to keep it or not (we could
-add another device method for getting this information later) I'd
-propose one of the following:
-PinRequest(string bt_addr, string device_path)
-PinRequest(string bt_addr, string device_path, boolean outgoing)
+--------------060301060901020902060202
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-So a call could look like:
-PinRequest("11:22:33:44:55:66", "/org/bluez/Device/hci0")
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Hi Marcel,<br>
+<br>
+Marcel Holtmann wrote:
+<blockquote cite="mid1140467939.7047.46.camel@localhost" type="cite">
+  <pre wrap="">Hi Herman,
 
-Johan
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">I hope one of you can help me... I am trying to use a USB 2.0 bluetooth 
+dongle (Belkin F8T012) through a USB 2.0 hub. The problem I have is that 
+whenever I insert the BT dongle the kernel reports the following error:
+
+hci_usb_intr_rx_submit: hci- intr rx submit failed urb df265514 err -28
+
+I have seen a conversation in which Marcel participated on the linux 
+kernel mailing lists which referred to a similar problem, but the 
+discussion was never really finished so no solution was given (see 
+<a class="moz-txt-link-freetext" href="http://lkml.org/lkml/2004/8/20/62">http://lkml.org/lkml/2004/8/20/62</a>). The problem seems to appear only 
+when using the ehci_hcd USB module. Because when I use the uhci_hcd 
+module (by rmmod ehci_hcd) it works. Does anyone have any idea what the 
+source of this problem is and how I might be able to solve it?
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+and again this seems to be an USB issue and not a Bluetooth issue. Take
+it up with the USB guys and make sure you run the latest 2.6 kernel.
+
+Regards
+
+Marcel
+
+  </pre>
+</blockquote>
+You are absolutely right off course. And upgrading the kernel did the
+trick. Sorry for bothering you with this.<br>
+<br>
+Regards,<br>
+Herman<br>
+</body>
+</html>
+
+--------------060301060901020902060202--
 
 
 -------------------------------------------------------
