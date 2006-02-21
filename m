@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43FB7C2C.2030203@tootai.net>
-From: Administrator TOOTAI <admin@tootai.net>
+Message-ID: <43FB7B60.3030500@cs.bgu.ac.il>
+From: Niv <nivv@cs.bgu.ac.il>
 MIME-Version: 1.0
-To: Bluetooth <bluez-users@lists.sourceforge.net>,
-        Suspend2 list <Suspend2-users@lists.suspend2.net>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-users] Btsco refuse to hibernate
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: [Bluez-users] bluetooth matrix
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,23 +16,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 21 Feb 2006 21:46:36 +0100
+Date: Tue, 21 Feb 2006 22:43:12 +0200
 
-Hi all,
+Hay,
 
-I face a problem using Suspend2+hibernate with snd-bt-sco and latest 
-2.6.15-4 from Debian SID.
+To address the common problem of "what adaptor to buy"
 
-Feb 21 21:29:32 nomade kernel: Stopping tasks failed.
-Feb 21 21:29:32 nomade kernel: Tasks that refused to be refrigerated and 
-haven't since exited:
-Feb 21 21:29:32 nomade kernel:  - snd-bt-scod (#2708) signalled and todo 
-list empty.
+I started a matrix in the gentoo-wiki here:
 
-Thanks for any hint.
+http://gentoo-wiki.com/HOWTO_use_a_bluetooth_headset
 
--- 
-Daniel
+I see that you got on hell of a matrix , but I am missing the pictures 
+there.
+
+I may copy it to the wiki but there are too many pictures to gather.
+
+
+Niv
+
 
 
 -------------------------------------------------------
