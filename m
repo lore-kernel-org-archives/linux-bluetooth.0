@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Possible Patch: list paired devices
+Subject: Re: [Bluez-devel] Implementing the PIN helper support
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200602211837.00121.denis.kenzior@trolltech.com>
-References: <200602211837.00121.denis.kenzior@trolltech.com>
+In-Reply-To: <20060221093118.GA10267@localhost.localdomain>
+References: <1140468298.7047.52.camel@localhost>
+	 <20060220211402.GA6466@localhost.localdomain>
+	 <1140471085.7047.63.camel@localhost>
+	 <20060221093118.GA10267@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1140521857.10008.12.camel@localhost>
+Message-Id: <1140521700.10008.8.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,26 +21,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 21 Feb 2006 12:37:37 +0100
+Date: Tue, 21 Feb 2006 12:35:00 +0100
 
-Hi Denis,
+Hi Johan,
 
-> I noticed that there is no way to list paired devices from hcitool/hciconfig, 
-> at least I couldn't find a way to do so.   Here is a proposed patch to 
-> hcitool which will show a list of paired devices.  
+> > my current idea is to have a default handler that the applications have
+> > to register over org.bluez.Manager and that they can have multiple other
+> > PIN handlers registered via the org.bluez.Device interface for specific
+> > devices. While the default handler is permanent, all other PIN handlers
+> > may expire and get removed automatically.
 > 
-> I'm not sure if this is the right solution, since it requires hcitool to be 
-> run with effective permissions to access the linkkeys file (e.g. root on my 
-> system).  If there is a better way let me know.
+> I think you'll still need a way to unregister the default handler, when
+> e.g. a user logs out from his session (so the next user that logs in can
+> register his own default handler).
 
-you can use standard tools like grep and awk to get this information and
-since we have the limitation with the root access, I am not going to add
-this. Use the new D-Bus interface to retrieve this information.
+I agree. In the first place I thought we can automatically unregister it
+when the program ends, but in case of desktop switching we need the
+Bluetooth applet playing nice.
 
-> Also, will the patch for 128 bit UUID searching in sdptool get merged into 
-> CVS, or did I mess something up again?
+> Using org.bluez.Manager interface for registering the default handler
+> seems to me extending too much its purpose compared to hald where we
+> copied it from. The only purpose of the manager interface there is to
+> allow local device discovery. Placing the default handler registration
+> method at the interface org.bluez.Device (or org.bluez.Device.PinAgent)
+> and object path /org/bluez/Device should be enough in my opinion. If you
+> want to register a handler only for a specific local device then the
+> exact path for that device (e.g. /org/bluez/Device/hci0) could be used.
 
-The patch is in my todo stack, but I haven't looked at it.
+For the default handler the Manager interface makes perfect sense to me.
+It has nothing to do with any device and it can be present even if no
+Bluetooth device is attached at all. From me perspective we put every
+non device specific things into the Manager interface. However I might
+be missing something.
+
+> > Do we really only need the object path? I really like to get the default
+> > handler thing implemented very soon.
+> 
+> For the handler registration the object path should be enough. However
+> we should probably rethink the org.bluez.PinAgent interface which
+> currently consists of only one method: PinRequest.
+> 
+> The PinRequest method currently takes two arguments: remote device
+> address and a boolean indicating whether the connection is incomming or
+> outgoing. A third parameter should probably be added for object path of
+> the local device, since that information could be used for e.g. querying
+> the name of the remote device.
+
+The interface must change. We use strings for the BD_ADDR now a clean
+break is a good thing. Can you propose something?
 
 Regards
 
