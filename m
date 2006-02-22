@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0602221048o5b5fd952qdb7aee98d246a511@mail.gmail.com>
+Message-ID: <e1effdeb0602221010m44b865a5qf2750e11e6ecc4de@mail.gmail.com>
 From: "Claudio Takahasi" <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_Part_8642_22537098.1140634086704"
-Subject: [Bluez-devel] [DBUS PATCH] BondingRemoved signal
+	boundary="----=_Part_7941_26900574.1140631841251"
+Subject: [Bluez-devel] [DBUS PATCH]RemoteAlias
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,72 +17,87 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 22 Feb 2006 15:48:06 -0300
+Date: Wed, 22 Feb 2006 15:10:41 -0300
 
-------=_Part_8642_22537098.1140634086704
+------=_Part_7941_26900574.1140631841251
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
 Hi Marcel,
 
-here is the patch to send the BondingRemoved signal.
-Considering that we will need review the condition to send the signal
-I put a tag "FIXME:" to track this issue, but feel free to remove if
-you think that this is not relevant.
 
+here is the patch that implements the RemoteAlias.
+
+What should be the reply message when the alias is not found?
+This patch returns"org.bluez.Error: No such device or address", is it ok?
 
 Regards,
-Claudio.
+Caudio.
 --
 ---------------------------------------------------------
 Claudio Takahasi
 Instituto Nokia de Tecnologia - INdT
 
-------=_Part_8642_22537098.1140634086704
-Content-Type: text/x-patch; name=bonding_removed01.patch; charset=us-ascii
+------=_Part_7941_26900574.1140631841251
+Content-Type: text/x-patch; name=remote_alias01.patch; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-X-Attachment-Id: f_ejztgc2s
-Content-Disposition: attachment; filename="bonding_removed01.patch"
+X-Attachment-Id: f_ejzs6bkm
+Content-Disposition: attachment; filename="remote_alias01.patch"
 
 Index: hcid/dbus-device.c
 ===================================================================
 RCS file: /cvsroot/bluez/utils/hcid/dbus-device.c,v
-retrieving revision 1.7
-diff -u -r1.7 dbus-device.c
---- hcid/dbus-device.c	22 Feb 2006 17:43:28 -0000	1.7
-+++ hcid/dbus-device.c	22 Feb 2006 18:40:59 -0000
-@@ -792,8 +792,10 @@
- static DBusMessage* handle_dev_remove_bonding_req(DBusMessage *msg, void *data)
- {
- 	struct hci_dbus_data *dbus_data = data;
-+	DBusConnection *connection = get_dbus_connection();
- 	DBusMessageIter iter;
- 	DBusMessage *reply;
-+	DBusMessage *signal;
- 	char filename[PATH_MAX + 1];
- 	char addr[18], *addr_ptr;
- 	struct hci_conn_info_req *cr;
-@@ -813,6 +815,16 @@
+retrieving revision 1.6
+diff -u -r1.6 dbus-device.c
+--- hcid/dbus-device.c	21 Feb 2006 23:55:19 -0000	1.6
++++ hcid/dbus-device.c	22 Feb 2006 18:04:38 -0000
+@@ -538,8 +538,41 @@
  
- 	/* Delete the link key from storage */
- 	textfile_del(filename, addr_ptr);
-+	
-+	/* FIXME: which condition must be verified before send the signal */
-+	signal = dev_signal_factory(dbus_data->dev_id, DEV_SIG_BONDING_REMOVED,
+ static DBusMessage* handle_dev_remote_alias_req(DBusMessage *msg, void *data)
+ {
+-	/*FIXME: */
+-	return bluez_new_failure_msg(msg, BLUEZ_EDBUS_NOT_IMPLEMENTED);
++	struct hci_dbus_data *dbus_data = data;
++	DBusConnection *connection = get_dbus_connection();
++	DBusMessageIter iter;
++	DBusMessage *reply;
++	DBusMessage *signal;
++	char str[249], *str_ptr = str, *addr_ptr;
++	bdaddr_t bdaddr;
++	int err;
++
++	dbus_message_iter_init(msg, &iter);
++	dbus_message_iter_get_basic(&iter, &addr_ptr);
++
++	str2ba(addr_ptr, &bdaddr);
++
++	err = get_device_alias(dbus_data->dev_id, &bdaddr, str, sizeof(str));
++
++	if (err < 0) {
++		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET | -err);
++		goto failed;
++	}
++
++	signal = dev_signal_factory(dbus_data->dev_id, DEV_SIG_REMOTE_ALIAS,
 +						DBUS_TYPE_STRING, &addr_ptr,
++						DBUS_TYPE_STRING, &str_ptr,
 +						DBUS_TYPE_INVALID);
 +	if (signal) {
 +		dbus_connection_send(connection, signal, NULL);
 +		dbus_connection_flush(connection);
 +		dbus_message_unref(signal);
 +	}
++
++	reply = dbus_message_new_method_return(msg);
++failed:
++	return reply;
++
+ }
  
- 	str2ba(addr_ptr, &bdaddr);
- 
+ static DBusMessage* handle_dev_remote_name_req(DBusMessage *msg, void *data)
 
-
-------=_Part_8642_22537098.1140634086704--
+------=_Part_7941_26900574.1140631841251--
 
 
 -------------------------------------------------------
