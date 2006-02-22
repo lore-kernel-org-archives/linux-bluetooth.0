@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0602220808v6e7796c4xebad39dd2cd2c28a@mail.gmail.com>
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
+From: Ville Tervo <ville.tervo@nokia.com>
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Soft lockup
+Message-ID: <20060222125425.GQ19185@null.research.nokia.com>
+References: <20060222091231.GM19185@null.research.nokia.com> <1140607245.4519.7.camel@localhost>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] [DBUS]BondingRemoved signal question
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1140607245.4519.7.camel@localhost>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,35 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 22 Feb 2006 13:08:03 -0300
+Date: Wed, 22 Feb 2006 14:54:25 +0200
 
-Hi Marcel, Johan and Eduardo,
+Hi Marcel,
 
+On Wed, Feb 22, 2006 at 12:20:45PM +0100, ext Marcel Holtmann wrote:
+> Hi Ville,
+> 
+> > I'm got attached oops while playing with Nokia 770. Attached patch
+> > helps. 
+> 
+> I am not really happy with this fix. Do you have an idea why this soft
+> lockup happens? Is this OMAP specific?
 
-I am going to start the development of the BondingRemoved signal. But
-before start coding I would like define some requirements.
+Me neither. I'll try to reproduce it with i386 and see if I can get more
+information.
 
-When it must be sent?  Currently, the code is not checking the result
-of the HCI delete stored key request, textfile_del return result or
-disconnect result. What should be the rule for sending the
-BondingRemoved signal?
-1. Wait the command complete event for the delete stored link key request?
-2. Check only the result of the textfile_del call?
-3. Or if one of these condition(TRUE) is enough to send the
-BondingRemoved signal
-
-As long as I could understand, we can have the scenario where the link
-key is NOT stored in the Bluetooth Controller, but it is stored in the
-linkkeys file. For connected devices, the disconnect can be another
-assumption, considering that the keys are automatically delete when
-disconnecting.
-
-Regards,
-Claudio.
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+-- 
+Ville
 
 
 -------------------------------------------------------
