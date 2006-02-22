@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43FCF647.7050806@prolly.org>
-From: Douglas Ward <douglas.ward@prolly.org>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Problem with SDP.
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8
-Subject: [Bluez-devel] Logitech BT mini-receiver
+In-Reply-To: <001a01c637fa$8affa800$c800a8c0@kazama>
+References: <001a01c637fa$8affa800$c800a8c0@kazama>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1140649027.4519.53.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,42 +18,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 22 Feb 2006 18:39:51 -0500
+Date: Wed, 22 Feb 2006 23:57:07 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi,
 
-after being completely ignored on the bluez users list i decided to post
-this here.
+> I hope somebody can help me. I made a aplication in c++ for blueZ and
+> register my own perfil in the SDP.  The function
+> to register works well.
+> =20
+> I make the SPDTOOL BROWSE LOCAL  and the new perfil appeards without
+> any problem.
+> =20
+> But... If I try to conect with SDP from Symbian, other linux or
+> Windows, They CAN=C2=B4T  connect and don=C2=B4t obtain any perfil.
+> =20
+> the sdpd daemon is working.... (I checkit).
+> =20
+> What is necessary to SDP are public and other bluetooth devices can
+> see it?
 
-I can't seem to get an hci device with this device. it came with my
-Logitech Cordless desktop mx 5000. It does the whole hid proxy thing so
-i tried to run hid2hci and got:
+check with "hcidump -X -V" if the other side really connects to your
+machine and what maybe fails.
 
-Switching device 046d:0b02 to HCI mode was successful
+Regards
 
-but when i run hciconfig i get nothing. dmesg shows nothing.
+Marcel
 
-any ideas?
-- --
-Douglas K Ward
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2.1 (GNU/Linux)
 
-iQIVAwUBQ/z2RlKDmmHy9Q32AQJtoRAAtgBx34JGrEpsQ51/D2WacNuJTZ8fGxoM
-vZ6HtCrn9zfgITBMXQb4pX/PChnxHoaGjnQ4zMi35ZF4S9v2hryyCauDRYGWjFkc
-CDrjLrgsqTM/EGgd3ImaeoLrQqZDpKjzn15DleU911YQn5+/gEiz3U7MwvhaI/Rl
-fgpgdwU0KY4NnnVFJjolgKsr+EX0By8qDIbDoeGIZVJRy7rDeCClRR6viZ/5blXg
-6+lMk9u7ZQEUH6GXZNKXppaQ5OQbYwG5/zEu98VW9xDWxz8gww6eoM0WAEnYykW5
-2O1PZ7jYlgHTzQDH2W65R0evNwvTMoahlcflA5AaaoL7dJIcF68lIWV1A1fLt7ym
-JSkNQTYmorUL7hSvLDUsRP8JG5DkIf9u4QRVYkE2/fl52k1XkzeXxykhl8SzmrPj
-FSUPa2ITHJVyeFzTUGkHvZNrzgQ5Bhkzi3GUU1YBTXOUT1lp6sdXaz2qFa40mPhE
-1AP17ZKxsj80SQnHIAoSO/ODp/TP0ZNXmFtfH1a6W00vNdG0nlH4O4eOIed//f50
-Ca+5KvVzzPMTSOyojVHTkn5amPlMW6zhgt6Ik968Nu7IW5RJ1b0lL5dZof/1f4sm
-wXzMmXt3lMlDX4ZKbZkXA9t7+c/ef4yOt7qtz+DZJD7MhqJr1BlPx1TkUl1+HJyd
-xay3Q4sIe80=
-=62n/
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
