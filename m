@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Ville Tervo <ville.tervo@nokia.com>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Soft lockup
-Message-ID: <20060222125425.GQ19185@null.research.nokia.com>
-References: <20060222091231.GM19185@null.research.nokia.com> <1140607245.4519.7.camel@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1140607245.4519.7.camel@localhost>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20060222091231.GM19185@null.research.nokia.com>
+References: <20060222091231.GM19185@null.research.nokia.com>
+Content-Type: text/plain
+Message-Id: <1140607245.4519.7.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,24 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 22 Feb 2006 14:54:25 +0200
+Date: Wed, 22 Feb 2006 12:20:45 +0100
 
-Hi Marcel,
+Hi Ville,
 
-On Wed, Feb 22, 2006 at 12:20:45PM +0100, ext Marcel Holtmann wrote:
-> Hi Ville,
-> 
-> > I'm got attached oops while playing with Nokia 770. Attached patch
-> > helps. 
-> 
-> I am not really happy with this fix. Do you have an idea why this soft
-> lockup happens? Is this OMAP specific?
+> I'm got attached oops while playing with Nokia 770. Attached patch
+> helps. 
 
-Me neither. I'll try to reproduce it with i386 and see if I can get more
-information.
+I am not really happy with this fix. Do you have an idea why this soft
+lockup happens? Is this OMAP specific?
 
--- 
-Ville
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
