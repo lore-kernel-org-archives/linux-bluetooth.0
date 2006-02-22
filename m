@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS PATCH]RemoteAlias
+Subject: Re: [Bluez-devel] [DBUS PATCH] GetAlias crash
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0602221010m44b865a5qf2750e11e6ecc4de@mail.gmail.com>
-References: <e1effdeb0602221010m44b865a5qf2750e11e6ecc4de@mail.gmail.com>
+In-Reply-To: <1140644211.4519.49.camel@localhost>
+References: <e1effdeb0602221142qedbca67k616f1f05c435d179@mail.gmail.com>
+	 <1140644211.4519.49.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1140651965.4519.59.camel@localhost>
+Message-Id: <1140651932.4519.57.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,16 +19,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Feb 2006 00:46:05 +0100
+Date: Thu, 23 Feb 2006 00:45:32 +0100
 
 Hi Claudio,
 
-> here is the patch that implements the RemoteAlias.
+> > Now, the  daemon is returning the same error message used in the
+> > RemoteAlias: "Error org.bluez.Error: No such device or address".
+> > Is it ok?
 > 
-> What should be the reply message when the alias is not found?
-> This patch returns"org.bluez.Error: No such device or address", is it ok?
+> The GetAlias and RemoteAlias must become GetRemoteAlias. I spent some
+> time thinking about it and after writing the first code for it, I
+> actually realized that GetRemoteAlias and SetRemoteAlias methods and
+> RemoteAliasChanged signal would be much better and cleaner.
 
-it has been replaced by GetRemoteAlias. See my other email for details.
+I did all the needed changes and finally checked in a first draft
+version of the D-Bus API document.
+
+We now really need the dbus-test script working with the new API and I
+think we also should write a bunch of regression tests for testing our
+new API.
 
 Regards
 
