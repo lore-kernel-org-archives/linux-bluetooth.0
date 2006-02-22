@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <fd87b6160602221602i3e3ea582md5f31fb4b69e5d65@mail.gmail.com>
-From: "John McCabe-Dansted" <gmatht@gmail.com>
+Subject: Re: [Bluez-users] Bitstuffing in a Rfcomm connection?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Btsco refuse to hibernate
-Cc: "Administrator TOOTAI" <admin@tootai.net>
-In-Reply-To: <43FC9783.5050708@tootai.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <43FB7C2C.2030203@tootai.net>
-	 <fd87b6160602211505n2edd9d11q9fcc6545c26edc2b@mail.gmail.com>
-	 <43FC9783.5050708@tootai.net>
+In-Reply-To: <1140642881.3319.10.camel@localhost.localdomain>
+References: <20051202220703.C04EF953BA@sc8-sf-spam1.sourceforge.net>
+	 <200512021834.19314.mgorbach@yahoo.com>
+	 <1140642881.3319.10.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1140643645.4519.42.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,110 +20,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Feb 2006 13:02:54 +1300
+Date: Wed, 22 Feb 2006 22:27:25 +0100
 
-On 2/23/06, Administrator TOOTAI <admin@tootai.net> wrote:
-> John McCabe-Dansted a =E9crit :
->
-> >I found that killing all running kmix processes allowed me to shutdown.
-> >this can be done by typing from the command line:
-> >        killall kmix
-> >        killall -9 kmix
-> >
-> >Does this help? What desktop are you using? (E.g. KDE or Gnome)
-> >
-> >
-> I killed all stuff concerning sound, it change nothing.
+Hi Agustin,
 
-Hmm, have you tryied killing virtually all processes (e.g. by going to
-runlevel 1)
+> I'm writing an application that communicates using rfcomm connections.
+> This application communicates with mobile devices. In order to debug the
+> application I also wrote a mobile device emulator that runs in a
+> computer.
+> 
+> Here's the problem:
+> When the application connects to the mobile device everything works
+> fine. But when the application connects to the computer emulating a
+> device, I obtain, mingled with the data the following bytes:
+> "00 5E 40". Sometimes these bytes are together. Some other times these
+> bytes are spreaded among the real data bytes. These additional bytes
+> keeps the application from synchronizing with the emulated device.
+> 
+> My question is: when an rfcomm connection is stablished between two
+> computers, is there some bit/byte stuffing involved?
 
-Have  you tried applying the patch below and replacing your hci_usb
-module (probably only useful if you are using a bluetooth usb dongle)?
+provide is with a full "hcidump -X -V" for this problem, because I have
+no idea what you are talking about.
 
-...
-Signed-Off-By: Johannes Berg <johannes@sipsolutions.net>
+Regards
 
---- linux-2.6.git.orig/drivers/bluetooth/hci_usb.c
-+++ linux-2.6.git/drivers/bluetooth/hci_usb.c
-@@ -1043,10 +1043,65 @@
-       hci_free_dev(hdev);
- }
+Marcel
 
-+static int hci_usb_suspend(struct usb_interface *intf, pm_message_t messag=
-e)
-+{
-+       struct hci_usb *husb =3D usb_get_intfdata(intf);
-+       int i;
-+       unsigned long flags;
-+       struct list_head killed;
-+
-+       if (!husb || intf =3D=3D husb->isoc_iface)
-+               return 0;
-+
-+       INIT_LIST_HEAD(&killed);
-+
-+       for (i =3D 0; i < 4; i++) {
-+               struct _urb_queue *q =3D &husb->pending_q[i];
-+               struct _urb *_urb, *_tmp;
-+               while ((_urb =3D _urb_dequeue(q))) {
-+                       /* reset queue since _urb_dequeue sets it to NULL *=
-/
-+                       _urb->queue =3D q;
-+                       usb_kill_urb(&_urb->urb);
-+                       list_add(&_urb->list, &killed);
-+               }
-+               spin_lock_irqsave(&q->lock, flags);
-+               list_for_each_entry_safe(_urb, _tmp, &killed, list) {
-+                       list_move_tail(&_urb->list, &q->head);
-+               }
-+               spin_unlock_irqrestore(&q->lock, flags);
-+       }
-+       return 0;
-+}
-+
-+static int hci_usb_resume(struct usb_interface *intf)
-+{
-+       struct hci_usb *husb =3D usb_get_intfdata(intf);
-+       int i, err =3D 0;
-+       unsigned long flags;
-+       if (!husb || intf =3D=3D husb->isoc_iface)
-+               return 0;
-+
-+       for (i =3D 0; i < 4; i++) {
-+               struct _urb_queue *q =3D &husb->pending_q[i];
-+               struct _urb *_urb;
-+               spin_lock_irqsave(&q->lock, flags);
-+               list_for_each_entry(_urb, &q->head, list) {
-+                       err =3D usb_submit_urb(&_urb->urb, GFP_ATOMIC);
-+                       if (err) break;
-+               }
-+               spin_unlock_irqrestore(&q->lock, flags);
-+               if (err)
-+                       return -EIO;
-+       }
-+       return 0;
-+}
-+
- static struct usb_driver hci_usb_driver =3D {
-       .name           =3D "hci_usb",
-       .probe          =3D hci_usb_probe,
-       .disconnect     =3D hci_usb_disconnect,
-+       .suspend        =3D hci_usb_suspend,
-+       .resume         =3D hci_usb_resume,
-       .id_table       =3D bluetooth_ids,
- };
 
---
-John C. McCabe-Dansted
-Master's Student
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by xPML, a groundbreaking scripting language
-that extends applications into web and mobile media. Attend the live webcast
-and join the prime developer group breaking into this new coding territory!
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=110944&bid=241720&dat=121642
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=103432&bid=230486&dat=121642
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
