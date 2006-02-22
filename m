@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0602221010m44b865a5qf2750e11e6ecc4de@mail.gmail.com>
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
+Subject: Re: [Bluez-devel] [DBUS]BondingRemoved signal question
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_7941_26900574.1140631841251"
-Subject: [Bluez-devel] [DBUS PATCH]RemoteAlias
+In-Reply-To: <e1effdeb0602220808v6e7796c4xebad39dd2cd2c28a@mail.gmail.com>
+References: <e1effdeb0602220808v6e7796c4xebad39dd2cd2c28a@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1140630371.4519.32.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,87 +18,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 22 Feb 2006 15:10:41 -0300
+Date: Wed, 22 Feb 2006 18:46:11 +0100
 
-------=_Part_7941_26900574.1140631841251
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Claudio,
 
-Hi Marcel,
+> I am going to start the development of the BondingRemoved signal. But
+> before start coding I would like define some requirements.
+> 
+> When it must be sent?  Currently, the code is not checking the result
+> of the HCI delete stored key request, textfile_del return result or
+> disconnect result. What should be the rule for sending the
+> BondingRemoved signal?
+> 1. Wait the command complete event for the delete stored link key request?
+> 2. Check only the result of the textfile_del call?
+> 3. Or if one of these condition(TRUE) is enough to send the
+> BondingRemoved signal
+> 
+> As long as I could understand, we can have the scenario where the link
+> key is NOT stored in the Bluetooth Controller, but it is stored in the
+> linkkeys file. For connected devices, the disconnect can be another
+> assumption, considering that the keys are automatically delete when
+> disconnecting.
+
+actually it is the normal scenario that the link key is not stored on
+the chip. However for now it is enough if we simply send out the
+BondingRemoved signal. We deal with the details later if we have an
+application making us of it.
+
+Regards
+
+Marcel
 
 
-here is the patch that implements the RemoteAlias.
-
-What should be the reply message when the alias is not found?
-This patch returns"org.bluez.Error: No such device or address", is it ok?
-
-Regards,
-Caudio.
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
-
-------=_Part_7941_26900574.1140631841251
-Content-Type: text/x-patch; name=remote_alias01.patch; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Attachment-Id: f_ejzs6bkm
-Content-Disposition: attachment; filename="remote_alias01.patch"
-
-Index: hcid/dbus-device.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus-device.c,v
-retrieving revision 1.6
-diff -u -r1.6 dbus-device.c
---- hcid/dbus-device.c	21 Feb 2006 23:55:19 -0000	1.6
-+++ hcid/dbus-device.c	22 Feb 2006 18:04:38 -0000
-@@ -538,8 +538,41 @@
- 
- static DBusMessage* handle_dev_remote_alias_req(DBusMessage *msg, void *data)
- {
--	/*FIXME: */
--	return bluez_new_failure_msg(msg, BLUEZ_EDBUS_NOT_IMPLEMENTED);
-+	struct hci_dbus_data *dbus_data = data;
-+	DBusConnection *connection = get_dbus_connection();
-+	DBusMessageIter iter;
-+	DBusMessage *reply;
-+	DBusMessage *signal;
-+	char str[249], *str_ptr = str, *addr_ptr;
-+	bdaddr_t bdaddr;
-+	int err;
-+
-+	dbus_message_iter_init(msg, &iter);
-+	dbus_message_iter_get_basic(&iter, &addr_ptr);
-+
-+	str2ba(addr_ptr, &bdaddr);
-+
-+	err = get_device_alias(dbus_data->dev_id, &bdaddr, str, sizeof(str));
-+
-+	if (err < 0) {
-+		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET | -err);
-+		goto failed;
-+	}
-+
-+	signal = dev_signal_factory(dbus_data->dev_id, DEV_SIG_REMOTE_ALIAS,
-+						DBUS_TYPE_STRING, &addr_ptr,
-+						DBUS_TYPE_STRING, &str_ptr,
-+						DBUS_TYPE_INVALID);
-+	if (signal) {
-+		dbus_connection_send(connection, signal, NULL);
-+		dbus_connection_flush(connection);
-+		dbus_message_unref(signal);
-+	}
-+
-+	reply = dbus_message_new_method_return(msg);
-+failed:
-+	return reply;
-+
- }
- 
- static DBusMessage* handle_dev_remote_name_req(DBusMessage *msg, void *data)
-
-------=_Part_7941_26900574.1140631841251--
 
 
 -------------------------------------------------------
