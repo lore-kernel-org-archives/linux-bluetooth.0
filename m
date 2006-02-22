@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS PATCH] GetAlias crash
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43FCF647.7050806@prolly.org>
+From: Douglas Ward <douglas.ward@prolly.org>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1140644211.4519.49.camel@localhost>
-References: <e1effdeb0602221142qedbca67k616f1f05c435d179@mail.gmail.com>
-	 <1140644211.4519.49.camel@localhost>
-Content-Type: text/plain
-Message-Id: <1140651932.4519.57.camel@localhost>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Subject: [Bluez-devel] Logitech BT mini-receiver
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,31 +16,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Feb 2006 00:45:32 +0100
+Date: Wed, 22 Feb 2006 18:39:51 -0500
 
-Hi Claudio,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> > Now, the  daemon is returning the same error message used in the
-> > RemoteAlias: "Error org.bluez.Error: No such device or address".
-> > Is it ok?
-> 
-> The GetAlias and RemoteAlias must become GetRemoteAlias. I spent some
-> time thinking about it and after writing the first code for it, I
-> actually realized that GetRemoteAlias and SetRemoteAlias methods and
-> RemoteAliasChanged signal would be much better and cleaner.
+after being completely ignored on the bluez users list i decided to post
+this here.
 
-I did all the needed changes and finally checked in a first draft
-version of the D-Bus API document.
+I can't seem to get an hci device with this device. it came with my
+Logitech Cordless desktop mx 5000. It does the whole hid proxy thing so
+i tried to run hid2hci and got:
 
-We now really need the dbus-test script working with the new API and I
-think we also should write a bunch of regression tests for testing our
-new API.
+Switching device 046d:0b02 to HCI mode was successful
 
-Regards
+but when i run hciconfig i get nothing. dmesg shows nothing.
 
-Marcel
+any ideas?
+- --
+Douglas K Ward
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.1 (GNU/Linux)
 
-
+iQIVAwUBQ/z2RlKDmmHy9Q32AQJtoRAAtgBx34JGrEpsQ51/D2WacNuJTZ8fGxoM
+vZ6HtCrn9zfgITBMXQb4pX/PChnxHoaGjnQ4zMi35ZF4S9v2hryyCauDRYGWjFkc
+CDrjLrgsqTM/EGgd3ImaeoLrQqZDpKjzn15DleU911YQn5+/gEiz3U7MwvhaI/Rl
+fgpgdwU0KY4NnnVFJjolgKsr+EX0By8qDIbDoeGIZVJRy7rDeCClRR6viZ/5blXg
+6+lMk9u7ZQEUH6GXZNKXppaQ5OQbYwG5/zEu98VW9xDWxz8gww6eoM0WAEnYykW5
+2O1PZ7jYlgHTzQDH2W65R0evNwvTMoahlcflA5AaaoL7dJIcF68lIWV1A1fLt7ym
+JSkNQTYmorUL7hSvLDUsRP8JG5DkIf9u4QRVYkE2/fl52k1XkzeXxykhl8SzmrPj
+FSUPa2ITHJVyeFzTUGkHvZNrzgQ5Bhkzi3GUU1YBTXOUT1lp6sdXaz2qFa40mPhE
+1AP17ZKxsj80SQnHIAoSO/ODp/TP0ZNXmFtfH1a6W00vNdG0nlH4O4eOIed//f50
+Ca+5KvVzzPMTSOyojVHTkn5amPlMW6zhgt6Ik968Nu7IW5RJ1b0lL5dZof/1f4sm
+wXzMmXt3lMlDX4ZKbZkXA9t7+c/ef4yOt7qtz+DZJD7MhqJr1BlPx1TkUl1+HJyd
+xay3Q4sIe80=
+=62n/
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
