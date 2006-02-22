@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Logitech BT mini-receiver
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <43FCF647.7050806@prolly.org>
+References: <43FCF647.7050806@prolly.org>
 Content-Type: text/plain
-Message-Id: <1140652705.4519.71.camel@localhost>
+Message-Id: <1140652091.4519.62.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-devel] The new D-Bus API specification
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,22 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Feb 2006 00:58:25 +0100
+Date: Thu, 23 Feb 2006 00:48:11 +0100
 
-Hi,
+Hi Douglas,
 
-there have been rumors about a written API specification for the D-Bus
-interface of hcid (and bluetoothd in the future) and all of them is
-actually true. You will find the current version under hcid/dbus-api.txt
-inside the bluez-utils CVS. This isn't the final version, but it really
-looks good and something about 90% has been implemented in the last few
-weeks. Most of the work has been done by Claudio, Eduardo and Johan. So
-thank these guys for their work.
+> after being completely ignored on the bluez users list i decided to post
+> this here.
 
-I like to see the rest 10% implemented and after that my plan is to
-release the next version of bluez-utils and open it for wider testing,
-but any feedback at this point is highly welcome. And I also like to see
-sample programs in various languages that we can include for reference.
+you are actually not being ignored, but my answer to this will be still
+the same. Doesn't matter how many people send in a request. I don't have
+this hardware and so I can't help to find the magic sequence.
 
 Regards
 
