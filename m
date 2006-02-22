@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS]BondingRemoved signal question
+Subject: Re: [Bluez-devel] [DBUS PATCH] msg_func_device: wrong request
+	handling for unknow methods
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0602220808v6e7796c4xebad39dd2cd2c28a@mail.gmail.com>
-References: <e1effdeb0602220808v6e7796c4xebad39dd2cd2c28a@mail.gmail.com>
+In-Reply-To: <e1effdeb0602220912k39f3f9d0g627bca665e0c4dad@mail.gmail.com>
+References: <e1effdeb0602220912k39f3f9d0g627bca665e0c4dad@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1140630371.4519.32.camel@localhost>
+Message-Id: <1140630269.4519.29.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,32 +19,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 22 Feb 2006 18:46:11 +0100
+Date: Wed, 22 Feb 2006 18:44:29 +0100
 
 Hi Claudio,
 
-> I am going to start the development of the BondingRemoved signal. But
-> before start coding I would like define some requirements.
+> Here is a patch to fix the function msg_func_device.
 > 
-> When it must be sent?  Currently, the code is not checking the result
-> of the HCI delete stored key request, textfile_del return result or
-> disconnect result. What should be the rule for sending the
-> BondingRemoved signal?
-> 1. Wait the command complete event for the delete stored link key request?
-> 2. Check only the result of the textfile_del call?
-> 3. Or if one of these condition(TRUE) is enough to send the
-> BondingRemoved signal
+> While Eduardo was fixing the dbus-test script he noticed a strange
+> reply value. The daemon was returning two consecutives error
+> messages(unknow method and unknow path) for services   not implemented
+> in the path.
 > 
-> As long as I could understand, we can have the scenario where the link
-> key is NOT stored in the Bluetooth Controller, but it is stored in the
-> linkkeys file. For connected devices, the disconnect can be another
-> assumption, considering that the keys are automatically delete when
-> disconnecting.
+> This bug happens due the registered fallback path associated with the
+> wrong return value. The "/org/bluez/Device/hciX" was returning unknow
+> method and the root path "/org/bluez/Device" was returning unknow
+> path.
 
-actually it is the normal scenario that the link key is not stored on
-the chip. However for now it is enough if we simply send out the
-BondingRemoved signal. We deal with the details later if we have an
-application making us of it.
+patch has been applied. Thanks.
 
 Regards
 
