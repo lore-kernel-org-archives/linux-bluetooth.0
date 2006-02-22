@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43FC5484.1070503@cs.bgu.ac.il>
-From: NIV VAIZER <nivv@cs.bgu.ac.il>
-MIME-Version: 1.0
+Message-ID: <12872735.1140610059229.JavaMail.tomcat@pne-ps6-sn1>
+From: <ari.paavilainen@pp.inet.fi>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] btsco doesnt like alsa-driver ?
+Mime-Version: 1.0
+Content-Type: text/plain;charset="UTF-8"
+Subject: [Bluez-users] sendto/recvfrom
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +16,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Feb 2006 14:09:40 +0200
+Date: Wed, 22 Feb 2006 13:07:39 +0100 (MET)
 
-here is an odd ball:
-I can use btsco from bluetooth alsa 0.41 with alsa build as modules in 
-the kernel,
-But If I turn it off in the kernel and install the alsa driver modules , 
-btsco - just doesnt work.
-in both case I  have the file:
-/lib/modules/`uname -r`/alsa-driver/acore/snd-hwdep.ko
+Hi,
 
-So is there a problem using btsco againt alsa 1.10 , while it works for 
-1.09?
-Niv
+Can I use sendto and recvfrom with l2cap sockets (instead of connect, listen, 
+accept,..)?
+
+-Ari
 
 
 -------------------------------------------------------
