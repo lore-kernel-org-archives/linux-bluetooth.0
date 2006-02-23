@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43FE2C18.7030306@tootai.net>
-From: Administrator TOOTAI <admin@tootai.net>
+Message-ID: <43FDFC4E.8040104@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Btsco refuse to hibernate
-References: <43FB7C2C.2030203@tootai.net>	 <fd87b6160602211505n2edd9d11q9fcc6545c26edc2b@mail.gmail.com>	 <43FC9783.5050708@tootai.net> <fd87b6160602221602i3e3ea582md5f31fb4b69e5d65@mail.gmail.com>
-In-Reply-To: <fd87b6160602221602i3e3ea582md5f31fb4b69e5d65@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] A2DP alsa no sound
+References: <43FDE154.7050803@cs.bgu.ac.il>
+In-Reply-To: <43FDE154.7050803@cs.bgu.ac.il>
+Content-Type: text/plain; charset=UTF-8
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,43 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Feb 2006 22:41:44 +0100
+Date: Thu, 23 Feb 2006 11:17:50 -0700
 
-John McCabe-Dansted a =E9crit :
-> On 2/23/06, Administrator TOOTAI <admin@tootai.net> wrote:
->=20
->>John McCabe-Dansted a =E9crit :
->>
->>
->>>I found that killing all running kmix processes allowed me to shutdown=
-.
->>>this can be done by typing from the command line:
->>>       killall kmix
->>>       killall -9 kmix
->>>
->>>Does this help? What desktop are you using? (E.g. KDE or Gnome)
->>>
->>>
->>
->>I killed all stuff concerning sound, it change nothing.
->=20
->=20
-> Hmm, have you tryied killing virtually all processes (e.g. by going to
-> runlevel 1)
+Niv
 
-No. I made <lsof | grep snd> then kill all programs showed.
+> I am SO glad you made a alsa plugin for the headphones.
+> I  tried it , I hear that the headphones do pick it up , but no sound
+> goes throu
 
->=20
-> Have  you tried applying the patch below and replacing your hci_usb
-> module (probably only useful if you are using a bluetooth usb dongle)?
+The plugin is a work in progress. I got stuck in getting it to do the
+right thing.
 
-There is no bluetooth device attached, just the module is loaded.
+Can you see from the hcidump where the plugin differs from a successful
+stream via a2play?
 
->=20
-[...]
-
---=20
-Daniel
+Brad
 
 
 -------------------------------------------------------
