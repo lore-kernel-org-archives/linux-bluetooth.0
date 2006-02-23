@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS PATCH]GetMinorClass
+Subject: Re: [Bluez-devel] [DBUS PATCH] SetMinorClass
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0602231101r28356778q72c02d66b67d549b@mail.gmail.com>
-References: <e1effdeb0602231101r28356778q72c02d66b67d549b@mail.gmail.com>
+In-Reply-To: <e1effdeb0602230635j3581adbbwcf20fb60844a5413@mail.gmail.com>
+References: <e1effdeb0602230635j3581adbbwcf20fb60844a5413@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1140722014.24721.62.camel@localhost>
+Message-Id: <1140721518.24721.60.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,14 +18,13 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Feb 2006 20:13:34 +0100
+Date: Thu, 23 Feb 2006 20:05:18 +0100
 
 Hi Claudio,
 
-> Here is the GetMinorClass service. For major classes diferent than
-> Computer an empty reply is returned.
+> Here is the patch to set the computer minor class.
 
-the patch has been applied. Thanks and forget about my other email ;)
+can I also get a patch for reading the minor class?
 
 Regards
 
