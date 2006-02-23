@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0602231233t1656b085xfbb430ad612a69d9@mail.gmail.com>
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
+Subject: Re: [Bluez-devel] [DBUS PATCH]GetMinorClass
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_7113_10797808.1140726807216"
-Subject: [Bluez-devel] hciconfig service class listing patch
+In-Reply-To: <e1effdeb0602231101r28356778q72c02d66b67d549b@mail.gmail.com>
+References: <e1effdeb0602231101r28356778q72c02d66b67d549b@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1140722014.24721.62.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,54 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Feb 2006 17:33:27 -0300
+Date: Thu, 23 Feb 2006 20:13:34 +0100
 
-------=_Part_7113_10797808.1140726807216
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Claudio,
 
-Hi Marcel,
+> Here is the GetMinorClass service. For major classes diferent than
+> Computer an empty reply is returned.
 
-while I was developing the service class for D-Bus I noticed that
-there is a small bug in the hciconfig service class listing.
+the patch has been applied. Thanks and forget about my other email ;)
 
-The sizeof is getting the pointer size instead of check the number of
-array elements.
+Regards
+
+Marcel
 
 
-Regards,
-Claudio.
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
-
-------=_Part_7113_10797808.1140726807216
-Content-Type: text/x-patch; name=hciconfig-service-class.patch;
-	charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Attachment-Id: f_ek1j7w9y
-Content-Disposition: attachment; filename="hciconfig-service-class.patch"
-
-Index: tools/hciconfig.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/tools/hciconfig.c,v
-retrieving revision 1.78
-diff -u -r1.78 hciconfig.c
---- tools/hciconfig.c	15 Feb 2006 09:17:52 -0000	1.78
-+++ tools/hciconfig.c	23 Feb 2006 20:27:45 -0000
-@@ -666,7 +666,7 @@
- 		printf("\tService Classes: ");
- 		if (cls[2]) {
- 			int first = 1;
--			for (s = 0; s < sizeof(*services); s++)
-+			for (s = 0; s < (sizeof(services) / sizeof(*services)); s++)
- 				if (cls[2] & (1 << s)) {
- 					if (!first)
- 						printf(", ");
-
-------=_Part_7113_10797808.1140726807216--
 
 
 -------------------------------------------------------
