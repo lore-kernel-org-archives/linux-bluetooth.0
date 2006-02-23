@@ -2,11 +2,10 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Build Problem
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1140716785.24721.52.camel@localhost>
+In-Reply-To: <e1effdeb0602230937n72ba801at6d0005d0f1a98dce@mail.gmail.com>
 References: <e1effdeb0602230937n72ba801at6d0005d0f1a98dce@mail.gmail.com>
-	 <1140716785.24721.52.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1140717002.24721.54.camel@localhost>
+Message-Id: <1140716785.24721.52.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,21 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Feb 2006 18:50:02 +0100
+Date: Thu, 23 Feb 2006 18:46:25 +0100
 
 Hi Claudio,
 
-> > I saw that you changed the hcid/Makefile.am to add sdp files. When you
-> > changed the file order the build broke. The attached patch should fix
-> > this issue.
-> 
-> it works for me. What autoconf/automake version are you using. Did you
-> ran bootstrap-configure again?
+> I saw that you changed the hcid/Makefile.am to add sdp files. When you
+> changed the file order the build broke. The attached patch should fix
+> this issue.
 
-oops, it also breaks it for me. Was working only the hcid subdirectory
-and in this case everything is fine, but a clean build doesn't work.
-
-Thanks for the patch.
+it works for me. What autoconf/automake version are you using. Did you
+ran bootstrap-configure again?
 
 Regards
 
