@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="big5"
-Message-ID: <E64BAD5A8AD46740828069A678D9DD73011B03@netbe01.net.unimis>
-From: "Al" <Al_chane@issc.com.tw>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] ISSC USB dongle can't ping with size 1000
+Subject: Re: [Bluez-users] recvfrom/sendto
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <13293140.1140685212408.JavaMail.tomcat@pne-ps5-sn1>
+References: <13293140.1140685212408.JavaMail.tomcat@pne-ps5-sn1>
+Content-Type: text/plain
+Message-Id: <1140691177.24721.8.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,33 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Feb 2006 16:44:48 +0800
+Date: Thu, 23 Feb 2006 11:39:37 +0100
 
-Hi,
+Hi Ari,
 
-    I have the same problem as below which was posted last month.
+> Can I use recvfrom and sendto with l2cap sockets (instead of listen, accept, 
+> connect,...)?
 
->   I started to play with the ping size. 'ping -s 900' works, 'ping -s =
-1000'
-> kills the PAN connection. There was hope! Then I played with MTU (on =
-both
-> sides): 'ifconfig bnep0 mtu 1000' solves all my problems (default is
-> 1500)!!! With this setting I've a rock solid 75 kByte/s transfer rate =
-over
-> ftp. A mtu of 1017 still works, 1018 definitely kills the connection.=20
+why do you repeat your emails? I already told you to try it and tell if
+it doesn't work.
 
-     I wonder if there is other solutions to this problem cause the =
-above solution needs to set MTU to 1000 on both sides.=20
+Regards
 
-     I try ISSC dongle with IVT software as NAP on Windows XP. Ping with =
-size
-1500 works fine. It seems ISSC chip has some problems to work with =
-BlueZ, in
-addition to adding HCI_RESET.
+Marcel
 
-Thanks for helps,
-
-Al=20
 
 
 
