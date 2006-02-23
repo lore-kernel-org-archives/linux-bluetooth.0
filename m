@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] recvfrom/sendto
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <13293140.1140685212408.JavaMail.tomcat@pne-ps5-sn1>
+From: <ari.paavilainen@pp.inet.fi>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <13293140.1140685212408.JavaMail.tomcat@pne-ps5-sn1>
-References: <13293140.1140685212408.JavaMail.tomcat@pne-ps5-sn1>
-Content-Type: text/plain
-Message-Id: <1140691177.24721.8.camel@localhost>
 Mime-Version: 1.0
+Content-Type: text/plain;charset="UTF-8"
+Subject: [Bluez-users] recvfrom/sendto
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +16,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Feb 2006 11:39:37 +0100
+Date: Thu, 23 Feb 2006 10:00:12 +0100 (MET)
 
-Hi Ari,
+Hi,
 
-> Can I use recvfrom and sendto with l2cap sockets (instead of listen, accept, 
-> connect,...)?
+Can I use recvfrom and sendto with l2cap sockets (instead of listen, accept, 
+connect,...)?
 
-why do you repeat your emails? I already told you to try it and tell if
-it doesn't work.
-
-Regards
-
-Marcel
-
-
+-Ari
 
 
 -------------------------------------------------------
