@@ -7,7 +7,7 @@ References: <e1effdeb0602231250q18912898td65b1ff0edf278@mail.gmail.com>
 	 <1140729493.24721.69.camel@localhost>
 	 <e1effdeb0602231329r446c015bh172515b7eebec548@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1140748782.24721.87.camel@localhost>
+Message-Id: <1140731482.24721.83.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,33 +20,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 24 Feb 2006 03:39:42 +0100
+Date: Thu, 23 Feb 2006 22:51:22 +0100
 
 Hi Claudio,
 
 > > the patch has been applied. So what have been left?
 > 
 > - GetFeatures
-
-this returns an empty list for now.
-
 > - PinCodeLength
-
-It has been implemented, but it definitely needs more testing. I choose
-an extension of the link keys file.
-
 > - EncryptionKeySize
-
-The basic functionality is there, but no backend for the different chips
-has been implemented.
-
 > - MinorClassChanged
-
-Done.
-
 > - dbus-test update
 
-I did a small update for my own testing.
+we might wanna leave the GetFeatures part out of it, because I am not
+sure if it is useful at all.
+
+The PinCodeLength needs some work from my side, because we actually need
+to store the length of the used PIN codes.
+
+Support for EncryptionKeySize can be only implemented for CSR chips,
+because I have no idea how to get this from other manufacturers.
+
+The MinorClassChanged signal is kinda easy to add.
+
+And I am not touching the dbus-test script ;)
+
+> I am going home now. I think we can try finish it until tomorrow.
+
+Looks really good. So we are almost ready for the next release. However
+I actually like to have a better D-Bus service file. We need to restrict
+some of the functions to the console user.
+
+> SDP will be another history, I think we can try develop it after the Carnival :)
+
+The SDP will take more time and is not that easy. Enjoy your Carnival :)
 
 Regards
 
