@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS PATCH] GetServiceClasses
+Subject: Re: [Bluez-devel] hciconfig service class listing patch
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0602231250q18912898td65b1ff0edf278@mail.gmail.com>
-References: <e1effdeb0602231250q18912898td65b1ff0edf278@mail.gmail.com>
+In-Reply-To: <e1effdeb0602231233t1656b085xfbb430ad612a69d9@mail.gmail.com>
+References: <e1effdeb0602231233t1656b085xfbb430ad612a69d9@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1140729493.24721.69.camel@localhost>
+Message-Id: <1140729417.24721.66.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,20 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Feb 2006 22:18:13 +0100
+Date: Thu, 23 Feb 2006 22:16:57 +0100
 
 Hi Claudio,
 
-> Here is the GetServiceClasses service.
+> while I was developing the service class for D-Bus I noticed that
+> there is a small bug in the hciconfig service class listing.
+> 
+> The sizeof is getting the pointer size instead of check the number of
+> array elements.
 
-the patch has been applied. So what have been left?
-
-> There are some shared constants(major classes, minor classes and
-> service classes) used by hciconfig.c and dbus-device.c. Maybe we could
-> put it in a common place.
-
-Keep them separate. It is not worth trying to move stuff around at this
-point.
+good catch. Thanks.
 
 Regards
 
