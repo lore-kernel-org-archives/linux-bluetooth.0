@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS PATCH] SetMinorClass
+Subject: Re: [Bluez-devel] [DBUS PATCH] dbus-test
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0602230635j3581adbbwcf20fb60844a5413@mail.gmail.com>
-References: <e1effdeb0602230635j3581adbbwcf20fb60844a5413@mail.gmail.com>
+In-Reply-To: <3013cac80602231049j49a278fj549ac697a696cc42@mail.gmail.com>
+References: <3013cac80602231049j49a278fj549ac697a696cc42@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1140721518.24721.60.camel@localhost>
+Message-Id: <1140721487.24721.58.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,13 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Feb 2006 20:05:18 +0100
+Date: Thu, 23 Feb 2006 20:04:47 +0100
 
-Hi Claudio,
+Hi Eduardo,
 
-> Here is the patch to set the computer minor class.
+> here is the patch for the new dbus-test compliant with the new
+> interface. It's not fully tested.
 
-can I also get a patch for reading the minor class?
+the patch has been applied to the CVS.
+
+> By the way Marcel, did you removed
+> the Discovery method from the API document?
+
+I removed it from the public version. I think we should spent some more
+time thinking about and playing with it before having a written API
+document. There a multiple designs possible and I like to find the best
+one, before putting out the specification.
 
 Regards
 
