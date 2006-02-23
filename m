@@ -1,16 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <fd87b6160602231604i5574b370uba09acf45c7d1a14@mail.gmail.com>
-From: "John McCabe-Dansted" <gmatht@gmail.com>
+Message-ID: <43FE2C18.7030306@tootai.net>
+From: Administrator TOOTAI <admin@tootai.net>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Btsco refuse to hibernate
-In-Reply-To: <43FE2C18.7030306@tootai.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <43FB7C2C.2030203@tootai.net>
-	 <fd87b6160602211505n2edd9d11q9fcc6545c26edc2b@mail.gmail.com>
-	 <43FC9783.5050708@tootai.net>
-	 <fd87b6160602221602i3e3ea582md5f31fb4b69e5d65@mail.gmail.com>
-	 <43FE2C18.7030306@tootai.net>
+References: <43FB7C2C.2030203@tootai.net>	 <fd87b6160602211505n2edd9d11q9fcc6545c26edc2b@mail.gmail.com>	 <43FC9783.5050708@tootai.net> <fd87b6160602221602i3e3ea582md5f31fb4b69e5d65@mail.gmail.com>
+In-Reply-To: <fd87b6160602221602i3e3ea582md5f31fb4b69e5d65@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,29 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 24 Feb 2006 13:04:20 +1300
+Date: Thu, 23 Feb 2006 22:41:44 +0100
 
-> No. I made <lsof | grep snd> then kill all programs showed.
+John McCabe-Dansted a =E9crit :
+> On 2/23/06, Administrator TOOTAI <admin@tootai.net> wrote:
+>=20
+>>John McCabe-Dansted a =E9crit :
+>>
+>>
+>>>I found that killing all running kmix processes allowed me to shutdown=
+.
+>>>this can be done by typing from the command line:
+>>>       killall kmix
+>>>       killall -9 kmix
+>>>
+>>>Does this help? What desktop are you using? (E.g. KDE or Gnome)
+>>>
+>>>
+>>
+>>I killed all stuff concerning sound, it change nothing.
+>=20
+>=20
+> Hmm, have you tryied killing virtually all processes (e.g. by going to
+> runlevel 1)
 
-Cool. I didn't realize you could do that. In my case though, e.g. xmms
-doesn't stop the machine hibernating even though it uses /dev/snd.
+No. I made <lsof | grep snd> then kill all programs showed.
 
-> >
-> > Have  you tried applying the patch below and replacing your hci_usb
-> > module (probably only useful if you are using a bluetooth usb dongle)?
->
-> There is no bluetooth device attached, just the module is loaded.
+>=20
+> Have  you tried applying the patch below and replacing your hci_usb
+> module (probably only useful if you are using a bluetooth usb dongle)?
 
-I am not sure what you mean. Surely you must have some sort of
-bluetooth adapter, even if it is built into the motherboard?
+There is no bluetooth device attached, just the module is loaded.
 
-If you really don't have any bluetooth devices, you may as well stop
-snd-bt-sco from loading next time you boot, e.g. by typing
-         sudo mv /lib/modules/`uname -r`/extra/snd-bt-sco.ko{,.bak}
+>=20
+[...]
 
---
-John C. McCabe-Dansted
-Master's Student
+--=20
+Daniel
 
 
 -------------------------------------------------------
