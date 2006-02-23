@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43FDFC4E.8040104@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Bitstuffing in a Rfcomm connection?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] A2DP alsa no sound
-References: <43FDE154.7050803@cs.bgu.ac.il>
-In-Reply-To: <43FDE154.7050803@cs.bgu.ac.il>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1140710294.3302.6.camel@localhost.localdomain>
+References: <20051202220703.C04EF953BA@sc8-sf-spam1.sourceforge.net>
+	 <200512021834.19314.mgorbach@yahoo.com>
+	 <1140642881.3319.10.camel@localhost.localdomain>
+	 <1140643645.4519.42.camel@localhost>
+	 <1140710294.3302.6.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1140713467.24721.45.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +22,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Feb 2006 11:17:50 -0700
+Date: Thu, 23 Feb 2006 17:51:07 +0100
 
-Niv
+Hi Agustin,
 
-> I am SO glad you made a alsa plugin for the headphones.
-> I  tried it , I hear that the headphones do pick it up , but no sound
-> goes throu
+> Here's the situation. I have an open rfcomm connection which I use
+> through a file descriptor, fd: fd = open(devname, O_RDWR | O_NOCTTY);
+> 
+> I realized that the 'extra bytes' I was reading (using the read
+> function) actually are some bytes that I'm periodically writing (using
+> the write function) to this file descriptor. It's like I have an 'echo'
+> of the bytes I write... I read all the incoming that AND the bytes I'm
+> writing  to this fd.
 
-The plugin is a work in progress. I got stuck in getting it to do the
-right thing.
+set the TTY into raw mode or use the RFCOMM socket directly.
 
-Can you see from the hcidump where the plugin differs from a successful
-stream via a2play?
+Regards
 
-Brad
+Marcel
+
+
 
 
 -------------------------------------------------------
