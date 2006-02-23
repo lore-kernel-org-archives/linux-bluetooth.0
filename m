@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [DBUS PATCH] SetMinorClass
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <e1effdeb0602230909o674853f6h7b9e01488c0c4d49@mail.gmail.com>
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0602230635j3581adbbwcf20fb60844a5413@mail.gmail.com>
-References: <e1effdeb0602230635j3581adbbwcf20fb60844a5413@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1140715100.24721.47.camel@localhost>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_2572_11464.1140714597626"
+Subject: [Bluez-devel] [DBUS PATCH]LastSeen
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,20 +17,84 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Feb 2006 18:18:20 +0100
+Date: Thu, 23 Feb 2006 14:09:57 -0300
 
-Hi Claudio,
+------=_Part_2572_11464.1140714597626
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> Here is the patch to set the computer minor class.
+Hi Marcel,
 
-I changing the variable naming a little bit and added a missing
-hci_close_dev() command.
+Here is the patch to add the last seen service.
 
-Regards
+I saw that I you implemented the SDP skeleton. At least, it seems to
+be more interesting than these mechanical patches :) SDP is most
+important feature missing on D-Bus API.
 
-Marcel
+
+Regards,
+Claudio.
+--
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
+
+------=_Part_2572_11464.1140714597626
+Content-Type: text/x-patch; name=last-seen01.patch; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Attachment-Id: f_ek15a8x7
+Content-Disposition: attachment; filename="last-seen01.patch"
+
+Index: hcid/dbus-device.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/dbus-device.c,v
+retrieving revision 1.11
+diff -u -r1.11 dbus-device.c
+--- hcid/dbus-device.c	23 Feb 2006 12:48:51 -0000	1.11
++++ hcid/dbus-device.c	23 Feb 2006 17:00:14 -0000
+@@ -533,8 +533,35 @@
+ 
+ static DBusMessage* handle_dev_last_seen_req(DBusMessage *msg, void *data)
+ {
+-	/*FIXME: */
+-	return bluez_new_failure_msg(msg, BLUEZ_EDBUS_NOT_IMPLEMENTED);
++	struct hci_dbus_data *dbus_data = data;
++	DBusMessageIter iter;
++	DBusMessage *reply;
++	char filename[PATH_MAX + 1];
++	char addr[18], *addr_ptr, *str;
++
++	get_device_address(dbus_data->dev_id, addr, sizeof(addr));
++
++	snprintf(filename, PATH_MAX, "%s/%s/lastseen", STORAGEDIR, addr);
++
++	dbus_message_iter_init(msg, &iter);
++	dbus_message_iter_get_basic(&iter, &addr_ptr);
++
++	str = textfile_get(filename, addr_ptr);
++
++	if (!str) {
++		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET | ENXIO);
++		goto failed;
++	}
++
++	reply = dbus_message_new_method_return(msg);
++
++	dbus_message_append_args(reply, DBUS_TYPE_STRING, &str,
++				 	DBUS_TYPE_INVALID);
++
++	free(str);
++
++failed:
++	return reply;
+ }
+ 
+ static DBusMessage* handle_dev_last_used_req(DBusMessage *msg, void *data)
 
 
+
+------=_Part_2572_11464.1140714597626--
 
 
 -------------------------------------------------------
