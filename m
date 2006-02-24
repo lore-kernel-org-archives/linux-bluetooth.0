@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43FF0F66.7030704@fillibach.de>
-From: Kosta Welke <kosta@fillibach.de>
-MIME-Version: 1.0
+From: Ville Tervo <ville.tervo@nokia.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] pand multiconnection patch
-References: <43FDBDDD.7030209@fillibach.de> <1140703850.24721.42.camel@localhost>
-In-Reply-To: <1140703850.24721.42.camel@localhost>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] Soft lockup
+Message-ID: <20060224110357.GT19185@null.research.nokia.com>
+References: <20060222091231.GM19185@null.research.nokia.com> <1140607245.4519.7.camel@localhost> <20060222125425.GQ19185@null.research.nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20060222125425.GQ19185@null.research.nokia.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,18 +18,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 24 Feb 2006 14:51:34 +0100
+Date: Fri, 24 Feb 2006 13:03:58 +0200
 
-Marcel Holtmann wrote:
-> the patch is too big for a full review. Please split it up into multiple
-> logical parts. It is much easier for me to review small patches and then
-> it is more likely that I am going to accept them.
+Hi Marcel,
 
-Okay, I'll do a smaller patch that just does multiple connections. As 
-soon as I find the time :)
+On Wed, Feb 22, 2006 at 02:54:25PM +0200, ext Ville Tervo wrote:
+> Hi Marcel,
+> 
+> On Wed, Feb 22, 2006 at 12:20:45PM +0100, ext Marcel Holtmann wrote:
+> > Hi Ville,
+> > 
+> > > I'm got attached oops while playing with Nokia 770. Attached patch
+> > > helps. 
+> > 
+> > I am not really happy with this fix. Do you have an idea why this soft
+> > lockup happens? Is this OMAP specific?
+> 
+> Me neither. I'll try to reproduce it with i386 and see if I can get more
+> information.
 
-Yours,
-Kosta
+Now I have more information about this problem.
+
+I had debuggin enabled in net/bluetooth/rfcomm/core.c and I noticed that
+for some reson rfcomm_dlc_clear_timer() is called for allready freed
+dlc and lock_timer_base() gets stuck because it's trying to use invalid
+timer pointer. I also tried to reproduce bug in i386 without success.
+Also then debugging is on the bug much harder to reproduse. To me this
+looks like dlc locking doens't work as it should work.
+
+And other notice. rfcomm_dlc_clear_timeri() uses timer_pending()
+together with del_timer() which allready calls timer_pending(). So
+timer_pending() is useless in rfcomm_dlc_clear_timer().
+
+-- 
+Ville
 
 
 -------------------------------------------------------
