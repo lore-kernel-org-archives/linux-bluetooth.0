@@ -1,18 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <fd87b6160602241539w43797d37i6fa2321a12693a12@mail.gmail.com>
-From: "John McCabe-Dansted" <gmatht@gmail.com>
+Subject: Re: Vs: Re: [Bluez-users] recvfrom/sendto
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Btsco refuse to hibernate
-In-Reply-To: <43FF1CE1.90604@tootai.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <43FB7C2C.2030203@tootai.net>
-	 <fd87b6160602211505n2edd9d11q9fcc6545c26edc2b@mail.gmail.com>
-	 <43FC9783.5050708@tootai.net>
-	 <fd87b6160602221602i3e3ea582md5f31fb4b69e5d65@mail.gmail.com>
-	 <43FE2C18.7030306@tootai.net>
-	 <fd87b6160602231604i5574b370uba09acf45c7d1a14@mail.gmail.com>
-	 <43FF1CE1.90604@tootai.net>
+In-Reply-To: <20403581.1140769616667.JavaMail.tomcat@pne-ps5-sn2>
+References: <20403581.1140769616667.JavaMail.tomcat@pne-ps5-sn2>
+Content-Type: text/plain
+Message-Id: <1140800100.7264.19.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -24,48 +18,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 25 Feb 2006 12:39:40 +1300
+Date: Fri, 24 Feb 2006 17:55:00 +0100
 
-On 2/25/06, Administrator TOOTAI <admin@tootai.net> wrote:
-> John McCabe-Dansted a =E9crit :
-> >If you really don't have any bluetooth devices, you may as well stop
-> >snd-bt-sco from loading next time you boot, e.g. by typing
-> >         sudo mv /lib/modules/`uname -r`/extra/snd-bt-sco.ko{,.bak}
-> >
-> >
-> Ah, I can do this ;-)?
->
-> Sure I have I have a bluetooth device, my sentence is to be understand
-> like "at the time I want to hibernate, no bluetooth device is attached." =
-:-)
+Hi Ari,
 
-I just remembered, hibernated doesn't work for me either when
-snd_bt_sco is *loaded*. However, if there are no processes are using
-it,  you should be able to remove it using the rmmod command,
-   i.e. rmmod -w snd_bt_sco.
+> Sorry about that. The reason: I sent the message to the list, and waited for 
+> it to appear to my mailbox. It didn't appear and then I realised that I am not 
+> even subscribing the list. I thought that the message didn't get to the list 
+> and I posted it second time.
+> 
+> I have tried to use sendto this way:
+> 
+> int sock;
+> struct sockaddr_l2 sock_addr;
+> char addr[18] = "00:12:37:46:bc:2b";
+> 
+> sock = socket(AF_BLUETOOTH, SOCK_DGRAM, BTPROTO_L2CAP);
+> sock_addr.l2_family = AF_BLUETOOTH;
+> sock_addr.l2_psm = htobs(6001);
+> str2ba(addr, &sock_addr.l2_bdaddr);
+> sendto(sock, "Bluetooth test", 15, 0, (struct sockaddr*)&sock_addr, sizeof
+> (sock_addr));
+> 
+> sendto returns 'Invalid argument' error.
 
-For this reason I have added:
+the SOCK_DGRAM support in L2CAP is not really good and thus might don't
+wanna you sendto() at all. Are there any problems with binding and
+connection to an L2CAP channel?
 
-  killall kmix
-  killall btsco
-  (sleep 1
-  killall -9 kmix
-  killall -9 btsco)
-  rmmod -w snd_bt_sco &
+Regards
 
-To the start of my /usr/sbin/hibernate file. This allows me to
-reliably hibernate (with kubuntu 5.10, you may have to kill a
-different set of processes, though I doubt that you will have to kill
-all processes listed by <lsof | grep snd>) . I have also added
+Marcel
 
-  modprobe snd_bt_sco
 
-to the end of this file so as to reload the module when coming out of hiber=
-nate.
-
---
-John C. McCabe-Dansted
-Master's Student
 
 
 -------------------------------------------------------
