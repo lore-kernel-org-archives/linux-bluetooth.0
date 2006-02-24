@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <43FEA2E7.3020409@gmail.com>
-From: nix4me@gmail.com
-MIME-Version: 1.0
+Message-ID: <fd87b6160602231604i5574b370uba09acf45c7d1a14@mail.gmail.com>
+From: "John McCabe-Dansted" <gmatht@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Re: DBT-120
+Subject: Re: [Bluez-users] Btsco refuse to hibernate
+In-Reply-To: <43FE2C18.7030306@tootai.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <43FB7C2C.2030203@tootai.net>
+	 <fd87b6160602211505n2edd9d11q9fcc6545c26edc2b@mail.gmail.com>
+	 <43FC9783.5050708@tootai.net>
+	 <fd87b6160602221602i3e3ea582md5f31fb4b69e5d65@mail.gmail.com>
+	 <43FE2C18.7030306@tootai.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,30 +22,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 24 Feb 2006 06:08:39 +0000
+Date: Fri, 24 Feb 2006 13:04:20 +1300
 
-Marcel,
-dfutool worked great, I now have HID proxy support. Well sort of.
-What happen's is this. I can reboot, and at post, I don't get the "no 
-keyboard" error, but I still
-can't use the keyboard to enter the bios?
+> No. I made <lsof | grep snd> then kill all programs showed.
 
-Once I get to my bootloader (grub), I don't have keyboard control there 
-either. When I get to my
-X logon prompt, thing's are fine. Couple of key's pressed, and it work's 
-like it should.
+Cool. I didn't realize you could do that. In my case though, e.g. xmms
+doesn't stop the machine hibernating even though it uses /dev/snd.
 
-What am I missing here?
+> >
+> > Have  you tried applying the patch below and replacing your hci_usb
+> > module (probably only useful if you are using a bluetooth usb dongle)?
+>
+> There is no bluetooth device attached, just the module is loaded.
 
-Regard's
-Doug Chalmers                                   p.s. hid2hci work's great.
+I am not sure what you mean. Surely you must have some sort of
+bluetooth adapter, even if it is built into the motherboard?
 
--- 
-----------------------------------------------------------
-The box said: "Requires Windows 98/2000/XP/NT, or better."
-So, I installed LINUX!
-----------------------------------------------------------
+If you really don't have any bluetooth devices, you may as well stop
+snd-bt-sco from loading next time you boot, e.g. by typing
+         sudo mv /lib/modules/`uname -r`/extra/snd-bt-sco.ko{,.bak}
 
+--
+John C. McCabe-Dansted
+Master's Student
 
 
 -------------------------------------------------------
