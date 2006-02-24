@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43FF1F65.3010708@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <43FF0F66.7030704@fillibach.de>
+From: Kosta Welke <kosta@fillibach.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] sdptool fails with ppc6700
-References: <C70061B183DE09419568AB2060C52A9501C19892@arion.intra.local>
-In-Reply-To: <C70061B183DE09419568AB2060C52A9501C19892@arion.intra.local>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [Bluez-devel] pand multiconnection patch
+References: <43FDBDDD.7030209@fillibach.de> <1140703850.24721.42.camel@localhost>
+In-Reply-To: <1140703850.24721.42.camel@localhost>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,42 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 24 Feb 2006 07:59:49 -0700
+Date: Fri, 24 Feb 2006 14:51:34 +0100
 
-Victor
+Marcel Holtmann wrote:
+> the patch is too big for a full review. Please split it up into multiple
+> logical parts. It is much easier for me to review small patches and then
+> it is more likely that I am going to accept them.
 
-> Try usimg sdptool browse XX:XX:XX:XX:XX:XX --l2cap (some phones do not
-> implement Public Browse Group which is used for discovery by default)
-> and if this does not help for some phones you have to ask for specific
-> profiles to get an answer (new Motorola's): sdptool search --bdaddr
-> XX:XX:XX:XX:XX:XX DUN for an example.
+Okay, I'll do a smaller patch that just does multiple connections. As 
+soon as I find the time :)
 
-thanks... the l2cap scan didn't help, but searching specifically for DUN
-did.
-
-The phone still locks up whenever I try to max out the connection so
-it's going back unless there's an easy fix. Maybe it's some kind of bad
-interaction between bluez and pocketpc. :(
-
-~# sdptool search --bdaddr 00:12:37:BD:9F:xx DUN
-Searching for DUN on 00:12:37:BD:9F:xx ...
-Service Name: Dial-up Networking
-Service RecHandle: 0x10002
-Service Class ID List:
-  "Dialup Networking" (0x1103)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 3
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Dialup Networking" (0x1103)
-    Version: 0x0100
-
-Brad
+Yours,
+Kosta
 
 
 -------------------------------------------------------
