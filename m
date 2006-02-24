@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <43FFDF4B.2080708@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] The new D-Bus API specification
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] sdptool fails with ppc6700
-References: <C70061B183DE09419568AB2060C52A9501C19892@arion.intra.local>	 <43FF1F65.3010708@xmission.com> <1140793583.4260.19.camel@localhost>
-In-Reply-To: <1140793583.4260.19.camel@localhost>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <1140652705.4519.71.camel@localhost>
+References: <1140652705.4519.71.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1140807942.7264.44.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,42 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 24 Feb 2006 21:38:35 -0700
+Date: Fri, 24 Feb 2006 20:05:42 +0100
+
+Hi,
+
+> there have been rumors about a written API specification for the D-Bus
+> interface of hcid (and bluetoothd in the future) and all of them is
+> actually true. You will find the current version under hcid/dbus-api.txt
+> inside the bluez-utils CVS. This isn't the final version, but it really
+> looks good and something about 90% has been implemented in the last few
+> weeks. Most of the work has been done by Claudio, Eduardo and Johan. So
+> thank these guys for their work.
+> 
+> I like to see the rest 10% implemented and after that my plan is to
+> release the next version of bluez-utils and open it for wider testing,
+> but any feedback at this point is highly welcome. And I also like to see
+> sample programs in various languages that we can include for reference.
+
+there has been some more progress and a small update to the D-Bus API
+document. The current CVS contains the latest version which includes
+also a dbus-test script written in Python. The local device name and
+minor device class are now stored on the filesystem and remembered after
+reboot.
+
+Please review the API document and send in comments. We also need a more
+secure D-Bus service config file.
+
+Regards
 
 Marcel
 
->>The phone still locks up whenever I try to max out the connection so
->>it's going back unless there's an easy fix. Maybe it's some kind of bad
->>interaction between bluez and pocketpc. :(
-> 
-> 
-> show me the "hcidump -X -V" for that problem. I think that I know what
-> it is and I titled it ByeByeMoto. I've seen similar things on my new
-> RAZR V3x.
-
-I only have the samsung i730 currently. So it will work for a while and
-then drop the connection when I do something that saturates the link. Is
-it useful to see the output of the older hcidump? The capture ends in:
-
-> ACL data: handle 42 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0045
-< ACL data: handle 42 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0045
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 42 reason 0x13
-    Reason: Remote User Terminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 42 reason 0x16
-    Reason: Connection Terminated by Local Host
-
-A complete dump is at
-http://www.xmission.com/~bmidgley/dump.gz
-
-Brad
 
 
 
