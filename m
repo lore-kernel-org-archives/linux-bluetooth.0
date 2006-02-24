@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: DBT-120
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <43FF1CE1.90604@tootai.net>
+From: Administrator TOOTAI <admin@tootai.net>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <43FEA2E7.3020409@gmail.com>
-References: <43FEA2E7.3020409@gmail.com>
-Content-Type: text/plain
-Message-Id: <1140799990.7264.17.camel@localhost>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Btsco refuse to hibernate
+References: <43FB7C2C.2030203@tootai.net>	 <fd87b6160602211505n2edd9d11q9fcc6545c26edc2b@mail.gmail.com>	 <43FC9783.5050708@tootai.net>	 <fd87b6160602221602i3e3ea582md5f31fb4b69e5d65@mail.gmail.com>	 <43FE2C18.7030306@tootai.net> <fd87b6160602231604i5574b370uba09acf45c7d1a14@mail.gmail.com>
+In-Reply-To: <fd87b6160602231604i5574b370uba09acf45c7d1a14@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,31 +18,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 24 Feb 2006 17:53:10 +0100
+Date: Fri, 24 Feb 2006 15:49:05 +0100
 
-Hi Doug,
+John McCabe-Dansted a =E9crit :
 
-> dfutool worked great, I now have HID proxy support. Well sort of.
-> What happen's is this. I can reboot, and at post, I don't get the "no 
-> keyboard" error, but I still
-> can't use the keyboard to enter the bios?
-> 
-> Once I get to my bootloader (grub), I don't have keyboard control there 
-> either. When I get to my
-> X logon prompt, thing's are fine. Couple of key's pressed, and it work's 
-> like it should.
-> 
-> What am I missing here?
+> [...]
+>
+>>>Have  you tried applying the patch below and replacing your hci_usb
+>>>module (probably only useful if you are using a bluetooth usb dongle)?
+>>>     =20
+>>>
+>>There is no bluetooth device attached, just the module is loaded.
+>>   =20
+>>
+>
+>I am not sure what you mean. Surely you must have some sort of
+>bluetooth adapter, even if it is built into the motherboard?
+>
+>If you really don't have any bluetooth devices, you may as well stop
+>snd-bt-sco from loading next time you boot, e.g. by typing
+>         sudo mv /lib/modules/`uname -r`/extra/snd-bt-sco.ko{,.bak}
+> =20
+>
+Ah, I can do this ;-)?
 
-you need to connect (and disconnect) your keyboard at least once and the
-keyboard must be paired. The CSR version of HID proxy is not accepting
-unpaired keyboards.
+Sure I have I have a bluetooth device, my sentence is to be understand=20
+like "at the time I want to hibernate, no bluetooth device is attached." =
+:-)
 
-Regards
-
-Marcel
-
-
+--=20
+Daniel
 
 
 -------------------------------------------------------
