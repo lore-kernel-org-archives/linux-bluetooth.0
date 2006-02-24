@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20403581.1140769616667.JavaMail.tomcat@pne-ps5-sn2>
-From: <ari.paavilainen@pp.inet.fi>
+Message-ID: <43FEA2E7.3020409@gmail.com>
+From: nix4me@gmail.com
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Vs: Re: [Bluez-users] recvfrom/sendto
-Mime-Version: 1.0
-Content-Type: text/plain;charset="UTF-8"
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Re: DBT-120
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,56 +16,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 24 Feb 2006 09:26:56 +0100 (MET)
+Date: Fri, 24 Feb 2006 06:08:39 +0000
 
+Marcel,
+dfutool worked great, I now have HID proxy support. Well sort of.
+What happen's is this. I can reboot, and at post, I don't get the "no 
+keyboard" error, but I still
+can't use the keyboard to enter the bios?
 
+Once I get to my bootloader (grub), I don't have keyboard control there 
+either. When I get to my
+X logon prompt, thing's are fine. Couple of key's pressed, and it work's 
+like it should.
 
->----Alkuper=C3=A4inen viesti----
->L=C3=A4hett=C3=A4j=C3=A4: marcel@holtmann.org
->P=C3=A4iv=C3=A4m=C3=A4=C3=A4r=C3=A4: Feb 23, 2006 11:39:37 AM
->Vastaanottaja: bluez-users@lists.sourceforge.net
->Aihe: Re: [Bluez-users] recvfrom/sendto
->
->Hi Ari,
->
->> Can I use recvfrom and sendto with l2cap sockets (instead of listen,=20
-accept,=20
->> connect,...)?
->
->why do you repeat your emails? I already told you to try it and tell if
->it doesn't work.
->
->Regards
->
->Marcel
->
+What am I missing here?
 
-Hi,
+Regard's
+Doug Chalmers                                   p.s. hid2hci work's great.
 
-Sorry about that. The reason: I sent the message to the list, and waited fo=
-r=20
-it to appear to my mailbox. It didn't appear and then I realised that I am =
-not=20
-even subscribing the list. I thought that the message didn't get to the lis=
-t=20
-and I posted it second time.
+-- 
+----------------------------------------------------------
+The box said: "Requires Windows 98/2000/XP/NT, or better."
+So, I installed LINUX!
+----------------------------------------------------------
 
-I have tried to use sendto this way:
-
-int sock;
-struct sockaddr_l2 sock_addr;
-char addr[18] =3D "00:12:37:46:bc:2b";
-
-sock =3D socket(AF_BLUETOOTH, SOCK_DGRAM, BTPROTO_L2CAP);
-sock_addr.l2_family =3D AF_BLUETOOTH;
-sock_addr.l2_psm =3D htobs(6001);
-str2ba(addr, &sock_addr.l2_bdaddr);
-sendto(sock, "Bluetooth test", 15, 0, (struct sockaddr*)&sock_addr, sizeof
-(sock_addr));
-
-sendto returns 'Invalid argument' error.
-
--Ari
 
 
 -------------------------------------------------------
