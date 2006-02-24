@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: Vs: Re: [Bluez-users] recvfrom/sendto
+Subject: Re: [Bluez-users] Re: DBT-120
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20403581.1140769616667.JavaMail.tomcat@pne-ps5-sn2>
-References: <20403581.1140769616667.JavaMail.tomcat@pne-ps5-sn2>
+In-Reply-To: <43FEA2E7.3020409@gmail.com>
+References: <43FEA2E7.3020409@gmail.com>
 Content-Type: text/plain
-Message-Id: <1140800100.7264.19.camel@localhost>
+Message-Id: <1140799990.7264.17.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,33 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 24 Feb 2006 17:55:00 +0100
+Date: Fri, 24 Feb 2006 17:53:10 +0100
 
-Hi Ari,
+Hi Doug,
 
-> Sorry about that. The reason: I sent the message to the list, and waited for 
-> it to appear to my mailbox. It didn't appear and then I realised that I am not 
-> even subscribing the list. I thought that the message didn't get to the list 
-> and I posted it second time.
+> dfutool worked great, I now have HID proxy support. Well sort of.
+> What happen's is this. I can reboot, and at post, I don't get the "no 
+> keyboard" error, but I still
+> can't use the keyboard to enter the bios?
 > 
-> I have tried to use sendto this way:
+> Once I get to my bootloader (grub), I don't have keyboard control there 
+> either. When I get to my
+> X logon prompt, thing's are fine. Couple of key's pressed, and it work's 
+> like it should.
 > 
-> int sock;
-> struct sockaddr_l2 sock_addr;
-> char addr[18] = "00:12:37:46:bc:2b";
-> 
-> sock = socket(AF_BLUETOOTH, SOCK_DGRAM, BTPROTO_L2CAP);
-> sock_addr.l2_family = AF_BLUETOOTH;
-> sock_addr.l2_psm = htobs(6001);
-> str2ba(addr, &sock_addr.l2_bdaddr);
-> sendto(sock, "Bluetooth test", 15, 0, (struct sockaddr*)&sock_addr, sizeof
-> (sock_addr));
-> 
-> sendto returns 'Invalid argument' error.
+> What am I missing here?
 
-the SOCK_DGRAM support in L2CAP is not really good and thus might don't
-wanna you sendto() at all. Are there any problems with binding and
-connection to an L2CAP channel?
+you need to connect (and disconnect) your keyboard at least once and the
+keyboard must be paired. The CSR version of HID proxy is not accepting
+unpaired keyboards.
 
 Regards
 
