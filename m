@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Karol Kozimor <sziwan@hell.org.pl>
+Message-ID: <44007852.5000503@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Cc: rmk@arm.linux.org.uk
-Message-ID: <20060226145934.GA18327@hell.org.pl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2
-Subject: [Bluez-devel] bug in hci_uart_tx_wakeup() causes panic when UART removed
+Subject: Re: [Bluez-devel] sdptool fails with ppc6700
+References: <C70061B183DE09419568AB2060C52A9501C19892@arion.intra.local>	 <43FF1F65.3010708@xmission.com> <1140793583.4260.19.camel@localhost> <43FFDF4B.2080708@xmission.com>
+In-Reply-To: <43FFDF4B.2080708@xmission.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,26 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 26 Feb 2006 15:59:35 +0100
+Date: Sat, 25 Feb 2006 08:31:30 -0700
 
-Hi,
-Under specific circumstances, hci_uart_tx_wakeup() seems to call
-tty->driver->write() without checking if the tty is alive, which
-effectively causes a nasty panic in uart_write(). From what I've read so
-far it seems that hci_ldisc.c is to blame, so I'm reporting it here.
+Marcel
 
-This is related to:
-http://sourceforge.net/mailarchive/message.php?msg_id=14724441
+>>it is and I titled it ByeByeMoto. I've seen similar things on my new
+>>RAZR V3x.
 
-See also:
-http://bugme.osdl.org/show_bug.cgi?id=6131
-http://bugzilla.kernel.org/show_bug.cgi?id=5958
+Do you have a "byebyemoto" workaround I can try out?
 
-Best regards,
-
--- 
-Karol 'sziwan' Kozimor
-sziwan@hell.org.pl
+Brad
 
 
 -------------------------------------------------------
