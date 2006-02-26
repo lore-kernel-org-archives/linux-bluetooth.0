@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5f30e2610602261444m477c13b6m3667c3031e5cb298@mail.gmail.com>
-From: "Jeff Wilson" <jazzbotley@gmail.com>
+Subject: Re: [Bluez-devel] bug in hci_uart_tx_wakeup() causes panic when
+	UART removed
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] decoding RFCOMM on hcidump -X -V
+In-Reply-To: <20060226145934.GA18327@hell.org.pl>
+References: <20060226145934.GA18327@hell.org.pl>
+Content-Type: text/plain
+Message-Id: <1140990026.23559.9.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,24 +19,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 26 Feb 2006 16:44:09 -0600
+Date: Sun, 26 Feb 2006 22:40:26 +0100
 
-Hi Marcel, hi list,
+Hi Karol,
 
-Does Bluetooth's RFCOMM protocol have ACKs and a sliding window, like
-TCP?  Is it possible for a sending application to block on send when
-sending a large payload to a slow reading application?
+> Under specific circumstances, hci_uart_tx_wakeup() seems to call
+> tty->driver->write() without checking if the tty is alive, which
+> effectively causes a nasty panic in uart_write(). From what I've read so
+> far it seems that hci_ldisc.c is to blame, so I'm reporting it here.
 
-I'm trying to debug a program I wrote using
-socket(PF_BLUETOOTH,SOCK_STREAM,BTPROTO_RFCOMM). Where can I learn
-more about decoding the output of `hcidump -X -V` especially as it
-applies to traffic crossing this RFCOMM socket?  I am particularly
-interested in what to look for when chasing flow control and TCP-like
-reliability.
+and I haven't seen a patch for it or any advice on how to fix this. At
+the moment I have no time to fully track this down.
 
-Thanks for your time,
+Regards
 
-       Jeff
+Marcel
+
+
 
 
 -------------------------------------------------------
