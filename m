@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <9e3a30280602261729u52e8b48ap5a90d422e4ddc44@mail.gmail.com>
-From: "Deniz Demir" <denizdemir@gmail.com>
+Subject: Re: [Bluez-devel] Re: bug in hci_uart_tx_wakeup() causes panic
+	when UART removed
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] RFCOMM Server: accept does not block
+In-Reply-To: <20060226224738.GF31256@flint.arm.linux.org.uk>
+References: <20060226145934.GA18327@hell.org.pl>
+	 <20060226224738.GF31256@flint.arm.linux.org.uk>
+Content-Type: text/plain
+Message-Id: <1140998289.23559.18.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,38 +20,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 26 Feb 2006 17:29:09 -0800
+Date: Mon, 27 Feb 2006 00:58:09 +0100
 
-Hi,
+Hi Russell,
 
-I want to run a small rfcomm server, however it does not block on
-accept, and returns immediately with -1 as socket descriptor (last
-line prints -1 right away).
+> > Under specific circumstances, hci_uart_tx_wakeup() seems to call
+> > tty->driver->write() without checking if the tty is alive, which
+> > effectively causes a nasty panic in uart_write(). From what I've read so
+> > far it seems that hci_ldisc.c is to blame, so I'm reporting it here.
+> > 
+> > This is related to:
+> > http://sourceforge.net/mailarchive/message.php?msg_id=14724441
+> > 
+> > See also:
+> > http://bugme.osdl.org/show_bug.cgi?id=6131
+> > http://bugzilla.kernel.org/show_bug.cgi?id=5958
+> 
+> As a priority, I especially recommend bluetooth developers read:
+> 
+> http://bugzilla.kernel.org/show_bug.cgi?id=5958#c2
+> 
+> where bug 6131 was predicted.
 
-I have the following code:
+I saw that we didn't implement the hangup callback. Will it be
+sufficient to use it to shutdown our HCI interface?
 
-    // allocate socket
-    s =3D socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+Regards
 
-    // bind socket to port 1 of the first available
-    // local bluetooth adapter
-    loc_addr.rc_family =3D AF_BLUETOOTH;
-    loc_addr.rc_bdaddr =3D *BDADDR_ANY;
-    loc_addr.rc_channel =3D (uint8_t) 1;
-    bind(s, (struct sockaddr *)&loc_addr, sizeof(loc_addr));
+Marcel
 
-    // put socket into listening mode
-    listen(s, 1);
 
-    // accept one connection
-    client =3D accept(s, (struct sockaddr *)&rem_addr, &opt);
-    printf("client: %d \n", client);
-
-I expected it would block on accept function until a connection
-request came in. I appreciate any comments.
-
-Thanks,
-Deniz
 
 
 -------------------------------------------------------
