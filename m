@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Edgar Neukirchner <edgar.neukirchner@chello.at>
+Message-ID: <20060226135323.34824.qmail@web15504.mail.cnb.yahoo.com>
+From: Zhixiang Deng <zhixiang_deng@yahoo.com.cn>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200602262022.41205.edgar.neukirchner@chello.at>
-Subject: [Bluez-users] headset playback problem suse 10.0
+Content-Type: multipart/alternative; boundary="0-1425326074-1140962003=:20955"
+Subject: [Bluez-users] RFCOMM PROBLEM
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,32 +16,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 26 Feb 2006 20:22:41 +0100
+Date: Sun, 26 Feb 2006 21:53:23 +0800 (CST)
 
-Hi!
+--0-1425326074-1140962003=:20955
+Content-Type: text/plain; charset=gb2312
+Content-Transfer-Encoding: 8bit
 
-I have installed and configured bluetooth-alsa without getting any errors. But 
-when trying to play a test.wav file with aplay, there was no sound at all - 
-only a slight increase of the noise floor in the headset (Jabra BT330). 
-Obviously there was some communication going between bluetooth dongle and 
-headset, as the blinking frequency of the LED on the headset changed.
+I have known that when a RFCOOM connection has benn established between two Bluetooth devices ,a virtual serial port RFCOMM0 will be created at both sides.But I don't know whether the driver is needed for RFCOMM0.If it is needed,where can I find the source code of the driver for RFCOMM0? Thanks a lot!
 
-When I issued the command cat test.wav > /dev/dsp1 as root there was an output 
-error message in the terminal and in the logfile the following:
+		
+---------------------------------
+无限容量雅虎相册，原图等大下载，超快速度，赶快抢注！ 
+--0-1425326074-1140962003=:20955
+Content-Type: text/html; charset=gb2312
+Content-Transfer-Encoding: 8bit
 
- kernel: ALSA sound/core/pcm_lib.c:2126: playback write error (DMA or IRQ 
-trouble?)
-kernel: ALSA sound/core/pcm_native.c:1451: playback drain error (DMA or IRQ 
-trouble?)
-
-I use the latest snd_bt_sco module from cvs with suse 10.0 and kernel 
-2.6.13-15.8-default. Headset is Jabra BT330, bluetooth usb dongle is 
-CCBT2035BDGP23-2 from Broadcom
-
-Who can help?
-
-Thanks,
-Edgar
+<div>I have known that when a RFCOOM connection has benn established between two Bluetooth devices ,a virtual serial port RFCOMM0 will be created at both sides.But I don't know whether&nbsp;the driver is needed for RFCOMM0.If it is needed,where can I find the source code of the driver for RFCOMM0? Thanks a lot!</div><p>
+		<hr size=1><a href="https://reg.cn.yahoo.com/cnreg/cnreg_first?id=78999&.prop=photo" target=blank>无限容量雅虎相册，原图等大下载，超快速度，赶快抢注！</a> 
+--0-1425326074-1140962003=:20955--
 
 
 -------------------------------------------------------
