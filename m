@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060227005919.48143.qmail@web31814.mail.mud.yahoo.com>
-From: Manu <seatmanu@yahoo.com>
+Subject: Re: [Bluez-users] Preparations for the first SBC library release
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20060227005507.B98C988712@sc8-sf-spam1.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] problem with Sony W600i
+In-Reply-To: <44023814.5000105@cs.bgu.ac.il>
+References: <1140989811.23559.7.camel@localhost>
+	 <44023814.5000105@cs.bgu.ac.il>
+Content-Type: text/plain
+Message-Id: <1140997659.23559.11.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,40 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 26 Feb 2006 16:59:19 -0800 (PST)
+Date: Mon, 27 Feb 2006 00:47:39 +0100
+
+Hi Niv,
+
+> Well I downloaded it and read in the README I should run " ./configure
+> - --prefix=/usr"
+> but there is no configure file. only the configure.in , and that aint an
+> executable file.
+
+it is a CVS repository. Run "./bootstrap-configure && make".
+
+Regards
+
+Marcel
 
 
-Hi 
-
-I am having a problem using the HCID part of the of
-the bluetooth. I am using ubuntu breezy. 
-
-The issue is that I can transfer file (image, hid,
-vcf) to my cellphone but when I try to use the
-remoting services it connect but fails on the
-passcode.
-
-I have configured the /etc/bluetooth/pin to use a
-simple pass code and it does not work (1234) :) 
-
-I tried changing the hcid.conf to use
- security none;
-
-and still it asking a passcode.
-
-I am relatively new in using bluetooth on linux but
-have played with different program hciconfig, hcidtool
-and bluez-pin
-
-Any idea what am I doing wrong or missing? Is there a
-way to completely disable the security mode?
-
-Manu
-
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
 
 
 -------------------------------------------------------
