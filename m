@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Edgar Neukirchner <edgar.neukirchner@chello.at>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1140989811.23559.7.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-users] Preparations for the first SBC library release
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200602262022.41205.edgar.neukirchner@chello.at>
+Subject: [Bluez-users] headset playback problem suse 10.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,21 +17,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 26 Feb 2006 22:36:51 +0100
+Date: Sun, 26 Feb 2006 20:22:41 +0100
 
-Hi,
+Hi!
 
-I think we are ready for the fist SBC library release and I will do this
-within the next days. Check the sbc-announce mailing list for the final
-release announcement posting.
+I have installed and configured bluetooth-alsa without getting any errors. But 
+when trying to play a test.wav file with aplay, there was no sound at all - 
+only a slight increase of the noise floor in the headset (Jabra BT330). 
+Obviously there was some communication going between bluetooth dongle and 
+headset, as the blinking frequency of the LED on the headset changed.
 
-	http://www.holtmann.org/linux/bluetooth/sbc.html
+When I issued the command cat test.wav > /dev/dsp1 as root there was an output 
+error message in the terminal and in the logfile the following:
 
-Regards
+ kernel: ALSA sound/core/pcm_lib.c:2126: playback write error (DMA or IRQ 
+trouble?)
+kernel: ALSA sound/core/pcm_native.c:1451: playback drain error (DMA or IRQ 
+trouble?)
 
-Marcel
+I use the latest snd_bt_sco module from cvs with suse 10.0 and kernel 
+2.6.13-15.8-default. Headset is Jabra BT330, bluetooth usb dongle is 
+CCBT2035BDGP23-2 from Broadcom
 
+Who can help?
 
+Thanks,
+Edgar
 
 
 -------------------------------------------------------
