@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: bug in hci_uart_tx_wakeup() causes panic
-	when UART removed
+Subject: Re: [Bluez-devel] decoding RFCOMM on hcidump -X -V
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20060226224738.GF31256@flint.arm.linux.org.uk>
-References: <20060226145934.GA18327@hell.org.pl>
-	 <20060226224738.GF31256@flint.arm.linux.org.uk>
+In-Reply-To: <5f30e2610602261444m477c13b6m3667c3031e5cb298@mail.gmail.com>
+References: <5f30e2610602261444m477c13b6m3667c3031e5cb298@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1140998289.23559.18.camel@localhost>
+Message-Id: <1140997944.23559.15.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,30 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 27 Feb 2006 00:58:09 +0100
+Date: Mon, 27 Feb 2006 00:52:24 +0100
 
-Hi Russell,
+Hi Jeff,
 
-> > Under specific circumstances, hci_uart_tx_wakeup() seems to call
-> > tty->driver->write() without checking if the tty is alive, which
-> > effectively causes a nasty panic in uart_write(). From what I've read so
-> > far it seems that hci_ldisc.c is to blame, so I'm reporting it here.
-> > 
-> > This is related to:
-> > http://sourceforge.net/mailarchive/message.php?msg_id=14724441
-> > 
-> > See also:
-> > http://bugme.osdl.org/show_bug.cgi?id=6131
-> > http://bugzilla.kernel.org/show_bug.cgi?id=5958
-> 
-> As a priority, I especially recommend bluetooth developers read:
-> 
-> http://bugzilla.kernel.org/show_bug.cgi?id=5958#c2
-> 
-> where bug 6131 was predicted.
+> Does Bluetooth's RFCOMM protocol have ACKs and a sliding window, like
+> TCP?  Is it possible for a sending application to block on send when
+> sending a large payload to a slow reading application?
 
-I saw that we didn't implement the hangup callback. Will it be
-sufficient to use it to shutdown our HCI interface?
+the RFCOMM is using flow control only. There is no sliding window and
+thus no real ACK mechanism.
+
+> I'm trying to debug a program I wrote using
+> socket(PF_BLUETOOTH,SOCK_STREAM,BTPROTO_RFCOMM). Where can I learn
+> more about decoding the output of `hcidump -X -V` especially as it
+> applies to traffic crossing this RFCOMM socket?  I am particularly
+> interested in what to look for when chasing flow control and TCP-like
+> reliability.
+
+Since RFCOMM also has an MTU, you will see the packets going over the
+air and the granted credits from each side.
 
 Regards
 
