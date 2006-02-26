@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bug in hci_uart_tx_wakeup() causes panic when
-	UART removed
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Karol Kozimor <sziwan@hell.org.pl>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20060226145934.GA18327@hell.org.pl>
-References: <20060226145934.GA18327@hell.org.pl>
-Content-Type: text/plain
-Message-Id: <1140990026.23559.9.camel@localhost>
+Cc: rmk@arm.linux.org.uk
+Message-ID: <20060226145934.GA18327@hell.org.pl>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-2
+Subject: [Bluez-devel] bug in hci_uart_tx_wakeup() causes panic when UART removed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,23 +17,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 26 Feb 2006 22:40:26 +0100
+Date: Sun, 26 Feb 2006 15:59:35 +0100
 
-Hi Karol,
+Hi,
+Under specific circumstances, hci_uart_tx_wakeup() seems to call
+tty->driver->write() without checking if the tty is alive, which
+effectively causes a nasty panic in uart_write(). From what I've read so
+far it seems that hci_ldisc.c is to blame, so I'm reporting it here.
 
-> Under specific circumstances, hci_uart_tx_wakeup() seems to call
-> tty->driver->write() without checking if the tty is alive, which
-> effectively causes a nasty panic in uart_write(). From what I've read so
-> far it seems that hci_ldisc.c is to blame, so I'm reporting it here.
+This is related to:
+http://sourceforge.net/mailarchive/message.php?msg_id=14724441
 
-and I haven't seen a patch for it or any advice on how to fix this. At
-the moment I have no time to fully track this down.
+See also:
+http://bugme.osdl.org/show_bug.cgi?id=6131
+http://bugzilla.kernel.org/show_bug.cgi?id=5958
 
-Regards
+Best regards,
 
-Marcel
-
-
+-- 
+Karol 'sziwan' Kozimor
+sziwan@hell.org.pl
 
 
 -------------------------------------------------------
