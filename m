@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Russell King <rmk@arm.linux.org.uk>
+Message-ID: <5f30e2610602261444m477c13b6m3667c3031e5cb298@mail.gmail.com>
+From: "Jeff Wilson" <jazzbotley@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20060226224738.GF31256@flint.arm.linux.org.uk>
-References: <20060226145934.GA18327@hell.org.pl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20060226145934.GA18327@hell.org.pl>
-Subject: [Bluez-devel] Re: bug in hci_uart_tx_wakeup() causes panic when UART removed
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] decoding RFCOMM on hcidump -X -V
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,30 +16,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 26 Feb 2006 22:47:38 +0000
+Date: Sun, 26 Feb 2006 16:44:09 -0600
 
-On Sun, Feb 26, 2006 at 03:59:35PM +0100, Karol Kozimor wrote:
-> Hi,
-> Under specific circumstances, hci_uart_tx_wakeup() seems to call
-> tty->driver->write() without checking if the tty is alive, which
-> effectively causes a nasty panic in uart_write(). From what I've read so
-> far it seems that hci_ldisc.c is to blame, so I'm reporting it here.
-> 
-> This is related to:
-> http://sourceforge.net/mailarchive/message.php?msg_id=14724441
-> 
-> See also:
-> http://bugme.osdl.org/show_bug.cgi?id=6131
-> http://bugzilla.kernel.org/show_bug.cgi?id=5958
+Hi Marcel, hi list,
 
-As a priority, I especially recommend bluetooth developers read:
+Does Bluetooth's RFCOMM protocol have ACKs and a sliding window, like
+TCP?  Is it possible for a sending application to block on send when
+sending a large payload to a slow reading application?
 
-http://bugzilla.kernel.org/show_bug.cgi?id=5958#c2
+I'm trying to debug a program I wrote using
+socket(PF_BLUETOOTH,SOCK_STREAM,BTPROTO_RFCOMM). Where can I learn
+more about decoding the output of `hcidump -X -V` especially as it
+applies to traffic crossing this RFCOMM socket?  I am particularly
+interested in what to look for when chasing flow control and TCP-like
+reliability.
 
-where bug 6131 was predicted.
+Thanks for your time,
 
--- 
-Russell King
+       Jeff
 
 
 -------------------------------------------------------
