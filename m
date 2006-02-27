@@ -6,7 +6,7 @@ In-Reply-To: <20060227073835.GA16640@localhost.localdomain>
 References: <1141022379.823.2.camel@localhost>
 	 <20060227073835.GA16640@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1141030661.823.17.camel@localhost>
+Message-Id: <1141026481.823.14.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,7 +19,7 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 27 Feb 2006 09:57:41 +0100
+Date: Mon, 27 Feb 2006 08:48:01 +0100
 
 Hi Johan,
 
@@ -34,9 +34,11 @@ Hi Johan,
 > also change to using Adapter instead of Device (currently we have
 > ListDevices, DefaultDevice, DeviceAdded and DeviceRemoved).
 
-it's done now. The only leftover thing is to rename dbus-device.c into
-dbus-adapter.c and then proceed. And we maybe need to update some
-function names, but that's totally internal.
+that is correct. It will be a BIG rename, but I think it is worth it and
+we can use the Device interface for remote devices in the future.
+
+Did you had a chance to look at the current code inside the CVS? Besides
+two or three missing methods, everything has been implemented.
 
 Regards
 
