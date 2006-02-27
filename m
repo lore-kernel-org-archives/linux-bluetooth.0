@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
+Subject: Re: [Bluez-devel] Big rename for the D-Bus API
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: multipart/mixed; boundary="=-26RD9c/8Ggg0VM4jEm40"
-Message-Id: <1141132514.18703.6.camel@localhost.localdomain>
+In-Reply-To: <20060227091006.GA17360@localhost.localdomain>
+References: <1141022379.823.2.camel@localhost>
+	 <20060227073835.GA16640@localhost.localdomain>
+	 <1141026481.823.14.camel@localhost>
+	 <20060227091006.GA17360@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1141031975.823.25.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-devel] [PATCH] l2cap.c: adding some kernel-docs
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,111 +21,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 28 Feb 2006 14:15:14 +0100
+Date: Mon, 27 Feb 2006 10:19:35 +0100
 
+Hi Johan,
 
---=-26RD9c/8Ggg0VM4jEm40
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+> > Did you had a chance to look at the current code inside the CVS? Besides
+> > two or three missing methods, everything has been implemented.
+> 
+> I haven't really had time to look at the new code, mostly because I have
+> been working with an obex server implementation lately (you'll get yet
+> another patch for openobex from me today or tomorrow ;)
 
-This small patch adds kernel-docs for four functions in l2cap.c.
-Kernel-docs can be used to annotate functions and their parameters like
-the following:
+go ahead. I have plans for another OpenOBEX release this week.
 
-/**
- * l2cap_parse_conf_req - parses a conf req packet for options
- * @sk: corresponding socket
- * @data: contains type, length and option data
- * @len: length of the whole configuration request packet
- *
- * Parses a configuration request that may contain multiple
-configuration
- * options. Sets the appropriate configuration request parameters from
-the
- * remote peer if understood.
- */
+> However, I took a quick look at the code and made two small fixes to the
+> first issues that I found (attached). The first patch cleans up
+> sys.stdout.write() ugliness in dbus-test (however the change is not
+> tested since my python version doesn't like the
+> "@dbus.decorators.explicitly_pass_message" stuff).
+> 
+> The second patch fixes the code path where hci_open_dev fails in the
+> hcid_dbus_setname_complete function (othervice strncpy(name, pname,
+> sizeof(name) - 1)) will try to access uninitialized memory).
 
-One can obtain the information on those annotations in multiple ways,
-for example by using the man page style:
-  scripts/kernel-doc -man net/bluetooth/l2cap.c | nroff -man | less
+both patches have been applied. Thanks.
 
-I think it's worth the effort for some functions to keep track of the
-functionality and the use of different parameters.
+Regards
 
-Martin
+Marcel
 
---=-26RD9c/8Ggg0VM4jEm40
-Content-Disposition: attachment; filename=patch-kernel-doc
-Content-Type: text/plain; name=patch-kernel-doc; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-
---- linux-2.6.15-mh2/net/bluetooth/l2cap.c	2006-02-16 11:38:19.000000000 +0100
-+++ linux-2.6.15-mr/net/bluetooth/l2cap.c	2006-02-28 14:14:27.000000000 +0100
-@@ -1267,6 +1267,16 @@
- 	return len;
- }
- 
-+/**
-+ * l2cap_parse_conf_req - parses a conf req packet for options
-+ * @sk: corresponding socket
-+ * @data: contains type, length and option data
-+ * @len: length of the whole configuration request packet
-+ *
-+ * Parses a configuration request that may contain multiple configuration 
-+ * options. Sets the appropriate configuration request parameters from the 
-+ * remote peer if understood.
-+ */
- static inline void l2cap_parse_conf_req(struct sock *sk, void *data, u16 len)
- {
- 	int type, hint, olen; 
-@@ -1303,6 +1313,16 @@
- 	}
- }
- 
-+/**
-+ * l2cap_add_conf_opt - adds a conf option to a response or a request
-+ * @ptr: pointer to complete option
-+ * @type: option type (e.g. L2CAP_CONF_MTU)
-+ * @len: length of option in Bytes (e.g. MTU == 2, RFC == 9)
-+ * @val: contains the data that is being added
-+ *
-+ * Adds a complete configuration parameter option to a configuration response
-+ * or a configuration request.
-+ */
- static void l2cap_add_conf_opt(void **ptr, u8 type, u8 len, unsigned long val)
- {
- 	struct l2cap_conf_opt *opt = *ptr;
-@@ -1333,6 +1353,14 @@
- 	*ptr += L2CAP_CONF_OPT_SIZE + len;
- }
- 
-+/**
-+ * l2cap_build_conf_req - Builds a configuration request
-+ * @sk: corresponding socket structure
-+ * @data: data portion of a conf request packet (dcid, flags, options)
-+ * @return: packet length (dcid, flags and options)
-+ *
-+ * Builds a configuration request with the help of l2cap_add_conf_opt
-+ */
- static int l2cap_build_conf_req(struct sock *sk, void *data)
- {
- 	struct l2cap_pinfo *pi = l2cap_pi(sk);
-@@ -1372,6 +1400,13 @@
- 	return result;
- }
- 
-+/**
-+ * l2cap_build_conf_rsp - Builds a configuration response
-+ * @sk: corresponding socket structure
-+ * @data: data portion of rsp packet (scid, flags, result, config)
-+ * @result: result code for response (success/reject/failure/...)
-+ * @return: command length
-+ */
- static int l2cap_build_conf_rsp(struct sock *sk, void *data, int *result)
- {
- 	struct l2cap_conf_rsp *rsp = data;
-
---=-26RD9c/8Ggg0VM4jEm40--
 
 
 
