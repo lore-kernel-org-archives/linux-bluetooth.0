@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Sniff traffic between PDA and Phone
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20060227190529.36782.qmail@web31808.mail.mud.yahoo.com>
+From: Manu <seatmanu@yahoo.com>
+Subject: Re: [Bluez-users] problem with Sony W600i
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20060227175719.GX9328@zanu.org.uk>
-References: <20060227175719.GX9328@zanu.org.uk>
-Content-Type: text/plain
-Message-Id: <1141112251.29374.4.camel@localhost>
-Mime-Version: 1.0
+In-Reply-To: <19c2b3920602270221oa65047bl@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,50 +17,121 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Feb 2006 08:37:31 +0100
+Date: Mon, 27 Feb 2006 11:05:29 -0800 (PST)
 
-Hi Nick,
+Cedric
 
-> I'm trying to capture bluetooth traffic between my PDA and mobile
-> phone for diagnostic purposes:
+Thanks. I just looked at it but still cannot find my
+answer.
+
+So few more questions:
+
+What is the difference between HCI and HID ?
+Do I need to use HID with Sony Ericsson?
+
+When running the sdptool browse I get an error message
+saying the file descriptor is in bad state....? How
+come I cannot see the services of my Cellphone?
+
+Thanks
+
+Manu
+--- rangzen <lipare@gmail.com> wrote:
+
+> I was able to use it with a K750i but like a
+> "one-shot".
+> Check history of the mailing list.
 > 
-> I have a Palm TX PDA and Samsung Z500 phone. If I try to use GRPS over
-> bluetooth (actually 3G, but it works the same) ppp connects and I am
-> given an IP address and DNS servers. If I try to send any traffic, the
-> packets are not sent. I can't ping the DNS servers for example.
+> Cedric
 > 
-> If I change the phone for a different brand then it works fine, and if
-> I change the PDA for a different model it works fine. Just those two
-> together don't work. I've borrowed a different Z500 just in case mine
-> was faulty, but the same problem. The other one had a slightly newer
-> ROM too so this isn't something they have fixed.
+> 2006/2/27, Manu <seatmanu@yahoo.com>:
+> >
+> > Hi
+> >
+> > I am having a problem using the HCID part of the
+> of
+> > the bluetooth. I am using ubuntu breezy.
+> >
+> > The issue is that I can transfer file (image, hid,
+> > vcf) to my cellphone but when I try to use the
+> > remoting services it connect but fails on the
+> > passcode.
+> >
+> > I have configured the /etc/bluetooth/pin to use a
+> > simple pass code and it does not work (1234) :)
+> >
+> > I tried changing the hcid.conf to use
+> >  security none;
+> >
+> > and still it asking a passcode.
+> >
+> > I am relatively new in using bluetooth on linux
+> but
+> > have played with different program hciconfig,
+> hcidtool
+> > and bluez-pin
+> >
+> > Any idea what am I doing wrong or missing? Is
+> there a
+> > way to completely disable the security mode?
+> >
+> > Manu
+> >
+> > __________________________________________________
+> > Do You Yahoo!?
+> > Tired of spam?  Yahoo! Mail has the best spam
+> protection around
+> > http://mail.yahoo.com
+> >
+> >
+> >
+>
+-------------------------------------------------------
+> > This SF.Net email is sponsored by xPML, a
+> groundbreaking scripting language
+> > that extends applications into web and mobile
+> media. Attend the live webcast
+> > and join the prime developer group breaking into
+> this new coding territory!
+> >
+>
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=110944&bid=241720&dat=121642
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> >
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >
 > 
-> I'm trying to find out if it is my phone or PDA that is a
-> problem. Right now, Samsung blames Palm, and Palm blames Samsung. My
-> carrier (Orange) blames them both, and would charge me a lot of money
-> to change phone :-(
 > 
-> I hoped that I could use hcidump to see if the Palm TX actually sends
-> packets, and if so, to compare them with what the Palm T3 sends. Can
-> I tell hcidump and my Bluetooth dongle to capture ALL traffic, not
-> just traffic going to/from the dongle?
+> --
+> liberté - partage - respect
+> freedom - share - respect
+> 
+> 
+>
+-------------------------------------------------------
+> This SF.Net email is sponsored by xPML, a
+> groundbreaking scripting language
+> that extends applications into web and mobile media.
+> Attend the live webcast
+> and join the prime developer group breaking into
+> this new coding territory!
+>
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid0944&bid$1720&dat1642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
 
-for this you need a sniffer like the dongle and software from Frontline.
-The hcidump can sniff only local traffic. It is not an air sniffer.
 
-However it might be true that both are at fault, but from the first
-guess I would blame Samsung not implemented the SDP records right. It
-might be wrong, but they don't really have a good record of getting
-these things right. Check the mailing list archive. On the other hand
-some of the earlier Palm devices were also really bad and unreliable.
-However I have no idea if this was Palm faults or a fault of the
-Broadcom chip they used.
-
-Regards
-
-Marcel
-
-
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
