@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Big rename for the D-Bus API
-Message-ID: <20060227073835.GA16640@localhost.localdomain>
-References: <1141022379.823.2.camel@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1141022379.823.2.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1141022379.823.2.camel@localhost>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Big rename for the D-Bus API
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,23 +16,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 27 Feb 2006 09:38:35 +0200
+Date: Mon, 27 Feb 2006 07:39:39 +0100
 
-Hi Marcel,
+Hi,
 
-On Mon, Feb 27, 2006, Marcel Holtmann wrote:
-> I just came to the conclusion that using org.bluez.Device for the local
-> attached Bluetooth dongles etc. is not a good name. I would prefer to
-> use org.bluez.Adapter and start renaming everything before the next
-> release. Any comments?
+I just came to the conclusion that using org.bluez.Device for the local
+attached Bluetooth dongles etc. is not a good name. I would prefer to
+use org.bluez.Adapter and start renaming everything before the next
+release. Any comments?
 
-I'm fine with that. The current naming is because of the "let's imitate
-hald interface" decision. However, if you change "Device" to "Adapter",
-then I think that the methods and signals in the Manager path should
-also change to using Adapter instead of Device (currently we have
-ListDevices, DefaultDevice, DeviceAdded and DeviceRemoved).
+Regards
 
-Johan
+Marcel
+
 
 
 
