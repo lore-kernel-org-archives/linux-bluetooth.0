@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Big rename for the D-Bus API
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20060227073835.GA16640@localhost.localdomain>
+Subject: Re: [Bluez-devel] Big rename for the D-Bus API
+Message-ID: <20060227073835.GA16640@localhost.localdomain>
 References: <1141022379.823.2.camel@localhost>
-	 <20060227073835.GA16640@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1141026481.823.14.camel@localhost>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1141022379.823.2.camel@localhost>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,31 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 27 Feb 2006 08:48:01 +0100
+Date: Mon, 27 Feb 2006 09:38:35 +0200
 
-Hi Johan,
+Hi Marcel,
 
-> > I just came to the conclusion that using org.bluez.Device for the local
-> > attached Bluetooth dongles etc. is not a good name. I would prefer to
-> > use org.bluez.Adapter and start renaming everything before the next
-> > release. Any comments?
-> 
-> I'm fine with that. The current naming is because of the "let's imitate
-> hald interface" decision. However, if you change "Device" to "Adapter",
-> then I think that the methods and signals in the Manager path should
-> also change to using Adapter instead of Device (currently we have
-> ListDevices, DefaultDevice, DeviceAdded and DeviceRemoved).
+On Mon, Feb 27, 2006, Marcel Holtmann wrote:
+> I just came to the conclusion that using org.bluez.Device for the local
+> attached Bluetooth dongles etc. is not a good name. I would prefer to
+> use org.bluez.Adapter and start renaming everything before the next
+> release. Any comments?
 
-that is correct. It will be a BIG rename, but I think it is worth it and
-we can use the Device interface for remote devices in the future.
+I'm fine with that. The current naming is because of the "let's imitate
+hald interface" decision. However, if you change "Device" to "Adapter",
+then I think that the methods and signals in the Manager path should
+also change to using Adapter instead of Device (currently we have
+ListDevices, DefaultDevice, DeviceAdded and DeviceRemoved).
 
-Did you had a chance to look at the current code inside the CVS? Besides
-two or three missing methods, everything has been implemented.
-
-Regards
-
-Marcel
-
+Johan
 
 
 
