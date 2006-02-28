@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f64f4e8a0602280751l642cf100p5fdd6bd1a7413626@mail.gmail.com>
-From: "zhu yong" <zhuyong0003@gmail.com>
-To: bluez-users <bluez-users@lists.sourceforge.net>
+Message-ID: <fe0a97c20602280215l790a32fer80a255cc24086132@mail.gmail.com>
+From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <fe0a97c20602250326l26572f44ge080939c3a57e0e7@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_3626_10667113.1141141867527"
-Subject: [Bluez-users] Help me! hciattach have no error msg, but hciconfig have no device msg.
+	boundary="----=_Part_19090_17809750.1141121710281"
+References: <fe0a97c20602250326l26572f44ge080939c3a57e0e7@mail.gmail.com>
+Subject: [Bluez-users] Bluetooth Audio gateway in linux kernel 2.4.20
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,42 +19,59 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Feb 2006 23:51:07 +0800
+Date: Tue, 28 Feb 2006 15:45:10 +0530
 
-------=_Part_3626_10667113.1141141867527
+------=_Part_19090_17809750.1141121710281
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Hi, everyone
-  I use one uare bluetooth device on my arm board. operation system is
-uclinux, kernel is linux-2.4.24.
-  I use hciattach cmd. There have no error msg.but I use hciconfig to
-display devices, there have no devices info.
-  I don't know why don't find device, any advice will help me!
+Hello Everyone, I have 2 questions:
 
-  In addition, I use the same hciattach cmd on my pc, hciconfig can find th=
-e
-device.
+1)Can I not connect to a bluetooth headset from linux 2.4.20 with downloade=
+d
+ALSA libraries and utilities??
 
-------=_Part_3626_10667113.1141141867527
+2) I downloaded latest kernel 2.6.9 <http://2.6.15.4>  and when i built and
+rebooted it I found that the kernel was unable to detect the dongle
+connected. i.e it is not showing in /proc/bus/usb/devices....
+
+
+I am a novice in Linux ... so can u please let me know what iam missing.
+
+Thanks a zillion
+regards
+Soumya
+
+------=_Part_19090_17809750.1141121710281
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-<div>Hi, everyone</div>
-<div>&nbsp; I use one uare bluetooth device on my arm board. operation syst=
-em is uclinux, kernel is linux-2.4.24.</div>
-<div>&nbsp; I use hciattach cmd. There have no error msg.but I use hciconfi=
-g to display devices, there have no devices info.</div>
-<div>&nbsp; I don't know why don't find device, any advice will help me!</d=
-iv>
+<br><span class=3D"gmail_quote"></span>Hello Everyone,
+<div>I have 2 questions:</div>
+<div><br>1)Can I not connect to a bluetooth headset from linux 2.4.20 with =
+downloaded ALSA libraries and utilities??</div>
 <div>&nbsp;</div>
-<div>&nbsp; In addition, I use the same hciattach cmd on my pc, hciconfig c=
-an find the device.</div>
+<div>2) I downloaded latest kernel <a href=3D"http://2.6.15.4" target=3D"_b=
+lank" onclick=3D"return top.js.OpenExtLink(window,event,this)">2.6.9</a>&nb=
+sp; and when i built and rebooted it I found that the kernel was unable to =
+detect the dongle connected.=20
+i.e it is not showing in /proc/bus/usb/devices....=20
+</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>I am a novice in Linux ... so can u please let me know what iam missin=
+g.</div>
+<div>&nbsp;</div>
+<div>Thanks a zillion</div>
+<div>regards</div>
+<div>Soumya</div>
+<div>&nbsp;</div>
 <div>&nbsp;</div>
 
-------=_Part_3626_10667113.1141141867527--
+
+------=_Part_19090_17809750.1141121710281--
 
 
 -------------------------------------------------------
