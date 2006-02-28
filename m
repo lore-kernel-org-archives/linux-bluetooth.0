@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Help me! hciattach have no error msg, but
-	hciconfig have no device msg.
-From: Erwin Authried <eauth@softsys.co.at>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <f64f4e8a0602280751l642cf100p5fdd6bd1a7413626@mail.gmail.com>
-References: <f64f4e8a0602280751l642cf100p5fdd6bd1a7413626@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1141142725.26020.178.camel@justakiss>
-Mime-Version: 1.0
+Message-ID: <f64f4e8a0602280751l642cf100p5fdd6bd1a7413626@mail.gmail.com>
+From: "zhu yong" <zhuyong0003@gmail.com>
+To: bluez-users <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_3626_10667113.1141141867527"
+Subject: [Bluez-users] Help me! hciattach have no error msg, but hciconfig have no device msg.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,28 +17,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Feb 2006 17:05:25 +0100
+Date: Tue, 28 Feb 2006 23:51:07 +0800
 
-Hi,
-is it the AT91M40800 that you are using? Which version of hcitools do
-you use? There are a few patches required for non-mmu systems. How does
-your startup script look like? 
+------=_Part_3626_10667113.1141141867527
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Regards,
-Erwin
+Hi, everyone
+  I use one uare bluetooth device on my arm board. operation system is
+uclinux, kernel is linux-2.4.24.
+  I use hciattach cmd. There have no error msg.but I use hciconfig to
+display devices, there have no devices info.
+  I don't know why don't find device, any advice will help me!
 
-Am Dienstag, den 28.02.2006, 23:51 +0800 schrieb zhu yong:
-> Hi, everyone
->   I use one uare bluetooth device on my arm board. operation system is
-> uclinux, kernel is linux-2.4.24.
->   I use hciattach cmd. There have no error msg.but I use hciconfig to
-> display devices, there have no devices info.
->   I don't know why don't find device, any advice will help me!
->  
->   In addition, I use the same hciattach cmd on my pc, hciconfig can
-> find the device.
->  
+  In addition, I use the same hciattach cmd on my pc, hciconfig can find th=
+e
+device.
 
+------=_Part_3626_10667113.1141141867527
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+<div>Hi, everyone</div>
+<div>&nbsp; I use one uare bluetooth device on my arm board. operation syst=
+em is uclinux, kernel is linux-2.4.24.</div>
+<div>&nbsp; I use hciattach cmd. There have no error msg.but I use hciconfi=
+g to display devices, there have no devices info.</div>
+<div>&nbsp; I don't know why don't find device, any advice will help me!</d=
+iv>
+<div>&nbsp;</div>
+<div>&nbsp; In addition, I use the same hciattach cmd on my pc, hciconfig c=
+an find the device.</div>
+<div>&nbsp;</div>
+
+------=_Part_3626_10667113.1141141867527--
 
 
 -------------------------------------------------------
