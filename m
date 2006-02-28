@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <44053CA9.4020206@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] rfcomm socket connect timeout
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] sound skips on i.tech a2dp headset
-References: <1141191114.22408.31.camel@localhost.localdomain>
-In-Reply-To: <1141191114.22408.31.camel@localhost.localdomain>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <20060228155006.GR6529@beta.private.mielke.cc>
+References: <1141132514.18703.6.camel@localhost.localdomain>
+	 <20060228145922.GQ6529@beta.private.mielke.cc>
+	 <1141139992.29228.0.camel@localhost>
+	 <20060228155006.GR6529@beta.private.mielke.cc>
+Content-Type: text/plain
+Message-Id: <1141142881.29228.10.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,37 +21,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 28 Feb 2006 23:18:17 -0700
+Date: Tue, 28 Feb 2006 17:08:01 +0100
 
-Scott
+Hi Dave,
 
-ironically, when the encoder was a little slower, i could do no wrong
-when streaming to my itech. only after speeding it up did it become
-essential to pace things better.
-
-sure, you can try fine-tuning but i believe the real problem will be
-solved by completing a plugin. gstreamer looks promising in this
-arena... each chunk of data has timing info attached and i assume the
-library provides additional help.
-
-i'm hoping gstreamer can help on another timing issue... latency. maybe
-by telling the system to build the appropriate delay into the video side
-of multimedia. try watching video with a2dp audio and you'll quickly get
-annoyed with the delay.
-
-brad
-
-> I've got the i.tech A2DP stereo headset clip-y thing. I've gotten a2play
-> working, but the sound skips every several seconds while playing. I
-> tried the -p flag, and that helped a whole lot, bringing the
-> time-between-skips up to over a minute, but it still happens, and it's
-> still annoying.
+> >you are looking for the page timeout (hciconfig hci0 pageto).
 > 
-> Looking at how things work, I get the idea that the sender just blasts
-> out data with no way to check on the buffer of the receiver. Could it
-> just be that the i.tech headset doesn't handle something right? Or is
-> this likely a timing issue on the computer? Should I just start tossing
-> in other numbers, like 43995 or 44005? Any other clues?
+> Thanks. I guess I'm not up on Bluetooth terminology. Is there a way to set it
+> via something like setsockopt()? I can't find a constant that looks like it'll
+> do it under "HCI socket options" in hci.h.
+
+no, because it is global (ACL) option and not RFCOMM specific.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
