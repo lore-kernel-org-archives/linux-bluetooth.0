@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20602280215l790a32fer80a255cc24086132@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
+Message-ID: <19c2b3920602280104s4d1b0163q@mail.gmail.com>
+From: rangzen <lipare@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <fe0a97c20602250326l26572f44ge080939c3a57e0e7@mail.gmail.com>
+Subject: Re: [Bluez-users] problem with Sony W600i
+In-Reply-To: <20060227190529.36782.qmail@web31808.mail.mud.yahoo.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_19090_17809750.1141121710281"
-References: <fe0a97c20602250326l26572f44ge080939c3a57e0e7@mail.gmail.com>
-Subject: [Bluez-users] Bluetooth Audio gateway in linux kernel 2.4.20
+Content-Type: text/plain; charset=ISO-8859-1
+References: <19c2b3920602270221oa65047bl@mail.gmail.com>
+	 <20060227190529.36782.qmail@web31808.mail.mud.yahoo.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,59 +19,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Feb 2006 15:45:10 +0530
+Date: Tue, 28 Feb 2006 10:04:27 +0100
 
-------=_Part_19090_17809750.1141121710281
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+> What is the difference between HCI and HID ?
+> Do I need to use HID with Sony Ericsson?
 
-Hello Everyone, I have 2 questions:
+http://en.wikipedia.org/wiki/Bluetooth
 
-1)Can I not connect to a bluetooth headset from linux 2.4.20 with downloade=
-d
-ALSA libraries and utilities??
+HCI for transfer
+HID for play with cursor :)
 
-2) I downloaded latest kernel 2.6.9 <http://2.6.15.4>  and when i built and
-rebooted it I found that the kernel was unable to detect the dongle
-connected. i.e it is not showing in /proc/bus/usb/devices....
-
-
-I am a novice in Linux ... so can u please let me know what iam missing.
-
-Thanks a zillion
-regards
-Soumya
-
-------=_Part_19090_17809750.1141121710281
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-<br><span class=3D"gmail_quote"></span>Hello Everyone,
-<div>I have 2 questions:</div>
-<div><br>1)Can I not connect to a bluetooth headset from linux 2.4.20 with =
-downloaded ALSA libraries and utilities??</div>
-<div>&nbsp;</div>
-<div>2) I downloaded latest kernel <a href=3D"http://2.6.15.4" target=3D"_b=
-lank" onclick=3D"return top.js.OpenExtLink(window,event,this)">2.6.9</a>&nb=
-sp; and when i built and rebooted it I found that the kernel was unable to =
-detect the dongle connected.=20
-i.e it is not showing in /proc/bus/usb/devices....=20
-</div>
-<div>&nbsp;</div>
-<div>&nbsp;</div>
-<div>I am a novice in Linux ... so can u please let me know what iam missin=
-g.</div>
-<div>&nbsp;</div>
-<div>Thanks a zillion</div>
-<div>regards</div>
-<div>Soumya</div>
-<div>&nbsp;</div>
-<div>&nbsp;</div>
-
-
-------=_Part_19090_17809750.1141121710281--
+--
+libert=E9 - partage - respect
+freedom - share - respect
 
 
 -------------------------------------------------------
