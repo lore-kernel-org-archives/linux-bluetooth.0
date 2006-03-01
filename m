@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Scott Gilliland <Scott.Gilliland@gatech.edu>
+Subject: Re: [Bluez-devel] Soft lockup
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20060224110357.GT19185@null.research.nokia.com>
+References: <20060222091231.GM19185@null.research.nokia.com>
+	 <1140607245.4519.7.camel@localhost>
+	 <20060222125425.GQ19185@null.research.nokia.com>
+	 <20060224110357.GT19185@null.research.nokia.com>
 Content-Type: text/plain
-Message-Id: <1141191114.22408.31.camel@localhost.localdomain>
+Message-Id: <1141188501.29216.1.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-devel] sound skips on i.tech a2dp headset
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,32 +21,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Mar 2006 00:31:53 -0500
+Date: Wed, 01 Mar 2006 05:48:21 +0100
 
-Hi all,
+Hi Ville,
 
-I've got the i.tech A2DP stereo headset clip-y thing. I've gotten a2play
-working, but the sound skips every several seconds while playing. I
-tried the -p flag, and that helped a whole lot, bringing the
-time-between-skips up to over a minute, but it still happens, and it's
-still annoying.
+> Now I have more information about this problem.
+> 
+> I had debuggin enabled in net/bluetooth/rfcomm/core.c and I noticed that
+> for some reson rfcomm_dlc_clear_timer() is called for allready freed
+> dlc and lock_timer_base() gets stuck because it's trying to use invalid
+> timer pointer. I also tried to reproduce bug in i386 without success.
+> Also then debugging is on the bug much harder to reproduse. To me this
+> looks like dlc locking doens't work as it should work.
+> 
+> And other notice. rfcomm_dlc_clear_timeri() uses timer_pending()
+> together with del_timer() which allready calls timer_pending(). So
+> timer_pending() is useless in rfcomm_dlc_clear_timer().
 
-Looking at how things work, I get the idea that the sender just blasts
-out data with no way to check on the buffer of the receiver. Could it
-just be that the i.tech headset doesn't handle something right? Or is
-this likely a timing issue on the computer? Should I just start tossing
-in other numbers, like 43995 or 44005? Any other clues?
+this all looks like we are missing a memory barrier somewhere. This
+could also be the reason why it only gets triggered on OMAP systems. Any
+further ideas?
 
-Further, if anyone is interested, an i.tech clip can be modified into
-having a low-level output to something like an amp (in my case, my car
-radio) with just a little bit of soldering. Further, since it uses
-standard nokia chargers, you can hook it up to run off of 12v with a
-nokia car charger (available at any quality computer show).
+Regards
 
+Marcel
 
-Thanks for any help,
-Scott Gilliland
-Scott Gilliland at gatech dot edu
 
 
 
