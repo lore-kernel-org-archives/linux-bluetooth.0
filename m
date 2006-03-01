@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sound skips on i.tech a2dp headset
 From: Scott Gilliland <Scott.Gilliland@gatech.edu>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <44053CA9.4020206@xmission.com>
-References: <1141191114.22408.31.camel@localhost.localdomain>
-	 <44053CA9.4020206@xmission.com>
 Content-Type: text/plain
-Message-Id: <1141198221.22408.37.camel@localhost.localdomain>
+Message-Id: <1141191114.22408.31.camel@localhost.localdomain>
 Mime-Version: 1.0
+Subject: [Bluez-devel] sound skips on i.tech a2dp headset
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,44 +16,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Mar 2006 02:30:21 -0500
+Date: Wed, 01 Mar 2006 00:31:53 -0500
 
-Brad,
+Hi all,
 
-Thanks the the info. Just a question or two... Are you saying that
-timing information actually makes it all the way out to the headset? I
-assumed it was just raw data, and the headset just tried to play it at
-the appropriate speed. (the headset could then vary a bit depending on
-how full the buffer was) 
+I've got the i.tech A2DP stereo headset clip-y thing. I've gotten a2play
+working, but the sound skips every several seconds while playing. I
+tried the -p flag, and that helped a whole lot, bringing the
+time-between-skips up to over a minute, but it still happens, and it's
+still annoying.
 
-Also, yes, the idea of having the latency info fed back to the source
-had occurred to me as well. Is there any way at all to estimate the
-delay from the headset tho? or would it just have to be a value you tune
-manually? Also, do you know if gstreamer is able to do this kind of
-thing now?
+Looking at how things work, I get the idea that the sender just blasts
+out data with no way to check on the buffer of the receiver. Could it
+just be that the i.tech headset doesn't handle something right? Or is
+this likely a timing issue on the computer? Should I just start tossing
+in other numbers, like 43995 or 44005? Any other clues?
 
-Thanks again,
-Scott
+Further, if anyone is interested, an i.tech clip can be modified into
+having a low-level output to something like an amp (in my case, my car
+radio) with just a little bit of soldering. Further, since it uses
+standard nokia chargers, you can hook it up to run off of 12v with a
+nokia car charger (available at any quality computer show).
 
-On Tue, 2006-02-28 at 23:18 -0700, Brad Midgley wrote:
-> Scott
-> 
-> ironically, when the encoder was a little slower, i could do no wrong
-> when streaming to my itech. only after speeding it up did it become
-> essential to pace things better.
-> 
-> sure, you can try fine-tuning but i believe the real problem will be
-> solved by completing a plugin. gstreamer looks promising in this
-> arena... each chunk of data has timing info attached and i assume the
-> library provides additional help.
-> 
-> i'm hoping gstreamer can help on another timing issue... latency. maybe
-> by telling the system to build the appropriate delay into the video side
-> of multimedia. try watching video with a2dp audio and you'll quickly get
-> annoyed with the delay.
-> 
-> brad
 
+Thanks for any help,
+Scott Gilliland
+Scott Gilliland at gatech dot edu
 
 
 
