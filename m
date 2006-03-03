@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] The new D-Bus API specification
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <e1effdeb0603030534k54fd1485u4f079a155b72c4@mail.gmail.com>
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <e1effdeb0603021302h2ffbcd80y1a9c46bf93e51278@mail.gmail.com>
-References: <1140652705.4519.71.camel@localhost>
-	 <1140807942.7264.44.camel@localhost>
-	 <e1effdeb0603021302h2ffbcd80y1a9c46bf93e51278@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1141394159.4814.3.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_8375_18469351.1141392843583"
+Subject: [Bluez-devel] [DBUS PATCH] cleanup
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,45 +17,200 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 03 Mar 2006 14:55:58 +0100
+Date: Fri, 3 Mar 2006 10:34:03 -0300
 
-Hi Claudio,
+------=_Part_8375_18469351.1141392843583
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> I tested the latest bluez-utils CVS version with the recent D-Bus
-> changes and I have some comments:
-> 
-> * Policy
-> I'm not sure, but I think some linux distributions use pam_console
-> instead of at_console. We sould investigate more to avoid future
-> problems. Another thing are the rules. at_console aims provide a way
-> to refer to users that are not physically sitting in front of the
-> computer. I tested send D-Bus messages from the local host or
-> connected through ssh and I didn't noticed differences. I mean, the
-> behaviour is the same. Remote users still able to send D-Bus messages.
+Hi Marcel,
 
-actually the at_console should be transparent between different Linux
-distributions. However we need to verify that it works on at least
-Fedora, SuSE, Debian and Ubuntu.
+Here is a patch to fix some error handling standard. I changed the
+function handle_dev_get_remote_name, get_peer_name is not necessary
+anymore because now it is possible use the function
+get_device_address.
 
-> * Device->Adapter
-> Maybe should be better if we rename the function names and constants
-> too. Or remove the prefix "dev" and "DEV". These prefixes were added
-> to avoid confusion when all functions were in the same file.
+Regards,
+Claudio
 
-Remove the prefix completely, because it is all internal.
+--
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
-> * Error
->   I noticed that there are different handling of hci_open_dev result.
-> I found bluez_new_failure_msg and error_no_such_device calls to handle
-> the same error. I will send a patch to use the same approach.
+------=_Part_8375_18469351.1141392843583
+Content-Type: text/x-patch; name=cleanup01.patch; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Attachment-Id: f_ekcd49ig
+Content-Disposition: attachment; filename="cleanup01.patch"
 
-Go ahead and send fixed. I am to busy to fully complete that change.
+Index: hcid/dbus-adapter.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/dbus-adapter.c,v
+retrieving revision 1.2
+diff -u -r1.2 dbus-adapter.c
+--- hcid/dbus-adapter.c	27 Feb 2006 10:24:55 -0000	1.2
++++ hcid/dbus-adapter.c	3 Mar 2006 13:23:25 -0000
+@@ -63,17 +63,6 @@
+ 	"wearable"
+ };
+ 
+-static char *get_peer_name(const bdaddr_t *local, const bdaddr_t *peer)
+-{
+-	char filename[PATH_MAX + 1], addr[18];
+-
+-	ba2str(local, addr);
+-	snprintf(filename, PATH_MAX, "%s/%s/names", STORAGEDIR, addr);
+-
+-	ba2str(peer, addr);
+-	return textfile_get(filename, addr);
+-}
+-
+ static DBusMessage *handle_dev_get_address_req(DBusMessage *msg, void *data)
+ {
+ 	struct hci_dbus_data *dbus_data = data;
+@@ -463,10 +452,8 @@
+ 		return bluez_new_failure_msg(msg, BLUEZ_EDBUS_WRONG_PARAM);
+ 
+ 	dd = hci_open_dev(dbus_data->dev_id);
+-	if (dd < 0) {
+-		syslog(LOG_ERR, "HCI device open failed: hci%d", dbus_data->dev_id);
+-		return bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
+-	}
++	if (dd < 0)
++		return error_no_such_device(msg);
+ 
+ 	if (hci_read_class_of_dev(dd, cls, 1000) < 0) {
+ 		syslog(LOG_ERR, "Can't read class of device on hci%d: %s(%d)",
+@@ -520,10 +507,8 @@
+ 	int dd, i;
+ 
+ 	dd = hci_open_dev(dbus_data->dev_id);
+-	if (dd < 0) {
+-		syslog(LOG_ERR, "HCI device open failed: hci%d", dbus_data->dev_id);
+-		return bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
+-	}
++	if (dd < 0)
++		return error_no_such_device(msg);
+ 
+ 	if (hci_read_class_of_dev(dd, cls, 1000) < 0) {
+ 		syslog(LOG_ERR, "Can't read class of device on hci%d: %s(%d)",
+@@ -689,24 +674,25 @@
+ 
+ static DBusMessage *handle_dev_get_remote_name_req(DBusMessage *msg, void *data)
+ {
++	char filename[PATH_MAX + 1], addr[18];
+ 	struct hci_dbus_data *dbus_data = data;
+ 	DBusMessage *reply = NULL;
+ 	const char *str_bdaddr;
+ 	char *name;
+-	bdaddr_t bdaddr;
+-	struct hci_dev_info di;
++	int err;
+ 
+ 	dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &str_bdaddr,
+ 							DBUS_TYPE_INVALID);
+ 
+-	str2ba(str_bdaddr, &bdaddr);
++	err = get_device_address(dbus_data->dev_id, addr, sizeof(addr));
++	if (err < 0)
++		return error_generic(msg, -err);
+ 
+-	if (hci_devinfo(dbus_data->dev_id, &di) < 0) {
+-		syslog(LOG_ERR, "Can't get device info");
+-		return bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_ENODEV);
+-	}
+ 
+-	name = get_peer_name(&di.bdaddr, &bdaddr);
++	snprintf(filename, PATH_MAX, "%s/%s/names", STORAGEDIR, addr);
++
++	name = textfile_get(filename, str_bdaddr);
++
+ 	if (!name)
+ 		return bluez_new_failure_msg(msg, BLUEZ_EDBUS_RECORD_NOT_FOUND);
+ 
+@@ -903,7 +889,7 @@
+ 	cr->type = ACL_LINK;
+ 
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+-		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
++		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET | errno);
+ 		goto done;
+ 	}
+ 
+@@ -922,7 +908,7 @@
+ 	if (hci_send_req(dd, &rq, 100) < 0) {
+ 		syslog(LOG_ERR, "Unable to send authentication request: %s (%d)",
+ 							strerror(errno), errno);
+-		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
++		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET | errno);
+ 		goto done;
+ 	}
+ 
+@@ -1174,7 +1160,7 @@
+ 	if (hci_send_req(dd, &rq, 100) < 0) {
+ 		syslog(LOG_ERR, "Unable to start inquiry: %s (%d)",
+ 							strerror(errno), errno);
+-		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
++		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET | errno);
+ 		goto failed;
+ 	}
+ 
+@@ -1207,13 +1193,13 @@
+ 	if (hci_send_req(dd, &rq, 100) < 0) {
+ 		syslog(LOG_ERR, "Sending cancel inquiry failed: %s (%d)",
+ 							strerror(errno), errno);
+-		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET + errno);
++		reply = bluez_new_failure_msg(msg, BLUEZ_ESYSTEM_OFFSET | errno);
+ 		goto failed;
+ 	}
+ 
+ 	if (status) {
+ 		syslog(LOG_ERR, "Cancel inquiry failed with status 0x%02x", status);
+-		reply = bluez_new_failure_msg(msg, BLUEZ_EBT_OFFSET + status);
++		reply = bluez_new_failure_msg(msg, BLUEZ_EBT_OFFSET | status);
+ 		goto failed;
+ 	}
+ 
+Index: hcid/dbus.h
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/dbus.h,v
+retrieving revision 1.39
+diff -u -r1.39 dbus.h
+--- hcid/dbus.h	27 Feb 2006 10:24:55 -0000	1.39
++++ hcid/dbus.h	3 Mar 2006 13:23:26 -0000
+@@ -252,19 +252,13 @@
+ #define BLUEZ_EFUTURE_OFFSET		(0x00040000)
+ 
+ /* D-Bus error code, class BLUEZ_EDBUS_OFFSET */
+-#define BLUEZ_EDBUS_UNKNOWN_METHOD	(0x01 + BLUEZ_EDBUS_OFFSET)
+-#define BLUEZ_EDBUS_WRONG_SIGNATURE	(0x02 + BLUEZ_EDBUS_OFFSET)
+-#define BLUEZ_EDBUS_WRONG_PARAM		(0x03 + BLUEZ_EDBUS_OFFSET)
+-#define BLUEZ_EDBUS_RECORD_NOT_FOUND	(0x04 + BLUEZ_EDBUS_OFFSET)
+-#define BLUEZ_EDBUS_NO_MEM   		(0x05 + BLUEZ_EDBUS_OFFSET)
+-#define BLUEZ_EDBUS_CONN_NOT_FOUND	(0x06 + BLUEZ_EDBUS_OFFSET)
+-#define BLUEZ_EDBUS_UNKNOWN_PATH	(0x07 + BLUEZ_EDBUS_OFFSET)
+-#define BLUEZ_EDBUS_NOT_IMPLEMENTED	(0x08 + BLUEZ_EDBUS_OFFSET)
+-
+-/* D-Bus error code, class BLUEZ_ESYSTEM_OFFSET */
+-#define BLUEZ_ESYSTEM_ENODEV		(ENODEV + BLUEZ_ESYSTEM_OFFSET)
+-
+-/* BLUEZ_DBUS_ERR_NO_MEMORY */
+-#define BLUEZ_DBUS_ERR_NO_MEMORY_STR	"No memory"
++#define BLUEZ_EDBUS_UNKNOWN_METHOD	(0x01 | BLUEZ_EDBUS_OFFSET)
++#define BLUEZ_EDBUS_WRONG_SIGNATURE	(0x02 | BLUEZ_EDBUS_OFFSET)
++#define BLUEZ_EDBUS_WRONG_PARAM		(0x03 | BLUEZ_EDBUS_OFFSET)
++#define BLUEZ_EDBUS_RECORD_NOT_FOUND	(0x04 | BLUEZ_EDBUS_OFFSET)
++#define BLUEZ_EDBUS_NO_MEM   		(0x05 | BLUEZ_EDBUS_OFFSET)
++#define BLUEZ_EDBUS_CONN_NOT_FOUND	(0x06 | BLUEZ_EDBUS_OFFSET)
++#define BLUEZ_EDBUS_UNKNOWN_PATH	(0x07 | BLUEZ_EDBUS_OFFSET)
++#define BLUEZ_EDBUS_NOT_IMPLEMENTED	(0x08 | BLUEZ_EDBUS_OFFSET)
+ 
+ #endif /* __H_BLUEZ_DBUS_H__ */
 
-Regards
 
-Marcel
-
-
+------=_Part_8375_18469351.1141392843583--
 
 
 -------------------------------------------------------
