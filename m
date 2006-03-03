@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] dbus pin failure
-From: David Woodhouse <dwmw2@infradead.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1141397987.12964.23.camel@aeonflux.holtmann.net>
+In-Reply-To: <1141396234.8699.10.camel@localhost.localdomain>
 References: <1141396234.8699.10.camel@localhost.localdomain>
-	 <1141397987.12964.23.camel@aeonflux.holtmann.net>
 Content-Type: text/plain
-Message-Id: <1141418085.8699.23.camel@localhost.localdomain>
+Message-Id: <1141397987.12964.23.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,17 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 03 Mar 2006 20:34:45 +0000
+Date: Fri, 03 Mar 2006 15:59:46 +0100
 
-On Fri, 2006-03-03 at 15:59 +0100, Marcel Holtmann wrote:
-> maybe the D-Bus library is a little bit too old. I actually removed
-> support for the old versions some time ago. What version are you
-> running?
+Hi David,
 
-It's 0.61
+> With the current bluez-utils (2.25) and bluez-pin (0.30) packages, the
+> PIN helper doesn't work. When hcid requests a PIN, I get this...
+> 
+> 6047: arguments to dbus_message_iter_get_fixed_array() were incorrect,
+> assertion "(subtype == DBUS_TYPE_INVALID) || dbus_type_is_fixed
+> (subtype)" failed in file dbus-message.c line 1743.
+> This is normally a bug in some application using the D-BUS library.
 
--- 
-dwmw2
+maybe the D-Bus library is a little bit too old. I actually removed
+support for the old versions some time ago. What version are you
+running?
+
+Regards
+
+Marcel
+
 
 
 
