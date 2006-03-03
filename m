@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [Bluez-devel] [DBUS PATCH] cleanup
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <e1effdeb0603030534k54fd1485u4f079a155b72c4@mail.gmail.com>
+References: <e1effdeb0603030534k54fd1485u4f079a155b72c4@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1141396234.8699.10.camel@localhost.localdomain>
+Message-Id: <1141394029.4814.0.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] dbus pin failure
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,18 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 03 Mar 2006 14:30:34 +0000
+Date: Fri, 03 Mar 2006 14:53:49 +0100
 
-With the current bluez-utils (2.25) and bluez-pin (0.30) packages, the
-PIN helper doesn't work. When hcid requests a PIN, I get this...
+Hi Claudio,
 
-6047: arguments to dbus_message_iter_get_fixed_array() were incorrect,
-assertion "(subtype == DBUS_TYPE_INVALID) || dbus_type_is_fixed
-(subtype)" failed in file dbus-message.c line 1743.
-This is normally a bug in some application using the D-BUS library.
+> Here is a patch to fix some error handling standard. I changed the
+> function handle_dev_get_remote_name, get_peer_name is not necessary
+> anymore because now it is possible use the function
+> get_device_address.
 
--- 
-dwmw2
+the patch has been applied. Thanks.
+
+Regards
+
+Marcel
+
 
 
 
