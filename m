@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <8a995dd50603050455o6a4a39f6s846afb277bf22a9c@mail.gmail.com>
-From: "Franz Pucher" <franz.puchner@gmail.com>
+Message-ID: <f64f4e8a0603030622x37694d06sfcdbf5bbbb7bcf98@mail.gmail.com>
+From: "zhu yong" <zhuyong0003@gmail.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] sending wap-push via bluetooth to mobile phone
+Content-Type: multipart/alternative;
+	boundary="----=_Part_2656_8915122.1141395758004"
+Subject: [Bluez-users] Re: Re: Re: Re: Help me! hciattach have no error msg, but hciconfig don't find the device.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +17,81 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 5 Mar 2006 13:55:32 +0100
+Date: Fri, 3 Mar 2006 22:22:38 +0800
 
-Hi,
+------=_Part_2656_8915122.1141395758004
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I am planning a project, where I need to send a wap push link via
-bluetooth to a mobile phone.
-Scenario: Someone walks near a bluetooth server and if his phone has
-blueooth enabled then he receives a link on his mobile phone, that
-links to a wap-url.
+Hi,Erwin
+Follows your suggestion, I want to download bluez-utils-2.10 and
+bluez-libs-2.10 package from
+http://bluez.sf.net/download/bluez-utils-2.10.tar.gz
+But, I can not download these source because of network enviroment.
+Can you do me a favor to send me the copy of bluez-utils-2.10 and
+bluez-libs-2.10 package to my email(zhuyong0003@gmail.com)?
 
-Although some people tell me that this is possible, I have not yet
-found information about how to do this technically.
+Thanks a lot.
 
-Can anyone inform me if this is possible in general and if this is
-supported by Bluez?
+Best regards
+yong Zhu
 
-Thanks a lot!
-Franz
+Am Donnerstag, den 02.03.2006, 23:08 +0800 schrieb zhu yong:
+> Hi,Erwin
+> my board use Samsung 44B0x chip of ATM7TDMI. I use bluez-utils-2.24
+> and bluez-libs-2.24.
+> Do I need patchs for non-mmu systems?
+> Is 'startup script'  /etc/hcid.conf?
+> I have no ides how to change the file, I use default config.
+
+>The default config should be ok. Some patches are necessary because of
+>the fork() restrictions on nommu (they may be different for 2.24!):
+>http://home.at/cgi-bin/viewcvs.cgi/midori/sources/bluez-utils-2.10/
+
+>My startup script works as follows:
+
+>/sbin/hcid -n &
+>/sbin/hciattach ttyS0 csr &
+
+>-Erwin
+
+------=_Part_2656_8915122.1141395758004
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+<div>Hi,Erwin</div>
+<div>Follows your suggestion, I want to download bluez-utils-2.10 and bluez=
+-libs-2.10 package from</div>
+<div><a href=3D"http://bluez.sf.net/download/bluez-utils-2.10.tar.gz">http:=
+//bluez.sf.net/download/bluez-utils-2.10.tar.gz</a><br>But, I can not downl=
+oad these source because of network enviroment.</div>
+<div>Can you do me a favor to send me the copy of bluez-utils-2.10 and blue=
+z-libs-2.10 package to my email(<a href=3D"mailto:zhuyong0003@gmail.com">zh=
+uyong0003@gmail.com</a>)?</div>
+<div>&nbsp;</div>
+<div>Thanks a lot.</div>
+<div>&nbsp;</div>
+<div>Best regards</div>
+<div>yong Zhu</div>
+<div><br>Am Donnerstag, den 02.03.2006, 23:08 +0800 schrieb zhu yong:<br>&g=
+t; Hi,Erwin<br>&gt; my board use Samsung 44B0x chip of ATM7TDMI. I use blue=
+z-utils-2.24<br>&gt; and bluez-libs-2.24.<br>&gt; Do I need patchs for non-=
+mmu systems?
+<br>&gt; Is 'startup script' &nbsp;/etc/hcid.conf?<br>&gt; I have no ides h=
+ow to change the file, I use default config.<br><br>&gt;The default config =
+should be ok. Some patches are necessary because of<br>&gt;the fork() restr=
+ictions on nommu (they may be different for=20
+2.24!):<br>&gt;<a onclick=3D"return top.js.OpenExtLink(window,event,this)" =
+href=3D"http://home.at/cgi-bin/viewcvs.cgi/midori/sources/bluez-utils-2.10/=
+" target=3D"_blank">http://home.at/cgi-bin/viewcvs.cgi/midori/sources/bluez=
+-utils-2.10/
+</a><br><br>&gt;My startup script works as follows:<br><br>&gt;/sbin/hcid -=
+n &amp;<br>&gt;/sbin/hciattach ttyS0 csr &amp;<br><br>&gt;-Erwin<br>&nbsp;<=
+/div>
+
+------=_Part_2656_8915122.1141395758004--
 
 
 -------------------------------------------------------
