@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <440AFB9C.60308@cs.bgu.ac.il>
-From: Niv <nivv@cs.bgu.ac.il>
-MIME-Version: 1.0
+Message-ID: <8a995dd50603050455o6a4a39f6s846afb277bf22a9c@mail.gmail.com>
+From: "Franz Pucher" <franz.puchner@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8
-Subject: [Bluez-users] hcitool requires setuid
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] sending wap-push via bluetooth to mobile phone
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +16,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 05 Mar 2006 16:54:20 +0200
+Date: Sun, 5 Mar 2006 13:55:32 +0100
 
-Hay,
-I want to give users at the computer science labs the ability to use BT
-headsets.
-to do that they need to run hcitool.
->From my experience at home, I must setuid hcitool to work for a user.
-When I tried giving permition from sudo , hcitool complained it can't
-open sockets.
-How can I use sudo with hcitool?
+Hi,
 
-the OS is Mandriva 10.2
-Niv
+I am planning a project, where I need to send a wap push link via
+bluetooth to a mobile phone.
+Scenario: Someone walks near a bluetooth server and if his phone has
+blueooth enabled then he receives a link on his mobile phone, that
+links to a wap-url.
+
+Although some people tell me that this is possible, I have not yet
+found information about how to do this technically.
+
+Can anyone inform me if this is possible in general and if this is
+supported by Bluez?
+
+Thanks a lot!
+Franz
 
 
 -------------------------------------------------------
