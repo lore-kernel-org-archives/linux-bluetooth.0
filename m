@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <440BE81C.5040902@porthome.nl>
-From: Pieter Poorthuis <pieter@porthome.nl>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] dbus pin failure
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SCO stuck on a Netgear WGT634U (mips)
-References: <20060303011433.c498e85e.henryk@ploetzli.ch>	<4407C5CF.6060208@xmission.com>	<20060304024114.38d9b29f.henryk@ploetzli.ch> <20060304084732.1ee8b518.henryk@ploetzli.ch>
-In-Reply-To: <20060304084732.1ee8b518.henryk@ploetzli.ch>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1141418085.8699.23.camel@localhost.localdomain>
+References: <1141396234.8699.10.camel@localhost.localdomain>
+	 <1141397987.12964.23.camel@aeonflux.holtmann.net>
+	 <1141418085.8699.23.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1141532537.4871.9.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,24 +20,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 06 Mar 2006 08:43:24 +0100
+Date: Sun, 05 Mar 2006 05:22:17 +0100
+
+Hi David,
+
+> > maybe the D-Bus library is a little bit too old. I actually removed
+> > support for the old versions some time ago. What version are you
+> > running?
+> 
+> It's 0.61
+
+ok then maybe it is too new. Does bluez-pin or hcid create this error
+message? I am still at 0.60 on all of my machines.
+
+Regards
+
+Marcel
 
 
->
-> Not completely solved yet, since the sound I hear in my headset is
-> anything from inaudible to heavily distorted, but at least the SCO
-> packets happily go in and out, so that should be solvable for me.
->
->   
-I'm using a Energic BT-001 headset (bluetooth 1.1, Motorale chipset) and 
-had a terrible distortion as well. After having disabled automatic 
-endianness fixup in the snd_bt_sco kernel module (line 32 btsco.c: 
-#undef AUTO_FIXUP_BYTESHIFT) it works flawlessly :).
-
-Btw, this headset costed me Euro 12.50, so is this the cheapest headset 
-that works with btsco...?
-
-Pieter
 
 
 -------------------------------------------------------
