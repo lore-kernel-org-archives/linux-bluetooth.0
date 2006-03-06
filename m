@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] dbus pin failure
-From: Marcel Holtmann <marcel@holtmann.org>
+From: David Woodhouse <dwmw2@infradead.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1141663646.4110.60.camel@pmac.infradead.org>
+In-Reply-To: <1141532537.4871.9.camel@aeonflux.holtmann.net>
 References: <1141396234.8699.10.camel@localhost.localdomain>
 	 <1141397987.12964.23.camel@aeonflux.holtmann.net>
 	 <1141418085.8699.23.camel@localhost.localdomain>
 	 <1141532537.4871.9.camel@aeonflux.holtmann.net>
-	 <1141663646.4110.60.camel@pmac.infradead.org>
 Content-Type: text/plain
-Message-Id: <1141666471.4733.3.camel@aeonflux.holtmann.net>
+Message-Id: <1141663646.4110.60.camel@pmac.infradead.org>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -22,23 +21,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 06 Mar 2006 18:34:31 +0100
+Date: Mon, 06 Mar 2006 16:47:26 +0000
 
-Hi David,
+On Sun, 2006-03-05 at 05:22 +0100, Marcel Holtmann wrote:
+> ok then maybe it is too new. Does bluez-pin or hcid create this error
+> message? I am still at 0.60 on all of my machines.
 
-> > ok then maybe it is too new. Does bluez-pin or hcid create this error
-> > message? I am still at 0.60 on all of my machines.
-> 
-> It's printed by bluez-pin
+It's printed by bluez-pin
 
-so I assume this means that bluez-pin is at fault. Actually that is out
-of my responsibility. However you also should already have patches in it
-for making it work with 0.36. Maybe these need to be reviewed.
-
-Regards
-
-Marcel
-
+-- 
+dwmw2
 
 
 
