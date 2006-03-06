@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060306014623.41457.qmail@web36114.mail.mud.yahoo.com>
-From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <440B9460.3050004@lycosmax.co.uk>
+From: Ben Griffiths <steel_warrior@lycosmax.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Why there is a need of Bluetooth Device Driver ?
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Some variety of user guide?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 5 Mar 2006 17:46:23 -0800 (PST)
+Date: Mon, 06 Mar 2006 01:46:08 +0000
 
-Hello,
-Can anyone tell me "why there is an need for Bluetooth
-device driver". This question was asked by my
-professor ie his question is there already exists USB
-Device Drivers in Linux which are capable of
-recognising the USB devices, then why there is a need
-for this Bluetooth device driver ? I gave him some
-answers but he was not convinced with this. Can anyone
-is able to provide me an answer for this question. 
-Thanks & Warm Regards,
-Swathi
+Hi,
 
+    Is there any sort of user guide or user documentation for BlueZ. 
+I've installed it but have no idea how to use it... I have no idea how 
+to search for varius bluetooth devices, for example. I'd like to contect 
+to my phone and download pictures.
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+    Further more, do I have to do everything through the terminal or is 
+there a graphical user interface out there. I noticed BlueThing on 
+Sourceforge, but it apparently hasn't got any files to be downloaded yet.
+
+Thanks,
+
+Ben.
 
 
 -------------------------------------------------------
