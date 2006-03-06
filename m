@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <440BEDC4.5040300@service2media.com>
-From: Herman Meerlo <herman@service2media.com>
-MIME-Version: 1.0
+Message-ID: <20060306014623.41457.qmail@web36114.mail.mud.yahoo.com>
+From: Swathi Mathur80 <swathi_mathur80@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Inquiry and connection through different devices
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Why there is a need of Bluetooth Device Driver ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,20 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Mar 2006 09:07:32 +0100
+Date: Sun, 5 Mar 2006 17:46:23 -0800 (PST)
 
-Hi all,
+Hello,
+Can anyone tell me "why there is an need for Bluetooth
+device driver". This question was asked by my
+professor ie his question is there already exists USB
+Device Drivers in Linux which are capable of
+recognising the USB devices, then why there is a need
+for this Bluetooth device driver ? I gave him some
+answers but he was not convinced with this. Can anyone
+is able to provide me an answer for this question. 
+Thanks & Warm Regards,
+Swathi
 
-I am trying out a setup in which one USB dongle constantly performs an 
-inquiry and another dongle then performs service searches on the found 
-devices. But this weekend I was wondering whether this is efficient. The 
-inquiry returns the found devices together with their clock offsets. But 
-I suppose that this clock offset means nothing to the other dongle. So 
-is it wise to do this or is it better to let both dongles perform their 
-own inquiries and determine their own clock offsets?
 
-Regards,
-Herman Meerlo
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
