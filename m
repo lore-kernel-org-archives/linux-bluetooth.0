@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f64f4e8a0603070704s65a86a46ued55b48074b80e87@mail.gmail.com>
-From: "zhu yong" <zhuyong0003@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <440D70C2.6090708@kernelconcepts.de>
+From: Nils Faerber <nils.faerber@kernelconcepts.de>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_5934_26190036.1141743887185"
-Subject: [Bluez-users] Re: Re: Re: Re: Help me! hciattach have no error msg, but hciconfig don't find the device.
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=UTF-8
+Subject: [Bluez-users] New HCI-USB device, no MAC?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,57 +16,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 7 Mar 2006 23:04:47 +0800
+Date: Tue, 07 Mar 2006 12:38:42 +0100
 
-------=_Part_5934_26190036.1141743887185
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-Hi,Erwin
-Follows your suggestion, I want to download bluez-utils-2.10 and
-bluez-libs-2.10 package.I use your patch to bluez-utils-2.10.
-Because of uclinux on my board, I copy my /bluez to my target root without
-/bluez/include and /bluez/lib.
+Hi!
+I just acquired a new USB Bluetooth dongle.
+Upon attachment it is correctly recognised as USB HCI but strangely it
+does not carry any valid MAC address:
 
-I use cmd "hciattach /dev/ttyS1 bcsp 115200 noflow" to attach my uart
-bluetooth device,but have some hdr error. info as follows:
-"bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Error in BCSP hdr checksum
-......"
-And I use cmd "hcid".But I find the cmd run without stop.
-hciattach is error so hcid is error?
+Requesting information ...
+        BD Address:  11:11:11:11:11:11
+        Device Name: piwi-1
+        LMP Version: 1.2 (0x2) LMP Subversion: 0x1fe
+        Manufacturer: Integrated System Solution Corp. (57)
+        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot
+offset>
+                <timing accuracy> <role switch> <sniff mode> <RSSI>
+                <channel quality> <SCO link> <HV2 packets> <HV3 packets>
+                <u-law log> <A-law log> <CVSD> <power control>
+                <transparent SCO> <broadcast encrypt> <enhanced iscan>
+                <interlaced iscan> <interlaced pscan> <inquiry with RSSI>
+                <AFH cap. slave> <AFH cap. master> <AFH class. master>
 
-In addition, the device is good used by my PC.
+Is this a known issue for that chipset?
+In fact I bought two dongles with the same chipset (but different
+casing) and both start with the above default MAC.
+Is there a tool to set a valid MAC?
+And if so, to which MAC should I set it?
+Or would probably the Windows driver program an initial MAC if first
+connected to Windows?
 
-Thanks a lot.
+Hints are welcome ;)
+Thanks!
 
-Best regards
-yong Zhu
+Cheers
+  nils faerber
 
-------=_Part_5934_26190036.1141743887185
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+- --
+kernel concepts          Tel: +49-271-771091-12
+Dreisbachstr. 24         Fax: +49-271-771091-19
+D-57250 Netphen          Mob: +49-176-21024535
+- --
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-Hi,Erwin<br>Follows your suggestion, I want to download bluez-utils-2.10 an=
-d<br>bluez-libs-2.10 package.I use your patch to bluez-utils-2.10.<br>Becau=
-se of uclinux on my board, I copy my /bluez to my target root without<br>
-/bluez/include and /bluez/lib.<br><br>I use cmd &quot;hciattach /dev/ttyS1 =
-bcsp 115200 noflow&quot; to attach my uart<br>bluetooth device,but have som=
-e hdr error. info as follows:<br>&quot;bcsp_recv: Error in BCSP hdr checksu=
-m
-<br>bcsp_recv: Error in BCSP hdr checksum<br>bcsp_recv: Error in BCSP hdr c=
-hecksum<br>bcsp_recv: Error in BCSP hdr checksum<br>bcsp_recv: Error in BCS=
-P hdr checksum<br>......&quot;<br>And I use cmd &quot;hcid&quot;.But I find=
- the cmd run without stop.
-<br>hciattach is error so hcid is error?<br><br>In addition, the device is =
-good used by my PC.<br><br>Thanks a lot.<br><br>Best regards<br>yong Zhu
-
-------=_Part_5934_26190036.1141743887185--
+iD8DBQFEDXDCJXeIURG1qHgRAu/2AKDx491XELi+LiPobdNdPp8lScZYBACdGH6A
+HPpi1f+oidiWSOXA5XWCVN4=
+=VQwz
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
