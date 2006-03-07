@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f64f4e8a0603080742s393ad20k9939788957e013dc@mail.gmail.com>
-From: "zhu yong" <zhuyong0003@gmail.com>
+Subject: Re: [Bluez-users] SDP in Motorola phones
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_1792_33518717.1141832522113"
-Subject: [Bluez-users] patch bluez for uclinux, but the cmd 'hcid' can not stop.
+In-Reply-To: <440DB456.3030401@yahoo.com>
+References: <440DB456.3030401@yahoo.com>
+Content-Type: text/plain
+Message-Id: <1141751166.4258.12.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,65 +18,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Mar 2006 23:42:02 +0800
+Date: Tue, 07 Mar 2006 18:06:06 +0100
 
-------=_Part_1792_33518717.1141832522113
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Pedro,
 
-Hi,everyone
-Follows Erwin suggestion, I download bluez-utils-2.10 and
-bluez-libs-2.10 package.I use Erwin's patch to bluez-utils-2.10.
-Because of uclinux on my board, I copy my compiled /bluez to my target root
-without /bluez/include and /bluez/lib.
+> I am experiencing problems getting SDP information from some new 
+> Motorola phones (I am dealing with E770). Running "sdptool browse 
+> BDADDR", I get the attached hcidump. As it can be seen, after the SDP 
+> SSA request, the mobile phone does not respond any data and after 20 
+> seconds (the SDP timeout compiled in bluez-libs), sdptool issues an ACL 
+> disconnect. During this time, the phone freezes completely. If I want to 
+> get a specific service (say, OBEX), there are no problems.
+> 
+>  From my understanding, the problem is that the Motorola phone does not 
+> deal correctly with the SDP query issued by bluez. I have been trying to 
+> debug sdptool and comparing to other implementations (Symbian seems to 
+> work OK with Motorola) but, as Marcel says, SDP is a horrible protocol.
+> 
+> Has anybody experienced any similar problem?
 
-I use cmd "hciattach /dev/ttyS1 bcsp 115200 noflow" to attach my uart
-bluetooth device,but have some hdr error. info as follows:
-"bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Error in BCSP hdr checksum
-......"
-And I use cmd "hcid".But I find the cmd run without stop.
-Does anyone encounter the same problem? Maybe you can help me.
+this problem also exists on the RARZ V3x and I called it ByeByeMoto,
+because it stalls my complete phone. There can't be an easy workaround.
+It is a really serious bug from Motorola and they should provide free
+software upgrades to anyone. However I have no idea how they passed the
+Bluetooth qualification with these devices.
 
-In addition, the device is good used by my PC.
+Regards
 
-thanks
-yong Zhu
+Marcel
 
-------=_Part_1792_33518717.1141832522113
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-<div style=3D"DIRECTION: ltr"><span class=3D"q">Hi,everyone<br>Follows <fon=
-t color=3D"#550055">Erwin </font>suggestion, I download bluez-utils-2.10 an=
-d<br></span></div><span></span>
-<div style=3D"DIRECTION: ltr">bluez-libs-2.10 package.I use Erwin's patch t=
-o bluez-utils-2.10.</div>
-<div>Because of uclinux on my board, I copy my compiled /bluez to my target=
- root without /bluez/include and /bluez/lib.</div>
-<div>&nbsp;</div>
-<div>I use cmd &quot;hciattach /dev/ttyS1 bcsp 115200 noflow&quot; to attac=
-h my uart bluetooth device,but have some hdr error. info as follows:</div>
-<div>&quot;bcsp_recv: Error in BCSP hdr checksum<br>bcsp_recv: Error in BCS=
-P hdr checksum<br>bcsp_recv: Error in BCSP hdr checksum<br>bcsp_recv: Error=
- in BCSP hdr checksum<br>bcsp_recv: Error in BCSP hdr checksum<br>......&qu=
-ot;=20
-</div>
-<div>And I use cmd &quot;hcid&quot;.But I find the cmd run without stop.</d=
-iv>
-<div>Does anyone encounter the same problem? Maybe you can help me.<br>&nbs=
-p;</div>
-<div>In addition, the device is good used by my PC.</div>
-<div>&nbsp;</div>
-<div>thanks</div>
-<div>yong Zhu</div>
-
-------=_Part_1792_33518717.1141832522113--
 
 
 -------------------------------------------------------
