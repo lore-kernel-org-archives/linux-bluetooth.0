@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Radek <fotopiper@o2.pl>
-To: bluez-devel@lists.sourceforge.net
-Message-Id: <20060308221925.17d20407.fotopiper@o2.pl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] PIN helper
+From: Peter Wippich <pewi@gw-instruments.de>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] SIM access profile & bluez ?
+In-Reply-To: <200603071619.11837.me@goetzi.de>
+Message-ID: <Pine.LNX.4.33.0603071625270.9478-100000@redbean.intranet.gw-instruments.de>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,46 +17,88 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 8 Mar 2006 22:19:25 +0100
+Date: Tue, 7 Mar 2006 16:27:28 +0100 (CET)
 
-Hello,
-from whot I had read in the net there had been some controversies about
-the pinhelpers. The d-bus one need d-bus, and the python one need some
-extra libs as well as X..
-Maybe it was thougt before.. but I would suggest using a different
-method. A list of devices with coresponding pins. This gives the
-possibilities to have a different pin for different devices (important
-especially if you have some that have a fixed pin:0000, not a very
-secure idea for a default pin) and possibly a default pin as an option.
-A very simple script that does that:
 
-#!/bin/sh
-echo "PIN:"$(grep $2 /etc/bluetooth/pins|sed s/.*PIN\://)
+Hi Goetz,
 
-Not a very clean solusion (sorry I'm no programer, and my knowledge of
-bash/sh is limited) but portable (bysybox suports all that is needed).
-The obviously in format:
+I think the main problem will be the GSM modul. Usualy they do not suppor=
+t
+remote SIM access. Have you checked this ??
 
-anything countaining the HWaddress of the device PIN: and the pin
+Ciao,
 
-this gives the possibility to have something like this:
+Peter
 
-00:0E:05:05:04:02; My cat; PIN:0000
-00:0E:05:05:04:01; The dog; PIN:1111432334
+On Tue, 7 Mar 2006, G=F6tz Issel wrote:
 
-It would be better if the script checked the files permisions, gave an
-option to use a default pin and maybe some logging... But for that my
-current sh knowledge is not enough.. sorry :-(
+> Hi folks,
+>
+> my aim is to use bluez and add the SIM access profile to it. I have a G=
+SM
+> module via serial port that also has its own SIM card reader as well as
+> integrated audio-in and audio-out. The bluetooth hardware is also avail=
+able
+> via serial port and working with bluez & utils so far. My mobile phone =
+is
+> intended to be the card server, my linux machine the client.
+>
+> The idea is to make the software somewhat general so that it will work =
+with
+> other bt and gsm hardware.
+>
+> My plan is to have an application (command line tool for now), that wil=
+l be
+> the controller of all interactions. So it will:
+>
+> - initialize the search to find  suitable devices (using sdp that comes=
+ with
+> bluez)
+>
+> - show search results and make a selection of a device possible (for th=
+e
+> beginning this will only be a txt file as output and input)
+>
+> - check the requirements of the connection and establish it (serial pro=
+file)
+>
+> - ask for sap pin exchange (16 digits), gain txt file as input replacem=
+ent
+>
+> - ask for sim card pin (4 digits)
+> ...
+>
+> Are there any design ideas from anyone? Not asking for ready made solut=
+ions.
+> Just wondering if the above mentioned plan is the right idea. I am not =
+sure
+> where to integrate the SAP profile still.
+>
+> thx,
+> goetz
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by xPML, a groundbreaking scripting lang=
+uage
+> that extends applications into web and mobile media. Attend the live we=
+bcast
+> and join the prime developer group breaking into this new coding territ=
+ory!
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D110944&bid=3D241720&dat=
+=3D121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
-Still I think this is a beeter solusion, a more universal one, then the
-ones shiped with bluez now.. which doesn't meen that the current
-helpers are not helpful :)
+|	Peter Wippich 			Voice: +49 30 46776411		|
+|	G&W Instruments GmbH		fax:   +49 30 46776419		|
+|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
+|	D-13355 Berlin  / Germany					|
 
-My regards.
 
--- 
-Radoslaw Rurarz
-Warsaw Poland
 
 
 -------------------------------------------------------
