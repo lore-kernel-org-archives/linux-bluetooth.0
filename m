@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <440D70C2.6090708@kernelconcepts.de>
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
+Message-ID: <20060307105813.97181.qmail@web26503.mail.ukl.yahoo.com>
+From: BATAILLE Philippe <philbataille@yahoo.fr>
+To: BlueZ <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8
-Subject: [Bluez-users] New HCI-USB device, no MAC?
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Problem : multi connection with PAN
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,58 +16,108 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 07 Mar 2006 12:38:42 +0100
+Date: Tue, 7 Mar 2006 11:58:13 +0100 (CET)
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi,
+I would like to use the PAN profile of the BlueZ
+stack. I have the 2.22 
+version of the PAN code and
+my kernel version is 2.6.15 (Fedora 4 distribution).
+I would like to create several connections between a
+GN and PANUs 
+entities. My problem is when I
+create only one connection between 2 entities (GN and
+PANU)  I can make 
+a 'ping' command between
+the two devices (in the 2 directions). If I try to
+create an other one 
+with a second PANU  (GN-PANU connection)
+the connection succeeds but the ping command doesn't
+work.
 
-Hi!
-I just acquired a new USB Bluetooth dongle.
-Upon attachment it is correctly recognised as USB HCI but strangely it
-does not carry any valid MAC address:
+I read the PAN Howto in order to configure the PAN
+correctly. This howto 
+mentions the possibility to
+create multiple PAN connections using an ethernet
+bridge (see "brctl" 
+program) but even if I configure it
+according to the PAN howto instructions, the problem
+is unresolved. May 
+be there is a wrong operation
+in the configuration process but I can't find it.
 
-Requesting information ...
-        BD Address:  11:11:11:11:11:11
-        Device Name: piwi-1
-        LMP Version: 1.2 (0x2) LMP Subversion: 0x1fe
-        Manufacturer: Integrated System Solution Corp. (57)
-        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot
-offset>
-                <timing accuracy> <role switch> <sniff mode> <RSSI>
-                <channel quality> <SCO link> <HV2 packets> <HV3 packets>
-                <u-law log> <A-law log> <CVSD> <power control>
-                <transparent SCO> <broadcast encrypt> <enhanced iscan>
-                <interlaced iscan> <interlaced pscan> <inquiry with RSSI>
-                <AFH cap. slave> <AFH cap. master> <AFH class. master>
+Problem description : A B and C are the 3 Bluetooths
+modules on 3 
+different PCs
+   A= GN   (bdaddr_A)
+   B and C =PANU (bdaddr_B,bdaddr_C)
+ 
+   # starting HCI daemon on each PC
+    hcid
+  
+   # network files on each PC:  
+/etc/sysconfig/network-script/ifcfg-bnep0
+   DEVICE=bnep0
+   BOOTPROTO=static
+   BROADCAST=10.255.255.255
+   HWADDR=00:02:72:C6:6E:89         # specific device
+address different 
+for each node
+   IPADDR=10.0.0.x                            # x= 1,
+2 and 3 for A, B 
+et C respectively
+   NETMASK=255.0.0.0
+   NETWORK=10.0.0.0
+   ONBOOT=no
+   
+   # on GN (bdaddr_A) starting  pand
+   pand -s  -r GN
 
-Is this a known issue for that chipset?
-In fact I bought two dongles with the same chipset (but different
-casing) and both start with the above default MAC.
-Is there a tool to set a valid MAC?
-And if so, to which MAC should I set it?
-Or would probably the Windows driver program an initial MAC if first
-connected to Windows?
+   # on each PANU (bdaddr_B, bdaddr_C) creating a
+connection with A
+   pand -c bdaddr_A (on B)
+   pand -c bdaddr_A  (on C)
 
-Hints are welcome ;)
-Thanks!
+   # show the connections on A with 'pand --show'
+   bnep1:bdaddr_C GN
+   bnep0:bdaddr_B GN
 
-Cheers
-  nils faerber
+   # on A, ping to B (IP:10.0.0.2)
+   ping 10.0.0.2   (this command is OK)
+  
+   # on A ping to C (IP:10.0.0.3)
+   ping 10.0.0.3  (this command is not OK : Message
+"Host unreachable" )
 
-- --
-kernel concepts          Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          Mob: +49-176-21024535
-- --
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFEDXDCJXeIURG1qHgRAu/2AKDx491XELi+LiPobdNdPp8lScZYBACdGH6A
-HPpi1f+oidiWSOXA5XWCVN4=
-=VQwz
------END PGP SIGNATURE-----
+Next, I try to configure the ethernet bridge exactly
+as it is described 
+on the PAN howto
+but without any improvement.
+
+Is there someone who can help me to resolve this
+problem ?
+
+thant you in advance
+
+Regards
+
+Philippe
+
+
+
+
+
+
+
+
+	
+
+	
+		
+___________________________________________________________________________ 
+Nouveau : téléphonez moins cher avec Yahoo! Messenger ! Découvez les tarifs exceptionnels pour appeler la France et l'international.
+Téléchargez sur http://fr.messenger.yahoo.com
 
 
 -------------------------------------------------------
