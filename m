@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Dawid =?ISO-8859-2?Q?Wr=F3bel?= <dawid@klej.net>
+From: Agustin Jose Fusaro <afusaro@apexar.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20060308235501.0a091f55@kromka>
+In-Reply-To: <E64BAD5A8AD46740828069A678D9DD73011B0A@netbe01.net.unimis>
+References: <E64BAD5A8AD46740828069A678D9DD73011B0A@netbe01.net.unimis>
+Content-Type: text/plain
+Message-Id: <1141845703.3098.4.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] BT mouse and it's issues
+Subject: [Bluez-users] Rfcomm connection with pin number question
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,30 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Mar 2006 23:55:01 +0100
+Date: Wed, 08 Mar 2006 16:21:42 -0300
 
-Hi,
+Hi everybody,
 
-	I read a lot in bluez mailing lists archives about link key
-issues between Windows and Linux, but I found no one mentioned that
-under Windows with Toshiba stack there are no such prblems.
+I'm writing an application that uses rfcomm sockets to connect to remote
+devices. I'm using some of the example code for how to use the blueZ
+api, from Marcel. 
 
-The point is that when I switch to Windows and then back to linux, I
-have to manually invoke 'hidd --search' and press the link button on my
-mx900. This case is obviosuly known. But how comes that when switching
-from linux to windows it works immediately without any further actions?
-More annoing is that when I press fn-f2 key combination (intended for
-turning the radios on/off) under linux I lose connection and have to
-reconnect the same way as above. Surprisingly under windows there is no
-such problem. 
+I wanted to know if there's a way of connecting to a remote device, that
+needs a PIN number, without using the pin helper file or any of those
+scripts... I just want to connect to the device passing, for example,
+the pin code as a function parameter. 
 
-So, if that's possible to be done with toshiba stack@windows, why is it
-not with bleuz@linux?
+Does anybody know if this can be achieved using the blueZ library, and
+not using the pin helper file?
 
-PS. I am using dell wireless 350 bluetooth 2.0 module here
+Thanks a lot!!!
 
--- 
-Regards
+Agustin Fusaro - Apexar Technologies
+
 
 
 -------------------------------------------------------
