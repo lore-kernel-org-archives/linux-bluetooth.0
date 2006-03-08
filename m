@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Dave Mielke <dave@mielke.cc>
+From: Radek <fotopiper@o2.pl>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] PIN helper
-Message-ID: <20060308214031.GZ4516@beta.private.mielke.cc>
-References: <20060308221925.17d20407.fotopiper@o2.pl>
+Message-Id: <20060308221925.17d20407.fotopiper@o2.pl>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="wRRV7LY7NUeQGEoC"
-In-Reply-To: <20060308221925.17d20407.fotopiper@o2.pl>
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-devel] PIN helper
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,106 +16,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 8 Mar 2006 16:40:32 -0500
+Date: Wed, 8 Mar 2006 22:19:25 +0100
 
-
---wRRV7LY7NUeQGEoC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-[quoted lines by Radek on 2006/03/08 at 22:19 +0100]
-
->from whot I had read in the net there had been some controversies about
->the pinhelpers. The d-bus one need d-bus, and the python one need some
->extra libs as well as X..
-
-May I use this opportunity to "readvertise" a script I tried to bring to your
-collective attention some months ago. It's attached to this post as "bluepin". 
-It works in text mode, supports a file containing address/pin mappings, and
-uses the dialog utility to bring up a text-mode prompt on a spare virtual
-terminal for devices not listed in the file. Please give it some consideration.
-I'll be glad to enhance it as necessary regarding whatever features it's
-missing or could use in addition to what it already does. See the comments at
-the top of the script for more detail. 
-
--- 
-Dave Mielke           | 2213 Fox Crescent | I believe that the Bible is the
-Phone: 1-613-726-0014 | Ottawa, Ontario   | Word of God. Please contact me
-EMail: dave@mielke.cc | Canada  K2A 1H7   | if you're concerned about Hell.
-http://FamilyRadio.com/                   | http://Mielke.cc/bible/
-
---wRRV7LY7NUeQGEoC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename=bluepin
+Hello,
+from whot I had read in the net there had been some controversies about
+the pinhelpers. The d-bus one need d-bus, and the python one need some
+extra libs as well as X..
+Maybe it was thougt before.. but I would suggest using a different
+method. A list of devices with coresponding pins. This gives the
+possibilities to have a different pin for different devices (important
+especially if you have some that have a fixed pin:0000, not a very
+secure idea for a default pin) and possibly a default pin as an option.
+A very simple script that does that:
 
 #!/bin/sh
-# This script has been written by Dave Mielke <dave@mielke.cc>. It's a light 
-# weight, text mode, Bluetooth PIN helper script. Its dependencies are:
-# *  /bin/sh  The standard system command shell.
-# *  open     A command which opens a free virtual terminal.
-# *  dialog   A command which presents a text-mode dialog.
-#
-# The file /etc/bluetooth/pins is searched for a line corresponding to the 
-# Bluetooth address of the device. Each line of this file should contain the
-# address of a device and its PIN, in that order, separated by space. If the
-# address is found then the corresponding PIN is automatically supplied. If
-# it's not found then the user is prompted via a text-mode dialog in a free 
-# virtual terminal. The console automatically returns to the original virtual
-# terminal as soon as the PIN is entered.
+echo "PIN:"$(grep $2 /etc/bluetooth/pins|sed s/.*PIN\://)
 
-pinsFile="/etc/bluetooth/pins"
-pinLimit=16
+Not a very clean solusion (sorry I'm no programer, and my knowledge of
+bash/sh is limited) but portable (bysybox suports all that is needed).
+The obviously in format:
 
-[ "${#}" -gt 0 ] && {
-   direction="${1}"
-   shift
+anything countaining the HWaddress of the device PIN: and the pin
 
-   [ "${#}" -gt 0 ] && {
-      address="${1}"
-      shift
+this gives the possibility to have something like this:
 
-      if [ "${#}" -gt 0 ]
-      then
-         name="${1}"
-         shift
-      else
-         name=""
-      fi
+00:0E:05:05:04:02; My cat; PIN:0000
+00:0E:05:05:04:01; The dog; PIN:1111432334
 
-      [ -f "${pinsFile}" -a -r "${pinsFile}" ] && exec <"${pinsFile}" && {
-         while read a p x
-         do
-            [ "${a}" = "${address}" ] && {
-               echo "PIN:${p}"
-               exit 0
-            }
-         done
-      }
+It would be better if the script checked the files permisions, gave an
+option to use a default pin and maybe some logging... But for that my
+current sh knowledge is not enough.. sorry :-(
 
-      if [ "${direction}" = "out" ]
-      then
-         adjective="outgoing"
-         preposition="to"
-      else
-         adjective="incoming"
-         preposition="from"
-      fi
+Still I think this is a beeter solusion, a more universal one, then the
+ones shiped with bluez now.. which doesn't meen that the current
+helpers are not helpful :)
 
-      title="Bluetooth PIN Prompt"
-      time="`date '+%Y-%m-%d@%H:%M:%S'`"
-      prompt="Enter PIN for ${adjective} Bluetooth connection ${preposition} ${name}[${address}]"
-      pin="`open 3>&1 -s -w -- dialog --output-fd 3 --clear --title "${title}" --cr-wrap --max-input "${pinLimit}" --inputbox "${time}\n\n${prompt}" 0 0 ""`"
-      [ -n "${pin}" ] && {
-         echo "PIN:${pin}"
-	 exit 0
-      }
-   }
-}
+My regards.
 
-echo ERR
-exit 0
-
---wRRV7LY7NUeQGEoC--
+-- 
+Radoslaw Rurarz
+Warsaw Poland
 
 
 -------------------------------------------------------
