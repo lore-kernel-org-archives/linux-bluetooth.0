@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060308164641.23944.qmail@web31111.mail.mud.yahoo.com>
-From: Yu Zhi <kuanyz@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-285758948-1141836401=:23868"
-Subject: [Bluez-users] Fwd: DHCP for dund
+Subject: Re: [Bluez-users] Can't open PIN file
+	/home/chenjiajing/bluez//etc/bluetooth/pin!
+From: Erwin Authried <eauth@softsys.co.at>
+To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <f64f4e8a0603080810v740f51fejeab23a6b86751b0@mail.gmail.com>
+References: <f64f4e8a0603080810v740f51fejeab23a6b86751b0@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1141835880.27904.68.camel@justakiss>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,59 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Mar 2006 08:46:41 -0800 (PST)
+Date: Wed, 08 Mar 2006 17:38:00 +0100
 
---0-285758948-1141836401=:23868
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Am Donnerstag, den 09.03.2006, 00:10 +0800 schrieb zhu yong:
+> I use the cmd 'hcid', but find that hcid find the pin file from error
+> directory.
+> the /home/chenjiajing/bluez/ is my compile directory. 
+> How can I change to the correct directory of '/etc/bluetooth/pin'?
+> info as follows:
+> # ./hcid -n -f /etc/bluetooth/hcid.conf
+> hcid[32]: Bluetooth HCI daemon
+> hcid[32]: Can't open PIN
+> file /home/chenjiajing/bluez//etc/bluetooth/pin. No suc
+> h file or directory(2)
+> hcid[33]: Can't init device hci0. Connection timed out(110)
+>  
+you need to specify --prefix=\"\" for "configure" in bluez-utils and
+bluez-libs for cross compiling.
 
- I'd using dund to establush connectino with my Pocket PC. Here's the steps I'd taken:
-  
-  1) I'd typed the following command in a terminal:
-  echo 1 > /proc/sys/net/ipv4/ip_forward
-  hcid
-  sdpd
-  
-  2) Put the following lines in a file called /etc/ppp/peers/dun
-  115200       
-  192.168.1.18:10.0.1.40        
-  local
-  ms-dns 192.168.1.1        
-  noauth        
-  debug  
-  
-  3) run in terminal
-  dund --nodetach --listen --persist --msdun call dun  
-  
- The steps work perfectly for my PDA to dialup to my linux server, and manage to browse the content in my webserver. However, the steps are only to assign fixed IP (in this case 10.0.1.40) to my PDA. I wish to have multiple PDA connect to the linux server, and hence fixed IP is not a solution. What should I do if i wanted DHCP server support dund for my case. Please advice.
-  
-  p/s I'm very fresh in Linux environment. The steps are  taken and edited  from http://howto.pilot-link.org/bluesync/ga.html. Please teach me step  by step.
-  
-  Regards,
-  Albert       
+-Erwin
 
----------------------------------
 
-		
----------------------------------
-Relax. Yahoo! Mail virus scanning helps detect nasty viruses!
-		
----------------------------------
-Yahoo! Mail
-Bring photos to life! New PhotoMail  makes sharing a breeze. 
---0-285758948-1141836401=:23868
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
 
- I'd using dund to establush connectino with my Pocket PC. Here's the steps I'd taken:<br>  <br>  1) I'd typed the following command in a terminal:<br>  echo 1 &gt; /proc/sys/net/ipv4/ip_forward<br>  hcid<br>  sdpd<br>  <br>  2) Put the following lines in a file called /etc/ppp/peers/dun<br>  <font color="#000000">115200       <br>  192.168.1.18:10.0.1.40        <br>  local<br>  ms-dns 192.168.1.1        <br>  noauth        <br>  debug  <br>  <br>  3) run in terminal<br>  </font>dund --nodetach --listen --persist --msdun call dun  <br>  <br> The steps work perfectly for my PDA to dialup to my linux server, and manage to browse the content in my webserver. However, the steps are only to assign fixed IP (in this case 10.0.1.40) to my PDA. I wish to have multiple PDA connect to the linux server, and hence fixed IP is not a solution. What should I do if i wanted DHCP server support dund for my case. Please advice.<br>  <br>  p/s I'm very fresh in Linux environment. The steps are 
-  taken
- and edited  from http://howto.pilot-link.org/bluesync/ga.html. Please teach me step  by step.<br>  <br>  Regards,<br>  Albert  <div>     </div><hr size="1"><p>
-		<hr size=1>Relax. Yahoo! Mail 
-<a href="http://us.rd.yahoo.com/mail_us/taglines/virusall/*http://communications.yahoo.com/features.php?page=221">virus scanning</a> helps detect nasty viruses!<p>
-		<hr size=1>Yahoo! Mail<br>
-Bring photos to life! <a href="http://pa.yahoo.com/*http://us.rd.yahoo.com/evt=39174/*http://photomail.mail.yahoo.com">New PhotoMail </a> makes sharing a breeze. 
-
---0-285758948-1141836401=:23868--
 
 
 -------------------------------------------------------
