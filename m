@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <94e407f00603090043g52353905xdd51a702628d19ce@mail.gmail.com>
+Message-ID: <94e407f00603090011w4b1d8bew510d15ccb7d14a39@mail.gmail.com>
 From: "Arpit Rai" <whalesurf@gmail.com>
 To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_1394_14708200.1141893832567"
+	boundary="----=_Part_1097_27120595.1141891908887"
 Subject: [Bluez-devel] Multiple connections between USB dongles
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -17,9 +17,9 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 9 Mar 2006 16:43:52 +0800
+Date: Thu, 9 Mar 2006 16:11:48 +0800
 
-------=_Part_1394_14708200.1141893832567
+------=_Part_1097_27120595.1141891908887
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
@@ -37,12 +37,12 @@ happening?
 Regards
 Arpit
 
-------=_Part_1394_14708200.1141893832567
+------=_Part_1097_27120595.1141891908887
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-<div id=3D"mb_0"><div style=3D"direction: ltr;">Hi<br>
+Hi<br>
 <br>
 I'm using Broadcom based dongles.<br>
 <br>
@@ -51,12 +51,10 @@ dongles. The problem is, at a time I can have only 2 connections. To
 connect to a third dongle I have to kill one of the 2 earlier
 connections. Any idea why this is happening?<br>
 <br>
-Regards<br></div><div style=3D"direction: ltr;"><span class=3D"sg">
+Regards<br>
 Arpit<br>
 
-</span></div></div>
-
-------=_Part_1394_14708200.1141893832567--
+------=_Part_1097_27120595.1141891908887--
 
 
 -------------------------------------------------------
