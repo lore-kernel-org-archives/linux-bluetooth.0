@@ -1,19 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Radek Rurarz <fotopiper@o2.pl>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] PIN helper
-Message-Id: <20060309192953.52ee8c2e.fotopiper@o2.pl>
-In-Reply-To: <20060309061255.GC4516@beta.private.mielke.cc>
-References: <20060308221925.17d20407.fotopiper@o2.pl>
-	<20060308214031.GZ4516@beta.private.mielke.cc>
-	<20060308230109.202dc5ff.fotopiper@o2.pl>
-	<20060308221644.GA4516@beta.private.mielke.cc>
-	<20060309064424.584539d2.fotopiper@o2.pl>
-	<20060309055552.GB4516@beta.private.mielke.cc>
-	<20060309070649.007fba22.fotopiper@o2.pl>
-	<20060309061255.GC4516@beta.private.mielke.cc>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-2
+Message-ID: <fe0a97c20603090959r28afb671n79c0a432f4f6c0c2@mail.gmail.com>
+From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
+To: Bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_1173_18022639.1141927180916"
+Subject: [Bluez-devel] Connecting to a headset
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -25,50 +17,61 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 9 Mar 2006 19:29:53 +0100
+Date: Thu, 9 Mar 2006 23:29:40 +0530
 
-On Thu, 9 Mar 2006 01:12:55 -0500
-Dave Mielke <dave@mielke.cc> wrote:
+------=_Part_1173_18022639.1141927180916
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> [quoted lines by Radek Rurarz on 2006/03/09 at 07:06 +0100]
->=20
-> >A simpler method would be to relly on another pinhelper (for
-> >instance one from the bluez-utlis) set in a config file.. juts pass
-> >the arguments to it.. and see if it returns a propper pin.. if not
-> >fall back to the internal methods (promp if allowed, the pin file
-> >shoud be checked first).
->=20
-> Do you think it should be just one, or should multiple specifications
-> of the option accumulate a set of helpers to try?
+Hi All...
+Iam a novice in linux and bluetooth....
+I have a very specific question regarding the headset and audio profile....
+Why is it that ALSA and Bluetooth can connect to a headset???
+I mean what ALSA can do which others can't do?
 
-Good question..
-For security reasons an simplicyty...  one is a good idea.
-But having an option to try more then one is more universal (but not
-nessesary).
-If it's not a big problem (both for you to implement and for the system
-to compute..) it would be a nice feature.
-=20
-> >Sorry, didn't noticed that... I need to work on my sh skills ;)
->=20
-> I'm grateful that you didn't as that gave me the idea to document the
-> "feature".
+Can't it be on a lil lower kernel of 2.4.20 or something... or with
+downloaded ALSA libraries ... why only with an "integrated"  kernel with
+ALSA???? ( i,e a newer kernel.... )
 
-It would be nice ;) still the bluz is poorly documented as whole.. an
-you're prepering the helper... The documentation is usually prepered
-after something is ready ;)
 
-Ps.
-I prefer a working program, then a problematic one with documentation ;)
+Please help me find answers to these...
 
-My regards.
+I need to set up an audio gateway in a lower kernel version i.e 2.4.20....
 
-Ps.
-Sorry for any spelling mistakes...
 
---=20
-Rados=B3aw Rurarz
-Warsaw Poland
-GG: 7249330
+
+with lots of hopes
+Soumya
+
+------=_Part_1173_18022639.1141927180916
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi All... <br>
+Iam a novice in linux and bluetooth.... <br>
+I have a very specific question regarding the headset and audio profile....=
+ <br>
+Why is it that ALSA and Bluetooth can connect to a headset???<br>
+I mean what ALSA can do which others can't do?<br>
+<br>
+Can't it be on a lil lower kernel of 2.4.20 or something... or with
+downloaded ALSA libraries ... why only with an &quot;integrated&quot;&nbsp;
+kernel with ALSA???? ( i,e a newer kernel.... )<br>
+<br>
+<br>
+Please help me find answers to these... <br>
+<br>
+I need to set up an audio gateway in a lower kernel version i.e 2.4.20.... =
+<br>
+<br>
+<br>
+<br>
+with lots of hopes<br>
+Soumya<br>
+
+------=_Part_1173_18022639.1141927180916--
 
 
 -------------------------------------------------------
