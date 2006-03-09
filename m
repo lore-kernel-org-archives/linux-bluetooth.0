@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <df1fb160603092325md62bc04o@mail.gmail.com>
-From: "=?GB2312?B?0Oy3yQ==?=" <xuzaifei@gmail.com>
-To: bluez-users@lists.sf.net, bluez-devel@lists.sf.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_7541_14600109.1141975533896"
-Subject: [Bluez-users] ask about bluetooth firmware
+Subject: Re: [Bluez-users] Monitoring BT traffic
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <loom.20060309T035913-435@post.gmane.org>
+References: <loom.20060309T035913-435@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1141937972.4605.58.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,39 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Mar 2006 15:25:33 +0800
+Date: Thu, 09 Mar 2006 21:59:32 +0100
 
-------=_Part_7541_14600109.1141975533896
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Steven,
 
-hi
-I am working on the firmware of bluetooth below hci, another words I want t=
-o
-realize software's function of the LC and LM.
-but I don't know the interface of LM to baseband, even more I don't know ho=
-w
-to do it.
-Can you give me some advice of the firmware??
-thanks
-James
+> I need to monitor the traffic between two BT devices in my research.  Is
+> this possible without using fancy BT protocol analyzers?  Any hint will be great.
 
-------=_Part_7541_14600109.1141975533896
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+no, it is not possible.
 
-<div>hi</div>
-<div>I am working on the firmware of bluetooth below hci, another words I w=
-ant to realize software's function of the LC and LM.</div>
-<div>but I don't know the interface of LM to baseband, even more I don't kn=
-ow how to do it.</div>
-<div>Can you give me some advice of the firmware??</div>
-<div>thanks</div>
-<div>James</div>
+Regards
 
-------=_Part_7541_14600109.1141975533896--
+Marcel
+
+
 
 
 -------------------------------------------------------
