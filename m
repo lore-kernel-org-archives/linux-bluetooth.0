@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Monitoring BT traffic
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <loom.20060309T035913-435@post.gmane.org>
-References: <loom.20060309T035913-435@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1141937972.4605.58.camel@aeonflux.holtmann.net>
+From: Steven <steven_lee@hotmail.com>
+Message-ID: <loom.20060309T035913-435@post.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Monitoring BT traffic
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,19 +16,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 09 Mar 2006 21:59:32 +0100
+Date: Thu, 9 Mar 2006 03:06:30 +0000 (UTC)
 
-Hi Steven,
+Hi All, I need to monitor the traffic between two BT devices in my research.  Is
+this possible without using fancy BT protocol analyzers?  Any hint will be great.
 
-> I need to monitor the traffic between two BT devices in my research.  Is
-> this possible without using fancy BT protocol analyzers?  Any hint will be great.
-
-no, it is not possible.
-
-Regards
-
-Marcel
-
+Thanks,
+Steven
 
 
 
