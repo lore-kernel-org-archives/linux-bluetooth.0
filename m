@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] New HCI-USB device, no MAC?
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <44104DD5.80109@kernelconcepts.de>
+From: Nils Faerber <nils.faerber@kernelconcepts.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <44104DD5.80109@kernelconcepts.de>
-References: <4410090A.3070706@kernelconcepts.de>
-	 <1141912311.4605.9.camel@aeonflux.holtmann.net>
-	 <44104DD5.80109@kernelconcepts.de>
-Content-Type: text/plain
-Message-Id: <1141923373.4605.39.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] New HCI-USB device, no MAC?
+References: <4410090A.3070706@kernelconcepts.de> <1141912311.4605.9.camel@aeonflux.holtmann.net>
+In-Reply-To: <1141912311.4605.9.camel@aeonflux.holtmann.net>
+Content-Type: text/plain; charset=ISO-8859-15
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,26 +18,48 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 09 Mar 2006 17:56:13 +0100
+Date: Thu, 09 Mar 2006 16:46:29 +0100
 
-Hi Nils,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> Windows did not change it :(
-> Also the tools that com eon the CDROM seem not to be able to change it.
-> 
-> Have you contacted ISSC about that issue already?
-> 
-> It should be forbidden to release hardware without valid BDADDR into the
-> market... That is kind of stupid and dangerous.
+Marcel Holtmann schrieb:
+> Hi Nils,
+Hi Marcel!
 
-I think it isn't really the fault of ISSC. It is a stupid module
-manufacturer that has not clue that an BD_ADDR suppose to be unique.
+>>And if so, to which MAC should I set it?
+>>Or would probably the Windows driver program an initial MAC if first
+>>connected to Windows?
+> I need information from ISSC on this, but you might wanna stick it into
+> a Windows machine and see if the address changes and you see a different
+> address from a Linux machine. Maybe it is kinda ROM version of the chip.
 
-Regards
+Windows did not change it :(
+Also the tools that com eon the CDROM seem not to be able to change it.
 
-Marcel
+Have you contacted ISSC about that issue already?
 
+It should be forbidden to release hardware without valid BDADDR into the
+market... That is kind of stupid and dangerous.
 
+> Regards
+> Marcel
+Cheers
+  nils faerber
+
+- --
+kernel concepts          Tel: +49-271-771091-12
+Dreisbachstr. 24         Fax: +49-271-771091-19
+D-57250 Netphen          Mob: +49-176-21024535
+- --
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFEEE3VJXeIURG1qHgRAqWMAJ9bBpHbiyzFZQ10ry6U7wAXm38AtgCdHxy6
+Sm8wZlsijK6My6SUg4bM5fs=
+=WHe6
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
