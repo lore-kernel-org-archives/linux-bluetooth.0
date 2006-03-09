@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: =?iso-8859-1?q?G=F6tz_Issel?= <me@goetzi.de>
+Message-ID: <94e407f00603090043g52353905xdd51a702628d19ce@mail.gmail.com>
+From: "Arpit Rai" <whalesurf@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: Re: [Bluez-devel] SIM access profile & bluez ?
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200603091101.52570.me@goetzi.de>
+Content-Type: multipart/alternative;
+	boundary="----=_Part_1394_14708200.1141893832567"
+Subject: [Bluez-devel] Multiple connections between USB dongles
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,24 +17,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 9 Mar 2006 11:01:51 +0100
+Date: Thu, 9 Mar 2006 16:43:52 +0800
 
-Hi Peter, 
+------=_Part_1394_14708200.1141893832567
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-the GSM module does support this feature, I double checked. 
+Hi
 
-Thx for the idea though,
-goetz
+I'm using Broadcom based dongles.
 
+I'm using hcitool cc <BD-ADDR> to connect to other bluetooth dongles. The
+problem is, at a time I can have only 2 connections. To connect to a third
+dongle I have to kill one of the 2 earlier connections. Any idea why this i=
+s
+happening?
 
->Hi Goetz,
->
->I think the main problem will be the GSM modul. Usualy they do not support
->remote SIM access. Have you checked this ??
->
->Ciao,
->
->Peter
+Regards
+Arpit
+
+------=_Part_1394_14708200.1141893832567
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+<div id=3D"mb_0"><div style=3D"direction: ltr;">Hi<br>
+<br>
+I'm using Broadcom based dongles.<br>
+<br>
+I'm using hcitool cc &lt;BD-ADDR&gt; to connect to other bluetooth
+dongles. The problem is, at a time I can have only 2 connections. To
+connect to a third dongle I have to kill one of the 2 earlier
+connections. Any idea why this is happening?<br>
+<br>
+Regards<br></div><div style=3D"direction: ltr;"><span class=3D"sg">
+Arpit<br>
+
+</span></div></div>
+
+------=_Part_1394_14708200.1141893832567--
 
 
 -------------------------------------------------------
