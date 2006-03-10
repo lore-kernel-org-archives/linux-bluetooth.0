@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Dave Mielke <dave@mielke.cc>
+Subject: Re: [Bluez-devel] snd-bt-sco.ko and ACPI suspend
+From: David Woodhouse <dwmw2@infradead.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] PIN helper
-Message-ID: <20060310133536.GI4516@beta.private.mielke.cc>
-References: <20060309064424.584539d2.fotopiper@o2.pl> <20060309055552.GB4516@beta.private.mielke.cc> <20060309070649.007fba22.fotopiper@o2.pl> <20060309061255.GC4516@beta.private.mielke.cc> <20060309192953.52ee8c2e.fotopiper@o2.pl> <20060309193423.GF4516@beta.private.mielke.cc> <20060309225521.0f407da9.fotopiper@o2.pl> <20060309230420.05dc3497.fotopiper@o2.pl> <20060310013307.GG4516@beta.private.mielke.cc> <20060310082859.57eaf23b.fotopiper@o2.pl>
+In-Reply-To: <4411710D.5000509@suse.de>
+References: <4411710D.5000509@suse.de>
+Content-Type: text/plain
+Message-Id: <1141995491.32726.78.camel@pmac.infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20060310082859.57eaf23b.fotopiper@o2.pl>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,26 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Mar 2006 08:35:37 -0500
+Date: Fri, 10 Mar 2006 12:58:11 +0000
 
-[quoted lines by Radek Rurarz on 2006/03/10 at 08:28 +0100]
+On Fri, 2006-03-10 at 13:29 +0100, Stefan Scheler wrote:
+> currently snd-bt-sco.ko is breaking ACPI suspend. So can we please apply
+> a minor patch like the following to CVS and fix this? Thanks.
 
->iPAQs or rather Familiar in general have a BusyBox all in one
->executable, at least for the basic comands.
->Bash is not present, it could be instaled, but at great expense of free
->space (or even not passible, doto lack of space).
->The executable has only sh, and I'm not sure is it a 100% full
->implementation.
-
-No problewm. I'll take out all of the bash-specific stuff and make it work in
-plain old sh. Is there a man page for that version of sh which you could send
-me for reference?
+If it had been merged into Linus' kernel tree, that would have happened
+already long ago. Why hasn't it been merged?
 
 -- 
-Dave Mielke           | 2213 Fox Crescent | I believe that the Bible is the
-Phone: 1-613-726-0014 | Ottawa, Ontario   | Word of God. Please contact me
-EMail: dave@mielke.cc | Canada  K2A 1H7   | if you're concerned about Hell.
-http://FamilyRadio.com/                   | http://Mielke.cc/bible/
+dwmw2
+
 
 
 -------------------------------------------------------
