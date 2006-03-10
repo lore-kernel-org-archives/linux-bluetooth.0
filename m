@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: cRoMo <cromo@klej.net>
+From: Geoff Shang <geoff@hitsandpieces.net>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] BT mouse and it's issues
-Message-ID: <20060310141026.2f914551@kromka>
-In-Reply-To: <20060308235501.0a091f55@kromka>
-References: <20060308235501.0a091f55@kromka>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Message-ID: <Pine.LNX.4.64.0603102152370.10698@data.home>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Subject: [Bluez-users] pand: Connection failed. File exists(17)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,13 +16,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Mar 2006 14:10:26 +0100
+Date: Fri, 10 Mar 2006 22:18:57 +1000 (EST)
 
-Was this a lame question or maybe I should ask developers on bluez-dev
-mailing list?
+Hi everyone,
+
+I'm trying to set up a network connection via bluetooth using pand and I've 
+hit a problem that I can't find any references to.
+
+I start pand on the NAP side with no problems, using the following comand:
+
+pand --listen --role NAP
+
+When I try to connect from the panu, I get the following:
+
+Mar 10 18:35:46 data pand[16077]: Connection failed. File exists(17)
+
+I get the same sort of thing on the other end.  Here's an example from when 
+I tried reversing roles:
+
+Mar 10 18:59:34 data pand[16186]: Bluetooth PAN daemon version 2.25
+Mar 10 18:59:34 data pand[16186]: Connecting to 00:02:72:B2:A0:6E
+Mar 10 18:59:34 data pand[16186]: Connect to 00:02:72:B2:A0:6E failed. File 
+exists(17)
+
+I've searched the web, read all relevant docs I could find, even took a 
+look at the pand source.  I got as far as looking at bnep_accept_connection 
+but then my brain began to ache (I'm not a C programmer).
+
+I'm using bluez libs and utils v2.25 on both ends.  They were compiled with 
+./configure --enable-all though some of the supporting components like obex 
+weren't available.  One end is running on a freshly installed Debian 3.1 
+system, the other is on a Debian 2.2 system with various upgrades; however 
+all bluez items were compiled from source.
+
+If anyone knows what this is, or even simply has suggestions as to what 
+file it is that pand is complaining about, I'd be extremely greatful.
+
+Geoff.
+
 
 -- 
-Regards
+Geoff Shang <geoff@hitsandpieces.net>
+Phone: +61-418-96-5590
+MSN: geoff@acbradio.org
+
+Make sure your E-mail can be read by everyone!
+http://www.betips.net/etc/evilmail.html
+
+Please avoid sending me Word or PowerPoint attachments.
+See http://www.gnu.org/philosophy/no-word-attachments.html
 
 
 -------------------------------------------------------
