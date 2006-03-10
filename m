@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <44121F70.6050503@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <441211DA.4060600@fillibach.de>
+From: Kosta Welke <kosta@fillibach.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] snd-bt-sco.ko and ACPI suspend
-References: <4411710D.5000509@suse.de> <1141995491.32726.78.camel@pmac.infradead.org>
-In-Reply-To: <1141995491.32726.78.camel@pmac.infradead.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] set/read flush timeout
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,23 +16,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Mar 2006 17:53:04 -0700
+Date: Sat, 11 Mar 2006 00:55:06 +0100
 
-David
+Hi!
 
->>currently snd-bt-sco.ko is breaking ACPI suspend. So can we please apply
->>a minor patch like the following to CVS and fix this? Thanks.
-> 
-> If it had been merged into Linus' kernel tree, that would have happened
-> already long ago. Why hasn't it been merged?
+I'm trying to do VoIP over PAN, and thus need to set (and read) the ACL 
+flush timeout. I tried modifying Albert Huang example code, but it does 
+not seem to work. Could someone give me a small hint what is wrong?
 
-I patched cvs.
+http://lastpageofthe.net/setflush.c
 
-I believe it would take more work to get it to the stage that it would
-be acceptable for inclusion. Probably as much effort as just moving it
-entirely to userspace, where it (arguably) belongs.
+Disclamer: I'm a complete noob when it comes to HCI requests, so please 
+forgive this "Help! Fix my problem!"-Mail. On the positive side, as soon 
+as it works, I want to put it into hcitool.
 
-Brad
+Yours,
+Kosta
 
 
 -------------------------------------------------------
