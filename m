@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <350247599@web.de>
+Message-ID: <df1fb160603092325md62bc04o@mail.gmail.com>
+From: "=?GB2312?B?0Oy3yQ==?=" <xuzaifei@gmail.com>
+To: bluez-users@lists.sf.net, bluez-devel@lists.sf.net
 MIME-Version: 1.0
-From: Irene Heinz <irene.heinz@web.de>
-To: bluez-users@lists.sourceforge.net
 Content-Type: multipart/alternative;
- boundary="=-------------1141982877817518672"
-Subject: [Bluez-users] pand does not work
+	boundary="----=_Part_7541_14600109.1141975533896"
+Subject: [Bluez-users] ask about bluetooth firmware
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,43 +17,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Mar 2006 10:27:57 +0100
+Date: Fri, 10 Mar 2006 15:25:33 +0800
 
-This is a multi-part message in MIME format.
+------=_Part_7541_14600109.1141975533896
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
---=-------------1141982877817518672
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
+hi
+I am working on the firmware of bluetooth below hci, another words I want t=
+o
+realize software's function of the LC and LM.
+but I don't know the interface of LM to baseband, even more I don't know ho=
+w
+to do it.
+Can you give me some advice of the firmware??
+thanks
+James
 
+------=_Part_7541_14600109.1141975533896
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
+<div>hi</div>
+<div>I am working on the firmware of bluetooth below hci, another words I w=
+ant to realize software's function of the LC and LM.</div>
+<div>but I don't know the interface of LM to baseband, even more I don't kn=
+ow how to do it.</div>
+<div>Can you give me some advice of the firmware??</div>
+<div>thanks</div>
+<div>James</div>
 
-Hi everyone,
-
-I am trying to connect a PDA via Bluetooth to a Linux PC (currently Suse, but later on it should work on an embedded linux). I am using a USB Bluetooth stick. The Linux PC is set as NAP with the following command:
-
-pand --listen --role NAP --master
-
-Afterwards, I set the IP address of bnep0 with ifconfig. The connection already worked yesterday. But when I tried it again this morning, bnep0 was not created, and I found the following message in /var/log/messages:
-
-pand: Bind failed. Address already in use(98).
-
-I disabled the standard ethernet connection (in case there might be some interference), restarted the PC, all in vain. Then I tried it on another Linux PC and got the same error message. hcitool scan works, and I can also send a successfull ping from Linux to the PDA. So what address is meant? What could I do?
-
-Regards, Irene
-
-
-	
-Erweitern Sie FreeMail zu einem noch leistungsstarkeren E-Mail-Postfach!	
-Mehr Infos unter *http://freemail.web.de/home/landingpad/?mc=021131* [http://freemail.web.de/home/landingpad/?mc=021131] 
-
---=-------------1141982877817518672
-Content-Type: text/html; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
-
-<html><body bgcolor='#ffffff' style='margin-left:0px; font-size:9pt; margin:0px; font-family:Verdana; margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px; font-family: Verdana' ><P>Hi everyone,</P><P>I am trying to connect a PDA via Bluetooth to a Linux PC (currently Suse, but later on it should work on an embedded linux). I am using a USB Bluetooth stick. The Linux PC is set as NAP with the following command:</P><P>pand --listen --role NAP --master</P><P>Afterwards, I set&nbsp;the IP address of bnep0 with ifconfig. The connection already worked yesterday. But when I tried it again this morning, bnep0 was not created, and I found the following message in&nbsp;/var/log/messages:</P><P>pand: Bind failed. Address already in use(98).</P><P>I disabled the standard ethernet connection (in case there might be some interference), restarted the PC, all in vain. Then I tried it on another Linux PC and got the same error message. hcitool scan works, and I can also send!
-  a successfull ping from Linux to the PDA. So what address is meant? What could I do?</P><P>Regards, Irene</P><br><br><table cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#000000"><img src="https://img.web.de/p.gif" width="1" height="1" border="0" alt="" /></td></tr><tr><td style="font-family:verdana; font-size:12px; line-height:17px;">Erweitern Sie FreeMail zu einem noch leistungsstarkeren E-Mail-Postfach!		&nbsp;&nbsp;&nbsp;<br>Mehr Infos unter <A HREF="http://freemail.web.de/home/landingpad/?mc=021131"><B>http://freemail.web.de/home/landingpad/?mc=021131</B></A>&nbsp;&nbsp;</td></tr></table></body></html>
-
---=-------------1141982877817518672--
+------=_Part_7541_14600109.1141975533896--
 
 
 -------------------------------------------------------
