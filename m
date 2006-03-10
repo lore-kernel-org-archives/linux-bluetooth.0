@@ -1,12 +1,22 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Dave Mielke <dave@mielke.cc>
+From: Radek Rurarz <fotopiper@o2.pl>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] PIN helper
-Message-ID: <20060310183933.GK4516@beta.private.mielke.cc>
-References: <20060309070649.007fba22.fotopiper@o2.pl> <20060309061255.GC4516@beta.private.mielke.cc> <20060309192953.52ee8c2e.fotopiper@o2.pl> <20060309193423.GF4516@beta.private.mielke.cc> <20060309225521.0f407da9.fotopiper@o2.pl> <20060309230420.05dc3497.fotopiper@o2.pl> <20060310013307.GG4516@beta.private.mielke.cc> <20060310082859.57eaf23b.fotopiper@o2.pl> <20060310172525.GJ4516@beta.private.mielke.cc> <20060310191346.077462e0.fotopiper@o2.pl>
+Message-Id: <20060310191346.077462e0.fotopiper@o2.pl>
+In-Reply-To: <20060310172525.GJ4516@beta.private.mielke.cc>
+References: <20060309064424.584539d2.fotopiper@o2.pl>
+	<20060309055552.GB4516@beta.private.mielke.cc>
+	<20060309070649.007fba22.fotopiper@o2.pl>
+	<20060309061255.GC4516@beta.private.mielke.cc>
+	<20060309192953.52ee8c2e.fotopiper@o2.pl>
+	<20060309193423.GF4516@beta.private.mielke.cc>
+	<20060309225521.0f407da9.fotopiper@o2.pl>
+	<20060309230420.05dc3497.fotopiper@o2.pl>
+	<20060310013307.GG4516@beta.private.mielke.cc>
+	<20060310082859.57eaf23b.fotopiper@o2.pl>
+	<20060310172525.GJ4516@beta.private.mielke.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20060310191346.077462e0.fotopiper@o2.pl>
+Content-Type: text/plain; charset=ISO-8859-2
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,24 +28,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Mar 2006 13:39:33 -0500
+Date: Fri, 10 Mar 2006 19:13:46 +0100
 
-[quoted lines by Radek Rurarz on 2006/03/10 at 19:13 +0100]
+On Fri, 10 Mar 2006 12:25:25 -0500
+Dave Mielke <dave@mielke.cc> wrote:
 
->bluepin -n gives (there is no poin in launching the promp on the iPAQ
->enyway.. no keyboard):
-> 
->bluepin: command not found: stat
->bluepin: file permission modes not verifiable: /etc/bluetooth/pins
->ERR
 
-Try disabling that check by specifying a null mode, i.e.: -m ''
+> Please try the attached updated script. I think I've removed all the
+> bashisms. My /bin/sh, however, supports more than it should so it's
+> hard for me to be sure.
 
--- 
-Dave Mielke           | 2213 Fox Crescent | I believe that the Bible is the
-Phone: 1-613-726-0014 | Ottawa, Ontario   | Word of God. Please contact me
-EMail: dave@mielke.cc | Canada  K2A 1H7   | if you're concerned about Hell.
-http://FamilyRadio.com/                   | http://Mielke.cc/bible/
+bluepin -n gives (there is no poin in launching the promp on the iPAQ
+enyway.. no keyboard):
+=20
+bluepin: command not found: stat
+bluepin: file permission modes not verifiable: /etc/bluetooth/pins
+ERR
+
+--=20
+Rados=B3aw Rurarz
+Warsaw Poland
+GG: 7249330
 
 
 -------------------------------------------------------
