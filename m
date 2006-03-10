@@ -2,8 +2,8 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Radek Rurarz <fotopiper@o2.pl>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] PIN helper
-Message-Id: <20060310191346.077462e0.fotopiper@o2.pl>
-In-Reply-To: <20060310172525.GJ4516@beta.private.mielke.cc>
+Message-Id: <20060310191014.4ad0f775.fotopiper@o2.pl>
+In-Reply-To: <20060310133536.GI4516@beta.private.mielke.cc>
 References: <20060309064424.584539d2.fotopiper@o2.pl>
 	<20060309055552.GB4516@beta.private.mielke.cc>
 	<20060309070649.007fba22.fotopiper@o2.pl>
@@ -14,7 +14,7 @@ References: <20060309064424.584539d2.fotopiper@o2.pl>
 	<20060309230420.05dc3497.fotopiper@o2.pl>
 	<20060310013307.GG4516@beta.private.mielke.cc>
 	<20060310082859.57eaf23b.fotopiper@o2.pl>
-	<20060310172525.GJ4516@beta.private.mielke.cc>
+	<20060310133536.GI4516@beta.private.mielke.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-2
 Sender: bluez-devel-admin@lists.sourceforge.net
@@ -28,22 +28,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Mar 2006 19:13:46 +0100
+Date: Fri, 10 Mar 2006 19:10:14 +0100
 
-On Fri, 10 Mar 2006 12:25:25 -0500
+On Fri, 10 Mar 2006 08:35:37 -0500
 Dave Mielke <dave@mielke.cc> wrote:
 
 
-> Please try the attached updated script. I think I've removed all the
-> bashisms. My /bin/sh, however, supports more than it should so it's
-> hard for me to be sure.
+> No problewm. I'll take out all of the bash-specific stuff and make it
+> work in plain old sh. Is there a man page for that version of sh
+> which you could send me for reference?
 
-bluepin -n gives (there is no poin in launching the promp on the iPAQ
-enyway.. no keyboard):
-=20
-bluepin: command not found: stat
-bluepin: file permission modes not verifiable: /etc/bluetooth/pins
-ERR
+No, there is no man or info at all ror the basic instal of Familiar
+0.8.3 ( http://www.handhelds.org/moin/moin.cgi/FamiliarDistribution )
+
+The sh is from:
+BusyBox v1.00 (2006.02.18-15:37+0000) multi-call binary
+( http://www.busybox.net/ I think).
 
 --=20
 Rados=B3aw Rurarz
