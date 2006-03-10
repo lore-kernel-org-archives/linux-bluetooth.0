@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Geoff Shang <geoff@hitsandpieces.net>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.64.0603102152370.10698@data.home>
+Message-Id: <350247599@web.de>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Subject: [Bluez-users] pand: Connection failed. File exists(17)
+From: Irene Heinz <irene.heinz@web.de>
+To: bluez-users@lists.sourceforge.net
+Content-Type: multipart/alternative;
+ boundary="=-------------1141982877817518672"
+Subject: [Bluez-users] pand does not work
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,55 +17,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Mar 2006 22:18:57 +1000 (EST)
+Date: Fri, 10 Mar 2006 10:27:57 +0100
+
+This is a multi-part message in MIME format.
+
+--=-------------1141982877817518672
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
+
+
 
 Hi everyone,
 
-I'm trying to set up a network connection via bluetooth using pand and I've 
-hit a problem that I can't find any references to.
+I am trying to connect a PDA via Bluetooth to a Linux PC (currently Suse, but later on it should work on an embedded linux). I am using a USB Bluetooth stick. The Linux PC is set as NAP with the following command:
 
-I start pand on the NAP side with no problems, using the following comand:
+pand --listen --role NAP --master
 
-pand --listen --role NAP
+Afterwards, I set the IP address of bnep0 with ifconfig. The connection already worked yesterday. But when I tried it again this morning, bnep0 was not created, and I found the following message in /var/log/messages:
 
-When I try to connect from the panu, I get the following:
+pand: Bind failed. Address already in use(98).
 
-Mar 10 18:35:46 data pand[16077]: Connection failed. File exists(17)
+I disabled the standard ethernet connection (in case there might be some interference), restarted the PC, all in vain. Then I tried it on another Linux PC and got the same error message. hcitool scan works, and I can also send a successfull ping from Linux to the PDA. So what address is meant? What could I do?
 
-I get the same sort of thing on the other end.  Here's an example from when 
-I tried reversing roles:
-
-Mar 10 18:59:34 data pand[16186]: Bluetooth PAN daemon version 2.25
-Mar 10 18:59:34 data pand[16186]: Connecting to 00:02:72:B2:A0:6E
-Mar 10 18:59:34 data pand[16186]: Connect to 00:02:72:B2:A0:6E failed. File 
-exists(17)
-
-I've searched the web, read all relevant docs I could find, even took a 
-look at the pand source.  I got as far as looking at bnep_accept_connection 
-but then my brain began to ache (I'm not a C programmer).
-
-I'm using bluez libs and utils v2.25 on both ends.  They were compiled with 
-./configure --enable-all though some of the supporting components like obex 
-weren't available.  One end is running on a freshly installed Debian 3.1 
-system, the other is on a Debian 2.2 system with various upgrades; however 
-all bluez items were compiled from source.
-
-If anyone knows what this is, or even simply has suggestions as to what 
-file it is that pand is complaining about, I'd be extremely greatful.
-
-Geoff.
+Regards, Irene
 
 
--- 
-Geoff Shang <geoff@hitsandpieces.net>
-Phone: +61-418-96-5590
-MSN: geoff@acbradio.org
+	
+Erweitern Sie FreeMail zu einem noch leistungsstarkeren E-Mail-Postfach!	
+Mehr Infos unter *http://freemail.web.de/home/landingpad/?mc=021131* [http://freemail.web.de/home/landingpad/?mc=021131] 
 
-Make sure your E-mail can be read by everyone!
-http://www.betips.net/etc/evilmail.html
+--=-------------1141982877817518672
+Content-Type: text/html; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
 
-Please avoid sending me Word or PowerPoint attachments.
-See http://www.gnu.org/philosophy/no-word-attachments.html
+<html><body bgcolor='#ffffff' style='margin-left:0px; font-size:9pt; margin:0px; font-family:Verdana; margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px; font-family: Verdana' ><P>Hi everyone,</P><P>I am trying to connect a PDA via Bluetooth to a Linux PC (currently Suse, but later on it should work on an embedded linux). I am using a USB Bluetooth stick. The Linux PC is set as NAP with the following command:</P><P>pand --listen --role NAP --master</P><P>Afterwards, I set&nbsp;the IP address of bnep0 with ifconfig. The connection already worked yesterday. But when I tried it again this morning, bnep0 was not created, and I found the following message in&nbsp;/var/log/messages:</P><P>pand: Bind failed. Address already in use(98).</P><P>I disabled the standard ethernet connection (in case there might be some interference), restarted the PC, all in vain. Then I tried it on another Linux PC and got the same error message. hcitool scan works, and I can also send!
+  a successfull ping from Linux to the PDA. So what address is meant? What could I do?</P><P>Regards, Irene</P><br><br><table cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#000000"><img src="https://img.web.de/p.gif" width="1" height="1" border="0" alt="" /></td></tr><tr><td style="font-family:verdana; font-size:12px; line-height:17px;">Erweitern Sie FreeMail zu einem noch leistungsstarkeren E-Mail-Postfach!		&nbsp;&nbsp;&nbsp;<br>Mehr Infos unter <A HREF="http://freemail.web.de/home/landingpad/?mc=021131"><B>http://freemail.web.de/home/landingpad/?mc=021131</B></A>&nbsp;&nbsp;</td></tr></table></body></html>
+
+--=-------------1141982877817518672--
 
 
 -------------------------------------------------------
