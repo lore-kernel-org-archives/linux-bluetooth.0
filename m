@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Michal Sojka x <wentasah@centrum.cz>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <44123BB2.5090707@fillibach.de>
+From: Kosta Welke <kosta@fillibach.de>
 MIME-Version: 1.0
-Message-Id: <200603110927.23055.wentasah@centrum.cz>
-Content-Type: text/plain;
-  charset="us-ascii"
-Subject: [Bluez-devel] hci_for_each_dev() return value?
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] set/read flush timeout
+References: <441211DA.4060600@fillibach.de> <ef9938ec0603101837u485c4500m8aaaa988450c107c@mail.gmail.com>
+In-Reply-To: <ef9938ec0603101837u485c4500m8aaaa988450c107c@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,19 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 11 Mar 2006 09:27:23 +0100
+Date: Sat, 11 Mar 2006 03:53:38 +0100
 
-Hello all,
+Albert Huang wrote:
+> You need to actually set the flush timeout value... notice that timeout 
+> is never set, and argv[2] is never used...
 
-I'm writing a simple application that uses HCI layer for communication. I have 
-a question on what is the meaning of return value of hci_for_each_dev()? It 
-seems to me that there is a bug, because even when everything goes well, then 
-the return value is -1 and errno is set to ENODEV.
+Okai, consider this my entry to "stupidest post on this list" :)
 
-Please CC me when replying. I'm not subscribed to the list.
+Anyway, can you tell me how to read the flush timeout?
 
-Regards
-Michal Sojka
+Thanks in advance,
+Kosta
 
 
 -------------------------------------------------------
