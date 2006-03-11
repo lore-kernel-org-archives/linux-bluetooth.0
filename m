@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4412B8DB.1080508@suse.de>
-From: Stefan Scheler <sscheler@suse.de>
+Message-ID: <001001c644f0$2c3d9130$0300a8c0@akira>
+From: "Sir Graham (Terra)" <sir__graham@terra.es>
+To: <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] snd-bt-sco.ko and ACPI suspend
-References: <4411710D.5000509@suse.de> <441223BD.8000903@xmission.com>
-In-Reply-To: <441223BD.8000903@xmission.com>
-Content-Type: multipart/signed; micalg=pgp-ripemd160;
- protocol="application/pgp-signature";
- boundary="------------enigFAC240402BB2AB4CD049B746"
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_000D_01C644F6.F261D820"
+Subject: [Bluez-devel] Problem With the Inquiry and RFCOMM conexions
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,69 +17,69 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 11 Mar 2006 12:47:39 +0100
-
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enigFAC240402BB2AB4CD049B746
-Content-Type: multipart/mixed;
- boundary="------------060008020904000005040104"
+Date: Sat, 11 Mar 2006 10:31:24 +0100
 
 This is a multi-part message in MIME format.
---------------060008020904000005040104
-Content-Type: text/plain; charset=ISO-8859-15
+
+------=_NextPart_000_000D_01C644F6.F261D820
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 
-> Can you give me a safer patch that will work with 2.6.12 for example?
+Hi,
 
-Well, yes. I also removed the unnecessary CONFIG_PM-define.
-try_to_freeze() is also available with power management disabled as I
-found out. The following patch has been tested with 2.6.11.4 and I
-didn't notice any ill effects.
+I have a problem with make a Inquiry and RFCOMM conexions at the same =
+time and don=B4t understand why.....(with BlueZ).
 
-Stefan
+Is It possible in the same module of bluetooth make a inquiry (independ =
+thread) and RFCOMM conexions (4 o 5 conexions in independ threads) =20
+at the same time?
 
+If I use diferent handles for this the call HCI to the module ... Is it =
+independient?=20
 
---------------060008020904000005040104
-Content-Type: text/x-patch;
- name="fix_suspend_v2.diff"
+Have somebody any experience in this sense?
+
+Regards,
+Sir Graham.
+------=_NextPart_000_000D_01C644F6.F261D820
+Content-Type: text/html;
+	charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline;
- filename="fix_suspend_v2.diff"
 
-diff -ru btsco.orig/kernel/btsco.c btsco/kernel/btsco.c
---- btsco.orig/kernel/btsco.c	2006-03-11 11:52:08.000000000 +0100
-+++ btsco/kernel/btsco.c	2006-03-11 11:52:57.000000000 +0100
-@@ -892,8 +892,11 @@
-=20
- 	do {
-=20
--#ifdef CONFIG_PM
-+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,12))
- 		try_to_freeze();
-+#else
-+		if (current->flags & PF_FREEZE)
-+			refrigerator(PF_FREEZE);
- #endif
-=20
- 		if (signal_pending(current))
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2802" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Hi,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I have a problem with make a Inquiry =
+and RFCOMM=20
+conexions at the same time and don=B4t understand why.....(with=20
+BlueZ).</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Is It possible in the same module of =
+bluetooth make=20
+a inquiry (independ thread) and RFCOMM conexions (4 o 5 conexions=20
+in&nbsp;independ threads)&nbsp; </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>at the same time?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>If I use diferent handles for this the =
+call HCI to=20
+the module ... Is&nbsp;it independient? </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Have somebody any experience in this=20
+sense?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Regards,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>Sir Graham.</FONT></DIV></BODY></HTML>
 
---------------060008020904000005040104--
+------=_NextPart_000_000D_01C644F6.F261D820--
 
---------------enigFAC240402BB2AB4CD049B746
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iD8DBQFEErjfhHfBfWZJXtERA/m9AJ9ZVir0QNIrCTS7WWLPt9pjSP1UGwCePbkZ
-Yka9EX29IK+eK+vfPC9sH1k=
-=eYOT
------END PGP SIGNATURE-----
-
---------------enigFAC240402BB2AB4CD049B746--
 
 
 -------------------------------------------------------
