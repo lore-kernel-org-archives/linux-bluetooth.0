@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <441223BD.8000903@xmission.com>
+Message-ID: <44121F70.6050503@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] snd-bt-sco.ko and ACPI suspend
-References: <4411710D.5000509@suse.de>
-In-Reply-To: <4411710D.5000509@suse.de>
-Content-Type: text/plain; charset=ISO-8859-15
+References: <4411710D.5000509@suse.de> <1141995491.32726.78.camel@pmac.infradead.org>
+In-Reply-To: <1141995491.32726.78.camel@pmac.infradead.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,34 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Mar 2006 18:11:25 -0700
+Date: Fri, 10 Mar 2006 17:53:04 -0700
 
-Stefan
+David
 
-doh. If we had been included then we wouldn't have to worry about the
-older api for try_to_freeze. Can you give me a safer patch that will
-work with 2.6.12 for example?
-
-brad
-
-> Signed-off-by: Stefan Scheler <sscheler@suse.de>
+>>currently snd-bt-sco.ko is breaking ACPI suspend. So can we please apply
+>>a minor patch like the following to CVS and fix this? Thanks.
 > 
-> diff -ru btsco/kernel/btsco.c btsco/kernel/btsco.c
-> --- btsco/kernel/btsco.c	2006-03-10 12:45:25.000000000 +0100
-> +++ btsco/kernel/btsco.c	2006-03-10 12:52:15.000000000 +0100
-> @@ -891,6 +891,11 @@
->  	up(&bt_sco->thread_sem);
->  
->  	do {
-> +
-> +#ifdef CONFIG_PM
-> +		try_to_freeze();
-> +#endif
-> +
->  		if (signal_pending(current))
->  			flush_signals(current);
->  
+> If it had been merged into Linus' kernel tree, that would have happened
+> already long ago. Why hasn't it been merged?
 
+I patched cvs.
+
+I believe it would take more work to get it to the stage that it would
+be acceptable for inclusion. Probably as much effort as just moving it
+entirely to userspace, where it (arguably) belongs.
+
+Brad
 
 
 -------------------------------------------------------
