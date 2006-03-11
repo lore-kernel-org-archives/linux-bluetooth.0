@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4412ECD1.4070007@xmission.com>
+Message-ID: <4412EB64.6000504@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Connecting to a headset
-References: <fe0a97c20603090959r28afb671n79c0a432f4f6c0c2@mail.gmail.com>
-In-Reply-To: <fe0a97c20603090959r28afb671n79c0a432f4f6c0c2@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [Bluez-devel] snd-bt-sco.ko and ACPI suspend
+References: <4411710D.5000509@suse.de> <441223BD.8000903@xmission.com> <4412B8DB.1080508@suse.de>
+In-Reply-To: <4412B8DB.1080508@suse.de>
+Content-Type: text/plain; charset=ISO-8859-15
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,25 +18,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 11 Mar 2006 08:29:21 -0700
+Date: Sat, 11 Mar 2006 08:23:16 -0700
 
-Sowmya
+Stefan
 
-> Iam a novice in linux and bluetooth....
-> I have a very specific question regarding the headset and audio profile....
-> Why is it that ALSA and Bluetooth can connect to a headset???
-> I mean what ALSA can do which others can't do?
+>>Can you give me a safer patch that will work with 2.6.12 for example?
 > 
-> Can't it be on a lil lower kernel of 2.4.20 or something... or with
-> downloaded ALSA libraries ... why only with an "integrated"  kernel with
-> ALSA???? ( i,e a newer kernel.... )
+> Well, yes. I also removed the unnecessary CONFIG_PM-define.
 
-Get the bluez cvs project and have a look at utils/test/scotest.c
-
-You can write your app to do all the audio transfers itself and you
-won't have to patch or upgrade the kernel.
-
-Of course you're mostly on your own :) so good luck.
+thanks for the quick fix :) I've applied it.
 
 Brad
 
