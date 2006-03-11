@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Radek Rurarz <fotopiper@o2.pl>
+Message-ID: <4412ECD1.4070007@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Message-Id: <20060311190606.236f7cbd.fotopiper@o2.pl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-2
-Subject: [Bluez-devel] New PIN helper, how to include with BlueZ?
+Subject: Re: [Bluez-devel] Connecting to a headset
+References: <fe0a97c20603090959r28afb671n79c0a432f4f6c0c2@mail.gmail.com>
+In-Reply-To: <fe0a97c20603090959r28afb671n79c0a432f4f6c0c2@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,37 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 11 Mar 2006 19:06:06 +0100
+Date: Sat, 11 Mar 2006 08:29:21 -0700
 
-Hello,
-a new PIN helper has been born, and I think it's time to include it in
-the BlueZ packages (including source packages) either as a default
-helper, or as an option. The problem is neither me, nor the author have
-a good sense of how such things happen for BlueZ.
+Sowmya
 
-For those who haven't fallowed our discussion I will gave a short
-summary of the situation:
+> Iam a novice in linux and bluetooth....
+> I have a very specific question regarding the headset and audio profile....
+> Why is it that ALSA and Bluetooth can connect to a headset???
+> I mean what ALSA can do which others can't do?
+> 
+> Can't it be on a lil lower kernel of 2.4.20 or something... or with
+> downloaded ALSA libraries ... why only with an "integrated"  kernel with
+> ALSA???? ( i,e a newer kernel.... )
 
-Dave Mielke has been working for some time on a new PIN helper for
-BlueZ, one that deals in a more complex, and in my opinion complete way,
-with the problem.
+Get the bluez cvs project and have a look at utils/test/scotest.c
 
-The basic approach is to have a list of pins and device addresses in a
-file, form which the helper will extract the correct PIN. If the device
-is not on the list a prompt is started on a new terminal, that asks for
-PIN (giving all the standard information). In case the terminal prompt
-is not welcomed, a secondary helper can be called (for instance the
-python script already shipped with BlueZ, or other for KDE/GPE/OPIE or
-any other). The prompt can be fully disabled. The script can be
-configured either with a config file, or by command line parameters.
+You can write your app to do all the audio transfers itself and you
+won't have to patch or upgrade the kernel.
 
-As can be seen above this gives more choices on chow to handle new
-devices (list, prompt, secondary helper).
+Of course you're mostly on your own :) so good luck.
 
---=20
-Rados=B3aw Rurarz
-Warsaw Poland
-GG: 7249330
+Brad
 
 
 -------------------------------------------------------
