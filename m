@@ -2,7 +2,7 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Radek Rurarz <fotopiper@o2.pl>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] New PIN helper, how to include with BlueZ?
-Message-Id: <20060312214056.11d1fd1c.fotopiper@o2.pl>
+Message-Id: <20060312205157.1092b7d7.fotopiper@o2.pl>
 In-Reply-To: <1142191960.4620.8.camel@aeonflux.holtmann.net>
 References: <20060311190606.236f7cbd.fotopiper@o2.pl>
 	<1142185809.4620.3.camel@aeonflux.holtmann.net>
@@ -21,25 +21,11 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 12 Mar 2006 21:40:56 +0100
+Date: Sun, 12 Mar 2006 20:51:57 +0100
 
 On Sun, 12 Mar 2006 20:32:40 +0100
 Marcel Holtmann <marcel@holtmann.org> wrote:
 
-> Hi Radek,
->=20
-> > > The /var/lib/bluetooth/<bdaddr>/pincodes file is supported for
-> > > outgoing connection for quite some time. The
-> > > default /etc/bluetooth/pin has been already removed and the
-> > > complete PIN helper script support will be remove really soon,
-> > > too.
-> >=20
-> > Hmm.. I see that BlueZ is even less documented then I thought.
-> > What is the syntax of the file?
-> > PS. I'm using the current stable version, and
-> > the /etc/bluetooth/pin is still there.. so I suppose it's still
-> > rather for the future. (but rather not far future).
->=20
 > the /etc/bluetooth/pin support is removed from the current CVS. And I
 > even removed the PIN helper script support completely. So it is the
 > near future with the next blue-utils release which has been targeted
@@ -48,10 +34,30 @@ Marcel Holtmann <marcel@holtmann.org> wrote:
 > The syntax of the pincodes file is easy. It is a BD_ADDR and PIN code
 > pair per line. Like the names file etc.
 
-Ok, done... but.. no connection, just timeouts as a result.
-Is this file used for incoming, or uotgoing connections?
-And is it dependent on the pinhelper setings form hcid.conf file?
-(pinhelper, I hope not, and security settings)
+Thank you.
+Will this stay for the next releses, or is it only a temporary solution?
+=20
+> > Great, and what about those systems where d-bus is not present?
+> > I hope the D-Bus will still be complemented by some list of devices
+> > and pins.
+>=20
+> And what kind of system should that be? All desktop systems are using
+> D-Bus and even the Nokia 770 and the new platform from PalmSource are
+> supporting it by default. So no reason to use something different than
+> D-Bus for PIN handling.
+
+Well, I'm not using D-Bus on WIndow Maker, Opie has no D-bus support
+(for now). But I don't mean interactive systems. Rather those which
+either have no X, or have no direct input methods at all (home server
+sollusions, no screen, no keyboard).
+I'm using an old PC as an BT gateway for couple of PDAs.
+
+The truth is that, both for WM and my small gateway, I only need the
+device-pin list and a way to disable any kind of prompt for PIN
+for unknown devices.
+If the support for the pincodes file is a permanent sollusion (one that
+will remain in the next relese) then the D-Bus approach is as good for
+me, as any other one.
 
 My regards.
 
