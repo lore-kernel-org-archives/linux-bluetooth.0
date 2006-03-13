@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] About the implementation of Generic Access
-	Profile(GAP)
+Subject: Re: [Bluez-devel] Problem With the Inquiry and RFCOMM conexions
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <009f01c6465d$4fdaccc0$6ceda8c0@accelsemi>
-References: <009f01c6465d$4fdaccc0$6ceda8c0@accelsemi>
-Content-Type: text/plain
-Message-Id: <1142256857.4622.4.camel@aeonflux.holtmann.net>
+In-Reply-To: <006b01c64683$e75b2c90$0300a8c0@akira>
+References: <006b01c64683$e75b2c90$0300a8c0@akira>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1142256728.4622.1.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,16 +18,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 13 Mar 2006 14:34:17 +0100
+Date: Mon, 13 Mar 2006 14:32:07 +0100
 
 Hi,
 
->     I am the novice at Bluetooth protocol stack and I have a question about Generic Access Profile(GAP).
->     Whether the GAP is only a set of terms and communication procedures? I didn't see any implementation of GAP in "bluez".
+> I have a problem with make a Inquiry and RFCOMM conexions at the same
+> time and don=C2=B4t understand why.....(with BlueZ).
 
-there exists no specific implementation of GAP, because it is always
-part of every profile code. Some parts of it are handled inside the
-kernel and others in the hcid and sdpd.
+this is a limitation of the hardware. What does "hciconfig hci0 version"
+tell you?
 
 Regards
 
