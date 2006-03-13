@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20603130215w55225c60t866d2af40ae086f2@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Connecting to a headset
+Message-ID: <006b01c64683$e75b2c90$0300a8c0@akira>
+From: "Sir Graham (Terra)" <sir__graham@terra.es>
+To: <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_5385_20257320.1142244946655"
+	boundary="----=_NextPart_000_0068_01C6468C.34585DD0"
+Subject: [Bluez-devel] Problem With the Inquiry and RFCOMM conexions
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,91 +17,71 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 13 Mar 2006 15:45:46 +0530
+Date: Mon, 13 Mar 2006 10:52:21 +0100
 
-------=_Part_5385_20257320.1142244946655
-Content-Type: text/plain; charset=ISO-8859-1
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0068_01C6468C.34585DD0
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi Brad...
-I have been going through the archives of this mailing list regarding the
-SCO audio support by Marcel and Max in 2002 discussing the demerits in the
-hci_usb driver to support SCO... (
-http://sourceforge.net/mailarchive/message.php?msg_id=3D2651899)
-Is the problem discussed rectified??
-My question is
-1) Does the hci_usb.o module support SCO???
-2) Iam planning to set up 2 USB dongles (CSR) for headset and Audio gateway
-each...
-Can I use scotest to send voice?? will I face problems??
-
-Iam yet to write the code
-
-Soumya
 
 
+Hi,
 
->
-> Sowmya
->
-> > Iam a novice in linux and bluetooth....
-> > I have a very specific question regarding the headset and audio
-> profile....
-> > Why is it that ALSA and Bluetooth can connect to a headset???
-> > I mean what ALSA can do which others can't do?
-> >
-> > Can't it be on a lil lower kernel of 2.4.20 or something... or with
-> > downloaded ALSA libraries ... why only with an "integrated"  kernel wit=
-h
-> > ALSA???? ( i,e a newer kernel.... )
->
-> Get the bluez cvs project and have a look at utils/test/scotest.c
->
-> You can write your app to do all the audio transfers itself and you
-> won't have to patch or upgrade the kernel.
->
-> Of course you're mostly on your own :) so good luck.
->
-> Brad
->
->
->
->
->
+I have a problem with make a Inquiry and RFCOMM conexions at the same =
+time and don=B4t understand why.....(with BlueZ).
 
-------=_Part_5385_20257320.1142244946655
-Content-Type: text/html; charset=ISO-8859-1
+Is It possible in the same module of bluetooth make a inquiry (independ =
+thread) and RFCOMM conexions (4 o 5 conexions in independ threads) =20
+at the same time?
+
+If I use diferent handles for this the call HCI to the module ... Is it =
+independient?=20
+
+Have somebody any experience in this sense?
+
+Regards,
+Sir Graham.
+------=_NextPart_000_0068_01C6468C.34585DD0
+Content-Type: text/html;
+	charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-Hi Brad... <br>I have been going through the archives of this mailing list =
-regarding the SCO audio support by Marcel and Max in 2002 discussing the de=
-merits in the hci_usb driver to support SCO... (<a href=3D"http://sourcefor=
-ge.net/mailarchive/message.php?msg_id=3D2651899">
-http://sourceforge.net/mailarchive/message.php?msg_id=3D2651899</a>)<br>Is =
-the problem discussed rectified??<br>My question is <br>1) Does the hci_usb=
-.o module support SCO??? <br>2) Iam planning to set up 2 USB dongles (CSR) =
-for headset and Audio gateway each...=20
-<br>Can I use scotest to send voice?? will I face problems??<br><br>Iam yet=
- to write the code<br><br>Soumya<br><br><div><span class=3D"gmail_quote"><b=
-r></span><blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid =
-rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-<br><br>Sowmya<br><br>&gt; Iam a novice in linux and bluetooth....<br>&gt; =
-I have a very specific question regarding the headset and audio profile....=
-<br>&gt; Why is it that ALSA and Bluetooth can connect to a headset???<br>
-&gt; I mean what ALSA can do which others can't do?<br>&gt;<br>&gt; Can't i=
-t be on a lil lower kernel of 2.4.20 or something... or with<br>&gt; downlo=
-aded ALSA libraries ... why only with an &quot;integrated&quot;&nbsp;&nbsp;=
-kernel with
-<br>&gt; ALSA???? ( i,e a newer kernel.... )<br><br>Get the bluez cvs proje=
-ct and have a look at utils/test/scotest.c<br><br>You can write your app to=
- do all the audio transfers itself and you<br>won't have to patch or upgrad=
-e the kernel.
-<br><br>Of course you're mostly on your own :) so good luck.<br><br>Brad<br=
-><br><br><br><br></blockquote></div><br>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2802" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Hi,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I have a problem with make a Inquiry =
+and RFCOMM=20
+conexions at the same time and don=B4t understand why.....(with=20
+BlueZ).</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Is It possible in the same module of =
+bluetooth make=20
+a inquiry (independ thread) and RFCOMM conexions (4 o 5 conexions=20
+in&nbsp;independ threads)&nbsp; </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>at the same time?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>If I use diferent handles for this the =
+call HCI to=20
+the module ... Is&nbsp;it independient? </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Have somebody any experience in this=20
+sense?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Regards,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>Sir Graham.</FONT></DIV></BODY></HTML>
 
-------=_Part_5385_20257320.1142244946655--
+------=_NextPart_000_0068_01C6468C.34585DD0--
+
 
 
 -------------------------------------------------------
