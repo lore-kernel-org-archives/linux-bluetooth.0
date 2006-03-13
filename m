@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <00f101c646a8$b02e9250$0300a8c0@akira>
-From: "Sir Graham (Terra)" <sir__graham@terra.es>
-To: <bluez-devel@lists.sourceforge.net>
-References: <006b01c64683$e75b2c90$0300a8c0@akira> <1142256728.4622.1.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] Problem With the Inquiry and RFCOMM conexions
-MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="utf-8";
-	reply-type=original
+From: Florian Echtler <floe@butterbrot.org>
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain
+Message-Id: <1142259275.19093.10.camel@localhost>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Bluez for Motorola EZX mobile phones
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,79 +16,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 13 Mar 2006 15:15:47 +0100
+Date: Mon, 13 Mar 2006 15:14:34 +0100
 
-Hi Marcel,
+Hi everybody,
 
-Thanks very much for you answer....
+there already was a thread a while ago about BlueZ on the Motorola EZX
+phones, and in the motorolafans.com forum, one can download a binary
+package containing the modules. However, I wanted a) to look at the
+source code and b) to have the newest BlueZ modules available, so I
+backported the modules from 2.4.31-mh1 to the custom Motorola kernel,
+which is based on 2.4.20. 
 
-"limitation of the hardware"..?   I use modules BT 2.0 for this ....
+My question is now what to do with the patch. I don't think it would
+make sense to integrate it into the main Bluez tree, would it? Perhaps
+it would be best to create a separate patch against the Motorola custom
+kernel tree? (There are some nasty little hacks involved so that the 
+kernel itself doesn't have to be recompiled, which could only be updated
+by flashing the phone - that's a big "DON'T" for me :-)
 
-Info of hciconfig hci0 version:
-
-hci0:   Type: UART
-        BD Address: 00:07:80:XX:XX:XX ACL MTU: 384:8 SCO MTU: 64:8
-        HCI Ver: 2.0 (0x3) HCI Rev: 0xa42 LMP Ver: 2.0 (0x3) LMP Subver:=20
-0xa42
-        Manufacturer: Cambridge Silicon Radio (10)
-
-
-The inquiry and the RFCOMM in blueZ have diferent handles. I understand t=
-he=20
-calls hci to module don=C2=B4t mixed ....
-
-Why if I send data over RFCOMM channels the inquiry don=C2=B4t find any d=
-evice?
-I don=C2=B4t send any data, mantaint the conexion, the inquiry works with=
- any=20
-problem.... =C2=BF=C2=BF???
-
-The Inquiry works in a independient thread, and every conexion RFCOMM hav=
-e=20
-his own thread also....
-
-Any idea?
-
-Regards,
-Sir Graham.
-
-
-
-
------ Original Message -----=20
-From: "Marcel Holtmann" <marcel@holtmann.org>
-To: <bluez-devel@lists.sourceforge.net>
-Sent: Monday, March 13, 2006 2:32 PM
-Subject: Re: [Bluez-devel] Problem With the Inquiry and RFCOMM conexions
-
-
-Hi,
-
-> I have a problem with make a Inquiry and RFCOMM conexions at the same
-> time and don=C2=B4t understand why.....(with BlueZ).
-
-this is a limitation of the hardware. What does "hciconfig hci0 version"
-tell you?
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by xPML, a groundbreaking scripting langua=
-ge
-that extends applications into web and mobile media. Attend the live webc=
-ast
-and join the prime developer group breaking into this new coding territor=
-y!
-http://sel.as-us.falkag.net/sel?cmd=3Dk&kid=110944&bid$1720&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel=20
+Yours, Florian
 
 
 
