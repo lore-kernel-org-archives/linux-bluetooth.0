@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <006b01c64683$e75b2c90$0300a8c0@akira>
-From: "Sir Graham (Terra)" <sir__graham@terra.es>
-To: <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0068_01C6468C.34585DD0"
-Subject: [Bluez-devel] Problem With the Inquiry and RFCOMM conexions
+From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain
+Message-Id: <1142243128.30440.15.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Question about L2CAP sockets
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,70 +16,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 13 Mar 2006 10:52:21 +0100
+Date: Mon, 13 Mar 2006 10:45:28 +0100
 
-This is a multi-part message in MIME format.
+Hello together,
 
-------=_NextPart_000_0068_01C6468C.34585DD0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+I'm currently recoding some functions to provide Flow Control mechanism
+on the L2CAP layer. Incoming Configuration Requests, Configuration
+Responses and Information Requests are mostly done. Now I try to do the
+corresponding work for an incoming Information Response. In order to
+keep track of the results (let's say I sent an info request about
+supported flow control) I need to store those results somewhere from
+where I can use them for a reasonable configuration request (if the
+remote peer doesn't support Flow Control, then we don't need request any
+Flow Control options any more). I thought these pieces of information
+belong to the corresponding socket, but now I have quite some trouble to
+access the socket struct from l2cap_information_rsp() as the only
+informational field I have is the l2cap_conn struct. 
 
+So is there a way to obtain the socket just from the connection struct?
 
-Hi,
+My only idea is to use the function:
+static inline struct *l2cap_get_chan_by_ident(struct l2cap_chan_list *l,
+u8 ident)
+as we have two candidate fields -- rx_ident and tx_ident -- in our
+connection struct. But I don't know if that might work.
+Is there anybody who may help me out a bit with the l2cap stuff?
 
-I have a problem with make a Inquiry and RFCOMM conexions at the same =
-time and don=B4t understand why.....(with BlueZ).
-
-Is It possible in the same module of bluetooth make a inquiry (independ =
-thread) and RFCOMM conexions (4 o 5 conexions in independ threads) =20
-at the same time?
-
-If I use diferent handles for this the call HCI to the module ... Is it =
-independient?=20
-
-Have somebody any experience in this sense?
-
-Regards,
-Sir Graham.
-------=_NextPart_000_0068_01C6468C.34585DD0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2900.2802" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Hi,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I have a problem with make a Inquiry =
-and RFCOMM=20
-conexions at the same time and don=B4t understand why.....(with=20
-BlueZ).</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Is It possible in the same module of =
-bluetooth make=20
-a inquiry (independ thread) and RFCOMM conexions (4 o 5 conexions=20
-in&nbsp;independ threads)&nbsp; </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>at the same time?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>If I use diferent handles for this the =
-call HCI to=20
-the module ... Is&nbsp;it independient? </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Have somebody any experience in this=20
-sense?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Regards,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Sir Graham.</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0068_01C6468C.34585DD0--
+Martin
 
 
 
