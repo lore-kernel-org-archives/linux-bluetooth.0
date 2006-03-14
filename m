@@ -1,17 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] dbus pin failure
-From: David Woodhouse <dwmw2@infradead.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1141666471.4733.3.camel@aeonflux.holtmann.net>
-References: <1141396234.8699.10.camel@localhost.localdomain>
-	 <1141397987.12964.23.camel@aeonflux.holtmann.net>
-	 <1141418085.8699.23.camel@localhost.localdomain>
-	 <1141532537.4871.9.camel@aeonflux.holtmann.net>
-	 <1141663646.4110.60.camel@pmac.infradead.org>
-	 <1141666471.4733.3.camel@aeonflux.holtmann.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Olivier Galibert <galibert@pobox.com>
+Cc: "Hack inc." <linux-kernel@vger.kernel.org>, maxk@qualcomm.com,
+        bluez-devel@lists.sf.net
+In-Reply-To: <20060314111248.GA75477@dspnet.fr.eu.org>
+References: <20060314111248.GA75477@dspnet.fr.eu.org>
 Content-Type: text/plain
-Message-Id: <1142355625.32726.185.camel@pmac.infradead.org>
+Message-Id: <1142344144.4448.3.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Re: [PATCH] Fix SCO on Broadcom Bluetooth adapters
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -23,17 +20,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 14 Mar 2006 17:00:25 +0000
+Date: Tue, 14 Mar 2006 14:49:03 +0100
 
-On Mon, 2006-03-06 at 18:34 +0100, Marcel Holtmann wrote:
-> so I assume this means that bluez-pin is at fault. Actually that is
-> out of my responsibility.
+Hi Olivier,
 
-For the record, this is fixed by the patch at
-http://david.woodhou.se/bluez-pin-0.30-dbus-die-die-die.patch
+> Broadcom USB Bluetooth adapters report a maximum of zero SCO packets
+> in-flight, killing SCO.  Use a reasonable count instead in that case.
+> 
+> Signed-off-by: Olivier Galibert <galibert@pobox.com>
+> 
+> ---
+> 
+> I don't think that could be reasonably done as a quirk.  Simple
+> examination of the .inf coming with the windows driver shows that 100+
+> different models may be having this problem.  Also, it can't break
+> already working adapters, so why bother.
 
--- 
-dwmw2
+your patch might break devices where this value is chosen on purpose, so
+it is not acceptable and must be done with a quirk. Another reason is
+that I don't allow any stupid vendor specific workarounds inside the
+Bluetooth core unless they are implemented as quirks. The core has no
+vendor information at all.
+
+Regards
+
+Marcel
+
 
 
 
