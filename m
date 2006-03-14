@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: =?iso-8859-1?q?G=F6tz_Issel?= <me@goetzi.de>
 To: bluez-devel@lists.sourceforge.net
+Cc: Olivier Galibert <galibert@pobox.com>,
+        "Hack inc." <linux-kernel@vger.kernel.org>, marcel@holtmann.org,
+        maxk@qualcomm.com
+Subject: [Bluez-devel] Re: [PATCH] Fix SCO on Broadcom Bluetooth adapters
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200603141107.53660.me@goetzi.de>
-Subject: [Bluez-devel] AT commands for GSM to use remoteSAP
+Message-ID: <OFCC12F511.CDE22FD8-ONC1257131.0043895D-C1257131.0043B684@sagem.com>
+From: Matthieu CASTET <matthieu.castet@sagem.com>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,22 +19,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 14 Mar 2006 11:07:53 +0100
+Date: Tue, 14 Mar 2006 13:19:29 +0100
 
-Hi all, 
+Hi, 
 
-I am working on a tool to eventually use remote SIM access or the SIM access 
-profile. To make it adaptable for different hardware I would like to know if 
-the AT commands for different GSM hardware are exactly the same. My question 
-of course only aims at the commands concerning the remote SIM access.  
-Example: a Siemens AC45 has AT^SRSA=.... for de/activation or AT^SRSM for SAP 
-messages like "CONNECT_REQ" etc. 
-Question: Can anyone with different hardware send me the needed sequence to 
-set the correct mode and instruct their GSM to use a remote SIM plus the 
-manufacturer, device name and revision.
+it applies also to uart broadcom chips, so "broken Broadcom detected, working around" would be better ;)
 
-Thx, 
-goetz
+
+Matthieu
+
 
 
 -------------------------------------------------------
