@@ -1,17 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] dbus pin failure
-From: Marcel Holtmann <marcel@holtmann.org>
+From: David Woodhouse <dwmw2@infradead.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1142355625.32726.185.camel@pmac.infradead.org>
+In-Reply-To: <1141666471.4733.3.camel@aeonflux.holtmann.net>
 References: <1141396234.8699.10.camel@localhost.localdomain>
 	 <1141397987.12964.23.camel@aeonflux.holtmann.net>
 	 <1141418085.8699.23.camel@localhost.localdomain>
 	 <1141532537.4871.9.camel@aeonflux.holtmann.net>
 	 <1141663646.4110.60.camel@pmac.infradead.org>
 	 <1141666471.4733.3.camel@aeonflux.holtmann.net>
-	 <1142355625.32726.185.camel@pmac.infradead.org>
 Content-Type: text/plain
-Message-Id: <1142356074.8805.3.camel@aeonflux.holtmann.net>
+Message-Id: <1142355625.32726.185.camel@pmac.infradead.org>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -24,24 +23,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 14 Mar 2006 18:07:54 +0100
+Date: Tue, 14 Mar 2006 17:00:25 +0000
 
-Hi David,
+On Mon, 2006-03-06 at 18:34 +0100, Marcel Holtmann wrote:
+> so I assume this means that bluez-pin is at fault. Actually that is
+> out of my responsibility.
 
-> > so I assume this means that bluez-pin is at fault. Actually that is
-> > out of my responsibility.
-> 
-> For the record, this is fixed by the patch at
-> http://david.woodhou.se/bluez-pin-0.30-dbus-die-die-die.patch
+For the record, this is fixed by the patch at
+http://david.woodhou.se/bluez-pin-0.30-dbus-die-die-die.patch
 
-and the next bluez-utils will contain a complete different interface for
-PIN handling. However we have a passkey-agent.c example in the CVS and
-it should be really easy to change bluez-pin to use it.
-
-Regards
-
-Marcel
-
+-- 
+dwmw2
 
 
 
