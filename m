@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Olivier Galibert <galibert@pobox.com>
-Cc: "Hack inc." <linux-kernel@vger.kernel.org>, maxk@qualcomm.com,
-        bluez-devel@lists.sf.net
-In-Reply-To: <20060314111248.GA75477@dspnet.fr.eu.org>
-References: <20060314111248.GA75477@dspnet.fr.eu.org>
-Content-Type: text/plain
-Message-Id: <1142344144.4448.3.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: [PATCH] Fix SCO on Broadcom Bluetooth adapters
+From: =?iso-8859-1?q?G=F6tz_Issel?= <me@goetzi.de>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200603141107.53660.me@goetzi.de>
+Subject: [Bluez-devel] AT commands for GSM to use remoteSAP
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,33 +17,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 14 Mar 2006 14:49:03 +0100
+Date: Tue, 14 Mar 2006 11:07:53 +0100
 
-Hi Olivier,
+Hi all, 
 
-> Broadcom USB Bluetooth adapters report a maximum of zero SCO packets
-> in-flight, killing SCO.  Use a reasonable count instead in that case.
-> 
-> Signed-off-by: Olivier Galibert <galibert@pobox.com>
-> 
-> ---
-> 
-> I don't think that could be reasonably done as a quirk.  Simple
-> examination of the .inf coming with the windows driver shows that 100+
-> different models may be having this problem.  Also, it can't break
-> already working adapters, so why bother.
+I am working on a tool to eventually use remote SIM access or the SIM access 
+profile. To make it adaptable for different hardware I would like to know if 
+the AT commands for different GSM hardware are exactly the same. My question 
+of course only aims at the commands concerning the remote SIM access.  
+Example: a Siemens AC45 has AT^SRSA=.... for de/activation or AT^SRSM for SAP 
+messages like "CONNECT_REQ" etc. 
+Question: Can anyone with different hardware send me the needed sequence to 
+set the correct mode and instruct their GSM to use a remote SIM plus the 
+manufacturer, device name and revision.
 
-your patch might break devices where this value is chosen on purpose, so
-it is not acceptable and must be done with a quirk. Another reason is
-that I don't allow any stupid vendor specific workarounds inside the
-Bluetooth core unless they are implemented as quirks. The core has no
-vendor information at all.
-
-Regards
-
-Marcel
-
-
+Thx, 
+goetz
 
 
 -------------------------------------------------------
