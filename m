@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec0603151722r5a63605by5e92a32d574e54b8@mail.gmail.com>
-From: "Albert Huang" <ashuang@gmail.com>
-To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+Message-ID: <001f01c64810$1e4ff130$0300a8c0@akira>
+From: "Sir Graham (Terra)" <sir__graham@terra.es>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Problem With the Inquiry and RFCOMM conexions
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_12650_18188067.1142472155502"
-Subject: [Bluez-devel] automatic flush timeout patch
+Content-Type: text/plain;
+	format=flowed;
+	charset="utf-8";
+	reply-type=response
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,179 +19,97 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Mar 2006 20:22:35 -0500
+Date: Wed, 15 Mar 2006 10:08:46 +0100
 
-------=_Part_12650_18188067.1142472155502
-Content-Type: multipart/alternative;
-	boundary="----=_Part_12651_5979296.1142472155502"
 
-------=_Part_12651_5979296.1142472155502
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-The attached two files add read/write for automatic flush timeout to libs,
-and modify hcitool accordingly
+Hi Marcel,
+
+Thanks very much for you answer....
+
+"limitation of the hardware"..?   I use modules BT 2.0 for this ....
+
+Info of hciconfig hci0 version:
+
+hci0:   Type: UART
+        BD Address: 00:07:80:XX:XX:XX ACL MTU: 384:8 SCO MTU: 64:8
+        HCI Ver: 2.0 (0x3) HCI Rev: 0xa42 LMP Ver: 2.0 (0x3) LMP Subver:
+0xa42
+        Manufacturer: Cambridge Silicon Radio (10)
+
+
+The inquiry and the RFCOMM in blueZ have diferent handles. I understand t=
+he
+calls hci to module don=C2=B4t mixed ....
+
+Why if I send data over RFCOMM channels the inquiry don=C2=B4t find any d=
+evice?
+I don=C2=B4t send any data, mantaint the conexion, the inquiry works with=
+ any
+problem.... =C2=BF=C2=BF???
+
+The Inquiry works in a independient thread, and every conexion RFCOMM hav=
+e
+his own thread also....
+
+Any idea?
 
 Regards,
-Albert
+Sir Graham.
 
-------=_Part_12651_5979296.1142472155502
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-The attached two files add read/write for automatic flush timeout to libs, =
-and modify hcitool accordingly<br>
-<br>
-Regards,<br>
-Albert<br>
 
-------=_Part_12651_5979296.1142472155502--
 
-------=_Part_12650_18188067.1142472155502
-Content-Type: text/plain; name="libs-aft-patch.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="libs-aft-patch.txt"
-X-Attachment-Id: f_ekueeon0
+----- Original Message -----=20
+From: "Marcel Holtmann" <marcel@holtmann.org>
+To: <bluez-devel@lists.sourceforge.net>
+Sent: Monday, March 13, 2006 2:32 PM
+Subject: Re: [Bluez-devel] Problem With the Inquiry and RFCOMM conexions
 
-SW5kZXg6IGluY2x1ZGUvaGNpLmgKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXov
-bGlicy9pbmNsdWRlL2hjaS5oLHYKcmV0cmlldmluZyByZXZpc2lvbiAxLjgxCmRpZmYgLXUgLXIx
-LjgxIGhjaS5oCi0tLSBpbmNsdWRlL2hjaS5oCTcgRmViIDIwMDYgMDc6NDg6MTEgLTAwMDAJMS44
-MQorKysgaW5jbHVkZS9oY2kuaAkxNiBNYXIgMjAwNiAwMToyMDo0MiAtMDAwMApAQCAtNzk2LDgg
-Kzc5NiwyOCBAQAogI2RlZmluZSBXUklURV9WT0lDRV9TRVRUSU5HX0NQX1NJWkUgMgogCiAjZGVm
-aW5lIE9DRl9SRUFEX0FVVE9NQVRJQ19GTFVTSF9USU1FT1VUCTB4MDAyNwordHlwZWRlZiBzdHJ1
-Y3QgeworCXVpbnQxNl90CWhhbmRsZTsKK30gX19hdHRyaWJ1dGVfXyAoKHBhY2tlZCkpIHJlYWRf
-YXV0b21hdGljX2ZsdXNoX3RpbWVvdXRfY3A7CisjZGVmaW5lIFJFQURfQVVUT01BVElDX0ZMVVNI
-X1RJTUVPVVRfQ1BfU0laRSAyCit0eXBlZGVmIHN0cnVjdCB7CisJdWludDhfdAkJc3RhdHVzOwor
-CXVpbnQxNl90CWhhbmRsZTsKKwl1aW50MTZfdAl0aW1lb3V0OworfSBfX2F0dHJpYnV0ZV9fICgo
-cGFja2VkKSkgcmVhZF9hdXRvbWF0aWNfZmx1c2hfdGltZW91dF9ycDsKKyNkZWZpbmUgUkVBRF9B
-VVRPTUFUSUNfRkxVU0hfVElNRU9VVF9SUF9TSVpFIDUKIAogI2RlZmluZSBPQ0ZfV1JJVEVfQVVU
-T01BVElDX0ZMVVNIX1RJTUVPVVQJMHgwMDI4Cit0eXBlZGVmIHN0cnVjdCB7CisJdWludDE2X3QJ
-aGFuZGxlOworCXVpbnQxNl90CWZsdXNoX3RpbWVvdXQ7Cit9IF9fYXR0cmlidXRlX18gKChwYWNr
-ZWQpKSB3cml0ZV9hdXRvbWF0aWNfZmx1c2hfdGltZW91dF9jcDsKKyNkZWZpbmUgV1JJVEVfQVVU
-T01BVElDX0ZMVVNIX1RJTUVPVVRfQ1BfU0laRSA0Cit0eXBlZGVmIHN0cnVjdCB7CisJdWludDhf
-dAkJc3RhdHVzOworCXVpbnQxNl90IAloYW5kbGU7Cit9IF9fYXR0cmlidXRlX18gKChwYWNrZWQp
-KSB3cml0ZV9hdXRvbWF0aWNfZmx1c2hfdGltZW91dF9ycDsKKyNkZWZpbmUgV1JJVEVfQVVUT01B
-VElDX0ZMVVNIX1RJTUVPVVRfUlBfU0laRSAzCiAKICNkZWZpbmUgT0NGX1JFQURfTlVNX0JST0FE
-Q0FTVF9SRVRSQU5TCTB4MDAyOQogCkluZGV4OiBpbmNsdWRlL2hjaV9saWIuaAo9PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei9saWJzL2luY2x1ZGUvaGNpX2xpYi5oLHYKcmV0cmll
-dmluZyByZXZpc2lvbiAxLjUzCmRpZmYgLXUgLXIxLjUzIGhjaV9saWIuaAotLS0gaW5jbHVkZS9o
-Y2lfbGliLmgJMyBKYW4gMjAwNiAxMjo1NjowOSAtMDAwMAkxLjUzCisrKyBpbmNsdWRlL2hjaV9s
-aWIuaAkxNiBNYXIgMjAwNiAwMToyMDo0MiAtMDAwMApAQCAtMTA2LDYgKzEwNiw4IEBACiBpbnQg
-aGNpX3JlYWRfcnNzaShpbnQgZGQsIHVpbnQxNl90IGhhbmRsZSwgaW50OF90ICpyc3NpLCBpbnQg
-dG8pOwogaW50IGhjaV9yZWFkX2FmaF9tYXAoaW50IGRkLCB1aW50MTZfdCBoYW5kbGUsIHVpbnQ4
-X3QgKm1vZGUsIHVpbnQ4X3QgKm1hcCwgaW50IHRvKTsKIGludCBoY2lfcmVhZF9jbG9jayhpbnQg
-ZGQsIHVpbnQxNl90IGhhbmRsZSwgdWludDhfdCB3aGljaCwgdWludDMyX3QgKmNsb2NrLCB1aW50
-MTZfdCAqYWNjdXJhY3ksIGludCB0byk7CitpbnQgaGNpX3dyaXRlX2F1dG9tYXRpY19mbHVzaF90
-aW1lb3V0KGludCBkZCwgdWludDE2X3QgaGFuZGxlLCB1aW50MTZfdCB0aW1lb3V0LCBpbnQgdG8p
-OworaW50IGhjaV9yZWFkX2F1dG9tYXRpY19mbHVzaF90aW1lb3V0KGludCBkZCwgdWludDE2X3Qg
-aGFuZGxlLCB1aW50MTZfdCAqdGltZW91dCwgaW50IHRvKTsKIAogaW50IGhjaV9sb2NhbF9uYW1l
-KGludCBkZCwgaW50IGxlbiwgY2hhciAqbmFtZSwgaW50IHRvKTsKIGludCBoY2lfcmVtb3RlX25h
-bWUoaW50IGRkLCBjb25zdCBiZGFkZHJfdCAqYmRhZGRyLCBpbnQgbGVuLCBjaGFyICpuYW1lLCBp
-bnQgdG8pOwpJbmRleDogc3JjL2hjaS5jCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZpbGU6IC9jdnNyb290L2Js
-dWV6L2xpYnMvc3JjL2hjaS5jLHYKcmV0cmlldmluZyByZXZpc2lvbiAxLjkxCmRpZmYgLXUgLXIx
-LjkxIGhjaS5jCi0tLSBzcmMvaGNpLmMJNyBGZWIgMjAwNiAwNzo0ODoxNSAtMDAwMAkxLjkxCisr
-KyBzcmMvaGNpLmMJMTYgTWFyIDIwMDYgMDE6MjA6NDIgLTAwMDAKQEAgLTIwNzIsNiArMjA3Miw2
-NiBAQAogCXJldHVybiAwOwogfQogCitpbnQgaGNpX3JlYWRfYXV0b21hdGljX2ZsdXNoX3RpbWVv
-dXQoaW50IGRkLCB1aW50MTZfdCBoYW5kbGUsIHVpbnQxNl90ICpmbHVzaF90aW1lb3V0LCBpbnQg
-dG8pCit7CisJcmVhZF9hdXRvbWF0aWNfZmx1c2hfdGltZW91dF9jcCBjcDsKKwlyZWFkX2F1dG9t
-YXRpY19mbHVzaF90aW1lb3V0X3JwIHJwOworCXN0cnVjdCBoY2lfcmVxdWVzdCBycTsKKworCW1l
-bXNldCgmY3AsIDAsIHNpemVvZihjcCkpOworCWNwLmhhbmRsZSA9IGhhbmRsZTsKKworCW1lbXNl
-dCgmcnEsIDAsIHNpemVvZihycSkpOworCXJxLm9nZiA9IE9HRl9IT1NUX0NUTDsKKwlycS5vY2Yg
-PSBPQ0ZfUkVBRF9BVVRPTUFUSUNfRkxVU0hfVElNRU9VVDsKKwlycS5jcGFyYW0gPSAmY3A7CisJ
-cnEuY2xlbiA9IFJFQURfQVVUT01BVElDX0ZMVVNIX1RJTUVPVVRfQ1BfU0laRTsKKwlycS5ycGFy
-YW0gPSAmcnA7CisJcnEucmxlbiA9IFJFQURfQVVUT01BVElDX0ZMVVNIX1RJTUVPVVRfUlBfU0la
-RTsKKworCWlmIChoY2lfc2VuZF9yZXEoZGQsICZycSwgdG8pIDwgMCkKKwkJcmV0dXJuIC0xOwor
-CisJaWYgKHJwLnN0YXR1cykgeworCQlmcHJpbnRmKHN0ZGVyciwgImhhbmRsZSAlZCBidCBlcnJv
-ciAlZCBvY2YgJXhcbiIsIHJwLmhhbmRsZSwgcnAuc3RhdHVzLCBycS5vY2YpOworCQllcnJubyA9
-IEVJTzsKKwkJcmV0dXJuIC0xOworCX0KKworCSpmbHVzaF90aW1lb3V0ID0gYnRvaHMocnAudGlt
-ZW91dCk7CisJcmV0dXJuIDA7Cit9CisJCitpbnQgaGNpX3dyaXRlX2F1dG9tYXRpY19mbHVzaF90
-aW1lb3V0KGludCBkZCwgdWludDE2X3QgaGFuZGxlLCB1aW50MTZfdCBmbHVzaF90aW1lb3V0LCBp
-bnQgdG8pCit7CisJd3JpdGVfYXV0b21hdGljX2ZsdXNoX3RpbWVvdXRfY3AgY3A7CisJd3JpdGVf
-YXV0b21hdGljX2ZsdXNoX3RpbWVvdXRfcnAgcnA7CisJc3RydWN0IGhjaV9yZXF1ZXN0IHJxOwor
-CisJbWVtc2V0KCZjcCwgMCwgc2l6ZW9mKGNwKSk7CisJY3AuaGFuZGxlID0gaGFuZGxlOworCWNw
-LmZsdXNoX3RpbWVvdXQgPSBmbHVzaF90aW1lb3V0OworCisJbWVtc2V0KCZycSwgMCwgc2l6ZW9m
-KHJxKSk7CisJcnEub2dmID0gT0dGX0hPU1RfQ1RMOworCXJxLm9jZiA9IE9DRl9XUklURV9BVVRP
-TUFUSUNfRkxVU0hfVElNRU9VVDsKKwlycS5jcGFyYW0gPSAmY3A7CisJcnEuY2xlbiA9IFdSSVRF
-X0FVVE9NQVRJQ19GTFVTSF9USU1FT1VUX0NQX1NJWkU7CisJcnEucnBhcmFtID0gJnJwOworCXJx
-LnJsZW4gPSBXUklURV9BVVRPTUFUSUNfRkxVU0hfVElNRU9VVF9SUF9TSVpFOworCisJaWYgKGhj
-aV9zZW5kX3JlcShkZCwgJnJxLCB0bykgPCAwKQorCQlyZXR1cm4gLTE7CisKKwlpZihycC5zdGF0
-dXMpIHsKKwkJZnByaW50ZihzdGRlcnIsICJoYW5kbGUgJWQgYnQgZXJyb3IgJWQgZnRvICVkXG4i
-LCBjcC5oYW5kbGUsIHJwLnN0YXR1cywgZmx1c2hfdGltZW91dCk7CisJCWVycm5vID0gRUlPOwor
-CQlyZXR1cm4gLTE7CisJfQorCisJcmV0dXJuIDA7Cit9CisKIGludCBoY2lfc2V0X2FmaF9jbGFz
-c2lmaWNhdGlvbihpbnQgZGQsIHVpbnQ4X3QgKm1hcCwgaW50IHRvKQogewogCXNldF9hZmhfY2xh
-c3NpZmljYXRpb25fY3AgY3A7Cg==
-------=_Part_12650_18188067.1142472155502
-Content-Type: text/plain; name="hcitool-aft-patch.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="hcitool-aft-patch.txt"
-X-Attachment-Id: f_ekueewym
 
-SW5kZXg6IHRvb2xzL2hjaXRvb2wuMQo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVl
-ei91dGlscy90b29scy9oY2l0b29sLjEsdgpyZXRyaWV2aW5nIHJldmlzaW9uIDEuMTAKZGlmZiAt
-dSAtcjEuMTAgaGNpdG9vbC4xCi0tLSB0b29scy9oY2l0b29sLjEJMyBKdWwgMjAwNSAxMDowODoy
-NiAtMDAwMAkxLjEwCisrKyB0b29scy9oY2l0b29sLjEJMTYgTWFyIDIwMDYgMDE6MjE6MzYgLTAw
-MDAKQEAgLTE4Myw2ICsxODMsMjIgQEAKIGZvciB0aGUgbG9jYWwgY2xvY2sgb3IKIC5CUiAxCiBm
-b3IgdGhlIHBpY29uZXQgY2xvY2sgKHdoaWNoIGlzIGRlZmF1bHQpLgorLlRQCisuQkkgYWZ0ICIg
-PGJkYWRkcj4gW3ZhbHVlXSIKK1dpdGggbm8KKy5JUiB2YWx1ZSAsCitkaXNwbGF5cyBhdXRvbWF0
-aWMgZmx1c2ggdGltZW91dCBmb3IgdGhlIGNvbm5lY3Rpb24gdG8gdGhlIGRldmljZSB3aXRoIEJs
-dWV0b290aCBhZGRyZXNzCisuSVIgYmRhZGRyIC4KK0lmCisuSQordmFsdWUKK2lzIGdpdmVuLCBz
-ZXRzIHRoZSBhdXRvbWF0aWMgZmx1c2ggdGltZW91dCBmb3IgdGhhdCBjb25uZWN0aW9uIHRvCisu
-SQordmFsdWUKK3Nsb3RzLCBvciB0byBpbmZpbml0ZSBpZgorLkkKK3ZhbHVlCitpcyAwLgogLlNI
-IEFVVEhPUlMKIFdyaXR0ZW4gYnkgTWF4aW0gS3Jhc255YW5za3kgPG1heGtAcXVhbGNvbW0uY29t
-PiBhbmQgTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPgogLlBQCkluZGV4OiB0
-b29scy9oY2l0b29sLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovdXRpbHMv
-dG9vbHMvaGNpdG9vbC5jLHYKcmV0cmlldmluZyByZXZpc2lvbiAxLjg1CmRpZmYgLXUgLXIxLjg1
-IGhjaXRvb2wuYwotLS0gdG9vbHMvaGNpdG9vbC5jCTE4IEphbiAyMDA2IDE3OjQ1OjUxIC0wMDAw
-CTEuODUKKysrIHRvb2xzL2hjaXRvb2wuYwkxNiBNYXIgMjAwNiAwMToyMTozNiAtMDAwMApAQCAt
-MjAyNyw2ICsyMDI3LDk0IEBACiAJY2xvc2UoZGQpOwogfQogCisvKiBHZXQvU2V0IGF1dG9tYXRp
-YyBmbHVzaCB0aW1lb3V0ICovCisKK3N0YXRpYyBzdHJ1Y3Qgb3B0aW9uIGFmdF9vcHRpb25zW10g
-PSB7CisJeyAiaGVscCIsCTAsIDAsICdoJyB9LAorCXsgMCwgMCwgMCwgMCB9Cit9OworCitzdGF0
-aWMgY2hhciAqYWZ0X2hlbHAgPQorCSJVc2FnZTpcbiIKKwkiXHRhZnQgPGJkYWRkcj4gW25ldyBh
-dXRvbWF0aWMgZmx1c2ggdGltZW91dF1cbiI7CisKK3N0YXRpYyB2b2lkIGNtZF9hZnQoaW50IGRl
-dl9pZCwgaW50IGFyZ2MsIGNoYXIgKiphcmd2KQoreworCXN0cnVjdCBoY2lfY29ubl9pbmZvX3Jl
-cSAqY3I7CisJYmRhZGRyX3QgYmRhZGRyOworCXVpbnQxNl90IHRpbWVvdXQ7CisJaW50IG9wdCwg
-ZGQ7CisKKwlmb3JfZWFjaF9vcHQob3B0LCBhZnRfb3B0aW9ucywgTlVMTCkgeworCQlzd2l0Y2gg
-KG9wdCkgeworCQkJZGVmYXVsdDoKKwkJCQlwcmludGYoYWZ0X2hlbHApOworCQkJCXJldHVybjsK
-KwkJfQorCX0KKwlhcmdjIC09IG9wdGluZDsKKwlhcmd2ICs9IG9wdGluZDsKKworCWlmIChhcmdj
-IDwgMSkgeworCQlwcmludGYoYWZ0X2hlbHApOworCQlyZXR1cm47CisJfQorCisJc3RyMmJhKGFy
-Z3ZbMF0sICZiZGFkZHIpOworCisJaWYgKGRldl9pZCA8IDApIHsKKwkJZGV2X2lkID0gaGNpX2Zv
-cl9lYWNoX2RldihIQ0lfVVAsIGZpbmRfY29ubiwgKGxvbmcpICZiZGFkZHIpOworCQlpZiAoZGV2
-X2lkIDwgMCkgeworCQkJZnByaW50ZihzdGRlcnIsICJOb3QgY29ubmVjdGVkLlxuIik7CisJCQll
-eGl0KDEpOworCQl9CisJfQorCisJZGQgPSBoY2lfb3Blbl9kZXYoZGV2X2lkKTsKKwlpZiAoZGQg
-PCAwKSB7CisJCXBlcnJvcigiSENJIGRldmljZSBvcGVuIGZhaWxlZCIpOworCQlleGl0KDEpOwor
-CX0KKworCWNyID0gbWFsbG9jKHNpemVvZigqY3IpICsgc2l6ZW9mKHN0cnVjdCBoY2lfY29ubl9p
-bmZvKSk7CisJaWYgKCFjcikgeworCQlwZXJyb3IoIkNhbid0IGFsbG9jYXRlIG1lbW9yeSIpOwor
-CQlleGl0KDEpOworCX0KKworCWJhY3B5KCZjci0+YmRhZGRyLCAmYmRhZGRyKTsKKwljci0+dHlw
-ZSA9IEFDTF9MSU5LOworCWlmIChpb2N0bChkZCwgSENJR0VUQ09OTklORk8sICh1bnNpZ25lZCBs
-b25nKSBjcikgPCAwKSB7CisJCXBlcnJvcigiR2V0IGNvbm5lY3Rpb24gaW5mbyBmYWlsZWQiKTsK
-KwkJZXhpdCgxKTsKKwl9CisKKwlpZiAoYXJnYyA9PSAxKSB7CisJCWlmIChoY2lfcmVhZF9hdXRv
-bWF0aWNfZmx1c2hfdGltZW91dChkZCwgaHRvYnMoY3ItPmNvbm5faW5mby0+aGFuZGxlKSwgJnRp
-bWVvdXQsIDEwMDApIDwgMCkgeworCQkJcGVycm9yKCJIQ0kgcmVhZF9hdXRvbWF0aWNfZmx1c2hf
-dGltZW91dCByZXF1ZXN0IGZhaWxlZCIpOworCQkJZXhpdCgxKTsKKwkJfQorCisJCXRpbWVvdXQg
-PSBidG9ocyh0aW1lb3V0KTsKKworCQlpZiAodGltZW91dCkKKwkJCXByaW50ZigiQXV0b21hdGlj
-IGZsdXNoIHRpbWVvdXQ6ICV1IHNsb3RzICglLjJmIG1zZWMpXG4iLAorCQkJCQl0aW1lb3V0LCAo
-ZmxvYXQpIHRpbWVvdXQgKiAwLjYyNSk7CisJCWVsc2UKKwkJCXByaW50ZigiQXV0b21hdGljIGZs
-dXNoIHRpbWVvdXQgbmV2ZXIgZXhwaXJlc1xuIik7CisJfSBlbHNlIHsKKwkJdGltZW91dCA9IGh0
-b2JzKHN0cnRvbChhcmd2WzFdLCBOVUxMLCAxMCkpOworCisJCWlmIChoY2lfd3JpdGVfYXV0b21h
-dGljX2ZsdXNoX3RpbWVvdXQoZGQsIGh0b2JzKGNyLT5jb25uX2luZm8tPmhhbmRsZSksIHRpbWVv
-dXQsIDEwMDApIDwgMCkgeworCQkJcGVycm9yKCJIQ0kgd3JpdGVfbGlua19zdXBlcnZpc2lvbl90
-aW1lb3V0IHJlcXVlc3QgZmFpbGVkIik7CisJCQlleGl0KDEpOworCQl9CisJfQorCisJY2xvc2Uo
-ZGQpOworCWZyZWUoY3IpOworfQorCiBzdGF0aWMgc3RydWN0IHsKIAljaGFyICpjbWQ7CiAJdm9p
-ZCAoKmZ1bmMpKGludCBkZXZfaWQsIGludCBhcmdjLCBjaGFyICoqYXJndik7CkBAIC0yMDUzLDYg
-KzIxNDEsNyBAQAogCXsgImtleSIsICAgIGNtZF9rZXksICAgICJDaGFuZ2UgY29ubmVjdGlvbiBs
-aW5rIGtleSIgICAgICAgICAgIH0sCiAJeyAiY2xrb2ZmIiwgY21kX2Nsa29mZiwgIlJlYWQgY2xv
-Y2sgb2Zmc2V0IiAgICAgICAgICAgICAgICAgICAgfSwKIAl7ICJjbG9jayIsICBjbWRfY2xvY2ss
-ICAiUmVhZCBsb2NhbCBvciByZW1vdGUgY2xvY2siICAgICAgICAgICB9LAorCXsgImFmdCIsIAlj
-bWRfYWZ0LAkiU2V0L2Rpc3BsYXkgYXV0b21hdGljIGZsdXNoIHRpbWVvdXQiICB9LAogCXsgTlVM
-TCwgTlVMTCwgMCB9CiB9OwogCg==
-------=_Part_12650_18188067.1142472155502--
+Hi,
+
+> I have a problem with make a Inquiry and RFCOMM conexions at the same
+> time and don=C2=B4t understand why.....(with BlueZ).
+
+this is a limitation of the hardware. What does "hciconfig hci0 version"
+tell you?
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by xPML, a groundbreaking scripting langua=
+ge
+that extends applications into web and mobile media. Attend the live webc=
+ast
+and join the prime developer group breaking into this new coding territor=
+y!
+http://sel.as-us.falkag.net/sel?cmd=3Dk&kid=110944&bid$1720&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by xPML, a groundbreaking scripting langua=
+ge
+that extends applications into web and mobile media. Attend the live webc=
+ast
+and join the prime developer group breaking into this new coding territor=
+y!
+http://sel.as-us.falkag.net/sel?cmd=3Dk&kid=110944&bid$1720&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel=20
+
 
 
 -------------------------------------------------------
