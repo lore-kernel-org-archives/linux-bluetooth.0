@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SCOtest
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <fe0a97c20603170558x411b72a5rfd9fe6a2f17b9152@mail.gmail.com>
-References: <fe0a97c20603170541t57ca15x9d6285baca6011b6@mail.gmail.com>
-	 <fe0a97c20603170558x411b72a5rfd9fe6a2f17b9152@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1142641584.9602.12.camel@localhost>
+From: Andreas Merkle <andreas.merkle@addcom.de>
+Message-ID: <loom.20060316T195745-915@post.gmane.org>
+References: <200603141107.53660.me@goetzi.de>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Subject: [Bluez-devel] Re: AT commands for GSM to use remoteSAP
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,21 +17,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 18 Mar 2006 01:26:24 +0100
+Date: Thu, 16 Mar 2006 18:59:28 +0000 (UTC)
 
-Hi Sowmya,
+Götz Issel <me <at> goetzi.de> writes:
 
-> I was playing around with the scotest and suddenly a doubt occured to
-> me..... 
-> can i not use scotest with headset as my windows PC and audio gateway
-> as my linux box??? 
+> 
+> Hi all, 
+> 
+> I am working on a tool to eventually use remote SIM access or the SIM access 
+> profile. To make it adaptable for different hardware I would like to know if 
+> the AT commands for different GSM hardware are exactly the same. My question 
+> of course only aims at the commands concerning the remote SIM access.  
+> Example: a Siemens AC45 has AT^SRSA=.... for de/activation or AT^SRSM for 
+SAP 
+> messages like "CONNECT_REQ" etc. 
+> Question: Can anyone with different hardware send me the needed sequence to 
+> set the correct mode and instruct their GSM to use a remote SIM plus the 
+> manufacturer, device name and revision.
+> 
+> Thx, 
+> goetz
+> 
 
-the scotest tool is a testing tool as the name implies. It is not good
-for headset or audio gateway emulation.
+
+Hi,
+IMHO the AT^SRSA=... is specific for the AC45 GSM module.
+Other modules communicate with the T0-protocol and the Bluetooth Stack does 
+the rest.
 
 Regards
 
-Marcel
 
 
 
