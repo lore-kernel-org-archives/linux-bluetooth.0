@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Geoff Shang <geoff@hitsandpieces.net>
+Subject: Re: [Bluez-users] Service Search failed: Connection timed out
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.64.0603180112070.738@data.home>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Subject: [Bluez-users] pand: Connection failed. File exists(17)
+In-Reply-To: <200603171404.26940.cijoml@volny.cz>
+References: <fe0a97c20603140341y28c27f40y6d807be1405acfff@mail.gmail.com>
+	 <1142600365.4392.27.camel@localhost>  <200603171404.26940.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1142601096.4392.29.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,65 +19,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 18 Mar 2006 01:14:56 +1000 (EST)
+Date: Fri, 17 Mar 2006 14:11:36 +0100
 
-Hi,
+Hi Michal,
 
-Not sure if this showed up on the list, so I'm resending.  Please let me 
-know if I should be posting this somewhere else.   I'm being pressured to 
-get this working.
+> why don't you add check directly to the hcid to check this for example via 
+> lock file?
 
-Geoff.
+if you use D-Bus we have this kinda lock already. However it is broken
+in the latest versions and we just fixed it recently.
 
+Regards
 
-
-Hi everyone,
-
-I'm trying to set up a network connection via bluetooth using pand and I've hit 
-a problem that I can't find any references to.
-
-I start pand on the NAP side with no problems, using the following comand:
-
-pand --listen --role NAP
-
-When I try to connect from the panu, I get the following:
-
-Mar 10 18:35:46 data pand[16077]: Connection failed. File exists(17)
-
-I get the same sort of thing on the other end.  Here's an example from when I 
-tried reversing roles:
-
-Mar 10 18:59:34 data pand[16186]: Bluetooth PAN daemon version 2.25
-Mar 10 18:59:34 data pand[16186]: Connecting to 00:02:72:B2:A0:6E
-Mar 10 18:59:34 data pand[16186]: Connect to 00:02:72:B2:A0:6E failed. File 
-exists(17)
-
-I've searched the web, read all relevant docs I could find, even took a look at 
-the pand source.  I got as far as looking at bnep_accept_connection but then my 
-brain began to ache (I'm not a C programmer).
-
-I'm using bluez libs and utils v2.25 on both ends.  They were compiled with 
-./configure --enable-all though some of the supporting components like obex 
-weren't available.  One end is running on a freshly installed Debian 3.1 
-system, the other is on a Debian 2.2 system with various upgrades; however all 
-bluez items were compiled from source.
-
-If anyone knows what this is, or even simply has suggestions as to what file it 
-is that pand is complaining about, I'd be extremely greatful.
-
-Geoff.
+Marcel
 
 
--- 
-Geoff Shang <geoff@hitsandpieces.net>
-Phone: +61-418-96-5590
-MSN: geoff@acbradio.org
-
-Make sure your E-mail can be read by everyone!
-http://www.betips.net/etc/evilmail.html
-
-Please avoid sending me Word or PowerPoint attachments.
-See http://www.gnu.org/philosophy/no-word-attachments.html
 
 
 -------------------------------------------------------
