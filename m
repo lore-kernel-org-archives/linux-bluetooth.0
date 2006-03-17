@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20603170558x411b72a5rfd9fe6a2f17b9152@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
+Subject: Re: [Bluez-devel] Problem With the Inquiry and RFCOMM conexions
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <fe0a97c20603170541t57ca15x9d6285baca6011b6@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_6106_12656491.1142603928045"
-References: <fe0a97c20603170541t57ca15x9d6285baca6011b6@mail.gmail.com>
-Subject: [Bluez-devel] SCOtest
+In-Reply-To: <00f101c646a8$b02e9250$0300a8c0@akira>
+References: <006b01c64683$e75b2c90$0300a8c0@akira>
+	 <1142256728.4622.1.camel@aeonflux.holtmann.net>
+	 <00f101c646a8$b02e9250$0300a8c0@akira>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1142600284.4392.25.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,39 +20,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 17 Mar 2006 19:28:48 +0530
+Date: Fri, 17 Mar 2006 13:58:04 +0100
 
-------=_Part_6106_12656491.1142603928045
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi,
 
-Hi all,
+> "limitation of the hardware"..?   I use modules BT 2.0 for this ....
+>=20
+> Info of hciconfig hci0 version:
+>=20
+> hci0:   Type: UART
+>         BD Address: 00:07:80:XX:XX:XX ACL MTU: 384:8 SCO MTU: 64:8
+>         HCI Ver: 2.0 (0x3) HCI Rev: 0xa42 LMP Ver: 2.0 (0x3) LMP Subver=
+:=20
+> 0xa42
+>         Manufacturer: Cambridge Silicon Radio (10)
+>=20
+>=20
+> The inquiry and the RFCOMM in blueZ have diferent handles. I understand=
+ the=20
+> calls hci to module don=C2=B4t mixed ....
 
-I was playing around with the scotest and suddenly a doubt occured to
-me.....
-can i not use scotest with headset as my windows PC and audio gateway as my
-linux box???
+it is still the same hardware. The number of handles doesn't matter.
+
+> Why if I send data over RFCOMM channels the inquiry don=C2=B4t find any=
+ device?
+> I don=C2=B4t send any data, mantaint the conexion, the inquiry works wi=
+th any=20
+> problem.... =C2=BF=C2=BF???
+
+I can't answer this. You might get lucky and get an answer for the CSR
+experts.
+
+Regards
+
+Marcel
 
 
-Awaiting your reply....
-Soumya
-
-------=_Part_6106_12656491.1142603928045
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-<span class=3D"gmail_quote"></span>Hi all,<br><div style=3D"direction: ltr;=
-"><br>I was playing around with the scotest and suddenly a doubt occured to=
- me..... <br>can i not use scotest with headset as my windows PC and audio =
-gateway as my linux box???=20
-<br><br><br>Awaiting your reply....=20
-<br>Soumya<br>
-
-</div>
-
-------=_Part_6106_12656491.1142603928045--
 
 
 -------------------------------------------------------
