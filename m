@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] blue-utils-2.25, dbus.c: dbus_connection_close()
-	not found
+Subject: Re: [Bluez-devel] sdptool browse not working
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <62d428280603100409j4e8318a3o890d4ba137c91991@mail.gmail.com>
-References: <62d428280603100409j4e8318a3o890d4ba137c91991@mail.gmail.com>
+In-Reply-To: <695f62bb0603080237q7f26f393q@mail.gmail.com>
+References: <695f62bb0603080237q7f26f393q@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1142599736.4392.14.camel@localhost>
+Message-Id: <1142588089.4392.0.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,24 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 17 Mar 2006 13:48:56 +0100
+Date: Fri, 17 Mar 2006 10:34:49 +0100
 
-Hi Johan,
+Hi Olivier,
 
-> I downloaded and compiled all four packages from
-> http://www.bluez.org/download.html
->     * bluez-libs-2.25.tar.gz
->     * bluez-utils-2.25.tar.gz
->     * bluez-firmware-1.1.tar.gz
->     * bluez-hcidump-1.30.tar.gz
+> I'm using sdptool v2.19 to retrieve the SDP record of a BT device i am
+> developping.
+> When trying to browse it, my host (on which BlueZ is running) stops
+> and seems to disconnect the link.
 > 
-> I only had problems compiling bluez-utils - all other three packages
-> has been compiled and installed.
-> dbus_connection_close() in dbus.c does not seem to difined nor declared.
-> Where is it supposed to be? Do I need to definen some paths, or
-> install something else?
+> I compared it with a working one (with a phone), and it seems that the
+> difference is in the L2CAP configuration request order. 
 
-you need a recent version of the D-Bus library.
+what version of the Linux kernel are you using?
+
+> Find enclosed the Merlin traces of this.
+
+Show us a "hcidump -X -V".
 
 Regards
 
