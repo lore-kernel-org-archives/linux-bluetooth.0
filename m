@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20603170259o137b2ed1p8e3235de4e48e715@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
+Subject: Re: [Bluez-users] Are MIPS platform supported by blueZ
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_5133_3990953.1142593162335"
-Subject: [Bluez-users] Vend/id 0xa12 /0x1
+In-Reply-To: <Pine.LNX.4.61.0603171123000.9400@cherokee.spacecom.si>
+References: 
+	 <D99246B510C34944823191CB90759C8604ADC5EF@blrse201.ap.infineon.com>
+	 <Pine.LNX.4.61.0603171123000.9400@cherokee.spacecom.si>
+Content-Type: text/plain
+Message-Id: <1142591443.4392.3.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,40 +20,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Mar 2006 16:29:22 +0530
+Date: Fri, 17 Mar 2006 11:30:43 +0100
 
-------=_Part_5133_3990953.1142593162335
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Mitja,
 
-Hi
-Please help me out... i know my question is silly... i have to find out...
-My dongle's vendor id and prod id is 0xa12 and 0x001... will be able to fin=
-d
-out which manufacturer from this info???
+> I am running bluez with no problems on Playstation 2, which EEs core 
+> is Toshiba R5900 in little endian mode.
+> 
+> Marcel, is your address listed somewhere on bluez or your personal page?
 
-And if there are any Indians out here please let me know where I can find
-it!!
+you are talking about my private address? No, it is not listed.
 
-(I know its CSR chipset.... ))
+Regards
 
-Thanks a zillion in advance
-Soumya
+Marcel
 
-------=_Part_5133_3990953.1142593162335
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-Hi<br>Please help me out... i know my question is silly... i have to find o=
-ut... <br>My dongle's vendor id and prod id is 0xa12 and 0x001... will be a=
-ble to find out which manufacturer from this info??? <br><br>And if there a=
-re any Indians out here please let me know where I can find it!!=20
-<br><br>(I know its CSR chipset.... ))<br><br>Thanks a zillion in advance<b=
-r>Soumya<br>
-
-------=_Part_5133_3990953.1142593162335--
 
 
 -------------------------------------------------------
