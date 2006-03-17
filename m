@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hci_for_each_dev() return value?
+Subject: Re: [Bluez-devel] blue-utils-2.25, dbus.c: dbus_connection_close()
+	not found
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Cc: Michal Sojka x <wentasah@centrum.cz>
-In-Reply-To: <200603110927.23055.wentasah@centrum.cz>
-References: <200603110927.23055.wentasah@centrum.cz>
+In-Reply-To: <62d428280603100409j4e8318a3o890d4ba137c91991@mail.gmail.com>
+References: <62d428280603100409j4e8318a3o890d4ba137c91991@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1142600036.4392.19.camel@localhost>
+Message-Id: <1142599736.4392.14.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,21 +19,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 17 Mar 2006 13:53:56 +0100
+Date: Fri, 17 Mar 2006 13:48:56 +0100
 
-Hi Michal,
+Hi Johan,
 
-> I'm writing a simple application that uses HCI layer for communication. I have 
-> a question on what is the meaning of return value of hci_for_each_dev()? It 
-> seems to me that there is a bug, because even when everything goes well, then 
-> the return value is -1 and errno is set to ENODEV.
+> I downloaded and compiled all four packages from
+> http://www.bluez.org/download.html
+>     * bluez-libs-2.25.tar.gz
+>     * bluez-utils-2.25.tar.gz
+>     * bluez-firmware-1.1.tar.gz
+>     * bluez-hcidump-1.30.tar.gz
+> 
+> I only had problems compiling bluez-utils - all other three packages
+> has been compiled and installed.
+> dbus_connection_close() in dbus.c does not seem to difined nor declared.
+> Where is it supposed to be? Do I need to definen some paths, or
+> install something else?
 
-it returns the dev_id of the first device that return where func()
-return a non 0 value.
-
-> Please CC me when replying. I'm not subscribed to the list.
-
-Then subscibe ;)
+you need a recent version of the D-Bus library.
 
 Regards
 
