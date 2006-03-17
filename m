@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <57a3c28e0603171013k49274a81yccc96845a9cd6687@mail.gmail.com>
-From: "Mike Elliott" <hbrednek@gmail.com>
+From: Geoff Shang <geoff@hitsandpieces.net>
 To: bluez-users@lists.sourceforge.net
+Message-ID: <Pine.LNX.4.64.0603180112070.738@data.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] RFCOMMd Version 1.2?
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Subject: [Bluez-users] pand: Connection failed. File exists(17)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +16,65 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Mar 2006 10:13:44 -0800
+Date: Sat, 18 Mar 2006 01:14:56 +1000 (EST)
 
-An admittedly oddball question: What was the release date of RFCOMMd
-version 1.2?  And, is there a repository somewhere (Sourceforge?) that
-will have the source in a form where the file modification dates can
-be considered somewhat authoritative?  Or a changelog with dates,
-maybe?
+Hi,
 
-The reason I'm asking is that I'm involved in a court case where the
-other side claims to have run RFCOMMd (with pictures of the screen
-output of syslog) in February of 2001.  This is, of course, utter
-nonsense,  but I'd like to be able to refute this in an authoritative
-manner.  The overall case involves a fraud (including attempted fraud)
-of over $1.2 million so it's a matter of some significance to give a
-definitive answer.
+Not sure if this showed up on the list, so I'm resending.  Please let me 
+know if I should be posting this somewhere else.   I'm being pressured to 
+get this working.
 
-As this is ongoing litigation, I'm uneasy about giving more details in
-an open (and therefore searchable) forum like this, but if anyone
-wishes to know more please contact me offline.
+Geoff.
+
+
+
+Hi everyone,
+
+I'm trying to set up a network connection via bluetooth using pand and I've hit 
+a problem that I can't find any references to.
+
+I start pand on the NAP side with no problems, using the following comand:
+
+pand --listen --role NAP
+
+When I try to connect from the panu, I get the following:
+
+Mar 10 18:35:46 data pand[16077]: Connection failed. File exists(17)
+
+I get the same sort of thing on the other end.  Here's an example from when I 
+tried reversing roles:
+
+Mar 10 18:59:34 data pand[16186]: Bluetooth PAN daemon version 2.25
+Mar 10 18:59:34 data pand[16186]: Connecting to 00:02:72:B2:A0:6E
+Mar 10 18:59:34 data pand[16186]: Connect to 00:02:72:B2:A0:6E failed. File 
+exists(17)
+
+I've searched the web, read all relevant docs I could find, even took a look at 
+the pand source.  I got as far as looking at bnep_accept_connection but then my 
+brain began to ache (I'm not a C programmer).
+
+I'm using bluez libs and utils v2.25 on both ends.  They were compiled with 
+./configure --enable-all though some of the supporting components like obex 
+weren't available.  One end is running on a freshly installed Debian 3.1 
+system, the other is on a Debian 2.2 system with various upgrades; however all 
+bluez items were compiled from source.
+
+If anyone knows what this is, or even simply has suggestions as to what file it 
+is that pand is complaining about, I'd be extremely greatful.
+
+Geoff.
+
+
+-- 
+Geoff Shang <geoff@hitsandpieces.net>
+Phone: +61-418-96-5590
+MSN: geoff@acbradio.org
+
+Make sure your E-mail can be read by everyone!
+http://www.betips.net/etc/evilmail.html
+
+Please avoid sending me Word or PowerPoint attachments.
+See http://www.gnu.org/philosophy/no-word-attachments.html
 
 
 -------------------------------------------------------
