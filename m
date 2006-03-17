@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Problem With the Inquiry and RFCOMM conexions
+Subject: Re: [Bluez-devel] hci_for_each_dev() return value?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <001001c644f0$2c3d9130$0300a8c0@akira>
-References: <001001c644f0$2c3d9130$0300a8c0@akira>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <1142600160.4392.22.camel@localhost>
+Cc: Michal Sojka x <wentasah@centrum.cz>
+In-Reply-To: <200603110927.23055.wentasah@centrum.cz>
+References: <200603110927.23055.wentasah@centrum.cz>
+Content-Type: text/plain
+Message-Id: <1142600036.4392.19.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,25 +19,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 17 Mar 2006 13:56:00 +0100
+Date: Fri, 17 Mar 2006 13:53:56 +0100
 
-Hi,
+Hi Michal,
 
-> I have a problem with make a Inquiry and RFCOMM conexions at the same
-> time and don=C2=B4t understand why.....(with BlueZ).
-> =20
-> Is It possible in the same module of bluetooth make a inquiry
-> (independ thread) and RFCOMM conexions (4 o 5 conexions in independ
-> threads) =20
-> at the same time?
-> =20
-> If I use diferent handles for this the call HCI to the module ...
-> Is it independient?=20
+> I'm writing a simple application that uses HCI layer for communication. I have 
+> a question on what is the meaning of return value of hci_for_each_dev()? It 
+> seems to me that there is a bug, because even when everything goes well, then 
+> the return value is -1 and errno is set to ENODEV.
 
-you can use as many handles as you like, but the underlaying HCI device
-is still the same. It doesn't allow inquiries while you are connecting
-to another device. However newer chips allow to run an inquiry while you
-are connected (still not while connecting).
+it returns the dev_id of the first device that return where func()
+return a non 0 value.
+
+> Please CC me when replying. I'm not subscribed to the list.
+
+Then subscibe ;)
 
 Regards
 
