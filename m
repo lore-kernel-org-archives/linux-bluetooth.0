@@ -1,15 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+Message-ID: <441C3CAB.5030806@silicom.fr>
+From: Fabien Chevalier - <fchevalier@silicom.fr>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Kernel panic with SCO socket - Debian kernel
- 2.6.15-8
-Message-Id: <20060318201220.46312b44.henryk@ploetzli.ch>
-In-Reply-To: <441C3CAB.5030806@silicom.fr>
-References: <441C3CAB.5030806@silicom.fr>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Sat__18_Mar_2006_20_12_20_+0100_dIFXqf_.WjeaDZ0q"
+Content-Type: multipart/mixed;
+ boundary="------------070900040007010609090800"
+Subject: [Bluez-devel] Kernel panic with SCO socket - Debian kernel 2.6.15-8
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,300 +17,200 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 18 Mar 2006 20:12:20 +0100
+Date: Sat, 18 Mar 2006 18:00:27 +0100
 
---Signature=_Sat__18_Mar_2006_20_12_20_+0100_dIFXqf_.WjeaDZ0q
-Content-Type: multipart/mixed;
- boundary="Multipart=_Sat__18_Mar_2006_20_12_20_+0100_ppXOeDymSh=TFuyR"
-
-
---Multipart=_Sat__18_Mar_2006_20_12_20_+0100_ppXOeDymSh=TFuyR
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Moin,
-
-Am Sat, 18 Mar 2006 18:00:27 +0100 schrieb Fabien Chevalier -:
-
-> I wrote a sample program that mimics the establishment of a Headset=20
-> Profile like connection.
-
-Hehe, I recently did something similar (in Python, though) ...
-
-> The thing basically works... exect after 1or 2 minutes playback, the=20
-> program suddenly exits.
-> Then i just have a few seconds left and *bang* . Kernel Panic :-(
-
-... and had similar results. Just look at the memory consumption when
-this happens. Apparently all incoming SCO data is buffered in kernel
-memory for you to read, so you *must* read it, even if you only ever
-intend to send data.
-
-I'd also suggest you simply use select() to wait for incoming data and
-then only send something when you received (and read!) something. This
-nicely gives the right timing without guessing the delay parameter.
+This is a multi-part message in MIME format.
+--------------070900040007010609090800
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-For reference I've attached my headset emulator (to be used with
-pybluez): It discards incoming audio and sends a pure sine wave.
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+Hi all,
 
---Multipart=_Sat__18_Mar_2006_20_12_20_+0100_ppXOeDymSh=TFuyR
-Content-Type: text/x-python;
- name="headset.py"
-Content-Disposition: attachment;
- filename="headset.py"
-Content-Transfer-Encoding: quoted-printable
+I'm currently playing with a bluetooth dongle and a Motorola HS810 headset.
 
-#!/bin/env python
+I wrote a sample program that mimics the establishment of a Headset 
+Profile like connection.
+For now it just waits for user input, then sends the content of a PCM 
+file over the SCO socket.
 
-import bluetooth, select, math, struct
+The thing basically works... exect after 1or 2 minutes playback, the 
+program suddenly exits.
+Then i just have a few seconds left and *bang* . Kernel Panic :-(
 
-class Headset:
-    MAX_TRIES =3D 3
-    MAX_LINE_LENGTH =3D 100
-    FREQUENCY =3D 19.8
-   =20
-    def __init__(self):
-        self.local_address =3D "00:80:98:34:38:9B"
-        self.connection =3D None
-        self.SCOserver =3D None
-        self.SCOconnection =3D None
-        self.unhandled =3D ""
-        self.peer =3D None
-        self.waiting_for_OK =3D None
-        self._audio_init =3D False
-       =20
-        self.bind_RFCOMM()
-   =20
-    def bind_RFCOMM(self):
-        tries =3D 0
-        self.serversock =3D bluetooth.BluetoothSocket(proto=3Dbluetooth.RFC=
-OMM)
-       =20
-        while tries < Headset.MAX_TRIES:
-            tries =3D tries + 1
-            try:
-                port =3D bluetooth.get_available_port(bluetooth.RFCOMM)
-                self.serversock.bind( (self.local_address, port) )
-                self.serversock.listen(1)
-                self.local_port =3D port
-                break
-            except bluetooth.BluetoothError, e:
-                if tries >=3D Headset.MAX_TRIES:
-                    raise
-           =20
-        bluetooth.advertise_service(self.serversock, "Python-Headset",=20
-            profiles =3D [bluetooth.HEADSET_PROFILE],
-            service_classes =3D [bluetooth.HEADSET_CLASS])
-       =20
-        print "Bound to '%s' on %s" % (self.local_address, self.local_port)
-   =20
-    def bind_SCO(self):
-        self.SCOserver =3D bluetooth.BluetoothSocket(proto=3Dbluetooth.SCO)
-        self.SCOserver.bind( (self.local_address,) )
-        self.SCOserver.listen(1)
-   =20
-    def close(self):
-        print "Closing"
-       =20
-        try: self.SCOconnection.close()
-        except: pass
-       =20
-        try: self.SCOserver.close()
-        except: pass
-       =20
-        try: bluetooth.stop_advertising(self.serversock)
-        except: pass
-       =20
-        try: self.serversock.close()
-        except: pass
-       =20
-        try: self.connection.close()
-        except: pass
-   =20
-    def run(self):
-        while True:
-            self.process_event()
-   =20
-    def process_event(self, timeout =3D None):
-        rlist =3D [self.serversock, ]; wlist =3D []; xlist =3D []
-        if self.connection:
-            rlist.append(self.connection)
-            xlist.append(self.connection)
-       =20
-        if self.SCOserver:
-            rlist.append(self.SCOserver)
-       =20
-        if self.SCOconnection:
-            rlist.append(self.SCOconnection)
-       =20
-        rlist, wlist, xlist =3D select.select(rlist, wlist, xlist, timeout)
-       =20
-        if self.serversock in rlist:
-            self.accept_connection()
-       =20
-        if self.SCOserver in rlist:
-            self.accept_SCO()
-       =20
-        if self.SCOconnection in rlist:
-            self.do_SCO_cycle()
-       =20
-        if self.connection:
-            if self.connection in xlist:
-                print "X on connection"
-            if self.connection in rlist:
-                self.read_control()
-   =20
-    def accept_connection(self):
-        conn, address =3D self.serversock.accept()
-        print "Have connection by", address
-        self.peer =3D address[0]
-        self.connection =3D conn
-       =20
-        self.waiting_for_OK =3D True
-        self.write_control("AT+CKPD=3D200")
-   =20
-    def accept_SCO(self):
-        conn, address =3D self.SCOserver.accept()
-        if address !=3D self.peer:
-            print "Warning: unauthorized SCO connection by %s (!=3D%s). Clo=
-sing." % (address, self.peer)
-            conn.close()
-        else:
-            self.SCOconnection =3D conn
-            print "Have SCO connection"
-   =20
-    def read_control(self):
-        try:
-            data =3D self.unhandled + self.connection.recv(65535)
-        except bluetooth.BluetoothError, e:
-            if str(e)[:5] =3D=3D "(104,":
-                self.close_control()
-                return
-            else:
-                raise
-       =20
-        line =3D None
-       =20
-        if data[0] =3D=3D "\r" and data[1] =3D=3D "\n":
-            data =3D data[2:]
-            pos =3D None
-            for i in range(len(data)):
-                if i > 0 and data[i-1] =3D=3D "\r" and data[i] =3D=3D "\n":
-                    pos =3D i+1
-                    break
-           =20
-            if pos is not None:
-                line =3D data[:pos-2]
-                data =3D data[pos:]
-        elif data[:3] =3D=3D "AT+":
-            pos =3D None
-            for i in range(len(data)):
-                if data[i] =3D=3D "\r":
-                    pos =3D i
-                    break
-           =20
-            if pos is not None:
-                line =3D data[:pos]
-                data =3D data[pos+1:]
-       =20
-        self.unhandled =3D data
-        if line is not None:
-            self.handle_command(line)
-       =20
-        if len(self.unhandled) > Headset.MAX_LINE_LENGTH:
-            raise IOError("Maximum line length exceeded. Shouldn't happen.")
-   =20
-    def write_control(self, data):
-        self.connection.send(data+"\r")
-   =20
-    def handle_command(self, command):
-        if self.waiting_for_OK and command =3D=3D "OK":
-            self.waiting_for_OK =3D False
-            self.bind_SCO()
-            print "Established"
-        else:
-            print "Ignoring '%s'" % command
-   =20
-    def do_SCO_cycle(self):
-        try:
-            data =3D self.SCOconnection.recv(1024)
-        except bluetooth.BluetoothError, e:
-            if str(e)[:5] =3D=3D "(104,":
-                self.close_SCO()
-                return
-            else:
-                raise
-       =20
-        if not hasattr(self, "_i"): self._i =3D 0
-        print "Have %s bytes SCO data (%i)" % (len(data), self._i)
-        self._i =3D self._i + 1
-       =20
-        response =3D []
-        while len(response) < len(data)/2:
-            response.append(self.nextaudio())
-       =20
-        self.SCOconnection.send("".join(response))
-   =20
-    def nextaudio(self):
-        if not self._audio_init:
-            self._x =3D 0.0
-            self._audio_init =3D True
-        sample =3D math.sin( math.radians( self._x ) ) * (1<<14)
-        self._x =3D (self._x + Headset.FREQUENCY) % 360.0
-        return struct.pack("<h", sample)
-   =20
-    def close_SCO(self):
-        self.SCOconnection.close()
-        self.SCOconnection =3D None
-       =20
-        print "SCO channel closed"
-   =20
-    def close_control(self):
-        if self.SCOconnection:
-            self.close_SCO()
-       =20
-        self.SCOserver.close()
-        self.SCOserver =3D None
-        self.waiting_for_OK =3D None
-        self.connection.close()
-        self.connection =3D None
-        self.peer =3D None
-       =20
-        print "Control channel closed"
+The issue is 100% reproductible on my configuration :-(.
 
-if __name__ =3D=3D "__main__":
-    headset =3D Headset()
-   =20
-    try:
-        try:
-            headset.run()
-        except KeyboardInterrupt:
-            pass
-    finally:
-        headset.close()
-   =20
+I attached the source of the program that makes my Linux crash... would 
+eventually anybody have any idea of what goes wrong ??
 
---Multipart=_Sat__18_Mar_2006_20_12_20_+0100_ppXOeDymSh=TFuyR--
+Tip : here is the command line i use to start this program:
+./hsplay 00:07:A4:4D:02:14 1 fallen-8kHz.wav 0
 
---Signature=_Sat__18_Mar_2006_20_12_20_+0100_dIFXqf_.WjeaDZ0q
-Content-Type: application/pgp-signature
+I also noticed that it crashes a lot faster when last parameter is 0...
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2.2 (GNU/Linux)
+Cheers,
 
-iD8DBQFEHFubvI90l8kWns8RAiQcAJ91eqa3L553BA994dDpAn363yxNOgCeMevI
-zTZjfR0V0KSbvw7V39cTMas=
-=CoE8
------END PGP SIGNATURE-----
+Fabien
 
---Signature=_Sat__18_Mar_2006_20_12_20_+0100_dIFXqf_.WjeaDZ0q--
+
+
+--------------070900040007010609090800
+Content-Type: text/x-csrc;
+ name="hsplay.c"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="hsplay.c"
+
+#include <getopt.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <assert.h>
+#include <string.h>
+#include <errno.h>
+#include <regex.h>
+#include <ctype.h>
+
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/poll.h>
+
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/hci.h>
+#include <bluetooth/hci_lib.h>
+#include <bluetooth/sco.h>
+#include <bluetooth/rfcomm.h>
+#include <bluetooth/sdp.h>
+#include <bluetooth/sdp_lib.h>
+
+static int rfcomm_connect(bdaddr_t * dst, uint8_t channel)
+{
+	struct sockaddr_rc addr;
+	int s;
+
+	if ((s = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)) < 0) {
+		return -1;
+	}
+
+	memset(&addr, 0, sizeof(addr));
+	addr.rc_family = AF_BLUETOOTH;
+	bacpy(&addr.rc_bdaddr, dst);
+	addr.rc_channel = channel;
+	if (connect(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+		close(s);
+		return -1;
+	}
+
+	return s;
+}
+
+static int sco_connect(bdaddr_t * dst, uint16_t * handle,
+		       uint16_t * mtu)
+{
+	struct sockaddr_sco addr;
+	struct sco_conninfo conn;
+	struct sco_options opts;
+	int s;
+	unsigned int size;
+
+	if ((s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO)) < 0) {
+		return -1;
+	}
+
+	memset(&addr, 0, sizeof(addr));
+	addr.sco_family = AF_BLUETOOTH;
+	bacpy(&addr.sco_bdaddr, dst);
+	if (connect(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+		close(s);
+		return -1;
+	}
+
+	size = sizeof(conn);
+	if (getsockopt(s, SOL_SCO, SCO_CONNINFO, &conn, &size) < 0) {
+		close(s);
+		return -1;
+	}
+
+	size = sizeof(opts);
+	if (getsockopt(s, SOL_SCO, SCO_OPTIONS, &opts, &size) < 0) {
+		close(s);
+		return -1;
+	}
+
+	if (handle)
+		*handle = conn.hci_handle;
+
+	if (mtu)
+		*mtu = opts.mtu;
+
+	return s;
+}
+
+#define PKT_SIZE 48
+
+int main(int argc, char **argv)
+{
+	bdaddr_t remote;
+	int rfcomm_socket;
+	int sco_socket;
+	char buff[256];
+	int res;
+	char *pcm_filename;
+	int pcm_fd;
+	int channel;
+	int delay;
+
+	if(argc != 5) {
+		printf("usage: hsplay bdaddr rfcomm_channel pcm_file delay\n");		
+		printf("bdaddr = headet bd address\n");
+		printf("rfcomm_channel = rfcomm channel used for headset control\n");		
+		printf("pcm_file = 8OOHz, 16 bits signed PCM file te read\n");		
+		printf("delay = between two sco packets, 1500 usually works great\n");		
+		exit(1);
+	}
+	
+	str2ba(argv[1], &remote);
+	channel = atoi(argv[2]);
+	pcm_filename = argv[3];
+	delay = atoi(argv[4]);	
+	
+	rfcomm_socket = rfcomm_connect(&remote, channel);
+	assert(rfcomm_socket != -1);
+	res = write(rfcomm_socket, "RING", 4); 	
+	assert(res == 4);
+	memset(buff, 0, sizeof(buff));
+	printf("RFCOMM control channel opened, waiting for HS button push\n");
+	res = read(rfcomm_socket, buff, sizeof(buff));
+	assert(res > 0);
+	printf("Recv: %s\n", buff);
+	sco_socket = sco_connect(&remote, 0, 0);
+	assert(res > 0);
+	printf("SCO connected.\n");
+
+	pcm_fd = open(pcm_filename, 0);
+	assert(pcm_fd > 0);
+	lseek(pcm_fd, 44, SEEK_SET);
+	while((res = read(pcm_fd, buff, PKT_SIZE)) == PKT_SIZE)
+	{
+		res = send(sco_socket, buff, PKT_SIZE, 0);
+		if(res <= 0) {
+			perror("write");
+			exit(1);
+		}
+		if(delay > 0) {
+			usleep(delay);
+		}
+	}	
+	return 0;
+}
+
+--------------070900040007010609090800--
 
 
 -------------------------------------------------------
