@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
+Message-ID: <441D3D91.3060000@silicom.fr>
+From: Fabien Chevalier - <fchevalier@silicom.fr>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15
-Message-Id: <1142865034.19109.18.camel@localhost.localdomain>
-Mime-Version: 1.0
-Subject: [Bluez-devel] information responses in l2cap.c
+Subject: Re: [Bluez-devel] Kernel panic with SCO socket - Debian kernel 2.6.15-8
+References: <441C3CAB.5030806@silicom.fr> <20060318201220.46312b44.henryk@ploetzli.ch>
+In-Reply-To: <20060318201220.46312b44.henryk@ploetzli.ch>
+Content-Type: multipart/alternative;
+ boundary="------------090403080404050103060407"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,52 +19,110 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 20 Mar 2006 15:30:34 +0100
+Date: Sun, 19 Mar 2006 12:16:33 +0100
 
-Hello together,
+This is a multi-part message in MIME format.
+--------------090403080404050103060407
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I need urgent help on an issue concerning information responses in
-l2cap.c, perhaps somebody knows something about this implementation.
-The current code didn't make use of information requests and so didn't
-receive information responses, too. I'd like to change that as it is
-recommended by the specfication to first interact with the remote peer
-by using information requests after a successful connection. I would
-like to ask the remote peer if it supports extended features, namely
-especially flow control, before I start request this technique. So far
-so good.
-So I send an information request via the l2cap_build_info_req() in the
-function l2cap_connect_rsp() whenever the connection response signals
-success. This works as expected and my Siemens S75 mobile phone responds
-with an information response immediately. Guess what, it send as a
-result the bytes =BB07 00 00 00=AB which indicates full extended features
-support. Wow. Now I'd like store this information in the corresponding
-socket so that I can continue the whole process with a configuration
-request. I would like to call l2cap_build_conf_req() within
-l2cap_information_rsp() like this:
 
-/* build configuration request */
-l2cap_pi(sk)->conf_state |=3D L2CAP_CONF_REQ_SENT;
-l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
-			l2cap_build_conf_req(sk, req), req);
+>Hehe, I recently did something similar (in Python, though) ...
+>
+>  
+>
+Good to now i'm not alone playing with SCOs !!
 
- But here is the problem located. From within an information response, I
-cannot reliably find the corresponding socket. All information pieces I
-get are the connection, the command header and the data. So there is no
-source or destination ID and the only function I could find which may
-return the socket for a connection is l2cap_get_chan_by_ident() like
-this:
-if (!(sk =3D l2cap_get_chan_by_ident(&conn->chan_list, cmd->ident))) {
-	printk("---> no socket!\n");
-	return 0;
-}
-Unfortunately cmd->ident and the conn ident are not equal and so the
-socket cannot be found ...
+>>The thing basically works... exect after 1or 2 minutes playback, the 
+>>program suddenly exits.
+>>Then i just have a few seconds left and *bang* . Kernel Panic :-(
+>>    
+>>
+>
+>... and had similar results. Just look at the memory consumption when
+>this happens. Apparently all incoming SCO data is buffered in kernel
+>memory for you to read, so you *must* read it, even if you only ever
+>intend to send data.
+>
+>I'd also suggest you simply use select() to wait for incoming data and
+>then only send something when you received (and read!) something. This
+>nicely gives the right timing without guessing the delay parameter.
+>
+>  
+>
+Quite interesting is the way you solved the issue :-)
+I'm gonna give a try to this select way of things :-)
+By the way i just ran another test using hsplay. I basically send a SCO 
+packet every second,
+which is obviously not enough to sustain the SCO packet flow.
+Using hcidump i am able to see the SCO flow coming from the Headset.
+... and no crash at all :-)
 
-I have no clue what is wrong or what else I should do to get the socket
-from an incoming information_rsp()
+Which for me basically means that the bug is somewhere on the 
+PC-->Heaset flow, where something must be handled the wrong way...
 
-Martin
+Cheers,
 
+Fabien
+
+--------------090403080404050103060407
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title></title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<br>
+<blockquote cite="mid20060318201220.46312b44.henryk@ploetzli.ch"
+ type="cite">
+  <pre wrap="">Hehe, I recently did something similar (in Python, though) ...
+
+  </pre>
+</blockquote>
+Good to now i'm not alone playing with SCOs !!<br>
+<blockquote cite="mid20060318201220.46312b44.henryk@ploetzli.ch"
+ type="cite">
+  <pre wrap=""></pre>
+  <blockquote type="cite">
+    <pre wrap="">The thing basically works... exect after 1or 2 minutes playback, the 
+program suddenly exits.
+Then i just have a few seconds left and *bang* . Kernel Panic :-(
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+... and had similar results. Just look at the memory consumption when
+this happens. Apparently all incoming SCO data is buffered in kernel
+memory for you to read, so you *must* read it, even if you only ever
+intend to send data.
+
+I'd also suggest you simply use select() to wait for incoming data and
+then only send something when you received (and read!) something. This
+nicely gives the right timing without guessing the delay parameter.
+
+  </pre>
+</blockquote>
+Quite interesting is the way you solved the issue :-)<br>
+I'm gonna give a try to this select way of things :-)<br>
+By the way i just ran another test using hsplay. I basically send a SCO
+packet every second,<br>
+which is obviously not enough to sustain the SCO packet flow.<br>
+Using hcidump i am able to see the SCO flow coming from the Headset.<br>
+... and no crash at all :-)<br>
+<br>
+Which for me basically means that the bug is somewhere on the
+PC--&gt;Heaset flow, where something must be handled the wrong way...<br>
+<br>
+Cheers,<br>
+<br>
+Fabien<br>
+</body>
+</html>
+
+--------------090403080404050103060407--
 
 
 -------------------------------------------------------
