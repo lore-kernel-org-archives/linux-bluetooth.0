@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: maxk@qualcomm.com, linux-kernel@vger.kernel.org, bluez-devel@lists.sf.net
-In-Reply-To: <1142934130.3964.14.camel@localhost>
-References: <1137540084.4543.15.camel@localhost>
-	 <1137589998.27515.8.camel@localhost>  <1137602323.4543.29.camel@localhost>
-	 <1142934130.3964.14.camel@localhost>
-Content-Type: text/plain
-Message-Id: <1142934755.4104.2.camel@localhost>
+Subject: Re: [Bluez-devel] information responses in l2cap.c
+From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1142865034.19109.18.camel@localhost.localdomain>
+References: <1142865034.19109.18.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-15
+Message-Id: <1142877563.18472.10.camel@localhost.localdomain>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: [PATCH] hci_usb: implement suspend/resume
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,28 +18,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 21 Mar 2006 10:52:35 +0100
+Date: Mon, 20 Mar 2006 18:59:22 +0100
 
-Hi Johannes,
+I may have found a solution for it.
 
-> > The attached patch implements suspend/resume for the hci_usb bluetooth
-> > driver by simply killing all outstanding urbs on suspend, and re-issuing
-> > them on resume.
-> > 
-> > This allows me to actually use the internal bluetooth "dongle" in my
-> > powerbook after suspend-to-ram without taking down all userland programs
-> > (sdpd, ...) and the hci device and reloading the module.
-> 
-> Can someone push this patch for 2.6.17 now that 2.6.16 is out? Or is
-> there still anything fundamentally wrong with it? I've been waiting for
-> it forever now ;)
+Am Montag, den 20.03.2006, 15:30 +0100 schrieb Martin R=F6hricht:
+> /* build configuration request */
+> l2cap_pi(sk)->conf_state |=3D L2CAP_CONF_REQ_SENT;
+> l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
+> 			l2cap_build_conf_req(sk, req), req);
 
-I will push it with some other small changes in the next few days.
+(Damn, I posted the wrong lines in my preceeding mail, but it looks
+almost the same. Instead of building a configuration request, I have
+code to build an information request)
+Within the send_cmd function call, I use l2cap_get_ident(conn) which
+increases the ident counter by one for each call. I did mistakenly
+assume that it just returns the ID for a given connection. Instead I use
+now cmd->ident like this:
 
-Regards
+l2cap_send_cmd(conn, cmd->ident, L2CAP_INFO_REQ,
+			l2cap_build_info_req(sk, &info), &info);
 
-Marcel
+> if (!(sk =3D l2cap_get_chan_by_ident(&conn->chan_list, cmd->ident))) {
+> 	printk("---> no socket!\n");
+> 	return 0;
+> }
 
+These lines work now, as a socket can be found.
+
+I'm not 100% sure yet whether this works as expected or not, but I have
+a better feeling.
+If somebody has some more information about socket and ID handling in
+this case, feel free to let me know.
+
+Martin
 
 
 
