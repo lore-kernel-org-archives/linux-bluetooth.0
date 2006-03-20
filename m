@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060320140334.49322.qmail@web15002.mail.cnb.yahoo.com>
-From: yong Zhu <zhuyong0003@yahoo.com.cn>
+Message-ID: <fe0a97c20603192304n4b63e33byfa05e05c121da239@mail.gmail.com>
+From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Does blueZ has Java protions as well
+In-Reply-To: <D99246B510C34944823191CB90759C8604B1DA39@blrse201.ap.infineon.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-20695929-1142863414=:47618"
-Subject: [Bluez-users] bluez utils compile error-"undefined reference to `daemon'"
+Content-Type: multipart/alternative;
+	boundary="----=_Part_2607_24866978.1142838275503"
+References: <D99246B510C34944823191CB90759C8604B1DA39@blrse201.ap.infineon.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,192 +19,197 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 20 Mar 2006 22:03:34 +0800 (CST)
+Date: Mon, 20 Mar 2006 12:34:35 +0530
 
---0-20695929-1142863414=:47618
-Content-Type: text/plain; charset=gb2312
-Content-Transfer-Encoding: 8bit
+------=_Part_2607_24866978.1142838275503
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Hi, everyone I have one compile error in my cross-compile.
-  I use the cmd "./configure --host=arm-elf --with-kernel=/home/zhuyong/uClinux-040408/linux-2.4.x/ --includedir=/home/zhuyong/uClinux-040408/linux-2.4.x/include/ --prefix=/". 
-  Then the cmd "make", I have "PATH_MAX" compile error first. I try to fix it to define the macro "PATH_MAX". 
-  But I got another compile error about undefined reference to `daemon' ". 
-  I do not know why have the compile error. Please help me. 
-   
-  thanks 
-  yong Zhu
-   
-  The "daemon" compile info as follows:
-   "[root@localhost bluez-utils-2.25]# make
-make  all-recursive
-make[1]: Entering directory `/home/zhuyong/bluez-utils-2.25'
-Making all in common
-make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/common'
-make[2]: Nothing to be done for `all'.
-make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/common'
-Making all in daemon
-make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/daemon'
-make[2]: Nothing to be done for `all'.
-make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/daemon'
-Making all in tools
-make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/tools'
-make[2]: Nothing to be done for `all'.
-make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/tools'
-Making all in rfcomm
-make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/rfcomm'
-make[2]: Nothing to be done for `all'.
-make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/rfcomm'
-Making all in hcid
-make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/hcid'
-make[2]: Nothing to be done for `all'.
-make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/hcid'
-Making all in sdpd
-make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/sdpd'
-source='main.c' object='main.o' libtool=no \
-depfile='.deps/main.Po' tmpdepfile='.deps/main.TPo' \
-depmode=gcc /bin/sh ../depcomp \
-arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I..    -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'main.c' || echo './'`main.c
-/bin/sh ../libtool --mode=link arm-elf-gcc -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g   -o sdpd  main.o request.o service.o cstate.o servicedb.o -L//lib -lbluetooth
-arm-elf-gcc -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o sdpd main.o request.o service.o cstate.o servicedb.o  -L//lib //lib/libbluetooth.a
-sdpd.elf2flt: In function `main':
-/home/zhuyong/bluez-utils-2.25/sdpd/main.c:409: undefined reference to `daemon'
-collect2: ld returned 1 exit status
-make[2]: *** [sdpd] Error 1
-make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/sdpd'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/home/zhuyong/bluez-utils-2.25'
-make: *** [all] Error 2
-[root@localhost bluez-utils-2.25]#"
-   
-   
-  the "PATH_MAX" compile error as follows: 
-  "[root@localhost bluez-utils-2.25]# make
-make  all-recursive
-make[1]: Entering directory `/home/zhuyong/bluez-utils-2.25'
-Making all in common
-make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/common'
-source='textfile.c' object='textfile.o' libtool=no \
-depfile='.deps/textfile.Po' tmpdepfile='.deps/textfile.TPo' \
-depmode=gcc /bin/sh ../depcomp \
-arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I..     -elf2flt -D_FORTIFY_SOURCE=2 -g -c
-`test -f 'textfile.c' || echo './'`textfile.c
-rm -f libtextfile.a
-arm-elf-ar cru libtextfile.a textfile.o
-arm-elf-ranlib libtextfile.a
-source='glib-ectomy.c' object='glib-ectomy.o' libtool=no \
-depfile='.deps/glib-ectomy.Po' tmpdepfile='.deps/glib-ectomy.TPo' \
-depmode=gcc /bin/sh ../depcomp \
-arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I..     -elf2flt -D_FORTIFY_SOURCE=2 -g -c
-`test -f 'glib-ectomy.c' || echo './'`glib-ectomy.c
-rm -f libglib-ectomy.a
-arm-elf-ar cru libglib-ectomy.a glib-ectomy.o
-arm-elf-ranlib libglib-ectomy.a
-source='test_textfile.c' object='test_textfile.o' libtool=no \
-depfile='.deps/test_textfile.Po' tmpdepfile='.deps/test_textfile.TPo' \
-depmode=gcc /bin/sh ../depcomp \
-arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I..     -elf2flt -D_FORTIFY_SOURCE=2 -g -c
-`test -f 'test_textfile.c' || echo './'`test_textfile.c
-/bin/sh ../libtool --mode=link arm-elf-gcc  -elf2flt -D_FORTIFY_SOURCE=2 -g   -o test_textfile  test_textfile.o libtextfile.a
-mkdir .libs
-arm-elf-gcc -elf2flt -D_FORTIFY_SOURCE=2 -g -o test_textfile test_textfile.o  libtextfile.a
-make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/common'
-Making all in daemon
-make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/daemon'
-make[2]: Nothing to be done for `all'.
-make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/daemon'
-Making all in tools
-make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/tools'
-source='hcitool.c' object='hcitool.o' libtool=no \
-depfile='.deps/hcitool.Po' tmpdepfile='.deps/hcitool.TPo' \
-depmode=gcc /bin/sh ../depcomp \
-arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common   -I//include  -I//include
--elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'hcitool.c' || echo './'`hcitool.c
-source='oui.c' object='oui.o' libtool=no \
-depfile='.deps/oui.Po' tmpdepfile='.deps/oui.TPo' \
-depmode=gcc /bin/sh ../depcomp \
-arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common   -I//include  -I//include
--elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'oui.c' || echo './'`oui.c
-/bin/sh ../libtool --mode=link arm-elf-gcc -I//include  -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g   -o hcitool  hcitool.o oui.o -L//lib -lbluetooth ../common/libtextfile.a
-mkdir .libs
-arm-elf-gcc -I//include -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o hcitool hcitool.o oui.o  -L//lib //lib/libbluetooth.a ../common/libtextfile.a
-source='l2ping.c' object='l2ping.o' libtool=no \
-depfile='.deps/l2ping.Po' tmpdepfile='.deps/l2ping.TPo' \
-depmode=gcc /bin/sh ../depcomp \
-arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common   -I//include  -I//include
--elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'l2ping.c' || echo './'`l2ping.c
-/bin/sh ../libtool --mode=link arm-elf-gcc -I//include  -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g   -o l2ping  l2ping.o -L//lib -lbluetooth
-arm-elf-gcc -I//include -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o l2ping l2ping.o  -L//lib //lib/libbluetooth.a
-source='sdptool.c' object='sdptool.o' libtool=no \
-depfile='.deps/sdptool.Po' tmpdepfile='.deps/sdptool.TPo' \
-depmode=gcc /bin/sh ../depcomp \
-arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common   -I//include  -I//include
--elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'sdptool.c' || echo './'`sdptool.c
-/bin/sh ../libtool --mode=link arm-elf-gcc -I//include  -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g   -o sdptool  sdptool.o -L//lib -lbluetooth
-arm-elf-gcc -I//include -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o sdptool sdptool.o  -L//lib //lib/libbluetooth.a
-source='ciptool.c' object='ciptool.o' libtool=no \
-depfile='.deps/ciptool.Po' tmpdepfile='.deps/ciptool.TPo' \
-depmode=gcc /bin/sh ../depcomp \
-arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common   -I//include  -I//include
--elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'ciptool.c' || echo './'`ciptool.c
-/bin/sh ../libtool --mode=link arm-elf-gcc -I//include  -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g   -o ciptool  ciptool.o -L//lib -lbluetooth
-arm-elf-gcc -I//include -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o ciptool ciptool.o  -L//lib //lib/libbluetooth.a
-source='hcisecfilter.c' object='hcisecfilter.o' libtool=no \
-depfile='.deps/hcisecfilter.Po' tmpdepfile='.deps/hcisecfilter.TPo' \
-depmode=gcc /bin/sh ../depcomp \
-arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common   -I//include  -I//include
--elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'hcisecfilter.c' || echo './'`hcisecfilter.c
-/bin/sh ../libtool --mode=link arm-elf-gcc -I//include  -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g   -o hcisecfilter  hcisecfilter.o
-arm-elf-gcc -I//include -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o hcisecfilter hcisecfilter.o
-source='ppporc.c' object='ppporc.o' libtool=no \
-depfile='.deps/ppporc.Po' tmpdepfile='.deps/ppporc.TPo' \
-depmode=gcc /bin/sh ../depcomp \
-arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common   -I//include  -I//include
--elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'ppporc.c' || echo './'`ppporc.c
-/bin/sh ../libtool --mode=link arm-elf-gcc -I//include  -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g   -o ppporc  ppporc.o -L//lib -lbluetooth
-arm-elf-gcc -I//include -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o ppporc ppporc.o  -L//lib //lib/libbluetooth.a
-source='hciattach.c' object='hciattach.o' libtool=no \
-depfile='.deps/hciattach.Po' tmpdepfile='.deps/hciattach.TPo' \
-depmode=gcc /bin/sh ../depcomp \
-arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common   -I//include  -I//include
--elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'hciattach.c' || echo './'`hciattach.c
-hciattach.c: In function `main':
-hciattach.c:972: `PATH_MAX' undeclared (first use in this function)
-hciattach.c:972: (Each undeclared identifier is reported only once
-hciattach.c:972: for each function it appears in.)
-make[2]: *** [hciattach.o] Error 1
-make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/tools'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/home/zhuyong/bluez-utils-2.25'
-make: *** [all] Error 2
-[root@localhost bluez-utils-2.25]#
-" 
+Hey Shailesh,
+JSR 82 is just a RI (Reference Implementation) of the Java spec of the
+Bluetooth API... even if u download them u find empty classes and
+methods.....
+BlueZ is implementred in Java applications in JBlueZ  i guess.... just try
+googling... u can  find the API....
 
-__________________________________________________
-∏œøÏ◊¢≤·—≈ª¢≥¨¥Û»›¡ø√‚∑—” œ‰?
-http://cn.mail.yahoo.com
---0-20695929-1142863414=:47618
-Content-Type: text/html; charset=gb2312
-Content-Transfer-Encoding: 8bit
+On 3/20/06, Shailesh.Suman@infineon.com <Shailesh.Suman@infineon.com> wrote=
+:
+>
+> I came across Java and JSR terms in blueZ site.
+>
+> http://www.bluez.org/jsr82.html
+>
+> What does it mean. Can someoen explain this to me. Does it mean that
+> blueZ would need Java support for its compilations etc. I was thinking
+> of possibility for using blueZ in embedded linux. But in that case I
+> have constraints like non-avaialbility of Java etc.
+>
+>   And could someone throw the complaince of blueZ wrt BT 2.0 specs. Is
+> it mostly complaint ?
+>
+>   Thanks..
+> --shailesh
+>
+> -----Original Message-----
+> From: bluez-users-admin@lists.sourceforge.net
+> [mailto:bluez-users-admin@lists.sourceforge.net] On Behalf Of Thomas
+> Arendsen Hein
+> Sent: Sunday, March 19, 2006 12:30 AM
+> To: bluez-users@lists.sourceforge.net
+> Subject: [Bluez-users] Re: Vend/id 0xa12 /0x1
+>
+> * Sowmya Gattupalli <sowmya.gattupalli@gmail.com> [20060318 08:09]:
+> > my hcitool dev is
+> > root@zin03uislnx-10 root]# hcitool dev
+> > Devices:
+> >         hci0    00:09:DD:10:00:CC
+> > [root@zin03uislnx-10 root]#
+> >
+> >
+> > and when i typed in the site... it gave:
+> > So what does this mean??
+> >
+> >
+> > 00-09-DD   (hex)              Mavin Technology Inc.
+> > *0009DD*     (base 16)                Mavin Technology Inc.
+> >                               Room 305, Bldg. 52 No. 195-28
+> >                               Sec. 4 Chung-Hsing Rd.
+> >                               Chutung, Hsinchu  310
+> >                               TAIWAN, REPUBLIC OF CHINA
+>
+> So your bluetooth device is probably made by Mavin Technology.
+>
+> Searching for "Mavin bluetooth" in your favourite search engine might
+> give you more hints.
+>
+> Thomas
+>
+> --
+> Email: thomas@intevation.de
+> http://intevation.de/~thomas/
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by xPML, a groundbreaking scripting
+> language
+> that extends applications into web and mobile media. Attend the live
+> webcast
+> and join the prime developer group breaking into this new coding
+> territory!
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D110944&bid=3D241720&dat=
+=3D121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by xPML, a groundbreaking scripting
+> language
+> that extends applications into web and mobile media. Attend the live
+> webcast
+> and join the prime developer group breaking into this new coding
+> territory!
+> http://sel.as-us.falkag.net/sel?cmdlnk&kid=110944&bid$1720&dat=121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
-<div>Hi, everyone I have one compile error in my cross-compile.</div>  <div>I use the cmd "./configure --host=arm-elf --with-kernel=/home/zhuyong/uClinux-040408/linux-2.4.x/ --includedir=/home/zhuyong/uClinux-040408/linux-2.4.x/include/ --prefix=/". </div>  <div>Then the cmd "make", I have "PATH_MAX" compile error first. I try to fix it to define the macro "PATH_MAX". </div>  <div>But I got another compile error about undefined reference to `daemon' ". </div>  <div>I do not know why have the compile error. Please help me. </div>  <div>&nbsp;</div>  <div>thanks </div>  <div>yong Zhu</div>  <div>&nbsp;</div>  <div>The "daemon" compile info as follows:</div>  <div>&nbsp;"[root@localhost bluez-utils-2.25]# make<BR>make&nbsp; all-recursive<BR>make[1]: Entering directory `/home/zhuyong/bluez-utils-2.25'<BR>Making all in common<BR>make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/common'<BR>make[2]: Nothing to be done for `all'.<BR>make[2]: Leaving directory
- `/home/zhuyong/bluez-utils-2.25/common'<BR>Making all in daemon<BR>make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/daemon'<BR>make[2]: Nothing to be done for `all'.<BR>make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/daemon'<BR>Making all in tools<BR>make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/tools'<BR>make[2]: Nothing to be done for `all'.<BR>make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/tools'<BR>Making all in rfcomm<BR>make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/rfcomm'<BR>make[2]: Nothing to be done for `all'.<BR>make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/rfcomm'<BR>Making all in hcid<BR>make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/hcid'<BR>make[2]: Nothing to be done for `all'.<BR>make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/hcid'<BR>Making all in sdpd<BR>make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/sdpd'<BR>source='main.c' object='main.o' libt
- ool=no
- \<BR>depfile='.deps/main.Po' tmpdepfile='.deps/main.TPo' \<BR>depmode=gcc /bin/sh ../depcomp \<BR>arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I..&nbsp;&nbsp;&nbsp; -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'main.c' || echo './'`main.c<BR>/bin/sh ../libtool --mode=link arm-elf-gcc -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g&nbsp;&nbsp; -o sdpd&nbsp; main.o request.o service.o cstate.o servicedb.o -L//lib -lbluetooth<BR>arm-elf-gcc -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o sdpd main.o request.o service.o cstate.o servicedb.o&nbsp; -L//lib //lib/libbluetooth.a<BR>sdpd.elf2flt: In function `main':<BR>/home/zhuyong/bluez-utils-2.25/sdpd/main.c:409: undefined reference to `daemon'<BR>collect2: ld returned 1 exit status<BR>make[2]: *** [sdpd] Error 1<BR>make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/sdpd'<BR>make[1]: *** [all-recursive] Error 1<BR>make[1]: Leaving directory `/home/zhuyong/bluez-utils-2.25'<BR>make: *** [all] Error 2<BR>[root@localhost
- bluez-utils-2.25]#"</div>  <div>&nbsp;</div>  <div>&nbsp;</div>  <div>the "PATH_MAX" compile error as follows: </div>  <div>"[root@localhost bluez-utils-2.25]# make<BR>make&nbsp; all-recursive<BR>make[1]: Entering directory `/home/zhuyong/bluez-utils-2.25'<BR>Making all in common<BR>make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/common'<BR>source='textfile.c' object='textfile.o' libtool=no \<BR>depfile='.deps/textfile.Po' tmpdepfile='.deps/textfile.TPo' \<BR>depmode=gcc /bin/sh ../depcomp \<BR>arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I..&nbsp;&nbsp;&nbsp;&nbsp; -elf2flt -D_FORTIFY_SOURCE=2 -g -c<BR>`test -f 'textfile.c' || echo './'`textfile.c<BR>rm -f libtextfile.a<BR>arm-elf-ar cru libtextfile.a textfile.o<BR>arm-elf-ranlib libtextfile.a<BR>source='glib-ectomy.c' object='glib-ectomy.o' libtool=no \<BR>depfile='.deps/glib-ectomy.Po' tmpdepfile='.deps/glib-ectomy.TPo' \<BR>depmode=gcc /bin/sh ../depcomp \<BR>arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I..&nbsp;&nbsp;&nbsp;
- &nbsp;
- -elf2flt -D_FORTIFY_SOURCE=2 -g -c<BR>`test -f 'glib-ectomy.c' || echo './'`glib-ectomy.c<BR>rm -f libglib-ectomy.a<BR>arm-elf-ar cru libglib-ectomy.a glib-ectomy.o<BR>arm-elf-ranlib libglib-ectomy.a<BR>source='test_textfile.c' object='test_textfile.o' libtool=no \<BR>depfile='.deps/test_textfile.Po' tmpdepfile='.deps/test_textfile.TPo' \<BR>depmode=gcc /bin/sh ../depcomp \<BR>arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I..&nbsp;&nbsp;&nbsp;&nbsp; -elf2flt -D_FORTIFY_SOURCE=2 -g -c<BR>`test -f 'test_textfile.c' || echo './'`test_textfile.c<BR>/bin/sh ../libtool --mode=link arm-elf-gcc&nbsp; -elf2flt -D_FORTIFY_SOURCE=2 -g&nbsp;&nbsp; -o test_textfile&nbsp; test_textfile.o libtextfile.a<BR>mkdir .libs<BR>arm-elf-gcc -elf2flt -D_FORTIFY_SOURCE=2 -g -o test_textfile test_textfile.o&nbsp; libtextfile.a<BR>make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/common'<BR>Making all in daemon<BR>make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/daemon'<BR>make[2]: Nothing t
- o be
- done for `all'.<BR>make[2]: Leaving directory `/home/zhuyong/bluez-utils-2.25/daemon'<BR>Making all in tools<BR>make[2]: Entering directory `/home/zhuyong/bluez-utils-2.25/tools'<BR>source='hcitool.c' object='hcitool.o' libtool=no \<BR>depfile='.deps/hcitool.Po' tmpdepfile='.deps/hcitool.TPo' \<BR>depmode=gcc /bin/sh ../depcomp \<BR>arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common&nbsp;&nbsp; -I//include&nbsp; -I//include<BR>-elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'hcitool.c' || echo './'`hcitool.c<BR>source='oui.c' object='oui.o' libtool=no \<BR>depfile='.deps/oui.Po' tmpdepfile='.deps/oui.TPo' \<BR>depmode=gcc /bin/sh ../depcomp \<BR>arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common&nbsp;&nbsp; -I//include&nbsp; -I//include<BR>-elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'oui.c' || echo './'`oui.c<BR>/bin/sh ../libtool --mode=link arm-elf-gcc -I//include&nbsp; -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g&nbsp;&nbsp; -o hcitool&nbsp; hcitool.o oui.o -L//lib -lbluet
- ooth
- ../common/libtextfile.a<BR>mkdir .libs<BR>arm-elf-gcc -I//include -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o hcitool hcitool.o oui.o&nbsp; -L//lib //lib/libbluetooth.a ../common/libtextfile.a<BR>source='l2ping.c' object='l2ping.o' libtool=no \<BR>depfile='.deps/l2ping.Po' tmpdepfile='.deps/l2ping.TPo' \<BR>depmode=gcc /bin/sh ../depcomp \<BR>arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common&nbsp;&nbsp; -I//include&nbsp; -I//include<BR>-elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'l2ping.c' || echo './'`l2ping.c<BR>/bin/sh ../libtool --mode=link arm-elf-gcc -I//include&nbsp; -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g&nbsp;&nbsp; -o l2ping&nbsp; l2ping.o -L//lib -lbluetooth<BR>arm-elf-gcc -I//include -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o l2ping l2ping.o&nbsp; -L//lib //lib/libbluetooth.a<BR>source='sdptool.c' object='sdptool.o' libtool=no \<BR>depfile='.deps/sdptool.Po' tmpdepfile='.deps/sdptool.TPo' \<BR>depmode=gcc /bin/sh ../depcomp \<BR>arm-elf-gcc -DHAVE_C
- ONFIG_H
- -I. -I. -I.. -I../common&nbsp;&nbsp; -I//include&nbsp; -I//include<BR>-elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'sdptool.c' || echo './'`sdptool.c<BR>/bin/sh ../libtool --mode=link arm-elf-gcc -I//include&nbsp; -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g&nbsp;&nbsp; -o sdptool&nbsp; sdptool.o -L//lib -lbluetooth<BR>arm-elf-gcc -I//include -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o sdptool sdptool.o&nbsp; -L//lib //lib/libbluetooth.a<BR>source='ciptool.c' object='ciptool.o' libtool=no \<BR>depfile='.deps/ciptool.Po' tmpdepfile='.deps/ciptool.TPo' \<BR>depmode=gcc /bin/sh ../depcomp \<BR>arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common&nbsp;&nbsp; -I//include&nbsp; -I//include<BR>-elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'ciptool.c' || echo './'`ciptool.c<BR>/bin/sh ../libtool --mode=link arm-elf-gcc -I//include&nbsp; -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g&nbsp;&nbsp; -o ciptool&nbsp; ciptool.o -L//lib -lbluetooth<BR>arm-elf-gcc -I//include -I//include -elf2fl
- t
- -D_FORTIFY_SOURCE=2 -g -o ciptool ciptool.o&nbsp; -L//lib //lib/libbluetooth.a<BR>source='hcisecfilter.c' object='hcisecfilter.o' libtool=no \<BR>depfile='.deps/hcisecfilter.Po' tmpdepfile='.deps/hcisecfilter.TPo' \<BR>depmode=gcc /bin/sh ../depcomp \<BR>arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common&nbsp;&nbsp; -I//include&nbsp; -I//include<BR>-elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'hcisecfilter.c' || echo './'`hcisecfilter.c<BR>/bin/sh ../libtool --mode=link arm-elf-gcc -I//include&nbsp; -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g&nbsp;&nbsp; -o hcisecfilter&nbsp; hcisecfilter.o<BR>arm-elf-gcc -I//include -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o hcisecfilter hcisecfilter.o<BR>source='ppporc.c' object='ppporc.o' libtool=no \<BR>depfile='.deps/ppporc.Po' tmpdepfile='.deps/ppporc.TPo' \<BR>depmode=gcc /bin/sh ../depcomp \<BR>arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common&nbsp;&nbsp; -I//include&nbsp; -I//include<BR>-elf2flt -D_FORTIFY_SOURCE=2 -g -c `te
- st -f
- 'ppporc.c' || echo './'`ppporc.c<BR>/bin/sh ../libtool --mode=link arm-elf-gcc -I//include&nbsp; -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g&nbsp;&nbsp; -o ppporc&nbsp; ppporc.o -L//lib -lbluetooth<BR>arm-elf-gcc -I//include -I//include -elf2flt -D_FORTIFY_SOURCE=2 -g -o ppporc ppporc.o&nbsp; -L//lib //lib/libbluetooth.a<BR>source='hciattach.c' object='hciattach.o' libtool=no \<BR>depfile='.deps/hciattach.Po' tmpdepfile='.deps/hciattach.TPo' \<BR>depmode=gcc /bin/sh ../depcomp \<BR>arm-elf-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I../common&nbsp;&nbsp; -I//include&nbsp; -I//include<BR>-elf2flt -D_FORTIFY_SOURCE=2 -g -c `test -f 'hciattach.c' || echo './'`hciattach.c<BR>hciattach.c: In function `main':<BR>hciattach.c:972: `PATH_MAX' undeclared (first use in this function)<BR>hciattach.c:972: (Each undeclared identifier is reported only once<BR>hciattach.c:972: for each function it appears in.)<BR>make[2]: *** [hciattach.o] Error 1<BR>make[2]: Leaving directory
- `/home/zhuyong/bluez-utils-2.25/tools'<BR>make[1]: *** [all-recursive] Error 1<BR>make[1]: Leaving directory `/home/zhuyong/bluez-utils-2.25'<BR>make: *** [all] Error 2<BR>[root@localhost bluez-utils-2.25]#<BR>" </div><p>__________________________________________________<br>∏œøÏ◊¢≤·—≈ª¢≥¨¥Û»›¡ø√‚∑—” œ‰?<br>http://cn.mail.yahoo.com
---0-20695929-1142863414=:47618--
+------=_Part_2607_24866978.1142838275503
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hey Shailesh,<br>JSR 82 is just a RI (Reference Implementation) of the Java=
+ spec of the Bluetooth API... even if u download them u find empty classes =
+and methods..... <br>BlueZ is implementred in Java applications in JBlueZ&n=
+bsp; i guess.... just try googling... u can&nbsp; find the API....
+<br><br><div><span class=3D"gmail_quote">On 3/20/06, <b class=3D"gmail_send=
+ername"><a href=3D"mailto:Shailesh.Suman@infineon.com">Shailesh.Suman@infin=
+eon.com</a></b> &lt;<a href=3D"mailto:Shailesh.Suman@infineon.com">Shailesh=
+.Suman@infineon.com
+</a>&gt; wrote:</span><blockquote class=3D"gmail_quote" style=3D"border-lef=
+t: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1=
+ex;">I came across Java and JSR terms in blueZ site.<br><br><a href=3D"http=
+://www.bluez.org/jsr82.html">
+http://www.bluez.org/jsr82.html</a><br><br> What does it mean. Can someoen =
+explain this to me. Does it mean that<br>blueZ would need Java support for =
+its compilations etc. I was thinking<br>of possibility for using blueZ in e=
+mbedded linux. But in that case I
+<br>have constraints like non-avaialbility of Java etc.<br><br>&nbsp;&nbsp;=
+And could someone throw the complaince of blueZ wrt BT 2.0 specs. Is<br>it =
+mostly complaint ?<br><br>&nbsp;&nbsp;Thanks..<br>--shailesh<br><br>-----Or=
+iginal Message-----
+<br>From: <a href=3D"mailto:bluez-users-admin@lists.sourceforge.net">bluez-=
+users-admin@lists.sourceforge.net</a><br>[mailto:<a href=3D"mailto:bluez-us=
+ers-admin@lists.sourceforge.net">bluez-users-admin@lists.sourceforge.net</a=
+>
+] On Behalf Of Thomas<br>Arendsen Hein<br>Sent: Sunday, March 19, 2006 12:3=
+0 AM<br>To: <a href=3D"mailto:bluez-users@lists.sourceforge.net">bluez-user=
+s@lists.sourceforge.net</a><br>Subject: [Bluez-users] Re: Vend/id 0xa12 /0x=
+1
+<br><br>* Sowmya Gattupalli &lt;<a href=3D"mailto:sowmya.gattupalli@gmail.c=
+om">sowmya.gattupalli@gmail.com</a>&gt; [20060318 08:09]:<br>&gt; my hcitoo=
+l dev is<br>&gt; root@zin03uislnx-10 root]# hcitool dev<br>&gt; Devices:<br=
+>
+&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; hci0&nbsp;&nbsp;&nbsp;=
+&nbsp;00:09:DD:10:00:CC<br>&gt; [root@zin03uislnx-10 root]#<br>&gt;<br>&gt;=
+<br>&gt; and when i typed in the site... it gave:<br>&gt; So what does this=
+ mean??<br>&gt;<br>&gt;<br>&gt; 00-09-DD&nbsp;&nbsp; (hex)&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mavin Te=
+chnology Inc.
+<br>&gt; *0009DD*&nbsp;&nbsp;&nbsp;&nbsp; (base 16)&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mav=
+in Technology Inc.<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Room 305, Bldg. 52=
+ No. 195-28<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sec. 4 Chung-Hsing Rd.<br=
+>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Chutung, Hsinchu&nbsp;&nbsp;310
+<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TAIWAN, REPUBLIC OF CHINA<br><br>So =
+your bluetooth device is probably made by Mavin Technology.<br><br>Searchin=
+g for &quot;Mavin bluetooth&quot; in your favourite search engine might
+<br>give you more hints.<br><br>Thomas<br><br>--<br>Email: <a href=3D"mailt=
+o:thomas@intevation.de">thomas@intevation.de</a><br><a href=3D"http://intev=
+ation.de/~thomas/">http://intevation.de/~thomas/</a><br><br><br>-----------=
+--------------------------------------------
+<br>This SF.Net email is sponsored by xPML, a groundbreaking scripting<br>l=
+anguage<br>that extends applications into web and mobile media. Attend the =
+live<br>webcast<br>and join the prime developer group breaking into this ne=
+w coding
+<br>territory!<br><a href=3D"http://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;=
+kid=3D110944&amp;bid=3D241720&amp;dat=3D121642">http://sel.as-us.falkag.net=
+/sel?cmd=3Dlnk&amp;kid=3D110944&amp;bid=3D241720&amp;dat=3D121642</a><br>__=
+_____________________________________________
+<br>Bluez-users mailing list<br><a href=3D"mailto:Bluez-users@lists.sourcef=
+orge.net">Bluez-users@lists.sourceforge.net</a><br><a href=3D"https://lists=
+.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/=
+lists/listinfo/bluez-users
+</a><br><br><br>-------------------------------------------------------<br>=
+This SF.Net email is sponsored by xPML, a groundbreaking scripting language=
+<br>that extends applications into web and mobile media. Attend the live we=
+bcast
+<br>and join the prime developer group breaking into this new coding territ=
+ory!<br><a href=3D"http://sel.as-us.falkag.net/sel?cmdlnk&amp;kid=110944&am=
+p;bid$1720&amp;dat=121642">http://sel.as-us.falkag.net/sel?cmdlnk&amp;kid=
+=110944&amp;bid$1720&amp;dat=121642
+</a><br>_______________________________________________<br>Bluez-users mail=
+ing list<br><a href=3D"mailto:Bluez-users@lists.sourceforge.net">Bluez-user=
+s@lists.sourceforge.net</a><br><a href=3D"https://lists.sourceforge.net/lis=
+ts/listinfo/bluez-users">
+https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquot=
+e></div><br>
+
+------=_Part_2607_24866978.1142838275503--
 
 
 -------------------------------------------------------
