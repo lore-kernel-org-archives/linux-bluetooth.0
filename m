@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Geoff Shang <geoff@hitsandpieces.net>
-To: blinux-list@redhat.com, general@lists.humbug.org.au,
-        bluez-users@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.64.0603181246420.738@data.home>
-Message-ID: <Pine.LNX.4.64.0603212358080.738@data.home>
-References: <Pine.LNX.4.64.0603181246420.738@data.home>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Subject: [Bluez-users] Re: [H-GEN] Bluetooth: pand: Connection failed. File exists(17)
+From: Johannes Kapune <listen@kapune.de>
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain
+Message-Id: <1142957469.7800.15.camel@johannes_01.kapune.local>
+Mime-Version: 1.0
+Subject: [Bluez-users] minimum requirements for A2DP?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,32 +16,88 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Mar 2006 00:05:11 +1000 (EST)
+Date: Tue, 21 Mar 2006 17:11:09 +0100
 
-Geoff Shang wrote:
+Hi to all.
 
-> Mar 10 18:35:46 data pand[16077]: Connection failed. File exists(17)
+Fist of all: I'm a newby of compilation and all the stuff around. I'm
+sure I will ask a lot of "well known tings"; excuse me.
 
-Thanks to those who helpfully suggested I run pand under strace. 
-Unfortunately, for me at least, the results weren't particularly 
-illuminating.
+I checked my installation of my bluetooth dongle with this site:
+http://www.gentoo.org/doc/en/bluetooth-guide.xml
 
-I'm assuming the following line from the panu side is significant:
+I think it runs (see the outputs at the end)
 
-ioctl(3, 0x400442c8, 0xbffff210)        = -1 EEXIST (File exists)
+Now there are some questions:
 
-Anyone know what this means?
+# rfcomm connect 0
+Can't connect RFCOMM socket: Connection refused
 
-If it matters, ifconfig seems to show bnep0 as already existing, but not 
-configured.  Should it go away when pand isn't running, and if so, how can 
-I make it go away (i.e. would this be causing my problem?)
+Why this does not work? What I'm missing?
 
-I'll send anyone interested in helping a copy of the entire strace output 
-if they want it, but I don't want to bore three lists with it.
+I hope last question: What I need minimum for bringing A2DP to work?
+What I have to test? What are the minimum software I need to install?
 
-Any help appreciated.
+If I have to post more informations please tell me.
 
-Geoff.
+
+Thank
+Johannes
+
+
+
+
+# /etc/init.d/bluetooth restart
+Shutting down bluetooth ( dund opd sdp hcid)
+done
+Starting bluetooth:  hcid sdpd opd rfcomm dund
+done
+# hciconfig
+hci0:   Type: USB
+        BD Address: 00:0A:94:02:7D:A0 ACL MTU: 384:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:648 acl:0 sco:0 events:63 errors:0
+        TX bytes:986 acl:0 sco:0 commands:50 errors:0
+
+# hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:0A:94:02:7D:A0 ACL MTU: 384:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:648 acl:0 sco:0 events:63 errors:0
+        TX bytes:986 acl:0 sco:0 commands:50 errors:0
+        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'BlueZ johannes_01 (0)'
+        Class: 0x700100
+        Service Classes:
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x5dc LMP Ver: 1.1 (0x1) LMP Subver:
+0x5dc
+        Manufacturer: Cambridge Silicon Radio (10)
+
+# ps -ae | grep hcid
+ 8107 ?        00:00:00 hcid
+# ps -ae | grep sdpd
+ 8109 ?        00:00:00 sdpd
+# hcitool dev
+Devices:
+        hci0    00:0A:94:02:7D:A0
+# hcitool scan
+Scanning ...
+        00:0A:94:A0:59:3B       BTST-9300
+# hcitool inq
+Inquiring ...
+        00:0A:94:A0:59:3B       clock offset: 0x09e5    class: 0x240404
+# l2ping 00:0a:94:a0:59:3b
+Ping: 00:0a:94:a0:59:3b from 00:0A:94:02:7D:A0 (data size 20) ...
+44 bytes from 00:0a:94:a0:59:3b id 0 time 30.50ms
+44 bytes from 00:0a:94:a0:59:3b id 1 time 49.95ms
+44 bytes from 00:0a:94:a0:59:3b id 2 time 43.60ms
+44 bytes from 00:0a:94:a0:59:3b id 3 time 34.65ms
+4 sent, 4 received, 0% loss
+  
 
 
 
