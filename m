@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: David Wulliamoz <david@wulliamoz.com>
-To: bluez-devel@lists.sourceforge.net
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: maxk@qualcomm.com, linux-kernel@vger.kernel.org, bluez-devel@lists.sf.net
+In-Reply-To: <1142934130.3964.14.camel@localhost>
+References: <1137540084.4543.15.camel@localhost>
+	 <1137589998.27515.8.camel@localhost>  <1137602323.4543.29.camel@localhost>
+	 <1142934130.3964.14.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1142954863.7446.14.camel@xgl.compassion.local>
+Message-Id: <1142934755.4104.2.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Broadcom & Plantronic 590a "pulsar"
+Subject: [Bluez-devel] Re: [PATCH] hci_usb: implement suspend/resume
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,47 +21,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 21 Mar 2006 16:27:42 +0100
+Date: Tue, 21 Mar 2006 10:52:35 +0100
 
-Hello,
+Hi Johannes,
 
-Just to let you know,
+> > The attached patch implements suspend/resume for the hci_usb bluetooth
+> > driver by simply killing all outstanding urbs on suspend, and re-issuing
+> > them on resume.
+> > 
+> > This allows me to actually use the internal bluetooth "dongle" in my
+> > powerbook after suspend-to-ram without taking down all userland programs
+> > (sdpd, ...) and the hci device and reloading the module.
+> 
+> Can someone push this patch for 2.6.17 now that 2.6.16 is out? Or is
+> there still anything fundamentally wrong with it? I've been waiting for
+> it forever now ;)
 
+I will push it with some other small changes in the next few days.
 
-Using SCO audio:
+Regards
 
-I've succeed in using a broadcom usb-dongle with bt-sco driver.
-I had to apply the patch (sco-mtu.patch). sound and voice are OK. Often
-there is a "RFCOMM channel lost" 
-
-
-
-Stereo (A2DP) Streaming: (no need to patch)
-this command work "mpg123 --au - file.mp3 | ./a2play 00:0D:3C:30:32:AD"
-but not "mpg123 --au - file.mp3 | sbc/sbcenc - | ./sbc/rcplay
-00:0D:3C:30:32:AD -"
-
-and neither with /dev/dsp (it might be not a bt, bt-sco issue, i'm not a
-linux developper)
-
-
-
-headset: Plantronic 590a
-usb dongle: BT-2200Tp from Trust (Broadcom chip)
-kernel: 2.6.14 (mandriva cooker with sco-mtu.patch)
-Sip ua: twinkle
-
-
-hciconfig:
-Class: 0x3e0100
-Service Classes: Networking, Rendering, Capturing
-Device Class: Computer, Uncategorized
-HCI Ver: 2.0 (0x3) HCI Rev: 0x2902 LMP Ver: 2.0 (0x3) LMP Subver: 0x4127
-Manufacturer: Broadcom Corporation (15)
-
-
-
-
+Marcel
 
 
 
