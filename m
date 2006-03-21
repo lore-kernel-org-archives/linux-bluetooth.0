@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4422851C.6020900@runbox.com>
-From: Tom K <tomk@runbox.com>
+Message-ID: <ef9938ec0603211523g5ffdc77dpfa6c48fc51d61b7@mail.gmail.com>
+From: "Albert Huang" <ashuang@gmail.com>
+To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <ef9938ec0603151722r5a63605by5e92a32d574e54b8@mail.gmail.com>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] btsco not working with 3Com 3CREB96 and SE HBH-602
+Content-Type: multipart/alternative;
+	boundary="----=_Part_4324_32744714.1142983422491"
+References: <ef9938ec0603151722r5a63605by5e92a32d574e54b8@mail.gmail.com>
+Subject: [Bluez-devel] Re: automatic flush timeout patch
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,70 +19,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Mar 2006 11:23:08 +0000
+Date: Tue, 21 Mar 2006 18:23:42 -0500
 
-First post here, not a developer, but I'm posting here as advised on the 
-bluetooth-alsa site.
+------=_Part_4324_32744714.1142983422491
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I have a 3Com 3CREB96 USB dongle and a SonyEricsson HBH-602 headset. I 
-have the following installed on the laptop:
+Marcel,
 
-kernel 2.6.15
-bluez-libs 2.25
-bluez-utils 2.25
-bluez-hcidump 1.29
-btsco 0.41
+Please let me know if there's something unacceptable about these patches.
 
-Bluetooth daemons are running, snd-bt-sco is loaded, hci0 is up, with 
-the voice 0x0060 setting. The devices are paired successfully. I now run 
-btsco -v A1:B2:C3:D4:E5:F6, and get the following response:
+Regards,
+Albert
 
-btsco v0.41
-Device is 1:0
-Voice setting: 0x0060
-RFCOMM channel 1 connected
-recieved AT*ECBP=?
-recieved AT+CLIP=1
-recieved AT+CSCS="UTF-8"
-recieved AT+CLAN?
+On 3/15/06, Albert Huang <ashuang@gmail.com> wrote:
+>
+> The attached two files add read/write for automatic flush timeout to libs=
+,
+> and modify hcitool accordingly
+>
+> Regards,
+> Albert
+>
+>
 
-In another terminal, I try aplay -B 1000000 -D plughw:Headset test.wav, 
-and the following is added in the btsco terminal:
+------=_Part_4324_32744714.1142983422491
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-i/o needed: connecting sco...
-Can't connect SCO audio channel
-: Connection refused
+Marcel,<br><br>Please let me know if there's something unacceptable about t=
+hese patches.<br><br>Regards,<br>Albert<br><br><div><span class=3D"gmail_qu=
+ote">On 3/15/06, <b class=3D"gmail_sendername">Albert Huang</b> &lt;<a href=
+=3D"mailto:ashuang@gmail.com">
+ashuang@gmail.com</a>&gt; wrote:</span><blockquote class=3D"gmail_quote" st=
+yle=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex=
+; padding-left: 1ex;"><div style=3D"direction: ltr;">The attached two files=
+ add read/write for automatic flush timeout to libs, and modify hcitool acc=
+ordingly
+<br>
+<br>
+Regards,<br></div><div style=3D"direction: ltr;"><span class=3D"sg">
+Albert<br>
 
-I shut down btsco, and after nearly 30 seconds, I hear a single beep in 
-the headset. I run btsco again as above, with the same initial response, 
-and run aplay again. This time, the sound file plays through the 
-headset, and btsco shows the following:
+</span></div><br clear=3D"all"></blockquote></div><br>
 
-i/o needed: connecting sco...
-connected SCO channel
-Done setting sco fd
-recieved AT+VGS=12
-Sending up speaker change 12
-speaker volume: 12 mic volume: 11
-driver is not in use
-disconnected SCO channel
-RFCOMM channel lost
-
-btsco then shuts itself down.
-
-All the above is consistently reproducable. Also, the same responses are 
-seen if arecord is used instead of aplay, except of course that a file 
-is recorded instead of played on the second attempt.
-
-About a year ago, I had the same headset working correctly with btsco 
-and a 3Com BT PCMCIA card, which I unfortunately can no longer use.
-
-If more info is required - hcidump, logs, etc - let me know. I am aware 
-that this is a dev list, so I will understand completely if nobody is 
-interested.
-
-All the best
-Tom K.
+------=_Part_4324_32744714.1142983422491--
 
 
 -------------------------------------------------------
