@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4421297E.2020302@yahoo.com>
-From: Pedro Monjo Florit <pmonjo2000@yahoo.com>
+From: Geoff Shang <geoff@hitsandpieces.net>
+To: blinux-list@redhat.com, general@lists.humbug.org.au,
+        bluez-users@lists.sourceforge.net
+In-Reply-To: <Pine.LNX.4.64.0603181246420.738@data.home>
+Message-ID: <Pine.LNX.4.64.0603212358080.738@data.home>
+References: <Pine.LNX.4.64.0603181246420.738@data.home>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Hidden bluetooth services
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Subject: [Bluez-users] Re: [H-GEN] Bluetooth: pand: Connection failed. File exists(17)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,23 +19,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Mar 2006 11:39:58 +0100
+Date: Wed, 22 Mar 2006 00:05:11 +1000 (EST)
 
-Hi everybody,
+Geoff Shang wrote:
 
-Some time ago, there were some discussions about hidden bluetooth 
-services in mobile phones. That is, services that a general SDP inquiry 
-would not return, but that are actually there, usually for connection 
-between a PC suite and the mobile. The utility bt_audit tries to find them.
+> Mar 10 18:35:46 data pand[16077]: Connection failed. File exists(17)
 
-IIRC, Marcel was trying to gather them in a unified database. Am I 
-right? I have been searching in the mailing list, but failed to find it. 
-Where can I find this information? Any pointers would be greately 
-appreciated.
+Thanks to those who helpfully suggested I run pand under strace. 
+Unfortunately, for me at least, the results weren't particularly 
+illuminating.
 
-Cheers,
+I'm assuming the following line from the panu side is significant:
 
-Pedro
+ioctl(3, 0x400442c8, 0xbffff210)        = -1 EEXIST (File exists)
+
+Anyone know what this means?
+
+If it matters, ifconfig seems to show bnep0 as already existing, but not 
+configured.  Should it go away when pand isn't running, and if so, how can 
+I make it go away (i.e. would this be causing my problem?)
+
+I'll send anyone interested in helping a copy of the entire strace output 
+if they want it, but I don't want to bore three lists with it.
+
+Any help appreciated.
+
+Geoff.
+
 
 
 -------------------------------------------------------
