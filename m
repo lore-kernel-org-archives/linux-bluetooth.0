@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4421421C.1020601@blueyonder.co.uk>
-From: Sid Boyce <sboyce@blueyonder.co.uk>
+Message-ID: <4421297E.2020302@yahoo.com>
+From: Pedro Monjo Florit <pmonjo2000@yahoo.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] skype_bt_hijacker problem
+Subject: [Bluez-users] Hidden bluetooth services
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,85 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Mar 2006 12:25:00 +0000
+Date: Wed, 22 Mar 2006 11:39:58 +0100
 
-I have to run "btscorunner" as root to get it to see the headset.
-lancelot@barrabas:~> btscorunner
-Error: control open (hw:2): No such device
-Error: Can't find device. Bail
-Error: control open (hw:2): No such device
-Error: Can't find device. Bail
-Error: control open (hw:2): No such device
-Error: Can't find device. Bail
+Hi everybody,
 
-lancelot@barrabas:~> l /dev/dsp* /dev/mixer*
-crw------- 1 lancelot audio 14,  3 2006-03-22 01:01 /dev/dsp
-crw-rw---- 1 lancelot audio 14, 35 2006-03-22 01:04 /dev/dsp2
-crw------- 1 lancelot audio 14,  0 2006-03-22 01:01 /dev/mixer
-crw------- 1 lancelot audio 14, 16 2006-03-22 01:01 /dev/mixer1
-crw-rw---- 1 lancelot audio 14, 32 2006-03-22 01:04 /dev/mixer2
+Some time ago, there were some discussions about hidden bluetooth 
+services in mobile phones. That is, services that a general SDP inquiry 
+would not return, but that are actually there, usually for connection 
+between a PC suite and the mobile. The utility bt_audit tries to find them.
 
-Running as root, it connects OK. I next call echo123 and the speaker/mic 
-works, but pressing the headset button gives the errors below. I can use 
-the headset in the normal way, runining "btsco -v <BTADDR>" and 
-selecting /dev/dsp2 in options.
-  barrabas:~ # btscorunner
-Traceback (most recent call last):
-   File "/usr/local/bin/skype_pickup.py", line 78, in ?
-     main()
-   File "/usr/local/bin/skype_pickup.py", line 74, in main
-     api_object = Api_obj()
-   File "/usr/local/bin/skype_pickup.py", line 11, in __init__
-     system_service_list = 
-remote_bus.get_service('org.freedesktop.DBus').get_object('/org/freedesktop/DBus', 
-'org.freedesktop.DBus').ListServices()
-AttributeError: 'SystemBus' object has no attribute 'get_service'
-Traceback (most recent call last):
-   File "/usr/local/bin/skype_pickup.py", line 78, in ?
-     main()
-   File "/usr/local/bin/skype_pickup.py", line 74, in main
-     api_object = Api_obj()
-   File "/usr/local/bin/skype_pickup.py", line 11, in __init__
-     system_service_list = 
-remote_bus.get_service('org.freedesktop.DBus').get_object('/org/freedesktop/DBus', 
-'org.freedesktop.DBus').ListServices()
-AttributeError: 'SystemBus' object has no attribute 'get_service'
-Traceback (most recent call last):
-   File "/usr/local/bin/skype_pickup.py", line 78, in ?
-     main()
-   File "/usr/local/bin/skype_pickup.py", line 74, in main
-     api_object = Api_obj()
-   File "/usr/local/bin/skype_pickup.py", line 11, in __init__
-     system_service_list = 
-remote_bus.get_service('org.freedesktop.DBus').get_object('/org/freedesktop/DBus', 
-'org.freedesktop.DBus').ListServices()
-AttributeError: 'SystemBus' object has no attribute 'get_service'
-Traceback (most recent call last):
-   File "/usr/local/bin/skype_pickup.py", line 78, in ?
-     main()
-   File "/usr/local/bin/skype_pickup.py", line 74, in main
-     api_object = Api_obj()
-   File "/usr/local/bin/skype_pickup.py", line 11, in __init__
-     system_service_list = 
-remote_bus.get_service('org.freedesktop.DBus').get_object('/org/freedesktop/DBus', 
-'org.freedesktop.DBus').ListServices()
-AttributeError: 'SystemBus' object has no attribute 'get_service'
+IIRC, Marcel was trying to gather them in a unified database. Am I 
+right? I have been searching in the mailing list, but failed to find it. 
+Where can I find this information? Any pointers would be greately 
+appreciated.
 
-# ps fax|grep btsco
-  9824 pts/17   S+     0:00  |   |           \_ /bin/bash 
-/usr/local/bin/btscorunner
-  9827 pts/17   S+     0:00  |   |  \_ btsco -s 00:03:89:60:F9:CF
+Cheers,
 
----------- 1 root root 0 2006-03-22 12:08 /tmp/bt_headset_connected
-
-Any ideas?
-Thanks and Regards
-Sid.
--- 
-Sid Boyce ... Hamradio License G3VBV, Licensed Private Pilot
-Retired IBM/Amdahl Mainframes and Sun/Fujitsu Servers Tech Support 
-Specialist, Cricket Coach
-Microsoft Windows Free Zone - Linux used for all Computing Tasks
+Pedro
 
 
 -------------------------------------------------------
