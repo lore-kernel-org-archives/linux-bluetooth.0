@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060322134049.38913.qmail@web37004.mail.mud.yahoo.com>
-From: Premila Nagarajan <premila_nagarajan80@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4421421C.1020601@blueyonder.co.uk>
+From: Sid Boyce <sboyce@blueyonder.co.uk>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1982928669-1143034849=:37859"
-Subject: [Bluez-users] First job, first job and first basic question on bluez forum
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] skype_bt_hijacker problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,30 +16,85 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Mar 2006 05:40:49 -0800 (PST)
+Date: Wed, 22 Mar 2006 12:25:00 +0000
 
---0-1982928669-1143034849=:37859
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+I have to run "btscorunner" as root to get it to see the headset.
+lancelot@barrabas:~> btscorunner
+Error: control open (hw:2): No such device
+Error: Can't find device. Bail
+Error: control open (hw:2): No such device
+Error: Can't find device. Bail
+Error: control open (hw:2): No such device
+Error: Can't find device. Bail
 
-Hello Guys,
-  This is my first day in the office and it is my first job and my first project manager had asked me to decipher the code of Bluez, so that i can develop applications using Bluez. Can i know why do we need to install bluez-libs and bluez-utils ? I surfed the net and was not able to find anything about this.
-  I hope you guys will be able to answer.
-  Thanks,
-  Pramila
+lancelot@barrabas:~> l /dev/dsp* /dev/mixer*
+crw------- 1 lancelot audio 14,  3 2006-03-22 01:01 /dev/dsp
+crw-rw---- 1 lancelot audio 14, 35 2006-03-22 01:04 /dev/dsp2
+crw------- 1 lancelot audio 14,  0 2006-03-22 01:01 /dev/mixer
+crw------- 1 lancelot audio 14, 16 2006-03-22 01:01 /dev/mixer1
+crw-rw---- 1 lancelot audio 14, 32 2006-03-22 01:04 /dev/mixer2
 
-		
----------------------------------
- Yahoo! Mail
- Use Photomail to share photos without annoying attachments.
---0-1982928669-1143034849=:37859
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Running as root, it connects OK. I next call echo123 and the speaker/mic 
+works, but pressing the headset button gives the errors below. I can use 
+the headset in the normal way, runining "btsco -v <BTADDR>" and 
+selecting /dev/dsp2 in options.
+  barrabas:~ # btscorunner
+Traceback (most recent call last):
+   File "/usr/local/bin/skype_pickup.py", line 78, in ?
+     main()
+   File "/usr/local/bin/skype_pickup.py", line 74, in main
+     api_object = Api_obj()
+   File "/usr/local/bin/skype_pickup.py", line 11, in __init__
+     system_service_list = 
+remote_bus.get_service('org.freedesktop.DBus').get_object('/org/freedesktop/DBus', 
+'org.freedesktop.DBus').ListServices()
+AttributeError: 'SystemBus' object has no attribute 'get_service'
+Traceback (most recent call last):
+   File "/usr/local/bin/skype_pickup.py", line 78, in ?
+     main()
+   File "/usr/local/bin/skype_pickup.py", line 74, in main
+     api_object = Api_obj()
+   File "/usr/local/bin/skype_pickup.py", line 11, in __init__
+     system_service_list = 
+remote_bus.get_service('org.freedesktop.DBus').get_object('/org/freedesktop/DBus', 
+'org.freedesktop.DBus').ListServices()
+AttributeError: 'SystemBus' object has no attribute 'get_service'
+Traceback (most recent call last):
+   File "/usr/local/bin/skype_pickup.py", line 78, in ?
+     main()
+   File "/usr/local/bin/skype_pickup.py", line 74, in main
+     api_object = Api_obj()
+   File "/usr/local/bin/skype_pickup.py", line 11, in __init__
+     system_service_list = 
+remote_bus.get_service('org.freedesktop.DBus').get_object('/org/freedesktop/DBus', 
+'org.freedesktop.DBus').ListServices()
+AttributeError: 'SystemBus' object has no attribute 'get_service'
+Traceback (most recent call last):
+   File "/usr/local/bin/skype_pickup.py", line 78, in ?
+     main()
+   File "/usr/local/bin/skype_pickup.py", line 74, in main
+     api_object = Api_obj()
+   File "/usr/local/bin/skype_pickup.py", line 11, in __init__
+     system_service_list = 
+remote_bus.get_service('org.freedesktop.DBus').get_object('/org/freedesktop/DBus', 
+'org.freedesktop.DBus').ListServices()
+AttributeError: 'SystemBus' object has no attribute 'get_service'
 
-<div>Hello Guys,</div>  <div>This is my first day in the office and it is my first job and my first project manager had asked me to decipher the code of Bluez, so that i can develop applications using Bluez. Can i know why do we need to install bluez-libs and bluez-utils ? I surfed the net and was not able to find anything about this.</div>  <div>I hope you guys will be able to answer.</div>  <div>Thanks,</div>  <div>Pramila</div><p>
-		<hr size=1> Yahoo! Mail<br> 
-<a href="http://pa.yahoo.com/*http://us.rd.yahoo.com/evt=38867/*http://photomail.mail.yahoo.com">Use Photomail</a> to share photos without annoying attachments.
---0-1982928669-1143034849=:37859--
+# ps fax|grep btsco
+  9824 pts/17   S+     0:00  |   |           \_ /bin/bash 
+/usr/local/bin/btscorunner
+  9827 pts/17   S+     0:00  |   |  \_ btsco -s 00:03:89:60:F9:CF
+
+---------- 1 root root 0 2006-03-22 12:08 /tmp/bt_headset_connected
+
+Any ideas?
+Thanks and Regards
+Sid.
+-- 
+Sid Boyce ... Hamradio License G3VBV, Licensed Private Pilot
+Retired IBM/Amdahl Mainframes and Sun/Fujitsu Servers Tech Support 
+Specialist, Cricket Coach
+Microsoft Windows Free Zone - Linux used for all Computing Tasks
 
 
 -------------------------------------------------------
