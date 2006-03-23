@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4422DA1E.6030303@runbox.com>
-From: Tom K <tomk@runbox.com>
+Message-ID: <4422C49C.2060004@rumms.uni-mannheim.de>
+From: Andreas Faerber <afaerber@rumms.uni-mannheim.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] btsco not working with 3Com 3CREB96 and SE HBH-602
-References: <4422851C.6020900@runbox.com> <Pine.LNX.4.61.0603231619010.25910@cherokee.spacecom.si>
-In-Reply-To: <Pine.LNX.4.61.0603231619010.25910@cherokee.spacecom.si>
+Subject: Re: [Bluez-devel] EVT_EXTENDED_INQUIRY_RESULT
+References: <44229D0A.5080508@rumms.uni-mannheim.de> <1143122060.9923.12.camel@localhost>
+In-Reply-To: <1143122060.9923.12.camel@localhost>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,29 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Mar 2006 17:25:50 +0000
+Date: Thu, 23 Mar 2006 16:54:04 +0100
 
-Mitja Pufic wrote:
-> Hello,
+Hi Marcel,
+
+>call "hciconfig hci0 inqmode 1" first to switch the device into the
+>correct inquiry mode.
 >
-> This is a very old dongle, with bluecore01 and confirms with bluetooth 
-> 1.0b specification. And as far as I know it has SCO mapped to PCM and not 
-> HCI, so this is the reason, why your setup is not working. Check mail 
-> list archive how to change this, or if it is even possible on this old 
-> chip. PCMCIA version does not have this problem.
+Thanks a lot, that worked!
+
+>You can also check the features with "hciconfig hci0 features" if it
+>tells you it supports inquiry with RSSI. However in case of some
+>Broadcom chips, this doesn't mean anything, because they support it
+>anyway even if the features bit is not set.
+>  
 >
->   
-Many thanks for your response.
-It's pretty old alright, but hciconfig hci0 revision gives me
+The feature is actually listed. The only weird thing I'm still tracking 
+down is that I only get inquiry results every five minutes while it did 
+work as expected with the previous dongles...
 
-hci0:   Type: USB
-        BD Address: 00:04:76:AD:12:E3 ACL MTU: 128:8 SCO MTU: 64:8
-        HCI 10.3
-        Chip version: BlueCore01b (ES)
-        SCO mapping:  HCI
+Thanks again,
 
-which looked promising to me. Still, if it's not the right stuff, I'll 
-hunt around for another one.
+Andreas
 
 
 -------------------------------------------------------
