@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Nicolas STRANSKY <Nico@stransky.cx>
-Message-ID: <e0352d$2oe$1@sea.gmane.org>
-References: <BAY12-F257741C2F24AE15EB32DD4B5E60@phx.gbl> <44187349.9090804@darkmetatron.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-In-Reply-To: <44187349.9090804@darkmetatron.de>
-Subject: [Bluez-users] Re: Multimedia keys (Microsoft keyboard)
+Message-ID: <005c01c64e73$90cfa250$0701a8c0@saturno>
+From: "Antonio Ignacio Cabrera Santana" <acabrera@coit.es>
+To: <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0059_01C64E73.900C2B40"
+Subject: [Bluez-users] Microsoft IntelliMouse Explorer for Bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +17,69 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 25 Mar 2006 11:12:29 +0100
+Date: Thu, 23 Mar 2006 12:16:07 -0000
 
-Le 03/15/2006 09:04 PM, Sebastian Beßler a écrit :
+This is a multi-part message in MIME format.
 
-> I am still waiting for the happy day when the kernel-gurus add this
-> wonderful piece of code to the official kernel. Even -mm would make me
-> happy....
+------=_NextPart_000_0059_01C64E73.900C2B40
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Yes, this would make me happy too, but Marcel said once that this is not
-gonna happen. It's a shame.
-Here are his words:
-"it is not a clean patch after all. It is a hack and this is
-something that shouldn't be in mainline."
+Hi,
 
--- 
-Nico
-Ne forçons point notre talent ;
-Nous ne ferions rien avec grâce.
-	-+- Jean de La Fontaine (1621-1695),
-	    L'Âne et le Petit Chien (Fables IV.5) -+-
+I have bought a Microsoft IntelliMouse Explorer for Bluetooth. Is =
+supported in linux?.
+
+I have debian etch installed, with kernel 2.6.15-8 compiled, and when
+the kernel start, I got the next message, and the mouse don't work:
+
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: HCI USB driver ver 2.9
+logips2pp: Detected unknown logitech mouse model 62
+input: ImExPS/2 Logitech Explorer Mouse as /class/input/input2
+
+Thanks
+
+------=_NextPart_000_0059_01C64E73.900C2B40
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2180" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>
+<DIV><FONT face=3DArial size=3D2>Hi,</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>I have bought a Microsoft IntelliMouse Explorer for Bluetooth. Is =
+supported=20
+in linux?.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>I have debian etch installed, with kernel 2.6.15-8 compiled, and=20
+when<BR>the kernel start, I got the next message, and the mouse don't=20
+work:</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Bluetooth: HCI device and connection manager =
+initialized<BR>Bluetooth: HCI=20
+socket layer initialized<BR>Bluetooth: HCI USB driver ver =
+2.9<BR>logips2pp:=20
+Detected unknown logitech mouse model 62<BR>input: ImExPS/2 Logitech =
+Explorer=20
+Mouse as /class/input/input2</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Thanks</DIV>
+<DIV>&nbsp;</DIV>
+<DIV></FONT></DIV></FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_0059_01C64E73.900C2B40--
+
 
 
 
