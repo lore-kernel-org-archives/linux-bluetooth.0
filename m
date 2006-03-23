@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <44229D0A.5080508@rumms.uni-mannheim.de>
-From: Andreas Faerber <afaerber@rumms.uni-mannheim.de>
+Message-ID: <4422851C.6020900@runbox.com>
+From: Tom K <tomk@runbox.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] EVT_EXTENDED_INQUIRY_RESULT
+Subject: [Bluez-devel] btsco not working with 3Com 3CREB96 and SE HBH-602
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,27 +16,70 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Mar 2006 14:05:14 +0100
+Date: Thu, 23 Mar 2006 11:23:08 +0000
 
-Hello,
+First post here, not a developer, but I'm posting here as advised on the 
+bluetooth-alsa site.
 
-We've just received an HCI 2.0 dongle (Belkin/Broadcom) and I've 
-recompiled my periodic scan code (on SuSE 10.1b8 w/BlueZ 2.24) to enable 
-support for EVT_EXTENDED_INQUIRY_RESULT. Unfortunately I still get the 
-"old" EVT_INQUIRY_RESULT only; I could not find an 
-OCF_EXTENDED_PERIODIC_INQUIRY command or the like so my expectation was 
-to simply get back EVT_EXTENDED_INQUIRY_RESULT from OCF_PERIODIC_INQUIRY 
-now that our hardware supports it (and I include it in the filter).
+I have a 3Com 3CREB96 USB dongle and a SonyEricsson HBH-602 headset. I 
+have the following installed on the laptop:
 
-Am I missing anything? Do I need to enable this feature somewhere?
+kernel 2.6.15
+bluez-libs 2.25
+bluez-utils 2.25
+bluez-hcidump 1.29
+btsco 0.41
 
-We want either EVT_INQUIRY_RESULT_WITH_RSSI or 
-EVT_EXTENDED_INQUIRY_RESULT because we need to read the RSSI without 
-connecting.
+Bluetooth daemons are running, snd-bt-sco is loaded, hci0 is up, with 
+the voice 0x0060 setting. The devices are paired successfully. I now run 
+btsco -v A1:B2:C3:D4:E5:F6, and get the following response:
 
-Regards,
+btsco v0.41
+Device is 1:0
+Voice setting: 0x0060
+RFCOMM channel 1 connected
+recieved AT*ECBP=?
+recieved AT+CLIP=1
+recieved AT+CSCS="UTF-8"
+recieved AT+CLAN?
 
-Andreas
+In another terminal, I try aplay -B 1000000 -D plughw:Headset test.wav, 
+and the following is added in the btsco terminal:
+
+i/o needed: connecting sco...
+Can't connect SCO audio channel
+: Connection refused
+
+I shut down btsco, and after nearly 30 seconds, I hear a single beep in 
+the headset. I run btsco again as above, with the same initial response, 
+and run aplay again. This time, the sound file plays through the 
+headset, and btsco shows the following:
+
+i/o needed: connecting sco...
+connected SCO channel
+Done setting sco fd
+recieved AT+VGS=12
+Sending up speaker change 12
+speaker volume: 12 mic volume: 11
+driver is not in use
+disconnected SCO channel
+RFCOMM channel lost
+
+btsco then shuts itself down.
+
+All the above is consistently reproducable. Also, the same responses are 
+seen if arecord is used instead of aplay, except of course that a file 
+is recorded instead of played on the second attempt.
+
+About a year ago, I had the same headset working correctly with btsco 
+and a 3Com BT PCMCIA card, which I unfortunately can no longer use.
+
+If more info is required - hcidump, logs, etc - let me know. I am aware 
+that this is a dev list, so I will understand completely if nobody is 
+interested.
+
+All the best
+Tom K.
 
 
 -------------------------------------------------------
