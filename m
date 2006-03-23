@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] EVT_EXTENDED_INQUIRY_RESULT
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <44229D0A.5080508@rumms.uni-mannheim.de>
+From: Andreas Faerber <afaerber@rumms.uni-mannheim.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <44229D0A.5080508@rumms.uni-mannheim.de>
-References: <44229D0A.5080508@rumms.uni-mannheim.de>
-Content-Type: text/plain
-Message-Id: <1143122060.9923.12.camel@localhost>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] EVT_EXTENDED_INQUIRY_RESULT
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,38 +16,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 23 Mar 2006 14:54:20 +0100
+Date: Thu, 23 Mar 2006 14:05:14 +0100
 
-Hi Andreas,
+Hello,
 
-> We've just received an HCI 2.0 dongle (Belkin/Broadcom) and I've 
-> recompiled my periodic scan code (on SuSE 10.1b8 w/BlueZ 2.24) to enable 
-> support for EVT_EXTENDED_INQUIRY_RESULT. Unfortunately I still get the 
-> "old" EVT_INQUIRY_RESULT only; I could not find an 
-> OCF_EXTENDED_PERIODIC_INQUIRY command or the like so my expectation was 
-> to simply get back EVT_EXTENDED_INQUIRY_RESULT from OCF_PERIODIC_INQUIRY 
-> now that our hardware supports it (and I include it in the filter).
-> 
-> Am I missing anything? Do I need to enable this feature somewhere?
-> 
-> We want either EVT_INQUIRY_RESULT_WITH_RSSI or 
-> EVT_EXTENDED_INQUIRY_RESULT because we need to read the RSSI without 
-> connecting.
+We've just received an HCI 2.0 dongle (Belkin/Broadcom) and I've 
+recompiled my periodic scan code (on SuSE 10.1b8 w/BlueZ 2.24) to enable 
+support for EVT_EXTENDED_INQUIRY_RESULT. Unfortunately I still get the 
+"old" EVT_INQUIRY_RESULT only; I could not find an 
+OCF_EXTENDED_PERIODIC_INQUIRY command or the like so my expectation was 
+to simply get back EVT_EXTENDED_INQUIRY_RESULT from OCF_PERIODIC_INQUIRY 
+now that our hardware supports it (and I include it in the filter).
 
-call "hciconfig hci0 inqmode 1" first to switch the device into the
-correct inquiry mode. However the extended inquiry will be only
-supported by Bluetooth 2.1 (aka Lisbon) devices.
+Am I missing anything? Do I need to enable this feature somewhere?
 
-You can also check the features with "hciconfig hci0 features" if it
-tells you it supports inquiry with RSSI. However in case of some
-Broadcom chips, this doesn't mean anything, because they support it
-anyway even if the features bit is not set.
+We want either EVT_INQUIRY_RESULT_WITH_RSSI or 
+EVT_EXTENDED_INQUIRY_RESULT because we need to read the RSSI without 
+connecting.
 
-Regards
+Regards,
 
-Marcel
-
-
+Andreas
 
 
 -------------------------------------------------------
