@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Daniel Hertrich" <daniel.hertrich@gmx.de>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <4423E987.8010604@runbox.com>
+From: Tom K <tomk@runbox.com>
 MIME-Version: 1.0
-References: <1143199077.6863.4.camel@bnocera.surrey.redhat.com>
-Subject: Re: [Bluez-devel] "Can't connect RFCOMM socket"
-Message-ID: <6422.1143209002@www019.gmx.net>
-Content-Type: text/plain; charset="us-ascii"
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] btsco not working with 3Com 3CREB96 and SE HBH-602
+References: <4422851C.6020900@runbox.com> <Pine.LNX.4.61.0603231619010.25910@cherokee.spacecom.si> <4422DA1E.6030303@runbox.com> <Pine.LNX.4.61.0603241208510.15783@cherokee.spacecom.si>
+In-Reply-To: <Pine.LNX.4.61.0603241208510.15783@cherokee.spacecom.si>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,48 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 24 Mar 2006 15:03:22 +0100 (MET)
+Date: Fri, 24 Mar 2006 12:43:51 +0000
 
-Hello Bastien,
-
-thaks for your reply!
-
-> On Fri, 2006-03-24 at 11:55 +0100, Daniel Hertrich wrote:
-> > Dear bluez developers,
-> <snip>
-> > * rfcomm bind /dev/rfcomm0 00:02:EE:0D:71:96 1
-> 
-> Did you check that the device you're connecting to has RFCOMM on channel
-> 1?
-
-How can I check that?
-
-> Double-check the pin setup in /etc/bluetooth/hcid.conf, the pin_helper
-> is the important thing.
-
-It is /usr/bin/bluepin, and if I call it manually, I get back
-PIN:1234
-Is it this what is expected from the pin_helper?
-
-> > Some of the hci* tools complained about a missing libsdp library.
-> 
-> The tools will complain, but libsdp is included in libbluetooth nowadays
-> and isn't required anymore.
-
-So my linking of the libraries was okay it seems...
-
-Thanks for any further help
-daniel
-
-
--- 
-Dipl.-Ing. Daniel Hertrich
-Reichertshofen, Germany
-http://www.hermocom.com
-http://www.daniel-hertrich.de
-
-"Feel free" mit GMX FreeMail!
-Monat für Monat 10 FreeSMS inklusive! http://www.gmx.net
+Mitja Pufic wrote:
+> Hello Tom,
+>
+> this really looks promissing, mine dongle says PCM, that could be because  
+> I am using it with a very old version of bluez. I see no problem, why 
+> this should not work with sco.
+>
+>   
+Thanks again, Mitja. Everything looks like it's in order, alright, but I 
+just can't set up a usable connection. It's a bit frustrating, because I 
+can send and receive audio, as described, so the hardware must be OK. 
+It's something in the setup, but I don't know what at the moment. Time 
+for some more tinkering, I think.
 
 
 -------------------------------------------------------
