@@ -4,7 +4,7 @@ To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
 References: <1143199077.6863.4.camel@bnocera.surrey.redhat.com>
 Subject: Re: [Bluez-devel] "Can't connect RFCOMM socket"
-Message-ID: <20282.1143212154@www019.gmx.net>
+Message-ID: <6422.1143209002@www019.gmx.net>
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -17,11 +17,11 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 24 Mar 2006 15:55:54 +0100 (MET)
+Date: Fri, 24 Mar 2006 15:03:22 +0100 (MET)
 
 Hello Bastien,
 
-addition:
+thaks for your reply!
 
 > On Fri, 2006-03-24 at 11:55 +0100, Daniel Hertrich wrote:
 > > Dear bluez developers,
@@ -31,24 +31,23 @@ addition:
 > Did you check that the device you're connecting to has RFCOMM on channel
 > 1?
 
+How can I check that?
 
-Now I checked (with sdptool search --bdaddr ... DUN): It is indeed channel
-1.
+> Double-check the pin setup in /etc/bluetooth/hcid.conf, the pin_helper
+> is the important thing.
 
-So what possible causes remain?
+It is /usr/bin/bluepin, and if I call it manually, I get back
+PIN:1234
+Is it this what is expected from the pin_helper?
 
-What is a bit unclear to me is which steps are actually really needed to
-connect.
-Different Internet pages mention different steps.
+> > Some of the hci* tools complained about a missing libsdp library.
+> 
+> The tools will complain, but libsdp is included in libbluetooth nowadays
+> and isn't required anymore.
 
-e.g. is an "rfcomm bind" needed before the rfcomm connect?
-Which modules must be loaded? Could it be that here some modules are
-missing?
-Where can I find a summary of what conditions have to be met in order to be
-able to connect?
+So my linking of the libraries was okay it seems...
 
-
-Thanks
+Thanks for any further help
 daniel
 
 
@@ -58,8 +57,8 @@ Reichertshofen, Germany
 http://www.hermocom.com
 http://www.daniel-hertrich.de
 
-Echte DSL-Flatrate dauerhaft für 0,- Euro*!
-"Feel free" mit GMX DSL! http://www.gmx.net/de/go/dsl
+"Feel free" mit GMX FreeMail!
+Monat für Monat 10 FreeSMS inklusive! http://www.gmx.net
 
 
 -------------------------------------------------------
