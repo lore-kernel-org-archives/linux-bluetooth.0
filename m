@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <001201c65019$a757a020$6280a8c0@clytemnestra>
-From: "Alec Myers" <alec@fridge-news.co.uk>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] Debian: rfcomm connection at boot: how?
+To: bluez-users@lists.sourceforge.net
+From: Nicolas STRANSKY <Nico@stransky.cx>
+Message-ID: <e0352d$2oe$1@sea.gmane.org>
+References: <BAY12-F257741C2F24AE15EB32DD4B5E60@phx.gbl> <44187349.9090804@darkmetatron.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <44187349.9090804@darkmetatron.de>
+Subject: [Bluez-users] Re: Multimedia keys (Microsoft keyboard)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,26 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 25 Mar 2006 14:37:27 -0000
+Date: Sat, 25 Mar 2006 11:12:29 +0100
 
-A question from a Linux novice. I have bluez installed and working fine on 
-Debian (3.1r1).
+Le 03/15/2006 09:04 PM, Sebastian Beßler a écrit :
 
-I manually create a connection to my remote device with
+> I am still waiting for the happy day when the kernel-gurus add this
+> wonderful piece of code to the official kernel. Even -mm would make me
+> happy....
 
-   hcitool cc xx:xx:xx:xx:xx:xx
+Yes, this would make me happy too, but Marcel said once that this is not
+gonna happen. It's a shame.
+Here are his words:
+"it is not a clean patch after all. It is a hack and this is
+something that shouldn't be in mainline."
 
-then hook it up to /dev/rfcomm0 with
-
-    rfcomm bind 0 xx:xx:xx:xx:xx:xx 1
-
-I'd like these two commands to execute at boot up. Is it possible to put 
-them in, for instance, /etc/default/bluez-utils ? If so, what would the 
-syntax be? If not then what's the 'right' way to do it? Do I need to write a 
-shell script and install it with rc-update etc?
-
-Many thanks! 
-
+-- 
+Nico
+Ne forçons point notre talent ;
+Nous ne ferions rien avec grâce.
+	-+- Jean de La Fontaine (1621-1695),
+	    L'Âne et le Petit Chien (Fables IV.5) -+-
 
 
 
