@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Robin Roevens <robin.roevens1@pandora.be>
 To: bluez-users@lists.sourceforge.net
-From: Doug <doug@hbs.edu>
-Message-ID: <loom.20060325T174822-928@post.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] logitech bluetooth mouse on fc3
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart2105930.JGIkffF301";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <200603251551.45792.robin.roevens1@pandora.be>
+Subject: [Bluez-users] bluetooth seems to be working but no /var/lib/bluetooth directory is generated
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,41 +19,87 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 25 Mar 2006 16:57:01 +0000 (UTC)
+Date: Sat, 25 Mar 2006 15:51:36 +0100
 
-I'm having some problems getting, or should I say keeping, a logitech v270
-bluetooth mouse working on my ibm t42p laptop running 2.6.11-1.35_FC3.
+--nextPart2105930.JGIkffF301
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I can get it to connect by doing:
-sudo hidd --connect 00:07:61:48:CB:7F
+Hi all,
 
-And this appears in the log:
-Mar 25 11:45:14 dswanson hidd: New HID device 00:07:61:48:CB:7F (Logitech
-Bluetooth Mouse)
-Mar 25 11:45:14 dswanson hal.hotplug[10064]: DEVPATH is not set
+I have a logitech dinovo bluetooth media desktop Laser which works perfect =
+in=20
+HID mode, but I want more bluetooth functionality so I followed all=20
+instructions on http://linux.yes.nu/diNovo/ and=20
+http://forums.gentoo.org/viewtopic-t-231506-postdays-0-postorder-asc-start-=
+0.html=20
+to get it running in HCI mode. I'm running gentoo-sources kernel 2.6.15-r1 =
++=20
+mh2 patch from bluez.org.
+I have these bluez packages installed: bluez-utils-2.24 bluez-libs-2.24=20
+bluez-hciemu-1.2 bluez-hcidump-1.30
+hid2hci succesfully replies with
 
-Mouse works, after some random? amount of time the below line appears in the
-/var/log/messages:
-Mar 25 11:46:34 dswanson hal.hotplug[10124]: DEVPATH is not set
-Now the mouse doesn't work.
+Switching device 046d:c70c to HCI mode was successful
+Switching device 046d:c70b to HCI mode was successful
 
-Here's the status of it when its connected:
-Connections:
-        < ACL 00:07:61:48:CB:7F handle 42 state 1 lm MASTER
+hciconfig gives me this:
 
-Here's the bluetooth packages installed:
-gnome-bluetooth-0.5.1-5.FC3.1
-bluez-hcidump-1.11-1
-bluez-utils-2.10-2
-bluez-libs-2.10-2
-bluez-pin-0.23-3
-bluez-bluefw-1.0-6
+hci0: Type: USB
+BD Address: 00:07:61:41:F5:80 ACL MTU: 1017:8 SCO MTU: 64:0
+UP RUNNING PSCAN ISCAN
+RX bytes:490 acl:11 sco:0 events:35 errors:0
+TX bytes:771 acl:8 sco:0 commands:25 errors:0
 
-Any help is much appreciated!
-Thanks
--Doug
+and hcitool finds all devices needed, so everything looks good but my=20
+keyboard, -pad nor mouse work...
+Every time I press a key on my keyboard, it connects succesfully, and gives=
+ me=20
+this message in /var/log/messages:
+hidd: HID create error 2 (No such file or directory)
+and gets disconnected again
 
+I ran an strace on the hidd deamon and the moment I press a key I see this:
+open("/var/lib/bluetooth/00:07:61:41:F5:80/hidd", O_RDONLY) =3D -1 ENOENT (=
+No=20
+such file or directory)
 
+so I went checking my /var/lib/bluetooth directory and I found out, that=20
+directory indeed doesn't exist..
+As far as I understand the whole bluez bluetooth thing, that directory shou=
+ld=20
+be generated automaticaly, but I can't seem to find anything about the=20
+directory not being generated nor what process/module/whatever should=20
+generate that directory...So I don't have any clue where to start searching=
+=20
+for a solution to this problem...
+Can anyone help me? any suggestions are fine since I am starting to get rea=
+ly=20
+desperate.. Everyone but me with a dinovo desktop seems to have his hardwar=
+e=20
+working in linux. What am I missing?
+
+Greetz
+Robin.
+=2D-=20
+100% MS FREE
+Absolutely no component of Microsoft was used
+in the generation or posting of this e-mail. So it is virus free
+
+--nextPart2105930.JGIkffF301
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.2 (GNU/Linux)
+
+iD8DBQBEJVkBHy/MOxtbPTsRAu4hAJ4xpDZLdnFuxuJ6iSfBLqJXRrMuoACfUdXU
+fXihaF8yJgxcSqsA0KckT5w=
+=H8P7
+-----END PGP SIGNATURE-----
+
+--nextPart2105930.JGIkffF301--
 
 
 -------------------------------------------------------
