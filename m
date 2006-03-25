@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <003401c65037$19565730$6280a8c0@clytemnestra>
-From: "Alec Myers" <alec@fridge-news.co.uk>
-To: <bluez-users@lists.sourceforge.net>
-References: <001201c65019$a757a020$6280a8c0@clytemnestra>
-Subject: Re: [Bluez-users] Debian: rfcomm connection at boot: how?
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
+To: bluez-users@lists.sourceforge.net
+From: Doug <doug@hbs.edu>
+Message-ID: <loom.20060325T174822-928@post.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] logitech bluetooth mouse on fc3
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,55 +16,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 25 Mar 2006 18:08:19 -0000
+Date: Sat, 25 Mar 2006 16:57:01 +0000 (UTC)
 
+I'm having some problems getting, or should I say keeping, a logitech v270
+bluetooth mouse working on my ibm t42p laptop running 2.6.11-1.35_FC3.
 
-Aha - I have solved my own question: here's the answer for anyone who 
-wonders about this in the future:
+I can get it to connect by doing:
+sudo hidd --connect 00:07:61:48:CB:7F
 
--the rfcomm setup goes in rfcomm.conf
--no connection needs to be configured with hcitool - it happens dynamically.
+And this appears in the log:
+Mar 25 11:45:14 dswanson hidd: New HID device 00:07:61:48:CB:7F (Logitech
+Bluetooth Mouse)
+Mar 25 11:45:14 dswanson hal.hotplug[10064]: DEVPATH is not set
 
-Problem solved.
+Mouse works, after some random? amount of time the below line appears in the
+/var/log/messages:
+Mar 25 11:46:34 dswanson hal.hotplug[10124]: DEVPATH is not set
+Now the mouse doesn't work.
 
+Here's the status of it when its connected:
+Connections:
+        < ACL 00:07:61:48:CB:7F handle 42 state 1 lm MASTER
 
+Here's the bluetooth packages installed:
+gnome-bluetooth-0.5.1-5.FC3.1
+bluez-hcidump-1.11-1
+bluez-utils-2.10-2
+bluez-libs-2.10-2
+bluez-pin-0.23-3
+bluez-bluefw-1.0-6
 
-
-
-Subject: [Bluez-users] Debian: rfcomm connection at boot: how?
-
-
-A question from a Linux novice. I have bluez installed and working fine on
-Debian (3.1r1).
-
-I manually create a connection to my remote device with
-
-   hcitool cc xx:xx:xx:xx:xx:xx
-
-then hook it up to /dev/rfcomm0 with
-
-    rfcomm bind 0 xx:xx:xx:xx:xx:xx 1
-
-I'd like these two commands to execute at boot up. Is it possible to put
-them in, for instance, /etc/default/bluez-utils ? If so, what would the
-syntax be? If not then what's the 'right' way to do it? Do I need to write a
-shell script and install it with rc-update etc?
-
-Many thanks!
-
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by xPML, a groundbreaking scripting language
-that extends applications into web and mobile media. Attend the live webcast
-and join the prime developer group breaking into this new coding territory!
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=110944&bid=241720&dat=121642
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
+Any help is much appreciated!
+Thanks
+-Doug
 
 
 
