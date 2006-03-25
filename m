@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Patrick Laplante" <plaplante@vanteon.com>
+Message-ID: <000901c65064$040843c0$6280a8c0@clytemnestra>
+From: "Alec Myers" <alec@fridge-news.co.uk>
 To: <bluez-users@lists.sourceforge.net>
-Subject: RE: [Bluez-users] Question about licensing!
+References: <E1FNH0j-0003Bs-QK@mail.sourceforge.net>
+Subject: Re: [Bluez-users] Question about licensing!
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <000901c65064$040843c0$6280a8c0@clytemnestra>
-Message-ID: <E1FNIbj-0004oU-50@mail.sourceforge.net>
+	charset="iso-8859-1"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,43 +18,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 25 Mar 2006 18:55:30 -0500
-
-My customer makes reference board.  So they will sell that solution
-(firmware and board) to other customers that will then customize, rewrite,
-do whatever they want with it to then sell their product to the consumer
-market.
-
-With that in mind, my customer is hiring me to write reference code
-demonstrating that the reference board does what it claims it can do.  We
-could have a clause in there stating that the Bluetooth code is using bluez
-and is only there to demonstrate that the Bluetooth part is working.  In
-that case, the end customer may or may not want GPL so they may engage with
-other such as StoneStreet (I know one customer who wants to use this board
-that is likely to do that) or they may like be fine with the GPL and simply
-use bluez.
-
-I am new to the whole GPL/OSS thing; I've been buried under BSD stuff for
-years and just starting in the Linux world.
-
-Regards,
-
-
-Pat Laplante
-Principal Engineer
-Vanteon Corporation
-2851 Clover Street
-Pittsford, NY 14534-1711
-Office: (585) 248-0510 x298
-Fax: (585) 248-0537
-www.vanteon.com - Embedded for Your Future 
-
------Original Message-----
-From: bluez-users-admin@lists.sourceforge.net
-[mailto:bluez-users-admin@lists.sourceforge.net] On Behalf Of Alec Myers
-Sent: Saturday, March 25, 2006 6:30 PM
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Question about licensing!
+Date: Sat, 25 Mar 2006 23:29:46 -0000
 
 Just to be quite clear: is your customer planning on selling the complete 
 solution to the public? Or is it just an in-house project?
@@ -125,18 +89,6 @@ www.vanteon.com  <http://www.vanteon.com> - Embedded for Your Future
 
 
 
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by xPML, a groundbreaking scripting language
-that extends applications into web and mobile media. Attend the live webcast
-and join the prime developer group breaking into this new coding territory!
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=110944&bid=241720&dat=121642
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 
