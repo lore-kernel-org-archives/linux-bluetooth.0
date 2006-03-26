@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20603270203k53b20d7cx6be47e19c8d1f253@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
+From: Robin Roevens <robin.roevens1@pandora.be>
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] bluetooth seems to be working but no /var/lib/bluetooth directory is generated
+References: <200603251551.45792.robin.roevens1@pandora.be>
+In-Reply-To: <200603251551.45792.robin.roevens1@pandora.be>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_125_5902142.1143453834359"
-Subject: [Bluez-users] Service Classes-unspecified....
+Content-Type: multipart/signed;
+  boundary="nextPart2237151.KeQqoPATu1";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <200603261223.34086.robin.roevens1@pandora.be>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,76 +21,105 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 27 Mar 2006 15:33:54 +0530
+Date: Sun, 26 Mar 2006 12:23:10 +0200
 
-------=_Part_125_5902142.1143453834359
-Content-Type: text/plain; charset=ISO-8859-1
+--nextPart2237151.KeQqoPATu1
+Content-Type: text/plain;
+  charset="iso-8859-2"
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Guys I think mine is a lil peculiar problem,,,, hope to get a solution for
-here,.....
+Seems like I found the solution myself:
+With hciscan, i found all 3 devices, and I tried connecting them before wit=
+h=20
+hciscan but that never had any result.
+Then I found out that hidd also had a connect option, which always gave me=
+=20
+input/output and other errors causing nothing to connect.
 
-Initially when I was running the knoppix live CD.... my "hcicongig -a". had
-all the service classes including Networking,Rendering,Capturing and
-Audio... I was delighted... but now it shows in this way!!
+But I now I tried connecting the devices with hcitool first, so that "hcito=
+ol=20
+con" shows me my 3 devices. Then connecting hidd with "hidd connect" to eac=
+h=20
+of the devices and suddenly everything worked like a charm...
+Now I can reboot and do whatever and the devices automaticaly reconnect and=
+=20
+work...
 
-(and I didn't even change hcid.conf)
-root@bluetooth:~# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:09:DD:10:00:CC ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:63 acl:0 sco:0 events:7 errors:0
-        TX bytes:27 acl:0 sco:0 commands:7 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'Soumya-0'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver:
-0x175
-        Manufacturer: Cambridge Silicon Radio (10)
+Greetz
+Robin
 
+On Saturday 25 March 2006 15:51, Robin Roevens wrote:
+> Hi all,
+>
+> I have a logitech dinovo bluetooth media desktop Laser which works perfect
+> in HID mode, but I want more bluetooth functionality so I followed all
+> instructions on http://linux.yes.nu/diNovo/ and
+> http://forums.gentoo.org/viewtopic-t-231506-postdays-0-postorder-asc-star=
+t-
+>0.html to get it running in HCI mode. I'm running gentoo-sources kernel
+> 2.6.15-r1 + mh2 patch from bluez.org.
+> I have these bluez packages installed: bluez-utils-2.24 bluez-libs-2.24
+> bluez-hciemu-1.2 bluez-hcidump-1.30
+> hid2hci succesfully replies with
+>
+> Switching device 046d:c70c to HCI mode was successful
+> Switching device 046d:c70b to HCI mode was successful
+>
+> hciconfig gives me this:
+>
+> hci0: Type: USB
+> BD Address: 00:07:61:41:F5:80 ACL MTU: 1017:8 SCO MTU: 64:0
+> UP RUNNING PSCAN ISCAN
+> RX bytes:490 acl:11 sco:0 events:35 errors:0
+> TX bytes:771 acl:8 sco:0 commands:25 errors:0
+>
+> and hcitool finds all devices needed, so everything looks good but my
+> keyboard, -pad nor mouse work...
+> Every time I press a key on my keyboard, it connects succesfully, and giv=
+es
+> me this message in /var/log/messages:
+> hidd: HID create error 2 (No such file or directory)
+> and gets disconnected again
+>
+> I ran an strace on the hidd deamon and the moment I press a key I see thi=
+s:
+> open("/var/lib/bluetooth/00:07:61:41:F5:80/hidd", O_RDONLY) =3D -1 ENOENT=
+ (No
+> such file or directory)
+>
+> so I went checking my /var/lib/bluetooth directory and I found out, that
+> directory indeed doesn't exist..
+> As far as I understand the whole bluez bluetooth thing, that directory
+> should be generated automaticaly, but I can't seem to find anything about
+> the directory not being generated nor what process/module/whatever should
+> generate that directory...So I don't have any clue where to start searchi=
+ng
+> for a solution to this problem...
+> Can anyone help me? any suggestions are fine since I am starting to get
+> realy desperate.. Everyone but me with a dinovo desktop seems to have his
+> hardware working in linux. What am I missing?
+>
+> Greetz
+> Robin.
 
-How come are my Service classes "unspecified" ??
-ne ideas??
+=2D-=20
+100% MS FREE
+Absolutely no component of Microsoft was used
+in the generation or posting of this e-mail. So it is virus free
 
-------=_Part_125_5902142.1143453834359
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+--nextPart2237151.KeQqoPATu1
+Content-Type: application/pgp-signature
 
-Guys I think mine is a lil peculiar problem,,,, hope to get a solution for =
-here,..... <br><br>Initially when I was running the knoppix live CD.... my =
-&quot;hcicongig -a&quot;. had all the service classes including Networking,=
-Rendering,Capturing and Audio... I was delighted... but now it shows in thi=
-s way!!
-<br><br>(and I didn't even change hcid.conf)<br>root@bluetooth:~# hciconfig=
- -a<br>hci0:&nbsp;&nbsp; Type: USB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp; BD Address: 00:09:DD:10:00:CC ACL MTU: 192:8&nbsp; SCO MTU: 64:8<br>&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<br>&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:63 acl:0 sco:0 events:7 errors=
-:0
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:27 acl:0 sco:0 comm=
-ands:7 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xf=
-f 0xff 0x0f 0x00 0x00 0x00 0x00 0x00<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3<br>&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp; Link mode: SLAVE ACCEPT
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'Soumya-0'<br>&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class: 0x000100<br>&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp; Service Classes: Unspecified<br>&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp; Device Class: Computer, Uncategorized<br>&nbsp;&nbsp;=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1=
-.1 (0x1) LMP Subver: 0x175
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufacturer: Cambridge Sili=
-con Radio (10)<br><br><br>How come are my Service classes &quot;unspecified=
-&quot; ?? <br>ne ideas??<br>
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.2 (GNU/Linux)
 
-------=_Part_125_5902142.1143453834359--
+iD8DBQBEJmumHy/MOxtbPTsRAhRQAJoD+wNRWmQ9Pc/ou7lG+Z/wknP7pQCfenAb
+SHQgXwWKa6JrY14ZyLZbvMQ=
+=QMxx
+-----END PGP SIGNATURE-----
+
+--nextPart2237151.KeQqoPATu1--
 
 
 -------------------------------------------------------
