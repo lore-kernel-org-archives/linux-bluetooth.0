@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <becc9d2c0603290046gfd5d2d2y6b766bf62ccda671@mail.gmail.com>
-From: "Andrea Carlevato" <andrea.carlevatoml@gmail.com>
+From: Florian Echtler <floe@butterbrot.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_12987_5582075.1143621966716"
-Subject: [Bluez-devel] Blueooth 2.0 sitecome dongles support ?
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-3OskYJrz+epM6Fdc/QU7"
+Message-Id: <1143530119.9151.5.camel@localhost>
+Mime-Version: 1.0
+Subject: [Bluez-devel] 2.4 Kernel hacking question
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,34 +16,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 29 Mar 2006 10:46:06 +0200
+Date: Tue, 28 Mar 2006 09:15:19 +0200
 
-------=_Part_12987_5582075.1143621966716
-Content-Type: text/plain; charset=ISO-8859-1
+
+--=-3OskYJrz+epM6Fdc/QU7
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-hi to all,
-i am going to buy a CN-521 Sitecom Bluetooth dongle,
-which is 2.0 edr and think to be based on CSR Bluecore4 chip.
-My question is: is bluez working on this device, and does all
-common libs work like 1.2 relese of that hardware ?
+Hello everybody,
 
-thanks a lot
-Andrea Carlevato
+as already mentioned in some earlier post, I've backported the most
+recent BlueZ modules from kernel 2.4.31-mh1 to a custom kernel 2.4.20.
 
-------=_Part_12987_5582075.1143621966716
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+I know that the 2.4 branch is considered unsupported by now, but maybe
+somebody can answer my question regardless:
 
-hi to all,<br>i am going to buy a CN-521 Sitecom Bluetooth dongle,<br>which=
- is 2.0 edr and think to be based on CSR Bluecore4 chip.<br>My question is:=
- is bluez working on this device, and does all<br>common libs work like=20
-1.2 relese of that hardware ?<br><br>thanks a lot<br>Andrea Carlevato<br><b=
-r><br>
+in rfcomm/tty.c, line 592, a function tty_wakeup() is used that isn't
+available in 2.4.20 yet. Can anybody tell me what exactly this function
+is supposed to do so that I can look for a workaround? (*)
 
-------=_Part_12987_5582075.1143621966716--
+CU Florian
+
+(*) I've already looked at the kernel source, of course. Still haven't
+got a real clue, though.. :-/
+
+
+--=-3OskYJrz+epM6Fdc/QU7
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: Dies ist ein digital signierter Nachrichtenteil
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.2 (GNU/Linux)
+
+iD8DBQBEKOKH7CzyshGvatgRAq9QAKDbEyYIkieyRfyw19B/dzOihfzEggCg1c1J
+ONy0vEzmNtJmW829c7xJ6yU=
+=fyYp
+-----END PGP SIGNATURE-----
+
+--=-3OskYJrz+epM6Fdc/QU7--
+
 
 
 -------------------------------------------------------
