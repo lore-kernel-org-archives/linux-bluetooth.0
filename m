@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Ingo Braun <Ingo.Braun@Medien.Uni-Weimar.de>
-Message-ID: <1513284197.20060331004549@Medien.Uni-Weimar.de>
+Message-ID: <becc9d2c0603290046gfd5d2d2y6b766bf62ccda671@mail.gmail.com>
+From: "Andrea Carlevato" <andrea.carlevatoml@gmail.com>
 To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] HSP and GSM 07.07
+Content-Type: multipart/alternative;
+	boundary="----=_Part_12987_5582075.1143621966716"
+Subject: [Bluez-devel] Blueooth 2.0 sitecome dongles support ?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,18 +17,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 31 Mar 2006 00:45:49 +0200
+Date: Wed, 29 Mar 2006 10:46:06 +0200
 
-Hello BlueZ development members,
+------=_Part_12987_5582075.1143621966716
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I'd like to know if the HSP supports the GSM 07.07 AT command "ATDnnn"
-for dialing.
+hi to all,
+i am going to buy a CN-521 Sitecom Bluetooth dongle,
+which is 2.0 edr and think to be based on CSR Bluecore4 chip.
+My question is: is bluez working on this device, and does all
+common libs work like 1.2 relese of that hardware ?
 
+thanks a lot
+Andrea Carlevato
 
--- 
-Best regards,
- Ingo                          mailto:Ingo.Braun@Medien.Uni-Weimar.de
+------=_Part_12987_5582075.1143621966716
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
+hi to all,<br>i am going to buy a CN-521 Sitecom Bluetooth dongle,<br>which=
+ is 2.0 edr and think to be based on CSR Bluecore4 chip.<br>My question is:=
+ is bluez working on this device, and does all<br>common libs work like=20
+1.2 relese of that hardware ?<br><br>thanks a lot<br>Andrea Carlevato<br><b=
+r><br>
+
+------=_Part_12987_5582075.1143621966716--
 
 
 -------------------------------------------------------
