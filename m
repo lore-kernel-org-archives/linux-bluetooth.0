@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <442EC2B6.70901@cs.bgu.ac.il>
-From: Niv <nivv@cs.bgu.ac.il>
-MIME-Version: 1.0
+Message-ID: <ef9938ec0603312242m41d4f82bm411d8f63780bc879@mail.gmail.com>
+From: "Albert Huang" <ashuang@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8
-Subject: [Bluez-users] snd-bt-sco doesnt load automaticly
+Subject: Re: [Bluez-users] Fwd: l2ping problem about "Can't connect: Host is down"
+In-Reply-To: <f64f4e8a0603291723r2f529303md34d79a52a8f2f2e@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_9071_5039849.1143873745053"
+References: <f64f4e8a0603290636m323b0802v10a71ce9be067254@mail.gmail.com>
+	 <f64f4e8a0603291723r2f529303md34d79a52a8f2f2e@mail.gmail.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,36 +20,246 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 01 Apr 2006 21:13:10 +0300
+Date: Sat, 1 Apr 2006 01:42:25 -0500
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+------=_Part_9071_5039849.1143873745053
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Hay all,
-I am running Gentoo kernel  2.6.15.4
-my /etc/modules.d/alsa reads:
+try it with hcidump -X -V and post the dump.
 
-# ALSA portion
-alias char-major-116 snd
+-albert
 
-alias snd-card-0 snd-via82xx
-alias snd-card-1 snd-bt87x
-alias snd-card-2 snd-bt-sco
-alias snd-card-3 snd-usb-audio
-alias snd-card-4 snd-usb-audio
+On 3/29/06, zhu yong <zhuyong0003@gmail.com> wrote:
+>
+>
+>
+> ---------- Forwarded message ----------
+> From: zhu yong <zhuyong0003@gmail.com>
+> Date: Mar 29, 2006 10:36 PM
+> Subject: l2ping problem about "Can't connect: Host is down"
+> To: bluez-users@lists.sourceforge.net
+>
+> Hi everyone,
+>
+> I am working with two bluetooth USB dongles. I use bluez-utils-2.25
+> and bluez-libs-2.25 packet. I use redhat9.0 with linux kernel 2.4.20,
+> I am not familier with kernel update, so I don't use bluez patch to
+> 2.4.20.
+> They are connected to the same host. However I cannot l2ping one from
+> the other.
+> info as follows:
+> [root@localhost root]# l2ping -i 00:11:67:20:7e:33 00:11:67:1a:a7:0f
+> Can't connect: Host is down
+>
+> And it looks like they are configured:
+> [root@localhost root]# hciconfig -a hci0
+> hci0:   Type: USB
+>        BD Address: 00:11:67:1A:A7:0F ACL MTU: 678:8 SCO MTU: 48:10
+>        UP RUNNING PSCAN ISCAN INQUIRY
+>        RX bytes:1038 acl:0 sco:0 events:38 errors:0
+>        TX bytes:923 acl:0 sco:0 commands:38 errors:0
+>        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
+>        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>        Link policy: RSWITCH HOLD SNIFF PARK
+>        Link mode: SLAVE ACCEPT
+>        Name: 'BlueZ (0)'
+>        Class: 0x3e0100
+>        Service Classes: Networking, Rendering, Capturing
+>        Device Class: Computer, Uncategorized
+>        HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP Subver:
+> 0x1fe
+>        Manufacturer: Integrated System Solution Corp. (57)
+>
+> [root@localhost root]# hciconfig -a hci1
+> hci1:   Type: USB
+>        BD Address: 00:11:67:20:7E:33 ACL MTU: 678:8 SCO MTU: 48:10
+>        UP RUNNING PSCAN ISCAN
+>        RX bytes:724 acl:0 sco:0 events:58 errors:0
+>        TX bytes:1075 acl:0 sco:0 commands:49 errors:0
+>        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
+>        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>        Link policy: RSWITCH HOLD SNIFF PARK
+>        Link mode: SLAVE ACCEPT
+>        Name: 'BlueZ (1)'
+>        Class: 0x3e0100
+>        Service Classes: Networking, Rendering, Capturing
+>        Device Class: Computer, Uncategorized
+>        HCI Ver: 1.2 (0x2) HCI Rev: 0x1f4 LMP Ver: 1.2 (0x2) LMP Subver:
+> 0x1f4
+>        Manufacturer: Integrated System Solution Corp. (57)
+>
+> load module as follows:
+> [root@localhost bluez-utils-2.25]# lsmod
+> Module                  Size  Used by    Not tainted
+> l2cap                  19276   1
+> hci_usb                 8920   2
+> bluez                  40132  11  [l2cap hci_usb]
+> nls_iso8859-1           3516   1  (autoclean)
+> nls_cp437               5116   1  (autoclean)
+> vfat                   13004   1  (autoclean)
+> fat                    38808   0  (autoclean) [vfat]
+> ide-cd                 35708   0  (autoclean)
+> cdrom                  33728   0  (autoclean) [ide-cd]
+> parport_pc             19076   1  (autoclean)
+> lp                      8996   0  (autoclean)
+> parport                37056   1  (autoclean) [parport_pc lp]
+> autofs                 13268   0  (autoclean) (unused)
+> sis900                 16812   1
+> ipt_REJECT              3928   6  (autoclean)
+> iptable_filter          2412   1  (autoclean)
+> ip_tables              15096   2  [ipt_REJECT iptable_filter]
+> microcode               4668   0  (autoclean)
+> keybdev                 2944   0  (unused)
+> mousedev                5492   1
+> hid                    22148   0  (unused)
+> input                   5856   0  [keybdev mousedev hid]
+> ehci-hcd               19976   0  (unused)
+> usb-ohci               21480   0  (unused)
+> usbcore                78784   1  [hci_usb hid ehci-hcd usb-ohci]
+> [root@localhost bluez-utils-2.25]#
+>
+> Can anyone figure out what"s wrong?
+>
+> Thanks in advance,
+> yong Zhu
+>
 
-It used to load the sco BT , but now doesnt.
-When I run modprobe snd-bt-sco , it does load.
+------=_Part_9071_5039849.1143873745053
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Niv
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2.2 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+try it with hcidump -X -V and post the dump.<br>
+<br>
+-albert<br><br><div><span class=3D"gmail_quote">On 3/29/06, <b class=3D"gma=
+il_sendername">zhu yong</b> &lt;<a href=3D"mailto:zhuyong0003@gmail.com">zh=
+uyong0003@gmail.com</a>&gt; wrote:</span><blockquote class=3D"gmail_quote" =
+style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8=
+ex; padding-left: 1ex;">
+<div style=3D"direction: ltr;"><span class=3D"e" id=3D"q_10a48c03c9da6469_0=
+"><br><br>---------- Forwarded message ----------<br><span class=3D"gmail_q=
+uote">From: <b class=3D"gmail_sendername">zhu yong</b> &lt;<a href=3D"mailt=
+o:zhuyong0003@gmail.com" target=3D"_blank" onclick=3D"return top.js.OpenExt=
+Link(window,event,this)">
+zhuyong0003@gmail.com</a>&gt;<br>Date: Mar 29, 2006 10:36 PM
+<br>Subject: l2ping problem about &quot;Can't connect: Host is down&quot;<b=
+r>To: <a href=3D"mailto:bluez-users@lists.sourceforge.net" target=3D"_blank=
+" onclick=3D"return top.js.OpenExtLink(window,event,this)">bluez-users@list=
+s.sourceforge.net
+</a><br><br></span>Hi everyone,<br><br>I am working with two bluetooth USB =
+dongles. I use=20
+bluez-utils-2.25<br>and bluez-libs-2.25 packet. I use redhat9.0 with linux =
+kernel 2.4.20,<br>I am not familier with kernel update, so I don't use blue=
+z patch to<br>2.4.20.<br>They are connected to the same host. However I can=
+not l2ping one from
+<br>the other.<br>info as follows:<br>[root@localhost root]# l2ping -i 00:1=
+1:67:20:7e:33 00:11:67:1a:a7:0f<br>Can't connect: Host is down<br><br>And i=
+t looks like they are configured:<br>[root@localhost root]# hciconfig -a hc=
+i0
+<br>hci0:&nbsp;&nbsp; Type: USB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD =
+Address: 00:11:67:1A:A7:0F ACL MTU: 678:8 SCO MTU: 48:10<br>&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN INQUIRY<br>&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; RX bytes:1038 acl:0 sco:0 events:38 errors:0<br>&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:923 acl:0 sco:0 commands:38 errors:0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xbf 0xfe 0x8d 0x78 0x08=
+ 0x18 0x00 0x00<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Packet type: DM1 DM=
+3 DM5 DH1 DH3 DH5 HV1 HV2 HV3<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link =
+policy: RSWITCH HOLD SNIFF PARK<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Lin=
+k mode: SLAVE ACCEPT<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'BlueZ (=
+0)'
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class: 0x3e0100<br>&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp; Service Classes: Networking, Rendering, Capturing<br>=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Device Class: Computer, Uncategorized<=
+br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe L=
+MP Ver: 1.2 (0x2) LMP Subver: 0x1fe<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+ Manufacturer: Integrated System Solution Corp. (57)
+<br><br>[root@localhost root]# hciconfig -a hci1<br>hci1:&nbsp;&nbsp; Type:=
+ USB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:11:67:20:7E:33 =
+ACL MTU: 678:8 SCO MTU: 48:10<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RU=
+NNING PSCAN ISCAN<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:724 acl:=
+0 sco:0 events:58 errors:0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:1075 acl:0 sco:0 commands=
+:49 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xbf 0xfe 0x=
+8d 0x78 0x08 0x18 0x00 0x00<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Packet =
+type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp; Link policy: RSWITCH HOLD SNIFF PARK
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link mode: SLAVE ACCEPT<br>&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'BlueZ (1)'<br>&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp; Class: 0x3e0100<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Servic=
+e Classes: Networking, Rendering, Capturing<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp; Device Class: Computer, Uncategorized<br>&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp; HCI Ver: 1.2 (0x2) HCI Rev: 0x1f4 LMP Ver:=20
+1.2 (0x2) LMP Subver: 0x1f4<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufac=
+turer: Integrated System Solution Corp. (57)<br><br>load module as follows:=
+<br>[root@localhost bluez-utils-2.25]# lsmod<br>Module&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;Size&nbsp;&nbsp;Used by&nbsp;&nbsp;&nbsp;&nbsp;Not tainted
+<br>l2cap&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;19276&nbsp;&nbsp;
+1<br>hci_usb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8920&nbsp;&nbsp; 2<br>bluez&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;40132&nbsp;&nbsp;11&nbsp;&nbsp;[l2cap hci_usb]<br>nls_is=
+o8859-1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3516&nb=
+sp;&nbsp; 1&nbsp;&nbsp;(autoclean)<br>nls_cp437&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+5116&nbsp;&nbsp; 1&nbsp;&nbsp;(autoclean)<br>
+vfat&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+13004&nbsp;&nbsp; 1&nbsp;&nbsp;(autoclean)<br>fat&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;38808&nbsp;&nbsp;
+0&nbsp;&nbsp;(autoclean) [vfat]<br>ide-cd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+35708&nbsp;&nbsp; 0&nbsp;&nbsp;(autoclean)<br>cdrom&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;33728&nbsp;&nbsp;
+0&nbsp;&nbsp;(autoclean) [ide-cd]<br>parport_pc&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 19076&nbsp;&nbsp; 1&nbsp;&nbsp=
+;(autoclean)
+<br>lp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;8996&nbsp;&n=
+bsp;
+0&nbsp;&nbsp;(autoclean)<br>parport&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;37056&nbsp;&nbsp;
+1&nbsp;&nbsp;(autoclean) [parport_pc lp]<br>autofs&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+13268&nbsp;&nbsp; 0&nbsp;&nbsp;(autoclean) (unused)<br>sis900&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp; 16812&nbsp;&nbsp; 1<br>ipt_REJECT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3928&nbsp;&nbsp;
+6&nbsp;&nbsp;(autoclean)
+<br>iptable_filter&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;2412&nbsp;&nbsp; 1&nbsp;&nbsp;(autoclean)<br>ip_tables&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15096&nbs=
+p;&nbsp;
+2&nbsp;&nbsp;[ipt_REJECT iptable_filter]<br>microcode&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+4668&nbsp;&nbsp; 0&nbsp;&nbsp;(autoclean)<br>keybdev&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+2944&nbsp;&nbsp; 0&nbsp;&nbsp;(unused)<br>mousedev&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5492=
+&nbsp;&nbsp; 1
+<br>hid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;22148&nbsp;&nbsp;
+0&nbsp;&nbsp;(unused)<br>input&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+5856&nbsp;&nbsp; 0&nbsp;&nbsp;[keybdev mousedev hid]<br>ehci-hcd&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+19976&nbsp;&nbsp; 0&nbsp;&nbsp;(unused)<br>usb-ohci&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+21480&nbsp;&nbsp; 0&nbsp;&nbsp;(unused)<br>usbcore&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7878=
+4&nbsp;&nbsp;
+1&nbsp;&nbsp;[hci_usb hid ehci-hcd usb-ohci]
+<br>[root@localhost bluez-utils-2.25]#<br><br>Can anyone figure out what&qu=
+ot;s wrong?<br><br>Thanks in advance,<br>yong Zhu<br>
 
-iD8DBQFELsK2kwazfG0MmCYRAicGAJ9Oma8queMwY8EsxgAbeKcospx0SgCfdK2N
-eT8pareSD6rI8ZraemG1o2E=
-=DiF0
------END PGP SIGNATURE-----
+</span></div></blockquote></div><br>
+
+------=_Part_9071_5039849.1143873745053--
 
 
 -------------------------------------------------------
