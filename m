@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Geoff Shang <geoff@hitsandpieces.net>
-To: Linux for blind general discussion <blinux-list@redhat.com>
-Cc: general@lists.humbug.org.au, bluez-users@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.64.0603181246420.738@data.home>
-Message-ID: <Pine.LNX.4.64.0604020439250.738@data.home>
-References: <Pine.LNX.4.64.0603181246420.738@data.home>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Subject: [Bluez-users] Solved (was Re: Bluetooth: pand: Connection failed. File exists(17))
+From: Christoph Simon <ml133@netpole.com.br>
+To: bluez-users@lists.sourceforge.net
+Message-Id: <20060401131949.fdb6d992.ml133@netpole.com.br>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] Anonymous service setup
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,30 +16,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 2 Apr 2006 04:45:27 +1000 (EST)
+Date: Sat, 1 Apr 2006 13:19:49 -0300
 
-Geoff Shang wrote:
+Hi,
 
-> When I try to connect from the panu, I get the following:
->
-> Mar 10 18:35:46 data pand[16077]: Connection failed. File exists(17)
+I was asked to set up a linux (debian) box, which has an usb bluetooth
+dongle, and which would allow anyone passing by and having a bluetooth
+enabled device, to fetch some file from the server.
 
-This was a case of brain failure on my part.  I failed to understand that 
-pand merely instructs the kernel and the hardware, rather than actually 
-maintain the connections.  This is unlike PPPd, for example.  So a PAN 
-connection will remain even if PANd is shut down.
+Unfortunately, I'm really stuck with all this, too many TLAs. I
+managed to run hciconfig listing the dongle, to scan and inquire a
+cellphone and to use l2ping on the MAC address. But there doesn't seem
+to be a way to make a basic filetransfer.
 
-The reason why I was getting the error is that I was trying to create a 
-connection that already existed.  I was able to verify this with "pand -l".
+When trying with obexftp, the celphone will asked for a PIN, when I
+enter that which is written in /etc/bluetooth/pin, but then it just
+hangs. In daemon.log, I can see the messages from hcid
+"link_key_request" and "pin_code_request" but nothing else. After some
+time, both obexftp desists, and the Motorola celphone would reboot. I
+have been looking for some sort of debug mode of hcid, but couldn't
+find any flag. I also changed the pin_helper line in the config file
+to be a shellscript which just outputs "PIN:1234", but still doesn't
+work. (the script is executable and works on the shell).
 
-I admit that the somewhat unhelpful error message had me chasing red 
-herrings for awhile.
+Thus, my first question is, what do I need to do to make this work. I
+should work, right? And the second question is, what kind of service I
+would have to setup, such that anybody can get some files prepared on
+that server, with the minimum hassle of typing pincodes.
 
-Thanks to those of you who, through your suggestions, nudged me in the 
-right direction.
+Thanks,
 
-Geoff.
-
+-- 
+Chris
 
 
 -------------------------------------------------------
