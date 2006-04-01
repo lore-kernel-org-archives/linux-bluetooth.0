@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Christoph Simon <ml133@netpole.com.br>
+Message-ID: <442EC2B6.70901@cs.bgu.ac.il>
+From: Niv <nivv@cs.bgu.ac.il>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20060401131949.fdb6d992.ml133@netpole.com.br>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Anonymous service setup
+Content-Type: text/plain; charset=UTF-8
+Subject: [Bluez-users] snd-bt-sco doesnt load automaticly
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,38 +16,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 1 Apr 2006 13:19:49 -0300
+Date: Sat, 01 Apr 2006 21:13:10 +0300
 
-Hi,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-I was asked to set up a linux (debian) box, which has an usb bluetooth
-dongle, and which would allow anyone passing by and having a bluetooth
-enabled device, to fetch some file from the server.
+Hay all,
+I am running Gentoo kernel  2.6.15.4
+my /etc/modules.d/alsa reads:
 
-Unfortunately, I'm really stuck with all this, too many TLAs. I
-managed to run hciconfig listing the dongle, to scan and inquire a
-cellphone and to use l2ping on the MAC address. But there doesn't seem
-to be a way to make a basic filetransfer.
+# ALSA portion
+alias char-major-116 snd
 
-When trying with obexftp, the celphone will asked for a PIN, when I
-enter that which is written in /etc/bluetooth/pin, but then it just
-hangs. In daemon.log, I can see the messages from hcid
-"link_key_request" and "pin_code_request" but nothing else. After some
-time, both obexftp desists, and the Motorola celphone would reboot. I
-have been looking for some sort of debug mode of hcid, but couldn't
-find any flag. I also changed the pin_helper line in the config file
-to be a shellscript which just outputs "PIN:1234", but still doesn't
-work. (the script is executable and works on the shell).
+alias snd-card-0 snd-via82xx
+alias snd-card-1 snd-bt87x
+alias snd-card-2 snd-bt-sco
+alias snd-card-3 snd-usb-audio
+alias snd-card-4 snd-usb-audio
 
-Thus, my first question is, what do I need to do to make this work. I
-should work, right? And the second question is, what kind of service I
-would have to setup, such that anybody can get some files prepared on
-that server, with the minimum hassle of typing pincodes.
+It used to load the sco BT , but now doesnt.
+When I run modprobe snd-bt-sco , it does load.
 
-Thanks,
+Niv
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.2 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
 
--- 
-Chris
+iD8DBQFELsK2kwazfG0MmCYRAicGAJ9Oma8queMwY8EsxgAbeKcospx0SgCfdK2N
+eT8pareSD6rI8ZraemG1o2E=
+=DiF0
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
