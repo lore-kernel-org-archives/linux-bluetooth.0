@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <443191B9.1040603@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <d23110170604030756h26f0ceb4h49eea03096d1508@mail.gmail.com>
+From: "Ulisses Furquim" <ulissesf@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Broadcom + SCO MTU patch, only beeps, raises noiselevel
- but no sound...
-References: <1143969010.12604.10.camel@firenze.zurich.ibm.com>
-In-Reply-To: <1143969010.12604.10.camel@firenze.zurich.ibm.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] Headsets that support sniff mode?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,21 +16,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 03 Apr 2006 15:20:57 -0600
+Date: Mon, 3 Apr 2006 11:56:56 -0300
 
-Jeroen
+Hi,
 
-> As it seems the problem is really with the Broadcom chip and it's driver
-> source availability, thus I guess a better and easier question than
-> asking why it doesn't work etc, is to simply ask which one of the
-> following adapters is a CSR
+I'm looking for headsets that support sniff mode. Are there any
+devices that you could recommend to me?
 
-The d-link dbt-120 uses CSR. It's likely the 122 does too.
+Best regards,
 
-If you can go elsewhere, the adapter that does it all is the Bluetake
-BT007EX. Class 1, CSR, edr.
-
-Brad
+-- Ulisses
 
 
 -------------------------------------------------------
