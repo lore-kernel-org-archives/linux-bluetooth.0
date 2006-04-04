@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Thomas Arendsen Hein <thomas@intevation.de>
+Message-ID: <fe0a97c20604040626ma7671acv8720823a6d45219a@mail.gmail.com>
+From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20060404134851.GB5177@intevation.de>
-References: <20060308164641.23944.qmail@web31111.mail.mud.yahoo.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20060308164641.23944.qmail@web31111.mail.mud.yahoo.com>
-Subject: [Bluez-users] Re: Fwd: DHCP for dund
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_3737_29666403.1144157183783"
+Subject: [Bluez-users] AT commands
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,46 +17,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 4 Apr 2006 15:48:52 +0200
+Date: Tue, 4 Apr 2006 18:56:23 +0530
 
-* Yu Zhi <kuanyz@yahoo.com> [20060308 16:47]:
-> I'd using dund to establush connectino with my Pocket PC. Here's the steps I'd taken:
->
->  2) Put the following lines in a file called /etc/ppp/peers/dun
->  115200
->  192.168.1.18:10.0.1.40
->  local
->  ms-dns 192.168.1.1
->  noauth
->  debug
->
-> The steps work perfectly for my PDA to dialup to my linux server,
-> and manage to browse the content in my webserver. However, the
-> steps are only to assign fixed IP (in this case 10.0.1.40) to my
-> PDA. I wish to have multiple PDA connect to the linux server, and
-> hence fixed IP is not a solution.
+------=_Part_3737_29666403.1144157183783
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Instead of 192.168.1.18:10.0.1.40 in /etc/ppp/dund I just use:
-name dund
+Hi all...
+Can anyone of you let me know as to how to know the AT commands?? in the
+sense when a Headset is connected to an audio gateway what are all the AT
+commands communicated between them....
+Probably Iam searching for some appropriate links to learn the AT
+commands... will be highly obliged if anyone of u cud provide me with such
+links......
 
-And in /etc/ppp/pap-secrets I have:
-palm-foo palm "pass1" foo
-palm-bar palm "pass2" bar
 
-So if I log in using the PPP username 'palm-foo' (with password
-'pass1') I get the hostname 'foo' assigned, with 'palm-bar' the
-hostname 'bar'.
 
-> What should I do if i wanted DHCP server support dund for my case.
+regards
+Soumya
 
-I hoped somebody would answer this, but I didn't find a way to use
-DHCP with PPP, too.
+------=_Part_3737_29666403.1144157183783
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Thomas
+Hi all... <br>Can anyone of you let me know as to how to know the AT comman=
+ds?? in the sense when a Headset is connected to an audio gateway what are =
+all the AT commands communicated between them.... <br>Probably Iam searchin=
+g for some appropriate links to learn the AT commands... will be highly obl=
+iged if anyone of u cud provide me with such links......=20
+<br><br><br><br>regards<br>Soumya<br>
 
--- 
-Email: thomas@intevation.de
-http://intevation.de/~thomas/
+------=_Part_3737_29666403.1144157183783--
 
 
 -------------------------------------------------------
