@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <9ec07a230604041044j6b1b91f4ue25b44f2ed6f7c55@mail.gmail.com>
-From: "=?ISO-8859-1?Q?Israel_Gu=EDo?=" <israzar@gmail.com>
+Message-ID: <6297d67c0604040645s3e26f3a0x84c4b2cac1e42217@mail.gmail.com>
+From: "Mayank Batra" <mayankbatra@gmail.com>
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Service Classes-unspecified....
+In-Reply-To: <fe0a97c20604040600k105581f1i96aa8334894218a@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_25867_11980523.1144172677239"
-Subject: [Bluez-devel] SCO transparent transmission
+	boundary="----=_Part_1445_3581277.1144158307641"
+References: <fe0a97c20603270203k53b20d7cx6be47e19c8d1f253@mail.gmail.com>
+	 <fe0a97c20604040600k105581f1i96aa8334894218a@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,61 +20,106 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 4 Apr 2006 19:44:37 +0200
+Date: Tue, 4 Apr 2006 19:15:07 +0530
 
-------=_Part_25867_11980523.1144172677239
+------=_Part_1445_3581277.1144158307641
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Hi.
+Sowmya,
 
-I'm trying to write an app for voice transmission between two laptops. When
-using CVSD, the communication performs ok. However, I would need to transmi=
-t
-the PCM samples in a transparent mode, for after receiving a voice frame, I
-must process the samples.
+Can you try restarting the whole process i.e. remove all bluez modules, kil=
+l
+hcid and sdpd, remove your bluetooth adapter and reinsert it.
+Now insert all modules and start hcid and sdpd.
 
-I have read in Bluetooth 2.0 specification that this can be done, for
-example, with 0x0063 as voice settings. I have tried it with my Bluetooth
-2.0+EDR dongles but it doesn't work properly. I transmit continuously a
-frame with values 0x01 through 0x30, but in the receiver side and using
-hcidump, I see that a brust of 0 is inserted in the middle of some frames
-and there are hops in the sequence. For instance, I send 0x00 0x01 0x02 0x0=
-3
-0x04 .... 0x29 0x30, but I receive 0x2e 0x2f 0x30 0x00 0x01 0x02 0x2f 0x30
-0x00 0x01.....
+Mayank
 
-Have any of you tested it? Is there any solution to make what I try?
 
-Thanks.
+On 4/4/06, Sowmya Gattupalli <sowmya.gattupalli@gmail.com> wrote:
+>
+>
+>
+> Guys I think mine is a lil peculiar problem,,,, hope to get a solution fo=
+r
+> here,.....
+>
+> Initially when I was running the knoppix live CD.... my "hcicongig -a".
+> had all the service classes including Networking,Rendering,Capturing and
+> Audio... I was delighted... but now it shows in this way!!
+>
+> (and I didn't even change hcid.conf)
+> root@bluetooth:~# hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:09:DD:10:00:CC ACL MTU: 192:8  SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:63 acl:0 sco:0 events:7 errors:0
+>         TX bytes:27 acl:0 sco:0 commands:7 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy:
+>         Link mode: SLAVE ACCEPT
+>         Name: 'Soumya-0'
+>         Class: 0x000100
+>         Service Classes: Unspecified
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver:
+> 0x175
+>         Manufacturer: Cambridge Silicon Radio (10)
+>
+>
+> How come are my Service classes "unspecified" ??
+> ne ideas??
+>
+>
 
-------=_Part_25867_11980523.1144172677239
+------=_Part_1445_3581277.1144158307641
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Hi.<br>
-<br>
-I'm trying to write an app for voice transmission between two laptops.
-When using CVSD, the communication performs ok. However, I would need
-to transmit the PCM samples in a transparent mode, for after receiving
-a voice frame, I must process the samples.<br>
-<br>
-I have read in Bluetooth 2.0 specification that this can be done, for
-example, with 0x0063 as voice settings. I have tried it with my
-Bluetooth 2.0+EDR dongles but it doesn't work properly. I transmit
-continuously a frame with values 0x01 through 0x30, but in the receiver
-side and using hcidump, I see that a brust of 0 is inserted in the
-middle of some frames and there are hops in the sequence. For instance,
-I send 0x00 0x01 0x02 0x03 0x04 .... 0x29 0x30, but I receive 0x2e 0x2f
-0x30 0x00 0x01 0x02 0x2f 0x30 0x00 0x01.....<br>
-<br>
-Have any of you tested it? Is there any solution to make what I try?<br>
-<br>
-Thanks. <br>
+<div>Sowmya,</div>
+<div>&nbsp;</div>
+<div>Can you try restarting the whole process i.e. remove all bluez modules=
+, kill hcid and sdpd, remove your bluetooth adapter and reinsert it.</div>
+<div>Now insert all modules and start hcid and sdpd.</div>
+<div>&nbsp;</div>
+<div>Mayank<br><br>&nbsp;</div>
+<div><span class=3D"gmail_quote">On 4/4/06, <b class=3D"gmail_sendername">S=
+owmya Gattupalli</b> &lt;<a href=3D"mailto:sowmya.gattupalli@gmail.com">sow=
+mya.gattupalli@gmail.com</a>&gt; wrote:</span>
+<blockquote class=3D"gmail_quote" style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0=
+px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">
+<div style=3D"DIRECTION: ltr"><br><span class=3D"gmail_quote"><br></span>
+<div style=3D"DIRECTION: ltr">Guys I think mine is a lil peculiar problem,,=
+,, hope to get a solution for here,..... <br><br>Initially when I was runni=
+ng the knoppix live CD.... my &quot;hcicongig -a&quot;. had all the service=
+ classes including Networking,Rendering,Capturing and Audio... I was deligh=
+ted... but now it shows in this way!!=20
+<br><br>(and I didn't even change hcid.conf)<br>root@bluetooth:~# hciconfig=
+ -a<br>hci0:&nbsp;&nbsp; Type: USB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp; BD Address: 00:09:DD:10:00:CC ACL MTU: 192:8&nbsp; SCO MTU: 64:8<br>&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<br>&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:63 acl:0 sco:0 events:7 errors=
+:0=20
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:27 acl:0 sco:0 comm=
+ands:7 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xf=
+f 0xff 0x0f 0x00 0x00 0x00 0x00 0x00<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3<br>&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp; Link mode: SLAVE ACCEPT=20
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'Soumya-0'<br>&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class: 0x000100<br>&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp; Service Classes: Unspecified<br>&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp; Device Class: Computer, Uncategorized<br>&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1=
+.1 (0x1) LMP Subver: 0x175=20
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufacturer: Cambridge Sili=
+con Radio (10)<br><br><br>How come are my Service classes &quot;unspecified=
+&quot; ?? <br>ne ideas??<br>&nbsp;</div></div></blockquote></div><br>
 
-------=_Part_25867_11980523.1144172677239--
+------=_Part_1445_3581277.1144158307641--
 
 
 -------------------------------------------------------
