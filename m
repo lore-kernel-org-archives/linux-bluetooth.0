@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20604040600k105581f1i96aa8334894218a@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
-To: Bluez-devel@lists.sourceforge.net
-In-Reply-To: <fe0a97c20603270203k53b20d7cx6be47e19c8d1f253@mail.gmail.com>
+Message-ID: <6297d67c0604040537yc7db5ci75e27815746a6aef@mail.gmail.com>
+From: "Mayank Batra" <mayankbatra@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] how to compile and install bluez
+In-Reply-To: <BAY112-F8C1E5AD573AAD1E9BC73FA5CA0@phx.gbl>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_3393_18106450.1144155656632"
-References: <fe0a97c20603270203k53b20d7cx6be47e19c8d1f253@mail.gmail.com>
-Subject: [Bluez-devel] Service Classes-unspecified....
+	boundary="----=_Part_13126_30250332.1144154249116"
+References: <BAY112-F8C1E5AD573AAD1E9BC73FA5CA0@phx.gbl>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,79 +19,111 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 4 Apr 2006 18:30:56 +0530
+Date: Tue, 4 Apr 2006 18:07:29 +0530
 
-------=_Part_3393_18106450.1144155656632
+------=_Part_13126_30250332.1144154249116
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Guys I think mine is a lil peculiar problem,,,, hope to get a solution for
-here,.....
+Jose,
 
-Initially when I was running the knoppix live CD.... my "hcicongig -a". had
-all the service classes including Networking,Rendering,Capturing and
-Audio... I was delighted... but now it shows in this way!!
+Try the fol links
+http://www.homewirelessconnection.com/bluez.php
 
-(and I didn't even change hcid.conf)
-root@bluetooth:~# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:09:DD:10:00:CC ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:63 acl:0 sco:0 events:7 errors:0
-        TX bytes:27 acl:0 sco:0 commands:7 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'Soumya-0'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver:
-0x175
-        Manufacturer: Cambridge Silicon Radio (10)
+http://www.fuschlberger.net/bluetooth/
+
+And by the way are you using the Video Distribution Profile for streaming
+the video?
+If yes which codec are you using?
+
+Mayank
 
 
-How come are my Service classes "unspecified" ??
-ne ideas??
+On 4/4/06, Jose Antonio Rodr=EDguez P=E9rez <jarodri30@hotmail.com> wrote:
+>
+>   Hello,
+>
+> i'm doing a project for my university that consist in transmit video
+> streaming between two PDAs with bluetooth. For making this i have to chan=
+ge
+> some parameters from the bluez souce code, but i don't know how to compil=
+e
+> and install it, when i do the instructions of the README text file, gcc
+> never found the bluetooth/bluetooth.h, and never is comipiled ok.
+>
+> Can anyone send me a list of steps about how to compile and install it
+> correctly.
+>
+> Thanks for all
+> ------------------------------------------------------- This SF.Net email
+> is sponsored by xPML, a groundbreaking scripting language that extends
+> applications into web and mobile media. Attend the live webcast and join =
+the
+> prime developer group breaking into this new coding territory!
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D110944&bid=3D241720&dat=
+=3D121642_______________________________________________ Bluez-devel mailin=
+g list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
-------=_Part_3393_18106450.1144155656632
+------=_Part_13126_30250332.1144154249116
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-<br><span class=3D"gmail_quote"><br></span><div style=3D"direction: ltr;">G=
-uys I think mine is a lil peculiar problem,,,, hope to get a solution for h=
-ere,..... <br><br>Initially when I was running the knoppix live CD.... my &=
-quot;hcicongig -a&quot;. had all the service classes including Networking,R=
-endering,Capturing and Audio... I was delighted... but now it shows in this=
- way!!
-<br><br>(and I didn't even change hcid.conf)<br>root@bluetooth:~# hciconfig=
- -a<br>hci0:&nbsp;&nbsp; Type: USB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp; BD Address: 00:09:DD:10:00:CC ACL MTU: 192:8&nbsp; SCO MTU: 64:8<br>&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<br>&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:63 acl:0 sco:0 events:7 errors=
-:0
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:27 acl:0 sco:0 comm=
-ands:7 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xf=
-f 0xff 0x0f 0x00 0x00 0x00 0x00 0x00<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3<br>&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp; Link mode: SLAVE ACCEPT
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'Soumya-0'<br>&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class: 0x000100<br>&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp; Service Classes: Unspecified<br>&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp; Device Class: Computer, Uncategorized<br>&nbsp;&nbsp;=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1=
-.1 (0x1) LMP Subver: 0x175
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufacturer: Cambridge Sili=
-con Radio (10)<br><br><br>How come are my Service classes &quot;unspecified=
-&quot; ?? <br>ne ideas??<br>
+<div>Jose,</div>
+<div>&nbsp;</div>
+<div>Try the fol links</div>
+<div><a href=3D"http://www.homewirelessconnection.com/bluez.php">http://www=
+.homewirelessconnection.com/bluez.php</a></div>
+<div>&nbsp;</div>
+<div><a href=3D"http://www.fuschlberger.net/bluetooth/">http://www.fuschlbe=
+rger.net/bluetooth/</a></div>
+<div>&nbsp;</div>
+<div>And by the way are you using the Video Distribution Profile for stream=
+ing the video?</div>
+<div>If yes which codec are you using?</div>
+<div>&nbsp;</div>
+<div>Mayank<br><br>&nbsp;</div>
+<div><span class=3D"gmail_quote">On 4/4/06, <b class=3D"gmail_sendername">J=
+ose Antonio Rodr=EDguez P=E9rez</b> &lt;<a href=3D"mailto:jarodri30@hotmail=
+.com">jarodri30@hotmail.com</a>&gt; wrote:</span>
+<blockquote class=3D"gmail_quote" style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0=
+px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">
+<div style=3D"DIRECTION: ltr">
+<div>
+<div>
+<p>Hello, </p>
+<p>i'm doing a project for&nbsp;my university that consist in transmit vide=
+o streaming between two PDAs with bluetooth. For making this i have to chan=
+ge some parameters from the bluez souce code, but i don't know how to compi=
+le and install it, when i do the instructions of the README text file, gcc =
+never found the bluetooth/bluetooth.h, and never is comipiled ok.=20
+</p>
+<p>Can anyone send me a list of steps about how to compile and install it c=
+orrectly.</p>
+<p>Thanks for all<br></p></div></div>--------------------------------------=
+----------------- This SF.Net email is sponsored by xPML, a groundbreaking =
+scripting language that extends applications into web and mobile media. Att=
+end the live webcast and join the prime developer group breaking into this =
+new coding territory!=20
+<a onclick=3D"return top.js.OpenExtLink(window,event,this)" href=3D"http://=
+sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;kid=3D110944&amp;bid=3D241720&amp;da=
+t=3D121642" target=3D"_blank">http://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp=
+;kid=3D110944&amp;bid=3D241720&amp;dat=3D121642
+</a> _______________________________________________ Bluez-devel mailing li=
+st <a onclick=3D"return top.js.OpenExtLink(window,event,this)" href=3D"mail=
+to:Bluez-devel@lists.sourceforge.net" target=3D"_blank">Bluez-devel@lists.s=
+ourceforge.net
+</a> <a onclick=3D"return top.js.OpenExtLink(window,event,this)" href=3D"ht=
+tps://lists.sourceforge.net/lists/listinfo/bluez-devel" target=3D"_blank">h=
+ttps://lists.sourceforge.net/lists/listinfo/bluez-devel</a> </div></blockqu=
+ote>
+</div><br>
 
-</div>
-
-------=_Part_3393_18106450.1144155656632--
+------=_Part_13126_30250332.1144154249116--
 
 
 -------------------------------------------------------
