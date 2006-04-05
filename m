@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20604042210s1a8aba1dpcc9f28a281a029e3@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
+Message-ID: <fd77e5b50604042046v7e42f383kae448ca769cc04c2@mail.gmail.com>
+From: "Asif Khan" <asifkhan.sb@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Any one having a beautiful poster for scatternet presentation??
-In-Reply-To: <fd77e5b50604042046v7e42f383kae448ca769cc04c2@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_12084_10751313.1144213851947"
-References: <fd77e5b50604042046v7e42f383kae448ca769cc04c2@mail.gmail.com>
+	boundary="----=_Part_7192_7665386.1144208775903"
+Subject: [Bluez-devel] Any one having a beautiful poster for scatternet presentation??
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,41 +17,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 5 Apr 2006 10:40:51 +0530
+Date: Wed, 5 Apr 2006 08:46:15 +0500
 
-------=_Part_12084_10751313.1144213851947
+------=_Part_7192_7665386.1144208775903
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-just  browse in google for bluetooth presentations.... refere Bluetooth
-Revealed... thats an excellent book...
+I urgently need a poster for scatternet presentation. If anyone can share a
+soft copy with me. I will be grateful.
 
-On 4/5/06, Asif Khan <asifkhan.sb@gmail.com> wrote:
->
-> I urgently need a poster for scatternet presentation. If anyone can share
-> a soft copy with me. I will be grateful.
->
-
-------=_Part_12084_10751313.1144213851947
+------=_Part_7192_7665386.1144208775903
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-just&nbsp; browse in google for bluetooth presentations.... refere Bluetoot=
-h Revealed... thats an excellent book... <br><br><div><span class=3D"gmail_=
-quote">On 4/5/06, <b class=3D"gmail_sendername">Asif Khan</b> &lt;<a href=
-=3D"mailto:asifkhan.sb@gmail.com">
-asifkhan.sb@gmail.com</a>&gt; wrote:</span><blockquote class=3D"gmail_quote=
-" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0=
-.8ex; padding-left: 1ex;"><div style=3D"direction: ltr;">I urgently need a =
-poster for scatternet presentation. If anyone can share a soft copy with me=
-. I will be grateful.
-<br>
+I urgently need a poster for scatternet presentation. If anyone can share a=
+ soft copy with me. I will be grateful.<br>
 
-</div></blockquote></div><br>
-
-------=_Part_12084_10751313.1144213851947--
+------=_Part_7192_7665386.1144208775903--
 
 
 -------------------------------------------------------
