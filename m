@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20604060405l2e3452c5i31b111a54bf73aee@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-Id: <200604050714.k357Ers31875@pocketmexico.com>
+From: "Gabriel Corvera" <galo@pocketmexico.com>
+To: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_3036_1777373.1144321520100"
-Subject: [Bluez-users] ISSC dongle---- does it support SCO?
+	boundary="----=_NextPart_000_0005_01C65856.B6CB3400"
+Subject: [Bluez-users] Question About Pocket PC and BlueZ
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,119 +17,265 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 6 Apr 2006 16:35:20 +0530
+Date: Wed, 5 Apr 2006 02:14:47 -0500
 
-------=_Part_3036_1777373.1144321520100
-Content-Type: text/plain; charset=ISO-8859-1
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0005_01C65856.B6CB3400
+Content-Type: text/plain;
+	charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-Hi guys...
-I have an ISSC dongle which has the following bdaddress and other info....
-Now does it support SCO??
+Hello, I am using Linux Ubuntu 5.10 and the Bluez Stack to send files =
+between my PC and my cell phone and PDA.=20
+
+=20
+
+I have successfully sent files to my mobile phone but I am having =
+troubles with my Pocket PC.
+
+=20
+
+I have an iPAQ hx4700 and when I send a file it says that it is sending =
+the file and it never shows an error. In fact, it acts like when I send =
+a file to my mobile phone. The problem is that when I look for the file =
+in the Pocket PC I cannot find it. I have made a test between the mobile =
+phone and the iPAQ and it is working properly. Also between the PC and =
+the mobile phone and also them are working together properly.
+
+=20
+
+Do you know which can be the cause of this behavior?
+
+=20
+
+I am a little bit desperate of knowing why it is not working.
+
+=20
+
+Thanks!
+
+=20
+
+  _____ =20
+
+Gabriel Eduardo Corvera Ortiz
+
+Webmaster de Pocket M=C3=A9xico
+
+Pocket M=C3=A9xico
+
+ <http://www.pocketmexico.com/> http://www.pocketmexico.com
+
+Sun Certified Java Programmer for the Java 2 Platform 1.4 (SCJP)
+
+Sun Certified Web Component Developer for J2EE 1.4 (SCWCD)
+
+Cisco Certified Network Associate (CCNA)
+
+galo@pocketmexico.com
+
+  _____ =20
+
+=20
 
 
-root@0[test]# hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 11:11:11:11:11:11 ACL MTU: 678:8  SCO MTU: 48:10
-        Unsupported manufacturer
-
-its hciconfig -a gives
-root@0[test]# hciconfig -a
-hci0:   Type: USB
-        BD Address: 11:11:11:11:11:11 ACL MTU: 678:8  SCO MTU: 48:10
-        UP RUNNING PSCAN ISCAN
-        RX bytes:6891545 acl:128 sco:168567 events:425 errors:0
-        TX bytes:3268 acl:128 sco:0 commands:139 errors:0
-        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'Knoppix-0'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP Subver:
-0x1fe
-        Manufacturer: Integrated System Solution Corp. (57)
-
-hcitool info gives:
-root@bluetooth:~# hcitool info 11:11:11:11:11:11
-Requesting information ...
-        BD Address:  11:11:11:11:11:11
-        Device Name: Knoppix-0
-        LMP Version: 1.2 (0x2) LMP Subversion: 0x1fe
-        Manufacturer: Integrated System Solution Corp. (57)
-        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset=
->
-                <timing accuracy> <role switch> <sniff mode> <RSSI>
-                <channel quality> <SCO link> <HV2 packets> <HV3 packets>
-                <u-law log> <A-law log> <CVSD> <power control>
-                <transparent SCO> <broadcast encrypt> <enhanced iscan>
-                <interlaced iscan> <interlaced pscan> <inquiry with RSSI>
-                <AFH cap. slave> <AFH cap. master> <AFH class. master>
-
-
-ne ideas??
-
-------=_Part_3036_1777373.1144321520100
-Content-Type: text/html; charset=ISO-8859-1
+------=_NextPart_000_0005_01C65856.B6CB3400
+Content-Type: text/html;
+	charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-Hi guys... <br>I have an ISSC dongle which has the following bdaddress and =
-other info.... <br>Now does it support SCO?? <br><br><br>root@0[test]# hcic=
-onfig hci0 revision<br>hci0:&nbsp;&nbsp; Type: USB<br>&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp; BD Address: 11:11:11:11:11:11 ACL MTU: 678:8&nbsp; SC=
-O MTU: 48:10
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Unsupported manufacturer<br>=
-<br>its hciconfig -a gives<br>root@0[test]# hciconfig -a<br>hci0:&nbsp;&nbs=
-p; Type: USB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 11:1=
-1:11:11:11:11 ACL MTU: 678:8&nbsp; SCO MTU: 48:10<br>&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:6891545 acl:128 sco=
-:168567 events:425 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; T=
-X bytes:3268 acl:128 sco:0 commands:139 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp; Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00<br>&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 D=
-H5 HV1 HV2 HV3
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy: RSWITCH HOLD SN=
-IFF PARK<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link mode: SLAVE ACC=
-EPT<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'Knoppix-0'<br>&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class: 0x000100<br>&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp; Service Classes: Unspecified<br>&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp; Device Class: Computer, Uncategorized
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI Ver: 1.2 (0x2) HCI Rev: =
-0x1fe LMP Ver: 1.2 (0x2) LMP Subver: 0x1fe<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp; Manufacturer: Integrated System Solution Corp. (57)<br><br>hc=
-itool info gives:<br>root@bluetooth:~# hcitool info 11:11:11:11:11:11
-<br>Requesting information ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-; BD Address:&nbsp; 11:11:11:11:11:11<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp; Device Name: Knoppix-0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p; LMP Version: 1.2 (0x2) LMP Subversion: 0x1fe<br>&nbsp;&nbsp;&nbsp;&nbsp;=
-&nbsp;&nbsp;&nbsp; Manufacturer: Integrated System Solution Corp. (57)
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xbf 0xfe 0x8d 0x7=
-8 0x08 0x18 0x00 0x00<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;3-slot packets&gt; &lt;5-slot =
-packets&gt; &lt;encryption&gt; &lt;slot offset&gt;<br>&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;t=
-iming accuracy&gt; &lt;role switch&gt; &lt;sniff mode&gt; &lt;RSSI&gt;
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp; &lt;channel quality&gt; &lt;SCO link&gt; &lt;HV2 packet=
-s&gt; &lt;HV3 packets&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;u-law log&gt; &lt;A-law lo=
-g&gt; &lt;CVSD&gt; &lt;power control&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;transparent=
- SCO&gt; &lt;broadcast encrypt&gt; &lt;enhanced iscan&gt;
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp; &lt;interlaced iscan&gt; &lt;interlaced pscan&gt; &lt;i=
-nquiry with RSSI&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;AFH cap. slave&gt; &lt;AFH cap.=
- master&gt; &lt;AFH class. master&gt;<br><br><br>ne ideas??<br><br><br>
-<br><br>
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" =
+xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
+xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns=3D"http://www.w3.org/TR/REC-html40">
 
-------=_Part_3036_1777373.1144321520100--
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; charset=3Dutf-8">
+<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
+<!--[if !mso]>
+<style>
+v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style>
+<![endif]-->
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Verdana;
+	panose-1:2 11 6 4 3 5 4 4 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EstiloCorreo17
+	{mso-style-type:personal-compose;
+	font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:612.1pt 792.1pt;
+	margin:70.85pt 3.0cm 70.85pt 3.0cm;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=3DES link=3Dblue vlink=3Dpurple>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial'>Hello, I am using Linux Ubuntu 5.10 and the =
+Bluez Stack
+to send files between my PC and my cell phone and PDA. =
+<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial'>I have successfully sent files to my mobile =
+phone but
+I am having troubles with my Pocket PC.<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial'>I have an iPAQ hx4700 and when I send a file =
+it says
+that it is sending the file and it never shows an error. In fact, it =
+acts like
+when I send a file to my mobile phone. The problem is that when I look =
+for the
+file in the Pocket PC I cannot find it. I have made a test between the =
+mobile
+phone and the iPAQ and it is working properly. Also between the PC and =
+the
+mobile phone and also them are working together =
+properly.<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial'>Do you know which can be the cause of this =
+behavior?<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial'>I am a little bit desperate of knowing why it =
+is not
+working.<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial'>Thanks!<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+<div class=3DMsoNormal align=3Dcenter style=3D'text-align:center'><font =
+size=3D3
+face=3D"Times New Roman"><span style=3D'font-size:12.0pt'>
+
+<hr size=3D2 width=3D"100%" align=3Dcenter tabindex=3D-1>
+
+</span></font></div>
+
+<p class=3DMsoNormal><font size=3D3 face=3DVerdana><span =
+style=3D'font-size:12.0pt;
+font-family:Verdana'>Gabriel Eduardo Corvera =
+Ortiz<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DVerdana><span =
+style=3D'font-size:10.0pt;
+font-family:Verdana'>Webmaster de Pocket =
+M=C3=A9xico<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><b><font size=3D2 face=3DVerdana><span lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:Verdana;font-weight:bold'>Pocket =
+M=C3=A9xico<o:p></o:p></span></font></b></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DVerdana><span =
+style=3D'font-size:10.0pt;
+font-family:Verdana'><a href=3D"http://www.pocketmexico.com/"><span =
+lang=3DEN-US>http://www.pocketmexico.com</span></a></span></font><font
+size=3D2 face=3DVerdana><span lang=3DEN-US =
+style=3D'font-size:10.0pt;font-family:Verdana'><o:p></o:p></span></font><=
+/p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DVerdana><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Verdana'>Sun Certified Java Programmer for the Java 2
+Platform 1.4 (SCJP)<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DVerdana><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Verdana'>Sun Certified Web Component Developer for =
+J2EE 1.4
+(SCWCD)<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DVerdana><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Verdana'>Cisco Certified Network Associate =
+(CCNA)<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DVerdana><span =
+style=3D'font-size:10.0pt;
+font-family:Verdana'><a =
+href=3D"mailto:galo@pocketmexico.com">galo@pocketmexico.com</a><o:p></o:p=
+></span></font></p>
+
+<div class=3DMsoNormal align=3Dcenter style=3D'text-align:center'><font =
+size=3D3
+face=3D"Times New Roman"><span style=3D'font-size:12.0pt'>
+
+<hr size=3D2 width=3D"100%" align=3Dcenter tabindex=3D-1>
+
+</span></font></div>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'><o:p>&nbsp;</o:p></span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------=_NextPart_000_0005_01C65856.B6CB3400--
+
 
 
 -------------------------------------------------------
