@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <9ec07a230604060110s7fa9c5fax46562d4fb0397543@mail.gmail.com>
-From: "=?ISO-8859-1?Q?Israel_Gu=EDo?=" <israzar@gmail.com>
+Message-ID: <6db221bd0604051120r2184f0deha4dc390b33e252a0@mail.gmail.com>
+From: "=?ISO-8859-1?Q?Jose_Antonio_Rodr=EDguez?=" <dilbert88@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: Re: [Bluez-devel] SCO transparent transmission
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_38502_22196596.1144311048072"
+	boundary="----=_Part_23318_15018600.1144261234022"
+Subject: [Bluez-devel] Re: how to compile and install bluez
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,74 +17,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 6 Apr 2006 10:10:48 +0200
+Date: Wed, 5 Apr 2006 20:20:34 +0200
 
-------=_Part_38502_22196596.1144311048072
+------=_Part_23318_15018600.1144261234022
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Hi Sowmya.
+Sorry,
 
-I don't use /dev/dsp to get audio samples. I use ALSA project library and i=
-t
-works (I suggest you should look for code samples about it, specially those
-regarding to headsets).
+It doesn't consist in transmit video streamming, it consist in doing a
+videoconference with skype
 
-CVSD is the default on-the-air coding for SCO packets but you can change it
-by means of "hciconfig".
+thanks for your help
 
-For SCO transmission, just open a socket as in scotest.c (bluez-utils/test)
-and use write and read on it.
-
-There is no documentation about BlueZ and, if you want to use it, you must
-read and undestand the code.
-
-Bye!
-
-
-
->Hey Israel,
->How did u use CVSD when transmitting over sco?? U mean u used some sort of
->function to convert the voice you input from /dev/dsp into CVSD codec??
->Can u also throw some light on CVSD and SCO... I mean how are u
-transmittin=3D
->g
->the packets over SCO??
-
->Soumya
-
-------=_Part_38502_22196596.1144311048072
+------=_Part_23318_15018600.1144261234022
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-<div>Hi Sowmya.</div>
-<div>&nbsp;</div>
-<div>I don't use /dev/dsp to get audio samples. I use ALSA project library =
-and it works (I suggest you should look for code samples about it, speciall=
-y those regarding to headsets). </div>
-<div>&nbsp;</div>
-<div>CVSD is the default on-the-air coding for SCO packets but you can chan=
-ge it by means of &quot;hciconfig&quot;. </div>
-<div>&nbsp;</div>
-<div>For SCO transmission, just open a socket as in scotest.c (bluez-utils/=
-test) and use write and read on it.</div>
-<div>&nbsp;</div>
-<div>There is no documentation about BlueZ and, if you want to use it, you =
-must read and undestand the code.</div>
-<div>&nbsp;</div>
-<div>Bye!</div>
-<div>&nbsp;</div>
-<div>&nbsp;</div>
-<div>&nbsp;</div>
-<div>&gt;Hey Israel,<br>&gt;How did u use CVSD when transmitting over sco??=
- U mean u used some sort of<br>&gt;function to convert the voice you input =
-from /dev/dsp into CVSD codec??<br>&gt;Can u also throw some light on CVSD =
-and SCO... I mean how are u transmittin=3D
-<br>&gt;g<br>&gt;the packets over SCO??<br><br>&gt;Soumya</div>
+Sorry, <br>
+<br>
+It doesn't consist in transmit video streamming, it consist in doing a vide=
+oconference with skype<br>
+<br>
+thanks for your help<br>
 
-------=_Part_38502_22196596.1144311048072--
+------=_Part_23318_15018600.1144261234022--
 
 
 -------------------------------------------------------
