@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Alexandre Coser Monteiro" <coser@cos.ufrj.br>
+Message-ID: <fe0a97c20604060405l2e3452c5i31b111a54bf73aee@mail.gmail.com>
+From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20060406200923.M10379@cos.ufrj.br>
-In-Reply-To: <Pine.LNX.4.64.0604020439250.738@data.home>
-References: <Pine.LNX.4.64.0603181246420.738@data.home> <Pine.LNX.4.64.0604020439250.738@data.home>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset=iso-8859-1
-Subject: [Bluez-users] sniff & pand
+Content-Type: multipart/alternative;
+	boundary="----=_Part_3036_1777373.1144321520100"
+Subject: [Bluez-users] ISSC dongle---- does it support SCO?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,44 +17,119 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 6 Apr 2006 18:22:45 -0200
+Date: Thu, 6 Apr 2006 16:35:20 +0530
+
+------=_Part_3036_1777373.1144321520100
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi guys...
+I have an ISSC dongle which has the following bdaddress and other info....
+Now does it support SCO??
 
 
-  Every time I try to command sniff mode at the Slave one, in a connection made by
-command <pand -s -c "address"> it failure and give this message :
-
-< HCI Command: ogf 0x02, ocf 0x0003, plen 9
- 06 10 00 00 10 FF F7 00 07
-> HCI Event: 0x0f plen 4
-12 01 03 08               
-
-hcidump show me this :
-
-< HCI Command: Sniff Mode (0x02|0x0003) plen 9
-> HCI Event: Command Status (0x0f) plen 4
-
-hciconfig  -a show this :
+root@0[test]# hciconfig hci0 revision
 hci0:   Type: USB
-        BD Address: 00:03:C9:23:DE:B2 ACL MTU: 377:10  SCO MTU: 16:0
+        BD Address: 11:11:11:11:11:11 ACL MTU: 678:8  SCO MTU: 48:10
+        Unsupported manufacturer
+
+its hciconfig -a gives
+root@0[test]# hciconfig -a
+hci0:   Type: USB
+        BD Address: 11:11:11:11:11:11 ACL MTU: 678:8  SCO MTU: 48:10
         UP RUNNING PSCAN ISCAN
-        RX bytes:954701 acl:264 sco:0 events:100672 errors:0
-        TX bytes:606650 acl:395 sco:0 commands:100394 errors:0
-        Features: 0xff 0xfd 0x05 0x00 0x00 0x00 0x00 0x00
+        RX bytes:6891545 acl:128 sco:168567 events:425 errors:0
+        TX bytes:3268 acl:128 sco:0 commands:139 errors:0
+        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: SNIFF
+        Link policy: RSWITCH HOLD SNIFF PARK
         Link mode: SLAVE ACCEPT
-        Name: 'Broadcom BCM2033'
-        Class: 0x000000
+        Name: 'Knoppix-0'
+        Class: 0x000100
         Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x2 LMP Ver: 1.1 (0x1) LMP Subver: 0x1007
-        Manufacturer: Broadcom Corporation (15)
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP Subver:
+0x1fe
+        Manufacturer: Integrated System Solution Corp. (57)
 
- It is impossible to enter in sniff mode by a pand conection ?
+hcitool info gives:
+root@bluetooth:~# hcitool info 11:11:11:11:11:11
+Requesting information ...
+        BD Address:  11:11:11:11:11:11
+        Device Name: Knoppix-0
+        LMP Version: 1.2 (0x2) LMP Subversion: 0x1fe
+        Manufacturer: Integrated System Solution Corp. (57)
+        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset=
+>
+                <timing accuracy> <role switch> <sniff mode> <RSSI>
+                <channel quality> <SCO link> <HV2 packets> <HV3 packets>
+                <u-law log> <A-law log> <CVSD> <power control>
+                <transparent SCO> <broadcast encrypt> <enhanced iscan>
+                <interlaced iscan> <interlaced pscan> <inquiry with RSSI>
+                <AFH cap. slave> <AFH cap. master> <AFH class. master>
 
 
+ne ideas??
 
+------=_Part_3036_1777373.1144321520100
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
+Hi guys... <br>I have an ISSC dongle which has the following bdaddress and =
+other info.... <br>Now does it support SCO?? <br><br><br>root@0[test]# hcic=
+onfig hci0 revision<br>hci0:&nbsp;&nbsp; Type: USB<br>&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp; BD Address: 11:11:11:11:11:11 ACL MTU: 678:8&nbsp; SC=
+O MTU: 48:10
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Unsupported manufacturer<br>=
+<br>its hciconfig -a gives<br>root@0[test]# hciconfig -a<br>hci0:&nbsp;&nbs=
+p; Type: USB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 11:1=
+1:11:11:11:11 ACL MTU: 678:8&nbsp; SCO MTU: 48:10<br>&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:6891545 acl:128 sco=
+:168567 events:425 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; T=
+X bytes:3268 acl:128 sco:0 commands:139 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp; Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00<br>&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 D=
+H5 HV1 HV2 HV3
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy: RSWITCH HOLD SN=
+IFF PARK<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link mode: SLAVE ACC=
+EPT<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'Knoppix-0'<br>&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class: 0x000100<br>&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp; Service Classes: Unspecified<br>&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp; Device Class: Computer, Uncategorized
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI Ver: 1.2 (0x2) HCI Rev: =
+0x1fe LMP Ver: 1.2 (0x2) LMP Subver: 0x1fe<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp; Manufacturer: Integrated System Solution Corp. (57)<br><br>hc=
+itool info gives:<br>root@bluetooth:~# hcitool info 11:11:11:11:11:11
+<br>Requesting information ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; BD Address:&nbsp; 11:11:11:11:11:11<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp; Device Name: Knoppix-0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p; LMP Version: 1.2 (0x2) LMP Subversion: 0x1fe<br>&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp; Manufacturer: Integrated System Solution Corp. (57)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xbf 0xfe 0x8d 0x7=
+8 0x08 0x18 0x00 0x00<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;3-slot packets&gt; &lt;5-slot =
+packets&gt; &lt;encryption&gt; &lt;slot offset&gt;<br>&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;t=
+iming accuracy&gt; &lt;role switch&gt; &lt;sniff mode&gt; &lt;RSSI&gt;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp; &lt;channel quality&gt; &lt;SCO link&gt; &lt;HV2 packet=
+s&gt; &lt;HV3 packets&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;u-law log&gt; &lt;A-law lo=
+g&gt; &lt;CVSD&gt; &lt;power control&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;transparent=
+ SCO&gt; &lt;broadcast encrypt&gt; &lt;enhanced iscan&gt;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp; &lt;interlaced iscan&gt; &lt;interlaced pscan&gt; &lt;i=
+nquiry with RSSI&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;AFH cap. slave&gt; &lt;AFH cap.=
+ master&gt; &lt;AFH class. master&gt;<br><br><br>ne ideas??<br><br><br>
+<br><br>
+
+------=_Part_3036_1777373.1144321520100--
 
 
 -------------------------------------------------------
