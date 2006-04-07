@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <44367EEE.708@csr.com>
-From: Steven Singer <steven.singer@csr.com>
+Message-ID: <44365D07.5000103@gmx.net>
+From: chris vigelius <chris.vigelius@gmx.net>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] sniff & pand
-References: <Pine.LNX.4.64.0603181246420.738@data.home> <Pine.LNX.4.64.0604020439250.738@data.home> <20060406200923.M10379@cos.ufrj.br>
-In-Reply-To: <20060406200923.M10379@cos.ufrj.br>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Re: hci_scodata_packet messages flooding syslog
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,52 +16,57 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 07 Apr 2006 16:02:06 +0100
+Date: Fri, 07 Apr 2006 14:37:27 +0200
 
-Alexandre Coser Monteiro wrote:
-> < HCI Command: ogf 0x02, ocf 0x0003, plen 9
->  06 10 00 00 10 FF F7 00 07
-> > HCI Event: 0x0f plen 4
-> 12 01 03 08               
+Hi again,
 
-The Command Status event shows error code 0x12 = Invalid HCI Command
-Parameters.
+does nobody have any information about this problem?
 
-This means that the controller didn't like one of the parameters to the
-sniff mode command.
+Since I consider this to be a bug, should I post the issue to the devel
+list instead?
 
-The sniff mode command you gave had the parameters:
-
-   Connection handle:  0x1006
-   Sniff Max Interval: 0x0000
-   Sniff Min Interval: 0xff10
-   Sniff Attempts:     0x00f7
-   Sniff Timeout:      0x??07
-
-Notes:
-
-  The connection handle is invalid. The valid range is 0x0000..0x0eff
-
-  The maximum interval is invalid. The valid range is 0x0002..0xfffe
-
-  The minimum interval is invalid. The valid range is 0x0002..max
-  interval.
-
-  The sniff attempts is highly unusual (but not actually invalid).
-
-  The sniff timeout field is truncated, it should be two bytes.
-
-So, it's not surprising that the controller is rejecting it.
-
-Where is the sniff mode command being generated? How is it getting
-through the BlueZ APIs to generate such an invalid event? Are the
-normal APIs being bypassed and is a raw command being sent.
-
-	- Steven
--- 
-
-
-To access the latest news from CSR copy this link into a web browser:  http://www.csr.com/email_sig.php
+regards,
+ chris
+> Hi,
+>
+> I am having problems with a BT USB dongle manufactured by Vivanco (Model 
+> 18031, FCC-ID NV6-CS8024, if that matters). 
+>
+> Everytime I connect the stick, the syslog is flooded with messages
+>
+> > hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
+>
+> There are about 500 messages generated EACH SECOND, causing a high load (and 
+> lots of wasted disk space) on my system. Is there anything I can do to get 
+> rid of them? 
+>
+> I believe the problem discussed in the thread below is about the same issue, 
+> but unfortunately there was no solution posted: 
+>
+> http://sourceforge.net/mailarchive/message.php?msg_id=13791329
+>
+> Output of hciconfig -a: 
+>
+> > hci0:   Type: USB
+> >         BD Address: 00:0C:78:30:EE:F2 ACL MTU: 339:4 SCO MTU: 60:9
+> >         UP RUNNING
+> >         RX bytes:249022 acl:0 sco:73200 events:16 errors:0
+> >         TX bytes:310 acl:0 sco:0 commands:14 errors:0
+> >         Features: 0xff 0xff 0x81 0x00 0x18 0x18 0x00 0x00
+> >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+> >         Link policy: RSWITCH HOLD SNIFF PARK
+> >         Link mode: SLAVE ACCEPT
+> >         Name: 'null-0'
+> >         Class: 0xb3010c
+> >         Service Classes: Positioning, Networking
+> >         Device Class: Computer, Laptop
+> >         HCI Ver: 1.2 (0x2) HCI Rev: 0x222 LMP Ver: 1.2 (0x2) LMP Subver:
+> > 0x222 Manufacturer: RTX Telecom A/S (21)
+>
+> Any help would be appreciated. 
+>
+> regards,
+>  chris
 
 
 -------------------------------------------------------
