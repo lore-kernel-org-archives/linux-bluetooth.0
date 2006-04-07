@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: "Renan" <renan@atlantico.com.br>
 To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <000001c65a72$b5321e10$052a650a@virgo.atlantico.net.br>
+Message-ID: <000001c65a6e$1fae3210$052a650a@virgo.atlantico.net.br>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0001_01C65A59.8FE4E610"
-Subject: [Bluez-devel] Device temporary discoverable
+	boundary="----=_NextPart_000_0001_01C65A54.FA636B10"
+Subject: [Bluez-devel] Discoverabe Mode - GIAC or LIAC
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,27 +17,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 7 Apr 2006 15:40:13 -0300
+Date: Fri, 7 Apr 2006 15:07:25 -0300
 
 This is a multi-part message in MIME format.
 
-------=_NextPart_000_0001_01C65A59.8FE4E610
+------=_NextPart_000_0001_01C65A54.FA636B10
 Content-Type: text/plain;
 	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 
-Hello Everyone !
+Hello everyone!!!
  
-How to make a device temporary discoverable under Linux? 
-I would like to make a device discoverable just for 1 minute, for
-example.
+Does anybody know how to set the discoverable mode for a device under
+Linux? 
+ 
+How to set the LIAC/GIAC mode for a device?
  
 Thanks in advance.
  
+ 
 Renan Martins
+renan@atlantico.com.br
+ 
+ 
  
 
-------=_NextPart_000_0001_01C65A59.8FE4E610
+------=_NextPart_000_0001_01C65A54.FA636B10
 Content-Type: text/html;
 	charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
@@ -55,7 +60,7 @@ charset=3Dus-ascii">
 <meta name=3DProgId content=3DWord.Document>
 <meta name=3DGenerator content=3D"Microsoft Word 10">
 <meta name=3DOriginator content=3D"Microsoft Word 10">
-<link rel=3DFile-List href=3D"cid:filelist.xml@01C65A59.8E222770">
+<link rel=3DFile-List href=3D"cid:filelist.xml@01C65A54.F7D63080">
 <!--[if gte mso 9]><xml>
  <o:OfficeDocumentSettings>
   <o:DoNotRelyOnCSS/>
@@ -147,53 +152,79 @@ style=3D'tab-interval:35.4pt'>
 
 <div class=3DSection1>
 
-<p class=3DMsoNormal><span class=3DSpellE><font size=3D2 =
-face=3DArial><span
-style=3D'font-size:10.0pt;font-family:Arial'>Hello</span></font></span><f=
-ont
-size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;font-family:Arial'> <span
-class=3DSpellE>Everyone</span> !<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
-style=3D'font-size:
-10.0pt;font-family:Arial;mso-ansi-language:EN-US'>How to make a device
-temporary discoverable under Linux? <o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
-style=3D'font-size:
-10.0pt;font-family:Arial;mso-ansi-language:EN-US'>I would like to make a =
-device
-discoverable just for 1 minute, for =
-example.<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
-style=3D'font-size:
-10.0pt;font-family:Arial;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></span=
-></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
-style=3D'font-size:
-10.0pt;font-family:Arial;mso-ansi-language:EN-US'>Thanks in =
-advance.<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
-style=3D'font-size:
-10.0pt;font-family:Arial;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></span=
-></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial;mso-no-proof:yes'>Renan Martins</span></font><span
-style=3D'mso-no-proof:yes'><o:p></o:p></span></p>
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'>Hello =
+everyone!!!<o:p></o:p></span></font></p>
 
 <p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-style=3D'font-size:
-12.0pt'><o:p>&nbsp;</o:p></span></font></p>
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
+n></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'>Does anybody know how =
+to set
+the discoverable mode for a device under Linux? =
+<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
+n></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'>How to set the =
+LIAC/GIAC mode
+for a device?<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
+n></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'>Thanks in =
+advance.<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
+n></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
+n></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'>Renan =
+Martins<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><a
+href=3D"mailto:renan@atlantico.com.br">renan@atlantico.com.br</a><o:p></o=
+:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
+n></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
+n></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
+n></font></p>
 
 </div>
 
@@ -201,7 +232,7 @@ style=3D'font-size:
 
 </html>
 
-------=_NextPart_000_0001_01C65A59.8FE4E610--
+------=_NextPart_000_0001_01C65A54.FA636B10--
 
 
 
