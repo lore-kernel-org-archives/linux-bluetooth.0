@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4436772F.6030300@csr.com>
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
+From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SCO transparent transmission
-References: <9ec07a230604041044j6b1b91f4ue25b44f2ed6f7c55@mail.gmail.com> <fe0a97c20604042223o7c59fb5fq871a004292ac1c55@mail.gmail.com>
-In-Reply-To: <fe0a97c20604042223o7c59fb5fq871a004292ac1c55@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
+Message-Id: <1144405107.13072.10.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-devel] endianess question
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +16,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 07 Apr 2006 15:29:03 +0100
+Date: Fri, 07 Apr 2006 12:18:27 +0200
 
-Sowmya Gattupalli wrote:
-> On 4/4/06, Israel Gu=EDo <israzar@gmail.com> wrote:
->> example, with 0x0063 as voice settings. I have tried it with my Blueto=
-oth
-> How did u use CVSD when transmitting over sco?? [...]
+Hello together,
 
-He was quite clear that he'd used voice settigns 0x0063. The last two
-bits indicate transparent coding and not CVSD.
+whenever I take data out of a socket buffer using the get_unaligned()
+function like this:
+	u16 control = get_unaligned((u16 *) skb->data);
+do I have to worry about endianess correctness if I need to do some bit
+fiddling stuff?
+For example:
+The specification states that all packet formats shall use little-endian
+byte order, so an iframe is denoted like the following:
+| 16 | 15 | 14 | 13 | 12 | 11 | 10 | 09 | 08 | 07 06 05 04 03 02 01
+|---SAR---|------------ReqSeq-----------|-R--| ...
 
-Israel, you need to be sure you're sending data at exactly the right
-average data rate. SCO links are synchronous and if you don't provide
-data at exactly the right rate then something somewhere in the
-system will have to insert or delete samples.
+if I need to pull the ReqSeq value out of the 16 Bits, do I need to make
+use of a function like __btoh(control):
+	u16 reqseq = (__btoh16(control) & 0x3F00) >> 8;
+or is it enough to say:
+	u16 reqseq = (control & 0x3F00) >> 8;
+when I took the get_unaligned() function?
 
-It would also be helpful if you stated what chip and firmware version
-you were using.
+Martin
 
-	- Steven
---=20
-
-
-To access the latest news from CSR copy this link into a web browser:  ht=
-tp://www.csr.com/email_sig.php
 
 
 -------------------------------------------------------
