@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Segmentation fault hcid in textfile.c
+Subject: Re: [Bluez-devel] HCRP
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4430C7C3.5050205@service2media.com>
-References: <4430C7C3.5050205@service2media.com>
+In-Reply-To: <6297d67c0604030251q39d1248k7e3224c1f53f0689@mail.gmail.com>
+References: <6297d67c0604030251q39d1248k7e3224c1f53f0689@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1144423072.2625.26.camel@aeonflux.holtmann.net>
+Message-Id: <1144422817.2625.21.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,36 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 07 Apr 2006 17:17:52 +0200
+Date: Fri, 07 Apr 2006 17:13:37 +0200
 
-Hi Herman,
+Hi Mayank,
 
-> this weekend I have been testing with a directional antenna and 
-> therefore I have seen a lot of bluetooth devices. I have witnessed a 
-> segmentation fault in common/textfile.c twice. After examining the core 
-> file of the hcid I found out where the problem is and I have made a 
-> patch for it.
-> The problem is that the textfile is mapped into memory with an mmap call 
-> on line 153, but the file I was writing to (once it was the lastseen 
-> file and once the names file) was exactly 8192 bytes. So an exact 
-> multiple of the page size. Therefore there is no terminating NULL 
-> character in the memory map and the find_key call on line 159, which 
-> uses a strstr, will read beyond the boundaries of the memory mapped 
-> segment -> SEGV.
-> I have made a change to the find_key call and added an extra parameter 
-> to indicate the length of the map. It works fine for me but maybe it is 
-> not an optimal solution. I have attached the patch.
+> I want to test the HCRP profile as present in the
+> bluez-utils-2.25/cups.
+> Can you suggest any application that will emulate an HCRP printer
+> ( and of course be interoperable with the one with this client
+> application)?
 
-can you verify that the latest CVS version still segfaults and please
-redo the patch against this version and use our coding style.
-
-> +	int start=0;
-
-Must be "int start = 0"
-
-> +		if (0 == strncmp(map+start, key, len)) {
-
-Must be "if (!strcmp(...)) {"
+I wrote one HCRP printer emulation a long time ago, but this code has
+been lost. Go ahead and write one and then we can include it.
 
 Regards
 
