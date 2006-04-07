@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Renan" <renan@atlantico.com.br>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <000001c65a6e$1fae3210$052a650a@virgo.atlantico.net.br>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0001_01C65A54.FA636B10"
-Subject: [Bluez-devel] Discoverabe Mode - GIAC or LIAC
+Subject: Re: [Bluez-devel] Segmentation fault hcid in textfile.c
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <4430C7C3.5050205@service2media.com>
+References: <4430C7C3.5050205@service2media.com>
+Content-Type: text/plain
+Message-Id: <1144423072.2625.26.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,222 +18,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 7 Apr 2006 15:07:25 -0300
+Date: Fri, 07 Apr 2006 17:17:52 +0200
 
-This is a multi-part message in MIME format.
+Hi Herman,
 
-------=_NextPart_000_0001_01C65A54.FA636B10
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+> this weekend I have been testing with a directional antenna and 
+> therefore I have seen a lot of bluetooth devices. I have witnessed a 
+> segmentation fault in common/textfile.c twice. After examining the core 
+> file of the hcid I found out where the problem is and I have made a 
+> patch for it.
+> The problem is that the textfile is mapped into memory with an mmap call 
+> on line 153, but the file I was writing to (once it was the lastseen 
+> file and once the names file) was exactly 8192 bytes. So an exact 
+> multiple of the page size. Therefore there is no terminating NULL 
+> character in the memory map and the find_key call on line 159, which 
+> uses a strstr, will read beyond the boundaries of the memory mapped 
+> segment -> SEGV.
+> I have made a change to the find_key call and added an extra parameter 
+> to indicate the length of the map. It works fine for me but maybe it is 
+> not an optimal solution. I have attached the patch.
 
-Hello everyone!!!
- 
-Does anybody know how to set the discoverable mode for a device under
-Linux? 
- 
-How to set the LIAC/GIAC mode for a device?
- 
-Thanks in advance.
- 
- 
-Renan Martins
-renan@atlantico.com.br
- 
- 
- 
+can you verify that the latest CVS version still segfaults and please
+redo the patch against this version and use our coding style.
 
-------=_NextPart_000_0001_01C65A54.FA636B10
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+> +	int start=0;
 
-<html xmlns:v=3D"urn:schemas-microsoft-com:vml" =
-xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
-xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns=3D"http://www.w3.org/TR/REC-html40">
+Must be "int start = 0"
 
-<head>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
+> +		if (0 == strncmp(map+start, key, len)) {
 
+Must be "if (!strcmp(...)) {"
 
-<meta name=3DProgId content=3DWord.Document>
-<meta name=3DGenerator content=3D"Microsoft Word 10">
-<meta name=3DOriginator content=3D"Microsoft Word 10">
-<link rel=3DFile-List href=3D"cid:filelist.xml@01C65A54.F7D63080">
-<!--[if gte mso 9]><xml>
- <o:OfficeDocumentSettings>
-  <o:DoNotRelyOnCSS/>
- </o:OfficeDocumentSettings>
-</xml><![endif]--><!--[if gte mso 9]><xml>
- <w:WordDocument>
-  <w:SpellingState>Clean</w:SpellingState>
-  <w:GrammarState>Clean</w:GrammarState>
-  <w:DocumentKind>DocumentEmail</w:DocumentKind>
-  <w:HyphenationZone>21</w:HyphenationZone>
-  <w:EnvelopeVis/>
-  <w:Compatibility>
-   <w:BreakWrappedTables/>
-   <w:SnapToGridInCell/>
-   <w:WrapTextWithPunct/>
-   <w:UseAsianBreakRules/>
-  </w:Compatibility>
-  <w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel>
- </w:WordDocument>
-</xml><![endif]-->
-<style>
-<!--
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{mso-style-parent:"";
-	margin:0cm;
-	margin-bottom:.0001pt;
-	mso-pagination:widow-orphan;
-	font-size:12.0pt;
-	font-family:"Times New Roman";
-	mso-fareast-font-family:"Times New Roman";}
-a:link, span.MsoHyperlink
-	{color:blue;
-	text-decoration:underline;
-	text-underline:single;}
-a:visited, span.MsoHyperlinkFollowed
-	{color:purple;
-	text-decoration:underline;
-	text-underline:single;}
-span.EstiloDeEmail17
-	{mso-style-type:personal-compose;
-	mso-style-noshow:yes;
-	mso-ansi-font-size:10.0pt;
-	mso-bidi-font-size:10.0pt;
-	font-family:Arial;
-	mso-ascii-font-family:Arial;
-	mso-hansi-font-family:Arial;
-	mso-bidi-font-family:Arial;
-	color:windowtext;}
-span.SpellE
-	{mso-style-name:"";
-	mso-spl-e:yes;}
-@page Section1
-	{size:612.0pt 792.0pt;
-	margin:70.85pt 3.0cm 70.85pt 3.0cm;
-	mso-header-margin:35.4pt;
-	mso-footer-margin:35.4pt;
-	mso-paper-source:0;}
-div.Section1
-	{page:Section1;}
--->
-</style>
-<!--[if gte mso 10]>
-<style>
- /* Style Definitions */=20
- table.MsoNormalTable
-	{mso-style-name:"Tabela normal";
-	mso-tstyle-rowband-size:0;
-	mso-tstyle-colband-size:0;
-	mso-style-noshow:yes;
-	mso-style-parent:"";
-	mso-padding-alt:0cm 5.4pt 0cm 5.4pt;
-	mso-para-margin:0cm;
-	mso-para-margin-bottom:.0001pt;
-	mso-pagination:widow-orphan;
-	font-size:10.0pt;
-	font-family:"Times New Roman";}
-</style>
-<![endif]--><!--[if gte mso 9]><xml>
- <o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
-</xml><![endif]--><!--[if gte mso 9]><xml>
- <o:shapelayout v:ext=3D"edit">
-  <o:idmap v:ext=3D"edit" data=3D"1" />
- </o:shapelayout></xml><![endif]-->
-</head>
+Regards
 
-<body lang=3DPT-BR link=3Dblue vlink=3Dpurple =
-style=3D'tab-interval:35.4pt'>
+Marcel
 
-<div class=3DSection1>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'>Hello =
-everyone!!!<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
-n></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'>Does anybody know how =
-to set
-the discoverable mode for a device under Linux? =
-<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
-n></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'>How to set the =
-LIAC/GIAC mode
-for a device?<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
-n></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'>Thanks in =
-advance.<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
-n></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
-n></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'>Renan =
-Martins<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><a
-href=3D"mailto:renan@atlantico.com.br">renan@atlantico.com.br</a><o:p></o=
-:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
-n></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
-n></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-US
-style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
-n></font></p>
-
-</div>
-
-</body>
-
-</html>
-
-------=_NextPart_000_0001_01C65A54.FA636B10--
 
 
 
