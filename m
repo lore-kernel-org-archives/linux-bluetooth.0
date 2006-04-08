@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <fe0a97c20604072112s584171c1k1735683254792fcf@mail.gmail.com>
+From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] SCO transparent transmission
+In-Reply-To: <4436772F.6030300@csr.com>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C65C3F.BB679869"
-Message-ID: <9FBCE015AF479F46B3B410499F3AE05B0119396D@pdsmsx405>
-From: "Wang, Jing J" <jing.j.wang@intel.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Is there a existing test suite for bluez stack on bluez website?
+	boundary="----=_Part_22309_21090851.1144469559376"
+References: <9ec07a230604041044j6b1b91f4ue25b44f2ed6f7c55@mail.gmail.com>
+	 <fe0a97c20604042223o7c59fb5fq871a004292ac1c55@mail.gmail.com>
+	 <4436772F.6030300@csr.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,224 +21,104 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Apr 2006 09:40:21 +0800
+Date: Sat, 8 Apr 2006 09:42:39 +0530
 
-This is a multi-part message in MIME format.
-
-------_=_NextPart_001_01C65C3F.BB679869
-Content-Type: text/plain;
-	charset="us-ascii"
+------=_Part_22309_21090851.1144469559376
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Hi,
+Hey Steven...
+For a CSR USB chip when the SCO mapping is over HCI is it possible to chang=
+e
+the voice settings to send PCM samples over the air?
 
-         Per job requirement, I need test bluez Bluetooth stack. I don't
-plan to develop a test suite from scratch. So, is there any existing
-test suite I can use for bluez?
+On 4/7/06, Steven Singer <steven.singer@csr.com> wrote:
+>
+> Sowmya Gattupalli wrote:
+> > On 4/4/06, Israel Gu=EDo <israzar@gmail.com> wrote:
+> >> example, with 0x0063 as voice settings. I have tried it with my
+> Bluetooth
+> > How did u use CVSD when transmitting over sco?? [...]
+>
+> He was quite clear that he'd used voice settigns 0x0063. The last two
+> bits indicate transparent coding and not CVSD.
+>
+> Israel, you need to be sure you're sending data at exactly the right
+> average data rate. SCO links are synchronous and if you don't provide
+> data at exactly the right rate then something somewhere in the
+> system will have to insert or delete samples.
+>
+> It would also be helpful if you stated what chip and firmware version
+> you were using.
+>
+>         - Steven
+> --
+>
+>
+> To access the latest news from CSR copy this link into a web browser:
+> http://www.csr.com/email_sig.php
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by xPML, a groundbreaking scripting
+> language
+> that extends applications into web and mobile media. Attend the live
+> webcast
+> and join the prime developer group breaking into this new coding
+> territory!
+> http://sel.as-us.falkag.net/sel?cmdlnk&kid=110944&bid$1720&dat=121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
-         Thanks in advance.
-
-=20
-
-=20
-
-WangJing
-
-
-------_=_NextPart_001_01C65C3F.BB679869
-Content-Type: text/html;
-	charset="us-ascii"
+------=_Part_22309_21090851.1144469559376
+Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
-xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns=3D"http://www.w3.org/TR/REC-html40">
+Hey Steven... <br>
+For a CSR USB chip when the SCO mapping is over HCI is it possible to
+change the voice settings to send PCM samples over the air?<br><br><div><sp=
+an class=3D"gmail_quote">On 4/7/06, <b class=3D"gmail_sendername">Steven Si=
+nger</b> &lt;<a href=3D"mailto:steven.singer@csr.com">steven.singer@csr.com=
+</a>
+&gt; wrote:</span><blockquote class=3D"gmail_quote" style=3D"border-left: 1=
+px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;"=
+>Sowmya Gattupalli wrote:<br>&gt; On 4/4/06, Israel Gu=EDo &lt;<a href=3D"m=
+ailto:israzar@gmail.com">
+israzar@gmail.com</a>&gt; wrote:<br>&gt;&gt; example, with 0x0063 as voice =
+settings. I have tried it with my Bluetooth<br>&gt; How did u use CVSD when=
+ transmitting over sco?? [...]<br><br>He was quite clear that he'd used voi=
+ce settigns 0x0063. The last two
+<br>bits indicate transparent coding and not CVSD.<br><br>Israel, you need =
+to be sure you're sending data at exactly the right<br>average data rate. S=
+CO links are synchronous and if you don't provide<br>data at exactly the ri=
+ght rate then something somewhere in the
+<br>system will have to insert or delete samples.<br><br>It would also be h=
+elpful if you stated what chip and firmware version<br>you were using.<br><=
+br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Steven<br>--<br><br><b=
+r>To access the latest news from CSR copy this link into a web browser:&nbs=
+p;&nbsp;
+<a href=3D"http://www.csr.com/email_sig.php">http://www.csr.com/email_sig.p=
+hp</a><br><br><br>-------------------------------------------------------<b=
+r>This SF.Net email is sponsored by xPML, a groundbreaking scripting langua=
+ge
+<br>that extends applications into web and mobile media. Attend the live we=
+bcast<br>and join the prime developer group breaking into this new coding t=
+erritory!<br><a href=3D"http://sel.as-us.falkag.net/sel?cmdlnk&amp;kid=1109=
+44&amp;bid$1720&amp;dat=121642">
+http://sel.as-us.falkag.net/sel?cmdlnk&amp;kid=110944&amp;bid$1720&amp;dat=
+=121642</a><br>_______________________________________________<br>Bluez-dev=
+el mailing list<br><a href=3D"mailto:Bluez-devel@lists.sourceforge.net">Blu=
+ez-devel@lists.sourceforge.net
+</a><br><a href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-devel=
+">https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br></blockqu=
+ote></div><br>
 
-<head>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
-<style>
-<!--
- /* Font Definitions */
- @font-face
-	{font-family:&#23435;&#20307;;
-	panose-1:2 1 6 0 3 1 1 1 1 1;}
-@font-face
-	{font-family:"\@&#23435;&#20307;";
-	panose-1:2 1 6 0 3 1 1 1 1 1;}
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0cm;
-	margin-bottom:.0001pt;
-	text-align:justify;
-	text-justify:inter-ideograph;
-	font-size:10.5pt;
-	font-family:"Times New Roman";}
-h2
-	{margin-top:0cm;
-	margin-right:0cm;
-	margin-bottom:0cm;
-	margin-left:31.5pt;
-	margin-bottom:.0001pt;
-	text-indent:0cm;
-	page-break-after:avoid;
-	mso-list:l0 level2 lfo1;
-	text-autospace:none;
-	font-size:18.0pt;
-	font-family:"Times New Roman";
-	font-weight:normal;}
-a:link, span.MsoHyperlink
-	{color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{color:purple;
-	text-decoration:underline;}
-span.EmailStyle17
-	{mso-style-type:personal-compose;
-	font-family:Arial;
-	color:windowtext;}
- /* Page Definitions */
- @page Section1
-	{size:595.3pt 841.9pt;
-	margin:72.0pt 90.0pt 72.0pt 90.0pt;
-	layout-grid:15.6pt;}
-div.Section1
-	{page:Section1;}
- /* List Definitions */
- @list l0
-	{mso-list-id:1641962034;
-	mso-list-template-ids:-1756343590;}
-@list l0:level1
-	{mso-level-tab-stop:0cm;
-	mso-level-number-position:left;
-	margin-left:27.0pt;
-	text-indent:0cm;}
-@list l0:level2
-	{mso-level-style-link:"Heading 2";
-	mso-level-text:"%1\.%2";
-	mso-level-tab-stop:0cm;
-	mso-level-number-position:left;
-	margin-left:31.5pt;
-	text-indent:0cm;}
-@list l0:level3
-	{mso-level-text:"6\.%3";
-	mso-level-tab-stop:0cm;
-	mso-level-number-position:left;
-	margin-left:45.0pt;
-	text-indent:0cm;
-	mso-ascii-font-family:"Times New Roman";
-	mso-hansi-font-family:"Times New Roman";
-	mso-bidi-font-family:"Times New Roman";
-	font-variant:normal !important;
-	mso-hide:none;
-	text-transform:none;
-	position:relative;
-	top:0pt;
-	mso-text-raise:0pt;
-	letter-spacing:0pt;
-	mso-font-kerning:0pt;
-	text-effect:none;
-	text-shadow:none;
-	text-effect:none;
-	text-effect:none;
-	font-emphasize:none;
-	mso-ansi-font-style:normal;
-	mso-bidi-font-style:normal;
-	text-decoration:none;
-	text-underline:none;
-	text-decoration:none;
-	text-line-through:none;
-	vertical-align:baseline;}
-@list l0:level4
-	{mso-level-text:"%1\.%2\.%3\.%4";
-	mso-level-tab-stop:0cm;
-	mso-level-number-position:left;
-	margin-left:45.35pt;
-	text-indent:0cm;}
-@list l0:level5
-	{mso-level-text:"%1\.%2\.%3\.%4\.%5";
-	mso-level-tab-stop:0cm;
-	mso-level-number-position:left;
-	margin-left:54.0pt;
-	text-indent:0cm;}
-@list l0:level6
-	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
-	mso-level-tab-stop:0cm;
-	mso-level-number-position:left;
-	margin-left:63.35pt;
-	text-indent:0cm;}
-@list l0:level7
-	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
-	mso-level-tab-stop:0cm;
-	mso-level-number-position:left;
-	margin-left:0cm;
-	text-indent:0cm;}
-@list l0:level8
-	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
-	mso-level-tab-stop:0cm;
-	mso-level-number-position:left;
-	margin-left:0cm;
-	text-indent:0cm;}
-@list l0:level9
-	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
-	mso-level-tab-stop:0cm;
-	mso-level-number-position:left;
-	margin-left:0cm;
-	text-indent:0cm;}
-ol
-	{margin-bottom:0cm;}
-ul
-	{margin-bottom:0cm;}
--->
-</style>
-
-</head>
-
-<body lang=3DZH-CN link=3Dblue vlink=3Dpurple =
-style=3D'text-justify-trim:punctuation'>
-
-<div class=3DSection1 style=3D'layout-grid:15.6pt'>
-
-<p class=3DMsoNormal><font size=3D1 face=3DArial><span lang=3DEN-US =
-style=3D'font-size:
-9.0pt;font-family:Arial'>Hi,<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D1 face=3DArial><span lang=3DEN-US =
-style=3D'font-size:
-9.0pt;font-family:Arial'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
- Per
-job requirement, I need test bluez Bluetooth stack. I don&#8217;t plan =
-to develop a
-test suite from scratch. So, is there any existing test suite I can use =
-for
-bluez?<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D1 face=3DArial><span lang=3DEN-US =
-style=3D'font-size:
-9.0pt;font-family:Arial'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
- Thanks
-in advance.<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D1 face=3DArial><span lang=3DEN-US =
-style=3D'font-size:
-9.0pt;font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D1 face=3DArial><span lang=3DEN-US =
-style=3D'font-size:
-9.0pt;font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D1 face=3DArial><span lang=3DEN-US =
-style=3D'font-size:
-9.0pt;font-family:Arial'>WangJing<o:p></o:p></span></font></p>
-
-</div>
-
-</body>
-
-</html>
-
-------_=_NextPart_001_01C65C3F.BB679869--
+------=_Part_22309_21090851.1144469559376--
 
 
 -------------------------------------------------------
