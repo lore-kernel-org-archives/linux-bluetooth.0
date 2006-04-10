@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0604100502v165e6d29g32480d6115d51090@mail.gmail.com>
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
+Subject: RE: [Bluez-devel] Is there a existing test suite for bluez stackon
+	bluez website?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Device temporary discoverable
-In-Reply-To: <ef9938ec0604071315t3043c95cy9f72231bf2daa7c6@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <000001c65a72$b5321e10$052a650a@virgo.atlantico.net.br>
-	 <ef9938ec0604071315t3043c95cy9f72231bf2daa7c6@mail.gmail.com>
+In-Reply-To: <9FBCE015AF479F46B3B410499F3AE05B011F0582@pdsmsx405>
+References: <9FBCE015AF479F46B3B410499F3AE05B011F0582@pdsmsx405>
+Content-Type: text/plain
+Message-Id: <1144663116.7825.15.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,78 +19,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Apr 2006 09:02:48 -0300
+Date: Mon, 10 Apr 2006 11:58:36 +0200
 
-Hi Renan,
+Hi,
 
-Now, there is D-Bus method available.
-Try:
+> 	On our distribution, a patch is applied to standard Bluez driver to support specific BT hardware. So I'd like run test suite to make sure the patch is harmless.
 
-dbus-send --system --type=3Dmethod_call --print-reply --dest=3Dorg.bluez
-/org/bluez/Adapter/hci0 org.bluez.Adapter.SetDiscoverableTimeout
-uint32:60000
+show me the patch.
 
-Setting to discoverable mode: Discoverable and connectable
-dbus-send --system --type=3Dmethod_call --print-reply --dest=3Dorg.bluez
-/org/bluez/Adapter/hci0 org.bluez.Adapter.SetMode string:discoverable
+> 	L2test and rctest are the standard test suite for bluez, right? Where can I get them? Thanks a lot!
 
-*** After x seconds the daemon is automatically sends the HCI command
-to change the discoverable mode to connectable only. If you want
-change to other mode again try the following  commands:
+They are part of the bluez-utils package.
 
-Setting to discoverable mode: Connectable only
-dbus-send --system --type=3Dmethod_call --print-reply --dest=3Dorg.bluez
-/org/bluez/Adapter/hci0 org.bluez.Adapter.SetMode string:connectable
+Regards
+
+Marcel
 
 
-Setting to discoverable mode: invible/off
-dbus-send --system --type=3Dmethod_call --print-reply --dest=3Dorg.bluez
-/org/bluez/Adapter/hci0 org.bluez.Adapter.SetMode string:off
-
-
-For more information about BlueZ D-Bus API read the documentation:
-hcid/dbus-api.txt
-
-
-Regards,
-Claudio.
---
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
-
-
-On 4/7/06, Albert Huang <ashuang@gmail.com> wrote:
-> see hciconfig
->
-> -albert
->
->
-> On 4/7/06, Renan <renan@atlantico.com.br> wrote:
-> >
-> >
-> >
-> >
-> > Hello Everyone !
-> >
-> >
-> >
-> > How to make a device temporary discoverable under Linux?
-> >
-> > I would like to make a device discoverable just for 1 minute, for examp=
-le.
-> >
-> >
-> >
-> > Thanks in advance.
-> >
-> >
-> >
-> > Renan Martins
-> >
-> >
->
->
 
 
 -------------------------------------------------------
