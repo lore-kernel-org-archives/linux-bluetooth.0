@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Is there a existing test suite for bluez stackon
-	bluez website?
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <443A125D.6050804@gmx.net>
+From: chris vigelius <chris.vigelius@gmx.net>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <9FBCE015AF479F46B3B410499F3AE05B011F0582@pdsmsx405>
-References: <9FBCE015AF479F46B3B410499F3AE05B011F0582@pdsmsx405>
-Content-Type: text/plain
-Message-Id: <1144663116.7825.15.camel@localhost>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-15
+Subject: [Bluez-devel] hci_scodata_packet messages flooding syslog
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,23 +16,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Apr 2006 11:58:36 +0200
+Date: Mon, 10 Apr 2006 10:07:57 +0200
 
 Hi,
 
-> 	On our distribution, a patch is applied to standard Bluez driver to support specific BT hardware. So I'd like run test suite to make sure the patch is harmless.
+I am having problems with a BT USB dongle manufactured by Vivanco (Model
+ 18031, FCC-ID NV6-CS8024, if that matters).
 
-show me the patch.
+Everytime I connect the stick, the syslog is flooded with messages
 
-> 	L2test and rctest are the standard test suite for bluez, right? Where can I get them? Thanks a lot!
+> hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
 
-They are part of the bluez-utils package.
+There are about 500 messages generated EACH SECOND, causing a high load
+(and lots of wasted disk space) on my system. Is there anything I can do
+to get  rid of them?
 
-Regards
+I believe the problem discussed in the thread below is about the same
+issue, but unfortunately there was no solution posted:
 
-Marcel
+> http://sourceforge.net/mailarchive/message.php?msg_id=13791329
+
+Output of hciconfig -a:
+>
+>
+> hci0:   Type: USB
+>         BD Address: 00:0C:78:30:EE:F2 ACL MTU: 339:4 SCO MTU: 60:9
+>         UP RUNNING
+>         RX bytes:249022 acl:0 sco:73200 events:16 errors:0
+>         TX bytes:310 acl:0 sco:0 commands:14 errors:0
+>         Features: 0xff 0xff 0x81 0x00 0x18 0x18 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'null-0'
+>         Class: 0xb3010c
+>         Service Classes: Positioning, Networking
+>         Device Class: Computer, Laptop
+>         HCI Ver: 1.2 (0x2) HCI Rev: 0x222 LMP Ver: 1.2 (0x2) LMP Subver:
+> 0x222 Manufacturer: RTX Telecom A/S (21)
 
 
+Any help would be appreciated.
+
+regards,
+ chris
+
+p.s. kernel is 2.6.15 (Kubuntu Dapper).
 
 
 -------------------------------------------------------
