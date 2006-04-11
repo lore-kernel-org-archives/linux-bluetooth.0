@@ -1,17 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec0604111510s7affbdd4lab9427339295d0f2@mail.gmail.com>
-From: "Albert Huang" <albert@csail.mit.edu>
+From: Wayne Stallwood <bluez@digimatic.plus.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Selection of Local module....
-In-Reply-To: <000901c65da5$7f680bb0$0300a8c0@akira>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_5927_32623859.1144793415323"
-References: <049f01c65cb0$0d478bf0$0300a8c0@akira>
-	 <ef9938ec0604101037w5114ce37rf783fc009f75fc04@mail.gmail.com>
-	 <000c01c65ccf$d8af7180$0300a8c0@akira>
-	 <ef9938ec0604111229n15e83f8q33d91f253fbb604b@mail.gmail.com>
-	 <000901c65da5$7f680bb0$0300a8c0@akira>
+Content-Type: text/plain
+Message-Id: <1144793359.6691.16.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-devel] hardware report for bluetooth-alsa
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -23,132 +16,72 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Apr 2006 18:10:15 -0400
+Date: Tue, 11 Apr 2006 23:09:19 +0100
 
-------=_Part_5927_32623859.1144793415323
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Just built btsco from CVS and I can confirm that it works with the
+following hardware.
 
-Hi Sir Graham,
+Hawking Technology HBTC1 USB adapter
+Bluetrek G2 headset (volume controls and call button are also detected)
 
-Good to hear.  yes, it can be 0.
+The only problem I have is that the sound from the Bluetrek's mic is
+muffled and quiet even if I set Mic volume to 15. It seems to be some
+sort of soft clipping issue because from volume 8 to 15 yelds little
+change and it is still as quiet (but distorted) if I shout at it.
 
--albert
+Performance of the G2's Mic is fine when it is paired with my mobile.
 
-On 4/11/06, Sir Graham (Terra) <sir__graham@terra.es> wrote:
->
-> Hi Albert.
->
-> WORKS!
->
-> However... In the Local address.... the port variable I think is not
-> important... can be to 0?    Or     must I make put special port?
->
-> Best Regards,
-> Sir Graham.
->
-> ----- Original Message -----
-> *From:* Albert Huang <albert@csail.mit.edu>
-> *To:* bluez-devel@lists.sourceforge.net
-> *Sent:* Tuesday, April 11, 2006 9:29 PM
-> *Subject:* Re: [Bluez-devel] Selection of Local module....
->
-> Hi Sir Graham,
->
->   This works when you make a server conexion.... but... When you create a=
-client function works also the bind function?
-> >
->
-> Feel free to try it out before you believe me.
->
-> Regards,
-> Albert
->
+Is there anything I can do to tweak the sound quality or are the quality
+issues work in progress ?
 
-------=_Part_5927_32623859.1144793415323
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Many Thanks for getting me this far
+Wayne
 
-Hi Sir Graham,<br><br>Good to hear.&nbsp; yes, it can be 0.<br><br>-albert<=
-br><br><div><span class=3D"gmail_quote">On 4/11/06, <b class=3D"gmail_sende=
-rname">Sir Graham (Terra)</b> &lt;<a href=3D"mailto:sir__graham@terra.es">s=
-ir__graham@terra.es
-</a>&gt; wrote:</span><blockquote class=3D"gmail_quote" style=3D"border-lef=
-t: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1=
-ex;"><div style=3D"direction: ltr;">
+hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:E0:98:FD:C5:CB ACL MTU: 192:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:3379314 acl:6837 sco:62823 events:6924 errors:0
+        TX bytes:3307038 acl:6766 sco:62497 commands:44 errors:0
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'digimatic-0'
+        Class: 0x3e0100
+        Service Classes: Networking, Rendering, Capturing, Object
+Transfer, Audio
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
+0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
+
+sudo hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:E0:98:FD:C5:CB ACL MTU: 192:8 SCO MTU: 64:8
+        HCI 16.4
+        Chip version: BlueCore02-External
+        Max key size: 56 bit
+        SCO mapping:  HCI
+
+hcitool info 00:06:C5:0F:85:90
+Requesting information ...
+        BD Address:  00:06:C5:0F:85:90
+        Device Name: BlueTrek G2
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x42c
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xfc 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+                <encryption> <slot offset> <timing accuracy> <role
+switch>
+                <hold mode> <sniff mode> <park state> <RSSI> <channel
+quality>
+                <SCO link> <HV2 packets> <HV3 packets> <u-law log>
+<A-law log>
+                <CVSD> <paging scheme> <power control> <transparent SCO>
 
 
 
 
-
-
-<div><font face=3D"Arial" size=3D"2">Hi Albert.</font></div>
-<div><font face=3D"Arial" size=3D"2"></font>&nbsp;</div>
-<div><font face=3D"Arial" size=3D"2">WORKS!</font></div>
-<div><font face=3D"Arial" size=3D"2"></font>&nbsp;</div>
-<div><font face=3D"Arial" size=3D"2">However... In the Local address.... th=
-e port=20
-variable I think&nbsp;is not important... can be to 0?&nbsp;&nbsp;&nbsp;=20
-Or&nbsp;&nbsp;&nbsp;&nbsp; must&nbsp;I make put special port?</font></div>
-<div><font face=3D"Arial" size=3D"2"></font>&nbsp;</div>
-<div><font face=3D"Arial" size=3D"2">Best Regards,</font></div></div><div s=
-tyle=3D"direction: ltr;"><span class=3D"sg">
-<div><font face=3D"Arial" size=3D"2">Sir Graham.</font></div>
-</span></div><div style=3D"direction: ltr;"><blockquote dir=3D"ltr" style=
-=3D"border-left: 2px solid rgb(0, 0, 0); padding-right: 0px; padding-left: =
-5px; margin-left: 5px; margin-right: 0px;"></blockquote></div><div style=3D=
-"direction: ltr;">
-<span class=3D"q">
-  <div style=3D"font-family: arial; font-style: normal; font-variant: norma=
-l; font-weight: normal; font-size: 10pt; line-height: normal; font-size-adj=
-ust: none; font-stretch: normal;">----- Original Message ----- </div>
-  <div style=3D"background: rgb(228, 228, 228) none repeat scroll 0% 50%; -=
-moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -m=
-oz-background-inline-policy: -moz-initial; font-family: arial; font-style: =
-normal; font-variant: normal; font-weight: normal; font-size: 10pt; line-he=
-ight: normal; font-size-adjust: none; font-stretch: normal;">
-<b>From:</b>=20
-  <a title=3D"albert@csail.mit.edu" href=3D"mailto:albert@csail.mit.edu" ta=
-rget=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,event,this)">Al=
-bert=20
-  Huang</a> </div>
-  <div style=3D"font-family: arial; font-style: normal; font-variant: norma=
-l; font-weight: normal; font-size: 10pt; line-height: normal; font-size-adj=
-ust: none; font-stretch: normal;"><b>To:</b> <a title=3D"bluez-devel@lists.=
-sourceforge.net" href=3D"mailto:bluez-devel@lists.sourceforge.net" target=
-=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,event,this)">
-bluez-devel@lists.sourceforge.net</a>=20
-  </div></span></div><div style=3D"direction: ltr;"><span class=3D"q">
-  <div style=3D"font-family: arial; font-style: normal; font-variant: norma=
-l; font-weight: normal; font-size: 10pt; line-height: normal; font-size-adj=
-ust: none; font-stretch: normal;"><b>Sent:</b> Tuesday, April 11, 2006 9:29=
-=20
-  PM</div>
-  <div style=3D"font-family: arial; font-style: normal; font-variant: norma=
-l; font-weight: normal; font-size: 10pt; line-height: normal; font-size-adj=
-ust: none; font-stretch: normal;"><b>Subject:</b> Re: [Bluez-devel] Selecti=
-on of=20
-  Local module....</div>
-  <div><br></div></span></div><div style=3D"direction: ltr;"><span class=3D=
-"e" id=3D"q_10a8a9d6da3502de_5">Hi Sir Graham,<br><br>
-  <div>
-  <blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(204=
-, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-    <div style=3D"direction: ltr;">
-    <div><font face=3D"Arial" size=3D"2">This works when you make a server =
-conexion....=20
-    but... When you create&nbsp;a</font><font face=3D"Arial" size=3D"2"> cl=
-ient function=20
-    works also the bind function?</font></div></div></blockquote>
-  <div><br>Feel free to try it out before you believe=20
-  me.<br><br>Regards,<br>Albert<br></div></div></span></div><div style=3D"d=
-irection: ltr;">
-
-</div></blockquote></div><br>
-
-------=_Part_5927_32623859.1144793415323--
 
 
 -------------------------------------------------------
