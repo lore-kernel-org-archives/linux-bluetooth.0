@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Wayne Stallwood <wayne@digimatic.plus.com>
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1144793265.6691.14.camel@localhost.localdomain>
-Mime-Version: 1.0
-Subject: [Bluez-devel] hardware report for bluetooth-alsa
+From: "Renan" <renan@atlantico.com.br>
+To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <000001c65da7$5722fc30$052a650a@virgo.atlantico.net.br>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0001_01C65D8E.31D5C430"
+Subject: [Bluez-devel] Linux as a HID mouse
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,70 +17,231 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Apr 2006 23:07:45 +0100
+Date: Tue, 11 Apr 2006 17:34:32 -0300
 
-Just built btsco from CVS and I can confirm that it works with the
-following hardware.
+This is a multi-part message in MIME format.
 
-Hawking Technology HBTC1 USB adapter
-Bluetrek G2 headset (volume controls and call button are also detected)
+------=_NextPart_000_0001_01C65D8E.31D5C430
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-The only problem I have is that the sound from the Bluetrek's mic is
-muffled and quiet even if I set Mic volume to 15. It seems to be some
-sort of soft clipping issue because from volume 8 to 15 yelds little
-change and it is still as quiet (but distorted) if I shout at it.
+Hello Everyone!
+ 
+I want to make a PC Linux to act as a HID mouse. The mouse button's
+pressing and movement will be simulated using the PC keyboard. 
+ 
+Is there a framework to register the HID service, create L2CAP
+connections (control and interrupt) and deal with host requests
+(GET_REPORT, GET_PROTOCOL etc)? 
+ 
+As I am a novice BlueZ programmer, I don't know how to write this
+application. Could somebody help me?
+ 
+ 
+Thanks in advance,
+ 
+Renan Martins 
+ 
+ 
 
-Performance of the G2's Mic is fine when it is paired with my mobile.
+------=_NextPart_000_0001_01C65D8E.31D5C430
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Is there anything I can do to tweak the sound quality or are the quality
-issues work in progress ?
+<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
+xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns=3D"http://www.w3.org/TR/REC-html40">
 
-Many Thanks for getting me this far
-Wayne
-
-hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:E0:98:FD:C5:CB ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:3379314 acl:6837 sco:62823 events:6924 errors:0
-        TX bytes:3307038 acl:6766 sco:62497 commands:44 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'digimatic-0'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing, Object
-Transfer, Audio
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
-0x20d
-        Manufacturer: Cambridge Silicon Radio (10)
-
-sudo hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:E0:98:FD:C5:CB ACL MTU: 192:8 SCO MTU: 64:8
-        HCI 16.4
-        Chip version: BlueCore02-External
-        Max key size: 56 bit
-        SCO mapping:  HCI
-
-hcitool info 00:06:C5:0F:85:90
-Requesting information ...
-        BD Address:  00:06:C5:0F:85:90
-        Device Name: BlueTrek G2
-        LMP Version: 1.1 (0x1) LMP Subversion: 0x42c
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features: 0xfc 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-                <encryption> <slot offset> <timing accuracy> <role
-switch>
-                <hold mode> <sniff mode> <park state> <RSSI> <channel
-quality>
-                <SCO link> <HV2 packets> <HV3 packets> <u-law log>
-<A-law log>
-                <CVSD> <paging scheme> <power control> <transparent SCO>
+<head>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
 
 
+<meta name=3DProgId content=3DWord.Document>
+<meta name=3DGenerator content=3D"Microsoft Word 10">
+<meta name=3DOriginator content=3D"Microsoft Word 10">
+<link rel=3DFile-List href=3D"cid:filelist.xml@01C65D8E.2A1FBCA0">
+<!--[if gte mso 9]><xml>
+ <o:OfficeDocumentSettings>
+  <o:DoNotRelyOnCSS/>
+ </o:OfficeDocumentSettings>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:SpellingState>Clean</w:SpellingState>
+  <w:GrammarState>Clean</w:GrammarState>
+  <w:DocumentKind>DocumentEmail</w:DocumentKind>
+  <w:HyphenationZone>21</w:HyphenationZone>
+  <w:EnvelopeVis/>
+  <w:Compatibility>
+   <w:BreakWrappedTables/>
+   <w:SnapToGridInCell/>
+   <w:WrapTextWithPunct/>
+   <w:UseAsianBreakRules/>
+  </w:Compatibility>
+  <w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel>
+ </w:WordDocument>
+</xml><![endif]-->
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0cm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;
+	text-underline:single;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;
+	text-underline:single;}
+span.EstiloDeEmail17
+	{mso-style-type:personal-compose;
+	mso-style-noshow:yes;
+	mso-ansi-font-size:10.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:Arial;
+	mso-ascii-font-family:Arial;
+	mso-hansi-font-family:Arial;
+	mso-bidi-font-family:Arial;
+	color:windowtext;}
+span.SpellE
+	{mso-style-name:"";
+	mso-spl-e:yes;}
+span.GramE
+	{mso-style-name:"";
+	mso-gram-e:yes;}
+@page Section1
+	{size:612.0pt 792.0pt;
+	margin:70.85pt 3.0cm 70.85pt 3.0cm;
+	mso-header-margin:35.4pt;
+	mso-footer-margin:35.4pt;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+<!--[if gte mso 10]>
+<style>
+ /* Style Definitions */=20
+ table.MsoNormalTable
+	{mso-style-name:"Tabela normal";
+	mso-tstyle-rowband-size:0;
+	mso-tstyle-colband-size:0;
+	mso-style-noshow:yes;
+	mso-style-parent:"";
+	mso-padding-alt:0cm 5.4pt 0cm 5.4pt;
+	mso-para-margin:0cm;
+	mso-para-margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";}
+</style>
+<![endif]-->
+</head>
+
+<body lang=3DPT-BR link=3Dblue vlink=3Dpurple =
+style=3D'tab-interval:35.4pt'>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal><span class=3DSpellE><font size=3D2 =
+face=3DArial><span
+style=3D'font-size:10.0pt;font-family:Arial'>Hello</span></font></span><f=
+ont
+size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;font-family:Arial'> <span
+class=3DSpellE>Everyone</span>!<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial;mso-ansi-language:EN-US'>I want to make a PC =
+Linux to
+act as a HID mouse. The mouse button&#8217;s pressing and movement will =
+be simulated
+using the PC keyboard. <o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></span=
+></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial;mso-ansi-language:EN-US'>Is there a framework =
+to register
+the HID service, create L2CAP connections (control and interrupt) and =
+deal with
+host requests (GET_REPORT, GET_PROTOCOL etc)? =
+<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></span=
+></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial;mso-ansi-language:EN-US'>As I am a novice <span
+class=3DSpellE>BlueZ</span> programmer, I don&#8217;t know how to write =
+this
+application. Could somebody help me?<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></span=
+></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></span=
+></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial;mso-ansi-language:EN-US'>Thanks in =
+advance,<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial;mso-ansi-language:EN-US;mso-no-proof:yes'><o:p>&=
+nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-US =
+style=3D'font-size:
+10.0pt;font-family:Arial;mso-ansi-language:EN-US;mso-no-proof:yes'>Renan
+Martins </span></font><span lang=3DEN-US =
+style=3D'mso-ansi-language:EN-US;
+mso-no-proof:yes'><o:p></o:p></span></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
+n></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></spa=
+n></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------=_NextPart_000_0001_01C65D8E.31D5C430--
 
 
 
