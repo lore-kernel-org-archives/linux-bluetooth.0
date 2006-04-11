@@ -2,10 +2,10 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="gb2312"
-Message-ID: <9FBCE015AF479F46B3B410499F3AE05B011F0BCB@pdsmsx405>
+Subject: RE: [Bluez-devel] Is there a existing test suite for bluez stackonbluez website?
+Message-ID: <9FBCE015AF479F46B3B410499F3AE05B011F0A24@pdsmsx405>
 From: "Wang, Jing J" <jing.j.wang@intel.com>
 To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] How to use hciemu to transfer files in Emulation environment
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,25 +17,7 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Apr 2006 13:33:53 +0800
-
-Marcel,
-	Another problem is how to use hciemu to create a emulation testing =
-environment. Currently I can use hciemu to create a virtual HCI, but how =
-to connect one with another? I use l2ping, it seems doesn't connect.
-	Could you give a detail usage steps to complete it?
-	Thanks again.
-
-WangJing
-
------Original Message-----
-From: bluez-devel-admin@lists.sourceforge.net =
-[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Wang, Jing =
-J
-Sent: 2006=C4=EA4=D4=C211=C8=D5 10:09
-To: bluez-devel@lists.sourceforge.net
-Subject: RE: [Bluez-devel] Is there a existing test suite for bluez =
-stackonbluez website?
+Date: Tue, 11 Apr 2006 10:08:48 +0800
 
 Thanks Marcel, the patch has not totally done now. I'll show you when =
 done.
@@ -80,20 +62,6 @@ and join the prime developer group breaking into this new coding =
 territory!
 http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D110944&bid=3D241720&dat=3D=
 121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by xPML, a groundbreaking scripting =
-language
-that extends applications into web and mobile media. Attend the live =
-webcast
-and join the prime developer group breaking into this new coding =
-territory!
-http://sel.as-us.falkag.net/sel?cmd=3Dk&kid=110944&bid$1720&dat=121642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
