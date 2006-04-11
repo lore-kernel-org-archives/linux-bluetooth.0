@@ -1,8 +1,8 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Wayne Stallwood <bluez@digimatic.plus.com>
+From: Wayne Stallwood <wayne@digimatic.plus.com>
 To: bluez-devel@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1144793359.6691.16.camel@localhost.localdomain>
+Message-Id: <1144793265.6691.14.camel@localhost.localdomain>
 Mime-Version: 1.0
 Subject: [Bluez-devel] hardware report for bluetooth-alsa
 Sender: bluez-devel-admin@lists.sourceforge.net
@@ -16,7 +16,7 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Apr 2006 23:09:19 +0100
+Date: Tue, 11 Apr 2006 23:07:45 +0100
 
 Just built btsco from CVS and I can confirm that it works with the
 following hardware.
@@ -78,7 +78,6 @@ quality>
                 <SCO link> <HV2 packets> <HV3 packets> <u-law log>
 <A-law log>
                 <CVSD> <paging scheme> <power control> <transparent SCO>
-
 
 
 
