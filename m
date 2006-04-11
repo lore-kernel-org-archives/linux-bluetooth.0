@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000901c65da5$7f680bb0$0300a8c0@akira>
-From: "Sir Graham (Terra)" <sir__graham@terra.es>
-To: <bluez-devel@lists.sourceforge.net>
-References: <049f01c65cb0$0d478bf0$0300a8c0@akira> <ef9938ec0604101037w5114ce37rf783fc009f75fc04@mail.gmail.com> <000c01c65ccf$d8af7180$0300a8c0@akira> <ef9938ec0604111229n15e83f8q33d91f253fbb604b@mail.gmail.com>
+Message-ID: <ef9938ec0604111229n15e83f8q33d91f253fbb604b@mail.gmail.com>
+From: "Albert Huang" <albert@csail.mit.edu>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Selection of Local module....
+In-Reply-To: <000c01c65ccf$d8af7180$0300a8c0@akira>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0006_01C65DB6.39925440"
+	boundary="----=_Part_5028_12544642.1144783746417"
+References: <049f01c65cb0$0d478bf0$0300a8c0@akira>
+	 <ef9938ec0604101037w5114ce37rf783fc009f75fc04@mail.gmail.com>
+	 <000c01c65ccf$d8af7180$0300a8c0@akira>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,107 +21,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Apr 2006 22:21:05 +0200
+Date: Tue, 11 Apr 2006 15:29:06 -0400
 
-This is a multi-part message in MIME format.
-
-------=_NextPart_000_0006_01C65DB6.39925440
-Content-Type: text/plain;
-	charset="iso-8859-1"
+------=_Part_5028_12544642.1144783746417
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Hi Albert.
+Hi Sir Graham,
 
-WORKS!
+This works when you make a server conexion.... but... When you create
+aclient function works also the bind function?
+>
 
-However... In the Local address.... the port variable I think is not =
-important... can be to 0?    Or     must I make put special port?
+Feel free to try it out before you believe me.
 
-Best Regards,
-Sir Graham.
-  ----- Original Message -----=20
-  From: Albert Huang=20
-  To: bluez-devel@lists.sourceforge.net=20
-  Sent: Tuesday, April 11, 2006 9:29 PM
-  Subject: Re: [Bluez-devel] Selection of Local module....
+Regards,
+Albert
 
-
-  Hi Sir Graham,
-
-
-    This works when you make a server conexion.... but... When you =
-create a client function works also the bind function?
-
-  Feel free to try it out before you believe me.
-
-  Regards,
-  Albert
-
-------=_NextPart_000_0006_01C65DB6.39925440
-Content-Type: text/html;
-	charset="iso-8859-1"
+------=_Part_5028_12544642.1144783746417
+Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2900.2802" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi Albert.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>WORKS!</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>However... In the Local address.... the =
-port=20
-variable I think&nbsp;is not important... can be to 0?&nbsp;&nbsp;&nbsp; =
+Hi Sir Graham,<br><br><div><blockquote class=3D"gmail_quote" style=3D"borde=
+r-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-le=
+ft: 1ex;"><div style=3D"direction: ltr;"><div><font face=3D"Arial" size=3D"=
+2">This works when you make a server conexion....=20
+but... When you create&nbsp;a</font><font face=3D"Arial" size=3D"2"> client=
+ function=20
+works also the bind function?</font></div></div></blockquote><div><br>Feel =
+free to try it out before you believe me.<br><br>Regards,<br>Albert<br></di=
+v></div>
 
-Or&nbsp;&nbsp;&nbsp;&nbsp; must&nbsp;I make put special =
-port?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Best Regards,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Sir Graham.</FONT></DIV>
-<BLOCKQUOTE dir=3Dltr=20
-style=3D"PADDING-RIGHT: 0px; PADDING-LEFT: 5px; MARGIN-LEFT: 5px; =
-BORDER-LEFT: #000000 2px solid; MARGIN-RIGHT: 0px">
-  <DIV style=3D"FONT: 10pt arial">----- Original Message ----- </DIV>
-  <DIV=20
-  style=3D"BACKGROUND: #e4e4e4; FONT: 10pt arial; font-color: =
-black"><B>From:</B>=20
-  <A title=3Dalbert@csail.mit.edu =
-href=3D"mailto:albert@csail.mit.edu">Albert=20
-  Huang</A> </DIV>
-  <DIV style=3D"FONT: 10pt arial"><B>To:</B> <A=20
-  title=3Dbluez-devel@lists.sourceforge.net=20
-  =
-href=3D"mailto:bluez-devel@lists.sourceforge.net">bluez-devel@lists.sourc=
-eforge.net</A>=20
-  </DIV>
-  <DIV style=3D"FONT: 10pt arial"><B>Sent:</B> Tuesday, April 11, 2006 =
-9:29=20
-  PM</DIV>
-  <DIV style=3D"FONT: 10pt arial"><B>Subject:</B> Re: [Bluez-devel] =
-Selection of=20
-  Local module....</DIV>
-  <DIV><BR></DIV>Hi Sir Graham,<BR><BR>
-  <DIV>
-  <BLOCKQUOTE class=3Dgmail_quote=20
-  style=3D"PADDING-LEFT: 1ex; MARGIN: 0pt 0pt 0pt 0.8ex; BORDER-LEFT: =
-rgb(204,204,204) 1px solid">
-    <DIV style=3D"DIRECTION: ltr">
-    <DIV><FONT face=3DArial size=3D2>This works when you make a server =
-conexion....=20
-    but... When you create&nbsp;a</FONT><FONT face=3DArial size=3D2> =
-client function=20
-    works also the bind function?</FONT></DIV></DIV></BLOCKQUOTE>
-  <DIV><BR>Feel free to try it out before you believe=20
-  =
-me.<BR><BR>Regards,<BR>Albert<BR></DIV></DIV></BLOCKQUOTE></BODY></HTML>
-
-------=_NextPart_000_0006_01C65DB6.39925440--
-
+------=_Part_5028_12544642.1144783746417--
 
 
 -------------------------------------------------------
