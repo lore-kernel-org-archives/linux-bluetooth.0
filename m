@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <9a7305090604121148p6d72255ep71e83c409752816d@mail.gmail.com>
-From: "Luis Alfonso Vega Garcia" <vegacom@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <443D4707.80402@pagestation.com>
+From: Jerry Geis <geisj@pagestation.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] iPAQ hx4700 file transfer problem
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] error when loading snd-bt-sco
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,78 +16,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 Apr 2006 13:48:25 -0500
+Date: Wed, 12 Apr 2006 14:29:27 -0400
 
-Hi,
+I have downloaded 2.6.16.4, compiled and installed it, rebooted. ( I am 
+using centos 4.3)
 
-Does any body have sent a file to an  iPAQ hx4700?
+I downloaded alsa-project.org 1.0.11rc5, compiled and installed it. 
+Sound works on my machine.
+I downloaded bluetooth-alsa.sourceforge.net and compiled and installed 
+snd-bt-sco kernel module.
+When I modprobe snd-bt-sco it says:
 
-I am trying to send a file thru bluetooth to an iPAQ hx4700. I use the
-following commad:
+Error inserting snd_bt_sco  (/lib/modules/2.6.16.4/extra/snd-bt-sco.ko) 
+Unknown symbol in module. see dmesg
 
-gnome-obex-send /etc/fstab
+the output from dmesg gives:
+snd_bt_sco: disagrees about version of symbol snd_ctl_add
+snd_bt_sco: Unknown symbol snd_ctl_add
+snd_bt_sco: disagrees about version of symbol snd_pcm_new
+snd_bt_sco: Unknown symbol snd_pcm_new
+snd_bt_sco: disagrees about version of symbol snd_card_register
+snd_bt_sco: Unknown symbol snd_card_register
+snd_bt_sco: disagrees about version of symbol snd_card_free
+snd_bt_sco: Unknown symbol snd_card_free
+snd_bt_sco: disagrees about version of symbol snd_ctl_new1
+snd_bt_sco: Unknown symbol snd_ctl_new1
+snd_bt_sco: disagrees about version of symbol snd_card_new
+snd_bt_sco: Unknown symbol snd_card_new
+snd_bt_sco: disagrees about version of symbol snd_pcm_lib_ioctl
+snd_bt_sco: Unknown symbol snd_pcm_lib_ioctl
+snd_bt_sco: disagrees about version of symbol snd_hwdep_new
+snd_bt_sco: Unknown symbol snd_hwdep_new
+snd_bt_sco: disagrees about version of symbol snd_ctl_notify
+snd_bt_sco: Unknown symbol snd_ctl_notify
+snd_bt_sco: disagrees about version of symbol snd_pcm_set_ops
+snd_bt_sco: Unknown symbol snd_pcm_set_ops
+snd_bt_sco: disagrees about version of symbol snd_pcm_period_elapsed
+snd_bt_sco: Unknown symbol snd_pcm_period_elapsed
 
--> Refresh, select iPAQ hx4700 device -> OK
+What have I not down correctly... Thanks,
 
-it prints something like:
+Jerry
 
-    Browsing 00:02:EE:6C:2F:AA ...
-    Service Name: OBEX Object Push
-    Service RecHandle: 0x10004
-    Protocol Descriptor List:
-      "L2CAP" (0x0100)
-      "RFCOMM" (0x0003)
-        Channel: 9
-      "OBEX" (0x0008)
-    Service Class ID List:
-      "OBEX Object Push" (0x1105)
-    ** Message: device 00:02:EE:6C:2F:AA (OBEX Object Push) port 9
-
-
-There is no error message, but the file is NOT received by the ipaq.
-I have successfully sent a file from a nokia6620 to the ipaq, from the
-pc to the nokia6620, but not from the pc to the ipaq.
-
-Is there an alternate command to send files? Maybe a non-GUI one?
-
-Is it an error in my /etc/bluetooth/hcid.conf?
-    # HCI daemon configuration file.
-    options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        pin_helper /usr/bin/pinwrapper;
-    }
-    device {
-        name "%h-%d";
-        class 0x3e0100;
-        iscan enable; pscan enable;
-        lm accept;
-        lp rswitch,hold,sniff,park;
-    }
-
-cat /etc/lsb-release
-    DISTRIB_ID=3DUbuntu
-    DISTRIB_RELEASE=3D6.06
-    DISTRIB_CODENAME=3Ddapper
-    DISTRIB_DESCRIPTION=3D"Ubuntu (The Dapper Drake Release) Development Br=
-anch"
-
-uname -a
-    Linux kaola 2.6.15-18-686 #1 SMP PREEMPT Thu Mar 9 15:29:22 UTC
-2006 i686 GNU/Linux
-
-Thanks a lot in advance.
-
---
-|               Luis Alfonso Vega Garc=EDa
-|                luis.vega@skills-depot.com
-|
-|   GNU/Linux User =3D 326423 @ http://counter.li.org
-|   LPI Certificate =3D LPI000053380 @ https://www.lpi.org
-|   gpg-key =3D BD3479B0 @ hkp://pgp.mit.edu
-*NOTA*: deseas una cuenta de correo gmail de m=E1s de 2500 MB?
-click en: http://vegacom.blogspot.com/2005/09/gmail.html
 
 
 -------------------------------------------------------
