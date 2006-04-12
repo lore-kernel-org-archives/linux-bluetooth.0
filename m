@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Flo <flolp@gmx.de>
 To: bluez-devel@lists.sourceforge.net
-From: Evan Paul Fletcher <evanpaul@gmail.com>
-Message-ID: <loom.20060412T215427-611@post.gmane.org>
-References: <4410090A.3070706@kernelconcepts.de>  <1141912311.4605.9.camel@aeonflux.holtmann.net>  <44104DD5.80109@kernelconcepts.de> <1141923373.4605.39.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Re: New HCI-USB device, no MAC?
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200604121641.01999.flolp@gmx.de>
+Subject: [Bluez-devel] 2 broadcom chipset results with sco-mtu-patch
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,39 +17,67 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 Apr 2006 20:00:26 +0000 (UTC)
+Date: Wed, 12 Apr 2006 16:41:01 +0200
 
-Marcel Holtmann <marcel <at> holtmann.org> writes:
+Hello bluez-devel, just dropping a note about my Broadcom tryouts...
+(and the other hardware I had at hands - hope its useful)
 
-> 
-> Hi Nils,
-> 
-> > Windows did not change it :(
-> > Also the tools that com eon the CDROM seem not to be able to change it.
-> > 
-> > Have you contacted ISSC about that issue already?
-> > 
-> > It should be forbidden to release hardware without valid BDADDR into the
-> > market... That is kind of stupid and dangerous.
-> 
-> I think it isn't really the fault of ISSC. It is a stupid module
-> manufacturer that has not clue that an BD_ADDR suppose to be unique.
-> 
-> Regards
-> 
-> Marcel
-> 
+I used 
+kernel 2.6.16.2 from kernel.org
+the sco-mtu.patch
+the cvs btsco version I downloaded on 12th April 06.
+The patch did not break anything...
 
-Hi Marcel,
+working hardware:
+Belkin F8T012 (Broadcom, with patch)
+D-Link DBT-120 (Cambridge, with/without patch)
+Motorola H300 [Headset] - works fine with btsco here, I think it can
+be put on the list.
 
-Did anyone ever find a solution/workaround for these ISSC-based dongles?  I seem
-to have acquired two dongles with a BD_ADDR of 11:11:11:11:11:11 and from
-searching Google, it seems that a lot of other people are in the same boat.
+NOT working hardware:
+Sitecom CN-500V2 (Broadcom, not at all)
 
-Cheers,
+Hardware details:
 
-Evan Paul Fletcher
+Motorola H300
+hcitool info **:**:**:**:**:**
+Requesting information ...
+        BD Address:  **:**:**:**:**:**
+        Device Name: Motorola H300
+        LMP Version: 2.0 (0x3) LMP Subversion: 0x977
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xfc 0xfe 0x0b 0x00 0x08 0x08 0x00 0x00
+                <encryption> <slot offset> <timing accuracy> <role switch>
+                <hold mode> <sniff mode> <RSSI> <channel quality> <SCO link>
+                <HV2 packets> <HV3 packets> <u-law log> <A-law log> <CVSD>
+                <paging scheme> <transparent SCO> <AFH cap. slave>
+                <AFH cap. master>
 
+Sitecom CN-500V2
+hcitool hci0 revision
+hci0:   Type: USB
+        BD Address: **:**:**:**:**:** ACL MTU: 377:10 SCO MTU: 64:8
+        Firmware 0.3 / 9
+
+
+Belkin F8T012
+hcitool hci0 revision
+hci0:   Type: USB
+        BD Address: **:**:**:**:**:** ACL MTU: 1017:8 SCO MTU: 64:8
+        Firmware 8192.65 / 39
+
+D-Link DBT-120
+hcitool hci0 revision
+hci0:   Type: USB
+        BD Address: **:**:**:**:**:** ACL MTU: 192:8 SCO MTU: 64:8
+        HCI 16.4
+        Chip version: BlueCore02-External
+        Max key size: 56 bit
+        SCO mapping:  HCI
+
+Get back to me for more details if necessary, greetings
+
+Flo
 
 
 -------------------------------------------------------
