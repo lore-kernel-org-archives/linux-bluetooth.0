@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <443EABA3.4030206@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] How to process fragmentation synchronously when
+	two l2cap connections over one acl connection?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH] snd-bt-sco and new mutex API in kernel
- 2.6.16
-References: <442D37DF.8030201@gmx.net>
-In-Reply-To: <442D37DF.8030201@gmx.net>
-Content-Type: text/plain; charset=ISO-8859-15
+In-Reply-To: <ef9938ec0604130949q67168579m85a3eb9521cdae91@mail.gmail.com>
+References: <9FBCE015AF479F46B3B410499F3AE05B011F0BCB@pdsmsx405>
+	 <OF01649481.41C9F474-ON4825714F.003F0EC5-4825714F.004171CE@zte.com.cn>
+	 <ef9938ec0604130949q67168579m85a3eb9521cdae91@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1144948700.11159.53.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,16 +21,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 13 Apr 2006 13:50:59 -0600
+Date: Thu, 13 Apr 2006 19:18:20 +0200
 
-Whoopie
+Hi Albert,
 
-> attached a patch to use the new mutex API introduced in kernel 2.6.16.
-> It's backwards compatible.
+> l2cap packets are always identified by a channel ID, which is
+> negotiated when each l2cap connection (channel) is established.
+> Continuation fragments always have the channel ID in the packet
+> header, so there is no ambiguity over which continuation fragment
+> belongs to which connection.  You should take another look at the
+> L2CAP section in the core spec.
 
-thanks. applied. let me know if things don't look just right.
+you are not allowed to mix L2CAP fragments. As simple as that.
 
-brad
+Regards
+
+Marcel
+
 
 
 
