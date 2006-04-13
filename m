@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <443E666A.2080806@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Message-ID: <OF1ED005D5.FC685CD1-ONC125714F.005778F6-C125714F.00581C63@sagem.com>
-From: Matthieu CASTET <matthieu.castet@sagem.com>
-Content-Type: text/plain; charset="us-ascii"
-Subject: [Bluez-devel] duplication of h4 protocol broken in btuart_cs
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] hardware report for bluetooth-alsa
+References: <1144793265.6691.14.camel@localhost.localdomain>
+In-Reply-To: <1144793265.6691.14.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,21 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 13 Apr 2006 18:02:14 +0200
+Date: Thu, 13 Apr 2006 08:55:38 -0600
 
-Hi,
+Wayne
 
-in hci_h4.c, the h4 stack checks the len of the packet given in the header 
-with h4_check_data_len.
-in btuart_cs.c, it doesn't. This could lead to skb_over_panic if the read len is wrong.
+> Is there anything I can do to tweak the sound quality or are the quality
+> issues work in progress ?
 
-I think it could be great if all drivers using h4 could use the same h4 
-stack.
+We could pace the outbound data better in btsco. I'm not sure there is
+much else that could help. I'm not very familiar with the kernel layers
+involved in sco.
 
-Thanks
-
-Matthieu
-
+Brad
 
 
 -------------------------------------------------------
