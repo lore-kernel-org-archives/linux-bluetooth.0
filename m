@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20060413210242.53178.qmail@web61218.mail.yahoo.com>
-From: deva seetharam <tagsense@yahoo.com>
-To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1239310292-1144962162=:53157"
-Subject: [Bluez-users] connecting multiple rfcomm clients to a single rfcomm socket server
+Content-Type: text/plain;
+	charset="us-ascii"
+Message-ID: <70DCB28C5BB04A4BBB1C8512589BAC65A6F12C@mail006.mail.lan>
+From: "Brand, Chris" <chris.brand@wideray.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Bccmd patch
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,83 +17,224 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 Apr 2006 14:02:42 -0700 (PDT)
+Date: Thu, 13 Apr 2006 16:40:03 -0400
 
---0-1239310292-1144962162=:53157
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+I discovered a couple of things :
+1. bccmd has some nice features that aren't mentioned in its "usages".
+2. bccmd psset didn't work for keys with a size > 32 bits (because the
+OPT_PSKEY macro returned an error if you specified more than one value
+for the key, but it expected a list of bytes if the length is more than
+1 or 2).
+=20
+Here's a patch (against bluez-utils version 2.25) :
+--- bccmd.c.old 2006-04-08 00:01:10.000000000 +0000
 
-hello,
- i am trying to connect multiple bluetooth rfcomm clients to a single rfcomm server. only the first client is able to connect, the subsequent ones just fail. 
- 
- here is my setup:
- server
- ====
- kernel: debian 2.6.12-1-686
- bluez version 2.25
- hardware: D-Link DBT-120 bluetooth dongle
- 
- client
- ====
- National lmx9820 bluetooth module
- 
- on the server, i edited hcid.conf to change link mode to 
- lm accept,master;
- 
- despite that the linkmode always comes up as "slave, accept" when i do hciconfig -a.
- 
- i have included more info below.  pls. see if you could give me some debugging tips. 
- 
- thanks in advance,
- deva
- 
- 
- when i do a hciconfig -a, i get the following:
- 
- hci0:   Type: USB
-         BD Address: 00:0D:88:C0:61:55 ACL MTU: 192:8 SCO MTU: 64:8
-         UP RUNNING PSCAN ISCAN
-         RX bytes:2304 acl:23 sco:0 events:65 errors:0
-         TX bytes:1429 acl:23 sco:0 commands:29 errors:0
-         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy:
-         Link mode: SLAVE ACCEPT
-         Name: 'BlueZ (0)'
-         Class: 0x000000
-         Service Classes: Unspecified
-         Device Class: Miscellaneous,
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x1bb LMP Ver: 1.1 (0x1) LMP Subver: 0x1bb
-         Manufacturer: Cambridge Silicon Radio (10)
- 
- from a different linux box (with another d-link dbt-120 bluetooth dongle), when i run hctiool info:
- 
- Requesting information ...
-         BD Address:  00:0D:88:C0:61:55
-         Device Name: BlueZ (0)
-         LMP Version: 1.1 (0x1) LMP Subversion: 0x1bb
-         Manufacturer: Cambridge Silicon Radio (10)
-         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                 <timing accuracy> <role switch> <hold mode> <sniff mode>
-                 <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
-                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
-                 <power control> <transparent SCO>
- 
- 
-		
----------------------------------
-Blab-away for as little as 1¢/min. Make  PC-to-Phone Calls using Yahoo! Messenger with Voice.
---0-1239310292-1144962162=:53157
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
++++ bccmd.c 2006-04-10 19:21:13.000000000 +0000
 
-hello,<br> i am trying to connect multiple bluetooth rfcomm clients to a single rfcomm server. only the first client is able to connect, the subsequent ones just fail. <br> <br> here is my setup:<br> server<br> ====<br> kernel: debian 2.6.12-1-686<br> bluez version 2.25<br> hardware: D-Link DBT-120 bluetooth dongle<br> <br> client<br> ====<br> National lmx9820 bluetooth module<br> <br> on the server, i edited hcid.conf to change link mode to <br> lm accept,master;<br> <br> despite that the linkmode always comes up as "slave, accept" when i do hciconfig -a.<br> <br> i have included more info below.&nbsp; pls. see if you could give me some debugging tips. <br> <br> thanks in advance,<br> deva<br> <br> <br> when i do a hciconfig -a, i get the following:<br> <br> hci0:&nbsp;&nbsp; Type: USB<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:0D:88:C0:61:55 ACL MTU: 192:8 SCO MTU: 64:8<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<br>
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:2304 acl:23 sco:0 events:65 errors:0<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:1429 acl:23 sco:0 commands:29 errors:0<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy:<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link mode: SLAVE ACCEPT<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'BlueZ (0)'<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class: 0x000000<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Service Classes: Unspecified<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Device Class: Miscellaneous,<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI Ver: 1.1 (0x1) HCI Rev: 0x1bb LMP Ver: 1.1 (0x1) LMP Subver: 0x1bb<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufacturer: Cambridge Silicon
- Radio (10)<br> <br> from a different linux box (with another d-link dbt-120 bluetooth dongle), when i run hctiool info:<br> <br> Requesting information ...<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address:&nbsp; 00:0D:88:C0:61:55<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Device Name: BlueZ (0)<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LMP Version: 1.1 (0x1) LMP Subversion: 0x1bb<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufacturer: Cambridge Silicon Radio (10)<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;3-slot packets&gt; &lt;5-slot packets&gt; &lt;encryption&gt; &lt;slot offset&gt;<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;timing accuracy&gt; &lt;role switch&gt; &lt;hold mode&gt; &lt;sniff mode&gt;<br>
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;park state&gt; &lt;RSSI&gt; &lt;channel quality&gt; &lt;SCO link&gt; &lt;HV2 packets&gt;<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;HV3 packets&gt; &lt;u-law log&gt; &lt;A-law log&gt; &lt;CVSD&gt; &lt;paging scheme&gt;<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;power control&gt; &lt;transparent SCO&gt;<br> <br> <p>
-		<hr size=1>Blab-away for as little as 1¢/min. Make <a href="http://us.rd.yahoo.com/mail_us/taglines/postman2/*http://us.rd.yahoo.com/evt=39663/*http://voice.yahoo.com"> PC-to-Phone Calls</a> using Yahoo! Messenger with Voice.
---0-1239310292-1144962162=:53157--
+@@ -199,9 +209,9 @@
+
+}
+
+}
+
+-#define OPT_RANGE(range) \
+
+- if (argc < (range)) { errno =3D EINVAL; return -1; } \
+
+- if (argc > (range)) { errno =3D E2BIG; return -1; }
+
++#define OPT_RANGE(min, max) \
+
++ if (argc < (min)) { errno =3D EINVAL; return -1; } \
+
++ if (argc > (max)) { errno =3D E2BIG; return -1; }
+
+static struct option help_options[] =3D {
+
+{ "help", 0, 0, 'h' },
+
+@@ -227,7 +237,7 @@
+
+#define OPT_HELP(range, help) \
+
+opt_help(argc, argv, (help)); \
+
+argc -=3D optind; argv +=3D optind; optind =3D 0; \
+
+- OPT_RANGE((range))
+
++ OPT_RANGE((range), (range))
+
+static int cmd_builddef(int transport, int argc, char *argv[])
+
+{
+
+@@ -510,10 +520,10 @@
+
+return optind;
+
+}
+
+-#define OPT_PSKEY(range, stores, reset, help) \
+
++#define OPT_PSKEY(min, max, stores, reset, help) \
+
+opt_pskey(argc, argv, (stores), (reset), (help)); \
+
+argc -=3D optind; argv +=3D optind; optind =3D 0; \
+
+- OPT_RANGE((range))
+
++ OPT_RANGE((min), (max))
+
+static int cmd_psget(int transport, int argc, char *argv[])
+
+{
+
+@@ -524,7 +534,7 @@
+
+memset(array, 0, sizeof(array));
+
+- OPT_PSKEY(1, &stores, &reset, NULL);
+
++ OPT_PSKEY(1, 1, &stores, &reset, NULL);
+
+if (strncasecmp(argv[0], "0x", 2)) {
+
+pskey =3D atoi(argv[0]);
+
+@@ -599,7 +609,7 @@
+
+memset(array, 0, sizeof(array));
+
+- OPT_PSKEY(2, &stores, &reset, NULL);
+
++ OPT_PSKEY(2, 81, &stores, &reset, NULL);
+
+if (strncasecmp(argv[0], "0x", 2)) {
+
+pskey =3D atoi(argv[0]);
+
+@@ -702,7 +712,7 @@
+
+uint16_t pskey, stores =3D CSR_STORES_PSRAM;
+
+int i, err, reset =3D 0;
+
+- OPT_PSKEY(1, &stores, &reset, NULL);
+
++ OPT_PSKEY(1, 1, &stores, &reset, NULL);
+
+if (strncasecmp(argv[0], "0x", 2)) {
+
+pskey =3D atoi(argv[0]);
+
+@@ -739,7 +749,7 @@
+
+uint16_t pskey =3D 0x0000, length, stores =3D CSR_STORES_DEFAULT;
+
+int err, reset =3D 0;
+
+- OPT_PSKEY(0, &stores, &reset, NULL);
+
++ OPT_PSKEY(0, 0, &stores, &reset, NULL);
+
+while (1) {
+
+memset(array, 0, sizeof(array));
+
+@@ -785,7 +795,7 @@
+
+char *str, val[7];
+
+int i, err, reset =3D 0;
+
+- OPT_PSKEY(0, &stores, &reset, NULL);
+
++ OPT_PSKEY(0, 0, &stores, &reset, NULL);
+
+while (1) {
+
+memset(array, 0, sizeof(array));
+
+@@ -854,7 +864,7 @@
+
+char *str, val[7];
+
+int err, reset =3D 0;
+
+- OPT_PSKEY(1, &stores, &reset, NULL);
+
++ OPT_PSKEY(1, 1, &stores, &reset, NULL);
+
+psr_read(argv[0]);
+
+@@ -933,13 +943,13 @@
+
+{ "disabletx", cmd_disabletx, "", "Disable TX on the device" },
+
+{ "enabletx", cmd_enabletx, "", "Enable TX on the device" },
+
+{ "memtypes", cmd_memtypes, NULL, "Get memory types" },
+
+- { "psget", cmd_psget, "<key>", "Get value for PS key" },
+
+- { "psset", cmd_psset, "<key> <value>", "Set value for PS key" },
+
+- { "psclr", cmd_psclr, "<key>", "Clear value for PS key" },
+
+- { "pslist", cmd_pslist, NULL, "List all PS keys" },
+
+- { "psread", cmd_psread, NULL, "Read all PS keys" },
+
+- { "psload", cmd_psload, "<file>", "Load all PS keys from PSR file" },
+
+- { "pscheck", cmd_pscheck, "<file>", "Check PSR file" },
+
++ { "psget", cmd_psget, "[-r] [-s <store>] <key>", "Get value for PS
+key" },
+
++ { "psset", cmd_psset, "[-r] [-s <store>] <key> <value>", "Set value
+for PS key" },
+
++ { "psclr", cmd_psclr, "[-r] [-s <store>] <key>", "Clear value for PS
+key" },
+
++ { "pslist", cmd_pslist, "[-r] [-s <store>]", "List all PS keys" },
+
++ { "psread", cmd_psread, "[-r] [-s <store>]", "Read all PS keys" },
+
++ { "psload", cmd_psload, "[-r] [-s <store>] <file>", "Load all PS keys
+from PSR file" },
+
++ { "pscheck", cmd_pscheck, "[-r] [-s <store>] <file>", "Check PSR file"
+},
+
+{ NULL }
+
+};
+
+@@ -977,6 +987,7 @@
+
+}
+
+}
+
+printf("\n");
+
++ printf("\tor by hex value\n");
+
+}
+
+static struct option main_options[] =3D {
+
+
+--=20
+Chris Brand
+Senior Software Engineer
+WideRay
+604-233-1105
+=20
 
 
 -------------------------------------------------------
