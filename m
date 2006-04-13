@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <443E672A.1080506@xmission.com>
+Message-ID: <443E5DFB.6060208@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] error when loading snd-bt-sco
-References: <443D4707.80402@pagestation.com>
-In-Reply-To: <443D4707.80402@pagestation.com>
+Subject: Re: [Bluez-users] Audio Over HCI ?
+References: <1209.213.168.233.73.1144841146.squirrel@noc.icecomms.net> <fe0a97c20604130251g6f6ee61nb8612d81799ced1e@mail.gmail.com>
+In-Reply-To: <fe0a97c20604130251g6f6ee61nb8612d81799ced1e@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,18 +18,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 Apr 2006 08:58:50 -0600
+Date: Thu, 13 Apr 2006 08:19:39 -0600
 
-Jerry
+Sowmya
 
-> snd_bt_sco: disagrees about version of symbol snd_hwdep_new
-> snd_bt_sco: Unknown symbol snd_hwdep_new
-
-there's a trick to get the snd_hwdep_new module built automatically but
-I haven't gotten it worked into cvs. in the meantime, build the emu10k1
-driver so you get it through that route.
+bluez can only do sco audio over hci. it works for csr adapters.
 
 brad
+
+> Yeah even iam lookin out for something like that... Do anyone have a sol
+> for this?
+> 
+> On 4/12/06, *Richard Rooney* < richardrooney@icecomms.net
+> <mailto:richardrooney@icecomms.net>> wrote:
+> 
+>     Many BT Modules have an Audio CODEC onboard or a PCM interface to allow
+>     external connection of one.
+> 
+>     I don't wish to use either of these methods to transport audio.
+> 
+>     I would like to transport it over HCI. Is this possible ?
+>     Is it dependant on HCI firmware implemenation ?
+>     (I am considering a Ezurio Module.)
+> 
+>     Richard Rooney.
+> 
+> 
+> 
+> 
+>     -------------------------------------------------------
+>     This SF.Net email is sponsored by xPML, a groundbreaking scripting
+>     language
+>     that extends applications into web and mobile media. Attend the live
+>     webcast
+>     and join the prime developer group breaking into this new coding
+>     territory!
+>     http://sel.as-us.falkag.net/sel?cmdlnk&kid0944&bid$1720&dat1642 <http://sel.as-us.falkag.net/sel?cmdlnk&kid0944&bid$1720&dat1642>
+>     _______________________________________________
+>     Bluez-users mailing list
+>     Bluez-users@lists.sourceforge.net
+>     <mailto:Bluez-users@lists.sourceforge.net>
+>     https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+> 
+
 
 
 -------------------------------------------------------
