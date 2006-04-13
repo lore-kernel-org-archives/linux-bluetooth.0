@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20604130251g6f6ee61nb8612d81799ced1e@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Audio Over HCI ?
-In-Reply-To: <1209.213.168.233.73.1144841146.squirrel@noc.icecomms.net>
+Message-ID: <443E1FCD.3040901@gdatech.co.in>
+From: Hariharan <v.hariharan@gdatech.co.in>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_5280_13094233.1144921895789"
-References: <1209.213.168.233.73.1144841146.squirrel@noc.icecomms.net>
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Rfcomm resource temperorily unavailable problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,79 +16,119 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 Apr 2006 15:21:35 +0530
+Date: Thu, 13 Apr 2006 15:24:21 +0530
 
-------=_Part_5280_13094233.1144921895789
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Dear all,
+We are facing one problem while connecting with rfcomm.
+hciattach, hciconfig, hcitool scan all are working fine.
 
-Yeah even iam lookin out for something like that... Do anyone have a sol fo=
-r
-this?
+presently we are having only
+while we try to connect with rfcomm, it says that rfcomm resuorce 
+unavailable.
+we are think that it is because of PIN information conflict.
 
-On 4/12/06, Richard Rooney <richardrooney@icecomms.net> wrote:
->
-> Many BT Modules have an Audio CODEC onboard or a PCM interface to allow
-> external connection of one.
->
-> I don't wish to use either of these methods to transport audio.
->
-> I would like to transport it over HCI. Is this possible ?
-> Is it dependant on HCI firmware implemenation ?
-> (I am considering a Ezurio Module.)
->
-> Richard Rooney.
->
->
->
->
-> -------------------------------------------------------
-> This SF.Net email is sponsored by xPML, a groundbreaking scripting
-> language
-> that extends applications into web and mobile media. Attend the live
-> webcast
-> and join the prime developer group breaking into this new coding
-> territory!
-> http://sel.as-us.falkag.net/sel?cmdlnk&kid=110944&bid$1720&dat=121642
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+Hcidump message is given below,
 
-------=_Part_5280_13094233.1144921895789
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+  70 E2 73 6D 0E 00 18 CC 02 00 00 00 01
+ > HCI Event: Command Status (0x0f) plen 4
+  00 01 05 04
+ > HCI Event: Connect Complete (0x03) plen 11
+  00 28 00 70 E2 73 6D 0E 00 01 00
+< ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+  28 00 0F 00
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+ > HCI Event: Command Complete (0x0e) plen 6
+  01 0D 08 00 28 00
+ > HCI Event: Max Slots Change (0x1b) plen 3
+  28 00 05
+ > ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0093 scid 0x0040 result 1 status 2
+ > HCI Event: QoS Setup Complete (0x0d) plen 21
+  00 28 00 00 01 00 00 00 00 00 00 00 00 FF FF FF FF FF FF FF
+  FF
+ > ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0093 scid 0x0040 result 0 status 0
+< ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0093 flags 0x0000 clen 4
+    MTU 1024
+ > ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 0
+< ACL data: handle 0x0028 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0093 flags 0x0000 result 0 clen 0
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+ > ACL data: handle 0x0028 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 4
+    MTU 672
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0093 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+ > ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+< ACL data: handle 0x0028 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0093 len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 20 frame_type 0 credit_flow 15 pri 7 ack_timer 0
+      frame_size 667 max_retrans 0 credits 7
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+ > ACL data: handle 0x0028 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 20 frame_type 0 credit_flow 14 pri 7 ack_timer 0
+      frame_size 667 max_retrans 0 credits 3
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0093 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 20 pf 1 ilen 0 fcs 0xfd
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+ > HCI Event: PIN Code Request (0x16) plen 6
+  70 E2 73 6D 0E 00
 
-Yeah even iam lookin out for something like that... Do anyone have a sol fo=
-r this?<br><br><div><span class=3D"gmail_quote">On 4/12/06, <b class=3D"gma=
-il_sendername">Richard Rooney</b> &lt;<a href=3D"mailto:richardrooney@iceco=
-mms.net">
-richardrooney@icecomms.net</a>&gt; wrote:</span><blockquote class=3D"gmail_=
-quote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt =
-0pt 0.8ex; padding-left: 1ex;">Many BT Modules have an Audio CODEC onboard =
-or a PCM interface to allow
-<br>external connection of one.<br><br>I don't wish to use either of these =
-methods to transport audio.<br><br>I would like to transport it over HCI. I=
-s this possible ?<br>Is it dependant on HCI firmware implemenation ?<br>
-(I am considering a Ezurio Module.)<br><br>Richard Rooney.<br><br><br><br><=
-br>-------------------------------------------------------<br>This SF.Net e=
-mail is sponsored by xPML, a groundbreaking scripting language<br>that exte=
-nds applications into web and mobile media. Attend the live webcast
-<br>and join the prime developer group breaking into this new coding territ=
-ory!<br><a href=3D"http://sel.as-us.falkag.net/sel?cmdlnk&amp;kid=110944&am=
-p;bid$1720&amp;dat=121642">http://sel.as-us.falkag.net/sel?cmdlnk&amp;kid=
-=110944&amp;bid$1720&amp;dat=121642
-</a><br>_______________________________________________<br>Bluez-users mail=
-ing list<br><a href=3D"mailto:Bluez-users@lists.sourceforge.net">Bluez-user=
-s@lists.sourceforge.net</a><br><a href=3D"https://lists.sourceforge.net/lis=
-ts/listinfo/bluez-users">
-https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquot=
-e></div><br>
+-- here some time it takes after PIN code request  -----------------
 
-------=_Part_5280_13094233.1144921895789--
+Can't connect RFCOMM socket: Resource temporarily unavailable
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0093 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 20 pf 1 ilen 0 fcs 0x1c
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0093 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+< ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0093 scid 0x0040
+[root@localhost bin]# > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+ > ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 20 pf 1 ilen 0 fcs 0x36
+ > ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+ > ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0093 scid 0x0040
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+  28 00 13
+ > HCI Event: Command Status (0x0f) plen 4
+  00 01 06 04
+ > HCI Event: Disconn Complete (0x05) plen 4
+  00 28 00 16
+ 
+Thanks in advance for valuable support.
+
+Hariharan.V.
 
 
 -------------------------------------------------------
