@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <443FF379.90608@pagestation.com>
+Message-ID: <443FB179.5030509@pagestation.com>
 From: Jerry Geis <geisj@pagestation.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] help with pairing
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] cant create connection
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,100 +16,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 14 Apr 2006 15:09:45 -0400
+Date: Fri, 14 Apr 2006 10:28:09 -0400
 
-I had my H500 headset paired with my cellphone.
-I have since deleted the pairing on the cell phone.
+I downloaded 2.6.16.4 and recomiled, installed etc...
+I am no longer using alsa 1.0.11rc5 from the web site. just 2.6.16.4
+I compile btsco and install and btsco/kernel and install
+I can successfully modprobe snd-bt-sco. It loads with no errors now. 
+GREAT I THOUGHT.
 
-I cannot get the H500 to pair with my DBT-120 dongle.
+however now when I am using "sdptool search --bdaddr MACADDR 0x111E"
+it says "failed to connect to SDP server on MACADDR: host is down"
 
-Using hcdump I see it is getting "PIN code request negative reply"
+I am using an H500 motorola headset and a DLINK DBT-120 dongle.
 
-I dont see a PIN popup window to ask me for it when I run "hcitool cc MAC"
+If I do an "l2ping MACADDR" it says "cant connect host is down".
 
-in my /etc/bluetooth/pin file I have tried
+My headset is ON I see it blinking blue, I hear it turn on. My dbt-120
+is on and responds to hciconfig
+hci0:   Type: USB
+        BD Address: 00:13:46:4C:10:32 ACL MTU: 192:8  SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:2123 acl:0 sco:0 events:94 errors:0
+        TX bytes:506 acl:0 sco:0 commands:51 errors:0
 
-echo PIN:0000
-
-my hcid.conf file has
-
-#
-# HCI daemon configuration file.
-#
-# $Id: hcid.conf,v 1.4 2004/04/29 20:14:21 holtmann Exp $
-#
-
-# HCId options
-options {
-	# Automatically initialize new devices
-	autoinit yes;
-
-	# Security Manager mode
-	#   none - Security manager disabled
-	#   auto - Use local PIN for incoming connections
-	#   user - Always ask user for a PIN
-	#
-	security auto;
-
-	# Pairing mode
-	#   none  - Pairing disabled
-	#   multi - Allow pairing with already paired devices
-	#   once  - Pair once and deny successive attempts
-	pairing multi;
-
-	# PIN helper
-	#JERRY_CHANGE pin_helper /etc/bluetooth/pin
-	pin_helper /etc/bluetooth/pin
-
-	# D-Bus PIN helper
-	#dbus_pin_helper;
-}
-
-# Default settings for HCI devices
-device {
-	# Local device name
-	#   %d - device id
-	#   %h - host name
-	name "%h-%d";
-
-	# Local device class
-	#JERRY_CHANG class 0x120104;
-	class 0x200404;
-
-	# Default packet type
-	#pkt_type DH1,DM1,HV1;
-
-	# Inquiry and Page scan
-	iscan enable; pscan enable;
-
-	# Default link mode
-	#   none   - no specific policy 
-	#   accept - always accept incoming connections
-	#   master - become master on incoming connections,
-	#            deny role switch on outgoing connections
-	#
-	#lm accept,master;
-	#
-	lm accept;
-
-	# Default link policy
-	#   none    - no specific policy
-	#   rswitch - allow role switch
-	#   hold    - allow hold mode
-	#   sniff   - allow sniff mode
-	#   park    - allow park mode
-	#
-	#lp hold,sniff;
-	#
-	lp rswitch,hold,sniff,park;
-
-	# Authentication and Encryption
-	#auth enable;
-	#encrypt enable;
-}
-
-
-Thanks for pairing suggestion...
+What am I missing at this stage? THanks,
 
 Jerry
 
