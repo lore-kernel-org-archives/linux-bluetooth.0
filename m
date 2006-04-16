@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1145218550.24273.62.camel@wyatt.hadess.net>
-Mime-Version: 1.0
-Subject: [Bluez-devel] sdpd restarts
+Message-ID: <a3b1b800604160901k6e86614bueceba1bcd5466d5d@mail.gmail.com>
+From: "Jan Benes" <jbenes@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] sdp_connect and co, timing
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,21 +16,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 16 Apr 2006 21:15:49 +0100
+Date: Sun, 16 Apr 2006 18:01:54 +0200
 
-Heya,
+hello,
+I'm trying ot write an application that scans for devices, asks for
+name and services and eventually sends some files/data. I'm running in
+threads. I've already discovered that I must use exclusive access to
+the dongle during connection-time. I also don't do any connecting
+while asking for services or scanning for devices. Still, sometimes,
+the sdp_connect fails to connect for some time. Also, rarely, the
+inquiry fails. Is it possible that there needs to be some time gap
+between such requests? Do scanning/asking for
+services/connectiong/sending cause "collisions"?
 
-I have a service (gnome-obex-server) that advertises OBEX PUSH support
-via sdpd and sdp_record_register().
-The problem is that the record would be gone after a restart of the sdpd
-daemon. Which is the best way to check whether the daemon is still
-available, and reregister the record when it comes back up?
+PS: also, what are the possible responses from a sdp_connect (or the
+respective socket functinos from the function itself. I can't find
+them anywhere)
 
-Cheers
-
--- 
-Bastien Nocera <hadess@hadess.net> 
-
+thanks, Jan
 
 
 -------------------------------------------------------
