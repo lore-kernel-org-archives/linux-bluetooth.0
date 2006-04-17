@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sdpd restarts
-From: Bastien Nocera <hadess@hadess.net>
+Message-ID: <4443519A.4050302@runbox.com>
+From: Tom K <tomk@runbox.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1145230769.4408.12.camel@localhost>
-References: <1145218550.24273.62.camel@wyatt.hadess.net>
-	 <1145230769.4408.12.camel@localhost>
-Content-Type: text/plain
-Message-Id: <1145267215.24273.64.camel@wyatt.hadess.net>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Installing Bluetooth-alsa ./configure fails
+References: <200604170852.24545.tuckernj@ntlworld.com>
+In-Reply-To: <200604170852.24545.tuckernj@ntlworld.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,27 +18,48 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 17 Apr 2006 10:46:54 +0100
+Date: Mon, 17 Apr 2006 09:28:10 +0100
 
-On Mon, 2006-04-17 at 01:39 +0200, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > I have a service (gnome-obex-server) that advertises OBEX PUSH support
-> > via sdpd and sdp_record_register().
-> > The problem is that the record would be gone after a restart of the sdpd
-> > daemon. Which is the best way to check whether the daemon is still
-> > available, and reregister the record when it comes back up?
-> 
-> with the current interface, there exists no good solution for this. With
-> the new D-Bus API this will be available at some point.
-
-OK, I added this to the opened bugzilla.
-
-Cheers
-
--- 
-Bastien Nocera <hadess@hadess.net> 
-
+Neil Tucker wrote:
+> Hi
+>
+> I'm attempting to install Bluetooth-alsa on my Fedora Core 5 machine.  I'm 
+> reasonablly good with using linux but have little experience compiling 
+> packages but have made a few custom kernels before by following the howto.
+>
+> It is a 2.6.* kernel. The kernel source package is installed and linked 
+> to  /usr/src/linux
+>
+> The ./configure fails because it can't find the bluetooth.h header files see 
+> below.  Here are the steps I take:
+>
+> 	#yum install bluez-libs bluez-pin bluez-utils bluez-hcidump bluez-utils-cup
+>
+> 	#yum install alsa-tools alsa-lib alsa-utils alsa-lib-devel
+>
+> 	#yum install automake
+>
+> 	$ cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa log
+> 	$ cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa co btsco
+> 	
+> 	$ cd btsco
+>
+> 	$ ./bootstrap
+> 	$ ./configure
+> 		.
+> 		.
+> 		.	
+> 		checking bluetooth/bluetooth.h usability... no
+> 		checking bluetooth/bluetooth.h presence... no
+> 		checking for bluetooth/bluetooth.h... no
+> 		configure: error: Bluetooth header files not found
+>
+>
+> Can body help me please? 
+>
+>
+>   
+Install bluez-libs-devel.
 
 
 -------------------------------------------------------
