@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <6297d67c0604180319p69ad44d6t23eb6a773ba2d998@mail.gmail.com>
+From: "Mayank Batra" <mayankbatra@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] sdp_connect and co, timing
-Message-ID: <20060418120837.GA7644@localdomain>
-References: <a3b1b800604160901k6e86614bueceba1bcd5466d5d@mail.gmail.com>
+Subject: Re: [Bluez-devel] Sdpd not working
+In-Reply-To: <41CB8F9678E6F0498DA096429793FA850DA382@blr-m3-msg.wipro.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <a3b1b800604160901k6e86614bueceba1bcd5466d5d@mail.gmail.com>
-From: Amateur <ztl.post@gmail.com>
+Content-Type: text/plain; charset=WINDOWS-1252
+References: <41CB8F9678E6F0498DA096429793FA850DA382@blr-m3-msg.wipro.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,51 +18,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 Apr 2006 20:08:37 +0800
+Date: Tue, 18 Apr 2006 15:49:00 +0530
 
-On Sun, Apr 16, 2006 at 06:01:54PM +0200, Jan Benes wrote:
->=20
-> hello,
-> I'm trying ot write an application that scans for devices, asks for
-> name and services and eventually sends some files/data. I'm running in
-> threads. I've already discovered that I must use exclusive access to
-> the dongle during connection-time. I also don't do any connecting
+Milan,
 
-On my Broadcom chipped dongle, I do can initiate two connection
-request simultaneously. But I found scanning and connect can't
-operate properly at the same time. Could this be a hardware
-limitation?=20
+I feel that the problem is that you have not executed the following
+command before starting sdpd:
 
-> while asking for services or scanning for devices. Still, sometimes,
-> the sdp_connect fails to connect for some time. Also, rarely, the
-> inquiry fails. Is it possible that there needs to be some time gap
-> between such requests? Do scanning/asking for
-> services/connectiong/sending cause "collisions"?
->=20
-> PS: also, what are the possible responses from a sdp_connect (or the
-> respective socket functinos from the function itself. I can't find
-> them anywhere)
->=20
-> thanks, Jan
->=20
->=20
-> -------------------------------------------------------
-> This SF.Net email is sponsored by xPML, a groundbreaking scripting langua=
-ge
-> that extends applications into web and mobile media. Attend the live webc=
-ast
-> and join the prime developer group breaking into this new coding territor=
-y!
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=110944&bid$1720&dat=121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->=20
--------------------------
+insmod l2cap
 
---=20
-You fill a much-needed gap.
+Try the above command before starting sdpd.
+It should work.
+
+Mayank
+
+
+On 4/18/06, milankumar.rathod@wipro.com <milankumar.rathod@wipro.com> wrote=
+:
+>
+>
+>
+> Hi all,
+>
+>
+>
+> I have RedHat 9 installed on my system. I built and installed
+> bluez-firmware, bluez-utils, bluez-libs packages. But when I try running
+> sdpd, it exits. Hcid is running. Hciconfig =96a shows me all details as
+> specified in hci.conf file. It also displays correct BD address. But,
+> sdptool is not able to find services on other devices.
+>
+>
+>
+> I installed same bluez packages on Fedora Core 4 (kernel 2.6). It is work=
+ing
+> fine. I am not getting any clue. Can someone guide me on Bluetooth setup =
+on
+> RedHat 9 (Kernel 2.4.20).
+>
+>
+>
+> Thanks in advance,
+>
+> -milan
 
 
 -------------------------------------------------------
