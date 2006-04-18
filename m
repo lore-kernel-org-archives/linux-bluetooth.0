@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <c6a2f99a0604181925x1b61f8fer9b44102b3df4da7b@mail.gmail.com>
-From: "Eric Munson" <ebmunson@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <444559B6.8060109@csr.com>
+From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Programming in C with Bluetooth Sockets
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] sniff & pand
+References: <8350AFF45303EE44BE0AF1AB40CA43584DAC8E@scsmsx404.amr.corp.intel.com> <20060407214713.M40337@cos.ufrj.br> <44454F28.3060800@csr.com>
+In-Reply-To: <44454F28.3060800@csr.com>
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,30 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 18 Apr 2006 19:25:54 -0700
+Date: Tue, 18 Apr 2006 22:27:18 +0100
 
-I am attempting to move data across a bluetooth connection using
-RFCOMM sockets in C.
+Steven Singer wrote:
+> Bluetooth 2.0 + EDR spec, volume 3, part E, section 5.2, page 375:
 
-I am able to establish the connection and I can successfully send and
-receive the first four bytes of the message.  The sending program
-reports a complete success and the receiving program only reads the
-first four characters.
+Oops, I meant volume 2. They're numbered from 0.
 
-I have tried several things to make this work, first was to send the
-message size initially and then break the message up into pieces no
-bigger than 4 bytes and send them individually.  The sending program
-again reports a complete success and the receiving program gets the
-correct message size and only the first four bytes of the message.
+	- Steven
+-- 
 
-The next step I tried was to have each side close the socket after
-each transmission and open a new socket for each data chunk.  This led
-to the same results as before.
 
-I am at a loss about what I am doing wrong after searching the web for
-information on bluetooth socket programming.  Has Anyone seen this
-sort of problem before and if so what did you do to fix it?  Thanks
-for your help.
+To access the latest news from CSR copy this link into a web browser:  http://www.csr.com/email_sig.php
 
 
 -------------------------------------------------------
