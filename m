@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <444559B6.8060109@csr.com>
+Message-ID: <44454F28.3060800@csr.com>
 From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] sniff & pand
-References: <8350AFF45303EE44BE0AF1AB40CA43584DAC8E@scsmsx404.amr.corp.intel.com> <20060407214713.M40337@cos.ufrj.br> <44454F28.3060800@csr.com>
-In-Reply-To: <44454F28.3060800@csr.com>
+References: <8350AFF45303EE44BE0AF1AB40CA43584DAC8E@scsmsx404.amr.corp.intel.com> <20060407214713.M40337@cos.ufrj.br>
+In-Reply-To: <20060407214713.M40337@cos.ufrj.br>
 Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,12 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 18 Apr 2006 22:27:18 +0100
+Date: Tue, 18 Apr 2006 21:42:16 +0100
 
-Steven Singer wrote:
-> Bluetooth 2.0 + EDR spec, volume 3, part E, section 5.2, page 375:
+Alexandre Coser Monteiro wrote:
+>  EUREKA, EUREKA, it is working, it is working !!!!! You are right it is just a reversed
+> sequence of MSB/LSB, but I didn`t find it write in any where.
 
-Oops, I meant volume 2. They're numbered from 0.
+Then you've not been looking very hard.
+
+Since you're sending raw commands, bypassing BlueZ and talking directly
+to the controller, perhaps you should read the HCI specification.
+
+Bluetooth 2.0 + EDR spec, volume 3, part E, section 5.2, page 375:
+
+  * Unless noted otherwise, all parameter values are sent and received
+    in Little Endian format
 
 	- Steven
 -- 
