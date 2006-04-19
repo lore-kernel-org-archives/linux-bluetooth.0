@@ -1,15 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <c6a2f99a0604191126p744f86f5xa9c1a361381fa23a@mail.gmail.com>
-From: "Eric Munson" <ebmunson@gmail.com>
+Message-ID: <ef9938ec0604190956r40a902b5sce596c16e40ce8e1@mail.gmail.com>
+From: "Albert Huang" <albert@csail.mit.edu>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Programming in C with Bluetooth Sockets
-In-Reply-To: <ef9938ec0604190956r40a902b5sce596c16e40ce8e1@mail.gmail.com>
+In-Reply-To: <c6a2f99a0604190804k7de31858i94b74e2d06b3ff11@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/alternative;
+	boundary="----=_Part_4002_25573710.1145465816147"
 References: <c6a2f99a0604181925x1b61f8fer9b44102b3df4da7b@mail.gmail.com>
 	 <fe0a97c20604182118w6f25db3ei437dde8f23c93436@mail.gmail.com>
 	 <c6a2f99a0604190804k7de31858i94b74e2d06b3ff11@mail.gmail.com>
-	 <ef9938ec0604190956r40a902b5sce596c16e40ce8e1@mail.gmail.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,281 +21,169 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 Apr 2006 11:26:07 -0700
+Date: Wed, 19 Apr 2006 12:56:56 -0400
 
-This is the function run by the bluetooth device that will recieve the data=
+------=_Part_4002_25573710.1145465816147
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+use hcidump -X -V to examine the packets that actually get transmitted and
+received.  That might give you some insight on where things are going wrong=
 .
 
-char* BT_Target()
-{
-       int s, client, bytes_read, count =3D 0;
-       char * buf;
-       struct sockaddr_rc loc_addr =3D { 0 }, rem_addr =3D { 0 };
-       int opt =3D sizeof(rem_addr);
-       unsigned int max_count;
+-albert
 
-       //attempt to allocate reception buffer
-       buf =3D (char *)calloc(MAX_MSG, 1);
+On 4/19/06, Eric Munson <ebmunson@gmail.com> wrote:
+>
+> Thanks for the link, but I have already been through that
+> documentation and my initial attempt was a direct copy of of his
+> RFCOMM socket code found here:
+> http://people.csail.mit.edu/albert/bluez-intro/x499.html  This code
+> gave the results that I am describing (only getting the first 4 bytes
+> of a string).
+>
+> Thanks,
+> Eric
+>
+> On 4/18/06, Sowmya Gattupalli <sowmya.gattupalli@gmail.com> wrote:
+> > I think u are not doing the socket programmin properly
+> > check out this link
+> > http://people.csail.mit.edu/albert/bluez-intro/index.html
+> > by Albert
+> >
+> >
+> > On 4/19/06, Eric Munson <ebmunson@gmail.com> wrote:
+> > >
+> >  I am attempting to move data across a bluetooth connection using
+> > RFCOMM sockets in C.
+> >
+> > I am able to establish the connection and I can successfully send and
+> > receive the first four bytes of the message.  The sending program
+> > reports a complete success and the receiving program only reads the
+> > first four characters.
+> >
+> > I have tried several things to make this work, first was to send the
+> > message size initially and then break the message up into pieces no
+> > bigger than 4 bytes and send them individually.  The sending program
+> > again reports a complete success and the receiving program gets the
+> > correct message size and only the first four bytes of the message.
+> >
+> >  The next step I tried was to have each side close the socket after
+> > each transmission and open a new socket for each data chunk.  This led
+> > to the same results as before.
+> >
+> > I am at a loss about what I am doing wrong after searching the web for
+> > information on bluetooth socket programming.  Has Anyone seen this
+> > sort of problem before and if so what did you do to fix it?  Thanks
+> > for your help.
+> >
+> >
+> > -------------------------------------------------------
+> > This SF.Net email is sponsored by xPML, a groundbreaking scripting
+> language
+> > that extends applications into web and mobile media. Attend the live
+> webcast
+> > and join the prime developer group breaking into this new coding
+> territory!
+> > http://sel.as-us.falkag.net/sel?cmdlnk&kid=110944&bid$1720&dat=121642
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >
+> >
+>
+>
+> -------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job
+> easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronim=
+o
+> http://sel.as-us.falkag.net/sel?cmdlnk&kid=120709&bid&3057&dat=121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
-       if(buf =3D=3D NULL)
-       {
-               perror("No memory!");
-               return("No memory!");
-       }
+------=_Part_4002_25573710.1145465816147
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-       //attempt to allocate socket
-       s =3D socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+use hcidump -X -V to examine the packets that actually get transmitted and =
+received.&nbsp; That might give you some insight on where things are going =
+wrong.<br><br>-albert<br><br><div><span class=3D"gmail_quote">On 4/19/06, <=
+b class=3D"gmail_sendername">
+Eric Munson</b> &lt;<a href=3D"mailto:ebmunson@gmail.com">ebmunson@gmail.co=
+m</a>&gt; wrote:</span><blockquote class=3D"gmail_quote" style=3D"border-le=
+ft: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: =
+1ex;">
+Thanks for the link, but I have already been through that<br>documentation =
+and my initial attempt was a direct copy of of his<br>RFCOMM socket code fo=
+und here:<br><a href=3D"http://people.csail.mit.edu/albert/bluez-intro/x499=
+.html">
+http://people.csail.mit.edu/albert/bluez-intro/x499.html</a>&nbsp;&nbsp;Thi=
+s code<br>gave the results that I am describing (only getting the first 4 b=
+ytes<br>of a string).<br><br>Thanks,<br>Eric<br><br>On 4/18/06, Sowmya Gatt=
+upalli &lt;
+<a href=3D"mailto:sowmya.gattupalli@gmail.com">sowmya.gattupalli@gmail.com<=
+/a>&gt; wrote:<br>&gt; I think u are not doing the socket programmin proper=
+ly<br>&gt; check out this link<br>&gt; <a href=3D"http://people.csail.mit.e=
+du/albert/bluez-intro/index.html">
+http://people.csail.mit.edu/albert/bluez-intro/index.html</a><br>&gt; by Al=
+bert<br>&gt;<br>&gt;<br>&gt; On 4/19/06, Eric Munson &lt;<a href=3D"mailto:=
+ebmunson@gmail.com">ebmunson@gmail.com</a>&gt; wrote:<br>&gt; &gt;<br>&gt;&=
+nbsp;&nbsp;I am attempting to move data across a bluetooth connection using
+<br>&gt; RFCOMM sockets in C.<br>&gt;<br>&gt; I am able to establish the co=
+nnection and I can successfully send and<br>&gt; receive the first four byt=
+es of the message.&nbsp;&nbsp;The sending program<br>&gt; reports a complet=
+e success and the receiving program only reads the
+<br>&gt; first four characters.<br>&gt;<br>&gt; I have tried several things=
+ to make this work, first was to send the<br>&gt; message size initially an=
+d then break the message up into pieces no<br>&gt; bigger than 4 bytes and =
+send them individually.&nbsp;&nbsp;The sending program
+<br>&gt; again reports a complete success and the receiving program gets th=
+e<br>&gt; correct message size and only the first four bytes of the message=
+.<br>&gt;<br>&gt;&nbsp;&nbsp;The next step I tried was to have each side cl=
+ose the socket after
+<br>&gt; each transmission and open a new socket for each data chunk.&nbsp;=
+&nbsp;This led<br>&gt; to the same results as before.<br>&gt;<br>&gt; I am =
+at a loss about what I am doing wrong after searching the web for<br>&gt; i=
+nformation on bluetooth socket programming.&nbsp;&nbsp;Has Anyone seen this
+<br>&gt; sort of problem before and if so what did you do to fix it?&nbsp;&=
+nbsp;Thanks<br>&gt; for your help.<br>&gt;<br>&gt;<br>&gt; ----------------=
+---------------------------------------<br>&gt; This SF.Net email is sponso=
+red by xPML, a groundbreaking scripting language
+<br>&gt; that extends applications into web and mobile media. Attend the li=
+ve webcast<br>&gt; and join the prime developer group breaking into this ne=
+w coding territory!<br>&gt; <a href=3D"http://sel.as-us.falkag.net/sel?cmdl=
+nk&amp;kid=110944&amp;bid$1720&amp;dat=121642">
+http://sel.as-us.falkag.net/sel?cmdlnk&amp;kid=110944&amp;bid$1720&amp;dat=
+=121642</a><br>&gt; _______________________________________________<br>&gt;=
+ Bluez-users mailing list<br>&gt; <a href=3D"mailto:Bluez-users@lists.sourc=
+eforge.net">
+Bluez-users@lists.sourceforge.net</a><br>&gt; <a href=3D"https://lists.sour=
+ceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists=
+/listinfo/bluez-users</a><br>&gt;<br>&gt;<br><br><br>----------------------=
+---------------------------------
+<br>Using Tomcat but need to do more? Need to support web services, securit=
+y?<br>Get stuff done quickly with pre-integrated technology to make your jo=
+b easier<br>Download IBM WebSphere Application Server v.1.0.1 based on Apac=
+he Geronimo
+<br><a href=3D"http://sel.as-us.falkag.net/sel?cmdlnk&amp;kid=120709&amp;bi=
+d&amp;3057&amp;dat=121642">http://sel.as-us.falkag.net/sel?cmdlnk&amp;kid=
+=120709&amp;bid&amp;3057&amp;dat=121642</a><br>____________________________=
+___________________
+<br>Bluez-users mailing list<br><a href=3D"mailto:Bluez-users@lists.sourcef=
+orge.net">Bluez-users@lists.sourceforge.net</a><br><a href=3D"https://lists=
+.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/=
+lists/listinfo/bluez-users
+</a><br></blockquote></div><br>
 
-       if(s < 0)
-       {
-               perror("socket failed to open:");
-               return("socket failed to open");
-       }
-
-       loc_addr.rc_family =3D AF_BLUETOOTH;
-       loc_addr.rc_bdaddr =3D *BDADDR_ANY;
-       loc_addr.rc_channel =3D (uint8_t) RFCOMM_CHANNEL;
-
-       //attempt to bind the socket for a maximum number of attempts
-       for( count =3D 0; count < MAX_ATTEMPTS && bind(s, (struct sockaddr
-*)&loc_addr, sizeof(loc_addr)) < 0; count++);
-
-       //if we tried to open the socket but failed
-       if( count =3D=3D MAX_ATTEMPTS )
-       {
-               perror("unable to bind socket: ");
-               close(s);
-               free(buf);
-               return "unable to bind socket";
-       }
-
-       //attempt to listen
-       if(listen(s, 1) < 0)
-       {
-               perror("listen failed: ");
-               close(s);
-               free(buf);
-               return "listen failed.";
-       }
-
-       //attempt to accept the socket
-       rem_addr.rc_family =3D AF_BLUETOOTH;
-       rem_addr.rc_bdaddr =3D *BDADDR_ANY;
-       rem_addr.rc_channel =3D (uint8_t) RFCOMM_CHANNEL;
-
-       client =3D accept(s, (struct sockaddr *)&rem_addr, &opt);
-
-       //if we have created a connection
-       //we need to recieve the transmission length into max_count
-       if(client >=3D 0)
-       {
-               count =3D 0;
-               fprintf(stderr,"Got a connection\n");
-               read(client, &max_count, sizeof(unsigned int));
-               printf( "Message size: %d\n", max_count );
-               close( client );
-
-       }
-       //the accept has failed
-       else
-       {
-               perror("accept failed: ");
-               close(s);
-               free(buf);
-               return("accept failed");
-       }
-
-       //while we have not recieved the entire message, get the next part
-       while( count < max_count &&
-                ( client =3D accept(s, (struct sockaddr*)&rem_addr, &opt) )=
- >=3D 0 )
-       {
-               bytes_read =3D read(client, buf + count, sizeof(buf) - count=
-);
-
-               fprintf(stderr, "got %d bytes this time\n", bytes_read);
-               count +=3D bytes_read;
-               fprintf(stderr, "recieved %d [%s] so far\n", count, buf);
-               close( client );
-
-               if(bytes_read < 0)
-               {
-                       perror("socket issue.");
-                       fprintf(stderr, "We have socket problems.\n");
-                       close(s);
-                       free(buf);
-                       close(client);
-                       return("We have socket Problems.");
-               }
-       }
-
-       close(s);
-       close(client);
-
-       return "Success";
-}
-
-And this is the function that will send the data.
-char* BT_Source(char* fname, int iter, char* tMAC)
-{
-       struct sockaddr_rc addr =3D { 0 };
-       int s, status, count =3D 0, fd;
-       char* dest =3D tMAC;
-       struct stat *stats;
-       unsigned int len =3D 0;
-       char* buf;
-
-       //attempt to allocate a socket
-       s =3D socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-       if(s < 0)
-       {
-               perror("error creating socket: ");
-               return "socket creation failed.";
-       }
-
-       // set the connection parameters (who to connect to)
-       addr.rc_family =3D AF_BLUETOOTH;
-       addr.rc_channel =3D (uint8_t) RFCOMM_CHANNEL;
-
-       fprintf(stderr, "The dest addr is now %s\n", dest);
-       str2ba(dest, &addr.rc_bdaddr);
-
-       //attempt to connect the socket for our maximum number of times
-       status =3D connect(s, (struct sockaddr *)&addr, sizeof(addr));
-       for(count =3D 0; status !=3D 0 && count < MAX_ATTEMPTS;)
-       {
-               perror("retrying connection: ");
-
-               //if the socket is busy or the host is down, close and reope=
-n
-               if(!(errno =3D=3D EBUSY || errno =3D=3D EHOSTDOWN))
-               {
-                       close(s);
-                       s =3D socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCO=
-MM);
-                       if(s < 0)
-                       {
-                               perror("error creating socket: ");
-                               return "socket creation failed.";
-                       }
-                       count++;
-               }
-
-               status =3D connect(s, (struct sockaddr *)&addr, sizeof(addr)=
-);
-       }
-
-       //if the socket was opened properly, send a message
-       if(status =3D=3D 0)
-       {
-               count =3D 0;
-
-               //get the file size and send it to the client
-               stat(fname, stats);
-               len =3D stats->st_size;
-               fprintf(stderr, "The length in bytes is %d\n", len);
-               write(s, &len, sizeof(unsigned int));
-
-               //open the file
-               if((fd =3D open(fname, O_RDONLY)) =3D=3D NULL)
-               {
-                       perror( "Cannot open file for reading" );
-                       close( s );
-                       return "failed";
-               }
-
-               //attempt to allocate reception buffer
-               buf =3D (char *)calloc( MAX_MSG + 1, 1 );
-
-               if( buf =3D=3D NULL )
-               {
-                       perror( "out of memory" );
-                       close( fd );
-                       close( s );
-                       return "failed";
-               }
-
-               //while we still have message to send
-               while((in =3D read(fd, buf, MAX_MSG)) > 0)
-               {
-                       //close previous socket connection to force a flush
-                       close( s );
-
-                       //allocate a socket
-                       s =3D socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCO=
-MM);
-                       if(s < 0)
-                       {
-                               perror("error creating socket: ");
-                               return "socket creation failed.";
-                       }
-
-                       //connect the socket
-                       status =3D connect(s, (struct sockaddr *)&addr,
-sizeof(addr));
-                       for(count =3D 0; status !=3D 0 && count < MAX_ATTEMP=
-TS;)
-                       {
-                               perror("retrying connection: ");
-
-                               if(!(errno =3D=3D EBUSY || errno =3D=3D EHOS=
-TDOWN))
-                               {
-                                       close(s);
-                                       s =3D socket(AF_BLUETOOTH,
-SOCK_STREAM, BTPROTO_RFCOMM);
-                                       if(s < 0)
-                                       {
-                                               perror("error creating
-socket: ");
-                                               return "socket creation fail=
-ed.";
-                                       }
-                                       count++;
-                                       sleep( 1 );
-                               }
-
-                               status =3D connect(s, (struct sockaddr
-*)&addr, sizeof(addr));
-                       }
-
-                       if( status < 0 )
-                       {
-                               perror("message failed: ");
-                               close(s);
-                               close(fd);
-                               fprintf(stderr, "failed connecting, I
-tried %d times.\n", count);
-                               return "uh oh, that message did not go throu=
-gh";
-                       }
-
-                       //write the next message segment
-                       fprintf(stderr,"data read '%s'\n", buf);
-                       count =3D write(s, buf, MAX_MSG);
-                       fprintf(stderr,"contents of in: %d, %d bytes
-were written\n", in, count);
-               }
-       }
-       else if(status < 0)
-       {
-               perror("message failed: ");
-               close(s);
-               close(fd);
-               fprintf(stderr, "failed connecting, I tried %d times.\n", co=
-unt);
-               return "uh oh, that message did not go through";
-       }
-
-       fprintf(stderr, "message sent\n");
-       close(s);
-       close(fd);
-
-       return strdup("Success");
-}
-
-This is the latest iteration where the connection is stopped after
-each 4 byte transmission and restarted before the next.
+------=_Part_4002_25573710.1145465816147--
 
 
 -------------------------------------------------------
