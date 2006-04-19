@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20604182131u46bc58b0g7aa370a8b87fdd98@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
-To: Bluez-devel@lists.sourceforge.net
+Message-ID: <ca2c963d0604181906o5410e592i6aa80464e3cf79c7@mail.gmail.com>
+From: "Rohit Chaudhri" <rohit.chaudhri@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_305_3742116.1145421118078"
-Subject: [Bluez-devel] rfcomm and voice
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] BlueZ on devices with Broadcom chipset
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,37 +16,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 19 Apr 2006 10:01:58 +0530
+Date: Tue, 18 Apr 2006 21:06:37 -0500
 
-------=_Part_305_3742116.1145421118078
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hello,
+I am using BlueZ on a few embedded linux (2.4.20 kernel) devices that
+have the Broadcom chipset. When doing device discovery I see that most
+BT devices in the vicinity get detected, however everytime some of my
+devices running BlueZ on the broadcom chipset donot get detected, all
+the devices are very close to each other, i.e within coverage.
+Looking at the BlueZ website I found that there is a bluez-firmware
+package available. Do I need to do a firmware upgrade on my devices to
+resolve this problem? If so, can some one please tell me how to apply
+the firmware upgrade on the device? I've downloaded and built the
+bluez-firmware package and I have a .hex & .bin file in my
+install-dir, however I don't understand how to apply the firmware
+upgrade to the chipset.
+Would appreciate any help regarding this.
 
-Hi all
-I wanna know if I can send the voice over rfcomm between 2 linux boxes
-enabled with BlueZ....
-I reading the /dev/dsp and sending the voice bytes using rfcomm sockets to
-other machine and simultaneously writig to /dev/dsp..... Have anyone of u
-tried to implement this???
-
-
-
-regards
-Soumya
-
-------=_Part_305_3742116.1145421118078
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi all<br>I wanna know if I can send the voice over rfcomm between 2 linux =
-boxes enabled with BlueZ.... <br>I reading the /dev/dsp and sending the voi=
-ce bytes using rfcomm sockets to other machine and simultaneously writig to=
- /dev/dsp..... Have anyone of u tried to implement this???=20
-<br><br><br><br>regards<br>Soumya<br>
-
-------=_Part_305_3742116.1145421118078--
+Thanks!
 
 
 -------------------------------------------------------
