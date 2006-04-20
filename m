@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Michal Krenek <mikos@sg1.cz>
+Subject: Re: [Bluez-devel] Bluetooth HID device doesn't work (HID create
+	error)
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Bluetooth HID device doesn't work (HID create	error)
-In-Reply-To: <1145543458.17818.6.camel@localhost>
-References: <20060420141808.1D1892FB5@osiris.flexible.cz> <1145543458.17818.6.camel@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20060420144908.42D792FB5@osiris.flexible.cz>
+In-Reply-To: <20060420141808.1D1892FB5@osiris.flexible.cz>
+References: <20060420141808.1D1892FB5@osiris.flexible.cz>
+Content-Type: text/plain
+Message-Id: <1145543458.17818.6.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,33 +19,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Apr 2006 16:49:08 +0200
+Date: Thu, 20 Apr 2006 16:30:58 +0200
 
-On Thu, 20 Apr 2006 at 16:31:12, Marcel Holtmann wrote:
+Hi Michal,
 
-> use "hidd --search" to connect to your phone. You need to do this at
-> least once to have the correct data in the hidd file.
+> I have Sony Ericsson K700 mobile phone, which supports standard HID profile (you
+> can use it as remote control for your computer). I have tried this function in
+> november (or december) last year and it had worked without problems. But when I
+> tried it today, it doesn't work. My mobile phone freezes on "Connecting" and I
+> must restart it.
+> 
+> I have kernel 2.6.16.4, udev 089, bluez-libs & bluez-utils 2.25. My phone is
+> paired with my PC and every other bluetooth functions work without problems
+> (file transfer, addressbook synchronization, internet connection via GPRS,
+> etc.). hidp kernel module is loaded and hidd --server is running (as root). This
+> is what hcid and hidd gives me when I try it:
+> 
+> hcid[2620]: link_key_request (sba=00:13:85:00:0E:62, dba=00:12:EE:7D:03:CF)
+> hidd[2634]: HID create error 2 (No such file or directory)
+> 
+> I have tried also strace on hidd:
+> 
+> open("/usr/var/lib/bluetooth/00:13:85:00:0E:62/hidd", O_RDONLY) = -1 ENOENT (No
+> such file or directory)
+> 
+> Well, this file really doesn't exist, so I have tried to create it manually
+> (touch /usr/var/lib/bluetooth/00:13:85:00:0E:62/hidd) and then repeat it. I have
+> also checked write permissions and it looks good. Now hidd gives me this error:
+> 
+> hidd[3846]: HID create error 22 (Invalid argument)
+> 
+> And if I try strace it:
+> open("/usr/var/lib/bluetooth/00:13:85:00:0E:62/hidd", O_RDONLY) = 9
+> flock(9, LOCK_SH)                       = 0
+> fstat64(9, {st_mode=S_IFREG|0644, st_size=0, ...}) = 0
+> mmap2(NULL, 0, PROT_READ, MAP_SHARED, 9, 0) = -1 EINVAL (Invalid argument)
+> 
+> I am really lost now, I don't know where is the problem. Can you please help me?
 
-Unfortunately this doesn't work. I have tried to kill running hidd --server=
-=20
-and then run hidd --search but without success=20
-(file /usr/var/lib/bluetooth/00:13:85:00:0E:62/hidd is still missing). Then=
- I=20
-tried to run hidd --search and while hidd --search was running, I have trie=
-d=20
-to activate "Remote control" function on my mobile phone, but also without=
-=20
-success (mobile phone doesn't freeze, but "connecting" phase is terminated=
-=20
-with "Can't connect to remote device" and hidd --search still didn't find=
-=20
-anything).
+use "hidd --search" to connect to your phone. You need to do this at
+least once to have the correct data in the hidd file.
 
-Also in the past (as I said in november or december) it has worked without=
-=20
-problems out of the box (I didn't have to run hidd --search). So I think th=
-is=20
-is some problem with newer versions of bluez-libs, bluez-utils or kernel.
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
