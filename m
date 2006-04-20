@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <3031.128.253.242.221.1145542617.squirrel@webmail.cornell.edu>
+From: "Donald Stuart Black" <dsb35@cornell.edu>
 To: bluez-users@lists.sourceforge.net
-From: Nicolas STRANSKY <Nico@stransky.cx>
-Message-ID: <e2bfnp$5sd$1@sea.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Bluetooth kernel patch for 2.6.16 ?
+MIME-Version: 1.0
+Content-Type: text/plain;charset=iso-8859-1
+Subject: [Bluez-users] USB dongle not found?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +16,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 21 Apr 2006 22:36:09 +0200
+Date: Thu, 20 Apr 2006 10:16:57 -0400 (EDT)
 
-Hi,
-
-Thanks for your work on bluetooth kernel patches.
-
-It's been a month since 2.6.16 release. Is it planed to release the
-bluetooth kernel patch for this kernel so that people depending on this
-patch could start using it ? Any chance to see this patch included in
-mainline one (happy) day ?
-
-Regards,
--- 
-Nico
-La gloire d'un bon avocat consiste à gagner de mauvais procès.
-	-+- Honoré de Balzac, Ursule Mirouet -+-
+I have been trying to get a USB Bluetooth dongle that came with a Logitech
+DiNovo Media Desktop setup to work without much success.  I have written a
+description of the issue at
+http://forums.gentoo.org/viewtopic.php?p=3269414 ; in summary, the device
+doesn't seem to show up as Bluetooth-capable when (I think that) it
+should.  Are there any known issues with this sort of hardware?  Have I
+been doing something wrong?
 
 
 
