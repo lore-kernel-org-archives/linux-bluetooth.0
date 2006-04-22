@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20604212141g18cc5aa4j9847815cb71947ac@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
+Subject: Re: [Bluez-devel] hcid doesn't compile without --enable-dbus
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] rfcomm and voice
-In-Reply-To: <ef9938ec0604211342j7ce87f49y8b7bad4354e5bbd8@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_6350_7092077.1145680863253"
-References: <fe0a97c20604182131u46bc58b0g7aa370a8b87fdd98@mail.gmail.com>
-	 <ef9938ec0604211342j7ce87f49y8b7bad4354e5bbd8@mail.gmail.com>
+In-Reply-To: <ef9938ec0604211458s3cccaca3q47555f9af8418582@mail.gmail.com>
+References: <ef9938ec0604211458s3cccaca3q47555f9af8418582@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1145666139.4914.3.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,96 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 22 Apr 2006 10:11:03 +0530
+Date: Sat, 22 Apr 2006 02:35:39 +0200
 
-------=_Part_6350_7092077.1145680863253
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Albert,
 
-well Albert ... it worked with rfcomm... (seriously) wrote a client which
-reads from /dev/.dsp... opens a socket and writes to the other bluetooth
-socket in the server prog. And the server binds and listens and gets all th=
-e
-packets and writes to the /dev/dsp.....
+> I get the following error when trying to compile utils from CVS
+> without --enable-dbus
+> 
+> security.c: In function 'disconn_complete':
+> security.c:614: warning: passing argument 2 of
+> 'hcid_dbus_disconn_complete' makes pointer from integer without a cast
+> security.c:614: error: too many arguments to function
+> 'hcid_dbus_disconn_complete' 
+> 
+> Attached patch appears to fix it.
 
-so I speak and hear whatever I speak in a few seconds...
+the patch has been applied. Thanks.
 
-But now I wanna know whether it is a duplex channel or not... is rfcomm a
-duplex channel....
+Regards
 
-Iam yet to try with  SCO.... but I was getting a recv error ( Connection
-reset by peer) God knows why
+Marcel
 
-On 4/22/06, Albert Huang <albert@csail.mit.edu> wrote:
->
-> This is possible, but if you want to send voice, why not use SCO?
->
-> -albert
->
->
-> On 4/19/06, Sowmya Gattupalli < sowmya.gattupalli@gmail.com> wrote:
-> >
-> > Hi all
-> > I wanna know if I can send the voice over rfcomm between 2 linux boxes
-> > enabled with BlueZ....
-> > I reading the /dev/dsp and sending the voice bytes using rfcomm sockets
-> > to other machine and simultaneously writig to /dev/dsp..... Have anyone=
- of u
-> > tried to implement this???
-> >
-> >
-> >
-> > regards
-> > Soumya
-> >
->
->
 
-------=_Part_6350_7092077.1145680863253
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-well Albert ... it worked with rfcomm... (seriously) wrote a client
-which reads from /dev/.dsp... opens a socket and writes to the other
-bluetooth socket in the server prog. And the server binds and listens
-and gets all the packets and writes to the /dev/dsp..... <br>
-<br>
-so I speak and hear whatever I speak in a few seconds... <br>
-<br>
-But now I wanna know whether it is a duplex channel or not... is rfcomm a d=
-uplex channel.... <br>
-<br>
-Iam yet to try with&nbsp; SCO.... but I was getting a recv error ( Connecti=
-on reset by peer) God knows why <br><br><div><span class=3D"gmail_quote">On=
- 4/22/06, <b class=3D"gmail_sendername">Albert Huang</b> &lt;<a href=3D"mai=
-lto:albert@csail.mit.edu">
-albert@csail.mit.edu</a>&gt; wrote:</span><blockquote class=3D"gmail_quote"=
- style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.=
-8ex; padding-left: 1ex;"><div style=3D"direction: ltr;">This is possible, b=
-ut if you want to send voice, why not use SCO?
-<br></div><div style=3D"direction: ltr;"><span class=3D"sg"><br>-albert</sp=
-an></div><div style=3D"direction: ltr;"><span class=3D"e" id=3D"q_10abe3121=
-5ac44e1_2"><br><br><div><span class=3D"gmail_quote">On 4/19/06, <b class=3D=
-"gmail_sendername">
-Sowmya Gattupalli</b> &lt;<a href=3D"mailto:sowmya.gattupalli@gmail.com" ta=
-rget=3D"_blank" onclick=3D"return top.js.OpenExtLink(window,event,this)">
-sowmya.gattupalli@gmail.com</a>&gt; wrote:</span><blockquote class=3D"gmail=
-_quote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt=
- 0pt 0.8ex; padding-left: 1ex;"><div style=3D"direction: ltr;">Hi all<br>I =
-wanna know if I can send the voice over rfcomm between 2 linux boxes enable=
-d with BlueZ....=20
-<br>I reading the /dev/dsp and sending the voice bytes using rfcomm
-sockets to other machine and simultaneously writig to /dev/dsp.....
-Have anyone of u tried to implement this??? <br><br><br><br>regards<br>Soum=
-ya<br>
-
-</div></blockquote></div><br>
-
-</span></div></blockquote></div><br>
-
-------=_Part_6350_7092077.1145680863253--
 
 
 -------------------------------------------------------
