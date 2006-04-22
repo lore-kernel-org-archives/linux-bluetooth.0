@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20604232227s383e43aet4144a8a9ea36149f@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <444A80EC.5040704@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Bluetooth kernel patch for 2.6.16 ?
+References: <e2bfnp$5sd$1@sea.gmane.org>
+In-Reply-To: <e2bfnp$5sd$1@sea.gmane.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] SCOtest failed....
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,29 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 24 Apr 2006 01:27:57 -0400
+Date: Sat, 22 Apr 2006 13:15:56 -0600
 
-Hi all
-I have been using scotest for a while.... between my CSR and ISSC
-dongles... it worked fine until yesterday....
+Nicolas
 
-M/c - A
-root@bluetooth:~/bluez-utils-2.10/test# ./scotest -s 00:09:DD:10:00:CC
-scotest[9095]: Can't connect. Function not implemented(38)
-scotest[9095]: Can't connect to the server. Function not implemented(38)
-root@bluetooth:~/bluez-utils-2.10/test#
+The kernel module in cvs should work with 2.6.16 but it if doesn't,
+please send us a bug report. We're probably due for another snapshot
+release. I'll do a 0.42 in a week or so if everything looks good.
 
+Getting stuff in mainline requires a significant political and technical
+effort. And that would be after making a decent technical justification
+for kernel rather than userspace...
 
-M/c - B
-root@bluetooth:~/bluez-utils-2.10/test# ./scotest -r
-scotest[9092]: Waiting for connection ...
+Brad
 
+> Thanks for your work on bluetooth kernel patches.
+> 
+> It's been a month since 2.6.16 release. Is it planed to release the
+> bluetooth kernel patch for this kernel so that people depending on this
+> patch could start using it ? Any chance to see this patch included in
+> mainline one (happy) day ?
+> 
+> Regards,
 
-
-ne ideas... the SCO module is loaded.... what might be the reason for
-this sudden error....??
-
-Please help
 
 
 -------------------------------------------------------
