@@ -1,110 +1,58 @@
-Return-Path: <mparedesx@gmail.com>
-Message-ID: <55cd79280604240416m634b1aa7j27e2cabedbb81239@mail.gmail.com>
-Date: Mon, 24 Apr 2006 12:16:24 +0100
-From: "Marcos P" <mparedesx@gmail.com>
-To: marcel@holtmann.org, bluez-devel@lists.sourceforge.net
-Subject: Fwd: Help with l2cap broadcast programming
-In-Reply-To: <55cd79280604231728s788eb97bi76e9998816181dd3@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_12638_27830569.1145877384543"
-References: <55cd79280604231728s788eb97bi76e9998816181dd3@mail.gmail.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
-
-------=_Part_12638_27830569.1145877384543
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-This is my first post, but it seems that the e-mails are not reaching the
-list. Maybe I am doing something wrong.
-
-Marcos
-
----------- Forwarded message ----------
-From: Marcos P <mparedesx@gmail.com>
-Date: Apr 24, 2006 1:28 AM
-Subject: Help with l2cap broadcast programming
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Re: New HCI-USB device, no MAC?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <444CAE4F.70404@kernelconcepts.de>
+References: <4410090A.3070706@kernelconcepts.de>
+	 <1141912311.4605.9.camel@aeonflux.holtmann.net>
+	 <44104DD5.80109@kernelconcepts.de>
+	 <1141923373.4605.39.camel@aeonflux.holtmann.net>
+	 <loom.20060412T215427-611@post.gmane.org>
+	 <444CAE4F.70404@kernelconcepts.de>
+Content-Type: text/plain
+Message-Id: <1145876694.21987.28.camel@localhost>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Mon, 24 Apr 2006 13:04:54 +0200
 
-Hello
+Hi Nils,
 
-I would like to ask for some help with broadcast with l2cap. I am designing
-a video server with bluetooth.
+> > Did anyone ever find a solution/workaround for these ISSC-based dongles?  I seem
+> > to have acquired two dongles with a BD_ADDR of 11:11:11:11:11:11 and from
+> > searching Google, it seems that a lot of other people are in the same boat.
+> 
+> I have contacted ISSC about that issue.
+> 
+> Hopefully the will reply and send the HCI or whatever commands
+> necessary... I have two of those dongles which renders at least one
+> useless (I guess two times the same BDADDR will not work in a piconet ;)
 
-I have been successful in implementing a H263 video server, which is able t=
-o
-stream video when is contacted by the clients; the server is able to send
-unicast video to each client requesting the video. This was easy to
-implement by following the examples provided the guided in how to program
-bluetooth by Albert Huang.
-
-
-But now I need to broadcast video to the group of clients that contact the
-piconet, It will be also useful if it is possible to broadcast to parked
-devices. I haven't been able to find examples with bluez that allow me to
-set-up this type of transmission.
-
-Any help with c commands, guides or examples will be greatly appreciated.
+actually it should work, but at the moment BlueZ is blocking this. You
+can't connect to yourself.
 
 Regards
 
-Marcos Paredes Farrera
-
-------=_Part_12638_27830569.1145877384543
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-This is my first post, but it seems that the e-mails are not reaching the l=
-ist. Maybe I am doing something wrong.<br><br>Marcos<br><br>---------- Forw=
-arded message ----------<br><span class=3D"gmail_quote">From: <b class=3D"g=
-mail_sendername">
-Marcos P</b> &lt;<a href=3D"mailto:mparedesx@gmail.com">mparedesx@gmail.com=
-</a>&gt;<br>Date: Apr 24, 2006 1:28 AM<br>Subject: Help with l2cap broadcas=
-t programming<br>To: <a href=3D"mailto:bluez-devel@lists.sourceforge.net">b=
-luez-devel@lists.sourceforge.net
-</a><br><br></span><div style=3D"direction: ltr;">
-
-
-
-<p><span lang=3D"EN-GB">Hello</span></p>
-
-<p><span lang=3D"EN-GB">I would like to ask for some help with
-broadcast with l2cap. I am designing a video server with bluetooth.<span>&n=
-bsp; </span></span></p>
+Marcel
 
 
 
 
-
-<p><span lang=3D"EN-GB">I have been successful in implementing a H263
-video server, which is able to stream video when is contacted by the client=
-s; the
-server is able to send unicast video to each client requesting the video. T=
-his
-was easy to implement by following the examples provided the guided in how =
-to
-program bluetooth by Albert Huang.<br>&nbsp;</span></p>
-
-<p><span lang=3D"EN-GB">But now I need to broadcast video to the
-group of clients that contact the piconet, It will be also useful if it is
-possible to broadcast to parked devices. I haven't been able to find exampl=
-es
-with bluez that allow me to set-up this type of transmission. </span></p>
-
-
-
-<p><span lang=3D"EN-GB">Any help with c commands, guides or examples will
-be greatly appreciated. <span>&nbsp;</span></span></p>
-
-
-
-<p><span lang=3D"EN-GB">Regards<br></span></p>
-
-<p><span lang=3D"EN-GB">Marcos Paredes Farrera </span></p>
-
-
-</div>
-
-------=_Part_12638_27830569.1145877384543--
+-------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
