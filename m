@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <444DFBE7.9010000@gdatech.co.in>
-From: hariharan <v.hariharan@gdatech.co.in>
+Message-ID: <444CDE0D.4030100@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] OBEXFTP autoscan the Channel for transmission
+Subject: Re: [Bluez-users] Re: Bluetooth kernel patch for 2.6.16 ?
+References: <e2bfnp$5sd$1@sea.gmane.org> <444A80EC.5040704@xmission.com> <e2hvnt$imd$1@sea.gmane.org>
+In-Reply-To: <e2hvnt$imd$1@sea.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,16 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 25 Apr 2006 16:07:27 +0530
+Date: Mon, 24 Apr 2006 08:17:49 -0600
 
-Dear all,
-We are in the process of developing a application that automatically 
-detects the
-Obex thansfer channel of destination  and send the file to the 
-destination. If any one,
-already done, provide the information related with the request.
+Nicolas
 
-Hariharan.V.
+> I don't really get what you are talking about. I was talking about the
+> kernel patches similar to those available on
+> http://www.bluez.org/patches.html.
+
+my mistake. As far as bluez core... Marcel is constantly merging his
+changes into mainline, so 2.6.16 may even have everything he's been
+working on.
+
+Brad
 
 
 -------------------------------------------------------
