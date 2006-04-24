@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <fe0a97c20604232227s383e43aet4144a8a9ea36149f@mail.gmail.com>
+From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
 To: bluez-users@lists.sourceforge.net
-From: Nicolas STRANSKY <Nico@stransky.cx>
-Message-ID: <e2hvnt$imd$1@sea.gmane.org>
-References: <e2bfnp$5sd$1@sea.gmane.org> <444A80EC.5040704@xmission.com>
-Mime-Version: 1.0
+MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-In-Reply-To: <444A80EC.5040704@xmission.com>
-Subject: [Bluez-users] Re: Bluetooth kernel patch for 2.6.16 ?
+Subject: [Bluez-users] SCOtest failed....
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,39 +16,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 24 Apr 2006 09:46:04 +0200
+Date: Mon, 24 Apr 2006 01:27:57 -0400
 
-Le 04/22/2006 09:15 PM, Brad Midgley a écrit :
+Hi all
+I have been using scotest for a while.... between my CSR and ISSC
+dongles... it worked fine until yesterday....
 
-Brad,
+M/c - A
+root@bluetooth:~/bluez-utils-2.10/test# ./scotest -s 00:09:DD:10:00:CC
+scotest[9095]: Can't connect. Function not implemented(38)
+scotest[9095]: Can't connect to the server. Function not implemented(38)
+root@bluetooth:~/bluez-utils-2.10/test#
 
-> The kernel module in cvs should work with 2.6.16 but it if doesn't,
-> please send us a bug report. We're probably due for another snapshot
-> release. I'll do a 0.42 in a week or so if everything looks good.
 
-I don't really get what you are talking about. I was talking about the
-kernel patches similar to those available on
-http://www.bluez.org/patches.html. And I don't see any 0.42 or 0.41
-version :) Also the bluez CVS on
-http://cvs.sourceforge.net/viewcvs.py/bluez/ seems to contain no kernel
-files anymore...
+M/c - B
+root@bluetooth:~/bluez-utils-2.10/test# ./scotest -r
+scotest[9092]: Waiting for connection ...
 
-BTW, is the git repository on
-http://www.kernel.org/git/?p=linux/kernel/git/holtmann/bluetooth-2.6.git
-already including the changes of the bluetooth kernel patch ?
 
-> Getting stuff in mainline requires a significant political and technical
-> effort. And that would be after making a decent technical justification
-> for kernel rather than userspace...
 
-I understand. It would be great for all those having hardware requiring
-this path, though.
+ne ideas... the SCO module is loaded.... what might be the reason for
+this sudden error....??
 
--- 
-Nico
-L'amour est à ceux qui y pensent.
-	-+- Marcel Achard (1899-1974), Patate -+-
-
+Please help
 
 
 -------------------------------------------------------
