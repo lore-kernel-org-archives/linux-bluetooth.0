@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <444D0164.5000505@xmission.com>
+Message-ID: <444D00BC.4040606@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Fwd: Help with l2cap broadcast programming
-References: <55cd79280604231728s788eb97bi76e9998816181dd3@mail.gmail.com> <55cd79280604240416m634b1aa7j27e2cabedbb81239@mail.gmail.com> <444CF59F.5020003@xmission.com> <444CF957.6080203@xmission.com>
-In-Reply-To: <444CF957.6080203@xmission.com>
+Subject: Re: [Bluez-devel] pcm_a2dp_works
+References: <20060418162647.2732.qmail@web31011.mail.mud.yahoo.com>
+In-Reply-To: <20060418162647.2732.qmail@web31011.mail.mud.yahoo.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,19 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Apr 2006 10:48:36 -0600
+Date: Mon, 24 Apr 2006 10:45:48 -0600
 
-Hey
+Sergey
 
->>The core spec talks about broadcast... lt_addr is all 0, llid = 10, ptt
->>= 0. I looked around for examples using bluez but couldn't find any.
+> i have made the pcm_a2dp plugin to work. mainly it was
+> cut and past from a2play program. now i can select
+> headphone as my alsa output device. XMMS and mplayer
+> both work. 
 
-If bluez really can't do this now, you can get it using the affix stack.
-We just can't discuss affix here unless it's in the context of improving
-bluez.
+I am very excited to see you have run with this and got it working. I
+have been out of town and unable to try it but I applied it anyway (what
+we had before didn't work at all... :)
 
-(There's a special place in hell reserved for replying to myself twice
-here :)
+> however, when XMMS finishes a song it does not start
+> to play the next one.
+
+There may be some more things we need to fix up in the plugin like
+capabilities negotiation. Also, Marcel had worked on connection caching
+so the connection wouldn't drop and have to be reestablished between
+songs on xmms. I'm not sure if the code we have now does that right.
+
+I'll be back tonight and be able to try things. Thanks tons.
 
 Brad
 
