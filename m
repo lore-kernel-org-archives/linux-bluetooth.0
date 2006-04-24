@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <444D00BC.4040606@xmission.com>
+Message-ID: <444CF957.6080203@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] pcm_a2dp_works
-References: <20060418162647.2732.qmail@web31011.mail.mud.yahoo.com>
-In-Reply-To: <20060418162647.2732.qmail@web31011.mail.mud.yahoo.com>
+Subject: Re: [Bluez-devel] Fwd: Help with l2cap broadcast programming
+References: <55cd79280604231728s788eb97bi76e9998816181dd3@mail.gmail.com> <55cd79280604240416m634b1aa7j27e2cabedbb81239@mail.gmail.com> <444CF59F.5020003@xmission.com>
+In-Reply-To: <444CF59F.5020003@xmission.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,28 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Apr 2006 10:45:48 -0600
+Date: Mon, 24 Apr 2006 10:14:15 -0600
 
-Sergey
+Hey
 
-> i have made the pcm_a2dp plugin to work. mainly it was
-> cut and past from a2play program. now i can select
-> headphone as my alsa output device. XMMS and mplayer
-> both work. 
+> The core spec talks about broadcast... lt_addr is all 0, llid = 10, ptt
+> = 0. I looked around for examples using bluez but couldn't find any.
 
-I am very excited to see you have run with this and got it working. I
-have been out of town and unable to try it but I applied it anyway (what
-we had before didn't work at all... :)
-
-> however, when XMMS finishes a song it does not start
-> to play the next one.
-
-There may be some more things we need to fix up in the plugin like
-capabilities negotiation. Also, Marcel had worked on connection caching
-so the connection wouldn't drop and have to be reestablished between
-songs on xmms. I'm not sure if the code we have now does that right.
-
-I'll be back tonight and be able to try things. Thanks tons.
+I did some more digging and about a year ago Marcel was discussing this.
+It sounds like an API for broadcast has not been hammered out and there
+may not be an implementation at the lowest (hci) layer.
 
 Brad
 
