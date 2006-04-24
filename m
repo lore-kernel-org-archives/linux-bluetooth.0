@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <444CF957.6080203@xmission.com>
+Message-ID: <444CF59F.5020003@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Fwd: Help with l2cap broadcast programming
-References: <55cd79280604231728s788eb97bi76e9998816181dd3@mail.gmail.com> <55cd79280604240416m634b1aa7j27e2cabedbb81239@mail.gmail.com> <444CF59F.5020003@xmission.com>
-In-Reply-To: <444CF59F.5020003@xmission.com>
+References: <55cd79280604231728s788eb97bi76e9998816181dd3@mail.gmail.com> <55cd79280604240416m634b1aa7j27e2cabedbb81239@mail.gmail.com>
+In-Reply-To: <55cd79280604240416m634b1aa7j27e2cabedbb81239@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,18 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Apr 2006 10:14:15 -0600
+Date: Mon, 24 Apr 2006 09:58:23 -0600
 
-Hey
+Marcos
 
-> The core spec talks about broadcast... lt_addr is all 0, llid = 10, ptt
-> = 0. I looked around for examples using bluez but couldn't find any.
+I saw both messages fwiw. The mailing list can be very slow.
 
-I did some more digging and about a year ago Marcel was discussing this.
-It sounds like an API for broadcast has not been hammered out and there
-may not be an implementation at the lowest (hci) layer.
+You're not using AVDTP to do your unicast video service are you? I don't
+see any accommodation for broadcast in the AVDTP spec fwiw.
+
+The core spec talks about broadcast... lt_addr is all 0, llid = 10, ptt
+= 0. I looked around for examples using bluez but couldn't find any.
 
 Brad
+
+> This is my first post, but it seems that the e-mails are not reaching
+> the list. Maybe I am doing something wrong.
+> 
+> Marcos
+> 
+> ---------- Forwarded message ----------
+> From: * Marcos P* <mparedesx@gmail.com <mailto:mparedesx@gmail.com>>
+> Date: Apr 24, 2006 1:28 AM
+> Subject: Help with l2cap broadcast programming
+> To: bluez-devel@lists.sourceforge.net
+> <mailto:bluez-devel@lists.sourceforge.net>
+> 
+> Hello
+> 
+> I would like to ask for some help with broadcast with l2cap. I am
+> designing a video server with bluetooth. 
 
 
 -------------------------------------------------------
