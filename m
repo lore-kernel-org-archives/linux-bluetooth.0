@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20060426105138.80361.qmail@web31010.mail.mud.yahoo.com>
-From: Sergey Krivov <krivov@yahoo.com>
-Subject: Re: [Bluez-devel] pcm_a2dp_works
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <444F10EB.90908@xmission.com>
+Message-ID: <444F2EE1.3030300@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] pcm_a2dp_works
+References: <20060418162647.2732.qmail@web31011.mail.mud.yahoo.com> <444F10EB.90908@xmission.com>
+In-Reply-To: <444F10EB.90908@xmission.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,24 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 26 Apr 2006 03:51:38 -0700 (PDT)
+Date: Wed, 26 Apr 2006 02:27:13 -0600
 
-Hi Brad,
+guys
 
-I have not had any problems with  the sound.wav file.
-i guess it is system specific and i am lucky. I am on
-FC5  with HP headphones.
+woooooo... after more tweaks the alsa plugin is finally working (mostly)
+for me. I've only played through xmms and aplay. The strangeness now is
+the xmms display looks like it's jittering around and it gets "stuck" at
+the end of a song, sometimes crashing with "alsa mixer timed out."
 
-Nice that you made it work too, i have the same
-simptomps with xmms, however most annoing is that i
-can not watch movies with mplayer.
+If it doesn't crash, I can click the next-track button or drag the
+slider to the end of the song to have it start the next one.
 
-Sergey
+i've elaborated in the alsa-plugins/BUILD document. i'm requiring the
+external libsbc build now since the version in the project isn't
+properly built for use by shared objects and the codec is going to be
+maintained externally anyway.
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+brad
 
 
 -------------------------------------------------------
