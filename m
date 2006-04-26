@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <444F2EE1.3030300@xmission.com>
+Message-ID: <444F10EB.90908@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] pcm_a2dp_works
-References: <20060418162647.2732.qmail@web31011.mail.mud.yahoo.com> <444F10EB.90908@xmission.com>
-In-Reply-To: <444F10EB.90908@xmission.com>
+References: <20060418162647.2732.qmail@web31011.mail.mud.yahoo.com>
+In-Reply-To: <20060418162647.2732.qmail@web31011.mail.mud.yahoo.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,24 +18,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 26 Apr 2006 02:27:13 -0600
+Date: Wed, 26 Apr 2006 00:19:23 -0600
 
-guys
+Sergey
 
-woooooo... after more tweaks the alsa plugin is finally working (mostly)
-for me. I've only played through xmms and aplay. The strangeness now is
-the xmms display looks like it's jittering around and it gets "stuck" at
-the end of a song, sometimes crashing with "alsa mixer timed out."
+> i have made the pcm_a2dp plugin to work. mainly it was
+> cut and past from a2play program. now i can select
+> headphone as my alsa output device. XMMS and mplayer
+> both work. 
 
-If it doesn't crash, I can click the next-track button or drag the
-slider to the end of the song to have it start the next one.
+I made some changes to what you gave us. I made it use the system's
+libsbc since the sbc inside the project is not built properly as a
+shared lib (install libsbc from cvs in the
+http://sourceforge.net/projects/sbc project)
 
-i've elaborated in the alsa-plugins/BUILD document. i'm requiring the
-external libsbc build now since the version in the project isn't
-properly built for use by shared objects and the codec is going to be
-maintained externally anyway.
+I had to recode to retry some connections since alsa was interrupting
+system calls.
 
-brad
+However, I'm still finding that
+
+aplay -B 1000000 -D pcm.headphone ~/sound.wav
+
+will segfault. It's when the memmove at line 706 is being called with a
+0 for the length to copy.
+
+fwiw, my sound.wav is available at bluetooth-alsa.sf.net/sound.wav
+
+Brad
 
 
 -------------------------------------------------------
