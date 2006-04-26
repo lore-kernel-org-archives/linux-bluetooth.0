@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <9c68c0a70604280052x18ecba47s23dd332e5097dae0@mail.gmail.com>
-From: "liang liping" <lianglip@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <015001c66921$76fe4390$030c1fc0@uranus>
+From: "Thomas Brandl" <t.brandl@gmx.at>
+To: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] RE: OBEXFTP autoscan the Channel for transmission
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_014D_01C66932.3A038BB0"
+Subject: [Bluez-users] Rfcomm Problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,17 +17,97 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Apr 2006 15:52:03 +0800
+Date: Wed, 26 Apr 2006 13:06:26 +0200
 
-Hi
-I think you may use the "sdptool" command or find how it works
+This is a multi-part message in MIME format.
 
-assume the bt address is 00:11:67:0D:EC:22.
-      $ sdptool search --bdaddr 00:11:67:0D:EC:22 OPUSH | grep
-"Channel" > channels
-sdptool command can find the information servivce you want including channe=
-l.
-and I think you can write a scrip to do that job.
+------=_NextPart_000_014D_01C66932.3A038BB0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hallo;
+
+I have a problem concerning rfcomm conenction. Hopefully somebody can =
+help me ;-))
+
+Following Problem:=20
+
+After=20
+sdptool add --channel=3D2 SP, and
+rfcomm listen rfcomm0 (I put it in an infinite loop so that reconnection =
+will establish automatically)
+I am waiting for an incoming connection. This connection is availiable =
+after a few seconds. So no problems so far.=20
+
+My problem now.=20
+I have an application listening on rfcomm0, if something happens that =
+causes an disconnection (with following reconnection) my apllication is =
+not be able to receive from dev/rfcomm0=20
+
+You can test it with simple cat /dev/rfcomm0. After disconnection cat is =
+closing.=20
+I need that cat /dev/rfcomm0 is kept open. Would it be possible to link =
+to a specific script which is able to handle this?? Any other =
+proposals??
+
+Thanks
+
+Thomas=20
+
+------=_NextPart_000_014D_01C66932.3A038BB0
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2873" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Hallo;</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I have a problem concerning rfcomm =
+conenction.=20
+Hopefully somebody can help me ;-))</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>
+<DIV><FONT face=3DArial size=3D2>Following Problem: </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>After </FONT></DIV>
+<DIV>sdptool add --channel=3D2 SP, and</DIV>
+<DIV>rfcomm listen rfcomm0 (I put it in an infinite loop so that =
+reconnection=20
+will establish automatically)</DIV>
+<DIV>I am waiting for an incoming connection. This connection is =
+availiable=20
+after a few seconds. So no problems so far. </DIV>
+<DIV>&nbsp;</DIV>
+<DIV>My problem now. </DIV>
+<DIV>I have an application listening on rfcomm0, if something happens =
+that=20
+causes an disconnection (with following reconnection) my apllication is =
+not be=20
+able to receive from dev/rfcomm0 </DIV>
+<DIV>&nbsp;</DIV>
+<DIV>You can test it with simple cat /dev/rfcomm0. After disconnection =
+cat is=20
+closing. </DIV>
+<DIV>I need that cat /dev/rfcomm0 is kept open. Would it be possible to =
+link to=20
+a specific script which is able to handle this?? Any other =
+proposals??</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Thanks</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Thomas&nbsp;</DIV>
+<DIV>&nbsp;</DIV></FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_014D_01C66932.3A038BB0--
+
 
 
 -------------------------------------------------------
