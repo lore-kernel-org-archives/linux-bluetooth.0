@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Ruud Beukema <ruudbeukema@gmail.com>
+Message-ID: <44508B48.7050105@csr.com>
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Capture HCI traffic between an embeddec BlueCore
+ and Host
+References: <1146125380.8784.39.camel@localhost>
+In-Reply-To: <1146125380.8784.39.camel@localhost>
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <1146125380.8784.39.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Capture HCI traffic between an embeddec BlueCore and Host
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,65 +19,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 27 Apr 2006 10:09:40 +0200
+Date: Thu, 27 Apr 2006 10:13:44 +0100
 
-Hi,
+Ruud Beukema wrote:
+>>>From a CSR powerpoint presentation I found out the BCSP packet header's
+> "protocol type nibble" can hold the following values (with their
+> meanings):
+> Protocol 0 is for ACK=E2=80=99s only
+> Protocol 1 is for Link Establishment
+> Protocol 5 is for Commands/Events
+> Protocol 6 is for ACL Data
+> Protocol 7 is for SCO Data
+>=20
+> The HCI packet types defined are these
+> HCI_COMMAND_PKT 0x01
+> HCI_ACLDATA_PKT 0x02
+> HCI_SCODATA_PKT 0x03
+> HCI_EVENT_PKT   0x04
+> HCI_VENDOR_PKT  0xFF
+>=20
+> I have BCSP header information available in my program and I have to
+> give this packet type byte a value. The problem here is that when I see
+> a protocol 5 (for COMMANDS and EVENTS) I still don't know whether it's =
+a
+> HCI_COMMAND_PKT or a HCI_EVENT_PKT.
 
-As one might recall from an earlier mail from my colleague Han Hoekstra,
-I'm writing a HCI monitoring program in order to log the HCI
-communication between an embedded BC-Host combination. The goal of the
-program is to store the HCI packets in a file which has a format that
-can be reread and re-interpreted by the hcidump program. In reaction to
-this previous mail it was said that all information needed could be
-found in the hcidump program's source code.
+This is easy. Packets going from the host to the controller on channel
+5 are commands. Packets going from the controller to the host are
+events.
 
-As far as I could derive from this source code the hcidump program puts
-a 12-byte HCIDUMP HEADER in front of the original HCI packet and then
-the whole hcidump packet is stored. What I discovered after comparing my
-program's output with the hcidump file (in the setup where a BlueCore
-dongle is attached to a PC) is that between the HCIDUMP HEADER and the
-original HCI packet another byte is present.
+As a double check, HCI commands start with the following byte
+sequence:
 
-This byte seems to hold the HCI packet type, which is used when the
-hcidump program reads in a dumped log file. According to CSR
-documentation this byte is appended in the MUX layer. To keep my program
-independent from the BlueZ stack I have to recreate the value of this
-byte. My guess is that the value of this byte depends on information
-given in the BCSP header.
+  opcode_low opcode_high param_len
 
->>From a CSR powerpoint presentation I found out the BCSP packet header's
-"protocol type nibble" can hold the following values (with their
-meanings):
-Protocol 0 is for ACK’s only
-Protocol 1 is for Link Establishment
-Protocol 5 is for Commands/Events
-Protocol 6 is for ACL Data
-Protocol 7 is for SCO Data
+whereas events start with:
 
-The HCI packet types defined are these
-HCI_COMMAND_PKT 0x01
-HCI_ACLDATA_PKT 0x02
-HCI_SCODATA_PKT 0x03
-HCI_EVENT_PKT   0x04
-HCI_VENDOR_PKT  0xFF
+  event_code param_len
 
-I have BCSP header information available in my program and I have to
-give this packet type byte a value. The problem here is that when I see
-a protocol 5 (for COMMANDS and EVENTS) I still don't know whether it's a
-HCI_COMMAND_PKT or a HCI_EVENT_PKT.
+So, for commands, the BCSP payload length is payload[2] + 3 whereas for
+events it's payload[1] + 2. This can allow you to detect traces which
+are the wrong way round.
 
-So, the main question: is my guess as described above right? And if not,
-how can I provide the packet type byte?
+	- Steven
+--=20
 
-A second (seemingly) less important question is what the HCIDUMP
-HEADER's "pad" field stands for. I always see this one as being 0x00
-using hcidump so I just follow this in my program, but this is off
-course not very neat.
 
-Thanks in advance!
-
-Ruud
-
+To access the latest news from CSR copy this link into a web browser:  ht=
+tp://www.csr.com/email_sig.php
 
 
 -------------------------------------------------------
