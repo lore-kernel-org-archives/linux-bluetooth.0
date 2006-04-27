@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5256d0b0604270813o74e136faqe83b46dfa6a13fd7@mail.gmail.com>
-From: "Peter Robinson" <pbrobinson@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bluetooth-alsa reorg
-In-Reply-To: <4450DDF8.7070304@xmission.com>
+Message-ID: <4450DDF8.7070304@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
 Content-Type: text/plain; charset=ISO-8859-1
-References: <4450DDF8.7070304@xmission.com>
+Subject: [Bluez-devel] bluetooth-alsa reorg
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +16,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 27 Apr 2006 16:13:46 +0100
+Date: Thu, 27 Apr 2006 09:06:32 -0600
 
-On 4/27/06, Brad Midgley <bmidgley@xmission.com> wrote:
-> Guys
->
-> FYI, I am going to move stuff around in the bluetooth-alsa project. I'll
-> have two cvs modules:
->
-> btsco: btsco daemon, alsa sco & a2dp plugins, kernel module
-> wavez: a2play, a2recv, gst sco & a2dp plugins, avrcp, scoot
->
-> (I'm writing scoot for gumstix to play sco audio through pcm)
->
-> The new module will be easier to embed and won't have any alsa-lib
-> entanglements. gstreamer plugins will be optionaly built like alsa
-> plugins are now. The libsbc stuff will finally be taken out and we'll
-> depend on the external project.
->
-> bluetooth-alsa is not the best name any more considering half this stuff
-> does not use alsa. sigh.
+Guys
 
-Excellent! How hard would it be to rename the project to something
-like bluetooth-audio or maybe just merge it with the bluez site?
+FYI, I am going to move stuff around in the bluetooth-alsa project. I'll
+have two cvs modules:
 
-Peter
+btsco: btsco daemon, alsa sco & a2dp plugins, kernel module
+wavez: a2play, a2recv, gst sco & a2dp plugins, avrcp, scoot
+
+(I'm writing scoot for gumstix to play sco audio through pcm)
+
+The new module will be easier to embed and won't have any alsa-lib
+entanglements. gstreamer plugins will be optionaly built like alsa
+plugins are now. The libsbc stuff will finally be taken out and we'll
+depend on the external project.
+
+bluetooth-alsa is not the best name any more considering half this stuff
+does not use alsa. sigh.
+
+Brad
 
 
 -------------------------------------------------------
