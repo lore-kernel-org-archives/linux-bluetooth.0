@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4450C8D8.1030402@xmission.com>
+Message-ID: <4450C705.8060206@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] a2dp alsa plugin "better"
-References: <20060427101407.30115.qmail@web31009.mail.mud.yahoo.com>
-In-Reply-To: <20060427101407.30115.qmail@web31009.mail.mud.yahoo.com>
+Subject: Re: [Bluez-devel] Advanced Audio Distribution Profile for Bluez
+References: <20060427121645.95821.qmail@web26905.mail.ukl.yahoo.com>
+In-Reply-To: <20060427121645.95821.qmail@web26905.mail.ukl.yahoo.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,20 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 27 Apr 2006 07:36:24 -0600
+Date: Thu, 27 Apr 2006 07:28:37 -0600
 
-Sergey
+javier
 
-> i wrote both of them.
+>  I am preparing my final project based on the bluez stack. It have to implement 
+>  the A2DP (Advanced Audio Distribution Profile). So, I would like to contribute to the 
+>  bluez stack with an implementation of the profile, following the requeriments of the official 
+>  profile and according to the actual structure of the stack.
 
-I still have occasional lockups for a2dp_transfer2. Could you put in
-comments so I have an easier time figuring out these two transfer routines?
+We have implemented some a2dp already. See bluetooth-alsa.sf.net. There
+is still plenty to do, if you want to help integrate it with gstreamer
+for example.
 
-We also need to take steps when write() returns an unexpected value.
-That may be part of the reason things come crashing down.
+I think it's not totally clear how the a2dp profile gets "integrated"
+since it really looks more like a bluez client that belongs in one or
+more multimedia frameworks.
 
 Brad
-
 
 
 -------------------------------------------------------
