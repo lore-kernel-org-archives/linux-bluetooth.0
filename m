@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4450DDF8.7070304@xmission.com>
+Message-ID: <4450C8D8.1030402@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] a2dp alsa plugin "better"
+References: <20060427101407.30115.qmail@web31009.mail.mud.yahoo.com>
+In-Reply-To: <20060427101407.30115.qmail@web31009.mail.mud.yahoo.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] bluetooth-alsa reorg
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,27 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 27 Apr 2006 09:06:32 -0600
+Date: Thu, 27 Apr 2006 07:36:24 -0600
 
-Guys
+Sergey
 
-FYI, I am going to move stuff around in the bluetooth-alsa project. I'll
-have two cvs modules:
+> i wrote both of them.
 
-btsco: btsco daemon, alsa sco & a2dp plugins, kernel module
-wavez: a2play, a2recv, gst sco & a2dp plugins, avrcp, scoot
+I still have occasional lockups for a2dp_transfer2. Could you put in
+comments so I have an easier time figuring out these two transfer routines?
 
-(I'm writing scoot for gumstix to play sco audio through pcm)
-
-The new module will be easier to embed and won't have any alsa-lib
-entanglements. gstreamer plugins will be optionaly built like alsa
-plugins are now. The libsbc stuff will finally be taken out and we'll
-depend on the external project.
-
-bluetooth-alsa is not the best name any more considering half this stuff
-does not use alsa. sigh.
+We also need to take steps when write() returns an unexpected value.
+That may be part of the reason things come crashing down.
 
 Brad
+
 
 
 -------------------------------------------------------
