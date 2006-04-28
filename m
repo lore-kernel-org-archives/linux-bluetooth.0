@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <445189C8.6060602@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Fredrik Tolf <fredrik@dolda2000.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Motorola HT820 audio fidelity
-References: <1146183877.13358.7.camel@pc7.dolda2000.com>
-In-Reply-To: <1146183877.13358.7.camel@pc7.dolda2000.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
+Message-Id: <1146183877.13358.7.camel@pc7.dolda2000.com>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Motorola HT820 audio fidelity
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,33 +16,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 27 Apr 2006 21:19:36 -0600
+Date: Fri, 28 Apr 2006 02:24:37 +0200
 
-Fredrik
+Hi all!
 
-> I just got a pair of Motorola HT820 bluetooth headphones, which support
-> A2DP and work with a2play. However, the audio fidelity could definitely
-> be a lot better. I'm no audiophile, but it sounds to me as though the
-> higher frequency bands ("higher" as in, I'd guestimate, ~10 kHz and
-> above) are seriously distorted (I can't put a better word on it than
-> that they are completely transformed into "chirping"). All the lower
-> bands are completely unaffected as far as I can hear, though.
+I just got a pair of Motorola HT820 bluetooth headphones, which support
+A2DP and work with a2play. However, the audio fidelity could definitely
+be a lot better. I'm no audiophile, but it sounds to me as though the
+higher frequency bands ("higher" as in, I'd guestimate, ~10 kHz and
+above) are seriously distorted (I can't put a better word on it than
+that they are completely transformed into "chirping"). All the lower
+bands are completely unaffected as far as I can hear, though.
 
-I noticed some quality loss at high frequencies, such as high notes on a
-violin, possibly when using fixed point to build libsbc. It is subtle.
-On the other hand, if you hear an unexpected "pop" using fixed point,
-it's definitely an overflow error in the encoder. There's still a
-problem in there I didn't hunt down.
+A friend told me that they work perfectly fine with his BT-enabled cell
+phone. I haven't tried myself, though, since my phone doesn't support
+A2DP.
 
-Steven Singer suggested we to track the error "K" after an
-encode-decode. K is derived from the root-mean-square error. We could
-use this to rule out a misbehaving codec.
+I don't know A2DP very well -- could this be the result of bad
+transmission? I'd guess not, since when I move away, the audio tends to
+break up rather than lose quality.
 
-It doesn't help that we're typically decoding mp3 and reencoding in sbc.
-Loss is really compounded. Try to test with something in a lossless
-format or with a high-quality first-generation mp3 or ogg.
+I found this little tidbit on Wikipedia:
 
-Brad
+ Most bluetooth stacks implement the SCMS-T copyright protection. In
+ these cases it is not possible to connect the A2DP headphones for high
+ quality audio. E.g. the Motorola HT820 can be used for high quality
+ audio only with certain versions of the Toshiba bluetooth stack.
+ (From <http://en.wikipedia.org/wiki/Bluetooth>)
+
+I don't know if that is related to this, but I thought I should at least
+mention it.
+
+Does anyone know what could be at fault?
+
+Fredrik Tolf
+
+
 
 
 -------------------------------------------------------
