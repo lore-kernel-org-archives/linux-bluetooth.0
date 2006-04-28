@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec0604281336o774171cbke3dbe9525fd129d3@mail.gmail.com>
-From: "Albert Huang" <albert@csail.mit.edu>
+Message-ID: <9c68c0a70604280052x18ecba47s23dd332e5097dae0@mail.gmail.com>
+From: "liang liping" <lianglip@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Rfcomm Problems
-In-Reply-To: <015001c66921$76fe4390$030c1fc0@uranus>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_5017_15323606.1146256581245"
-References: <015001c66921$76fe4390$030c1fc0@uranus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] RE: OBEXFTP autoscan the Channel for transmission
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,34 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Apr 2006 16:36:21 -0400
+Date: Fri, 28 Apr 2006 15:52:03 +0800
 
-------=_Part_5017_15323606.1146256581245
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi
+I think you may use the "sdptool" command or find how it works
 
->
-> I need that cat /dev/rfcomm0 is kept open.
->
-
-To my knowledge, this is not currently possible.  Anyone?
-
--albert
-
-------=_Part_5017_15323606.1146256581245
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-<div><blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(=
-204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;"><div style=
-=3D"direction: ltr;"><div><font face=3D"Arial" size=3D"2"><div>I need that =
-cat /dev/rfcomm0 is kept open.=20
-</div></font></div></div></blockquote><div><br>To my knowledge, this is not=
- currently possible.&nbsp; Anyone?<br><br>-albert</div></div>
-
-------=_Part_5017_15323606.1146256581245--
+assume the bt address is 00:11:67:0D:EC:22.
+      $ sdptool search --bdaddr 00:11:67:0D:EC:22 OPUSH | grep
+"Channel" > channels
+sdptool command can find the information servivce you want including channe=
+l.
+and I think you can write a scrip to do that job.
 
 
 -------------------------------------------------------
