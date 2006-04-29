@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Per Thomas Jahr <perja@extern.uio.no>
+From: Fabrice =?iso-8859-1?q?M=E9nard?= <menard.fabrice@wanadoo.fr>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1146324837.4199.11.camel@localhost.localdomain>
-Mime-Version: 1.0
-Subject: [Bluez-users] Support for Logitech Wireless Music System
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200604291601.43549.menard.fabrice@wanadoo.fr>
+Subject: [Bluez-users] DiNovo and evdev
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +17,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 Apr 2006 17:33:57 +0200
+Date: Sat, 29 Apr 2006 16:01:43 +0200
 
-Hi,
+Hi all,
 
-Does anyone know if 'Logitech Wireless Music System for PC' [1] works
-with the bluetooth-alsa project? From some googling it seems to use at
-least A2DP (and maybe also AVRCP). 
+I'm trying to use my dinovo mouse with the evdev driver from xorg in blueto=
+oth=20
+mode.
 
-[1]
-http://www.logitech.com/index.cfm/products/details/US/EN,CRID=2416,CONTENTID=10855
+I've got a problem with the way the events are handled:
 
-Thanks
-Per Thomas Jahr
+I've got no entry for the mouse in /proc/bus/input/devices before I "shake"=
+=20
+the device. So, udevstart can't create a node in the /dev directory and X=20
+can't start without a proper event number (Device =3D "/dev/input/event4" i=
+n=20
+xorg.conf).
+
+So, here is the question:
+Is there a way to make appear the mouse in /proc/bus/input/devices without=
+=20
+having to move the device ?
+
+Thanks.
+
+=2D-=20
+=46abrice M=E9nard
+menard.fabrice@wanadoo.fr
 
 
 
