@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <330d2d2b0604300412x7f8faf9uca23728b708ddd7d@mail.gmail.com>
-From: "Philipp Glaser" <johndoe.ois@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4453B258.10601@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] bluetooth keyboard connects, but does not work
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Support for Logitech Wireless Music System
+References: <1146324837.4199.11.camel@localhost.localdomain>
+In-Reply-To: <1146324837.4199.11.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,41 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Apr 2006 13:12:19 +0200
+Date: Sat, 29 Apr 2006 12:37:12 -0600
 
-i am using ubuntu breezy, with ms intelli mouse explorer and the
-according bt usb dongle.
-i would like to use an HP iPAQ Bluetooth Foldable Keyboard (because it
-is so handy) and ran into the following problem:
+Hi
 
-i can connect to the keyboard and request the link quality, info, or
-whatever. what i cannot is to type something using my keyboard.
+> Does anyone know if 'Logitech Wireless Music System for PC' [1] works
+> with the bluetooth-alsa project? From some googling it seems to use at
+> least A2DP (and maybe also AVRCP). 
+> 
+> [1]
+> http://www.logitech.com/index.cfm/products/details/US/EN,CRID=2416,CONTENTID=10855
 
-i was also using sdptool search HID, and got no output, but when using
-sdptool search SP i got:
+I haven't heard of anyone using it, but we've had good luck hooking up
+with a2dp gear. We may need a tweak in the stream setup if they do
+anything wacky but I suspect it will just work.
 
-Searching for SP on <bt-addr> ...
-Service Name: SPP slave
-Service RecHandle: 0x10000
-Service Class ID List:
-  "Serial Port" (0x1101)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 1
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
+We only have test code for using avrcp, so some work remains to do
+interesting controls with it.
 
-also when using kbluetoothd i just see, that my keyboard comes up with SPP.
+If we could get it to receive from a linux machine running a2recv, I
+would be very interested to see what the volume control sequences from
+their gear look like.
 
-i would like to know now, what i could do, to use keyboard as a
-secondary keyboard for my computer.
-
-thanks for your suggestions
-
-philipp
+Brad
 
 
 -------------------------------------------------------
