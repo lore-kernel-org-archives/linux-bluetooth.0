@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4453D6C5.6090905@gmail.com>
-From: JP Freeley <jpf321@gmail.com>
-MIME-Version: 1.0
+Message-ID: <20060429110332.81242.qmail@web31006.mail.mud.yahoo.com>
+From: Sergey Krivov <krivov@yahoo.com>
+Subject: Re: [Bluez-devel] a2dp alsa plugin "better"
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] obtainining client BTADDR during obexserver (1.0-3) session?
+In-Reply-To: <445295C9.5030004@xmission.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,17 +17,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 29 Apr 2006 17:12:37 -0400
+Date: Sat, 29 Apr 2006 04:03:32 -0700 (PDT)
 
-How would I obtain the BTADDR of the connecting remote device when it 
-connects to obexserver (1.0-3)? I would like the server to accept a 
-file, parse it and reply accordingly to the device which sent it.
+Brad,
 
-Any help, direction, pointers, snippets would be greatly appreciated.
+> Sergey,
+> 
+> This is formatted as if the second statement was
+> inside the if. What was
+> your intent here?
+> 
+> 	if (a2dp->state == BT_CONNECTED)
+> 		a2dp->num += len / a2dp->frame_bytes; //update
+> pointer
+> 		a2dp->num %=io->buffer_size;
 
-Thanks,
+this code i kept from the previos version of the
+plugin. looked at the other alsa pcm codes i guess it
+updates the pointer to the current position in the
+data buffer. it is returned in the pointer function.
 
-jpf
+Sergey
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
