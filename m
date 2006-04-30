@@ -1,66 +1,87 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <445409F8.3010104@gmail.com>
+From: JP Freeley <jpf321@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C63D04.B88A88B6"
-Message-ID: <34C4FA35021357469685D8102806A1C0030BFEA1@mail01.student.main.ntu.edu.sg>
-From: "#KAVERI DHAKAR#" <KAVE0001@ntu.edu.sg>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Windows based SBC code
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 1 Mar 2006 15:49:29 +0800
+Cc: bluez-devel@lists.sourceforge.net
+References: <4453D6C5.6090905@gmail.com>
+In-Reply-To: <4453D6C5.6090905@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] Re: obtainining client BTADDR during obexserver (1.0-3) session?
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Sat, 29 Apr 2006 20:51:04 -0400
 
-This is a multi-part message in MIME format.
+Thanks Colllin .. ran into a bit of a snag .. "address already in use on 
+channel 1"
 
-------_=_NextPart_001_01C63D04.B88A88B6
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+I assume that I must use channel 1 since my handheld device has OPUSH on 
+channel 1.
 
-I want the windows based code for SBC. Coud you please let me know where =
-can i find it?
-=20
-I am a student and need it for my research work.=20
-=20
-Regards,
-Kaveri Dhakar
+# sdptool search opush
+Inquiring ...
+Searching for opush on 00:07:E0:xx.xx.xx ...
+Service Name: OBEX Object Push
+Service RecHandle: 0x10001
+Service Class ID List:
+  "OBEX Object Push" (0x1105)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 1
+  "OBEX" (0x0008)
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x8cc
+  base_offset: 0x100
 
-------_=_NextPart_001_01C63D04.B88A88B6
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Perhaps I'm wrong .. thanks...perhaps usefull output below..
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"><HTML =
-DIR=3Dltr><HEAD><META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Diso-8859-1"></HEAD><BODY><DIV><FONT face=3D'Arial' =
-color=3D#000000 size=3D2>I want the windows based code for SBC. Coud you =
-please let =0A=
-me know where can i find it?</FONT></DIV>=0A=
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>=0A=
-<DIV><FONT face=3DArial size=3D2>I am a student and need it for my =
-research work. =0A=
-</FONT></DIV>=0A=
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>=0A=
-<DIV><FONT face=3DArial size=3D2>Regards,</FONT></DIV>=0A=
-<DIV><FONT face=3DArial size=3D2>Kaveri Dhakar</FONT></DIV></BODY></HTML>
-------_=_NextPart_001_01C63D04.B88A88B6--
+$ sobexsrv -l ONPTD -s 1 -iRS -r /tmp -c 1
+server bind: : Address already in use
+
+$sdptool browse local
+Browsing FF:FF:FF:00:00:00 ...
+
+#hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:03:C9:xx.xx.xx ACL MTU: 1017:8 SCO MTU: 64:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:1093 acl:30 sco:0 events:55 errors:0
+        TX bytes:1251 acl:30 sco:0 commands:31 errors:0
+        Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'Device03-0'
+        Class: 0x000100
+        Service Classes: Unspecified
+        Device Class: Computer, Uncategorized
+        HCI Ver: 2.0 (0x3) HCI Rev: 0x2000 LMP Ver: 2.0 (0x3) LMP 
+Subver: 0x4127
+        Manufacturer: Broadcom Corporation (15)
+
+#rfcomm -a
+#
+
+
+
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by xPML, a groundbreaking scripting language
-that extends applications into web and mobile media. Attend the live webcast
-and join the prime developer group breaking into this new coding territory!
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=110944&bid=241720&dat=121642
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
