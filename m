@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <3e890f530605010911j11103d4bhfd25c20984d7e45e@mail.gmail.com>
+Message-ID: <3e890f530605010828q1ca34bbfg4a0ed7ed466eee1@mail.gmail.com>
 From: "=?ISO-8859-1?Q?Javier_Rodas_Gonz=E1lez?=" <javier.rodas@nomasystems.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_7708_26100976.1146499914763"
+	boundary="----=_Part_7200_10128489.1146497296492"
 Subject: [Bluez-users] Inquiry with RSSI on Broadcom BCM2035 - not supported ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -17,9 +17,9 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 1 May 2006 18:11:54 +0200
+Date: Mon, 1 May 2006 17:28:16 +0200
 
-------=_Part_7708_26100976.1146499914763
+------=_Part_7200_10128489.1146497296492
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
@@ -85,7 +85,7 @@ Thanks for your attention.
 
 Best regards.
 
-------=_Part_7708_26100976.1146499914763
+------=_Part_7200_10128489.1146497296492
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
@@ -196,7 +196,7 @@ Thanks for your attention.<br>
 <br>
 Best regards.<br>
 
-------=_Part_7708_26100976.1146499914763--
+------=_Part_7200_10128489.1146497296492--
 
 
 -------------------------------------------------------
