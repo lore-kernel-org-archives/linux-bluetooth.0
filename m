@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Motorola HT820 audio fidelity
-From: Fredrik Tolf <fredrik@dolda2000.com>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <445189C8.6060602@xmission.com>
-References: <1146183877.13358.7.camel@pc7.dolda2000.com>
-	 <445189C8.6060602@xmission.com>
-Content-Type: text/plain
-Message-Id: <1146492165.13358.16.camel@pc7.dolda2000.com>
-Mime-Version: 1.0
+Message-ID: <44560F4C.6010709@ens.fr>
+From: Giuseppe Castagna <Giuseppe.Castagna@ens.fr>
+MIME-Version: 1.0
+To: Giuseppe Castagna <Giuseppe.Castagna@ens.fr>
+Cc: claudio.takahasi@indt.org.br, bluez-devel@lists.sourceforge.net
+References: <445501FC.9070103@ens.fr>
+In-Reply-To: <445501FC.9070103@ens.fr>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] Re: gbluezconf-00.10
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,25 +19,75 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 01 May 2006 16:02:44 +0200
+Date: Mon, 01 May 2006 15:38:20 +0200
 
-On Thu, 2006-04-27 at 21:19 -0600, Brad Midgley wrote:
-> It doesn't help that we're typically decoding mp3 and reencoding in sbc.
-> Loss is really compounded.
+Giuseppe Castagna wrote:
+ >
+ > Any suggestion? Should I use the cvs version of bluez-utils?
+ >
 
-Indeed, that seems to be the problem. I was always under the
-(uninformed) impression that SBC was lossless, but I just tried
-re-encoding an MP3 to SBC and playing that SBC with sbcenc and sbcdec,
-and the exact same audio artifacts are showing themselves when I play
-back to my normal speaker system as through the headphones.
+Indeed, I should have tried this before writing. I installed cvs version of 
+bluez-libs and bluez-utils and now gbluezconf partially works.
 
-So, at least it's not a hardware or BT stack problem. Is this an
-inherent problem in SBC, or is there a way to tune the encoder to
-compensate? Is it possibly so that a better encoder could be written
-altogether?
+Advanced Configuration and Search Devices no longer are greyed, while
+"Set up bluetooth device" still is (is it normal?). When I select search devices 
+I obtain the following error message.
 
-Fredrik Tolf
+[_dbus_send_inquiry_request] search.c:1200: [DBUS] reply 
+error:(org.bluez.Error.NotImplemented,Not implemented)
 
+Looking at the code I have seen that it calls DiscoverDevices. So I tried to 
+play around with it but I always obtain a Null result.
+
+BTW
+
+  bluez/utils/hcid/dbus-test DiscoverDevices
+
+does not work since the entry for  DiscoverDevices was forgotten. Any suggestion 
+on how to have seach working?
+
+Thanks in advance
+
+
+
+Giuseppe Castagna wrote:
+> Hi,
+>    I successfully compiled gbluezconf-00.10: I just had to change
+> 
+> $ACLOCAL -I m4 || exit 1
+> 
+> into
+> 
+> $ACLOCAL -I ./m4 || exit 1
+> 
+> to do it. I installed and launched it but in the submenues all option 
+> are greyed  apart from About Help Quit. My bluetooth system is working 
+> (in this right moment I am writing this mail by using a bluetooth mouse, 
+> connected by the "old way"  hidd --connect). When launching gbluezconf 
+> on the console the follwoing messages are displayed
+> 
+> [beppe@mirto tmp]$ gbluezconf
+> [stock_icons_init] stock-icons.c:57: Loading:gbluezconf-tray-icon.png
+> [stock_icons_init] stock-icons.c:57: Loading:gbluezconf-inactive.png
+> [stock_icons_init] stock-icons.c:57: Loading:gbluezconf-data.png
+> [_device_default_update] shell.c:534: reply 
+> error:(org.bluez.Error,Method not found)
+> 
+> 
+> 
+> I running a custom kernel 2.6.17-rc3 on a Fedora 5 installation and use 
+> the following libraries:
+> 
+> bluez-pin-0.30-2
+> bluez-utils-2.25-4
+> bluez-libs-devel-2.25-1
+> bluez-libs-2.25-1
+> 
+> Any suggestion? Should I use the cvs version of bluez-utils? Thanks in 
+> advance!
+> 
+> ---Beppe---
+> 
 
 
 
