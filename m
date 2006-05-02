@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <445789D6.7030408@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <6297d67c0605020425y2f2f3e5r1eee2d647a10fb97@mail.gmail.com>
+From: "Mayank Batra" <mayankbatra@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Motorola HT820 audio fidelity
-References: <1146183877.13358.7.camel@pc7.dolda2000.com>	 <445189C8.6060602@xmission.com>	 <1146492165.13358.16.camel@pc7.dolda2000.com>	 <44561FB6.5000306@xmission.com> <1146567726.13358.40.camel@pc7.dolda2000.com>
-In-Reply-To: <1146567726.13358.40.camel@pc7.dolda2000.com>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <6297d67c0605012141n127aa187l88ef180c431bd060@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_10581_31088100.1146569156727"
+References: <6297d67c0605012141n127aa187l88ef180c431bd060@mail.gmail.com>
+Subject: [Bluez-devel] Re: Three-Wire UART transport layer (H5 protocol)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,33 +19,63 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 02 May 2006 10:33:26 -0600
+Date: Tue, 2 May 2006 16:55:56 +0530
 
-Fredrik
+------=_Part_10581_31088100.1146569156727
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> I have Windows in a VMware exactly for things like these, so I could
-> test that. However, I could find no such thing on bluetooth.org. In
-> fact, googling for "sbc site:bluetooth.org" only yielded two
-> insignificant results, so I'm beginning to wonder if I'm doing something
-> wrong (whatever that'd be...). Any pointers?
+Hi,
 
-You can get it but you probably need to be logged into a (free) account:
+Another question with reference to the following mail:
+I see that the BCSP protocol is very similar to the 3 Wire UART protocol.
+So is there a possibility to reuse hci_bcsp.c for 3 Wire UART?
 
-https://www.bluetooth.org/foundry/adopters/document/A2DP_Bitstream/en/1/A2DP_Bitstream.zip
+Mayank
 
-we can also compare with our floating point implementation which we have
-more faith in.
 
-> Unfortunately, that seems to be no relief in this case. a2play gets only
-> one acp_seid_info from the headset, so I guess that means that it only
-> supports SBC, correct?
+On 5/2/06, Mayank Batra <mayankbatra@gmail.com> wrote:
+>
+>  Hi,
+>
+> I wanted to know if someone is already working on the Three-Wire UART
+> transport layer (H5 protocol)?
+> I presume that currently only H4 protocol is being supported.
+>
+> Mayank
+>
 
-It wouldn't be hard to add mp3 support. We might have to know just a bit
-of mp3 smarts like how to break up a stream into packets appropriately.
-I don't think we'd ever want to encode mp3 on the fly so it's not as
-complex as sbc support.
+------=_Part_10581_31088100.1146569156727
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Brad
+<div>Hi,</div>
+<div>&nbsp;</div>
+<div>Another question with reference to the following mail:</div>
+<div>I see that the BCSP protocol is very similar to the 3 Wire UART protoc=
+ol.</div>
+<div>So is there a possibility to reuse hci_bcsp.c for 3 Wire UART?</div>
+<div>&nbsp;</div>
+<div>Mayank<br><br>&nbsp;</div>
+<div><span class=3D"gmail_quote">On 5/2/06, <b class=3D"gmail_sendername">M=
+ayank Batra</b> &lt;<a href=3D"mailto:mayankbatra@gmail.com">mayankbatra@gm=
+ail.com</a>&gt; wrote:</span>
+<blockquote class=3D"gmail_quote" style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0=
+px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">
+<div style=3D"DIRECTION: ltr">
+<div>Hi,</div>
+<div>&nbsp;</div>
+<div>I wanted to know if someone is already working on the Three-Wire UART =
+transport layer (H5 protocol)?</div>
+<div>I presume that currently only H4 protocol is being supported.</div></d=
+iv>
+<div style=3D"DIRECTION: ltr"><span class=3D"sg">
+<div>&nbsp;</div>
+<div>Mayank</div></span></div></blockquote></div><br>
+
+------=_Part_10581_31088100.1146569156727--
 
 
 -------------------------------------------------------
