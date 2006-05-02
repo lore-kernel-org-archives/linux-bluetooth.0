@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <a3b1b800605021215y4bd5377bs2d9d5163975e7a98@mail.gmail.com>
-From: "Jan Benes" <jbenes@gmail.com>
-To: bluez-devel <bluez-devel@lists.sourceforge.net>
+Message-ID: <e1effdeb0605021103u5641f8f0gcbe172ff78fa7637@mail.gmail.com>
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] D-Bus and two inquiries
+In-Reply-To: <4450A0A7.1000504@service2media.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] debugging apps using bluez under C
+References: <4450A0A7.1000504@service2media.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,47 +18,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 2 May 2006 21:15:47 +0200
+Date: Tue, 2 May 2006 15:03:24 -0300
 
-hello,
-I've been trying to make this application I'm working on run for over
-a month now. it doesn't do anything extraordinary, just scans for
-devices and if appropriate devices are found, sends a file via OBEX.
-The thing is I'm getting all kinds of different problems all the time
-that are very hard to decypher. So I ask (for BlueZ), is there any
-tool that can help me with figuring out if there's anything wrong with
-the stakc? If I did something wrong? Or how am I supposed to know?
+Hi Herman,
 
-for example: It happend to me twice that my app. failed with a SDP
-request and since then, all the requests failed as well (for some
-time). How do I know what I did wrong?
-another example: I inquire for devices (my previous posts) but it
-takes longer than I specify in the parameter. I can't afford to wait
-for 3 minutes till the inquiry is over, cause all the devices I've
-found could be out of reach by then. Again, how am I to know what went
-wrong? Also, I've noted that sometimes, the hci_inquiry function
-returns immediately (some result caching i suppose, and yes, I tell
-the func. to flush the cash).
-last example: "I got a Software caused connection abort" error from
-OBEX (which runs on top of the RFCOMM protocol afaik). What, how, no
-documentation, google doesn't know either. What went wrong?
+If you have two local Bluetooth adapter, it's possible run two
+inquiries simultaneously.
+You can reproduce sending the inquiry command using dbus-send:
+$dbus-send --system --type=3Dmethod_call --print-reply --dest=3Dorg.bluez
+/org/bluez/hci0 org.bluez.Adapter.DiscoverDevices
+$dbus-send --system --type=3Dmethod_call --print-reply --dest=3Dorg.bluez
+/org/bluez/hci1 org.bluez.Adapter.DiscoverDevices
 
-I study the sources, I study the other sources, I search all the
-mailing lists I've found for the answer, but most of the time to no
-avail.
+If you have just one local adapter, the second inquiry request can be
+processed after the DiscoveryCompleted signal only.
 
-1) how can I tell what went wrong, is there a diagnostic function in the st=
-ack?
-2) I don't mean to be impolite, but you should consider putting
-together some documentation. I know you probably don't get paid for
-this, you do it in your free time (I'm talking about the authors), but
-that would really be a good idea. Just 10 lines of comments for each
-function, is that too much to ask? Not that I couldn't imaigine what
-function hci_inquiry does, but figuring out all the pitfalls (as many
-already have I believe) is very tedious. I can offer my help (that's
-not much considering my knowledge) with documentation if you want.
+Regards,
+Claudio.
 
-thanks, Jan
+On 4/27/06, Herman Meerlo <herman@service2media.com> wrote:
+> Hi all,
+>
+> I noticed that when I try to perform two inquiries on two different
+> devices simultaneously (using DBus), that one of the two will report
+> 'Discover already in progress'. Is this by design and if so why?
+>
+> Regards,
+> Herman Meerlo
+>
+>
+>
+> -------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job ea=
+sier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronim=
+o
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+
+
+--
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
