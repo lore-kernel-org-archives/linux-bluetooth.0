@@ -1,17 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Motorola HT820 audio fidelity
-From: Fredrik Tolf <fredrik@dolda2000.com>
+Message-ID: <45bf5ff80605031407v16adf99es7e6e8ec98acfd0a@mail.gmail.com>
+From: "Artur Almeida" <fidalgo.a@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <445789D6.7030408@xmission.com>
-References: <1146183877.13358.7.camel@pc7.dolda2000.com>
-	 <445189C8.6060602@xmission.com>
-	 <1146492165.13358.16.camel@pc7.dolda2000.com>
-	 <44561FB6.5000306@xmission.com>
-	 <1146567726.13358.40.camel@pc7.dolda2000.com>
-	 <445789D6.7030408@xmission.com>
-Content-Type: text/plain
-Message-Id: <1146709233.13358.73.camel@pc7.dolda2000.com>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_55260_25437979.1146690445840"
+Subject: [Bluez-devel] Power Class
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -23,39 +17,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 04 May 2006 04:20:33 +0200
+Date: Wed, 3 May 2006 22:07:25 +0100
 
-On Tue, 2006-05-02 at 10:33 -0600, Brad Midgley wrote:
-> Fredrik
-> 
-> > I have Windows in a VMware exactly for things like these, so I could
-> > test that. However, I could find no such thing on bluetooth.org. In
-> > fact, googling for "sbc site:bluetooth.org" only yielded two
-> > insignificant results, so I'm beginning to wonder if I'm doing something
-> > wrong (whatever that'd be...). Any pointers?
-> 
-> You can get it but you probably need to be logged into a (free) account:
-> 
-> https://www.bluetooth.org/foundry/adopters/document/A2DP_Bitstream/en/1/A2DP_Bitstream.zip
+------=_Part_55260_25437979.1146690445840
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I could get it without an account. I find it rather weird that google
-didn't find it, but oh well.
+Hi
 
-Anyway, I tried it, and it was an *enormous* difference. It is true that
-the file encoded by the encoder from bluetooth.org is almost twice as
-large as that encoded by sbcenc as well, but nonetheless, the difference
-in audio quality was huge.
+Is there a way to find the power class (1.2..3) of the device? The pratical
+example is im trying to bind a discovery service to a class2 device while
+the obex service will run in a class1, both usb dongles in my desktop.
 
-> we can also compare with our floating point implementation which we have
-> more faith in.
+Thank you
 
-Is this in the CVS tree? I can't seem to find any other encoder than
-sbcenc. (Speaking of which, what's the difference between the "sbc" and
-"sbc32" directories?)
+Regards
 
-Fredrik Tolf
+Artur
 
+------=_Part_55260_25437979.1146690445840
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
+Hi<br><br>Is there a way to find the power class (1.2..3) of the device? Th=
+e pratical example is im trying to bind a discovery service to a class2 dev=
+ice while the obex service will run in a class1, both usb dongles in my des=
+ktop.=20
+<br><br>Thank you<br><br>Regards<br><br>Artur<br>
+
+------=_Part_55260_25437979.1146690445840--
 
 
 -------------------------------------------------------
