@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Skrzypek Piotr" <skrzypek@xl.wp.pl>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <4458b81c93c93@wp.pl>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C66F69.454283D8"
-Message-ID: <D99246B510C34944823191CB90759C86050B0039@blrse201.ap.infineon.com>
-From: <Shailesh.Suman@infineon.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Does BlueZ support EDR mode
+Content-Type: text/plain; charset=iso-8859-2
+Subject: [Bluez-users] bnep not present
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,63 +16,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 4 May 2006 16:25:35 +0530
+Date: Wed, 03 May 2006 16:03:08 +0200
 
-This is a multi-part message in MIME format.
+Hello
+I`m interested in recent topic - pand created but no bnep interface. I`ve got similar problem but i`ve succesfully established pand connection only once (and no bnep0 found). Now, i can type pand --listen --role NAP but other devices can`t see the PAN service. 
 
-------_=_NextPart_001_01C66F69.454283D8
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Here are some envirnomental informations:
+gentoo, emerge bluez-util and bluez-libs. bnep compiled into kernel (not as a module - maybe that`s wrong?). 
+/etc.init.d/bluetooth starts automatically, 
+in /etc/i forgot/bluetooth i typed to start pand automatically (pand=true)
 
-Hi,
-=20
-  A trivial question...
-  Does BlueZ stack support EDR 2.0 mode. For this do  Ineed to enable
-any special flag or compilation with som eextra flag needed?
-=20
-  Please respond..
-=20
-Thanks & Regards..
---shailesh
+For now - other devices can`t see any services (pan) on my bluez device, bnep is never created, even after pand --listen.... About logs - nothing - in fack i haven`t really found any logs. dmesg is silent too. Please help!
 
-------_=_NextPart_001_01C66F69.454283D8
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dus-ascii">
-<META content=3D"MSHTML 6.00.2800.1528" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial=20
-size=3D2>Hi,</FONT></SPAN></DIV>
-<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial size=3D2>&nbsp; =
-A trivial=20
-question...</FONT></SPAN></DIV>
-<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial size=3D2>&nbsp; =
-Does BlueZ=20
-stack support EDR 2.0 mode. For this do&nbsp; Ineed to enable any =
-special flag=20
-or compilation with som eextra flag needed?</FONT></SPAN></DIV>
-<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial size=3D2>&nbsp; =
-Please=20
-respond..</FONT></SPAN></DIV>
-<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial size=3D2>Thanks =
-&amp;=20
-Regards..</FONT></SPAN></DIV>
-<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial=20
-size=3D2>--shailesh</FONT></SPAN></DIV></BODY></HTML>
 
-------_=_NextPart_001_01C66F69.454283D8--
 
 
 -------------------------------------------------------
