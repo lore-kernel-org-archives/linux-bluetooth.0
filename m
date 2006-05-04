@@ -1,5 +1,5 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <445A14D0.6080604@xmission.com>
+Message-ID: <445A116C.2060507@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
@@ -18,24 +18,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 04 May 2006 08:50:56 -0600
+Date: Thu, 04 May 2006 08:36:28 -0600
 
 Frederic
+
+> I recently started to work with bluetooth-alsa (0.41) and a bluetake
+> iPhono BT420 headset. I made it work using a2play, but not using
+> alsa-plugins. I also tried the latest cvs without success.
+
+stick with cvs for this stuff. the 0.41 release will not work (esp plugin).
 
 > Has anyone made the plugin work? Also, as I will have time to work
 > with bt-alsa, I would be pleased to help. What must/can be done? What
 > area can I investigate in order to have a2dp working with alsa?
 
-oh one more biggie... Marcel was working on this.
+Sergey did help us get it working. I've got a csr adapter on my computer
+and I'm testing with an iphono mini set. It's possible he and I are
+using different versions of a2dp_transfer (a2dp_transfer2 works better
+for me and that's the one cvs-head uses)
 
-We need to keep the connection open for a few seconds after the client
-closes it in case the client is going to turn around and open it again.
-eg gxine opens, closes, opens, closes, opens then plays the media you
-passed to it on the command line. this puts the headset in a strange
-state sometimes; that last open fails and new connections won't work for
-a while.
+I had to put in a bunch of i/o retries that Sergey didn't so the
+behavior can differ a lot from setup to setup. Alsa interrupts our
+system calls so we have to be careful about calls that take time like
+initially connecting to the set.
 
-brad
+There is plenty to be done... you need to get it working first :)
+
+seriously, alsa plugin needs bulletproofing (eg we need to watch error
+messages from write() and think about how to handle them gracefully). I
+also noticed that after choosing pcm.headset, gxine wouldn't even launch
+when my headset was off.
+
+Brad
 
 
 -------------------------------------------------------
