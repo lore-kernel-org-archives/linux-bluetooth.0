@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Dick <dm@chello.nl>
-Message-ID: <loom.20060505T213220-715@post.gmane.org>
-References: <200604291601.43549.menard.fabrice@wanadoo.fr>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Subject: [Bluez-users] Re: DiNovo and evdev
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C66F69.454283D8"
+Message-ID: <D99246B510C34944823191CB90759C86050B0039@blrse201.ap.infineon.com>
+From: <Shailesh.Suman@infineon.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Does BlueZ support EDR mode
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,20 +17,63 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 5 May 2006 19:40:18 +0000 (UTC)
+Date: Thu, 4 May 2006 16:25:35 +0530
 
-Fabrice Ménard <menard.fabrice <at> wanadoo.fr> writes:
-> Is there a way to make appear the mouse in /proc/bus/input/devices without 
-> having to move the device ?
+This is a multi-part message in MIME format.
 
-I suppose you should hack your hidd init script (or create an extra init script)
-to aggresively connect the mouse. ie. hidd --connect 00:07:61:24:12:34
+------_=_NextPart_001_01C66F69.454283D8
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Just curious, will evdev give us the 11th mouse button and all keyboard Fn keys?
+Hi,
+=20
+  A trivial question...
+  Does BlueZ stack support EDR 2.0 mode. For this do  Ineed to enable
+any special flag or compilation with som eextra flag needed?
+=20
+  Please respond..
+=20
+Thanks & Regards..
+--shailesh
 
-gr
-Dick
+------_=_NextPart_001_01C66F69.454283D8
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dus-ascii">
+<META content=3D"MSHTML 6.00.2800.1528" name=3DGENERATOR></HEAD>
+<BODY>
+<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial=20
+size=3D2>Hi,</FONT></SPAN></DIV>
+<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial=20
+size=3D2></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial size=3D2>&nbsp; =
+A trivial=20
+question...</FONT></SPAN></DIV>
+<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial size=3D2>&nbsp; =
+Does BlueZ=20
+stack support EDR 2.0 mode. For this do&nbsp; Ineed to enable any =
+special flag=20
+or compilation with som eextra flag needed?</FONT></SPAN></DIV>
+<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial=20
+size=3D2></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial size=3D2>&nbsp; =
+Please=20
+respond..</FONT></SPAN></DIV>
+<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial=20
+size=3D2></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial size=3D2>Thanks =
+&amp;=20
+Regards..</FONT></SPAN></DIV>
+<DIV><SPAN class=3D312115410-04052006><FONT face=3DArial=20
+size=3D2>--shailesh</FONT></SPAN></DIV></BODY></HTML>
+
+------_=_NextPart_001_01C66F69.454283D8--
 
 
 -------------------------------------------------------
