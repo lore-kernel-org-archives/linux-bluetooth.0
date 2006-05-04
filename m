@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <4459F354.3020500@ubuntu.com>
+From: Charles Majola <charles@ubuntu.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Message-ID: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C075@eumonex01.palmsource.com>
-From: "Frederic Dalleau" <Frederic.Dalleau@palmsource.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] A2DP and Alsa Plugin
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] bluez-utils vs patches
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,38 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 4 May 2006 15:30:38 +0200
+Date: Thu, 04 May 2006 14:28:04 +0200
 
 Hi all,
 
-I recently started to work with bluetooth-alsa (0.41) and a bluetake =
-iPhono BT420 headset.
-I made it work using a2play, but not using alsa-plugins. I also tried =
-the latest cvs without success.
+After a lot of testing and user input is seems that applying the patches 
+from git://.. ../holtmann/bluetooth-2.6.git bluez-utils blocks the 
+functionality of HID devices. disabling bluez-utils get everything to 
+work fine. dunno how to report this as a bug as of yet.
 
-At first, I had the following message :=20
-"Requested Capabilities for SEID =3D 1
-Didn't receive SBC codec parameters (first) for SEID =3D 1"
-As it worked with a2play, I went into the source code, and it appeared =
-that pcm_a2dp.c uses O_NONBLOCK socket option. Removing the option =
-allowed me to go further.
+please see  http://ubuntuforums.org/showthread.php?t=142987 and 
+http://ubuntuforums.org/showthread.php?t=143388
 
-After that, I saw "DEBUG:a2dp_transfer" traces : but the write() call =
-was failing with error=3DIncorrect parameter. I believe this has =
-something to do with mtu because after reducing the transmitted size, =
-the calls were succeeding, and the iphono started to make noise, but it =
-really was not what I expected. I'm right saying there is no a2dp =
-encapsulation for sbc blocks  within the plugin?=20
-
-Has anyone made the plugin work? Also, as I will have time to work with =
-bt-alsa, I would be pleased to help. What must/can be done? What area =
-can I investigate in order to have a2dp working with alsa?
-
-I'm really new to bt, any help will be welcome, thank you,
-
-Regards,
-
-Fr=E9d=E9ric Dalleau
+Regards
+chmj
 
 
 -------------------------------------------------------
