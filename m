@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <445A1BB6.4050101@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: RE: [Bluez-devel] A2DP and Alsa Plugin
-Message-ID: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C08B@eumonex01.palmsource.com>
-From: "Frederic Dalleau" <Frederic.Dalleau@palmsource.com>
-To: <bluez-devel@lists.sourceforge.net>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] A2DP and Alsa Plugin
+References: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C075@eumonex01.palmsource.com>
+In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C075@eumonex01.palmsource.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,17 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 4 May 2006 17:34:15 +0200
-
-> It's possible he and I are using different versions of a2dp_transfer
-> (a2dp_transfer2 works better for me and that's the one cvs-head uses)
-
-a2dp_transfer2 ? I have no such function.
-I used cvs.sourceforge.net/cvsroot/bluetooth-alsa.=20
-bluetooth-alsa.cvs.sourceforge.net/... didn't want my anonymous login.
-Is it a different server?
+Date: Thu, 04 May 2006 09:20:22 -0600
 
 Frederic
+
+> it really was not what I expected. I'm right saying there is no a2dp
+> encapsulation for sbc blocks  within the plugin?
+
+fyi, there is not any a2dp encapsulation for the plugin or for a2play...
+a2dp negotiation happens over one l2cap and a separate l2cap is
+negotiated for the sbc data.
+
+Brad
 
 
 -------------------------------------------------------
