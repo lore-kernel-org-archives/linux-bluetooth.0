@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <445A3789.6010000@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] A2DP and Alsa Plugin
-References: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C090@eumonex01.palmsource.com>
-In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C090@eumonex01.palmsource.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+	charset="us-ascii"
+Subject: RE: [Bluez-devel] A2DP and Alsa Plugin
+Message-ID: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C090@eumonex01.palmsource.com>
+From: "Frederic Dalleau" <Frederic.Dalleau@palmsource.com>
+To: <bluez-devel@lists.sourceforge.net>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,18 +17,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 04 May 2006 11:19:05 -0600
+Date: Thu, 4 May 2006 17:58:29 +0200
+
+Brad,
+
+> fyi, there is not any a2dp encapsulation for the plugin or for
+a2play...
+> a2dp negotiation happens over one l2cap and a separate l2cap is
+negotiated for the sbc data.
+
+By encapsulation I mean there is a packet_header and a payload_header in
+a2play.c that I do not see in alsa-plugin, at least in my version!
+I'm still waiting to see a2dp_transfer2
 
 Frederic
-
-> By encapsulation I mean there is a packet_header and a payload_header in
-> a2play.c that I do not see in alsa-plugin, at least in my version!
-> I'm still waiting to see a2dp_transfer2
-
-i've been meaning to for a while, so i made a 0.42 snapshot. it's
-current so you could try that if cvs is giving you trouble.
-
-brad
 
 
 -------------------------------------------------------
