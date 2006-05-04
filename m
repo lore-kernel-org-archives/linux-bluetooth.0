@@ -1,5 +1,5 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <445A1BB6.4050101@xmission.com>
+Message-ID: <445A14D0.6080604@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
@@ -18,18 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 04 May 2006 09:20:22 -0600
+Date: Thu, 04 May 2006 08:50:56 -0600
 
 Frederic
 
-> it really was not what I expected. I'm right saying there is no a2dp
-> encapsulation for sbc blocks  within the plugin?
+> Has anyone made the plugin work? Also, as I will have time to work
+> with bt-alsa, I would be pleased to help. What must/can be done? What
+> area can I investigate in order to have a2dp working with alsa?
 
-fyi, there is not any a2dp encapsulation for the plugin or for a2play...
-a2dp negotiation happens over one l2cap and a separate l2cap is
-negotiated for the sbc data.
+oh one more biggie... Marcel was working on this.
 
-Brad
+We need to keep the connection open for a few seconds after the client
+closes it in case the client is going to turn around and open it again.
+eg gxine opens, closes, opens, closes, opens then plays the media you
+passed to it on the command line. this puts the headset in a strange
+state sometimes; that last open fails and new connections won't work for
+a while.
+
+brad
 
 
 -------------------------------------------------------
