@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluez-utils vs patches
-From: David Woodhouse <dwmw2@infradead.org>
+Message-ID: <445A40CE.9000509@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4459F354.3020500@ubuntu.com>
-References: <4459F354.3020500@ubuntu.com>
-Content-Type: text/plain
-Message-Id: <1146786624.2885.151.camel@hades.cambridge.redhat.com>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Motorola HT820 audio fidelity
+References: <1146183877.13358.7.camel@pc7.dolda2000.com>	 <445189C8.6060602@xmission.com>	 <1146492165.13358.16.camel@pc7.dolda2000.com>	 <44561FB6.5000306@xmission.com>	 <6297d67c0605012039x618add3bq2b29b9ad584c609e@mail.gmail.com>	 <4456E4DF.5000601@xmission.com> <d9a6586e0605041028t3c3499e8t25f1dae3a82c978f@mail.gmail.com>
+In-Reply-To: <d9a6586e0605041028t3c3499e8t25f1dae3a82c978f@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +18,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 05 May 2006 00:50:24 +0100
+Date: Thu, 04 May 2006 11:58:38 -0600
 
-On Thu, 2006-05-04 at 14:28 +0200, Charles Majola wrote:
-> After a lot of testing and user input is seems that applying the
-> patches from git://.. ../holtmann/bluetooth-2.6.git bluez-utils blocks
-> the functionality of HID devices. disabling bluez-utils get everything
-> to work fine. dunno how to report this as a bug as of yet.
+Shawn
 
-The problem seems to be just that we switch the Bluetooth device from
-HID mode, where it automatically connects with the remote keyboard and
-mouse, to HCI mode, where it expects _us_ to do that. And we don't
-actually manage to reconnect to the existing keyboard and mouse.
+> Maybe there needs to be a new kind of sound device (/dev/sound/play or
+> something) which for typical sound hardware, does the decoding, and
+> for A2DP can either decode or send the packets across, depending on
+> whether it can negotiate a compatible decoder on the device.  Having
+> it work only with one library/toolkit like gstreamer is kindof
+> limiting. 
 
-Bluetooth HID devices _do_ work, to a certain extent, but not without
-manually repairing the devices, I believe. We don't have it working
-transparently, because I don't think we know how.
+alsa doesn't transparently provide an api like this. it's either
+something on top of alsa or approximated by writing a plugin for each
+type of codec. alsa plugins are only supposed to know about some very
+simple encoding audio schemes though.
 
-I suspect there must be a way to query a device in HID mode and find out
-which remote HID devices it's connected to -- then we can immediately
-try to reconnect to those devices after we switch to HCI mode. Or
-there's something else we're missing.
+ironic that you are making the case for gstreamer at the same time you
+say it's limiting. :)
 
--- 
-dwmw2
+> The ALSA A2DP driver was supposed to be in userspace anyway, right?
 
+We have the alsa plugin mostly working now. We haven't abandoned that
+idea. alsa plugins are relatively simple in what they expose to the client.
+
+i plan to keep improving the alsa plugin and get into gstreamer to get
+some of the more advanced stuff. i have a little picture illustrating
+how we tear btsco into two projects that go into these two camps.
+
+http://bluetooth-alsa.sourceforge.net/wavez.png
+
+Brad
 
 
 -------------------------------------------------------
