@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluez-utils vs patches
-From: David Woodhouse <dwmw2@infradead.org>
+Message-ID: <445B8A4D.7000403@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <445AEC24.1010908@rootcore.co.za>
-References: <4459F354.3020500@ubuntu.com>
-	 <1146786624.2885.151.camel@hades.cambridge.redhat.com>
-	 <445AEC24.1010908@rootcore.co.za>
-Content-Type: text/plain
-Message-Id: <1146863605.2503.1.camel@shinybook.infradead.org>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] A2DP and Alsa Plugin
+References: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C0D2@eumonex01.palmsource.com>
+In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C0D2@eumonex01.palmsource.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,21 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 05 May 2006 22:13:25 +0100
+Date: Fri, 05 May 2006 11:24:29 -0600
 
-On Fri, 2006-05-05 at 08:09 +0200, Charles Majola wrote:
-> We can have a GUI or something to manage the device, so that by default 
-> we leave the device in HID mode and the user can manually change it to 
-> HCI and start a HID daemon. 
+Frederic
 
-Yes, that might work. You have to click the button in the GUI and then
-stick both your bluetooth keyboard and mouse into 'discoverable' mode so
-that they get picked up. It's a complete PITA though, and there _has_ to
-be a better way. MacOS manages it better than this.
+> It works!
+> 
+> I have lots of glitch using mpg123|a2play but none with alsa-plugin!
+> It's cool :D
+> There were minor build problems though (sbc.h and libsbc.a not
+> reachable)
+> Retried cvs but I couldn't get latest, anonymous login is not allowed.
 
--- 
-dwmw2
+I'm glad to hear it works out. Is this totally a hobby thing or does it
+have anything to do with your day job? :)
 
+I assume you changed the sbc.h path and linked to libsbc.a. I'm trying
+to move the sbc library out of btsco and link properly with libsbc.so;
+that's why it is pointed to the system versions.
+
+Brad
 
 
 -------------------------------------------------------
