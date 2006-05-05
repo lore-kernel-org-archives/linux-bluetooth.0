@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <445CA3F6.3070902@lawatsch.at>
-From: Philip Lawatsch <philip@lawatsch.at>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] bluez-utils vs patches
+From: David Woodhouse <dwmw2@infradead.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Experiences with mx-5000 bluetooth mouse+keyboard
- combo
-References: <444A7675.7020505@mail.utexas.edu>
-In-Reply-To: <444A7675.7020505@mail.utexas.edu>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <445AEC24.1010908@rootcore.co.za>
+References: <4459F354.3020500@ubuntu.com>
+	 <1146786624.2885.151.camel@hades.cambridge.redhat.com>
+	 <445AEC24.1010908@rootcore.co.za>
+Content-Type: text/plain
+Message-Id: <1146863605.2503.1.camel@shinybook.infradead.org>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,28 +20,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 06 May 2006 15:26:14 +0200
+Date: Fri, 05 May 2006 22:13:25 +0100
 
-Philip Langdale wrote:
-> Hi all,
+On Fri, 2006-05-05 at 08:09 +0200, Charles Majola wrote:
+> We can have a GUI or something to manage the device, so that by default 
+> we leave the device in HID mode and the user can manually change it to 
+> HCI and start a HID daemon. 
 
-Hi,
+Yes, that might work. You have to click the button in the GUI and then
+stick both your bluetooth keyboard and mouse into 'discoverable' mode so
+that they get picked up. It's a complete PITA though, and there _has_ to
+be a better way. MacOS manages it better than this.
 
-> I decided to get myself an mx-5000 set this week and I've been fiddling
-> with it and while I've got it working well, I'm not quite there yet. 
+-- 
+dwmw2
 
-Same here, but my goal is to actually use the / manipulate the lcd from
-linux.
-
-Did someone already do some research in this direction?
-
-And, would someone happen to know a tool to sniff the traffic between
-the windows drivers and the keyboard (preferably free and without the
-need for a second dongle)
-
-Logitech does not seem to be willing to hand out any specs :(
-
-kind regards Philip
 
 
 -------------------------------------------------------
