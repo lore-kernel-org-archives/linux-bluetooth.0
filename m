@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <445CEF84.3050305@mail.utexas.edu>
-From: Philip Langdale <philipl@mail.utexas.edu>
+Message-ID: <445CA3F6.3070902@lawatsch.at>
+From: Philip Lawatsch <philip@lawatsch.at>
 MIME-Version: 1.0
-To: Philip Langdale <philipl@mail.utexas.edu>
-Cc: bluez-devel@lists.sourceforge.net
-References: <444A7675.7020505@mail.utexas.edu> <444A7810.4090607@mail.utexas.edu>
-In-Reply-To: <444A7810.4090607@mail.utexas.edu>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Experiences with mx-5000 bluetooth mouse+keyboard
+ combo
+References: <444A7675.7020505@mail.utexas.edu>
+In-Reply-To: <444A7675.7020505@mail.utexas.edu>
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Re: Experiences with mx-5000 bluetooth mouse+keyboard combo
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,58 +19,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 06 May 2006 11:48:36 -0700
+Date: Sat, 06 May 2006 15:26:14 +0200
 
 Philip Langdale wrote:
-> Philip Langdale wrote:
->> Hi all,
->>
->> I decided to get myself an mx-5000 set this week and I've been fiddling
->> with it and while I've got it working well, I'm not quite there yet. I
->> do want to report my initial findings however.
->>
->> 0) Everything works fine in HID mode. All the buttons on the mouse
->>    and keyboard work correctly at the input level as reported by evtest.
->>
->>
->> 5) The keyboard is in a similar situation but I have not mapped out the
->>    broken usages yet, and even some of the multimedia keys that do work
->>    report different codes from HID mode.
->>
-> 
-> This is only partially true. There are some keys that don't generate
-> input events in either mode, and some keys that generate different codes
-> in HCI mode. So, there's two problems there.
+> Hi all,
 
-I did some more investigation today and came up with useful conclusions.
+Hi,
 
-1) The initial attempt at mapping the usage code is correct, but a later
-step in the configuration mangles the codes so they end up incorrect.
-(incorrect is a relative term as long as your desktop environment/apps
-supports configurable keybindings - so it's not a deal breaker).
+> I decided to get myself an mx-5000 set this week and I've been fiddling
+> with it and while I've got it working well, I'm not quite there yet. 
 
-This step is:
+Same here, but my goal is to actually use the / manipulate the lcd from
+linux.
 
-while (usage->code <= max && test_and_set_bit(usage->code, bit)) {
-    usage->code = find_next_zero_bit(bit, max + 1, usage->code);
-}
+Did someone already do some research in this direction?
 
-in hidinput_configure_usage.
+And, would someone happen to know a tool to sniff the traffic between
+the windows drivers and the keyboard (preferably free and without the
+need for a second dongle)
 
-eg: It mangles KEY_UNDO (131) into KEY_SENDFILE (145) which doesn't seem
-very useful.
+Logitech does not seem to be willing to hand out any specs :(
 
-2) Some of the keys that generated no input events are simply keys that
-hidinput_configure_usage doesn't know about. I added entries for them
-and now they work (some are mangled, some are not).
-
-3) Much more interestingly, there are multiple keys that generate *no*
-meaningful events, even at the hcidump level. I assume that these can
-only be made to work by downloading programs to the keyboard (the
-mx-5000 and di novo are programmable but the interface is apparently
-unknown).
-
---phil
+kind regards Philip
 
 
 -------------------------------------------------------
