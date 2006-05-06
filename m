@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20060508153458.88001.qmail@web26908.mail.ukl.yahoo.com>
-From: javier labella <javi_labella@yahoo.es>
-To: bluez develop <bluez-devel@lists.sourceforge.net>
+Message-ID: <445CEF84.3050305@mail.utexas.edu>
+From: Philip Langdale <philipl@mail.utexas.edu>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1333238275-1147102498=:87566"
-Subject: [Bluez-devel] Re:Advanced Audio Distribution Profile for BlueZ
+To: Philip Langdale <philipl@mail.utexas.edu>
+Cc: bluez-devel@lists.sourceforge.net
+References: <444A7675.7020505@mail.utexas.edu> <444A7810.4090607@mail.utexas.edu>
+In-Reply-To: <444A7810.4090607@mail.utexas.edu>
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] Re: Experiences with mx-5000 bluetooth mouse+keyboard combo
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,55 +19,58 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 8 May 2006 17:34:58 +0200 (CEST)
+Date: Sat, 06 May 2006 11:48:36 -0700
 
---0-1333238275-1147102498=:87566
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Philip Langdale wrote:
+> Philip Langdale wrote:
+>> Hi all,
+>>
+>> I decided to get myself an mx-5000 set this week and I've been fiddling
+>> with it and while I've got it working well, I'm not quite there yet. I
+>> do want to report my initial findings however.
+>>
+>> 0) Everything works fine in HID mode. All the buttons on the mouse
+>>    and keyboard work correctly at the input level as reported by evtest.
+>>
+>>
+>> 5) The keyboard is in a similar situation but I have not mapped out the
+>>    broken usages yet, and even some of the multimedia keys that do work
+>>    report different codes from HID mode.
+>>
+> 
+> This is only partially true. There are some keys that don't generate
+> input events in either mode, and some keys that generate different codes
+> in HCI mode. So, there's two problems there.
 
+I did some more investigation today and came up with useful conclusions.
 
+1) The initial attempt at mapping the usage code is correct, but a later
+step in the configuration mangles the codes so they end up incorrect.
+(incorrect is a relative term as long as your desktop environment/apps
+supports configurable keybindings - so it's not a deal breaker).
 
-  Fecha: Wed, 3 May 2006 18:18:27 +0200 (CEST)
-De: javier labella <javi_labella@yahoo.es>
-Asunto: Re:Advanced Audio Distribution Profile for 
-Bluez
-Para: bluez-devel@lists.sourceforge.net
+This step is:
 
+while (usage->code <= max && test_and_set_bit(usage->code, bit)) {
+    usage->code = find_next_zero_bit(bit, max + 1, usage->code);
+}
 
->We have implemented some a2dp already. See bluetooth-alsa.sf.net. There
->is still plenty to do, if you want to help integrate it with gstreamer
->for example.
+in hidinput_configure_usage.
 
->I think it's not totally clear how the a2dp profile gets "integrated"
->since it really looks more like a bluez client that belongs in one or
->more multimedia frameworks.
+eg: It mangles KEY_UNDO (131) into KEY_SENDFILE (145) which doesn't seem
+very useful.
 
->Brad
+2) Some of the keys that generated no input events are simply keys that
+hidinput_configure_usage doesn't know about. I added entries for them
+and now they work (some are mangled, some are not).
 
-Hi,
-I've visited bluetooth-alsa.sf.net and the project is very interesting but I think that the profile's implementation is based on SCO channels. If I'm making a mistake I apologize for it. On the other hand, I've read the A2DP profile specification and I think that an implementation should uses ACL channels: "The Advanced Audio Distribution Profile (A2DP) defines the protocols and procedures that realize distribution of audio content of high-quality in mono or stereo on ACL channels (Introduction of Advanced Audio Distribution Profile Specification)" So I'd like to develop an implementation using ACL channels instead of SCO channels.
+3) Much more interestingly, there are multiple keys that generate *no*
+meaningful events, even at the hcidump level. I assume that these can
+only be made to work by downloading programs to the keyboard (the
+mx-5000 and di novo are programmable but the interface is apparently
+unknown).
 
-I'd like to know if you're interested in include this implementation in the BlueZ stack too.  
-Thanks.
-
-Javier.
-  
-
-
-		
----------------------------------
-
-LLama Gratis a cualquier PC del Mundo.
-Llamadas a fijos y móviles desde 1 céntimo por minuto.
-http://es.voice.yahoo.com
---0-1333238275-1147102498=:87566
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-<BR><BR>  <BLOCKQUOTE class=replbq style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #1010ff 2px solid">Fecha: Wed, 3 May 2006 18:18:27 +0200 (CEST)<BR>De: javier labella &lt;javi_labella@yahoo.es&gt;<BR>Asunto: Re:Advanced Audio Distribution Profile for <BR>Bluez<BR>Para: bluez-devel@lists.sourceforge.net<BR><BR><PRE><TT>&gt;We have implemented some a2dp already. See bluetooth-alsa.sf.net. There<BR>&gt;is still plenty to do, if you want to help integrate it with gstreamer<BR>&gt;for example.<BR><BR>&gt;I think it's not totally clear how the a2dp profile gets "integrated"<BR>&gt;since it really looks more like a bluez client that belongs in one or<BR>&gt;more multimedia frameworks.<BR><BR>&gt;Brad</TT></PRE><BR>Hi,<BR>I've visited bluetooth-alsa.sf.net and the project is very interesting but I think that the profile's implementation is based on SCO channels. If I'm making a mistake I apologize for it. On the other hand, I've read the A2DP profile specification and I
- think that an implementation should uses ACL channels: "The Advanced Audio Distribution Profile (A2DP) defines the protocols and procedures that realize distribution of audio content of high-quality in mono or stereo on ACL channels (Introduction of Advanced Audio Distribution Profile Specification)" So I'd like to develop an implementation using ACL channels instead of SCO channels.<BR><BR>I'd like to know if you're interested in include this implementation in the BlueZ stack too.&nbsp; <BR>Thanks.<BR><BR>Javier.<BR>  <div></div></BLOCKQUOTE><BR><p>
-		<hr size=1><br><font face="Verdana" size="-2">LLama Gratis a cualquier PC del Mundo.<br>Llamadas a fijos y móviles desde 1 céntimo por minuto.<br><a href="http://us.rd.yahoo.com/mail/es/tagline/messenger/*http://es.voice.yahoo.com/">http://es.voice.yahoo.com</a></font>
---0-1333238275-1147102498=:87566--
+--phil
 
 
 -------------------------------------------------------
