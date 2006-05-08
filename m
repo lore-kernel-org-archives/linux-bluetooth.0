@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <006501c6726d$be55e5e0$030c1fc0@uranus>
+From: "Thomas Brandl" <t.brandl@gmx.at>
+To: <bluez-users@lists.sourceforge.net>
+References: <015001c66921$76fe4390$030c1fc0@uranus> <ef9938ec0604281336o774171cbke3dbe9525fd129d3@mail.gmail.com>
+Subject: Re: [Bluez-users] Rfcomm Problems
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C6737C.2B6DE8AE"
-Message-ID: <4684BF2299A63D459A4C8B7589D48BE980B3A1@NDJSEVS13.ndc.nasa.gov>
-From: "Hostetler, David B. (JSC-SF)[BAR]" <david.b.hostetler@nasa.gov>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Logitech diNovo Desktop mouse not working...
+	boundary="----=_NextPart_000_0062_01C6727E.816A9750"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,48 +18,92 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 9 May 2006 10:20:55 -0500
+Date: Mon, 8 May 2006 09:05:08 +0200
 
 This is a multi-part message in MIME format.
 
-------_=_NextPart_001_01C6737C.2B6DE8AE
+------=_NextPart_000_0062_01C6727E.816A9750
 Content-Type: text/plain;
-	charset="us-ascii"
+	charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 
-Using stock, out of the box kernel 2.6.9 from CentOS 4.3, I have almost
-fully usage of the diNovo desktop, however after a VERY short period of
-use, the mouse starts jumping and hanging. I need to fix this ASAP and
-was hoping I might find someone kind enough to help me understand what
-is occouring here and how to fix this...
+is it maybe possible to create a script, which can simulate that open =
+device file. at that moment i don't know how, but i think there should =
+be any solution.
 
-------_=_NextPart_001_01C6737C.2B6DE8AE
+greetings
+
+thomas
+  ----- Original Message -----=20
+  From: Albert Huang=20
+  To: bluez-users@lists.sourceforge.net=20
+  Sent: Friday, April 28, 2006 10:36 PM
+  Subject: Re: [Bluez-users] Rfcomm Problems
+
+
+    I need that cat /dev/rfcomm0 is kept open.=20
+
+  To my knowledge, this is not currently possible.  Anyone?
+
+  -albert
+------=_NextPart_000_0062_01C6727E.816A9750
 Content-Type: text/html;
-	charset="us-ascii"
+	charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
-<HTML>
-<HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
-6.5.7638.1">
-<TITLE>Logitech diNovo Desktop mouse not working...</TITLE>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2873" name=3DGENERATOR>
+<STYLE></STYLE>
 </HEAD>
-<BODY>
-<!-- Converted from text/rtf format -->
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>is it maybe possible to create a =
+script, which can=20
+simulate that open device file. at that moment i don't know how, but i =
+think=20
+there should be any solution.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>greetings</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>thomas</FONT></DIV>
+<BLOCKQUOTE dir=3Dltr=20
+style=3D"PADDING-RIGHT: 0px; PADDING-LEFT: 5px; MARGIN-LEFT: 5px; =
+BORDER-LEFT: #000000 2px solid; MARGIN-RIGHT: 0px">
+  <DIV style=3D"FONT: 10pt arial">----- Original Message ----- </DIV>
+  <DIV=20
+  style=3D"BACKGROUND: #e4e4e4; FONT: 10pt arial; font-color: =
+black"><B>From:</B>=20
+  <A title=3Dalbert@csail.mit.edu =
+href=3D"mailto:albert@csail.mit.edu">Albert=20
+  Huang</A> </DIV>
+  <DIV style=3D"FONT: 10pt arial"><B>To:</B> <A=20
+  title=3Dbluez-users@lists.sourceforge.net=20
+  =
+href=3D"mailto:bluez-users@lists.sourceforge.net">bluez-users@lists.sourc=
+eforge.net</A>=20
+  </DIV>
+  <DIV style=3D"FONT: 10pt arial"><B>Sent:</B> Friday, April 28, 2006 =
+10:36=20
+  PM</DIV>
+  <DIV style=3D"FONT: 10pt arial"><B>Subject:</B> Re: [Bluez-users] =
+Rfcomm=20
+  Problems</DIV>
+  <DIV><BR></DIV>
+  <DIV>
+  <BLOCKQUOTE class=3Dgmail_quote=20
+  style=3D"PADDING-LEFT: 1ex; MARGIN: 0pt 0pt 0pt 0.8ex; BORDER-LEFT: =
+rgb(204,204,204) 1px solid">
+    <DIV style=3D"DIRECTION: ltr">
+    <DIV><FONT face=3DArial size=3D2>
+    <DIV>I need that cat /dev/rfcomm0 is kept open.=20
+  </DIV></FONT></DIV></DIV></BLOCKQUOTE>
+  <DIV><BR>To my knowledge, this is not currently possible.&nbsp;=20
+  Anyone?<BR><BR>-albert</DIV></DIV></BLOCKQUOTE></BODY></HTML>
 
-<P><FONT SIZE=3D2 FACE=3D"Arial">Using stock, out of the box kernel =
-2.6.9 from CentOS 4.3, I have almost fully usage of the diNovo desktop, =
-however after a VERY short period of use, the mouse starts jumping and =
-hanging. I need to fix this ASAP and was hoping I might find someone =
-kind enough to help me understand what is occouring here and how to fix =
-this...</FONT></P>
+------=_NextPart_000_0062_01C6727E.816A9750--
 
-</BODY>
-</HTML>
-------_=_NextPart_001_01C6737C.2B6DE8AE--
 
 
 -------------------------------------------------------
