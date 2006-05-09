@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4460B201.2030009@xmission.com>
+Message-ID: <446028BE.1050006@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Re:Advanced Audio Distribution Profile for BlueZ
+References: <20060508153458.88001.qmail@web26908.mail.ukl.yahoo.com>
+In-Reply-To: <20060508153458.88001.qmail@web26908.mail.ukl.yahoo.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] infineon adapter init
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,18 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 09 May 2006 09:15:13 -0600
+Date: Mon, 08 May 2006 23:29:34 -0600
 
-Hey
+javier
 
-Is anyone using infineon's singlestone pba31307 with bluez?
+>     I've visited bluetooth-alsa.sf.net and the project is very
+>     interesting but I think that the profile's implementation is based
+>     on SCO channels. If I'm making a mistake I apologize for it. On the
+>     other hand, I've read the A2DP profile specification and I think
+>     that an implementation should uses ACL channels
 
-Gumstix just updated their stick with this chip but it comes online at
-115k and they can't get it to switch to 921kbps... that's the best rate
-their xscale can do but the chip is changing to some other rate out of
-range when they try the switch to 921k.
+it may not be all that clear but the project has two parts, sco and a2dp.
 
-Brad
+an a2dp stream can be sent to a stereo headset using the application
+a2play. there are also some test apps for avrcp in av*.c in case that's
+interesting to you.
+
+brad
 
 
 -------------------------------------------------------
