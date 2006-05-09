@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C6738F.897AE4FA"
-Message-ID: <4684BF2299A63D459A4C8B7589D48BE980B468@NDJSEVS13.ndc.nasa.gov>
+	boundary="----_=_NextPart_001_01C6737C.2B6DE8AE"
+Message-ID: <4684BF2299A63D459A4C8B7589D48BE980B3A1@NDJSEVS13.ndc.nasa.gov>
 From: "Hostetler, David B. (JSC-SF)[BAR]" <david.b.hostetler@nasa.gov>
 To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Mh patch for 2.6.9?
+Subject: [Bluez-users] Logitech diNovo Desktop mouse not working...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,21 +17,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 9 May 2006 12:39:34 -0500
+Date: Tue, 9 May 2006 10:20:55 -0500
 
 This is a multi-part message in MIME format.
 
-------_=_NextPart_001_01C6738F.897AE4FA
+------_=_NextPart_001_01C6737C.2B6DE8AE
 Content-Type: text/plain;
 	charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 
-I am noticing the kernel patches appear to be for a myriad of 2.4.x
-kernels, and then jumps suddenly to 2.6.15xx. Is there a patch for 2.6.9
-that I am just missing the link to or did it not ever exist / been
-pulled for some reason?
+Using stock, out of the box kernel 2.6.9 from CentOS 4.3, I have almost
+fully usage of the diNovo desktop, however after a VERY short period of
+use, the mouse starts jumping and hanging. I need to fix this ASAP and
+was hoping I might find someone kind enough to help me understand what
+is occouring here and how to fix this...
 
-------_=_NextPart_001_01C6738F.897AE4FA
+------_=_NextPart_001_01C6737C.2B6DE8AE
 Content-Type: text/html;
 	charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
@@ -43,19 +44,21 @@ Content-Transfer-Encoding: quoted-printable
 charset=3Dus-ascii">
 <META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
 6.5.7638.1">
-<TITLE>Mh patch for 2.6.9?</TITLE>
+<TITLE>Logitech diNovo Desktop mouse not working...</TITLE>
 </HEAD>
 <BODY>
 <!-- Converted from text/rtf format -->
 
-<P><FONT SIZE=3D2 FACE=3D"Arial">I am noticing the kernel patches appear =
-to be for a myriad of 2.4.x kernels, and then jumps suddenly to =
-2.6.15xx. Is there a patch for 2.6.9 that I am just missing the link to =
-or did it not ever exist / been pulled for some reason?</FONT></P>
+<P><FONT SIZE=3D2 FACE=3D"Arial">Using stock, out of the box kernel =
+2.6.9 from CentOS 4.3, I have almost fully usage of the diNovo desktop, =
+however after a VERY short period of use, the mouse starts jumping and =
+hanging. I need to fix this ASAP and was hoping I might find someone =
+kind enough to help me understand what is occouring here and how to fix =
+this...</FONT></P>
 
 </BODY>
 </HTML>
-------_=_NextPart_001_01C6738F.897AE4FA--
+------_=_NextPart_001_01C6737C.2B6DE8AE--
 
 
 -------------------------------------------------------
