@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <44619563.5020207@yahoo.com>
-From: Pedro Monjo Florit <pmonjo2000@yahoo.com>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-References: <4684BF2299A63D459A4C8B7589D48BE980B468@NDJSEVS13.ndc.nasa.gov>
-In-Reply-To: <4684BF2299A63D459A4C8B7589D48BE980B468@NDJSEVS13.ndc.nasa.gov>
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Re: Mh patch for 2.6.9?
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C6738F.897AE4FA"
+Message-ID: <4684BF2299A63D459A4C8B7589D48BE980B468@NDJSEVS13.ndc.nasa.gov>
+From: "Hostetler, David B. (JSC-SF)[BAR]" <david.b.hostetler@nasa.gov>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Mh patch for 2.6.9?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,23 +17,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 10 May 2006 09:25:23 +0200
+Date: Tue, 9 May 2006 12:39:34 -0500
 
-> I am noticing the kernel patches appear to be for a myriad of 2.4.x
-> kernels, and then jumps suddenly to 2.6.15xx. Is there a patch for 2.6.9
-> that I am just missing the link to or did it not ever exist / been
-> pulled for some reason?
-> 
+This is a multi-part message in MIME format.
 
-The old patches are there, but you must look for them by trial and
-error. The path is:
+------_=_NextPart_001_01C6738F.897AE4FA
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-http://www.holtmann.org/linux/kernel/patch-2.6.X-mhY.gz
+I am noticing the kernel patches appear to be for a myriad of 2.4.x
+kernels, and then jumps suddenly to 2.6.15xx. Is there a patch for 2.6.9
+that I am just missing the link to or did it not ever exist / been
+pulled for some reason?
 
-In your case, X=9 and just start Y=1 and increment it until your browser
-gets an error.
+------_=_NextPart_001_01C6738F.897AE4FA
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Pedro
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+6.5.7638.1">
+<TITLE>Mh patch for 2.6.9?</TITLE>
+</HEAD>
+<BODY>
+<!-- Converted from text/rtf format -->
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">I am noticing the kernel patches appear =
+to be for a myriad of 2.4.x kernels, and then jumps suddenly to =
+2.6.15xx. Is there a patch for 2.6.9 that I am just missing the link to =
+or did it not ever exist / been pulled for some reason?</FONT></P>
+
+</BODY>
+</HTML>
+------_=_NextPart_001_01C6738F.897AE4FA--
 
 
 -------------------------------------------------------
