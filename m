@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20605102047q4feba4a8p224c6d3c3980ed5b@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4462172D.3040604@ihep.ru>
+From: Anton Gusev <Anton.Gusev@ihep.ru>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_1429_22700548.1147319225454"
-Subject: [Bluez-users] blocking or non-blocking?
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=KOI8-R
+Subject: [Bluez-users] Intellimouse transmission lost
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,29 +16,90 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 11 May 2006 09:17:05 +0530
+Date: Wed, 10 May 2006 20:39:09 +0400
 
-------=_Part_1429_22700548.1147319225454
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi all!
 
-Hi all,
-Are rfcomm sockets "blocking" sockets by default???
+  As I see, my mouse (MS Intellimouse for bluetooth) works automatically
+after system up without starting bluetooth daemon on my distro
+(ALT-Linux3.0).
+So, the kernel (2.6.16) determines devices themselves and initialize
+modules.
+  But everytime my bt-mouse suspends after 20-40 minutes for some
+reason, which
+I can't determine. Linux installed on Toshiba Satellite M40-289 laptop.
+  Please, help me if You have some ideas.
+Thanks in advance,
+Anton.
 
+- part of lsmod issue:
+...
+ohci1394               35120  0
+psmouse                40072  0
+hci_usb                15764  0
+bluetooth              49252  1 hci_usb
+usbhid                 39264  0
+ohci_hcd               21508  0
+ehci_hcd               33416  0
+usbcore               130948  5 hci_usb,usbhid,ohci_hcd,ehci_hcd
+...
 
-regards
-Soumya
+- part of dmesg:
+....
+usbcore: registered new driver hiddev
+input: HID 045e:00bf as /class/input/input1
+input: USB HID v1.11 Keyboard [HID 045e:00bf] on usb-0000:00:13.1-1.2
+input: HID 045e:00be as /class/input/input2
+input: USB HID v1.11 Mouse [HID 045e:00be] on usb-0000:00:13.1-1.3
+usbcore: registered new driver usbhid
+drivers/usb/input/hid-core.c: v2.6:USB HID core driver
+Bluetooth: Core ver 2.8
+NET: Registered protocol family 31
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: HCI USB driver ver 2.9
+usbcore: registered new driver hci_usb
+....
 
-------=_Part_1429_22700548.1147319225454
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+- part of xorg.conf
+...
+Section "ServerLayout"
+        Identifier     "Default Layout"
+        Screen         "Screen at Device0" 0 0
+        InputDevice    "ruwin_ct_sh" "CoreKeyboard"
+        InputDevice    "mouseTP"  "CorePointer"
+        InputDevice    "mouseBT"  "AlwaysCore"
+EndSection
 
-Hi all,<br>Are rfcomm sockets &quot;blocking&quot; sockets by default???<br=
-><br><br>regards<br>Soumya<br>
+Section "InputDevice"
+        Identifier "mouseBT"
+        Driver "mouse"
+        Option "Protocol" "ExplorerPS/2"
+        Option "Device" "/dev/mouse"
+        Option "Buttons" "7"
+        Option "ZAxisMapping" "6 7"
+EndSection
 
-------=_Part_1429_22700548.1147319225454--
+Section "InputDevice"
+        Identifier  "mouseTP"
+        Driver      "synaptics"
+        Option      "Device" "/dev/input/mice"
+        Option      "Protocol" "auto-dev"
+        Option      "LeftEdge" "1700"
+        Option      "RightEdge" "5300"
+        Option      "TopEdge" "1700"
+        Option      "BottomEdge" "4200"
+        Option      "FingerLow" "25"
+        Option      "FingerHigh" "30"
+        Option      "MaxTapTime" "180"
+        Option      "MaxTapMove" "220"
+        Option      "VertScrollDelta" "100"
+        Option      "MinSpeed" "0.06"
+        Option      "MaxSpeed" "0.12"
+        Option      "AccelFactor" "0.0010"
+        Option      "SHMConfig" "on"
+EndSection
+
 
 
 -------------------------------------------------------
