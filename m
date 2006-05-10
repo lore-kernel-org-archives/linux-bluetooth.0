@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4462279A.8010002@xmission.com>
+Message-ID: <446208DD.1050207@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] A2DP and Alsa Plugin
-References: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C1E3@eumonex01.palmsource.com>
-In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C1E3@eumonex01.palmsource.com>
+Subject: Re: [Bluez-devel] A2DP  and VDP for BlueZ
+References: <20060510151310.29728.qmail@web26907.mail.ukl.yahoo.com>
+In-Reply-To: <20060510151310.29728.qmail@web26907.mail.ukl.yahoo.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,24 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 10 May 2006 11:49:14 -0600
+Date: Wed, 10 May 2006 09:38:05 -0600
 
-Frederic
+javier
 
-> You're right brad! It's my day job. As you know, PalmSource announced
-> recently that its next platform release called ALP will use BlueZ (BT
-> 2.0 compliant) : see
-> http://www.palmsource.com/press/2006/021406_accesslinuxplatform.html.
-> Currently, we are still in the development phase of the ALP platform. In
-> this context, I will work on the a2dp profile.
+> On the other hand, I'd like to know if you had studied the Video
+> Distribution Profile (VDP). At first, my objetives were to develop the
+> A2DP or, if it was already implemented, the VDP. Therefore, I'm
+> interested in knowing if you have implemented something similar to
+> a2play for A2DP.
 
-I've read about ALP. It looks exciting. I was glad to see ALP will
-include gstreamer as part of the foundation. You should help me write
-proper gstreamer plugins.
+I have not read much about vdp. At least it uses a common codec (h.263)
+so you won't have to write codec code I think.
 
-alsa plugins use an api that is too simple for complete headset
-support... also there have been complaints about libalsa not scaling
-down for embedded systems.
+There are no vdp devices out there so you would have to write the sender
+and the receiver to see results.
+
+I would suggest you write your stuff as a new app "vplay" that is
+modeled after a2play (and vrecv modeled after a2recv).
 
 Brad
 
