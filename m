@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4462172D.3040604@ihep.ru>
-From: Anton Gusev <Anton.Gusev@ihep.ru>
+Message-ID: <44619563.5020207@yahoo.com>
+From: Pedro Monjo Florit <pmonjo2000@yahoo.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=KOI8-R
-Subject: [Bluez-users] Intellimouse transmission lost
+References: <4684BF2299A63D459A4C8B7589D48BE980B468@NDJSEVS13.ndc.nasa.gov>
+In-Reply-To: <4684BF2299A63D459A4C8B7589D48BE980B468@NDJSEVS13.ndc.nasa.gov>
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Re: Mh patch for 2.6.9?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,90 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 10 May 2006 20:39:09 +0400
+Date: Wed, 10 May 2006 09:25:23 +0200
 
-Hi all!
+> I am noticing the kernel patches appear to be for a myriad of 2.4.x
+> kernels, and then jumps suddenly to 2.6.15xx. Is there a patch for 2.6.9
+> that I am just missing the link to or did it not ever exist / been
+> pulled for some reason?
+> 
 
-  As I see, my mouse (MS Intellimouse for bluetooth) works automatically
-after system up without starting bluetooth daemon on my distro
-(ALT-Linux3.0).
-So, the kernel (2.6.16) determines devices themselves and initialize
-modules.
-  But everytime my bt-mouse suspends after 20-40 minutes for some
-reason, which
-I can't determine. Linux installed on Toshiba Satellite M40-289 laptop.
-  Please, help me if You have some ideas.
-Thanks in advance,
-Anton.
+The old patches are there, but you must look for them by trial and
+error. The path is:
 
-- part of lsmod issue:
-...
-ohci1394               35120  0
-psmouse                40072  0
-hci_usb                15764  0
-bluetooth              49252  1 hci_usb
-usbhid                 39264  0
-ohci_hcd               21508  0
-ehci_hcd               33416  0
-usbcore               130948  5 hci_usb,usbhid,ohci_hcd,ehci_hcd
-...
+http://www.holtmann.org/linux/kernel/patch-2.6.X-mhY.gz
 
-- part of dmesg:
-....
-usbcore: registered new driver hiddev
-input: HID 045e:00bf as /class/input/input1
-input: USB HID v1.11 Keyboard [HID 045e:00bf] on usb-0000:00:13.1-1.2
-input: HID 045e:00be as /class/input/input2
-input: USB HID v1.11 Mouse [HID 045e:00be] on usb-0000:00:13.1-1.3
-usbcore: registered new driver usbhid
-drivers/usb/input/hid-core.c: v2.6:USB HID core driver
-Bluetooth: Core ver 2.8
-NET: Registered protocol family 31
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: HCI USB driver ver 2.9
-usbcore: registered new driver hci_usb
-....
+In your case, X=9 and just start Y=1 and increment it until your browser
+gets an error.
 
-- part of xorg.conf
-...
-Section "ServerLayout"
-        Identifier     "Default Layout"
-        Screen         "Screen at Device0" 0 0
-        InputDevice    "ruwin_ct_sh" "CoreKeyboard"
-        InputDevice    "mouseTP"  "CorePointer"
-        InputDevice    "mouseBT"  "AlwaysCore"
-EndSection
-
-Section "InputDevice"
-        Identifier "mouseBT"
-        Driver "mouse"
-        Option "Protocol" "ExplorerPS/2"
-        Option "Device" "/dev/mouse"
-        Option "Buttons" "7"
-        Option "ZAxisMapping" "6 7"
-EndSection
-
-Section "InputDevice"
-        Identifier  "mouseTP"
-        Driver      "synaptics"
-        Option      "Device" "/dev/input/mice"
-        Option      "Protocol" "auto-dev"
-        Option      "LeftEdge" "1700"
-        Option      "RightEdge" "5300"
-        Option      "TopEdge" "1700"
-        Option      "BottomEdge" "4200"
-        Option      "FingerLow" "25"
-        Option      "FingerHigh" "30"
-        Option      "MaxTapTime" "180"
-        Option      "MaxTapMove" "220"
-        Option      "VertScrollDelta" "100"
-        Option      "MinSpeed" "0.06"
-        Option      "MaxSpeed" "0.12"
-        Option      "AccelFactor" "0.0010"
-        Option      "SHMConfig" "on"
-EndSection
-
+Pedro
 
 
 -------------------------------------------------------
