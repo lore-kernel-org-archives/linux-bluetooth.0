@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <4461A33F.1060702@killesreiter.de>
+From: Gerhard Killesreiter <gerhard@killesreiter.de>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: RE: [Bluez-devel] A2DP and Alsa Plugin
-Message-ID: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C2E7@eumonex01.palmsource.com>
-From: "Frederic Dalleau" <Frederic.Dalleau@palmsource.com>
-To: <bluez-devel@lists.sourceforge.net>
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] SCO for non-CSR based devices?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,44 +16,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 11 May 2006 11:15:57 +0200
+Date: Wed, 10 May 2006 10:24:31 +0200
 
-Brad,
+Hi there!
 
-> I've read about ALP. It looks exciting. I was glad to see ALP=20
-> will include gstreamer as part of the foundation. You should=20
-> help me write proper gstreamer plugins.
+I've recently purchased a bluetooth headset and discovered that my 
+bluetooth adapter (a pcmcia card, 
+http://www.sphinx-elektronik.de/deutsch/bluetooth/picocard.htm) isn't 
+supported by bluetooth-alsa as there is no SCO support for this type of 
+device.
 
-	I did not worry about gstreamer as I tried the gstreamer
-alsasink yesterday. This allow you to create a graph with either
-bluetooth output or alsa output without modifying your .asoundrc. Just
-modify the device field. One address only as set in filename.
+During my searches on the web I noticed a kernel patch that was recently 
+posted to this list 
+(http://article.gmane.org/gmane.linux.bluez.devel/7579). I had a look 
+and indeed my card has the problem which is mentioned there, namely it 
+displays SCO MTU: 64:0 (Complete output of hciconf -a is at the end of 
+this mail).
 
-> alsa plugins use an api that is too simple for complete=20
-> headset support... also there have been complaints about=20
-> libalsa not scaling down for embedded systems.
+Now my question is: Would this kernel patch potentially allow me to use 
+my card with bluetooth-alsa? Or is the actual problem unrelated? I am 
+willing to recompile my kernel and apply this patch or test others, but 
+I am really no kernel hacker and so I'd appreciate some input.
 
-	I'm new to alsa and gstreamer and I don't understand you yet.
-Can you point me to document you use? I just saw that volume control
-wasn't available with alsa-plugin if this is what you mean.
+Of course, I could simply go and buy a CSR based bluetooth adapter, but 
+that's boring. ;)
 
-	However, I mainly worry about the following points :
-	* I do not get 2 apps with a2dp output on the same address. As
-devices seems to manage only one socket, the second app will generally
-crash. Could we implement some sort of mixing or application selection
-(the foreground app or the first app started on an address, but with
-proper error handling for the others)?
-	* How to select whether the application will output on a2dp or
-speaker? Should this be application related or system related?
-	* What you told me with gxine may vary depending the
-application. I believe one way to handle this is to maintain
-asynchronous connection to target sink. The api would just enqueue the
-audio packets into a common shared queue (per target). The connection
-simply close when there are no more audio packets.
+Cheers,
+    Gerhard
 
-	Did you change something since 0.42?
 
-Frederic
+hci0:   Type: PCCARD
+        BD Address: 00:80:37:15:74:E6 ACL MTU: 672:10 SCO MTU: 64:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:125 acl:0 sco:0 events:15 errors:0
+        TX bytes:322 acl:0 sco:0 commands:14 errors:0
+        Features: 0x07 0xea 0x31 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'theo-dhcp-42-0'
+        Class: 0x100100
+        Service Classes:
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.1 (0x1) HCI Rev: 0xb LMP Ver: 1.1 (0x1) LMP Subver: 0x300
+        Manufacturer: Ericsson Technology Licensing (0)
+
 
 
 -------------------------------------------------------
