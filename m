@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4461A33F.1060702@killesreiter.de>
-From: Gerhard Killesreiter <gerhard@killesreiter.de>
-MIME-Version: 1.0
+Message-ID: <6297d67c0605102037p3c89755er906dce79e8ca61c@mail.gmail.com>
+From: "Mayank Batra" <mayankbatra@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] SCO for non-CSR based devices?
+Subject: Re: [Bluez-devel] A2DP and VDP for BlueZ
+In-Reply-To: <20060510151310.29728.qmail@web26907.mail.ukl.yahoo.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_33719_30008293.1147318638104"
+References: <20060510151310.29728.qmail@web26907.mail.ukl.yahoo.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,51 +19,83 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 10 May 2006 10:24:31 +0200
+Date: Thu, 11 May 2006 09:07:18 +0530
 
-Hi there!
+------=_Part_33719_30008293.1147318638104
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I've recently purchased a bluetooth headset and discovered that my 
-bluetooth adapter (a pcmcia card, 
-http://www.sphinx-elektronik.de/deutsch/bluetooth/picocard.htm) isn't 
-supported by bluetooth-alsa as there is no SCO support for this type of 
-device.
-
-During my searches on the web I noticed a kernel patch that was recently 
-posted to this list 
-(http://article.gmane.org/gmane.linux.bluez.devel/7579). I had a look 
-and indeed my card has the problem which is mentioned there, namely it 
-displays SCO MTU: 64:0 (Complete output of hciconf -a is at the end of 
-this mail).
-
-Now my question is: Would this kernel patch potentially allow me to use 
-my card with bluetooth-alsa? Or is the actual problem unrelated? I am 
-willing to recompile my kernel and apply this patch or test others, but 
-I am really no kernel hacker and so I'd appreciate some input.
-
-Of course, I could simply go and buy a CSR based bluetooth adapter, but 
-that's boring. ;)
-
-Cheers,
-    Gerhard
+Javier,
 
 
-hci0:   Type: PCCARD
-        BD Address: 00:80:37:15:74:E6 ACL MTU: 672:10 SCO MTU: 64:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:125 acl:0 sco:0 events:15 errors:0
-        TX bytes:322 acl:0 sco:0 commands:14 errors:0
-        Features: 0x07 0xea 0x31 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'theo-dhcp-42-0'
-        Class: 0x100100
-        Service Classes:
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0xb LMP Ver: 1.1 (0x1) LMP Subver: 0x300
-        Manufacturer: Ericsson Technology Licensing (0)
+> >Thank you very much for your comments. I was wrong. I've already seen th=
+e
+> A2DP's implementation over ACL channels in the page >bluetooth-alsa.sf.ne=
+t<http://bluetooth-alsa.sf.net/>
+> .
+>
+> >On the other hand, I'd like to know if you had studied the Video
+> Distribution Profile (VDP). At first, my objetives were to develop the
+>
+ >A2DP or, if it was already implemented, the VDP. Therefore, I'm
+> interested in knowing if you have implemented something similar to >a2pla=
+y
+> for A2DP.
+>
+>
 
+VDP also makes use of AVDTP, thus it is pretty much the same, protocol wise=
+.
+So connection establishment in case of 'vplay' / 'vrecv' should be more or
+less the same as in a2play/a2recv.
+Only difference might be the sink capabilities.
+So you'll only have to read stuff about the H.263 codec.
+To begin with you can directly send the encoded file and later on try
+encoding video taken from a webcam to h.263 and then stream.
+
+Mayank
+
+------=_Part_33719_30008293.1147318638104
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Javier,<br><br>
+<div>
+<blockquote class=3D"gmail_quote" style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0=
+px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">
+<div>
+<div>&nbsp;</div>
+<div>&gt;Thank you very much for your comments. I was&nbsp;wrong. I've alre=
+ady seen the A2DP's implementation over ACL&nbsp;channels in&nbsp;the page =
+<a onclick=3D"return top.js.OpenExtLink(window,event,this)" href=3D"http://=
+bluetooth-alsa.sf.net/" target=3D"_blank">
+&gt;bluetooth-alsa.sf.net</a>.</div>
+<div>&nbsp;</div>
+<div>&gt;On the other hand, I'd like to know if you had studied the Video D=
+istribution Profile (VDP). At first, my objetives were to develop the</div>=
+</div></blockquote>
+<blockquote class=3D"gmail_quote" style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0=
+px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">
+<div>
+<div>&gt;A2DP or, if it&nbsp;was already implemented, the&nbsp;VDP. Therefo=
+re, I'm interested&nbsp;in knowing if you have&nbsp;implemented something s=
+imilar to &gt;a2play for A2DP.</div>
+<div>&nbsp;</div></div></blockquote>
+<div>&nbsp;</div>
+<div>VDP also makes use of AVDTP, thus it is pretty much the same, protocol=
+ wise.</div>
+<div>So connection establishment in case of 'vplay' / 'vrecv' should be mor=
+e or less the same as in a2play/a2recv.</div>
+<div>Only difference might be the sink capabilities.</div>
+<div>So you'll only have to read stuff about the H.263 codec.</div>
+<div>To begin with you can directly send the encoded file and later on try =
+encoding video taken from a webcam to h.263 and then stream.</div>
+<div>&nbsp;</div>
+<div>Mayank</div><br>&nbsp;</div>
+
+------=_Part_33719_30008293.1147318638104--
 
 
 -------------------------------------------------------
