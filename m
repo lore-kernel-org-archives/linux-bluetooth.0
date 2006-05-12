@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <100466c40605121019k42718981jc962b7d1bcee376c@mail.gmail.com>
-From: "Antonio Terreno" <antonio.terreno@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <4464C195.1020403@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_11469_10373986.1147454372330"
-Subject: [Bluez-devel] concurrent service searches
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] A2DP and Alsa Plugin
+References: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C2E7@eumonex01.palmsource.com>
+In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C2E7@eumonex01.palmsource.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,48 +18,74 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 12 May 2006 19:19:32 +0200
+Date: Fri, 12 May 2006 11:10:45 -0600
 
-------=_Part_11469_10373986.1147454372330
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+Frederic
 
-SGkgYWxsLAoKd2h5IGlmIEkgc3RhcnQgbXVsdGlwbGUgc2VydmljZXMgc2VhcmNoIG9uIGRpZmZl
-cmVudCBkZXZpY2VzIChhbHdheXMgbGVzcwp0aGFuIDcpCgppbiB0aGF0IHdheToKc2RwdG9vbCBi
-cm93c2UgIkRFVklDRV9BRERSIgpbZ25vbWUtb2JleC1zZW5kIC0tZGVzdCAiREVWSUNFX0FERFIi
-IGZpbGUyc2VuZC50eHRdIChvcHRpb25hbCkKCkkgZ2V0IGFsd2F5cyBlcnJvcnMgKG9uIDQtNSBk
-ZXZpY2VzIGlzIGZpbmUsIG9uIDMtMiBkZXZpY2VzIGlzICJGYWlsZWQgdG8KY29ubmVjdCB0byBT
-RFAgc2VydmVyIG9uICJERVZJQ0VfQUREUiI6IEZpbGUgZGVzY3JpcHRvciBpbiBiYWQgc3RhdGUi
-KQoKVGhlIHNpdHVhdGlvbiBpcyBiZXR0ZXIgaWYgSSB3YWl0IDEgb3IgZXZlbiAyIHNlYyBiZWZv
-cmUgc3RhcnRpbmcgYSBuZXcKc2VhcmNoIGFuZCBzZW5kLgoKVGhlIHByb2JsZW0gd2FzIHRyaWdn
-ZXJlZCBkZXZlbG9waW5nIGEgbXVsdGl0aHJlYWRlZCBibHVldG9vdGggc2VydmVyIGluCmphdmEs
-IHdpdGggYXZldGFuYSBibHVldG9vdGguCkkgZG9udCBoYXZlIHRoZXNlIHByb2JsZW0gdXNpbmcg
-dGhlIHNhbWUgY29kZSBvbiB3aW5kb3dzLi4uLgoKClRoYW5rcyBpbiBhZHZhbmNlLApiZXN0IHJl
-Z2FyZHMKYW50b25pbwoKLS0gCi0tIApBbnRvbmlvIFRlcnJlbm8KaHR0cDovL2FudG9uaW90ZXJy
-ZW5vLmphdmEybWUub3JnLwo=
-------=_Part_11469_10373986.1147454372330
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+> 	I did not worry about gstreamer as I tried the gstreamer
+> alsasink yesterday. This allow you to create a graph with either
+> bluetooth output or alsa output without modifying your .asoundrc. Just
+> modify the device field. One address only as set in filename.
 
-SGkgYWxsLDxicj4KPGJyPgp3aHkgaWYgSSBzdGFydCBtdWx0aXBsZSBzZXJ2aWNlcyBzZWFyY2gg
-b24gZGlmZmVyZW50IGRldmljZXMgKGFsd2F5cyBsZXNzIHRoYW4gNykgPGJyPgo8YnI+CmluIHRo
-YXQgd2F5Ojxicj4Kc2RwdG9vbCBicm93c2UgJnF1b3Q7REVWSUNFX0FERFImcXVvdDs8YnI+Cltn
-bm9tZS1vYmV4LXNlbmQgLS1kZXN0ICZxdW90O0RFVklDRV9BRERSJnF1b3Q7IGZpbGUyc2VuZC50
-eHRdIChvcHRpb25hbCk8YnI+Cjxicj4KSSBnZXQgYWx3YXlzIGVycm9ycyAob24gNC01IGRldmlj
-ZXMgaXMgZmluZSwgb24gMy0yIGRldmljZXMgaXMgJnF1b3Q7RmFpbGVkCnRvIGNvbm5lY3QgdG8g
-U0RQIHNlcnZlciBvbiAmcXVvdDtERVZJQ0VfQUREUiZxdW90OzogRmlsZSBkZXNjcmlwdG9yIGlu
-IGJhZApzdGF0ZSZxdW90Oyk8YnI+Cjxicj4KVGhlIHNpdHVhdGlvbiBpcyBiZXR0ZXIgaWYgSSB3
-YWl0IDEgb3IgZXZlbiAyIHNlYyBiZWZvcmUgc3RhcnRpbmcgYSBuZXcgc2VhcmNoIGFuZCBzZW5k
-Ljxicj4KPGJyPgpUaGUgcHJvYmxlbSB3YXMgdHJpZ2dlcmVkIGRldmVsb3BpbmcgYSBtdWx0aXRo
-cmVhZGVkIGJsdWV0b290aCBzZXJ2ZXIgaW4gamF2YSwgd2l0aCBhdmV0YW5hIGJsdWV0b290aC4g
-PGJyPgpJIGRvbnQgaGF2ZSB0aGVzZSBwcm9ibGVtIHVzaW5nIHRoZSBzYW1lIGNvZGUgb24gd2lu
-ZG93cy4uLi4gPGJyPgo8YnI+Cjxicj4KVGhhbmtzIGluIGFkdmFuY2UsPGJyPgpiZXN0IHJlZ2Fy
-ZHM8YnI+CmFudG9uaW88YnIgY2xlYXI9ImFsbCI+PGJyPi0tIDxicj4tLSA8YnI+QW50b25pbyBU
-ZXJyZW5vPGJyPjxhIGhyZWY9Imh0dHA6Ly9hbnRvbmlvdGVycmVuby5qYXZhMm1lLm9yZy8iPmh0
-dHA6Ly9hbnRvbmlvdGVycmVuby5qYXZhMm1lLm9yZy88L2E+PGJyPjxicj4K
-------=_Part_11469_10373986.1147454372330--
+It will work (probably not much worse than direct alsa). We end up with
+a plugin api that is a least-common denominator of the two this way. I'd
+rather eliminate the need for the extra layers. (btw, libalsa and
+alsasink probably add over a megabyte together in libraries.)
+
+regarding docs... alsalib is poorly documented (that's one of the
+problems) but gstreamer does have good plugin docs.
+
+http://gstreamer.freedesktop.org/data/doc/gstreamer/head/pwg/html/index.html
+
+the gstreamer approach allows us to easily snap out the software sbc
+codec for a dsp task if you have one available. the decision doesn't
+even have to be made until runtime and the other layers like a2dp setup
+don't need to be replaced or duplicated.
+
+>> alsa plugins use an api that is too simple for complete 
+>> headset support... also there have been complaints about 
+>> libalsa not scaling down for embedded systems.
+> 
+> 	I'm new to alsa and gstreamer and I don't understand you yet.
+> Can you point me to document you use? I just saw that volume control
+> wasn't available with alsa-plugin if this is what you mean.
+
+the link above goes into gstreamer and there's a good document for app
+writers. it is complicated but I think it will serve the purpose well.
+
+we may have to use "soft" volume control by manipulating the stream
+before encoding it. there should be a plugin for this. i've tried to use
+avrcp to control volume without any luck.
+
+> 	However, I mainly worry about the following points :
+> 	* I do not get 2 apps with a2dp output on the same address. As
+> devices seems to manage only one socket, the second app will generally
+> crash. Could we implement some sort of mixing or application selection
+> (the foreground app or the first app started on an address, but with
+> proper error handling for the others)?
+
+we either need a sound server or we need a plugin that can use ipc so a
+single instance is actually transferring data to the headset. i know
+alsa can't do the latter but i'm not sure if gstreamer helps.
+
+> 	* How to select whether the application will output on a2dp or
+> speaker? Should this be application related or system related?
+
+system. we need a way to change it while an app is outputing sound.
+
+> 	* What you told me with gxine may vary depending the
+> application. I believe one way to handle this is to maintain
+> asynchronous connection to target sink. The api would just enqueue the
+> audio packets into a common shared queue (per target). The connection
+> simply close when there are no more audio packets.
+
+yes. a sound server or mixer plugin via ipc could enforce this behavior.
+
+> 	Did you change something since 0.42?
+
+not yet
+
+brad
 
 
 -------------------------------------------------------
