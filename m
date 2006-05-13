@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4469DE7B.3060009@silicom.fr>
-From: Fabien Chevalier <fchevalier@silicom.fr>
-MIME-Version: 1.0
+Message-ID: <3e890f530605131204w2980dee2v586468fed3fe16ed@mail.gmail.com>
+From: "=?ISO-8859-1?Q?Javier_Rodas_Gonz=E1lez?=" <javier.rodas@nomasystems.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] l2ping seems to ignore -t timeout option
-References: <44674F48.2060605@struction.de>
-In-Reply-To: <44674F48.2060605@struction.de>
-Content-Type: multipart/mixed;
- boundary="------------010102070904070606020303"
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_42614_19757879.1147547073618"
+Subject: [Bluez-devel] Inquiry with RSSI on Broadcom BCM2035 - not supported ?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,98 +17,196 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 16 May 2006 16:15:23 +0200
+Date: Sat, 13 May 2006 21:04:33 +0200
 
-This is a multi-part message in MIME format.
---------------010102070904070606020303
+------=_Part_42614_19757879.1147547073618
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+I have make this question on bluez-users mailing list some time ago, withou=
+t
+answer.
 
 
-Hi,
+I have tested the D-Link DBT-122 dongle (BCM2035 chipset) with BlueZ-utils
+and I find the following features list:
 
-I'm not a 100% sure of the answer however i would say it is because 
-there are 2 timeouts:
-   - One is hardware based, and is globally configured at the device 
-level. It is the timeout for the paging procedure.
-   - the other is how much to wait for an L2CAP echo after you sent and 
-L2CAP reply.
+# hciconfig hci0 features
+hci0:   Type: USB
+        BD Address: 00:13:46:01:22:90 ACL MTU: 377:10 SCO MTU: 16:0
+        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset=
+>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <RSSI> <channel quality> <SCO link> <HV2 packets>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <power control=
+>
+                <transparent SCO> <enhanced iscan> <interlaced iscan>
+                <interlaced pscan> <AFH cap. slave> <AFH cap. master>
 
-Basically, the first timeout will be used when establishing a baseband 
-connection with a device, while the other will be used by l2ping ONCE 
-and only ONCE the baseband connection is up (which also means device is up).
-
-I hope it helps :-)
-
-Cheers,
-
-Fabien
-
-> hi,
-> 
-> i noticed that l2ping does not care about the timeout-argument.
-> 
-> running a current l2ping from bluez-utils-2.25 against a device that's 
-> not available timeouts after 20 seconds regardless of any -t parameter.
-> 
-> pitti ~ # time l2ping -c 1 00:01:02:03:04:05
-> Can't connect: Host is down
-> 0.00s user 0.00s system 0% cpu 20.527 total
-> 
-> pitti ~ # time l2ping -c 1 -t 10 00:01:02:03:04:05
-> Can't connect: Host is down
-> 0.00s user 0.00s system 0% cpu 20.509 total
-> 
-> pitti ~ # time l2ping -c 1 -t 20 00:01:02:03:04:05
-> Can't connect: Host is down
-> 0.00s user 0.00s system 0% cpu 20.515 total
-> 
-> pitti ~ # time l2ping -c 1 -t 40 00:01:02:03:04:05
-> Can't connect: Host is down
-> 0.00s user 0.00s system 0% cpu 20.521 total
-> 
-> pitti ~ # time l2ping -c 1 -t 80 00:01:02:03:04:05
-> Can't connect: Host is down
-> 0.00s user 0.00s system 0% cpu 20.513 total
-> 
-> 
-> regards
->   pille
-> 
-> 
-> -------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job 
-> easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
+Looking the manufactured specification page of BCM2035 chipset it says that
+it implements the Bluetooth v1.2 specification. Nevertheless I found that
+it's not true, because this dongle doesn't support the <Inquiry with RSSI>
+feature, that belongs to that version and following of the BT specification=
+.
 
 
---------------010102070904070606020303
-Content-Type: text/x-vcard; charset=utf-8;
- name="fchevalier.vcf"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="fchevalier.vcf"
+I have also tested other usb dongles, for example CSR BlueCore4,
+successfully with this feature:
 
-begin:vcard
-fn:Fabien CHEVALIER
-n:CHEVALIER;Fabien
-org:SILICOM
-adr:;;4 rue de Jouanet;RENNES ATALANTE;;35700;FRANCE
-email;internet:fchevalier@silicom.fr
-title:Software & Studies Engineer
-tel;work:+33 (0) 2 99 84 17 17
-version:2.1
-end:vcard
+# hciconfig hci0 features
+hci0:   Type: USB
+        BD Address: 00:80:5A:46:2D:51 ACL MTU: 384:8 SCO MTU: 64:8
+        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+                <3-slot packets> <5-slot packets> <encryption> <slot offset=
+>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park state> <RSSI> <channel quality> <SCO link> <HV2
+packets>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme=
+>
+                <power control> <transparent SCO> <broadcast encrypt>
+                <EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan>
+                <interlaced iscan> <interlaced pscan> <inquiry with RSSI>
+<-----
+                <extended SCO> <EV4 packets> <EV5 packets> <AFH cap. slave>
+                <AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL>
+                <AFH cap. master> <AFH class. master> <EDR eSCO 2 Mbps>
+                <EDR eSCO 3 Mbps> <3-slot EDR eSCO> <extended features>
 
 
---------------010102070904070606020303--
+
+Please, could you confirm me that it's impossible to make an "Inquiry with
+RSSI" operation with the BCM2035 chipset from Broadcom ?
+Do you know on existence of an firmware upgrade for this chipsets that
+solves this lack ?
+
+
+I have asked the same question on D-Link support page without response.
+I use Ubuntu Dapper with Kernel v2.6.15 and BlueZ-utils v2.25.
+
+
+Thanks for your attention.
+
+Best regards.
+
+------=_Part_42614_19757879.1147547073618
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+I have make this question on bluez-users mailing list some time ago, withou=
+t answer.<br>
+<br>
+<br>
+I have tested the D-Link DBT-122 dongle (BCM2035 chipset) with BlueZ-utils =
+and I find the following features list:<br>
+<br>
+# hciconfig hci0 features<br>
+hci0:&nbsp;&nbsp; Type: USB<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:13:46:01:22:90 AC=
+L MTU: 377:10 SCO MTU: 16:0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xfe 0x0d 0x38 0x=
+08 0x08 0x00 0x00<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;3-slot packets&gt; &lt;5-slot packets&gt; &lt;encryption&gt;
+&lt;slot offset&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;timing accuracy&gt; &lt;role switch&gt; &lt;hold mode&gt; &lt;sniff
+mode&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;RSSI&gt; &lt;channel quality&gt; &lt;SCO link&gt; &lt;HV2
+packets&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;HV3 packets&gt; &lt;u-law log&gt; &lt;A-law log&gt; &lt;CVSD&gt;
+&lt;power control&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;transparent SCO&gt; &lt;enhanced iscan&gt; &lt;interlaced iscan&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;interlaced pscan&gt; &lt;AFH cap. slave&gt; &lt;AFH cap. master&gt;<br>
+<br>
+Looking the manufactured specification page of BCM2035 chipset it says
+that it implements the Bluetooth v1.2 specification. Nevertheless I
+found that it's not true, because this dongle doesn't support the
+&lt;Inquiry with RSSI&gt; feature, that belongs to that version and
+following of the BT specification.<br>
+<br>
+<br>
+I have also tested other usb dongles, for example CSR BlueCore4, successful=
+ly with this feature:<br>
+<br>
+# hciconfig hci0 features<br>
+hci0:&nbsp;&nbsp; Type: USB<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:80:5A:46:2D:51 AC=
+L MTU: 384:8 SCO MTU: 64:8<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xff 0x8f 0xfe 0x=
+9b 0xf9 0x00 0x80<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;3-slot packets&gt; &lt;5-slot packets&gt; &lt;encryption&gt;
+&lt;slot offset&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;timing accuracy&gt; &lt;role switch&gt; &lt;hold mode&gt; &lt;sniff
+mode&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;park state&gt; &lt;RSSI&gt; &lt;channel quality&gt; &lt;SCO
+link&gt; &lt;HV2 packets&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;HV3 packets&gt; &lt;u-law log&gt; &lt;A-law log&gt; &lt;CVSD&gt;
+&lt;paging scheme&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;power control&gt; &lt;transparent SCO&gt; &lt;broadcast encrypt&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;EDR ACL 2 Mbps&gt; &lt;EDR ACL 3 Mbps&gt; &lt;enhanced iscan&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;interlaced iscan&gt; &lt;interlaced pscan&gt; &lt;inquiry with
+RSSI&gt;&nbsp; &lt;-----<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;extended SCO&gt; &lt;EV4 packets&gt; &lt;EV5 packets&gt; &lt;AFH
+cap. slave&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;AFH class. slave&gt; &lt;3-slot EDR ACL&gt; &lt;5-slot EDR ACL&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;AFH cap. master&gt; &lt;AFH class. master&gt; &lt;EDR eSCO 2
+Mbps&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;
+&lt;EDR eSCO 3 Mbps&gt; &lt;3-slot EDR eSCO&gt; &lt;extended
+features&gt;<br>
+<br>
+<br>
+<br>
+Please, could you confirm me that it's impossible to make an &quot;Inquiry
+with RSSI&quot; operation with the BCM2035 chipset from Broadcom ?<br>
+Do you know on existence of an firmware upgrade for this chipsets that solv=
+es this lack ?<br>
+<br>
+<br>
+I have asked the same question on D-Link support page without response.<br>
+I use Ubuntu Dapper with Kernel v2.6.15 and BlueZ-utils v2.25.<br>
+<br>
+<br>
+Thanks for your attention.<br>
+<br>
+Best regards.<br>
+
+------=_Part_42614_19757879.1147547073618--
 
 
 -------------------------------------------------------
