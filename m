@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Power Class
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <44674F48.2060605@struction.de>
+From: pille <pille@struction.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <45bf5ff80605031407v16adf99es7e6e8ec98acfd0a@mail.gmail.com>
-References: <45bf5ff80605031407v16adf99es7e6e8ec98acfd0a@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1147789684.24761.86.camel@localhost>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] l2ping seems to ignore -t timeout option
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,22 +16,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 16 May 2006 16:28:04 +0200
+Date: Sun, 14 May 2006 17:39:52 +0200
 
-Hi Artur,
+hi,
 
-> Is there a way to find the power class (1.2..3) of the device? The
-> pratical example is im trying to bind a discovery service to a class2
-> device while the obex service will run in a class1, both usb dongles
-> in my desktop. 
+i noticed that l2ping does not care about the timeout-argument.
 
-the simple answer is no.
+running a current l2ping from bluez-utils-2.25 against a device that's 
+not available timeouts after 20 seconds regardless of any -t parameter.
 
-Regards
+pitti ~ # time l2ping -c 1 00:01:02:03:04:05
+Can't connect: Host is down
+0.00s user 0.00s system 0% cpu 20.527 total
 
-Marcel
+pitti ~ # time l2ping -c 1 -t 10 00:01:02:03:04:05
+Can't connect: Host is down
+0.00s user 0.00s system 0% cpu 20.509 total
+
+pitti ~ # time l2ping -c 1 -t 20 00:01:02:03:04:05
+Can't connect: Host is down
+0.00s user 0.00s system 0% cpu 20.515 total
+
+pitti ~ # time l2ping -c 1 -t 40 00:01:02:03:04:05
+Can't connect: Host is down
+0.00s user 0.00s system 0% cpu 20.521 total
+
+pitti ~ # time l2ping -c 1 -t 80 00:01:02:03:04:05
+Can't connect: Host is down
+0.00s user 0.00s system 0% cpu 20.513 total
 
 
+regards
+   pille
 
 
 -------------------------------------------------------
