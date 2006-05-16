@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Does BlueZ support EDR mode
+Subject: Re: [Bluez-users] blocking or non-blocking?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <D99246B510C34944823191CB90759C86050B0039@blrse201.ap.infineon.com>
-References: 
-	 <D99246B510C34944823191CB90759C86050B0039@blrse201.ap.infineon.com>
+In-Reply-To: <fe0a97c20605102047q4feba4a8p224c6d3c3980ed5b@mail.gmail.com>
+References: <fe0a97c20605102047q4feba4a8p224c6d3c3980ed5b@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1147789658.24761.84.camel@localhost>
+Message-Id: <1147789434.24761.79.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,17 +18,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 16 May 2006 16:27:38 +0200
+Date: Tue, 16 May 2006 16:23:54 +0200
 
-Hi Shailesh,
+Hi Sowmya,
 
->   A trivial question...
->   Does BlueZ stack support EDR 2.0 mode. For this do  Ineed to enable
-> any special flag or compilation with som eextra flag needed?
+> Are rfcomm sockets "blocking" sockets by default???
 
-the BlueZ supports Bluetooth 2.0 + EDR and it will be used automatically
-if the hardware supports it. No special commands or flags to enable it
-are needed.
+they are blocking by default (like all other sockets).
 
 Regards
 
