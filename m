@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] infineon adapter init
+Subject: Re: [Bluez-devel] concurrent service searches
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4460B201.2030009@xmission.com>
-References: <4460B201.2030009@xmission.com>
+In-Reply-To: <100466c40605121019k42718981jc962b7d1bcee376c@mail.gmail.com>
+References: <100466c40605121019k42718981jc962b7d1bcee376c@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1147789523.24761.81.camel@localhost>
+Message-Id: <1147789399.24761.77.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,19 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 16 May 2006 16:25:23 +0200
+Date: Tue, 16 May 2006 16:23:19 +0200
 
-Hi Brad,
+Hi Antonio,
 
-> Is anyone using infineon's singlestone pba31307 with bluez?
+> why if I start multiple services search on different devices (always
+> less than 7) 
 > 
-> Gumstix just updated their stick with this chip but it comes online at
-> 115k and they can't get it to switch to 921kbps... that's the best rate
-> their xscale can do but the chip is changing to some other rate out of
-> range when they try the switch to 921k.
+> in that way:
+> sdptool browse "DEVICE_ADDR"
+> [gnome-obex-send --dest "DEVICE_ADDR" file2send.txt] (optional)
+> 
+> I get always errors (on 4-5 devices is fine, on 3-2 devices is "Failed
+> to connect to SDP server on "DEVICE_ADDR": File descriptor in bad
+> state")
+> 
+> The situation is better if I wait 1 or even 2 sec before starting a
+> new search and send.
+> 
+> The problem was triggered developing a multithreaded bluetooth server
+> in java, with avetana bluetooth. 
+> I dont have these problem using the same code on windows.... 
 
-I tried to get a development kit from Infineon and additional
-information about their chips, but I never succeeded.
+you can't have multiple inquiry or page attempts at the same time. This
+is a limitation of the baseband and not the host.
 
 Regards
 
