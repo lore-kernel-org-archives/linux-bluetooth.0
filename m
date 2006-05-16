@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Inquiry with RSSI on Broadcom BCM2035 - not
-	supported ?
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <446A4BD6.2060102@fh-wolfenbuettel.de>
+From: Goetz Issel <g.issel@fh-wolfenbuettel.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <3e890f530605131204w2980dee2v586468fed3fe16ed@mail.gmail.com>
-References: <3e890f530605131204w2980dee2v586468fed3fe16ed@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1147789208.24761.73.camel@localhost>
-Mime-Version: 1.0
+Subject: Re: Re: [Bluez-devel] infineon adapter init
+References: <20060516152903.0BCF7ED51@sc8-sf-spam2.sourceforge.net>
+In-Reply-To: <20060516152903.0BCF7ED51@sc8-sf-spam2.sourceforge.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,82 +18,50 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 16 May 2006 16:20:08 +0200
+Date: Wed, 17 May 2006 00:01:58 +0200
 
-Hi Javier,
+bluez-devel-request@lists.sourceforge.net wrote:
 
-> I have make this question on bluez-users mailing list some time ago,
-> without answer.
-> 
-> 
-> I have tested the D-Link DBT-122 dongle (BCM2035 chipset) with
-> BlueZ-utils and I find the following features list:
-> 
-> # hciconfig hci0 features
-> hci0:   Type: USB
->         BD Address: 00:13:46:01:22:90 ACL MTU: 377:10 SCO MTU: 16:0
->         Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
->                 <3-slot packets> <5-slot packets> <encryption> <slot
-> offset>
->                 <timing accuracy> <role switch> <hold mode> <sniff
-> mode>
->                 <RSSI> <channel quality> <SCO link> <HV2 packets>
->                 <HV3 packets> <u-law log> <A-law log> <CVSD> <power
-> control>
->                 <transparent SCO> <enhanced iscan> <interlaced iscan>
->                 <interlaced pscan> <AFH cap. slave> <AFH cap. master>
-> 
-> Looking the manufactured specification page of BCM2035 chipset it says
-> that it implements the Bluetooth v1.2 specification. Nevertheless I
-> found that it's not true, because this dongle doesn't support the
-> <Inquiry with RSSI> feature, that belongs to that version and
-> following of the BT specification.
-> 
-> 
-> I have also tested other usb dongles, for example CSR BlueCore4,
-> successfully with this feature:
-> 
-> # hciconfig hci0 features
-> hci0:   Type: USB
->         BD Address: 00:80:5A:46:2D:51 ACL MTU: 384:8 SCO MTU: 64:8
->         Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
->                 <3-slot packets> <5-slot packets> <encryption> <slot
-> offset>
->                 <timing accuracy> <role switch> <hold mode> <sniff
-> mode>
->                 <park state> <RSSI> <channel quality> <SCO link> <HV2
-> packets>
->                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging
-> scheme>
->                 <power control> <transparent SCO> <broadcast encrypt>
->                 <EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan>
->                 <interlaced iscan> <interlaced pscan> <inquiry with
-> RSSI>  <-----
->                 <extended SCO> <EV4 packets> <EV5 packets> <AFH cap.
-> slave>
->                 <AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL>
->                 <AFH cap. master> <AFH class. master> <EDR eSCO 2
-> Mbps>
->                 <EDR eSCO 3 Mbps> <3-slot EDR eSCO> <extended
-> features>
-> 
-> 
-> 
-> Please, could you confirm me that it's impossible to make an "Inquiry
-> with RSSI" operation with the BCM2035 chipset from Broadcom ?
-> Do you know on existence of an firmware upgrade for this chipsets that
-> solves this lack ?
+Hi Brad, hi Marcel,
 
-simply try "hciconfig hci0 inqmode 1" and monitor with "hcidump -X -V"
-what happens if you call "hcitool scan". I've seen some Broadcom chips
-that don't set the feature bit for inquiry with RSSI, but they do
-support it.
+>Hi Bra#d,
+>  
+>
+>>Is anyone using infineon's singlestone pba31307 with bluez?
+>>
+>>Gumstix just updated their stick with this chip but it comes online at
+>>115k and they can't get it to switch to 921kbps... that's the best rate
+>>their xscale can do but the chip is changing to some other rate out of
+>>range when they try the switch to 921k.
+>>    
+>>
+>I tried to get a development kit from Infineon and additional
+>information about their chips, but I never succeeded.
+>
+>  
+>
+we do have the mentioned dev-kit at work, sorry, I can not give it to 
+you. I am trying to figure out a way to get the exact same chip to work 
+properly as well. So far I do have the bt-hardware running, connected 
+via ttyS, using no special initialisation sequence. It is possible 
+though, that the hardware already "preprogrammed" and it does now run 
+with 115k, the speed I want to use anyway. I will see if I can test the 
+921k with it if my time allows that in between, no promise.
 
-Regards
+I do have a list of init sequences (hci) here but it does not make much 
+sense to me, the device work fine without any specific things.
 
-Marcel
+I used the bluez-utils..hciattach,hcitool to get the device up, scan for 
+other bt devices and even connect to them. my who system freezes whe  i 
+want to get the name of a designated bt device address. (hcitool name 
+xx:xx:xx:xx:xx), but using the hcitool scan work.. which also gives the 
+names.
 
+Maybe I can give you a name to contact at Infineon, Marcel, to get a kit 
+for your dev. work, email me direct for that !
 
+Regards,
+Goetz
 
 
 -------------------------------------------------------
