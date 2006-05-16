@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <100466c40605150115k35c2c140n29d0a99a6ea49f80@mail.gmail.com>
-From: "Antonio Terreno" <antonio.terreno@gmail.com>
+Subject: Re: [Bluez-devel] Capture HCI traffic between an embeddec BlueCore
+	and Host
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Subject: [Bluez-devel] concurrent service searches
+In-Reply-To: <1146125380.8784.39.camel@localhost>
+References: <1146125380.8784.39.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1147789954.24761.89.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,23 +19,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 15 May 2006 10:15:47 +0200
+Date: Tue, 16 May 2006 16:32:34 +0200
 
-KEkganVzdCByZXNlbmQgdGhpcyBtYWlsIGNvcyBsb29rcyBsaWtlIHRoZSBvdGhlciB0aW1lIHdh
-cyBub3QgaW4Kc2ltcGxlIHRleHQsIHNvcnJ5IGZvciB0aGUgaW5jb252ZW5pZW5jZSkKCkhpIGFs
-bCwKCndoeSBpZiBJIHN0YXJ0IG11bHRpcGxlIHNlcnZpY2VzIHNlYXJjaCBvbiBkaWZmZXJlbnQg
-ZGV2aWNlcyAoYWx3YXlzCmxlc3MgdGhhbiA3KQoKaW4gdGhhdCB3YXk6CnNkcHRvb2wgYnJvd3Nl
-ICJERVZJQ0VfQUREUiIKW2dub21lLW9iZXgtc2VuZCAtLWRlc3QgIkRFVklDRV9BRERSIiBmaWxl
-MnNlbmQudHh0XSAob3B0aW9uYWwpCgpJIGdldCBhbHdheXMgZXJyb3JzIChvbiA0LTUgZGV2aWNl
-cyBpcyBmaW5lLCBvbiAzLTIgZGV2aWNlcyBpcyAiRmFpbGVkCnRvIGNvbm5lY3QgdG8gU0RQIHNl
-cnZlciBvbiAiREVWSUNFX0FERFIiOiBGaWxlIGRlc2NyaXB0b3IgaW4gYmFkCnN0YXRlIikKClRo
-ZSBzaXR1YXRpb24gaXMgYmV0dGVyIGlmIEkgd2FpdCAxIG9yIGV2ZW4gMiBzZWMgYmVmb3JlIHN0
-YXJ0aW5nIGEKbmV3IHNlYXJjaCBhbmQgc2VuZC4KClRoZSBwcm9ibGVtIHdhcyB0cmlnZ2VyZWQg
-ZGV2ZWxvcGluZyBhIG11bHRpdGhyZWFkZWQgYmx1ZXRvb3RoIHNlcnZlcgppbiBqYXZhLCB3aXRo
-IGF2ZXRhbmEgYmx1ZXRvb3RoLgpJIGRvbnQgaGF2ZSB0aGVzZSBwcm9ibGVtIHVzaW5nIHRoZSBz
-YW1lIGNvZGUgb24gd2luZG93cy4uLi4KCgpUaGFua3MgaW4gYWR2YW5jZSwKYmVzdCByZWdhcmRz
-CmFudG9uaW8KCi0tIAotLSAKQW50b25pbyBUZXJyZW5vCmh0dHA6Ly9hbnRvbmlvdGVycmVuby5q
-YXZhMm1lLm9yZy8K
+Hi Ruud,
+
+> As one might recall from an earlier mail from my colleague Han Hoekstra,
+> I'm writing a HCI monitoring program in order to log the HCI
+> communication between an embedded BC-Host combination. The goal of the
+> program is to store the HCI packets in a file which has a format that
+> can be reread and re-interpreted by the hcidump program. In reaction to
+> this previous mail it was said that all information needed could be
+> found in the hcidump program's source code.
+
+why don't we extend hcidump to read the BCSP traffic?
+
+> A second (seemingly) less important question is what the HCIDUMP
+> HEADER's "pad" field stands for. I always see this one as being 0x00
+> using hcidump so I just follow this in my program, but this is off
+> course not very neat.
+
+It is a padding field. Such fields are normal in protocol or file format
+specification. They are supposed to be 0x00. A padding field can be used
+to extend the format in the future without breaking the compatibility of
+older programs.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
