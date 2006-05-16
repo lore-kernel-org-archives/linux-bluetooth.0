@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4466C20B.9040500@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <4469E7AD.4000901@infitsrl.com>
+From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bluetooth-alsa compile Issues
-References: <50307.71.109.111.205.1147543317.squirrel@71.109.111.205>
-In-Reply-To: <50307.71.109.111.205.1147543317.squirrel@71.109.111.205>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: [Bluez-devel] Asyncronous inquiry
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,24 +16,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 13 May 2006 23:37:15 -0600
+Date: Tue, 16 May 2006 16:54:37 +0200
 
-charles
+Hi all,
+my question is really simple, it's possible to make an asyncronous inquiry?
+I'm looking in BlueZ header and I think I have to use some specific hci 
+command but I can't undertand which?
 
->    I am attempting to compile bluetooth-alsa from CVS (freshly checked out
-> before sending this e-mail). It fails. Here are the issues:
-> 
-> 1. Missing config.h.in
-> 2. Missing .po files
+Can someone help me?
 
-sorry it's not working. we are definitely using sf cvs for project
-maintenance...
+Many thanks
+Fabrizio
 
-both authenticated and anon cvs are not working, so i'm going to check
-back on this in a couple of days. i've heard sf is making big changes to
-their cvs servers.
 
-brad
 
 
 -------------------------------------------------------
