@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3e890f530605131204w2980dee2v586468fed3fe16ed@mail.gmail.com>
-From: "=?ISO-8859-1?Q?Javier_Rodas_Gonz=E1lez?=" <javier.rodas@nomasystems.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <4469C2F9.4010803@palmsource.com>
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_42614_19757879.1147547073618"
-Subject: [Bluez-devel] Inquiry with RSSI on Broadcom BCM2035 - not supported ?
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] bluetooth-alsa compile Issues
+References: <50307.71.109.111.205.1147543317.squirrel@71.109.111.205> <4468D527.7020403@thewybles.com>
+In-Reply-To: <4468D527.7020403@thewybles.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,196 +18,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 13 May 2006 21:04:33 +0200
+Date: Tue, 16 May 2006 14:18:01 +0200
 
-------=_Part_42614_19757879.1147547073618
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi,
 
-I have make this question on bluez-users mailing list some time ago, withou=
-t
-answer.
+you might look at package 0.42 available for download on sourceforge as=20
+it seems that cvs.sourceforge.net is no longer used.
+package 0.42 nearly compiled fine but you should get libsbc first.
+
+Frederic
 
 
-I have tested the D-Link DBT-122 dongle (BCM2035 chipset) with BlueZ-utils
-and I find the following features list:
+Charles Wyble a =E9crit :
 
-# hciconfig hci0 features
-hci0:   Type: USB
-        BD Address: 00:13:46:01:22:90 ACL MTU: 377:10 SCO MTU: 16:0
-        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset=
+> Any update on this? Is this the right place to ask questions about=20
+> bluetooth alsa?
 >
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <RSSI> <channel quality> <SCO link> <HV2 packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <power control=
+> charles@thewybles.com wrote:
 >
-                <transparent SCO> <enhanced iscan> <interlaced iscan>
-                <interlaced pscan> <AFH cap. slave> <AFH cap. master>
-
-Looking the manufactured specification page of BCM2035 chipset it says that
-it implements the Bluetooth v1.2 specification. Nevertheless I found that
-it's not true, because this dongle doesn't support the <Inquiry with RSSI>
-feature, that belongs to that version and following of the BT specification=
-.
-
-
-I have also tested other usb dongles, for example CSR BlueCore4,
-successfully with this feature:
-
-# hciconfig hci0 features
-hci0:   Type: USB
-        BD Address: 00:80:5A:46:2D:51 ACL MTU: 384:8 SCO MTU: 64:8
-        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-                <3-slot packets> <5-slot packets> <encryption> <slot offset=
+>> Hello everyone,
+>>
+>>    I am attempting to compile bluetooth-alsa from CVS (freshly=20
+>> checked out
+>> before sending this e-mail). It fails. Here are the issues:
+>>
+>> 1. Missing config.h.in
+>> 2. Missing .po files
+>>
+>> Is the bluetooth-alsa project still using CVS? Should I be looking
+>> somewhere else other then the SF CVS repository for the code? I would
+>> greatly appreciate if someone could do a fresh checkout and see if the=
+y
+>> can reproduce the problem. I am running debian testing. I have the=20
+>> latest
+>> versions of autotools as well as version 1.7 as mentioned on the=20
+>> site. The
+>> compile fails with both.
+>>
+>>
+>> If I can be of any further assistance please let me know. I am more th=
+en
+>> happy to try with autoconf hackery etc. Whatever is needed.
+>>
+>> Thanks!
 >
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <channel quality> <SCO link> <HV2
-packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme=
->
-                <power control> <transparent SCO> <broadcast encrypt>
-                <EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan>
-                <interlaced iscan> <interlaced pscan> <inquiry with RSSI>
-<-----
-                <extended SCO> <EV4 packets> <EV5 packets> <AFH cap. slave>
-                <AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL>
-                <AFH cap. master> <AFH class. master> <EDR eSCO 2 Mbps>
-                <EDR eSCO 3 Mbps> <3-slot EDR eSCO> <extended features>
 
-
-
-Please, could you confirm me that it's impossible to make an "Inquiry with
-RSSI" operation with the BCM2035 chipset from Broadcom ?
-Do you know on existence of an firmware upgrade for this chipsets that
-solves this lack ?
-
-
-I have asked the same question on D-Link support page without response.
-I use Ubuntu Dapper with Kernel v2.6.15 and BlueZ-utils v2.25.
-
-
-Thanks for your attention.
-
-Best regards.
-
-------=_Part_42614_19757879.1147547073618
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-I have make this question on bluez-users mailing list some time ago, withou=
-t answer.<br>
-<br>
-<br>
-I have tested the D-Link DBT-122 dongle (BCM2035 chipset) with BlueZ-utils =
-and I find the following features list:<br>
-<br>
-# hciconfig hci0 features<br>
-hci0:&nbsp;&nbsp; Type: USB<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:13:46:01:22:90 AC=
-L MTU: 377:10 SCO MTU: 16:0<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xfe 0x0d 0x38 0x=
-08 0x08 0x00 0x00<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;3-slot packets&gt; &lt;5-slot packets&gt; &lt;encryption&gt;
-&lt;slot offset&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;timing accuracy&gt; &lt;role switch&gt; &lt;hold mode&gt; &lt;sniff
-mode&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;RSSI&gt; &lt;channel quality&gt; &lt;SCO link&gt; &lt;HV2
-packets&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;HV3 packets&gt; &lt;u-law log&gt; &lt;A-law log&gt; &lt;CVSD&gt;
-&lt;power control&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;transparent SCO&gt; &lt;enhanced iscan&gt; &lt;interlaced iscan&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;interlaced pscan&gt; &lt;AFH cap. slave&gt; &lt;AFH cap. master&gt;<br>
-<br>
-Looking the manufactured specification page of BCM2035 chipset it says
-that it implements the Bluetooth v1.2 specification. Nevertheless I
-found that it's not true, because this dongle doesn't support the
-&lt;Inquiry with RSSI&gt; feature, that belongs to that version and
-following of the BT specification.<br>
-<br>
-<br>
-I have also tested other usb dongles, for example CSR BlueCore4, successful=
-ly with this feature:<br>
-<br>
-# hciconfig hci0 features<br>
-hci0:&nbsp;&nbsp; Type: USB<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:80:5A:46:2D:51 AC=
-L MTU: 384:8 SCO MTU: 64:8<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xff 0x8f 0xfe 0x=
-9b 0xf9 0x00 0x80<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;3-slot packets&gt; &lt;5-slot packets&gt; &lt;encryption&gt;
-&lt;slot offset&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;timing accuracy&gt; &lt;role switch&gt; &lt;hold mode&gt; &lt;sniff
-mode&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;park state&gt; &lt;RSSI&gt; &lt;channel quality&gt; &lt;SCO
-link&gt; &lt;HV2 packets&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;HV3 packets&gt; &lt;u-law log&gt; &lt;A-law log&gt; &lt;CVSD&gt;
-&lt;paging scheme&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;power control&gt; &lt;transparent SCO&gt; &lt;broadcast encrypt&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;EDR ACL 2 Mbps&gt; &lt;EDR ACL 3 Mbps&gt; &lt;enhanced iscan&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;interlaced iscan&gt; &lt;interlaced pscan&gt; &lt;inquiry with
-RSSI&gt;&nbsp; &lt;-----<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;extended SCO&gt; &lt;EV4 packets&gt; &lt;EV5 packets&gt; &lt;AFH
-cap. slave&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;AFH class. slave&gt; &lt;3-slot EDR ACL&gt; &lt;5-slot EDR ACL&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;AFH cap. master&gt; &lt;AFH class. master&gt; &lt;EDR eSCO 2
-Mbps&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;
-&lt;EDR eSCO 3 Mbps&gt; &lt;3-slot EDR eSCO&gt; &lt;extended
-features&gt;<br>
-<br>
-<br>
-<br>
-Please, could you confirm me that it's impossible to make an &quot;Inquiry
-with RSSI&quot; operation with the BCM2035 chipset from Broadcom ?<br>
-Do you know on existence of an firmware upgrade for this chipsets that solv=
-es this lack ?<br>
-<br>
-<br>
-I have asked the same question on D-Link support page without response.<br>
-I use Ubuntu Dapper with Kernel v2.6.15 and BlueZ-utils v2.25.<br>
-<br>
-<br>
-Thanks for your attention.<br>
-<br>
-Best regards.<br>
-
-------=_Part_42614_19757879.1147547073618--
 
 
 -------------------------------------------------------
