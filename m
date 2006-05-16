@@ -1,90 +1,39 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <e1effdeb0605161138g5f1bcab4p6440e191cb7a6c84@mail.gmail.com>
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
+Return-Path: <antonio.terreno@gmail.com>
+Message-ID: <100466c40605161025y72f1d718j1e4868a2ebbd3db6@mail.gmail.com>
+Date: Tue, 16 May 2006 19:25:19 +0200
+From: "Antonio Terreno" <antonio.terreno@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] BlueZ management through DBus
-In-Reply-To: <446A0F06.3030009@palmsource.com>
+Subject: Re: [Bluez-devel] concurrent service searches
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-References: <446A0F06.3030009@palmsource.com>
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 16 May 2006 15:38:18 -0300
+Content-Type: text/plain; charset=UTF-8; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Fred,
-
-If you have access through a developer account, checkout the latest
-version. The anonymous CVS is NOT updated. The core(Adapter and
-Manager) interface is working fine, it is almost stable :).
-Currently, we are implementing SDP and RFCOMM services.
-
-Read the API description hcid/dbus-api.txt to get more information
-about the provided services. There is a D-Bus client for test
-available at:
-http://extindt01.indt.org/connectivity/bluez/gbluezconf-00.24.tar.gz
-
-Regarding the release, only Marcel can answer :)
-
-Regards,
-Claudio.
---=20
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
-
-
-On 5/16/06, Frederic Danis <frederic.danis@palmsource.com> wrote:
-> Hello,
->
-> I took a look to the new management interface through DBus in cvs. It
-> brings a lot of interesting stuff : do you have any idea when this will
-> be released ?
->
-> Thanks
->
-> Fred
->
-> --
-> -----------------------------------------------
-> It is not by improving the oil lamp that one invents the electric bulb!
-> -----------------------------------------------
-> Danis Frederic            PalmSource Europe
-> Software engineer
-> Mail : mailto:frederic.danis@palmsource.com
-> -----------------------------------------------
->
->
->
-> -------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job ea=
-sier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronim=
-o
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
-=3D121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-
-
--------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+PiBTdWJqZWN0OiBSZTogW0JsdWV6LWRldmVsXSBjb25jdXJyZW50IHNlcnZpY2Ugc2VhcmNoZXMK
+PiBGcm9tOiBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+Cj4gVG86IGJsdWV6
+LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+IERhdGU6IFR1ZSwgMTYgTWF5IDIwMDYgMTY6
+MjM6MTkgKzAyMDAKPiBSZXBseS1UbzogYmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0
+Cj4KPiBIaSBBbnRvbmlvLAo+Cj4gPiB3aHkgaWYgSSBzdGFydCBtdWx0aXBsZSBzZXJ2aWNlcyBz
+ZWFyY2ggb24gZGlmZmVyZW50IGRldmljZXMgKGFsd2F5cwo+ID4gbGVzcyB0aGFuIDcpCj4gPgo+
+ID4gaW4gdGhhdCB3YXk6Cj4gPiBzZHB0b29sIGJyb3dzZSAiREVWSUNFX0FERFIiCj4gPiBbZ25v
+bWUtb2JleC1zZW5kIC0tZGVzdCAiREVWSUNFX0FERFIiIGZpbGUyc2VuZC50eHRdIChvcHRpb25h
+bCkKPiA+Cj4gPiBJIGdldCBhbHdheXMgZXJyb3JzIChvbiA0LTUgZGV2aWNlcyBpcyBmaW5lLCBv
+biAzLTIgZGV2aWNlcyBpcyAiRmFpbGVkCj4gPiB0byBjb25uZWN0IHRvIFNEUCBzZXJ2ZXIgb24g
+IkRFVklDRV9BRERSIjogRmlsZSBkZXNjcmlwdG9yIGluIGJhZAo+ID4gc3RhdGUiKQo+ID4KPiA+
+IFRoZSBzaXR1YXRpb24gaXMgYmV0dGVyIGlmIEkgd2FpdCAxIG9yIGV2ZW4gMiBzZWMgYmVmb3Jl
+IHN0YXJ0aW5nIGEKPiA+IG5ldyBzZWFyY2ggYW5kIHNlbmQuCj4gPgo+ID4gVGhlIHByb2JsZW0g
+d2FzIHRyaWdnZXJlZCBkZXZlbG9waW5nIGEgbXVsdGl0aHJlYWRlZCBibHVldG9vdGggc2VydmVy
+Cj4gPiBpbiBqYXZhLCB3aXRoIGF2ZXRhbmEgYmx1ZXRvb3RoLgo+ID4gSSBkb250IGhhdmUgdGhl
+c2UgcHJvYmxlbSB1c2luZyB0aGUgc2FtZSBjb2RlIG9uIHdpbmRvd3MuLi4uCj4KPiB5b3UgY2Fu
+J3QgaGF2ZSBtdWx0aXBsZSBpbnF1aXJ5IG9yIHBhZ2UgYXR0ZW1wdHMgYXQgdGhlIHNhbWUgdGlt
+ZS4gVGhpcwo+IGlzIGEgbGltaXRhdGlvbiBvZiB0aGUgYmFzZWJhbmQgYW5kIG5vdCB0aGUgaG9z
+dC4KPgo+IFJlZ2FyZHMKPgo+IE1hcmNlbAoKQmFzZWJhbmQgbGltaXRhdGlvbj8gQW5kIHdoeSBv
+biB3aW5kb3dzIGxvb2tzIHdvcmtpbmc/IFRoZSBpbnF1aXJpZXMKYXJlIHNvbWVob3cgImJ1ZmZl
+cmVkIj8KQW5kIHdoeSBpZiBJIHB1dCBhIHNsZWVwIG9uIG15IGNvZGUvc2NyaXB0IGxvb2tzIGFs
+c28gd29ya2luZz8KTWF5YmUgY29zIHRoZSBTZWFyY2g0U2VydmljZXMgYXJlIGFscmVhZHkgdGVy
+bWluYXRlZD8KCkF0IHRoaXMgcG9pbnQsIGFzc3VtaW5nIHRoYXQgd2UgY2FuIGRvIGp1c3Qgb25l
+IHNlcnZpY2UgZGlzY292ZXJ5Jm9iZXgKcHVzaCBieSB0aW1lIHdoYXQgYWJvdXQgcHV0dGluZyAx
+MCBhbnRlbm5hcyBhbmQgZG8gb25lIGRpc2NvdmVyeSBmb3IKZWFjaCBhbnRlbm5hPwoKQW5kIGlm
+IGl0J3Mgc3R1cGlkIHRvIGhhdmUgMTAgYW50ZW5uYXMsIGlzIGl0IHBvc3NpYmxlIHRvIGhhdmUg
+Nwpjb25jdXJyZW50IG9iamVjdCBwdXNoIGF0IHRoZSBzYW1lIHRpbWUgb3IgaXQncyBhbHdheXMg
+dGhlIGJhc2ViYW5kCnByb2JsZW0/CgpUaGFua3MgYSBsb3QsCmJlc3QgcmdyZHMsCgphbnRvbmlv
+Cg==
