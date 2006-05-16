@@ -2,10 +2,12 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] BlueZ management through DBus
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <446A0F06.3030009@palmsource.com>
+In-Reply-To: <5256d0b0605161220o58b7e1catb2a3709982fafb7c@mail.gmail.com>
 References: <446A0F06.3030009@palmsource.com>
+	 <e1effdeb0605161138g5f1bcab4p6440e191cb7a6c84@mail.gmail.com>
+	 <5256d0b0605161220o58b7e1catb2a3709982fafb7c@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1147808548.24761.106.camel@localhost>
+Message-Id: <1147808355.24761.103.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,16 +20,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 16 May 2006 21:42:28 +0200
+Date: Tue, 16 May 2006 21:39:15 +0200
 
-Hi Frederic,
+Hi Peter,
 
-> I took a look to the new management interface through DBus in cvs. It 
-> brings a lot of interesting stuff : do you have any idea when this will 
-> be released ?
+> > If you have access through a developer account, checkout the latest
+> > version. The anonymous CVS is NOT updated. The core(Adapter and
+> > Manager) interface is working fine, it is almost stable :).
+> > Currently, we are implementing SDP and RFCOMM services.
+> 
+> If  your referring to the fact that the sourceforge anonymous CVS has
+> been down. It is apparently now back up but with some changes to the
+> hostnames required for anonymous access.
+> 
+> Full details can be found here -> https://sourceforge.net/docs/E04
 
-my plan is to get this out really soon. We are almost done with all
-major parts and it needs public testing now.
+everybody using cvs.bluez.org will be fine.
 
 Regards
 
