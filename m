@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <e85851c20605182102m13c0da04kb2d30854870a61eb@mail.gmail.com>
-From: "Gloria Saripah Patara" <glowz.saripah@gmail.com>
+Message-ID: <20060517221929.76231.qmail@web54604.mail.yahoo.com>
+From: Peter McClure <mcclurep@yahoo.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_6224_26661826.1148011333075"
-Subject: [Bluez-users] Want to ask....
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Linux control of bluetooth radio
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,90 +16,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 19 May 2006 11:02:13 +0700
+Date: Wed, 17 May 2006 15:19:29 -0700 (PDT)
 
-------=_Part_6224_26661826.1148011333075
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+I have a dual-boot (WinXP and Mandriva w/ 2.6.14) Dell
+M70 laptop with an internal Bluetooth daughter card. 
+It would seem that I can use WinXP to disable the
+radio on the Bluetooth card.  When I then boot into
+Linux, the BT card is detected and hci0 is initialised
+but Bluetooth doesn't work.
 
-Hello, Users of Mailing List. I'm Gloria, a student of Satya Wacana
-Christian University. I am a beginner for BlueZ development and i get a
-problem, now.
-When i just begin my try out of examples in your thesis. I get a problem at
-first example ( simplescan.c). I get some error messages and warnings.
-
-Here they are :
-
-/usr/include/bluetooth/bluetooth.h:18:error:syntax error before "int"
-/usr/include/bluetooth/hcilib.h:122:error:syntax error before "void"
-simplescan.c:7:30 bluetooth/hcilib.h:No such file o directory
-simplescan.c:9:error: parse error before "argv"
-simplescan.c:In function 'main'
-simplescan.c:18:warning:implicit declaration of function 'hci_get_route'
-simplescan.c:19:warning:implicit declaration of function 'hci_open_dev'
-simplescan.c:28:warning:implicit declaration of function 'hci_inquiry'
-simplescan.c:33:warning:implicit declaration of function
-'hci_read_remote_name'
-
-i attached the code with this message.
-
-How can i resolve these problems?
-There something wrong with my Linux OS or lack-of-libraries for meamo?
-
-------------------------------------------------------------
-Thanks a lot.
-
-------=_Part_6224_26661826.1148011333075
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hello, Users of Mailing List. I'm Gloria, a student of Satya Wacana Christi=
-an
-University. I am a beginner for BlueZ development and i get a problem,
-now.<br>When i just begin my try out of examples in your thesis. I get a pr=
-oblem at first example (
-simplescan.c). I get some error messages and warnings.<br><br>Here they are=
- :<br><br><span style=3D"font-family: courier new,monospace; font-weight: b=
-old;">/usr/include/bluetooth/bluetoot</span><div><span style=3D"font-family=
-: courier new,monospace; font-weight: bold;">
-h.h:18:error:syntax error before &quot;int&quot;</span><br style=3D"font-fa=
-mily: courier new,monospace; font-weight: bold;"><span style=3D"font-family=
-: courier new,monospace; font-weight: bold;">/usr/include/bluetooth/hcilib<=
-/span>
-<span style=3D"font-family: courier new,monospace; font-weight: bold;">.h:1=
-22:error:syntax error before &quot;void&quot;
-</span><br style=3D"font-family: courier new,monospace; font-weight: bold;"=
-><span style=3D"font-family: courier new,monospace; font-weight: bold;">sim=
-plescan.c:7:30 bluetooth/hcilib.h:No such file o directory</span><br style=
-=3D"font-family: courier new,monospace; font-weight: bold;">
-<span style=3D"font-family: courier new,monospace; font-weight: bold;">simp=
-lescan.c:9:error: parse error before &quot;argv&quot;</span><br style=3D"fo=
-nt-family: courier new,monospace; font-weight: bold;"><span style=3D"font-f=
-amily: courier new,monospace; font-weight: bold;">
-simplescan.c:In function 'main'</span><br style=3D"font-family: courier new=
-,monospace; font-weight: bold;"><span style=3D"font-family: courier new,mon=
-ospace; font-weight: bold;">simplescan.c:18:warning:implicit declaration of=
- function 'hci_get_route'
-</span><br style=3D"font-family: courier new,monospace; font-weight: bold;"=
-><span style=3D"font-family: courier new,monospace; font-weight: bold;">sim=
-plescan.c:19:warning:implicit declaration of function 'hci_open_dev'</span>
-<br style=3D"font-family: courier new,monospace; font-weight: bold;"><span =
-style=3D"font-family: courier new,monospace; font-weight: bold;">simplescan=
-.c:28:warning:implicit declaration of function 'hci_inquiry'</span><br styl=
-e=3D"font-family: courier new,monospace; font-weight: bold;">
-<span style=3D"font-family: courier new,monospace; font-weight: bold;">simp=
-lescan.c:33:warning:implicit declaration of function 'hci_read_remote_name'
-</span><br style=3D"font-family: courier new,monospace; font-weight: bold;"=
-><br>i attached the code with this message.<br><br>How can i resolve these =
-problems?<br>There something wrong with my Linux OS or lack-of-libraries fo=
-r meamo?
-<br><br>------------------------------------------------------------
-<br>Thanks a lot.<br></div>
+Is there a way to turn the BT radio on and off under
+Linux ?  (hciconfig up/down and reloading the kernel
+module doesn't seem to work and there's no /proc
+interface)
 
 
-------=_Part_6224_26661826.1148011333075--
+
+Thanks
+Peter
 
 
 -------------------------------------------------------
