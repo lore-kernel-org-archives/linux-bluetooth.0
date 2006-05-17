@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: RE: [Bluez-devel] Dbus and RemoteDeviceFound API
-Message-ID: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C733@eumonex01.palmsource.com>
-From: "Renaud Malaval" <Renaud.Malaval@palmsource.com>
-To: <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Dbus and RemoteDeviceFound API
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C720@eumonex01.palmsource.com>
+References: 
+	 <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C720@eumonex01.palmsource.com>
+Content-Type: text/plain
+Message-Id: <1147881784.14106.26.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,45 +19,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 17 May 2006 18:44:53 +0200
+Date: Wed, 17 May 2006 18:03:04 +0200
 
-Hello, marcel=20
+Hi Renaud,
 
->
-> Hi Renaud,
->=20
-> >  I just discover that new API, and I have a remark.
-> >=20
-> >  Is it to possible to add to that message the class of device (as an
-> > uint32) ?
-> >  With this we can have complete information about discovered device=20
-> > even if major or minor are not in "constant definition" of dbus API.
-> >  This can also simplify programation in C (ie: filtering, displaying
-> > icons,...)
->=20
-> we did it this way on purpose. If definitions are missing,=20
-> then this is a bug and needs to be fixed. What types are you missing?
->=20
-> Another basic design idea behind the D-Bus API for BlueZ is=20
-> not to use weird integer constants at all. We have clear text=20
-> attributes which make it very easy to use them from scripting=20
-> languages like Python. However this makes it harder for=20
-> application written in C, but we accepted this disadvantage.
->=20
-> Regards
->=20
-> Marcel
->=20
+>  I just discover that new API, and I have a remark.
+> 
+>  Is it to possible to add to that message the class of device (as an
+> uint32) ?
+>  With this we can have complete information about discovered device even
+> if major or minor are not in "constant definition" of dbus API.
+>  This can also simplify programation in C (ie: filtering, displaying
+> icons,...) 
 
- The LIMITED_DISCOVERABLE_MODE service class is missing and minor
-classes for other major classes than Computer and Phone are not listed
-in "constant definition" (ie: uncategorized, keyboard, pointing, combo
-for Peripheral major class).
- I use the "class of device" to filter and/or display specific icon for
-all couple of major and minor in an embedded device.
- Perhaps a new set of APIs could be better ?
+we did it this way on purpose. If definitions are missing, then this is
+a bug and needs to be fixed. What types are you missing?
 
-Renaud
+Another basic design idea behind the D-Bus API for BlueZ is not to use
+weird integer constants at all. We have clear text attributes which make
+it very easy to use them from scripting languages like Python. However
+this makes it harder for application written in C, but we accepted this
+disadvantage.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
