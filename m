@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <446B7242.7050106@gmx.de>
-From: Jens Hottenroth <jens-hottenroth@gmx.de>
-MIME-Version: 1.0
+From: andreas.knuth@daimlerchrysler.com
 To: bluez-users@lists.sourceforge.net
-References: <OF0B6841A9.963250D8-ONC1257171.002503E4-C1257171.00289B9D@dcx.dcx>
-In-Reply-To: <OF0B6841A9.963250D8-ONC1257171.002503E4-C1257171.00289B9D@dcx.dcx>
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Bluetooth instability problem
+Message-id: <OF0B6841A9.963250D8-ONC1257171.002503E4-C1257171.00289B9D@dcx.dcx>
+MIME-version: 1.0
+Content-type: multipart/alternative; boundary="=_alternative 00289B9BC1257171_="
+Subject: [Bluez-users] How to setup a pptp-connection via the dund-service ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,47 +16,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 May 2006 20:58:10 +0200
+Date: Wed, 17 May 2006 09:23:29 +0200
 
-Hi to anyone!
+Dies ist eine mehrteilige Nachricht im MIME-Format.
+--=_alternative 00289B9BC1257171_=
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-I don't know if i'm at the right spot here, but i'll ask here first. I
-have the following problem:
+Hello,
+Does someone has successfully tried to set up a pptp server via dund=20
+communicating over Bluetooth?
+My first attempt does not work as expected...
+How does interact the dund with the pptpd and the pppd ?
 
-I've 3 "PCs" (one is an embedded linux based broadband handheld tester,
-afterwards refered to as bbt), all running linux with Kernels from 2.24
-(bbt) to 2.26 (PCs), and identical bluetooth usb-sticks (D-Link BT120).
+It would be helpful to see some commandline examples.
+=20
+Thanks in advance
 
-Here's what i've done / what i know:
 
-Downloaded the latest bluez-libs and bluez-utils, compiled and
-installed. Ran configure / make for a new kernel with only that
-functions needed, installed it to the bbt.
+Mit freundlichen Gr=FC=DFen / kind regards
 
-Running some tests with l2ping brought the following results. I can ping
-the bbt, sometimes i get no response messages (max. 5 after another,
-most times 4 in a row). This test runs for about 30 minutes, then i
-canceled it. The bigger I define paketsize (defaults 44 Bytes) the
-faster / more often come those no response messages and, here it comes!,
-when more than 250 Bytes are specified, the connection hangs! Aprox. 2
-minutes. The bigger the paketsize the faster it hangs.
-After it once hung, only a total reset of the bbt gets it running again.
+Andreas Knuth
 
-Between those 2 PCs, I only had problems with rfcomm and dun, pan worked
-just fine. After i updated the Systems (it's SuSe linux 9.1 and 9.3, i
-forgot to say that) those problems where gone.
+--=_alternative 00289B9BC1257171_=
+Content-Type: text/html; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-The biggest Problem is, that i can't path or upgrade the kernel in the bbt.
 
-Does anyone have any suggestions?
-
--- 
-
-Mit freundlichem Gruﬂ und Dank im voraus.
-Kind regards and thanks a lot already.
-	
-
-	Jens Hottenroth
+<br><font size=3D2 face=3D"sans-serif">Hello,</font>
+<br><font size=3D2 face=3D"sans-serif">Does someone has successfully tried
+to set up a pptp server via dund communicating over Bluetooth?</font>
+<br><font size=3D2 face=3D"sans-serif">My first attempt does not work as ex=
+pected...</font>
+<br><font size=3D2 face=3D"sans-serif">How does interact the dund with the
+pptpd and the pppd ?</font>
+<br>
+<br><font size=3D2 face=3D"sans-serif">It would be helpful to see some comm=
+andline
+examples.</font>
+<br><font size=3D2 face=3D"sans-serif">&nbsp;</font>
+<br><font size=3D2 face=3D"sans-serif">Thanks in advance</font>
+<br>
+<br>
+<br><font size=3D2 face=3D"sans-serif">Mit freundlichen Gr=FC=DFen / kind r=
+egards<br>
+<br>
+Andreas Knuth<br>
+</font>
+--=_alternative 00289B9BC1257171_=--
 
 
 -------------------------------------------------------
