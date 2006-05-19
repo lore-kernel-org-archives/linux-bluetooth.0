@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <BAY111-F1767DE6A7429B539F50C6C98A70@phx.gbl>
-From: "ozkan gumus" <ozkan_gumus@hotmail.com>
+Message-ID: <6297d67c0605182016m4db5bb0ei96cd7d2cf4b22dba@mail.gmail.com>
+From: "Mayank Batra" <mayankbatra@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/html; format=flowed
-Subject: [Bluez-devel] cannot " hci_create_connection "
+Subject: Re: [Bluez-devel] New bluez headset implementation
+In-Reply-To: <446CDD43.3050604@free.fr>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_67457_4274488.1148008619239"
+References: <446CDD43.3050604@free.fr>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,32 +19,157 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 May 2006 07:38:27 +0000
+Date: Fri, 19 May 2006 08:46:59 +0530
 
-<html><div style='background-color:'><P>hi mr holtmann, </P>
-<P>i have problem with hci_create_connection function at line 120. <BR>here's the code ,&nbsp; when program comes to the line&nbsp; of hci_create_connection function <BR>it always says :</P>
-<P>&nbsp;#./simplescan<BR>scanning ...<BR>00:0E:6D:3F:E0:73&nbsp; ozkan<BR>Cannot create connection</P>
-<P><BR>simplescan.c</P>
-<P>#include &lt;stdio.h&gt;<BR>#include &lt;errno.h&gt;<BR>#include &lt;ctype.h&gt;<BR>#include &lt;fcntl.h&gt;<BR>#include &lt;unistd.h&gt;<BR>#include &lt;stdlib.h&gt;<BR>#include &lt;string.h&gt;<BR>#include &lt;getopt.h&gt;<BR>#include &lt;sys/param.h&gt;<BR>#include &lt;sys/ioctl.h&gt;<BR>#include &lt;sys/socket.h&gt;<BR>#include &lt;signal.h&gt;<BR>#include &lt;termios.h&gt;<BR>#include &lt;fcntl.h&gt;<BR>#include &lt;getopt.h&gt;<BR>#include &lt;asm/types.h&gt;<BR>#include &lt;netinet/in.h&gt;</P>
-<P>#include &lt;bluetooth/bluetooth.h&gt;<BR>#include &lt;bluetooth/hci.h&gt;<BR>#include &lt;bluetooth/hci_lib.h&gt;</P>
-<P>int main(int argc, char **argv)<BR>{<BR>&nbsp;&nbsp;&nbsp; inquiry_info *ii = NULL;<BR>&nbsp;&nbsp;&nbsp; int max_rsp, num_rsp;<BR>&nbsp;&nbsp;&nbsp; int dev_id, sock, len, flags;<BR>&nbsp;&nbsp;&nbsp; int i;<BR>&nbsp;&nbsp;&nbsp; char addr[19] = { 0 };<BR>&nbsp;&nbsp;&nbsp; char name[248] = { 0 };<BR>&nbsp;int measure ;</P>
-<P>&nbsp;&nbsp;&nbsp; dev_id = hci_get_route(NULL);<BR>&nbsp;&nbsp;&nbsp; sock = hci_open_dev( dev_id );<BR>&nbsp;&nbsp;&nbsp; if (dev_id &lt; 0 || sock &lt; 0) {<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; perror("opening socket");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exit(1);<BR>&nbsp;&nbsp;&nbsp; }</P>
-<P>&nbsp;&nbsp;&nbsp; len&nbsp; = 8;<BR>&nbsp;&nbsp;&nbsp; max_rsp = 255;<BR>&nbsp;&nbsp;&nbsp; flags = IREQ_CACHE_FLUSH;<BR>&nbsp;&nbsp;&nbsp; ii = (inquiry_info*)malloc(max_rsp * sizeof(inquiry_info));<BR>&nbsp;&nbsp;&nbsp; printf("scanning ...\n");<BR>&nbsp;&nbsp;&nbsp; num_rsp = hci_inquiry(dev_id, len, max_rsp, NULL, &amp;ii, flags);<BR>&nbsp;&nbsp;&nbsp; if( num_rsp &lt; 0 ) perror("hci_inquiry");</P>
-<P>&nbsp;&nbsp;&nbsp; for (i = 0; i &lt; num_rsp; i++) {<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ba2str(&amp;(ii+i)-&gt;bdaddr, addr);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; memset(name, 0, sizeof(name));<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (hci_read_remote_name(sock, &amp;(ii+i)-&gt;bdaddr, sizeof(name), <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name, 0) &lt; 0)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; strcpy(name, "[unknown]");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; printf("%s&nbsp; %s\n", addr, name);<BR>&nbsp;&nbsp;measure = read_rssi(&amp;(ii+i)-&gt;bdaddr);<BR>&nbsp;&nbsp;printf("the RSSI measure for %s is %d",name,measure);<BR>&nbsp;&nbsp;&nbsp; }</P>
-<P>&nbsp;&nbsp;&nbsp; free( ii );<BR>&nbsp;&nbsp;&nbsp; close( sock );<BR>&nbsp;&nbsp;&nbsp; return 0;<BR>}</P>
-<P><BR>static int find_conn(int s, int dev_id, long arg)<BR>{<BR>&nbsp;struct hci_conn_list_req *cl;<BR>&nbsp;struct hci_conn_info *ci;<BR>&nbsp;int i;</P>
-<P>&nbsp;if (!(cl = malloc(10 * sizeof(*ci) + sizeof(*cl)))) {<BR>&nbsp;&nbsp;perror("Can't allocate memory");<BR>&nbsp;&nbsp;exit(1);<BR>&nbsp;}<BR>&nbsp;cl-&gt;dev_id = dev_id;<BR>&nbsp;cl-&gt;conn_num = 10;<BR>&nbsp;ci = cl-&gt;conn_info;</P>
-<P>&nbsp;if (ioctl(s, HCIGETCONNLIST, (void*)cl)) {<BR>&nbsp;&nbsp;perror("Can't get connection list");<BR>&nbsp;&nbsp;exit(1);<BR>&nbsp;}</P>
-<P>&nbsp;for (i=0; i &lt; cl-&gt;conn_num; i++, ci++)<BR>&nbsp;&nbsp;if (!bacmp((bdaddr_t *)arg, &amp;ci-&gt;bdaddr))<BR>&nbsp;&nbsp;&nbsp;return 1;<BR>&nbsp;return 0;<BR>}</P>
-<P><BR>int read_rssi(char* address) {<BR>&nbsp; int cc = 0;<BR>&nbsp; int dd;<BR>&nbsp; int dev_id;<BR>&nbsp; uint16_t handle;<BR>&nbsp; struct hci_conn_info_req *cr;<BR>&nbsp; struct hci_request rq;<BR>&nbsp; read_rssi_rp rp;<BR>&nbsp; bdaddr_t bdaddr;<BR>&nbsp; <BR>&nbsp; str2ba(address, &amp;bdaddr);<BR>&nbsp; <BR>&nbsp; dev_id = hci_for_each_dev(HCI_UP, find_conn, (long) &amp;bdaddr);<BR>&nbsp; if (dev_id &lt; 0) {<BR>&nbsp;&nbsp;&nbsp; dev_id = hci_get_route(&amp;bdaddr);<BR>&nbsp;&nbsp;&nbsp; cc = 1;<BR>&nbsp; }<BR>&nbsp; if (dev_id &lt; 0) {<BR>&nbsp;&nbsp;&nbsp; printf("Device not available\n");<BR>&nbsp;&nbsp;&nbsp; exit(1);<BR>&nbsp; }<BR>&nbsp; <BR>&nbsp; dd = hci_open_dev(dev_id);<BR>&nbsp; if (dd &lt; 0) {<BR>&nbsp;&nbsp;&nbsp; printf("Cannot open device\n");<BR>&nbsp;&nbsp;&nbsp; exit(1);<BR>&nbsp; }<BR>// ***************************&nbsp;&nbsp; PROBLEM HERE 
-************************* <BR>&nbsp; if (cc) {<BR>&nbsp;&nbsp;&nbsp; if (hci_create_connection(dd, &amp;bdaddr, 0x0008 | 0x0010, 0, 0, &amp;handle, 25000) &lt; 0) {<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; printf("Cannot create connection\n");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; close(dd);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exit(1);<BR>&nbsp;&nbsp;&nbsp; }<BR>&nbsp; }<BR>&nbsp;// ***************************** *****************************************<BR>&nbsp; cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));<BR>&nbsp; if (!cr) {<BR>&nbsp;&nbsp;&nbsp; printf("Could not allocate memory\n");<BR>&nbsp;&nbsp;&nbsp; exit(1);<BR>&nbsp; }<BR>&nbsp;&nbsp;&nbsp; <BR>&nbsp; bacpy(&amp;cr-&gt;bdaddr, &amp;bdaddr);<BR>&nbsp; cr-&gt;type = ACL_LINK;<BR>&nbsp; if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) &lt; 0) {<BR>&nbsp;&nbsp;&nbsp; printf("Get connection info failed\n");<BR>&nbsp;&nbsp;&nbsp; 
-exit(1);<BR>&nbsp; }<BR>&nbsp; <BR>&nbsp; memset(&amp;rq, 0, sizeof(rq));<BR>&nbsp; rq.ogf&nbsp;&nbsp;&nbsp; = OGF_STATUS_PARAM;<BR>&nbsp; rq.ocf&nbsp;&nbsp;&nbsp; = OCF_READ_RSSI;<BR>&nbsp; rq.cparam = &amp;cr-&gt;conn_info-&gt;handle;<BR>&nbsp; rq.clen&nbsp;&nbsp; = 2;<BR>&nbsp; rq.rparam = &amp;rp;<BR>&nbsp; rq.rlen&nbsp;&nbsp; = READ_RSSI_RP_SIZE;<BR>&nbsp; <BR>&nbsp; if (hci_send_req(dd, &amp;rq, 100) &lt; 0) {<BR>&nbsp;&nbsp;&nbsp; printf("Read RSSI failed\n");<BR>&nbsp;&nbsp;&nbsp; exit(1);<BR>&nbsp; }<BR>&nbsp; <BR>&nbsp; if (rp.status) {<BR>&nbsp;&nbsp;&nbsp; printf("Read RSSI returned (error) status 0x%2.2X\n", rp.status);<BR>&nbsp;&nbsp;&nbsp; exit(1);<BR>&nbsp; }<BR>&nbsp; <BR>&nbsp; if (cc) {<BR>&nbsp;&nbsp;&nbsp; hci_disconnect(dd, handle, 0x13, 10000);<BR>&nbsp; }<BR>&nbsp; <BR>&nbsp; close(dd);<BR>&nbsp; free(cr);<BR>&nbsp; printf("My RSSI is&nbsp; : %d",rp.rssi);<BR>&nbsp; return rp.rssi ;<BR>} </P>
-<P>can you give me some advise to resolve this problem, ? do you think my ptype or clkoffset are false ? </P>
-<P>i will be very grateful for a little help..</P>
-<P>thanks,</P>
-<P>&nbsp;</P>
-<P>&nbsp;</P></div><br clear=all><hr> <a href="http://g.msn.com/8HMAENUS/2731??PS=47575" target="_top">Find just what you're after with the new, more precise MSN Search - try it now!</a> </html>
+------=_Part_67457_4274488.1148008619239
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
+Hi Fabien,
+
+I am very much interested in testing it.
+
+Regards
+Mayank
+
+
+On 5/19/06, Fabien Chevalier <fabchevalier@free.fr> wrote:
+>
+>
+> Hello all, i've been spending most of my spare time in the past
+> month writing an alternative implementation to btsco for headsets support.
+> The starting point was me being frustrated not to be able to use my
+> laptop for VoIP because of crappy microphones the manufacturers usually
+> put in. So my goal now is to go wireless with bluetooth. :-)
+> So here i am. The software i wrote is now mature enough to be shared
+> with others.
+>
+> What i'm looking for now is peer review from experienced bluez
+> developpers about it. But that's enough about me, let's talk about the
+> software :-)
+>
+> So What's In ?
+>
+> What is implemented is the AG side of the headset profile. Both Headset
+> initiated connections and access gateway initiated connections are
+> supported. It does not support A2DP, as it is another profile, and
+> moreover people here are already working on the subject :-)
+>
+> The spirit that governed the design was the following:
+>   - be able to handle voice over IP applications well (this means
+> keeping buffering at a minimum for a reduced latency)
+>   - make it easy to use for open source VoIp apps developpers (the idea
+> is that it should be very easy for the apps to provide some basic
+> support for bluetooth headsets with no change to the application itself)
+>   - support 100% of bluetooth headset profile (device
+> connect/disconnect, headset button push)
+>
+> The architecture is the following:
+>   - 1 daemon, responsible for doing SDP, handling RFCOMM and SCO
+> channels, parsing AT commands, sending DBUS signals when things happen.
+> The daemon handles application requests (referred to as AG initiated
+> connection in HSP spec) or headset connection requests (referred to as
+> HS initiated connection in HSP spec)
+> The daemon also handles session caching between PCM open/close.
+>   - 2 ALSA user space IO plugins (1 control, 1 PCM). Both of them
+> communicate with the daemon using unix sockets. The PCM also has an
+> instance of the SCO socket, so that it can reads/write data directly to
+> it.
+>
+> Compared to btsco, it differs in the following way:
+>   - it is 100% userspace. No more kernel module.
+>   - all parameters are supplied by the application to the alsa pcm
+> plugin, that will eventually forward them to the daemon. This will make
+> implementation of user friendly MMI much easier (in particular, there
+> is no need to lauch the daemon separately with a predefined BD address.
+> The gui will thus be able to provide bd address).
+>   - it handles only one active headset at a time
+>   - it supports HS initiated connections as well
+>   - codebase cleaner. It should be possible with minimal pain to
+>     support handsfree profile.
+>
+> Still to be done :
+>   1) more testing
+>   2) DBUS signalling to tell the world about connected /
+> disconnected / button pushed events.
+>   3) some kind of switching from headset to an alternate sound device
+> in case the headset is unavailable.
+>   4) interoperability testing against a variety of devices.
+>   5) document the design
+>   6) debug kernel sco support (more on that on a separate e-mail)
+>
+> I'm likely to do 3), 5), however 1 and 2 might be better handled
+> by somebody else, and 4 is just everybody's work :-)
+>
+> Where to get the software:
+>   Simple! On my hard disk!!   No i'm kidding... but in fact not
+> completely. ;-)
+>   I don't wanna start a whole open source project for such a small
+> thing. So for now i will send it by private e-mail to developers
+> interested in giving it a try. Just reply to this e-mail if you are
+> interested.
+>
+> How to play with the software:
+>   - use standard aplay/arecord tools (not very funny)
+>   - use xmms (a litte more funny :-) )
+>   - use ekiga 2.0.1 (top fun!- however you will need to patch it and
+> rebuild it)
+>
+>
+> Fabien
+>
+>
+>
+>
+>
+>
+> -------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job
+> easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+
+------=_Part_67457_4274488.1148008619239
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<div>Hi Fabien,</div>
+<div>&nbsp;</div>
+<div>I am very much interested in testing it.</div>
+<div>&nbsp;</div>
+<div>Regards</div>
+<div>Mayank<br><br>&nbsp;</div>
+<div><span class="gmail_quote">On 5/19/06, <b class="gmail_sendername">Fabien Chevalier</b> &lt;<a href="mailto:fabchevalier@free.fr">fabchevalier@free.fr</a>&gt; wrote:</span>
+<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid"><br>Hello all, i've been spending most of my spare time in the past<br>month writing an alternative implementation to btsco for headsets support.
+<br>The starting point was me being frustrated not to be able to use my<br>laptop for VoIP because of crappy microphones the manufacturers usually<br>put in. So my goal now is to go wireless with bluetooth. :-)<br>So here i am. The software i wrote is now mature enough to be shared
+<br>with others.<br><br>What i'm looking for now is peer review from experienced bluez<br>developpers about it. But that's enough about me, let's talk about the<br>software :-)<br><br>So What's In ?<br><br>What is implemented is the AG side of the headset profile. Both Headset
+<br>initiated connections and access gateway initiated connections are<br>supported. It does not support A2DP, as it is another profile, and<br>moreover people here are already working on the subject :-)<br><br>The spirit that governed the design was the following:
+<br>&nbsp;&nbsp;- be able to handle voice over IP applications well (this means<br>keeping buffering at a minimum for a reduced latency)<br>&nbsp;&nbsp;- make it easy to use for open source VoIp apps developpers (the idea<br>is that it should be very easy for the apps to provide some basic
+<br>support for bluetooth headsets with no change to the application itself)<br>&nbsp;&nbsp;- support 100% of bluetooth headset profile (device<br>connect/disconnect, headset button push)<br><br>The architecture is the following:<br>
+&nbsp;&nbsp;- 1 daemon, responsible for doing SDP, handling RFCOMM and SCO<br>channels, parsing AT commands, sending DBUS signals when things happen.<br>The daemon handles application requests (referred to as AG initiated<br>connection in HSP spec) or headset connection requests (referred to as
+<br>HS initiated connection in HSP spec)<br>The daemon also handles session caching between PCM open/close.<br>&nbsp;&nbsp;- 2 ALSA user space IO plugins (1 control, 1 PCM). Both of them<br>communicate with the daemon using unix sockets. The PCM also has an
+<br>instance of the SCO socket, so that it can reads/write data directly to it.<br><br>Compared to btsco, it differs in the following way:<br>&nbsp;&nbsp;- it is 100% userspace. No more kernel module.<br>&nbsp;&nbsp;- all parameters are supplied by the application to the alsa pcm
+<br>plugin, that will eventually forward them to the daemon. This will make<br>implementation of user friendly MMI much easier (in particular, there<br>is no need to lauch the daemon separately with a predefined BD address.
+<br>The gui will thus be able to provide bd address).<br>&nbsp;&nbsp;- it handles only one active headset at a time<br>&nbsp;&nbsp;- it supports HS initiated connections as well<br>&nbsp;&nbsp;- codebase cleaner. It should be possible with minimal pain to
+<br>&nbsp;&nbsp;&nbsp;&nbsp;support handsfree profile.<br><br>Still to be done :<br>&nbsp;&nbsp;1) more testing<br>&nbsp;&nbsp;2) DBUS signalling to tell the world about connected /<br>disconnected / button pushed events.<br>&nbsp;&nbsp;3) some kind of switching from headset to an alternate sound device
+<br>in case the headset is unavailable.<br>&nbsp;&nbsp;4) interoperability testing against a variety of devices.<br>&nbsp;&nbsp;5) document the design<br>&nbsp;&nbsp;6) debug kernel sco support (more on that on a separate e-mail)<br><br>I'm likely to do 3), 5), however 1 and 2 might be better handled
+<br>by somebody else, and 4 is just everybody's work :-)<br><br>Where to get the software:<br>&nbsp;&nbsp;Simple! On my hard disk!!&nbsp;&nbsp; No i'm kidding... but in fact not<br>completely. ;-)<br>&nbsp;&nbsp;I don't wanna start a whole open source project for such a small
+<br>thing. So for now i will send it by private e-mail to developers<br>interested in giving it a try. Just reply to this e-mail if you are<br>interested.<br><br>How to play with the software:<br>&nbsp;&nbsp;- use standard aplay/arecord tools (not very funny)
+<br>&nbsp;&nbsp;- use xmms (a litte more funny :-) )<br>&nbsp;&nbsp;- use ekiga 2.0.1 (top fun!- however you will need to patch it and<br>rebuild it)<br><br><br>Fabien<br><br><br><br><br><br><br>-------------------------------------------------------
+<br>Using Tomcat but need to do more? Need to support web services, security?<br>Get stuff done quickly with pre-integrated technology to make your job easier<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+<br><a href="http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642">http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642</a><br>_______________________________________________
+<br>Bluez-devel mailing list<br><a href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-devel">https://lists.sourceforge.net/lists/listinfo/bluez-devel
+</a><br></blockquote></div><br>
+
+------=_Part_67457_4274488.1148008619239--
 
 
 -------------------------------------------------------
