@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <ef9938ec0605191431m741a0b66k52f5f14f49d46915@mail.gmail.com>
+From: "Albert Huang" <albert@csail.mit.edu>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] I'm sorry.....i want to ask again
+In-Reply-To: <e85851c20605190100m1ad6f534if610905aed0677cb@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C67D49.63341578"
-Subject: [Bluez-users] Mac OS X Scanner
-Message-ID: <C3CDAA96649B7E4290D26BD856B710C7024CEE@marge.au.hmv.com>
-From: "Nathan Lynch" <nathan.lynch@hmv.com.au>
-To: <bluez-users@lists.sourceforge.net>
+	boundary="----=_Part_45347_16443532.1148074294384"
+References: <e85851c20605190100m1ad6f534if610905aed0677cb@mail.gmail.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,130 +19,64 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 May 2006 12:42:36 +1000
+Date: Fri, 19 May 2006 17:31:34 -0400
 
-This is a multi-part message in MIME format.
-
-------_=_NextPart_001_01C67D49.63341578
-Content-Type: text/plain;
-	charset="us-ascii"
+------=_Part_45347_16443532.1148074294384
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Hi Bluez-group!
+Hi Gloria,
 
-=20
+Please try to keep your posts on the same thread to avoid mailing list
+clutter.  If you haven't posted to many mailing lists before, it's worth
+taking a few minutes to read some FAQs on mailing list etiquette.  You can
+find tons of these in web searches.
 
-A quick question on the applications front - I have a Mac G5 running
-Tiger (OS X 10.4), does anyone know a proximity/scanner application that
-I could use to discover Bluetooth enabled devices and ideally write out
-information to a database?
+That said, I'm not convinced that you need to recompile your kernel, and
+that it's probably something simpler.  Please post the exact file you're
+trying to compile, and the command that you're using to compile it with.
 
-=20
+-albert
 
-T.I.A!
+On 5/19/06, Gloria Saripah Patara <glowz.saripah@gmail.com> wrote:
+>
+> I want to know about how to compile linux kernel for bluetooth.
+> I have searched in Internet, but i didn't find the match one.
+>
+> -------------------------------
+> thanks.....
+>
 
-=20
-
-Nathan
-
-
-------_=_NextPart_001_01C67D49.63341578
-Content-Type: text/html;
-	charset="us-ascii"
+------=_Part_45347_16443532.1148074294384
+Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
-xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns=3D"http://www.w3.org/TR/REC-html40">
+Hi Gloria,<br>
+<br>
+Please try to keep your posts on the same thread to avoid mailing list
+clutter.&nbsp; If you haven't posted to many mailing lists before, it's
+worth taking a few minutes to read some FAQs on mailing list
+etiquette.&nbsp; You can find tons of these in web searches.<br>
+<br>
+That said, I'm not convinced that you need to recompile your kernel,
+and that it's probably something simpler.&nbsp; Please post the exact
+file you're trying to compile, and the command that you're using to
+compile it with.&nbsp; <br><br>
+-albert<br>
+<br><div><span class=3D"gmail_quote">On 5/19/06, <b class=3D"gmail_senderna=
+me">Gloria Saripah Patara</b> &lt;<a href=3D"mailto:glowz.saripah@gmail.com=
+">glowz.saripah@gmail.com</a>&gt; wrote:</span><blockquote class=3D"gmail_q=
+uote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0=
+pt 0.8ex; padding-left: 1ex;">
+<div>I want to know about how to compile linux kernel for bluetooth.<br>I h=
+ave searched in Internet, but i didn't find the match one.<br><br>---------=
+----------------------<br>thanks.....<br>
 
-<head>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
-<style>
-<!--
- /* Font Definitions */
- @font-face
-	{font-family:Verdana;
-	panose-1:2 11 6 4 3 5 4 4 2 4;}
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0pt;
-	margin-bottom:.0001pt;
-	font-size:12.0pt;
-	font-family:"Times New Roman";}
-a:link, span.MsoHyperlink
-	{color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{color:purple;
-	text-decoration:underline;}
-span.EmailStyle17
-	{mso-style-type:personal-reply;
-	font-family:Verdana;
-	color:navy;}
-@page Section1
-	{size:612.0pt 792.0pt;
-	margin:72.0pt 90.0pt 72.0pt 90.0pt;}
-div.Section1
-	{page:Section1;}
--->
-</style>
+</div></blockquote></div><br>
 
-</head>
-
-<body lang=3DEN-US link=3Dblue vlink=3Dpurple>
-
-<div class=3DSection1>
-
-<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
-style=3D'font-size:
-9.5pt;font-family:Verdana;color:navy'>Hi =
-Bluez-group!<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
-style=3D'font-size:
-9.5pt;font-family:Verdana;color:navy'><o:p>&nbsp;</o:p></span></font></p>=
-
-
-<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
-style=3D'font-size:
-9.5pt;font-family:Verdana;color:navy'>A quick question on the =
-applications front
-&#8211; I have a Mac G5 running Tiger (OS X 10.4), does anyone know a
-proximity/scanner application that I could use to discover Bluetooth =
-enabled
-devices and ideally write out information to a =
-database?<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
-style=3D'font-size:
-9.5pt;font-family:Verdana;color:navy'><o:p>&nbsp;</o:p></span></font></p>=
-
-
-<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
-style=3D'font-size:
-9.5pt;font-family:Verdana;color:navy'>T.I.A!<o:p></o:p></span></font></p>=
-
-
-<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
-style=3D'font-size:
-9.5pt;font-family:Verdana;color:navy'><o:p>&nbsp;</o:p></span></font></p>=
-
-
-<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
-style=3D'font-size:
-9.5pt;font-family:Verdana;color:navy'>Nathan<o:p></o:p></span></font></p>=
-
-
-</div>
-
-</body>
-
-</html>
-
-------_=_NextPart_001_01C67D49.63341578--
-
+------=_Part_45347_16443532.1148074294384--
 
 
 -------------------------------------------------------
