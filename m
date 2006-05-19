@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <6297d67c0605182016m4db5bb0ei96cd7d2cf4b22dba@mail.gmail.com>
-From: "Mayank Batra" <mayankbatra@gmail.com>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] New bluez headset implementation
+References: <446CDD43.3050604@free.fr>
 In-Reply-To: <446CDD43.3050604@free.fr>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_67457_4274488.1148008619239"
-References: <446CDD43.3050604@free.fr>
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200605191016.45394.denis.kenzior@trolltech.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,24 +19,13 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 May 2006 08:46:59 +0530
+Date: Fri, 19 May 2006 10:16:45 +1000
 
-------=_Part_67457_4274488.1148008619239
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I would be interested in playing with this as well.
 
-Hi Fabien,
+-Denis
 
-I am very much interested in testing it.
-
-Regards
-Mayank
-
-
-On 5/19/06, Fabien Chevalier <fabchevalier@free.fr> wrote:
->
->
+On Friday 19 May 2006 06:46, Fabien Chevalier wrote:
 > Hello all, i've been spending most of my spare time in the past
 > month writing an alternative implementation to btsco for headsets support.
 > The starting point was me being frustrated not to be able to use my
@@ -57,63 +46,62 @@ On 5/19/06, Fabien Chevalier <fabchevalier@free.fr> wrote:
 > moreover people here are already working on the subject :-)
 >
 > The spirit that governed the design was the following:
->   - be able to handle voice over IP applications well (this means
+>    - be able to handle voice over IP applications well (this means
 > keeping buffering at a minimum for a reduced latency)
->   - make it easy to use for open source VoIp apps developpers (the idea
+>    - make it easy to use for open source VoIp apps developpers (the idea
 > is that it should be very easy for the apps to provide some basic
 > support for bluetooth headsets with no change to the application itself)
->   - support 100% of bluetooth headset profile (device
+>    - support 100% of bluetooth headset profile (device
 > connect/disconnect, headset button push)
 >
 > The architecture is the following:
->   - 1 daemon, responsible for doing SDP, handling RFCOMM and SCO
+>    - 1 daemon, responsible for doing SDP, handling RFCOMM and SCO
 > channels, parsing AT commands, sending DBUS signals when things happen.
 > The daemon handles application requests (referred to as AG initiated
 > connection in HSP spec) or headset connection requests (referred to as
 > HS initiated connection in HSP spec)
 > The daemon also handles session caching between PCM open/close.
->   - 2 ALSA user space IO plugins (1 control, 1 PCM). Both of them
+>    - 2 ALSA user space IO plugins (1 control, 1 PCM). Both of them
 > communicate with the daemon using unix sockets. The PCM also has an
-> instance of the SCO socket, so that it can reads/write data directly to
-> it.
+> instance of the SCO socket, so that it can reads/write data directly to it.
 >
 > Compared to btsco, it differs in the following way:
->   - it is 100% userspace. No more kernel module.
->   - all parameters are supplied by the application to the alsa pcm
+>    - it is 100% userspace. No more kernel module.
+>    - all parameters are supplied by the application to the alsa pcm
 > plugin, that will eventually forward them to the daemon. This will make
 > implementation of user friendly MMI much easier (in particular, there
 > is no need to lauch the daemon separately with a predefined BD address.
 > The gui will thus be able to provide bd address).
->   - it handles only one active headset at a time
->   - it supports HS initiated connections as well
->   - codebase cleaner. It should be possible with minimal pain to
->     support handsfree profile.
+>    - it handles only one active headset at a time
+>    - it supports HS initiated connections as well
+>    - codebase cleaner. It should be possible with minimal pain to
+>      support handsfree profile.
 >
 > Still to be done :
->   1) more testing
->   2) DBUS signalling to tell the world about connected /
+>    1) more testing
+>    2) DBUS signalling to tell the world about connected /
 > disconnected / button pushed events.
->   3) some kind of switching from headset to an alternate sound device
+>    3) some kind of switching from headset to an alternate sound device
 > in case the headset is unavailable.
->   4) interoperability testing against a variety of devices.
->   5) document the design
->   6) debug kernel sco support (more on that on a separate e-mail)
+>    4) interoperability testing against a variety of devices.
+>    5) document the design
+>    6) debug kernel sco support (more on that on a separate e-mail)
 >
 > I'm likely to do 3), 5), however 1 and 2 might be better handled
 > by somebody else, and 4 is just everybody's work :-)
 >
 > Where to get the software:
->   Simple! On my hard disk!!   No i'm kidding... but in fact not
+>    Simple! On my hard disk!!   No i'm kidding... but in fact not
 > completely. ;-)
->   I don't wanna start a whole open source project for such a small
+>    I don't wanna start a whole open source project for such a small
 > thing. So for now i will send it by private e-mail to developers
 > interested in giving it a try. Just reply to this e-mail if you are
 > interested.
 >
 > How to play with the software:
->   - use standard aplay/arecord tools (not very funny)
->   - use xmms (a litte more funny :-) )
->   - use ekiga 2.0.1 (top fun!- however you will need to patch it and
+>    - use standard aplay/arecord tools (not very funny)
+>    - use xmms (a litte more funny :-) )
+>    - use ekiga 2.0.1 (top fun!- however you will need to patch it and
 > rebuild it)
 >
 >
@@ -127,49 +115,13 @@ On 5/19/06, Fabien Chevalier <fabchevalier@free.fr> wrote:
 > -------------------------------------------------------
 > Using Tomcat but need to do more? Need to support web services, security?
 > Get stuff done quickly with pre-integrated technology to make your job
-> easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> easier Download IBM WebSphere Application Server v.1.0.1 based on Apache
+> Geronimo
 > http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 > _______________________________________________
 > Bluez-devel mailing list
 > Bluez-devel@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-
-------=_Part_67457_4274488.1148008619239
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>Hi Fabien,</div>
-<div>&nbsp;</div>
-<div>I am very much interested in testing it.</div>
-<div>&nbsp;</div>
-<div>Regards</div>
-<div>Mayank<br><br>&nbsp;</div>
-<div><span class="gmail_quote">On 5/19/06, <b class="gmail_sendername">Fabien Chevalier</b> &lt;<a href="mailto:fabchevalier@free.fr">fabchevalier@free.fr</a>&gt; wrote:</span>
-<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid"><br>Hello all, i've been spending most of my spare time in the past<br>month writing an alternative implementation to btsco for headsets support.
-<br>The starting point was me being frustrated not to be able to use my<br>laptop for VoIP because of crappy microphones the manufacturers usually<br>put in. So my goal now is to go wireless with bluetooth. :-)<br>So here i am. The software i wrote is now mature enough to be shared
-<br>with others.<br><br>What i'm looking for now is peer review from experienced bluez<br>developpers about it. But that's enough about me, let's talk about the<br>software :-)<br><br>So What's In ?<br><br>What is implemented is the AG side of the headset profile. Both Headset
-<br>initiated connections and access gateway initiated connections are<br>supported. It does not support A2DP, as it is another profile, and<br>moreover people here are already working on the subject :-)<br><br>The spirit that governed the design was the following:
-<br>&nbsp;&nbsp;- be able to handle voice over IP applications well (this means<br>keeping buffering at a minimum for a reduced latency)<br>&nbsp;&nbsp;- make it easy to use for open source VoIp apps developpers (the idea<br>is that it should be very easy for the apps to provide some basic
-<br>support for bluetooth headsets with no change to the application itself)<br>&nbsp;&nbsp;- support 100% of bluetooth headset profile (device<br>connect/disconnect, headset button push)<br><br>The architecture is the following:<br>
-&nbsp;&nbsp;- 1 daemon, responsible for doing SDP, handling RFCOMM and SCO<br>channels, parsing AT commands, sending DBUS signals when things happen.<br>The daemon handles application requests (referred to as AG initiated<br>connection in HSP spec) or headset connection requests (referred to as
-<br>HS initiated connection in HSP spec)<br>The daemon also handles session caching between PCM open/close.<br>&nbsp;&nbsp;- 2 ALSA user space IO plugins (1 control, 1 PCM). Both of them<br>communicate with the daemon using unix sockets. The PCM also has an
-<br>instance of the SCO socket, so that it can reads/write data directly to it.<br><br>Compared to btsco, it differs in the following way:<br>&nbsp;&nbsp;- it is 100% userspace. No more kernel module.<br>&nbsp;&nbsp;- all parameters are supplied by the application to the alsa pcm
-<br>plugin, that will eventually forward them to the daemon. This will make<br>implementation of user friendly MMI much easier (in particular, there<br>is no need to lauch the daemon separately with a predefined BD address.
-<br>The gui will thus be able to provide bd address).<br>&nbsp;&nbsp;- it handles only one active headset at a time<br>&nbsp;&nbsp;- it supports HS initiated connections as well<br>&nbsp;&nbsp;- codebase cleaner. It should be possible with minimal pain to
-<br>&nbsp;&nbsp;&nbsp;&nbsp;support handsfree profile.<br><br>Still to be done :<br>&nbsp;&nbsp;1) more testing<br>&nbsp;&nbsp;2) DBUS signalling to tell the world about connected /<br>disconnected / button pushed events.<br>&nbsp;&nbsp;3) some kind of switching from headset to an alternate sound device
-<br>in case the headset is unavailable.<br>&nbsp;&nbsp;4) interoperability testing against a variety of devices.<br>&nbsp;&nbsp;5) document the design<br>&nbsp;&nbsp;6) debug kernel sco support (more on that on a separate e-mail)<br><br>I'm likely to do 3), 5), however 1 and 2 might be better handled
-<br>by somebody else, and 4 is just everybody's work :-)<br><br>Where to get the software:<br>&nbsp;&nbsp;Simple! On my hard disk!!&nbsp;&nbsp; No i'm kidding... but in fact not<br>completely. ;-)<br>&nbsp;&nbsp;I don't wanna start a whole open source project for such a small
-<br>thing. So for now i will send it by private e-mail to developers<br>interested in giving it a try. Just reply to this e-mail if you are<br>interested.<br><br>How to play with the software:<br>&nbsp;&nbsp;- use standard aplay/arecord tools (not very funny)
-<br>&nbsp;&nbsp;- use xmms (a litte more funny :-) )<br>&nbsp;&nbsp;- use ekiga 2.0.1 (top fun!- however you will need to patch it and<br>rebuild it)<br><br><br>Fabien<br><br><br><br><br><br><br>-------------------------------------------------------
-<br>Using Tomcat but need to do more? Need to support web services, security?<br>Get stuff done quickly with pre-integrated technology to make your job easier<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-<br><a href="http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642">http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642</a><br>_______________________________________________
-<br>Bluez-devel mailing list<br><a href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-devel">https://lists.sourceforge.net/lists/listinfo/bluez-devel
-</a><br></blockquote></div><br>
-
-------=_Part_67457_4274488.1148008619239--
 
 
 -------------------------------------------------------
