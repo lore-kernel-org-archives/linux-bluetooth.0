@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4470B491.7040004@free.fr>
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <446F383A.1040605@ens.fr>
+From: Giuseppe Castagna <Giuseppe.Castagna@ens.fr>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] report on new bluez headset
-References: <446CDD43.3050604@free.fr> <446F383A.1040605@ens.fr>
-In-Reply-To: <446F383A.1040605@ens.fr>
+References: <446CDD43.3050604@free.fr>
+In-Reply-To: <446CDD43.3050604@free.fr>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] report on new bluez headset
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,70 +18,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 21 May 2006 20:42:25 +0200
+Date: Sat, 20 May 2006 17:39:38 +0200
 
-Hi Giuseppe,
+Hi Fabien,
 
-please find a few answers below.
+    here you are a first report on your headset support. I have a Motorola HS850 
+and use it in conjunction with a Thinkpad X40 with bluetooth-modem integrated 
+adapter.
 
-> Hi Fabien,
-> 
->    here you are a first report on your headset support. I have a 
-> Motorola HS850 and use it in conjunction with a Thinkpad X40 with 
-> bluetooth-modem integrated adapter.
-> 
-> I have patched and compiled ekiga and selected the bluetooth headset 
-> device.
-> Everithing works fine in general (nice work) but:
-> 
-> - if I close and reopen the headset then ekiga no longer finds the audio 
-> device
+I have patched and compiled ekiga and selected the bluetooth headset device.
+Everithing works fine in general (nice work) but:
 
-Do you mean ending a call by closing the headset ??
+- if I close and reopen the headset then ekiga no longer finds the audio device
+- if I change the device in the preferences and then put back the
+   bluetooth headset  ekiga no longer finds the bluetooth device.
 
-> - if I change the device in the preferences and then put back the
->   bluetooth headset  ekiga no longer finds the bluetooth device.
-> 
-Hmmm... strange. Could you please be a little more precise on that ?
+In both cases the only solution is to close and reopen ekiga.
 
-> In both cases the only solution is to close and reopen ekiga.
-> 
-> Woth xmms instad the beahviour is *quite* bizarre. When I select the 
-> headset in the alsa plugin the music is played about 4 times faster and 
-> the console prints repeatedly the following warning.
-> 
-> ** WARNING **: alsa_mmap_audio(): snd_pcm_mmap_commit returned 24, 
-> expected 104
+Woth xmms instad the beahviour is *quite* bizarre. When I select the headset in 
+the alsa plugin the music is played about 4 times faster and the console prints 
+repeatedly the following warning.
 
-I would even say 104 / 24 = 4,3333 time faster.
+** WARNING **: alsa_mmap_audio(): snd_pcm_mmap_commit returned 24, expected 104
 
-That's weird as xmms works really perfectly on my box. :-(
-COuld you give me details about your software configuration (xmms 
-version, alsa version, OS version..) ?
+As soon as I change de device (e.g. to default) or pass to OSS then this weird 
+behavior completely desappears and the song is played correctly.
 
-Could you also try to remove line 322 in file pcm_bluez_headset,
-and see if it works better ?
+I guess that you already know it but
+- pressing the headset button has no visible effect
+- the device does not appear in the alsa mixer
 
-> 
-> As soon as I change de device (e.g. to default) or pass to OSS then this 
-> weird behavior completely desappears and the song is played correctly.
-> 
-> I guess that you already know it but
-> - pressing the headset button has no visible effect
-
-Yep. It's on the TODO list. There is DBUS cabling to do (see dbus.c). 
-Any volunteers ?? :-)
-
-> - the device does not appear in the alsa mixer
-
-You're wrong on this one.
-If you launch 'alsamixer -Dheadset' you will see your headset controls,
-and if you play with volume controls while in a middle of a call you 
-should ear the difference.
-
-Cheers,
-
-Fabien
+---Beppe---
 
 
 -------------------------------------------------------
