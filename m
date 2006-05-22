@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <fe0a97c20605230020i4606620dydedaeb8ba2cf789e@mail.gmail.com>
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
+Message-ID: <ef9938ec0605221453g29a81633v337564b60eb4e010@mail.gmail.com>
+From: "Albert Huang" <albert@csail.mit.edu>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] blocking or non-blocking?
-In-Reply-To: <1147789434.24761.79.camel@localhost>
+Subject: Re: [Bluez-users] Bluez service discovery
+In-Reply-To: <48637.156.116.2.246.1148036921.squirrel@webmail.uio.no>
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_22421_28116064.1148368829623"
-References: <fe0a97c20605102047q4feba4a8p224c6d3c3980ed5b@mail.gmail.com>
-	 <1147789434.24761.79.camel@localhost>
+	boundary="----=_Part_63930_30448267.1148334799872"
+References: <48637.156.116.2.246.1148036921.squirrel@webmail.uio.no>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,26 +19,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 23 May 2006 12:50:29 +0530
+Date: Mon, 22 May 2006 17:53:19 -0400
 
-------=_Part_22421_28116064.1148368829623
+------=_Part_63930_30448267.1148334799872
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-How do I make it non-blocking Marcel???
+If you're using a Bluetooth reserved UUID, make sure that you've correctly
+specified it by adding the Bluetooth Base UUID.
 
-On 5/16/06, Marcel Holtmann <marcel@holtmann.org> wrote:
+-albert
+
+On 5/19/06, markusv@student.matnat.uio.no <markusv@student.matnat.uio.no>
+wrote:
 >
-> Hi Sowmya,
 >
-> > Are rfcomm sockets "blocking" sockets by default???
+> hi
+> I am trying to discover services on my cellular phone a Sony Ericsson k75=
+0
+> i. I am running ubuntu and the Bluez bluetooth protocol stack. I have
+> followed this example:
+> http://people.csail.mit.edu/albert/bluez-intro/x601.html
+> I have ofcourse changed the bluetooth address and the uuid to match my
+> phone and service. But still my program finds no services on the phone??
+> What is wrong here? Anybody have some hints?
 >
-> they are blocking by default (like all other sockets).
+> Thanks
+> Markus
 >
-> Regards
 >
-> Marcel
+>
 >
 >
 >
@@ -58,35 +68,43 @@ o
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
 >
 
-------=_Part_22421_28116064.1148368829623
+------=_Part_63930_30448267.1148334799872
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-How do I make it non-blocking Marcel??? <br><br><div><span class=3D"gmail_q=
-uote">On 5/16/06, <b class=3D"gmail_sendername">Marcel Holtmann</b> &lt;<a =
-href=3D"mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:</spa=
-n><blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(204=
-, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-Hi Sowmya,<br><br>&gt; Are rfcomm sockets &quot;blocking&quot; sockets by d=
-efault???<br><br>they are blocking by default (like all other sockets).<br>=
-<br>Regards<br><br>Marcel<br><br><br><br><br>------------------------------=
--------------------------
-<br>Using Tomcat but need to do more? Need to support web services, securit=
-y?<br>Get stuff done quickly with pre-integrated technology to make your jo=
-b easier<br>Download IBM WebSphere Application Server v.1.0.1 based on Apac=
-he Geronimo
-<br><a href=3D"http://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;kid=3D120709&a=
-mp;bid=3D263057&amp;dat=3D121642">http://sel.as-us.falkag.net/sel?cmd=3Dlnk=
-&amp;kid=3D120709&amp;bid=3D263057&amp;dat=3D121642</a><br>________________=
-_______________________________
-<br>Bluez-users mailing list<br><a href=3D"mailto:Bluez-users@lists.sourcef=
-orge.net">Bluez-users@lists.sourceforge.net</a><br><a href=3D"https://lists=
-.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/=
-lists/listinfo/bluez-users
-</a><br></blockquote></div><br>
+If you're using a Bluetooth reserved UUID, make sure that you've correctly =
+specified it by adding the Bluetooth Base UUID.<br><br>-albert<br><br><div>=
+<span class=3D"gmail_quote">On 5/19/06, <b class=3D"gmail_sendername"><a hr=
+ef=3D"mailto:markusv@student.matnat.uio.no">
+markusv@student.matnat.uio.no</a></b> &lt;<a href=3D"mailto:markusv@student=
+.matnat.uio.no">markusv@student.matnat.uio.no</a>&gt; wrote:</span><blockqu=
+ote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(204, 204, 204=
+); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+<br>hi<br>I am trying to discover services on my cellular phone a Sony Eric=
+sson k750<br>i. I am running ubuntu and the Bluez bluetooth protocol stack.=
+ I have<br>followed this example:<br><a href=3D"http://people.csail.mit.edu=
+/albert/bluez-intro/x601.html">
+http://people.csail.mit.edu/albert/bluez-intro/x601.html</a><br>I have ofco=
+urse changed the bluetooth address and the uuid to match my<br>phone and se=
+rvice. But still my program finds no services on the phone??<br>What is wro=
+ng here? Anybody have some hints?
+<br><br>Thanks<br>Markus<br><br><br><br><br><br><br><br>-------------------=
+------------------------------------<br>Using Tomcat but need to do more? N=
+eed to support web services, security?<br>Get stuff done quickly with pre-i=
+ntegrated technology to make your job easier
+<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geron=
+imo<br><a href=3D"http://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;kid=3D12070=
+9&amp;bid=3D263057&amp;dat=3D121642">http://sel.as-us.falkag.net/sel?cmd=3D=
+lnk&amp;kid=3D120709&amp;bid=3D263057&amp;dat=3D121642
+</a><br>_______________________________________________<br>Bluez-users mail=
+ing list<br><a href=3D"mailto:Bluez-users@lists.sourceforge.net">Bluez-user=
+s@lists.sourceforge.net</a><br><a href=3D"https://lists.sourceforge.net/lis=
+ts/listinfo/bluez-users">
+https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquot=
+e></div><br>
 
-------=_Part_22421_28116064.1148368829623--
+------=_Part_63930_30448267.1148334799872--
 
 
 -------------------------------------------------------
