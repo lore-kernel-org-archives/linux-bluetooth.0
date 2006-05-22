@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <e85851c20605212237i61459460v12df08c32c0e8d78@mail.gmail.com>
-From: "Gloria Saripah Patara" <glowz.saripah@gmail.com>
-To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_Part_6689_3620298.1148276239475"
-Subject: [Bluez-users] Want some help
+	boundary="----_=_NextPart_001_01C67D49.63341578"
+Subject: [Bluez-users] Mac OS X Scanner
+Message-ID: <C3CDAA96649B7E4290D26BD856B710C7024CEE@marge.au.hmv.com>
+From: "Nathan Lynch" <nathan.lynch@hmv.com.au>
+To: <bluez-users@lists.sourceforge.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,39 +17,130 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 May 2006 12:37:19 +0700
+Date: Mon, 22 May 2006 12:42:36 +1000
 
-------=_Part_6689_3620298.1148276239475
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+This is a multi-part message in MIME format.
+
+------_=_NextPart_001_01C67D49.63341578
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-I have completed compiling the code to scanning the Current
-Activing-Bluetooth.
-Now, I found some problem. I get a source file from internet and i attempt
-to compiling it.
-But, it prints some errors which show that the VARIABEL used inside the fil=
-e
-.c didn't recognized.
-like obex_setpath, etc.
-Am i lack-of-libraries?
+Hi Bluez-group!
 
-------------------------------------------------
-Thanks in advance.
+=20
 
-------=_Part_6689_3620298.1148276239475
-Content-Type: text/html; charset=ISO-8859-1
+A quick question on the applications front - I have a Mac G5 running
+Tiger (OS X 10.4), does anyone know a proximity/scanner application that
+I could use to discover Bluetooth enabled devices and ideally write out
+information to a database?
+
+=20
+
+T.I.A!
+
+=20
+
+Nathan
+
+
+------_=_NextPart_001_01C67D49.63341578
+Content-Type: text/html;
+	charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-I have completed compiling the code to scanning the Current Activing-Blueto=
-oth.<br>Now, I found some problem. I get a source file from internet and i =
-attempt to compiling it.<br>But, it prints some errors which show that the =
-VARIABEL used inside the file .c didn't recognized.
-<br>like obex_setpath, etc.<br>Am i lack-of-libraries?<br><br>-------------=
------------------------------------<br>Thanks in advance.<br>
+<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
+xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns=3D"http://www.w3.org/TR/REC-html40">
 
-------=_Part_6689_3620298.1148276239475--
+<head>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Verdana;
+	panose-1:2 11 6 4 3 5 4 4 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0pt;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-reply;
+	font-family:Verdana;
+	color:navy;}
+@page Section1
+	{size:612.0pt 792.0pt;
+	margin:72.0pt 90.0pt 72.0pt 90.0pt;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=3DEN-US link=3Dblue vlink=3Dpurple>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
+style=3D'font-size:
+9.5pt;font-family:Verdana;color:navy'>Hi =
+Bluez-group!<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
+style=3D'font-size:
+9.5pt;font-family:Verdana;color:navy'><o:p>&nbsp;</o:p></span></font></p>=
+
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
+style=3D'font-size:
+9.5pt;font-family:Verdana;color:navy'>A quick question on the =
+applications front
+&#8211; I have a Mac G5 running Tiger (OS X 10.4), does anyone know a
+proximity/scanner application that I could use to discover Bluetooth =
+enabled
+devices and ideally write out information to a =
+database?<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
+style=3D'font-size:
+9.5pt;font-family:Verdana;color:navy'><o:p>&nbsp;</o:p></span></font></p>=
+
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
+style=3D'font-size:
+9.5pt;font-family:Verdana;color:navy'>T.I.A!<o:p></o:p></span></font></p>=
+
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
+style=3D'font-size:
+9.5pt;font-family:Verdana;color:navy'><o:p>&nbsp;</o:p></span></font></p>=
+
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DVerdana><span =
+style=3D'font-size:
+9.5pt;font-family:Verdana;color:navy'>Nathan<o:p></o:p></span></font></p>=
+
+
+</div>
+
+</body>
+
+</html>
+
+------_=_NextPart_001_01C67D49.63341578--
+
 
 
 -------------------------------------------------------
