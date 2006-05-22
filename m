@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluez service discovery
-From: Charles Bueche <charles@bueche.ch>
+Message-ID: <fe0a97c20605212303v43fb21cet9384b3cc953bbc35@mail.gmail.com>
+From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <19c2b3920605190517q3999d79buc23d082ce749ae1e@mail.gmail.com>
-References: <48637.156.116.2.246.1148036921.squirrel@webmail.uio.no>
-	 <19c2b3920605190517q3999d79buc23d082ce749ae1e@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1148283810.9940.1.camel@bluez.bueche.ch>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Need some tutorials
+In-Reply-To: <e85851c20605212257p4ceeff89m7bc462f226d1b0ce@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_Part_12716_1684675.1148277788997"
+References: <e85851c20605212257p4ceeff89m7bc462f226d1b0ce@mail.gmail.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,64 +19,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 May 2006 09:43:30 +0200
+Date: Mon, 22 May 2006 11:33:08 +0530
 
-Hi,
+------=_Part_12716_1684675.1148277788997
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-My K700i didn't play nice with bluetooth, until I asked for a new
-firmware, which fixed all the bugs I was aware off. You may want to ask
-your vendor for an update.
+dudette!! google... OBEX + Bluetooth... lady!! u wil get
+Google is our best friend... u shud be try to utilise it.... and please
+don;t change the subjects and increase the mails... use the same subject...
 
-I just got my W810i, didn't test at all yet.
+DIDN'T U GET WHAT MARCEL WAS TELLIN U ABT MAILING ETHICS??
 
-Charles
+On 5/22/06, Gloria Saripah Patara <glowz.saripah@gmail.com> wrote:
+>
+> Did you know some tutorials that tells about OBEX?
+>
+> -----------------------------------
+> Thanks in advance
+>
 
-On ven, 2006-05-19 at 14:17 +0200, rangzen wrote:
-> Hello,
-> I tried for months to have an HID connexion between my k750i and linux
-> and ... I give up ... I can see services, connect but only one time :)
-> If I want connect again, I need to reset the computer and the phone so
-> it's not very usefull ...
-> For files transfern no problem.
-> Check your menu with "activate bluetooth", "hide the phone to other",
-> etc. and try the program supplied by bluez first.
-> 
-> 2006/5/19, markusv@student.matnat.uio.no <markusv@student.matnat.uio.no>:
-> >
-> > hi
-> > I am trying to discover services on my cellular phone a Sony Ericsson k750
-> > i. I am running ubuntu and the Bluez bluetooth protocol stack. I have
-> > followed this example:
-> > http://people.csail.mit.edu/albert/bluez-intro/x601.html
-> > I have ofcourse changed the bluetooth address and the uuid to match my
-> > phone and service. But still my program finds no services on the phone??
-> > What is wrong here? Anybody have some hints?
-> >
-> > Thanks
-> > Markus
-> >
-> >
-> >
-> >
-> >
-> >
-> >
-> > -------------------------------------------------------
-> > Using Tomcat but need to do more? Need to support web services, security?
-> > Get stuff done quickly with pre-integrated technology to make your job easier
-> > Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> > http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >
-> 
+------=_Part_12716_1684675.1148277788997
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
--- 
-Charles Bueche <charles@bueche.ch>
-sand, snow, wave, wind and net -surfer
+dudette!! google... OBEX + Bluetooth... lady!! u wil get<br>Google is our b=
+est friend... u shud be try to utilise it.... and please don;t change the s=
+ubjects and increase the mails... use the same subject... <br><br>DIDN'T U =
+GET WHAT MARCEL WAS TELLIN U ABT MAILING ETHICS??=20
+<br><br><div><span class=3D"gmail_quote">On 5/22/06, <b class=3D"gmail_send=
+ername">Gloria Saripah Patara</b> &lt;<a href=3D"mailto:glowz.saripah@gmail=
+.com">glowz.saripah@gmail.com</a>&gt; wrote:</span><blockquote class=3D"gma=
+il_quote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0=
+pt 0pt 0.8ex; padding-left: 1ex;">
+<div>Did you know some tutorials that tells about OBEX?<br><br>------------=
+-----------------------<br>Thanks in advance<br>
 
+</div></blockquote></div><br>
+
+------=_Part_12716_1684675.1148277788997--
 
 
 -------------------------------------------------------
