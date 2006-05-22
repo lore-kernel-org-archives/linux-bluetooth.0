@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4471DE09.5050405@xmission.com>
+Message-ID: <4471D778.6030301@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: broadcom in disguise...
-References: <4461A33F.1060702@killesreiter.de> <44634846.3000006@xmission.com> <Pine.LNX.4.63.0605111727560.7379@redbean.intranet.gw-instruments.de> <4461FE7D.3050108@killesreiter.de> <447105B1.3060908@killesreiter.de> <447140B7.2090100@xmission.com> <44718942.10609@killesreiter.de>
-In-Reply-To: <44718942.10609@killesreiter.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [Bluez-devel] A few tests: a2play aborts when hanging up the
+ call. That's not the way it should work.
+References: <20060522154201.3cff8m3ju4w0ck4o@mail.blas.net>
+In-Reply-To: <20060522154201.3cff8m3ju4w0ck4o@mail.blas.net>
+Content-Type: text/plain; charset=ISO-8859-15
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,32 +19,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 May 2006 09:51:37 -0600
+Date: Mon, 22 May 2006 09:23:36 -0600
 
-Gerhard
+db
 
->> A couple of manufacturers switched from csr to broadcom around the time
->> bluecore4 and the other edr chips came out. Not sure why.
->>   
-> I find this highly annoying. I have written to typhoon and asked for an
-> explanation.
+> While listening to stereo music with a2play, taking a call works (that the part
+> of the headset) and the a2play keeps on to stream during the call. Normal.
+> But when I hang up in order to go on and listen to the music the a2play detects
+> a connection reset by peer and aborts.
 
-this is unfortunately a fairly standard practice across the computer
-hardware industry.
+Are these sets doing avrcp? It's possible that your headset likes to
+send a pause command via avrcp to the a2dp streamer before taking the
+voice call. If so, we should listen for avrcp pause and act accordingly.
 
-bluetake has done the switcheroo as well but currently their BT007EX is
-our only source for a class 1 bluecore4 dongle so we like them again.
+I should probably combine a2play and avsnd but for now, start up
 
->>  If you've used the adapter in windows
->> for sco audio
->>  then it might change some nvram settings.
+ avsnd <headsetbtaddr>
 
-I really don't know much about the broadcom models or even if they do
-have nvram settings for this. It's possible they ship something that
-can't do sco out of the box but will do it after the windows driver
-initializes it. That's my "all out of ideas" suggestion.
+just after you start up a2play and watch the avrcp stream.
 
 Brad
+
 
 
 
