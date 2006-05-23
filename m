@@ -1,5 +1,5 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <57355.80.203.47.235.1148404143.squirrel@webmail.uio.no>
+Message-ID: <57354.80.203.47.235.1148404102.squirrel@webmail.uio.no>
 From: markusv@student.matnat.uio.no
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
@@ -16,18 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 23 May 2006 19:09:03 +0200 (CEST)
+Date: Tue, 23 May 2006 19:08:22 +0200 (CEST)
 
 
-I have generated my own service and generated a UUID with uuidgen. The
-UUID I generated is 1c712d88aac711da818a000bcd4e8912. But my laptop does
-not find my service on the phone! If i change the uuid to search for on
-the laptop to 0x1002 the public brose root, as far as I know it should
-than give me all services on the phone. But still no services are found.
-Searching with sdptool finds all services on the phone including my own.
-Why can't I find them in my C program? I would realy appreciate some help
-here. I have spent far to much time on that now, and I need that to work
-for my master thesis.
+I have generated my own service and generated a UUID with uuidgen. But my
+laptop does not find my service on the phone! If i change the uuid to
+search for on the laptop to 0x1002 the public brose root, as far as I know
+it should than give me all services on the phone. But still no services
+are found. Searching with sdptool finds all services on the phone
+including my own. Why can't I find them in my C program? I would realy
+appreciate some help here. I have spent far to much time on that now, and
+I need that to work for my master thesis.
 
 Markus
 
