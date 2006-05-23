@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <9763591.1148373977331.JavaMail.rajanrengasamy@mac.com>
-From: Rajan Rengasamy <rajanrengasamy@mac.com>
+Subject: Re: [Bluez-users] blocking or non-blocking?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluez service discovery
-in-reply-to: <ef9938ec0605221453g29a81633v337564b60eb4e010@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_1936_10586728.1148373977205"
-references: <48637.156.116.2.246.1148036921.squirrel@webmail.uio.no> <ef9938ec0605221453g29a81633v337564b60eb4e010@mail.gmail.com>
+In-Reply-To: <fe0a97c20605230020i4606620dydedaeb8ba2cf789e@mail.gmail.com>
+References: <fe0a97c20605102047q4feba4a8p224c6d3c3980ed5b@mail.gmail.com>
+	 <1147789434.24761.79.camel@localhost>
+	 <fe0a97c20605230020i4606620dydedaeb8ba2cf789e@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1148369129.18226.6.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,62 +20,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 23 May 2006 18:46:17 +1000
+Date: Tue, 23 May 2006 09:25:29 +0200
 
-------=_Part_1936_10586728.1148373977205
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Hi Sowmya,
 
-Hi Albert, if u dont mind me asking, would you be able to guide me on how i can get my phone's UUID? please thanks.
-i also have a k750.
- 
-On Tuesday, May 23, 2006, at 07:54AM, Albert Huang <albert@csail.mit.edu> wrote:
+> How do I make it non-blocking Marcel??? 
 
->
-><<Original Attached>>
+check the manpage for fcntl() and then look for F_SETFL.
 
+Regards
 
-Rajan
-------------- 
-Tat Twvam Asi
+Marcel
 
-------=_Part_1936_10586728.1148373977205
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-If you're using a Bluetooth reserved UUID, make sure that you've correctly =
-specified it by adding the Bluetooth Base UUID.<br><br>-albert<br><br><div>=
-<span class=3D"gmail_quote">On 5/19/06, <b class=3D"gmail_sendername"><a hr=
-ef=3D"mailto:markusv@student.matnat.uio.no">
-markusv@student.matnat.uio.no</a></b> &lt;<a href=3D"mailto:markusv@student=
-.matnat.uio.no">markusv@student.matnat.uio.no</a>&gt; wrote:</span><blockqu=
-ote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(204, 204, 204=
-); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-<br>hi<br>I am trying to discover services on my cellular phone a Sony Eric=
-sson k750<br>i. I am running ubuntu and the Bluez bluetooth protocol stack.=
- I have<br>followed this example:<br><a href=3D"http://people.csail.mit.edu=
-/albert/bluez-intro/x601.html">
-http://people.csail.mit.edu/albert/bluez-intro/x601.html</a><br>I have ofco=
-urse changed the bluetooth address and the uuid to match my<br>phone and se=
-rvice. But still my program finds no services on the phone??<br>What is wro=
-ng here? Anybody have some hints?
-<br><br>Thanks<br>Markus<br><br><br><br><br><br><br><br>-------------------=
-------------------------------------<br>Using Tomcat but need to do more? N=
-eed to support web services, security?<br>Get stuff done quickly with pre-i=
-ntegrated technology to make your job easier
-<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geron=
-imo<br><a href=3D"http://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;kid=3D12070=
-9&amp;bid=3D263057&amp;dat=3D121642">http://sel.as-us.falkag.net/sel?cmd=3D=
-lnk&amp;kid=3D120709&amp;bid=3D263057&amp;dat=3D121642
-</a><br>_______________________________________________<br>Bluez-users mail=
-ing list<br><a href=3D"mailto:Bluez-users@lists.sourceforge.net">Bluez-user=
-s@lists.sourceforge.net</a><br><a href=3D"https://lists.sourceforge.net/lis=
-ts/listinfo/bluez-users">
-https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquot=
-e></div><br>
-
-------=_Part_1936_10586728.1148373977205--
 
 
 
