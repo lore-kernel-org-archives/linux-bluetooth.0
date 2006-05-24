@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michael Mauch <michael.mauch@gmx.de>
+Message-ID: <44748EFD.2060000@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20060524212831.GA3447@elmicha.333200002251-0001.dialin.t-online.de>
-References: <e85851c20605232344p52bf1210y36273bef4ff02ce6@mail.gmail.com> <e85851c20605232349q63e37b30ta98c0dd4309c562f@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <e85851c20605232349q63e37b30ta98c0dd4309c562f@mail.gmail.com>
-Subject: [Bluez-users] Re: Found errors
+Subject: Re: [Bluez-users] bluetooth-alsa: a2recv stuttering sound from WM5.0
+ AKU2.0
+References: <96B7A15232D6CF42836BFD428AD6B6034E4F41@deexmb01.de.icap.com>
+In-Reply-To: <96B7A15232D6CF42836BFD428AD6B6034E4F41@deexmb01.de.icap.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,32 +19,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 May 2006 23:28:32 +0200
+Date: Wed, 24 May 2006 09:51:09 -0700
 
-Gloria Saripah Patara wrote:
+Guido
 
-> Hello, Friends. I want ask you, about error messages.
-> Did you find this kind of message?
-> -------- Can't establish OBEX connection : Host is down -----------
-> I use perror to print the message. And function that raises the
-> message is BtOBEX_TransportConnect(...., ...., ....., ....)
+> But the sound is stuttering like hell. It is played at half to quater of
+> normal speed in very small sound blocks.
 > 
-> inside this message i attached my code.
+> Can someone help me? Has somebody got this working on a WM 5.0 Device as
+> a sender?
 
->From your code:
+You will be the first. :)
 
-        ii = (inquiry_info*)malloc(max_rsp * sizeof(inquiry_info));
-        free(ii);
+Did you configure with --enable-fixed? Fixed point decoding is more
+efficient but it may not behave as well for some codec settings.
 
-        return (ii->bdaddr);
+Can you figure out what codec settings the wm5 device is using? Maybe
+they are not getting set in our decoder properly.
 
-That's wrong. After you freed ii, you are not allowed to access it
-anymore. You may only access malloced variables between the malloc() and
-the free(). After free(), the system may overwrite the contents of the
-allocated memory.
-
-
-  Michael
+Brad
 
 
 -------------------------------------------------------
