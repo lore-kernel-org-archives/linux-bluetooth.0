@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <e85851c20605232349q63e37b30ta98c0dd4309c562f@mail.gmail.com>
-From: "Gloria Saripah Patara" <glowz.saripah@gmail.com>
+Message-ID: <ef9938ec0605232128n66fd4ce3oc05e542f037f02e9@mail.gmail.com>
+From: "Albert Huang" <albert@csail.mit.edu>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <e85851c20605232344p52bf1210y36273bef4ff02ce6@mail.gmail.com>
+Subject: Re: [Bluez-users] Found -undefined reference-
+In-Reply-To: <e85851c20605232041n2570cf9bk7a3f279358a63676@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_94079_29669233.1148453356353"
-References: <e85851c20605232344p52bf1210y36273bef4ff02ce6@mail.gmail.com>
-Subject: [Bluez-users] Found errors
+Content-Type: multipart/alternative;
+	boundary="----=_Part_80040_28039600.1148444934571"
+References: <e85851c20605230329s754c5187sf2528816a0e64d@mail.gmail.com>
+	 <e85851c20605232040h2cb185bp780b724e667fc84d@mail.gmail.com>
+	 <e85851c20605232041n2570cf9bk7a3f279358a63676@mail.gmail.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,123 +21,78 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 May 2006 13:49:16 +0700
+Date: Wed, 24 May 2006 00:28:54 -0400
 
-------=_Part_94079_29669233.1148453356353
+------=_Part_80040_28039600.1148444934571
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Hello, Friends. I want ask you, about error messages.
-Did you find this kind of message?
--------- Can't establish OBEX connection : Host is down -----------
-I use perror to print the message. And function that raises the
-message is BtOBEX_TransportConnect(...., ...., ....., ....)
+you need to link against libopenobex.
 
-inside this message i attached my code.
+it's either
 
----------------------
-Thanks in advance
+gcc -o code code.c -lbluetooth -lopenobex
 
-------=_Part_94079_29669233.1148453356353
-Content-Type: application/octet-stream; name=main.c
-Content-Transfer-Encoding: 7bit
-X-Attachment-Id: f_enlb4jwo
-Content-Disposition: attachment; filename="main.c"
+or
 
-#include <stdio.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <getopt.h>
-#include <signal.h>
-#include <libgen.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
+gcc -o code codec.c -lbluetooth -lopenobex-1.0
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/hci.h>
-#include <bluetooth/hci_lib.h>
+or something like that.
 
-#include <readline/readline.h>
-#include <readline/history.h>
+-albert
 
-#include "goep.h"
-#include "ftp.h"
+On 5/23/06, Gloria Saripah Patara <glowz.saripah@gmail.com> wrote:
+>
+> Have u ever met the error messages like these :
+>
+> undefined reference to 'OBEX_Cleanup'
+>
+> i used the command line below:
+>
+> gcc -o code code.c -lbluetooth
+>
+> it's occur when i try to call certain function or procedure which
+> declarated in obex.h file (header file in Openobex libraries).
+>
+> file code.c is attached inside this message.
+> -----------------------
+> Thanks in advance....
+>
+>
+>
 
-void send_file(int od, char *fileName)
-{
-	struct stat st;
-	unsigned char *data;
-	int fd;
+------=_Part_80040_28039600.1148444934571
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-	fd = open(argv[0], O_RDONLY);
-	if (fd < 0) {
-		printf("Can't open file %s\n", fileName);
-		return;
-	}
+you need to link against libopenobex.<br>
+<br>
+it's either<br>
+<br>
+gcc -o code code.c -lbluetooth -lopenobex<br>
+<br>
+or <br>
+<br>
+gcc -o code codec.c -lbluetooth -lopenobex-1.0<br>
+<br>
+or something like that.<br>
+<br>
+-albert<br><br><div><span class=3D"gmail_quote">On 5/23/06, <b class=3D"gma=
+il_sendername">Gloria Saripah Patara</b> &lt;<a href=3D"mailto:glowz.saripa=
+h@gmail.com">glowz.saripah@gmail.com</a>&gt; wrote:</span><blockquote class=
+=3D"gmail_quote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin=
+: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+Have u ever met the error messages like these :<br><br>undefined reference =
+to 'OBEX_Cleanup'<br><br>i used the command line below:<br><br>gcc -o code =
+code.c -lbluetooth<br><br>it's occur when i try to call certain function or=
+ procedure which
+<br>declarated in obex.h file (header file in Openobex libraries).<br><br>f=
+ile code.c is attached inside this message.<br>-----------------------<br>T=
+hanks in advance....<br><br><br></blockquote></div><br>
 
-	if (fstat(fd, &st) < 0) {
-		printf("Can't get size of file %s\n", fileName);
-		close(fd);
-		return;
-	}
-
-	data = mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
-	if (!data) {
-		printf("Can't mmap file %s\n", fileName);
-		close(fd);
-		return;
-	}
-
-	if (obex_put(od, NULL, basename(fileName), data, st.st_size) == 0) {
-		printf("%lu bytes sent\n", st.st_size);
-	}
-
-	munmap(data, st.st_size);
-	close(fd);
-}
-
-bdaddr_t get_client(){
-	inquiry_info *ii = NULL;
-	int max_rsp;
-
-	max_rsp = 255;
-	ii = (inquiry_info*)malloc(max_rsp * sizeof(inquiry_info));
-	free(ii);
-
-    	return (ii->bdaddr);
-}
-
-int main(){
-	bdaddr_t src, dest;
-	int mode, od;
-	char *fileName = "bt.sol";
-	
-	bacpy(&src, BDADDR_ANY);
-
-	if ((od = obex_open(&src, &get_client(), channel)) < 0) {
-		perror("Can't establish OBEX connection");
-		exit(1);
-	}
-
-	mode = OBEX_FILE_TRANSFER;
-	obex_connect(od, mode);
-	printf("Connected\n");
-
-	//transferring file
-	send_file();
-
-	obex_disconnect(od);
-	printf("Disconnected.\n");
-	obex_close(od);
-
-	return 0;
-}
-------=_Part_94079_29669233.1148453356353--
+------=_Part_80040_28039600.1148444934571--
 
 
 -------------------------------------------------------
