@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4475DBB0.2090003@silicom.fr>
-From: Fabien Chevalier <fchevalier@silicom.fr>
+Message-ID: <4475D2DC.304@killesreiter.de>
+From: Gerhard Killesreiter <gerhard@killesreiter.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] report on new bluez headset
-References: <446CDD43.3050604@free.fr> <446F383A.1040605@ens.fr> <4470B491.7040004@free.fr> <4470C77A.2080006@ens.fr> <4475C22B.9080908@free.fr> <4475CE30.7080109@xmission.com>
-In-Reply-To: <4475CE30.7080109@xmission.com>
-Content-Type: multipart/mixed;
- boundary="------------000308050406070408060404"
+Subject: Re: [Bluez-devel] Re: broadcom in disguise...
+References: <4461A33F.1060702@killesreiter.de> <44634846.3000006@xmission.com> <Pine.LNX.4.63.0605111727560.7379@redbean.intranet.gw-instruments.de> <4461FE7D.3050108@killesreiter.de> <447105B1.3060908@killesreiter.de> <447140B7.2090100@xmission.com> <44718942.10609@killesreiter.de> <4471DE09.5050405@xmission.com>
+In-Reply-To: <4471DE09.5050405@xmission.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,98 +18,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 May 2006 18:30:40 +0200
-
-This is a multi-part message in MIME format.
---------------000308050406070408060404
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Date: Thu, 25 May 2006 17:53:00 +0200
 
 Brad Midgley wrote:
 
->this is only going to work if egika will listen for dbus events to that
->effect. alsa provides nothing for signaling.
->
->  
->
-Agreed :-)
-However Ekiga already has optionnal support for DBUS. It should be 
-possible to patch Ekiga so that it is responsive to headset 
-connect/disconnect/button pushed events.
+Hi Brad!
 
->>>But the sound is not perfect. I hear some frying sound (un petit
->>>gresillement), not very disturbing though but it is absent when I use
->>>it with Ekiga.
->>>      
->>>
->>I noticed that. It's not perfect yet.
->>I'm currently working on improving voice quality in general, but i looks
->>it will end up with a kernel patch.
->>    
->>
+>>> A couple of manufacturers switched from csr to broadcom around the time
+>>> bluecore4 and the other edr chips came out. Not sure why.
+>>>   
+>>>       
+>> I find this highly annoying. I have written to typhoon and asked for an
+>> explanation.
+>>     
 >
->We've had quality problems that might be attributed to improperly pacing
->the data sent through sco. I am not sure what the kernel provides--if
->anything--in terms of timing.
->  
->
-Could you provide further information on these other quality problems ? 
-Just out of curiosity ;-)
+> this is unfortunately a fairly standard practice across the computer
+> hardware industry.
+>   
 
->What kind of kernel patch you are looking into?
->  
->
-Well, i'm currently implementing a prototype for SCO flow control, so 
-that user apps don't have to throttle themselves when sending data over 
-a SCO socket. It should *theorically* help to have a continuous stream
-of PCM samples flow troughout the stack without interruption. Everything 
-is in the *theorically*. I'm just checking
-that at the moment.
+If they'd at least update their docs...
 
->alsa has two ways to look for devices. plugins do not show up using the
->api everyone is used to unfortunately.
->  
->
-That's too bad, but that's true. It's just a shame alsa IO plugins can't 
-appear like sound cards too.
+Anyway, I got an anwer from them (didn't really expect one)!
 
->Brad
->
->
->-------------------------------------------------------
->All the advantages of Linux Managed Hosting--Without the Cost and Risk!
->Fully trained technicians. The highest number of Red Hat certifications in
->the hosting industry. Fanatical Support. Click to learn more
->http://sel.as-us.falkag.net/sel?cmd=lnk&kid=107521&bid=248729&dat=121642
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->  
->
+They claim that the chip can be addressed by the broadcom driver but 
+would definitly be a CSR chip.
+
+Does that make any sense to anybody?
 
 
---------------000308050406070408060404
-Content-Type: text/x-vcard; charset=utf-8;
- name="fchevalier.vcf"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="fchevalier.vcf"
-
-begin:vcard
-fn:Fabien CHEVALIER
-n:CHEVALIER;Fabien
-org:SILICOM
-adr:;;4 rue de Jouanet;RENNES ATALANTE;;35700;FRANCE
-email;internet:fchevalier@silicom.fr
-title:Software & Studies Engineer
-tel;work:+33 (0) 2 99 84 17 17
-version:2.1
-end:vcard
 
 
---------------000308050406070408060404--
+> bluetake has done the switcheroo as well but currently their BT007EX is
+> our only source for a class 1 bluecore4 dongle so we like them again.
+>
+>   
+>>>  If you've used the adapter in windows
+>>> for sco audio
+>>>  then it might change some nvram settings.
+>>>       
+>
+> I really don't know much about the broadcom models or even if they do
+> have nvram settings for this. It's possible they ship something that
+> can't do sco out of the box but will do it after the windows driver
+> initializes it. That's my "all out of ideas" suggestion.
+>   
+
+Guess I will need to take it to a windows box then.
+
+Cheers,
+    Gerhard
 
 
 -------------------------------------------------------
