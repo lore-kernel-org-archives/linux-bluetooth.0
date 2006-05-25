@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4475D2DC.304@killesreiter.de>
-From: Gerhard Killesreiter <gerhard@killesreiter.de>
+Message-ID: <4475CE30.7080109@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: broadcom in disguise...
-References: <4461A33F.1060702@killesreiter.de> <44634846.3000006@xmission.com> <Pine.LNX.4.63.0605111727560.7379@redbean.intranet.gw-instruments.de> <4461FE7D.3050108@killesreiter.de> <447105B1.3060908@killesreiter.de> <447140B7.2090100@xmission.com> <44718942.10609@killesreiter.de> <4471DE09.5050405@xmission.com>
-In-Reply-To: <4471DE09.5050405@xmission.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] report on new bluez headset
+References: <446CDD43.3050604@free.fr> <446F383A.1040605@ens.fr> <4470B491.7040004@free.fr> <4470C77A.2080006@ens.fr> <4475C22B.9080908@free.fr>
+In-Reply-To: <4475C22B.9080908@free.fr>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,55 +18,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 May 2006 17:53:00 +0200
+Date: Thu, 25 May 2006 09:33:04 -0600
 
-Brad Midgley wrote:
+Fabien
 
-Hi Brad!
+>> Yes, exactly. If I close the headset during a conversation then ekiga
+>> completely freezes.
+> 
+> 
+> For now this is not supported :-)
+> 
+> In the long run it should be possible to tell ekiga that the headset has
+> closed, however this would require some king of communication between
+> headsetd and ekiga -- i'm not there yet :-(
 
->>> A couple of manufacturers switched from csr to broadcom around the time
->>> bluecore4 and the other edr chips came out. Not sure why.
->>>   
->>>       
->> I find this highly annoying. I have written to typhoon and asked for an
->> explanation.
->>     
->
-> this is unfortunately a fairly standard practice across the computer
-> hardware industry.
->   
+this is only going to work if egika will listen for dbus events to that
+effect. alsa provides nothing for signaling.
 
-If they'd at least update their docs...
+>> But the sound is not perfect. I hear some frying sound (un petit
+>> gresillement), not very disturbing though but it is absent when I use
+>> it with Ekiga.
+> 
+> I noticed that. It's not perfect yet.
+> I'm currently working on improving voice quality in general, but i looks
+> it will end up with a kernel patch.
 
-Anyway, I got an anwer from them (didn't really expect one)!
+We've had quality problems that might be attributed to improperly pacing
+the data sent through sco. I am not sure what the kernel provides--if
+anything--in terms of timing.
 
-They claim that the chip can be addressed by the broadcom driver but 
-would definitly be a CSR chip.
+What kind of kernel patch you are looking into?
 
-Does that make any sense to anybody?
+>>>> - the device does not appear in the alsa mixer
 
+alsa has two ways to look for devices. plugins do not show up using the
+api everyone is used to unfortunately.
 
-
-
-> bluetake has done the switcheroo as well but currently their BT007EX is
-> our only source for a class 1 bluecore4 dongle so we like them again.
->
->   
->>>  If you've used the adapter in windows
->>> for sco audio
->>>  then it might change some nvram settings.
->>>       
->
-> I really don't know much about the broadcom models or even if they do
-> have nvram settings for this. It's possible they ship something that
-> can't do sco out of the box but will do it after the windows driver
-> initializes it. That's my "all out of ideas" suggestion.
->   
-
-Guess I will need to take it to a windows box then.
-
-Cheers,
-    Gerhard
+Brad
 
 
 -------------------------------------------------------
