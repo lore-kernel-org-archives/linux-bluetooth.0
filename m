@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bluetooth keyboard.
-From: "Collin R. Mulliner" <collin@betaversion.net>
+From: Mark Murphy <mjmrphy1@uiuc.edu>
+Subject: Re: [Bluez-devel] Bluetooth 2.6.12-2.6.13
+ Patch
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20060526123914.GD5720@beta.private.mielke.cc>
-References: <e85851c20605260120r47e103b9y5fc3a67b5e8ac224@mail.gmail.com>
-	 <20060526123914.GD5720@beta.private.mielke.cc>
-Content-Type: text/plain
-Message-Id: <1148666571.30353.33.camel@panic>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Message-Id: <65d9a561.be867fa1.8220b00@expms5.cites.uiuc.edu>
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,23 +17,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 May 2006 11:02:51 -0700
+Date: Fri, 26 May 2006 10:35:37 -0500
 
-Yes, my xkbd-bthid:  http://mulliner.org/bluetooth/xkbdbthid.php also
-its still in development
 
-Collin
+Okay, so that was a dumb question - there were two lines
+difference. 
 
-On Fri, 2006-05-26 at 08:39 -0400, Dave Mielke wrote:
-> Is anyone aware of an application which makes the PC behave like a Bluetooth
-> keyboard to another device?
-> 
---
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-Pizza is goooood :-)
+Can anyone give me a bit more info as to what bug those were
+trying to fix?
 
+Mark
 
 
 -------------------------------------------------------
