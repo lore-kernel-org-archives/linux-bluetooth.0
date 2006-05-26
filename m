@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Dave Mielke <dave@mielke.cc>
+Message-ID: <4476E686.2040402@free.fr>
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20060526123914.GD5720@beta.private.mielke.cc>
-References: <e85851c20605260120r47e103b9y5fc3a67b5e8ac224@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <e85851c20605260120r47e103b9y5fc3a67b5e8ac224@mail.gmail.com>
-Subject: [Bluez-devel] Bluetooth keyboard.
+Subject: Re: [Bluez-devel] report on new bluez headset
+References: <446CDD43.3050604@free.fr> <446F383A.1040605@ens.fr> <4470B491.7040004@free.fr> <4470C77A.2080006@ens.fr> <4475C22B.9080908@free.fr> <4475CE30.7080109@xmission.com> <4475DBB0.2090003@silicom.fr> <44761461.8080503@xmission.com>
+In-Reply-To: <44761461.8080503@xmission.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,16 +18,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 May 2006 08:39:14 -0400
+Date: Fri, 26 May 2006 13:29:10 +0200
 
-Is anyone aware of an application which makes the PC behave like a Bluetooth
-keyboard to another device?
+Brad Midgley wrote:
+> Fabien
+> 
+> 
+>>>We've had quality problems that might be attributed to improperly pacing
+>>>the data sent through sco. I am not sure what the kernel provides--if
+>>>anything--in terms of timing.
+>>> 
+>>>
+>>
+>>Could you provide further information on these other quality problems ?
+>>Just out of curiosity ;-)
+> 
+> 
+> the high and lo bytes sometimes get out of sync so we are reading part
+> of the previous sample and part of the next one when capturing from the
+> mic. the result is noise.
 
--- 
-Dave Mielke           | 2213 Fox Crescent | I believe that the Bible is the
-Phone: 1-613-726-0014 | Ottawa, Ontario   | Word of God. Please contact me
-EMail: dave@mielke.cc | Canada  K2A 1H7   | if you're concerned about Hell.
-http://FamilyRadio.com/                   | http://Mielke.cc/bible/
+That's *weird*. I'm just wondering how it can ever happen.
+
+> 
+> the output sometimes gets stuck in a mode in which it generates only
+> static that might be a similar problem.
+> 
+
+Very interesting !!
+I encountered this problem 2 or 3 times, and thought it was a bug in my 
+code. Sadly, the least i can say, is that it is not easily reproductible ...
+
+Thanks for your answers,
+
+Fabien
+
+
 
 
 -------------------------------------------------------
