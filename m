@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: IGuthrie@aol.com
-Message-ID: <482.1026ae7.31a8a957@aol.com>
-To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="-----------------------------1148669783"
-Subject: [Bluez-users] Documentation?
+Content-Type: text/plain;
+	charset="US-ASCII"
+Subject: RE: [Bluez-users] bluetooth-alsa: a2recv stuttering sound from WM5.0 AKU2.0
+Message-ID: <96B7A15232D6CF42836BFD428AD6B6034E5034@deexmb01.de.icap.com>
+From: "Guido Reimer" <G.Reimer@de.icap.com>
+To: <bluez-users@lists.sourceforge.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,43 +17,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 May 2006 14:56:23 EDT
+Date: Fri, 26 May 2006 16:14:57 +0200
 
+Brad
 
--------------------------------1148669783
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+> fyi, I made a change in cvs so we re-ioctl /dev/dsp if during the
+stream
+> the sender changes the rate on us. a2recv will print a message if that
+> happens.
 
-It the API actually documented anywhere? I have looked around and saw 2 or  3 
-code examples, but is there any actual documentation? Where is the best place 
- to look to get an idea of how things work, or am I missing something?
- 
- 
-Thanks!
+Thanks,=20
 
--------------------------------1148669783
-Content-Type: text/html; charset="US-ASCII"
-Content-Transfer-Encoding: quoted-printable
+will try it, as far as i come home, today :`)
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; charset=3DUS-ASCII">
-<META content=3D"MSHTML 6.00.2900.2873" name=3DGENERATOR></HEAD>
-<BODY id=3Drole_body style=3D"FONT-SIZE: 10pt; COLOR: #000000; FONT-FAMILY:=20=
-Arial"=20
-bottomMargin=3D7 leftMargin=3D7 topMargin=3D7 rightMargin=3D7><FONT id=3Drol=
-e_document=20
-face=3DArial color=3D#000000 size=3D2>
-<DIV>It the API actually documented anywhere? I have looked around and saw 2=
- or=20
-3 code examples, but is there any actual documentation? Where is the best pl=
-ace=20
-to look to get an idea of how things work, or am I missing something?</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Thanks!</DIV></FONT></BODY></HTML>
+Send you my results after weekend. Over weekend, i have no chance to
+access this mail address ...
 
--------------------------------1148669783--
+Guido
+
 
 
 -------------------------------------------------------
