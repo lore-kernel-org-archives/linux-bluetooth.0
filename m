@@ -1,17 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <447A9960.7020104@xmission.com>
-Date: Sun, 28 May 2006 23:49:04 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <4479225C.9090809@trn.iki.fi>
+Date: Sun, 28 May 2006 07:09:00 +0300
+From: =?UTF-8?B?TGFzc2UgS8Okcmtrw6RpbmVu?= <tronic+bdtmwkm6@trn.iki.fi>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-References: <4461A33F.1060702@killesreiter.de> <44634846.3000006@xmission.com>
-	<Pine.LNX.4.63.0605111727560.7379@redbean.intranet.gw-instruments.de>
-	<4461FE7D.3050108@killesreiter.de>
-	<447105B1.3060908@killesreiter.de> <447140B7.2090100@xmission.com>
-	<44718942.10609@killesreiter.de>
-	<4471DE09.5050405@xmission.com> <4475D2DC.304@killesreiter.de>
-In-Reply-To: <4475D2DC.304@killesreiter.de>
-Subject: Re: [Bluez-devel] broadcom in disguise...
+Subject: [Bluez-devel] rfcomm disconnects + hcid dying
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,23 +14,92 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1259608133=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Gerhard
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--===============1259608133==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="------------enigB60A7E998003C60E4069A985"
 
-> They claim that the chip can be addressed by the broadcom driver but
-> would definitly be a CSR chip.
-> 
-> Does that make any sense to anybody?
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigB60A7E998003C60E4069A985
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-no sense whatsoever.
+Who is responsible for these parts? Why am I getting no replies to this
+mail? Are any developers reading this list? Where should I send this, to
+developers' private addresses or something?
 
-brad
+Reposting, third time:
 
+
+PROBLEM 1:
+
+Whenever /dev/rfcomm0 (or rfcomm1) is closed, the corresponding Bluetooth=
+
+device gets disconnected and I have to run hcitool cc xx:xx:xx:xx:xx:xx t=
+o
+get it working again. How can I have the devices automatically connected
+at all times whenever they are within reach and the USB BT dongle is
+plugged in?
+
+My current workaround is an endless while loop that runs hcitool cc all
+the time, but this is obviously quite ugly. It works, but I'd really want=
+
+to have something more elegant.
+
+
+PROBLEM 2:
+
+My hcid keeps dying occassionally. I don't know why, but it just does
+that. My current workaround is to have the init system restart it wheneve=
+r
+it dies, but this, too, is somewhat ugly. Haven't found any messages abou=
+t
+that in the logs yet, but that is partly because my log was flooded with
+other stuff.
+
+
+- Tronic -
+
+
+
+--------------enigB60A7E998003C60E4069A985
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iD8DBQFEeSJgOBbAI1NE8/ERAoRJAKCqNoReh7TVvrCuU9KaIP8qqfVqBwCfdpk6
+1Mt35b8BozGaAmd8zLNB3TY=
+=qM8F
+-----END PGP SIGNATURE-----
+
+--------------enigB60A7E998003C60E4069A985--
+
+
+--===============1259608133==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+
+--===============1259608133==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1259608133==--
