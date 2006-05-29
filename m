@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <447B6A07.2070301@porthome.nl>
-Date: Mon, 29 May 2006 23:39:19 +0200
-From: Pieter Poorthuis <pieter@porthome.nl>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <447B4F98.8020501@free.fr> <1148934839.31689.116.camel@localhost>
-In-Reply-To: <1148934839.31689.116.camel@localhost>
-Subject: Re: [Bluez-devel] [PATCH] SCO flow control
+Date: Mon, 29 May 2006 16:39:35 -0400
+Message-ID: <70DCB28C5BB04A4BBB1C8512589BAC65D4E798@MAIL006.mail.lan>
+In-Reply-To: <1148935055.31689.121.camel@localhost>
+From: "Brand, Chris" <chris.brand@wideray.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Strange behaviour
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,17 +19,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> And for the core part, please be brief with any additional comments. My
-> rule for comments is to put them where the code is not clear by itself.
-> What you have done is actually over-commenting and that makes the code
-> harder to read and understand.
->
->   
-I've read the code and for me the comments are very welcome. As well as 
-your enthousiasm & code, Fabian.
+> that might be the reason. We fixed a lot of stuff between the 
+> 2.15 and 2.25. Do you mind updating to FC5?
 
-Cheers, Pieter
+That's been on my to-do list for a while. Now I seem to have a good
+reason to get on with it :-)
+
+> Your code seems 
+> to work by accident.
+
+I hate it when that happens :-)
+
+Chris
 
 
 _______________________________________________
