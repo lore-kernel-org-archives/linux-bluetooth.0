@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <447AABF1.80500@xmission.com>
+Date: Mon, 29 May 2006 02:08:17 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <d4f1333a0605271008q1d86a4d4h865417a889abf0a2@mail.gmail.com>
-References: <d4f1333a0605271008q1d86a4d4h865417a889abf0a2@mail.gmail.com>
-Date: Mon, 29 May 2006 15:00:00 +0200
-Message-Id: <1148907600.31689.9.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] upgrade to FC5 "breaks" my bluetooth -
-	what's	wrong?
+References: <96B7A15232D6CF42836BFD428AD6B6034E5096@deexmb01.de.icap.com>
+In-Reply-To: <96B7A15232D6CF42836BFD428AD6B6034E5096@deexmb01.de.icap.com>
+Subject: Re: [Bluez-users] bluetooth-alsa: a2recv stutteringsound	from	WM5.0
+ AKU2.0
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,31 +21,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Travis,
+Guido
 
-> I upgraded from FC3 to FC5, and my script which calls hidd --connect
-> with the hardware addresses of my keyboard and mouse doesn't work any
-> more.  I'm using the Microsloth bluetooth combo (I figure it's okay
-> because I'm using it in Linux).  Anyhow, what do I have to do to get
-> these guys recognized and talking to Linux?
+> Does this give any informations to you?
 
-check /etc/sysconfig/hidd and make sure that the hidd service is enabled
-and started. You only need to use "--connect" once. After that the
-keyboard will reconnect to your laptop.
+not really.
 
-> Also, I don't suppose there is any way to use these things before
-> Linux boots up, like in grub, correct?  That's kind of a bummer.  I
-> guess USB and Bluetooth aren't really replacements for a regular
-> keyboard yet.
+if a2recv prints out that it's using 1 channel then that would be the
+problem. the less likely problem is wm is encoding with 48khz but
+reporting to us that it's 44.1khz.
 
-You need a dongle with HID proxy mode. A USB keyboard is fully supported
-by any modern BIOS.
-
-Regards
-
-Marcel
-
-
+brad
 
 
 _______________________________________________
