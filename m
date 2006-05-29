@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <OF0B6841A9.963250D8-ONC1257171.002503E4-C1257171.00289B9D@dcx.dcx>
-References: <OF0B6841A9.963250D8-ONC1257171.002503E4-C1257171.00289B9D@dcx.dcx>
-Date: Mon, 29 May 2006 15:26:05 +0200
-Message-Id: <1148909165.31689.50.camel@localhost>
+In-Reply-To: <20060517221929.76231.qmail@web54604.mail.yahoo.com>
+References: <20060517221929.76231.qmail@web54604.mail.yahoo.com>
+Date: Mon, 29 May 2006 15:20:25 +0200
+Message-Id: <1148908825.31689.41.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] How to setup a pptp-connection via
-	the	dund-service ?
+Subject: Re: [Bluez-users] Linux control of bluetooth radio
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,16 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Andreas,
+Hi Peter,
 
-> Does someone has successfully tried to set up a pptp server via dund
-> communicating over Bluetooth? 
-> My first attempt does not work as expected... 
-> How does interact the dund with the pptpd and the pppd ? 
+> I have a dual-boot (WinXP and Mandriva w/ 2.6.14) Dell
+> M70 laptop with an internal Bluetooth daughter card. 
+> It would seem that I can use WinXP to disable the
+> radio on the Bluetooth card.  When I then boot into
+> Linux, the BT card is detected and hci0 is initialised
+> but Bluetooth doesn't work.
+> 
+> Is there a way to turn the BT radio on and off under
+> Linux ?  (hciconfig up/down and reloading the kernel
+> module doesn't seem to work and there's no /proc
+> interface)
 
-so far I don't know of anybody who ever tried this. Maybe we need to
-extend dund with some pptpd capabilities, but I never used pptpd and so
-I have no experiences with it.
+check /proc/bus/usb/devices if the Bluetooth is present there. Otherwise
+you need to find the switch to activate Bluetooth with a Dell laptop. I
+don't have a Dell machine, so I don't know what's the magic trick.
 
 Regards
 
