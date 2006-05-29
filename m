@@ -1,41 +1,60 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Return-Path: <pkg-bluetooth-maintainers-bounces@lists.alioth.debian.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <70DCB28C5BB04A4BBB1C8512589BAC65CAADD0@MAIL006.mail.lan>
-References: <70DCB28C5BB04A4BBB1C8512589BAC65CAADD0@MAIL006.mail.lan>
-Date: Mon, 29 May 2006 15:22:08 +0200
-Message-Id: <1148908928.31689.44.camel@localhost>
+In-Reply-To: <20060519204815.GA8424@esaurito.net>
+References: <20060519204815.GA8424@esaurito.net>
+Content-Type: text/plain
+Date: Mon, 29 May 2006 15:16:21 +0200
+Message-Id: <1148908581.31689.35.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Strange behaviour
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Cc: 322732-submitter@bugs.debian.org, 322732@bugs.debian.org,
+        bluez-devel@lists.sf.net, control@bugs.debian.org
+Subject: [Pkg-bluetooth-maintainers] Bug#322732: [Bluez-devel] more on this
+	bug (was: rfcomm bind fails with obscure error message)
+Reply-To: Marcel Holtmann <marcel@holtmann.org>, 322732@bugs.debian.org
+List-Unsubscribe: <http://lists.alioth.debian.org/mailman/listinfo/pkg-bluetooth-maintainers>,
+	<mailto:pkg-bluetooth-maintainers-request@lists.alioth.debian.org?subject=unsubscribe>
+List-Archive: <http://lists.alioth.debian.org/pipermail/pkg-bluetooth-maintainers>
+List-Post: <mailto:pkg-bluetooth-maintainers@lists.alioth.debian.org>
+List-Help: <mailto:pkg-bluetooth-maintainers-request@lists.alioth.debian.org?subject=help>
+List-Subscribe: <http://lists.alioth.debian.org/mailman/listinfo/pkg-bluetooth-maintainers>,
+	<mailto:pkg-bluetooth-maintainers-request@lists.alioth.debian.org?subject=subscribe>
+Sender: pkg-bluetooth-maintainers-bounces@lists.alioth.debian.org
+Errors-To: pkg-bluetooth-maintainers-bounces@lists.alioth.debian.org
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Chris,
+Hi Filippo,
 
-> This is some test code that uses rfcomm to send data back and forth
-> between two hosts.
-> It seems to behave as expected to start with, but after a while data
-> stops flowing in one direction, and in the other direction it gets very
-> bursty.
+> > When the 'rfcomm' kernel module isn't compiled with CONFIG_BT_RFCOMM_TTY
+> > enabled, 'rfcomm bind' will fail with an obscure error message, "Can't
+> > create device: Operation not supported".  It does this when it's trying to
+> > bind to a device in /dev.
+> > 
+> > Could this be changed to report something more useful, such as "Check
+> > rfcomm.ko is compiled with TTY support"?
+> 
+> Hi,
+> I agree with this bug and the ioctl is mostly likely to fail when there is no
+> rfcomm tty support, here is my proposed patch:
+> 
+> --- rfcomm/main.c       (revision 154)
+> +++ rfcomm/main.c       (working copy)
+> @@ -172,8 +172,10 @@
+>                         req.channel = 1;
+>         }
+> 
+> -       if ((err = ioctl(ctl, RFCOMMCREATEDEV, &req)) < 0 )
+> +       if ((err = ioctl(ctl, RFCOMMCREATEDEV, &req)) < 0 ){
+>                 perror("Can't create device");
+> +               fprintf(stderr, "Check RFCOMM TTY availabily");
+> +    }
+> 
+>         return err;
+>  }
+> 
+> comments? 
 
-please send the code as attachment. It seems your mailer messed up the
-whitespaces.
-
-> Is this something wrong in my test code ? Is it a bug in the bluez stack
-> ? Is it specific to this hardware ?
-
-Could be one of it or even both. How do I run the test case and what
-should I look for?
+check for EOPNOTSUPP error code and only then print this error.
 
 Regards
 
@@ -45,6 +64,6 @@ Marcel
 
 
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Pkg-bluetooth-maintainers mailing list
+Pkg-bluetooth-maintainers@lists.alioth.debian.org
+http://lists.alioth.debian.org/mailman/listinfo/pkg-bluetooth-maintainers
