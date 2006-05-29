@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Date: Mon, 29 May 2006 15:01:34 -0400
-Message-ID: <70DCB28C5BB04A4BBB1C8512589BAC65D4E784@MAIL006.mail.lan>
-In-Reply-To: <1148929214.31689.104.camel@localhost>
-From: "Brand, Chris" <chris.brand@wideray.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <70DCB28C5BB04A4BBB1C8512589BAC65D4E783@MAIL006.mail.lan>
+References: <70DCB28C5BB04A4BBB1C8512589BAC65D4E783@MAIL006.mail.lan>
+Date: Mon, 29 May 2006 21:00:14 +0200
+Message-Id: <1148929214.31689.104.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Strange behaviour
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,14 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
- 
-> no, you need two dongles on one machine to make your code 
-> work. It actually picks hci1 and not hci0.
+Hi Chris,
 
-I only have one dongle attached to the machine I ran it on this morning.
-"hcitool dev" only lists hci0.
+>  > you need to attach at least two dongles to make your program 
+> > work. Is this really what it is supposed to do?
+> 
+> One dongle to each of two machines, yes (I haven't tried it with one
+> machine and two dongles, but don't see why it shouldn't work).
 
-Chris
+no, you need two dongles on one machine to make your code work. It
+actually picks hci1 and not hci0.
+
+Regards
+
+Marcel
+
+
 
 
 _______________________________________________
