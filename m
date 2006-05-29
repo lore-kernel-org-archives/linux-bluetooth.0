@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <C3CDAA96649B7E4290D26BD856B710C7024CEE@marge.au.hmv.com>
-References: <C3CDAA96649B7E4290D26BD856B710C7024CEE@marge.au.hmv.com>
-Date: Mon, 29 May 2006 15:14:51 +0200
-Message-Id: <1148908491.31689.32.camel@localhost>
+In-Reply-To: <8ff9e38c0605230923x4ef4dc9emab0298b88848cc97@mail.gmail.com>
+References: <8ff9e38c0605230923x4ef4dc9emab0298b88848cc97@mail.gmail.com>
+Date: Mon, 29 May 2006 15:13:32 +0200
+Message-Id: <1148908412.31689.30.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Mac OS X Scanner
+Subject: Re: [Bluez-users] USB Bluetooth Adapters with same hardware address
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,18 +16,27 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGkgTmF0aGFuLAoKPiBBIHF1aWNrIHF1ZXN0aW9uIG9uIHRoZSBhcHBsaWNhdGlvbnMgZnJvbnQg
-4oCTIEkgaGF2ZSBhIE1hYyBHNSBydW5uaW5nCj4gVGlnZXIgKE9TIFggMTAuNCksIGRvZXMgYW55
-b25lIGtub3cgYSBwcm94aW1pdHkvc2Nhbm5lciBhcHBsaWNhdGlvbgo+IHRoYXQgSSBjb3VsZCB1
-c2UgdG8gZGlzY292ZXIgQmx1ZXRvb3RoIGVuYWJsZWQgZGV2aWNlcyBhbmQgaWRlYWxseQo+IHdy
-aXRlIG91dCBpbmZvcm1hdGlvbiB0byBhIGRhdGFiYXNlPwoKQmx1ZVogaXMgdGhlIExpbnV4IHBy
-b3RvY29sIHN0YWNrIGZvciBCbHVldG9vdGguIFNvIGl0IGlzIHRoZSB3cm9uZwptYWlsaW5nIGxp
-c3QgdG8gYXNrIHF1ZXN0aW9ucyBhYm91dCBNYWNPUyBYIHByb2R1Y3RzLgoKUmVnYXJkcwoKTWFy
-Y2VsCgoKCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpC
-bHVlei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0
-Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJz
-Cg==
+Hi,
+
+> I recently got 3 USB Bluetooth Adapters but when I check the BD
+> address, all of them show up as 11:11:11:11:11:11.  Is there any way
+> to change the address?
+
+the bdaddr utility can change the address of some chips, but not for
+this one.
+
+Regards
+
+Marcel
+
+
+
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
