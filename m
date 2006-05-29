@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <44761061.1000804@free.fr>
-References: <44761061.1000804@free.fr>
-Date: Mon, 29 May 2006 15:10:24 +0200
-Message-Id: <1148908224.31689.24.camel@localhost>
+In-Reply-To: <e85851c20605260120r47e103b9y5fc3a67b5e8ac224@mail.gmail.com>
+References: <e85851c20605260120r47e103b9y5fc3a67b5e8ac224@mail.gmail.com>
+Date: Mon, 29 May 2006 15:08:12 +0200
+Message-Id: <1148908092.31689.19.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Question for Marcel (& maybe others)
+Subject: Re: [Bluez-devel] wanna ask something...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,18 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
+Hi Gloria,
 
-> There is an item in the TODO list concerning SCO audio:
-> 
-> "Full support for SCO connections with the HCI USB driver"
-> 
-> Could you please provide me some details on the missing bits ?
+> Does Bluez is the same with Affix?. i'm newbie here. And, i just found
+> about Affix via Google Search Engine.
 
-for the hci_usb driver and SCO support you need to switch the alternate
-setting of the second interface depending on how many SCO channels are
-opened and what voice setting is in use. This is not implemented. We
-only support one channel and 16-bit encoding.
+both are two independent projects that implement Bluetooth for Linux.
+The BlueZ stack was initially developed by Qualcomm and is now an open
+source project maintained by the community. The Affix stack was
+developed by Nokia Research Center and made public later on. So far it
+seems that Affix is not longer actively maintained.
+
+BlueZ is the official Bluetooth stack for Linux.
 
 Regards
 
