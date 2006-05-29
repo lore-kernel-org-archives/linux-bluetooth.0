@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <41458.156.116.2.246.1148041722.squirrel@webmail.uio.no>
-References: <41458.156.116.2.246.1148041722.squirrel@webmail.uio.no>
-Date: Mon, 29 May 2006 15:18:04 +0200
-Message-Id: <1148908684.31689.38.camel@localhost>
+In-Reply-To: <C3CDAA96649B7E4290D26BD856B710C7024CEE@marge.au.hmv.com>
+References: <C3CDAA96649B7E4290D26BD856B710C7024CEE@marge.au.hmv.com>
+Date: Mon, 29 May 2006 15:14:51 +0200
+Message-Id: <1148908491.31689.32.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Internal bluetooth on d610
+Subject: Re: [Bluez-users] Mac OS X Scanner
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,39 +16,18 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Markus,
-
-> I have a dell latitude d610 with internal bluetooth. I have recently
-> installed ubuntu linux. I am using the bluez version distributed wiht
-> ubuntu. But I have some problems with my internal bluetooth device. The
-> hcitool dev gives me the output:
->  hciconfig
-> hci0:   Type: USB
->         BD Address: 00:16:41:0B:19:64 ACL MTU: 384:8 SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:226 acl:0 sco:0 events:20 errors:0
->         TX bytes:413 acl:0 sco:0 commands:19 errors:0
-> 
-> so the bluetooth device is recognized by the system. But when i try
-> hcitool inq no devices are found, using a Belkin usb bluetooth adapter mye
-> cellular phone is recognized. Why does my internal bluetooth device not
-> recognize my phone? What is wrong here?
-
-I don't have any Dell machine at hand for testing, but maybe some weird
-ACPI or BIOS setting deactivated your antenna.
-
-Regards
-
-Marcel
-
-
-
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGkgTmF0aGFuLAoKPiBBIHF1aWNrIHF1ZXN0aW9uIG9uIHRoZSBhcHBsaWNhdGlvbnMgZnJvbnQg
+4oCTIEkgaGF2ZSBhIE1hYyBHNSBydW5uaW5nCj4gVGlnZXIgKE9TIFggMTAuNCksIGRvZXMgYW55
+b25lIGtub3cgYSBwcm94aW1pdHkvc2Nhbm5lciBhcHBsaWNhdGlvbgo+IHRoYXQgSSBjb3VsZCB1
+c2UgdG8gZGlzY292ZXIgQmx1ZXRvb3RoIGVuYWJsZWQgZGV2aWNlcyBhbmQgaWRlYWxseQo+IHdy
+aXRlIG91dCBpbmZvcm1hdGlvbiB0byBhIGRhdGFiYXNlPwoKQmx1ZVogaXMgdGhlIExpbnV4IHBy
+b3RvY29sIHN0YWNrIGZvciBCbHVldG9vdGguIFNvIGl0IGlzIHRoZSB3cm9uZwptYWlsaW5nIGxp
+c3QgdG8gYXNrIHF1ZXN0aW9ucyBhYm91dCBNYWNPUyBYIHByb2R1Y3RzLgoKUmVnYXJkcwoKTWFy
+Y2VsCgoKCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpC
+bHVlei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0
+Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJz
+Cg==
