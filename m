@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Date: Tue, 30 May 2006 08:30:13 +0200
-Message-ID: <96B7A15232D6CF42836BFD428AD6B6034E5137@deexmb01.de.icap.com>
-From: "Guido Reimer" <G.Reimer@de.icap.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth-alsa: a2recv stutteringsound	from	WM5.0
-	AKU2.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bgsmith@bendcable.com, BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1148930801.6559.5.camel@localhost.localdomain>
+References: <1148930801.6559.5.camel@localhost.localdomain>
+Date: Mon, 29 May 2006 22:36:12 +0200
+Message-Id: <1148934972.31689.118.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] DiNovo keyboard/mouse and FC5
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,41 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Brad
+Hi Brad,
 
-Yesterday I tried to set the channel and speed settings manualy. Set
-Channels = 2 and speed 36000/44100/48000 ... but nothing changes. 
+> I have a Logitech dinovo keyboard and mouse combination that use
+> bluetooth.  The computer is running FC5 (x86-64).  The mouse and
+> keyboard will work briefly during boot, but stop working after boot is
+> complete.  
+> 
+> I can get the mouse and keyboard to start working again if I unplug the
+> bluetooth receiver from the UBB port and then plug it back in.  This
+> happens, naturally, every time I have to reboot (usually seldom).
+> 
+> Is there a way I can set up this system so that the mouse and keyboard
+> just work without having to manually unplug and plug in the USB
+> connector?
 
-Hier is what i did ...
+you can tweak the init scripts to not execute hid2hci and you dongle
+will stay in HID proxy. Or you must run hidd in server mode and at least
+connect once to your keyboard and mouse with hidd in client mode.
 
+Regards
 
-unsigned char audio_buffer[BUF_SIZE];
-int speed, channels;
-int my_speed, my_channels; // guido
+Marcel
 
-int adjustsound()
-{
-	my_speed = 48000;
-	my_channels = 2;
-	if(ioctl(audio_fd,SNDCTL_DSP_CHANNELS,&my_channels)==-1) { //
-guido
-		perror("\nioctl no. 2\n");
-		exit(1);
-	}
-
-	if(ioctl(audio_fd,SNDCTL_DSP_SPEED,&my_speed)==-1) {   / guido
-		perror("\nioctl no. 3\n");
-		exit(1);
-	}
-
-	return 1;
-}
-
-
-Still have the same problem :`(
-
-
-Guido
 
 
 
