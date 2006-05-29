@@ -1,13 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <447A9C7B.2040301@xmission.com>
-Date: Mon, 29 May 2006 00:02:19 -0700
+Message-ID: <447A9960.7020104@xmission.com>
+Date: Sun, 28 May 2006 23:49:04 -0700
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-References: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C2E7@eumonex01.palmsource.com>
-	<4464C195.1020403@xmission.com> <446B54AF.5040302@palmsource.com>
-In-Reply-To: <446B54AF.5040302@palmsource.com>
-Subject: Re: [Bluez-devel] A2DP and Alsa Plugin
+References: <4461A33F.1060702@killesreiter.de> <44634846.3000006@xmission.com>
+	<Pine.LNX.4.63.0605111727560.7379@redbean.intranet.gw-instruments.de>
+	<4461FE7D.3050108@killesreiter.de>
+	<447105B1.3060908@killesreiter.de> <447140B7.2090100@xmission.com>
+	<44718942.10609@killesreiter.de>
+	<4471DE09.5050405@xmission.com> <4475D2DC.304@killesreiter.de>
+In-Reply-To: <4475D2DC.304@killesreiter.de>
+Subject: Re: [Bluez-devel] broadcom in disguise...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,37 +21,20 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fr=E9d=E9ric
+Gerhard
 
-I've been discussing this over at the gstreamer list and I have some
-more info.
+> They claim that the chip can be addressed by the broadcom driver but
+> would definitly be a CSR chip.
+> 
+> Does that make any sense to anybody?
 
->>>     * How to select whether the application will output on a2dp or
->>> speaker? Should this be application related or system related?
+no sense whatsoever.
 
-Ideally it's a system function, but I'm not seeing a way to pull that off.
-
-> How about a daemon that uses gstreamer with one or more ipc gstreamer
-> source, a mixmatrix, volume control (if not done by mixmatrix), (alsa
-> sink or (sbcfilter and a2dp sink)) to finish...
-> An alsa plugin and/or a gstreamer ipc plugin would just send ipc to the
-> daemon.
-
-gstreamer has no ipc equivalent to the alsa dmix, so a pure gst
-implementation will not mix multiple apps down to one stream.
-
-that is unless you help write the ipc mixer for gst :)
-
-sadly, gst would really be a great implementation (moving the encoder
-into a hotpluggable module, allowing for late binding on choosing the
-encoder, possibly a way to redirect a stream in progress to the set) but
-the lack of a way to mix multiple apps is not great.
-
-Brad
+brad
 
 
 _______________________________________________
