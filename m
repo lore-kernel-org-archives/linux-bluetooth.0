@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <447B3236.8090504@free.fr>
-Date: Mon, 29 May 2006 19:41:10 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44761061.1000804@free.fr> <1148908224.31689.24.camel@localhost>
-In-Reply-To: <1148908224.31689.24.camel@localhost>
-Subject: Re: [Bluez-devel] Question for Marcel (& maybe others)
+In-Reply-To: <70DCB28C5BB04A4BBB1C8512589BAC65D4E773@MAIL006.mail.lan>
+References: <70DCB28C5BB04A4BBB1C8512589BAC65D4E773@MAIL006.mail.lan>
+Date: Mon, 29 May 2006 19:36:52 +0200
+Message-Id: <1148924212.31689.95.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Strange behaviour
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,30 +20,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Fabien,
-> 
-> 
->>There is an item in the TODO list concerning SCO audio:
->>
->>"Full support for SCO connections with the HCI USB driver"
->>
->>Could you please provide me some details on the missing bits ?
-> 
-> 
-> for the hci_usb driver and SCO support you need to switch the alternate
-> setting of the second interface depending on how many SCO channels are
-> opened and what voice setting is in use. This is not implemented. We
-> only support one channel and 16-bit encoding.
-> 
+Hi Chris,
 
-Ok, thanks for this clarification.
-I think i will try to improve this, however for now it's not on top of 
-my todo list....
+> > please send the code as attachment. It seems your mailer 
+> > messed up the whitespaces.
+> 
+> Attached. Sorry about that.
+> 
+> > How do I run the test case 
+> > and what should I look for?
+> 
+> On one node, I run it with "./rfcommloop -c 1 -M 1024". It reports the
+> bluetooth address of the device it's using. On the other node, use the
+> same command line but append the reported bluetooth address.
 
-Cheers,
+it doesn't actually work (and yes, a dongle is attached):
 
-Fabien
+# ./rfcommloop -c 1 -M 1024
+[Status] Random seed = 1148924068
+_RfGetPrimaryBDA [757]: No bluetooth modules (19)
+_RfGetPrimaryBDA [757]: No bluetooth modules (19)
+_RfListen [816]: _RfGetPrimaryBDA () failed (19)
+_RfGetPrimaryBDA [757]: No bluetooth modules (19)
+main [1117]: _RfListen () failed (19)
+
+Are you sure this is the latest code?
+
+Regards
+
+Marcel
+
+
 
 
 _______________________________________________
