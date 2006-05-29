@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 MIME-Version: 1.0
-Date: Mon, 29 May 2006 09:42:21 +0200
-Message-ID: <96B7A15232D6CF42836BFD428AD6B6034E5096@deexmb01.de.icap.com>
+Date: Mon, 29 May 2006 09:25:55 +0200
+Message-ID: <96B7A15232D6CF42836BFD428AD6B6034E508F@deexmb01.de.icap.com>
 From: "Guido Reimer" <G.Reimer@de.icap.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth-alsa: a2recv stutteringsound	from	WM5.0
-	AKU2.0
+Subject: Re: [Bluez-users] bluetooth-alsa: a2recv stuttering
+	sound	from	WM5.0 AKU2.0
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,43 +19,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-
 Brad,
 
-Found this in Registry:
+> maybe wm5 reports the wrong rate to us. you could try hardcoding in
+> adjustsound() the value that is used. the legal values are 16000,
+32000,
+> 44100, 48000.
 
-Bluetooth\AudioGateway:
-	BTAGExtModule = BTAGExt.dll
-	BTAGBModule   = \Windows\BthAGPhonebook.dll
-	Capability	  = 37
-	NoRoleSwitch  = 1
-	SupportCLI	  = 0
+I will try this as far as i come home today.
+Will also set the channels manual to 2 (just got your secound mail)
 
-Bluetooth\A2DP\Devices\1:
-	Address	  = C4 A1 01 72 02 00 00 00
+> we print out the rate that the sender reports. what rate are you
+getting
+> printed out?
 
-Bluetooth\Device\00027201a1c4:
-	Class		  = 2098180 (0x200404)
-	Name		  = BlueZ at mycomputer (0)
-	Trusted	  = 1
+44100
 
-Bluetooth\l2cap:
-	ConfigTimeout     = 120 (0x000078)
-	ConnectPacketType = 0
-	ERTX              = 300 (0x00012C)
-	IdleConnect       = 10
-	IdlePhys          = 10
-	LinkPolicy        = 15
-      NoRoleSwitch      = 1
-	PicoCabable       = 0
-      RTX               = 60
-      ScanModeControl   = 1
+> it sounds like wm5 is encoding at a higher rate than we expect.
 
-
-Does this give any informations to you?
-
+Do you mean the bitrate of the streamed Data? Will check the registry of
+WM5.0 to find additional infos about the crazy things it does.
 
 Guido
+
+
+
 
 
 
