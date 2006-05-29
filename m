@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 30 May 2006 12:02:17 +0200
-From: =?windows-1252?Q?G=F6tz_Issel?= <g.issel@fh-wolfenbuettel.de>
-To: bluez-devel@lists.sourceforge.net
-Message-id: <13960213768f.13768f139602@fh-wolfenbuettel.de>
-MIME-version: 1.0
-Subject: [Bluez-devel] SDP without results
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <447B6A07.2070301@porthome.nl>
+References: <447B4F98.8020501@free.fr>
+	<1148934839.31689.116.camel@localhost> <447B6A07.2070301@porthome.nl>
+Date: Tue, 30 May 2006 00:21:35 +0200
+Message-Id: <1148941295.31689.127.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] SCO flow control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,42 +21,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi, 
+Hi Pieter,
 
-I am trying to discover services of a device, looking for the SAP
-service. In my understanding this is the hex ID for uuid  0x112d .
+> > And for the core part, please be brief with any additional comments. My
+> > rule for comments is to put them where the code is not clear by itself.
+> > What you have done is actually over-commenting and that makes the code
+> > harder to read and understand.
+> >   
+> I've read the code and for me the comments are very welcome. As well as 
+> your enthousiasm & code, Fabian.
 
-I have been trying to use the sample of Albert Huang
-(http://people.csail.mit.edu/albert/bluez-intro/)   section 4.4 .
+the right amount of comments and the coding style has always been
+something people disagree on. However the kernel follows the policy to
+have clean and easy code. You should understand the code and there
+should be no need for comments. The comments are used to explain parts
+that are not easy to guess.
 
-The service id is defined as
-    uint32_t svc_uuid_int[] = { 0x0, 0x0, 0x0, 0x112d };
+Example for these are the reasons why to put a memory barrier here or
+why not using some kind of locking or the reason why this isn't a race
+conditions even if it looks like one etc.
 
-The line
-    session = sdp_connect( BDADDR_ANY, &target, SDP_RETRY_IF_BUSY );
+Regards
 
-results in (checked via printf)
-	session->state=0, 
-	session->flags=1, 
-	session->sock=3, 
-	session->local=0,
-	session->tid=0
+Marcel
 
-The line 
-err = sdp_service_search_attr_req( session, search_list, \
-            SDP_ATTR_REQ_RANGE, attrid_list, &response_list);
 
-gives err = 0 , so all is fine up to there.
-
-The following FOR-loop is never entered ( for (; r; r = r->next ) {....  ) !
-
-Any ideas ? 
-My source code under : http://www.goetzi.de/try1.html
-
-Using the command line tool "sdptool search 0x112d" gives perfect
-results by the way.
-
-Goetz
 
 
 _______________________________________________
