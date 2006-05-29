@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4462172D.3040604@ihep.ru>
-References: <4462172D.3040604@ihep.ru>
-Date: Mon, 29 May 2006 15:37:58 +0200
-Message-Id: <1148909878.31689.68.camel@localhost>
+In-Reply-To: <20060516104849.16848.qmail@web50514.mail.yahoo.com>
+References: <20060516104849.16848.qmail@web50514.mail.yahoo.com>
+Date: Mon, 29 May 2006 15:27:05 +0200
+Message-Id: <1148909225.31689.52.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Intellimouse transmission lost
+Subject: Re: [Bluez-users] Request with RSSI
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,21 +20,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Anton,
+Hi Mahtab,
 
->   As I see, my mouse (MS Intellimouse for bluetooth) works automatically
-> after system up without starting bluetooth daemon on my distro
-> (ALT-Linux3.0).
-> So, the kernel (2.6.16) determines devices themselves and initialize
-> modules.
->   But everytime my bt-mouse suspends after 20-40 minutes for some
-> reason, which
-> I can't determine. Linux installed on Toshiba Satellite M40-289 laptop.
->   Please, help me if You have some ideas.
+> In the previous emails from the archive, I read that "hci_inquiry"
+> doesn't provide RSSI value on Inquiry. The suggestion was to use raw
+> sockets to achieve it.
+> 
+> I had found Scott Gifford's code using exactly that approach (in the
+> archive). But my problem is: I always get EVT_INQUIRY_RESULT, not the
+> desired  EVT_INQUIRY_RESULT_WITH_RSSI.
+> 
+> I check the "mode" value usingn "hci_read_inquiry_mode" which gave me
+> 1. Is it correct? I don't know what mode should be set for
+> Request_with_RSSI.
+> 
+> Also, my hci_send_cmd looks like the following (copied from Scott's
+> program):
+> hci_send_cmd(dd, OGF_LINK_CTL, OCF_INQUIRY, INQUIRY_CP_SIZE, &cp);
+> where
+> cp.lap[2] = 0x9e
+> cp.lap[1] = 0x8b
+> cp.lap[0] = 0x33
+> 
+> I don't know what these values mean (I see exactly similar value for
+> cp.lap in the hci_inquiry function from the bluez libraries). Could
+> anyone give me any pointers to know more about them?
 
-the Microsoft mouse disconnects after an idle time of 12 minutes. You
-need to make sure that "hidd --server" is running and then the mouse
-will reconnect when you use it.
+you need to call "hciconfig hci0 inqmode 1" first to switch this feature
+on. You can also use inqmode option in hcid.conf.
 
 Regards
 
