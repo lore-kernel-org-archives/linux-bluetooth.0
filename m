@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <447A98E0.5080805@xmission.com>
+Date: Sun, 28 May 2006 23:46:56 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Date: Mon, 29 May 2006 08:58:37 +0200
-Message-ID: <96B7A15232D6CF42836BFD428AD6B6034E5073@deexmb01.de.icap.com>
-From: "Guido Reimer" <G.Reimer@de.icap.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <96B7A15232D6CF42836BFD428AD6B6034E5062@deexmb01.de.icap.com>
+In-Reply-To: <96B7A15232D6CF42836BFD428AD6B6034E5062@deexmb01.de.icap.com>
 Subject: Re: [Bluez-users] bluetooth-alsa: a2recv stuttering sound
-	from	WM5.0 AKU2.0
+ from	WM5.0 AKU2.0
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,23 +21,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Brad
-
-> thanks for tracking it down. I backed it out. I was trying to limit
-the
-> reported capabilities of the receiver to the two modes (plain stereo,
-> mono) that we actually support.
-
-No problem, but what can we do now? For me it looks like, a2recv will
-not grab the packets at the right speed, or something like this. 
-
-The timeline on my sending media player will also run very slow, so it
-seems, that it notices, that something is not realy ok. 
-
-Does a2recv confirms the packages back to the sender?
-
 Guido
 
+> I have testet the latest CVS version and run into massive trubble.
+
+thanks for tracking it down. I backed it out. I was trying to limit the
+reported capabilities of the receiver to the two modes (plain stereo,
+mono) that we actually support.
+
+Brad
 
 
 _______________________________________________
