@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Date: Mon, 29 May 2006 14:48:42 -0400
-Message-ID: <70DCB28C5BB04A4BBB1C8512589BAC65D4E783@MAIL006.mail.lan>
-In-Reply-To: <1148928294.31689.102.camel@localhost>
-From: "Brand, Chris" <chris.brand@wideray.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <70DCB28C5BB04A4BBB1C8512589BAC65D4E77C@MAIL006.mail.lan>
+References: <70DCB28C5BB04A4BBB1C8512589BAC65D4E77C@MAIL006.mail.lan>
+Date: Mon, 29 May 2006 20:44:54 +0200
+Message-Id: <1148928294.31689.102.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Strange behaviour
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,17 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
- 
-> you need to attach at least two dongles to make your program 
-> work. Is this really what it is supposed to do?
+Hi Chris,
 
-One dongle to each of two machines, yes (I haven't tried it with one
-machine and two dongles, but don't see why it shouldn't work).
+> > it doesn't actually work (and yes, a dongle is attached):
+> 
+> That's very strange.
+> 
+> > Are you sure this is the latest code?
+> 
+> I just rebuilt and re-ran it here and it ran fine.
 
-The idea is to pass data back and forth between two machines over
-bluetooth.
+you need to attach at least two dongles to make your program work. Is
+this really what it is supposed to do?
 
-Chris
+Regards
+
+Marcel
+
+
 
 
 _______________________________________________
