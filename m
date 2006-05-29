@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <822EACFA-537D-4382-BA97-4192E5EBCF4A@pepper.com>
-References: <822EACFA-537D-4382-BA97-4192E5EBCF4A@pepper.com>
-Date: Mon, 29 May 2006 15:12:33 +0200
-Message-Id: <1148908353.31689.28.camel@localhost>
+In-Reply-To: <44761061.1000804@free.fr>
+References: <44761061.1000804@free.fr>
+Date: Mon, 29 May 2006 15:10:24 +0200
+Message-Id: <1148908224.31689.24.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Bluez Bluetooth certification tests?
+Subject: Re: [Bluez-devel] Question for Marcel (& maybe others)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,19 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Michael,
+Hi Fabien,
 
-> Are there any Bluetooth certification tests for the Bluez stack?
+> There is an item in the TODO list concerning SCO audio:
 > 
-> Test for the stack and supporting profiles?
+> "Full support for SCO connections with the HCI USB driver"
 > 
-> I noticed that Bluez is listed on the Bluetooth.org site as a  
-> compliant stack, I was curious how this certification was achieved.
+> Could you please provide me some details on the missing bits ?
 
-the Bluetooth SIG defines for every protocol and profile a bunch of
-qualification test cases. You need to pass to get the qualification. The
-BlueZ qualification was sponsored by TomTom and we did it at a test lab
-of RFI somewhere in England.
+for the hci_usb driver and SCO support you need to switch the alternate
+setting of the second interface depending on how many SCO channels are
+opened and what voice setting is in use. This is not implemented. We
+only support one channel and 16-bit encoding.
 
 Regards
 
