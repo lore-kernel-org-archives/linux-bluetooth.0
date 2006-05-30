@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d4f1333a0605301946t42f35b76r298e17bf7ffc4b5b@mail.gmail.com>
-Date: Tue, 30 May 2006 21:46:26 -0500
-From: "Travis H." <solinym@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1148907600.31689.9.camel@localhost>
-MIME-Version: 1.0
-References: <d4f1333a0605271008q1d86a4d4h865417a889abf0a2@mail.gmail.com>
-	<1148907600.31689.9.camel@localhost>
-Subject: Re: [Bluez-users] upgrade to FC5 "breaks" my bluetooth - what's
-	wrong?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <447C5100.9070503@gmx.de>
+References: <mailman.301.1148929305.21349.bluez-users@lists.sourceforge.net>
+	<447C5100.9070503@gmx.de>
+Date: Tue, 30 May 2006 16:24:39 +0200
+Message-Id: <1148999079.11251.11.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Bluetooth Instability Problem extended info
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,21 +21,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 5/29/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> You need a dongle with HID proxy mode. A USB keyboard is fully supported
-> by any modern BIOS.
+Hi Jens,
 
-Where can I learn about USB, specifically what all these terms mean?
-I don't know what HID or HID proxy mode means.
+> I send you the requested information (and a bit more):
+> 
+> The bbt is running Kernel 2.4.25-mh5, gcc 3.3.3 with denx elkd version 3.1
+> The PC is running suse 9.3 professional with kernel
+> 2.6.11.4-21.11-default and gcc 3.3.5 (3.3.3 when cross compiling for PPC)
+> 
+> I tested some more hardware, the D-Link DBT-120 is revision B4 (got two
+> of these), an Acer BT-600, and a Typhoon 20006. Everything works fine
+> between two PC's, when used in bbt it still hangs.
+> 
+> One of my co-workers is suspecting the USB-Host chip, a timing or data
+> size problem inside the bbt, so i'll try to check that out, too.
 
-I solved my problem; the MS bluetooth kbd/mse require you to reset
-them with the button, scan them with "hcitool scan", then connect to
-them.  This worked for me.
+and he might be right with that. The USB stack in a 2.4 kernel is
+actually not good. You should really consider moving to a recent 2.6
+kernel for your btt.
 
--- 
-Scientia Est Potentia
-Security "guru" for rent or hire - http://www.lightconsulting.com/~travis/ -><-
-GPG fingerprint: 9D3F 395A DAC5 5CCC 9066  151D 0A6B 4098 0C55 1484
+Regards
+
+Marcel
+
+
 
 
 _______________________________________________
