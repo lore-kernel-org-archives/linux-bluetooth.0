@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <447C7330.9000303@xmission.com>
-Date: Tue, 30 May 2006 10:30:40 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <447C69D4.9020504@palmsource.com>
+Date: Tue, 30 May 2006 17:50:44 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <447C6278.1040707@palmsource.com> <447C6598.6050107@xmission.com>
-	<447C69D4.9020504@palmsource.com>
-In-Reply-To: <447C69D4.9020504@palmsource.com>
+In-Reply-To: <447C6598.6050107@xmission.com>
 Subject: Re: [Bluez-devel] A2DP Profile Certification
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,29 +20,70 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi brad,
+
+We must be very careful here : The ICS says the Source must accept =
+
+connection establishment, this is different from the sink role because =
+
+the source will accept the connection and then send its audio stream!
+
+As you said, I'm not sure it makes sense, and I can't figure how to test =
+
+it. But I believe a typical scenario would be the following :
+
+- you listen a2dp music from your pc (source) on the headphone (sink).
+- someone call your mobile.
+- you answer the call so the headphone tell the source to stop a2dp.
+- while you talk, the source send audio data to /dev/null.
+- when you hangup, the headphone will tell your computer to send the =
+
+music again.
+
 Fr=E9d=E9ric
 
-> We must be very careful here : The ICS says the Source must accept =
 
-> connection establishment, this is different from the sink role because =
 
-> the source will accept the connection and then send its audio stream!
+Brad Midgley a =E9crit :
 
-ok. yes, we're missing a lot of stuff here that we need to handle.
+>Fr=E9d=E9ric
+>
+>  =
 
-we need to use "sdptool add A2SRC" to advertise the source. we need to
-listen for new connections and keep listening on the control connection
-during playback (maybe in another thread)
+>
+>>- Accept Connection Establishment,
+>>- Accept Start Streaming,
+>>- Accept Connection Release.
+>>    =
 
-the alsa plugin can't just block audio writes when the stream is
-stopped. most alsa clients do not have a separate transmission thread,
-so the ui will lock up. the way to handle it is to use dbus to tell the
-audio app to pause if possible.
+>>
+>
+>see a2recv for these. it implements the a2dp sink. there is not any sort
+>of special connection with alsa for this, but i'm not sure it makes
+>sense since this runs more like a daemon and just sends any audio that
+>comes in to the speakers.
+>
+>  =
 
-there is a lot of overlap with avrcp here, so we should make it easy to
-work that in too.
+>
+>>- An entry must also appear in SDP records.
+>>    =
 
-brad
+>>
+>
+>sdptool add A2SNK
+>
+>brad
+>
+>
+>_______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>  =
+
+>
+
 
 
 _______________________________________________
