@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <CB055E3B-083D-4B4A-B42C-2ADB2E3DEFC6@pepper.com>
+Mime-Version: 1.0 (Apple Message framework v750)
+In-Reply-To: <1148908353.31689.28.camel@localhost>
 References: <822EACFA-537D-4382-BA97-4192E5EBCF4A@pepper.com>
 	<1148908353.31689.28.camel@localhost>
-	<CB055E3B-083D-4B4A-B42C-2ADB2E3DEFC6@pepper.com>
-Date: Tue, 30 May 2006 16:23:14 +0200
-Message-Id: <1148998994.11251.9.camel@localhost>
-Mime-Version: 1.0
+Message-Id: <CB055E3B-083D-4B4A-B42C-2ADB2E3DEFC6@pepper.com>
+From: Michael Frey <mfrey@pepper.com>
+Date: Tue, 30 May 2006 10:06:38 -0400
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Bluez Bluetooth certification tests?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,30 +21,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Michael,
+Marcel,
 
-> Are there any resulting test harness or supporting code from TomTom's  
-> effort?  Or does the fact the if someone uses the Bluez stack, they  
-> are by default certified?
+Are there any resulting test harness or supporting code from TomTom's  
+effort?  Or does the fact the if someone uses the Bluez stack, they  
+are by default certified?
 
-you can use the current BlueZ qualification to qualify your own product.
-It will save you a lot of time, because most test have are already been
-done. And I think we spent 4 days with the L2CAP, RFCOMM and SDP testing
-and you don't wanna do it again normally.
+Thanks,
+Michael
 
-At some point the BlueZ qualification must be updated to PRD 2.0, but I
-only wanna do that after the Lisbon specification has been released. It
-makes no real sense to do it again now. With PRD 2.0 it should also
-include some kind of HCI qualification so you basically don't even have
-to re-qualify your hardware. However I haven't fully looked into the new
-qualification program. I will do that when the next specification
-version gets public and I have found a sponsor for it. We still have to
-pay the listing fee.
+On May 29, 2006, at 9:12 AM, Marcel Holtmann wrote:
 
-Regards
-
-Marcel
-
+> Hi Michael,
+>
+>> Are there any Bluetooth certification tests for the Bluez stack?
+>>
+>> Test for the stack and supporting profiles?
+>>
+>> I noticed that Bluez is listed on the Bluetooth.org site as a
+>> compliant stack, I was curious how this certification was achieved.
+>
+> the Bluetooth SIG defines for every protocol and profile a bunch of
+> qualification test cases. You need to pass to get the  
+> qualification. The
+> BlueZ qualification was sponsored by TomTom and we did it at a test  
+> lab
+> of RFI somewhere in England.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 
