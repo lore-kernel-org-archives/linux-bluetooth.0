@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <447C7508.6060200@xmission.com>
-Date: Tue, 30 May 2006 10:38:32 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C2E7@eumonex01.palmsource.com>	<4464C195.1020403@xmission.com>	<446B54AF.5040302@palmsource.com>
-	<447A9C7B.2040301@xmission.com> <447C1C70.1030309@palmsource.com>
-In-Reply-To: <447C1C70.1030309@palmsource.com>
-Subject: Re: [Bluez-devel] A2DP and Alsa Plugin
+In-Reply-To: <447C7330.9000303@xmission.com>
+References: <447C6278.1040707@palmsource.com>
+	<447C6598.6050107@xmission.com> <447C69D4.9020504@palmsource.com>
+	<447C7330.9000303@xmission.com>
+Date: Tue, 30 May 2006 18:33:32 +0200
+Message-Id: <1149006812.11251.31.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] A2DP Profile Certification
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,33 +18,38 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fr=E9d=E9ric
+Hi Brad,
 
-> gstreamer provides a tcpserver sink and source but it does not work the =
+> > We must be very careful here : The ICS says the Source must accept 
+> > connection establishment, this is different from the sink role because 
+> > the source will accept the connection and then send its audio stream!
+> 
+> ok. yes, we're missing a lot of stuff here that we need to handle.
+> 
+> we need to use "sdptool add A2SRC" to advertise the source. we need to
+> listen for new connections and keep listening on the control connection
+> during playback (maybe in another thread)
+> 
+> the alsa plugin can't just block audio writes when the stream is
+> stopped. most alsa clients do not have a separate transmission thread,
+> so the ui will lock up. the way to handle it is to use dbus to tell the
+> audio app to pause if possible.
+> 
+> there is a lot of overlap with avrcp here, so we should make it easy to
+> work that in too.
 
-> way i want it to.
+it might be a good idea to integrate everything into a deamon and only
+have a stupid ALSA plugin that sends us the PCM data.
 
-yeah too bad... gst folks could recommend the easiest approach to code
-up a fix.
+Regards
 
-> However, mixing might be a fake problem. Maybe we should first figure =
+Marcel
 
-> what applications uses alsa directly. All the popular apps (xmms/totem) =
 
-> seems esd and arts aware.
-
-totem and amarok at least have gstreamer "ports" now, but that might be
-mainly to get the best codec the os can provide.
-
-i have not looked at all into having esd/arts working with our alsa
-plugin. they may need patching to look for plugins, to open on demand,
-and to briefly cache unneeded connections.
-
-brad
 
 
 _______________________________________________
