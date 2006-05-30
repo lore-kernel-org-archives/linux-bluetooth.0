@@ -1,45 +1,40 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <e85851c20605300332p163f0e51x84ab59c5cb24cbe3@mail.gmail.com>
-References: <e85851c20605300332p163f0e51x84ab59c5cb24cbe3@mail.gmail.com>
-Date: Tue, 30 May 2006 12:45:55 +0200
-Message-Id: <1148985955.17015.9.camel@localhost>
+In-Reply-To: <13960213768f.13768f139602@fh-wolfenbuettel.de>
+References: <13960213768f.13768f139602@fh-wolfenbuettel.de>
+Date: Tue, 30 May 2006 12:40:45 +0200
+Message-Id: <1148985645.17015.3.camel@localhost>
 Mime-Version: 1.0
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] [Bluez-devel] There is comfirmation but ....
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Subject: Re: [Bluez-devel] SDP without results
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Gloria,
+Hi Goetz,
 
-> i get some problem when i attempt to send a file  (i try any
-> file that have differ extension) to a nokia phone (Nokia e60) from a
-> computer using bluetooth.
-> However, i getting confuse because i can send that file to Nokia 6680
-> without any change to the source code.
+> I am trying to discover services of a device, looking for the SAP
+> service. In my understanding this is the hex ID for uuid  0x112d .
 > 
-> Are there any differences between them?
+> I have been trying to use the sample of Albert Huang
+> (http://people.csail.mit.edu/albert/bluez-intro/)   section 4.4 .
+> 
+> The service id is defined as
+>     uint32_t svc_uuid_int[] = { 0x0, 0x0, 0x0, 0x112d };
 
-maybe or maybe not. Run "hcidump -X -V --obex=<channel>" as root in
-another terminal and see what it actually tells you.
-
-> And also, i want to get some advices about how to get progression info
-> while we sending a file?
-
-This is actually OpenOBEX specific and I think the OpenOBEX mailing list
-will be a little more suitable for this question. However if anyone else
-wants to answer it, be my quest.
+you use of sdp_uuid128_create() is wrong and also not needed at all. It
+is enough to add the UUID16 identifier for this kind of search. The
+bluez-utils source packages contains enough examples on how to search
+for specific services.
 
 Regards
 
@@ -49,6 +44,6 @@ Marcel
 
 
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
