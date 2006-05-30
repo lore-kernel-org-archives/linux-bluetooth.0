@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <447C1C70.1030309@palmsource.com>
-Date: Tue, 30 May 2006 12:20:32 +0200
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C2E7@eumonex01.palmsource.com>	<4464C195.1020403@xmission.com>
-	<446B54AF.5040302@palmsource.com> <447A9C7B.2040301@xmission.com>
-In-Reply-To: <447A9C7B.2040301@xmission.com>
-Subject: Re: [Bluez-devel] A2DP and Alsa Plugin
+Date: Tue, 30 May 2006 12:02:17 +0200
+From: =?windows-1252?Q?G=F6tz_Issel?= <g.issel@fh-wolfenbuettel.de>
+To: bluez-devel@lists.sourceforge.net
+Message-id: <13960213768f.13768f139602@fh-wolfenbuettel.de>
+MIME-version: 1.0
+Subject: [Bluez-devel] SDP without results
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,69 +14,46 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi brad,
+Hi, 
 
->>>>    * How to select whether the application will output on a2dp or
->>>>speaker? Should this be application related or system related?
->>>>        =
+I am trying to discover services of a device, looking for the SAP
+service. In my understanding this is the hex ID for uuid  0x112d .
 
->>>>
->
->Ideally it's a system function, but I'm not seeing a way to pull that off.
->  =
+I have been trying to use the sample of Albert Huang
+(http://people.csail.mit.edu/albert/bluez-intro/)   section 4.4 .
 
->
-gstreamer makes it easy to write applications, but application writer =
+The service id is defined as
+    uint32_t svc_uuid_int[] = { 0x0, 0x0, 0x0, 0x112d };
 
-can choose whatever sink he wants. We cant rely on application being =
+The line
+    session = sdp_connect( BDADDR_ANY, &target, SDP_RETRY_IF_BUSY );
 
-a2dp aware.
-To provide system level functionnality, a good place is inside the sound =
+results in (checked via printf)
+	session->state=0, 
+	session->flags=1, 
+	session->sock=3, 
+	session->local=0,
+	session->tid=0
 
-daemon like esd. esd already does the mixing and ipc stuff.
-The main drawback is that this would restrict usage to gnome apps.
+The line 
+err = sdp_service_search_attr_req( session, search_list, \
+            SDP_ATTR_REQ_RANGE, attrid_list, &response_list);
 
-I just saw a media system selector (gstreamer-properties) but I haven't =
+gives err = 0 , so all is fine up to there.
 
-figured its role. Is that a sort of default gstreamer audio sink?
+The following FOR-loop is never entered ( for (; r; r = r->next ) {....  ) !
 
->gstreamer has no ipc equivalent to the alsa dmix, so a pure gst
->implementation will not mix multiple apps down to one stream.
->  =
+Any ideas ? 
+My source code under : http://www.goetzi.de/try1.html
 
->
-I've played a bit with dmix but did not have it working. It seems to =
+Using the command line tool "sdptool search 0x112d" gives perfect
+results by the way.
 
-only redirect sound to hardware sound cards. gonna ask on alsa mailing list.
-
->that is unless you help write the ipc mixer for gst :)
->  =
-
->
-The only sort of ipc I know that would suit would be ip sockets... We =
-
-will end up writing a sound server like esd and we would still need to =
-
-write a plugin and a gstreamer sink.
-
-gstreamer provides a tcpserver sink and source but it does not work the =
-
-way i want it to. The server will block until a client connect. Multiple =
-
-client are not allowed.
-
-However, mixing might be a fake problem. Maybe we should first figure =
-
-what applications uses alsa directly. All the popular apps (xmms/totem) =
-
-seems esd and arts aware.
-
-Fr=E9d=E9ric
-
+Goetz
 
 
 _______________________________________________
