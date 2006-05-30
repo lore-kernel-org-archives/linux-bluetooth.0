@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <447C5100.9070503@gmx.de>
-References: <mailman.301.1148929305.21349.bluez-users@lists.sourceforge.net>
-	<447C5100.9070503@gmx.de>
-Date: Tue, 30 May 2006 16:24:39 +0200
-Message-Id: <1148999079.11251.11.camel@localhost>
+In-Reply-To: <20060530140840.52436.qmail@web50504.mail.yahoo.com>
+References: <20060530140840.52436.qmail@web50504.mail.yahoo.com>
+Date: Tue, 30 May 2006 16:18:55 +0200
+Message-Id: <1148998735.11251.3.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluetooth Instability Problem extended info
+Subject: Re: [Bluez-users] Transmit Power Level (TPL)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,24 +20,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Jens,
+Hi Mahtab,
 
-> I send you the requested information (and a bit more):
-> 
-> The bbt is running Kernel 2.4.25-mh5, gcc 3.3.3 with denx elkd version 3.1
-> The PC is running suse 9.3 professional with kernel
-> 2.6.11.4-21.11-default and gcc 3.3.5 (3.3.3 when cross compiling for PPC)
-> 
-> I tested some more hardware, the D-Link DBT-120 is revision B4 (got two
-> of these), an Acer BT-600, and a Typhoon 20006. Everything works fine
-> between two PC's, when used in bbt it still hangs.
-> 
-> One of my co-workers is suspecting the USB-Host chip, a timing or data
-> size problem inside the bbt, so i'll try to check that out, too.
+> I have been trying to work on the various signal strength values
+> (RSSI, LQ & TPL) for quite sometime now. Though I am successful in
+> getting RSSI & link quality (LQ) for my dongles (from both hcitool
+> command & my own program), I always get Transmit Power level (TPL) as
+> 0 - I have tested in various distances.
+> My dongles are either ISSC or Broadcom-based (no CSR dongles) - all of
+> them support "power-control" feature.
 
-and he might be right with that. The USB stack in a 2.4 kernel is
-actually not good. You should really consider moving to a recent 2.6
-kernel for your btt.
+maybe ISSC and Broadcom simply don't implement it correct. Get yourself
+a CSR based dongle and retest.
+
+> And Marcel, I had also digged your code and saw that, you take a
+> parameter for transmit power level calculation (the "type" field) in
+> "hci_read_transmit_power_level" function and you set the parameter as:
+> type = (argc>1) ? atoi(argv[1]) : 0;
+
+Why don't you read the specification. If you give it 0 it will request
+the current power level and with 1 it request the maximum power level.
+
+> Finally, I only see "Get_Link_Quality" and "Read_RSSI" in bluetooth
+> specification 1.0.B - no mention of "Transmit Power Level" there. My
+> dongles are bluetooth 1.2, so, is there a possibility that they didn't
+> provide transmit_power_level status value similar to that previous
+> specification.
+
+You should double check with "hcidump -X -V" that they really not report
+and error and hcitool is doing it wrong. But it can happen that they
+didn't actually implement transmit power level at all and they always
+return the value 0.
+
+> I think bluetooth specification 1.0.B is the free one available till
+> now. If later versions are available, could anyone please provide me
+> the link.
+
+The current Bluetooth specification is version 2.0 and you should always
+use this one.
 
 Regards
 
