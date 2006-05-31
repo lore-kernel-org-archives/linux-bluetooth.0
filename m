@@ -1,102 +1,146 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <44560F4C.6010709@ens.fr>
-From: Giuseppe Castagna <Giuseppe.Castagna@ens.fr>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <447E0B1B.1010100@gnunux.info>
+Date: Wed, 31 May 2006 23:31:07 +0200
+From: Emmanuel GARETTE <gnunux@gnunux.info>
 MIME-Version: 1.0
-To: Giuseppe Castagna <Giuseppe.Castagna@ens.fr>
-Cc: claudio.takahasi@indt.org.br, bluez-devel@lists.sourceforge.net
-References: <445501FC.9070103@ens.fr>
-In-Reply-To: <445501FC.9070103@ens.fr>
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Can't create HID control channel: Connection refused
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1465390879=="
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
+
+This is a multi-part message in MIME format.
+--===============1465390879==
+Content-Type: multipart/alternative;
+	boundary="------------040304050007010008040603"
+
+This is a multi-part message in MIME format.
+--------------040304050007010008040603
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] Re: gbluezconf-00.10
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 01 May 2006 15:38:20 +0200
+Content-Transfer-Encoding: 7bit
 
-Giuseppe Castagna wrote:
- >
- > Any suggestion? Should I use the cvs version of bluez-utils?
- >
+I'm using bluez stack in maemo 
+(http://770.fs-security.com/maemo-bt-plugin/). I've bought a Com one 
+KB600's keyboard.
 
-Indeed, I should have tried this before writing. I installed cvs version of 
-bluez-libs and bluez-utils and now gbluezconf partially works.
+When I scan, I can see my device :
 
-Advanced Configuration and Search Devices no longer are greyed, while
-"Set up bluetooth device" still is (is it normal?). When I select search devices 
-I obtain the following error message.
+// # hcitool scan
+Scanning ...
+        00:0A:3A:32:97:11       KEYBOARD
+/
+I have information from this device :
 
-[_dbus_send_inquiry_request] search.c:1200: [DBUS] reply 
-error:(org.bluez.Error.NotImplemented,Not implemented)
+// # hcitool info 00:0A:3A:32:97:11
+Requesting information ...
+        BD Address:  00:0A:3A:32:97:11
+        Device Name: KEYBOARD
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x2c2
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xbc 0x06 0x07 0x00 0x00 0x00 0x00 0x00
+                <encryption> <slot offset> <timing accuracy> <role 
+switch>                <sniff mode> <RSSI> <channel quality> <CVSD> 
+<paging scheme>                <power control>
+/
+I can ping it :
 
-Looking at the code I have seen that it calls DiscoverDevices. So I tried to 
-play around with it but I always obtain a Null result.
+// # l2ping -c 2 00:0A:3A:32:97:11
+Ping: 00:0A:3A:32:97:11 from 08:00:28:45:55:BB (data size 20) ...
+44 bytes from 00:0A:3A:32:97:11 id 0 time 67.57ms
+44 bytes from 00:0A:3A:32:97:11 id 1 time 30.91ms
+2 sent, 2 received, 0% loss
+/
+But i can't connect to it :
 
-BTW
+// # hidd --connect 00:0A:3A:32:97:11
+Can't create HID control channel: Connection refused
+/
+What "Connection refused" refered to ? How to solve this problem ?
 
-  bluez/utils/hcid/dbus-test DiscoverDevices
+Regards.
 
-does not work since the entry for  DiscoverDevices was forgotten. Any suggestion 
-on how to have seach working?
+--------------040304050007010008040603
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-Thanks in advance
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title></title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+I'm using bluez stack in maemo
+(<a class="moz-txt-link-freetext" href="http://770.fs-security.com/maemo-bt-plugin/">http://770.fs-security.com/maemo-bt-plugin/</a>). I've bought a Com one
+KB600's keyboard.<br>
+<br>
+When I scan, I can see my device :<br>
+<br>
+<i>/ # hcitool scan<br>
+Scanning ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 00:0A:3A:32:97:11&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; KEYBOARD<br>
+</i><br>
+I have information from this device :<br>
+<br>
+<i>/ # hcitool info 00:0A:3A:32:97:11<br>
+Requesting information ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address:&nbsp; 00:0A:3A:32:97:11<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Device Name: KEYBOARD<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LMP Version: 1.1 (0x1) LMP Subversion: 0x2c2<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufacturer: Cambridge Silicon Radio (10)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xbc 0x06 0x07 0x00 0x00 0x00 0x00 0x00<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;encryption&gt; &lt;slot offset&gt; &lt;timing
+accuracy&gt; &lt;role switch&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;sniff mode&gt;
+&lt;RSSI&gt; &lt;channel quality&gt; &lt;CVSD&gt; &lt;paging
+scheme&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;power control&gt;<br>
+</i><br>
+I can ping it :<br>
+<br>
+<i>/ # l2ping -c 2 00:0A:3A:32:97:11<br>
+Ping: 00:0A:3A:32:97:11 from 08:00:28:45:55:BB (data size 20) ...<br>
+44 bytes from 00:0A:3A:32:97:11 id 0 time 67.57ms<br>
+44 bytes from 00:0A:3A:32:97:11 id 1 time 30.91ms<br>
+2 sent, 2 received, 0% loss<br>
+</i><br>
+But i can't connect to it :<br>
+<br>
+<i>/ # hidd --connect 00:0A:3A:32:97:11<br>
+Can't create HID control channel: Connection refused<br>
+</i><br>
+What "Connection refused" refered to ? How to solve this problem ?<br>
+<br>
+Regards.<br>
+</body>
+</html>
+
+--------------040304050007010008040603--
 
 
-
-Giuseppe Castagna wrote:
-> Hi,
->    I successfully compiled gbluezconf-00.10: I just had to change
-> 
-> $ACLOCAL -I m4 || exit 1
-> 
-> into
-> 
-> $ACLOCAL -I ./m4 || exit 1
-> 
-> to do it. I installed and launched it but in the submenues all option 
-> are greyed  apart from About Help Quit. My bluetooth system is working 
-> (in this right moment I am writing this mail by using a bluetooth mouse, 
-> connected by the "old way"  hidd --connect). When launching gbluezconf 
-> on the console the follwoing messages are displayed
-> 
-> [beppe@mirto tmp]$ gbluezconf
-> [stock_icons_init] stock-icons.c:57: Loading:gbluezconf-tray-icon.png
-> [stock_icons_init] stock-icons.c:57: Loading:gbluezconf-inactive.png
-> [stock_icons_init] stock-icons.c:57: Loading:gbluezconf-data.png
-> [_device_default_update] shell.c:534: reply 
-> error:(org.bluez.Error,Method not found)
-> 
-> 
-> 
-> I running a custom kernel 2.6.17-rc3 on a Fedora 5 installation and use 
-> the following libraries:
-> 
-> bluez-pin-0.30-2
-> bluez-utils-2.25-4
-> bluez-libs-devel-2.25-1
-> bluez-libs-2.25-1
-> 
-> Any suggestion? Should I use the cvs version of bluez-utils? Thanks in 
-> advance!
-> 
-> ---Beppe---
-> 
+--===============1465390879==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 
+--===============1465390879==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
--------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1465390879==--
