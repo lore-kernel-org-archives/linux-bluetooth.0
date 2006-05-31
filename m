@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20060531170736.25650@gmx.net>
+Message-ID: <447DCC75.2030000@ibdcon.org.br>
+Date: Wed, 31 May 2006 14:03:49 -0300
+From: Paulo Wollny <paulo.wollny@ibdcon.org.br>
 MIME-Version: 1.0
-Date: Wed, 31 May 2006 19:07:36 +0200
-From: pea sen <Blade_MV@gmx.de>
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] sdpd not working on arm based linux
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <mailman.301.1148929305.21349.bluez-users@lists.sourceforge.net>	<447C5100.9070503@gmx.de>
+	<1148999079.11251.11.camel@localhost>
+In-Reply-To: <1148999079.11251.11.camel@localhost>
+Subject: [Bluez-users] bluetooth ppd for dummies
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,34 +17,21 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hello,
+Hi,
 
-we`re trying to integrate bluez into an arm-based embedded-linux. =
+i used to connect my computer to the internet (GPRS) using bluez with
+wvdial, under suse 9.0.
+I upgraded to suse 10.0, and since then, wvdial is not working anymore.
+does anyone have all the pppd configuration whuch could send to me as an
+example, with all the steps?
 
-we crosscompiled the bluez-libs and utils.
-everything works fine: hciconfig, hcitool, sdptool are working correctly.
-But when we try to start sdp-server "sdpd", nothing is done. no errormsg an=
-d "ps" does not list sdpd-process.
-typing "sdptool browse local" result following errormsg:
-Failed to connect to SDP server on FF:FF:FF:00:00:00: Address family not su=
-pported by protocol
+Best regards,
 
-we're not sure if we did everything right, but other bluez-tools working...=
- so what can be there? what is missing? what does sdpd need to work and why=
- is no output-message there?
-
-All hints are usefull
--- =
-
-
-
-Der GMX SmartSurfer hilft bis zu 70% Ihrer Onlinekosten zu sparen!
-      Ideal f=FCr Modem und ISDN: http://www.gmx.net/de/go/smartsurfer
-    =
+Paulo Wollny
 
 
 
