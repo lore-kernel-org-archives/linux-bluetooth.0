@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <70DCB28C5BB04A4BBB1C8512589BAC65D4F163@MAIL006.mail.lan>
-References: <70DCB28C5BB04A4BBB1C8512589BAC65D4F163@MAIL006.mail.lan>
-Date: Thu, 01 Jun 2006 19:56:08 +0200
-Message-Id: <1149184568.28511.35.camel@localhost>
+In-Reply-To: <70DCB28C5BB04A4BBB1C8512589BAC65D4F15C@MAIL006.mail.lan>
+References: <70DCB28C5BB04A4BBB1C8512589BAC65D4F15C@MAIL006.mail.lan>
+Date: Thu, 01 Jun 2006 19:54:59 +0200
+Message-Id: <1149184499.28511.33.camel@localhost>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Strange behaviour
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -22,27 +22,17 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Chris,
 
-> > > even with the latest FC5 kernel?
+> > > I've upgraded one of the two machines to FC5 (bluez-libs 
+> > 2.25-1), and 
+> > > my test code is quite happy to run with only one bt dongle attached.
 > > 
-> > No. Now I see the same thing you do.
+> > even with the latest FC5 kernel?
 > 
-> I take that back - sorry.
-> 
-> I actually didn't have a dongle attached. With a single dongle attached,
-> my test code does still start fine.
-> 
-> Kernel is 2.6.16-1.2122_FC5smp (from cat /proc/version)
-> I've also got these installed :
-> bluez-hcidump.i386 1.30-1
-> bluez-libs.i386 2.25-1
-> bluez-libs-devel.i386 2.25-1
-> bluez-pin.i386 0.30-2
-> bluez-utils.i386 2.25-4
-> (all from yum list bluez\*)
-> 
-> Basically, this is a fully-updated FC5.
+> No. Now I see the same thing you do.
+> Something changed here between kernel 2.6.15 and 2.6.16, then ?
 
-then it must be the bluez-libs from CVS.
+then it is the socket fix. You are trying to run a getsockname() on an
+unbound socket.
 
 Regards
 
