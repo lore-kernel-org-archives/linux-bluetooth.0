@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <447F71B5.8060905@xmission.com>
-Date: Thu, 01 Jun 2006 17:01:09 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <70DCB28C5BB04A4BBB1C8512589BAC65D4F2D8@MAIL006.mail.lan>
 References: <70DCB28C5BB04A4BBB1C8512589BAC65D4F2D8@MAIL006.mail.lan>
-	<1149202516.32406.0.camel@localhost>
-In-Reply-To: <1149202516.32406.0.camel@localhost>
+Date: Fri, 02 Jun 2006 00:55:16 +0200
+Message-Id: <1149202516.32406.0.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Strange behaviour
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,17 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Chris,
+
+> > Do you really need to use a thread to produce this behavior. 
+> > I normally try to avoid any threaded programs at all. Can you 
+> > please remove all extra stuff from your code (and use simply 
+> > hci0 only) and try to not to use threads?
+> 
+> I think the problem only occurs when I'm sending and receiving at the
+> same time, which could well mean that it will only occur with a threaded
+> program.
+
+can we try to reproduce this with a non-thread test program. If we can
+reproduce it this way, it will be much easier to debug.
+
+Regards
+
 Marcel
 
-> can we try to reproduce this with a non-thread test program. If we can
-> reproduce it this way, it will be much easier to debug.
 
-maybe using async socket i/o would reproduce it.
-
-threads implementations and debugging threads has improved from the bad
-old days but I can understand the desire to avoid the issue.
-
-brad
 
 
 _______________________________________________
