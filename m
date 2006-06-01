@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Date: Thu, 1 Jun 2006 12:55:06 -0400
-Message-ID: <70DCB28C5BB04A4BBB1C8512589BAC65D4F15C@MAIL006.mail.lan>
-In-Reply-To: <1149106097.2152.42.camel@localhost>
-From: "Brand, Chris" <chris.brand@wideray.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Strange behaviour
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <447EA02C.3070703@palmsource.com>
+References: <447C7ADD.1040503@palmsource.com>
+	<447E951C.6040400@xmission.com>  <447EA02C.3070703@palmsource.com>
+Date: Thu, 01 Jun 2006 10:27:30 +0200
+Message-Id: <1149150450.28511.6.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] First try
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,16 +21,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-> > I've upgraded one of the two machines to FC5 (bluez-libs 
-> 2.25-1), and 
-> > my test code is quite happy to run with only one bt dongle attached.
+Hi Frederic,
+
+> >could you resend as a 'diff -u' output?
 > 
-> even with the latest FC5 kernel?
+> this is the command line I use is that correct?
+> 
+> cvs diff -u pcm_a2dp.c > pcm_a2dp.c.diff-u
 
-No. Now I see the same thing you do.
-Something changed here between kernel 2.6.15 and 2.6.16, then ?
+you should have a .cvsrc file in $HOME that looks like this:
 
-Chris
+cvs -z3
+diff -u
+update -dP
+checkout -P
+
+> Now the output has +- instead of ><
+
+It is called unified diff and it is the preferred format around any open
+source project. I don't know of anybody who ever has reviewed a context
+diff.
+
+Regards
+
+Marcel
+
+
 
 
 _______________________________________________
