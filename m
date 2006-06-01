@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Date: Thu, 1 Jun 2006 17:16:38 -0400
-Message-ID: <70DCB28C5BB04A4BBB1C8512589BAC65D4F2D8@MAIL006.mail.lan>
-In-Reply-To: <1149196284.28511.73.camel@localhost>
-From: "Brand, Chris" <chris.brand@wideray.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <70DCB28C5BB04A4BBB1C8512589BAC65D4F163@MAIL006.mail.lan>
+References: <70DCB28C5BB04A4BBB1C8512589BAC65D4F163@MAIL006.mail.lan>
+Date: Thu, 01 Jun 2006 23:11:24 +0200
+Message-Id: <1149196284.28511.73.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Strange behaviour
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,17 +20,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-> Do you really need to use a thread to produce this behavior. 
-> I normally try to avoid any threaded programs at all. Can you 
-> please remove all extra stuff from your code (and use simply 
-> hci0 only) and try to not to use threads?
+Hi Chris,
+
+> > > even with the latest FC5 kernel?
+> > 
+> > No. Now I see the same thing you do.
 > 
+> I take that back - sorry.
+> 
+> I actually didn't have a dongle attached. With a single dongle attached,
+> my test code does still start fine.
 
-I think the problem only occurs when I'm sending and receiving at the
-same time, which could well mean that it will only occur with a threaded
-program.
+I hacked up the code to avoid this test and simply go ahead with hci0
+and I can see that something weird is going on. However I have no idea
+what it is and your code is not easy to follow.
 
-Chris
+Do you really need to use a thread to produce this behavior. I normally
+try to avoid any threaded programs at all. Can you please remove all
+extra stuff from your code (and use simply hci0 only) and try to not to
+use threads?
+
+Regards
+
+Marcel
+
+
 
 
 _______________________________________________
