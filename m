@@ -1,7 +1,8 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 MIME-Version: 1.0
-Date: Thu, 1 Jun 2006 13:01:19 -0400
-Message-ID: <70DCB28C5BB04A4BBB1C8512589BAC65D4F163@MAIL006.mail.lan>
+Date: Thu, 1 Jun 2006 12:55:06 -0400
+Message-ID: <70DCB28C5BB04A4BBB1C8512589BAC65D4F15C@MAIL006.mail.lan>
+In-Reply-To: <1149106097.2152.42.camel@localhost>
 From: "Brand, Chris" <chris.brand@wideray.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Strange behaviour
@@ -18,31 +19,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
- 
-> > > I've upgraded one of the two machines to FC5 (bluez-libs
-> > 2.25-1), and
-> > > my test code is quite happy to run with only one bt 
-> dongle attached.
-> > 
-> > even with the latest FC5 kernel?
+> > I've upgraded one of the two machines to FC5 (bluez-libs 
+> 2.25-1), and 
+> > my test code is quite happy to run with only one bt dongle attached.
 > 
-> No. Now I see the same thing you do.
+> even with the latest FC5 kernel?
 
-I take that back - sorry.
-
-I actually didn't have a dongle attached. With a single dongle attached,
-my test code does still start fine.
-
-Kernel is 2.6.16-1.2122_FC5smp (from cat /proc/version)
-I've also got these installed :
-bluez-hcidump.i386 1.30-1
-bluez-libs.i386 2.25-1
-bluez-libs-devel.i386 2.25-1
-bluez-pin.i386 0.30-2
-bluez-utils.i386 2.25-4
-(all from yum list bluez\*)
-
-Basically, this is a fully-updated FC5.
+No. Now I see the same thing you do.
+Something changed here between kernel 2.6.15 and 2.6.16, then ?
 
 Chris
 
