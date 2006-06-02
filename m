@@ -1,6 +1,6 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45865.156.116.3.43.1149253067.squirrel@webmail.uio.no>
-Date: Fri, 2 Jun 2006 14:57:47 +0200 (CEST)
+Message-ID: <35749.156.116.3.43.1149246092.squirrel@webmail.uio.no>
+Date: Fri, 2 Jun 2006 13:01:32 +0200 (CEST)
 From: markusv@student.matnat.uio.no
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
@@ -17,13 +17,6 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
-
----------------------------- Original Message ----------------------------
-Subject: Re: Bluez service discovery
-From:    markusv@ulrik.uio.no
-Date:    Fri, June 2, 2006 13:01
-To:      bluez-users@lists.sourceforge.net
---------------------------------------------------------------------------
 
 
 hi again
@@ -230,7 +223,6 @@ examine
  > Bluez-users@li...
  > https://lists.sourceforge.net/lists/listinfo/bluez-users
  >
-
 
 
 
