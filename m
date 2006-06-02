@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <45865.156.116.3.43.1149253067.squirrel@webmail.uio.no>
+Date: Fri, 2 Jun 2006 14:57:47 +0200 (CEST)
+From: markusv@student.matnat.uio.no
 To: bluez-users@lists.sourceforge.net
-From: Stefan <stv_vt@yahoo.com>
-Date: Fri, 2 Jun 2006 14:53:25 +0000 (UTC)
-Message-ID: <loom.20060602T160736-77@post.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-users] PAN over bluetooth - no TCP/IP activity
+MIME-Version: 1.0
+Subject: Re: [Bluez-users] Bluez service discovery
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,89 +18,218 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
-
-I'm trying to create a PAN between a laptop and a desktop computer. 
-
-I carefully followed the instructions for creating a PAN network
-(http://bluez.sourceforge.net/contrib/HOWTO-PAN).
-
-Right now I am able to connect, ending up with correct and configured "bnep0"
-interfaces on both computers.
-
-The problem is, that I can not even ping them. After a lot of tries, I figured
-out, that if I put the bnep0 interface in promiscuous mode, using 
-
-ifconfig bnep0 promisc (at the NAP side)
-
-then ICMP packets starts flowing, and the both nodes are able to ping each
-other. But that's all. 
-
-On both nodes hcid & sdpd are running, bnep module is loaded, kernel version is
-2.6.16 (Fedora Core 4), bluez-utils 2.15
-
-Here is what I do:
-
-@NAP: # pand -s -r NAP
-@PANU: # pand -Q -r PANU -d NAP
-@Both (after a while): # ifconfig bnep0 10.0.0.x netmask 255.255.255.0 up
-@both: # ifconfig bnep0
-bnep0     Link encap:Ethernet  HWaddr 11:11:11:11:11:11
-          inet addr:10.0.0.x  Bcast:10.0.0.255  Mask:255.255.255.0
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:6 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:4 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:1000
-          RX bytes:478 (478.0 b)  TX bytes:64 (64.0 b)
+---------------------------- Original Message ----------------------------
+Subject: Re: Bluez service discovery
+From:    markusv@ulrik.uio.no
+Date:    Fri, June 2, 2006 13:01
+To:      bluez-users@lists.sourceforge.net
+--------------------------------------------------------------------------
 
 
-Accoring to all docs I read, at this poing both nodes should be able to ping
-each other. But they are not!
+hi again
+I have finaly found what my problem is, I am using:
+uint32_t svc_uuid_int[] = {0x1c712d88, 0xaac711da, 0x818a000b, 0x0000ffff};
+sdp_uuid128_create( &svc_uuid, &svc_uuid_int);
 
-I don't know how important is, but just in case, here is the output of
+to create the service i am looking for. But something goes wrong using the
+sdp_uuid128_create function I think. Using the uuid created returns nu
+results. But using:
+sdp_uuid16_create(&svc_uuid, 0x1002);
 
-# hciconfig hci0 -a
+gives me a lot of results. I have dobbel checked that the uuid is correct
+and that the service is running on my phone so why can i not use
+sdp_uuid128_create()??
 
-@Desktop NAP (USB dongle):
+markus
 
-hci0:   Type: USB
-        BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 48:10
-        UP RUNNING PSCAN ISCAN
-        RX bytes:1076 acl:25 sco:0 events:42 errors:0
-        TX bytes:657 acl:19 sco:0 commands:17 errors:0
-        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: ACCEPT MASTER
-        Name: 'experta'
-        Class: 0x120104
-        Service Classes: Networking
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP Subver: 0x1fe
-        Manufacturer: Integrated System Solution Corp. (57)
 
-@Laptop PANU (IBM/Lenovo Z60m):
-
-hci0:   Type: USB
-        BD Address: 00:14:A4:DF:2D:C8 ACL MTU: 1017:8 SCO MTU: 64:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:133516 acl:2949 sco:0 events:6546 errors:0
-        TX bytes:108738 acl:3185 sco:0 commands:1594 errors:0
-        Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'lenovo'
-        Class: 0x120104
-        Service Classes: Networking
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x206c LMP Ver: 2.0 (0x3) LMP Subver: 0x4132
-        Manufacturer: Broadcom Corporation (15)
-
-Could you please help me!
-
-Regards,
-Stefan
+> On 5/25/06, markusv@st... <markusv@st...>
+>  wrote:
+>  >
+>  >
+>  > My UUID is: 1c712d88aac711da818a000bcd4e8912. I created this with
+uuidgen.
+>  > I have done nothing more to it. Do I have to??
+>
+>
+ > No, that's fine.
+>
+> What do I have to do? How
+>  > do I add the Bluetooth Base UUID or one of the UUID functions
+specific to
+>  > reserved UUIDs?
+>
+>
+>  To create a valid UUID out of a 16-bit reserved UUID, use
+>  sdp_uuid16_create.  See sdp_lib.h for details, it should be pretty self
+>  explanatory.  There a bunch of defined constants in sdp.h that you can
+also
+>  use.  e.g.
+>
+ > {
+ >   uuid_t u;
+ >   sdp_uuid16_create( &u, PUBLIC_BROWSE_GROUP );
+>  }
+>
+ > If you continue to have trouble, download the bluez source code and
+examine
+>  sdptool.c
+>
+>  -albert
+>
+ > Markus
+ >
+ > > Have you added the Bluetooth Base UUID, or one of the UUID functions
+ > >  specific to reserved UUIDs?
+ > >
+ > > -albert
+ > >
+ > > On 5/23/06, markusv@st... <markusv@st...>
+ > > wrote:
+ > >
+ > >
+ > > I have generated my own service and generated a UUID with uuidgen. But
+ > my
+ > > laptop does not find my service on the phone! If i change the uuid to
+ > > search for on the laptop to 0x1002 the public brose root, as far as I
+ > know
+ > > it should than give me all services on the phone. But still no services
+ > > are found. Searching with sdptool finds all services on the phone
+ > > including my own. Why can't I find them in my C program? I would realy
+ > > appreciate some help here. I have spent far to much time on that now,
+ > and
+ > > I need that to work for my master thesis.
+ > >
+ > > Markus
+ > >
+ > >
+ > >
+ > > >Individual devices (e.g. phones) do not have UUIDs.  Services do.  If
+ > > you're
+ > > >implementing a Bluetooth profile, that profile should come with a
+ > > >preassigned UUID.  If you're creating your own custom service that's
+ > not
+ > > >part of the Bluetooth profiles or specifications, make your own uuid
+ > with
+ > > >uuidgen.
+ > > >
+ > > >More generally, a UUID is a 128-bit identifier.  Bluetooth has this
+ > > notion
+ > > >of 16-bit and 32-bit reserved UUIDs.  These are really 128-bit UUIDs,
+ > but
+ > > >with the lower 112/96 bits fixed to the Bluetooth Base UUID.  If you
+ > find
+ > > a
+ > > >service with a 16-bit UUID (e.g. Serial Port Profile is 0x1101, then
+ > you
+ > > may
+ > > >need to convert it to the full 128-bit UUID.
+ > >
+ > > -albert
+ > >
+ > > On 5/23/06, Rajan Rengasamy <rajanrengasamy@ma...> wrote:
+ > > >
+ > > > Hi Albert, if u dont mind me asking, would you be able to guide me on
+ > > how
+ > > > i can get my phone's UUID? please thanks.
+ > > > i also have a k750.
+ > > >
+ > > > On Tuesday, May 23, 2006, at 07:54AM, Albert Huang <albert@cs...
+ > > >
+ > > > wrote:
+ > > >
+ > > > >
+ > > > ><<Original Attached>>
+ > > >
+ > > >
+ > > > Rajan
+ > > > -------------
+ > > > Tat Twvam Asi
+ > > >
+ > > >
+ > > > If you're using a Bluetooth reserved UUID, make sure that you've
+ > > correctly
+ > > > specified it by adding the Bluetooth Base UUID.
+ > > >
+ > > > -albert
+ > > >
+ > > > On 5/19/06, markusv@st... <markusv@st...
+ > > >
+ > > > wrote:
+ > > > >
+ > > > >
+ > > > > hi
+ > > > > I am trying to discover services on my cellular phone a Sony
+ > Ericsson
+ > > > > k750
+ > > > > i. I am running ubuntu and the Bluez bluetooth protocol stack. I
+ > have
+ > > > > followed this example:
+ > > > > http://people.csail.mit.edu/albert/bluez-intro/x601.html
+ > > > > I have ofcourse changed the bluetooth address and the uuid to match
+ > my
+ > > > > phone and service. But still my program finds no services on the
+ > > phone??
+ > > > > What is wrong here? Anybody have some hints?
+ > > > >
+ > > > > Thanks
+ > > > > Markus
+ > > > >
+ > > > >
+ > > > >
+ > > > >
+ > > > >
+ > > > >
+ > > > >
+ > > > > -------------------------------------------------------
+ > > > > Using Tomcat but need to do more? Need to support web services,
+ > > > > security?
+ > > > > Get stuff done quickly with pre-integrated technology to make your
+ > job
+ > > > > easier
+ > > > > Download IBM WebSphere Application Server v.1.0.1 based on Apache
+ > > > > Geronimo
+ > > > >
+ > > http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+ > > > >
+ > > > > _______________________________________________
+ > > > > Bluez-users mailing list
+ > > > > Bluez-users@li...
+ > > > > https://lists.sourceforge.net/lists/listinfo/bluez-users
+ > > > >
+ > > >
+ > > >
+ > > >
+ > >
+ > >
+ > >
+ > > -------------------------------------------------------
+ > > Using Tomcat but need to do more? Need to support web services,
+ > security?
+ > > Get stuff done quickly with pre-integrated technology to make your job
+ > > easier
+ > > Download IBM WebSphere Application Server v.1.0.1 based on Apache
+ > Geronimo
+ > > http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+ > > _______________________________________________
+ > > Bluez-users mailing list
+ > > Bluez-users@li...
+ > > https://lists.sourceforge.net/lists/listinfo/bluez-users
+ > >
+ >
+ >
+ >
+ >
+ > -------------------------------------------------------
+ > All the advantages of Linux Managed Hosting--Without the Cost and Risk!
+ > Fully trained technicians. The highest number of Red Hat certifications in
+ > the hosting industry. Fanatical Support. Click to learn more
+ > http://sel.as-us.falkag.net/sel?cmd=lnk&kid=107521&bid=248729&dat=121642
+ > _______________________________________________
+ > Bluez-users mailing list
+ > Bluez-users@li...
+ > https://lists.sourceforge.net/lists/listinfo/bluez-users
+ >
 
 
 
