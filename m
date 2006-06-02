@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sat, 3 Jun 2006 15:40:11 +0200
-From: Filippo Giunchedi <filippo@esaurito.net>
-To: bluez-devel@lists.sf.net
-Message-ID: <20060603134011.GA13263@esaurito.net>
+Message-ID: <448077B0.3090509@bartol.udel.edu>
+Date: Fri, 02 Jun 2006 13:38:56 -0400
+From: Rich Townsend <rhdt@bartol.udel.edu>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="bp/iNruPH9dso1Pn"
-Subject: Re: [Bluez-devel] [PATCH] some manual pages patches
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <4469387E.5000203@bartol.udel.edu>
+	<1148909788.31689.66.camel@localhost>
+In-Reply-To: <1148909788.31689.66.camel@localhost>
+Subject: Re: [Bluez-devel] SCO MTU problem on CSR-based Belkin F8T020/F8T007
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,178 +17,104 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Marcel Holtmann wrote:
+> Hi Rich,
+> 
+> 
+>>I've recently acquired a Belkin F8T020/F8T007 PCMCIA bluetooth interface 
+>>(basically, a compact flash card in an adapter sleeve), and I'm trying to get 
+>>this linked up to a Digiwave BH-2000 headset.
+>>
+>>Mostly, everything is functioning correctly; the interface provides a UART on 
+>>/dev/ttyS3, which Bluez has no problem working with using the hci_uart driver. 
+>>The problem, however, comes in getting the ALSA module, snd_bt_sco, to behave 
+>>properly. I can get the headset to connect to my computer, and do things such as 
+>>change the volume; but I've had no luck in getting any sound to play on the headset.
+>>
+>>After a little digging around, it turns out that no SCO packets are being 
+>>transmitted by the interface. Closer investigation shows that the problem is 
+>>with the outgoing MTU; the len value passed to sco_send_frame is invariably 
+>>longer than the default SCO MTU of the interface (64), with the result that 
+>>sco_send_frame aborts early with an EINVAL return value (which in turn is 
+>>silently ignored).
+>>
+>>As a test fix, I upped the SCO MTU on the interface to 255, and now stuff 
+>>actually gets transmitted -- and I can hear sound on the headset, albeit very 
+>>distorted.
+>>
+>>So, it seems snd_bt_sco is disregarding the MTU settings of the interface. Why, 
+>>I'm not sure; a quick look through the snd_bt_sco source code doesn't reveal 
+>>anything obvious (in fact, it's not clear how the module picks up the MTU). I'd 
+>>appreciate hearing suggestions about how I might go about fixing this.
+>>
+>>For the record:
+>>
+>>Kernel 2.6.16 (x86)
+>>
+>>hciconfig -a (after upping MTU so TX works):
+>>
+>>hci0:   Type: UART
+>>         BD Address: 00:02:72:81:23:27 ACL MTU: 192:8 SCO MTU: 255:8
+>>         UP RUNNING PSCAN ISCAN AUTH ENCRYPT
+>>         RX bytes:5063515 acl:52 sco:30471 events:94 errors:0
+>>         TX bytes:4612824 acl:42 sco:0 commands:27604 errors:0
+>>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>>         Link policy: RSWITCH HOLD SNIFF PARK
+>>         Link mode: SLAVE ACCEPT
+>>         Name: 'BlueZ (0)'
+>>         Class: 0x000100
+>>         Service Classes: Unspecified
+>>         Device Class: Computer, Uncategorized
+>>         HCI Ver: 1.1 (0x1) HCI Rev: 0x110 LMP Ver: 1.1 (0x1) LMP Subver: 0x110
+>>         Manufacturer: Cambridge Silicon Radio (10)
+>>
+>>hcitool info 00:13:8A:06:31:0E (the headset):
+>>
+>>Requesting information ...
+>>         BD Address:  00:13:8A:06:31:0E
+>>         Device Name: BH2000
+>>         LMP Version: 1.2 (0x2) LMP Subversion: 0x611
+>>         Manufacturer: Cambridge Silicon Radio (10)
+>>         Features: 0xfc 0xfe 0x0f 0x00 0x08 0x08 0x00 0x00
+>>                 <encryption> <slot offset> <timing accuracy> <role switch>
+>>                 <hold mode> <sniff mode> <RSSI> <channel quality> <SCO link>
+>>                 <HV2 packets> <HV3 packets> <u-law log> <A-law log> <CVSD>
+>>                 <paging scheme> <power control> <transparent SCO>
+>>                 <AFH cap. slave> <AFH cap. master>
+>>
+>>Big note: both devices are CSR, so this *ISN'T* the well-known MTU problem 
+>>experienced by Broadcom chipsets. Smaller note: although the hciconfig output is 
+>>after I upped the MTU and got (distorted) sound on the headset, the SCO TX count 
+>>is still at zero. Hmmmm....
+>>
+>>Let me know if you need more info...
+> 
+> 
+> run "hciconfig hci0 revision" as root and see if the SCO mapping is done
+> over PCM or HCI.
 
---bp/iNruPH9dso1Pn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+OK, here's what I get:
 
-Hi Marcel,
-the two attached patches for l2ping and pand apply against current CVS.
+hci0:   Type: UART
+         BD Address: 00:02:72:81:23:27 ACL MTU: 192:8 SCO MTU: 64:8
+         HCI 14.3
+         Chip version: BlueCore02-External (ES2)
+         Max key size: 56 bit
+         SCO mapping:  HCI
 
-The pand patch is really easy, it just appends a SCRIPTS section to explain the
-/etc/bluetooth/pan/dev-up usage, it may be worth including it in a file to be
---included to help2man:
+As you can see, the mapping is over HCI, so it should work, right?
 
-[SCRIPTS]
-pand will execute \fB/etc/bluetooth/pan/dev-up\fR \fIdevice\fR \fIdestination\fR
-when the interface becomes available.
+cheers,
 
+Rich
 
-You may want to discard the first chunk of l2ping.1.patch as it changes the
-l2ping section from 1 to 8.
-
-IMO section 8 (system administration commands) is more suitable at least for
-pand,hcid and hidd, being them daemons. The l2ping (for example) case is tricky, on
-a normal system it would require root privileges so it is not really a user
-command.
-
-thanks,
-filippo
---
-Filippo Giunchedi - http://esaurito.net
-PGP key: 0x6B79D401
-random quote follows:
-
-Man was made at the end of the week's work when God was tired.
--- Mark Twain
-
---bp/iNruPH9dso1Pn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="l2ping.1.patch"
-
-Index: l2ping.1
-===================================================================
-RCS file: /cvsroot/bluez/utils/tools/l2ping.1,v
-retrieving revision 1.5
-diff -u -r1.5 l2ping.1
---- l2ping.1	20 Mar 2006 22:24:24 -0000	1.5
-+++ l2ping.1	3 Jun 2006 13:10:40 -0000
-@@ -1,58 +1,59 @@
--.TH L2PING 1 "Jan 22 2002" BlueZ "Linux System Administration"
-+.TH L2PING 8 "Jan 22 2002" BlueZ "Linux System Administration"
- .SH NAME
- l2ping \- Send L2CAP echo request and receive answer
- .SH SYNOPSIS
- .B l2ping
--[
--.I -i <hciX>
--] [
--.I -s size
--] [
--.I -c count
--] [
--.I -t timeout
--] [
--.I -f
--] [
--.I -r
--] <
-+.RB [\| \-i
-+.IR <hciX> \|]
-+.RB [\| \-s
-+.IR size \|]
-+.RB [\| \-c
-+.IR count \|]
-+.RB [\| \-t
-+.IR timeout \|]
-+.RB [\| \-f \|]
-+.RB [\| \-r \|]
- .I bd_addr
-->
-+
-+.SH DESCRIPTION
-+.LP
-+.I bd_addr
-+
- .SH DESCRIPTION
- .LP
- L2ping sends a L2CAP echo request to the Bluetooth MAC address
--.B bd_addr
-+.I bd_addr
- given in dotted hex notation.
- .SH OPTIONS
- .TP
--.I -i " <hciX>"
-+.BI \-i " <hciX>"
- The command is applied to device
--.I
-+.BI
- hciX
- , which must be the name of an installed Bluetooth device (X = 0, 1, 2, ...)
- If not specified, the command will be sent to the first available Bluetooth
- device.
- .TP
--.I -s size
-+.BI \-s " size"
- The
--.B size
-+.I size
- of the data packets to be sent.
- .TP
--.I -c count
-+.BI \-c " count"
- Send
--.B count
-+.I count
- number of packets then exit.
- .TP
--.I -t \fBtimeout\fP
-+.BI \-t " timeout"
- Wait
--.B \fBtimeout\fP
-+.I timeout
- seconds for the response.
- .TP
--.I -f
-+.B \-f
- Kind of flood ping. Use with care! It reduces the delay time between packets
- to 0.
- .TP
--.I -r
-+.B \-r
- Reverse ping (gnip?). Send echo response instead of echo request.
- .TP
- .I bd_addr
-
---bp/iNruPH9dso1Pn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="pand.1.patch"
-
-Index: pand.1
-===================================================================
-RCS file: /cvsroot/bluez/utils/pand/pand.1,v
-retrieving revision 1.5
-diff -u -r1.5 pand.1
---- pand.1	20 Jan 2006 01:42:21 -0000	1.5
-+++ pand.1	3 Jun 2006 13:22:37 -0000
-@@ -68,3 +68,7 @@
- .TP
- \fB\-\-autozap\fR \fB\-z\fR
- Disconnect automatically on exit
-+
-+.SH SCRIPTS
-+pand will execute \fB/etc/bluetooth/pan/dev-up\fR \fIdevice\fR \fIdestination\fR when
-+the interface becomes available.
-
---bp/iNruPH9dso1Pn
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-
---bp/iNruPH9dso1Pn
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---bp/iNruPH9dso1Pn--
