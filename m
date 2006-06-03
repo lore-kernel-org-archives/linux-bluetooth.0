@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44826140.5010600@xmission.com>
-Date: Sat, 03 Jun 2006 22:27:44 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Date: Sat, 3 Jun 2006 15:57:08 +0200
+From: Filippo Giunchedi <filippo@esaurito.net>
+To: bluez-devel@lists.sf.net
+Message-ID: <20060603135708.GB13263@esaurito.net>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] ppc aku2 vs. a2recv
+Content-Type: multipart/mixed; boundary="wq9mPyueHGvFACwf"
+Subject: Re: [Bluez-devel] [PATCH] rfcomm 'anycommand' bug
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,30 +15,73 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hey
 
-I tried a2dp via an unofficial aku2 hack on an imate jamin and things
-mostly work with this config. Some of the values below are from the
-bitfields (eg subbands)
+--wq9mPyueHGvFACwf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Channels=2, speed=44100 channel_mode = 2 allocation_method = 1 subbands
-= 1 block_length = 1 min_bitpool = 48 max_bitpool = 48
+Hi Marcel,
+attached there is a new patch (using tabs, "set noet" for the vim lovers) for
+rfcomm, agreed it could be better. I hope it is clear enough.
 
-it did bail once with a message
+thanks,
+filippo
+--
+Filippo Giunchedi - http://esaurito.net
+PGP key: 0x6B79D401
+random quote follows:
 
-unsupported signalling command: 9
+The only way to get rid of a temptation is to yield to it.
+-- Oscar Wilde
 
-but mostly worked other than that. fwiw, the role switch code bails with
-an operation-not-permitted error.
+--wq9mPyueHGvFACwf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="rfcomm.patch"
 
-Brad
+diff -u -r1.16 main.c
+--- main.c	3 Jan 2006 13:29:01 -0000	1.16
++++ main.c	3 Jun 2006 13:54:33 -0000
+@@ -621,8 +621,19 @@
+ 	argv += optind;
+ 	optind = 0;
+ 
+-	if (argc < 2)
++	if (argc == 0) {
+ 		show_all = 1;
++	} else if (argc == 1) {
++		for(i = 0; command[i].cmd; i++) {
++			if ((strncmp(command[i].cmd, argv[0], 4) == 0) && (strncmp(command[i].alt, argv[0], 4) == 0) )
++				break;
++			if (command[i+1].cmd == NULL) {
++				usage();
++				exit(0);
++			}
++		}
++		show_all = 1;
++	}
+ 
+ 	if ((ctl = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_RFCOMM)) < 0 ) {
+ 		perror("Can't open RFCOMM control socket");
 
+--wq9mPyueHGvFACwf
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+
+--wq9mPyueHGvFACwf
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--wq9mPyueHGvFACwf--
