@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Stefan <stv_vt@yahoo.com>
-Date: Sun, 4 Jun 2006 12:34:47 +0000 (UTC)
-Message-ID: <loom.20060604T140324-862@post.gmane.org>
-References: <loom.20060602T160736-77@post.gmane.org>
-	<1149260862.23555.5.camel@localhost>
-	<200606021531.k52FVqi8028691@news01.csr.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <549053140606031339i43cee0a7h8622f83d76370504@mail.gmail.com>
+References: <549053140606021732w4263c5c2g93efa4cdf9a7614d@mail.gmail.com>
+	<1149362263.1977.4.camel@localhost>
+	<549053140606031339i43cee0a7h8622f83d76370504@mail.gmail.com>
+Date: Sat, 03 Jun 2006 23:50:47 +0200
+Message-Id: <1149371447.1977.13.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] PAN over bluetooth - no TCP/IP activity
+Subject: Re: [Bluez-users] PM325 by LG cell phone
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,34 +22,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Peter Stephenson <pws <at> csr.com> writes:
+Hi Carl,
 
+>         > Service Name: Dialup Networking
+>         > Service RecHandle: 0x10003
+>         > Service Class ID List:
+>         >   "Dialup Networking" (0x1103)
+>         > Protocol Descriptor List:
+>         >   "L2CAP" (0x0100) 
+>         >   "RFCOMM" (0x0003)
+>         >     Channel: 4
+>         > Profile Descriptor List:
+>         >   "Dialup Networking" (0x1103)
+>         >     Version: 0x0100
+>         >
+>         > I am not sure what to do next.  looks like audio and dun are
+>         the only 
+>         > profiles the phone supports, so DUN seems like a good place
+>         to start.
+>         
+>         with DUN you can use your mobile phone to dialup to the
+>         Internet. It
+>         makes you phone look like a modem. The audio profiles allow
+>         you to 
+>         connect a headset to your phone.
 > 
-> Marcel Holtmann wrote:
-> ...
-> > one of these ISSC chips again. The MAC address is bogus and as far as I
-> > recall not valid for Ethernet.
 > 
-> Right, that looks like a group address (the lowest bit is set), i.e.
-> valid for multicast or broadcast only.  That's definitely going to get
-> you into trouble with Ethernet/802 addressing logic.
-> 
+> I am assuming I can connect minicom to it and issue AT commands.  I
+> couln't find any instructions on how.
 
-Yes, it is! I now can confirm that the wrong MAC address is the only source of
-trouble. I borrowed a dongle from a friend, which looks exactly the same - the
-shape and the "hciconfing -a" output. The "only" difference was the MAC address
-- the new one looks like a real one. And it works now!
+call "rfcomm connect 0 <bdaddr> 4" and you will get a /dev/rfcomm0
+terminal device you can use with minicom or whatever program supporting
+Linux TTY devices.
 
-So thank you guys for pointing me out!
+Regards
 
-Nowever, I guess there should be a workaround. The same bogus dongle, but under
-Windows with the software, which comes along the dongle (BlueSoleil), works on a
-NAP side. Connections from PANU under Windows and Bluez PANU under Linux are
-both ok. Well, almost. Things stop working after reboot of the NAP, but this is,
-may be, a completely different story. ;)
+Marcel
 
-Regards,
-Stefan
 
 
 
