@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20060603134011.GA13263@esaurito.net>
-References: <20060603134011.GA13263@esaurito.net>
-Date: Sun, 04 Jun 2006 15:06:54 +0200
-Message-Id: <1149426414.8053.0.camel@localhost>
+From: Johannes Kapune <listen@kapune.de>
+To: bluez-devel@lists.sourceforge.net
+Date: Sun, 04 Jun 2006 16:37:01 +0200
+Message-Id: <1149431821.7480.6.camel@johannes_01.kapune.local>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] [PATCH] some manual pages patches
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] cant' update cvs
+Reply-To: listen@kapune.de,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,34 +19,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Filippo,
+Hello, 
+I can't update my sources. I get the error-message:
 
-> the two attached patches for l2ping and pand apply against current CVS.
-> 
-> The pand patch is really easy, it just appends a SCRIPTS section to explain the
-> /etc/bluetooth/pan/dev-up usage, it may be worth including it in a file to be
-> --included to help2man:
-> 
-> [SCRIPTS]
-> pand will execute \fB/etc/bluetooth/pan/dev-up\fR \fIdevice\fR \fIdestination\fR
-> when the interface becomes available.
+cvs [update aborted]: connect to cvs.sf.net(66.35.250.207):2401 failed:
+No route to host
 
-both patches are applied now. Thanks.
+I try then:
 
-> You may want to discard the first chunk of l2ping.1.patch as it changes the
-> l2ping section from 1 to 8.
-> 
-> IMO section 8 (system administration commands) is more suitable at least for
-> pand,hcid and hidd, being them daemons. The l2ping (for example) case is tricky, on
-> a normal system it would require root privileges so it is not really a user
-> command.
+cvs
+-d:pserver:anonymous@bluetooth-alsa.cvs.sf.net:/cvsroot/bluetooth-alsa
+login
 
-This is historical and might need to change that, but not right now.
+and the answer is:
 
-Regards
+Unknown host bluetooth-alsa.cvs.sf.net.
 
-Marcel
 
+
+Do the files move or is there a problem with cvs?
+
+Thanks a lot
+Johannes
 
 
 
