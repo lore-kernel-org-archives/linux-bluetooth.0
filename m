@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Didier LINK <didier.link@wanadoo.fr>
 To: bluez-users@lists.sourceforge.net
-Date: Mon, 05 Jun 2006 01:09:44 +0200
-Message-Id: <1149462584.13066.2.camel@neutrino.cosmos.net>
+From: Stefan <stv_vt@yahoo.com>
+Date: Sun, 4 Jun 2006 12:34:47 +0000 (UTC)
+Message-ID: <loom.20060604T140324-862@post.gmane.org>
+References: <loom.20060602T160736-77@post.gmane.org>
+	<1149260862.23555.5.camel@localhost>
+	<200606021531.k52FVqi8028691@news01.csr.com>
 Mime-Version: 1.0
-Subject: [Bluez-users] kernel 2.6.16 and bluez stack patches
+Subject: Re: [Bluez-users] PAN over bluetooth - no TCP/IP activity
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,77 +17,42 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0644718232=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Peter Stephenson <pws <at> csr.com> writes:
 
---===============0644718232==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-f1V+fLyFhqj6oBAzDFaU"
+> 
+> Marcel Holtmann wrote:
+> ...
+> > one of these ISSC chips again. The MAC address is bogus and as far as I
+> > recall not valid for Ethernet.
+> 
+> Right, that looks like a group address (the lowest bit is set), i.e.
+> valid for multicast or broadcast only.  That's definitely going to get
+> you into trouble with Ethernet/802 addressing logic.
+> 
 
+Yes, it is! I now can confirm that the wrong MAC address is the only source of
+trouble. I borrowed a dongle from a friend, which looks exactly the same - the
+shape and the "hciconfing -a" output. The "only" difference was the MAC address
+- the new one looks like a real one. And it works now!
 
---=-f1V+fLyFhqj6oBAzDFaU
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
+So thank you guys for pointing me out!
 
-Hello all !
+Nowever, I guess there should be a workaround. The same bogus dongle, but under
+Windows with the software, which comes along the dongle (BlueSoleil), works on a
+NAP side. Connections from PANU under Windows and Bluez PANU under Linux are
+both ok. Well, almost. Things stop working after reboot of the NAP, but this is,
+may be, a completely different story. ;)
 
-Since months I wait for the patch to have a good bluez stack in the
-kernel 2.6.16 and nothing ...
-
-I've read at some places to apply the patch for 2.6.15 but a lot of diff
-don't apply at all, and another place tell us that the main kernel tree
-is up to date ?
-
-What's exactly the situation, I'm lost !
-
-Thanks for your answers !
-
-Didier Link
-
---=20
-Didier Link <didier.link@wanadoo.fr>
-Jabber : zanfib@ims.kelkoo.net
-MSN : zanfib@hotmail.fr
-SIP : Zanfib@ekiga.net
-
-Cl=E9 GPG : 75BAC9EE
-
---=-f1V+fLyFhqj6oBAzDFaU
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: Ceci est une partie de message
-	=?ISO-8859-1?Q?num=E9riquement?= =?ISO-8859-1?Q?_sign=E9e?=
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.3 (GNU/Linux)
-
-iD8DBQBEg2g4kyPwinW6ye4RAkLtAKCI9MA+l3XOT4z8rEK2NDxuKpIZTQCfRQa+
-fTPInFgqUXCRyoXvxkTJb7Q=
-=e1zw
------END PGP SIGNATURE-----
-
---=-f1V+fLyFhqj6oBAzDFaU--
+Regards,
+Stefan
 
 
-
---===============0644718232==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-
---===============0644718232==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0644718232==--
