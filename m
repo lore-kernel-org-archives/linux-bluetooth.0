@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Johannes Kapune <listen@kapune.de>
-To: bluez-devel@lists.sourceforge.net
-Date: Sun, 04 Jun 2006 16:37:01 +0200
-Message-Id: <1149431821.7480.6.camel@johannes_01.kapune.local>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20060603135708.GB13263@esaurito.net>
+References: <20060603135708.GB13263@esaurito.net>
+Content-Type: multipart/mixed; boundary="=-5NDQ2jtWD/tUFE3ZEkGZ"
+Date: Sun, 04 Jun 2006 15:19:21 +0200
+Message-Id: <1149427161.8053.3.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-devel] cant' update cvs
-Reply-To: listen@kapune.de,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+Cc: bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] [PATCH] rfcomm 'anycommand' bug
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,36 +18,81 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello, 
-I can't update my sources. I get the error-message:
 
-cvs [update aborted]: connect to cvs.sf.net(66.35.250.207):2401 failed:
-No route to host
+--=-5NDQ2jtWD/tUFE3ZEkGZ
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-I try then:
+Hi Filippo,
 
-cvs
--d:pserver:anonymous@bluetooth-alsa.cvs.sf.net:/cvsroot/bluetooth-alsa
-login
+> attached there is a new patch (using tabs, "set noet" for the vim lovers) for
+> rfcomm, agreed it could be better. I hope it is clear enough.
 
-and the answer is:
+now the patch is readable, but it is still worse. However it helped me
+to understand what you tried to achieve. I fixed it with the attached
+patch.
 
-Unknown host bluetooth-alsa.cvs.sf.net.
+Regards
 
-
-
-Do the files move or is there a problem with cvs?
-
-Thanks a lot
-Johannes
+Marcel
 
 
+--=-5NDQ2jtWD/tUFE3ZEkGZ
+Content-Disposition: attachment; filename=patch
+Content-Type: text/plain; name=patch; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+? .deps
+? .libs
+? Makefile
+? Makefile.in
+? lexer.c
+? parser.c
+? parser.h
+? rfcomm
+Index: main.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/rfcomm/main.c,v
+retrieving revision 1.16
+diff -u -r1.16 main.c
+--- main.c	3 Jan 2006 13:29:01 -0000	1.16
++++ main.c	4 Jun 2006 13:17:13 -0000
+@@ -621,8 +621,13 @@
+ 	argv += optind;
+ 	optind = 0;
+ 
+-	if (argc < 2)
+-		show_all = 1;
++	if (argc < 2) {
++		if (argc != 0) {
++			usage();
++			exit(1);
++		} else
++			show_all = 1;
++	}
+ 
+ 	if ((ctl = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_RFCOMM)) < 0 ) {
+ 		perror("Can't open RFCOMM control socket");
+
+--=-5NDQ2jtWD/tUFE3ZEkGZ
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+
+--=-5NDQ2jtWD/tUFE3ZEkGZ
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--=-5NDQ2jtWD/tUFE3ZEkGZ--
