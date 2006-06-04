@@ -1,61 +1,47 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Johannes Kapune <listen@kapune.de>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4482FFA3.2090608@xmission.com>
-References: <1149431821.7480.6.camel@johannes_01.kapune.local>
-	<4482FFA3.2090608@xmission.com>
-Date: Sun, 04 Jun 2006 21:01:08 +0200
-Message-Id: <1149447668.7481.6.camel@johannes_01.kapune.local>
+Return-Path: <pkg-bluetooth-maintainers-bounces@lists.alioth.debian.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20060604151505.GA16780@esaurito.net>
+References: <20060519204815.GA8424@esaurito.net>
+	<1148908581.31689.35.camel@localhost>
+	<20060604151505.GA16780@esaurito.net>
+Content-Type: text/plain
+Date: Sun, 04 Jun 2006 17:46:54 +0200
+Message-Id: <1149436014.8053.6.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] cant' update cvs
-Reply-To: listen@kapune.de,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Subject: Bug#322732: [Bluez-devel] [Pkg-bluetooth-maintainers] Bug#322732:
+	more on this bug (was: rfcomm bind fails with obscure error message)
+Cc: 322732-submitter@bugs.debian.org, 322732@bugs.debian.org
+Reply-To: Marcel Holtmann <marcel@holtmann.org>, 322732@bugs.debian.org
+List-Unsubscribe: <http://lists.alioth.debian.org/mailman/listinfo/pkg-bluetooth-maintainers>,
+	<mailto:pkg-bluetooth-maintainers-request@lists.alioth.debian.org?subject=unsubscribe>
+List-Archive: <http://lists.alioth.debian.org/pipermail/pkg-bluetooth-maintainers>
+List-Post: <mailto:pkg-bluetooth-maintainers@lists.alioth.debian.org>
+List-Help: <mailto:pkg-bluetooth-maintainers-request@lists.alioth.debian.org?subject=help>
+List-Subscribe: <http://lists.alioth.debian.org/mailman/listinfo/pkg-bluetooth-maintainers>,
+	<mailto:pkg-bluetooth-maintainers-request@lists.alioth.debian.org?subject=subscribe>
+Sender: pkg-bluetooth-maintainers-bounces@lists.alioth.debian.org
+Errors-To: pkg-bluetooth-maintainers-bounces@lists.alioth.debian.org
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Am Sonntag, den 04.06.2006, 09:43 -0600 schrieb Brad Midgley:
+Hi Filippo,
 
-
+> > > comments? 
+> > 
+> > check for EOPNOTSUPP error code and only then print this error.
 > 
-> sorry, looks like the "sf.net" is not always equivalent to "sourceforge.net"
-> 
-> try: bluetooth-alsa.cvs.sourceforge.net
-> 
-> i'll fix the docs now
-> 
-> brad
-> 
-Hello,
-it seems to work but I can't login anonymous.
+> allright, I fixed this with the attached patch
 
-I tried with empty password, "anonymous" and  email-adress but nothing
-worked 
+the patch has been applied to the CVS now. Thanks.
 
-(cvs checkout: used empty password; try "cvs login" with a real
-password)
-(cvs login: authorization failed: server
-bluetooth-alsa.cvs.sourceforge.net rejected access
-to /cvsroot/bluetooth-also for user anonymous)
+Regards
 
-What I have to do? What's my mistake?
-
-
-Thanks a lot
-Johannes
+Marcel
 
 
 
 
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Pkg-bluetooth-maintainers mailing list
+Pkg-bluetooth-maintainers@lists.alioth.debian.org
+http://lists.alioth.debian.org/mailman/listinfo/pkg-bluetooth-maintainers
