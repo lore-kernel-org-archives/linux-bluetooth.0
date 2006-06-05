@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <448430E9.8080108@auroramsx.nl>
-Date: Mon, 05 Jun 2006 15:26:01 +0200
+Message-ID: <44841B29.7020904@auroramsx.nl>
+Date: Mon, 05 Jun 2006 13:53:13 +0200
 From: Eric Boon <eric@auroramsx.nl>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <768ccca40606041514m77eea4cer437d3ea227d3eec8@mail.gmail.com>	<4483B5E4.7000305@xmission.com>	<44840D5E.5060800@auroramsx.nl>
-	<44841B29.7020904@auroramsx.nl>
-In-Reply-To: <44841B29.7020904@auroramsx.nl>
+References: <768ccca40606041514m77eea4cer437d3ea227d3eec8@mail.gmail.com>	<4483B5E4.7000305@xmission.com>
+	<44840D5E.5060800@auroramsx.nl>
+In-Reply-To: <44840D5E.5060800@auroramsx.nl>
 Subject: Re: [Bluez-devel] Belkin
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,20 +21,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-And another hello :-)
+Hello again,
 
-I applied the patch as described in
-http://www.ussg.iu.edu/hypermail/linux/kernel/0601.1/1679.html
-and the device is now working, although I get numerous buffer
-under-runs when the CPU has a noticeable load...
-(E.g. upon opening an application.)
-I'd still rather work with a non-patched kernel, so other options
-are welcome!
+I wrote:
 
-Greetz,
-    Eric
+> I recently bought a Belkin USB BT-stick and stumbled upon the infamous 
+> Broadcom problem: everything seems to work fine, but no audio :-/ 
+> [...]
 
 
+I just tested the combination (Belkin USB BT stick + Logitech Headset on 
+my WinXP laptop, and everything runs smoothly over there...
+
+     Eric
 
 
 _______________________________________________
