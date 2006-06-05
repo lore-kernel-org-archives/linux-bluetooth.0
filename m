@@ -1,15 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <549053140606060015h1f95955ao63714bd03df53998@mail.gmail.com>
-Date: Tue, 6 Jun 2006 02:15:40 -0500
-From: "Carl Karsten" <cfkarsten@gmail.com>
+Message-ID: <5d12691e0606051652h660e446dm5e82bfbe74c121f5@mail.gmail.com>
+Date: Mon, 5 Jun 2006 16:52:37 -0700
+From: "Aaron Miller" <armantic101@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1149371447.1977.13.camel@localhost>
+In-Reply-To: <1149362073.1977.0.camel@localhost>
 MIME-Version: 1.0
-References: <549053140606021732w4263c5c2g93efa4cdf9a7614d@mail.gmail.com>
-	<1149362263.1977.4.camel@localhost>
-	<549053140606031339i43cee0a7h8622f83d76370504@mail.gmail.com>
-	<1149371447.1977.13.camel@localhost>
-Subject: Re: [Bluez-users] PM325 by LG cell phone
+References: <5d12691e0606021931hd95b058u38f464d30af8fd56@mail.gmail.com>
+	<1149334394.19311.17.camel@localhost>
+	<5d12691e0606031048o148ad92bre33d6efe2b280560@mail.gmail.com>
+	<1149362073.1977.0.camel@localhost>
+Subject: Re: [Bluez-users] bluez udev rules for Slackware 10.2
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,86 +19,91 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1056082674=="
+Content-Type: multipart/mixed; boundary="===============1428009980=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1056082674==
+--===============1428009980==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_6267_20725598.1149578140978"
+	boundary="----=_Part_38932_19458109.1149551557212"
 
-------=_Part_6267_20725598.1149578140978
+------=_Part_38932_19458109.1149551557212
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
+<smacks myself on head>
+Reading the rfcomm man page was actually what sent me on this long quest to
+create an rfcomm device. I misunderstood 'rfcomm bind <dev>' to mean that I
+had to supply it with the device that already existed. After your comments,
+and rereading the man page, I see that <dev> is the device I want to create,
+not the one that is already there. All is good now.
+
+Thanks for your help!
+...aaron
+
 On 6/3/06, Marcel Holtmann <marcel@holtmann.org> wrote:
 >
-> Hi Carl,
+> Hi Aaron,
 >
-> >         > Service Name: Dialup Networking
-> >         > Service RecHandle: 0x10003
-> >         > Service Class ID List:
-> >         >   "Dialup Networking" (0x1103)
-> >         > Protocol Descriptor List:
-> >         >   "L2CAP" (0x0100)
-> >         >   "RFCOMM" (0x0003)
-> >         >     Channel: 4
-> >         > Profile Descriptor List:
-> >         >   "Dialup Networking" (0x1103)
-> >         >     Version: 0x0100
-> >         >
-> >         > I am not sure what to do next.  looks like audio and dun are
-> >         the only
-> >         > profiles the phone supports, so DUN seems like a good place
-> >         to start.
+> >  I'm sorry I wasn't more specific, I didn't realize that there were
+> > other devices then the rfcomm tty device node. This is actually the on
+> > I am after sense it is needed for my device to work with p3nfs.
 > >
-> >         with DUN you can use your mobile phone to dialup to the
-> >         Internet. It
-> >         makes you phone look like a modem. The audio profiles allow
-> >         you to
-> >         connect a headset to your phone.
-> >
-> >
-> > I am assuming I can connect minicom to it and issue AT commands.  I
-> > couln't find any instructions on how.
+> > I have RFCOMM protocol support enabled in the kernel as a modules, and
+> > RFCOMM TTY support hard coded. I had to 'modprobe rfcomm' but the
+> > bluetooth module loaded automatically, both of which are listed in my
+> > 'lsmod'. How do I get udev to create the rfcomm device node? I
+> > searched for files containing "rfcomm" in the bluez build directory
+> > but didn't see anything relating to udev rules. Am I supposed to build
+> > this node myself or should udev be creating it automatically?
 >
-> call "rfcomm connect 0 <bdaddr> 4" and you will get a /dev/rfcomm0
-> terminal device you can use with minicom or whatever program supporting
-> Linux TTY devices.
+> you will see these device nodes if you bind or connect a RFCOMM TTY to a
+> remote device. See the rfcomm command for more details.
+>
+> Regards
+>
+> Marcel
 >
 >
-carl@asus17:~$ sudo rfcomm connect 0 08:00:37:03:EF:36 4
-Can't connect RFCOMM socket: Connection refused
+>
+>
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
-I am not sure I have paired.  If I did, does rebooting phone or linux end
-that 'session' ?
-
-------=_Part_6267_20725598.1149578140978
+------=_Part_38932_19458109.1149551557212
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-<br><br><div><span class="gmail_quote">On 6/3/06, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-Hi Carl,<br><br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt; Service Name: Dialup Networking<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt; Service RecHandle: 0x10003<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt; Service Class ID List:<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;&nbsp;&nbsp; &quot;Dialup Networking&quot; (0x1103)<br>
-&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt; Protocol Descriptor List:<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;&nbsp;&nbsp; &quot;L2CAP&quot; (0x0100)<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;&nbsp;&nbsp; &quot;RFCOMM&quot; (0x0003)<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; Channel: 4<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt; Profile Descriptor List:
-<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;&nbsp;&nbsp; &quot;Dialup Networking&quot; (0x1103)<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp; Version: 0x0100<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt; I am not sure what to do next.&nbsp;&nbsp;looks like audio and dun are<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the only
-<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt; profiles the phone supports, so DUN seems like a good place<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; to start.<br>&gt;<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; with DUN you can use your mobile phone to dialup to the<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Internet. It<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; makes you phone look like a modem. The audio profiles allow
-<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; you to<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; connect a headset to your phone.<br>&gt;<br>&gt;<br>&gt; I am assuming I can connect minicom to it and issue AT commands.&nbsp;&nbsp;I<br>&gt; couln't find any instructions on how.<br><br>call &quot;rfcomm connect 0 &lt;bdaddr&gt; 4&quot; and you will get a /dev/rfcomm0
-<br>terminal device you can use with minicom or whatever program supporting<br>Linux TTY devices.<br><br></blockquote></div><br>carl@asus17:~$ sudo rfcomm connect 0 08:00:37:03:EF:36 4<br>Can't connect RFCOMM socket: Connection refused
-<br><br>I am not sure I have paired.&nbsp; If I did, does rebooting phone or linux end that 'session' ?<br>
+<div>&lt;smacks myself on head&gt;</div>
+<div>Reading the rfcomm man page was actually what sent me on this long quest to create an rfcomm device. I misunderstood 'rfcomm bind&nbsp;&lt;dev&gt;' to mean that I had to supply it with the device that already existed. After your comments, and rereading the man page, I see that &lt;dev&gt; is the device I want to create, not the one that is already there. All is good now.
+</div>
+<div>&nbsp;</div>
+<div>Thanks for your help!</div>
+<div>...aaron<br>&nbsp;</div>
+<div><span class="gmail_quote">On 6/3/06, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:</span>
+<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Hi Aaron,<br><br>&gt;&nbsp;&nbsp;I'm sorry I wasn't more specific, I didn't realize that there were<br>&gt; other devices then the rfcomm tty device node. This is actually the on
+<br>&gt; I am after sense it is needed for my device to work with p3nfs.<br>&gt;<br>&gt; I have RFCOMM protocol support enabled in the kernel as a modules, and<br>&gt; RFCOMM TTY support hard coded. I had to 'modprobe rfcomm' but the
+<br>&gt; bluetooth module loaded automatically, both of which are listed in my<br>&gt; 'lsmod'. How do I get udev to create the rfcomm device node? I<br>&gt; searched for files containing &quot;rfcomm&quot; in the bluez build directory
+<br>&gt; but didn't see anything relating to udev rules. Am I supposed to build<br>&gt; this node myself or should udev be creating it automatically?<br><br>you will see these device nodes if you bind or connect a RFCOMM TTY to a
+<br>remote device. See the rfcomm command for more details.<br><br>Regards<br><br>Marcel<br><br><br><br><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net">
+Bluez-users@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br>
 
-------=_Part_6267_20725598.1149578140978--
+------=_Part_38932_19458109.1149551557212--
 
 
---===============1056082674==
+--===============1428009980==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 
---===============1056082674==
+--===============1428009980==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -109,4 +114,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1056082674==--
+--===============1428009980==--
