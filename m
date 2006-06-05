@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Didier LINK <didier.link@wanadoo.fr>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Mon, 05 Jun 2006 23:42:30 +0200
-Message-Id: <1149543750.14142.11.camel@neutrino.cosmos.net>
+In-Reply-To: <1149521839.7696.18.camel@localhost>
+References: <1149462584.13066.2.camel@neutrino.cosmos.net>
+	<1149517024.7696.14.camel@localhost>
+	<1149521770.25884.17.camel@neutrino.cosmos.net>
+	<1149521839.7696.18.camel@localhost>
+Date: Mon, 05 Jun 2006 17:50:31 +0200
+Message-Id: <1149522631.25884.20.camel@neutrino.cosmos.net>
 Mime-Version: 1.0
-Subject: [Bluez-users] crazy mouse
+Subject: Re: [Bluez-users] kernel 2.6.16 and bluez stack patches
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,47 +19,44 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0172851983=="
+Content-Type: multipart/mixed; boundary="===============0508434075=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 
---===============0172851983==
+--===============0508434075==
 Content-Type: multipart/signed; micalg=pgp-sha1;
 	protocol="application/pgp-signature";
-	boundary="=-dsGkwwNQof1RHnclAB4A"
+	boundary="=-8LYFXsttwcPhX3z65eYX"
 
 
---=-dsGkwwNQof1RHnclAB4A
+--=-8LYFXsttwcPhX3z65eYX
 Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-Hello all,
+Le lundi 05 juin 2006 =E0 17:37 +0200, Marcel Holtmann a =E9crit :
+> Hi Didier,
+>=20
+> > > > I've read at some places to apply the patch for 2.6.15 but a lot of=
+ diff
+> > > > don't apply at all, and another place tell us that the main kernel =
+tree
+> > > > is up to date ?
+> > >=20
+> > > I think that I actually already fixed that, but never came around to
+> > > release another -mh patch.
+> >=20
+> > Can you please release a 2.6.16-mh ? I want to upgrade my kernel versio=
+n
+> > for some drivers update needs ...
+>=20
+> I just did :)
 
-Thanks to Marcel to have so quickly publish the patch 2.6.16-mh1 after
-my request ! I've patched a 2.6.16.19 kernel and all seems to works
-after the reboot.
+Yes !!! You're my hero ! ;)
 
-But my mouse (Logitech MX900 BT) move strangely. The movement seems to
-be by "hop" on the screen, I've never see this before, it's annoying ...
+Regards !
 
-For a better explanation, its as if the mouse send is move data normally
-but X and the console (gpm) receive it asynchronously and at a point the
-cursor "freeze" a 1/4 of second and move quickly at the real position,
-all along the move of the mouse ...
-
-Very strange no ?
-
-After rebooting on my 2.6.15-mh2 kernel all works good !
-
-Any idea ? Or maybe a procedure to debug that I can do ?
-
-I've a Gentoo on amd64, full 64 bits, last bluez utilities on gentoo.
-For more information just ask me.
-
-Best regards.
-
-Didier Link
+Didier
 
 --=20
 Didier Link <didier.link@wanadoo.fr>
@@ -64,7 +66,7 @@ SIP : Zanfib@ekiga.net
 
 Cl=E9 GPG : 75BAC9EE
 
---=-dsGkwwNQof1RHnclAB4A
+--=-8LYFXsttwcPhX3z65eYX
 Content-Type: application/pgp-signature; name=signature.asc
 Content-Description: Ceci est une partie de message
 	=?ISO-8859-1?Q?num=E9riquement?= =?ISO-8859-1?Q?_sign=E9e?=
@@ -72,23 +74,23 @@ Content-Description: Ceci est une partie de message
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.3 (GNU/Linux)
 
-iD8DBQBEhKVGkyPwinW6ye4RAiTnAKCBkzU99fRZDI6fNFdk55RlgBKa2QCfbiF9
-nyKPiDmq7lqpRdeeNl8O9FE=
-=zjVH
+iD8DBQBEhFLHkyPwinW6ye4RAh8MAJ9bxOxmGK6I0fETdEOAel4vYQ1b9ACcCsNu
+odN1uuEI0R/Mu8q6p3SpDPY=
+=e8WH
 -----END PGP SIGNATURE-----
 
---=-dsGkwwNQof1RHnclAB4A--
+--=-8LYFXsttwcPhX3z65eYX--
 
 
 
---===============0172851983==
+--===============0508434075==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 
---===============0172851983==
+--===============0508434075==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -99,4 +101,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0172851983==--
+--===============0508434075==--
