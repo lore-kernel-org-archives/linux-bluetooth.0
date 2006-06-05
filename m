@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4457BEF2.90707@free.fr>
-References: <4457BEF2.90707@free.fr>
-Date: Mon, 05 Jun 2006 16:10:42 +0200
-Message-Id: <1149516642.7696.11.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] RFC : H4 and BCSP proto unification
+Message-ID: <448430E9.8080108@auroramsx.nl>
+Date: Mon, 05 Jun 2006 15:26:01 +0200
+From: Eric Boon <eric@auroramsx.nl>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <768ccca40606041514m77eea4cer437d3ea227d3eec8@mail.gmail.com>	<4483B5E4.7000305@xmission.com>	<44840D5E.5060800@auroramsx.nl>
+	<44841B29.7020904@auroramsx.nl>
+In-Reply-To: <44841B29.7020904@auroramsx.nl>
+Subject: Re: [Bluez-devel] Belkin
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,31 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Matthieu,
+And another hello :-)
 
-> this patch is an attempt to share H4 and BCSP proto for other drivers
-> than hci_uart.
-> 
-> hci_h4.c and hci_bcsp.c where expecting a hci_uart structure, I define a
-> more generic one. I need to add a tx_wakeup function for BCSP.
-> 
-> I also added 1 operation henqueue that queue a skb in the head of the
-> skb list for driver that can't send all the skb data in one operation.
-> 
-> This is far from perfect (I don't like the hci_dev pointer duplication,
-> ...) and untested for hci_uart driver.
-> 
-> Any comments will be appreciated.
+I applied the patch as described in
+http://www.ussg.iu.edu/hypermail/linux/kernel/0601.1/1679.html
+and the device is now working, although I get numerous buffer
+under-runs when the CPU has a noticeable load...
+(E.g. upon opening an application.)
+I'd still rather work with a non-patched kernel, so other options
+are welcome!
 
-we don't need anything for BCSP. So don't even bother with it, but for
-H4 it makes sense to have on common code. However using an extra module
-for it is a little bit too much. I would prefer using something like
-libata etc. So creating a libh4 and using it would be the better
-approach.
-
-Regards
-
-Marcel
+Greetz,
+    Eric
 
 
 
