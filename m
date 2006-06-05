@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Date: Tue, 6 Jun 2006 11:35:28 +0200
-Message-ID: <96B7A15232D6CF42836BFD428AD6B6034E556A@deexmb01.de.icap.com>
-From: "Guido Reimer" <G.Reimer@de.icap.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth-alsa: a2recv stutteringsound	from	WM5.0
-	AKU2.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1149543750.14142.11.camel@neutrino.cosmos.net>
+References: <1149543750.14142.11.camel@neutrino.cosmos.net>
+Date: Mon, 05 Jun 2006 23:57:29 +0200
+Message-Id: <1149544649.7238.1.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] crazy mouse
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,18 +20,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi Didier,
 
-Brad
+> Thanks to Marcel to have so quickly publish the patch 2.6.16-mh1 after
+> my request ! I've patched a 2.6.16.19 kernel and all seems to works
+> after the reboot.
+> 
+> But my mouse (Logitech MX900 BT) move strangely. The movement seems to
+> be by "hop" on the screen, I've never see this before, it's annoying ...
+> 
+> For a better explanation, its as if the mouse send is move data normally
+> but X and the console (gpm) receive it asynchronously and at a point the
+> cursor "freeze" a 1/4 of second and move quickly at the real position,
+> all along the move of the mouse ...
+> 
+> Very strange no ?
+> 
+> After rebooting on my 2.6.15-mh2 kernel all works good !
+> 
+> Any idea ? Or maybe a procedure to debug that I can do ?
 
->> Still have the same problem :`(
+check your Xorg configuration. You might have configured two inputs and
+the events add up. There was a report about that some time ago.
 
->argh... well i will try to run this test with my brother's aku2 device
->this weekend and see if i can see the problem.
+Regards
 
-Is there any progress?
-
-
-Guido
+Marcel
 
 
 
