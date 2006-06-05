@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44850D2C.9080708@xmission.com>
-Date: Mon, 05 Jun 2006 23:05:48 -0600
+Message-ID: <4484AE0A.8050900@xmission.com>
+Date: Mon, 05 Jun 2006 16:19:54 -0600
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <447C7ADD.1040503@palmsource.com> <447E951C.6040400@xmission.com>
-	<447EA02C.3070703@palmsource.com>
-In-Reply-To: <447EA02C.3070703@palmsource.com>
-Subject: Re: [Bluez-devel] First try
+Subject: [Bluez-devel] itech r35 supports mp3
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,19 +14,24 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fr=E9d=E9ric
+Hey
 
-I had a look at your a2dp patches to move globals into the
-per-connection struct. It all looks like a clear improvement. I didn't
-have any problems with changes in quality after the change.
+FYI, I found my new r35 headset supports mp3 encoded streams. I changed
+a2play to identify (but not use yet) mp3 support and there it is, layer
+3 support built in.
 
-Would you like to check things out of cvs and verify it works for you?
+too bad about the alsa plugin... audio must be decoded before being sent
+to the plugin where it's re-encoded, possibly in the same format we just
+decoded :(
 
-thanks
+gstreamer would realize the stream is already in a supported format and
+skip those steps, but we're still stuck without a good ipc/server mixer
+for gst.
+
 Brad
 
 
