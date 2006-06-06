@@ -1,25 +1,44 @@
-Return-Path: <philipl@mail.utexas.edu>
-Message-ID: <4487B00F.7070204@mail.utexas.edu>
-Date: Wed, 07 Jun 2006 22:05:19 -0700
-From: Philip Langdale <philipl@mail.utexas.edu>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <564d96fb0606060714u14bb143ap72ce8afe6cce3cc3@mail.gmail.com>
+Date: Tue, 6 Jun 2006 11:14:32 -0300
+From: "=?UTF-8?Q?Rafael_Esp=C3=ADndola?=" <rafael.espindola@gmail.com>
+To: bluez-devel@lists.sourceforge.net,
+        "ulissesf@gmail.com" <ulissesf@gmail.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: bluez-devel@lists.sourceforge.net
-Subject: Re: Latest 2.6.16-mh1 patch.
-References: <44867199.2000409@mail.utexas.edu>	 <1149664531.22472.4.camel@localhost>  <4486EE2D.3010507@mail.utexas.edu> <1149714318.22472.59.camel@localhost>
-In-Reply-To: <1149714318.22472.59.camel@localhost>
-Content-Type: text/plain; charset=ISO-8859-1
-List-ID: <bluez-devel.lists.sourceforge.net>
+Subject: [Bluez-devel] bug in sdp_gen_pd
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> 
-> I will look at it, but you might wanna try to disable the automatic
-> sniff mode and see if this helps at all. Simply call:
-> 
-> 	echo 0 > /sys/class/bluetooth/hci0/idle_timeout
+In sdp_gen_pd when handling SDP_TEXT_STR{8,16,32}, data_size is assumed to be
+"d->unitSize - sizeof(uint8_t)". This is false.
 
-I just tried this, and unfortunately it doesn't help.
+In sdp_data_alloc_with_length, d->unitSize is defined to be
+sizeof(unit8_t) + length + sizeof(uint8_t) if length <= UCHAR_MAX
+or
+sizeof(unit8_t) + length + sizeof(uint16_t) if length > UCHAR_MAX
 
-Thanks,
+The attached patch fixes sdp_gen_pdu to correctly compute data_size.
 
---phil
+Another strange thing in sdp_data_alloc_with_length: after adjusting
+unitSize, the dtd variable is changed from SDP_*_STR8 to SDP_*_STR16
+or the other way around. But this code is dead, since the dtd variable
+is no longer used in this function.
+
+Best Regards,
+Rafael
+
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
