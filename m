@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <44859F7F.7060307@xmission.com>
+Date: Tue, 06 Jun 2006 09:30:07 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Date: Tue, 6 Jun 2006 18:35:19 -0600
-Message-ID: <F23ABFFDB8261D40A6F6D30EA014882501CE8E24@VS6.EXCHPROD.USA.NET>
-From: "Robert Wlaschin" <robertw@healthhero.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] rfcomm (utils)
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Fabien Chevalier's plugin in cvs
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,15 +18,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-In poking around in \bluez-utils-2.21\rfcomm\main.c, I noticed in
-several functions (including print_dev_list) there seems to be a malloc
-statement but no corresponding free.  Is this the recommended way to
-handle the rfcomm_dev_list_req structures?
+Hi
 
-Thanks,
-~Robert
+Fabien Chevalier's plugin that moves sco audio handling to userspace is
+now in our cvs. We hope it will be more convenient for people to track
+and work with us on it this way. Email your comments and patches here to
+bluez-devel.
 
+Fabien was calling it 'bluez-headset' and for now I've renamed it to
+'alsa-plugin-sco' since everything we have could be described as
+bluez-headset :)
 
+It should appear shortly in anon cvs:
+
+cvs
+-d:pserver:anonymous@bluetooth-alsa.cvs.sourceforge.net:/cvsroot/bluetooth-alsa
+login	
+cvs
+-d:pserver:anonymous@bluetooth-alsa.cvs.sourceforge.net:/cvsroot/bluetooth-alsa
+co alsa-plugin-sco
+
+This is a big piece of the puzzle and I'm excited to be moving in the
+right direction. Thank you, Fabien...
+
+Brad
 
 
 _______________________________________________
