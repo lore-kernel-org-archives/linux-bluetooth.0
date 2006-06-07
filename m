@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <448733E2.7090602@free.fr>
-Date: Wed, 07 Jun 2006 22:15:30 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <447B4F98.8020501@free.fr>	<1148934839.31689.116.camel@localhost>
-	<447C4862.5050205@free.fr> <1149189300.28511.61.camel@localhost>
-In-Reply-To: <1149189300.28511.61.camel@localhost>
-Subject: Re: [Bluez-devel] [PATCH] SCO flow control
+In-Reply-To: <fe0a97c20606070328h4924fb22n28d30bce79cb54d7@mail.gmail.com>
+References: <fe0a97c20606052352j37b71f20mad12696fdff7c08d@mail.gmail.com>
+	<fe0a97c20606070328h4924fb22n28d30bce79cb54d7@mail.gmail.com>
+Date: Wed, 07 Jun 2006 22:13:22 +0200
+Message-Id: <1149711202.22472.49.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Does rfcomm manipulate the data??
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,58 +21,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Soumya,
 
-Sorry to be a little late on this answer, however a busy work schedule 
-and a sunny Sunday prevented me to answer my e-mails for a few days :-)
+> Is rfcomm a transparent socket?? Does it manipulate the data sent from
+> one side to another??
 
-> so far I only looked at the changes to the HCI core. Please don't rename
-> the disconnect timer. This will collide with the changes for automatic
-> sniff mode support.
+it doesn't change any data. What you put in on one sides comes out on
+the other.
 
-Ok, however as now sniff mode is out, i would suggest i build on top of 
-it :-)
+Regards
 
-> 
-> Can we change the core and add a hci_stream_sco() without breaking the
-> API. This would make it easier for me to apply the changes.
-
-I see your point, however i don't see how to bring this feature in 
-without breaking the hci core API for SCO sockets... :-(
-
-> 
-> Another question is if we really should queue the data in sk_write_queue
-> and not directly in the core. I would prefer to send the data to the
-> core and then stream it from there.
-
-That's an interesting question... :-)
-I asked it myself when i started to design this feature.
-In fact having outgoing packets stored in a socket queue has some 
-advantages:
-   * it makes use of the BSD socket send queue, and thus can reuse some 
-generic socket queue management related functions, which rely on some 
-well known sk_buff variable (sk_sndbuff, sk_wmem_alloc, sk_rcvbuff, 
-sk_rmem_alloc ...)
-   * it makes the thing symetrical, both uplink and downlink path make 
-use socket queues to buffer data.
-
-As such I thought there were not any valid reason to put in the core... 
-however if you have suggestions i would be very happy to hear them. :-)
-
-For now i would suggest we do the following:
-   - for you: have a look at the "whole picture", including the SCO part 
-patch. This way you would be able to better understand the interaction 
-between SCO sockets & hci layer. This way you will be able to send in 
-other comments too. :-)
-   - for me: * port the patch on top of the 2.6.16-mh1 :-)
-             * have it to work also when HZ % 333 != 0 ( i've just seen 
-it wouldn't work properly in this case... )
-
-What do you think of the idea ?
-
-Cheers,
-
-Fabien
+Marcel
 
 
 
