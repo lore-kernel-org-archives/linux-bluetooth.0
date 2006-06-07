@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Philip Langdale <philipl@mail.utexas.edu>
-In-Reply-To: <44867199.2000409@mail.utexas.edu>
-References: <44867199.2000409@mail.utexas.edu>
-Date: Wed, 07 Jun 2006 09:15:31 +0200
-Message-Id: <1149664531.22472.4.camel@localhost>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <F23ABFFDB8261D40A6F6D30EA014882501CE8E24@VS6.EXCHPROD.USA.NET>
+References: <F23ABFFDB8261D40A6F6D30EA014882501CE8E24@VS6.EXCHPROD.USA.NET>
+Date: Wed, 07 Jun 2006 09:13:29 +0200
+Message-Id: <1149664409.22472.1.camel@localhost>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Latest 2.6.16-mh1 patch.
+Subject: Re: [Bluez-devel] rfcomm (utils)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,18 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Philip,
+Hi Robert,
 
-> I just tried out the 2.6.16-mh1 patch and I'm seeing very laggy
-> behaviour with my mx5000 mouse. With the 2.6.15-mh2 modified to
-> remove the changes already in 2.6.16, I do not see this behaviour.
-> 
-> The interdiff is not huge but it's large enough that I can't
-> see the culprit at a glance.
+> In poking around in \bluez-utils-2.21\rfcomm\main.c, I noticed in
+> several functions (including print_dev_list) there seems to be a malloc
+> statement but no corresponding free.  Is this the recommended way to
+> handle the rfcomm_dev_list_req structures?
 
-so it seems that I messed up when porting the HID report mode. Please
-send me your modified 2.6.15-mh2 patch and I am going to take a look at
-it.
+this seems to be a bug, but I would prefer you actually check the latest
+version from CVS instead of an old package and be more specific of the
+cases you are talking about. Otherwise we can fix them.
 
 Regards
 
