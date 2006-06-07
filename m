@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <loom.20060607T182956-173@post.gmane.org>
-References: <F23ABFFDB8261D40A6F6D30EA014882501CE8E24@VS6.EXCHPROD.USA.NET>
-	<1149664409.22472.1.camel@localhost>
-	<loom.20060607T182956-173@post.gmane.org>
-Date: Wed, 07 Jun 2006 22:12:43 +0200
-Message-Id: <1149711163.22472.47.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] rfcomm (utils)
+Message-ID: <fe0a97c20606070328h4924fb22n28d30bce79cb54d7@mail.gmail.com>
+Date: Wed, 7 Jun 2006 15:58:43 +0530
+From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <fe0a97c20606052352j37b71f20mad12696fdff7c08d@mail.gmail.com>
+MIME-Version: 1.0
+References: <fe0a97c20606052352j37b71f20mad12696fdff7c08d@mail.gmail.com>
+Subject: [Bluez-devel] Does rfcomm manipulate the data??
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,28 +16,54 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1875408545=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Robert,
+--===============1875408545==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_25_6829883.1149676123782"
 
-> After reading some of the other posts I came to find out that diff -u is the
-> preferred format.  This is using utils/rfcomm/main.c v 1.18 from the CVS 
-> repository.
+------=_Part_25_6829883.1149676123782
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-the context diffs are not really readable by any humans. However please
-attach this patch, because your mail client converted all tabs into
-whitespaces.
+Hi all
+Is rfcomm a transparent socket?? Does it manipulate the data sent from one
+side to another??
 
-Regards
+regards
+Soumya
 
-Marcel
+------=_Part_25_6829883.1149676123782
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<br><span class="gmail_quote"><br></span><div>Hi all<br>Is rfcomm a transparent socket?? Does it manipulate the data sent from one side to another??<br><br>regards<br>Soumya<br>
+
+</div>
+
+------=_Part_25_6829883.1149676123782--
 
 
+--===============1875408545==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
+
+--===============1875408545==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1875408545==--
