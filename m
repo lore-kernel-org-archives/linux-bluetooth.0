@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Date: Wed, 7 Jun 2006 13:08:48 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <15207714a694.14a694152077@fh-wolfenbuettel.de>
+Message-ID: <Pine.LNX.4.63.0606071302320.2900@redbean.intranet.gw-instruments.de>
+References: <15207714a694.14a694152077@fh-wolfenbuettel.de>
 MIME-Version: 1.0
-Date: Wed, 7 Jun 2006 09:12:45 -0600
-Message-ID: <F23ABFFDB8261D40A6F6D30EA014882501CE925B@VS6.EXCHPROD.USA.NET>
-From: "Robert Wlaschin" <robertw@healthhero.com>
-To: <bluez-devel@lists.sourceforge.net>,
-        "Steve Finney" <sfinney@healthhero.com>,
-        "Edwin Reich" <ereich@healthhero.com>
-Subject: Re: [Bluez-devel] rfcomm (utils)
+Content-Type: MULTIPART/MIXED;
+	BOUNDARY="-1463794332-1586515895-1149678528=:2900"
+Subject: Re: [Bluez-devel] Sim Access Profile question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,82 +18,95 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Thanks for the quick response.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-In reference, the current CVS available
-http://bluez.cvs.sourceforge.net/bluez/ web site seems to have the same
-issue.
-
-Here's a suggested patch (using the 2.25 source)
-
---- bluez-utils-2.25/rfcomm/main.c.orig 2006-06-07 08:01:03.149584500
--0700
-+++ bluez-utils-2.25/rfcomm/main.c.new  2006-06-07 08:02:25.915739200
--0700
-@@ -132,11 +132,14 @@
- 
-        if (ioctl(ctl, RFCOMMGETDEVLIST, (void *) dl) < 0) {
-                perror("Can't get device list");
-+               free(dl);
-                exit(1);
-        }
- 
-        for (i = 0; i < dl->dev_num; i++)
-                print_dev_info(di + i);
-+
-+       free(dl);
- }
- 
- static int create_dev(int ctl, int dev, uint32_t flags, bdaddr_t
-*bdaddr, int argc, char **argv)
-@@ -237,12 +240,15 @@
- 
-        if (ioctl(ctl, RFCOMMGETDEVLIST, (void *) dl) < 0) {
-                perror("Can't get device list");
-+               free(dl);
-                exit(1);
-        }
- 
-        for (i = 0; i < dl->dev_num; i++)
-                release_dev(ctl, (di + i)->id, 0);
- 
-+       free(dl);
-+
-        return 0;
- }
+---1463794332-1586515895-1149678528=:2900
+Content-Type: TEXT/PLAIN; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
 
 
-This should catch the missing deallocs.
+Hi Goetz,=20
 
-Hope this helps.
+On Wed, 7 Jun 2006, G=F6tz Isse wrote:
 
-Thanks,
-Robert
+> Hi,
+>=20
+> I have read the SimAccessProfile Spec and am not 100% sure on the follo=
+wing:
+>=20
+> 1. Establish connection l2cap and rfcomm to SAP-server (ie. a mobile
+> that supports this profile) as stated in section4.1, 2nd paragraph?
+> Is l2cap really needed seperately or is it included when connection via
+> rfcomm ?
+RFCommm always uses L2CAP as the lower layer. So don't worry about L2CAP=20
+because BlueZ will handle all this.=20
+=20
+> 2. Then build messages specified for conection request and write them o=
+n
+> the rfcomm connection using write(socket,values, length) ? ...wait for
+> response etc. and continue.
+> I have place the appropriate hex values in a array of unsigned char and
+> then use that whole array to send.
+>=20
+> The real question is here:
+> - Is the sending via rfcomm the correct way? I sent a dial command
+> "atd123456789" to the port and my mobile starts dialing... so in genera=
+l
+> the connection is there and the phone reacts.=20
+>=20
+> - What is l2cap needed for? The spec does not help me. Maybe you can?
+As before. L2CAP is always the lower layer for RFCOMM. To get the big=20
+picture maybe you can try to get a textbook which givers you some overvie=
+w=20
+of the Bluetooth standard. Because from your name I assume you speak=20
+German you may also find some general information on the Heise Verlag web=
+=20
+site (www.heise.de). Or search your favorite bookstore...=20
 
-Hi Robert,
+> Happy to phone anyone who can help directly, in case you are not happy
+> writing all this.. just give me your phone number and a time...and your
+> timezone.
+>=20
+> Thanks ,=20
+> Goetz
 
-> In poking around in \bluez-utils-2.21\rfcomm\main.c, I noticed in
-> several functions (including print_dev_list) there seems to be a
-malloc
-> statement but no corresponding free.  Is this the recommended way to
-> handle the rfcomm_dev_list_req structures?
+Ciao,=20
 
-this seems to be a bug, but I would prefer you actually check the latest
-version from CVS instead of an old package and be more specific of the
-cases you are talking about. Otherwise we can fix them.
+Peter=20
 
-Regards
-
-Marcel
+>=20
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>=20
 
 
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
 
+---1463794332-1586515895-1149678528=:2900
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+
+---1463794332-1586515895-1149678528=:2900
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+---1463794332-1586515895-1149678528=:2900--
