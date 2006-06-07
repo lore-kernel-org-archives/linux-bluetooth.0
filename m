@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <fe0a97c20606070328h4924fb22n28d30bce79cb54d7@mail.gmail.com>
-Date: Wed, 7 Jun 2006 15:58:43 +0530
-From: "Sowmya Gattupalli" <sowmya.gattupalli@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <fe0a97c20606052352j37b71f20mad12696fdff7c08d@mail.gmail.com>
+Message-ID: <44872289.1020100@free.fr>
+Date: Wed, 07 Jun 2006 21:01:29 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
-References: <fe0a97c20606052352j37b71f20mad12696fdff7c08d@mail.gmail.com>
-Subject: [Bluez-devel] Does rfcomm manipulate the data??
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <44859F7F.7060307@xmission.com>
+In-Reply-To: <44859F7F.7060307@xmission.com>
+Subject: Re: [Bluez-devel] Fabien Chevalier's plugin in cvs
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,54 +16,39 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1875408545=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1875408545==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_25_6829883.1149676123782"
 
-------=_Part_25_6829883.1149676123782
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi all,
 
-Hi all
-Is rfcomm a transparent socket?? Does it manipulate the data sent from one
-side to another??
+> Hi
+> 
+> Fabien Chevalier's plugin that moves sco audio handling to userspace is
+> now in our cvs. We hope it will be more convenient for people to track
+> and work with us on it this way. Email your comments and patches here to
+> bluez-devel.
+> 
+> Fabien was calling it 'bluez-headset' and for now I've renamed it to
+> 'alsa-plugin-sco' since everything we have could be described as
+> bluez-headset :)
 
-regards
-Soumya
+Yes, however i have the advantage that i am the only one targetting 100% 
+of headset profile. :-)
+However i would tend to agree with the fact that it is just misleading 
+for the end user to have something called bluez-headset that cannot 
+handle his brand new stereo (a2dp) headset :-)
 
-------=_Part_25_6829883.1149676123782
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+At the end of the day we will have to find a better name, and rename 
+some files to have something coherent at the end... However it's really 
+not really important for now, and alsa-plugin-sco will be just fine for 
+now :-)
 
-<br><span class="gmail_quote"><br></span><div>Hi all<br>Is rfcomm a transparent socket?? Does it manipulate the data sent from one side to another??<br><br>regards<br>Soumya<br>
+Fabien
 
-</div>
-
-------=_Part_25_6829883.1149676123782--
-
-
---===============1875408545==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-
---===============1875408545==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1875408545==--
