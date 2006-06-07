@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <448733E2.7090602@free.fr>
+Date: Wed, 07 Jun 2006 22:15:30 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <448733E2.7090602@free.fr>
-References: <447B4F98.8020501@free.fr>
-	<1148934839.31689.116.camel@localhost> <447C4862.5050205@free.fr>
-	<1149189300.28511.61.camel@localhost>  <448733E2.7090602@free.fr>
-Date: Wed, 07 Jun 2006 22:30:46 +0200
-Message-Id: <1149712246.22472.56.camel@localhost>
-Mime-Version: 1.0
+References: <447B4F98.8020501@free.fr>	<1148934839.31689.116.camel@localhost>
+	<447C4862.5050205@free.fr> <1149189300.28511.61.camel@localhost>
+In-Reply-To: <1149189300.28511.61.camel@localhost>
 Subject: Re: [Bluez-devel] [PATCH] SCO flow control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,60 +21,58 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
+Hi Marcel,
 
-> Sorry to be a little late on this answer, however a busy work schedule 
-> and a sunny Sunday prevented me to answer my e-mails for a few days :-)
+Sorry to be a little late on this answer, however a busy work schedule 
+and a sunny Sunday prevented me to answer my e-mails for a few days :-)
 
-no big deal. I should do this more often by myself ;)
+> so far I only looked at the changes to the HCI core. Please don't rename
+> the disconnect timer. This will collide with the changes for automatic
+> sniff mode support.
 
-> > Can we change the core and add a hci_stream_sco() without breaking the
-> > API. This would make it easier for me to apply the changes.
+Ok, however as now sniff mode is out, i would suggest i build on top of 
+it :-)
+
 > 
-> I see your point, however i don't see how to bring this feature in 
-> without breaking the hci core API for SCO sockets... :-(
+> Can we change the core and add a hci_stream_sco() without breaking the
+> API. This would make it easier for me to apply the changes.
 
-No problem. We can break the API, but at least I need some good reason
-for it.
+I see your point, however i don't see how to bring this feature in 
+without breaking the hci core API for SCO sockets... :-(
 
-> > Another question is if we really should queue the data in sk_write_queue
-> > and not directly in the core. I would prefer to send the data to the
-> > core and then stream it from there.
 > 
-> That's an interesting question... :-)
-> I asked it myself when i started to design this feature.
-> In fact having outgoing packets stored in a socket queue has some 
-> advantages:
->    * it makes use of the BSD socket send queue, and thus can reuse some 
-> generic socket queue management related functions, which rely on some 
-> well known sk_buff variable (sk_sndbuff, sk_wmem_alloc, sk_rcvbuff, 
-> sk_rmem_alloc ...)
->    * it makes the thing symetrical, both uplink and downlink path make 
-> use socket queues to buffer data.
-> 
-> As such I thought there were not any valid reason to put in the core... 
-> however if you have suggestions i would be very happy to hear them. :-)
+> Another question is if we really should queue the data in sk_write_queue
+> and not directly in the core. I would prefer to send the data to the
+> core and then stream it from there.
 
-Actually I never thought about SCO as socket is the best interface. So
-we might wanna move away from it sometime in the future. And in this
-case it would be great if it uses simple SKB queues or maybe kfifo for
-it. Even if this sounds like more work right now, I might be worth it.
+That's an interesting question... :-)
+I asked it myself when i started to design this feature.
+In fact having outgoing packets stored in a socket queue has some 
+advantages:
+   * it makes use of the BSD socket send queue, and thus can reuse some 
+generic socket queue management related functions, which rely on some 
+well known sk_buff variable (sk_sndbuff, sk_wmem_alloc, sk_rcvbuff, 
+sk_rmem_alloc ...)
+   * it makes the thing symetrical, both uplink and downlink path make 
+use socket queues to buffer data.
 
-> For now i would suggest we do the following:
->    - for you: have a look at the "whole picture", including the SCO part 
-> patch. This way you would be able to better understand the interaction 
-> between SCO sockets & hci layer. This way you will be able to send in 
-> other comments too. :-)
->    - for me: * port the patch on top of the 2.6.16-mh1 :-)
->              * have it to work also when HZ % 333 != 0 ( i've just seen 
-> it wouldn't work properly in this case... )
+As such I thought there were not any valid reason to put in the core... 
+however if you have suggestions i would be very happy to hear them. :-)
 
-Let's have another patch on top of 2.6.16-mh1 and maybe you also wanna
-adapt scotest for testing it.
+For now i would suggest we do the following:
+   - for you: have a look at the "whole picture", including the SCO part 
+patch. This way you would be able to better understand the interaction 
+between SCO sockets & hci layer. This way you will be able to send in 
+other comments too. :-)
+   - for me: * port the patch on top of the 2.6.16-mh1 :-)
+             * have it to work also when HZ % 333 != 0 ( i've just seen 
+it wouldn't work properly in this case... )
 
-Regards
+What do you think of the idea ?
 
-Marcel
+Cheers,
+
+Fabien
 
 
 
