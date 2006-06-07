@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 07 Jun 2006 12:54:03 +0200
-From: =?windows-1252?Q?G=F6tz_Issel?= <g.issel@fh-wolfenbuettel.de>
-To: bluez-devel@lists.sourceforge.net
-Message-id: <15207714a694.14a694152077@fh-wolfenbuettel.de>
-MIME-version: 1.0
-Subject: [Bluez-devel] Sim Access Profile question
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Philip Langdale <philipl@mail.utexas.edu>
+In-Reply-To: <44867199.2000409@mail.utexas.edu>
+References: <44867199.2000409@mail.utexas.edu>
+Date: Wed, 07 Jun 2006 09:15:31 +0200
+Message-Id: <1149664531.22472.4.camel@localhost>
+Mime-Version: 1.0
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Latest 2.6.16-mh1 patch.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,34 +21,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Philip,
 
-I have read the SimAccessProfile Spec and am not 100% sure on the following:
+> I just tried out the 2.6.16-mh1 patch and I'm seeing very laggy
+> behaviour with my mx5000 mouse. With the 2.6.15-mh2 modified to
+> remove the changes already in 2.6.16, I do not see this behaviour.
+> 
+> The interdiff is not huge but it's large enough that I can't
+> see the culprit at a glance.
 
-1. Establish connection l2cap and rfcomm to SAP-server (ie. a mobile
-that supports this profile) as stated in section4.1, 2nd paragraph?
-Is l2cap really needed seperately or is it included when connection via
-rfcomm ?
+so it seems that I messed up when porting the HID report mode. Please
+send me your modified 2.6.15-mh2 patch and I am going to take a look at
+it.
 
-2. Then build messages specified for conection request and write them on
-the rfcomm connection using write(socket,values, length) ? ...wait for
-response etc. and continue.
-I have place the appropriate hex values in a array of unsigned char and
-then use that whole array to send.
+Regards
 
-The real question is here:
-- Is the sending via rfcomm the correct way? I sent a dial command
-"atd123456789" to the port and my mobile starts dialing... so in general
-the connection is there and the phone reacts. 
+Marcel
 
-- What is l2cap needed for? The spec does not help me. Maybe you can?
 
-Happy to phone anyone who can help directly, in case you are not happy
-writing all this.. just give me your phone number and a time...and your
-timezone.
-
-Thanks , 
-Goetz
 
 
 _______________________________________________
