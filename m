@@ -1,17 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <564d96fb0606081007p3fb8ea42v5926c80eb1cc9657@mail.gmail.com>
-Date: Thu, 8 Jun 2006 14:07:02 -0300
-From: "=?UTF-8?Q?Rafael_Esp=C3=ADndola?=" <rafael.espindola@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1149718288.22472.71.camel@localhost>
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_6045_20657184.1149786422942"
-References: <564d96fb0606060325q834360bqe4e9d41cbb28a16f@mail.gmail.com>
-	<1149714650.22472.62.camel@localhost>
-	<564d96fb0606071459i7367f84fkb7ee645941f84279@mail.gmail.com>
-	<1149718288.22472.71.camel@localhost>
-Subject: Re: [Bluez-devel] bug in sdp_gen_pd
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <027101c68b0f$2dc2cfb0$0203a8c0@NBVICTOR>
+References: <027101c68b0f$2dc2cfb0$0203a8c0@NBVICTOR>
+Date: Thu, 08 Jun 2006 17:41:45 +0200
+Message-Id: <1149781305.4219.38.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] DUN: samsung-E770 & LG-S5200 & more...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,85 +16,65 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_6045_20657184.1149786422942
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi Victor,
 
-> it would help a lot. I am a little bit worried of such off-by-one
-> errors, because as I said, the SDP code is a strange code. You might
-> break some other part of the code that rely on this being wrong. Don't
-> get me wrong, it is still a bug, but we need to take care to fix both
-> places. And I have seen such stuff in the SDP code before. This is why I
-> am extra careful.
-ok. This is a simple program that has the bug:
-----------------------------------------------------------
-#include <sdp.h>
-#include <sdp_lib.h>
+> I'm testing DUN with some LGs and Samsungs (mostly new models) and some 
+> cases get very strange results. From the log below, PPP configuring the 
+> connection:
+> 
+> sent [LCP ConfReq id=0x2 <asyncmap 0xa0000> <magic 0xd8a026bf>]
+> < ACL data: handle 42 flags 0x02 dlen 45
+>     L2CAP(d): cid 0x005b len 41 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 37 fcs 0x9a
+>       0000: 7e ff 7d 23 c0 21 7d 21  7d 22 7d 20 7d 30 7d 22 
+>  ~.}#.!}!}"} }0}" <-------------- PPP data is escaped with 0x7D
+>       0010: 7d 26 7d 20 7d 2a 7d 20  7d 20 7d 25 7d 26 d8 
+> a0  }&} }*} } }%}&..
+>       0020: 26 bf f2 83 7e                                    &...~
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 42
+> > ACL data: handle 42 flags 0x02 dlen 10 
+> > <-------------------------------here phone responds
+>     L2CAP(d): cid 0x0040 len 6 [psm 3]
+>       RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 1 fcs 0x5c credits 1
+>       0000: 7e                                                ~
+> > ACL data: handle 42 flags 0x02 dlen 31
+>     L2CAP(d): cid 0x0040 len 27 [psm 3]
+>       RFCOMM(d): UIH: cr 0 dlci 2 pf 0 ilen 23 fcs 0x40
+>       0000: ff 03 80 21 04 02 00 10  02 06 00 0a 00 00 05 06 
+> ...!............  <--------------- PPP data not escaped?
+>       0010: d8 a0 26 bf 8f e7 7e                              ..&...~
+> 
+> PPP sends configure request and phone replies, but for some reasong the data 
+> in the replied frame is not escaped as should be according to standard.... 
+> So it looks like PPP ignores the reply (cause it is invalid?) and sends the 
+> next request... And so on till we termiate the link.
 
-int main() {
-        uint8_t     dtd = SDP_URL_STR8;
-        char     *value = "abc";
+you can create a pppdump from hcidump and then feed it into pppdump or
+Ethereal for further inspection. It also includes an experimental PPP
+decoder, but that one is in an early stage.
 
-        sdp_data_t *d = sdp_data_alloc(dtd, value);
+> P.S. Looks like Windows handles these phones correctly
+> P.P.S. Another strange thing with LGs, after trying a phone it with a 
+> Windows PC (where it works fine), it starts to work also with the ARM box 
+> running Bluez, if I reboot the phone it no longer works with ARM+Bluez till 
+> I use it with Windows PC again. This is weird, will try to dig something up.
 
-        sdp_buf_t buf;
-        uint8_t   data[1000];
-        buf.data      = data;
-        buf.buf_size  = sizeof(data);
-        buf.data_size = 0;
+Can you compare the SDP records before Windows touches it and after. I
+assume that Windows somehow enables the DUN profile.
 
-        sdp_gen_pdu(&buf, d);
-        return 0;
-}
--------------------------------------------------------------------
+Regards
 
-> Send in a patch. I will check it.
-Attached.
-
-> Regards
->
-> Marcel
-
-Best Regards,
-Rafael
-
-------=_Part_6045_20657184.1149786422942
-Content-Type: application/octet-stream; name=sdp.patch
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_eo7d3uy5
-Content-Disposition: attachment; filename="sdp.patch"
-
-LS0tIHRlbXAvYmx1ZXotbGlicy0yLjI0L3NyYy9zZHAuYwkyMDA1LTEyLTI0IDE0OjAzOjM4LjAw
-MDAwMDAwMCAtMDMwMAorKysgc2RwLmMJMjAwNi0wNi0wOCAxNDowNDoxMS4wMDAwMDAwMDAgLTAz
-MDAKQEAgLTQzMywxOCArNDMzLDggQEAKIAogCQkJaWYgKGxlbmd0aCA8PSBVQ0hBUl9NQVgpIHsK
-IAkJCQlkLT51bml0U2l6ZSArPSBzaXplb2YodWludDhfdCk7Ci0JCQkJaWYgKGR0ZCAhPSBTRFBf
-VVJMX1NUUjggJiYgZHRkICE9IFNEUF9URVhUX1NUUjgpIHsKLQkJCQkJaWYgKGR0ZCA9PSBTRFBf
-VVJMX1NUUjE2KQotCQkJCQkJZHRkID0gU0RQX1VSTF9TVFI4OwotCQkJCQllbHNlCi0JCQkJCQlk
-dGQgPSBTRFBfVEVYVF9TVFI4OwotCQkJCX0KIAkJCX0gZWxzZSB7CiAJCQkJZC0+dW5pdFNpemUg
-Kz0gc2l6ZW9mKHVpbnQxNl90KTsKLQkJCQlpZiAoZHRkID09IFNEUF9URVhUX1NUUjgpCi0JCQkJ
-CWR0ZCA9IFNEUF9URVhUX1NUUjE2OwotCQkJCWVsc2UKLQkJCQkJZHRkID0gU0RQX1VSTF9TVFIx
-NjsKIAkJCX0KIAkJfSBlbHNlIHsKIAkJCVNEUEVSUigiU3RyaW5ncyBvZiBzaXplID4gVVNIUlRf
-TUFYIG5vdCBzdXBwb3J0ZWRcbiIpOwo=
-------=_Part_6045_20657184.1149786422942
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Marcel
 
 
-------=_Part_6045_20657184.1149786422942
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------=_Part_6045_20657184.1149786422942--
