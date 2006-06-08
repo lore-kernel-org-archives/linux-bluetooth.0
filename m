@@ -1,16 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d23110170606081814m434c5e15ia7de6c74b3bf2209@mail.gmail.com>
-Date: Thu, 8 Jun 2006 22:14:47 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1149798394.23481.2.camel@neutrino.cosmos.net>
+From: "Alexandre Coser Monteiro" <coser@cos.ufrj.br>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Thu, 8 Jun 2006 21:31:10 -0200
+Message-Id: <20060608231759.M13160@cos.ufrj.br>
+In-Reply-To: <e85851c20606080031q31dafb80qa7b144b81b997ca4@mail.gmail.com>
+References: <e85851c20606080031q31dafb80qa7b144b81b997ca4@mail.gmail.com>
 MIME-Version: 1.0
-References: <1149543750.14142.11.camel@neutrino.cosmos.net>
-	<1149544649.7238.1.camel@localhost>
-	<1149616008.9380.11.camel@neutrino.cosmos.net>
-	<d23110170606061337m3ef2e630k702a7e3ef3509256@mail.gmail.com>
-	<1149798394.23481.2.camel@neutrino.cosmos.net>
-Subject: Re: [Bluez-users] crazy mouse
+Subject: [Bluez-users] Min. output power of TPL
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,19 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 6/8/06, Didier LINK <didier.link@wanadoo.fr> wrote:
-> That's it, I've made 2 little circles on screen.
-> Thanks for your help ! This command seems to be usefull !!! ;)
 
-Hmm.. I can't see anything unusual. Only the automatic switch to sniff
-mode feature trying to hold the connection in active mode and your
-mouse turning it back to sniff mode. Could you give the 2.6.16-mh2 a
-try? It doesn't contain the automatic switch to sniff mode feature and
-we'll be able to see if that's causing your mouse problems.
+      Anyone can explain to me, how its possible to read in Trasmit Power Level command
+by hcitool a valou of -20 dBm, if in power class definition of bluetooth its defined
+that the Minimum Output Power for Class 1 device is 0dBm !?! Is it my device broken ? 
+      
 
-Best regards,
-
--- Ulisses
+Sds,
+   Alexandre
 
 
 _______________________________________________
