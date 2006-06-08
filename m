@@ -1,16 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Philip Langdale <philipl@mail.utexas.edu>
-In-Reply-To: <4487B00F.7070204@mail.utexas.edu>
-References: <44867199.2000409@mail.utexas.edu>
-	<1149664531.22472.4.camel@localhost> <4486EE2D.3010507@mail.utexas.edu>
-	<1149714318.22472.59.camel@localhost>
-	<4487B00F.7070204@mail.utexas.edu>
-Date: Thu, 08 Jun 2006 09:17:21 +0200
-Message-Id: <1149751041.27331.5.camel@localhost>
-Mime-Version: 1.0
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Latest 2.6.16-mh1 patch.
+Date: Thu, 08 Jun 2006 13:17:33 +0200
+From: =?windows-1252?Q?G=F6tz_Issel?= <g.issel@fh-wolfenbuettel.de>
+To: bluez-devel@lists.sourceforge.net
+Message-id: <15a4c8153a9b.153a9b15a4c8@fh-wolfenbuettel.de>
+MIME-version: 1.0
+Subject: [Bluez-devel] Sim Access Profile question (rfcomm,l2cap,messages)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,25 +18,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Philip,
+Hi,
 
-> > I will look at it, but you might wanna try to disable the automatic
-> > sniff mode and see if this helps at all. Simply call:
-> > 
-> > 	echo 0 > /sys/class/bluetooth/hci0/idle_timeout
-> 
-> I just tried this, and unfortunately it doesn't help.
+I have read the SimAccessProfile Spec and am not 100% sure on the following:
 
-I actually don't saw any other change that justified this behavior. So
-you have your patch working with 2.6.16, but mine is not. That is really
-strange.
+1. Establish connection l2cap and rfcomm (on port given from sdp search)
+to SAP-server (ie. a mobile that supports this profile) as stated in
+section 4.1, 2nd paragraph of spec?
+Is l2cap really needed seperately or is it included when connection via
+rfcomm ? If needed, what for?
 
-Run "hcidump -X -V" and let me check if it contains something unusual.
+2. do the binding/pairing stuff
 
-Regards
+3. Then build messages specified for conection request and write them on
+the rfcomm connection using write(socket,values, length) ? ...wait for
+response etc. and continue.
+I have place the appropriate hex values in a array of unsigned char and
+then use that whole array to send.
 
-Marcel
 
+The real question is here:
+- Is the sending via rfcomm the correct way? I sent a dial command
+"atd123456789" to the port using channel 0 and my mobile starts
+dialing... so in general
+the connection is there and the phone reacts.
+
+- What is l2cap needed for? The spec does not help me. Maybe you can?
+
+Happy to phone anyone who can help directly, in case you are not happy
+writing all this.. just give me your phone number and a time and timezone.
+
+Thanks ,
+Goetz
 
 
 
