@@ -1,59 +1,76 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 08 Jun 2006 13:17:33 +0200
-From: =?windows-1252?Q?G=F6tz_Issel?= <g.issel@fh-wolfenbuettel.de>
-To: bluez-devel@lists.sourceforge.net
-Message-id: <15a4c8153a9b.153a9b15a4c8@fh-wolfenbuettel.de>
-MIME-version: 1.0
-Subject: [Bluez-devel] Sim Access Profile question (rfcomm,l2cap,messages)
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <e85851c20606072213o130384b3u38242e415dc6271b@mail.gmail.com>
+References: <e85851c20606072213o130384b3u38242e415dc6271b@mail.gmail.com>
+Date: Thu, 08 Jun 2006 09:21:08 +0200
+Message-Id: <1149751268.27331.9.camel@localhost>
+Mime-Version: 1.0
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] [Bluez-devel] How to send file using File
+	Transfer Protocol
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi,
+Hi Gloria,
 
-I have read the SimAccessProfile Spec and am not 100% sure on the following:
+> I want to ask you about the way to send file using File
+> Transfer Protocol.
+> Here my code :
+> 
+> int main(){
+> 	bdaddr_t src,dest;
+> 	uint8_t channel = 0;
+> 	int mode,od;
+> 	unsigned char *buf;
+> 	size_t len;
+> 
+> 
+> 	bacpy(&src,BDADDR_ANY);
+> 	str2ba("xx:xx:xx:xx:xx:xx",&dest); //xx is my bluetooth address
+> 
+> 	if((!channel)&&(!sdp_get_ftp_channel(&src,&dest,&channel))){
+> 		printf("Can't retrieve RFCOMM OBEX channel\n");
+> 		exit(1);
+> 	}
+> 
+> 	if((od=obex_open(&src,&dest,channel))<0){
+> 		perror("Can't establish OBEX connection\n");
+> 		exit(1);
+> 	}
+> 
+> 	mode = OBEX_FILE_TRANSFER;
+> 	obex_connect(od,mode);
+> 	printf("connected\n");
+> 
+>         obex_setpath(od, "C:/", 0x03);
 
-1. Establish connection l2cap and rfcomm (on port given from sdp search)
-to SAP-server (ie. a mobile that supports this profile) as stated in
-section 4.1, 2nd paragraph of spec?
-Is l2cap really needed seperately or is it included when connection via
-rfcomm ? If needed, what for?
+using the FTP profile you are not using Windows alike paths. This is not
+how it works and all paths are mapped under a root directory. So leave
+this command out and try again.
 
-2. do the binding/pairing stuff
+> NB : The function used in main function has declared.
 
-3. Then build messages specified for conection request and write them on
-the rfcomm connection using write(socket,values, length) ? ...wait for
-response etc. and continue.
-I have place the appropriate hex values in a array of unsigned char and
-then use that whole array to send.
+And your code has do be licensed under GPL.
 
+Regards
 
-The real question is here:
-- Is the sending via rfcomm the correct way? I sent a dial command
-"atd123456789" to the port using channel 0 and my mobile starts
-dialing... so in general
-the connection is there and the phone reacts.
+Marcel
 
-- What is l2cap needed for? The spec does not help me. Maybe you can?
-
-Happy to phone anyone who can help directly, in case you are not happy
-writing all this.. just give me your phone number and a time and timezone.
-
-Thanks ,
-Goetz
 
 
 
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
