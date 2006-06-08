@@ -1,76 +1,19 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <e85851c20606072213o130384b3u38242e415dc6271b@mail.gmail.com>
-References: <e85851c20606072213o130384b3u38242e415dc6271b@mail.gmail.com>
-Date: Thu, 08 Jun 2006 09:21:08 +0200
-Message-Id: <1149751268.27331.9.camel@localhost>
-Mime-Version: 1.0
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] [Bluez-devel] How to send file using File
-	Transfer Protocol
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Return-Path: <glowz.saripah@gmail.com>
+Message-ID: <e85851c20606080031q31dafb80qa7b144b81b997ca4@mail.gmail.com>
+Date: Thu, 8 Jun 2006 14:31:10 +0700
+From: "Gloria Saripah Patara" <glowz.saripah@gmail.com>
+To: bluez-users@lists.sourceforge.net, bluez-devel@lists.sourceforge.net,
+        marcel@holtmann.org, albert@csail.mit.edu, ashuang@gmail.com
+Subject: how to set the server device to File Transfer mode
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Gloria,
+hallo, i'm newbie here. i want to ask you about file transfer
+protocol. i we want to sending file or other operations using FTP, do
+we have to set the server device to File Transfer Mode? or we must not
+to set it? if yes, how we can do it? Is there another solution?. i
+want to create bluetooth application.
 
-> I want to ask you about the way to send file using File
-> Transfer Protocol.
-> Here my code :
-> 
-> int main(){
-> 	bdaddr_t src,dest;
-> 	uint8_t channel = 0;
-> 	int mode,od;
-> 	unsigned char *buf;
-> 	size_t len;
-> 
-> 
-> 	bacpy(&src,BDADDR_ANY);
-> 	str2ba("xx:xx:xx:xx:xx:xx",&dest); //xx is my bluetooth address
-> 
-> 	if((!channel)&&(!sdp_get_ftp_channel(&src,&dest,&channel))){
-> 		printf("Can't retrieve RFCOMM OBEX channel\n");
-> 		exit(1);
-> 	}
-> 
-> 	if((od=obex_open(&src,&dest,channel))<0){
-> 		perror("Can't establish OBEX connection\n");
-> 		exit(1);
-> 	}
-> 
-> 	mode = OBEX_FILE_TRANSFER;
-> 	obex_connect(od,mode);
-> 	printf("connected\n");
-> 
->         obex_setpath(od, "C:/", 0x03);
-
-using the FTP profile you are not using Windows alike paths. This is not
-how it works and all paths are mapped under a root directory. So leave
-this command out and try again.
-
-> NB : The function used in main function has declared.
-
-And your code has do be licensed under GPL.
-
-Regards
-
-Marcel
-
-
-
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+----------------------------------------
+Thanks in advance.
