@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4489B3C6.6070800@free.fr>
+Date: Fri, 09 Jun 2006 19:45:42 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <564d96fb0606090629i6b431352pedf0e125d8d399d4@mail.gmail.com>
-References: <564d96fb0606090629i6b431352pedf0e125d8d399d4@mail.gmail.com>
-Date: Fri, 09 Jun 2006 22:12:48 +0200
-Message-Id: <1149883968.3985.4.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bug in hci_devba
+References: <4489AB13.3020501@dgreaves.com> <4489AC19.3030200@free.fr>
+	<4489AF5B.7060303@xmission.com>
+In-Reply-To: <4489AF5B.7060303@xmission.com>
+Subject: Re: [Bluez-devel] 2 instances of btsco on one dongle...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,37 +21,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Rafael,
-
-> running the program:
-> ----------------------------------------------
-> #include <bluetooth/bluetooth.h>
-> #include <bluetooth/hci.h>
-> #include <bluetooth/hci_lib.h>
+Brad Midgley wrote:
+> Fabien
 > 
-> int main() {
->         bdaddr_t bdaddr;
->         hci_devba(0, &bdaddr);
->         return 0;
-> }
-> -----------------------------------------------
+>> I don't know if btsco can handle more than one headset, however what is 
+>> sure is that the hci USB driver cannot (as SCO support is not complete...)
+>> Having what you want to work might require quite a lot of work actually :-(
 > 
-> in valgrind produces this warning:
-> -------------------------------------------------------------------------------------
-> ==7618== Conditional jump or move depends on uninitialised value(s)
-> ==7618==    at 0x4B25757: hci_devba (in /usr/lib/libbluetooth.so.1.0.25)
-> ==7618==    by 0x40058D: main (in /home/rafael/temp/temp)
-> -------------------------------------------------------------------------------------
-> 
-> The attached patch fixes this.
+> starting with the plugin-alsa-sco would be less work than modifying
+> btsco and its kernel mod. then we only have to deal with the sco part.
+> but then maybe that's what you were thinking of when you say it's a lot
+> of work.
 
-applied. Thanks.
+Well, what i mean is that it's not gonna work tonight...nor tomorrow :-)
+Having this use case to work would require a few days work at the very 
+minimum :-(
 
-Regards
-
-Marcel
-
-
+Fabien
 
 
 _______________________________________________
