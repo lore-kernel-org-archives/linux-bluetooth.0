@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4489AA6C.7010300@free.fr>
-Date: Fri, 09 Jun 2006 19:05:48 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <564d96fb0606090629i6b431352pedf0e125d8d399d4@mail.gmail.com>
+Date: Fri, 9 Jun 2006 10:29:45 -0300
+From: "=?UTF-8?Q?Rafael_Esp=C3=ADndola?=" <rafael.espindola@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <447B4F98.8020501@free.fr>	<1148934839.31689.116.camel@localhost>
-	<447C4862.5050205@free.fr>	<1149189300.28511.61.camel@localhost>
-	<448733E2.7090602@free.fr> <1149712246.22472.56.camel@localhost>
-In-Reply-To: <1149712246.22472.56.camel@localhost>
-Subject: Re: [Bluez-devel] [PATCH] SCO flow control
+Content-Type: multipart/mixed;
+	boundary="----=_Part_2795_9035622.1149859785856"
+Subject: [Bluez-devel] bug in hci_devba
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,57 +16,66 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+------=_Part_2795_9035622.1149859785856
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
->>> Another question is if we really should queue the data in sk_write_queue
->>> and not directly in the core. I would prefer to send the data to the
->>> core and then stream it from there.
->> That's an interesting question... :-)
->> I asked it myself when i started to design this feature.
->> In fact having outgoing packets stored in a socket queue has some 
->> advantages:
->>    * it makes use of the BSD socket send queue, and thus can reuse some 
->> generic socket queue management related functions, which rely on some 
->> well known sk_buff variable (sk_sndbuff, sk_wmem_alloc, sk_rcvbuff, 
->> sk_rmem_alloc ...)
->>    * it makes the thing symetrical, both uplink and downlink path make 
->> use socket queues to buffer data.
->>
->> As such I thought there were not any valid reason to put in the core... 
->> however if you have suggestions i would be very happy to hear them. :-)
-> 
-> Actually I never thought about SCO as socket is the best interface. So
-> we might wanna move away from it sometime in the future. And in this
-> case it would be great if it uses simple SKB queues or maybe kfifo for
-> it. Even if this sounds like more work right now, I might be worth it.
+running the program:
+----------------------------------------------
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/hci.h>
+#include <bluetooth/hci_lib.h>
 
-It might make sense: however we must take into account the following 
-constraints:
-   - we must be aple to setup fifo lengths from userspace, so that to 
-simulate a variable size ring buffer as found on sound card hardware.
-   - we must be able to put the sending task to sleep, and wake it up 
-later, when the fifo gets 'full'.
+int main() {
+        bdaddr_t bdaddr;
+        hci_devba(0, &bdaddr);
+        return 0;
+}
+-----------------------------------------------
 
-I'm not against this, even if it means more work...
-However i don't have any precise idea on which communication mechanism 
-to use between userspace/kernelspace. Any ideas ??
+in valgrind produces this warning:
+-------------------------------------------------------------------------------------
+==7618== Conditional jump or move depends on uninitialised value(s)
+==7618==    at 0x4B25757: hci_devba (in /usr/lib/libbluetooth.so.1.0.25)
+==7618==    by 0x40058D: main (in /home/rafael/temp/temp)
+-------------------------------------------------------------------------------------
 
-> 
-> Let's have another patch on top of 2.6.16-mh1 and maybe you also wanna
-> adapt scotest for testing it.
-> 
-Ok, i'm gonna work on that then...
+The attached patch fixes this.
 
-Cheers,
+Best Regards,
+Rafael
 
-Fabien
+------=_Part_2795_9035622.1149859785856
+Content-Type: application/octet-stream; name=hci.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_eo8kt3vs
+Content-Disposition: attachment; filename="hci.patch"
 
+LS0tIHNyYy9oY2kuYwkyMDA2LTAxLTA3IDIzOjAzOjA1LjAwMDAwMDAwMCAtMDMwMAorKysgL2hv
+bWUvcmFmYWVsL2hjaS5jCTIwMDYtMDYtMDkgMTA6MjY6MDIuMDAwMDAwMDAwIC0wMzAwCkBAIC03
+NjEsNiArNzYxLDcgQEAKIGludCBoY2lfZGV2YmEoaW50IGRldl9pZCwgYmRhZGRyX3QgKmJkYWRk
+cikKIHsKIAlzdHJ1Y3QgaGNpX2Rldl9pbmZvIGRpOworCW1lbXNldCgmZGksIDAsIHNpemVvZihk
+aSkpOwogCiAJaWYgKGhjaV9kZXZpbmZvKGRldl9pZCwgJmRpKSkKIAkJcmV0dXJuIC0xOwo=
+------=_Part_2795_9035622.1149859785856
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+
+------=_Part_2795_9035622.1149859785856
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_2795_9035622.1149859785856--
