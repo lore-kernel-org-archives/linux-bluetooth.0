@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4489B3C6.6070800@free.fr>
-Date: Fri, 09 Jun 2006 19:45:42 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <4489AF5B.7060303@xmission.com>
+Date: Fri, 09 Jun 2006 11:26:51 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <4489AB13.3020501@dgreaves.com> <4489AC19.3030200@free.fr>
-	<4489AF5B.7060303@xmission.com>
-In-Reply-To: <4489AF5B.7060303@xmission.com>
+In-Reply-To: <4489AC19.3030200@free.fr>
 Subject: Re: [Bluez-devel] 2 instances of btsco on one dongle...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,23 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Brad Midgley wrote:
-> Fabien
-> 
->> I don't know if btsco can handle more than one headset, however what is 
->> sure is that the hci USB driver cannot (as SCO support is not complete...)
->> Having what you want to work might require quite a lot of work actually :-(
-> 
-> starting with the plugin-alsa-sco would be less work than modifying
-> btsco and its kernel mod. then we only have to deal with the sco part.
-> but then maybe that's what you were thinking of when you say it's a lot
-> of work.
-
-Well, what i mean is that it's not gonna work tonight...nor tomorrow :-)
-Having this use case to work would require a few days work at the very 
-minimum :-(
-
 Fabien
+
+> I don't know if btsco can handle more than one headset, however what is 
+> sure is that the hci USB driver cannot (as SCO support is not complete...)
+> Having what you want to work might require quite a lot of work actually :-(
+
+starting with the plugin-alsa-sco would be less work than modifying
+btsco and its kernel mod. then we only have to deal with the sco part.
+but then maybe that's what you were thinking of when you say it's a lot
+of work.
+
+brad
 
 
 _______________________________________________
