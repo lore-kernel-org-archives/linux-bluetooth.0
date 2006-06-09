@@ -1,12 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 11 Jun 2006 01:07:02 +0300
-From: Niv <nivv@cs.bgu.ac.il>
-In-reply-to: <1149980702.5358.19.camel@aeonflux.holtmann.net>
-To: bluez-users@lists.sourceforge.net
-Message-id: <448B4286.6030103@cs.bgu.ac.il>
-MIME-version: 1.0
-References: <1149980702.5358.19.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] [BlueZ-Announce] Release of bluez-hcidump-1.31
+From: Didier LINK <didier.link@wanadoo.fr>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d23110170606081814m434c5e15ia7de6c74b3bf2209@mail.gmail.com>
+References: <1149543750.14142.11.camel@neutrino.cosmos.net>
+	<1149544649.7238.1.camel@localhost>
+	<1149616008.9380.11.camel@neutrino.cosmos.net>
+	<d23110170606061337m3ef2e630k702a7e3ef3509256@mail.gmail.com>
+	<1149798394.23481.2.camel@neutrino.cosmos.net>
+	<d23110170606081814m434c5e15ia7de6c74b3bf2209@mail.gmail.com>
+Date: Fri, 09 Jun 2006 22:38:20 +0200
+Message-Id: <1149885500.17091.2.camel@neutrino.cosmos.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] crazy mouse
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,47 +21,82 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0610896153=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
 
-any gentoo folks may help in releasing an ebuild?
+--===============0610896153==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="=-03amj1uTs3mzwPqDIXUJ"
 
-Marcel Holtmann wrote:
-> Hi Folks,
-> 
-> I released a new version of the hcidump package. This version adds
-> support for an Ericsson LMP decoder and fixes the compilation problems
-> with the latest Bluetooth library.
-> 
-> The sources can be found at http://www.bluez.org/download.html
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> _______________________________________________
-> BlueZ-Announce mailing list
-> BlueZ-Announce@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-announce
+
+--=-03amj1uTs3mzwPqDIXUJ
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+Le jeudi 08 juin 2006 =E0 22:14 -0300, Ulisses Furquim a =E9crit :
+> On 6/8/06, Didier LINK <didier.link@wanadoo.fr> wrote:
+> > That's it, I've made 2 little circles on screen.
+> > Thanks for your help ! This command seems to be usefull !!! ;)
+>=20
+> Hmm.. I can't see anything unusual. Only the automatic switch to sniff
+> mode feature trying to hold the connection in active mode and your
+> mouse turning it back to sniff mode. Could you give the 2.6.16-mh2 a
+> try? It doesn't contain the automatic switch to sniff mode feature and
+> we'll be able to see if that's causing your mouse problems.
+
+Yes that's it, my mouse workd perfect with mh2 !! I don't understand but
+if you want a tester for a newer patch just ask me ! :)
+
+Thanks a lot !!
+
+Best regards.
+
+Didier
+
+--=20
+Didier Link <didier.link@wanadoo.fr>
+Jabber : zanfib@ims.kelkoo.net
+MSN : zanfib@hotmail.fr
+SIP : Zanfib@ekiga.net
+
+Cl=E9 GPG : 75BAC9EE
+
+--=-03amj1uTs3mzwPqDIXUJ
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: Ceci est une partie de message
+	=?ISO-8859-1?Q?num=E9riquement?= =?ISO-8859-1?Q?_sign=E9e?=
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.3 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
 
-iD8DBQFEi0KGkwazfG0MmCYRAu+4AJ9AnNmGdGLeVsnwOq9XcrR2EZsWxACfYz+U
-9OBG5jtpVHwuNK8dqcRXpMI=
-=LUNE
+iD8DBQBEidw8kyPwinW6ye4RAo3AAKCkL0OSl0KzrjFT7K1cWOsU7ThZCgCcD4ML
+dajy+iZb4dNHNnT/TR/bYCI=
+=SJdw
 -----END PGP SIGNATURE-----
 
+--=-03amj1uTs3mzwPqDIXUJ--
+
+
+
+--===============0610896153==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+
+--===============0610896153==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0610896153==--
