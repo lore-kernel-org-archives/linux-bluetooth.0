@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44891608.2030906@personnelware.com>
-Date: Fri, 09 Jun 2006 01:32:40 -0500
-From: Carl K <carl@personnelware.com>
+Message-ID: <d23110170606081814m434c5e15ia7de6c74b3bf2209@mail.gmail.com>
+Date: Thu, 8 Jun 2006 22:14:47 -0300
+From: "Ulisses Furquim" <ulissesf@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1149798394.23481.2.camel@neutrino.cosmos.net>
 MIME-Version: 1.0
-To: Bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] PM325 by LG cell phone - pairing failed
+References: <1149543750.14142.11.camel@neutrino.cosmos.net>
+	<1149544649.7238.1.camel@localhost>
+	<1149616008.9380.11.camel@neutrino.cosmos.net>
+	<d23110170606061337m3ef2e630k702a7e3ef3509256@mail.gmail.com>
+	<1149798394.23481.2.camel@neutrino.cosmos.net>
+Subject: Re: [Bluez-users] crazy mouse
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,55 +24,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I am trying to pair my phone to my ubuntu/dapper laptop . 
-carl@asus17:~$ lsusb
+On 6/8/06, Didier LINK <didier.link@wanadoo.fr> wrote:
+> That's it, I've made 2 little circles on screen.
+> Thanks for your help ! This command seems to be usefull !!! ;)
 
-Bus 003 Device 002: ID 044e:3001 Alps Electric Co., Ltd UGTZ4 Bluetooth
-carl@asus17:~$ cat /etc/bluetooth/pin
-1234
-carl@asus17:~$ sudo /etc/init.d/bluez-utils start
+Hmm.. I can't see anything unusual. Only the automatic switch to sniff
+mode feature trying to hold the connection in active mode and your
+mouse turning it back to sniff mode. Could you give the 2.6.16-mh2 a
+try? It doesn't contain the automatic switch to sniff mode feature and
+we'll be able to see if that's causing your mouse problems.
 
-On the phone:  menu, bluetooth, add new, Searching and Pairing,
-it shows asus17-0, I select that, phone prompts "Enter PIN code", I 
-enter 1234<Next> and within a second get "pairing failed"
+Best regards,
 
-guessing because of this:
-
-Jun  9 00:37:42 localhost gconfd (root-7749): starting (version 2.14.0), 
-pid 7749 user 'root'
-Jun  9 00:37:42 localhost gconfd (root-7749): Resolved address 
-"xml:readonly:/etc/gconf/gconf.xml.mandatory" to a read-only 
-configuration source at position 0
-Jun  9 00:37:42 localhost gconfd (root-7749): Resolved address 
-"xml:readwrite:/root/.gconf" to a writable configuration source at 
-position 1
-Jun  9 00:37:42 localhost gconfd (root-7749): Resolved address 
-"xml:readonly:/etc/gconf/gconf.xml.defaults" to a read-only 
-configuration source at position 2
-Jun  9 00:37:42 localhost gconfd (root-7749): Resolved address 
-"xml:readonly:/var/lib/gconf/debian.defaults" to a read-only 
-configuration source at position 3
-Jun  9 00:37:42 localhost gconfd (root-7749): Resolved address 
-"xml:readonly:/var/lib/gconf/defaults" to a read-only configuration 
-source at position 4
-Jun  9 00:38:42 localhost gconfd (root-7749): GConf server is not in 
-use, shutting down.
-Jun  9 00:38:42 localhost gconfd (root-7749): Exiting
-
-Jun  9 01:03:08 localhost hcid[8572]: Bluetooth HCI daemon
-Jun  9 01:03:08 localhost hcid[8572]: Can't get system message bus name: 
-Connection ":1.15" is not allowed to own the service "org.bluez" due to 
-security policies in the configuration file
-Jun  9 01:03:08 localhost hcid[8572]: Starting security manager 0
-Jun  9 01:03:08 localhost sdpd[8577]: Bluetooth SDP daemon
-
-
-I probably need to file a bug report with ubuntu, but I would like to 
-get some feedback from the experts so that the report has some useful info.
-
-Or do I need to be doing something else?
-
-Carl K
+-- Ulisses
 
 
 _______________________________________________
