@@ -1,6 +1,6 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <448A981D.6030101@free.fr>
-Date: Sat, 10 Jun 2006 11:59:57 +0200
+Message-ID: <448A8FC7.5010401@free.fr>
+Date: Sat, 10 Jun 2006 11:24:23 +0200
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -26,29 +26,34 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Marcel,
 
-A just thought to a few more things related to a sco socket.
-I just though to a real advantage of using socket for SCO (vs ALSA 
-device or character device).
-Using a character or block device usually means that the device is 
-connected. You can plug your USB mass storage device, and the /dev/sda 
-will be usefull.
-Sockets are usually used to connect to devices that the OS does not know 
-if they exist or not (think to a distant IP host: the kernel has no way 
-of knowing if it is valid are not. The connect call will just ask the 
-kernel to 'give a try', and bail out if the device does not exist).
-Having said that, this is really quite similar to the bluetooth 
-technology, where before you have tryed to connect, you don't know if 
-the device is on or off...)
+>> I'm not against this, even if it means more work...
+> 
+> I think it will be worth it.
+> 
+>> However i don't have any precise idea on which communication mechanism 
+>> to use between userspace/kernelspace. Any ideas ??
+> 
+> We might leave the socket for now. The alternative is a character device
+> or directly an ALSA sound card. Haven't fully thought about it either.
 
-And for kfifo use: it make sense, however the bad point is that all 
-bluez stack is coded with sk_buffs all over the place. Using kfifo
-today will mean having to do the following convertion:
+For the ALSA sound card, this is basically what snd-bt-sco does. The 
+issue with this alternative, is that the headset&handsfree profile 
+mandates the use of an RFCOMM channel before to use SCO. Doing this at 
+kernel level will mean that SCO layer will be dependant on RFCOMM 
+sockets, or that user space will have to handle RFCOMM channel before to 
+open ALSA device. This is roughly the way btsco works today. The result 
+is not very pretty :-(
 
-(hci core) kfifo --> (hci device) sk_buff
+>  
+>>> Let's have another patch on top of 2.6.16-mh1 and maybe you also wanna
+>>> adapt scotest for testing it.
+>>>
+>> Ok, i'm gonna work on that then...
+> 
+> The 2.6.16-mh2 is missing the automatic sniff mode patch, but only for
+> testing. It is coming back for sure.
 
-I think for now i'm gonna stick with sk_buffs :-)
-However i will have a look to see how to queue sk_buffs at hci core 
-layer instead of socket layer :-)
+Ok, i will stick with mh1 then....
 
 Cheers,
 
