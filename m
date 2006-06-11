@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <448C81FC.50509@xmission.com>
-Date: Sun, 11 Jun 2006 14:50:04 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <85cea3460606111303r218e088ek21d50709fce3c6df@mail.gmail.com>
-In-Reply-To: <85cea3460606111303r218e088ek21d50709fce3c6df@mail.gmail.com>
-Subject: Re: [Bluez-devel] btsco and connection problems
+Date: Sun, 11 Jun 2006 21:45:51 +0100
+From: Matthew Garrett <mjg59@srcf.ucam.org>
+To: bluez-devel@lists.sourceforge.net, hal@lists.freedesktop.org,
+        networkmanager-list@gnome.org
+Message-ID: <20060611204551.GA19920@srcf.ucam.org>
+Mime-Version: 1.0
+Subject: [Bluez-devel] [RFC] HAL/Bluez integration
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,27 +19,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Sweta
+I've put a tarball up at 
+http://www.codon.org.uk/~mjg59/tmp/hal-bluetooth.tar.gz as a first 
+attempt at some degree of integration. The current interface is 
+basically:
 
-> [root@lirr ~]# hcitool info 00:07:A4:26:8D:3F
-> Requesting information ...
-> Can't create connection: Connection timed out
+1) Bluetooth HCIs support a "Scan" method. Calling this will populate 
+the tree with any located bluetooth devices.
+2) Bluetooth devices support "Pair" and "Browse" methods. Calling the 
+first will attempt to initiate a pairing interaction - the second will 
+populate the tree with any services found on the device via SDP.
 
-> [root@lirr ~]# btsco 00:07:A4:26:8D:3F
-> Error: Failed to connect to SDP server: Function not implemented
-> Assuming channel 2
-> 
-> Can't connect RFCOMM channel: Resource temporarily unavailable
+So it's fairly simple at the moment. The obvious next step is to allow 
+services to provide rfcomm-binding methods and the like, and to ensure 
+that relevant pieces of service information are provided via sdp.
 
-something more fundamental is wrong with your setup if you can't get the
-rfcomm channel connected or an sdp scan. is the headset in pairing mode
-when you are trying this stuff?
+Now, there's a couple of issues:
 
-make sure /etc/bluetooth/hcid.conf has not been customized, try
-restarting the bluez utils, etc. that's the sort of thing I do, but
-there are probably more systematic ways of narrowing down the problem.
+1) I'm not sure about the pairing interface. Right now, calling the pair 
+method prompts hcid to attempt to send a message to a registered pairing 
+agent via bluetooth. This strikes me as a mild security problem, since 
+there's no mechanism for ensuring that it's the current user who has 
+registered a pairing agent. The best that can be done is to attempt to 
+register an agent, notice that the registration has failed and then bail 
+before attempting to make the connection (setting an appropriate error). 
+This isn't entirely ideal. David, can you see any way that PolicyKit can 
+help us here?
 
-brad
+2) The SDP interface in bluez is currently labelled "experimental" and 
+is fairly limited in functionality. I tried going back through the 
+mailing list archives, but the sourceforge interface makes me cry - has 
+there been discussion of what this interface should look like and the 
+technical problems involved?
+
+Obligatory screenshot - http://www.codon.org.uk/~mjg59/tmp/bluetooth.png
+
+-- 
+Matthew Garrett | mjg59@srcf.ucam.org
 
 
 _______________________________________________
