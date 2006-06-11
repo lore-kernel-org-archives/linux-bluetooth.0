@@ -1,7 +1,7 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Didier LINK <didier.link@wanadoo.fr>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1149986106.5358.27.camel@aeonflux.holtmann.net>
+In-Reply-To: <1149885500.17091.2.camel@neutrino.cosmos.net>
 References: <1149543750.14142.11.camel@neutrino.cosmos.net>
 	<1149544649.7238.1.camel@localhost>
 	<1149616008.9380.11.camel@neutrino.cosmos.net>
@@ -9,9 +9,9 @@ References: <1149543750.14142.11.camel@neutrino.cosmos.net>
 	<1149798394.23481.2.camel@neutrino.cosmos.net>
 	<d23110170606081814m434c5e15ia7de6c74b3bf2209@mail.gmail.com>
 	<1149885500.17091.2.camel@neutrino.cosmos.net>
-	<1149986106.5358.27.camel@aeonflux.holtmann.net>
-Date: Sun, 11 Jun 2006 11:24:52 +0200
-Message-Id: <1150017892.13788.1.camel@neutrino.cosmos.net>
+Content-Type: multipart/mixed; boundary="=-BIZfuba3J68pFQDOTc1W"
+Date: Sun, 11 Jun 2006 02:35:06 +0200
+Message-Id: <1149986106.5358.27.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] crazy mouse
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -23,81 +23,96 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1365861761=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 
---===============1365861761==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-JzNq6GlxMWR1VdZ5YMoS"
+--=-BIZfuba3J68pFQDOTc1W
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+Hi Didier,
+
+> > Hmm.. I can't see anything unusual. Only the automatic switch to sniff
+> > mode feature trying to hold the connection in active mode and your
+> > mouse turning it back to sniff mode. Could you give the 2.6.16-mh2 a
+> > try? It doesn't contain the automatic switch to sniff mode feature and
+> > we'll be able to see if that's causing your mouse problems.
+> 
+> Yes that's it, my mouse workd perfect with mh2 !! I don't understand but
+> if you want a tester for a newer patch just ask me ! :)
+
+please use 2.6.16-mh1 and the attached patch. That should make it work
+again as expected.
+
+Regards
+
+Marcel
 
 
---=-JzNq6GlxMWR1VdZ5YMoS
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
+--=-BIZfuba3J68pFQDOTc1W
+Content-Disposition: attachment; filename=patch
+Content-Type: text/x-patch; name=patch; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Le dimanche 11 juin 2006 =E0 02:35 +0200, Marcel Holtmann a =E9crit :
-> Hi Didier,
+diff -u b/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+--- b/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -154,6 +154,7 @@
+ 	__u16            interval;
+ 	__u16            link_policy;
+ 	__u32		 link_mode;
++	__u8             power_save;
+ 	unsigned long	 pend;
+ 
+ 	unsigned int	 sent;
+diff -u b/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+--- b/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -158,6 +158,8 @@
+ 	conn->mode   = HCI_CM_ACTIVE;
+ 	conn->state  = BT_OPEN;
+ 
++	conn->power_save = 1;
++
+ 	skb_queue_head_init(&conn->data_q);
+ 
+ 	init_timer(&conn->disc_timer);
+@@ -387,7 +389,7 @@
+ 	if (test_bit(HCI_RAW, &hdev->flags))
+ 		return;
+ 
+-	if (conn->mode != HCI_CM_SNIFF)
++	if (conn->mode != HCI_CM_SNIFF || !conn->power_save)
+ 		goto timer;
+ 
+ 	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
+diff -u b/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+--- b/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -881,7 +881,12 @@
+ 		conn->mode = ev->mode;
+ 		conn->interval = __le16_to_cpu(ev->interval);
+ 
+-		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
++		if (!test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
++			if (conn->mode == HCI_CM_ACTIVE)
++				conn->power_save = 1;
++			else
++				conn->power_save = 0;
++		}
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
 
-Hi,
-
->=20
-> > > Hmm.. I can't see anything unusual. Only the automatic switch to snif=
-f
-> > > mode feature trying to hold the connection in active mode and your
-> > > mouse turning it back to sniff mode. Could you give the 2.6.16-mh2 a
-> > > try? It doesn't contain the automatic switch to sniff mode feature an=
-d
-> > > we'll be able to see if that's causing your mouse problems.
-> >=20
-> > Yes that's it, my mouse workd perfect with mh2 !! I don't understand bu=
-t
-> > if you want a tester for a newer patch just ask me ! :)
->=20
-> please use 2.6.16-mh1 and the attached patch. That should make it work
-> again as expected.
-
-Yes, it works perfect now ! Thanks a lot ! :)
-
-Best regards.
-
-Didier
-
---=20
-Didier Link <didier.link@wanadoo.fr>
-Jabber : zanfib@ims.kelkoo.net
-MSN : zanfib@hotmail.fr
-SIP : Zanfib@ekiga.net
-
-Cl=E9 GPG : 75BAC9EE
-
---=-JzNq6GlxMWR1VdZ5YMoS
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: Ceci est une partie de message
-	=?ISO-8859-1?Q?num=E9riquement?= =?ISO-8859-1?Q?_sign=E9e?=
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.3 (GNU/Linux)
-
-iD8DBQBEi+FkkyPwinW6ye4RApbUAJ9g4jHnto4NoOsnt/sDgATL62+KxwCeLn0x
-FBZAmBt0UEjULkuKz4rC0sc=
-=G5t/
------END PGP SIGNATURE-----
-
---=-JzNq6GlxMWR1VdZ5YMoS--
-
-
-
---===============1365861761==
+--=-BIZfuba3J68pFQDOTc1W
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 
---===============1365861761==
+--=-BIZfuba3J68pFQDOTc1W
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -108,4 +123,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1365861761==--
+--=-BIZfuba3J68pFQDOTc1W--
