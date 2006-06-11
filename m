@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <6db221bd0606110314w11c2ea96qab02c13dc87963f9@mail.gmail.com>
-References: <6db221bd0606110314w11c2ea96qab02c13dc87963f9@mail.gmail.com>
-Date: Mon, 12 Jun 2006 08:14:36 +0200
-Message-Id: <1150092876.2589.2.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] configure bluetooth device in parked or hold mode
+Message-ID: <6db221bd0606110314w11c2ea96qab02c13dc87963f9@mail.gmail.com>
+Date: Sun, 11 Jun 2006 12:14:29 +0200
+From: "=?ISO-8859-1?Q?Jose_Antonio_Rodr=EDguez?=" <dilbert88@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] configure bluetooth device in parked or hold mode
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,29 +14,56 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1262088378=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jose,
+--===============1262088378==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_475_5146763.1150020869581"
 
-> I need to configure parked or hold mode in a bluetooth device. Does
-> anyone knows how to do it?
+------=_Part_475_5146763.1150020869581
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-the support for park state and hold mode is activated by default if the
-local adapter supports it. BlueZ at the moment never enforces park state
-or hold mode. Both power mode are not really useful. If you wanna save
-power you should use sniff mode. The latest -mh patch contains support
-for the automatic sniff mode feature.
+hi,
 
-Regards
+I need to configure parked or hold mode in a bluetooth device. Does anyone
+knows how to do it?
 
-Marcel
+Thanks
+
+------=_Part_475_5146763.1150020869581
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+hi, <br>
+<br>
+I need to configure parked or hold mode in a bluetooth device. Does anyone knows how to do it?<br>
+<br>
+Thanks<br>
+
+------=_Part_475_5146763.1150020869581--
 
 
+--===============1262088378==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
+
+--===============1262088378==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1262088378==--
