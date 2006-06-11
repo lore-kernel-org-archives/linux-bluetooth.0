@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 11 Jun 2006 21:45:51 +0100
-From: Matthew Garrett <mjg59@srcf.ucam.org>
-To: bluez-devel@lists.sourceforge.net, hal@lists.freedesktop.org,
-        networkmanager-list@gnome.org
-Message-ID: <20060611204551.GA19920@srcf.ucam.org>
-Mime-Version: 1.0
-Subject: [Bluez-devel] [RFC] HAL/Bluez integration
+Message-ID: <85cea3460606111303r218e088ek21d50709fce3c6df@mail.gmail.com>
+Date: Sun, 11 Jun 2006 16:03:08 -0400
+From: "Sweta Vasudevan" <sweta.vasudevan@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] btsco and connection problems
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,50 +14,178 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0933501201=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I've put a tarball up at 
-http://www.codon.org.uk/~mjg59/tmp/hal-bluetooth.tar.gz as a first 
-attempt at some degree of integration. The current interface is 
-basically:
+--===============0933501201==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_6949_22614378.1150056188673"
 
-1) Bluetooth HCIs support a "Scan" method. Calling this will populate 
-the tree with any located bluetooth devices.
-2) Bluetooth devices support "Pair" and "Browse" methods. Calling the 
-first will attempt to initiate a pairing interaction - the second will 
-populate the tree with any services found on the device via SDP.
+------=_Part_6949_22614378.1150056188673
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-So it's fairly simple at the moment. The obvious next step is to allow 
-services to provide rfcomm-binding methods and the like, and to ensure 
-that relevant pieces of service information are provided via sdp.
+Hi all,
 
-Now, there's a couple of issues:
+I am trying to get audio-bluetooth working on my linux system-I was hoping
+that you could help me out with the errors I'm getting. I am using a Fedora
+Core4  2.6.16 kernel, DLink DBT 120 USB(revision B3)  and Jabra BT 250
+headset.
 
-1) I'm not sure about the pairing interface. Right now, calling the pair 
-method prompts hcid to attempt to send a message to a registered pairing 
-agent via bluetooth. This strikes me as a mild security problem, since 
-there's no mechanism for ensuring that it's the current user who has 
-registered a pairing agent. The best that can be done is to attempt to 
-register an agent, notice that the registration has failed and then bail 
-before attempting to make the connection (setting an appropriate error). 
-This isn't entirely ideal. David, can you see any way that PolicyKit can 
-help us here?
+The headset is detected(hcitool scan), but I'm not able to connect to it:
 
-2) The SDP interface in bluez is currently labelled "experimental" and 
-is fairly limited in functionality. I tried going back through the 
-mailing list archives, but the sourceforge interface makes me cry - has 
-there been discussion of what this interface should look like and the 
-technical problems involved?
+[root@lirr ~]# hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:0D:88:AC:18:A7 ACL MTU: 192:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:107 acl:0 sco:0 events:14 errors:0
+        TX bytes:300 acl:0 sco:0 commands:13 errors:0
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'lirr.cs.columbia.edu-0'
+        Class: 0x120104
+        Service Classes: Networking
+        Device Class: Computer, Desktop workstation
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
+0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
 
-Obligatory screenshot - http://www.codon.org.uk/~mjg59/tmp/bluetooth.png
+  [root@lirr ~]# hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:0D:88:AC:18:A7 ACL MTU: 192:8 SCO MTU: 64:8
+        HCI 16.4
+        Chip version: BlueCore02-External
+        Max key size: 56 bit
+        SCO mapping:  HCI
 
--- 
-Matthew Garrett | mjg59@srcf.ucam.org
+[root@lirr ~]# hcitool info 00:07:A4:26:8D:3F
+Requesting information ...
+Can't create connection: Connection timed out
 
+[root@lirr ~]# hcidump -X
+HCI sniffer - Bluetooth packet analyzer ver 1.18
+device: hci0 snap_len: 1028 filter: 0xffffffff
+(this one hangs forever)
+
+[root@lirr ~]# btsco 00:07:A4:26:8D:3F
+Error: Failed to connect to SDP server: Function not implemented
+Assuming channel 2
+
+Can't connect RFCOMM channel: Resource temporarily unavailable
+
+[root@lirr ~]# btsco -v 00:07:A4:26:8D:3F
+btsco v0.42
+Device is 1:0
+Error: Failed to connect to SDP server: Function not implemented
+Assuming channel 2
+
+Voice setting: 0x0060
+Can't connect RFCOMM channel: Resource temporarily unavailable
+
+
+I made sure that hcid and sdpd are running.
+I must be missing something obvious, but can't seem figure it out.
+
+Thanks,
+sv.
+
+------=_Part_6949_22614378.1150056188673
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<div><div>Hi all,</div>
+<div>&nbsp;</div>
+<div>I am trying to get audio-bluetooth working on my linux system-I
+was hoping that you could help me out with the errors I'm getting. I am
+using a Fedora Core4&nbsp; 2.6.16 kernel, DLink DBT 120
+USB(revision&nbsp;B3) &nbsp;and Jabra BT 250 headset.&nbsp;
+<br>&nbsp;<br>The headset is detected(hcitool scan), but I'm not able to connect to it:</div>
+<div>&nbsp;<br>
+[root@lirr ~]# hciconfig -a<br>
+hci0:&nbsp;&nbsp; Type: USB<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:0D:88:AC:18:A7 ACL MTU: 192:8 SCO MTU: 64:8<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:107 acl:0 sco:0 events:14 errors:0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:300 acl:0 sco:0 commands:13 errors:0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy: RSWITCH HOLD SNIFF PARK<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link mode: SLAVE ACCEPT<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'lirr.cs.columbia.edu-0'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class: 0x120104<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Service Classes: Networking<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Device Class: Computer, Desktop workstation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufacturer: Cambridge Silicon Radio (10)<br>
+<br>
+</div>
+<div>&nbsp;[root@lirr ~]# hciconfig hci0 revision<br>
+hci0:&nbsp;&nbsp; Type: USB<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:0D:88:AC:18:A7 ACL MTU: 192:8 SCO MTU: 64:8<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI 16.4<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Chip version: BlueCore02-External<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Max key size: 56 bit<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SCO mapping:&nbsp; HCI<br>
+<br>
+[root@lirr ~]# hcitool info 00:07:A4:26:8D:3F<br>
+Requesting information ...<br>
+Can't create connection: Connection timed out<br>
+<br>
+[root@lirr ~]# hcidump -X<br>
+HCI sniffer - Bluetooth packet analyzer ver 1.18<br>
+device: hci0 snap_len: 1028 filter: 0xffffffff<br>
+(this one hangs forever)<br>
+<br>
+[root@lirr ~]# btsco 00:07:A4:26:8D:3F<br>
+Error: Failed to connect to SDP server: Function not implemented<br>
+Assuming channel 2<br>
+<br>
+Can't connect RFCOMM channel: Resource temporarily unavailable<br>
+<br>
+[root@lirr ~]# btsco -v 00:07:A4:26:8D:3F<br>
+btsco v0.42<br>
+Device is 1:0<br>
+Error: Failed to connect to SDP server: Function not implemented<br>
+Assuming channel 2<br>
+<br>
+Voice setting: 0x0060<br>
+Can't connect RFCOMM channel: Resource temporarily unavailable<br>
+<br>
+<br>
+I made sure that hcid and sdpd are running. <br>
+I must be missing something obvious, but can't seem figure it out.<br>
+<br>
+Thanks,<br>
+sv.<br>
+</div>
+
+</div>
+
+
+------=_Part_6949_22614378.1150056188673--
+
+
+--===============0933501201==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+
+--===============0933501201==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0933501201==--
