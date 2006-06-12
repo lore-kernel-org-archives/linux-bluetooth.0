@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Johannes Kapune <listen@kapune.de>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Mon, 12 Jun 2006 23:38:55 +0200
-Message-Id: <1150148335.7372.7.camel@johannes_01.kapune.local>
-Mime-Version: 1.0
-Subject: [Bluez-users] Can't play mp3, what I'm missing?
-Reply-To: listen@kapune.de, BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <448DB88D.8080306@stfw.eu>
+Date: Mon, 12 Jun 2006 19:55:09 +0100
+From: Zhares <ml-sourceforge@stfw.eu>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] hidd error 14 (Bad address) on ubuntu ppc
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,61 +18,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
-I try to play mp3 with my headphones but I get some errors.
-you give me a little help?
+Hi
 
-Both versions written in the README won't work.
+I'm trying to connect my bluetooth apple keyboard and my logitech MX900 
+to the internal dongle of my mac G5 with the latest ubuntu and I have 
+some troubles: The hidd program failed in a call to ioctl that set errno 
+to 14.
+I tried the brand new version 3.0 as well and I still have the same 
+problem. This bug has been confirmed in ubuntu but nobody seems to want 
+to work on it:
+https://launchpad.net/distros/ubuntu/+source/bluez-utils/+bug/32415
+The current solution is to remove bluez, which mean the bluetooth dongle 
+stays in HID mode (used to have the keyboard in bootloader) and every 
+mouse/keyboard device paired with OSX are working fine (except the mouse 
+wheel and eject button).
+This is not a solution for me since I would like to use the dongle for 
+phone transfer and a bluetooth headset as well.
+It seems nobody else care about this bug because they are fine with the 
+hid mode. Also, most researches on the subject are hidden by people who 
+just want to pair with there devices.
 
-Johannes
+Pairing works fine for me and file transfer as well. The bluetooth 
+headset is also making a ioctl error. And I've got the same error with 3 
+other bluetooth dongles.
 
+I tried to understand how the program works but it is not easy since it 
+is not commented. I think I can fix the bug by myself but I need some 
+help to run proper debugging sessions. Since this problem seems to only 
+happen on linux ppc, I suspect there is a big-endian problem somewhere 
+in the structures but I have no idea of where to start looking at. Maybe 
+someone has a better idea of what the problem is and can tell me where 
+to look.
 
+Thanks in advance for your answers
 
-johannes@johannes_01:~/btsco> mpg123 --au - Din_Tei.mp3 | ./a2play
-00:0A:94:A0:59:3b
-subbands = 8 blocks = 16 bitpool = 32
-High Performance MPEG 1.0/2.0/2.5 Audio Player for Layer 1, 2, and 3.
-Version 0.59q (2002/03/23). Written and copyrights by Joe Drew.
-Uses code from various people. See 'README' for more!
-THIS SOFTWARE COMES WITH ABSOLUTELY NO WARRANTY! USE AT YOUR OWN RISK!
-Title  : Dragostea Din Tei               Artist: Haiducii
-Album  :                                 Year  : 2004
-Comment: I&T okay                        Genre : Blues
+-- 
 
-Playing MPEG stream from Din_Tei.mp3 ...
-MPEG 1.0 layer III, 192 kbit/s, 44100 Hz stereo
-len=2048
-Header size=28
-Sample Rate:44100
-Channels:2
-Using address: 00:0A:94:A0:59:3b
-Found A2DP Sink
-Found A2DP Sink at the destination
-Can't connect to 3B:59:A0:94:0A:00. Connection refused(111)
-cannot open psm_cmd = 25
-
-
-
-
-johannes@johannes_01:~/btsco> mpg123 --au - Din_Tei.mp3 | sbc/sbcenc -
-| ./sbc/rcplay 00:0A:94:A0:59:3b -
-High Performance MPEG 1.0/2.0/2.5 Audio Player for Layer 1, 2, and 3.
-Version 0.59q (2002/03/23). Written and copyrights by Joe Drew.
-Uses code from various people. See 'README' for more!
-THIS SOFTWARE COMES WITH ABSOLUTELY NO WARRANTY! USE AT YOUR OWN RISK!
-Title  : Dragostea Din Tei               Artist: Haiducii
-Album  :                                 Year  : 2004
-Comment: I&T okay                        Genre : Blues
-
-Playing MPEG stream from Din_Tei.mp3 ...
-MPEG 1.0 layer III, 192 kbit/s, 44100 Hz stereo
-Can't get channel number: Success
-johannes@johannes_01:~/btsco>
-
-
-
-
-
+Zhares
 
 
 
