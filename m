@@ -1,18 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <564d96fb0606120452m4e4ced33x66ca63fd675ad3@mail.gmail.com>
-Date: Mon, 12 Jun 2006 08:52:30 -0300
-From: "=?UTF-8?Q?Rafael_Esp=C3=ADndola?=" <rafael.espindola@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1150099297.2589.15.camel@aeonflux.holtmann.net>
+Message-ID: <c9a3e4540606120325q4f460c53l3372d8421cc1ecdd@mail.gmail.com>
+Date: Mon, 12 Jun 2006 10:25:07 +0000
+From: "ronnie sahlberg" <ronniesahlberg@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-References: <564d96fb0606060325q834360bqe4e9d41cbb28a16f@mail.gmail.com>
-	<1149714650.22472.62.camel@localhost>
-	<564d96fb0606071459i7367f84fkb7ee645941f84279@mail.gmail.com>
-	<1149718288.22472.71.camel@localhost>
-	<564d96fb0606081007p3fb8ea42v5926c80eb1cc9657@mail.gmail.com>
-	<1149884042.3985.6.camel@aeonflux.holtmann.net>
-	<1150099297.2589.15.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] bug in sdp_gen_pd
+Subject: [Bluez-devel] Ethereal/Wireshark support for bluetooth,
+	developer needs sample captures
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -26,28 +19,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-> please use the latest bluez-utils-3.0 release and call this three
-> commands:
->
->         sdptool add sp
->         sdptool browse local
->         sdptool browse --raw local
->
-> You will see that the string values are wrong for the third commands.
-> Can you please check what happens here.
-I am unable to reproduce. I have just compiled bluez-libs-3.0 and
-bluz-utils-3.0 (using the just compiled lib) and the output is equal
-to the installed 2.25.
+Hi again list.
 
-> Regards
->
-> Marcel
+I have modified and checked in most of the protocols from the affix
+patch to ethereal   into the new wireshark svn repository.
+www.wireshark.com
 
-Best Regards,
+(wireshark is the new name for ethereal. no drama. simple trademark issue)
 
---
-Rafael,
-INdT
+This is support to read hcidump files natively in wireshark and to
+decode the actual packets.
+
+
+Right now what is still remaining and what I would like example
+captures to test with would be
+BNEP: bnep is currently not implemented and I would need some hcidump
+captures with this kind of traffic. Once i have example captures of
+bnep it would be easy to do the required modifications and check in
+support for it.
+
+RFCOMM: rfcomm is implemented   but what is not implemented is the
+de-escaping of ppp and dissection of ppp ontop rfcomm.
+
+
+
+Would someone here have any captures they can share with me so i can
+finish off implementing bnep and rfcomm support in wireshark?
+I would need any capture with bnep traffic  as well as a capture with
+RFCOMM where ppp is transported atop RFCOMM.
+
+
+best regards
+ronnie s
+
+
+(you guys should actually talk some with the tcpdump.org people and
+add support four your bluetooth interface to pcap, so that one could
+capture natively from pcap applications such as wireshark, tcpdump
+etc.)
 
 
 _______________________________________________
