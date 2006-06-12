@@ -1,245 +1,164 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <448D9B2F.8010706@unina.it>
-Date: Mon, 12 Jun 2006 18:49:51 +0200
-From: Marcello Cinque <macinque@unina.it>
+Return-Path: <philipl@mail.utexas.edu>
+Message-ID: <448D88EE.3030902@mail.utexas.edu>
+Date: Mon, 12 Jun 2006 08:31:58 -0700
+From: Philip Langdale <philipl@mail.utexas.edu>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: multipart/mixed; boundary="------------070509000109030605070704"
-Subject: [Bluez-devel] Fwd:  hci connect and switch role modifications
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: bluez-devel@lists.sourceforge.net
+Subject: Observations from mx-5000 bluetooth keyboard + mouse combo
+Content-Type: multipart/mixed;
+ boundary="------------000206080001000808010207"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
 This is a multi-part message in MIME format.
---------------070509000109030605070704
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+--------------000206080001000808010207
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 
-Hi Marcel,
+Marcel,
 
-in february I sent you the email in the following, about some proposed 
-modifications in the HCI connect and switch role APIs. At that time, I also attached 
-you the unified diff files, which I'm attaching also now.
-Anyway, I didn't receive any reply. Do you think these modifications are 
-likely to be integrated in next releases?
+I originally sent these observations at the end of april but
+you were busy at that time and I guess it passed by without
+you noticing.
+
+0) Everything works fine in HID mode. All the buttons on the mouse
+   and keyboard work correctly at the input level as reported by evtest.
+
+1) The patch to hid2hci.c that Trevor Joynson provided and which was
+incorporated is not correct - and this is consistent with the reported
+experience of other people with the di novo laser desktop combo.
+
+- the 0x0b02 device is the usb hub itself and it is not the right thing
+  to attempt to switch to hci mode. Rather, you try to switch the HID
+  devices themselves. In the case of the mx-5000, the hid devices are
+  0xc70a (the mouse) and 0xc70e (the keyboard). I belive that the
+  di novo devices are 0xc70b and 0xc70c.
+
+- Once switched, the hci device appears as 0xc709 - the same as in the
+  di novo receiver.
+
+2) I did not need Trevor's hci_usb patch, which Marcel did not see a
+   need for either.
+
+3) I applied the mh patches (now 2.6.16-mh3) to get HID report mode.
+
+4) In HID report mode, the HWHEEL is mangled at some point. Instead of
+   reporting a usage of 0x10036, it reports 0xC0238, causing it to be
+   marked as an unknown button. I put a hack into hidp's hid.c to catch
+   this case and rewrite the usage. The rest of the characteristics seem
+   to be correct and the horizontal scrolling works correctly.
+
+   I don't know if the mouse is just reporting the wrong value or if the
+   usage is getting mangled somewhere in the stack.
+
+5) The keyboard also sees modified usages, but this is definitely in the
+   hidp driver:
+
+   This step is in hidinput_configure_usage:
+
+   while (usage->code <= max && test_and_set_bit(usage->code, bit)) {
+       usage->code = find_next_zero_bit(bit, max + 1, usage->code);
+   }
+
+   eg: It mangles KEY_UNDO (131) into KEY_SENDFILE (145) which doesn't
+   seem very useful.
+
+   It's not the end of the world if the desktop environment/application
+   supports configurable keybindings, but it's still not correct.
+
+6) The keyboard has HID consumer reports that hidp doesn't know about.
+   So, I added entries for them in hidinput_configure_usage and now they
+   work fine.
+
+7) Not a driver matter, but the keyboard features keys that generate no
+   bluetooth traffic, at least as far as hcidump is concerned. My
+   conclusion was that these buttons are only activated by firmware that
+   you download to the keyboard in windows - but I currently have the
+   basic firmware running on the keyboard (Gives me data/time/temp) and
+   none of these keys work in linux. Philip Lawatsch thinks that it's
+   not quite as simple as I describe - he says the firmware files are
+   too small to actually include code that would program the buttons
+   at a low level. These non-functional buttons also don't work in HID
+   proxy mode, in case you were wondering.
+
+8) No idea how extra stuff like battery levels and tweaking the cruise
+   control buttons works. Tools like locomo don't work (and they don't
+   work with the mx900 either). Could such things still be done through
+   the HID endpoints in HCI mode or would they have to be done at the
+   bluetooth level? If it's at the bluetooth level, should we see an
+   explicit service of somesort listed?
+
+I've attached the hidp patch that I'm using the fix the HWHEEL and the
+extra keyboard events, but this is hardly directly applicable. If
+nothing else, a proper quirks infrastructure is needed for the HWHEEL
+handling.
+
 Thanks,
-Marcello.
 
+--phil
 
-
-
-Subject:
-Re: [Bluez-devel] hci connect and switch role modifications
-From:
-Capaianca <fcornevilli@gmail.com>
-Date:
-Tue, 21 Feb 2006 17:03:36 +0100
-
-To:
-bluez-devel@lists.sourceforge.net
-
-
-Hi Marcel,
-
-  as requested, we have attached the unified diff files of our 
-modifications. Basically, we added a couple mechanisms that may use to 
-prevent some errors from occurring (error masking mechanisms). The 
-mechanisms are part of the results of our research on bluetooth 
-networks. Perhaps the same strategies  can  be  generalized and applied  
-on several parts of the code in order to improve the overall robustness 
-of the BlueZ stack.
-
-Specifically, in the hci.c file (and related hci_lib.h) we added two 
-functions that may help to solve some problems which may arise when 
-creating connections or when switching the role. These functions are 
-called "hci_create_connection_timed" and "hci_switch_role_checked".
-
-The hci_create_connection_timed function first creates a connection and 
-then checks whether the handle is valid (>0) until a given timeout 
-expires. The timeout is specified as an additional parameter, in 
-milliseconds.
-We created this function because, while working with bluetooth, we 
-noticed that to get a valid handle over a connection may take some time, 
-even after that the hci_create_connection function return, due to the 
-asynchronous nature of the connection creation process. This could 
-result in a error when subsequent calls are performed over the 
-connection with a handle that is still not valid (e.g. a bnep create 
-connection call over an already created l2cap connection, or a switch 
-role command). This function avoids this problem because it returns with 
-no errors only if the created connection has a valid handle.
-It is worth noting that the function returns a "timer expired (ETIME)" 
-error even when the connection is created. This happens when the timeout 
-expires but the connection still has a not valid handle. However, the 
-handle could become valid after the function exits.
-
-The hci_switch_role_checked function performs a similar task. During our 
-tests we noticed that sometimes the hci_switch_role function exits with 
-a EIO error even if the role was actually switched. This problem may be 
-due to a temporary bad state of the rp.status value during the switch 
-role process attempt. To overcome this problem, after an invalid check 
-of rp.status value, our function reads the linkmode of the connection to 
-check the real status after a little amount of time (100ms in the 
-current version). If the role is not switched, further attempts are made 
-until a timeout expires. This timeout is provided as an input parameter 
-to our function.
-This function resulted particularly useful when using PDA and other 
-limited resources devices where the time required to perform the switch 
-role may be longer and may result in errors signaled by the original 
-hci_switch_role function even if the role was actually switched.
-
-
-We preferred to provide two new functions rather than modifying the 
-original ones. This way the user can choose to use the function that 
-better suites his requirements.
-
-In order to test and use the new functionalities, we also slightly 
-modified the hcitool.c program, so as to add an optional parameter 
-"--timeout" to both the "cc" and "sr" commands. If the parameter is 
-specified the new functions are called, otherwise the original functions 
-are used.
-
-Hope this can be of interest and help the BlueZ community.
-
-Best regards,
-Marcello Cinque
-Fabio Cornevilli
-Mobilab Research Group - www.mobilab.unina.it
-
-Hi Marcello,
-
- 
-
-> we are working with Bluetooth and BlueZ since two years, and during the
-> development of a field failure data analysis of Bluetooth networks, we
-> experienced some annoying and frequent runtime errors that could be 
-> avoided.
-> Those errors concern the creation of a L2CAP connection via HCI and 
-> the role
-> switch operation. However, we discovered how to prevent these errors from
-> occurring, by adding a little amount of code in the 
-> hci_create_connection and
-> hci_switch_role functions in hci.c.  
-> We would like to contribute to the development and let the community 
-> know and
-> evaluate these modifications.
->
-> If you are interested, let us know what is the procedure to contribute.
->     
-
-
-simply sent a unified diff against the latest CVS to the mailing list.
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc. Do you grep through log 
-files
-for problems?  Stop!  Download the new AJAX search engine that makes
-searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
-http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
--- 
-Il messaggio e' stato analizzato alla ricerca di virus o
-contenuti pericolosi da MailScanner, ed e'
-risultato non infetto.
-
-
---------------070509000109030605070704
-Content-Type: application/gzip;
- name="diffiles.tar.gz"
-Content-Transfer-Encoding: base64
+--------------000206080001000808010207
+Content-Type: text/x-patch;
+ name="phil-bt-hid.diff"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline;
- filename="diffiles.tar.gz"
+ filename="phil-bt-hid.diff"
 
-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
+--- linux/net/bluetooth/hidp/hid.c.org	2006-06-06 22:48:24.000000000 -0700
++++ linux/net/bluetooth/hidp/hid.c	2006-06-06 22:47:59.000000000 -0700
+@@ -1137,6 +1137,10 @@
+ 	int is_abs = 0;
+ 	unsigned long *bit;
+ 
++	if (usage->hid == 0xC0238) {
++		usage->hid = 0x10036;
++	}
++
+ 	switch (usage->hid & HID_USAGE_PAGE) {
+ 
+ 		case HID_UP_KEYBOARD:
+@@ -1291,10 +1295,20 @@
+ 				case 0x0e9: usage->code = KEY_VOLUMEUP;		break;
+ 				case 0x0ea: usage->code = KEY_VOLUMEDOWN;	break;
+ 
+-				case 0x183: usage->code = KEY_CONFIG;		break;
++//				case 0x183: usage->code = KEY_CONFIG;		break;
++			case 0x183: usage->code = KEY_MEDIA;		break;
++			case 0x184: usage->code = KEY_PROG1;		break;
++			case 0x186: usage->code = KEY_PROG2;		break;
++			case 0x188: usage->code = KEY_PROG3;		break;
+ 				case 0x18a: usage->code = KEY_MAIL;		break;
+ 				case 0x192: usage->code = KEY_CALC;		break;
+ 				case 0x194: usage->code = KEY_FILE;		break;
++			case 0x1b6: usage->code = KEY_DOCUMENTS;	break;
++			case 0x1b7: usage->code = KEY_SOUND;		break;
++			case 0x1b8: usage->code = KEY_CAMERA;		break;
++			case 0x1bc: usage->code = KEY_CHAT;		break;
++			case 0x207: usage->code = KEY_SAVE;		break;
++			case 0x208: usage->code = KEY_PRINT;		break;
+ 				case 0x21a: usage->code = KEY_UNDO;		break;
+ 				case 0x21b: usage->code = KEY_COPY;		break;
+ 				case 0x21c: usage->code = KEY_CUT;		break;
+@@ -1308,6 +1322,11 @@
+ 				case 0x227: usage->code = KEY_REFRESH;		break;
+ 				case 0x22a: usage->code = KEY_BOOKMARKS;	break;
+ 
++			case 0x22d: usage->code = KEY_KBDILLUMUP;	break;
++			case 0x22e: usage->code = KEY_KBDILLUMDOWN;	break;
++			case 0x230: usage->code = KEY_KBDILLUMTOGGLE;	break;
++			case 0x279: usage->code = KEY_REDO;		break;
++
+ 				default:    usage->code = KEY_UNKNOWN;		break;
+ 			}
+ 
+@@ -1389,7 +1408,7 @@
+ 		default:
+ 		unknown:
+ 			resolv_usage(usage->hid);
+-
++return;
+ 			if (field->report_size == 1) {
+ 
+ 				if (field->report->type == HID_OUTPUT_REPORT) {
 
---------------070509000109030605070704
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-
---------------070509000109030605070704
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------070509000109030605070704--
+--------------000206080001000808010207--
