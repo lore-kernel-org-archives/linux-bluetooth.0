@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <768ccca40606121319y38801e69h40c9d1a4ecd4aa95@mail.gmail.com>
-Date: Mon, 12 Jun 2006 22:19:56 +0200
-From: "Eduardo Margallo" <eduardo.margallo@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4483B5E4.7000305@xmission.com>
+Message-ID: <448D9B2F.8010706@unina.it>
+Date: Mon, 12 Jun 2006 18:49:51 +0200
+From: Marcello Cinque <macinque@unina.it>
 MIME-Version: 1.0
-References: <768ccca40606041514m77eea4cer437d3ea227d3eec8@mail.gmail.com>
-	<4483B5E4.7000305@xmission.com>
-Subject: Re: [Bluez-devel] Broadcom adapter
+To: bluez-devel@lists.sourceforge.net
+Content-Type: multipart/mixed; boundary="------------070509000109030605070704"
+Subject: [Bluez-devel] Fwd:  hci connect and switch role modifications
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,283 +15,231 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
+This is a multi-part message in MIME format.
+--------------070509000109030605070704
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-well, in fact using the Broadcom Adapter under Windows with
-BlueSoleil, I get a perfect audio connection. After pairing, I just
-have to press the top button on my Jabra Headset and voil=E0. I have
-attached the HCI communication (monitoring usb traffic and decoding
-the packages in python) between both devices.
+Hi Marcel,
 
-This sequence started when I pressed the connect button with both
-devices paired. I stopped it after SCO traffic was going on. If you
-need a different connection sequence, I can provide it. It is not a
-lot of work now.
-
-Cheers,
-
-Eduardo
-
-------------------------------------------------
-UP EVT: Connection Request Event Data =3D D3 73 7C 17 13 00 0C 04 20 01
-        BD_ADDR 0x13177C73D3 Class_of_Device 0x20040C Link_Type 0x1
-DOWN CMD: Accept Connection Request Command Data =3D 07 D3 73 7C 17 13 00 00
-        BD_ADDR 0x13177C73D3 Role 0x0 Remaining Data:  [0]
-UP EVT: Command Status Event Data =3D 00 01 09 04
-        Status 0x0 Num_HCI_Command_Packets 0x1 Command_Opcode 0x409
-UP CMD: Accept Connection Request Command Data =3D 07 D3 73 7C 17 13 00
-00 20 00 00 00 00 00 0A 00
-        BD_ADDR 0x13177C73D3 Role 0x0 Remaining Data:  [0, 32, 0, 0,
-0, 0, 0, 10, 0]
-UP EVT: Role Change Event Data =3D 00 D3 73 7C 17 13 00 00
-        Status 0x0 BD_ADDR 0x13177C73D3 New_Role 0x0
-UP EVT: Link Key Request Event Data =3D D3 73 7C 17 13 00
-        BD_ADDR 0x13177C73D3
-DOWN CMD: Link Key Request Reply Command Data =3D 16 D3 73 7C 17 13 00
-13 80 BA 19 E9 DC B3 A0 E5 8D A3 63 91 A1 BB E9
-        BD_ADDR 0x13177C73D3 Link_Key 0xE9BBA19163A38DE5A0B3DCE919BA8013
-UP CMD: Link Key Request Reply Command Data =3D 16 D3 73 7C 17 13 00 13
-80 BA 19 E9 DC B3 A0 E5 8D A3 63 91 A1 BB E9 20 00 00 00 00 00 19 00
-        BD_ADDR 0x13177C73D3 Link_Key
-0xE9BBA19163A38DE5A0B3DCE919BA8013 Remaining Data:  [32, 0, 0, 0, 0,
-0, 25, 0]
-UP EVT: Command Complete Event Data =3D 01 0B 04 00 D3 73 7C 17 13 00
-        Num_HCI_Command_Packets 0x1 Command_Opcode 0x0 Remaining Data:
- [1, 11, 4, 0, 211, 115, 124, 23, 19, 0]
-UP EVT: Connection Complete Event Data =3D 00 07 00 D3 73 7C 17 13 00 01 01
-        Status 0x0 Connection_Handle 0x7 BD_ADDR 0x13177C73D3
-Link_Type 0x1 Encryption_Mode 0x1
-DOWN CMD: Write Link Policy Settings Command Data =3D 04 07 00 07 00
-        Remaining Data:  [7, 0, 7, 0]
-UP ACL: conn=3D7 flags=3D 2 Data =3D  08 00 01 00 02 01 04 00 01 00 61 00
-        L2CAP len=3D8 ch=3D1 Command=3DConnection request PSM 0x1 Src ID 0x=
-61
-UP CMD: Write Link Policy Settings Command Data =3D 04 07 00 07 00 20 00
-00 00 00 00 07 00
-        Remaining Data:  [7, 0, 7, 0, 32, 0, 0, 0, 0, 0, 7, 0]
-UP EVT: Command Complete Event Data =3D 01 0D 08 00 07 00
-        Num_HCI_Command_Packets 0x1 Command_Opcode 0x0 Remaining Data:
- [1, 13, 8, 0, 7, 0]
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0c 00 01 00 03 01 08 00 42 00 61 00 0=
-0 00 00 00
-        L2CAP len=3D12 ch=3D1 Command=3DConnection response Dest ID 0x42 Src
-ID 0x61 Result 0x0 Status 0x0
-UP ACL: conn=3D7 flags=3D 2 Data =3D  08 00 01 00 04 04 04 00 61 00 00 00
-        L2CAP len=3D8 ch=3D1 Command=3DConfigure request Dest ID 0x61 Flags=
- 0x0
-DOWN CMD: Write Link Supervision Timeout Command Data =3D 04 07 00 00 7D
-        Remaining Data:  [7, 0, 0, 125]
-UP EVT: Command Complete Event Data =3D 01 37 0C 00 07 00
-        Num_HCI_Command_Packets 0x1 Command_Opcode 0x0 Remaining Data:
- [1, 55, 12, 0, 7, 0]
-UP CMD: Write Link Supervision Timeout Command Data =3D 04 07 00 00 7D
-20 00 00 00 00 00 07 00
-        Remaining Data:  [7, 0, 0, 125, 32, 0, 0, 0, 0, 0, 7, 0]
-DOWN CMD: Read Clock Offset Command Data =3D 02 07 00
-        Remaining Data:  [7, 0]
-UP EVT: Number Of Completed Packets Event Data =3D 01 07 00 02 00
-        Number_of_Handles 0x1 Connection_Handle[0] 0x7
-HC_Num_Of_Completed_Packets[0] 0x2
-UP EVT: Command Status Event Data =3D 00 01 1F 04
-        Status 0x0 Num_HCI_Command_Packets 0x1 Command_Opcode 0x41F
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0c 00 01 00
-UP CMD: Read Clock Offset Command Data =3D 02 07 00 20 00 00 00 00 00 05 00
-        Remaining Data:  [7, 0, 32, 0, 0, 0, 0, 0, 5, 0]
-UP ACL: conn=3D7 flags=3D 1 Data =3D  04 02 08 00 42 00 00 00 01 02 30 00
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0a 00 01 00 05 02 06 00 61 00 00 00 0=
-0 00
-        L2CAP len=3D10 ch=3D1 Command=3DConfigure response Reason 0x61 Data
-0x0 Remaining Data:  [0, 0]
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0a 00 01 00 05 04 06 00 42 00 00 00 0=
-0 00
-        L2CAP len=3D10 ch=3D1 Command=3DConfigure response Reason 0x42 Data
-0x0 Remaining Data:  [0, 0]
-UP EVT: Number Of Completed Packets Event Data =3D 01 07 00 01 00
-        Number_of_Handles 0x1 Connection_Handle[0] 0x7
-HC_Num_Of_Completed_Packets[0] 0x1
-UP EVT: Read Clock Offset Complete Event Data =3D 00 07 00 FE 0B
-        Status 0x0 Connection_Handle 0x7 Clock_Offset 0xBFE
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0f 00 42 00
-UP ACL: conn=3D7 flags=3D 1 Data =3D  02 00 01 00 0a 35 05 1a 00 00 11 12 0=
-0 28 00
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0e 00 61 00 03 00 01 00 09 00 01 00 01
-00 01 00 13 00
-        L2CAP len=3D2 ch=3D1 Command=3DInformation request Info Type 0x0
-Remaining Data:  [17, 18, 0, 40, 0, 14, 0, 97, 0, 3, 0, 1, 0, 9, 0, 1,
-0, 1, 0, 1, 0, 19, 0]
-UP EVT: Number Of Completed Packets Event Data =3D 01 07 00 01 00
-        Number_of_Handles 0x1 Connection_Handle[0] 0x7
-HC_Num_Of_Completed_Packets[0] 0x1
-UP ACL: conn=3D7 flags=3D 2 Data =3D  11 00 42 00 04 00 02 00 0c 00 01 00 13
-00 26 35 03 09 00 04 00
-UP ACL: conn=3D7 flags=3D 2 Data =3D  1b 00 61 00 05 00 02 00 16 00 13 35 11
-09 00 04 35 0c 35 03 19 01 00 35 05 19 00 03 08 07 00
-UP EVT: Number Of Completed Packets Event Data =3D 01 07 00 01 00
-        Number_of_Handles 0x1 Connection_Handle[0] 0x7
-HC_Num_Of_Completed_Packets[0] 0x1
-UP ACL: conn=3D7 flags=3D 2 Data =3D  08 00 01 00 02 03 04 00 03 00 62 00
-        L2CAP len=3D8 ch=3D1 Command=3DConnection request PSM 0x3 Src ID 0x=
-62
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0c 00 01 00 03 03 08 00 43 00 62 00 0=
-0 00 00 00
-        L2CAP len=3D12 ch=3D1 Command=3DConnection response Dest ID 0x43 Src
-ID 0x62 Result 0x0 Status 0x0
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0c 00 01 00 04 05 08 00 62 00 00 00 0=
-1 02 ae 06
-        L2CAP len=3D12 ch=3D1 Command=3DConfigure request Dest ID 0x62 Flags
-0x0 Remaining Data:  [1, 2, 174, 6]
-UP EVT: Number Of Completed Packets Event Data =3D 01 07 00 02 00
-        Number_of_Handles 0x1 Connection_Handle[0] 0x7
-HC_Num_Of_Completed_Packets[0] 0x2
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0c 00 01 00 04 04 08 00 43 00 00 00 0=
-1 02 84 00
-        L2CAP len=3D12 ch=3D1 Command=3DConfigure request Dest ID 0x43 Flags
-0x0 Remaining Data:  [1, 2, 132, 0]
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0a 00 01 00 05 04 06 00 62 00 00 00 0=
-0 00
-        L2CAP len=3D10 ch=3D1 Command=3DConfigure response Reason 0x62 Data
-0x0 Remaining Data:  [0, 0]
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0e 00 01 00 05 05 0a 00 43 00 00 00 00
-00 01 02 84 00
-        L2CAP len=3D14 ch=3D1 Command=3DConfigure response Reason 0x43 Data
-0x0 Remaining Data:  [0, 0, 1, 2, 132, 0]
-UP EVT: Number Of Completed Packets Event Data =3D 01 07 00 01 00
-        Number_of_Handles 0x1 Connection_Handle[0] 0x7
-HC_Num_Of_Completed_Packets[0] 0x1
-UP ACL: conn=3D7 flags=3D 2 Data =3D  04 00 43 00 03 3f 01 1c
-UP ACL: conn=3D7 flags=3D 2 Data =3D  04 00 62 00 03 73 01 d7
-UP EVT: Number Of Completed Packets Event Data =3D 01 07 00 01 00
-        Number_of_Handles 0x1 Connection_Handle[0] 0x7
-HC_Num_Of_Completed_Packets[0] 0x1
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0e 00 43 00 03 ef 15 83 11 0e f0 00 00
-7e 00 00 00 70
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0e 00 62 00 01 ef 15 81 11 0e e0 00 00
-7e 00 00 07 aa
-UP EVT: Number Of Completed Packets Event Data =3D 01 07 00 01 00
-        Number_of_Handles 0x1 Connection_Handle[0] 0x7
-HC_Num_Of_Completed_Packets[0] 0x1
-UP ACL: conn=3D7 flags=3D 2 Data =3D  04 00 43 00 3b 3f 01 06
-UP ACL: conn=3D7 flags=3D 2 Data =3D  04 00 62 00 3b 73 01 cd
-UP ACL: conn=3D7 flags=3D 2 Data =3D  08 00 62 00 01 ef 09 e3 05 3b 8d aa
-UP EVT: Number Of Completed Packets Event Data =3D 01 07 00 02 00
-        Number_of_Handles 0x1 Connection_Handle[0] 0x7
-HC_Num_Of_Completed_Packets[0] 0x2
-UP ACL: conn=3D7 flags=3D 2 Data =3D  08 00 43 00 03 ef 09 e1 05 3b 8d 70
-UP ACL: conn=3D7 flags=3D 2 Data =3D  08 00 43 00 03 ef 09 e3 05 3b 0d 70
-UP ACL: conn=3D7 flags=3D 2 Data =3D  05 00 43 00 3b ff 01 0f b9
-UP ACL: conn=3D7 flags=3D 2 Data =3D  08 00 62 00 01 ef 09 e1 05 3b 0d aa
-UP EVT: Number Of Completed Packets Event Data =3D 01 07 00 01 00
-        Number_of_Handles 0x1 Connection_Handle[0] 0x7
-HC_Num_Of_Completed_Packets[0] 0x1
-UP ACL: conn=3D7 flags=3D 2 Data =3D  08 00 01 00 06 05 04 00 42 00 61 00
-        L2CAP len=3D8 ch=3D1 Command=3DDisconnection request Src ID 0x42
-Flags 0x61 Result 0x0 Config 0x0
-UP ACL: conn=3D7 flags=3D 2 Data =3D  08 00 01 00 07 05 04 00 42 00 61 00
-        L2CAP len=3D8 ch=3D1 Command=3DDisconnection response Dest ID 0x42
-Src ID 0x61 Result 0x0 Status 0x0
-UP EVT: Number Of Completed Packets Event Data =3D 01 07 00 01 00
-        Number_of_Handles 0x1 Connection_Handle[0] 0x7
-HC_Num_Of_Completed_Packets[0] 0x1
-UP ACL: conn=3D7 flags=3D 2 Data =3D  10 00 43 00 3b ef 19 41 54 2b 43 4b 50
-44 3d 32 30 30 0d a5
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0a 00 62 00 39 ef 0d 0d 0a 4f 4b 0d 0=
-a 7f
-DOWN CMD: Add SCO Connection Command Data =3D 04 07 00 E0 00
-        Connection_Handle 0x7 Packet_Type 0xE0
-UP CMD: Add SCO Connection Command Data =3D 04 07 00 E0 00 20 00 00 00 00 0=
-0 07 00
-        Connection_Handle 0x7 Packet_Type 0xE0 Remaining Data:  [32,
-0, 0, 0, 0, 0, 7, 0]
-UP EVT: Command Status Event Data =3D 00 01 07 04
-        Status 0x0 Num_HCI_Command_Packets 0x1 Command_Opcode 0x407
-UP EVT: Number Of Completed Packets Event Data =3D 01 07 00 01 00
-        Number_of_Handles 0x1 Connection_Handle[0] 0x7
-HC_Num_Of_Completed_Packets[0] 0x1
-UP EVT: Connection Complete Event Data =3D 00 01 00 D3 73 7C 17 13 00 00 01
-        Status 0x0 Connection_Handle 0x1 BD_ADDR 0x13177C73D3
-Link_Type 0x0 Encryption_Mode 0x1
-DOWN SCO:  00 00 00 00 00 00 00 00 40 9d 55 80 40 9d 55 80 ...
-DOWN SCO:  00 00 00 00 00 00 00 00 40 94 55 80 00 e1 3f 84 ...
-UP SCO:  08 00 08 00 20 00 20 00 18 00 20 00 18 00 30 00 ...
-DOWN SCO:  08 00 08 00 20 00 20 00 18 00 20 00 18 00 30 00 ...
-UP SCO:  00 00 00 30 00 50 00 38 00 38 00 38 00 38 00 30 ...
-DOWN SCO:  00 00 00 30 00 50 00 38 00 38 00 38 00 38 00 30 ...
-UP SCO:  00 18 00 30 00 48 00 40 00 20 00 40 00 40 00 20 ...
-DOWN SCO:  00 18 00 30 00 48 00 40 00 20 00 40 00 40 00 20 ...
-UP SCO:  00 10 00 30 00 40 00 38 00 18 00 30 00 30 00 28 ...
-DOWN SCO:  00 10 00 30 00 40 00 38 00 18 00 30 00 30 00 28 ...
-UP SCO:  00 18 00 38 00 48 00 48 00 38 00 38 00 30 00 20 ...
-DOWN SCO:  00 18 00 38 00 48 00 48 00 38 00 38 00 30 00 20 ...
-UP SCO:  00 18 00 40 00 60 00 30 00 10 00 48 00 38 00 20 ...
-DOWN SCO:  00 18 00 40 00 60 00 30 00 10 00 48 00 38 00 20 ...
-UP SCO:  00 10 00 30 00 38 00 40 00 38 00 30 00 30 00 20 ...
-DOWN SCO:  00 10 00 30 00 38 00 40 00 38 00 30 00 30 00 20 ...
-UP SCO:  00 10 00 28 00 30 00 40 00 38 00 30 00 30 00 28 ...
-DOWN SCO:  00 10 00 28 00 30 00 40 00 38 00 30 00 30 00 28 ...
-UP SCO:  00 10 00 38 00 48 00 38 00 28 00 38 00 30 00 20 ...
-DOWN SCO:  00 10 00 38 00 48 00 38 00 28 00 38 00 30 00 20 ...
-UP SCO:  00 18 00 40 00 50 00 48 00 38 00 38 00 38 00 28 ...
-DOWN SCO:  00 18 00 40 00 50 00 48 00 38 00 38 00 38 00 28 ...
-UP SCO:  00 10 00 40 00 50 00 48 00 28 00 30 00 30 00 28 ...
-DOWN SCO:  00 10 00 40 00 50 00 48 00 28 00 30 00 30 00 28 ...
-UP SCO:  00 10 00 40 00 58 00 38 00 20 00 38 00 30 00 30 ...
-DOWN SCO:  00 10 00 40 00 58 00 38 00 20 00 38 00 30 00 30 ...
-UP EVT: Connection Packet Type Changed Event Data =3D 00 01 00 80 00
-        Status 0x0 Connection_Handle 0x1 Packet_Type 0x80
-UP SCO:  38 00 30 00 40 00 20 00 28 00 40 00 30 00 40 00 ...
-DOWN SCO:  38 00 30 00 40 00 20 00 28 00 40 00 30 00 40 00 ...
-UP SCO:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ...
-DOWN SCO:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ...
-UP SCO:  00 30 00 30 00 30 00 28 00 38 00 30 00 30 00 28 ...
-DOWN SCO:  00 30 00 30 00 30 00 28 00 38 00 30 00 30 00 28 ...
-UP SCO:  00 48 00 30 00 18 00 28 00 38 00 20 00 28 00 18 ...
-DOWN SCO:  00 48 00 30 00 18 00 28 00 38 00 20 00 28 00 18 ...
-UP SCO:  00 38 00 40 00 30 00 30 00 30 00 20 00 30 00 28 ...
-DOWN SCO:  00 38 00 40 00 30 00 30 00 30 00 20 00 30 00 28 ...
-UP ACL: conn=3D7 flags=3D 2 Data =3D  0f 00 43 00 3b ff 15 01 41 54 2b 56 47
-53 3d 31 31
-UP ACL: conn=3D7 flags=3D 1 Data =3D  0d b9
-UP SCO:  00 30 00 40 00 28 00 20 00 40 00 30 00 20 00 18 ...
-DOWN SCO:  00 30 00 40 00 28 00 20 00 40 00 30 00 20 00 18 ...
+in february I sent you the email in the following, about some proposed 
+modifications in the HCI connect and switch role APIs. At that time, I also attached 
+you the unified diff files, which I'm attaching also now.
+Anyway, I didn't receive any reply. Do you think these modifications are 
+likely to be integrated in next releases?
+Thanks,
+Marcello.
 
 
 
 
-2006/6/5, Brad Midgley <bmidgley@xmission.com>:
-> Eduardo
+Subject:
+Re: [Bluez-devel] hci connect and switch role modifications
+From:
+Capaianca <fcornevilli@gmail.com>
+Date:
+Tue, 21 Feb 2006 17:03:36 +0100
+
+To:
+bluez-devel@lists.sourceforge.net
+
+
+Hi Marcel,
+
+  as requested, we have attached the unified diff files of our 
+modifications. Basically, we added a couple mechanisms that may use to 
+prevent some errors from occurring (error masking mechanisms). The 
+mechanisms are part of the results of our research on bluetooth 
+networks. Perhaps the same strategies  can  be  generalized and applied  
+on several parts of the code in order to improve the overall robustness 
+of the BlueZ stack.
+
+Specifically, in the hci.c file (and related hci_lib.h) we added two 
+functions that may help to solve some problems which may arise when 
+creating connections or when switching the role. These functions are 
+called "hci_create_connection_timed" and "hci_switch_role_checked".
+
+The hci_create_connection_timed function first creates a connection and 
+then checks whether the handle is valid (>0) until a given timeout 
+expires. The timeout is specified as an additional parameter, in 
+milliseconds.
+We created this function because, while working with bluetooth, we 
+noticed that to get a valid handle over a connection may take some time, 
+even after that the hci_create_connection function return, due to the 
+asynchronous nature of the connection creation process. This could 
+result in a error when subsequent calls are performed over the 
+connection with a handle that is still not valid (e.g. a bnep create 
+connection call over an already created l2cap connection, or a switch 
+role command). This function avoids this problem because it returns with 
+no errors only if the created connection has a valid handle.
+It is worth noting that the function returns a "timer expired (ETIME)" 
+error even when the connection is created. This happens when the timeout 
+expires but the connection still has a not valid handle. However, the 
+handle could become valid after the function exits.
+
+The hci_switch_role_checked function performs a similar task. During our 
+tests we noticed that sometimes the hci_switch_role function exits with 
+a EIO error even if the role was actually switched. This problem may be 
+due to a temporary bad state of the rp.status value during the switch 
+role process attempt. To overcome this problem, after an invalid check 
+of rp.status value, our function reads the linkmode of the connection to 
+check the real status after a little amount of time (100ms in the 
+current version). If the role is not switched, further attempts are made 
+until a timeout expires. This timeout is provided as an input parameter 
+to our function.
+This function resulted particularly useful when using PDA and other 
+limited resources devices where the time required to perform the switch 
+role may be longer and may result in errors signaled by the original 
+hci_switch_role function even if the role was actually switched.
+
+
+We preferred to provide two new functions rather than modifying the 
+original ones. This way the user can choose to use the function that 
+better suites his requirements.
+
+In order to test and use the new functionalities, we also slightly 
+modified the hcitool.c program, so as to add an optional parameter 
+"--timeout" to both the "cc" and "sr" commands. If the parameter is 
+specified the new functions are called, otherwise the original functions 
+are used.
+
+Hope this can be of interest and help the BlueZ community.
+
+Best regards,
+Marcello Cinque
+Fabio Cornevilli
+Mobilab Research Group - www.mobilab.unina.it
+
+Hi Marcello,
+
+ 
+
+> we are working with Bluetooth and BlueZ since two years, and during the
+> development of a field failure data analysis of Bluetooth networks, we
+> experienced some annoying and frequent runtime errors that could be 
+> avoided.
+> Those errors concern the creation of a L2CAP connection via HCI and 
+> the role
+> switch operation. However, we discovered how to prevent these errors from
+> occurring, by adding a little amount of code in the 
+> hci_create_connection and
+> hci_switch_role functions in hci.c.  
+> We would like to contribute to the development and let the community 
+> know and
+> evaluate these modifications.
 >
-> > I have been investigating a bit around the code. I am not familiar
-> > with bluez and my knowledge of BT is limited. However, I found that
-> > I'm getting -ERESTARTSYS (-512) errors in snd_card_bt_sco_thread
-> > coming from bt_sock_recvmsg. It looks like quite an exotic error code
-> > to me. Further I have difficulty tracking where it comes from. Is this
-> > code normal?
->
-> I haven't dug into it like you have, but it's not unexpected to see the
-> error happen there. We have no sco data arriving on hci, so recvmsg must
-> be interrupted by a signal instead.
->
-> I suspect broadcom has an equivalent to csr's nonvolatile setting for
-> hci vs. pcm audio delivery. Apparently no one has good enough docs to
-> know for sure. It would help if we knew that dongle had been
-> successfully used for sco under windows.
->
-> Brad
->
->
->
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+> If you are interested, let us know what is the procedure to contribute.
+>     
 
+
+simply sent a unified diff against the latest CVS to the mailing list.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log 
+files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
+-- 
+Il messaggio e' stato analizzato alla ricerca di virus o
+contenuti pericolosi da MailScanner, ed e'
+risultato non infetto.
+
+
+--------------070509000109030605070704
+Content-Type: application/gzip;
+ name="diffiles.tar.gz"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="diffiles.tar.gz"
+
+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
+
+--------------070509000109030605070704
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+
+--------------070509000109030605070704
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------070509000109030605070704--
