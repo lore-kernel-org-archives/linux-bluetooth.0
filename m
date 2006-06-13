@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 13 Jun 2006 13:52:40 +0200 (CEST)
+Date: Tue, 13 Jun 2006 13:36:26 +0200 (CEST)
 From: Peter Wippich <pewi@gw-instruments.de>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.63.0606131336450.23668@redbean.intranet.gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1150197013.2534.23.camel@aeonflux.holtmann.net>
+Message-ID: <Pine.LNX.4.63.0606131329100.23668@redbean.intranet.gw-instruments.de>
+References: <Pine.LNX.4.63.0606131103210.23334@redbean.intranet.gw-instruments.de>
+	<1150197013.2534.23.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-Subject: [Bluez-devel] RFCOMM TTY behaviour
+Subject: Re: [Bluez-devel] bluez-utils-3.0 cross compile broken
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,33 +22,15 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
-Dear all, 
+Hi Marcel, 
 
-we just had some discussion on the behaviour of the RFCOMM TTY driver with 
-some BlueZ users. The problem is that it is not realy possible to have 
-RFCOMM server ports when using the TTY driver (/dev/rfcommX). 
+> the bluez-utils-3.0 is now using pkg-config for the library detection.
 
-The suggested behaviour would be that a /dev/rfcommX device always exists 
-(like any normal tty device), no matter if a bluetooth connection to the 
-DLC exists or not. This would than much more act like a normal TTY. If 
-there is a Bluetooth connection the cable is plugged, if there is no 
-Bluetooth connection the cable is unplugged. 
+What a pain ...... I'll stay with the older version for now ...... 
+When I got some spare time I'll try to figure out how to use this stuff 
+when doing cross builds. 
 
-After looking at the source of the RFC tty driver it should be possible to 
-make it work like this by a few changes: 
-Add a flag to the driver struct to make it a "server" port. 
-Change the tty open behaviour.
-Modify the tty write / ioctl functions to honour the actual connection 
-status (just do nothing / throw write data away if not connected). 
-
-Question: is there anything I missed which would provide from doing a 
-described ?? 
-Is there any good other reason why the tty driver should act like it 
-currently does ?? 
-
-Any input welcome. 
-
-Thank you and best regards, 
+Thank you, 
 
 Peter 
 
