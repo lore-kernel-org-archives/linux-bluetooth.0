@@ -1,7 +1,7 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <448F0E0A.7020308@stfw.eu>
-Date: Tue, 13 Jun 2006 20:12:10 +0100
-From: Zhares <ml-sourceforge@stfw.eu>
+Message-ID: <448EFA00.3030000@xmission.com>
+Date: Tue, 13 Jun 2006 11:46:40 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 References: <1150148335.7372.7.camel@johannes_01.kapune.local>	<448DEA20.5000806@stfw.eu>
@@ -21,33 +21,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi
-
-Johannes Kapune wrote:
+Johannes
 
 > When I have changed the hcid.conf, what to do to use the changes?
 
+restart hcid (sometimes started via bluez-utils startup script)
 
-try to replace the line :
-    security auto;
-
-by:
-    security user;
-or:
-    security none;
-
-here is an extract of the hcid,conf that was installed with ubuntu:
-
-         # Security Manager mode
-         #   none - Security manager disabled
-         #   auto - Use local PIN for incoming connections
-         #   user - Always ask user for a PIN
-         #
-
-
--- 
-
-      Zhares
+brad
 
 
 _______________________________________________
