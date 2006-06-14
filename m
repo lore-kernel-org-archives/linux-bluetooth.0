@@ -1,32 +1,65 @@
-Return-Path: <philipl@mail.utexas.edu>
-Message-ID: <4490C0F1.1090704@mail.utexas.edu>
-Date: Wed, 14 Jun 2006 19:07:45 -0700
-From: Philip Langdale <philipl@mail.utexas.edu>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Date: Wed, 14 Jun 2006 11:00:09 -0400
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: bluez-devel@lists.sourceforge.net
-Subject: Re: Latest 2.6.16-mh1 patch.
-References: <44867199.2000409@mail.utexas.edu>	 <1149664531.22472.4.camel@localhost>  <4486EE2D.3010507@mail.utexas.edu>	 <1149714318.22472.59.camel@localhost>  <4487B00F.7070204@mail.utexas.edu>	 <1149803817.4219.61.camel@localhost>  <448A4385.4020809@mail.utexas.edu> <1149986039.5358.25.camel@aeonflux.holtmann.net>
-In-Reply-To: <1149986039.5358.25.camel@aeonflux.holtmann.net>
-Content-Type: text/plain; charset=ISO-8859-1
-List-ID: <bluez-devel.lists.sourceforge.net>
+Message-ID: <E65CD2CAB74C80498703D6EF7624BB4C0239745E@zmaex.zma.zoran.com>
+From: "Lan Zhang" <Lan.Zhang@Zoran.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Rfcomm always response DM mode
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Philip,
-> 
->>> okay. I released patch-2.6.16-mh2 with doesn't contain the automatic
->>> sniff mode feature anymore. Please check if your mouse is now working as
->>> expected. 
->> Yep, that did the trick, but I hope you can get the two to play well
->> together.
+Hello:
+ 
+I have a problem with rfcomm, it will always response DM mode for other
+device connection request, the bluetooth is running, the sdpd and hcid
+are running fine, and hciconfig shows like below:
+hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:0A:3A:55:C3:4C ACL MTU: 192:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:414 acl:0 sco:0 events:22 errors:0
+        TX bytes:582 acl:0 sco:0 commands:22 errors:0
+        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'BlueZ (0)'
+        Class: 0x140680
+        Service Classes: Rendering, Object Transfer
+        Device Class: Imaging, Printer
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP
+Subver:0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
 
-Marcel,
+And I can find to other device, set up a connection and do a file
+transfer, but I cannot run it as a service. Like I said, the rfcomm will
+always reject connection. I don't know what I am missing, it just work
+for the old version.
 
-I've been working with mh3 over the last couple of days and have
-noticed another regression. The mouse no longer auto-reconnects
-after being turned off and on or after it auto-disconnects due
-to a timeout.
+By the way, did I still need rfcomm packet in order to get a connection
+from rfcomm, I think it is build-in the bluez packet? Anyway, I download
+rfcomm-0.10, and follow the instruction, but got a lot of compile
+errors. I am using the 2.25 utilas and libs from bluez, and after 3.0
+come out, I try to catch your latest version, but in utils's configure,
+it says DBUS didn't reach your requirement. You requested dbus-glib-l >
+0.35, what I have is 0.22, is there anyway to poss that?
 
-This didn't happen with mh2.
+Thanks. 
 
---phil
+Lan
+
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
