@@ -1,45 +1,17 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44859045.7090208@palmsource.com>
-References: <44859045.7090208@palmsource.com>
-Date: Wed, 14 Jun 2006 07:44:14 +0200
-Message-Id: <1150263854.5359.1.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Minor classes support
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Return-Path: <glowz.saripah@gmail.com>
+Message-ID: <e85851c20606132201w49ef3b8cm621062753b1ea490@mail.gmail.com>
+Date: Wed, 14 Jun 2006 12:01:45 +0700
+From: "Gloria Saripah Patara" <glowz.saripah@gmail.com>
+To: bluez-users@lists.sourceforge.net, bluez-devel@lists.sourceforge.net,
+        marcel@holtmann.org, ashuang@gmail.com, albert@csail.mit.edu
+Subject: how to get service name and how to connect through it
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Frederic,
+Hallo guys!!!!
+i want to try to write some scratch code about how to get service name
+from a certain phone (i.e xx:xx:xx:xx:xx:xx) and how to connect
+through it? what function should i use?
 
-> You can find attached a patch to support minor classes with the new DBus 
-> API.
-> This patch updates functions : GetMajorClass, ListAvailableMinorClasses, 
-> GetMinorClass, GetRemoteMajorClass, GetRemoteMinorClass and dbus-api.txt.
-> It also adds some call to exerce them (and discoveries) in dbus-test 
-> program.
-
-I forgot to include this patch in the final 3.0 release. Can you please
-redo it against latest CVS.
-
-Regards
-
-Marcel
-
-
-
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+------------------------------------
