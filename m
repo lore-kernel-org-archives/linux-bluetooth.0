@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4492D0E1.5090806@marples.net>
+Date: Fri, 16 Jun 2006 11:40:17 -0400
+From: Dave Marples <dave-lists@marples.net>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4492B250.000111.26041@bj163app70.163.com>
-References: <mailman.0.1150463548.25144.bluez-users@lists.sourceforge.net>
-	<4492B250.000111.26041@bj163app70.163.com>
-Date: Sat, 17 Jun 2006 12:16:19 +0200
-Message-Id: <1150539379.17539.8.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] l2ping issues
+References: <4492B0C9.6010305@marples.net>
+In-Reply-To: <4492B0C9.6010305@marples.net>
+Subject: Re: [Bluez-users] rfcomm device blocking/data available behaviour
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,61 +20,83 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Folks,
+Replying to myself here, but moving over to the python library, the 
+following code _works_;
 
-> I have 2 issues with l2ping. bluz version is as the following:
-> rpm info:
-> linux-l20w:~ # rpm -qa|grep bluez
-> bluez-utils-2.24-17
-> bluez-libs-2.24-10
-> 
-> 1. l2ping failed to ping itself
-> linux-l20w:~ # hciconfig
-> hci0:   Type: USB
->         BD Address: 00:0E:9B:DD:E4:D1 ACL MTU: 377:10 SCO MTU: 16:0
->         UP RUNNING PSCAN ISCAN
->         RX bytes:5545 acl:3 sco:0 events:193 errors:0
->         TX bytes:4482 acl:3 sco:0 commands:168 errors:0
-> 
-> linux-l20w:~ # lsmod|grep -E "l2cap|rfcomm|bcm203x"
-> rfcomm                 32408  5
-> l2cap                  20740  14 hidp,bnep,rfcomm
-> bluetooth              41188  10
-> hidp,bnep,rfcomm,l2cap,hci_vhci,hci_usb
-> linux-l20w:~ # l2ping 00:0E:9B:DD:E4:D1
-> Can't connect: No route to host
-> 
-> Is this normal or correct?
-> 
-> 2. I can run hciemu to emulate a faked bluetooth device, but the
-> l2ping still failed. Is that normal or correct?
-> linux-l20w:~ # modprobe hci_vhci
-> linux-l20w:~ # ls /dev/vhci -l
-> crw-rw---- 1 root root 10, 62 Jun 15 07:51 /dev/vhci
-> linux-l20w:~ # hciemu 00:0E:9B:DD:E4:D2
-> linux-l20w:~ # hciconfig
-> hci0:   Type: USB
->         BD Address: 00:0E:9B:DD:E4:D1 ACL MTU: 377:10 SCO MTU: 16:0
->         UP RUNNING PSCAN ISCAN
->         RX bytes:203 acl:0 sco:0 events:28 errors:0
->         TX bytes:876 acl:0 sco:0 commands:28 errors:0
-> 
-> hci1:   Type: VHCI
->         BD Address: 00:0E:9B:DD:E4:D2 ACL MTU: 192:8 SCO MTU: 64:0
->         UP RUNNING PSCAN ISCAN
->         RX bytes:0 acl:0 sco:0 events:15 errors:0
->         TX bytes:569 acl:0 sco:0 commands:15 errors:0
-> 
-> linux-l20w:~ # l2ping  00:0E:9B:DD:E4:D2
-> Can't connect: Host is down
+import bluetooth
 
-you can't connect a virtual HCI device to a real device. It is not
-working this way. Use either two real or two virtual devices.
+s=bluetooth.BluetoothSocket( bluetooth.RFCOMM )
+s.connect(("xx:xx:xx:xx:xx:xx",1))
+s.send('ATZ\r')
+while 1:
+    c=s.recv(1)
+    print "Got",len(c),"Detail:",ord(c),c
+
+...so, I can only conclude that it's something to do with the device 
+emulation side of things.  Hope this is helpful to someone.
 
 Regards
 
-Marcel
+DAVE
 
+Dave Marples wrote:
+> Folks,
+>
+> I've got a problem using rfcomm to a generic BT device (actually a SE 
+> K750i phone, but that's just what I'm using for an example).  It looks 
+> to me like a bug in the rfcomm/socket interface, but what do I know?
+>
+> The problem seems to be that blocking/select on a rfcomm serial port 
+> isn't working correctly. This is using Ubuntu Dapper (latest release) 
+> and I've checked the bluetooth/rfcomm directory against patch 2.6.16-mh3 
+> to ensure that all of the current changes are in there, and they are (in 
+> fact, only core.c has changed, and that's mostly beautification).
+>
+> The easiest way to create the problem is as follows;
+>
+> 1) In /etc/bluetooth/rfcomm.conf establish a connection to the phone;
+>
+> rfcomm3 {
+>    bind yes;
+>    # Bluetooth address of the device
+>    device xx:xx:xx:xx:xx:xx;
+>    # RFCOMM channel for the connection
+>    channel    1;
+>    # Description of the connection
+>    comment "K750i";
+> }
+>
+> 2) ...then cat /dev/rfcomm3
+>
+> Obviously, at this point nothing happens.
+> 3) _RING_ the phone
+>
+> The output from the 'cat' job goes crazy, and never finishes.
+>
+> Another way to create the problem  is the following (using python);
+>
+> fd=open("/dev/rfcomm3","r+")
+> fd.write("ATZ\n")
+> while 1:
+>    c=fd.read(1)
+>    print "Got",len(c),"Detail:",ord(c),c
+>
+> Can anyone help?  I'm stuck here....it's quite possible I'm doing 
+> something _really_ silly, but I need someone to hold a mirror up to be 
+> able to see that...
+>
+> Regards
+>
+> DAVE
+>
+>
+>
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>   
 
 
 
