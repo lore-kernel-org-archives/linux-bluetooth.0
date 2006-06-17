@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4493FEAF.3000904@uni-koblenz.de>
-Date: Sat, 17 Jun 2006 15:07:59 +0200
-From: Kevin Read <kread@uni-koblenz.de>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Multiple connections with kernel 2.4 make HCI die
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <448DB88D.8080306@stfw.eu>
+References: <448DB88D.8080306@stfw.eu>
+Date: Sat, 17 Jun 2006 12:32:27 +0200
+Message-Id: <1150540347.17539.28.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] hidd error 14 (Bad address) on ubuntu ppc
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,47 +20,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+Hi,
 
-I know that kernel 2.4 is no longer supported, but I hope that somebody 
-can give me a clue here...
+> I'm trying to connect my bluetooth apple keyboard and my logitech MX900 
+> to the internal dongle of my mac G5 with the latest ubuntu and I have 
+> some troubles: The hidd program failed in a call to ioctl that set errno 
+> to 14.
+> I tried the brand new version 3.0 as well and I still have the same 
+> problem. This bug has been confirmed in ubuntu but nobody seems to want 
+> to work on it:
+> https://launchpad.net/distros/ubuntu/+source/bluez-utils/+bug/32415
+> The current solution is to remove bluez, which mean the bluetooth dongle 
+> stays in HID mode (used to have the keyboard in bootloader) and every 
+> mouse/keyboard device paired with OSX are working fine (except the mouse 
+> wheel and eject button).
+> This is not a solution for me since I would like to use the dongle for 
+> phone transfer and a bluetooth headset as well.
+> It seems nobody else care about this bug because they are fine with the 
+> hid mode. Also, most researches on the subject are hidden by people who 
+> just want to pair with there devices.
+> 
+> Pairing works fine for me and file transfer as well. The bluetooth 
+> headset is also making a ioctl error. And I've got the same error with 3 
+> other bluetooth dongles.
+> 
+> I tried to understand how the program works but it is not easy since it 
+> is not commented. I think I can fix the bug by myself but I need some 
+> help to run proper debugging sessions. Since this problem seems to only 
+> happen on linux ppc, I suspect there is a big-endian problem somewhere 
+> in the structures but I have no idea of where to start looking at. Maybe 
+> someone has a better idea of what the problem is and can tell me where 
+> to look.
 
-I'm attempting to create a multi-threaded, multi-dongle OBEX client
-appliance. When I run it on a kernel 2.6 based machine (either a x86 or
-on a NSLU2, which is a big-endian ARM box), everything runs very smooth.
+run "hcidump -X -V" and show us the results.
 
-The same code compiled for a little endian MIPS machine running kernel
-2.4.30 has problems. I cannot change the kernel version, because the
-on-board Broadcom wireless chipset of the router doesn't really work yet
-  under kernel 2.6 (damn closed source drivers) :(
+Regards
 
-When one bt interface does device discovery and another interface does
-service discovery and the RFCOMM transfers, everything is fine. As soon
-as data is sent/received over two connections simultaneously, the HCIs
-begin to "die" - they don't respond to hciconfig reset/up/down commands
-and all data transmissions time out, as do SDP connects. If I 'hciconfig
-down' the interfaces, they don't come up again afterwards. The only
-thing that helps is re-plugging the dongles. Re-loading hci-usb or the
-uhci drivers is not enough, although all interfaces show as "up" again
-afterwards. They still time out, though.
+Marcel
 
-This hang might come after a few kb's of simultenous data was sent, or
-after up to two megabyte have been transferred. It comes quicker when
-two dongles transmit data simultaneously, but also happens when I have
-two active RFCOMM connections on one dongle.
-
-I have applied the changes in the 2.4.32 patch by Marcel, but I think
-they only refer to module unloading. Bluez installed is version 2.32. I
-already stressed the USB bus with wireless and a hard disk, to rule out
-that the usb driver has some funkiness, but everything went smooth.
-
-It would be great if somebody could help me here, I'm totally stuck. I
-can give out shell access to the router, if that is of any help with
-this problem.
-
-Best regards,
-
-Kevin
 
 
 
