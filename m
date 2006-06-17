@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <167599168834.168834167599@fh-wolfenbuettel.de>
-References: <167599168834.168834167599@fh-wolfenbuettel.de>
-Date: Sat, 17 Jun 2006 12:14:46 +0200
-Message-Id: <1150539286.17539.6.camel@aeonflux.holtmann.net>
+In-Reply-To: <435B3A56-B448-4E26-8BEB-E0879356ACBB@wideray.com>
+References: <435B3A56-B448-4E26-8BEB-E0879356ACBB@wideray.com>
+Date: Sat, 17 Jun 2006 12:07:56 +0200
+Message-Id: <1150538876.17539.0.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] sending SAP messages on rfcomm?
+Subject: Re: [Bluez-devel] Bug: infinite loop in extract_seq()
+	when	sdp_extract_seqtype() fails
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,22 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Goetz,
+Hi Jason,
 
-> --> using hcidump shows, that the essage is sent in some way,look at end
-> of  http://sap.goetzi.de/hci_dump_sap_1st_msg.txt 
+> I'm new to this list.  Please let me know if there is a more  
+> appropriate place to report this.
 
-in the future you should use "hcidump -X -V", because nobody is going to
-decode the HCI commands and events for you by hand.
+this mailing list is the correct place to report such problems.
 
-> I have the feeling i am missing something. Any suggestions? Is "write()"
-> the correct way? Do I have to define a new type of packet somewhere
-> first? I amlost and my deadline for handing in my project at uni is
-> coming closer. Any help appreciated, please.
+> It appears that extract_seq() in sdp.c (bluez-libs) can enter an  
+> infinite loop if sdp_extract_seqtype() fails when extract_seq() has  
+> called itself recursively.  Here's how:
 
-I don't have a SIM access capable phone and thus I never played with
-this profile. And I won't do that until someone donates a SIM access
-phone to me.
+Do you have a patch for it or can you send a small reproducer program?
 
 Regards
 
