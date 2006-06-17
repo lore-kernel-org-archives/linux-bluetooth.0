@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0606131329100.23668@redbean.intranet.gw-instruments.de>
-References: <Pine.LNX.4.63.0606131103210.23334@redbean.intranet.gw-instruments.de>
-	<1150197013.2534.23.camel@aeonflux.holtmann.net>
-	<Pine.LNX.4.63.0606131329100.23668@redbean.intranet.gw-instruments.de>
-Date: Sat, 17 Jun 2006 12:31:05 +0200
-Message-Id: <1150540265.17539.26.camel@aeonflux.holtmann.net>
+In-Reply-To: <Pine.LNX.4.63.0606131336450.23668@redbean.intranet.gw-instruments.de>
+References: <Pine.LNX.4.63.0606131336450.23668@redbean.intranet.gw-instruments.de>
+Date: Sat, 17 Jun 2006 12:30:02 +0200
+Message-Id: <1150540202.17539.24.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bluez-utils-3.0 cross compile broken
+Subject: Re: [Bluez-devel] RFCOMM TTY behaviour
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,14 +22,31 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Peter,
 
-> > the bluez-utils-3.0 is now using pkg-config for the library detection.
+> we just had some discussion on the behaviour of the RFCOMM TTY driver with 
+> some BlueZ users. The problem is that it is not realy possible to have 
+> RFCOMM server ports when using the TTY driver (/dev/rfcommX). 
 > 
-> What a pain ...... I'll stay with the older version for now ...... 
-> When I got some spare time I'll try to figure out how to use this stuff 
-> when doing cross builds. 
+> The suggested behaviour would be that a /dev/rfcommX device always exists 
+> (like any normal tty device), no matter if a bluetooth connection to the 
+> DLC exists or not. This would than much more act like a normal TTY. If 
+> there is a Bluetooth connection the cable is plugged, if there is no 
+> Bluetooth connection the cable is unplugged. 
+> 
+> After looking at the source of the RFC tty driver it should be possible to 
+> make it work like this by a few changes: 
+> Add a flag to the driver struct to make it a "server" port. 
+> Change the tty open behaviour.
+> Modify the tty write / ioctl functions to honour the actual connection 
+> status (just do nothing / throw write data away if not connected). 
+> 
+> Question: is there anything I missed which would provide from doing a 
+> described ?? 
+> Is there any good other reason why the tty driver should act like it 
+> currently does ?? 
 
-sorry for that, but pkg-config should actually make it easier in the
-end. And a new major version is allowed to break stuff :)
+the main API of RFCOMM is the socket. So I don't actually bother that
+much with the TTY stuff. However patches are always welcome. Feel free
+to provide actual code for the change you described.
 
 Regards
 
