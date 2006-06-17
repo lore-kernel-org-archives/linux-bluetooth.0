@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <fe0a97c20606090546w4e53ca48o61f338c44708283@mail.gmail.com>
-References: <fe0a97c20606090546w4e53ca48o61f338c44708283@mail.gmail.com>
-Date: Sat, 17 Jun 2006 13:09:02 +0200
-Message-Id: <1150542542.17539.69.camel@aeonflux.holtmann.net>
+In-Reply-To: <20060611204551.GA19920@srcf.ucam.org>
+References: <20060611204551.GA19920@srcf.ucam.org>
+Date: Sat, 17 Jun 2006 13:06:37 +0200
+Message-Id: <1150542398.17539.66.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Limit on the rfcomm socket buffer
+Cc: hal@lists.freedesktop.org, networkmanager-list@gnome.org
+Subject: Re: [Bluez-devel] [RFC] HAL/Bluez integration
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,19 +21,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Sowmaya,
+Hi Matthew,
 
-> I think that the rfcomm sockets can't take as large as 1024 bytes
-> unlike TCP/IP (it gets stuck and I get this "Resource temporarily
-> unavailbale" error incase I wanna reuse it) .... I know its the
-> SOCKET_STREAM thing , but I want to know is there any limit on the
-> socket buffer??? 
+> 2) The SDP interface in bluez is currently labelled "experimental" and 
+> is fairly limited in functionality. I tried going back through the 
+> mailing list archives, but the sourceforge interface makes me cry - has 
+> there been discussion of what this interface should look like and the 
+> technical problems involved?
 
-the kernel socket buffers limits it, but this should be something around
-32k or so.
-
-If you can reproduce an error condition, please send in a sample program
-and the output of "hcidump -X -V".
+we need to add an asynchronous SDP API to bluez-libs and integrate
+working caching of SDP objects. This is not a simple task and there was
+no enough time for it.
 
 Regards
 
