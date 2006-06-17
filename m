@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4494238A.1050007@stfw.eu>
-Date: Sat, 17 Jun 2006 16:45:14 +0100
-From: Zhares <ml-sourceforge@stfw.eu>
+Message-ID: <4493FEAF.3000904@uni-koblenz.de>
+Date: Sat, 17 Jun 2006 15:07:59 +0200
+From: Kevin Read <kread@uni-koblenz.de>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <448DB88D.8080306@stfw.eu>
-	<1150540347.17539.28.camel@aeonflux.holtmann.net>
-In-Reply-To: <1150540347.17539.28.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] hidd error 14 (Bad address) on ubuntu ppc
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Multiple connections with kernel 2.4 make HCI die
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,26 +18,48 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
+Hello,
 
-> run "hcidump -X -V" and show us the results.
+I know that kernel 2.4 is no longer supported, but I hope that somebody 
+can give me a clue here...
 
+I'm attempting to create a multi-threaded, multi-dongle OBEX client
+appliance. When I run it on a kernel 2.6 based machine (either a x86 or
+on a NSLU2, which is a big-endian ARM box), everything runs very smooth.
 
-Hi, thanks for investigate my problem. I've put the result of hcidump 
-here: http://stfw.eu/hcidump-X-V.txt
+The same code compiled for a little endian MIPS machine running kernel
+2.4.30 has problems. I cannot change the kernel version, because the
+on-board Broadcom wireless chipset of the router doesn't really work yet
+  under kernel 2.6 (damn closed source drivers) :(
 
-Here is the command I did and the result:
-root@Monster:~# hidd --connect 00:0A:95:3A:CA:44
-HID create error 14 (Bad address)
-root@Monster:~#
+When one bt interface does device discovery and another interface does
+service discovery and the RFCOMM transfers, everything is fine. As soon
+as data is sent/received over two connections simultaneously, the HCIs
+begin to "die" - they don't respond to hciconfig reset/up/down commands
+and all data transmissions time out, as do SDP connects. If I 'hciconfig
+down' the interfaces, they don't come up again afterwards. The only
+thing that helps is re-plugging the dongles. Re-loading hci-usb or the
+uhci drivers is not enough, although all interfaces show as "up" again
+afterwards. They still time out, though.
 
-Here what was writen in syslog (only one line):
-Jun 17 16:20:16 localhost hidd: New HID device 00:0A:95:3A:CA:44 (Apple 
-Wireless Keyboard)
+This hang might come after a few kb's of simultenous data was sent, or
+after up to two megabyte have been transferred. It comes quicker when
+two dongles transmit data simultaneously, but also happens when I have
+two active RFCOMM connections on one dongle.
 
--- 
+I have applied the changes in the 2.4.32 patch by Marcel, but I think
+they only refer to module unloading. Bluez installed is version 2.32. I
+already stressed the USB bus with wireless and a hard disk, to rule out
+that the usb driver has some funkiness, but everything went smooth.
 
-Zhares
+It would be great if somebody could help me here, I'm totally stuck. I
+can give out shell access to the router, if that is of any help with
+this problem.
+
+Best regards,
+
+Kevin
+
 
 
 _______________________________________________
