@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-In-Reply-To: <1150657050.8816.15.camel@localhost>
-References: <0B0B4E49-71C5-4D33-A5E6-6304B2EFDA7F@ciziunas.com>
-	<1150657050.8816.15.camel@localhost>
-Mime-Version: 1.0 (Apple Message framework v750)
-Content-Type: multipart/mixed; boundary=Apple-Mail-2-554778987
-Message-Id: <7D0614E0-109E-4E3F-9017-79874501E212@ciziunas.com>
-From: =?UTF-8?Q?Vincas_=C4=8Ci=C5=BEi=C5=ABnas?= <vincas@ciziunas.com>
-Date: Sun, 18 Jun 2006 15:57:50 -0400
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Samsung T809/D820 association issues.
+In-Reply-To: <4493FEAF.3000904@uni-koblenz.de>
+References: <4493FEAF.3000904@uni-koblenz.de>
+Date: Sun, 18 Jun 2006 21:02:07 +0200
+Message-Id: <1150657327.8816.20.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Multiple connections with kernel 2.4 make HCI die
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,111 +16,60 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi Kevin,
 
---Apple-Mail-2-554778987
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain;
-	charset=US-ASCII;
-	delsp=yes;
-	format=flowed
+> I know that kernel 2.4 is no longer supported, but I hope that somebody 
+> can give me a clue here...
+> 
+> I'm attempting to create a multi-threaded, multi-dongle OBEX client
+> appliance. When I run it on a kernel 2.6 based machine (either a x86 or
+> on a NSLU2, which is a big-endian ARM box), everything runs very smooth.
+> 
+> The same code compiled for a little endian MIPS machine running kernel
+> 2.4.30 has problems. I cannot change the kernel version, because the
+> on-board Broadcom wireless chipset of the router doesn't really work yet
+>   under kernel 2.6 (damn closed source drivers) :(
 
+I am not buying this argument, because the bcm43xx open source driver
+exists. Otherwise simply swap the mini-PCI card for an Intel one.
 
-When I try to get the computer to initiate, I get a "connection  
-refused".  Attached is the hcidump output of an  "echo ATZ > /dev/ 
-rfcomm0" , which does result in "rfcomm0: connection refused".  I did  
-"Authorize" the linux box from the phone's menu, so I'm still  
-somewhat confused as to why it's denying.  Thanks again.
+> When one bt interface does device discovery and another interface does
+> service discovery and the RFCOMM transfers, everything is fine. As soon
+> as data is sent/received over two connections simultaneously, the HCIs
+> begin to "die" - they don't respond to hciconfig reset/up/down commands
+> and all data transmissions time out, as do SDP connects. If I 'hciconfig
+> down' the interfaces, they don't come up again afterwards. The only
+> thing that helps is re-plugging the dongles. Re-loading hci-usb or the
+> uhci drivers is not enough, although all interfaces show as "up" again
+> afterwards. They still time out, though.
+> 
+> This hang might come after a few kb's of simultenous data was sent, or
+> after up to two megabyte have been transferred. It comes quicker when
+> two dongles transmit data simultaneously, but also happens when I have
+> two active RFCOMM connections on one dongle.
+> 
+> I have applied the changes in the 2.4.32 patch by Marcel, but I think
+> they only refer to module unloading. Bluez installed is version 2.32. I
+> already stressed the USB bus with wireless and a hard disk, to rule out
+> that the usb driver has some funkiness, but everything went smooth.
 
---Vincas
+You can try to make sure that the hci_usb driver doesn't use any ISOC
+transfers for SCO. The 2.4 USB subsystem was kinda picky about it. Other
+than that you don't really have a choice except re-writing the hci_usb
+driver.
 
+Regards
 
---Apple-Mail-2-554778987
-Content-Transfer-Encoding: base64
-Content-Type: application/octet-stream;
-	x-unix-mode=0755;
-	name="test2"
-Content-Disposition: attachment;
-	filename=test2
-
-EQAAAIKvlURHFwsAAQUEDVPFDNsWABjMAgAAAAAHAAEAgq+VRJk2CwAEDwQAAQUEDgABAISvlUTX
-xQAABAMLACkAU8UM2xYAAQARAAAAhK+VRMLHAAACKSAMAAgAAQACAQQAAwBAAAgAAACEr5VES8kA
-AAENCAQpAA8ACAABAISvlURD3QAABBMFASkAAQAGAAEAhK+VRAnlAAAEGwMpAAUJAAEAhK+VRL3w
-AAAEDgYBDQgAKQAVAAEAhK+VRHb8AAACKSAQAAwAAQADAQgARwBAAAAAAAAVAAAAhK+VRMv9AAAC
-KSAQAAwAAQAEAggARwAAAAECAAQVAAEAhK+VREYEAQACKSAQAAwAAQAEAQgAQAAAAAECPgYTAAAA
-hK+VRNEFAQACKSAOAAoAAQAFAQYARwAAAAAACAABAISvlUTOFwEABBMFASkAAQAIAAEAhK+VRJwf
-AQAEEwUBKQABABMAAQCEr5VEXCsBAAIpIA4ACgABAAUCBgBAAAAAAAANAAAAhK+VRGAxAQACKSAI
-AAQARwADPwEcCAABAISvlUS/RgEABBMFASkAAQANAAEAhK+VRO2UAQACKSAIAAQAQAADcwHXFwAA
-AISvlUSilgEAAikgEgAOAEcAA+8VgxEC8AcA+wMAB3AIAAEAhK+VRAu0AQAEEwUBKQABAA0AAQCE
-r5VE+7sBAAIpIAgABABAAAsPAWYNAAAAhK+VRGbDAQACKSAIAAQARwADUwH9EQAAAISvlUQwxQEA
-AikgDAAIAAEABgMEAEcAQAAIAAEAhK+VREPbAQAEEwUBKQABAAgAAQCEr5VE++IBAAQTBQEpAAEA
-DQABAISvlUSZ4wEAAikgCAAEAEAAA3MB1xEAAQCEr5VE5+wBAAIpIAwACAABAAcDBABHAEAABwAA
-AIavlURV5wEAAQYEAykAEwcAAQCGr5VEB/0BAAQPBAABBgQHAAEAhq+VRCEgAgAEBQQAKQAW
-
---Apple-Mail-2-554778987
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain;
-	charset=US-ASCII;
-	format=flowed
-
-
+Marcel
 
 
 
-
-On Jun 18, 2006, at 2:57 PM, Marcel Holtmann wrote:
-
-> Hi Vincas,
->
->> I am having trouble getting my Samsung phone to permit my linux box
->> to use it as an rfcomm device.  The phone in question is a Samsung
->> t809.  From what I can tell, the phone attempts to authenticate to
->> the computer with the pin I gave it, it then successfully pairs, and
->> tries "Getting a service list...".  This is where things go wrong.
->> The phone errors out with a "Service not found".  It then refuses to
->> permit me to authorize the computer to use it as an rfcomm device.  I
->> think it the latter has everything to do with some flawed logic that
->> the phone designers had that if it gets a "Service not found", it is
->> not really paired with the device.  Attached is an hcidump output,
->> perhaps someone more intelligent than myself can enlighten me on what
->> I can do to handle this situation?  Thanks!
->
-> I only see connections from the phone to your Linux box and thus it is
-> totally okay that it asks for supported services and disconnects if it
-> doesn't find any. Establish the connection from the Linux box.
->
-> Regards
->
-> Marcel
->
->
->
->
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
-
-
---Apple-Mail-2-554778987
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-
---Apple-Mail-2-554778987
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---Apple-Mail-2-554778987--
