@@ -1,15 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 18 Jun 2006 15:02:48 +0200 (CEST)
-From: Peter Wippich <pewi@gw-instruments.de>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1150540265.17539.26.camel@aeonflux.holtmann.net>
-Message-ID: <Pine.LNX.4.63.0606181455350.8278@redbean.intranet.gw-instruments.de>
-References: <Pine.LNX.4.63.0606131103210.23334@redbean.intranet.gw-instruments.de>
-	<1150197013.2534.23.camel@aeonflux.holtmann.net>
-	<Pine.LNX.4.63.0606131329100.23668@redbean.intranet.gw-instruments.de>
-	<1150540265.17539.26.camel@aeonflux.holtmann.net>
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] bluez-utils-3.0 cross compile broken
+In-Reply-To: <a3b1b800606180216r729c9e1fq91f67249b916d968@mail.gmail.com>
+References: <e85851c20606132201w49ef3b8cm621062753b1ea490@mail.gmail.com>
+	<1150540024.17539.20.camel@aeonflux.holtmann.net>
+	<a3b1b800606180216r729c9e1fq91f67249b916d968@mail.gmail.com>
+Date: Sun, 18 Jun 2006 11:30:32 +0200
+Message-Id: <1150623032.8816.7.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] how to get service name and how to
+	connect	through it
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,33 +23,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Jan,
 
-Hi Marcel,
+> i've already written that but I must reiterate that the main
+> reason people keep asking is that there's quite a big lack of
+> documentation. Even if you just want to write a small utility, you
+> have to study quite a lot of source code. Seems to me like some kind
+> of sport or what under linux (I'm more of a Windows guy). Or that's my
+> point of view at least. I know you try, to me writing a BlueZ app
+> seemed much like building a new car from parts where my only reference
+> is an already completed car. You can peak inside, see how they did it,
+> but in the end, you have to do a lot of tweaking and trying of
+> different combinations to make it work. And for example, I never got
+> an answer to why the HCI scanning routine (and the hctitool utility =>
+> BlueZ) ignores my timeout value...also, there's lots of error codes
+> and nobody tells me what went wrong or why.
 
-> > What a pain ...... I'll stay with the older version for now ...... 
-> > When I got some spare time I'll try to figure out how to use this stuff 
-> > when doing cross builds. 
-> 
-> sorry for that, but pkg-config should actually make it easier in the
-> end. And a new major version is allowed to break stuff :)
+for this reason we spent quite some time to design the the BlueZ D-Bus
+API. It makes it easy to do the basic tasks without knowing any details
+about the BlueZ internals or Bluetooth internals like HCI. And you can
+use it with C, C++, Python, Java, Mono etc.
 
-It seems to be easier then expected. Just installing pkg-config, adding 
-PKG_CONFIG_PATH to the build environment for bluez utils and rebuilding 
-everything seems to do the job. The build now complains about the missing  
-d-bus libraries, but this is a different story..... 
+Regards
 
-Wouldn't be that bad if somebody can update the package dependencies in 
-the Readme (I know, nobody gots enough free time doing such non productive 
-work ;-). 
+Marcel
 
-Ciao, 
-
-Peter
-
-|       Peter Wippich                   Voice: +49 30 46776411          |
-|       G&W Instruments GmbH            fax:   +49 30 46776419          |
-|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
-|       D-13355 Berlin  / Germany                                       |
 
 
 
