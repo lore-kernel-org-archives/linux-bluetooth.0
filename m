@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 18 Jun 2006 15:09:45 +0200 (CEST)
+Date: Sun, 18 Jun 2006 15:02:48 +0200 (CEST)
 From: Peter Wippich <pewi@gw-instruments.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1150540202.17539.24.camel@aeonflux.holtmann.net>
-Message-ID: <Pine.LNX.4.63.0606181503351.8278@redbean.intranet.gw-instruments.de>
-References: <Pine.LNX.4.63.0606131336450.23668@redbean.intranet.gw-instruments.de>
-	<1150540202.17539.24.camel@aeonflux.holtmann.net>
+In-Reply-To: <1150540265.17539.26.camel@aeonflux.holtmann.net>
+Message-ID: <Pine.LNX.4.63.0606181455350.8278@redbean.intranet.gw-instruments.de>
+References: <Pine.LNX.4.63.0606131103210.23334@redbean.intranet.gw-instruments.de>
+	<1150197013.2534.23.camel@aeonflux.holtmann.net>
+	<Pine.LNX.4.63.0606131329100.23668@redbean.intranet.gw-instruments.de>
+	<1150540265.17539.26.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] RFCOMM TTY behaviour
+Subject: Re: [Bluez-devel] bluez-utils-3.0 cross compile broken
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,24 +24,27 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
+Hi Marcel,
 
-Hi Marcel, 
+> > What a pain ...... I'll stay with the older version for now ...... 
+> > When I got some spare time I'll try to figure out how to use this stuff 
+> > when doing cross builds. 
+> 
+> sorry for that, but pkg-config should actually make it easier in the
+> end. And a new major version is allowed to break stuff :)
 
-> the main API of RFCOMM is the socket. So I don't actually bother that
-> much with the TTY stuff. However patches are always welcome. Feel free
-> to provide actual code for the change you described.
+It seems to be easier then expected. Just installing pkg-config, adding 
+PKG_CONFIG_PATH to the build environment for bluez utils and rebuilding 
+everything seems to do the job. The build now complains about the missing  
+d-bus libraries, but this is a different story..... 
 
-Yes, I know that BlueZ is focused on the socket API. This isn't bad as 
-long as you can use sockets. In the case we have here the tty API is 
-needed because of backward compatibility reasons. 
-
-I will try to implement the suggested changes and send a patch if it 
-works. And I hope I don't forget to change my editor to Hard Tab indenting 
-so it gets a chance to get accepted.
+Wouldn't be that bad if somebody can update the package dependencies in 
+the Readme (I know, nobody gots enough free time doing such non productive 
+work ;-). 
 
 Ciao, 
 
-Peter 
+Peter
 
 |       Peter Wippich                   Voice: +49 30 46776411          |
 |       G&W Instruments GmbH            fax:   +49 30 46776419          |
