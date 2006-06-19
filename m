@@ -1,13 +1,21 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <6297d67c0606192109obc34f76oc00d36729e555b84@mail.gmail.com>
-Date: Tue, 20 Jun 2006 09:39:17 +0530
-From: "Mayank Batra" <mayankbatra@gmail.com>
-To: "=?ISO-8859-1?Q?G=F6tz_Issel?=" <g.issel@fh-wolfenbuettel.de>,
-        "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <16b5b416d372.16d37216b5b4@fh-wolfenbuettel.de>
+Message-ID: <564d96fb0606191321n68e4d17dp997e3dfe9578f195@mail.gmail.com>
+Date: Mon, 19 Jun 2006 17:21:12 -0300
+From: "=?UTF-8?Q?Rafael_Esp=C3=ADndola?=" <rafael.espindola@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1150740459.4277.25.camel@localhost>
 MIME-Version: 1.0
-References: <16b5b416d372.16d37216b5b4@fh-wolfenbuettel.de>
-Subject: Re: [Bluez-devel] blueZ and SAP
+References: <564d96fb0606060325q834360bqe4e9d41cbb28a16f@mail.gmail.com>
+	<564d96fb0606081007p3fb8ea42v5926c80eb1cc9657@mail.gmail.com>
+	<1149884042.3985.6.camel@aeonflux.holtmann.net>
+	<1150099297.2589.15.camel@aeonflux.holtmann.net>
+	<564d96fb0606120452m4e4ced33x66ca63fd675ad3@mail.gmail.com>
+	<1150715237.4277.17.camel@localhost>
+	<564d96fb0606190513r4c59cd28v9bd23a9a45e55e8b@mail.gmail.com>
+	<564d96fb0606190517w50ef4027p258030f7593ebd6a@mail.gmail.com>
+	<564d96fb0606191038m42f48295w784bf0062ae184a3@mail.gmail.com>
+	<1150740459.4277.25.camel@localhost>
+Subject: Re: [Bluez-devel] bug in sdp_gen_pd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,100 +25,31 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1535855588=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1535855588==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_10595_26368256.1150776557280"
+On 6/19/06, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Rafael,
+Hi Marcel,
 
-------=_Part_10595_26368256.1150776557280
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> please also check hidd, because the HID report descriptor is placed in a
+> string and we need to know the exact string length.
 
-Hi Goetz,
-
-First of all, please do not reply on individual ids.
+I tested with a Nokia bluetooth keyboard. I am not sure what the "HID
+report descriptor" is.
 
 
-
+> Regards
 >
->
-> first of all I am happy to hear that there is somebody out there working
-> on this too. I thought I was on my own since I never got any helpful
-> response on the list so far.
->
-> I have been checking the returned values in 2 ways.
->
-> First I tried to use "read()" on the socket on which I did the "write()"
-> before. I got no response at all. By the way, I am using  Nokia 6810 and
-> a Siemens S65 for testing.
+> Marcel
 
+Best Regards,
+Rafael
+INdT
 
-Hang on, if you do a read() before write(), won't the read block your
-thread? and your control will never reach the write()?
-Or are you using different threads for the read and write?
-
-I have a report/thesis to hand in in 2 weeks and am soo stuck on this
-> problem. I need to implement the whole sap profile. Panic!
->
-> If you have any decend code I can use... please help. If you want I can
-> send you the code I have so far.
-
-
-No, I did not have any code actually, I just made the RFCOMM connection, and
-I was sending the connect_req etc on this rfcomm device (/dev/rfcomm0). So I
-wrote the connect_req in hex form in a file and then simply did cat file >
-/dev/rfcomm0
-
-Regards,
-Mayank
-
-------=_Part_10595_26368256.1150776557280
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>Hi Goetz,</div>
-<div>&nbsp;</div>
-<div>First of all, please do not reply on individual ids.<br><br>&nbsp;</div>
-<div>
-<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid"><br><br>first of all I am happy to hear that there is somebody out there working<br>on this too. I thought I was on my own since I never got any helpful
-<br>response on the list so far.<br><br>I have been checking the returned values in 2 ways.<br><br>First I tried to use &quot;read()&quot; on the socket on which I did the &quot;write()&quot;<br>before. I got no response at all. By the way, I am using&nbsp;&nbsp;Nokia 6810 and
-<br>a Siemens S65 for testing.</blockquote>
-<div>&nbsp;</div>
-<div>Hang on, if you do a read() before write(), won't the read block your thread? and your control will never reach the write()?</div>
-<div>Or are you using different threads for the read and write?</div><br>
-<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">I have a report/thesis to hand in in 2 weeks and am soo stuck on this<br>problem. I need to implement the whole sap profile. Panic!
-<br><br>If you have any decend code I can use... please help. If you want I can<br>send you the code I have so far.</blockquote>
-<div>&nbsp;</div>
-<div>No, I did not have any code actually, I just made the RFCOMM connection, and I was sending the connect_req etc on this rfcomm device (/dev/rfcomm0). So I wrote the connect_req in hex form in a file and then simply did cat file &gt; /dev/rfcomm0
-</div>
-<div>&nbsp;</div></div>
-<div>Regards,</div>
-<div>Mayank</div>
-
-------=_Part_10595_26368256.1150776557280--
-
-
---===============1535855588==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-
---===============1535855588==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1535855588==--
