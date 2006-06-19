@@ -1,13 +1,19 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44969304.1020502@ibmt.fraunhofer.de>
-Date: Mon, 19 Jun 2006 14:05:24 +0200
-From: =?ISO-8859-1?Q?Harald_Niederl=E4nder?= <harald.niederlaender@ibmt.fraunhofer.de>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <448D6723.4050107@ibmt.fraunhofer.de>
-	<1150540961.17539.40.camel@aeonflux.holtmann.net>
-In-Reply-To: <1150540961.17539.40.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] Problem connecting Bluetooth device
+In-Reply-To: <564d96fb0606120452m4e4ced33x66ca63fd675ad3@mail.gmail.com>
+References: <564d96fb0606060325q834360bqe4e9d41cbb28a16f@mail.gmail.com>
+	<1149714650.22472.62.camel@localhost>
+	<564d96fb0606071459i7367f84fkb7ee645941f84279@mail.gmail.com>
+	<1149718288.22472.71.camel@localhost>
+	<564d96fb0606081007p3fb8ea42v5926c80eb1cc9657@mail.gmail.com>
+	<1149884042.3985.6.camel@aeonflux.holtmann.net>
+	<1150099297.2589.15.camel@aeonflux.holtmann.net>
+	<564d96fb0606120452m4e4ced33x66ca63fd675ad3@mail.gmail.com>
+Date: Mon, 19 Jun 2006 13:07:17 +0200
+Message-Id: <1150715237.4277.17.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] bug in sdp_gen_pd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,261 +27,115 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Rafael,
 
+> > please use the latest bluez-utils-3.0 release and call this three
+> > commands:
+> >
+> >         sdptool add sp
+> >         sdptool browse local
+> >         sdptool browse --raw local
+> >
+> > You will see that the string values are wrong for the third commands.
+> > Can you please check what happens here.
+> I am unable to reproduce. I have just compiled bluez-libs-3.0 and
+> bluz-utils-3.0 (using the just compiled lib) and the output is equal
+> to the installed 2.25.
 
-Marcel Holtmann schrieb:
-> Hi Harald,
-> 
-> 
-> run it with "hcidump -X -V" as root.
-> 
-> Regards
-> 
-> Marcel
-> 
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
+please use bluez-libs-3.1 and bluez-utils-3.1 and make sure that the
+sdpd from this release is running and you use its sdptool. After that
+issues the following commands:
 
+# sdptool add sp
+Serial Port service registered
+# sdptool browse local
+Browsing FF:FF:FF:00:00:00 ...
+Service Name: Serial Po
+Service Description: COM Po
+Service RecHandle: 0x10000
+Service Class ID List:
+  "Serial Port" (0x1101)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 1
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "Serial Port" (0x1101)
+    Version: 0x0100
 
-Hi Marcel,
+# sdptool browse --tree local
+Browsing FF:FF:FF:00:00:00 ...
+Attribute Identifier : 0x0 - ServiceRecordHandle
+  Integer : 0x10000
+Attribute Identifier : 0x1 - ServiceClassIDList
+  Data Sequence
+    UUID16 : 0x1101 - SerialPort
+Attribute Identifier : 0x4 - ProtocolDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x0100 - L2CAP
+    Data Sequence
+      UUID16 : 0x0003 - RFCOMM
+      Channel/Port (Integer) : 0x1
+Attribute Identifier : 0x5 - BrowseGroupList
+  Data Sequence
+    UUID16 : 0x1002 - PublicBrowseGroup
+Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
+  Data Sequence
+    Code ISO639 (Integer) : 0x656e
+    Encoding (Integer) : 0x6a
+    Base Offset (Integer) : 0x100
+Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x1101 - SerialPort
+      Version (Integer) : 0x100
+Attribute Identifier : 0x100
+  Text : "Serial Po"
+Attribute Identifier : 0x101
+  Text : "COM Po"
 
-here are 2 different outputs of "hcidump -X -V" (i apologize for the length)
+# sdptool browse --raw local
+Sequence
+        Attribute 0x0000 - ServiceRecordHandle
+                UINT32 0x00010000
+        Attribute 0x0001 - ServiceClassIDList
+                Sequence
+                        UUID16 0x1101 - SerialPort
+        Attribute 0x0004 - ProtocolDescriptorList
+                Sequence
+                        Sequence
+                                UUID16 0x0100 - L2CAP
+                        Sequence
+                                UUID16 0x0003 - RFCOMM
+                                UINT8 0x01
+        Attribute 0x0005 - BrowseGroupList
+                Sequence
+                        UUID16 0x1002 - PublicBrowseGroup
+        Attribute 0x0006 - LanguageBaseAttributeIDList
+                Sequence
+                        UINT16 0x656e
+                        UINT16 0x006a
+                        UINT16 0x0100
+        Attribute 0x0009 - BluetoothProfileDescriptorList
+                Sequence
+                        Sequence
+                                UUID16 0x1101 - SerialPort
+                                UINT16 0x0100
+        Attribute 0x0100
+                String Serial Po
+        Attribute 0x0101
+                String COM Po
 
-
-1.  Trying to connect the device for the first time:
-
-doro: # rfcomm connect /dev/rfcomm0 0:11:B1:A2:01:C9
-Can't create RFCOMM TTY: Address already in use
-doro: #
-
-The device ask for the PIN
-
-doro: # hcidump -X -V -i hci0
-HCI sniffer - Bluetooth packet analyzer ver 1.30
-device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-     bdaddr 00:11:B1:A2:01:C9 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-     Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: PIN Code Request (0x16) plen 6
-     bdaddr 00:11:B1:A2:01:C9
-< HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
-     bdaddr 00:11:B1:A2:01:C9 len 6 pin '111111'
-> HCI Event: Command Complete (0x0e) plen 10
-     PIN Code Request Reply (0x01|0x000d) ncmd 1
-     status 0x00 bdaddr 00:11:B1:A2:01:C9
-> HCI Event: Link Key Notification (0x18) plen 23
-     bdaddr 00:11:B1:A2:01:C9 key 060E5E846F8206C5AECD5306622526E6 type 0
-> HCI Event: Connect Complete (0x03) plen 11
-     status 0x00 handle 6 bdaddr 00:11:B1:A2:01:C9 type ACL encrypt 0x01
-< ACL data: handle 6 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 3 scid 0x0040
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-     handle 6 policy 0x0f
-     Link policy: RSWITCH HOLD SNIFF PARK
-> HCI Event: Command Complete (0x0e) plen 6
-     Write Link Policy Settings (0x02|0x000d) ncmd 1
-     status 0x00 handle 6
-> HCI Event: Max Slots Change (0x1b) plen 3
-     handle 6 slots 5
-> HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 6 packets 1
-> ACL data: handle 6 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 2
-       Connection pending - Authorization pending
-> ACL data: handle 6 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-       Connection successful
-< ACL data: handle 6 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-       MTU 1024
-> HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 6 packets 1
-> ACL data: handle 6 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-       Success
-> ACL data: handle 6 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-       MTU 1024
-< ACL data: handle 6 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-       Success
-< ACL data: handle 6 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-> HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 6 packets 2
-> ACL data: handle 6 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-< ACL data: handle 6 flags 0x02 dlen 18
-     L2CAP(d): cid 0x0040 len 14 [psm 3]
-       RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
-       dlci 2 frame_type 0 credit_flow 15 pri 7 ack_timer 0
-       frame_size 1019 max_retrans 0 credits 7
-> HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 6 packets 1
-> ACL data: handle 6 flags 0x02 dlen 17
-> ACL data: handle 6 flags 0x01 dlen 1
-     L2CAP(d): cid 0x0040 len 14 [psm 3]
-       RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
-       dlci 2 frame_type 0 credit_flow 14 pri 7 ack_timer 0
-       frame_size 320 max_retrans 0 credits 0
-< ACL data: handle 6 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59
-> HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 6 packets 1
-> ACL data: handle 6 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
-< ACL data: handle 6 flags 0x02 dlen 12
-     L2CAP(d): cid 0x0040 len 8 [psm 3]
-       RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-       dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 0 b2 0 b3 0 len 0
-< ACL data: handle 6 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8
-> ACL data: handle 6 flags 0x02 dlen 12
-     L2CAP(d): cid 0x0040 len 8 [psm 3]
-       RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-       dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 0 b2 0 b3 0 len 0
-< ACL data: handle 6 flags 0x02 dlen 12
-     L2CAP(d): cid 0x0040 len 8 [psm 3]
-       RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-       dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 0 b2 0 b3 0 len 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 6 packets 3
-> ACL data: handle 6 flags 0x02 dlen 12
-     L2CAP(d): cid 0x0040 len 8 [psm 3]
-       RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-       dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 0 b2 0 b3 0 len 0
-< ACL data: handle 6 flags 0x02 dlen 9
-     L2CAP(d): cid 0x0040 len 5 [psm 3]
-       RFCOMM(d): UIH: cr 1 dlci 2 pf 1 ilen 0 fcs 0x86 credits 33
-> ACL data: handle 6 flags 0x02 dlen 9
-     L2CAP(d): cid 0x0040 len 5 [psm 3]
-       RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 5
-> HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 6 packets 1
-> ACL data: handle 6 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
-< ACL data: handle 6 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
-< ACL data: handle 6 flags 0x02 dlen 12
-     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 6 packets 2
-> ACL data: handle 6 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73
-> ACL data: handle 6 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73
-> ACL data: handle 6 flags 0x02 dlen 12
-     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-     handle 6 reason 0x13
-     Reason: Remote User Terminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-     Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> HCI Event: Disconn Complete (0x05) plen 4
-     status 0x00 handle 6 reason 0x16
-     Reason: Connection Terminated by Local Host
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-     lap 0x9e8b33 len 6 num 0
-> HCI Event: Command Status (0x0f) plen 4
-     Inquiry (0x01|0x0001) status 0x00 ncmd 1
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x48af class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x48af class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x48af class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x48af class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x48af class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x48af class 0x001f00
-> HCI Event: Inquiry Complete (0x01) plen 1
-     status 0x00
-
-2.  Trying to connect the device for the second time (without resetting
-the device):
-
-doro: # rfcomm connect /dev/rfcomm0 0:11:B1:A2:01:C9
-Can't connect RFCOMM socket: Permission denied
-doro: #
-
-The device don't ask for the PIN!!
-
-doro: # hcidump -X -V -i hci0
-HCI sniffer - Bluetooth packet analyzer ver 1.30
-device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-     bdaddr 00:11:B1:A2:01:C9 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-     Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-     bdaddr 00:11:B1:A2:01:C9
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-     bdaddr 00:11:B1:A2:01:C9 key 6F032F60640CF647B6F07173A5A773CD
-> HCI Event: Command Complete (0x0e) plen 10
-     Link Key Request Reply (0x01|0x000b) ncmd 1
-     status 0x00 bdaddr 00:11:B1:A2:01:C9
-> HCI Event: Connect Complete (0x03) plen 11
-     status 0x05 handle 6 bdaddr 00:11:B1:A2:01:C9 type ACL encrypt 0x00
-     Error: Authentication Failure
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-     lap 0x9e8b33 len 6 num 0
-> HCI Event: Command Status (0x0f) plen 4
-     Inquiry (0x01|0x0001) status 0x00 ncmd 1
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x19c0 class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x19c1 class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x19c1 class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x19c0 class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x19c1 class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x19c0 class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x19c1 class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x19c1 class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x19c0 class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x19c1 class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x19c1 class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:11:B1:A2:01:C9 mode 1 clkoffset 0x19c0 class 0x001f00
-> HCI Event: Inquiry Result (0x02) plen 15
-     bdaddr 00:A0:96:0B:98:B8 mode 1 clkoffset 0x7f1e class 0x000510
-> HCI Event: Inquiry Complete (0x01) plen 1
-     status 0x00
+You will see that attributes 0x100 and 0x101 are not matching.
 
 Regards
 
-Harald
-
-
-
-
-
-
+Marcel
 
 
 
