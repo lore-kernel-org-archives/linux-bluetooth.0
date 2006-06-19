@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Sumeet VERMA <sumeet.verma@st.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Tue, 20 Jun 2006 10:02:19 +0530
-Message-ID: <003b01c69422$84b26300$7f0cc70a@dlh.st.com>
+Message-ID: <44970CBD.8000802@xmission.com>
+Date: Mon, 19 Jun 2006 14:44:45 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] dbus-glib problem
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <1150746967.5012.13.camel@localhost>
+In-Reply-To: <1150746967.5012.13.camel@localhost>
+Subject: Re: [Bluez-users] Slow connection to Motorola H500 Headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,37 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi
+Christoph
 
-I have downloaded bluez-utils-3.1 and bluez-libs-3.1 and I am trying to build them.
+> Audio transfer is working perfectly in both directions, the only minor
+> annoyance is that it takes several seconds for every connection to be
+> established.
 
-I get the following error when I run ./configure for bluez-utils -
+maybe the headset is parking itself between connections. I don't know
+much about what can be done to influence its policy though.
 
-[I have no name!@del32tpt  bluez-utils-3.1]$ ./configure
-checking for a BSD-compatible install... /usr/bin/install -c
-checking whether build environment is sane... yes
-checking for gawk... gawk
-..
-.
-.
-.
-.
-.
-.
-checking for BLUEZ... yes
-checking for DBUS... Package dbus-glib-1 was not found in the pkg-config search path.
-Perhaps you should add the directory containing `dbus-glib-1.pc'
-to the PKG_CONFIG_PATH environment variable
-No package 'dbus-glib-1' found
-configure: error: dbus-glib > 0.35 is required
+you could start up hcidump before you bring up the headset and tell us
+what the dump looks like at the start. we might be able to tell what
+slows things down.
 
-There seem to be some dependencies. I have tried installing dbus-0.61 and glib-2.8.6 but it does not work. Please tell me what packages to install to remove these dependencies and send me a link also if possible.
-
-Thanks,
-
-Sumeet
-
-
+Brad
 
 
 
