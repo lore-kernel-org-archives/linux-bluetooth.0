@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Christoph Lukas <christoph.lukas@gmx.net>
-To: bluez-users@lists.sourceforge.net
-Date: Mon, 19 Jun 2006 21:56:06 +0200
-Message-Id: <1150746967.5012.13.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-users] Slow connection to Motorola H500 Headset
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="----_=_NextPart_001_01C693CE.D0855F61"
+Date: Mon, 19 Jun 2006 14:32:08 -0400
+Message-ID: <70DCB28C5BB04A4BBB1C8512589BAC65E69A15@MAIL006.mail.lan>
+In-Reply-To: <1150740544.4277.28.camel@localhost>
+From: "Brand, Chris" <chris.brand@qwikker.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Bccmd patch
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,73 +16,122 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+This is a multi-part message in MIME format.
 
-I am trying to use my Motorola Headset H500 as a bluetooth audio
-device. 
+------_=_NextPart_001_01C693CE.D0855F61
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Audio transfer is working perfectly in both directions, the only minor
-annoyance is that it takes several seconds for every connection to be
-established. 
-This makes it difficult to use the headset as an audio device for VoIP
-as there is a gap of up to 5 seconds between pressing 'accept call' and
-an established audio connection. 
+=20
+> please create a patch against the latest CVS (or=20
+> bluez-utils-3.1) and attach it.
 
-These connection delays also happen with using a simple:
+Here it is against bluez-utils-3.1
 
-aplay -D plughw:Headset soundfile.wav
+Chris
 
-I am running Ubuntu Dapper with kernel 2.6.15, bluez-utils 2.24,
-snd-bt-sco 1.11 and btsco v0.42.
+------_=_NextPart_001_01C693CE.D0855F61
+Content-Type: application/octet-stream;
+	name="bccmd.patch"
+Content-Transfer-Encoding: base64
+Content-Description: bccmd.patch
+Content-Disposition: attachment;
+	filename="bccmd.patch"
 
-btsco -v <addr> shows:
+LS0tIGJsdWV6LXV0aWxzLTMuMS90b29scy9iY2NtZC5jLm9yaWcJMjAwNi0wNi0xOSAxMToxNjo0
+MC4wMDAwMDAwMDAgLTA3MDAKKysrIGJsdWV6LXV0aWxzLTMuMS90b29scy9iY2NtZC5jCTIwMDYt
+MDYtMTkgMTE6MjQ6MTQuMDAwMDAwMDAwIC0wNzAwCkBAIC0xOTksOSArMTk5LDkgQEAKIAl9CiB9
+CiAKLSNkZWZpbmUgT1BUX1JBTkdFKHJhbmdlKSBcCi0JCWlmIChhcmdjIDwgKHJhbmdlKSkgeyBl
+cnJubyA9IEVJTlZBTDsgcmV0dXJuIC0xOyB9IFwKLQkJaWYgKGFyZ2MgPiAocmFuZ2UpKSB7IGVy
+cm5vID0gRTJCSUc7IHJldHVybiAtMTsgfQorI2RlZmluZSBPUFRfUkFOR0UobWluLCBtYXgpIFwK
+KwkJaWYgKGFyZ2MgPCAobWluKSkgeyBlcnJubyA9IEVJTlZBTDsgcmV0dXJuIC0xOyB9IFwKKwkJ
+aWYgKGFyZ2MgPiAobWF4KSkgeyBlcnJubyA9IEUyQklHOyByZXR1cm4gLTE7IH0KIAogc3RhdGlj
+IHN0cnVjdCBvcHRpb24gaGVscF9vcHRpb25zW10gPSB7CiAJeyAiaGVscCIsCTAsIDAsICdoJyB9
+LApAQCAtMjI3LDcgKzIyNyw3IEBACiAjZGVmaW5lIE9QVF9IRUxQKHJhbmdlLCBoZWxwKSBcCiAJ
+CW9wdF9oZWxwKGFyZ2MsIGFyZ3YsIChoZWxwKSk7IFwKIAkJYXJnYyAtPSBvcHRpbmQ7IGFyZ3Yg
+Kz0gb3B0aW5kOyBvcHRpbmQgPSAwOyBcCi0JCU9QVF9SQU5HRSgocmFuZ2UpKQorCQlPUFRfUkFO
+R0UoKHJhbmdlKSwgKHJhbmdlKSkKIAogc3RhdGljIGludCBjbWRfYnVpbGRkZWYoaW50IHRyYW5z
+cG9ydCwgaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKIHsKQEAgLTU2NCwxMCArNTY0LDEwIEBACiAJ
+cmV0dXJuIG9wdGluZDsKIH0KIAotI2RlZmluZSBPUFRfUFNLRVkocmFuZ2UsIHN0b3JlcywgcmVz
+ZXQsIGhlbHApIFwKKyNkZWZpbmUgT1BUX1BTS0VZKG1pbiwgbWF4LCBzdG9yZXMsIHJlc2V0LCBo
+ZWxwKSBcCiAJCW9wdF9wc2tleShhcmdjLCBhcmd2LCAoc3RvcmVzKSwgKHJlc2V0KSwgKGhlbHAp
+KTsgXAogCQlhcmdjIC09IG9wdGluZDsgYXJndiArPSBvcHRpbmQ7IG9wdGluZCA9IDA7IFwKLQkJ
+T1BUX1JBTkdFKChyYW5nZSkpCisJCU9QVF9SQU5HRSgobWluKSwgKG1heCkpCiAKIHN0YXRpYyBp
+bnQgY21kX3BzZ2V0KGludCB0cmFuc3BvcnQsIGludCBhcmdjLCBjaGFyICphcmd2W10pCiB7CkBA
+IC01NzgsNyArNTc4LDcgQEAKIAogCW1lbXNldChhcnJheSwgMCwgc2l6ZW9mKGFycmF5KSk7CiAK
+LQlPUFRfUFNLRVkoMSwgJnN0b3JlcywgJnJlc2V0LCBOVUxMKTsKKwlPUFRfUFNLRVkoMSwgMSwg
+JnN0b3JlcywgJnJlc2V0LCBOVUxMKTsKIAogCWlmIChzdHJuY2FzZWNtcChhcmd2WzBdLCAiMHgi
+LCAyKSkgewogCQlwc2tleSA9IGF0b2koYXJndlswXSk7CkBAIC02NTMsNyArNjUzLDcgQEAKIAog
+CW1lbXNldChhcnJheSwgMCwgc2l6ZW9mKGFycmF5KSk7CiAKLQlPUFRfUFNLRVkoMiwgJnN0b3Jl
+cywgJnJlc2V0LCBOVUxMKTsKKwlPUFRfUFNLRVkoMiwgODEsICZzdG9yZXMsICZyZXNldCwgTlVM
+TCk7CiAKIAlpZiAoc3RybmNhc2VjbXAoYXJndlswXSwgIjB4IiwgMikpIHsKIAkJcHNrZXkgPSBh
+dG9pKGFyZ3ZbMF0pOwpAQCAtNzU2LDcgKzc1Niw3IEBACiAJdWludDE2X3QgcHNrZXksIHN0b3Jl
+cyA9IENTUl9TVE9SRVNfUFNSQU07CiAJaW50IGksIGVyciwgcmVzZXQgPSAwOwogCi0JT1BUX1BT
+S0VZKDEsICZzdG9yZXMsICZyZXNldCwgTlVMTCk7CisJT1BUX1BTS0VZKDEsIDEsICZzdG9yZXMs
+ICZyZXNldCwgTlVMTCk7CiAKIAlpZiAoc3RybmNhc2VjbXAoYXJndlswXSwgIjB4IiwgMikpIHsK
+IAkJcHNrZXkgPSBhdG9pKGFyZ3ZbMF0pOwpAQCAtNzkzLDcgKzc5Myw3IEBACiAJdWludDE2X3Qg
+cHNrZXkgPSAweDAwMDAsIGxlbmd0aCwgc3RvcmVzID0gQ1NSX1NUT1JFU19ERUZBVUxUOwogCWlu
+dCBlcnIsIHJlc2V0ID0gMDsKIAotCU9QVF9QU0tFWSgwLCAmc3RvcmVzLCAmcmVzZXQsIE5VTEwp
+OworCU9QVF9QU0tFWSgwLCAwLCAmc3RvcmVzLCAmcmVzZXQsIE5VTEwpOwogCiAJd2hpbGUgKDEp
+IHsKIAkJbWVtc2V0KGFycmF5LCAwLCBzaXplb2YoYXJyYXkpKTsKQEAgLTgzOSw3ICs4MzksNyBA
+QAogCWNoYXIgKnN0ciwgdmFsWzddOwogCWludCBpLCBlcnIsIHJlc2V0ID0gMDsKIAotCU9QVF9Q
+U0tFWSgwLCAmc3RvcmVzLCAmcmVzZXQsIE5VTEwpOworCU9QVF9QU0tFWSgwLCAwLCAmc3RvcmVz
+LCAmcmVzZXQsIE5VTEwpOwogCiAJd2hpbGUgKDEpIHsKIAkJbWVtc2V0KGFycmF5LCAwLCBzaXpl
+b2YoYXJyYXkpKTsKQEAgLTkwOCw3ICs5MDgsNyBAQAogCWNoYXIgKnN0ciwgdmFsWzddOwogCWlu
+dCBlcnIsIHJlc2V0ID0gMDsKIAotCU9QVF9QU0tFWSgxLCAmc3RvcmVzLCAmcmVzZXQsIE5VTEwp
+OworCU9QVF9QU0tFWSgxLCAxLCAmc3RvcmVzLCAmcmVzZXQsIE5VTEwpOwogCiAJcHNyX3JlYWQo
+YXJndlswXSk7CiAKQEAgLTk5MCwxMyArOTkwLDEzIEBACiAJeyAiaG9wcGluZ29uIiwgY21kX2hv
+cHBpbmdvbiwgIiIsICAgICAgICAgICAgICAiUmV2ZXJ0IHRvIGNoYW5uZWwgaG9wcGluZyIgICAg
+ICB9LAogCXsgInJ0dHhkYXRhMSIsIGNtZF9ydHR4ZGF0YTEsICI8ZnJlcT4gPGxldmVsPiIsIlRY
+RGF0YTEgcmFkaW8gdGVzdCIgICAgICAgICAgICAgfSwKIAl7ICJtZW10eXBlcyIsICBjbWRfbWVt
+dHlwZXMsICBOVUxMLCAgICAgICAgICAgICJHZXQgbWVtb3J5IHR5cGVzIiAgICAgICAgICAgICAg
+IH0sCi0JeyAicHNnZXQiLCAgICAgY21kX3BzZ2V0LCAgICAgIjxrZXk+IiwgICAgICAgICAiR2V0
+IHZhbHVlIGZvciBQUyBrZXkiICAgICAgICAgICB9LAotCXsgInBzc2V0IiwgICAgIGNtZF9wc3Nl
+dCwgICAgICI8a2V5PiA8dmFsdWU+IiwgIlNldCB2YWx1ZSBmb3IgUFMga2V5IiAgICAgICAgICAg
+fSwKLQl7ICJwc2NsciIsICAgICBjbWRfcHNjbHIsICAgICAiPGtleT4iLCAgICAgICAgICJDbGVh
+ciB2YWx1ZSBmb3IgUFMga2V5IiAgICAgICAgIH0sCi0JeyAicHNsaXN0IiwgICAgY21kX3BzbGlz
+dCwgICAgTlVMTCwgICAgICAgICAgICAiTGlzdCBhbGwgUFMga2V5cyIgICAgICAgICAgICAgICB9
+LAotCXsgInBzcmVhZCIsICAgIGNtZF9wc3JlYWQsICAgIE5VTEwsICAgICAgICAgICAgIlJlYWQg
+YWxsIFBTIGtleXMiICAgICAgICAgICAgICAgfSwKLQl7ICJwc2xvYWQiLCAgICBjbWRfcHNsb2Fk
+LCAgICAiPGZpbGU+IiwgICAgICAgICJMb2FkIGFsbCBQUyBrZXlzIGZyb20gUFNSIGZpbGUiIH0s
+Ci0JeyAicHNjaGVjayIsICAgY21kX3BzY2hlY2ssICAgIjxmaWxlPiIsICAgICAgICAiQ2hlY2sg
+UFNSIGZpbGUiICAgICAgICAgICAgICAgICB9LAorCXsgInBzZ2V0IiwgICAgIGNtZF9wc2dldCwg
+ICAgICJbLXJdIFstcyBzdG9yZV0gPGtleT4iLCAgICAgICAgICJHZXQgdmFsdWUgZm9yIFBTIGtl
+eSIgICAgICAgICAgIH0sCisJeyAicHNzZXQiLCAgICAgY21kX3Bzc2V0LCAgICAgIlstcl0gWy1z
+IHN0b3JlXSA8a2V5PiA8dmFsdWU+IiwgIlNldCB2YWx1ZSBmb3IgUFMga2V5IiAgICAgICAgICAg
+fSwKKwl7ICJwc2NsciIsICAgICBjbWRfcHNjbHIsICAgICAiWy1yXSBbLXMgc3RvcmVdIDxrZXk+
+IiwgICAgICAgICAiQ2xlYXIgdmFsdWUgZm9yIFBTIGtleSIgICAgICAgICB9LAorCXsgInBzbGlz
+dCIsICAgIGNtZF9wc2xpc3QsICAgICJbLXJdIFstcyBzdG9yZV0iLCAgICAgICAgICAgICAgICJM
+aXN0IGFsbCBQUyBrZXlzIiAgICAgICAgICAgICAgIH0sCisJeyAicHNyZWFkIiwgICAgY21kX3Bz
+cmVhZCwgICAgIlstcl0gWy1zIHN0b3JlXSIsICAgICAgICAgICAgICAgIlJlYWQgYWxsIFBTIGtl
+eXMiICAgICAgICAgICAgICAgfSwKKwl7ICJwc2xvYWQiLCAgICBjbWRfcHNsb2FkLCAgICAiWy1y
+XSBbLXMgc3RvcmVdIDxmaWxlPiIsICAgICAgICAiTG9hZCBhbGwgUFMga2V5cyBmcm9tIFBTUiBm
+aWxlIiB9LAorCXsgInBzY2hlY2siLCAgIGNtZF9wc2NoZWNrLCAgICJbLXJdIFstcyBzdG9yZV0g
+PGZpbGU+IiwgICAgICAgICJDaGVjayBQU1IgZmlsZSIgICAgICAgICAgICAgICAgIH0sCiAJeyBO
+VUxMIH0KIH07CiAKQEAgLTEwMzMsNyArMTAzMyw3IEBACiAJCQlwb3MgPSAwOwogCQl9CiAJfQot
+CXByaW50ZigiXG4iKTsKKwlwcmludGYoIlx0b3IgYnkgaGV4IHZhbHVlXG4iKTsKIH0KIAogc3Rh
+dGljIHN0cnVjdCBvcHRpb24gbWFpbl9vcHRpb25zW10gPSB7Cg==
 
-btsco v0.42
-Device is 1:0
-Voice setting: 0x0060
-RFCOMM channel 2 connected
-Using interface hci0
-recieved AT+BRSF=26
-speaker volume: 7 mic volume: 1
-i/o needed: connecting sco...
-   <several seconds here>
-connected SCO channel
-Done setting sco fd
-recieved AT+VGS=07
-Sending up speaker change 7
-speaker volume: 7 mic volume: 1
-driver is not in use
-disconnected SCO channel
+------_=_NextPart_001_01C693CE.D0855F61
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 
-and hcidump -t shows:
-
-1150745951.394107 < HCI Command: Add SCO Connection (0x01|0x0007) plen 4
-1150745951.399620 > HCI Event: Command Status (0x0f) plen 4
-1150745956.366798 > HCI Event: Connect Complete (0x03) plen 11
-1150745956.389809 > SCO data: handle 41 dlen 48
-1150745956.389813 > SCO data: handle 41 dlen 48
-1150745956.389818 > SCO data: handle 41 dlen 48
-1150745956.389888 < SCO data: handle 41 dlen 48
-1150745956.389912 < SCO data: handle 41 dlen 48
-1150745956.389930 < SCO data: handle 41 dlen 48
-
-
-Can I do anything to avoid these delays?
-
-Thanks for any hints.
-
-Regards,
-Christoph
-
-
-
+------_=_NextPart_001_01C693CE.D0855F61
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+------_=_NextPart_001_01C693CE.D0855F61--
