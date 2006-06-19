@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44965A3C.20002@palmsource.com>
-Date: Mon, 19 Jun 2006 10:03:08 +0200
+Message-ID: <44965944.6090908@palmsource.com>
+Date: Mon, 19 Jun 2006 09:59:00 +0200
 From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <447C7ADD.1040503@palmsource.com>
-	<447E951C.6040400@xmission.com>	<447EA02C.3070703@palmsource.com>
-	<44850D2C.9080708@xmission.com>
-In-Reply-To: <44850D2C.9080708@xmission.com>
-Subject: Re: [Bluez-devel] First try
+References: <447C6278.1040707@palmsource.com>
+	<447C6598.6050107@xmission.com>	<447C69D4.9020504@palmsource.com>
+	<447C7330.9000303@xmission.com> <44963723.4040807@xmission.com>
+In-Reply-To: <44963723.4040807@xmission.com>
+Subject: Re: [Bluez-devel] A2DP Profile Certification
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,30 +22,47 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi brad,
 
->I had a look at your a2dp patches to move globals into the
->per-connection struct. It all looks like a clear improvement. I didn't
->have any problems with changes in quality after the change.
->
->Would you like to check things out of cvs and verify it works for you?
+>I put code in a2play so it will listen on the control link for
+>suspend/resume from a2dp headset (*if* you use -p for pthreads). This
+>should be a decent model for getting it into the alsa plugin if you want
+>to look at that.
 >  =
 
 >
-Sorry for the long silence, I'm working on something else. I'm pleased =
+I will have a look by the end of the week.
 
-you integrated my previous patch, it works well.
+>This is how we find out a combo headset is taking a voice call.
+>  =
 
-I tried two headset at a time. It does'nt crash, but I have bad sound. I =
+>
+I noticed that my headset stopped streaming when pressing the main =
 
-believe this is due to bandwith limit. My bluetooth dongle is USB so =
+button and didn't get back playing after pressing the button again.
+Is that what you mean?
 
-there is enough bandwith.  And bluetooth is 700 kb/s so I thought it =
+>Frankly it may be messy getting those signals to the media player. It
+>would be easier to make the alsa plugin just throw away audio it gets
+>while the set wants things suspended.
+>  =
 
-should be enough to pass sbc data. I believed sbc was 128 kb/s. Maybe it =
+>
+Yes for sure, and it's not bad IMHO, you would not like your speaker do =
 
-is per channel... Can you confirm?
+some sound if you answer a phone call!
 
-Thank you!
+>We're still missing something here... we don't listen for new control
+>connections from the set. You could look at a2recv.c for code that will
+>listen for new connections. This will be more complicated since you may
+>want to use dbus to start up the media player in response.
+>  =
+
+>
+I was wondering how to generate such connections? Simply switch on the =
+
+headset? Any ideas?
+
 Fr=E9d=E9ric.
 
 
