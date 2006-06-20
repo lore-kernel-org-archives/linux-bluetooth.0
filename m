@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Sumeet VERMA <sumeet.verma@st.com>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
-Date: Tue, 20 Jun 2006 17:38:07 +0530
-Message-ID: <006601c69462$3118c2d0$7f0cc70a@dlh.st.com>
-MIME-Version: 1.0
-In-Reply-To: <1150797013.18381.31.camel@localhost>
-Subject: Re: [Bluez-users] Bccmd patch
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4496DADD.5050208@cormack.org>
+References: <4496DADD.5050208@cormack.org>
+Date: Tue, 20 Jun 2006 11:55:37 +0200
+Message-Id: <1150797337.18381.35.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Bluez NAP refuses connection if PANU clent
+	has	deleted pairing.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,46 +21,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel 
-I am unable to access CVS from my PC. Is there some other way to download
-the package which does not have a check for dbus.
+Hi Alec,
 
-Thanks in Advance,
-
-Sumeet
-
-
-
------Original Message-----
-From: bluez-users-bounces@lists.sourceforge.net
-[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: Tuesday, June 20, 2006 3:20 PM
-To: BlueZ users
-Subject: Re: [Bluez-users] Bccmd patch
-
-
-Hi Chris,
-
->  > please create a patch against the latest CVS (or
-> > bluez-utils-3.1) and attach it.
+> I am using openslug 2.7 linux on Linksys NSLU2 server to create a 
+> Bluetooth NAP.
 > 
-> Here it is against bluez-utils-3.1
+> The packages are a bit out of date but they are the latest available for 
+> the NSLU2.
+> 
+> bluez-utils-nodbus - 2.21-r0 -
+> kernel-module-bluetooth - 2.6.12.2-r17.4 -
+> libbluetooth1 - 2.21-r0 -
+> 
+> The NAP works perfectly allowing clients to connect, enter the PIN and 
+> gain internet access via tle Bluez NAP.  Once clients have paired once 
+> they can re-connect without a PIN.
+> 
+> The problem I get is if a client deletes its pairing but the server 
+> still has its pairing in /var/lib/bluetooth/{ADDR}/linkkeys.  Under 
+> these circumstances the client is refused access until I delete the 
+> pairing on the server - at which point the client is prompted to re-pair 
+> and everything then works fine again.
+> 
+> I assumed there was some combination of settings in hcid.conf that would 
+> overcome this (pairing multi looked promising! but made no difference) 
+> and I have tried every variation of  settings I can think of. 
 
-I applied the OPT_RANGE changes, but I didn't apply the usage() change.
-Please update the manpage to include them there. It is a better place.
+you are in security mode 3 (auth and encrypt enabled). Don't do this.
+Simply start pand with -A and -E options. You should also update your
+bluez-utils to the latest version, because the handling of the link keys
+might contain a bug and this is the reason why you see this issue.
 
 Regards
 
 Marcel
 
-
-
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 
