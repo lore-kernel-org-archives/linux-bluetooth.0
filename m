@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Sumeet VERMA <sumeet.verma@st.com>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
-Date: Wed, 21 Jun 2006 10:52:55 +0530
-Message-ID: <000801c694f2$c07e3190$7f0cc70a@dlh.st.com>
 MIME-Version: 1.0
-In-Reply-To: <1150792316.18381.11.camel@localhost>
-Subject: Re: [Bluez-users] dbus-glib problem
+Content-Type: multipart/mixed; boundary="----_=_NextPart_001_01C69496.2B6D69C9"
+Date: Tue, 20 Jun 2006 14:19:11 -0400
+Message-ID: <70DCB28C5BB04A4BBB1C8512589BAC65ED7DE4@MAIL006.mail.lan>
+In-Reply-To: <1150797013.18381.31.camel@localhost>
+From: "Brand, Chris" <chris.brand@qwikker.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Bccmd patch
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,74 +16,85 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel
-Could you tell me what change did you make to remove the dbus-glib check. I
-can make the same change on my side as I am unable to access CVS from my
-machine.
+This is a multi-part message in MIME format.
 
-Thanks for your kind help.
+------_=_NextPart_001_01C69496.2B6D69C9
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Best Regards,
+=20
+> I applied the OPT_RANGE changes, but I didn't apply the=20
+> usage() change.
 
-Sumeet
+I would have thought that it should be in both the manpage and the
+usage.
+
+> Please update the manpage to include them there.
+
+Patch attached (against 3.1).
+
+Chris
+
+------_=_NextPart_001_01C69496.2B6D69C9
+Content-Type: application/octet-stream;
+	name="bccmd_man.patch"
+Content-Transfer-Encoding: base64
+Content-Description: bccmd_man.patch
+Content-Disposition: attachment;
+	filename="bccmd_man.patch"
+
+LS0tIGJsdWV6LXV0aWxzLTMuMS90b29scy9iY2NtZC44Lm9yaWcJMjAwNi0wNi0yMCAxMTowNDow
+Ny4wMDAwMDAwMDAgLTA3MDAKKysrIGJsdWV6LXV0aWxzLTMuMS90b29scy9iY2NtZC44CTIwMDYt
+MDYtMjAgMTE6MTU6NDQuMDAwMDAwMDAwIC0wNzAwCkBAIC0xLDQgKzEsNCBAQAotLlRIIEJDQ01E
+IDggIkRlYyA2IDIwMDUiIEJsdWVaICJMaW51eCBTeXN0ZW0gQWRtaW5pc3RyYXRpb24iCisuVEgg
+QkNDTUQgOCAiSnVuIDIwIDIwMDYiIEJsdWVaICJMaW51eCBTeXN0ZW0gQWRtaW5pc3RyYXRpb24i
+CiAuU0ggTkFNRQogYmNjbWQgXC0gVXRpbGl0eSBmb3IgdGhlIENTUiBCQ0NNRCBpbnRlcmZhY2UK
+IC5TSCBTWU5PUFNJUwpAQCAtODcsMzAgKzg3LDM3IEBACiAuQkkgbWVtdHlwZXMKIEdldCBtZW1v
+cnkgdHlwZXMKIC5UUAotLkJJIHBzZ2V0XCA8a2V5PgotR2V0IHZhbHVlIGZvciBQUyBrZXkKLS5U
+UAotLkJJIHBzc2V0XCA8a2V5PlwgPHZhbHVlPgotU2V0IHZhbHVlIGZvciBQUyBrZXkKLS5UUAot
+LkJJIHBzY2xyXCA8a2V5PgotQ2xlYXIgdmFsdWUgZm9yIFBTIGtleQotLlRQCi0uQkkgcHNsaXN0
+Ci1MaXN0IGFsbCBQUyBrZXlzCi0uVFAKLS5CSSBwc3JlYWQKLVJlYWQgYWxsIFBTIGtleXMKLS5U
+UAotLkJJIHBzbG9hZFwgPGZpbGU+Ci1Mb2FkIGFsbCBQUyBrZXlzIGZyb20gUFNSIGZpbGUKLS5U
+UAotLkJJIHBzY2hlY2tcIDxmaWxlPgotQ2hlY2sgc3ludGF4IG9mIFBTUiBmaWxlCisuQkkgcHNn
+ZXRcIFstcl1cIFstc1wgPHN0b3JlPl1cIDxrZXk+CitHZXQgdmFsdWUgZm9yIFBTIGtleS4KKy1y
+IHNlbmRzIGEgd2FybSByZXNldCBhZnRlcndhcmRzCisuVFAKKy5CSSBwc3NldFwgWy1yXVwgWy1z
+XCA8c3RvcmU+XVwgPGtleT5cIDx2YWx1ZT4KK1NldCB2YWx1ZSBmb3IgUFMga2V5LgorLXIgc2Vu
+ZHMgYSB3YXJtIHJlc2V0IGFmdGVyd2FyZHMKKy5UUAorLkJJIHBzY2xyXCBbLXJdXCBbLXNcIDxz
+dG9yZT5dXCA8a2V5PgorQ2xlYXIgdmFsdWUgZm9yIFBTIGtleS4KKy1yIHNlbmRzIGEgd2FybSBy
+ZXNldCBhZnRlcndhcmRzCisuVFAKKy5CSSBwc2xpc3RcIFstcl1cIFstc1wgPHN0b3JlPl0KK0xp
+c3QgYWxsIFBTIGtleXMuCistciBzZW5kcyBhIHdhcm0gcmVzZXQgYWZ0ZXJ3YXJkcworLlRQCisu
+QkkgcHNyZWFkXCBbLXJdXCBbLXNcIDxzdG9yZT5dCitSZWFkIGFsbCBQUyBrZXlzLgorLXIgc2Vu
+ZHMgYSB3YXJtIHJlc2V0IGFmdGVyd2FyZHMKKy5UUAorLkJJIHBzbG9hZFwgWy1yXVwgWy1zXCA8
+c3RvcmU+XVwgPGZpbGU+CitMb2FkIGFsbCBQUyBrZXlzIGZyb20gUFNSIGZpbGUuCistciBzZW5k
+cyBhIHdhcm0gcmVzZXQgYWZ0ZXJ3YXJkcworLlRQCisuQkkgcHNjaGVja1wgWy1yXVwgWy1zXCA8
+c3RvcmU+XVwgPGZpbGU+CitDaGVjayBzeW50YXggb2YgUFNSIGZpbGUuCistciBzZW5kcyBhIHdh
+cm0gcmVzZXQgYWZ0ZXJ3YXJkcwogLlNIIEtFWVMKIGJkYWRkciBjb3VudHJ5IGRldmNsYXNzIGtl
+eW1pbiBrZXltYXggZmVhdHVyZXMgY29tbWFuZHMgdmVyc2lvbgogcmVtdmVyIGhjaWV4dG4gbWFw
+c2NvIGJhdWRyYXRlIGhvc3RpbnRmIGFuYWZyZXEgYW5hZnRyaW0gdXNidmlkCi11c2JwaWQgZGZ1
+cGlkIGJvb3Rtb2RlCit1c2JwaWQgZGZ1cGlkIGJvb3Rtb2RlIG9yIGhleCB2YWx1ZQogLlNIIEFV
+VEhPUlMKIFdyaXR0ZW4gYnkgTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPiwK
+IG1hbiBwYWdlIGJ5IEFkYW0gTGF1cmllIDxhZGFtQGFsZ3JvdXAuY28udWs+Cg==
+
+------_=_NextPart_001_01C69496.2B6D69C9
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 
-
------Original Message-----
-From: bluez-users-bounces@lists.sourceforge.net
-[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: Tuesday, June 20, 2006 2:02 PM
-To: BlueZ users
-Subject: Re: [Bluez-users] dbus-glib problem
-
-
-Hi,
-
-> >> checking for BLUEZ... yes
-> >> checking for DBUS... Package dbus-glib-1 was not found in the 
-> >> pkg-config search path. Perhaps you should add the directory 
-> >> containing `dbus-glib-1.pc' to the PKG_CONFIG_PATH environment 
-> >> variable No package 'dbus-glib-1' found
-> >> configure: error: dbus-glib > 0.35 is required
-> >>
-> >> There seem to be some dependencies. I have tried installing 
-> >> dbus-0.61 and glib-2.8.6 but it does not work. Please tell me what 
-> >> packages to install to remove these dependencies and send me a link 
-> >> also if possible.
-> > 
-> > we don't require the dbus-glib bindings. No idea why it is looking 
-> > for them. This seems like a bug in D-Bus package. What kind 
-> > distribution is this?
-> 
-> I had the same problem on my ubuntu. You have to install 
-> dbus-glib-dev.
-> The configure script is looking for the include files but apparently 
-> does not seems to say it.
-
-oops. This is my mistake. I accidentally put in a check for dbus-glib, but
-this is not needed at all. We only use the low-level D-Bus API. I fixed that
-in the CVS now.
-
-Regards
-
-Marcel
-
-
-
+------_=_NextPart_001_01C69496.2B6D69C9
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+------_=_NextPart_001_01C69496.2B6D69C9--
