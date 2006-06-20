@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <c49421c50606201753i46e54059qf975de33200ffd39@mail.gmail.com>
-Date: Tue, 20 Jun 2006 16:53:21 -0800
-From: "Loreno Oliveira" <lorenooliveira@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <44986D90.2090505@fh-wolfenbuettel.de>
+Date: Tue, 20 Jun 2006 23:50:08 +0200
+From: Goetz Issel <g.issel@fh-wolfenbuettel.de>
 MIME-Version: 1.0
-Subject: [Bluez-devel] bluez tutorial/manual
+To: bluez-devel@lists.sourceforge.net
+References: <mailman.1467.1150830573.9417.bluez-devel@lists.sourceforge.net>
+In-Reply-To: <mailman.1467.1150830573.9417.bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] blueZ and SAP
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,58 +16,77 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0963460360=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0963460360==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_28912_20614002.1150851201997"
+Hi Mayank,
 
-------=_Part_28912_20614002.1150851201997
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi everyone,
-
-sorry for the question, probably it was previously answered a number of
-times. Unfortunately, I can't access the list archive :-(
-
-Well, I'm new on BlueZ and need some material for studying the API. Does
-anyone has some hint about documents that can help BlueZ newbies?
-
-Thanks in advance!
-
-Loreno
-
-------=_Part_28912_20614002.1150851201997
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi everyone,<br><br>sorry for the question, probably it was previously answered a number of times. Unfortunately, I can't access the list archive :-(<br><br>Well, I'm new on BlueZ and need some material for studying the API. Does anyone has some hint about documents that can help BlueZ newbies?
-<br><br>Thanks in advance!<br><br>Loreno<br>
-
-------=_Part_28912_20614002.1150851201997--
+>
+>First of all, please do not reply on individual ids.
 
 
---===============0963460360==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+sorry for PM, will post here in list again.
+
+ I do get a message back from the mobile phone, of course after first 
+sending a message to it..
+The response of a 'connect-req' from the phone is:
+header:            1100, the response message header is correct, since 
+it has the correct MsgID that corresponds to 'connect-resp'
+
+parameter #1:  10010000 ,  meaning that it is the parameterID 
+'ConnectionStatus', with parameter value length 1 and the value is 0 (= 
+OK, server can fulfill the requirements)
+
+This message is received  from a Nokia 6810 and the MaxMsgSize requested 
+in the 'connection-req' was 0x0118. It looks promising so far. I will 
+try to get a few more things done now.
+When I request an initial MaxMsgSize of 0xff ff the mobile phone 
+responds with
+header: 1200 , so now 2 parameters in the 'connect-resp' message coming up
+parameter #1: 10012000 , connectionStatus  now gives 'Error, Server does 
+not support maximum message size'
+parameter #2: 00028000 , the server now suggests MaxMsgSize to be 0x800
+
+And... when I request a small MaxMsgSize (ie 0x0001) the SIM server 
+returns the expected 'Error, maximum message size by Client is too small' 
+
+In case you decide to work on this subject as well I am interested in a 
+bit of team work.
+
+> > first of all I am happy to hear that there is somebody out there working
+> > on this too. I thought I was on my own since I never got any helpful
+> > response on the list so far.
+> >
+> > I have been checking the returned values in 2 ways.
+> >
+> > First I tried to use "read()" on the socket on which I did the "write()"
+> > before. I got no response at all. By the way, I am using  Nokia 6810 and
+> > a Siemens S65 for testing.
+>   
+>Hang on, if you do a read() before write(), won't the read block your
+>thread? and your control will never reach the write()?
+>Or are you using different threads for the read and write?
+
+> > problem. I need to implement the whole sap profile. Panic!
+> >
+> > If you have any decend code I can use... please help. If you want I can
+> > send you the code I have so far.
+>   
+>No, I did not have any code actually, I just made the RFCOMM connection, and
+>I was sending the connect_req etc on this rfcomm device (/dev/rfcomm0). So I
+>wrote the connect_req in hex form in a file and then simply did cat file >
+>/dev/rfcomm0
+
+>Regards,
+>Mayank
+
+Greetings,
+Goetz
 
 
---===============0963460360==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0963460360==--
