@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44986D90.2090505@fh-wolfenbuettel.de>
-Date: Tue, 20 Jun 2006 23:50:08 +0200
-From: Goetz Issel <g.issel@fh-wolfenbuettel.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-References: <mailman.1467.1150830573.9417.bluez-devel@lists.sourceforge.net>
-In-Reply-To: <mailman.1467.1150830573.9417.bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] blueZ and SAP
+Mime-Version: 1.0 (Apple Message framework v750)
+In-Reply-To: <4497A5AC.8050009@yahoo.com>
+References: <435B3A56-B448-4E26-8BEB-E0879356ACBB@wideray.com>	<1150538876.17539.0.camel@aeonflux.holtmann.net>	<F73F58A0-A537-4ACE-8C56-D5F2D6735F61@wideray.com>
+	<1150741647.4277.30.camel@localhost> <4497A5AC.8050009@yahoo.com>
+Message-Id: <273ADBB8-1458-4DBB-BE1D-11FF4E7037AB@wideray.com>
+From: Jason Watts <jason.watts@wideray.com>
+Date: Tue, 20 Jun 2006 12:54:52 -0700
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Bug: infinite loop in extract_seq() when
+	sdp_extract_seqtype() fails
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,73 +18,65 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mayank,
+On Jun 20, 2006, at 12:37 AM, Pedro Monjo Florit wrote:
 
+>>> All I know at this point is that /var/log/messages gets an endless
+>>> flood of
+>>>
+>>>    sdp_extract_seqtype: Unknown sequence type, aborting
+>>>
+>>> We don't know yet what triggers this.  Of course I will follow up if
+>>> it still turns out to be a problem in bluez.
+>>
+>> it is kinda likely that SDP still have endless loops in it. However
+>> please make sure you use the latest bluez-libs from CVS and really  =
+
+>> run
+>> the latest sdpd and/or sdptool.
 >
->First of all, please do not reply on individual ids.
+>
+> In a message I sent to the mailing-list back in February (Valentine's
+> day), I explained what, IMHO, is the same problem. I have seen this
+> infinite loop being triggered by a Samsung mobile phone, but still do
+> not know which. I did not state it then, but syslog got flooded  =
+
+> with the
+> same message that Jason reports.
+
+Thanks, Pedro.  This corroborates my findings and further isolates  =
+
+the fault.
+
+I don't know which phone, either.  This happened at a large venue, so  =
+
+it could have been anyone in range.  However, I identified OUI and  =
+
+CoD of the most likely culprits from our logs.  Samsung OUIs also  =
+
+showed up in our data.
+
+Here are the candidates, from most likely to least:
+
+    OUI       CoD       Org. (from http://standards.ieee.org/regauth/ =
+
+oui/oui.txt)
+    00:15:B9  0x7A0204  Samsung Electronics
+    00:12:47  0x7A0204  Samsung Electronics
+    00:12:56  0x520204  LG Information & Comm.
+    00:0E:6D  0x520204  Murata Manufacturing
+
+I've added code to capture a call chain when this problem occurs.   =
+
+We'll deploy this change and hopefully nail down the problem.
 
 
-sorry for PM, will post here in list again.
-
- I do get a message back from the mobile phone, of course after first 
-sending a message to it..
-The response of a 'connect-req' from the phone is:
-header:            1100, the response message header is correct, since 
-it has the correct MsgID that corresponds to 'connect-resp'
-
-parameter #1:  10010000 ,  meaning that it is the parameterID 
-'ConnectionStatus', with parameter value length 1 and the value is 0 (= 
-OK, server can fulfill the requirements)
-
-This message is received  from a Nokia 6810 and the MaxMsgSize requested 
-in the 'connection-req' was 0x0118. It looks promising so far. I will 
-try to get a few more things done now.
-When I request an initial MaxMsgSize of 0xff ff the mobile phone 
-responds with
-header: 1200 , so now 2 parameters in the 'connect-resp' message coming up
-parameter #1: 10012000 , connectionStatus  now gives 'Error, Server does 
-not support maximum message size'
-parameter #2: 00028000 , the server now suggests MaxMsgSize to be 0x800
-
-And... when I request a small MaxMsgSize (ie 0x0001) the SIM server 
-returns the expected 'Error, maximum message size by Client is too small' 
-
-In case you decide to work on this subject as well I am interested in a 
-bit of team work.
-
-> > first of all I am happy to hear that there is somebody out there working
-> > on this too. I thought I was on my own since I never got any helpful
-> > response on the list so far.
-> >
-> > I have been checking the returned values in 2 ways.
-> >
-> > First I tried to use "read()" on the socket on which I did the "write()"
-> > before. I got no response at all. By the way, I am using  Nokia 6810 and
-> > a Siemens S65 for testing.
->   
->Hang on, if you do a read() before write(), won't the read block your
->thread? and your control will never reach the write()?
->Or are you using different threads for the read and write?
-
-> > problem. I need to implement the whole sap profile. Panic!
-> >
-> > If you have any decend code I can use... please help. If you want I can
-> > send you the code I have so far.
->   
->No, I did not have any code actually, I just made the RFCOMM connection, and
->I was sending the connect_req etc on this rfcomm device (/dev/rfcomm0). So I
->wrote the connect_req in hex form in a file and then simply did cat file >
->/dev/rfcomm0
-
->Regards,
->Mayank
-
-Greetings,
-Goetz
+=BF.) Jason Watts
+Embedded Software Engineer
+Qwikker, Inc.
 
 
 
