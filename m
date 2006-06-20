@@ -1,15 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Alec <bluez@cormack.org>
-In-Reply-To: <4497E167.3020205@cormack.org>
-References: <4496DADD.5050208@cormack.org>
-	<1150797337.18381.35.camel@localhost>  <4497E167.3020205@cormack.org>
-Date: Tue, 20 Jun 2006 15:56:53 +0200
-Message-Id: <1150811813.18381.44.camel@localhost>
-Mime-Version: 1.0
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluez NAP refuses connection if PANU clent
-	has	deleted pairing.
+From: Sumeet VERMA <sumeet.verma@st.com>
+To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
+Date: Tue, 20 Jun 2006 17:38:07 +0530
+Message-ID: <006601c69462$3118c2d0$7f0cc70a@dlh.st.com>
+MIME-Version: 1.0
+In-Reply-To: <1150797013.18381.31.camel@localhost>
+Subject: Re: [Bluez-users] Bccmd patch
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,33 +19,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Alec,
+Hi Marcel 
+I am unable to access CVS from my PC. Is there some other way to download
+the package which does not have a check for dbus.
 
-> Thanks for the reply.  I will try to get a later version of bluez-utils 
-> then update the mailing list with the outcome.
+Thanks in Advance,
 
-always reply to the mailing list. There is no point in moving this to a
-private discussion.
+Sumeet
 
-> I just wanted to clarify one point first about not using auth and 
-> encrypt (mode 3). 
 
-If you set auth and encrypt in hcid.conf (which got removed in
-bluez-utils-3.1 btw) then you are in security mode 3. You really don't
-wanna do that and for the why you simply look at the mailing list
-archive, because this has been discussed multiple times.
 
-> Do you mean just that I shouldn't use them in hcid.conf and only use 
-> them when I start the pand daemon?  Or is there some problem using both 
-> options together?
+-----Original Message-----
+From: bluez-users-bounces@lists.sourceforge.net
+[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Marcel
+Holtmann
+Sent: Tuesday, June 20, 2006 3:20 PM
+To: BlueZ users
+Subject: Re: [Bluez-users] Bccmd patch
 
-The pand has the options -A (for auth) and -E (for encrypt) and this
-gives you security mode 2 which is what you really want.
+
+Hi Chris,
+
+>  > please create a patch against the latest CVS (or
+> > bluez-utils-3.1) and attach it.
+> 
+> Here it is against bluez-utils-3.1
+
+I applied the OPT_RANGE changes, but I didn't apply the usage() change.
+Please update the manpage to include them there. It is a better place.
 
 Regards
 
 Marcel
 
+
+
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 
