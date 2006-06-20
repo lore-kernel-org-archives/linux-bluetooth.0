@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4496DADD.5050208@cormack.org>
-References: <4496DADD.5050208@cormack.org>
-Date: Tue, 20 Jun 2006 11:55:37 +0200
-Message-Id: <1150797337.18381.35.camel@localhost>
+In-Reply-To: <70DCB28C5BB04A4BBB1C8512589BAC65E69A15@MAIL006.mail.lan>
+References: <70DCB28C5BB04A4BBB1C8512589BAC65E69A15@MAIL006.mail.lan>
+Date: Tue, 20 Jun 2006 11:50:13 +0200
+Message-Id: <1150797013.18381.31.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluez NAP refuses connection if PANU clent
-	has	deleted pairing.
+Subject: Re: [Bluez-users] Bccmd patch
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,36 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Alec,
+Hi Chris,
 
-> I am using openslug 2.7 linux on Linksys NSLU2 server to create a 
-> Bluetooth NAP.
+>  > please create a patch against the latest CVS (or 
+> > bluez-utils-3.1) and attach it.
 > 
-> The packages are a bit out of date but they are the latest available for 
-> the NSLU2.
-> 
-> bluez-utils-nodbus - 2.21-r0 -
-> kernel-module-bluetooth - 2.6.12.2-r17.4 -
-> libbluetooth1 - 2.21-r0 -
-> 
-> The NAP works perfectly allowing clients to connect, enter the PIN and 
-> gain internet access via tle Bluez NAP.  Once clients have paired once 
-> they can re-connect without a PIN.
-> 
-> The problem I get is if a client deletes its pairing but the server 
-> still has its pairing in /var/lib/bluetooth/{ADDR}/linkkeys.  Under 
-> these circumstances the client is refused access until I delete the 
-> pairing on the server - at which point the client is prompted to re-pair 
-> and everything then works fine again.
-> 
-> I assumed there was some combination of settings in hcid.conf that would 
-> overcome this (pairing multi looked promising! but made no difference) 
-> and I have tried every variation of  settings I can think of. 
+> Here it is against bluez-utils-3.1
 
-you are in security mode 3 (auth and encrypt enabled). Don't do this.
-Simply start pand with -A and -E options. You should also update your
-bluez-utils to the latest version, because the handling of the link keys
-might contain a bug and this is the reason why you see this issue.
+I applied the OPT_RANGE changes, but I didn't apply the usage() change.
+Please update the manpage to include them there. It is a better place.
 
 Regards
 
