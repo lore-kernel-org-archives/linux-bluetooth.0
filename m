@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4498EB58.3090200@ibmt.fraunhofer.de>
+Date: Wed, 21 Jun 2006 08:46:48 +0200
+From: =?ISO-8859-1?Q?Harald_Niederl=E4nder?= <harald.niederlaender@ibmt.fraunhofer.de>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20060621050238.39581.qmail@web15809.mail.cnb.yahoo.com>
-References: <20060621050238.39581.qmail@web15809.mail.cnb.yahoo.com>
-Date: Wed, 21 Jun 2006 09:10:57 +0200
-Message-Id: <1150873857.3950.7.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel]
-	=?utf-8?b?UkXvvJogUkU6IEZXRO+8miBSZTogUmU6UmVxdWVz?=
-	=?utf-8?q?t_with_RSSI?=
+References: <4497CE54.5080305@ibmt.fraunhofer.de>
+In-Reply-To: <4497CE54.5080305@ibmt.fraunhofer.de>
+Subject: Re: [Bluez-devel] [Fwd: Re:  Problem connecting Bluetooth device]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,105 +20,192 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Marcel,
 
->  I want to get RSSI value when inquiring, and my dongole support the
-> feature:
-> mylinux:/home/lucharse# hciconfig hci0 features
-> hci0:   Type: USB
->         BD Address: 00:11:67:19:3D:EC ACL MTU: 678:8 SCO MTU: 48:10
->         Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
->                 <3-slot packets> <5-slot packets> <encryption> <slot
-> offset>
->                 <timing accuracy> <role switch> <sniff mode> <RSSI>
->                 <channel quality> <SCO link> <HV2 packets> <HV3
-> packets>
->                 <u-law log> <A-law log> <CVSD> <power control>
->                 <transparent SCO> <broadcast encrypt> <enhanced iscan>
->                 <interlaced iscan> <interlaced pscan> <inquiry with
-> RSSI>
->                 <AFH cap. slave> <AFH cap. master> <AFH class. master>
->  
-> I set the inquiry mode to 1 which is inquiry with RSSI:
->  
-> mylinux:/home/lucharse# hciconfig hci0 inqmode 1
-> mylinux:/home/lucharse# hciconfig hci0 inqmode
-> hci0:   Type: USB
->         BD Address: 00:11:67:19:3D:EC ACL MTU: 678:8 SCO MTU: 48:10
->         Inquiry mode: Inquiry with RSSI
-> 
-> But when I use the sample code from from Scott W
-> Gifford(http://sourceforge.net/mailarchive/message.php?msg_id=10195457) which is claimed to inquiry with RSSI, the output shows that the inquiry result without RSSI value. and the hcidump(-X -V) show the event type is EVT_INQUIRY_RESULT.
->  
-> mylinux:/home/lucharse/testcase# ./a.out
-> activate_rssi: err=0
-> begin_inquiry: starting
-> Polling...
-> Got event!  Type is 2
-> inquiry_result: num 1
->  00:0F:B3:9B:04:D3:    ?
-> Polling...
-> Got event!  Type is 2
-> inquiry_result: num 1
->  00:14:A4:D7:52:48:    ?
-> Polling...
-> Got event!  Type is 2
-> inquiry_result: num 1
->  00:14:A4:D7:52:91:    ?
-> Polling...
-> Got event!  Type is 2
-> inquiry_result: num 1
->  00:20:E0:7A:F4:E6:    ?
-> Polling...
-> Polling...
-> Program finished.
-> cancel_inquiry: err=0
-> 
-> while using hcidump -X -V:
->  
-> mylinux:/home/lucharse/# hcidump -X -V
-> HCI sniffer - Bluetooth packet analyzer ver 1.31
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> < HCI Command: Write Inquiry Mode (0x03|0x0045) plen 1
->     mode 1
-> > HCI Event: Command Complete (0x0e) plen 4
->     Write Inquiry Mode (0x03|0x0045) ncmd 1
->     status 0x00
-> < HCI Command: Inquiry (0x01|0x0001) plen 5
->     lap 0x9e8b33 len 48 num 0
-> > HCI Event: Command Status (0x0f) plen 4
->     Inquiry (0x01|0x0001) status 0x00 ncmd 1
-> > HCI Event: Inquiry Result (0x02) plen 16
->     bdaddr 00:0F:B3:9B:04:D3 mode 1 clkoffset 0x10e4 class 0x020104
-> > HCI Event: Inquiry Result (0x02) plen 16
->     bdaddr 00:14:A4:D7:52:48 mode 1 clkoffset 0x7c5a class 0x72010c
-> > HCI Event: Inquiry Result (0x02) plen 16
->     bdaddr 00:14:A4:D7:52:91 mode 1 clkoffset 0x4c9b class 0x72010c
-> > HCI Event: Inquiry Result (0x02) plen 16
->     bdaddr 00:20:E0:7A:F4:E6 mode 1 clkoffset 0x6ec5 class 0x00010c
-> < HCI Command: Inquiry Cancel (0x01|0x0002) plen 0
-> > HCI Event: Command Complete (0x0e) plen 4
->     Inquiry Cancel (0x01|0x0002) ncmd 1
->     status 0x00
-> 
-> in your last mail, you ask me to to use hcidump(-X -V), but I can't
-> see the RSSI value. 
->  
-> The sample code I used uses the HCI raw socket, and I review the DBus
-> API(bluez-utils-3.1), I don't know which API can give me the RSSI
-> wheng inquirying.
->  
-> How do you think about it?
 
-this is strange. If "hciconfig hci0 inqmode" tells you that you use
-Inquiry with RSSI then you should get the Inquiry with RSSI Results.
-What hardware is this (hciconfig hci0 version).
+Marcel Holtmann wrote:
+> 
+> 
+> Hi Harald,
+> 
+>> here are 2 different outputs of "hcidump -X -V" (i apologize for the length)
+> 
+> is the device a security mode 3 device or did you enabled auth and
+> encrypt in hcid.conf?
+>
+
+auth and encrypt are disabled, see my hcid.conf below
+
+> So the PIN code of this device is "111111". 
+
+Yes, the PIN is 111111
+
+
+What does the manual state
+> about Bluetooth pairing etc.
+
+I don't understand exactly what you mean, therefore the hcid.conf file:
+(the Bluetooth-Device should be SLAVE)
+
+# HCI daemon configuration file.
+#
+# $Id: hcid.conf,v 1.7 2004/12/13 14:16:03 holtmann Exp $
+#
+
+# HCId options
+options {
+         # Automatically initialize new devices
+         autoinit yes;
+
+         # Security Manager mode
+         #   none - Security manager disabled
+         #   auto - Use local PIN for incoming connections
+         #   user - Always ask user for a PIN
+         #
+         security user;
+
+         # Pairing mode
+         #   none  - Pairing disabled
+         #   multi - Allow pairing with already paired devices
+         #   once  - Pair once and deny successive attempts
+         pairing multi;
+
+         # PIN helper
+         # if you want a interactiv query of your pin use /usr/bin/bluepin
+         # /bin/bluepincat is using the pin in the /etc/bluetooth/pin file
+         # pin_helper /usr/bin/bluepin;
+         pin_helper /bin/bluepincat;
+
+         # D-Bus PIN helper
+         # dbus_pin_helper;
+}
+
+# Default settings for HCI devices
+device {
+         # Local device name
+         #   %d - device id
+         #   %h - host name
+         name "BlueZ %h (%d)";
+
+         # Local device class
+         # e.g.
+         #  0xsss100 = Computer
+         #  0xsss104 = Computer Desktop
+         #  0xsss108 = Computer Server
+         #  0xsss10c = Computer Laptop
+         # The 'sss' above defines the service-class (not quite, only the
+         # first 11 bits, the next 11 define the device-class, than 2
+format bits.)
+         # See
+https://www.bluetooth.org/foundry/assignnumb/document/baseband
+         # for more information.
+         # 0x100bbb stands for "Object Transfer  (v-Inbox, v-Folder, ...)"
+         # 0x020bbb stands for "Networking (LAN, Ad hoc, ...)"
+         class 0x100100;
+
+         # Default packet type
+         #pkt_type DH1,DM1,HV1;
+
+         # Inquiry and Page scan
+         # valid parameters: enable | disable
+         iscan enable;
+         pscan enable;
+
+         # Default link mode
+         #   none   - no specific policy
+         #   accept - always accept incoming connections
+         #   master - become master on incoming connections,
+         #            deny role switch on outgoing connections
+         lm accept;
+
+         # Default link policy
+         #   none    - no specific policy
+         #   rswitch - allow role switch
+         #   hold    - allow hold mode
+         #   sniff   - allow sniff mode
+         #   park    - allow park mode
+         lp rswitch,hold,sniff,park;
+
+         # Authentication and Encryption (Security Mode 3)
+         auth disable;
+         encrypt disable;
+}
+doro:/etc/bluetooth #
+
+> 
+> The link key you get from the pairing is different from the link key you
+> actually use for authentication in the second try. Please check what has
+> been stored in /var/lib/bluetooth/<bdaddr>/linkkeys.
+
+The directory /var/lib/bluetooth is empty !!
+
+It exist two directorys:
+doro:/usr/var/lib/bluetooth/00:0A:3A:64:97:46 #
+doro:/usr/var/lib/bluetooth/00:0B:0D:09:36:E8 #
+
+(it exist two directorys because I use two USB-Bluetooth connectors)
+
+linkkeys exist only in:
+
+doro:/usr/var/lib/bluetooth/00:0A:3A:64:97:46 #
+
+and contain
+00:11:B1:A2:01:C9 6F032F60640CF647B6F07173A5A773CD 0
+
+This entry is older (from March) and different from the key output from
+hcidump : 060E5E846F8206C5AECD5306622526E6
+
+doro:/usr/var/lib/bluetooth/00:0B:0D:09:36:E8 #
+contains only a file names
+
+P.S. :
+both connectors are different by the "Features":
+Is it important?
+
+hci0:   Type: USB
+         BD Address: 00:0A:3A:64:97:46 ACL MTU: 377:10 SCO MTU: 16:0
+         UP RUNNING PSCAN ISCAN
+         RX bytes:430 acl:0 sco:0 events:23 errors:0
+         TX bytes:339 acl:0 sco:0 commands:22 errors:0
+         Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+         Link policy: RSWITCH HOLD SNIFF PARK
+         Link mode: SLAVE ACCEPT
+         Name: 'BlueZ doro (0)'
+         Class: 0x100100
+         Service Classes: Object Transfer
+         Device Class: Computer, Uncategorized
+         HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 
+0x309
+         Manufacturer: Broadcom Corporation (15)
+
+hci1:   Type: USB
+         BD Address: 00:0B:0D:09:36:E8 ACL MTU: 120:20 SCO MTU: 64:0
+         UP RUNNING PSCAN ISCAN
+         RX bytes:111 acl:0 sco:0 events:14 errors:0
+         TX bytes:310 acl:0 sco:0 commands:14 errors:0
+         Features: 0xff 0xff 0x05 0x38 0x18 0x18 0x00 0x00
+         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+         Link policy: RSWITCH HOLD SNIFF PARK
+         Link mode: SLAVE ACCEPT
+         Name: 'BlueZ doro (1)'
+         Class: 0x100100
+         Service Classes: Object Transfer
+         Device Class: Computer, Uncategorized
+         HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 
+0x757
+         Manufacturer: Silicon Wave (11)
+
+> 
+> Regards
+> 
+> Marcel
+> 
 
 Regards
 
-Marcel
+Harald
 
-> 
 
 
 
