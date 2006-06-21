@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4498EB58.3090200@ibmt.fraunhofer.de>
-References: <4497CE54.5080305@ibmt.fraunhofer.de>
-	<4498EB58.3090200@ibmt.fraunhofer.de>
-Date: Wed, 21 Jun 2006 11:45:59 +0200
-Message-Id: <1150883159.3950.34.camel@localhost>
+To: Mingfan lu <lucharse@yahoo.com.cn>
+In-Reply-To: <20060621093306.95930.qmail@web15806.mail.cnb.yahoo.com>
+References: <20060621093306.95930.qmail@web15806.mail.cnb.yahoo.com>
+Date: Wed, 21 Jun 2006 11:43:06 +0200
+Message-Id: <1150882986.3950.31.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [Fwd: Re:  Problem connecting Bluetooth device]
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel]
+	=?utf-8?b?W0JsdWV6LWRldmVdUmU6IFJlOu+8miBSZTogUkU=?=
+	=?utf-8?b?77yaIFJFOiBGV0Q6UmU6IFJlOlJlcXVlc3Qgd2l0aAlSU1NJ?=
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,44 +23,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Harald,
+Hi,
 
-> What does the manual state
-> > about Bluetooth pairing etc.
-> 
-> I don't understand exactly what you mean, therefore the hcid.conf file:
-> (the Bluetooth-Device should be SLAVE)
+> ps, is there any plan for  official document for bluez, although the
+> bluez is being under development. 
 
-the manual of the device speak at least about pairing etc.
-
-> > The link key you get from the pairing is different from the link key you
-> > actually use for authentication in the second try. Please check what has
-> > been stored in /var/lib/bluetooth/<bdaddr>/linkkeys.
-> 
-> The directory /var/lib/bluetooth is empty !!
-> 
-> It exist two directorys:
-> doro:/usr/var/lib/bluetooth/00:0A:3A:64:97:46 #
-> doro:/usr/var/lib/bluetooth/00:0B:0D:09:36:E8 #
-> 
-> (it exist two directorys because I use two USB-Bluetooth connectors)
-> 
-> linkkeys exist only in:
-> 
-> doro:/usr/var/lib/bluetooth/00:0A:3A:64:97:46 #
-> 
-> and contain
-> 00:11:B1:A2:01:C9 6F032F60640CF647B6F07173A5A773CD 0
-> 
-> This entry is older (from March) and different from the key output from
-> hcidump : 060E5E846F8206C5AECD5306622526E6
-> 
-> doro:/usr/var/lib/bluetooth/00:0B:0D:09:36:E8 #
-> contains only a file names
-
-Remove all linkkeys files and run "hcidump -X -V" again. Connect to your
-device and then compare the link key in the file with the values in the
-dump.
+what do you mean by document. We have manpages for all commands and
+there are some howtos you can find on the web.
 
 Regards
 
