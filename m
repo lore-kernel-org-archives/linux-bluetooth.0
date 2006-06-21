@@ -1,58 +1,71 @@
-Return-Path: <philipl@mail.utexas.edu>
-Message-ID: <4498AA79.3060709@mail.utexas.edu>
-Date: Tue, 20 Jun 2006 19:10:01 -0700
-From: Philip Langdale <philipl@mail.utexas.edu>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <c49421c50606201753i46e54059qf975de33200ffd39@mail.gmail.com>
+Date: Tue, 20 Jun 2006 16:53:21 -0800
+From: "Loreno Oliveira" <lorenooliveira@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: bluez-devel@lists.sourceforge.net
-Subject: Re: Observations from mx-5000 bluetooth keyboard + mouse combo
-References: <448D88EE.3030902@mail.utexas.edu> <1150540883.17539.38.camel@aeonflux.holtmann.net>
-In-Reply-To: <1150540883.17539.38.camel@aeonflux.holtmann.net>
-Content-Type: multipart/mixed;
- boundary="------------040008000304020500060003"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Subject: [Bluez-devel] bluez tutorial/manual
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0963460360=="
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------040008000304020500060003
-Content-Type: text/plain; charset=ISO-8859-1
+--===============0963460360==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_28912_20614002.1150851201997"
+
+------=_Part_28912_20614002.1150851201997
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Marcel Holtmann wrote:
->>
->> 1) The patch to hid2hci.c that Trevor Joynson provided and which was
->> incorporated is not correct - and this is consistent with the reported
->> experience of other people with the di novo laser desktop combo.
-> 
-> I have no idea what you are talking about. If you think that something
-> is wrong, please provide a patch to fix it.
+Hi everyone,
 
-I have attached the patch against hid2hci.
+sorry for the question, probably it was previously answered a number of
+times. Unfortunately, I can't access the list archive :-(
 
-I'll followup on the other items and get back to you when I've got
-some information.
+Well, I'm new on BlueZ and need some material for studying the API. Does
+anyone has some hint about documents that can help BlueZ newbies?
 
---phil
+Thanks in advance!
 
---------------040008000304020500060003
-Content-Type: text/x-patch;
- name="hid2hci-mx5000.diff"
+Loreno
+
+------=_Part_28912_20614002.1150851201997
+Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="hid2hci-mx5000.diff"
+Content-Disposition: inline
 
---- hid2hci.c	2006-06-20 19:08:09.000000000 -0700
-+++ hid2hci.c.org	2006-06-20 19:07:20.000000000 -0700
-@@ -222,10 +222,7 @@
- 	{ HCI, 0x046d, 0xc703, switch_logitech },
- 	{ HCI, 0x046d, 0xc704, switch_logitech },
- 	{ HCI, 0x046d, 0xc705, switch_logitech },
--	{ HCI, 0x046d, 0xc70a, switch_logitech }, /* Logitech MX-5000 Desktop */
--	{ HCI, 0x046d, 0xc70b, switch_logitech }, /* Logitech diNovo Desktop */
--	{ HCI, 0x046d, 0xc70c, switch_logitech }, /* Logitech diNovo Desktop */
--	{ HCI, 0x046d, 0xc70e, switch_logitech }, /* Logitech MX-5000 Desktop */
-+	{ HCI, 0x046d, 0x0b02, switch_logitech },	/* Logitech diNovo Media Desktop Laser */
- 	{ -1 }
- };
- 
+Hi everyone,<br><br>sorry for the question, probably it was previously answered a number of times. Unfortunately, I can't access the list archive :-(<br><br>Well, I'm new on BlueZ and need some material for studying the API. Does anyone has some hint about documents that can help BlueZ newbies?
+<br><br>Thanks in advance!<br><br>Loreno<br>
 
---------------040008000304020500060003--
+------=_Part_28912_20614002.1150851201997--
+
+
+--===============0963460360==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+
+--===============0963460360==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0963460360==--
