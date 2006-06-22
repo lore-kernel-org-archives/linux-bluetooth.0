@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <bf1d6e70606220431j541afa88j65850d163fa30989@mail.gmail.com>
+Message-ID: <bf1d6e70606220431j541afa88j65850d163fa30989@mail.gmail.com>
+Date: Thu, 22 Jun 2006 17:01:35 +0530
+From: "Lavanya Jagan" <la.mindgames@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1150959776.13991.5.camel@localhost>
+MIME-Version: 1.0
 References: <bf1d6e70606212208r7ed5e33ak5895b61024c36850@mail.gmail.com>
 	<1150959776.13991.5.camel@localhost>
-	<bf1d6e70606220431j541afa88j65850d163fa30989@mail.gmail.com>
-Date: Thu, 22 Jun 2006 13:33:25 +0200
-Message-Id: <1150976005.13991.45.camel@localhost>
-Mime-Version: 1.0
 Subject: Re: [Bluez-users] bluez installation
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -18,29 +17,52 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1789910299=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Lavanya,
+--===============1789910299==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_6589_22967529.1150975895851"
 
-> i tried replacing dbus-glib with dbus.. but the same problem
-> persists..
+------=_Part_6589_22967529.1150975895851
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-you have install the dbus-devel or libdbus-dev package. Starting with
-the 3.x series the D-Bus support became mandatory.
+i tried replacing dbus-glib with dbus.. but the same problem persists..
+-- 
+lav
 
-Regards
+------=_Part_6589_22967529.1150975895851
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Marcel
+i tried replacing dbus-glib with dbus.. but the same problem persists..<br>-- <br>lav
+
+------=_Part_6589_22967529.1150975895851--
 
 
+--===============1789910299==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 All the advantages of Linux Managed Hosting--Without the Cost and Risk!
 Fully trained technicians. The highest number of Red Hat certifications in
 the hosting industry. Fanatical Support. Click to learn more
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=107521&bid=248729&dat=121642
+--===============1789910299==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1789910299==--
