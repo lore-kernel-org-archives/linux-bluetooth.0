@@ -1,12 +1,19 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Olivier Dole <olivier.dole@palmsource.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <c49421c50606211346v3ca910a5vaa946beb6a74964f@mail.gmail.com>
-References: <c49421c50606211346v3ca910a5vaa946beb6a74964f@mail.gmail.com>
-Date: Thu, 22 Jun 2006 09:47:00 +0200
-Message-Id: <1150962420.8226.3.camel@localhost.localdomain>
+In-Reply-To: <449A297B.7010009@mail.utexas.edu>
+References: <44867199.2000409@mail.utexas.edu>
+	<1149664531.22472.4.camel@localhost> <4486EE2D.3010507@mail.utexas.edu>
+	<1149714318.22472.59.camel@localhost>
+	<4487B00F.7070204@mail.utexas.edu>
+	<1149803817.4219.61.camel@localhost> <448A4385.4020809@mail.utexas.edu>
+	<1149986039.5358.25.camel@aeonflux.holtmann.net>
+	<4490C0F1.1090704@mail.utexas.edu> <1150874298.3950.15.camel@localhost>
+	<449A297B.7010009@mail.utexas.edu>
+Date: Thu, 22 Jun 2006 09:06:39 +0200
+Message-Id: <1150959999.13991.9.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] how to get signal strength?
+Subject: Re: [Bluez-devel] Latest 2.6.16-mh1 patch.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,30 +23,43 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGVsbG8sCgpoY2l0b29sIHNlZW1zIHRvIGJlIGFibGUgdG8gZG8gdGhhdCB3aXRoICJscSIgYW5k
-ICJ0cGwiIG9wdGlvbnM6Ci1scSAgICAgIERpc3BsYXkgbGluayBxdWFsaXR5Ci10cGwgICAgIERp
-c3BsYXkgdHJhbnNtaXQgcG93ZXIgbGV2ZWwKUmVhZCB0aGUgbWFuIHBhZ2UgZm9yIG1vcmUgaW5m
-byA7KQoKT2xpdmllcgoKTGUgbWVyY3JlZGkgMjEganVpbiAyMDA2IMOgIDE3OjQ2IC0wMzAwLCBM
-b3Jlbm8gT2xpdmVpcmEgYSDDqWNyaXQgOgo+IERvZXMgYW55Ym9ieSBrbm93cyBob3cgZG8gSSBn
-ZXQgdGhlIHNpZ25hbCBzdHJlbmd0aCBiZXR3ZWVuIG15IGRldmljZQo+IGFuZCBvdGhlciBjbG9z
-ZSBkZXZpY2VzPz8KPiAKPiBMb3Jlbm8KPiBBbGwgdGhlIGFkdmFudGFnZXMgb2YgTGludXggTWFu
-YWdlZCBIb3N0aW5nLS1XaXRob3V0IHRoZSBDb3N0IGFuZCBSaXNrIQo+IEZ1bGx5IHRyYWluZWQg
-dGVjaG5pY2lhbnMuIFRoZSBoaWdoZXN0IG51bWJlciBvZiBSZWQgSGF0IGNlcnRpZmljYXRpb25z
-IGluCj4gdGhlIGhvc3RpbmcgaW5kdXN0cnkuIEZhbmF0aWNhbCBTdXBwb3J0LiBDbGljayB0byBs
-ZWFybiBtb3JlCj4gaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9bG5rJmtpZD0x
-MDc1MjEmYmlkPTI0ODcyOSZkYXQ9MTIxNjQyCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX18gQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0IEJsdWV6LWRldmVs
-QGxpc3RzLnNvdXJjZWZvcmdlLm5ldCBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0
-cy9saXN0aW5mby9ibHVlei1kZXZlbAoKCkFsbCB0aGUgYWR2YW50YWdlcyBvZiBMaW51eCBNYW5h
-Z2VkIEhvc3RpbmctLVdpdGhvdXQgdGhlIENvc3QgYW5kIFJpc2shCkZ1bGx5IHRyYWluZWQgdGVj
-aG5pY2lhbnMuIFRoZSBoaWdoZXN0IG51bWJlciBvZiBSZWQgSGF0IGNlcnRpZmljYXRpb25zIGlu
-CnRoZSBob3N0aW5nIGluZHVzdHJ5LiBGYW5hdGljYWwgU3VwcG9ydC4gQ2xpY2sgdG8gbGVhcm4g
-bW9yZQpodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lkPTEwNzUyMSZi
-aWQ9MjQ4NzI5JmRhdD0xMjE2NDIKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNv
-dXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5m
-by9ibHVlei1kZXZlbAo=
+Hi Philip,
+
+> I tried with 17-mh1 and the behaviour is not as bad. I only see one
+> problem: If I turn off the mouse and then quickly turn it back on,
+> the mouse doesn't work until the old connection times out on the host
+> side. At that point, the mouse can reconnect and life returns to normal.
+> 
+> Reconnecting after a timeout disconnect or after turning off and waiting
+> for the host to clean up is no longer a problem.
+> 
+> In the problem case, hcidump reports no incoming packets between when
+> I turn off and on and when it reports the disconnect. Then I see the
+> reconnect and new packets.
+> 
+> It's obviously not a big problem.
+
+this seems that you have to wait for the link supervision timeout on the
+host side. Play a little bit with it. If you turn off the Bluetooth chip
+in the mouse the host simply needs some time to detect this.
+
+What kind of chip is in your mouse? Is it CSR or Broadcom based?
+
+Regards
+
+Marcel
+
+
+
+All the advantages of Linux Managed Hosting--Without the Cost and Risk!
+Fully trained technicians. The highest number of Red Hat certifications in
+the hosting industry. Fanatical Support. Click to learn more
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=107521&bid=248729&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
