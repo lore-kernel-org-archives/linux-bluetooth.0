@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Stephen Strowes <sds@dcs.gla.ac.uk>
-To: bluez-users@lists.sourceforge.net
-Date: Fri, 23 Jun 2006 13:36:45 +0100
-Message-Id: <1151066205.6247.19.camel@addu>
-Mime-Version: 1.0
-Subject: [Bluez-users] L2CAP MTU and packet fragmentation?
+Message-ID: <449BB9B0.1070001@stfw.eu>
+Date: Fri, 23 Jun 2006 10:51:44 +0100
+From: Zhares <ml-sourceforge@stfw.eu>
+MIME-Version: 1.0
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <bf1d6e70606212208r7ed5e33ak5895b61024c36850@mail.gmail.com>	<1150959776.13991.5.camel@localhost>	<bf1d6e70606220431j541afa88j65850d163fa30989@mail.gmail.com>	<1150976005.13991.45.camel@localhost>	<bf1d6e70606222233v5d582126k2adc22fd748ba4db@mail.gmail.com>	<449BA939.6050705@stfw.eu>
+	<bf1d6e70606230243q3c59d2dewec378e13267b5b33@mail.gmail.com>
+In-Reply-To: <bf1d6e70606230243q3c59d2dewec378e13267b5b33@mail.gmail.com>
+Subject: Re: [Bluez-users] bluez installation
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,26 +21,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Lavanya Jagan wrote:
+> Hi,
+> 
+> * dbus-devel:
+>        Requires :
+>                * dbus
+>                * glib2-devel >= 2.6.0
+>                * rpmlib(CompressedFileNames) = 3.0.4-1
+>                * rpmlib(PayloadFilesHavePrefix) = 4.0-1
+     ...
+> This goes on.. is there any shorter path..
+> regards
+> 
 
-Forgive me if this has been answered time and again, but I can't seem to
-access the archives just now. Google's not helping me much either.
+Have a look at yum, It is supposed to do that automatically:
+http://www.linuxjournal.com/article/7448
 
-I have a bit of BlueZ code, which I have to make use of L2CAP sockets to
-communicate between devices. I've seen that I can alter the MTU for
-packets, but I'm surprised that packets don't get fragmented as per
-plain UDP when a packet larger than the MTU is passed to send().
+-- 
 
-Have I missed a configuration option somewhere?
-
-I could live with the MTU being 64k with no fragmentation, but I seem to
-get quite a lot of corrupt packets over around 2kB.
-
-
-Cheers,
-Stephen.
-
-
+      Zhares
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
