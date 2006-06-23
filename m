@@ -1,113 +1,67 @@
-Return-Path: <Lan.Zhang@Zoran.com>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Date: Fri, 23 Jun 2006 18:21:16 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <70DCB28C5BB04A4BBB1C8512589BAC65ED87BC@MAIL006.mail.lan>
+Message-ID: <Pine.LNX.4.63.0606231818400.25515@redbean.intranet.gw-instruments.de>
+References: <70DCB28C5BB04A4BBB1C8512589BAC65ED87BC@MAIL006.mail.lan>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----_=_NextPart_001_01C696F7.702E4176"
-Subject: 
-Date: Fri, 23 Jun 2006 15:01:30 -0400
-Message-ID: <E65CD2CAB74C80498703D6EF7624BB4C02397471@zmaex.zma.zoran.com>
-From: "Lan Zhang" <Lan.Zhang@Zoran.com>
-To: <bluez-devel@lists.sourceforge.net>
-Cc: "Marcel Holtmann" <marcel@holtmann.org>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Subject: Re: [Bluez-devel] CSR hci continuous transmit mode?
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+On Fri, 23 Jun 2006, Brand, Chris wrote:
 
-------_=_NextPart_001_01C696F7.702E4176
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Hi Chris, 
 
-Hi,=20
+> I was looking at how to send the CSR "Enter Device Under Test Mode"
+> command, which sounds like it may be related. I found the ogf, ocf and
+> parameters in the CSR documentation (0x6, 0x3 and none, in this case).
+> Then I used
+> hcitool cmd 0x6 0x3
+> To send that command to the chip.
+This is something different. The device under test mode is intended to be 
+used with a Bluetooth Tester. When the device is in DUT mode it can be 
+controlled by a remote (Test) device. More specifics information about DUT 
+mode can be found in the BT spec. 
 
-Could you guys add BPP ReferencePrinting service into the sdptools and
-checked in? I don't know how many perple will benefit from this, at
-least it will not hurt. And I think more people will use it later.=20
+Ciao, 
+Peter 
 
-and if you checked in, could you let me know the CVS version number?=20
 
-Thanks.=20
 
-Lan
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
 
-------_=_NextPart_001_01C696F7.702E4176
-Content-Type: text/plain;
-	name="sdptool_addrefprinting.txt"
-Content-Transfer-Encoding: base64
-Content-Description: sdptool_addrefprinting.txt
-Content-Disposition: attachment;
-	filename="sdptool_addrefprinting.txt"
 
-c3RhdGljIGludCBhZGRfYnBwX3N0YXR1cyhzZHBfc2Vzc2lvbl90ICpzZXNzaW9uLCBzdmNfaW5m
-b190ICpzaSkNCnsNCg0KCXNkcF9saXN0X3QgKnN2Y2xhc3NfaWQsICpwZnNlcSwgKmFwc2VxLCAq
-cm9vdDsNCgl1dWlkX3Qgcm9vdF91dWlkLCBicHBfcHNfdXVpZCwgbDJjYXBfdXVpZCwgcmZjb21t
-X3V1aWQsIG9iZXhfdXVpZDsNCglzZHBfcHJvZmlsZV9kZXNjX3QgcHJvZmlsZVsxXTsNCglzZHBf
-bGlzdF90ICphcHJvdG8sICpwcm90b1szXTsNCglzZHBfcmVjb3JkX3QgcmVjb3JkOw0KCXVpbnQ4
-X3QgY2hhbiA9IHNpLT5jaGFubmVsPyBzaS0+Y2hhbm5lbDogNDsNCglzZHBfZGF0YV90ICpjaGFu
-bmVsOw0KCWludCByZXQgPSAwOw0KDQoJbWVtc2V0KCh2b2lkICopJnJlY29yZCwgMCwgc2l6ZW9m
-KHNkcF9yZWNvcmRfdCkpOw0KCXJlY29yZC5oYW5kbGUgPSBzaS0+aGFuZGxlOw0KDQoJc2RwX3V1
-aWQxNl9jcmVhdGUoJnJvb3RfdXVpZCwgUFVCTElDX0JST1dTRV9HUk9VUCk7DQoJcm9vdCA9IHNk
-cF9saXN0X2FwcGVuZCgwLCAmcm9vdF91dWlkKTsNCglzZHBfc2V0X2Jyb3dzZV9ncm91cHMoJnJl
-Y29yZCwgcm9vdCk7DQoNCg0KCXNkcF91dWlkMTZfY3JlYXRlKCZicHBfcHNfdXVpZCwgUFJJTlRJ
-TkdfU1RBVFVTX1NWQ0xBU1NfSUQpOw0KCXN2Y2xhc3NfaWQgPSBzZHBfbGlzdF9hcHBlbmQoMCwg
-JmJwcF9wc191dWlkKTsNCglzZHBfc2V0X3NlcnZpY2VfY2xhc3NlcygmcmVjb3JkLCBzdmNsYXNz
-X2lkKTsNCgkNCglzZHBfdXVpZDE2X2NyZWF0ZSgmcHJvZmlsZVswXS51dWlkLCBQUklOVElOR19T
-VEFUVVNfUFJPRklMRV9JRCk7DQoJcHJvZmlsZVswXS52ZXJzaW9uID0gMHgwMTAwOw0KCXBmc2Vx
-ID0gc2RwX2xpc3RfYXBwZW5kKDAsICZwcm9maWxlWzBdKTsNCglzZHBfc2V0X3Byb2ZpbGVfZGVz
-Y3MoJnJlY29yZCwgcGZzZXEpOw0KDQoJc2RwX3V1aWQxNl9jcmVhdGUoJmwyY2FwX3V1aWQsIEwy
-Q0FQX1VVSUQpOw0KCXByb3RvWzBdID0gc2RwX2xpc3RfYXBwZW5kKDAsICZsMmNhcF91dWlkKTsN
-CglhcHNlcSA9IHNkcF9saXN0X2FwcGVuZCgwLCBwcm90b1swXSk7DQoNCglzZHBfdXVpZDE2X2Ny
-ZWF0ZSgmcmZjb21tX3V1aWQsIFJGQ09NTV9VVUlEKTsNCglwcm90b1sxXSA9IHNkcF9saXN0X2Fw
-cGVuZCgwLCAmcmZjb21tX3V1aWQpOw0KCWNoYW5uZWwgPSBzZHBfZGF0YV9hbGxvYyhTRFBfVUlO
-VDgsICZjaGFuKTsNCglwcm90b1sxXSA9IHNkcF9saXN0X2FwcGVuZChwcm90b1sxXSwgY2hhbm5l
-bCk7DQoJYXBzZXEgPSBzZHBfbGlzdF9hcHBlbmQoYXBzZXEsIHByb3RvWzFdKTsNCg0KCXNkcF91
-dWlkMTZfY3JlYXRlKCZvYmV4X3V1aWQsIE9CRVhfVVVJRCk7DQoJcHJvdG9bMl0gPSBzZHBfbGlz
-dF9hcHBlbmQoMCwgJm9iZXhfdXVpZCk7DQoJYXBzZXEgPSBzZHBfbGlzdF9hcHBlbmQoYXBzZXEs
-IHByb3RvWzJdKTsNCg0KCWFwcm90byA9IHNkcF9saXN0X2FwcGVuZCgwLCBhcHNlcSk7DQoJc2Rw
-X3NldF9hY2Nlc3NfcHJvdG9zKCZyZWNvcmQsIGFwcm90byk7DQoJc2RwX3NldF9pbmZvX2F0dHIo
-JnJlY29yZCwgIkJQUCBQcmludGVyIFN0YXR1cyIsIDAsIDApOw0KDQogICAgIAlpZiAoMCA+IHNk
-cF9yZWNvcmRfcmVnaXN0ZXIoc2Vzc2lvbiwgJnJlY29yZCwgU0RQX1JFQ09SRF9QRVJTSVNUKSkg
-ew0KCSAgcHJpbnRmKCJTZXJ2aWNlIFJlY29yZCByZWdpc3RyYXRpb24gZmFpbGVkXG4iKTsNCgkg
-IHJldCA9IC0xOw0KCSAgZ290byBlbmQ7DQoJfQ0KCXByaW50ZigiXHQgQlBQIFByaW50aW5nIFN0
-YXR1cyBzZXJ2aWNlIHJlZ2lzdGVyZWRcbiIpOw0KIGVuZDoNCglzZHBfZGF0YV9mcmVlKGNoYW5u
-ZWwpOw0KCXNkcF9saXN0X2ZyZWUocHJvdG9bMF0sIDApOw0KCXNkcF9saXN0X2ZyZWUocHJvdG9b
-MV0sIDApOw0KCXNkcF9saXN0X2ZyZWUocHJvdG9bMl0sIDApOw0KCXNkcF9saXN0X2ZyZWUoYXBz
-ZXEsIDApOw0KCXNkcF9saXN0X2ZyZWUoYXByb3RvLCAwKTsNCgkvL3ByaW50ZiAoIiBcbiBCUFAg
-IHJlY29yZF9oYW5kbGUgPSAleFxuXG4iLCByZWNvcmQuaGFuZGxlKTsNCglyZXR1cm4gcmV0Ow0K
-fQ0KDQovL2FkZCByZWZlcmVuY2UgcHJpbnRpbmcgc2VydmVycw0Kc3RhdGljIGludCBhZGRfcmVm
-X29iaihzZHBfc2Vzc2lvbl90ICpzZXNzaW9uLCBzdmNfaW5mb190ICpzaSkNCnsNCg0KCXNkcF9s
-aXN0X3QgKnN2Y2xhc3NfaWQsICpwZnNlcSwgKmFwc2VxLCAqcm9vdDsNCgl1dWlkX3Qgcm9vdF91
-dWlkLCBicHBfZHByb3NfdXVpZCwgbDJjYXBfdXVpZCwgcmZjb21tX3V1aWQsIG9iZXhfdXVpZDsN
-CglzZHBfcHJvZmlsZV9kZXNjX3QgcHJvZmlsZVsxXTsNCglzZHBfbGlzdF90ICphcHJvdG8sICpw
-cm90b1szXTsNCglzZHBfcmVjb3JkX3QgcmVjb3JkOw0KCXVpbnQ4X3QgY2hhbiA9IHNpLT5jaGFu
-bmVsPyBzaS0+Y2hhbm5lbDogNTsNCglzZHBfZGF0YV90ICpjaGFubmVsOw0KCWludCByZXQgPSAw
-Ow0KDQoJbWVtc2V0KCZyZWNvcmQsIDAsIHNpemVvZihzZHBfcmVjb3JkX3QpKTsNCglyZWNvcmQu
-aGFuZGxlID0gc2ktPmhhbmRsZTsNCg0KCXNkcF91dWlkMTZfY3JlYXRlKCZyb290X3V1aWQsIFBV
-QkxJQ19CUk9XU0VfR1JPVVApOw0KCXJvb3QgPSBzZHBfbGlzdF9hcHBlbmQoMCwgJnJvb3RfdXVp
-ZCk7DQoJc2RwX3NldF9icm93c2VfZ3JvdXBzKCZyZWNvcmQsIHJvb3QpOw0KDQoNCglzZHBfdXVp
-ZDE2X2NyZWF0ZSgmYnBwX2Rwcm9zX3V1aWQsIERJUkVDVF9QUlRfUkVGT0JKU19TVkNMQVNTX0lE
-KTsNCglzdmNsYXNzX2lkID0gc2RwX2xpc3RfYXBwZW5kKDAsICZicHBfZHByb3NfdXVpZCk7DQoJ
-c2RwX3NldF9zZXJ2aWNlX2NsYXNzZXMoJnJlY29yZCwgc3ZjbGFzc19pZCk7DQoNCglzZHBfdXVp
-ZDE2X2NyZWF0ZSgmcHJvZmlsZVswXS51dWlkLCBESVJFQ1RfUFJUX1JFRk9CSlNfUFJPRklMRV9J
-RCk7DQoJcHJvZmlsZVswXS52ZXJzaW9uID0gMHgwMTAwOw0KCXBmc2VxID0gc2RwX2xpc3RfYXBw
-ZW5kKDAsIHByb2ZpbGUpOw0KCXNkcF9zZXRfcHJvZmlsZV9kZXNjcygmcmVjb3JkLCBwZnNlcSk7
-DQoNCglzZHBfdXVpZDE2X2NyZWF0ZSgmbDJjYXBfdXVpZCwgTDJDQVBfVVVJRCk7DQoJcHJvdG9b
-MF0gPSBzZHBfbGlzdF9hcHBlbmQoMCwgJmwyY2FwX3V1aWQpOw0KCWFwc2VxID0gc2RwX2xpc3Rf
-YXBwZW5kKDAsIHByb3RvWzBdKTsNCg0KCXNkcF91dWlkMTZfY3JlYXRlKCZyZmNvbW1fdXVpZCwg
-UkZDT01NX1VVSUQpOw0KCXByb3RvWzFdID0gc2RwX2xpc3RfYXBwZW5kKDAsICZyZmNvbW1fdXVp
-ZCk7DQoJY2hhbm5lbCA9IHNkcF9kYXRhX2FsbG9jKFNEUF9VSU5UOCwgJmNoYW4pOw0KCXByb3Rv
-WzFdID0gc2RwX2xpc3RfYXBwZW5kKHByb3RvWzFdLCBjaGFubmVsKTsNCglhcHNlcSA9IHNkcF9s
-aXN0X2FwcGVuZChhcHNlcSwgcHJvdG9bMV0pOw0KDQoJc2RwX3V1aWQxNl9jcmVhdGUoJm9iZXhf
-dXVpZCwgT0JFWF9VVUlEKTsNCglwcm90b1syXSA9IHNkcF9saXN0X2FwcGVuZCgwLCAmb2JleF91
-dWlkKTsNCglhcHNlcSA9IHNkcF9saXN0X2FwcGVuZChhcHNlcSwgcHJvdG9bMl0pOw0KDQoJYXBy
-b3RvID0gc2RwX2xpc3RfYXBwZW5kKDAsIGFwc2VxKTsNCglzZHBfc2V0X2FjY2Vzc19wcm90b3Mo
-JnJlY29yZCwgYXByb3RvKTsNCglzZHBfc2V0X2luZm9fYXR0cigmcmVjb3JkLCAiQlBQIFJlZmVy
-ZW5jZSBPYmplY3QgU2VydmljZSIsIDAsIDApOw0KDQogICAgIAlpZiAoMCA+IHNkcF9yZWNvcmRf
-cmVnaXN0ZXIoc2Vzc2lvbiwgJnJlY29yZCwgU0RQX1JFQ09SRF9QRVJTSVNUKSkgew0KCSAgcHJp
-bnRmKCJTZXJ2aWNlIFJlY29yZCByZWdpc3RyYXRpb24gZmFpbGVkXG4iKTsNCgkgIHJldCA9IC0x
-Ow0KCSAgZ290byBlbmQ7DQoJfQ0KCXByaW50ZigiXHQgQlBQIFJlZmVyZW5jZSBQcmludGluZyBz
-ZXJ2aWNlIHJlZ2lzdGVyZWRcbiIpOw0KIGVuZDoNCglzZHBfZGF0YV9mcmVlKGNoYW5uZWwpOw0K
-CXNkcF9saXN0X2ZyZWUocHJvdG9bMF0sIDApOw0KCXNkcF9saXN0X2ZyZWUocHJvdG9bMV0sIDAp
-Ow0KCXNkcF9saXN0X2ZyZWUocHJvdG9bMl0sIDApOw0KCXNkcF9saXN0X2ZyZWUoYXBzZXEsIDAp
-Ow0KCXNkcF9saXN0X2ZyZWUoYXByb3RvLCAwKTsNCgkNCglyZXR1cm4gcmV0Ow0KfQ0K
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
 
-------_=_NextPart_001_01C696F7.702E4176--
+
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
