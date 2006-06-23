@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: "Kevin Mahaffey" <kevin.mahaffey@flexilis.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Fri, 23 Jun 2006 17:51:03 -0700
-MIME-Version: 1.0
-in-reply-to: <1151104752.3281.62.camel@localhost>
-Message-ID: <E1FtwMl-0004Dc-OI@mail.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <E1Ftu0w-0005Bn-Uc@mail.sourceforge.net>
+References: <E1Ftu0w-0005Bn-Uc@mail.sourceforge.net>
+Date: Sat, 24 Jun 2006 01:19:12 +0200
+Message-Id: <1151104752.3281.62.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] ACL Connection Handles
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -18,20 +19,6 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
-
-Marcel,
-
-Thanks.  l2test has exactly what I need.
-
--Kevin
-
------Original Message-----
-From: bluez-devel-bounces@lists.sourceforge.net
-[mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: Friday, June 23, 2006 4:19 PM
-To: BlueZ development
-Subject: Re: [Bluez-devel] ACL Connection Handles
 
 Hi Kevin,
 
@@ -53,17 +40,6 @@ Regards
 Marcel
 
 
-
-
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job
-easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 Using Tomcat but need to do more? Need to support web services, security?
