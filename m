@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <449BA939.6050705@stfw.eu>
-Date: Fri, 23 Jun 2006 09:41:29 +0100
-From: Zhares <ml-sourceforge@stfw.eu>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <bf1d6e70606212208r7ed5e33ak5895b61024c36850@mail.gmail.com>	<1150959776.13991.5.camel@localhost>	<bf1d6e70606220431j541afa88j65850d163fa30989@mail.gmail.com>	<1150976005.13991.45.camel@localhost>
-	<bf1d6e70606222233v5d582126k2adc22fd748ba4db@mail.gmail.com>
-In-Reply-To: <bf1d6e70606222233v5d582126k2adc22fd748ba4db@mail.gmail.com>
+In-Reply-To: <000d01c69683$90314cb0$7f0cc70a@dlh.st.com>
+References: <000d01c69683$90314cb0$7f0cc70a@dlh.st.com>
+Date: Fri, 23 Jun 2006 10:12:06 +0200
+Message-Id: <1151050326.3281.12.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] bluez installation
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,25 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Lavanya Jagan wrote:
-> Hi,
-> 
-> i tried intallin dbus-devel.. n i get such errors :(
-> 
-> [lavanya@rise24 fry_bluez]$ rpm -ivh dbus-devel-0.33-3.i386.rpm
-> warning: dbus-devel-0.33-3.i386.rpm: V3 DSA signature: NOKEY, key ID
-> 4f2a6fd2
-> error: Failed dependencies:
->        dbus = 0.33-3 is needed by dbus-devel-0.33-3
-> 
-Hi,
-You have to install dbus-0.33-3 first. You may have a similar error 
-doing it, in that case, you have to manually install all the other 
-packages in the 'failed dependencies' listed in the error.
+Hi Sumeet,
 
--- 
+> I also face the same problem as Lavanya. Replacing dbus-glib with dbus
+> in acinclude.m4 doesn't work. The problem remains.
 
-     Zhares
+you still have to install the D-Bus low-level library and if you change
+this in the tarball sources, you also have to generate a new configure.
+The simple solution would be to install dbus-glib-devel package until I
+release a new version.
+
+Regards
+
+Marcel
+
+
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
