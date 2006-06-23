@@ -1,10 +1,19 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v750)
-Message-Id: <E2C96E1D-1581-40B1-84F6-C7528EEA2007@pepper.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-From: Michael Frey <mfrey@pepper.com>
-Date: Fri, 23 Jun 2006 11:38:52 -0400
-Subject: [Bluez-devel] CSR hci continuous transmit mode?
+In-Reply-To: <6297d67c0606222124t1fc03326w5c6995b4b37f3b76@mail.gmail.com>
+References: <44867199.2000409@mail.utexas.edu>
+	<1149803817.4219.61.camel@localhost> <448A4385.4020809@mail.utexas.edu>
+	<1149986039.5358.25.camel@aeonflux.holtmann.net>
+	<4490C0F1.1090704@mail.utexas.edu> <1150874298.3950.15.camel@localhost>
+	<449A297B.7010009@mail.utexas.edu> <1150959999.13991.9.camel@localhost>
+	<d23110170606220734t5765d71aiae468fc768d6fc31@mail.gmail.com>
+	<1150999928.13991.60.camel@localhost>
+	<6297d67c0606222124t1fc03326w5c6995b4b37f3b76@mail.gmail.com>
+Date: Fri, 23 Jun 2006 10:10:32 +0200
+Message-Id: <1151050232.3281.9.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Latest 2.6.16-mh1 patch.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,11 +27,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Does anyone know how to put a CSR Bluecore chip into continuous  
-transmit mode using hcitool?
+Hi Mayank,
 
+> Is it a new event or something that host will receive when the link
+> supervision timeout changes?
 
-Michael
+the host will be informed when the remote side changes the link
+supervision timeout. At the moment the host simply can't detect this.
+
+Regards
+
+Marcel
+
 
 
 Using Tomcat but need to do more? Need to support web services, security?
