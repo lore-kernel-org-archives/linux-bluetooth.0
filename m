@@ -1,19 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <6297d67c0606222124t1fc03326w5c6995b4b37f3b76@mail.gmail.com>
-References: <44867199.2000409@mail.utexas.edu>
-	<1149803817.4219.61.camel@localhost> <448A4385.4020809@mail.utexas.edu>
-	<1149986039.5358.25.camel@aeonflux.holtmann.net>
-	<4490C0F1.1090704@mail.utexas.edu> <1150874298.3950.15.camel@localhost>
-	<449A297B.7010009@mail.utexas.edu> <1150959999.13991.9.camel@localhost>
-	<d23110170606220734t5765d71aiae468fc768d6fc31@mail.gmail.com>
-	<1150999928.13991.60.camel@localhost>
-	<6297d67c0606222124t1fc03326w5c6995b4b37f3b76@mail.gmail.com>
-Date: Fri, 23 Jun 2006 10:10:32 +0200
-Message-Id: <1151050232.3281.9.camel@localhost>
+In-Reply-To: <1151045907.1450.73.camel@localhost>
+References: <1151045907.1450.73.camel@localhost>
+Date: Fri, 23 Jun 2006 10:08:42 +0200
+Message-Id: <1151050122.3281.6.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Latest 2.6.16-mh1 patch.
+Subject: Re: [Bluez-devel] BlueZ and licensing issues
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -27,13 +20,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mayank,
+Hi Pierre-Yves,
 
-> Is it a new event or something that host will receive when the link
-> supervision timeout changes?
+> From the informations I was able to gather, up to today, everything
+> released by the BlueZ project has been released under the GPL, and
+> they're discussion about a LGPL release of bluez-libs in the future, if
+> Qualcomm does agree with that as one of the copyright holders.
 
-the host will be informed when the remote side changes the link
-supervision timeout. At the moment the host simply can't detect this.
+That is fully correct. I never did any release with LGPL so far.
+
+> My question: has BlueZ ever released to a person or a company a copy of
+> bluez-libs under another license than the GPL? It seems that they're
+> companies around (at least one I know of) that are distributing/selling
+> products linked against the libs (according to ldd), under a very
+> proprietary license - nothing looking like the GPL, and not accompanied
+> by the required notices and source code offerings. I'm wondering if some
+> have been granted an "exception" allowing them to do so legally.
+
+I haven't granted an exception for my parts of the code so far. The
+bluez-libs was and is GPL for everybody. No special treatment.
+
+> Is it right that to date, the only way to use BlueZ in a non-GPL
+> licensed project is to communicate with it through some kind of IPC
+> (like TomTom did with their TTMP lib, or now with the dbus API exposed
+> by hcid)?
+
+That is correct. Especially the BlueZ D-Bus API is designed to make
+Bluetooth easy and help third-party people to use it.
+
+> I'm trying to clearly understand the situation from the licensing point
+> of view, for possible use of BlueZ in a non-GPL project, thus those
+> questions. Any useful comment on that matter would be much appreciated.
+
+You can't link the Bluetooth library from a non-GPL program. This might
+change at some point in the future, but for now you simply can't.
 
 Regards
 
