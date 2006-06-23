@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1151066205.6247.19.camel@addu>
-References: <1151066205.6247.19.camel@addu>
-Date: Mon, 26 Jun 2006 14:17:27 +0200
-Message-Id: <1151324247.7694.10.camel@localhost>
+From: Stephen Strowes <sds@dcs.gla.ac.uk>
+To: bluez-users@lists.sourceforge.net
+Date: Fri, 23 Jun 2006 13:36:45 +0100
+Message-Id: <1151066205.6247.19.camel@addu>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] L2CAP MTU and packet fragmentation?
+Subject: [Bluez-users] L2CAP MTU and packet fragmentation?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,30 +18,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Stephen,
+Hi,
 
-> Forgive me if this has been answered time and again, but I can't seem to
-> access the archives just now. Google's not helping me much either.
-> 
-> I have a bit of BlueZ code, which I have to make use of L2CAP sockets to
-> communicate between devices. I've seen that I can alter the MTU for
-> packets, but I'm surprised that packets don't get fragmented as per
-> plain UDP when a packet larger than the MTU is passed to send().
-> 
-> Have I missed a configuration option somewhere?
+Forgive me if this has been answered time and again, but I can't seem to
+access the archives just now. Google's not helping me much either.
 
-the L2CAP socket is a SOCK_SEQPACKET and you have to honor that MTU. It
-is not a stream or a connection-less socket.
+I have a bit of BlueZ code, which I have to make use of L2CAP sockets to
+communicate between devices. I've seen that I can alter the MTU for
+packets, but I'm surprised that packets don't get fragmented as per
+plain UDP when a packet larger than the MTU is passed to send().
 
-> I could live with the MTU being 64k with no fragmentation, but I seem to
-> get quite a lot of corrupt packets over around 2kB.
+Have I missed a configuration option somewhere?
 
-I have no idea what you are talking about. The L2CAP layer is reliable
-and the underlaying ACL link, too.
+I could live with the MTU being 64k with no fragmentation, but I seem to
+get quite a lot of corrupt packets over around 2kB.
 
-Regards
 
-Marcel
+Cheers,
+Stephen.
 
 
 
