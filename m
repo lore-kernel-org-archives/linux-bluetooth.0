@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 23 Jun 2006 22:56:46 +0200
-From: =?windows-1252?Q?G=F6tz_Issel?= <g.issel@fh-wolfenbuettel.de>
-To: bluez-devel@lists.sourceforge.net
-Message-id: <17c121177c91.177c9117c121@fh-wolfenbuettel.de>
-MIME-version: 1.0
-Subject: Re: [Bluez-devel] blueZ and SAP
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lan Zhang <Lan.Zhang@Zoran.com>
+In-Reply-To: <E65CD2CAB74C80498703D6EF7624BB4C02397471@zmaex.zma.zoran.com>
+References: <E65CD2CAB74C80498703D6EF7624BB4C02397471@zmaex.zma.zoran.com>
+Date: Fri, 23 Jun 2006 21:17:28 +0200
+Message-Id: <1151090248.3281.58.camel@localhost>
+Mime-Version: 1.0
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] (no subject)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,39 +21,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mayank,
-> 
-> On 6/21/06, Mayank Batra <mayankbatra@gmail.com> wrote:
-> >
-> >  *But tell me one thing: After you receive a connect_resp from 
-> the phone,
-> > do you receive a status_ind as well?*
-> > *This is important, because if you do not receive this, the 
-> connection is
-> > not really up. See page 22 of the spec.*
-> >
-> So, I mean that after you've read the connect_resp, you should perform
-> another read for the status_ind which will be something like:
-> 
-> 0x11 0x01 0x00 0x00 0x08 0x00 0x00 0x01 0x04 0x00 0x00 0x00
-> 
-> 0x11 is msg_id for status_ind.
-> 0x08 is parameter_id for StatusChange
-> 0x04 is the value of StatusChange which says "Card Inserted"
-> > 
-> Please let me know in case you want any further information.
+Hi Lan,
 
-Well, all seems to be fine now, I got the connect_req and response, get
-the following status_ind (saying 'card reset' which is correct) and I
-implemented a few more messages by now already, ie requesting the card
-reader status etc. I hope to finish all SAP messages by Monday so I can
-hook up my gsm modem (which does support SAP) and see how that responds.
-I do already have the multiplexing on serial port (specified in GSM
-standard somewhere) working for it. Wish me luck to have all interact in
-a way expected.
-Thanks for the offer to help, I will see if I have more questions or not.
-Greetings,
-Goetz
+don't forget a subject !!!
+
+> Could you guys add BPP ReferencePrinting service into the sdptools and
+> checked in? I don't know how many perple will benefit from this, at
+> least it will not hurt. And I think more people will use it later. 
+> 
+> and if you checked in, could you let me know the CVS version number? 
+
+please provide a patch against the latest CVS and take care of following
+the coding style.
+
+Regards
+
+Marcel
+
 
 
 Using Tomcat but need to do more? Need to support web services, security?
