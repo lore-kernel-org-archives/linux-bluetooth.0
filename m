@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 25 Jun 2006 16:32:12 +0200
-From: =?iso-8859-1?q?G=F6tz_Issel?= <g.issel@fh-wolfenbuettel.de>
-To: bluez-devel@lists.sourceforge.net
-Message-id: <200606251632.12624.g.issel@fh-wolfenbuettel.de>
-MIME-version: 1.0
-Subject: [Bluez-devel] reading response on bluetooth socket
+From: "Kevin Mahaffey" <kevin.mahaffey@flexilis.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Fri, 23 Jun 2006 17:51:03 -0700
+MIME-Version: 1.0
+in-reply-to: <1151104752.3281.62.camel@localhost>
+Message-ID: <E1FtwMl-0004Dc-OI@mail.sourceforge.net>
+Subject: Re: [Bluez-devel] ACL Connection Handles
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,60 +19,52 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all,
+Marcel,
 
-I would like a sample snipplet of code to get help on the following problem:
+Thanks.  l2test has exactly what I need.
 
-After having set up a rfcommm connection from my notebook to a mobile phone I 
-need to get the response data from the mobile device. I can read from the 
-socket using 'recv()' but if no data is there at thaht moment this will block 
-the process or pause my program. What I need to do is get a signal on 'data 
-available' on the socket for reading or a non blocking read. I heard there is 
-a function 'select()' .. but it does not seem to work or I don't understand 
-it. It needs to be as simple as possible.
+-Kevin
 
-This is what I have now:
+-----Original Message-----
+From: bluez-devel-bounces@lists.sourceforge.net
+[mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf Of Marcel
+Holtmann
+Sent: Friday, June 23, 2006 4:19 PM
+To: BlueZ development
+Subject: Re: [Bluez-devel] ACL Connection Handles
 
-// init + declare variables
-	fd_set readFds;
-	struct timeval timeout;
-    	struct sockaddr_rc addr = { 0 };
-   	int rfcomm_sock, status; 
-	
-// allocate a socket
-   	 rfcomm_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+Hi Kevin,
 
-// set the connection parameters (who to connect to)
-    	addr.rc_family = AF_BLUETOOTH;
-    	addr.rc_channel = (uint8_t) dest_channel;
-    	str2ba( dest, &addr.rc_bdaddr );
+> Because of the single ACL connection limit between two devices, this
+> list has recommended to use bluez to open new connections rather than
+> direct HCI manipulation.  
+> 
+> Once the connection is active and in the connection hash list, how can
+> one extract the handle out again to start raw HCI packet slinging?
+>  Looking at the kernel source, there is a hci_conn_hash_lookup_ba
+> function that seems promising, or is there another method that I am
+> missing.
 
-// connect to server, here mobile phone
-   	 status = connect(rfcomm_sock, (struct sockaddr *)&addr, sizeof(addr));
+check the source code of l2test and rctest. It will show you how the get
+the underlaying connection handles for L2CAP and RFCOMM connections.
 
-	timeout.tv_sec=5;
-	timeout.tv_usec=0;	
-	FD_ZERO(&readFds);
-	FD_SET(rfcomm_socket, &readFds);
-	if (select(rfcommsocket + 1, &readFds, NULL, NULL, &timeout) == 0) 
-	{
-		printf("timed out");
-	}
-	else
-		printf("data ready for read");
+Regards
 
-
-Anyone done this  before? I have seen something like this in the source file 
-'sdp.c' but somehow I am missing something.
-
-Thanks for your help in advance.
-
-Goetz
+Marcel
 
 
 
 
-	 
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job
+easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
