@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <6297d67c0606252046j4cd4c317sabafe807edaa5ff@mail.gmail.com>
-Date: Mon, 26 Jun 2006 09:16:07 +0530
-From: "Mayank Batra" <mayankbatra@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <17c121177c91.177c9117c121@fh-wolfenbuettel.de>
-MIME-Version: 1.0
-References: <17c121177c91.177c9117c121@fh-wolfenbuettel.de>
-Subject: Re: [Bluez-devel] blueZ and SAP
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200606251632.12624.g.issel@fh-wolfenbuettel.de>
+References: <200606251632.12624.g.issel@fh-wolfenbuettel.de>
+Date: Sun, 25 Jun 2006 16:52:15 +0200
+Message-Id: <1151247135.2982.6.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] reading response on bluetooth socket
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,112 +16,89 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0835655640=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0835655640==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_37858_26716064.1151293567088"
-
-------=_Part_37858_26716064.1151293567088
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
 Hi Goetz,
 
-On 6/24/06, G=F6tz Issel <g.issel@fh-wolfenbuettel.de> wrote:
->
-> Well, all seems to be fine now, I got the connect_req and response, get
-> the following status_ind (saying 'card reset' which is correct) and I
-> implemented a few more messages by now already, ie requesting the card
-> reader status etc. I hope to finish all SAP messages by Monday so I can
-> hook up my gsm modem (which does support SAP) and see how that responds.
+> After having set up a rfcommm connection from my notebook to a mobile phone I 
+> need to get the response data from the mobile device. I can read from the 
+> socket using 'recv()' but if no data is there at thaht moment this will block 
+> the process or pause my program. What I need to do is get a signal on 'data 
+> available' on the socket for reading or a non blocking read. I heard there is 
+> a function 'select()' .. but it does not seem to work or I don't understand 
+> it. It needs to be as simple as possible.
+> 
+> This is what I have now:
+> 
+> // init + declare variables
+> 	fd_set readFds;
+> 	struct timeval timeout;
+>     	struct sockaddr_rc addr = { 0 };
+
+don't do this. Use memset() instead.
+
+>    	int rfcomm_sock, status; 
+> 	
+> // allocate a socket
+>    	 rfcomm_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+> 
+> // set the connection parameters (who to connect to)
+>     	addr.rc_family = AF_BLUETOOTH;
+>     	addr.rc_channel = (uint8_t) dest_channel;
+
+Why do you cast here. No need in doing this. Get you declarations right.
+
+>     	str2ba( dest, &addr.rc_bdaddr );
+> 
+> // connect to server, here mobile phone
+>    	 status = connect(rfcomm_sock, (struct sockaddr *)&addr, sizeof(addr));
+> 
+> 	timeout.tv_sec=5;
+> 	timeout.tv_usec=0;	
+> 	FD_ZERO(&readFds);
+> 	FD_SET(rfcomm_socket, &readFds);
+
+What is it? rfcomm_sock, rfcomm_socket or rfcommsocket. Get your code
+clean.
+
+> 	if (select(rfcommsocket + 1, &readFds, NULL, NULL, &timeout) == 0) 
+> 	{
+> 		printf("timed out");
+> 	}
+> 	else
+> 		printf("data ready for read");
+
+And you should check the manual page of select() or move over using
+poll(). This might be a better example:
+
+        while (1) {
+                fd_set rset;
+
+                FD_ZERO(&rset);
+                FD_SET(sk, &rset);
+
+                if (select(sk + 1, &rset, NULL, NULL, NULL) < 0)
+                        break;
+
+                if (!FD_ISSET(sk, &rset))
+                        continue;
+
+                ...
+        }
+
+Regards
+
+Marcel
 
 
- This sounds great!
-I wish you luck. I am sure everything will go fine.
-
-I do already have the multiplexing on serial port (specified in GSM
-> standard somewhere) working for it. Wish me luck to have all interact in
-> a way expected.
-
-
-I don't think, I understood what "multilexing on serial port" means.
-
-Thanks for the offer to help, I will see if I have more questions or not.
-> Greetings,
-> Goetz
-
-
-I'll be ready for those questions.
-
-Regards,
-Mayank
-
-------=_Part_37858_26716064.1151293567088
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi Goetz,<br><br>
-<div><span class=3D"gmail_quote">On 6/24/06, <b class=3D"gmail_sendername">=
-G=F6tz Issel</b> &lt;<a href=3D"mailto:g.issel@fh-wolfenbuettel.de">g.issel=
-@fh-wolfenbuettel.de</a>&gt; wrote:</span>
-<blockquote class=3D"gmail_quote" style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0=
-px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Well, all seems to be fine now, =
-I got the connect_req and response, get<br>the following status_ind (saying=
- 'card reset' which is correct) and I
-<br>implemented a few more messages by now already, ie requesting the card<=
-br>reader status etc. I hope to finish all SAP messages by Monday so I can<=
-br>hook up my gsm modem (which does support SAP) and see how that responds.
-</blockquote>
-<div>&nbsp;</div>
-<div>
-<div>This sounds great!</div>
-<div>I wish you luck. I am sure everything will go fine.</div></div><br>
-<blockquote class=3D"gmail_quote" style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0=
-px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">I do already have the multiplexi=
-ng on serial port (specified in GSM<br>standard somewhere) working for it. =
-Wish me luck to have all interact in
-<br>a way expected.</blockquote>
-<div>&nbsp;</div>
-<div>I don't think, I understood what &quot;multilexing on serial port&quot=
-; means.</div><br>
-<blockquote class=3D"gmail_quote" style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0=
-px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Thanks for the offer to help, I =
-will see if I have more questions or not.<br>Greetings,<br>Goetz</blockquot=
-e>
-
-<div>&nbsp;</div>
-<div>I'll be ready for those questions.</div>
-<div>&nbsp;</div>
-<div>Regards,</div>
-<div>Mayank</div><br>&nbsp;</div>
-
-------=_Part_37858_26716064.1151293567088--
-
-
---===============0835655640==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0835655640==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0835655640==--
