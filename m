@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <6297d67c0606270347r35dd5e23i1b98fa6225008d5d@mail.gmail.com>
-Date: Tue, 27 Jun 2006 16:17:45 +0530
-From: "Mayank Batra" <mayankbatra@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0606271146090.6782@redbean.intranet.gw-instruments.de>
-MIME-Version: 1.0
+Date: Tue, 27 Jun 2006 11:56:53 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <6297d67c0606270126k2217235fwbc7fd3b56b1007dc@mail.gmail.com>
+Message-ID: <Pine.LNX.4.63.0606271146090.6782@redbean.intranet.gw-instruments.de>
 References: <6297d67c0606262242q11b6e769r15a48f1edffaa759@mail.gmail.com>
 	<1151393851.25011.7.camel@localhost>
 	<6297d67c0606270126k2217235fwbc7fd3b56b1007dc@mail.gmail.com>
-	<Pine.LNX.4.63.0606271146090.6782@redbean.intranet.gw-instruments.de>
+MIME-Version: 1.0
 Subject: Re: [Bluez-devel] Kernel Modules for ARM
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,116 +18,93 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0022482344=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0022482344==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_24993_11690813.1151405265175"
 
-------=_Part_24993_11690813.1151405265175
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi Manyak,
 
-Hi Peter,
+> I already have a 2.4.21 kernel running, but I cannot see any of the kernel
+> modules for BlueZ, e.g. bluez.o, l2cap.o, rfcomm.o in the directory
+> /lib/modules/kernel.
+> 
+> So does that mean that my kernel was compiled without Bluetooth support?
+> - If yes, is there any way with which I can enable Bluetooth support? (Will
+> I have to recompile the kernel?)
+> - Or can I directly apply some patch by which I can get those kernel
+> modules?
+Have you tried to compile the kernel Modules as build in ?? This avoids 
+all possible module path problems and stuff in the first place. 
 
-On 6/27/06, Peter Wippich <pewi@gw-instruments.de> wrote:
->
->
-> Have you tried to compile the kernel Modules as build in ?? This avoids
-> all possible module path problems and stuff in the first place.
+I also would recommend using a 2.6 kernel. We do not have any problems 
+with it (at least not with the BlueZ part). 
 
+Below is my build script for cross compiling bluez libs and utils. Maybe 
+this helps.
+TARGET is set to arm-linux and XPREFIX is the path to the target device 
+root on the build machine. Maybe this helps. 
 
-I've just recompiled my kernel, and now I am able to get the kernel modules
-for BlueZ.
+Ciao, 
 
-I also would recommend using a 2.6 kernel. We do not have any problems
-> with it (at least not with the BlueZ part).
+Peter 
+ 
+#!/bin/sh
+# build bluez libs / tools for WPC 
 
+export BUILD_ARCH=arm
 
-Ok...I'll try...but not now
+. build-config.env
 
-Below is my build script for cross compiling bluez libs and utils. Maybe
-> this helps.
-> TARGET is set to arm-linux and XPREFIX is the path to the target device
-> root on the build machine. Maybe this helps.
->
-> Ciao,
->
-> Peter
+#export target cross tools 
+export AR="$TARGET-ar"
+export LD="$TARGET-ld"
+export CC="$TARGET-gcc"
+export GCC="$TARGET-gcc"
 
+export LINUX_DIR=$PWD/$KERNEL_SRC
 
-Thanks a lot for this script. But I've already cross-compiled the bluez-libs
-and blue-utils. Anyways, I'll keep them with me for reference later on.
-Actually, I almost did the steps written in the script. So, its good to have
-them in a script.
+# configure and make bluez libs 
+pushd bluez/bluez-libs-2.25
+./configure --host=$TARGET --build=i686-pc-linux-gnu \
+            --with-kernel=$LINUX_DIR \
+            --libdir=/lib --includedir=/include
+make
+echo
+echo "Installing Bluez Libs in $XPREFIX"
+echo 
+make install DESTDIR=$XPREFIX
+popd
 
-Another problem that I am facing now is that when I do hcitool scan, I find
-no devices whereas there are a lot of devices in the surroundings.
-Another strange thing is that sdptool browse actually shows the services
-present on the remote devices.
-Also, if I register any service using sdptool, I can see it from a remote
-device.
-Any suggestion? Marcel?
-
-Thanks.
-
-Regards,
-Mayank
-
-------=_Part_24993_11690813.1151405265175
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi Peter,<br><br>
-<div><span class="gmail_quote">On 6/27/06, <b class="gmail_sendername">Peter Wippich</b> &lt;<a href="mailto:pewi@gw-instruments.de">pewi@gw-instruments.de</a>&gt; wrote:</span>
-<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid"><br>Have you tried to compile the kernel Modules as build in ?? This avoids<br>all possible module path problems and stuff in the first place.
-</blockquote>
-<div>&nbsp;</div>
-<div>I've just recompiled my kernel, and now I am able to get the kernel modules for BlueZ.</div><br>
-<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">I also would recommend using a 2.6 kernel. We do not have any problems<br>with it (at least not with the BlueZ part).
-</blockquote>
-<div>&nbsp;</div>
-<div>Ok...I'll try...but not now</div><br>
-<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Below is my build script for cross compiling bluez libs and utils. Maybe<br>this helps.<br>TARGET is set to arm-linux and XPREFIX is the path to the target device
-<br>root on the build machine. Maybe this helps.<br><br>Ciao,<br><br>Peter</blockquote>
-<div>&nbsp;</div>
-<div>Thanks a lot for this script. But I've already cross-compiled the bluez-libs and blue-utils. Anyways, I'll keep them with me for reference later on. Actually, I almost did the steps written in the script. So, its good to have them in a script.
-</div><br>Another problem that I am facing now is that when I do hcitool scan, I find no devices whereas there are a lot of devices in the surroundings.</div>
-<div>Another strange thing is that sdptool browse actually shows the services present on the remote devices.</div>
-<div>Also, if I register any service using sdptool, I can see it from a remote device.</div>
-<div>Any suggestion? Marcel?</div>
-<div>&nbsp;</div>
-<div>Thanks.</div>
-<div>&nbsp;</div>
-<div>Regards,</div>
-<div>Mayank</div>
-
-------=_Part_24993_11690813.1151405265175--
+# configure and make bluez utils
+# export PKG_CONFIG_PATH="$XPREFIX/lib/pkgconfig"
+pushd bluez/bluez-utils-2.25
+./configure --enable-bccmd --prefix=$XPREFIX --host=$TARGET 
+--build=i686-pc-linux-gnu \
+            --with-kernel=$LINUX_DIR \
+            --libdir=$XPREFIX/lib --includedir=$XPREFIX/include
+#            --sysconfdir=/etc 
+#            --without-glib
+# can't figure out how to get this right .......... so... 
+echo "#undef CONFIGDIR" >> config.h 
+echo "#define CONFIGDIR \"/etc/bluetooth\"" >> config.h 
+make
+make install
+popd
 
 
---===============0022482344==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
+
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0022482344==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0022482344==--
