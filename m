@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 30 Jun 2006 00:28:09 -0400
-From: john hood <cgull@glup.org>
+Message-ID: <20060627085731.12075.qmail@web50501.mail.yahoo.com>
+Date: Tue, 27 Jun 2006 01:57:31 -0700 (PDT)
+From: Mahtab Hossain <mahtab_hossain2002@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20060630042809.GA30894@glup.org>
-Mime-Version: 1.0
-Subject: [Bluez-users] setting bdaddr on ISSC adapters
+In-Reply-To: <BAY114-F36DD43CFD742B96E05E081CF790@phx.gbl>
+MIME-Version: 1.0
+Subject: Re: [Bluez-users] howto use hci_read_rssi
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,65 +15,48 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1053371087=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Like so many before me, I ended up with an ISSC USB adapter with an
-address of 11:11:11:11:11:11.  This is the adapter manufacturer being
-cheap and omitting the USD $.10 EEPROM chip, and the firmware using
-that address as a default in lieu of anything better.
+--===============1053371087==
+Content-Type: multipart/alternative; boundary="0-808545264-1151398651=:11104"
+Content-Transfer-Encoding: 8bit
 
-This annoyed me, so I played around with the bdaddr program in
-bluez-utils.  I found that the MAC address can be set with the same
-commands used for "Ericsson" adapters.  One small patch later, I had
-set a new MAC address on that adapter, at least until it's powered off.
+--0-808545264-1151398651=:11104
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Marcel Holtmann has coded up a more complete solution in the CVS
-source (it'll be in the next released version), but here is a minimal
-patch that will apply to later 2.x versions of bluez-utils.  If it
-doesn't apply automatically, patching by hand should be fairly
-obvious.
+Hi Colina,
 
---- bdaddr.c.orig	2005-10-29 19:04:29.000000000 -0400
-+++ bdaddr.c	2006-06-28 23:35:04.000000000 -0400
-@@ -249,6 +249,8 @@
- 	{ 10,		csr_write_bd_addr,	csr_reset_device	},
- 	{ 13,		ti_write_bd_addr,	NULL,			},
- 	{ 18,		zeevo_write_bd_addr,	NULL			},
-+	/* ISSC dongles seem to work with ericson commands. */
-+	{ 57,		ericsson_write_bd_addr,	NULL			},
- 	{ 65535,	NULL,			NULL			},
- };
- 
+>Moreover, I don't know if its necessary or not to make a previous connection
+>with another function.
+Yes, you need to make a previous connection before you can read the status parameter (e.g. RSSI or link quality) of a connection. You may do it at the HCI level (though not recommended by Marcel, e.g. hcitool cc <BD_ADDR>) or by upper level transport protocol (recommended, e.g. rfcomm).
 
-After running this patched bdaddr, you'll need to do 'hciconfig hci0
-reset' to get the new address to show.
+>handle and to
+"handle" is the connection handle of the connection u have made and "to" is the timeout field. You may need to look into the source-code of "hcitool" which comes with bluez-utils - then everything will be clear.
 
-It's only been tested on two or three adapters so far.  Since the ISSC
-adapters with these default MAC addresses (11:11:11:11:11:11 or
-22:22:22:22:22:22) apparently have no writeable, nonvolatile storage,
-there should be no risk of making unrecoverable changes to the
-adapter.
+Regards
+Mahtab
 
-I suggest taking the MAC address of the machine's first ethernet
-adapter, setting bit 2 of the first byte to 1 to get a
-"locally-administered" address that will be unique, and setting that
-on your adapter.
+Luis Colina <todten@hotmail.com> wrote: 
 
-Setting the MAC address to something unique and valid should clear up
-some difficulties with PAN networking (I can't test this), and allow
-using more than 1 of these dongles together (I can't test this
-either).
 
-If you have any problems with this, let Marcel and I know.
 
-  --jh
+Hi everyone!
 
--- 
-[bicycle] spokes are like kennedy assassins,            John Hood,     cgull
-they don't act alone.  you have to root out the                            @
-entire conspiracy.  --mark weaver (of california)                   glup.org
+I want to program an example using the hci_read_rssi function but I don't
+know how to do it because I don't understand its parameters, specially the
+uint16_t handle and the int to. I don't know how ti initialize them.
+
+Moreover, I don't know if its necessary or not to make a previous connection
+with another function.
+
+Can anybody help me?
+
+Thanks a lot.
+
+
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
@@ -82,3 +66,40 @@ _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+
+ 		
+---------------------------------
+Yahoo! Messenger with Voice. Make PC-to-Phone Calls to the US (and 30+ countries) for 2¢/min or less.
+--0-808545264-1151398651=:11104
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+Hi Colina,<br><br>&gt;Moreover, I don't know if its necessary or not to make a previous connection<br>&gt;with another function.<br>Yes, you need to make a previous connection before you can read the status parameter (e.g. RSSI or link quality) of a connection. You may do it at the HCI level (though not recommended by Marcel, e.g. hcitool cc &lt;BD_ADDR&gt;) or by upper level transport protocol (recommended, e.g. rfcomm).<br><br>&gt;handle and to<br>"handle" is the connection handle of the connection u have made and "to" is the timeout field. You may need to look into the source-code of "hcitool" which comes with bluez-utils - then everything will be clear.<br><br>Regards<br>Mahtab<br><br><b><i>Luis Colina &lt;todten@hotmail.com&gt;</i></b> wrote:<blockquote class="replbq" style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;"> <br><br><br><br>Hi everyone!<br><br>I want to program an example using the hci_read_rssi function but I don't<br>know
+ how to do it because I don't understand its parameters, specially the<br>uint16_t handle and the int to. I don't know how ti initialize them.<br><br>Moreover, I don't know if its necessary or not to make a previous connection<br>with another function.<br><br>Can anybody help me?<br><br>Thanks a lot.<br><br><br><br>Using Tomcat but need to do more? Need to support web services, security?<br>Get stuff done quickly with pre-integrated technology to make your job easier<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo<br>http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642<br>_______________________________________________<br>Bluez-users mailing list<br>Bluez-users@lists.sourceforge.net<br>https://lists.sourceforge.net/lists/listinfo/bluez-users<br></blockquote><br><p>&#32;
+		<hr size=1>Yahoo! Messenger with Voice. <a href="http://us.rd.yahoo.com/mail_us/taglines/postman1/*http://us.rd.yahoo.com/evt=39663/*http://voice.yahoo.com">Make PC-to-Phone Calls</a> to the US (and 30+ countries) for 2¢/min or less.
+--0-808545264-1151398651=:11104--
+
+
+--===============1053371087==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============1053371087==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1053371087==--
