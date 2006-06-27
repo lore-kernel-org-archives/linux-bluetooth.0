@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <6297d67c0606270132y66c2569ag25c063415a432d09@mail.gmail.com>
+In-Reply-To: <6297d67c0606270126k2217235fwbc7fd3b56b1007dc@mail.gmail.com>
 References: <6297d67c0606262242q11b6e769r15a48f1edffaa759@mail.gmail.com>
 	<1151393851.25011.7.camel@localhost>
 	<6297d67c0606270126k2217235fwbc7fd3b56b1007dc@mail.gmail.com>
-	<6297d67c0606270132y66c2569ag25c063415a432d09@mail.gmail.com>
-Date: Tue, 27 Jun 2006 10:48:43 +0200
-Message-Id: <1151398123.25011.12.camel@localhost>
+Date: Tue, 27 Jun 2006 10:47:48 +0200
+Message-Id: <1151398068.25011.10.camel@localhost>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Kernel Modules for ARM
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -25,14 +24,19 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Mayank,
 
-> One more question:
-> The kernel patches that are there at your site
-> http://www.holtmann.org/linux/kernel/
-> are they for i386 or ARM?
-> Because my kernel is for ARM, can I apply those patches?
+> I already have a 2.4.21 kernel running, but I cannot see any of the
+> kernel modules for BlueZ, e.g. bluez.o, l2cap.o, rfcomm.o in the
+> directory /lib/modules/kernel.
+>  
+> So does that mean that my kernel was compiled without Bluetooth
+> support?
+> - If yes, is there any way with which I can enable Bluetooth support?
+> (Will I have to recompile the kernel?)
+> - Or can I directly apply some patch by which I can get those kernel
+> modules?
 
-these patches are only changing the source code and i386, ARM and other
-kernels are compiled from the same source.
+you will have to re-compile the kernel if no additional kernel modules
+package is available.
 
 Regards
 
