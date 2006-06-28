@@ -1,16 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44A21B71.6090108@ibmt.fraunhofer.de>
-References: <4497CE54.5080305@ibmt.fraunhofer.de>
-	<4498EB58.3090200@ibmt.fraunhofer.de>	<1150883159.3950.34.camel@localhost>
-	<44991DF2.2000409@ibmt.fraunhofer.de>
-	<1150886307.3950.36.camel@localhost>
-	<44A21B71.6090108@ibmt.fraunhofer.de>
-Date: Wed, 28 Jun 2006 09:32:59 +0200
-Message-Id: <1151479980.9544.8.camel@localhost>
+In-Reply-To: <6297d67c0606272204g1a70d1ew2763d51002f44383@mail.gmail.com>
+References: <6297d67c0606272204g1a70d1ew2763d51002f44383@mail.gmail.com>
+Date: Wed, 28 Jun 2006 09:30:31 +0200
+Message-Id: <1151479831.9544.5.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [Fwd: Re:  Problem connecting Bluetooth device]
+Subject: Re: [Bluez-devel] BlueZ not on Linux
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,22 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Harald,
+Hi Mayank,
 
-> The problem regarding the linkkey is that the stored linkkey from the first connection is
-> OK and all further connections are successful. But if I switch off and then switch on the
-> remote device, a new linkkey, different from the first, will be generated, but the old
-> linkkey will not be overwritten with the new one! Therefore I can contact the remote
-> device only one time (after entering the PIN). Why the linkkey is not overwritten?!
+> I was wondering if the BlueZ stack can be ported onto some other OS
+> apart from Linux?
+> Has anyone done that so far?
+> How much of effort will that involve?
 
-how can the remote device generate a new link key when it is switched
-off. This can't be right. Bluetooth is not working this way. And this is
-also not what we saw in hcidump. The local device is giving a wrong link
-key and thus the authentication was refused.
+not again. BlueZ is highly integrated into the Linux kernel and it is
+very unlikely to get it ported to any other OS without a massive shim
+layer. So in all cases it should be easier to start from scratch for
+these operating systems. And the GPL might not even allow it to port it
+to another non-GPL OS.
 
 Regards
 
 Marcel
+
 
 
 
