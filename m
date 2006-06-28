@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <6297d67c0606272204g1a70d1ew2763d51002f44383@mail.gmail.com>
-References: <6297d67c0606272204g1a70d1ew2763d51002f44383@mail.gmail.com>
-Date: Wed, 28 Jun 2006 09:30:31 +0200
-Message-Id: <1151479831.9544.5.camel@localhost>
+In-Reply-To: <loom.20060628T033626-329@post.gmane.org>
+References: <loom.20060628T033626-329@post.gmane.org>
+Date: Wed, 28 Jun 2006 09:28:18 +0200
+Message-Id: <1151479698.9544.1.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] BlueZ not on Linux
+Subject: Re: [Bluez-devel] cross-compiling bluez-utils.3.1
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,23 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mayank,
+Hi Robert,
 
-> I was wondering if the BlueZ stack can be ported onto some other OS
-> apart from Linux?
-> Has anyone done that so far?
-> How much of effort will that involve?
+> I seem to be having problems with the latest version of bluez-utils.  It seems
+> that dbus is a required component of the 3.1 release; which isn't cross-compile
+> friendly (the dbus build complains about cross-compiling) -- a previous version
+> of bluez-utils (2.21) is.  In the 2.21 release there was an option to compile
+> without dbus, is there a work around for the 3.1/if so, how?  If not, any
+> suggestions about cross-compiling the stock bluez-utils.3.1 (including dbus as
+> necessary) for an ARM processor?
 
-not again. BlueZ is highly integrated into the Linux kernel and it is
-very unlikely to get it ported to any other OS without a massive shim
-layer. So in all cases it should be easier to start from scratch for
-these operating systems. And the GPL might not even allow it to port it
-to another non-GPL OS.
+the D-Bus library is mandatory now. Hence the new major version number.
 
 Regards
 
 Marcel
-
 
 
 
