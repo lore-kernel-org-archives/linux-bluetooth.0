@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44A21B71.6090108@ibmt.fraunhofer.de>
-Date: Wed, 28 Jun 2006 08:02:25 +0200
-From: =?ISO-8859-1?Q?Harald_Niederl=E4nder?= <harald.niederlaender@ibmt.fraunhofer.de>
+Message-ID: <6297d67c0606272204g1a70d1ew2763d51002f44383@mail.gmail.com>
+Date: Wed, 28 Jun 2006 10:34:09 +0530
+From: "Mayank Batra" <mayankbatra@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <4497CE54.5080305@ibmt.fraunhofer.de>	<4498EB58.3090200@ibmt.fraunhofer.de>	<1150883159.3950.34.camel@localhost>	<44991DF2.2000409@ibmt.fraunhofer.de>
-	<1150886307.3950.36.camel@localhost>
-In-Reply-To: <1150886307.3950.36.camel@localhost>
-Subject: Re: [Bluez-devel] [Fwd: Re:  Problem connecting Bluetooth device]
+Subject: [Bluez-devel] BlueZ not on Linux
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,50 +14,67 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0379716403=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann schrieb:
-> Hi Harald,
-> 
-> 
-> it seems that the link key is stored totally wrong. Please replace it
-> with the link key you see in the first connection attempt and then try
-> again.
-> 
-> Regards
-> 
-> Marcel
-> 
->
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-> 
+--===============0379716403==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_6474_1258277.1151471049481"
 
-Hi Marcel,
+------=_Part_6474_1258277.1151471049481
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-The problem regarding the linkkey is that the stored linkkey from the first connection is
-OK and all further connections are successful. But if I switch off and then switch on the
-remote device, a new linkkey, different from the first, will be generated, but the old
-linkkey will not be overwritten with the new one! Therefore I can contact the remote
-device only one time (after entering the PIN). Why the linkkey is not overwritten?!
+Hi,
 
-Regards
+I was wondering if the BlueZ stack can be ported onto some other OS apart
+from Linux?
+Has anyone done that so far?
+How much of effort will that involve?
+Thanks for any suggestions.
 
-Harald
+Regards,
+Mayank
+
+------=_Part_6474_1258277.1151471049481
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<div>Hi,</div>
+<div>&nbsp;</div>
+<div>I was wondering if the BlueZ stack can be ported onto some other OS apart from Linux?</div>
+<div>Has anyone done that so far?</div>
+<div>How much of effort will that involve?</div>
+<div>Thanks for any suggestions.</div>
+<div>&nbsp;</div>
+<div>Regards,</div>
+<div>Mayank</div>
+
+------=_Part_6474_1258277.1151471049481--
 
 
-
+--===============0379716403==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0379716403==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0379716403==--
