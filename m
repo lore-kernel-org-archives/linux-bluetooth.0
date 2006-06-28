@@ -1,13 +1,18 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44A29F2F.7020801@xmission.com>
-Date: Wed, 28 Jun 2006 09:24:31 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <BAY116-DAV738BD697D0EDB18FB509AC77F0@phx.gbl>	<6297d67c0606272049g55cc14cby52254c90863e727f@mail.gmail.com>	<BAY116-DAV22C2B995073A52F8216D6C77F0@phx.gbl>
-	<6297d67c0606280257y1cda0a8bj5ebdec42e3b1079@mail.gmail.com>
-In-Reply-To: <6297d67c0606280257y1cda0a8bj5ebdec42e3b1079@mail.gmail.com>
-Subject: Re: [Bluez-devel] A2DP a2play and a2recv
+In-Reply-To: <44A26821.9030904@ibmt.fraunhofer.de>
+References: <4497CE54.5080305@ibmt.fraunhofer.de>
+	<4498EB58.3090200@ibmt.fraunhofer.de>	<1150883159.3950.34.camel@localhost>
+	<44991DF2.2000409@ibmt.fraunhofer.de>	<1150886307.3950.36.camel@localhost>
+	<44A21B71.6090108@ibmt.fraunhofer.de>	<1151479980.9544.8.camel@localhost>
+	<44A25F14.7080307@ibmt.fraunhofer.de>
+	<1151493008.26495.0.camel@localhost>
+	<44A26821.9030904@ibmt.fraunhofer.de>
+Date: Wed, 28 Jun 2006 13:37:28 +0200
+Message-Id: <1151494648.26495.2.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [Fwd: Re:  Problem connecting Bluetooth device]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,37 +26,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-guys
+Hi Harald,
 
-first off, make sure you configure with --enable-fixed so you get the
-fixed-point sbc library.
+> > this is possible, but this doesn't explain why the stored link key on
+> > your device is different from the link key provided on the next connect.
+> 
+> The reason is, that the stored linkkey is the result from the first connection, and 
+> because each new generated linkkey, after switch off and later switch on the device, is 
+> different from the first linkkey and the old linkkey will not be overwritten.
 
->          Thanks for reply. can a2play run on OSS too?
+unless you see a link key notification you can't know this. And if
+pairing mode is set to multi then the old link key will be overwritten.
 
-not directly.
+Regards
 
-if you know what you're doing, you could use dynamic loading tricks to
-make writes to /dev/dsp go to custom code based on a2play.
+Marcel
 
-it would be easier to modify the audio apps themselves. you may be able
-to do that on your embedded platform.
 
->          I ported BlueZ on an embeded ARM7 running at 80 MHz.
->     I also try a2recv on embeded board with sound chip using OSS
->     driver. Printout looks ok, but can't hear anything:
-
-it could be the cpu is too busy or the oss writes aren't right. I'm not
-sure 80Mhz is fast enough.
-
-There are a couple more sbc optimizations in the list of things to do.
-
-- rework encoder to avoid moving values around (follow model from decoder)
-- use a log2 table for byte integer scale factors calculation (sum log2
-results for high and low bytes)
-- fill bitpool by 16 bits instead of one at a time in bits
-allocation/bitpool generation
-
-Brad
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
