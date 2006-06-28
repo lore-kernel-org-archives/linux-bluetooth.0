@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <44A21B71.6090108@ibmt.fraunhofer.de>
+Date: Wed, 28 Jun 2006 08:02:25 +0200
+From: =?ISO-8859-1?Q?Harald_Niederl=E4nder?= <harald.niederlaender@ibmt.fraunhofer.de>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <loom.20060628T033626-329@post.gmane.org>
-References: <loom.20060628T033626-329@post.gmane.org>
-Date: Wed, 28 Jun 2006 09:28:18 +0200
-Message-Id: <1151479698.9544.1.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] cross-compiling bluez-utils.3.1
+References: <4497CE54.5080305@ibmt.fraunhofer.de>	<4498EB58.3090200@ibmt.fraunhofer.de>	<1150883159.3950.34.camel@localhost>	<44991DF2.2000409@ibmt.fraunhofer.de>
+	<1150886307.3950.36.camel@localhost>
+In-Reply-To: <1150886307.3950.36.camel@localhost>
+Subject: Re: [Bluez-devel] [Fwd: Re:  Problem connecting Bluetooth device]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,21 +21,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Robert,
+Marcel Holtmann schrieb:
+> Hi Harald,
+> 
+> 
+> it seems that the link key is stored totally wrong. Please replace it
+> with the link key you see in the first connection attempt and then try
+> again.
+> 
+> Regards
+> 
+> Marcel
+> 
+>
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
+> 
 
-> I seem to be having problems with the latest version of bluez-utils.  It seems
-> that dbus is a required component of the 3.1 release; which isn't cross-compile
-> friendly (the dbus build complains about cross-compiling) -- a previous version
-> of bluez-utils (2.21) is.  In the 2.21 release there was an option to compile
-> without dbus, is there a work around for the 3.1/if so, how?  If not, any
-> suggestions about cross-compiling the stock bluez-utils.3.1 (including dbus as
-> necessary) for an ARM processor?
+Hi Marcel,
 
-the D-Bus library is mandatory now. Hence the new major version number.
+The problem regarding the linkkey is that the stored linkkey from the first connection is
+OK and all further connections are successful. But if I switch off and then switch on the
+remote device, a new linkkey, different from the first, will be generated, but the old
+linkkey will not be overwritten with the new one! Therefore I can contact the remote
+device only one time (after entering the PIN). Why the linkkey is not overwritten?!
 
 Regards
 
-Marcel
+Harald
+
 
 
 
