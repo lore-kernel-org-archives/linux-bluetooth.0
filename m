@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Pierre-Yves Paulus <py@idlum.be>
-To: bluez-devel@lists.sourceforge.net
-Date: Thu, 29 Jun 2006 16:16:00 +0200
-Message-Id: <1151590561.753.27.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-devel] DBus API and rfcomm crashing hcid
+Message-ID: <28c817710606290543i3f331478ta461242dcc94d612@mail.gmail.com>
+Date: Thu, 29 Jun 2006 20:43:41 +0800
+From: ifq <ifqqfi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1151582944.14964.17.camel@localhost>
+MIME-Version: 1.0
+References: <28c817710606290332o2e84020dl91d4a0bff11db73f@mail.gmail.com>
+	<6297d67c0606290445h455ea56bjfdf3bc2b44f26ad1@mail.gmail.com>
+	<1151582944.14964.17.camel@localhost>
+Subject: Re: [Bluez-devel] how to create a ACL connection with an
+	authentication?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,32 +19,102 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============1815428624=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGVsbG8sCgpJJ20gdHJ5aW5nIHRvIGluaXRpYXRlIGFuIFJGQ09NTSBjb25uZWN0aW9uIHVzaW5n
-IHRoZSBEQnVzIEFQSS4gSSBjYW4KZ2V0IHRoZSBSRkNPTU0gb2JqZWN0IG9uIHRoZSBidXMsIHRo
-ZW4gSSBjYWxsIENvbm5lY3RCeUNoYW5uZWwoYWRkcmVzcywKY2hhbm5lbCkuIEkgdGhlbiBnZXQg
-dGhlIHByb21wdCBvbiB0aGUgcmVtb3RlIGRldmljZSB0byBhY2NlcHQgb3IgZGVueS4KQnV0IHdo
-ZW4gSSBhY2NlcHQsIGhjaWQgZG9lcyBjcmFzaCB3aXRoIHRoZSBmb2xsb3dpbmcgb3V0cHV0OgoK
-aGNpZFsxOTkxXTogQ29ubmVjdCBpbiBwcm9ncmVzcwpoY2lkWzE5OTFdOiByZmNvbW1fY29ubmVj
-dF9jYjogY29ubmVjdGVkCmhjaWRbMTk5MV06IGlvY3RsKFJGQ09NTUNSRUFURURFVik6IE9wZXJh
-dGlvbiBub3Qgc3VwcG9ydGVkICg5NSkKaGNpZFsxOTkxXTogcmZjb21tX3JlbGVhc2Uo77+977+9
-77+977+977+977+9OkJCOjREOjkYKQpTZWdtZW50YXRpb24gZmF1bHQKCmhjaWQgaXMgcmFuIGFz
-IHJvb3QsIGFuZCBteSBhcHBsaWNhdGlvbiBhcyB1c2VyLiBNYXliZSBib3RoIGhhdmUgdG8gYmUK
-cnVubmluZyBhcyByb290IHRvIGhhdmUgdGhpcyB3b3JraW5nPyBPciBpcyBpdCBzb21ldGhpbmcg
-ZWxzZSB0aGF0CmNhdXNlcyB0aGlzIGNyYXNoPwoKQWxzbywgYnJvd3NpbmcgdGhlIERCdXMtcmVs
-YXRlZCBzb3VyY2VzIG9uIHRoZSBDVlMsIEkgc2F3IHRoYXQgc29tZQptZXRob2RzIGFyZSBub3Qg
-aW1wbGVtZW50ZWQgc28gZmFyIG9yIG9ubHkgZXhwZXJpbWVudGFsbHkuIEFyZSB0aGV5CmN1cnJl
-bnRseSB3b3JrZWQgb24gYnkgc29tZW9uZSwgYW5kIGlmIHllcywgYXJlIHRoZXkgcGxhbm5lZCB0
-byBiZQphdmFpbGFibGUvdXBkYXRlZCBzb29uPwoKVGhhbmtzIGluIGFkdmFuY2UsCkJlc3QgUmVn
-YXJkcy4KClBpZXJyZS1ZdmVzIFBhdWx1cwoKClVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBt
-b3JlPyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNlcnZpY2VzLCBzZWN1cml0eT8KR2V0IHN0dWZmIGRv
-bmUgcXVpY2tseSB3aXRoIHByZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kgdG8gbWFrZSB5b3VyIGpv
-YiBlYXNpZXIKRG93bmxvYWQgSUJNIFdlYlNwaGVyZSBBcHBsaWNhdGlvbiBTZXJ2ZXIgdi4xLjAu
-MSBiYXNlZCBvbiBBcGFjaGUgR2Vyb25pbW8KaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3Nl
-bD9jbWQ9bG5rJmtpZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQyCl9fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlz
-dApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vm
-b3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
+--===============1815428624==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_93884_8161195.1151585021330"
+
+------=_Part_93884_8161195.1151585021330
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+if I need to build the authentication connection in my own program,what
+should I do?
+what I know is use the socket API to create a connection.but how to set this
+connection to have an authentication?
+thanks.
+
+Regards
+
+Jingtian Wang
+
+2006/6/29, Marcel Holtmann <marcel@holtmann.org>:
+>
+> Hi Mayank,
+>
+> > On 6/29/06, ifq <ifqqfi@gmail.com> wrote:
+> >         I want to create a ACL connection with an authentication and
+> >         encryption use BlueZ. I searched the BlueZ lib and found
+> >         nothing.is there anyone could give me some advice?thank you
+> >         very much!
+> >
+> > In /etc/bluetooth/hcid.conf file make sure that the following lines
+> > are there (i.e. they should not be commented!)
+> > auth enable
+> > encrypt enable
+>
+> don't advise people to enter security mode 3 unless you are going to
+> handle all their troubles with different devices. These two option are
+> removed in the 3.x releases anyway.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job
+> easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+
+------=_Part_93884_8161195.1151585021330
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+if I need to build the authentication connection in my own program,what should I do?<br>what I know is use the socket API to create a connection.but how to set this connection to have an authentication?<br>thanks.<br><br>Regards
+<br><br>Jingtian Wang<br><br><div><span class="gmail_quote">2006/6/29, Marcel Holtmann &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt;:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+Hi Mayank,<br><br>&gt; On 6/29/06, ifq &lt;<a href="mailto:ifqqfi@gmail.com">ifqqfi@gmail.com</a>&gt; wrote:<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I want to create a ACL connection with an authentication and<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; encryption use BlueZ. I searched the BlueZ lib and found
+<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://nothing.is">nothing.is</a> there anyone could give me some advice?thank you<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; very much!<br>&gt;<br>&gt; In /etc/bluetooth/hcid.conf file make sure that the following lines<br>
+&gt; are there (i.e. they should not be commented!)<br>&gt; auth enable<br>&gt; encrypt enable<br><br>don't advise people to enter security mode 3 unless you are going to<br>handle all their troubles with different devices. These two option are
+<br>removed in the 3.x releases anyway.<br><br>Regards<br><br>Marcel<br><br><br><br>Using Tomcat but need to do more? Need to support web services, security?<br>Get stuff done quickly with pre-integrated technology to make your job easier
+<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo<br><a href="http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642">http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642
+</a><br>_______________________________________________<br>Bluez-devel mailing list<br><a href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-devel">
+https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br></blockquote></div><br>
+
+------=_Part_93884_8161195.1151585021330--
+
+
+--===============1815428624==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============1815428624==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1815428624==--
