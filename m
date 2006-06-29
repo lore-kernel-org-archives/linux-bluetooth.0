@@ -1,74 +1,146 @@
-Return-Path: <ulissesf@gmail.com>
-Message-ID: <d23110170606291331q48f5062dh4eb67803291b45b8@mail.gmail.com>
-Date: Thu, 29 Jun 2006 17:31:52 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: Controller to host flow control
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1151612400.14964.41.camel@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-References: <d23110170606291108r57335a6bx76a19d7cf7f63cf6@mail.gmail.com>
-	 <1151612400.14964.41.camel@localhost>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Date: Thu, 29 Jun 2006 17:03:16 -0300
+From: Nelson Murilo <nelson@pangeia.com.br>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20060629200316.GC22212@pangeia.com.br>
+References: <5bab330d0512192018o281f89a6l242586c487297e8f@mail.gmail.com>
+	<43A78D40.7070209@xmission.com>
+	<5bab330d0512201659w8af0301r7fd09cba76c6ca92@mail.gmail.com>
+	<43A9B384.5040202@xmission.com>
+	<20060628215123.GA17616@pangeia.com.br>
+	<1151596908.14964.28.camel@localhost>
+	<20060629170818.GB22212@pangeia.com.br>
+	<e1effdeb0606291051t567f7ccfod6acb4ac833dba03@mail.gmail.com>
+Mime-Version: 1.0
+In-Reply-To: <e1effdeb0606291051t567f7ccfod6acb4ac833dba03@mail.gmail.com>
+Subject: Re: [Bluez-devel] pin_helper missing?
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="iso-8859-1"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 6/29/06, Marcel Holtmann <marcel@holtmann.org> wrote:
 
-> > Well, I was saying that finally I had time to look into controller to
-> > host flow control and I'd like to share what I've thought to see if
-> > you agree with me before I start implementing it. Ah.. another thing,
-> > do you like me to send these messages to the mailing list or directly
-> > to you?
->
-> I am fine with using the mailing list.
+Thanks Claudio,
 
-Ok, I've CCed the bluez development mailing list.
+I will create scripts based in your info for do it. =
 
-> > I've thought about implementing some simple flow control. We could add
-> > 5 extra fields in hci_dev structure to set if that device wants
-> > controller to host flow control and also the ACL/SCO buffer sizes.
-> > These fields might be something like:
+
+Regards,
+
+./nelson -murilo
+
+On Thu, Jun 29, 2006 at 02:51:43PM -0300, Claudio Takahasi wrote:
+> Hi Nelson,
+> =
+
+> On 6/29/06, Nelson Murilo <nelson@pangeia.com.br> wrote:
+> > On Thu, Jun 29, 2006 at 06:01:48PM +0200, Marcel Holtmann wrote:
+> > > Hi Nelson,
 > >
-> >   __u8    host_flow_ctl;
-> >   __u16  acl_data_len;
-> >   __u16  sco_data_len;
-> >   __u16  max_acl_pkts;
-> >   __u16  max_sco_pkts;
+> > Hi Marcel,
 > >
-> > When the device is registered we can set flow control with the "Set
-> > Controller to Host Flow Control" command and set the buffer sizes with
-> > the "Host Buffer Size" command (if the device wants controller to host
-> > flow control, of course).
->
-> We also need the "Host Buffer Size" command for normal operation. The
-> ISSC based dongles for example tend to send to much data which we can't
-> handle smoothly.
-
-Hmm.. I don't know if I understood. Do you mean we need to send the
-host buffer size command more than once?
-
-> > Besides that we'd need a counter per connection to be able to report
-> > how many packets were completed per connection handle with the "Host
-> > Number of Completed Packets" command. The counter per connection can
-> > be a field like the following in hci_conn:
+> > > you need to set the discoverable timeout to zero. Otherwise it will s=
+et
+> > > the device back to invisible at some point.
 > >
-> >   __u16  nr_compl_pkts;
->
-> I prefer to have an atomic counter here.
+> > How I do this without use gblueconf?  Sorry for this but I don=B4t found
+> > any info about it.
+> =
 
-Of course. I wanted an atomic counter but have written __u16.
+> To read the current mode:
+> $dbus-send --system --type=3Dmethod_call --dest=3Dorg.bluez --print-reply
+> /org/bluez/hci0 org.bluez.Adapter.GetMode
+> =
 
-> > We'll have to define when we're going to send the "Host Number of
-> > Completed Packets" command. The specification says we should send this
-> > command when "the corresponding buffer space has been freed on the
-> > Host", so we can do it this way. What do you think?
->
-> For starters we can send it after every data packet, but that is not
-> what we really want. We might wanna have something like 8 outstanding
-> packets.
+> To set a new value:
+> $dbus-send --system --type=3Dmethod_call --dest=3Dorg.bluez --print-reply
+> /org/bluez/hci0 org.bluez.Adapter.SetMode string:discoverable
+> =
 
-Ok.
+> To read the timeout value:
+> $dbus-send --system --type=3Dmethod_call --dest=3Dorg.bluez --print-reply
+> /org/bluez/hci0 org.bluez.Adapter.GetDiscoverableTimeout
+> =
 
-Best regards,
+> To set a new value:
+> $dbus-send --system --type=3Dmethod_call --dest=3Dorg.bluez --print-reply
+> /org/bluez/hci0 org.bluez.Adapter.SetDiscoverableTimeout uint32:0
+> (for always visible or enter how many seconds you want)
+> =
 
--- Ulisses
+> Claudio.
+> =
+
+> >
+> > > They are created when you bind a device or connect a TTY.
+> >
+> > Great.
+> >
+> > > The PIN helper stuff is gone. We have the concept of passkey agents n=
+ow.
+> >
+> > I will read the code, but if I=B4d like use different PINs for diffs de=
+vices?
+> >
+> >
+> > > I chose the new major version, because it breaks something.
+> >
+> > I agree.
+> >
+> > Best regards,
+> >
+> > ./nelson -murilo
+> >
+> > Using Tomcat but need to do more? Need to support web services, securit=
+y?
+> > Get stuff done quickly with pre-integrated technology to make your job =
+easier
+> > Download IBM WebSphere Application Server v.1.0.1 based on Apache Geron=
+imo
+> > http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> > _______________________________________________
+> > Bluez-devel mailing list
+> > Bluez-devel@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> >
+> =
+
+> =
+
+> -- =
+
+> ---------------------------------------------------------
+> Claudio Takahasi
+> Instituto Nokia de Tecnologia - INdT
+> =
+
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job ea=
+sier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
