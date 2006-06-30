@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44A4E5A4.5070904@infitsrl.com>
-References: <44A4E5A4.5070904@infitsrl.com>
-Date: Fri, 30 Jun 2006 10:53:24 +0200
-Message-Id: <1151657604.20305.9.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] sdp_connect thread safe?
+Message-ID: <44A4E5A4.5070904@infitsrl.com>
+Date: Fri, 30 Jun 2006 10:49:40 +0200
+From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] sdp_connect thread safe?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,25 +18,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabrizio,
+Hi all,
+using sdp_connect to find services on bluetooth devices I've found a 
+problem.
+If sdp_connect it's uses in synchronous way  all works but if I use a 
+thread for every device found by hci_inquiry
+sdp_connect always fails.
 
-> using sdp_connect to find services on bluetooth devices I've found a 
-> problem.
-> If sdp_connect it's uses in synchronous way  all works but if I use a 
-> thread for every device found by hci_inquiry
-> sdp_connect always fails.
-> 
-> Simultaneous multiple sdp_connect would have to be possible, reading 
-> sdp_connect source I've see it's simply a socket l2cap creation and a 
-> connection using this.
+Simultaneous multiple sdp_connect would have to be possible, reading 
+sdp_connect source I've see it's simply a socket l2cap creation and a 
+connection using this.
 
-check with "hcidump -X -V", because I think you dongle simply doesn't
-support multiple page request at the same time (like all others).
+Can someone suggest something ?
 
-Regards
-
-Marcel
-
+Many thanks
+Fabrizio Guglielmino
 
 
 Using Tomcat but need to do more? Need to support web services, security?
