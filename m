@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Johannes Kapune <listen@kapune.de>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1151695635.11672.3.camel@johannes_01.kapune.local>
+In-Reply-To: <44A576BB.1000006@xmission.com>
 References: <1151660752.7416.12.camel@johannes_01.kapune.local>
 	<1151683090.8460.9.camel@johannes_01.kapune.local>
 	<44A54DD5.2070505@xmission.com>
 	<1151685968.8460.17.camel@johannes_01.kapune.local>
 	<44A576BB.1000006@xmission.com>
-	<1151695635.11672.3.camel@johannes_01.kapune.local>
-Date: Fri, 30 Jun 2006 21:54:25 +0200
-Message-Id: <1151697265.11672.12.camel@johannes_01.kapune.local>
+Date: Fri, 30 Jun 2006 21:27:15 +0200
+Message-Id: <1151695635.11672.3.camel@johannes_01.kapune.local>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] a2play will not work
 Reply-To: listen@kapune.de, BlueZ users <bluez-users@lists.sourceforge.net>
@@ -25,37 +24,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Am Freitag, den 30.06.2006, 21:27 +0200 schrieb Johannes Kapune:
-> Am Freitag, den 30.06.2006, 13:08 -0600 schrieb Brad Midgley:
-> > Johannes
-> > 
-> > > you think something like this?:
-> > > mpg123 --p - Din_Tei.mp3 | ./a2play 00:0A:94:A0:59:3b
-> > 
-> > try:
-> > mpg123 - Din_Tei.mp3 | ./a2play -p 00:0A:94:A0:59:3b
-> > 
-> I tred this but then nothing happens, no sound and no data in the
-> hcidump -X -V window
+Am Freitag, den 30.06.2006, 13:08 -0600 schrieb Brad Midgley:
+> Johannes
 > 
-> > a2play used to lock up my itech clip s set but I thought I had fixed the
-> > problem. I thought a2play was sending more stream data after it had
-> > signaled the set to close the stream.
-> > 
-> > anyway, the ordering might be better using -p but if not you could try
-> > disabling the stream close by changing "#if 1" to "#if 0" in the latest
-> > version from cvs (you might have to give it an hour for anon cvs to
-> > catch up)
-> > 
-I'm sorry but -
-I tried out updating the cvs and I get a new a2play. The differenz in
-behavier is now I dont need to set the headphone in pairing mode but at
-the end of the first mp3 there is no additinal mp3 possible. Push the
-button at the headphone I can see in the hcidump -X -V window.
+> > you think something like this?:
+> > mpg123 --p - Din_Tei.mp3 | ./a2play 00:0A:94:A0:59:3b
+> 
+> try:
+> mpg123 - Din_Tei.mp3 | ./a2play -p 00:0A:94:A0:59:3b
+> 
+I tred this but then nothing happens, no sound and no data in the
+hcidump -X -V window
 
+> a2play used to lock up my itech clip s set but I thought I had fixed the
+> problem. I thought a2play was sending more stream data after it had
+> signaled the set to close the stream.
+> 
+> anyway, the ordering might be better using -p but if not you could try
+> disabling the stream close by changing "#if 1" to "#if 0" in the latest
+> version from cvs (you might have to give it an hour for anon cvs to
+> catch up)
+> 
+> Brad
 Johannes
-
-PS the headset is shown as "btst-9300"
 
 
 Using Tomcat but need to do more? Need to support web services, security?
