@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Pierre-Yves Paulus <py@idlum.be>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44A4E987.1000104@infitsrl.com>
-References: <44A4E5A4.5070904@infitsrl.com>
-	<1151657604.20305.9.camel@localhost>  <44A4E987.1000104@infitsrl.com>
-Date: Fri, 30 Jun 2006 11:12:11 +0200
-Message-Id: <1151658731.20305.11.camel@localhost>
+In-Reply-To: <1151590561.753.27.camel@localhost>
+References: <1151590561.753.27.camel@localhost>
+Date: Fri, 30 Jun 2006 11:08:40 +0200
+Message-Id: <1151658521.753.38.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] sdp_connect thread safe?
+Subject: Re: [Bluez-devel] DBus API and rfcomm crashing hcid
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,30 +16,38 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabrizio,
-
-> Is there a list of bluetooth adapters supporting this feature?
-> Doing hciconfig -a [adapter] is not possible to known if the device 
-> support multiple simultaneus sdp_connect ?
-
-I think my phrase was not clear. I haven't seen any adapter that is
-capable of multiple baseband pages at the same time.
-
-Regards
-
-Marcel
-
-
-
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGVsbG8sCgo+IEknbSB0cnlpbmcgdG8gaW5pdGlhdGUgYW4gUkZDT01NIGNvbm5lY3Rpb24gdXNp
+bmcgdGhlIERCdXMgQVBJLiBJIGNhbgo+IGdldCB0aGUgUkZDT01NIG9iamVjdCBvbiB0aGUgYnVz
+LCB0aGVuIEkgY2FsbCBDb25uZWN0QnlDaGFubmVsKGFkZHJlc3MsCj4gY2hhbm5lbCkuIEkgdGhl
+biBnZXQgdGhlIHByb21wdCBvbiB0aGUgcmVtb3RlIGRldmljZSB0byBhY2NlcHQgb3IgZGVueS4K
+PiBCdXQgd2hlbiBJIGFjY2VwdCwgaGNpZCBkb2VzIGNyYXNoIHdpdGggdGhlIGZvbGxvd2luZyBv
+dXRwdXQ6Cj4gCj4gaGNpZFsxOTkxXTogQ29ubmVjdCBpbiBwcm9ncmVzcwo+IGhjaWRbMTk5MV06
+IHJmY29tbV9jb25uZWN0X2NiOiBjb25uZWN0ZWQKPiBoY2lkWzE5OTFdOiBpb2N0bChSRkNPTU1D
+UkVBVEVERVYpOiBPcGVyYXRpb24gbm90IHN1cHBvcnRlZCAoOTUpCj4gaGNpZFsxOTkxXTogcmZj
+b21tX3JlbGVhc2Uo77+977+977+977+977+977+9OkJCOjREOjkYKQo+IFNlZ21lbnRhdGlvbiBm
+YXVsdAoKVGhlIGZvbGxvd2luZyBwYXRjaCBzZWVtcyB0byBzb2x2ZSB0aGUgY3Jhc2guIE5vdCBz
+dXJlIGhvd2V2ZXIgaWYgaXQgaXMKYSBjbGVhbiBhbmQgZ29vZCB3YXkgdG8gZml4IGl0LCB0aGlz
+IGlzIHZlcnkgbmV3IGZvciBtZS4gQW55IGNvbW1lbnQKdmVyeSB3ZWxjb21lIChhbHNvIGFib3V0
+IHRoZSBwYXRjaCBmb3JtYXQgaXRzZWxmLCBuZXZlciBkb25lIHRoaXMKYmVmb3JlKS4KCgoKKioq
+IG9yaWdpbmFsL2RidXMtcmZjb21tLmMgICAgICBGcmkgSnVuIDMwIDEwOjU4OjEyIDIwMDYKLS0t
+IG5ldy9kYnVzLXJmY29tbS5jICAgRnJpIEp1biAzMCAxMDo1OToyMSAyMDA2CioqKioqKioqKioq
+KioqKgoqKiogMjQ2LDI0OSAqKioqCi0tLSAyNDYsMjUzIC0tLS0KICAgICAgICAgICAgICAgIGdv
+dG8gZmFpbGVkOwogICAgICAgIH0KKyAgICAgICBub2RlLT5pbyA9IE5VTEw7CisgICAgICAgbm9k
+ZS0+b3duZXIgPSBOVUxMOworICAgICAgIG1lbXNldCgmbm9kZS0+bmFtZSwgMCwgc2l6ZW9mKG5v
+ZGUtPm5hbWUpKTsKKwoKICAgICAgICAvKiBDcmVhdGUgdGhlIHJmY29tbSBkZXZpY2Ugbm9kZSAq
+LwoKCgpIb3dldmVyLCB0aGlzIG9idmlvdXNseSBkb2VzIG5vdGhpbmcgdG8gc29sdmUgdGhlIGZh
+Y3QgdGhhdCB0aGUKY29ubmVjdGlvbiBmYWlscyBhdCB0aGUgaW9jdGwgY2FsbC4gSSBzdGlsbCBu
+ZWVkIHRvIGZpZ3VyZSBvdXQgaG93IGFsbAp0aGF0IHN0dWZmIHdvcmtzLi4uCgoKUmVnYXJkcywK
+UGllcnJlLVl2ZXMKCgoKVXNpbmcgVG9tY2F0IGJ1dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8g
+c3VwcG9ydCB3ZWIgc2VydmljZXMsIHNlY3VyaXR5PwpHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdp
+dGggcHJlLWludGVncmF0ZWQgdGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9iIGVhc2llcgpEb3du
+bG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFw
+YWNoZSBHZXJvbmltbwpodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lk
+PTEyMDcwOSZiaWQ9MjYzMDU3JmRhdD0xMjE2NDIKX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVs
+QGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0
+cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
