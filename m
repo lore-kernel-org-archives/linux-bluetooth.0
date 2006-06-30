@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 30 Jun 2006 12:25:02 +0200 (CEST)
+Date: Fri, 30 Jun 2006 12:14:40 +0200 (CEST)
 From: Peter Wippich <pewi@gw-instruments.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44A4F25C.5000408@infitsrl.com>
-Message-ID: <Pine.LNX.4.63.0606301219200.18028@redbean.intranet.gw-instruments.de>
+In-Reply-To: <1151658731.20305.11.camel@localhost>
+Message-ID: <Pine.LNX.4.63.0606301142130.18028@redbean.intranet.gw-instruments.de>
 References: <44A4E5A4.5070904@infitsrl.com>
 	<1151657604.20305.9.camel@localhost>
 	<44A4E987.1000104@infitsrl.com> <1151658731.20305.11.camel@localhost>
-	<44A4F25C.5000408@infitsrl.com>
 MIME-Version: 1.0
 Subject: Re: [Bluez-devel] sdp_connect thread safe?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -24,30 +23,46 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
-Hi Fabrizio,
+Hello All, 
+> Hi Fabrizio,
+> 
+> > Is there a list of bluetooth adapters supporting this feature?
+> > Doing hciconfig -a [adapter] is not possible to known if the device 
+> > support multiple simultaneus sdp_connect ?
+> 
+> I think my phrase was not clear. I haven't seen any adapter that is
+> capable of multiple baseband pages at the same time.
 
-On Fri, 30 Jun 2006, Fabrizio Guglielmino wrote:
+So do I. There's a simple proof: just send a HCI_Create_Connection command 
+and than try to send a second Create_Connection before you get the 
+connection complete event for the first Create_Connection. 
+If the second create connection passes, please tell me what chip it was 
+!!!
+The normal behaviour is that the chip will reply with an error event (like 
+command dissallowed) for the second connection attempt. I think there was 
+some discussion about this some time ago. The only way to come around this 
+is a complicated buffering for HCI commands inside BlueZ. It will require 
+the stack to hold a create connection command in the queue when it gets an 
+error response for a create connection command and re-issue it once it 
+gets an connection complete or connection fail event.
+The real bad thing here is that different chips will behave different so 
+there is some kind of hardware dependence here. 
 
-> In Microsoft stack I suppose sdp discovery of push service is masked in 
-> sense I don't have to specify the RFCOMM channel when  I made  the 
-> connection with device. In the SOCKADDR_BTH struct used by connect I 
-> simply specify -1 in port field (channel) and all works with 100% of 
-> opush enabled devices tested.
+I have not checked but as far as I know BlueZ does not support such a 
+mechanism. Feel free to implement this (the less complicated task) and  
+make sure it always works correctly (the much more complicated task
+because you have to test with a lot of different hardware).  
 
-They are doing the SDP just before connecting the device. This normaly is 
-save because a device usualy supports only one opush service. You may get 
-problems for other service types (like SPP) when a device supports more 
-than one. In this case you can not control to which service you realy 
-connect. 
-
-I also suppose they are doing some synchronisation on the lower level to 
-make sure there is only one outstanding connection attempt, like Marcel 
-already wrote. 
+You may also try something on the upper level. For example synchronize 
+your threads in such a way that there is only one outstanding sdp connect. 
+For example use a semaphore which must be owned by the thread to issue a 
+sdp connect. Once the sdp connect is through (even completed or failed) 
+the semaphore is freed and the next thread waiting is allowed to start a 
+sdp connection. 
 
 Ciao, 
 
 Peter 
-
 
 |       Peter Wippich                   Voice: +49 30 46776411          |
 |       G&W Instruments GmbH            fax:   +49 30 46776419          |
