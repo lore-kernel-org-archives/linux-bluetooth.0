@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <e0638ac60606301533r646d798dle31901ed4583b165@mail.gmail.com>
-Date: Fri, 30 Jun 2006 17:33:33 -0500
-From: "Eunsoo Seo" <eunsoo@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] SCO link for data packets
+Message-Id: <44A54F61.5301.0014.0@novell.com>
+Date: Fri, 30 Jun 2006 16:21:05 -0600
+From: "Olin Atkinson" <oatkinson@novell.com>
+To: <bluez-devel@lists.sourceforge.net>
+Mime-Version: 1.0
+Subject: [Bluez-devel] bluetooth-alsa/btsco connects but I can't hear the
+	sound
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,16 +19,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello, guys.
+where do I go to let people know that another device is working under
+the bluetooth-alsa project?
 
-I have two questions.
+I have a Plantronics explorer 320 and it is working using btsco.
 
-1. Is it possible to use SCO link for data packet transmissions (not audio)?
-2. Is there any documentation for bluez sco programming?
+What determines if a headset works with a2dp?  I am going to try that
+next.
 
-Thanks in advance.
+Olin 
 
-Eunsoo
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
