@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Pierre-Yves Paulus <py@idlum.be>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1151596732.14964.25.camel@localhost>
-References: <1151590561.753.27.camel@localhost>
-	<1151596732.14964.25.camel@localhost>
-Date: Fri, 30 Jun 2006 08:36:28 +0200
-Message-Id: <1151649389.753.32.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] DBus API and rfcomm crashing hcid
+Message-ID: <BAY116-DAV15082F73CFA8D4005D654DC77D0@phx.gbl>
+From: "ichane" <ichane@hotmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <BAY116-DAV738BD697D0EDB18FB509AC77F0@phx.gbl><6297d67c0606272049g55cc14cby52254c90863e727f@mail.gmail.com><BAY116-DAV22C2B995073A52F8216D6C77F0@phx.gbl><6297d67c0606282023y52f26393i97ce102bde16776@mail.gmail.com>
+	<6297d67c0606290020x51468e0ap97c3afee4bbad94a@mail.gmail.com>
+Date: Fri, 30 Jun 2006 11:30:33 +0800
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] A2DP a2play and a2recv
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,91 +16,251 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============1332284560=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+This is a multi-part message in MIME format.
 
-> run hcid with -n and through gdb. So we get a backtrace and line numbers
-> where this fails.
+--===============1332284560==
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_00F6_01C69C38.997F5B80"
 
-Hope this is what you were looking for:
+This is a multi-part message in MIME format.
 
-(gdb) r -xn
-Starting program: /tmp/Bluez/bluez-utils-3.1/hcid/hcid -xn
-hcid[9730]: Bluetooth HCI daemon
-hcid[9730]: Register path:/org/bluez fallback:1
-hcid[9730]: Device hci0 has been added
-hcid[9730]: Starting security manager 0
-hcid[9730]: Device hci0 has been activated
-hcid[9730]: Register path:/org/bluez/hci0 fallback:0
-hcid[9730]: Connect in progress
-hcid[9730]: rfcomm_connect_cb: connected
-hcid[9730]: ioctl(RFCOMMCREATEDEV): Operation not supported (95)
-)cid[9730]: rfcomm_release(=EC=B7=EC=B7
+------=_NextPart_000_00F6_01C69C38.997F5B80
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Program received signal SIGSEGV, Segmentation fault.
-g_io_channel_close (channel=3D0x11) at glib-ectomy.c:58
-58              close(channel->fd);
-(gdb) bt full
-#0  g_io_channel_close (channel=3D0x11) at glib-ectomy.c:58
-No locals.
-#1  0x0805d77b in rfcomm_release (node=3D0x8068118, err=3D0x0) at
-dbus-rfcomm.c:174
-        req =3D {dev_id =3D 0, flags =3D 3086381648, src =3D {b =3D "h}\006=
-\bh}"},
-dst =3D {b =3D "\006\b0=E8\006\b"}, channel =3D 95 '_'}
-#2  0x0805d9ff in rfcomm_connect_cb (chan=3D0x11, cond=3DG_IO_OUT,
-c=3D0x806e830) at dbus-rfcomm.c:323
-        sk =3D 11
-        ret =3D 0
-        err =3D 95
-        fd =3D 0
-        i =3D 95
-        len =3D 10
-        ptr =3D 0x0
-        req =3D {dev_id =3D -1, flags =3D 3, src =3D {b =3D "=D9\a=F4 \000P=
-"}, dst =3D
-{b =3D "\222M=BBW`"}, channel =3D 9 '\t'}
-        node =3D (struct rfcomm_node *) 0x8068118
-        reply =3D (DBusMessage *) 0x0
-#3  0x0805fdba in g_main_loop_run (loop=3D0x8066b08) at glib-ectomy.c:302
-        nfds =3D 4
-        rc =3D 17
-        n =3D (struct watch *) 0x4
-        w =3D (struct watch *) 0x806e860
-        ufds =3D (struct pollfd *) 0x806c828
-#4  0x0804c77b in main (argc=3D0, argv=3D0x0) at main.c:729
-        addr =3D {hci_family =3D 31, hci_dev =3D 65535}
-        flt =3D {type_mask =3D 16, event_mask =3D {0, 536870912}, opcode =
-=3D 0}
-        sa =3D {__sigaction_handler =3D {sa_handler =3D 0x1, sa_sigaction =
-=3D
-0x1}, sa_mask =3D {__val =3D {0 <repeats 32 times>}}, sa_flags =3D 1, =
+Hi, Mayank & Brad:
 
-  sa_restorer =3D 0}
-        ctl_io =3D (GIOChannel *) 0x11
-        opt =3D 17
-        daemonize =3D 0
-        sdp =3D 0
-        experimental =3D 1
-(gdb)
+    Thanks for your replies.
 
-As you can see, I'm running the 3.1 version. I would be happy to provide
-any other information that could be helpful, if I can.
+     I try fixed point sbc. The distorted sound can be heard using =
+a2recv.
 
-Regards,
-Pierre-Yves
+    I've not tried the sbc optimizations Brad mentioned since I'm not
+familiar with sbc lib. I need some more time to study how to do it.
 
+Thanks a lot for the helps,
+
+Chane
+
+  ----- Original Message -----=20
+  From: Mayank Batra=20
+  To: BlueZ development=20
+  Sent: Thursday, June 29, 2006 3:20 PM
+  Subject: Re: [Bluez-devel] A2DP a2play and a2recv
+
+
+  Hi Chane,
+
+
+  On 6/29/06, Mayank Batra <mayankbatra@gmail.com> wrote:=20
+    Hi Chane,
+
+
+    On 6/28/06, I-Chung Chane <ichane@hotmail.com > wrote:=20
+      Is CPU (ARM7 @80MHz) powerful enough  to run a2recv ?
+
+    On second thoughts, I think it is not fast enough. So please use =
+fixed point calculations in libsbc.a
+    In fact I tried the floating point library with a2play on my ARM9 =
+platform (~100MHz) yesterday. And it was probably too much for it. The =
+CPU load was too high.
+
+  Just to confirm, I ran a2play on my ARM9 platform just now.
+  It works fine when I use fixed point libsbc.
+  But if I use floating point, it is terrible.
+
+  Hope that helps.
+
+  Regards,
+  Mayank
+
+
+-------------------------------------------------------------------------=
+-----
+
+
+  Using Tomcat but need to do more? Need to support web services, =
+security?
+  Get stuff done quickly with pre-integrated technology to make your job =
+easier
+  Download IBM WebSphere Application Server v.1.0.1 based on Apache =
+Geronimo
+  =
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D=
+121642
+
+
+-------------------------------------------------------------------------=
+-----
+
+
+  _______________________________________________
+  Bluez-devel mailing list
+  Bluez-devel@lists.sourceforge.net
+  https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_NextPart_000_00F6_01C69C38.997F5B80
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2912" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; size=3D2>Hi, Mayank =
+&amp; Brad:</FONT></DIV>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; =
+size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; =
+size=3D2>&nbsp;&nbsp;&nbsp; Thanks for your=20
+replies.</FONT></DIV>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; =
+size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; =
+size=3D2>&nbsp;&nbsp;&nbsp;&nbsp; I try fixed point sbc. The=20
+distorted sound can be heard using a2recv.</FONT></DIV>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; =
+size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; =
+size=3D2>&nbsp;&nbsp;&nbsp; I've not&nbsp;tried the sbc=20
+optimizations Brad mentioned since I'm not</FONT></DIV>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; size=3D2>familiar =
+with sbc lib. I need some more time to=20
+study how to do it.</FONT></DIV>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; =
+size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; size=3D2>Thanks a lot =
+for the helps,</FONT></DIV>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; =
+size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; =
+size=3D2>Chane</FONT></DIV>
+<DIV><FONT face=3D&#26032;&#32048;&#26126;&#39636; size=3D2><FONT =
+size=3D3></FONT></FONT>&nbsp;</DIV>
+<BLOCKQUOTE=20
+style=3D"PADDING-RIGHT: 0px; PADDING-LEFT: 5px; MARGIN-LEFT: 5px; =
+BORDER-LEFT: #000000 2px solid; MARGIN-RIGHT: 0px">
+  <DIV style=3D"FONT: 10pt &#26032;&#32048;&#26126;&#39636;">----- =
+Original Message ----- </DIV>
+  <DIV=20
+  style=3D"BACKGROUND: #e4e4e4; FONT: 10pt =
+&#26032;&#32048;&#26126;&#39636;; font-color: black"><B>From:</B>=20
+  <A title=3Dmayankbatra@gmail.com =
+href=3D"mailto:mayankbatra@gmail.com">Mayank=20
+  Batra</A> </DIV>
+  <DIV style=3D"FONT: 10pt &#26032;&#32048;&#26126;&#39636;"><B>To:</B> =
+<A=20
+  title=3Dbluez-devel@lists.sourceforge.net=20
+  href=3D"mailto:bluez-devel@lists.sourceforge.net">BlueZ =
+development</A> </DIV>
+  <DIV style=3D"FONT: 10pt =
+&#26032;&#32048;&#26126;&#39636;"><B>Sent:</B> Thursday, June 29, 2006 =
+3:20=20
+PM</DIV>
+  <DIV style=3D"FONT: 10pt =
+&#26032;&#32048;&#26126;&#39636;"><B>Subject:</B> Re: [Bluez-devel] A2DP =
+a2play and=20
+  a2recv</DIV>
+  <DIV><BR></DIV>Hi Chane,<BR><BR>
+  <DIV><SPAN class=3Dgmail_quote>On 6/29/06, <B =
+class=3Dgmail_sendername>Mayank=20
+  Batra</B> &lt;<A=20
+  href=3D"mailto:mayankbatra@gmail.com">mayankbatra@gmail.com</A>&gt;=20
+  wrote:</SPAN>=20
+  <BLOCKQUOTE class=3Dgmail_quote=20
+  style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: =
+#ccc 1px solid">
+    <DIV>Hi Chane,<BR><BR>
+    <DIV></DIV>
+    <DIV><SPAN class=3Dq><SPAN class=3Dgmail_quote>On 6/28/06, <B=20
+    class=3Dgmail_sendername>I-Chung Chane</B> &lt;<A=20
+    onclick=3D"return top.js.OpenExtLink(window,event,this)"=20
+    href=3D"mailto:ichane@hotmail.com " =
+target=3D_blank>ichane@hotmail.com </A>&gt;=20
+    wrote:</SPAN> </SPAN></DIV>
+    <DIV><SPAN class=3Dq>
+    <BLOCKQUOTE class=3Dgmail_quote=20
+    style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: =
+#ccc 1px solid">
+      <DIV>
+      <DIV bgcolor=3D"#ffffff">
+      <DIV><FONT face=3D"&#27;$B?7:YL@qs&#27;(B" size=3D2>Is&nbsp;CPU =
+(ARM7 @80MHz)=20
+      powerful enough &nbsp;to run a2recv =
+?</FONT></DIV></DIV></DIV></BLOCKQUOTE>
+    <DIV>&nbsp;</DIV></SPAN></DIV>
+    <DIV>
+    <DIV>On second thoughts, I think it is not fast enough. So please =
+use fixed=20
+    point calculations in libsbc.a</DIV>
+    <DIV>In fact I tried the floating point library with a2play on my =
+ARM9=20
+    platform (~100MHz)&nbsp;yesterday. And it was probably too much for =
+it. The=20
+    CPU load was too high.</DIV></DIV></DIV></BLOCKQUOTE>
+  <DIV>&nbsp;</DIV>
+  <DIV>Just to confirm, I ran a2play on my ARM9 platform just now.</DIV>
+  <DIV>It works fine when I use fixed point libsbc.</DIV>
+  <DIV>But if I use floating point, it is terrible.</DIV>
+  <DIV>&nbsp;</DIV>
+  <DIV>Hope that helps.</DIV>
+  <DIV>&nbsp;</DIV>
+  <DIV>Regards,</DIV>
+  <DIV>Mayank</DIV></DIV>
+  <P>
+  <HR>
+
+  <P></P>Using Tomcat but need to do more? Need to support web services, =
+
+  security?<BR>Get stuff done quickly with pre-integrated technology to =
+make=20
+  your job easier<BR>Download IBM WebSphere Application Server v.1.0.1 =
+based on=20
+  Apache=20
+  =
+Geronimo<BR>http://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;kid=3D120709&am=
+p;bid=3D263057&amp;dat=3D121642
+  <P>
+  <HR>
+
+  <P></P>_______________________________________________<BR>Bluez-devel =
+mailing=20
+  =
+list<BR>Bluez-devel@lists.sourceforge.net<BR>https://lists.sourceforge.ne=
+t/lists/listinfo/bluez-devel<BR></BLOCKQUOTE></BODY></HTML>
+
+------=_NextPart_000_00F6_01C69C38.997F5B80--
+
+
+--===============1332284560==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============1332284560==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1332284560==--
