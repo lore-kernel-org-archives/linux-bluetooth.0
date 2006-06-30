@@ -1,11 +1,18 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <be976db60606301615j2f7fe75n3ec26ead68ef724a@mail.gmail.com>
-Date: Fri, 30 Jun 2006 16:15:19 -0700
-From: "Mark S. Townsley" <mstownsley@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] bluetooth protocol question
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+From: Johannes Kapune <listen@kapune.de>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1151695635.11672.3.camel@johannes_01.kapune.local>
+References: <1151660752.7416.12.camel@johannes_01.kapune.local>
+	<1151683090.8460.9.camel@johannes_01.kapune.local>
+	<44A54DD5.2070505@xmission.com>
+	<1151685968.8460.17.camel@johannes_01.kapune.local>
+	<44A576BB.1000006@xmission.com>
+	<1151695635.11672.3.camel@johannes_01.kapune.local>
+Date: Fri, 30 Jun 2006 21:54:25 +0200
+Message-Id: <1151697265.11672.12.camel@johannes_01.kapune.local>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] a2play will not work
+Reply-To: listen@kapune.de, BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,72 +21,48 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0864468796=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0864468796==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_32746_12051446.1151709319664"
+Am Freitag, den 30.06.2006, 21:27 +0200 schrieb Johannes Kapune:
+> Am Freitag, den 30.06.2006, 13:08 -0600 schrieb Brad Midgley:
+> > Johannes
+> > 
+> > > you think something like this?:
+> > > mpg123 --p - Din_Tei.mp3 | ./a2play 00:0A:94:A0:59:3b
+> > 
+> > try:
+> > mpg123 - Din_Tei.mp3 | ./a2play -p 00:0A:94:A0:59:3b
+> > 
+> I tred this but then nothing happens, no sound and no data in the
+> hcidump -X -V window
+> 
+> > a2play used to lock up my itech clip s set but I thought I had fixed the
+> > problem. I thought a2play was sending more stream data after it had
+> > signaled the set to close the stream.
+> > 
+> > anyway, the ordering might be better using -p but if not you could try
+> > disabling the stream close by changing "#if 1" to "#if 0" in the latest
+> > version from cvs (you might have to give it an hour for anon cvs to
+> > catch up)
+> > 
+I'm sorry but -
+I tried out updating the cvs and I get a new a2play. The differenz in
+behavier is now I dont need to set the headphone in pairing mode but at
+the end of the first mp3 there is no additinal mp3 possible. Push the
+button at the headphone I can see in the hcidump -X -V window.
 
-------=_Part_32746_12051446.1151709319664
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Johannes
 
-Hi
+PS the headset is shown as "btst-9300"
 
-I am somewhat new to Bluetooth and Bluez so this may be somewhat of a newbie
-question.
-
-I have a bluetooth device that I am trying to write code to work with it on
-my Suse box.   In my log
-file, I see link_key_request, and then pin_code_request and then
-link_key_notify.  All seems successful.
-And then after a few minutes I get this line in my system log:
-
-  sdpd[8619]: close_sock:  Read error: Connection timed out
-
-What is sdpd trying to do?  I think there must be something about the
-bluetooth protocol that I am missing.
-Is sdpd trying to read data out of the device?   Is there a good doc
-somewhere I can understand the bluetooth protocol (handshake etc...)
-
-Thanks for any tips.
-
-Mark
-
-------=_Part_32746_12051446.1151709319664
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi <br><br>I am somewhat new to Bluetooth and Bluez so this may be somewhat of a newbie question.<br><br>I have a bluetooth device that I am trying to write code to work with it on my Suse box.&nbsp;&nbsp; In my log<br>file, I see link_key_request, and then pin_code_request and then link_key_notify.&nbsp; All seems successful.
-<br>And then after a few minutes I get this line in my system log:<br><br>&nbsp; sdpd[8619]: close_sock:&nbsp; Read error: Connection timed out<br><br>What is sdpd trying to do?&nbsp; I think there must be something about the bluetooth protocol that I am missing.
-<br>Is sdpd trying to read data out of the device?&nbsp;&nbsp; Is there a good doc somewhere I can understand the bluetooth protocol (handshake etc...)<br><br>Thanks for any tips.<br><br>Mark<br>
-
-------=_Part_32746_12051446.1151709319664--
-
-
---===============0864468796==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0864468796==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0864468796==--
