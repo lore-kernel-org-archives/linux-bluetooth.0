@@ -1,164 +1,59 @@
-Return-Path: <akpm@osdl.org>
-Date: Sat, 1 Jul 2006 17:02:29 -0700
-From: Andrew Morton <akpm@osdl.org>
-To: David Greaves <david@dgreaves.com>
-Cc: galibert@pobox.com, linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        maxk@qualcomm.com, bluez-devel@lists.sourceforge.net
-Subject: Re: [PATCH] Fix SCO on some bluetooth adapters (Success report for
- Belkin F8T012)
-Message-Id: <20060701170229.4f0ec643.akpm@osdl.org>
-In-Reply-To: <44A66911.50309@dgreaves.com>
-References: <20060420140517.GA72089@dspnet.fr.eu.org>
-	<44A66911.50309@dgreaves.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <44A6A236.8010006@runbox.com>
+Date: Sat, 01 Jul 2006 17:26:30 +0100
+From: Tom K <tomk@runbox.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] hcid fails to start after upgrade to
+	bluez-libs/bluez-utils 3.1
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sat, 01 Jul 2006 13:22:41 +0100
-David Greaves <david@dgreaves.com> wrote:
+I was looking for a bug-tracker, and couldn't find it, so I hope this is 
+in the right place.
 
-> > Pavel, '4' doesn't seem to be a value that happens in any correctly
-> > answering adapter, while 8 happens often.  Try "SCO MTU 64:4" and "SCO
-> > MTU 64:8" for comparison.
-> > 
-> > 
-> >  drivers/bluetooth/hci_usb.c      |   12 ++++++++++++
-> >  drivers/bluetooth/hci_usb.h      |    1 +
-> >  include/net/bluetooth/hci_core.h |    1 +
-> >  net/bluetooth/hci_event.c        |   16 ++++++++++++++--
-> >  4 files changed, 28 insertions(+), 2 deletions(-)
-> > 
-> > 841d7690e75189803907fbc4616b984087e7f89c
-> 
-> Replying to an old email about a patch that hasn't made it yet (at least
-> to 2.6.17.3).
-> 
-> Without this patch I can't use my Belkin F8T012 with the bluetooth alsa
-> sound driver (snd-bt-sco)
-> 
-> with it, I can :)
-> 
-> Thanks Olivier.
-> 
-> Is this likely to be merged?
+Yesterday I upgraded bluez-libs and bluez-utils from 2.25 to 3.1. hcid 
+now fails to start - here are the log entries:
 
-It's floating around in -mm still.  I resend it to various people when I
-feel like provoking a fight.
+Jul  1 16:47:43 tk-i5ka hcid[4240]: Bluetooth HCI daemon
+Jul  1 16:47:43 tk-i5ka hcid[4240]: Unknown option 'pin_helper' line 26
+Jul  1 16:47:43 tk-i5ka hcid[4240]: syntax error line 26
+Jul  1 16:47:43 tk-i5ka hcid[4240]: Unknown option 'auth' line 70
+Jul  1 16:47:43 tk-i5ka hcid[4240]: Can't open system message bus 
+connection: Failed to connect to socket /var/run/dbus/system_bus_socket: 
+Connection refused
+Jul  1 16:47:43 tk-i5ka hcid[4240]: Unable to get on D-Bus
 
-Marcel is working on a better way of fixing this problem.
+Downgrading to 2.25 again solves the problem:
 
-But it's a teeny patch and `patch -R' is easy.  If this patch doesn't break
-anything, perhaps we should temp-merge it?
+Jul  1 16:53:38 tk-i5ka hcid[4316]: Bluetooth HCI daemon
+Jul  1 16:53:38 tk-i5ka hcid[4316]: HCI dev 0 up
+Jul  1 16:53:38 tk-i5ka hcid[4316]: Starting security manager 0
 
+The system is running kernel 2.6.17-ck1, using hci_usb with a 3Com 
+3CREB96 USB dongle. No changes were made to hcid.conf or any other conf 
+files.
 
+Please advise if any additional information is required.
 
-From: Olivier Galibert <galibert@pobox.com>
+Regards
+Tom K.
 
-Some bluetooth adapters return an incorrect number of sco packets in
-READ_BUFFER_SIZE.  Fix it.
-
-This is the worst possible way to fix it for several reasons:
-- this is not a generic fix, it has to me activated explicitely by the
-  driver
-
-- this is not a driver-specific fix either, only one action is
-  possible (change to 8), the driver can only enable it
-
-- this is not a wildcard-able fix, because it overwrites the returned
-  value no matter what, i.e. even when it is correct.  So drivers without
-  device id which need it, for instance uart, can't use it.
-
-- there is no warning anywhere when the problematic condition is
-  detected, so users of non-listed buggy hardware have no clue about
-  what is going on, and the list of buggy hardware will be very hard to
-  complete
-
-- the fix is inconsistant with the sco_mtu handling
-
-But that's exactly what Marcel Holtmann wants, so that's what he gets.
-
-Signed-off-by: Olivier Galibert <galibert@pobox.com>
-Cc: Pavel Machek <pavel@ucw.cz>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Greg KH <greg@kroah.com>
-
-[akpm: this is permanacked, but will keep getting sent until the problem is
-fixed for real]
-
-Signed-off-by: Andrew Morton <akpm@osdl.org>
----
-
- drivers/bluetooth/hci_usb.c |    6 ++++++
- drivers/bluetooth/hci_usb.h |    1 +
- include/net/bluetooth/hci.h |    3 ++-
- net/bluetooth/hci_event.c   |   10 ++++++++--
- 4 files changed, 17 insertions(+), 3 deletions(-)
-
-diff -puN drivers/bluetooth/hci_usb.c~fix-sco-on-some-bluetooth-adapters-2 drivers/bluetooth/hci_usb.c
---- a/drivers/bluetooth/hci_usb.c~fix-sco-on-some-bluetooth-adapters-2
-+++ a/drivers/bluetooth/hci_usb.c
-@@ -129,6 +129,9 @@ static struct usb_device_id blacklist_id
- 	/* CSR BlueCore Bluetooth Sniffer */
- 	{ USB_DEVICE(0x0a12, 0x0002), .driver_info = HCI_SNIFFER },
- 
-+	/* Belkin F8T012 */
-+	{ USB_DEVICE(0x050d, 0x0012), .driver_info = HCI_READ_BUFFER_SIZE },
-+
- 	{ }	/* Terminating entry */
- };
- 
-@@ -984,6 +987,9 @@ static int hci_usb_probe(struct usb_inte
- 	if (reset || id->driver_info & HCI_RESET)
- 		set_bit(HCI_QUIRK_RESET_ON_INIT, &hdev->quirks);
- 
-+	if (id->driver_info & HCI_READ_BUFFER_SIZE)
-+		set_bit(HCI_QUIRK_FIX_SCO_PKTS, &hdev->quirks);
-+
- 	if (id->driver_info & HCI_SNIFFER) {
- 		if (le16_to_cpu(udev->descriptor.bcdDevice) > 0x997)
- 			set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
-diff -puN drivers/bluetooth/hci_usb.h~fix-sco-on-some-bluetooth-adapters-2 drivers/bluetooth/hci_usb.h
---- a/drivers/bluetooth/hci_usb.h~fix-sco-on-some-bluetooth-adapters-2
-+++ a/drivers/bluetooth/hci_usb.h
-@@ -35,6 +35,7 @@
- #define HCI_SNIFFER		0x10
- #define HCI_BCM92035		0x20
- #define HCI_BROKEN_ISOC		0x40
-+#define HCI_READ_BUFFER_SIZE    0x80
- 
- #define HCI_MAX_IFACE_NUM	3
- 
-diff -puN include/net/bluetooth/hci.h~fix-sco-on-some-bluetooth-adapters-2 include/net/bluetooth/hci.h
---- a/include/net/bluetooth/hci.h~fix-sco-on-some-bluetooth-adapters-2
-+++ a/include/net/bluetooth/hci.h
-@@ -54,7 +54,8 @@
- /* HCI device quirks */
- enum {
- 	HCI_QUIRK_RESET_ON_INIT,
--	HCI_QUIRK_RAW_DEVICE
-+	HCI_QUIRK_RAW_DEVICE,
-+	HCI_QUIRK_FIX_SCO_PKTS
- };
- 
- /* HCI device flags */
-diff -puN net/bluetooth/hci_event.c~fix-sco-on-some-bluetooth-adapters-2 net/bluetooth/hci_event.c
---- a/net/bluetooth/hci_event.c~fix-sco-on-some-bluetooth-adapters-2
-+++ a/net/bluetooth/hci_event.c
-@@ -320,8 +320,14 @@ static void hci_cc_info_param(struct hci
- 
- 		hdev->acl_mtu  = __le16_to_cpu(bs->acl_mtu);
- 		hdev->sco_mtu  = bs->sco_mtu ? bs->sco_mtu : 64;
--		hdev->acl_pkts = hdev->acl_cnt = __le16_to_cpu(bs->acl_max_pkt);
--		hdev->sco_pkts = hdev->sco_cnt = __le16_to_cpu(bs->sco_max_pkt);
-+		hdev->acl_pkts = __le16_to_cpu(bs->acl_max_pkt);
-+		hdev->sco_pkts = __le16_to_cpu(bs->sco_max_pkt);
-+
-+		if (test_bit(HCI_QUIRK_FIX_SCO_PKTS, &hdev->quirks))
-+			hdev->sco_pkts = 8;
-+
-+		hdev->acl_cnt = hdev->acl_pkts;
-+		hdev->sco_cnt = hdev->sco_pkts;
- 
- 		BT_DBG("%s mtu: acl %d, sco %d max_pkt: acl %d, sco %d", hdev->name,
- 			hdev->acl_mtu, hdev->sco_mtu, hdev->acl_pkts, hdev->sco_pkts);
-_
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
