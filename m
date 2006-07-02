@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <aa7ce83b0607020701m3885f893s41df751ddf6f62c@mail.gmail.com>
-Date: Mon, 3 Jul 2006 00:01:40 +1000
-From: "Ken Robinson" <kenrobinsonster@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <c49421c50607020657r1ab513ebsdc00121f904aa36c@mail.gmail.com>
+Date: Sun, 2 Jul 2006 05:57:11 -0800
+From: "Loreno Oliveira" <lorenooliveira@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <a83467220607020223l52633bbeo92c5eb19b0208d8b@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] No bnep0 interface occuring - Problem now fixed
+References: <a83467220607020223l52633bbeo92c5eb19b0208d8b@mail.gmail.com>
+Subject: Re: [Bluez-users] BlueZ programmers manual
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,376 +16,96 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1347100534=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I finally think I found the source of the problem. I beleive the
-korebot card was confused with the existing ethernet interface usbf
-(my bluetooth connection was via usb and hci_usb). Once this interface
-was brought down (using ifconfig usbf down) the interface seemed to
-work correctly.
+--===============1347100534==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_25665_3229001.1151848631067"
+
+------=_Part_25665_3229001.1151848631067
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+There is an excelent starter guide at
+http://people.csail.mit.edu/albert/bluez-intro/
+Unfortunately, this tutorial doesn't cover deeper aspects of bluetooth
+programming using bluez. Presently I'm studying bluez programming using C
+and trying to document as much as possible the bluez library. The idea is to
+document the purpose of the main functions and constants of the library and
+thus get enough material for creating a more omnibus programmer manual.
+
+Loreno
+
+On 7/2/06, Avi B <ascoob@gmail.com> wrote:
+>
+> Hi grp.
+>       i was wondering if there is any programmers manual also available?
+> It can be a really gud resource for a starter like me?
+>
+> can someone help
+> cheers
+> AS
+>
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job
+> easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+>
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>
+>
+
+------=_Part_25665_3229001.1151848631067
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+There is an excelent starter guide at <a href="http://people.csail.mit.edu/albert/bluez-intro/">http://people.csail.mit.edu/albert/bluez-intro/</a><br>Unfortunately, this tutorial doesn't cover deeper aspects of bluetooth programming using bluez. Presently I'm studying bluez programming using C and trying to document as much as possible the bluez library. The idea is to document the purpose of the main functions and constants of the library and thus get enough material for creating a more omnibus programmer manual.
+<br><br>Loreno<br><br><div><span class="gmail_quote">On 7/2/06, <b class="gmail_sendername">Avi B</b> &lt;<a href="mailto:ascoob@gmail.com">ascoob@gmail.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+<div><div>Hi grp.</div>
+<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i was wondering if there is any programmers manual also available? </div>
+<div>It can be a really gud resource for a starter like me?</div>
+<div>&nbsp;</div>
+<div>can someone help</div>
+<div>cheers</div>
+<div>AS</div>
+
+</div><br>Using Tomcat but need to do more? Need to support web services, security?<br>Get stuff done quickly with pre-integrated technology to make your job easier<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+<br><a onclick="return top.js.OpenExtLink(window,event,this)" href="http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642" target="_blank">http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642
+</a><br><br>_______________________________________________<br>Bluez-users mailing list<br><a onclick="return top.js.OpenExtLink(window,event,this)" href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net
+</a><br><a onclick="return top.js.OpenExtLink(window,event,this)" href="https://lists.sourceforge.net/lists/listinfo/bluez-users" target="_blank">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br><br><br></blockquote>
+</div><br>
+
+------=_Part_25665_3229001.1151848631067--
 
 
-
- An update to my earlier post below.
-
- on the korebot
- I changed the device -> class id in hcid.conf so it was 0x0203xx which meant
- it was Networking /Adhoc device with an access point. I don't think this
- really changed anything when I ran a pand --connect <bluetooth address>.
-
- I then tried to reconnect several times. I found this constant connection
- woke up the host computer in some way and I was able to get a bnep0
- interface. I don't understand how this happens.
- I then assigned ip address on both the korebot and the host computer and
- made sure both interfaces were up and running. I got this message on the
- korebot when I tried to ping.
-
-       PING 192.168.1.23 (192.168.1.23): 56 data bytes
- NETDEV WATCHDOG: usbf: transmit timed out
- NETDEV WATCHDOG: usbf: transmit timed out
- NETDEV WATCHDOG: usbf: transmit timed out
- NETDEV WATCHDOG: usbf: transmit timed out
- NETDEV WATCHDOG: usbf: transmit timed out
- NETDEV WATCHDOG: usbf: transmit timed out
- NETDEV WATCHDOG: usbf: transmit timed out
-
- Is there some other trick to initialisation of the bnep0 interface?
-
- oot@Possibility:/home/krobinson# hcidump
- HCI sniffer - Bluetooth packet analyzer ver 1.23
- device: hci0 snap_len: 1028 filter: 0xffffffff
- > HCI Event: Connect Request (0x04) plen 10
- < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Role Change (0x12) plen 8
- > HCI Event: Connect Complete (0x03) plen 11
- < HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
- > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
- > HCI Event: Max Slots Change (0x1b) plen 3
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Connection Packet Type Changed (0x1d) plen 5
- > ACL data: handle 42 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 15 scid 0x0040
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-       Connection successful
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-       MTU 1691
- < ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-       Success
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-       MTU 1691
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-       Success
- > ACL data: handle 42 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 15 scid 0x0041
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
-       Connection successful
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-       MTU 1691
- < ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-       Success
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-       MTU 1691
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-       Success
- > ACL data: handle 42 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 15 scid 0x0042
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0042 scid 0x0042 result 0 status 0
-       Connection successful
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0042 flags 0x00 clen 4
-       MTU 1691
- < ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0042 flags 0x00 result 0 clen 0
-       Success
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0042 flags 0x00 clen 4
-       MTU 1691
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0042 flags 0x00 result 0 clen 0
-       Success
- > ACL data: handle 42 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 15 scid 0x0043
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0043 scid 0x0043 result 0 status 0
-       Connection successful
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0043 flags 0x00 clen 4
-       MTU 1691
- < ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0043 flags 0x00 result 0 clen 0
-       Success
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0043 flags 0x00 clen 4
-       MTU 1691
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0043 flags 0x00 result 0 clen 0
-       Success
- > ACL data: handle 42 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 15 scid 0x0044
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0044 scid 0x0044 result 0 status 0
-       Connection successful
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0044 flags 0x00 clen 4
-       MTU 1691
- < ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0044 flags 0x00 result 0 clen 0
-       Success
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0044 flags 0x00 clen 4
-       MTU 1691
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0044 flags 0x00 result 0 clen 0
-       Success
- > ACL data: handle 42 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 15 scid 0x0045
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0045 scid 0x0045 result 0 status 0
-       Connection successful
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0045 flags 0x00 clen 4
-       MTU 1691
- < ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0045 flags 0x00 result 0 clen 0
-       Success
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0045 flags 0x00 clen 4
-       MTU 1691
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0045 flags 0x00 result 0 clen 0
-       Success
- > ACL data: handle 42 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 15 scid 0x0046
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0046 scid 0x0046 result 0 status 0
-       Connection successful
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0046 flags 0x00 clen 4
-       MTU 1691
- < ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0046 flags 0x00 result 0 clen 0
-       Success
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0046 flags 0x00 clen 4
-       MTU 1691
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0046 flags 0x00 result 0 clen 0
-       Success
- > ACL data: handle 42 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 15 scid 0x0047
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0047 scid 0x0047 result 0 status 0
-       Connection successful
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0047 flags 0x00 clen 4
-       MTU 1691
- < ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0047 flags 0x00 result 0 clen 0
-       Success
- < ACL data: handle 42 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0047 flags 0x00 clen 4
-       MTU 1691
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0047 flags 0x00 result 0 clen 0
-       Success
- > ACL data: handle 42 flags 0x02 dlen 11
-     L2CAP(d): cid 0x0047 len 7 [psm 15]
-       BNEP: Control(0x01|0)
-         Setup Req(0x01) size 0x02 dst 0x1116(NAP) src 0x1115(PANU)
- < ACL data: handle 42 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0047 len 4 [psm 15]
-       BNEP: Control(0x01|0)
-         Setup Rsp(0x02) res 0x0000
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 3
-     L2CAP(d): cid 0x0047 len 16 [psm 15]
-       BNEP: Control(0x01|0)
-         Filter MultAddr Set(0x05) len 0x000c
-           ff:ff:ff:ff:ff:ff - ff:ff:ff:ff:ff:ff
- < ACL data: handle 42 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0047 len 4 [psm 15]
-       BNEP: Control(0x01|0)
-         Filter MultAddr Rsp(0x06) res 0x0000
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 3
-     L2CAP(d): cid 0x0047 len 16 [psm 15]
-       BNEP: Control(0x01|0)
-         Filter MultAddr Set(0x05) len 0x000c
-           ff:ff:ff:ff:ff:ff - ff:ff:ff:ff:ff:ff
- < ACL data: handle 42 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0047 len 4 [psm 15]
-       BNEP: Control(0x01|0)
-         Filter MultAddr Rsp(0x06) res 0x0000
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 3
-     L2CAP(d): cid 0x0047 len 16 [psm 15]
-       BNEP: Control(0x01|0)
-         Filter MultAddr Set(0x05) len 0x000c
-           ff:ff:ff:ff:ff:ff - ff:ff:ff:ff:ff:ff
- < ACL data: handle 42 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0047 len 4 [psm 15]
-       BNEP: Control(0x01|0)
-         Filter MultAddr Rsp(0x06) res 0x0000
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 5
- > ACL data: handle 42 flags 0x01 dlen 121
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 3
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 90
- > ACL data: handle 42 flags 0x01 dlen 13
-     L2CAP(d): cid 0x0047 len 585 [psm 15]
-       BNEP: Compressed DestOnly(0x04|0)
-         dst ff:ff:ff:ff:ff:ff [proto 0x0800]
- > ACL data: handle 42 flags 0x02 dlen 121
- > ACL data: handle 42 flags 0x01 dlen 71
- > ACL data: handle 42 flags 0x01 dlen 121
- > ACL data: handle 42 flags 0x01 dlen 71
- > ACL data: handle 42 flags 0x01 dlen 121
- > ACL data: handle 42 flags 0x01 dlen 71
- > ACL data: handle 42 flags 0x01 dlen 13
-     L2CAP(d): cid 0x0047 len 585 [psm 15]
-       BNEP: Compressed DestOnly(0x04|0)
-         dst ff:ff:ff:ff:ff:ff [proto 0x0800]
- > ACL data: handle 42 flags 0x02 dlen 121
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 3
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 90
- > ACL data: handle 42 flags 0x01 dlen 121
- > ACL data: handle 42 flags 0x01 dlen 71
- > ACL data: handle 42 flags 0x01 dlen 13
-     L2CAP(d): cid 0x0047 len 585 [psm 15]
-       BNEP: Compressed DestOnly(0x04|0)
-         dst ff:ff:ff:ff:ff:ff [proto 0x0800]
- > ACL data: handle 42 flags 0x02 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 17
- > ACL data: handle 42 flags 0x01 dlen 5
- > ACL data: handle 42 flags 0x01 dlen 121
- > ACL data: handle 42 flags 0x01 dlen 71
- > ACL data: handle 42 flags 0x01 dlen 121
- > ACL data: handle 42 flags 0x01 dlen 71
- > ACL data: handle 42 flags 0x01 dlen 13
-     L2CAP(d): cid 0x0047 len 585 [psm 15]
-       BNEP: Compressed DestOnly(0x04|0)
-         dst ff:ff:ff:ff:ff:ff [proto 0x0800]
- > ACL data: handle 42 flags 0x02 dlen 32
-     L2CAP(d): cid 0x0047 len 28 [psm 15]
-       BNEP: Control(0x01|0)
-         Filter MultAddr Set(0x05) len 0x0018
-           ff:ff:ff:ff:ff:ff - ff:ff:ff:ff:ff:ff
-           01:00:5e:00:00:01 - 01:00:5e:00:00:01
- < ACL data: handle 42 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0047 len 4 [psm 15]
-       BNEP: Control(0x01|0)
-         Filter MultAddr Rsp(0x06) res 0x0000
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 42 flags 0x02 dlen 32
-     L2CAP(d): cid 0x
-
-
-			
- 			
- 			
- 		 	
-
-
- 				 			 		 		    	
- 	
-About SourceForge.net
-About OSTG
-Privacy Statement
-Terms of Use
-Advertise
-Get Support
-RSS 	
-
- 		Powered by the SourceForge(r) collaborative development environment
-from VA Software
- 		(c)Copyright 2006 - OSTG Open Source Technology Group, All Rights Reserved
+--===============1347100534==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============1347100534==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1347100534==--
