@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <e1effdeb0607030536k595ee27br6a24c8fba13e6799@mail.gmail.com>
-Date: Mon, 3 Jul 2006 09:36:42 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44A6A236.8010006@runbox.com>
+Date: Mon, 3 Jul 2006 14:29:42 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <003e01c69e8c$c0717970$2800a8c0@Desarrollo>
+Message-ID: <Pine.LNX.4.63.0607031426320.28132@redbean.intranet.gw-instruments.de>
+References: <003e01c69e8c$c0717970$2800a8c0@Desarrollo>
 MIME-Version: 1.0
-References: <44A6A236.8010006@runbox.com>
-Subject: Re: [Bluez-devel] hcid fails to start after upgrade to
-	bluez-libs/bluez-utils 3.1
+Subject: Re: [Bluez-devel] Serial comunication RFCOMM
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,68 +20,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Tom,
 
-Which D-Bus version are you running?
+Hi Victor, 
 
-Check if the BlueZ D-Bus configuration file(bluez-hcid.conf) is in the
-following directory:
-/etc/dbus-1/system.d/
+On Mon, 3 Jul 2006, Victor Andres wrote:
 
-After upgrade bluez-utils you need restart dbus-daemon to load the
-bluez-hcid.conf file.
+> Hi. I'm a new developer of bluez API. I would like that someone say if 
+> is posible to do I want.
+> 
+> Is it posible to link (bluetooth) multiple devices to mi PC using Linux 
+> and Bluez stack (using multple usb-bluetooth adapter if it's necesary)?
+> 
+> I want link my PC with multiples (more than 7) GPS bluetooth (so I 
+> can't do it with windows stack), to receive the NMEA sentences and 
+> manipulate then (get the latitud, longitud, speed ...).
 
-BR,
-Claudio.
+I don't see anything which should prevent you from doing so. 
+And as far as I know BlueZ currently is the only Bluetooth Stack which 
+supports multiple HCI devices. 
 
+Ciao, 
 
-
-On 7/1/06, Tom K <tomk@runbox.com> wrote:
-> I was looking for a bug-tracker, and couldn't find it, so I hope this is
-> in the right place.
->
-> Yesterday I upgraded bluez-libs and bluez-utils from 2.25 to 3.1. hcid
-> now fails to start - here are the log entries:
->
-> Jul  1 16:47:43 tk-i5ka hcid[4240]: Bluetooth HCI daemon
-> Jul  1 16:47:43 tk-i5ka hcid[4240]: Unknown option 'pin_helper' line 26
-> Jul  1 16:47:43 tk-i5ka hcid[4240]: syntax error line 26
-> Jul  1 16:47:43 tk-i5ka hcid[4240]: Unknown option 'auth' line 70
-> Jul  1 16:47:43 tk-i5ka hcid[4240]: Can't open system message bus
-> connection: Failed to connect to socket /var/run/dbus/system_bus_socket:
-> Connection refused
-> Jul  1 16:47:43 tk-i5ka hcid[4240]: Unable to get on D-Bus
->
-> Downgrading to 2.25 again solves the problem:
->
-> Jul  1 16:53:38 tk-i5ka hcid[4316]: Bluetooth HCI daemon
-> Jul  1 16:53:38 tk-i5ka hcid[4316]: HCI dev 0 up
-> Jul  1 16:53:38 tk-i5ka hcid[4316]: Starting security manager 0
->
-> The system is running kernel 2.6.17-ck1, using hci_usb with a 3Com
-> 3CREB96 USB dongle. No changes were made to hcid.conf or any other conf
-> files.
->
-> Please advise if any additional information is required.
->
-> Regards
-> Tom K.
->
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+Peter 
 
 
--- 
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
+
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
