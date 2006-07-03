@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Olivier Dole <olivier.dole@palmsource.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <be976db60606301615j2f7fe75n3ec26ead68ef724a@mail.gmail.com>
-References: <be976db60606301615j2f7fe75n3ec26ead68ef724a@mail.gmail.com>
-Date: Mon, 03 Jul 2006 17:15:53 +0200
-Message-Id: <1151939753.12125.18.camel@localhost>
+In-Reply-To: <aa7ce83b0607020701m3885f893s41df751ddf6f62c@mail.gmail.com>
+References: <aa7ce83b0607020701m3885f893s41df751ddf6f62c@mail.gmail.com>
+Date: Mon, 03 Jul 2006 09:58:43 +0200
+Message-Id: <1151913523.8387.4.camel@localhost.localdomain>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] bluetooth protocol question
+Subject: Re: [Bluez-users] No bnep0 interface occuring - Problem now fixed
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,41 +16,60 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mark,
-
-> I am somewhat new to Bluetooth and Bluez so this may be somewhat of a
-> newbie question.
-> 
-> I have a bluetooth device that I am trying to write code to work with
-> it on my Suse box.   In my log
-> file, I see link_key_request, and then pin_code_request and then
-> link_key_notify.  All seems successful. 
-> And then after a few minutes I get this line in my system log:
-> 
->   sdpd[8619]: close_sock:  Read error: Connection timed out
-> 
-> What is sdpd trying to do?  I think there must be something about the
-> bluetooth protocol that I am missing. 
-> Is sdpd trying to read data out of the device?   Is there a good doc
-> somewhere I can understand the bluetooth protocol (handshake etc...)
-
-run "hcidump -X -V" in another terminal and show us its output.
-
-Regards
-
-Marcel
-
-
-
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+TGUgbHVuZGkgMDMganVpbGxldCAyMDA2IMOgIDAwOjAxICsxMDAwLCBLZW4gUm9iaW5zb24gYSDD
+qWNyaXQgOgo+IEkgZmluYWxseSB0aGluayBJIGZvdW5kIHRoZSBzb3VyY2Ugb2YgdGhlIHByb2Js
+ZW0uIEkgYmVsZWl2ZSB0aGUKPiBrb3JlYm90IGNhcmQgd2FzIGNvbmZ1c2VkIHdpdGggdGhlIGV4
+aXN0aW5nIGV0aGVybmV0IGludGVyZmFjZSB1c2JmCj4gKG15IGJsdWV0b290aCBjb25uZWN0aW9u
+IHdhcyB2aWEgdXNiIGFuZCBoY2lfdXNiKS4gT25jZSB0aGlzIGludGVyZmFjZQo+IHdhcyBicm91
+Z2h0IGRvd24gKHVzaW5nIGlmY29uZmlnIHVzYmYgZG93bikgdGhlIGludGVyZmFjZSBzZWVtZWQg
+dG8KPiB3b3JrIGNvcnJlY3RseS4KPiAKPiAKPiAKPiAgQW4gdXBkYXRlIHRvIG15IGVhcmxpZXIg
+cG9zdCBiZWxvdy4KPiAKPiAgb24gdGhlIGtvcmVib3QKPiAgSSBjaGFuZ2VkIHRoZSBkZXZpY2Ug
+LT4gY2xhc3MgaWQgaW4gaGNpZC5jb25mIHNvIGl0IHdhcyAweDAyMDN4eCB3aGljaCBtZWFudAo+
+ICBpdCB3YXMgTmV0d29ya2luZyAvQWRob2MgZGV2aWNlIHdpdGggYW4gYWNjZXNzIHBvaW50LiBJ
+IGRvbid0IHRoaW5rIHRoaXMKPiAgcmVhbGx5IGNoYW5nZWQgYW55dGhpbmcgd2hlbiBJIHJhbiBh
+IHBhbmQgLS1jb25uZWN0IDxibHVldG9vdGggYWRkcmVzcz4uCj4gCj4gIEkgdGhlbiB0cmllZCB0
+byByZWNvbm5lY3Qgc2V2ZXJhbCB0aW1lcy4gSSBmb3VuZCB0aGlzIGNvbnN0YW50IGNvbm5lY3Rp
+b24KPiAgd29rZSB1cCB0aGUgaG9zdCBjb21wdXRlciBpbiBzb21lIHdheSBhbmQgSSB3YXMgYWJs
+ZSB0byBnZXQgYSBibmVwMAo+ICBpbnRlcmZhY2UuIEkgZG9uJ3QgdW5kZXJzdGFuZCBob3cgdGhp
+cyBoYXBwZW5zLgo+ICBJIHRoZW4gYXNzaWduZWQgaXAgYWRkcmVzcyBvbiBib3RoIHRoZSBrb3Jl
+Ym90IGFuZCB0aGUgaG9zdCBjb21wdXRlciBhbmQKPiAgbWFkZSBzdXJlIGJvdGggaW50ZXJmYWNl
+cyB3ZXJlIHVwIGFuZCBydW5uaW5nLiBJIGdvdCB0aGlzIG1lc3NhZ2Ugb24gdGhlCj4gIGtvcmVi
+b3Qgd2hlbiBJIHRyaWVkIHRvIHBpbmcuCj4gCj4gICAgICAgIFBJTkcgMTkyLjE2OC4xLjIzICgx
+OTIuMTY4LjEuMjMpOiA1NiBkYXRhIGJ5dGVzCj4gIE5FVERFViBXQVRDSERPRzogdXNiZjogdHJh
+bnNtaXQgdGltZWQgb3V0Cj4gIE5FVERFViBXQVRDSERPRzogdXNiZjogdHJhbnNtaXQgdGltZWQg
+b3V0Cj4gIE5FVERFViBXQVRDSERPRzogdXNiZjogdHJhbnNtaXQgdGltZWQgb3V0Cj4gIE5FVERF
+ViBXQVRDSERPRzogdXNiZjogdHJhbnNtaXQgdGltZWQgb3V0Cj4gIE5FVERFViBXQVRDSERPRzog
+dXNiZjogdHJhbnNtaXQgdGltZWQgb3V0Cj4gIE5FVERFViBXQVRDSERPRzogdXNiZjogdHJhbnNt
+aXQgdGltZWQgb3V0Cj4gIE5FVERFViBXQVRDSERPRzogdXNiZjogdHJhbnNtaXQgdGltZWQgb3V0
+Cj4gCj4gIElzIHRoZXJlIHNvbWUgb3RoZXIgdHJpY2sgdG8gaW5pdGlhbGlzYXRpb24gb2YgdGhl
+IGJuZXAwIGludGVyZmFjZT8KPiAKSGksCgpUbyBhdXRvbWF0ZSBibmVwMCBpbml0aWFsaXNhdGlv
+biwgdXNlIC0tZGV2dXAgb3B0aW9uIG9mIHBhbmQgZGFlbW9uIGFuZApjcmVhdGUgYW4gZXhlY3V0
+YWJsZSBiYXNoIHNjcmlwdCAodGhlIGFyZ3VtZW50IG9mIC0tZGV2dXAgb3B0aW9uKSB3aGljaAp3
+aWxsIGluaXRpYWxpemVzIGJuZXAgaW50ZXJmYWNlLgpUbyBiZSBtb3JlIHByZWNpc2Ugd2hlbiBi
+bmVwIGludGVyZmFjZSB3aWxsIGJlIGF2YWlsYWJsZSwgdGhlIGRldi11cApzY3JpcHQgd2lsbCBi
+ZSBjYWxsZWQgd2l0aCBibmVwWCBhbmQgcmVtb3RlIEJsdWV0b290aCBhZGRyZXNzIGFzCmFyZ3Vt
+ZW50cy4KSG9wZSB0aGlzIGhlbHAsCgpPbGl2aWVyCgo+IAo+ICAJCVBvd2VyZWQgYnkgdGhlIFNv
+dXJjZUZvcmdlKHIpIGNvbGxhYm9yYXRpdmUgZGV2ZWxvcG1lbnQgZW52aXJvbm1lbnQKPiBmcm9t
+IFZBIFNvZnR3YXJlCj4gIAkJKGMpQ29weXJpZ2h0IDIwMDYgLSBPU1RHIE9wZW4gU291cmNlIFRl
+Y2hub2xvZ3kgR3JvdXAsIEFsbCBSaWdodHMgUmVzZXJ2ZWQKPiAKPiBVc2luZyBUb21jYXQgYnV0
+IG5lZWQgdG8gZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0IHdlYiBzZXJ2aWNlcywgc2VjdXJpdHk/
+Cj4gR2V0IHN0dWZmIGRvbmUgcXVpY2tseSB3aXRoIHByZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kg
+dG8gbWFrZSB5b3VyIGpvYiBlYXNpZXIKPiBEb3dubG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0
+aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNoZSBHZXJvbmltbwo+IGh0dHA6Ly9zZWwu
+YXMtdXMuZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZraWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0PTEy
+MTY0Mgo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4g
+Qmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0Cj4gQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2Uu
+bmV0Cj4gaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXot
+dXNlcnMKCgpVc2luZyBUb21jYXQgYnV0IG5lZWQgdG8gZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0
+IHdlYiBzZXJ2aWNlcywgc2VjdXJpdHk/CkdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUt
+aW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRvIG1ha2UgeW91ciBqb2IgZWFzaWVyCkRvd25sb2FkIElC
+TSBXZWJTcGhlcmUgQXBwbGljYXRpb24gU2VydmVyIHYuMS4wLjEgYmFzZWQgb24gQXBhY2hlIEdl
+cm9uaW1vCmh0dHA6Ly9zZWwuYXMtdXMuZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZraWQ9MTIwNzA5
+JmJpZD0yNjMwNTcmZGF0PTEyMTY0MgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMu
+c291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3Rp
+bmZvL2JsdWV6LXVzZXJzCg==
