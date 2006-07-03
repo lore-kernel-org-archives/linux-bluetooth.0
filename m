@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Olivier Dole <olivier.dole@palmsource.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1151939665.12125.16.camel@localhost>
-References: <1151937859.8418.26.camel@localhost.localdomain>
-	<1151939665.12125.16.camel@localhost>
-Date: Mon, 03 Jul 2006 18:14:35 +0200
-Message-Id: <1151943275.8418.28.camel@localhost.localdomain>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] PAN Profile: NAP & GN at the same time ???
+Message-ID: <01e101c69eb9$50f41670$2800a8c0@Desarrollo>
+From: "Victor Andres" <victor@cymonline.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <003e01c69e8c$c0717970$2800a8c0@Desarrollo><Pine.LNX.4.63.0607031426320.28132@redbean.intranet.gw-instruments.de>
+	<e1effdeb0607030546w38382e5ct4bb6bed8c0271da8@mail.gmail.com>
+Date: Mon, 3 Jul 2006 17:56:53 +0200
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Serial comunication RFCOMM
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,43 +16,110 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-TGUgbHVuZGkgMDMganVpbGxldCAyMDA2IMOgIDE3OjE0ICswMjAwLCBNYXJjZWwgSG9sdG1hbm4g
-YSDDqWNyaXQgOgo+IEhpIE9saXZpZXIsCj4gCj4gPiBJIHdvbmRlciB3ZXRoZXIgaXQgaXMgcG9z
-c2libGUgb3Igbm90IHRvIGhhdmUgYSBibHVldG9vdGggZGV2aWNlIHdoaWNoCj4gPiBtYW5hZ2Vz
-IGEgTkFQIGFuZCBhIEdOIGNvbm5lY3Rpb24gYXQgdGhlIHNhbWUgdGltZS4KPiA+IElmIHdlIGNv
-bnNpZGVyIEJsdWVaIGltcGxlbWVudGF0aW9uLCBpdCBpcyBub3QgcG9zc2libGU6IAo+ID4gcGFu
-ZCAtLWxpc3RlbiAtLXJvbGUgTkFQIC1uCj4gPiBwYW5kWzEwNzUwXTogQmx1ZXRvb3RoIFBBTiBk
-YWVtb24gdmVyc2lvbiAyLjIwCj4gPiBwYW5kWzEwNzUwXTogQmluZCBmYWlsZWQuIEFkZHJlc3Mg
-YWxyZWFkeSBpbiB1c2UoOTgpCj4gPiBBbmQgaXQgaXMgYSBub3JtYWwgYmVoYXZpb3VyIHdoZW4g
-d2UgY29uc2lkZXIgdGhhdCBOQVAgJiBHTiBib3RoIHVzZQo+ID4gQk5FUCBzbyBQU009MHgwRj0x
-NS4KPiA+IEkgYWxzbyBoYXZlIGEgbG9vayBhdCBCbHVldG9vdGggYW5kIFBBTiBwcm9maWxlIHNw
-ZWNzIGFuZCBub3RoaW5nCj4gPiBzZWVtcyB0byBwcmV2ZW50IHVzIGZyb20gZG9pbmcgc3VjaCBh
-IHRoaW5nLgo+ID4gU28gbXkgcXVlc3Rpb24gaXM6IGRvZXMgUFNNIGFzcGVjdCBpbXBseSB0aGF0
-IGl0IGlzIG5vdCBwb3NzaWJsZSB0bwo+ID4gbWFuYWdlIDIgbWFzdGVyIHNlcnZpY2VzIGF0IHRo
-ZSBzYW1lIHRpbWUgb3IgaXMgdGhlcmUgc29sdXRpb24gdG8gZG8KPiA+IHRoYXQgPz8/Cj4gCj4g
-eW91IGhhdmUgdG8gbW9kaWZ5IHBhbmQgc28gaXQgcmVnaXN0ZXJzIGJvdGggU0RQIHJlY29yZHMu
-IFNpbmNlIHlvdSBjYW4KPiBoYXZlIG9ubHkgb25lIGxpc3RlbiBzb2NrZXQgb24gUFNNIDE1IHlv
-dSBtdXN0IGRvIGFueSBtdWx0aXBsZXhpbmcKPiBpbnNpZGUgcGFuZCBpdHNlbGYuCj4gCj4gUmVn
-YXJkcwo+IAo+IE1hcmNlbAo+IApPayB0aGF0J3Mgd2hhdCBJIGZlYXJlZC4KVGhhbmtzIGFueXdh
-eSBmb3IgdGhlIHF1aWNrIHJlcGx5IDopCgpSZWdhcmRzLAoKT2xpdmllcgo+IAo+IAo+IFVzaW5n
-IFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNlcnZpY2Vz
-LCBzZWN1cml0eT8KPiBHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdpdGggcHJlLWludGVncmF0ZWQg
-dGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9iIGVhc2llcgo+IERvd25sb2FkIElCTSBXZWJTcGhl
-cmUgQXBwbGljYXRpb24gU2VydmVyIHYuMS4wLjEgYmFzZWQgb24gQXBhY2hlIEdlcm9uaW1vCj4g
-aHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9bG5rJmtpZD0xMjA3MDkmYmlkPTI2
-MzA1NyZkYXQ9MTIxNjQyCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX18KPiBCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKPiBCbHVlei1kZXZlbEBsaXN0cy5z
-b3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0
-aW5mby9ibHVlei1kZXZlbAoKClVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVk
-IHRvIHN1cHBvcnQgd2ViIHNlcnZpY2VzLCBzZWN1cml0eT8KR2V0IHN0dWZmIGRvbmUgcXVpY2ts
-eSB3aXRoIHByZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kgdG8gbWFrZSB5b3VyIGpvYiBlYXNpZXIK
-RG93bmxvYWQgSUJNIFdlYlNwaGVyZSBBcHBsaWNhdGlvbiBTZXJ2ZXIgdi4xLjAuMSBiYXNlZCBv
-biBBcGFjaGUgR2Vyb25pbW8KaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9bG5r
-JmtpZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQyCl9fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVlei1k
-ZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQv
-bGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
+Thanks!
+
+But I can't find the dbus-api.txt, and I really don't know what's d-bus. I 
+have done some examples using rfcomm from the shell. I actually use Ubuntu, 
+and I have installed bluez from apt-get. Is this the correct way?
+
+
+Thanks. Very pleased.
+
+
+
+----- Original Message ----- 
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Sent: Monday, July 03, 2006 2:46 PM
+Subject: Re: [Bluez-devel] Serial comunication RFCOMM
+
+
+> Hi Victor,
+>
+> The BlueZ D-Bus API provides an easy way to handle multiple local
+> adapters based on D-Bus paths. eg:
+> /org/bluez/hci0
+> /org/bluez/hci1
+> ....
+>
+>
+> Check the dbus-api.txt file and the dbus-test python script for more
+> information.
+>
+> BR,
+> Claudio.
+>
+> On 7/3/06, Peter Wippich <pewi@gw-instruments.de> wrote:
+>>
+>> Hi Victor,
+>>
+>> On Mon, 3 Jul 2006, Victor Andres wrote:
+>>
+>> > Hi. I'm a new developer of bluez API. I would like that someone say if
+>> > is posible to do I want.
+>> >
+>> > Is it posible to link (bluetooth) multiple devices to mi PC using Linux
+>> > and Bluez stack (using multple usb-bluetooth adapter if it's necesary)?
+>> >
+>> > I want link my PC with multiples (more than 7) GPS bluetooth (so I
+>> > can't do it with windows stack), to receive the NMEA sentences and
+>> > manipulate then (get the latitud, longitud, speed ...).
+>>
+>> I don't see anything which should prevent you from doing so.
+>> And as far as I know BlueZ currently is the only Bluetooth Stack which
+>> supports multiple HCI devices.
+>>
+>> Ciao,
+>>
+>> Peter
+>>
+>>
+>>
+>> |       Peter Wippich                   Voice: +49 30 46776411          |
+>> |       G&W Instruments GmbH            fax:   +49 30 46776419          |
+>> |       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+>> |       D-13355 Berlin  / Germany                                       |
+>>
+>>
+>> Using Tomcat but need to do more? Need to support web services, security?
+>> Get stuff done quickly with pre-integrated technology to make your job 
+>> easier
+>> Download IBM WebSphere Application Server v.1.0.1 based on Apache 
+>> Geronimo
+>> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+>> _______________________________________________
+>> Bluez-devel mailing list
+>> Bluez-devel@lists.sourceforge.net
+>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>>
+>
+>
+> -- 
+> ---------------------------------------------------------
+> Claudio Takahasi
+> Instituto Nokia de Tecnologia - INdT
+>
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job 
+> easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel 
+
+
+
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
