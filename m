@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <e0638ac60606301533r646d798dle31901ed4583b165@mail.gmail.com>
-References: <e0638ac60606301533r646d798dle31901ed4583b165@mail.gmail.com>
-Date: Mon, 03 Jul 2006 17:17:43 +0200
-Message-Id: <1151939863.12125.21.camel@localhost>
+In-Reply-To: <1151937859.8418.26.camel@localhost.localdomain>
+References: <1151937859.8418.26.camel@localhost.localdomain>
+Date: Mon, 03 Jul 2006 17:14:25 +0200
+Message-Id: <1151939665.12125.16.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] SCO link for data packets
+Subject: Re: [Bluez-devel] PAN Profile: NAP & GN at the same time ???
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Eunsoo,
+Hi Olivier,
 
-> I have two questions.
-> 
-> 1. Is it possible to use SCO link for data packet transmissions (not audio)?
+> I wonder wether it is possible or not to have a bluetooth device which
+> manages a NAP and a GN connection at the same time.
+> If we consider BlueZ implementation, it is not possible: 
+> pand --listen --role NAP -n
+> pand[10750]: Bluetooth PAN daemon version 2.20
+> pand[10750]: Bind failed. Address already in use(98)
+> And it is a normal behaviour when we consider that NAP & GN both use
+> BNEP so PSM=0x0F=15.
+> I also have a look at Bluetooth and PAN profile specs and nothing
+> seems to prevent us from doing such a thing.
+> So my question is: does PSM aspect imply that it is not possible to
+> manage 2 master services at the same time or is there solution to do
+> that ???
 
-in theory it is possible to use the transparent codec and send data over
-the SCO link, but in the end it is audio data that will be processed by
-a codec. And this means that there is not guarantee that you will
-receive the same data on one side that you sent on the other side.
-
-> 2. Is there any documentation for bluez sco programming?
-
-Not really. Check the source code files in bluez-utils.
+you have to modify pand so it registers both SDP records. Since you can
+have only one listen socket on PSM 15 you must do any multiplexing
+inside pand itself.
 
 Regards
 
