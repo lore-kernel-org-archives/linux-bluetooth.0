@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44A9923A.4050200@runbox.com>
-Date: Mon, 03 Jul 2006 22:55:06 +0100
-From: Tom K <tomk@runbox.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] hcid fails to start after upgrade to
-	bluez-libs/bluez-utils 3.1 (Continued)
+From: Olivier Dole <olivier.dole@palmsource.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1151939665.12125.16.camel@localhost>
+References: <1151937859.8418.26.camel@localhost.localdomain>
+	<1151939665.12125.16.camel@localhost>
+Date: Mon, 03 Jul 2006 18:14:35 +0200
+Message-Id: <1151943275.8418.28.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] PAN Profile: NAP & GN at the same time ???
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,135 +17,43 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Apologies for the second thread - I had some system problems which 
-delayed my list subscription request.
-
-On 7/3/06, Claudio Takahasi <cktakahasi@gm...> wrote:
- > Hi Tom,
- >
-
-Many thanks for your reply, Claudio.
-
- > Which D-Bus version are you running?
- >
-
-Version 0.62.
-
- > Check if the BlueZ D-Bus configuration file(bluez-hcid.conf) is in the
- > following directory:
- > /etc/dbus-1/system.d/
-
-Yes, it's there.
-
- >
- > After upgrade bluez-utils you need restart dbus-daemon to load the
- > bluez-hcid.conf file.
-
-I probably didn't do that the first time. I've done it now, though, and 
-things aren't good. I've removed the pin_helper and auth lines from 
-hcid.conf, as per the original error message, and added the passkey 
-line. Starting from a reboot, here are the relevant log entries.
-
-Module loading:
-Bluetooth: Core ver 2.8
-NET: Registered protocol family 31
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: HCI USB driver ver 2.9
-usbcore: registered new driver hci_usb
-
-hcid starting:
-hcid[2126]: Bluetooth HCI daemon
-hcid[2126]: Register path:/org/bluez fallback:1
-hcid[2126]: Device hci0 has been added
-hcid[2126]: Can't read version info for hci0: Connection timed out (110)
-hcid[2126]: Register path:/org/bluez/hci0 fallback:0
-hci_cmd_task: hci0 command tx timeout
-hcid[2126]: HCI dev 0 up
-hcid[2126]: Starting security manager 0
-
-USB disconnect/reconnect:
-usb 1-1.1: USB disconnect, address 3
-usb 1-1.1: new full speed USB device using uhci_hcd and address 5
-usb 1-1.1: configuration #1 chosen from 1 choice
-
-hcid restarting:
-hcid[2126]: Can't write inquiry mode for hci0: Connection timed out (110)
-hcid[2126]: HCI dev 0 down
-hcid[2126]: Stoping security manager 0
-hcid[2126]: Device hci0 has been disabled
-hcid[2126]: HCI dev 0 unregistered
-hcid[2126]: Unregister path:/org/bluez/hci0
-hcid[2126]: Device hci0 has been removed
-hcid[2126]: HCI dev 0 registered
-hcid[2126]: Device hci0 has been added
-hcid[2126]: Register path:/org/bluez/hci0 fallback:0
-hci_cmd_task: hci0 command tx timeout
-hcid[2126]: Sending read scan enable command failed: Connection timed 
-out (110)
-hcid[2126]: HCI dev 0 up
-hcid[2126]: Starting security manager 0
-
-
-USB disconnect/reconnect:
-usb 1-1.1: USB disconnect, address 5
-usb 1-1.1: new full speed USB device using uhci_hcd and address 6
-usb 1-1.1: configuration #1 chosen from 1 choice
-
-etc.
-
-The hcid and USB logs above alternated continuously, with the USB 
-address incrementing each time, until I halted hcid.
-
-I then unplugged the dongle, unloaded the module, and started again, 
-with more success this time. Again, here are the logs.
-
-Module:
-Bluetooth: Core ver 2.8
-NET: Registered protocol family 31
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: HCI USB driver ver 2.9
-usbcore: registered new driver hci_usb
-
-hcid & USB:
-hcid[14066]: Bluetooth HCI daemon
-hcid[14066]: Register path:/org/bluez fallback:1
-hcid[14066]: Device hci0 has been added
-hcid[14066]: Can't write inquiry mode for hci0: Connection timed out (110)
-hcid[14066]: Register path:/org/bluez/hci0 fallback:0
-hci_cmd_task: hci0 command tx timeout
-hcid[14066]: Sending read scan enable command failed: Connection timed 
-out (110)
-usb 1-1.1: USB disconnect, address 66
-hcid[14066]: Can't read address for hci0: Connection timed out (110)
-hcid[14066]: HCI dev 0 up
-hcid[14066]: Starting security manager 0
-hcid[14066]: Can't open device hci0: No such device (19)
-hcid[14066]: Can't open device hci0
-hcid[14066]: HCI dev 0 down
-hcid[14066]: Device hci0 has been disabled
-hcid[14076]: Can't open device hci0: No such device (19)
-hcid[14066]: HCI dev 0 unregistered
-hcid[14066]: Unregister path:/org/bluez/hci0
-usb 1-1.1: new full speed USB device using uhci_hcd and address 67
-usb 1-1.1: configuration #1 chosen from 1 choice
-
-There were no further USB disconnects. hciconfig showed the device down, 
-but I was able to bring it up, and then use it as normal.
-
-Regards
-Tom K.
-
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+TGUgbHVuZGkgMDMganVpbGxldCAyMDA2IMOgIDE3OjE0ICswMjAwLCBNYXJjZWwgSG9sdG1hbm4g
+YSDDqWNyaXQgOgo+IEhpIE9saXZpZXIsCj4gCj4gPiBJIHdvbmRlciB3ZXRoZXIgaXQgaXMgcG9z
+c2libGUgb3Igbm90IHRvIGhhdmUgYSBibHVldG9vdGggZGV2aWNlIHdoaWNoCj4gPiBtYW5hZ2Vz
+IGEgTkFQIGFuZCBhIEdOIGNvbm5lY3Rpb24gYXQgdGhlIHNhbWUgdGltZS4KPiA+IElmIHdlIGNv
+bnNpZGVyIEJsdWVaIGltcGxlbWVudGF0aW9uLCBpdCBpcyBub3QgcG9zc2libGU6IAo+ID4gcGFu
+ZCAtLWxpc3RlbiAtLXJvbGUgTkFQIC1uCj4gPiBwYW5kWzEwNzUwXTogQmx1ZXRvb3RoIFBBTiBk
+YWVtb24gdmVyc2lvbiAyLjIwCj4gPiBwYW5kWzEwNzUwXTogQmluZCBmYWlsZWQuIEFkZHJlc3Mg
+YWxyZWFkeSBpbiB1c2UoOTgpCj4gPiBBbmQgaXQgaXMgYSBub3JtYWwgYmVoYXZpb3VyIHdoZW4g
+d2UgY29uc2lkZXIgdGhhdCBOQVAgJiBHTiBib3RoIHVzZQo+ID4gQk5FUCBzbyBQU009MHgwRj0x
+NS4KPiA+IEkgYWxzbyBoYXZlIGEgbG9vayBhdCBCbHVldG9vdGggYW5kIFBBTiBwcm9maWxlIHNw
+ZWNzIGFuZCBub3RoaW5nCj4gPiBzZWVtcyB0byBwcmV2ZW50IHVzIGZyb20gZG9pbmcgc3VjaCBh
+IHRoaW5nLgo+ID4gU28gbXkgcXVlc3Rpb24gaXM6IGRvZXMgUFNNIGFzcGVjdCBpbXBseSB0aGF0
+IGl0IGlzIG5vdCBwb3NzaWJsZSB0bwo+ID4gbWFuYWdlIDIgbWFzdGVyIHNlcnZpY2VzIGF0IHRo
+ZSBzYW1lIHRpbWUgb3IgaXMgdGhlcmUgc29sdXRpb24gdG8gZG8KPiA+IHRoYXQgPz8/Cj4gCj4g
+eW91IGhhdmUgdG8gbW9kaWZ5IHBhbmQgc28gaXQgcmVnaXN0ZXJzIGJvdGggU0RQIHJlY29yZHMu
+IFNpbmNlIHlvdSBjYW4KPiBoYXZlIG9ubHkgb25lIGxpc3RlbiBzb2NrZXQgb24gUFNNIDE1IHlv
+dSBtdXN0IGRvIGFueSBtdWx0aXBsZXhpbmcKPiBpbnNpZGUgcGFuZCBpdHNlbGYuCj4gCj4gUmVn
+YXJkcwo+IAo+IE1hcmNlbAo+IApPayB0aGF0J3Mgd2hhdCBJIGZlYXJlZC4KVGhhbmtzIGFueXdh
+eSBmb3IgdGhlIHF1aWNrIHJlcGx5IDopCgpSZWdhcmRzLAoKT2xpdmllcgo+IAo+IAo+IFVzaW5n
+IFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNlcnZpY2Vz
+LCBzZWN1cml0eT8KPiBHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdpdGggcHJlLWludGVncmF0ZWQg
+dGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9iIGVhc2llcgo+IERvd25sb2FkIElCTSBXZWJTcGhl
+cmUgQXBwbGljYXRpb24gU2VydmVyIHYuMS4wLjEgYmFzZWQgb24gQXBhY2hlIEdlcm9uaW1vCj4g
+aHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9bG5rJmtpZD0xMjA3MDkmYmlkPTI2
+MzA1NyZkYXQ9MTIxNjQyCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18KPiBCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKPiBCbHVlei1kZXZlbEBsaXN0cy5z
+b3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0
+aW5mby9ibHVlei1kZXZlbAoKClVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVk
+IHRvIHN1cHBvcnQgd2ViIHNlcnZpY2VzLCBzZWN1cml0eT8KR2V0IHN0dWZmIGRvbmUgcXVpY2ts
+eSB3aXRoIHByZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kgdG8gbWFrZSB5b3VyIGpvYiBlYXNpZXIK
+RG93bmxvYWQgSUJNIFdlYlNwaGVyZSBBcHBsaWNhdGlvbiBTZXJ2ZXIgdi4xLjAuMSBiYXNlZCBv
+biBBcGFjaGUgR2Vyb25pbW8KaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9bG5r
+JmtpZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQyCl9fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVlei1k
+ZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQv
+bGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
