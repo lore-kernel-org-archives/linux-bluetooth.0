@@ -1,17 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <e1effdeb0607041532x5701ab2eib524b5c70f0dc436@mail.gmail.com>
-Date: Tue, 4 Jul 2006 19:32:10 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <e1effdeb0607041156y797a376cn2081738e19559605@mail.gmail.com>
+Message-ID: <44AADFBA.1030901@runbox.com>
+Date: Tue, 04 Jul 2006 22:38:02 +0100
+From: Tom K <tomk@runbox.com>
 MIME-Version: 1.0
-References: <003e01c69e8c$c0717970$2800a8c0@Desarrollo>
-	<Pine.LNX.4.63.0607031426320.28132@redbean.intranet.gw-instruments.de>
-	<e1effdeb0607030546w38382e5ct4bb6bed8c0271da8@mail.gmail.com>
-	<01e101c69eb9$50f41670$2800a8c0@Desarrollo>
-	<003001c69f95$0b1ab140$2800a8c0@Desarrollo>
-	<e1effdeb0607041156y797a376cn2081738e19559605@mail.gmail.com>
-Subject: Re: [Bluez-devel] Serial comunication RFCOMM
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <44A9923A.4050200@runbox.com>
+	<e1effdeb0607040642j3c3e0a34l67565401acb2f318@mail.gmail.com>
+In-Reply-To: <e1effdeb0607040642j3c3e0a34l67565401acb2f318@mail.gmail.com>
+Content-Type: multipart/mixed; boundary="------------040801010103010906070001"
+Subject: Re: [Bluez-devel] hcid fails to start after upgrade
+ to	bluez-libs/bluez-utils 3.1 (Continued)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,155 +19,70 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Victor,
+This is a multi-part message in MIME format.
+--------------040801010103010906070001
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-sorry. Just fixing a wrong answer. I read the question quickly without
-pay attention exactly what you asked :-) According with the spec you
-can have up to 7 ACL connections. Between two BT devices, the RFCOMM
-protocol supports up to 60 simultaneous connections , I never tested
-and probably linux should have a limitation. I guess Marcel can answer
-this better.
-
-Br,
-Claudio.
-
-On 7/4/06, Claudio Takahasi <cktakahasi@gmail.com> wrote:
-> Hi Victor,
+Claudio Takahasi wrote:
+> Hi Tom,
 >
-> Regarding the dbus-api.txt, you can get it from the BlueZ anonymous CVS
-> http://www.bluez.org/cvs.html
->
-> On 7/4/06, Victor Andres <victor@cymonline.com> wrote:
-> > Can anyone say me how can I develop this kind of APP (a software that let my
-> > conect more than 7 devices to my PC using SPP profile, and using more than 1
-> > usb-bluetooth, if it's necesary)?
-> [Claudio Takahasi]
-> just one is enough
->
-> Do I have to use bluez Rfcomm library
-> > (ansi C)? Dbus? Actually a know what's dbus, but I don't know how can I
-> > program using it.
-> [Claudio Takahasi]
-> D-Bus RFCOMM and SDP interfaces are experimental. If you want, you can
-> enable it and check if it works :-) There is a python test
-> script(hcid/dbus-test) and an app that I developed for testing
-> purpose, check if it can help you:
-> http://extindt01.indt.org/connectivity/bluez/gbluezconf-00.30.tar.gz
->
-> Regarding SDP, only the client side is available. Currently, you can
-> query some services, but you can't register a RFCOMM based service.
->
-> If you don't want use D-Bus, check openobex library, gnome-bluetooth
-> or kde-bluetooth.
+> I was not able to reproduce the problem that you described. I found
+> some problems with dongles that doesn't support set the inquiry mode,
+> but I never noticed "Connection timed out".
+> Could you send the hcidump?
 >
 > BR,
 > Claudio.
->
-> >
-> > I have test windows vista beta 2 to try conect 2 usb-bluetooth and it's
-> > failed (it look that this isn't going to be updates by the newer windows
-> > version ... microsxxxx).
-> >
-> > Thanks!
-> >
-> >
-> >
-> >
-> > > ----- Original Message -----
-> > > From: "Claudio Takahasi" <cktakahasi@gmail.com>
-> > > To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-> > > Sent: Monday, July 03, 2006 2:46 PM
-> > > Subject: Re: [Bluez-devel] Serial comunication RFCOMM
-> > >
-> > >
-> > >> Hi Victor,
-> > >>
-> > >> The BlueZ D-Bus API provides an easy way to handle multiple local
-> > >> adapters based on D-Bus paths. eg:
-> > >> /org/bluez/hci0
-> > >> /org/bluez/hci1
-> > >> ....
-> > >>
-> > >>
-> > >> Check the dbus-api.txt file and the dbus-test python script for more
-> > >> information.
-> > >>
-> > >> BR,
-> > >> Claudio.
-> > >>
-> > >> On 7/3/06, Peter Wippich <pewi@gw-instruments.de> wrote:
-> > >>>
-> > >>> Hi Victor,
-> > >>>
-> > >>> On Mon, 3 Jul 2006, Victor Andres wrote:
-> > >>>
-> > >>> > Hi. I'm a new developer of bluez API. I would like that someone say if
-> > >>> > is posible to do I want.
-> > >>> >
-> > >>> > Is it posible to link (bluetooth) multiple devices to mi PC using
-> > >>> > Linux
-> > >>> > and Bluez stack (using multple usb-bluetooth adapter if it's
-> > >>> > necesary)?
-> > >>> >
-> > >>> > I want link my PC with multiples (more than 7) GPS bluetooth (so I
-> > >>> > can't do it with windows stack), to receive the NMEA sentences and
-> > >>> > manipulate then (get the latitud, longitud, speed ...).
-> > >>>
-> > >>> I don't see anything which should prevent you from doing so.
-> > >>> And as far as I know BlueZ currently is the only Bluetooth Stack which
-> > >>> supports multiple HCI devices.
-> > >>>
-> > >>> Ciao,
-> > >>>
-> > >>> Peter
-> > >>>
-> > >>>
-> > >>>
-> > >>> |       Peter Wippich                   Voice: +49 30 46776411
-> > >>> |
-> > >>> |       G&W Instruments GmbH            fax:   +49 30 46776419
-> > >>> |
-> > >>> |       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de
-> > >>> |
-> > >>> |       D-13355 Berlin  / Germany
-> > >>> |
-> > >>>
-> > >>>
-> >
-> >
-> >
-> > Using Tomcat but need to do more? Need to support web services, security?
-> > Get stuff done quickly with pre-integrated technology to make your job easier
-> > Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> > http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> > _______________________________________________
-> > Bluez-devel mailing list
-> > Bluez-devel@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> >
->
->
-> --
-> ---------------------------------------------------------
-> Claudio Takahasi
-> Instituto Nokia de Tecnologia - INdT
->
+>   
 
+Here's the dump file, Claudio. I started hcidump immediately after 
+plugging in the dongle, and then started the bluetooth daemons. I got 
+the same sequence of USB and hcid log messages as before, and let it 
+cycle through 6 consecutive USB addresses before shutting it down. To my 
+inexpert eye, there doesn't seem to be much in the dump, but hopefully 
+it will mean something to you.
 
--- 
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+TIA
+Tom.
+
+--------------040801010103010906070001
+Content-Type: application/octet-stream;
+ name="bt20060704.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="bt20060704.dump"
+
+BAAAAFvcqkS+iw0AAQMQAAcAAQBb3KpEv5INAAQPBAABAAAEAAAAW9yqRPGSDQABBRAADwAB
+AFvcqkRIpg0ABA4MAQMQAP//BQAAAAAABAAAAFvcqkR4pg0AAQkQAA4AAQBb3KpEackNAAQO
+CwEFEACAAEAIAAgABAAAAFvcqkSbyQ0AASUMAA0AAQBb3KpEQdENAAQOCgEJEADjEq12BAAG
+AAAAW9yqRILRDQABBQwCAK0JAAEAW9yqRLPkDQAEDgYBJQwAYAAGAAAAW9yqRM3kDQABGAwC
+AIAHAAEAW9yqRH/sDQAEDgQBBQwABgAAAFvcqkSQ7A0AARYMAgB9BwABAFvcqkQVAA4ABA4E
+ARgMAAQAAABb3KpEJgAOAAEBEAAHAAEAW9yqRNkHDgAEDgQBFgwADwABAFvcqkSAFw4ABA4M
+AQEQAABhAAEKAGEABAAAAFvcqkRXTQ4AAQMQAA8AAQBb3KpErGEOAAQODAEDEAD//wUAAAAA
+AAUAAABb3KpEE2IOAAFFDAEABAAAAFzcqkSYugAAAQMMAA==
+--------------040801010103010906070001
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--------------040801010103010906070001
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------040801010103010906070001--
