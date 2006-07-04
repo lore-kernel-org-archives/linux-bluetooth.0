@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <003001c69f95$0b1ab140$2800a8c0@Desarrollo>
-From: "Victor Andres" <victor@cymonline.com>
+Message-ID: <e1effdeb0607040642j3c3e0a34l67565401acb2f318@mail.gmail.com>
+Date: Tue, 4 Jul 2006 10:42:27 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-References: <003e01c69e8c$c0717970$2800a8c0@Desarrollo><Pine.LNX.4.63.0607031426320.28132@redbean.intranet.gw-instruments.de><e1effdeb0607030546w38382e5ct4bb6bed8c0271da8@mail.gmail.com>
-	<01e101c69eb9$50f41670$2800a8c0@Desarrollo>
-Date: Tue, 4 Jul 2006 20:09:45 +0200
+In-Reply-To: <44A9923A.4050200@runbox.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] Serial comunication RFCOMM
+References: <44A9923A.4050200@runbox.com>
+Subject: Re: [Bluez-devel] hcid fails to start after upgrade to
+	bluez-libs/bluez-utils 3.1 (Continued)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,83 +21,150 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Can anyone say me how can I develop this kind of APP (a software that let my 
-conect more than 7 devices to my PC using SPP profile, and using more than 1 
-usb-bluetooth, if it's necesary)?  Do I have to use bluez Rfcomm library 
-(ansi C)? Dbus? Actually a know what's dbus, but I don't know how can I 
-program using it.
+Hi Tom,
 
-I have test windows vista beta 2 to try conect 2 usb-bluetooth and it's 
-failed (it look that this isn't going to be updates by the newer windows 
-version ... microsxxxx).
+I was not able to reproduce the problem that you described. I found
+some problems with dongles that doesn't support set the inquiry mode,
+but I never noticed "Connection timed out".
+Could you send the hcidump?
 
-Thanks!
+BR,
+Claudio.
+-- 
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
-
-
-
-> ----- Original Message ----- 
-> From: "Claudio Takahasi" <cktakahasi@gmail.com>
-> To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-> Sent: Monday, July 03, 2006 2:46 PM
-> Subject: Re: [Bluez-devel] Serial comunication RFCOMM
+On 7/3/06, Tom K <tomk@runbox.com> wrote:
+> Apologies for the second thread - I had some system problems which
+> delayed my list subscription request.
+>
+> On 7/3/06, Claudio Takahasi <cktakahasi@gm...> wrote:
+>  > Hi Tom,
+>  >
+>
+> Many thanks for your reply, Claudio.
+>
+>  > Which D-Bus version are you running?
+>  >
+>
+> Version 0.62.
+>
+>  > Check if the BlueZ D-Bus configuration file(bluez-hcid.conf) is in the
+>  > following directory:
+>  > /etc/dbus-1/system.d/
+>
+> Yes, it's there.
+>
+>  >
+>  > After upgrade bluez-utils you need restart dbus-daemon to load the
+>  > bluez-hcid.conf file.
+>
+> I probably didn't do that the first time. I've done it now, though, and
+> things aren't good. I've removed the pin_helper and auth lines from
+> hcid.conf, as per the original error message, and added the passkey
+> line. Starting from a reboot, here are the relevant log entries.
+>
+> Module loading:
+> Bluetooth: Core ver 2.8
+> NET: Registered protocol family 31
+> Bluetooth: HCI device and connection manager initialized
+> Bluetooth: HCI socket layer initialized
+> Bluetooth: HCI USB driver ver 2.9
+> usbcore: registered new driver hci_usb
+>
+> hcid starting:
+> hcid[2126]: Bluetooth HCI daemon
+> hcid[2126]: Register path:/org/bluez fallback:1
+> hcid[2126]: Device hci0 has been added
+> hcid[2126]: Can't read version info for hci0: Connection timed out (110)
+> hcid[2126]: Register path:/org/bluez/hci0 fallback:0
+> hci_cmd_task: hci0 command tx timeout
+> hcid[2126]: HCI dev 0 up
+> hcid[2126]: Starting security manager 0
+>
+> USB disconnect/reconnect:
+> usb 1-1.1: USB disconnect, address 3
+> usb 1-1.1: new full speed USB device using uhci_hcd and address 5
+> usb 1-1.1: configuration #1 chosen from 1 choice
+>
+> hcid restarting:
+> hcid[2126]: Can't write inquiry mode for hci0: Connection timed out (110)
+> hcid[2126]: HCI dev 0 down
+> hcid[2126]: Stoping security manager 0
+> hcid[2126]: Device hci0 has been disabled
+> hcid[2126]: HCI dev 0 unregistered
+> hcid[2126]: Unregister path:/org/bluez/hci0
+> hcid[2126]: Device hci0 has been removed
+> hcid[2126]: HCI dev 0 registered
+> hcid[2126]: Device hci0 has been added
+> hcid[2126]: Register path:/org/bluez/hci0 fallback:0
+> hci_cmd_task: hci0 command tx timeout
+> hcid[2126]: Sending read scan enable command failed: Connection timed
+> out (110)
+> hcid[2126]: HCI dev 0 up
+> hcid[2126]: Starting security manager 0
 >
 >
->> Hi Victor,
->>
->> The BlueZ D-Bus API provides an easy way to handle multiple local
->> adapters based on D-Bus paths. eg:
->> /org/bluez/hci0
->> /org/bluez/hci1
->> ....
->>
->>
->> Check the dbus-api.txt file and the dbus-test python script for more
->> information.
->>
->> BR,
->> Claudio.
->>
->> On 7/3/06, Peter Wippich <pewi@gw-instruments.de> wrote:
->>>
->>> Hi Victor,
->>>
->>> On Mon, 3 Jul 2006, Victor Andres wrote:
->>>
->>> > Hi. I'm a new developer of bluez API. I would like that someone say if
->>> > is posible to do I want.
->>> >
->>> > Is it posible to link (bluetooth) multiple devices to mi PC using 
->>> > Linux
->>> > and Bluez stack (using multple usb-bluetooth adapter if it's 
->>> > necesary)?
->>> >
->>> > I want link my PC with multiples (more than 7) GPS bluetooth (so I
->>> > can't do it with windows stack), to receive the NMEA sentences and
->>> > manipulate then (get the latitud, longitud, speed ...).
->>>
->>> I don't see anything which should prevent you from doing so.
->>> And as far as I know BlueZ currently is the only Bluetooth Stack which
->>> supports multiple HCI devices.
->>>
->>> Ciao,
->>>
->>> Peter
->>>
->>>
->>>
->>> |       Peter Wippich                   Voice: +49 30 46776411 
->>> |
->>> |       G&W Instruments GmbH            fax:   +49 30 46776419 
->>> |
->>> |       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de 
->>> |
->>> |       D-13355 Berlin  / Germany 
->>> |
->>>
->>>
-
-
+> USB disconnect/reconnect:
+> usb 1-1.1: USB disconnect, address 5
+> usb 1-1.1: new full speed USB device using uhci_hcd and address 6
+> usb 1-1.1: configuration #1 chosen from 1 choice
+>
+> etc.
+>
+> The hcid and USB logs above alternated continuously, with the USB
+> address incrementing each time, until I halted hcid.
+>
+> I then unplugged the dongle, unloaded the module, and started again,
+> with more success this time. Again, here are the logs.
+>
+> Module:
+> Bluetooth: Core ver 2.8
+> NET: Registered protocol family 31
+> Bluetooth: HCI device and connection manager initialized
+> Bluetooth: HCI socket layer initialized
+> Bluetooth: HCI USB driver ver 2.9
+> usbcore: registered new driver hci_usb
+>
+> hcid & USB:
+> hcid[14066]: Bluetooth HCI daemon
+> hcid[14066]: Register path:/org/bluez fallback:1
+> hcid[14066]: Device hci0 has been added
+> hcid[14066]: Can't write inquiry mode for hci0: Connection timed out (110)
+> hcid[14066]: Register path:/org/bluez/hci0 fallback:0
+> hci_cmd_task: hci0 command tx timeout
+> hcid[14066]: Sending read scan enable command failed: Connection timed
+> out (110)
+> usb 1-1.1: USB disconnect, address 66
+> hcid[14066]: Can't read address for hci0: Connection timed out (110)
+> hcid[14066]: HCI dev 0 up
+> hcid[14066]: Starting security manager 0
+> hcid[14066]: Can't open device hci0: No such device (19)
+> hcid[14066]: Can't open device hci0
+> hcid[14066]: HCI dev 0 down
+> hcid[14066]: Device hci0 has been disabled
+> hcid[14076]: Can't open device hci0: No such device (19)
+> hcid[14066]: HCI dev 0 unregistered
+> hcid[14066]: Unregister path:/org/bluez/hci0
+> usb 1-1.1: new full speed USB device using uhci_hcd and address 67
+> usb 1-1.1: configuration #1 chosen from 1 choice
+>
+> There were no further USB disconnects. hciconfig showed the device down,
+> but I was able to bring it up, and then use it as normal.
+>
+> Regards
+> Tom K.
+>
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
