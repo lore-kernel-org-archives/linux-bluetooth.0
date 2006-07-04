@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44AAAF46.7060309@runbox.com>
-Date: Tue, 04 Jul 2006 19:11:18 +0100
-From: Tom K <tomk@runbox.com>
+Message-ID: <003001c69f95$0b1ab140$2800a8c0@Desarrollo>
+From: "Victor Andres" <victor@cymonline.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <003e01c69e8c$c0717970$2800a8c0@Desarrollo><Pine.LNX.4.63.0607031426320.28132@redbean.intranet.gw-instruments.de><e1effdeb0607030546w38382e5ct4bb6bed8c0271da8@mail.gmail.com>
+	<01e101c69eb9$50f41670$2800a8c0@Desarrollo>
+Date: Tue, 4 Jul 2006 20:09:45 +0200
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44A9923A.4050200@runbox.com>
-	<e1effdeb0607040642j3c3e0a34l67565401acb2f318@mail.gmail.com>
-In-Reply-To: <e1effdeb0607040642j3c3e0a34l67565401acb2f318@mail.gmail.com>
-Subject: Re: [Bluez-devel] hcid fails to start after upgrade
- to	bluez-libs/bluez-utils 3.1 (Continued)
+Subject: Re: [Bluez-devel] Serial comunication RFCOMM
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,25 +20,83 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Claudio Takahasi wrote:
-> Hi Tom,
+Can anyone say me how can I develop this kind of APP (a software that let my 
+conect more than 7 devices to my PC using SPP profile, and using more than 1 
+usb-bluetooth, if it's necesary)?  Do I have to use bluez Rfcomm library 
+(ansi C)? Dbus? Actually a know what's dbus, but I don't know how can I 
+program using it.
+
+I have test windows vista beta 2 to try conect 2 usb-bluetooth and it's 
+failed (it look that this isn't going to be updates by the newer windows 
+version ... microsxxxx).
+
+Thanks!
+
+
+
+
+> ----- Original Message ----- 
+> From: "Claudio Takahasi" <cktakahasi@gmail.com>
+> To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+> Sent: Monday, July 03, 2006 2:46 PM
+> Subject: Re: [Bluez-devel] Serial comunication RFCOMM
 >
-> I was not able to reproduce the problem that you described. I found
-> some problems with dongles that doesn't support set the inquiry mode,
-> but I never noticed "Connection timed out".
-> Could you send the hcidump?
 >
-> BR,
-> Claudio.
->   
-Thanks for your continued interest, Claudio.
+>> Hi Victor,
+>>
+>> The BlueZ D-Bus API provides an easy way to handle multiple local
+>> adapters based on D-Bus paths. eg:
+>> /org/bluez/hci0
+>> /org/bluez/hci1
+>> ....
+>>
+>>
+>> Check the dbus-api.txt file and the dbus-test python script for more
+>> information.
+>>
+>> BR,
+>> Claudio.
+>>
+>> On 7/3/06, Peter Wippich <pewi@gw-instruments.de> wrote:
+>>>
+>>> Hi Victor,
+>>>
+>>> On Mon, 3 Jul 2006, Victor Andres wrote:
+>>>
+>>> > Hi. I'm a new developer of bluez API. I would like that someone say if
+>>> > is posible to do I want.
+>>> >
+>>> > Is it posible to link (bluetooth) multiple devices to mi PC using 
+>>> > Linux
+>>> > and Bluez stack (using multple usb-bluetooth adapter if it's 
+>>> > necesary)?
+>>> >
+>>> > I want link my PC with multiples (more than 7) GPS bluetooth (so I
+>>> > can't do it with windows stack), to receive the NMEA sentences and
+>>> > manipulate then (get the latitud, longitud, speed ...).
+>>>
+>>> I don't see anything which should prevent you from doing so.
+>>> And as far as I know BlueZ currently is the only Bluetooth Stack which
+>>> supports multiple HCI devices.
+>>>
+>>> Ciao,
+>>>
+>>> Peter
+>>>
+>>>
+>>>
+>>> |       Peter Wippich                   Voice: +49 30 46776411 
+>>> |
+>>> |       G&W Instruments GmbH            fax:   +49 30 46776419 
+>>> |
+>>> |       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de 
+>>> |
+>>> |       D-13355 Berlin  / Germany 
+>>> |
+>>>
+>>>
 
-I'm not able to send a hcidump yet, because I need to rebuild hcidump 
-against bluez-libs 3.1, and I'm getting an error. Not my day, it seems. :(
 
-I'll send the dump file asap.
-
-Tom.
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
