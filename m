@@ -1,7 +1,9 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Wed, 5 Jul 2006 14:46:58 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0607051445110.3048@redbean.intranet.gw-instruments.de>
+In-Reply-To: <1152102849.4260.12.camel@localhost>
+Message-ID: <Pine.LNX.4.63.0607051445110.3048@redbean.intranet.gw-instruments.de>
 References: <003e01c69e8c$c0717970$2800a8c0@Desarrollo>
 	<Pine.LNX.4.63.0607031426320.28132@redbean.intranet.gw-instruments.de>
 	<e1effdeb0607030546w38382e5ct4bb6bed8c0271da8@mail.gmail.com>
@@ -12,10 +14,7 @@ References: <003e01c69e8c$c0717970$2800a8c0@Desarrollo>
 	<1152053676.29250.4.camel@localhost>
 	<003501c6a02d$e6b8c8c0$2800a8c0@Desarrollo>
 	<1152102849.4260.12.camel@localhost>
-	<Pine.LNX.4.63.0607051445110.3048@redbean.intranet.gw-instruments.de>
-Date: Wed, 05 Jul 2006 15:07:51 +0200
-Message-Id: <1152104871.4260.15.camel@localhost>
-Mime-Version: 1.0
+MIME-Version: 1.0
 Subject: Re: [Bluez-devel] Serial comunication RFCOMM
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -30,23 +29,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Peter,
 
-> > specify always the source interface (dongle). All BlueZ tools accept the
-> > parameter --device (-i hci0 for example).
-> Obvious :-). 
-> 
-> Sorry, can't resist 
 
-yeah. This one is funny. It is legacy. The -i was for interface as used
-by many IP related tools and --device for the actual Bluetooth device.
-We screwed that up, but it is consistent. Nowadays I would refer to
-adapter and not devices for the local ones.
+Hi Marcel, 
 
-Regards
+On Wed, 5 Jul 2006, Marcel Holtmann wrote:
 
-Marcel
+> specify always the source interface (dongle). All BlueZ tools accept the
+> parameter --device (-i hci0 for example).
+Obvious :-). 
 
+Sorry, can't resist 
+
+Peter 
+
+
+
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
 
 
 Using Tomcat but need to do more? Need to support web services, security?
