@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44AEB3A3.9040708@xmission.com>
-Date: Fri, 07 Jul 2006 13:18:59 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <e1effdeb0607071117q1a22bb24yfdefc69377c9acb8@mail.gmail.com>
+Date: Fri, 7 Jul 2006 15:17:03 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <44AADFBA.1030901@runbox.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44AE84D4.9080903@palmsource.com>
-In-Reply-To: <44AE84D4.9080903@palmsource.com>
-Subject: Re: [Bluez-devel] Alsa plugin for A2DP daemon
+References: <44A9923A.4050200@runbox.com>
+	<e1effdeb0607040642j3c3e0a34l67565401acb2f318@mail.gmail.com>
+	<44AADFBA.1030901@runbox.com>
+Subject: Re: [Bluez-devel] hcid fails to start after upgrade to
+	bluez-libs/bluez-utils 3.1 (Continued)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,31 +19,66 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fr=E9d=E9ric
+Hi Tom,
 
->     You can get a full archive there http://fdalleau.free.fr/btsco.tar.gz
->      I would love to have someone try it on an ARM platform. Next step =
+this dump doesn't contain the command status and the command complete events.
+Could you send it again with "hcidump -X -a -V"?
 
-> is volume control!
+BR,
+Claudio.
 
-this sounds great. I will have a look.
+On 7/4/06, Tom K <tomk@runbox.com> wrote:
+> Claudio Takahasi wrote:
+> > Hi Tom,
+> >
+> > I was not able to reproduce the problem that you described. I found
+> > some problems with dongles that doesn't support set the inquiry mode,
+> > but I never noticed "Connection timed out".
+> > Could you send the hcidump?
+> >
+> > BR,
+> > Claudio.
+> >
+>
+> Here's the dump file, Claudio. I started hcidump immediately after
+> plugging in the dongle, and then started the bluetooth daemons. I got
+> the same sequence of USB and hcid log messages as before, and let it
+> cycle through 6 consecutive USB addresses before shutting it down. To my
+> inexpert eye, there doesn't seem to be much in the dump, but hopefully
+> it will mean something to you.
+>
+> TIA
+> Tom.
+>
+>
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+>
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+>
+>
+>
 
-I do have a gumstix board I can try this with. I just have to hunt down
-a change on their side that broke the btsco cross-compile.
 
-Brad
-
+-- 
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
