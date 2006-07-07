@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Christoph Lukas <christoph.lukas@gmx.net>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <d23110170607071014p5f60069fj6e6ef41d0034d049@mail.gmail.com>
+Message-ID: <d23110170607071014p5f60069fj6e6ef41d0034d049@mail.gmail.com>
+Date: Fri, 7 Jul 2006 14:14:46 -0300
+From: "Ulisses Furquim" <ulissesf@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1152287304.5770.15.camel@localhost>
+MIME-Version: 1.0
 References: <1150746967.5012.13.camel@localhost>
 	<44970CBD.8000802@xmission.com> <1152109512.11387.24.camel@localhost>
 	<d23110170607070744u5cdc657cy607db2016a887908@mail.gmail.com>
 	<1152287304.5770.15.camel@localhost>
-	<d23110170607071014p5f60069fj6e6ef41d0034d049@mail.gmail.com>
-Date: Fri, 07 Jul 2006 20:07:26 +0200
-Message-Id: <1152295646.5770.20.camel@localhost>
-Mime-Version: 1.0
 Subject: Re: [Bluez-users] Slow connection to Motorola H500 Headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -24,29 +23,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Ulisses,
+On 7/7/06, Christoph Lukas <christoph.lukas@gmx.net> wrote:
 
-> > Are there any negative side effect of disabling sniff mode?
-> 
-> Yeah, I didn't say but you could have done just that. Though it
-> disables the sniff mode for all ACL connections using the hci0 adapter
-> and we usually don't want this because several devices use the sniff
-> mode to save battery. Thus the negative side effect you might notice
-> is that your devices will probably run out of battery much earlier
-> than before.
+Hi Christoph,
 
-Does entering the sniff mode even save power on the notebooks bluetooth
-device? 
+> In a first try I have used hciconfig to disable sniff mode completely on
+> hci0:
+>
+> hciconfig hci0 lp RSWITCH,HOLD,PARK
+>
+> This made my headset working perfectly!
+>
+> You are my hero!
+>
+> Are there any negative side effect of disabling sniff mode?
 
-> FWIW, I think that your headset doesn't make use of sniff mode correctly.
+Yeah, I didn't say but you could have done just that. Though it
+disables the sniff mode for all ACL connections using the hci0 adapter
+and we usually don't want this because several devices use the sniff
+mode to save battery. Thus the negative side effect you might notice
+is that your devices will probably run out of battery much earlier
+than before.
 
-Do you know any possibility to force a smaller sniff interval for this
-device? Something like 250 msec instead of 2.5 sec? That would probably
-be the best solution.
+FWIW, I think that your headset doesn't make use of sniff mode correctly.
 
-Thanks a lot for your help,
-Christoph
+> Is it needed for some devices?
 
+I really don't know if the sniff mode is mandatory for some devices,
+but I do know that some keyboards/mice like to be in sniff mode all
+the time.
+
+Best regards,
+
+-- Ulisses
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
