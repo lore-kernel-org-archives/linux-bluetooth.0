@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d23110170607071014p5f60069fj6e6ef41d0034d049@mail.gmail.com>
-Date: Fri, 7 Jul 2006 14:14:46 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1152287304.5770.15.camel@localhost>
-MIME-Version: 1.0
+From: Christoph Lukas <christoph.lukas@gmx.net>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d23110170607070744u5cdc657cy607db2016a887908@mail.gmail.com>
 References: <1150746967.5012.13.camel@localhost>
 	<44970CBD.8000802@xmission.com> <1152109512.11387.24.camel@localhost>
 	<d23110170607070744u5cdc657cy607db2016a887908@mail.gmail.com>
-	<1152287304.5770.15.camel@localhost>
+Date: Fri, 07 Jul 2006 17:48:24 +0200
+Message-Id: <1152287304.5770.15.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] Slow connection to Motorola H500 Headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -23,39 +22,49 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 7/7/06, Christoph Lukas <christoph.lukas@gmx.net> wrote:
+Hi Ulisses,
 
-Hi Christoph,
+thanks for your reply.
 
-> In a first try I have used hciconfig to disable sniff mode completely on
-> hci0:
->
-> hciconfig hci0 lp RSWITCH,HOLD,PARK
->
-> This made my headset working perfectly!
->
-> You are my hero!
->
-> Are there any negative side effect of disabling sniff mode?
+> > can anybody tell me what this 'HCI Event: Mode Change (0x14) plen 6' is
+> > about and probably how to prevent this?
+> > A full hcidump from pairing the headset and starting btsco is attached.
+> 
+> First of all, hcidump produce better output when you use -X and -V switches. :-)
 
-Yeah, I didn't say but you could have done just that. Though it
-disables the sniff mode for all ACL connections using the hci0 adapter
-and we usually don't want this because several devices use the sniff
-mode to save battery. Thus the negative side effect you might notice
-is that your devices will probably run out of battery much earlier
-than before.
+Ah, thanks. That would have made it easier.
 
-FWIW, I think that your headset doesn't make use of sniff mode correctly.
+> Well, this mode change event is turning the connection to sniff mode,
+> probably to save some power. And according to your dump the command to
+> change the connection mode was sent by your headset. Looking closer we
+> can see that the interval between two sniff anchor points is 4096
+> baseband slots that give us 2.56 seconds! This really seems to be
+> overkill and it's probably causing the delay you're experiencing.
 
-> Is it needed for some devices?
+Ok. That sounds reasonable. 
 
-I really don't know if the sniff mode is mandatory for some devices,
-but I do know that some keyboards/mice like to be in sniff mode all
-the time.
+> I don't think there's something you can do to avoid this. btsco could
+> change the link policy settings to remove sniff mode, but this would
+> require root privileges and I really don't think btsco shoud do that.
+> Marcel, am I right or is there anything that might be done and I don't
+> know?
 
-Best regards,
+In a first try I have used hciconfig to disable sniff mode completely on
+hci0:
 
--- Ulisses
+hciconfig hci0 lp RSWITCH,HOLD,PARK
+
+This made my headset working perfectly!
+
+You are my hero!
+
+Are there any negative side effect of disabling sniff mode? Is it needed
+for some devices?
+
+Thanks a lot,
+Christoph
+
+
 
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
