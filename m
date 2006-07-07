@@ -1,272 +1,100 @@
-Return-Path: <hch@lst.de>
-Date: Sat, 8 Jul 2006 20:58:33 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: marcel@holtmann.org, maxk@qualcomm.com
-Cc: bluez-devel@lists.sourceforge.net
-Subject: [PATCH] bluetooth: use kthread_ API
-Message-ID: <20060708185833.GA7917@lst.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <44AEC88B.4090803@runbox.com>
+Date: Fri, 07 Jul 2006 21:48:11 +0100
+From: Tom K <tomk@runbox.com>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <44A9923A.4050200@runbox.com>	<e1effdeb0607040642j3c3e0a34l67565401acb2f318@mail.gmail.com>	<44AADFBA.1030901@runbox.com>
+	<e1effdeb0607071117q1a22bb24yfdefc69377c9acb8@mail.gmail.com>
+In-Reply-To: <e1effdeb0607071117q1a22bb24yfdefc69377c9acb8@mail.gmail.com>
+Subject: Re: [Bluez-devel] hcid fails to start after upgrade
+ to	bluez-libs/bluez-utils 3.1 (Continued)
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Claudio Takahasi wrote:
+> Hi Tom,
+>
+> this dump doesn't contain the command status and the command complete events.
+> Could you send it again with "hcidump -X -a -V"?
+>
+> BR,
+> Claudio.
+>   
+OK - how's this:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+$ hcidump -X -a -V -r bt20060704.dump
+HCI sniffer - Bluetooth packet analyzer ver 1.29
+< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
+ > HCI Event: Command Status (0x0f) plen 4
+    Unknown (0x00|0x0000) status 0x00 ncmd 1
+< HCI Command: Read Buffer Size (0x04|0x0005) plen 0
+ > HCI Event: Command Complete (0x0e) plen 12
+    Read Local Supported Features (0x04|0x0003) ncmd 1
+    status 0x00
+    Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
+< HCI Command: Read BD ADDR (0x04|0x0009) plen 0
+ > HCI Event: Command Complete (0x0e) plen 11
+    Read Buffer Size (0x04|0x0005) ncmd 1
+    status 0x00
+    ACL MTU 128:8 SCO MTU 64:8
+< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+ > HCI Event: Command Complete (0x0e) plen 10
+    Read BD ADDR (0x04|0x0009) ncmd 1
+    status 0x00 bdaddr 00:04:76:AD:12:E3
+< HCI Command: Set Event Filter (0x03|0x0005) plen 2
+    type 0 condition 0
+    Clear all filters
+ > HCI Event: Command Complete (0x0e) plen 6
+    Read Voice Setting (0x03|0x0025) ncmd 1
+    status 0x00 voice setting 0x0060
+< HCI Command: Write Page Timeout (0x03|0x0018) plen 2
+    timeout 32768
+ > HCI Event: Command Complete (0x0e) plen 4
+    Set Event Filter (0x03|0x0005) ncmd 1
+    status 0x00
+< HCI Command: Write Connection Accept Timeout (0x03|0x0016) plen 2
+    timeout 32000
+ > HCI Event: Command Complete (0x0e) plen 4
+    Write Page Timeout (0x03|0x0018) ncmd 1
+    status 0x00
+< HCI Command: Read Local Version Information (0x04|0x0001) plen 0
+ > HCI Event: Command Complete (0x0e) plen 4
+    Write Connection Accept Timeout (0x03|0x0016) ncmd 1
+    status 0x00
+ > HCI Event: Command Complete (0x0e) plen 12
+    Read Local Version Information (0x04|0x0001) ncmd 1
+    status 0x00
+    HCI Version: 1.0b (0x0) HCI Revision: 0x61
+    LMP Version: 1.1 (0x1) LMP Subversion: 0x61
+    Manufacturer: Cambridge Silicon Radio (10)
+< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
+ > HCI Event: Command Complete (0x0e) plen 12
+    Read Local Supported Features (0x04|0x0003) ncmd 1
+    status 0x00
+    Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
+< HCI Command: Write Inquiry Mode (0x03|0x0045) plen 1
+    mode 0
+< HCI Command: Reset (0x03|0x0003) plen 0
 
-Index: linux-2.6/net/bluetooth/bnep/bnep.h
-===================================================================
---- linux-2.6.orig/net/bluetooth/bnep/bnep.h	2006-02-16 12:37:32.000000000 +0100
-+++ linux-2.6/net/bluetooth/bnep/bnep.h	2006-07-08 20:20:08.000000000 +0200
-@@ -159,7 +159,7 @@
- 	unsigned int  role;
-         unsigned long state;
-         unsigned long flags;
--	atomic_t      killed;
-+	struct task_struct *thread;
- 
- 	struct ethhdr eh;
- 	struct msghdr msg;
-Index: linux-2.6/net/bluetooth/bnep/core.c
-===================================================================
---- linux-2.6.orig/net/bluetooth/bnep/core.c	2006-07-08 17:44:37.000000000 +0200
-+++ linux-2.6/net/bluetooth/bnep/core.c	2006-07-08 20:20:08.000000000 +0200
-@@ -39,6 +39,7 @@
- #include <linux/errno.h>
- #include <linux/smp_lock.h>
- #include <linux/net.h>
-+#include <linux/kthread.h>
- #include <net/sock.h>
- 
- #include <linux/socket.h>
-@@ -470,13 +471,12 @@
- 
- 	BT_DBG("");
- 
--        daemonize("kbnepd %s", dev->name);
- 	set_user_nice(current, -15);
- 	current->flags |= PF_NOFREEZE;
- 
- 	init_waitqueue_entry(&wait, current);
- 	add_wait_queue(sk->sk_sleep, &wait);
--	while (!atomic_read(&s->killed)) {
-+	while (!kthread_should_stop()) {
- 		set_current_state(TASK_INTERRUPTIBLE);
- 
- 		// RX
-@@ -575,8 +575,9 @@
- 
- 	__bnep_link_session(s);
- 	
--	err = kernel_thread(bnep_session, s, CLONE_KERNEL);
--	if (err < 0) {
-+	s->thread = kthread_run(bnep_session, s, "kbnepd %s", dev->name);
-+	if (IS_ERR(s->thread)) {
-+		err = PTR_ERR(s->thread);
- 		/* Session thread start failed, gotta cleanup. */
- 		unregister_netdev(dev);
- 		__bnep_unlink_session(s);
-@@ -609,8 +610,7 @@
- 		s->sock->sk->sk_err = EUNATCH;
- 		
- 		/* Kill session thread */
--		atomic_inc(&s->killed);
--		wake_up_interruptible(s->sock->sk->sk_sleep);
-+		kthread_stop(s->thread);
- 	} else
- 		err = -ENOENT;
- 
-Index: linux-2.6/net/bluetooth/cmtp/capi.c
-===================================================================
---- linux-2.6.orig/net/bluetooth/cmtp/capi.c	2006-07-08 17:44:37.000000000 +0200
-+++ linux-2.6/net/bluetooth/cmtp/capi.c	2006-07-08 20:20:13.000000000 +0200
-@@ -34,6 +34,7 @@
- #include <linux/ioctl.h>
- #include <linux/file.h>
- #include <linux/wait.h>
-+#include <linux/kthread.h>
- #include <net/sock.h>
- 
- #include <linux/isdn/capilli.h>
-@@ -364,8 +365,7 @@
- 
- 	capi_ctr_reseted(ctrl);
- 
--	atomic_inc(&session->terminate);
--	cmtp_schedule(session);
-+	kthread_stop(session->thread);
- }
- 
- static void cmtp_register_appl(struct capi_ctr *ctrl, __u16 appl, capi_register_params *rp)
-Index: linux-2.6/net/bluetooth/cmtp/cmtp.h
-===================================================================
---- linux-2.6.orig/net/bluetooth/cmtp/cmtp.h	2006-02-16 12:37:32.000000000 +0100
-+++ linux-2.6/net/bluetooth/cmtp/cmtp.h	2006-07-08 20:20:13.000000000 +0200
-@@ -81,7 +81,7 @@
- 
- 	char name[BTNAMSIZ];
- 
--	atomic_t terminate;
-+	struct task_struct *thread;
- 
- 	wait_queue_head_t wait;
- 
-Index: linux-2.6/net/bluetooth/cmtp/core.c
-===================================================================
---- linux-2.6.orig/net/bluetooth/cmtp/core.c	2006-07-08 17:44:37.000000000 +0200
-+++ linux-2.6/net/bluetooth/cmtp/core.c	2006-07-08 20:20:13.000000000 +0200
-@@ -34,6 +34,7 @@
- #include <linux/ioctl.h>
- #include <linux/file.h>
- #include <linux/init.h>
-+#include <linux/kthread.h>
- #include <net/sock.h>
- 
- #include <linux/isdn/capilli.h>
-@@ -285,13 +286,12 @@
- 
- 	BT_DBG("session %p", session);
- 
--	daemonize("kcmtpd_ctr_%d", session->num);
- 	set_user_nice(current, -15);
- 	current->flags |= PF_NOFREEZE;
- 
- 	init_waitqueue_entry(&wait, current);
- 	add_wait_queue(sk->sk_sleep, &wait);
--	while (!atomic_read(&session->terminate)) {
-+	while (!kthread_should_stop()) {
- 		set_current_state(TASK_INTERRUPTIBLE);
- 
- 		if (sk->sk_state != BT_CONNECTED)
-@@ -374,9 +374,12 @@
- 
- 	__cmtp_link_session(session);
- 
--	err = kernel_thread(cmtp_session, session, CLONE_KERNEL);
--	if (err < 0)
-+	session->thread = kthread_run(cmtp_session, session,
-+			"kcmtpd_ctr_%d", session->num);
-+	if (IS_ERR(session->thread)) {
-+		err = PTR_ERR(session->thread);
- 		goto unlink;
-+	}
- 
- 	if (!(session->flags & (1 << CMTP_LOOPBACK))) {
- 		err = cmtp_attach_device(session);
-@@ -414,8 +417,7 @@
- 		skb_queue_purge(&session->transmit);
- 
- 		/* Kill session thread */
--		atomic_inc(&session->terminate);
--		cmtp_schedule(session);
-+		kthread_stop(session->thread);
- 	} else
- 		err = -ENOENT;
- 
-Index: linux-2.6/net/bluetooth/hidp/core.c
-===================================================================
---- linux-2.6.orig/net/bluetooth/hidp/core.c	2006-07-08 17:44:37.000000000 +0200
-+++ linux-2.6/net/bluetooth/hidp/core.c	2006-07-08 20:20:17.000000000 +0200
-@@ -35,6 +35,7 @@
- #include <linux/file.h>
- #include <linux/init.h>
- #include <linux/wait.h>
-+#include <linux/kthread.h>
- #include <net/sock.h>
- 
- #include <linux/input.h>
-@@ -222,8 +223,7 @@
- {
- 	struct hidp_session *session = (struct hidp_session *) arg;
- 
--	atomic_inc(&session->terminate);
--	hidp_schedule(session);
-+	kthread_stop(session->thread);
- }
- 
- static inline void hidp_set_timer(struct hidp_session *session)
-@@ -318,7 +318,7 @@
- 		skb_queue_purge(&session->intr_transmit);
- 
- 		/* Kill session thread */
--		atomic_inc(&session->terminate);
-+		kthread_stop(session->thread);
- 		break;
- 
- 	case HIDP_CTRL_HARD_RESET:
-@@ -460,17 +460,10 @@
- 	struct sock *ctrl_sk = session->ctrl_sock->sk;
- 	struct sock *intr_sk = session->intr_sock->sk;
- 	struct sk_buff *skb;
--	int vendor = 0x0000, product = 0x0000;
- 	wait_queue_t ctrl_wait, intr_wait;
- 
- 	BT_DBG("session %p", session);
- 
--	if (session->input) {
--		vendor  = session->input->id.vendor;
--		product = session->input->id.product;
--	}
--
--	daemonize("khidpd_%04x%04x", vendor, product);
- 	set_user_nice(current, -15);
- 	current->flags |= PF_NOFREEZE;
- 
-@@ -478,7 +471,7 @@
- 	init_waitqueue_entry(&intr_wait, current);
- 	add_wait_queue(ctrl_sk->sk_sleep, &ctrl_wait);
- 	add_wait_queue(intr_sk->sk_sleep, &intr_wait);
--	while (!atomic_read(&session->terminate)) {
-+	while (!kthread_should_stop()) {
- 		set_current_state(TASK_INTERRUPTIBLE);
- 
- 		if (ctrl_sk->sk_state != BT_CONNECTED || intr_sk->sk_state != BT_CONNECTED)
-@@ -574,6 +567,7 @@
- int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock, struct socket *intr_sock)
- {
- 	struct hidp_session *session, *s;
-+	int vendor = 0x0000, product = 0x0000;
- 	int err;
- 
- 	BT_DBG("");
-@@ -630,9 +624,17 @@
- 
- 	hidp_set_timer(session);
- 
--	err = kernel_thread(hidp_session, session, CLONE_KERNEL);
--	if (err < 0)
-+	if (session->input) {
-+		vendor  = session->input->id.vendor;
-+		product = session->input->id.product;
-+	}
-+
-+	session->thread = kthread_run(hidp_session, session,
-+			"khidpd_%04x%04x", vendor, product);
-+	if (IS_ERR(session->thread)) {
-+		err = PTR_ERR(session->thread);
- 		goto unlink;
-+	}
- 
- 	if (session->input) {
- 		hidp_send_ctrl_message(session,
-@@ -684,8 +686,7 @@
- 			skb_queue_purge(&session->intr_transmit);
- 
- 			/* Kill session thread */
--			atomic_inc(&session->terminate);
--			hidp_schedule(session);
-+			kthread_stop(session->thread);
- 		}
- 	} else
- 		err = -ENOENT;
-Index: linux-2.6/net/bluetooth/hidp/hidp.h
-===================================================================
---- linux-2.6.orig/net/bluetooth/hidp/hidp.h	2006-02-16 12:37:31.000000000 +0100
-+++ linux-2.6/net/bluetooth/hidp/hidp.h	2006-07-08 20:20:17.000000000 +0200
-@@ -138,7 +138,7 @@
- 	uint ctrl_mtu;
- 	uint intr_mtu;
- 
--	atomic_t terminate;
-+	struct task_struct *thread;
- 
- 	unsigned char keys[8];
- 	unsigned char leds;
+That's one Status and nine Complete - is that OK, or will I capture a 
+new dump?
+
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
