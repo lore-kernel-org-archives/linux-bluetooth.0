@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <fd77e5b50607092123k8dbc1b0m727e3a070dd17c08@mail.gmail.com>
-Date: Mon, 10 Jul 2006 09:23:13 +0500
-From: "Asif Khan" <asifkhan.sb@gmail.com>
+Date: Mon, 10 Jul 2006 00:58:22 +0200 (CEST)
+From: Jan Slupski <jslupski@juljas.net>
 To: bluez-devel@lists.sourceforge.net
+Message-ID: <Pine.BSO.4.62.0607100038250.13205@tydraniu.sfires.net>
 MIME-Version: 1.0
-Subject: [Bluez-devel] Thanks Mr. Holtmann!!
+Subject: [Bluez-devel] Nokia HS-56W works with btsco
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,73 +14,29 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1799106153=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1799106153==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_24869_20849978.1152505393595"
 
-------=_Part_24869_20849978.1152505393595
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi,
 
-Respected Mr. Holtmann!!
-                                 Hope this email finds you in the best of
-health.
+I would like to say thanks to the btsco authors for their great
+work, and to let you know that I was successful with your driver
+and Nokia HS-56W headset.
 
-              Starting with your advice and the forum you are running, and
-striving till this day, I finally completed my project and displayed it in
-the "Open House" a couple of days back. Not only did I manage to attract the
-professors and company representatives, but I also achieved a prize
-sponsored by a company for Best Project of the year.
-              I must say thanks to all the helpers. You Mr.Holtmann and Mr.
-Albert are on the top of the list. I once again hope and wish that you be in
-the best of health.
+I had to use sco-mtu patch (but this is dongle issue, or not?)
+and except that everything works great.
 
-              Keep running this forum and serving the mankind :)
+I'll let you know about connection/quality issues if any of these 
+show up. Just in case you need to contact me, please cc me directly,
+since I'm not subscribed to the list.
 
-Thanking you,
+Jan Slupski
 
-- Asif Khan
-
-------=_Part_24869_20849978.1152505393595
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>Respected Mr. Holtmann!!<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Hope this email finds you in the best of health. <br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Starting with your advice and the forum you are running, and striving till this day, I finally
-completed my project and displayed it in the &quot;Open House&quot; a couple of
-days back. Not only did I manage to attract the professors and company
-representatives, but I also achieved a prize sponsored by a company for
-Best Project of the year.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-I must say thanks to all the helpers. You Mr.Holtmann and Mr. Albert are on the top of the list. I once again hope and wish that
-you be in the best of health.<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Keep running this forum and serving the mankind :)<br>
-<br>
-Thanking you,<br></div>
-<span class="sg">
-<br>
-- Asif Khan</span>
-
-------=_Part_24869_20849978.1152505393595--
-
-
---===============1799106153==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+    _  _  _  _  _____________________________________________
+    | |_| |\ |  S L U P S K I             jslupski@juljas.net
+  |_| | | | \|                             http://juljas.net/
 
 
 -------------------------------------------------------------------------
@@ -88,16 +44,7 @@ Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-
---===============1799106153==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1799106153==--
