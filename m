@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Adrian Bunk <bunk@stusta.de>
-In-Reply-To: <20060710183154.GD13938@stusta.de>
-References: <20060710183154.GD13938@stusta.de>
-Date: Mon, 10 Jul 2006 21:07:20 +0200
-Message-Id: <1152558440.32554.4.camel@localhost>
+Date: Mon, 10 Jul 2006 13:35:08 +0100
+From: Matthew Garrett <mjg59@srcf.ucam.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20060710123507.GA20928@srcf.ucam.org>
+References: <20060707192112.GA26163@srcf.ucam.org>
+	<1152300678.3693.17.camel@localhost>
 Mime-Version: 1.0
-Cc: netdev@vger.kernel.org, linux390@de.ibm.com, bluez-devel@lists.sf.net,
-        maxk@qualcomm.com, linux-kernel@vger.kernel.org
-Subject: Re: [Bluez-devel] [2.6 patch] let BT_HIDP depend on INPUT
+In-Reply-To: <1152300678.3693.17.camel@localhost>
+Subject: Re: [Bluez-devel] Dbus RFCOMM interface
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,34 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Adrian,
+On Fri, Jul 07, 2006 at 09:31:18PM +0200, Marcel Holtmann wrote:
 
-> This patch let's BT_HIDP depend on instead of select INPUT.
-> 
-> This fixes the following warning during an s390 build:
-> 
-> <--  snip  -->
-> 
-> ...
-> net/bluetooth/hidp/Kconfig:4:warning: 'select' used by config symbol 'BT_HIDP' refer to undefined symbol 'INPUT'
-> ...
-> 
-> <--  snip  -->
-> 
-> A dependency on INPUT also implies !S390 (and therefore makes the 
-> explicit dependency obsolete) since INPUT is not available on s390.
-> 
-> The practical difference should be nearly zero, since INPUT is always 
-> set to y unless EMBEDDED=y (or S390=y).
+> I marked it as experimental, because we might have to change that
+> interface and it is not all of the RFCOMM and SDP stuff is fully
+> implemented. However if you start hcid with -x you will get what is
+> currently implemented.
 
-I actually have no idea why we ended up with using select, but depends
-is also fine by me. Except I like to see it "BT && BT_L2CAP && INPUT" ;)
+Ok. I'll take a look at what's needed in order to implement some of the 
+missing RFCOMM methods.
 
-Regards
-
-Marcel
-
-
+-- 
+Matthew Garrett | mjg59@srcf.ucam.org
 
 
 -------------------------------------------------------------------------
