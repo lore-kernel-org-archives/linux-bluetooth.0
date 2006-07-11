@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 11 Jul 2006 20:39:00 +0100
-From: Matthew Garrett <mjg59@srcf.ucam.org>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20060711193859.GA3569@srcf.ucam.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <44B3F51E.1070009@free.fr>
+References: <44B3F51E.1070009@free.fr>
+Date: Tue, 11 Jul 2006 21:04:30 +0200
+Message-Id: <1152644670.15028.42.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-devel] [Patch] Add dbus method for obtaining RFCOMM channels
+Subject: Re: [Bluez-devel] Broadcom 2035 SCO question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,71 +20,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-So, firstly, this is something that scratches an itch I have for hal 
-integration. I'm entirely open to doing it in an entirely different way 
-if people would prefer that.
+Hi Fabien,
 
-This patch adds a GetRFCOMMChannel dbus method, allowing channels to be 
-added to hal objects. An example use case would be a phone manager - 
-having the channel means that it can simply call a few dbus methods and 
-then have a serial device.
+> I recently purchased a class 1 "sweex" bluetooth USB dongle.  It has a 
+> broadcom bcm2035
+> usb chip( idVendor = 0x0a5c, idProduct = 0x200a). It advertises SCO 
+> mtu=16, sco packets = 0.
+> I tryed to use it with SCO, no luck.(I wasn't surprised by that, given 
+> sco packets = 0) Then i looked at hci usb driver and found it was in the 
+> blacklist, with HCI_BROKEN_ISOC.
+> 
+> I then removed it from this list, forced SCO mtu to 48 and packets 
+> number to 8 by hacking hci_event.c... and guess what, it works !!
+> 
+> So my question is: shouldn't this product marked as HCI_WRONG_SCO_MTU 
+> mtu instead of HCI_BROKEN_ISOC?
 
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus-sdp.c,v
-retrieving revision 1.6
-diff -u -r1.6 dbus-sdp.c
---- dbus-sdp.c	27 Jun 2006 07:33:37 -0000	1.6
-+++ dbus-sdp.c	11 Jul 2006 19:30:50 -0000
-@@ -929,6 +929,38 @@
- 	return send_reply_and_unref(conn, reply);
- }
- 
-+
-+static DBusHandlerResult get_rfcomm_channel(DBusConnection *conn,
-+					    DBusMessage *msg, void *data)
-+{
-+	DBusMessage *reply;
-+	sdp_record_t *rec;
-+	uint32_t identifier;
-+	sdp_list_t *protos;
-+	int channel;
-+
-+	if (!dbus_message_get_args(msg, NULL,
-+				DBUS_TYPE_UINT32, &identifier,
-+				DBUS_TYPE_INVALID))
-+		return error_invalid_arguments(conn, msg);
-+
-+	rec = find_record(identifier);
-+	if (!rec)
-+		return error_record_does_not_exist(conn, msg);
-+
-+	reply = dbus_message_new_method_return(msg);
-+	
-+	if (sdp_get_access_protos(rec, &protos) == 0) {
-+		channel = sdp_get_proto_port(protos, RFCOMM_UUID);
-+	}
-+
-+	dbus_message_append_args(reply,
-+			DBUS_TYPE_UINT32, &channel,
-+			DBUS_TYPE_INVALID);
-+
-+	return send_reply_and_unref(conn, reply);
-+}
-+
- static DBusHandlerResult get_name(DBusConnection *conn,
- 		DBusMessage *msg, void *data)
- {
-@@ -1058,6 +1090,7 @@
- 	{ "GetIdentifiersByService",	get_identifiers_by_service	},
- 	{ "GetUUID",			get_uuid			},
- 	{ "GetName",			get_name			},
-+	{ "GetRFCOMMChannel",		get_rfcomm_channel		},
- 	{ "RegisterRFCOMM",		register_rfcomm			},
- 	{ "UnregisterRFCOMM",		unregister_rfcomm		},
- 	{ NULL, NULL }
+is it enough to change HCI_BROKEN_ISOC into HCI_WRONG_SCO_MTU to make
+this work. If yes, then I am happy to submit a patch.
 
--- 
-Matthew Garrett | mjg59@srcf.ucam.org
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------------------------
