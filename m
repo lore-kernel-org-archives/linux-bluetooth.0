@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <fd77e5b50607092123k8dbc1b0m727e3a070dd17c08@mail.gmail.com>
-References: <fd77e5b50607092123k8dbc1b0m727e3a070dd17c08@mail.gmail.com>
-Date: Tue, 11 Jul 2006 13:28:54 +0200
-Message-Id: <1152617334.15028.22.camel@localhost>
+In-Reply-To: <20060707094252.GA26792@suse.de>
+References: <20060707094252.GA26792@suse.de>
+Date: Tue, 11 Jul 2006 13:24:58 +0200
+Message-Id: <1152617098.15028.16.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Thanks Mr. Holtmann!!
+Subject: Re: [Bluez-devel] kernel: hci_scodata_packet: hci1 SCO packet
+	for	unknown connection handle 0
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,22 +21,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Asif,
+Hi Stefan,
 
->               Starting with your advice and the forum you are running,
-> and striving till this day, I finally completed my project and
-> displayed it in the "Open House" a couple of days back. Not only did I
-> manage to attract the professors and company representatives, but I
-> also achieved a prize sponsored by a company for Best Project of the
-> year.
+> i have an el-cheapo USB BT dongle in front of me that throws an endless
+> stream of
+> kernel: hci_scodata_packet: hci1 SCO packet for unknown connection handle 0
+> after inserting it into the USB port, unless i do
+> echo 1 > /sys/module/hci_usb/parameters/isoc
+> 
+> I don't know about the usual practice in such cases: do those devices get
+> blacklisted in the drivers? If yes, what information should i provide to
+> get it into the blacklist?
 
-if you send me some details about it, I can put up a "Successful
-projects" page and link your projects there.
+what does "hciconfig -a" tells you about this dongle? The content
+from /proc/bus/usb/devices for this device might also be helpful.
 
 Regards
 
 Marcel
-
 
 
 
