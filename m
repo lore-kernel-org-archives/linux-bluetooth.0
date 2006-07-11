@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20060706100912.95773.qmail@web25107.mail.ukl.yahoo.com>
-References: <20060706100912.95773.qmail@web25107.mail.ukl.yahoo.com>
-Date: Tue, 11 Jul 2006 13:18:58 +0200
-Message-Id: <1152616738.15028.12.camel@localhost>
+In-Reply-To: <be976db60607061016yf4cebb1mda306e5c3912b2bc@mail.gmail.com>
+References: <be976db60607061016yf4cebb1mda306e5c3912b2bc@mail.gmail.com>
+Date: Tue, 11 Jul 2006 13:18:07 +0200
+Message-Id: <1152616687.15028.10.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] hcidump of an ok sco connection with a hs?
+Subject: Re: [Bluez-users] hcidump output
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,16 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Salvatore,
+Hi Mark,
 
-> i 'm trying to establish a connection with a headset from a usb/dongle
-> using a my custom usb driver: the acl connection is created, the sco
-> one's is refused. 
-> 1) I'm looking for an output of hcidump related to the creation from
-> scratch of a sco connection, eventually whit sco data,
-> 2) is necessary l2cap packet to start sco transfer?
+> When connecting to my device, I got a "Connection timeout" from sdpd.
+> I did an hcidump but I have no idea how to interpret the output.
+> Specifically, there is a "Command Disallowed" but I don't see what the
+> command is.  Is there a guide online explaining how to interpret
+> hcidump 
+> results?
 
-in general not, but it might be in specific implementations.
+you are in security mode 3. This is not a wise choice and unless you
+really know what you are doing, don't use it.
+
+You also ask for a serial port profile record, but there is non, so an
+error will be returned.
 
 Regards
 
