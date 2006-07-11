@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 11 Jul 2006 15:39:56 +0200
-From: Stefan Seyfried <seife@suse.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060711133956.GD13809@suse.de>
-References: <20060707094252.GA26792@suse.de>
-	<1152617098.15028.16.camel@localhost>
-Mime-Version: 1.0
-In-Reply-To: <1152617098.15028.16.camel@localhost>
-Subject: Re: [Bluez-devel] kernel: hci_scodata_packet: hci1 SCO packet
-	for	unknown connection handle 0
+Message-ID: <20060711133445.70784.qmail@web86907.mail.ukl.yahoo.com>
+Date: Tue, 11 Jul 2006 14:34:45 +0100 (BST)
+From: Zalfarienty Mat Zain <phivetooienty52@yahoo.co.uk>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] de.avetana.bluetooth.connection.BadURLFormat: The URL
+	could not retrieved: Protocol not Supported!
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,109 +15,79 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============0651400148=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+--===============0651400148==
+Content-Type: multipart/alternative; boundary="0-1354061916-1152624885=:68226"
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 11, 2006 at 01:24:58PM +0200, Marcel Holtmann wrote:
-> Hi Stefan,
-> =
+--0-1354061916-1152624885=:68226
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-> > i have an el-cheapo USB BT dongle in front of me that throws an endless
-> > stream of
-> > kernel: hci_scodata_packet: hci1 SCO packet for unknown connection hand=
-le 0
-> > after inserting it into the USB port, unless i do
-> > echo 1 > /sys/module/hci_usb/parameters/isoc
-> > =
+Hi all developers,
 
-> > I don't know about the usual practice in such cases: do those devices g=
-et
-> > blacklisted in the drivers? If yes, what information should i provide to
-> > get it into the blacklist?
-> =
+Does anyone know whether or not possible for me to install BlueZ (Linux) Protocol in Windows?
 
-> what does "hciconfig -a" tells you about this dongle? The content
-
-root@strolchi:~# hciconfig -a hci1
-hci1:   Type: USB
-        BD Address: 00:0C:78:31:11:0A ACL MTU: 339:4 SCO MTU: 60:9
-        UP RUNNING
-        RX bytes:419 acl:0 sco:0 events:19 errors:0
-        TX bytes:319 acl:0 sco:0 commands:17 errors:0
-        Features: 0xff 0xff 0x81 0x00 0x18 0x18 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ strolchi (1)'
-        Class: 0x100100
-        Service Classes:
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x222 LMP Ver: 1.2 (0x2) LMP Subver: 0x=
-222
-        Manufacturer: RTX Telecom A/S (21)
-
-> from /proc/bus/usb/devices for this device might also be helpful.
-
-T:  Bus=3D02 Lev=3D01 Prnt=3D01 Port=3D00 Cnt=3D01 Dev#=3D  3 Spd=3D12  MxC=
-h=3D 0
-D:  Ver=3D 1.10 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 MxPS=3D 8 #Cfgs=3D  1
-P:  Vendor=3D0400 ProdID=3D080a Rev=3D 1.00
-C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3D80 MxPwr=3D  0mA
-I:  If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  64 Ivl=3D1ms
-E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-I:  If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-
-This is all with isoc=3D1, as otherwise my syslog fills quicker than i am
-able to free space on my drive :-)
+or maybe you guys can help me to fix this error . Do I have to initialize the BlueZ stack. Well, I've tried to initialize the BlueZ stack but failed to do so... Err, is it probably because I didn't initialize it in a proper way ?? in terms of programming the initialization?? ... (I'm using the avetana bluetooth libraries). Please please please help me. I'm so sick of this error.
 
 
-Thanks,
+Now Searching for Services ..........
 
-    Stefan
--- =
+Service search completed .....
+SERVICE_SEARCH_COMPLETED
 
-Stefan Seyfried                  \ "I didn't want to write for pay. I
-QA / R&D Team Mobile Devices      \ wanted to be paid for what I write."
-SUSE LINUX Products GmbH, N=FCrnberg \                    -- Leonard Cohen
+Service URL: null
+java.io.IOException: de.avetana.bluetooth.connection.BadURLFormat: The URL could not retrieved: Protocol not supported!
+java.lang.NullPointerException
+        at _J_BluetoothBrowser$BToothInquirer.serviceSearchCompleted(_J_BluetoothBrowser.java:242)
+        at de.avetana.bluetooth.stack.BlueZ$1.serviceSearchCompleted(BlueZ.java:613)
+        at de.avetana.bluetooth.stack.BlueZ.serviceSearchComplete(BlueZ.java:770)
+        at de.avetana.bluetooth.stack.BlueZ.listService(Native Method)
+        at de.avetana.bluetooth.stack.BlueZ$2.run(BlueZ.java:628)
+        at java.lang.Thread.run(Unknown Source)
+
+
+regards
+Zalfarienty
+ 		
+---------------------------------
+ All new Yahoo! Mail "The new Interface is stunning in its simplicity and ease of use." - PC Magazine
+--0-1354061916-1152624885=:68226
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+Hi all developers,<br><br>Does anyone know whether or not possible for me to install BlueZ (Linux) Protocol in Windows?<br><br>or maybe you guys can help me to fix this error . Do I have to initialize the BlueZ stack. Well, I've tried to initialize the BlueZ stack but failed to do so... Err, is it probably because I didn't initialize it in a proper way ?? in terms of programming the initialization?? ... (I'm using the avetana bluetooth libraries). Please please please help me. I'm so sick of this error.<br><br><br>Now Searching for Services ..........<br><br>Service search completed .....<br>SERVICE_SEARCH_COMPLETED<br><br>Service URL: null<br>java.io.IOException: de.avetana.bluetooth.connection.BadURLFormat: The URL could not retrieved: Protocol not supported!<br>java.lang.NullPointerException<br>&nbsp; &nbsp; &nbsp; &nbsp; at _J_BluetoothBrowser$BToothInquirer.serviceSearchCompleted(_J_BluetoothBrowser.java:242)<br>&nbsp; &nbsp; &nbsp; &nbsp; at
+ de.avetana.bluetooth.stack.BlueZ$1.serviceSearchCompleted(BlueZ.java:613)<br>&nbsp; &nbsp; &nbsp; &nbsp; at de.avetana.bluetooth.stack.BlueZ.serviceSearchComplete(BlueZ.java:770)<br>&nbsp; &nbsp; &nbsp; &nbsp; at de.avetana.bluetooth.stack.BlueZ.listService(Native Method)<br>&nbsp; &nbsp; &nbsp; &nbsp; at de.avetana.bluetooth.stack.BlueZ$2.run(BlueZ.java:628)<br>&nbsp; &nbsp; &nbsp; &nbsp; at java.lang.Thread.run(Unknown Source)<br><br><br>regards<br>Zalfarienty<p>&#32;
+		<hr size=1> 
+<a href="http://us.rd.yahoo.com/mail/uk/taglines/default/nowyoucan/pc_mag/*http://us.rd.yahoo.com/evt=40565/*http://uk.docs.yahoo.com/nowyoucan.html">All new Yahoo! Mail</a> "The new Interface is stunning in its simplicity and ease of use." - PC Magazine
+--0-1354061916-1152624885=:68226--
+
+
+--===============0651400148==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+
+--===============0651400148==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0651400148==--
