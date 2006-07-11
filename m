@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20060709104423.40755.qmail@web50508.mail.yahoo.com>
-References: <20060709104423.40755.qmail@web50508.mail.yahoo.com>
-Date: Tue, 11 Jul 2006 13:27:33 +0200
-Message-Id: <1152617253.15028.20.camel@localhost>
+In-Reply-To: <20060706100912.95773.qmail@web25107.mail.ukl.yahoo.com>
+References: <20060706100912.95773.qmail@web25107.mail.ukl.yahoo.com>
+Date: Tue, 11 Jul 2006 13:18:58 +0200
+Message-Id: <1152616738.15028.12.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluetooth USB dongles
+Subject: Re: [Bluez-users] hcidump of an ok sco connection with a hs?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,20 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mahtab,
+Hi Salvatore,
 
-> I am looking for bluetooth USB dongles and kind of require some
-> special information about them which are not typically there in their
-> website or shops! Some requirements would be:
-> 
-> 1. CSR (Cambridge Silicon Radio) chips
-> 2. WidComm stack
+> i 'm trying to establish a connection with a headset from a usb/dongle
+> using a my custom usb driver: the acl connection is created, the sco
+> one's is refused. 
+> 1) I'm looking for an output of hcidump related to the creation from
+> scratch of a sco connection, eventually whit sco data,
+> 2) is necessary l2cap packet to start sco transfer?
 
-you realized that this list deals with Bluetooth and Linux only. It is
-not nice to ask about Windows based software here.
-
-And since Widcomm got bought by Broadcom it is kinda unusual to find a
-CSR based dongle with software from Broadcom ;)
+in general not, but it might be in specific implementations.
 
 Regards
 
