@@ -1,15 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v752.2)
-In-Reply-To: <273ADBB8-1458-4DBB-BE1D-11FF4E7037AB@wideray.com>
-References: <435B3A56-B448-4E26-8BEB-E0879356ACBB@wideray.com>	<1150538876.17539.0.camel@aeonflux.holtmann.net>	<F73F58A0-A537-4ACE-8C56-D5F2D6735F61@wideray.com>
-	<1150741647.4277.30.camel@localhost> <4497A5AC.8050009@yahoo.com>
-	<273ADBB8-1458-4DBB-BE1D-11FF4E7037AB@wideray.com>
-Message-Id: <461B0A95-BB6D-4C36-8EE5-886AFB5665EA@qwikker.com>
-From: Jason Watts <jason.watts@qwikker.com>
-Date: Tue, 11 Jul 2006 15:46:55 -0700
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bug: infinite loop in extract_seq() when
-	sdp_extract_seqtype() fails
+Date: Tue, 11 Jul 2006 20:39:00 +0100
+From: Matthew Garrett <mjg59@srcf.ucam.org>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20060711193859.GA3569@srcf.ucam.org>
+Mime-Version: 1.0
+Subject: [Bluez-devel] [Patch] Add dbus method for obtaining RFCOMM channels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,38 +18,71 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+So, firstly, this is something that scratches an itch I have for hal 
+integration. I'm entirely open to doing it in an entirely different way 
+if people would prefer that.
 
-On Jun 20, 2006, at 12:54 PM, Jason Watts wrote:
+This patch adds a GetRFCOMMChannel dbus method, allowing channels to be 
+added to hal objects. An example use case would be a phone manager - 
+having the channel means that it can simply call a few dbus methods and 
+then have a serial device.
 
-> On Jun 20, 2006, at 12:37 AM, Pedro Monjo Florit wrote:
->
->>>> All I know at this point is that /var/log/messages gets an endless
->>>> flood of
->>>>
->>>>    sdp_extract_seqtype: Unknown sequence type, aborting
->>>>
->>
->>
->> In a message I sent to the mailing-list back in February (Valentine's
->> day), I explained what, IMHO, is the same problem. I have seen this
->> infinite loop being triggered by a Samsung mobile phone, but still do
->> not know which.
->
->
-> I've added code to capture a call chain when this problem occurs.
-> We'll deploy this change and hopefully nail down the problem.
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/dbus-sdp.c,v
+retrieving revision 1.6
+diff -u -r1.6 dbus-sdp.c
+--- dbus-sdp.c	27 Jun 2006 07:33:37 -0000	1.6
++++ dbus-sdp.c	11 Jul 2006 19:30:50 -0000
+@@ -929,6 +929,38 @@
+ 	return send_reply_and_unref(conn, reply);
+ }
+ 
++
++static DBusHandlerResult get_rfcomm_channel(DBusConnection *conn,
++					    DBusMessage *msg, void *data)
++{
++	DBusMessage *reply;
++	sdp_record_t *rec;
++	uint32_t identifier;
++	sdp_list_t *protos;
++	int channel;
++
++	if (!dbus_message_get_args(msg, NULL,
++				DBUS_TYPE_UINT32, &identifier,
++				DBUS_TYPE_INVALID))
++		return error_invalid_arguments(conn, msg);
++
++	rec = find_record(identifier);
++	if (!rec)
++		return error_record_does_not_exist(conn, msg);
++
++	reply = dbus_message_new_method_return(msg);
++	
++	if (sdp_get_access_protos(rec, &protos) == 0) {
++		channel = sdp_get_proto_port(protos, RFCOMM_UUID);
++	}
++
++	dbus_message_append_args(reply,
++			DBUS_TYPE_UINT32, &channel,
++			DBUS_TYPE_INVALID);
++
++	return send_reply_and_unref(conn, reply);
++}
++
+ static DBusHandlerResult get_name(DBusConnection *conn,
+ 		DBusMessage *msg, void *data)
+ {
+@@ -1058,6 +1090,7 @@
+ 	{ "GetIdentifiersByService",	get_identifiers_by_service	},
+ 	{ "GetUUID",			get_uuid			},
+ 	{ "GetName",			get_name			},
++	{ "GetRFCOMMChannel",		get_rfcomm_channel		},
+ 	{ "RegisterRFCOMM",		register_rfcomm			},
+ 	{ "UnregisterRFCOMM",		unregister_rfcomm		},
+ 	{ NULL, NULL }
 
-
-We've traced this to a known problem that occurs in bluez libs 2.10,  
-but was fixed in 2.23 (in sdp.c 1.31).  I was looking at the wrong  
-version of the source code before, so I couldn't find the faulty  
-logic.  It had already been fixed by then!
-
-Thanks for the fix. :-)
-
-Jason Watts
-Embedded Software Engineer
-Qwikker, Inc.
+-- 
+Matthew Garrett | mjg59@srcf.ucam.org
 
 
 -------------------------------------------------------------------------
