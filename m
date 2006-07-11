@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44B3E5CE.20609@free.fr>
-Date: Tue, 11 Jul 2006 19:54:22 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+Date: Tue, 11 Jul 2006 17:45:01 +0200
+From: Stefan Seyfried <seife@suse.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44AE84D4.9080903@palmsource.com>
-In-Reply-To: <44AE84D4.9080903@palmsource.com>
-Subject: Re: [Bluez-devel] Alsa plugin for A2DP daemon
+Message-ID: <20060711154501.GE13809@suse.de>
+References: <20060707094252.GA26792@suse.de>
+	<1152617098.15028.16.camel@localhost>
+	<20060711133956.GD13809@suse.de>
+	<1152625591.15028.35.camel@localhost>
+Mime-Version: 1.0
+In-Reply-To: <1152625591.15028.35.camel@localhost>
+Subject: Re: [Bluez-devel] kernel: hci_scodata_packet: hci1 SCO
+	packet	for	unknown connection handle 0
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,146 +24,56 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi,
 
+On Tue, Jul 11, 2006 at 03:46:31PM +0200, Marcel Holtmann wrote:
+> Hi Stefan,
+ =
 
-Terrific work !! :-)
+> actually with isco=3D1 the SCO transfers are still on, but limited to
+> 8-bit instead of 16-bit with isoc=3D2. So if you have isoc=3D2 it fills up
+> your syslog. Can you extract some of these SCO packets with hcidump for
+> me.
 
-Just a tip: maybe you could use UNIX sockets to remove TCP burden.
+ok, it looks like this (hoping that i invoked hcidump correctly, i am still
+learning this bluetooth thingy :-):
 
-Cheers,
+root@strolchi:~# hcidump -i hci1
+HCI sniffer - Bluetooth packet analyzer ver 1.29
+device: hci1 snap_len: 1028 filter: 0xffffffff
+> SCO data: handle 0 dlen 0
+> SCO data: handle 0 dlen 0
+> SCO data: handle 0 dlen 0
+> SCO data: handle 0 dlen 0
+> SCO data: handle 0 dlen 0
+> SCO data: handle 0 dlen 0
+> SCO data: handle 0 dlen 0
+> SCO data: handle 0 dlen 0
+> SCO data: handle 0 dlen 0
+> SCO data: handle 0 dlen 0
 
-Fabien
+This happens immediately after plugging the thing in, there is no pairing
+or any application involved that might trigger this AFAICT.
 
-> Hi all,
-> =
+> My problem is now that I can only fully blacklist the SCO support for
+> this dongle. I can't force the Bluetooth core into using 8-bit only.
 
->     I've been working with Brad's a2dp plugin for some time now. I =
+Maybe i should try if SCO works at all with this thing :-)
+ =
 
-> hacked it with the idea of having an ipc alsa plugin and an audio daemon =
+> Any chance of a name or identification of this dongle?
 
-> and guess what : today, I have something working pretty well. It fully =
+It is an Abe UB20S, http://www.abe-hk.com/english/products/ub12-22/ub12-22.=
+htm
+The FCC ID is NV6-CS8024.
+It is sold e.g. by conrad.com in germany and pretty cheap (around 10 Euro),
+and it is pretty small (this is why i bought it, i can leave it plugged in
+when putting the notebook into the bag :-)
+-- =
 
-> separate the application and the headset (tcp used for ipc). Thus, you =
-
-> can let the application play audio while having the heaset switched off. =
-
-> Switch on the headset and you will start hearing sound. It also permit =
-
-> having lots of applications using the headset at a time and yes, sound =
-
-> is mixed. You can crash and restart the daemon without interrupting the =
-
-> app. Reverse is possible too.
->     Drawbacks : some ticks in the sound, Tcp may give additionnal burden =
-
-> but for now it seems far from being cpu intensive (if you consider Xeon =
-
-> as being a representative cpu ;).
-> =
-
->     Brad, to do this, I only modified file Makefile.am and added new =
-
-> source code files in the 'alsa-plugins' folder. It will setup next to =
-
-> the original alsa-plugin. Is is called pcm_a2dpd.c. The archive also =
-
-> contain a modified version of pcm_a2dp.c that receives connections on =
-
-> the control socket.
-> =
-
->     You can get a full archive there http://fdalleau.free.fr/btsco.tar.gz
->      I would love to have someone try it on an ARM platform. Next step =
-
-> is volume control!
-> =
-
->     Hope you like it! Documentation follow
-> =
-
->     Fr=E9d=E9ric
-> =
-
-> =
-
-> =
-
-> =
-
-> To build
-> -----------
->     bootstrap && ./configure --enable-alsaplugin && make && sudo make =
-
-> install
->     You may have to create a symbolic link as I had : sudo ln -s =
-
-> /usr/local/lib/alsa-lib  /usr/lib/alsa-lib
-> =
-
-> =
-
-> To run
-> ----------
->     Your headset must be paired.
->     create .asoundrc if you do not have one that contain the following =
-
-> (don't forget backup previous one)
-> pcm.!default {
->         type a2dpd
->         bdaddr "00:11:22:33:44:55"
-> }
-> =
-
-> pcm.a2dpd {
->         type a2dpd
->         bdaddr "00:11:22:33:44:55"
-> }
->     This bluetooth address is needed but not used. Put something that =
-
-> looks like a bluetooth address.
-> =
-
->     restart alsa with : /etc/init.d/alsa-utils restart
-> =
-
->     start your favorite media player configure it to play with alsa, and =
-
-> press play!
-> =
-
->     Oops, we forgot to start the daemon... No problem. Go in the =
-
-> alsa-plugins subfolder of the archive and type : a2dpd AA:BB:CC:DD:EE:FF.
->     where AA:BB:CC:DD:EE:FF is the bluetooth address of your device. =
-
-> Now, switch on your headset. Ctrl-C will quit the daemon.
-> =
-
->     Try to keep with 16bits/stereo sounds!
-> =
-
->     Remove the .asoundrc to restore your sound!
-> =
-
-> =
-
-> =
-
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job ea=
-sier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
-=3D121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> =
-
-> =
-
-
+Stefan Seyfried                  \ "I didn't want to write for pay. I
+QA / R&D Team Mobile Devices      \ wanted to be paid for what I write."
+SUSE LINUX Products GmbH, N=FCrnberg \                    -- Leonard Cohen
 
 
 -------------------------------------------------------------------------
