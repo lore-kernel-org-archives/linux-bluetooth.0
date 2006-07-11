@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <44B3F51E.1070009@free.fr>
+Date: Tue, 11 Jul 2006 20:59:42 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44B3F51E.1070009@free.fr>
-References: <44B3F51E.1070009@free.fr>
-Date: Tue, 11 Jul 2006 21:04:30 +0200
-Message-Id: <1152644670.15028.42.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Broadcom 2035 SCO question
+Subject: [Bluez-devel] Broadcom 2035 SCO question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,30 +18,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
 
-> I recently purchased a class 1 "sweex" bluetooth USB dongle.  It has a 
-> broadcom bcm2035
-> usb chip( idVendor = 0x0a5c, idProduct = 0x200a). It advertises SCO 
-> mtu=16, sco packets = 0.
-> I tryed to use it with SCO, no luck.(I wasn't surprised by that, given 
-> sco packets = 0) Then i looked at hci usb driver and found it was in the 
-> blacklist, with HCI_BROKEN_ISOC.
-> 
-> I then removed it from this list, forced SCO mtu to 48 and packets 
-> number to 8 by hacking hci_event.c... and guess what, it works !!
-> 
-> So my question is: shouldn't this product marked as HCI_WRONG_SCO_MTU 
-> mtu instead of HCI_BROKEN_ISOC?
+Hi all,
 
-is it enough to change HCI_BROKEN_ISOC into HCI_WRONG_SCO_MTU to make
-this work. If yes, then I am happy to submit a patch.
+I recently purchased a class 1 "sweex" bluetooth USB dongle.  It has a 
+broadcom bcm2035
+usb chip( idVendor = 0x0a5c, idProduct = 0x200a). It advertises SCO 
+mtu=16, sco packets = 0.
+I tryed to use it with SCO, no luck.(I wasn't surprised by that, given 
+sco packets = 0) Then i looked at hci usb driver and found it was in the 
+blacklist, with HCI_BROKEN_ISOC.
 
-Regards
+I then removed it from this list, forced SCO mtu to 48 and packets 
+number to 8 by hacking hci_event.c... and guess what, it works !!
 
-Marcel
+So my question is: shouldn't this product marked as HCI_WRONG_SCO_MTU 
+mtu instead of HCI_BROKEN_ISOC?
 
+Cheers,
 
+Fabien
 
 
 -------------------------------------------------------------------------
