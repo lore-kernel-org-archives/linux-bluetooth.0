@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 13 Jul 2006 01:11:01 +0100
-From: Matthew Garrett <mjg59@srcf.ucam.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060713001101.GA17372@srcf.ucam.org>
+In-Reply-To: <20060711193859.GA3569@srcf.ucam.org>
 References: <20060711193859.GA3569@srcf.ucam.org>
-	<1152747138.17416.10.camel@localhost>
+Date: Thu, 13 Jul 2006 01:32:18 +0200
+Message-Id: <1152747138.17416.10.camel@localhost>
 Mime-Version: 1.0
-In-Reply-To: <1152747138.17416.10.camel@localhost>
 Subject: Re: [Bluez-devel] [Patch] Add dbus method for obtaining
 	RFCOMM	channels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -22,34 +21,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, Jul 13, 2006 at 01:32:18AM +0200, Marcel Holtmann wrote:
+Hi Matthew,
 
-> I would actually prefer not to hand the channel around. We have seen
-> devices where the channel changes every time they reboot and so it might
-> not be a good idea. I would prefer using a unique ID to identify the
-> service.
+> So, firstly, this is something that scratches an itch I have for hal 
+> integration. I'm entirely open to doing it in an entirely different way 
+> if people would prefer that.
+> 
+> This patch adds a GetRFCOMMChannel dbus method, allowing channels to be 
+> added to hal objects. An example use case would be a phone manager - 
+> having the channel means that it can simply call a few dbus methods and 
+> then have a serial device.
 
-Ok. Is it possible for a device to have multiple services with the same 
-UUID? If not, is that a reasonable thing to key it off? I noticed the 
-list of services in dbus-api.txt, but it currently seems somewhat 
-smaller than the number of available profiles.
+I would actually prefer not to hand the channel around. We have seen
+devices where the channel changes every time they reboot and so it might
+not be a good idea. I would prefer using a unique ID to identify the
+service.
 
-> One of the bigger goals is a working SDP cache for these kind of task
-> and the knowledge when to refresh the SDP records for a specific
-> service. At the moment it is not fully clear how this can be achieved
-> and we might simply have to play with certain ways and see what works
-> best in the end.
+One of the bigger goals is a working SDP cache for these kind of task
+and the knowledge when to refresh the SDP records for a specific
+service. At the moment it is not fully clear how this can be achieved
+and we might simply have to play with certain ways and see what works
+best in the end.
 
-Is there a practical way of knowing when the device has rebooted? If 
-not, is it possible to simply check the channel on every connection 
-attempt? I'm keen on working on this stuff, but my experience of 
-bluetooth is mostly at the ui level rather than the protocol level. From 
-my point of view, I just want a good way of providing "Get an RFCOMM 
-connection to this device" to user applications :)
+Regards
 
-Thanks,
--- 
-Matthew Garrett | mjg59@srcf.ucam.org
+Marcel
+
+
 
 
 -------------------------------------------------------------------------
