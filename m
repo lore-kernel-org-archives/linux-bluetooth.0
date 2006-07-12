@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: will.voorhees@gmail.com, BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1152677223.5330.12.camel@Godel>
-References: <1152677223.5330.12.camel@Godel>
-Date: Thu, 13 Jul 2006 01:27:52 +0200
-Message-Id: <1152746872.17416.5.camel@localhost>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <5a55627a0607121528w6e2a2b1cqfa167d35327453f0@mail.gmail.com>
+References: <5a55627a0607121528w6e2a2b1cqfa167d35327453f0@mail.gmail.com>
+Date: Thu, 13 Jul 2006 01:23:32 +0200
+Message-Id: <1152746612.17416.2.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Apple Wireless Keyboard
+Subject: Re: [Bluez-users] SDIO support
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,45 +20,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Will,
+Hi Mirza,
 
-> First I'd like to thank you very much for your continued efforts in
-> making Bluetooth on Linux work well. 
-> 
-> I've been trying to get my Logitech MX900 mouse, and Apple wireless
-> keyboard to be recognized on boot on my Ubununtu 6.06 system.
-> Unfortunately documentation for the bluez seems pretty sparse. So far
-> I've edited the /etc/default/bluez-utils file to contain this section:
-> 
-> 
-> ############ HIDD
-> #
-> # To have Bluetooth mouse and keyboard support, get the
-> # Linux 2.6.6 patch or better from bluez.org, and set 
-> # HIDD_ENABLED to 1.
-> HIDD_ENABLED=1
-> HIDD_OPTIONS=" --server --search"
-> HIDD_OPTIONS=" -i 00:07:61:19:FA:E9 --server"
-> HIDD_OPTIONS=" -i 00:0A:95:44:AF:88 --server"
-> # to make hidd always use a particular interface, use something
-> # like this, substituting the bdaddr of the interface:
-> # HIDD_OPTIONS="-i AA:BB:CC:DD:EE:FF --server"
-> #
-> # remove '--master' if you're having trouble working with Ericsson
-> # T630 phones with hidd operational at the same time.
-> 
-> Where 00:07:61:19:FA:E9 is the address of my mouse and 00:0A:95:44:AF:88
-> the address of my keyboard. With this setup I am able to get the mouse
-> to work, but only if I run hidd --search by hand, after boot. 
-> 
-> I've tried enabling security mode three to pair the keyboard(I read in
-> the forum archives that it need it) but that didn't seem to work at all.
-> If anyone could provide me with any details on how to setup my keyboard
-> and mouse I'd really appetite it.
+> I want to know if there is SDIO support in Bluez?
 
-leave the options to " --server" only and make sure the hidd instance is
-running at root. Then only do a "hidd --search" once and all further
-times, the mouse and keyboard will reconnect to you.
+the Linux kernel is missing general SDIO support. We are working on
+having a full SDIO host capable stack for the Linux kernel and after
+that we will also have support for Bluetooth SDIO cards.
 
 Regards
 
