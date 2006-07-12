@@ -1,11 +1,9 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <5a55627a0607121528w6e2a2b1cqfa167d35327453f0@mail.gmail.com>
-References: <5a55627a0607121528w6e2a2b1cqfa167d35327453f0@mail.gmail.com>
-Date: Thu, 13 Jul 2006 01:23:32 +0200
-Message-Id: <1152746612.17416.2.camel@localhost>
-Mime-Version: 1.0
+Message-ID: <5a55627a0607121528w6e2a2b1cqfa167d35327453f0@mail.gmail.com>
+Date: Wed, 12 Jul 2006 15:28:56 -0700
+From: "Mirza Baig" <ambaig@gmail.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
 Subject: Re: [Bluez-users] SDIO support
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -16,23 +14,44 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0288452844=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mirza,
+--===============0288452844==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_15006_6987378.1152743336027"
 
-> I want to know if there is SDIO support in Bluez?
+------=_Part_15006_6987378.1152743336027
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-the Linux kernel is missing general SDIO support. We are working on
-having a full SDIO host capable stack for the Linux kernel and after
-that we will also have support for Bluetooth SDIO cards.
+I want to know if there is SDIO support in Bluez?
 
-Regards
+Thanks
 
-Marcel
+Ahmed
+
+------=_Part_15006_6987378.1152743336027
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<div>I want to know if there is SDIO support in Bluez?</div>
+<div>&nbsp;</div>
+<div>Thanks</div>
+<div>&nbsp;</div>
+<div>Ahmed</div>
+
+------=_Part_15006_6987378.1152743336027--
 
 
+--===============0288452844==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 
 -------------------------------------------------------------------------
@@ -40,7 +59,16 @@ Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+
+--===============0288452844==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0288452844==--
