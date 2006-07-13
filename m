@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 13 Jul 2006 01:42:40 +0100
+Date: Thu, 13 Jul 2006 01:11:01 +0100
 From: Matthew Garrett <mjg59@srcf.ucam.org>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20060713004239.GA17607@srcf.ucam.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20060713001101.GA17372@srcf.ucam.org>
+References: <20060711193859.GA3569@srcf.ucam.org>
+	<1152747138.17416.10.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-devel] A2DP plugin success with HP bluetooth headphones
+In-Reply-To: <1152747138.17416.10.camel@localhost>
+Subject: Re: [Bluez-devel] [Patch] Add dbus method for obtaining
+	RFCOMM	channels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,53 +22,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+On Thu, Jul 13, 2006 at 01:32:18AM +0200, Marcel Holtmann wrote:
 
-I've finally got around to retesting my HP bluetooth headphones with the 
-latest alsa-plugin code. They work almost perfectly, though with 
-occasional brief audio dropouts. There doesn't seem to be any good 
-pattern to these. Is there a good way of diagnosing what the problem 
-might be?
+> I would actually prefer not to hand the channel around. We have seen
+> devices where the channel changes every time they reboot and so it might
+> not be a good idea. I would prefer using a unique ID to identify the
+> service.
 
-Also, hitting "stop" in beep-media-player (using the alsa output plugin) 
-seems to make things unhappy - the next time I hit play, everything 
-looks normal, I get plenty of "SBC Bandwidth =" messages and no audio 
-appears. The log from hitting stop is:
+Ok. Is it possible for a device to have multiple services with the same 
+UUID? If not, is that a reasonable thing to key it off? I noticed the 
+list of services in dbus-api.txt, but it currently seems somewhat 
+smaller than the number of available profiles.
 
-DEBUG: a2dp_stop: a2dp 0x838bd70
-DEBUG: a2dp_stop: Listen thread terminating
-Thread in signal handler 14
-Error while receiving -1 (errno=4:Interrupted system call)
-listen_thread: ending perfeclty
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-DEBUG: a2dp_stop: a2dp 0x838bd70
-DEBUG: a2dp_stop: Listen thread terminating
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-DEBUG: a2dp_close: a2dp Destroying 0x838bd70
-DEBUG: a2dp_close: OK
-DEBUG: _snd_pcm_a2dp_open: name pcm.headphone mode 1
-DEBUG: _snd_pcm_a2dp_open: bdaddr/dest is 00:0D:44:2A:14:66
-DEBUG: a2dp_constraint: TEST a2dp 0x838bd70
-DEBUG: a2dp_params: a2dp 0x838bd70
-DEBUG: a2dp_params: format S16_LE rate 44100 channels 2
-DEBUG: a2dp_params: frame_bytes 4 period_bytes 8192 period_size 2048 
-buffer_size 4096
-DEBUG: a2dp_prepare: a2dp 0x838bd70
-DEBUG: a2dp_prepare: a2dp 0x838bd70
-SBC Bandwidth = 10 kbps [10557 bps]
-DEBUG: a2dp_start: a2dp 0x838bd70
-SBC Bandwidth = 26 kbps [26703 bps]
-SBC Bandwidth = 26 kbps [26703 bps]
+> One of the bigger goals is a working SDP cache for these kind of task
+> and the knowledge when to refresh the SDP records for a specific
+> service. At the moment it is not fully clear how this can be achieved
+> and we might simply have to play with certain ways and see what works
+> best in the end.
 
-and so on. Restarting the player seems to clear things up some of the 
-time, but other times it simply hangs at the connect stream state with 
-"Host is down" (plainly not true - the light is on and it's beeping at 
-me in an irritating way). Trying again after that seems to result in 
-"retrying sdp connect: File descriptor in bad state". Power cycling the 
-headphones seems to make things happy.
+Is there a practical way of knowing when the device has rebooted? If 
+not, is it possible to simply check the channel on every connection 
+attempt? I'm keen on working on this stuff, but my experience of 
+bluetooth is mostly at the ui level rather than the protocol level. From 
+my point of view, I just want a good way of providing "Get an RFCOMM 
+connection to this device" to user applications :)
 
+Thanks,
 -- 
 Matthew Garrett | mjg59@srcf.ucam.org
 
