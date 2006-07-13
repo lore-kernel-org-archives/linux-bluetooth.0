@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 13 Jul 2006 22:06:47 +0200 (CEST)
-From: Andreas Fehr <andreas.fehr@freesurf.ch>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1152820951.4838.76.camel@localhost>
-Message-ID: <Pine.LNX.4.64.0607132205380.4704@ybpnyubfg.ybpnyqbznva>
+In-Reply-To: <Pine.LNX.4.64.0607132135350.4704@ybpnyubfg.ybpnyqbznva>
 References: <Pine.LNX.4.64.0607132135350.4704@ybpnyubfg.ybpnyqbznva>
-	<1152820951.4838.76.camel@localhost>
-MIME-Version: 1.0
+Date: Thu, 13 Jul 2006 22:02:31 +0200
+Message-Id: <1152820951.4838.76.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] rfcomm pairing and timeout
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,23 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Thursday, 13. July 2006, 22:02, Marcel Holtmann (as MH) wrote:
+Hi Andreas,
 
->MH: > I've still a problem with pairing my phone with my bluetooth dongle. My 
->MH: > phone asks me if I want a serial port connection with computer. As soon 
->MH: > as I accept this, the dialog to enter the pin shows but disappears 
->MH: > within about 1 second. Far to few time to enter any pin.
->MH: > 
->MH: > Is there a way to set some other timeout for pairing? Just in case it 
->MH: > helps, I dumped the bluetooth connection below (including timestamps and 
->MH: > some hint where I want the enter the pin). (./hcidump -X -V -t)
->MH: 
->MH: what hardware and what kernel are you using?
+> I've still a problem with pairing my phone with my bluetooth dongle. My 
+> phone asks me if I want a serial port connection with computer. As soon 
+> as I accept this, the dialog to enter the pin shows but disappears 
+> within about 1 second. Far to few time to enter any pin.
+> 
+> Is there a way to set some other timeout for pairing? Just in case it 
+> helps, I dumped the bluetooth connection below (including timestamps and 
+> some hint where I want the enter the pin). (./hcidump -X -V -t)
 
-Hi Marcel
+what hardware and what kernel are you using?
 
-AVM Blue Fritz V2.0
-and Linux 2.6.17.4 
+Regards
+
+Marcel
+
 
 
 
