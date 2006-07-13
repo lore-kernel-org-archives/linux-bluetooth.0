@@ -1,22 +1,56 @@
-Return-Path: <hch@lst.de>
-Date: Fri, 14 Jul 2006 10:03:33 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: maxk@qualcomm.com, bluez-devel@lists.sourceforge.net
-Subject: Re: [PATCH] bluetooth: use kthread_ API
-Message-ID: <20060714080333.GA10043@lst.de>
-References: <20060708185833.GA7917@lst.de> <1152798551.4838.14.camel@localhost>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Date: Fri, 14 Jul 2006 00:36:36 +0100
+From: Matthew Garrett <mjg59@srcf.ucam.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20060713233635.GA29102@srcf.ucam.org>
+References: <7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6E85@eumonex01.palmsource.com>
+	<20060713105346.GA22651@srcf.ucam.org>
+	<44B63E89.1000403@palmsource.com>
+	<20060713125020.GA23616@srcf.ucam.org>
+	<44B676D6.7030909@palmsource.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1152798551.4838.14.camel@localhost>
-List-ID: <bluez-devel.lists.sourceforge.net>
+In-Reply-To: <44B676D6.7030909@palmsource.com>
+Subject: Re: [Bluez-devel] RE : A2DP plugin success with
+	HP	bluetooth	headphones
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="iso-8859-1"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, Jul 13, 2006 at 03:49:11PM +0200, Marcel Holtmann wrote:
-> Hi Christoph,
-> 
-> thanks for the patch. It is in my -mh patch now for further testing.
-> What about RFCOMM. No fun in touching that one?
+On Thu, Jul 13, 2006 at 06:37:42PM +0200, Fr=E9d=E9ric DALLEAU wrote:
 
-Actually I'm pretty sure I had a patch for that aswell.  Unfortunately
-the box I have the kthread patches on doesn't seem to boot currently.
-You'll get the rfcomm patch when I return from Ottawa.
+> I also have a hp bluetooth headset, I had good sound, not the best but go=
+od.
+
+Ok, it turns out that if I use something other than beep-media-player =
+
+(say Rhythmbox), things work much better. The quality still isn't =
+
+perfect, but it's pretty close to just using the traditional a2dp =
+
+driver. So it's probably something pathological in their alsa plugin.
+
+-- =
+
+Matthew Garrett | mjg59@srcf.ucam.org
+
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
