@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Anselm Martin Hoffmeister <anselm@hoffmeister-online.de>
+Date: Thu, 13 Jul 2006 22:06:47 +0200 (CEST)
+From: Andreas Fehr <andreas.fehr@freesurf.ch>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Thu, 13 Jul 2006 23:01:19 +0200
-Message-Id: <1152824480.6204.18.camel@anselm.venusberg.augustinnetz.de>
-Mime-Version: 1.0
-Subject: [Bluez-users] HID device support
+In-Reply-To: <1152820951.4838.76.camel@localhost>
+Message-ID: <Pine.LNX.4.64.0607132205380.4704@ybpnyubfg.ybpnyqbznva>
+References: <Pine.LNX.4.64.0607132135350.4704@ybpnyubfg.ybpnyqbznva>
+	<1152820951.4838.76.camel@localhost>
+MIME-Version: 1.0
+Subject: Re: [Bluez-users] rfcomm pairing and timeout
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,22 +21,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello list,
+On Thursday, 13. July 2006, 22:02, Marcel Holtmann (as MH) wrote:
 
-my web search about the status of HID support in Bluez did not turn out
-too much. As far as my probing went, boot protocol is supported.
+>MH: > I've still a problem with pairing my phone with my bluetooth dongle. My 
+>MH: > phone asks me if I want a serial port connection with computer. As soon 
+>MH: > as I accept this, the dialog to enter the pin shows but disappears 
+>MH: > within about 1 second. Far to few time to enter any pin.
+>MH: > 
+>MH: > Is there a way to set some other timeout for pairing? Just in case it 
+>MH: > helps, I dumped the bluetooth connection below (including timestamps and 
+>MH: > some hint where I want the enter the pin). (./hcidump -X -V -t)
+>MH: 
+>MH: what hardware and what kernel are you using?
 
-I did not manage to get non-boot-protocol devices working though, they
-just turn up as "boot protocol device" although their SDP record
-explicitely contains
+Hi Marcel
 
-Attribute Identifier 0x20e - boot protocol: 0x0
+AVM Blue Fritz V2.0
+and Linux 2.6.17.4 
 
-Should "full HID mode" work, or is that not the case for kernel module
-version 1.1 (2.6.17.4, as from kernel.org)?
-
-Thanks,
-Anselm
 
 
 -------------------------------------------------------------------------
