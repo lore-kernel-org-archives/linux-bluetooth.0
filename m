@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44B676D6.7030909@palmsource.com>
-Date: Thu, 13 Jul 2006 18:37:42 +0200
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6E85@eumonex01.palmsource.com>	<20060713105346.GA22651@srcf.ucam.org>	<44B63E89.1000403@palmsource.com>
-	<20060713125020.GA23616@srcf.ucam.org>
-In-Reply-To: <20060713125020.GA23616@srcf.ucam.org>
-Subject: Re: [Bluez-devel] RE : A2DP plugin success with
-	HP	bluetooth	headphones
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20060708185833.GA7917@lst.de>
+References: <20060708185833.GA7917@lst.de>
+Date: Thu, 13 Jul 2006 15:49:11 +0200
+Message-Id: <1152798551.4838.14.camel@localhost>
+Mime-Version: 1.0
+Cc: bluez-devel@lists.sourceforge.net, maxk@qualcomm.com
+Subject: Re: [Bluez-devel] [PATCH] bluetooth: use kthread_ API
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,28 +21,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi matthew and Brad
+Hi Christoph,
 
->It looks like it should be running at 44.1KHz. This is on a 1.2GHz 
->Pentium M. A quick play suggests that it hits the "overslept" codepath 
->in a2dpd very frequently - should this be the case?
->
->  
->
-I don't see which case you talk about? Is that the "more than on sec"?
-I should never pass there unless when debugging.
+thanks for the patch. It is in my -mh patch now for further testing.
+What about RFCOMM. No fun in touching that one?
 
-I've updated the online version, give it a try, there is a change in timing.
-http://fdalleau.free.fr/btsco.tar.gz
+Regards
 
-I also have a hp bluetooth headset, I had good sound, not the best but good.
-
-Brad,
-I have excellent quality with iPhono BT420
-I also tried the hp on arm (I found one) it is recognisable but not good.
-I believe it is a kernel timer issue (usleep resolution), any ideas?
-
-Frederic
+Marcel
 
 
 
