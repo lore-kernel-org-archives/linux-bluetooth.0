@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+To: bluez-devel@lists.sf.net
 MIME-Version: 1.0
-Date: Thu, 13 Jul 2006 08:52:59 +0200
-Message-ID: <7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6E88@eumonex01.palmsource.com>
-From: "Frederic Dalleau" <Frederic.Dalleau@palmsource.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>,
-        <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] RE :  Alsa plugin for A2DP daemon
+Message-ID: <OFD1707D05.2BB5AEFF-ON652571AA.001326A4-652571AA.00148070@lntinfotech.com>
+From: Gnaanesha Thimmegowda <Gnaanesha.Thimmegowda@lntinfotech.com>
+Date: Thu, 13 Jul 2006 09:13:56 +0530
+Subject: [Bluez-devel] To check the availabillty of blutooth protocol stack
+	for ARM processor
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,35 +15,90 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============0198245718=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-> Terrific work !! :-)
+This is a multipart message in MIME format.
+--===============0198245718==
+Content-Type: multipart/alternative;
+	boundary="=_alternative 0014806D652571AA_="
 
-Thank you :D your work with sco is great too! Wish I had seen it before! I'=
-m gonna use your ctl plugin as a startup base.
+This is a multipart message in MIME format.
+--=_alternative 0014806D652571AA_=
+Content-Type: text/plain; charset="US-ASCII"
 
-> Just a tip: maybe you could use UNIX sockets to remove TCP burden.
+Hii !!
 
-I thought about it, but at the moment, I knew very well internet sockets an=
-d not at all unix sockets... This has not changed yet!
-In the end, I like the fact it works accross computers. So if it must be do=
-ne, it will certainly be configurable.
-I read the main TCP task is a checksum calculation and I can still afford i=
-t.
+I am having a  Bluetooth Protocol stack for X86 processor . 
 
-Fr=E9d=E9ric
+Is the same available for any version of ARM procesor.??
+
+If is available , please let me know.
+
+
+Thanks in advance
+
+Gnaanesha.T
+
+
+
+
+
+
+______________________________________________________________________
+--=_alternative 0014806D652571AA_=
+Content-Type: text/html; charset="US-ASCII"
+
+
+<br><font size=2 face="sans-serif">Hii !!</font>
+<br>
+<br><font size=2 face="sans-serif">I am having a &nbsp;Bluetooth Protocol
+stack for X86 processor . </font>
+<br>
+<br><font size=2 face="sans-serif">Is the same available for any version
+of ARM procesor.??</font>
+<br>
+<br><font size=2 face="sans-serif">If is available , please let me know.</font>
+<br>
+<br>
+<br><font size=2 face="sans-serif">Thanks in advance</font>
+<br>
+<br><font size=2 face="sans-serif">Gnaanesha.T</font>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<BR>
+______________________________________________________________________<BR>
+
+--=_alternative 0014806D652571AA_=--
+
+
+--===============0198245718==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+
+--===============0198245718==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0198245718==--
