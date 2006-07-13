@@ -1,8 +1,8 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 14 Jul 2006 00:36:36 +0100
+Date: Thu, 13 Jul 2006 22:30:21 +0100
 From: Matthew Garrett <mjg59@srcf.ucam.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060713233635.GA29102@srcf.ucam.org>
+Message-ID: <20060713213021.GA28168@srcf.ucam.org>
 References: <7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6E85@eumonex01.palmsource.com>
 	<20060713105346.GA22651@srcf.ucam.org>
 	<44B63E89.1000403@palmsource.com>
@@ -27,17 +27,18 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 On Thu, Jul 13, 2006 at 06:37:42PM +0200, Fr=E9d=E9ric DALLEAU wrote:
 
-> I also have a hp bluetooth headset, I had good sound, not the best but go=
-od.
+> I don't see which case you talk about? Is that the "more than on sec"?
+> I should never pass there unless when debugging.
 
-Ok, it turns out that if I use something other than beep-media-player =
+Sorry, the "We're late, do nothing" case.
 
-(say Rhythmbox), things work much better. The quality still isn't =
+> I've updated the online version, give it a try, there is a change in timi=
+ng.
+> http://fdalleau.free.fr/btsco.tar.gz
 
-perfect, but it's pretty close to just using the traditional a2dp =
+I'll give that a go later on.
 
-driver. So it's probably something pathological in their alsa plugin.
-
+Thanks!
 -- =
 
 Matthew Garrett | mjg59@srcf.ucam.org
