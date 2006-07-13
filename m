@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 14 Jul 2006 06:12:41 +0200 (CEST)
-From: Andreas Fehr <andreas.fehr@freesurf.ch>
+From: "Alexandre Coser Monteiro" <coser@cos.ufrj.br>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1152824695.4838.81.camel@localhost>
-Message-ID: <Pine.LNX.4.64.0607140608250.3992@ybpnyubfg.ybpnyqbznva>
-References: <Pine.LNX.4.64.0607132135350.4704@ybpnyubfg.ybpnyqbznva>
-	<1152820951.4838.76.camel@localhost>
-	<Pine.LNX.4.64.0607132205380.4704@ybpnyubfg.ybpnyqbznva>
-	<1152824695.4838.81.camel@localhost>
+Date: Thu, 13 Jul 2006 20:27:07 -0200
+Message-Id: <20060713213636.M32080@cos.ufrj.br>
+In-Reply-To: <1152824744.4838.83.camel@localhost>
+References: <1152824480.6204.18.camel@anselm.venusberg.augustinnetz.de>
+	<1152824744.4838.83.camel@localhost>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] rfcomm pairing and timeout
+Subject: [Bluez-users] hold mode Disallowed
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,36 +21,104 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Thursday, 13. July 2006, 23:04, Marcel Holtmann (as MH) wrote:
 
->MH: > >MH: > I've still a problem with pairing my phone with my 
->MH: > >MH: > bluetooth dongle. My phone asks me if I want a serial port 
->MH: > >MH: > connection with computer. As soon as I accept this, the 
->MH: > >MH: > dialog to enter the pin shows but disappears within about 
->MH: > >MH: > 1 second. Far to few time to enter any pin.
->MH: > >MH: > 
->MH: > >MH: > Is there a way to set some other timeout for pairing?
->MH: > >MH: 
->MH: > >MH: what hardware and what kernel are you using?
->MH: > 
->MH: > AVM Blue Fritz V2.0
->MH: > and Linux 2.6.17.4 
->MH: 
->MH: and what hardware are you running this on? Is it Intel, AMD, 32-bit or
->MH: 64-bit (uname -a).
+    I`m new in this bluetooth stuff and I`ve tried some experiments for my graduation,
+but I find some problems.
+    I would like to know why my hold command isn`t working ? My connection it is OK, I
+have the hold feature, I set the link policy in Hold mode, but hcidump get an error :
+command disallowed. Why ?
+    At same set, what kind of fault is possible to make sniff mode doesn`t work almost
+evrytime and work at next second time, if I do nothing different to submit the command ?
+    There is some way to set this bluetooth dongle in park mode with this feature not
+show up in feature status of this device ?
+   
+ Thanks for any help !
 
-Hi Marcel,
+--
+Sds,
+ Alexandre
 
-it's a Fujitsu Siemens Lifebook P7020 with a Pentium M 1.1GHz.
+[root@prata ~]# hcitool con Connections:
+        > ACL 00:10:60:B0:B8:F3 handle 6 state 1 lm SLAVE
 
-Linux mycomputer 2.6.17.4 #1 Fri Jul 7 20:43:16 CEST 2006 i686 i686 i386 GNU/Linux
+Machine 2 - Slave
+
+[root@prata ~]# hcitool cmd 0x02 0x0001 0x06 0x00 0x80 0x00 0x40 0x00
+
+HCIDUMP
+
+< HCI Command: Hold Mode (0x02|0x0001) plen 6
+  0000: 06 00 80 00 40 00                                 ....@.> HCI Event: Command
+Status (0x0f) plen 4
+    Hold Mode (0x02|0x0001) status 0x0c ncmd 1
+    Error: Command Disallowed
 
 
-And again, vmware with USB and the same bluetooth dongle does work and 
-the old driver 2.x did work to.
+[root@prata ~]# hciconfig hci0 features
+hci0:   Type: USB
+        BD Address: 00:10:60:B0:B8:69 ACL MTU: 377:10 SCO MTU: 16:0
+        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <RSSI> <channel quality> <SCO link> <HV2 packets>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <power control>
+                <transparent SCO> <enhanced iscan> <interlaced iscan>
+                <interlaced pscan> <AFH cap. slave> <AFH cap. master>
 
 
-Andreas
+
+[root@prata ~]# hciconfig -a hci0
+hci0:   Type: USB
+        BD Address: 00:10:60:B0:B8:69 ACL MTU: 377:10 SCO MTU: 16:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:11885 acl:344 sco:0 events:53 errors:0
+        TX bytes:336 acl:10 sco:0 commands:42 errors:0
+        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: HOLD
+        Link mode: SLAVE ACCEPT
+        Name: 'Broadcom BCM2035'
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
+        Manufacturer: Broadcom Corporation (15)
+
+Machine 1 - Master
+
+[root@helio script]# hciconfig hci0 features
+hci0:   Type: USB
+        BD Address: 00:10:60:B0:B8:F3 ACL MTU: 377:10  SCO MTU: 16:0
+        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <RSSI> <channel quality> <SCO link> <HV2 packets>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <power control>
+                <transparent SCO> <enhanced iscan> <interlaced iscan>
+                <interlaced pscan> <AFH cap. slave> <AFH cap. master>
+
+[root@helio script]#  hciconfig -a hci0
+hci0:   Type: USB
+        BD Address: 00:10:60:B0:B8:F3 ACL MTU: 377:10  SCO MTU: 16:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:9138055 acl:25059 sco:0 events:130106 errors:0
+        TX bytes:8677635 acl:21920 sco:0 commands:125603 errors:0
+        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: HOLD
+        Link mode: SLAVE ACCEPT
+        Name: 'Broadcom BCM2035'
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
+        Manufacturer: Broadcom Corporation (15)
+
+
+
+
+
+
 
 
 -------------------------------------------------------------------------
