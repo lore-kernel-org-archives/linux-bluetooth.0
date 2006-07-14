@@ -1,9 +1,8 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 14 Jul 2006 20:14:42 +0200 (CEST)
-From: Andreas Fehr <andreas@mrs.ch>
+Date: Fri, 14 Jul 2006 20:00:57 +0200
+From: Stefan Seyfried <seife@suse.de>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20060714180057.GH22273@suse.de>
-Message-ID: <Pine.LNX.4.64.0607142012590.23317@ysf-zvav.gfns.pu>
+Message-ID: <20060714180057.GH22273@suse.de>
 References: <Pine.LNX.4.64.0607132135350.4704@ybpnyubfg.ybpnyqbznva>
 	<1152820951.4838.76.camel@localhost>
 	<Pine.LNX.4.64.0607132205380.4704@ybpnyubfg.ybpnyqbznva>
@@ -14,8 +13,8 @@ References: <Pine.LNX.4.64.0607132135350.4704@ybpnyubfg.ybpnyqbznva>
 	<1152862064.13430.9.camel@localhost>
 	<Pine.LNX.4.64.0607140931090.19685@ysf-zvav.gfns.pu>
 	<Pine.LNX.4.64.0607141906370.9987@ybpnyubfg.ybpnyqbznva>
-	<20060714180057.GH22273@suse.de>
-MIME-Version: 1.0
+Mime-Version: 1.0
+In-Reply-To: <Pine.LNX.4.64.0607141906370.9987@ybpnyubfg.ybpnyqbznva>
 Subject: Re: [Bluez-users] rfcomm pairing and timeout
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -26,44 +25,42 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Friday, 14. July 2006, 20:00, Stefan Seyfried (as SS) wrote:
+On Fri, Jul 14, 2006 at 07:26:17PM +0200, Andreas Fehr wrote:
 
->SS: On Fri, Jul 14, 2006 at 07:26:17PM +0200, Andreas Fehr wrote:
->SS: 
->SS: > Anyway... this might be the problem... how do I configure a 
->SS: > pin_helper? I read the announcement of BlueZ 3.0, all I saw was 
->SS: > the new ability with a D-Bus passkey agent. But how to setup? (I 
->SS: > have to admit, I didn't read the D-Bus documentation, but a link 
->SS: > would be nice).
->SS: 
->SS: There is a "passkey-agent" that's compiled but not installed, in 
->SS: the hcid subdirectory. Copy this into your path, then do
+> Anyway... this might be the problem... how do I configure a pin_helper? =
 
-Isn't this the same 'problem' with the agent to be for the incoming 
-connections only?
+> I read the announcement of BlueZ 3.0, all I saw was the new ability with =
 
+> a D-Bus passkey agent. But how to setup? (I have to admit, I didn't read =
 
->SS:     passkey-agent --default 9999
->SS: 
->SS: before trying to pair the phone.
+> the D-Bus documentation, but a link would be nice).
 
-No success... and now I have lost my pairing of the device I created 
-with BlueZ 2.25 :-/
+There is a "passkey-agent" that's compiled but not installed, in the hcid
+subdirectory. Copy this into your path, then do
 
-Thanks anyway for the hint :-)
+    passkey-agent --default 9999
 
-Andreas
+before trying to pair the phone.
+
+This worked for me.
+-- =
+
+Stefan Seyfried                     | "Please, just tell people
+QA / R&D Team Mobile Devices        |               to use KDE."
+SUSE LINUX Products GmbH, N=FCrnberg  |          -- Linus Torvalds
 
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
