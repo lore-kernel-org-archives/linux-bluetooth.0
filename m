@@ -1,10 +1,21 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44BAB94E.9060905@szift.org>
-Date: Mon, 17 Jul 2006 00:10:22 +0200
-From: =?ISO-8859-2?Q?=A3ukasz_Hejnak?= <blue@szift.org>
-MIME-Version: 1.0
-To: Bluetooth <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] BD hardware address problem
+Date: Fri, 14 Jul 2006 21:58:38 +0200
+From: Stefan Seyfried <seife@suse.de>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20060714195838.GA31119@suse.de>
+References: <Pine.LNX.4.64.0607132205380.4704@ybpnyubfg.ybpnyqbznva>
+	<1152824695.4838.81.camel@localhost>
+	<Pine.LNX.4.64.0607140608250.3992@ybpnyubfg.ybpnyqbznva>
+	<20060714064703.GA19807@suse.de>
+	<Pine.LNX.4.64.0607140911530.19575@ysf-zvav.gfns.pu>
+	<1152862064.13430.9.camel@localhost>
+	<Pine.LNX.4.64.0607140931090.19685@ysf-zvav.gfns.pu>
+	<Pine.LNX.4.64.0607141906370.9987@ybpnyubfg.ybpnyqbznva>
+	<20060714180057.GH22273@suse.de>
+	<Pine.LNX.4.64.0607142012590.23317@ysf-zvav.gfns.pu>
+Mime-Version: 1.0
+In-Reply-To: <Pine.LNX.4.64.0607142012590.23317@ysf-zvav.gfns.pu>
+Subject: Re: [Bluez-users] rfcomm pairing and timeout
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,86 +25,57 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi
-I've been trying to make a bluetooth link between two computers, a 
-windows run laptop and my linux box - using two bluetooth usb dongles
+On Fri, Jul 14, 2006 at 08:14:42PM +0200, Andreas Fehr wrote:
+> On Friday, 14. July 2006, 20:00, Stefan Seyfried (as SS) wrote:
+> =
 
-The devices see each other (hcitool inq) but I can't get them connected 
-using pand:
-Jul 16 18:55:20 szift pand[5200]: Connecting to 11:11:11:11:11:11
-Jul 16 18:55:20 szift pand[5200]: Connect to 11:11:11:11:11:11 failed. 
-No route to host(113)
+> >SS: There is a "passkey-agent" that's compiled but not installed, in =
 
-I think the problem is quite obvious: they both have been assigned the 
-same bd address: 11:11:11:11:11:11
-whatever I try, both devices still have the same bd addresses leading 
-even to a situation like this (when connected to the same PC):
+> >SS: the hcid subdirectory. Copy this into your path, then do
+> =
 
-root@szift:/home/szift#hciconfig -a
-hci0:   Type: USB
-         BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 48:10
-         UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-         RX bytes:2511835 acl:13393 sco:0 events:8268 errors:0
-         TX bytes:693525 acl:8233 sco:0 commands:25 errors:0
-         Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
-         Packet type: DM1 DH1 HV1
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: SLAVE ACCEPT
-         Class: 0x3e0100
-         Service Classes: Networking, Rendering, Capturing
-         Device Class: Computer, Uncategorized
-         HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP 
-Subver: 0x1fe
-         Manufacturer: Integrated System Solution Corp. (57)
+> Isn't this the same 'problem' with the agent to be for the incoming =
 
-hci1:   Type: USB
-         BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 48:10
-         UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-         RX bytes:118 acl:0 sco:0 events:15 errors:0
-         TX bytes:312 acl:0 sco:0 commands:15 errors:0
-         Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
-         Packet type: DM1 DH1 HV1
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: SLAVE ACCEPT
-         Class: 0x3e0100
-         Service Classes: Networking, Rendering, Capturing
-         Device Class: Computer, Uncategorized
-         HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP 
-Subver: 0x1fe
-         Manufacturer: Integrated System Solution Corp. (57)
+> connections only?
 
+I don't think so. However, my knowlede comes from lurking in this list
+and playing with bluez-3.1 since ~3 days, so i might be wrong.
 
-So I guess no wonder why pand didn't know which device I've been talking 
-about when I typed 11:11:11...
+> >SS:     passkey-agent --default 9999
+> >SS: =
 
-Apart from this, both devices work fine.
-I tested them with my nokia 6310i to get a gprs connection and it works.
+> >SS: before trying to pair the phone.
+> =
 
-So my question is:
-is there anything I can do to change those bd addresses?
-or is there any other way to get the connection up and going?
+> No success... and now I have lost my pairing of the device I created =
 
-*My target is to share an EDGE link from the windows machine via these 
-bluetooth adapters to my linux box*
+> with BlueZ 2.25 :-/
 
-I use bluez libs/utils 2.25 with a 2.6.16 kernel
-The windows is a XP home with the drivers that were shipped together 
-with the dongles (that side also works fine with the phone).
+Can't you just initiate a pairing from the phone, so you can use the
+passkey in hcid.conf? Maybe that's what i did, which let me claim it
+worked ;-)
 
---
-Best wishes
-Lukasz 'Szift' Hejnak
+I'll play with this stuff more intensively next week and try to put together
+some howto so we can all use our phones until kbluetoothd and co have caught
+up ;-)
+-- =
+
+Stefan Seyfried                     | "Please, just tell people
+QA / R&D Team Mobile Devices        |               to use KDE."
+SUSE LINUX Products GmbH, N=FCrnberg  |          -- Linus Torvalds
 
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
