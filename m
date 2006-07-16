@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44BAD555.6030708@szift.org>
-Date: Mon, 17 Jul 2006 02:09:57 +0200
-From: =?windows-1252?Q?=3Fukasz_Hejnak?= <blue@szift.org>
+Message-ID: <44BAC592.2010705@szift.org>
+Date: Mon, 17 Jul 2006 01:02:42 +0200
+From: =?UTF-8?B?xYF1a2FzeiBIZWpuYWs=?= <blue@szift.org>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
 References: <44BAB94E.9060905@szift.org> <1153088451.19520.1.camel@localhost>
-	<44BAC592.2010705@szift.org>
-In-Reply-To: <44BAC592.2010705@szift.org>
+In-Reply-To: <1153088451.19520.1.camel@localhost>
 Subject: Re: [Bluez-users] BD hardware address problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,28 +20,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-?ukasz Hejnak napisa?(a):
->>> I've been trying to make a bluetooth link between two computers, a 
->>> windows run laptop and my linux box - using two bluetooth usb dongles
->>> I think the problem is quite obvious: they both have been assigned the 
->>> same bd address: 11:11:11:11:11:11
->> this is a known problem and it is these stupid ISSC dongles where the
->> manufacturer doesn't assigned unique addresses to each dongle. You can
->> try to use bdaddr from CVS to set your own address.
 
-> Can't write new address
+>> I've been trying to make a bluetooth link between two computers, a 
+>> windows run laptop and my linux box - using two bluetooth usb dongles
+>> I think the problem is quite obvious: they both have been assigned the 
+>> same bd address: 11:11:11:11:11:11
+>> whatever I try, both devices still have the same bd addresses leading 
+>> even to a situation like this (when connected to the same PC):
+> 
+> this is a known problem and it is these stupid ISSC dongles where the
+> manufacturer doesn't assigned unique addresses to each dongle. You can
+> try to use bdaddr from CVS to set your own address.
 
-of course it couldn't, I wasn't root ;]
-after executing this set of commands
-bdaddr -r -i hci0 22:22:22:22:22:22
-hciconfig hci0 down
-hciconfig hci0 up
-I got the device up and going with the new address and the rest of my 
-config, then I fired up:
-pand -c 11:11:11:11:11:11
-but now it ends with:
-Connect to 11:11:11:11:11:11 failed. Protocol error(71)
-and I'm stuck again ;]
+Hi, thanks for the fast reply, but unluckily that didn't help
+
+szift@szift:~/blue/utils/test$./bdaddr -i hci0 22:22:22:22:22:22
+Manufacturer:   Integrated System Solution Corp. (57)
+Device address: 11:11:11:11:11:11
+New BD address: 22:22:22:22:22:22
+
+Can't write new address
+
+But if I could give You any debug data that could be usefull, just let 
+me know
+
+and btw. Your web-based cvs viewer is down - I had to check the cvs 
+history and guess to get the right module name ;]
 
 --
 Best wishes
