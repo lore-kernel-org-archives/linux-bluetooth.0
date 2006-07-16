@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44BAC592.2010705@szift.org>
-Date: Mon, 17 Jul 2006 01:02:42 +0200
-From: =?UTF-8?B?xYF1a2FzeiBIZWpuYWs=?= <blue@szift.org>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <44BAB94E.9060905@szift.org> <1153088451.19520.1.camel@localhost>
-In-Reply-To: <1153088451.19520.1.camel@localhost>
+In-Reply-To: <44BAB94E.9060905@szift.org>
+References: <44BAB94E.9060905@szift.org>
+Date: Mon, 17 Jul 2006 00:20:51 +0200
+Message-Id: <1153088451.19520.1.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] BD hardware address problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -20,36 +20,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi Lukasz,
 
->> I've been trying to make a bluetooth link between two computers, a 
->> windows run laptop and my linux box - using two bluetooth usb dongles
->> I think the problem is quite obvious: they both have been assigned the 
->> same bd address: 11:11:11:11:11:11
->> whatever I try, both devices still have the same bd addresses leading 
->> even to a situation like this (when connected to the same PC):
+> I've been trying to make a bluetooth link between two computers, a 
+> windows run laptop and my linux box - using two bluetooth usb dongles
 > 
-> this is a known problem and it is these stupid ISSC dongles where the
-> manufacturer doesn't assigned unique addresses to each dongle. You can
-> try to use bdaddr from CVS to set your own address.
+> The devices see each other (hcitool inq) but I can't get them connected 
+> using pand:
+> Jul 16 18:55:20 szift pand[5200]: Connecting to 11:11:11:11:11:11
+> Jul 16 18:55:20 szift pand[5200]: Connect to 11:11:11:11:11:11 failed. 
+> No route to host(113)
+> 
+> I think the problem is quite obvious: they both have been assigned the 
+> same bd address: 11:11:11:11:11:11
+> whatever I try, both devices still have the same bd addresses leading 
+> even to a situation like this (when connected to the same PC):
 
-Hi, thanks for the fast reply, but unluckily that didn't help
+this is a known problem and it is these stupid ISSC dongles where the
+manufacturer doesn't assigned unique addresses to each dongle. You can
+try to use bdaddr from CVS to set your own address.
 
-szift@szift:~/blue/utils/test$./bdaddr -i hci0 22:22:22:22:22:22
-Manufacturer:   Integrated System Solution Corp. (57)
-Device address: 11:11:11:11:11:11
-New BD address: 22:22:22:22:22:22
+Regards
 
-Can't write new address
+Marcel
 
-But if I could give You any debug data that could be usefull, just let 
-me know
 
-and btw. Your web-based cvs viewer is down - I had to check the cvs 
-history and guess to get the right module name ;]
-
---
-Best wishes
-Lukasz 'Szift' Hejnak
 
 
 -------------------------------------------------------------------------
