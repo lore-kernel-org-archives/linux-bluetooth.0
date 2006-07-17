@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 17 Jul 2006 16:56:02 +1000 (EST)
-From: Geoff Shang <geoff@hitsandpieces.net>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.64.0607171648260.1625@data.home>
-MIME-Version: 1.0
-Subject: [Bluez-users] Blootooth 2.0 devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <44BAD555.6030708@szift.org>
+References: <44BAB94E.9060905@szift.org>
+	<1153088451.19520.1.camel@localhost> <44BAC592.2010705@szift.org>
+	<44BAD555.6030708@szift.org>
+Date: Mon, 17 Jul 2006 08:28:13 +0200
+Message-Id: <1153117693.22288.1.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] BD hardware address problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +22,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Lukasz,
 
-Just purchasing some USB bluetooth dongles and wondered how well if at all 
-BlueTooth 2.0 was supported in the BlueZ stack.  If not, what is the most 
-recent revision of the Bluetooth standard that is supported?
+> >>> I've been trying to make a bluetooth link between two computers, a 
+> >>> windows run laptop and my linux box - using two bluetooth usb dongles
+> >>> I think the problem is quite obvious: they both have been assigned the 
+> >>> same bd address: 11:11:11:11:11:11
+> >> this is a known problem and it is these stupid ISSC dongles where the
+> >> manufacturer doesn't assigned unique addresses to each dongle. You can
+> >> try to use bdaddr from CVS to set your own address.
+> 
+> > Can't write new address
+> 
+> of course it couldn't, I wasn't root ;]
+> after executing this set of commands
+> bdaddr -r -i hci0 22:22:22:22:22:22
+> hciconfig hci0 down
+> hciconfig hci0 up
+> I got the device up and going with the new address and the rest of my 
+> config, then I fired up:
+> pand -c 11:11:11:11:11:11
+> but now it ends with:
+> Connect to 11:11:11:11:11:11 failed. Protocol error(71)
+> and I'm stuck again ;]
 
-I'm currently using two Bluetooth 1.1 CSR-based dongles and want to get a 
-higher data rate on my PAN.  Will going up to a 1.2 dongle achieve any 
-speed increase or do I need to make the move to a Bluetooth 2 dongle?
+use a valid BD_ADDR and not an address that will be a broadcast address
+in the Ethernet range. Also run "hcidump -X -V" to see what is really
+going on.
 
-Geoff.
+Regards
+
+Marcel
 
 
--- 
-Geoff Shang <geoff@hitsandpieces.net>
-Phone: +61-418-96-5590
-MSN: geoff@acbradio.org
-
-Make sure your E-mail can be read by everyone!
-http://www.betips.net/etc/evilmail.html
-
-Please avoid sending me Word or PowerPoint attachments.
-See http://www.gnu.org/philosophy/no-word-attachments.html
 
 
 -------------------------------------------------------------------------
