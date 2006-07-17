@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 17 Jul 2006 08:59:32 +0200
-From: Thomas Arendsen Hein <thomas@intevation.de>
+Date: Mon, 17 Jul 2006 16:56:02 +1000 (EST)
+From: Geoff Shang <geoff@hitsandpieces.net>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20060717065932.GA7218@intevation.de>
-References: <Pine.LNX.4.64.0607171648260.1625@data.home>
+Message-ID: <Pine.LNX.4.64.0607171648260.1625@data.home>
 MIME-Version: 1.0
-In-Reply-To: <Pine.LNX.4.64.0607171648260.1625@data.home>
-Subject: Re: [Bluez-users] Blootooth 2.0 devices
+Subject: [Bluez-users] Blootooth 2.0 devices
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,26 +18,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-* Geoff Shang <geoff@hitsandpieces.net> [20060717 08:56]:
-> Just purchasing some USB bluetooth dongles and wondered how well if at all 
-> BlueTooth 2.0 was supported in the BlueZ stack.  If not, what is the most 
-> recent revision of the Bluetooth standard that is supported?
+Hi,
 
-2.0 is supported for quite a while now. I use a CSR-based one with
-the bluez packages for Debian sarge, which are already somewhat old.
+Just purchasing some USB bluetooth dongles and wondered how well if at all 
+BlueTooth 2.0 was supported in the BlueZ stack.  If not, what is the most 
+recent revision of the Bluetooth standard that is supported?
 
-> I'm currently using two Bluetooth 1.1 CSR-based dongles and want to get a 
-> higher data rate on my PAN.  Will going up to a 1.2 dongle achieve any 
-> speed increase or do I need to make the move to a Bluetooth 2 dongle?
+I'm currently using two Bluetooth 1.1 CSR-based dongles and want to get a 
+higher data rate on my PAN.  Will going up to a 1.2 dongle achieve any 
+speed increase or do I need to make the move to a Bluetooth 2 dongle?
 
-1.2 isn't faster, so I'd recommend buying a 2.0 dongle. See the list
-archive for recommended types.
+Geoff.
 
-Thomas
 
 -- 
-Email: thomas@intevation.de
-http://intevation.de/~thomas/
+Geoff Shang <geoff@hitsandpieces.net>
+Phone: +61-418-96-5590
+MSN: geoff@acbradio.org
+
+Make sure your E-mail can be read by everyone!
+http://www.betips.net/etc/evilmail.html
+
+Please avoid sending me Word or PowerPoint attachments.
+See http://www.gnu.org/philosophy/no-word-attachments.html
 
 
 -------------------------------------------------------------------------
