@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <c5cec3110607171638o4f8d4e5cv93b2e708da751c72@mail.gmail.com>
-Date: Tue, 18 Jul 2006 07:38:43 +0800
-From: bees <guoqibi@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <56A271EBD9DF1A4AA4ADDF5075FBB3FB016FD62C@NAEX03.na.qualcomm.com>
 MIME-Version: 1.0
-References: <56A271EBD9DF1A4AA4ADDF5075FBB3FB016FD62C@NAEX03.na.qualcomm.com>
-Subject: Re: [Bluez-users] BlueZ installation Error
+Date: Mon, 17 Jul 2006 15:52:26 -0700
+Message-ID: <56A271EBD9DF1A4AA4ADDF5075FBB3FB016FD62C@NAEX03.na.qualcomm.com>
+From: "Patil, Mahesh" <c_mpatil@qualcomm.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] BlueZ installation Error
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,168 +14,238 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1694496387=="
+Content-Type: multipart/mixed; boundary="===============1135435343=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1694496387==
+This is a multi-part message in MIME format.
+
+--===============1135435343==
+Content-class: urn:content-classes:message
 Content-Type: multipart/alternative;
-	boundary="----=_Part_19337_24907510.1153179523735"
+	boundary="----_=_NextPart_001_01C6A9F3.AD22561A"
 
-------=_Part_19337_24907510.1153179523735
-Content-Type: text/plain; charset=GB2312; format=flowed
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+This is a multi-part message in MIME format.
 
-SGkgUGF0aWw6CiAgICAxLiB0cnkgIm1ha2UiIGJlZm9yZSAibWFrZSBpbnN0YWxsIgogICAgMi4g
-YWRkIHlvdXIgYmx1ZXRvb3RoIGxpYiBwYXRoIHRvICIvZXRjL2xkLnNvLmNvbmYiLCB0aGVuICJs
-ZGNvbmZpZyIKICAgIDMuIGFkZCB5b3VyIHBrZ2NvbmZpZyBwYXRoIHRvICcnUEtHX0NPTkZJR19Q
-QVRIJwogICAgNC4gaWYgeW91ciBibHVleiB2ZXJzaW9uIGlzIDMuMCBvciBoaWdoZXIsIHlvdSBt
-YXkgaW5zdGFsbCBkYnVzIGZpcnN0LgpPdGhlcndpc2UsIHVzZSB0aGUgbG93ZXIgdmVyc2lvbi4g
-c3VjaCBhcyAyLjIwIG9yIDIuMjUsIGFuZCBzbyBvbi4KClJlZ2FyZHMKCkJlZXMKCgoyMDA2Lzcv
-MTgsIFBhdGlsLCBNYWhlc2ggPGNfbXBhdGlsQHF1YWxjb21tLmNvbT46Cj4KPiAgIEhpIEFsbCwK
-Pgo+ICAgIEkgYW0gbmV3YmllIHRvIEJsdWVaLiBJIHRyaWVkIHRvIGluc3RhbGwgaXQgb24gbGlu
-dXggbWFjaGluZSB3aXRoCj4ga2VybmVsIHZlcnNpb24gMi40LjEwLiBJIHRyaWVkIHRvIGluc3Rh
-bGwgdGhlIGxpc3Qgb2YgYmVsb3cgbW9kdWxlcyBmcm9tCj4gaHR0cDovL3d3dy5ibHVlei5vcmcv
-ZG93bmxvYWQuaHRtbAo+Cj4KPgo+IFRoZSBpbnN0YWxsYXRpb24gb2YgYmx1ZXotZmlybXdhcmUt
-MS4yLnRhci5nejxodHRwOi8vd3d3LmJsdWV6Lm9yZy9yZWRpcmVjdC5waHA/dXJsPWh0dHAlM0El
-MkYlMkZibHVlei5zZi5uZXQlMkZkb3dubG9hZCUyRmJsdWV6LWZpcm13YXJlLTEuMi50YXIuZ3o+
-YW5kCj4gYmx1ZXotbGlicy0zLjEudGFyLmd6PGh0dHA6Ly93d3cuYmx1ZXoub3JnL3JlZGlyZWN0
-LnBocD91cmw9aHR0cCUzQSUyRiUyRmJsdWV6LnNmLm5ldCUyRmRvd25sb2FkJTJGYmx1ZXotbGli
-cy0zLjEudGFyLmd6PndlbnQgdGhyb3VnaCBmaW5lLiBCdXQgd2hlbiBJIHRyaWVkIHRoZSBzYW1l
-IHByb2NlZHVyZSBmb3Igb3RoZXIgbW9kdWxlcwo+IGJsdWV6LWhjaWR1bXAtMS4zMS50YXIuZ3o8
-aHR0cDovL3d3dy5ibHVlei5vcmcvcmVkaXJlY3QucGhwP3VybD1odHRwJTNBJTJGJTJGYmx1ZXou
-c2YubmV0JTJGZG93bmxvYWQlMkZibHVlei1oY2lkdW1wLTEuMzEudGFyLmd6PmFuZAo+IGJsdWV6
-LXV0aWxzLTMuMS50YXIuZ3o8aHR0cDovL3d3dy5ibHVlei5vcmcvcmVkaXJlY3QucGhwP3VybD1o
-dHRwJTNBJTJGJTJGYmx1ZXouc2YubmV0JTJGZG93bmxvYWQlMkZibHVlei11dGlscy0zLjEudGFy
-Lmd6PiwgSSBhbSBnZXR0aW5nIGJlbG93IGVycm9yLAo+Cj4KPgo+ICAgIENoZWNraW5nIGZvciBC
-TFVFWqGtLiBDb25maWd1cmUgZXJyb3I6IEJsdWV0b290aCBsaWJyYXJ5IGlzIHJlcXVpcmVkLgo+
-Cj4KPgo+IFRoZSBzdGVwcyBmb2xsb3dlZCBhcmUsCj4KPiAgICAxLiBndW56aXAgPG1vZHVsZT4u
-Z3oKPiAgICAyLiB0YXIgeHZmIDxtb2R1bGU+LnRhcgo+ICAgIDMuIGNkIDxtb2R1bGU+IGRpcmVj
-dG9yeQo+ICAgIDQuIC4vY29uZmlndXJlJwo+ICAgIDUuIG1ha2UgaW5zdGFsbAo+Cj4KPgo+IFBs
-ZWFzZSwgbGV0IG1lIGtub3cgaG93IHRvIHJlc29sdmUgdGhlIGlzc3VlIG9yIHBvaW50ZXJzIHRv
-IGluZm8uCj4KPgo+Cj4gVGhhbmtzISEKPgo+IE1haGVzaAo+Cj4gLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+
-IFRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJVAo+IEpv
-aW4gU291cmNlRm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0aGUgY2hh
-bmNlIHRvIHNoYXJlCj4geW91cgo+IG9waW5pb25zIG9uIElUICYgYnVzaW5lc3MgdG9waWNzIHRo
-cm91Z2ggYnJpZWYgc3VydmV5cyAtLSBhbmQgZWFybiBjYXNoCj4gaHR0cDovL3d3dy50ZWNoc2F5
-LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgo+
-Cj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiBCbHVl
-ei11c2VycyBtYWlsaW5nIGxpc3QKPiBCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQK
-PiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vy
-cwo+Cj4KPgo=
-------=_Part_19337_24907510.1153179523735
-Content-Type: text/html; charset=GB2312
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+------_=_NextPart_001_01C6A9F3.AD22561A
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-PGRpdj5IaSBQYXRpbDo8L2Rpdj4KPGRpdj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsxLiB0cnkg
-JnF1b3Q7bWFrZSZxdW90OyBiZWZvcmUgJnF1b3Q7bWFrZSBpbnN0YWxsJnF1b3Q7PC9kaXY+Cjxk
-aXY+Jm5ic3A7Jm5ic3A7Jm5ic3A7IDIuIGFkZCB5b3VyIGJsdWV0b290aCBsaWIgcGF0aCB0byAm
-cXVvdDsvZXRjL2xkLnNvLmNvbmYmcXVvdDssIHRoZW4gJnF1b3Q7bGRjb25maWcmcXVvdDs8L2Rp
-dj4KPGRpdj4mbmJzcDsmbmJzcDsmbmJzcDsgMy4gYWRkIHlvdXIgcGtnY29uZmlnIHBhdGggdG8g
-JydQS0dfQ09ORklHX1BBVEgnPC9kaXY+CjxkaXY+Jm5ic3A7Jm5ic3A7Jm5ic3A7IDQuIGlmIHlv
-dXIgYmx1ZXogdmVyc2lvbiBpcyAzLjAgb3IgaGlnaGVyLCB5b3UgbWF5IGluc3RhbGwgZGJ1cyBm
-aXJzdC4gT3RoZXJ3aXNlLCB1c2UgdGhlIGxvd2VyIHZlcnNpb24uIHN1Y2ggYXMgMi4yMCBvciAy
-LjI1LCBhbmQgc28gb24uPC9kaXY+CjxkaXY+Jm5ic3A7PC9kaXY+CjxkaXY+UmVnYXJkczwvZGl2
-Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2PkJlZXM8YnI+PGJyPiZuYnNwOzwvZGl2Pgo8ZGl2Pjxz
-cGFuIGNsYXNzPSJnbWFpbF9xdW90ZSI+MjAwNi83LzE4LCBQYXRpbCwgTWFoZXNoICZsdDs8YSBo
-cmVmPSJtYWlsdG86Y19tcGF0aWxAcXVhbGNvbW0uY29tIj5jX21wYXRpbEBxdWFsY29tbS5jb208
-L2E+Jmd0Ozo8L3NwYW4+CjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9IlBB
-RERJTkctTEVGVDogMWV4OyBNQVJHSU46IDBweCAwcHggMHB4IDAuOGV4OyBCT1JERVItTEVGVDog
-I2NjYyAxcHggc29saWQiPgo8ZGl2Pgo8ZGl2IGxhbmc9IkVOLVVTIiB2bGluaz0icHVycGxlIiBs
-aW5rPSJibHVlIj4KPGRpdj4KPHA+PGZvbnQgZmFjZT0iQXJpYWwiIHNpemU9IjIiPjxzcGFuIHN0
-eWxlPSJGT05ULVNJWkU6IDEwcHQ7IEZPTlQtRkFNSUxZOiBBcmlhbCI+SGkgQWxsLDwvc3Bhbj48
-L2ZvbnQ+PC9wPgo8cD48Zm9udCBmYWNlPSJBcmlhbCIgc2l6ZT0iMiI+PHNwYW4gc3R5bGU9IkZP
-TlQtU0laRTogMTBwdDsgRk9OVC1GQU1JTFk6IEFyaWFsIj4mbmJzcDsmbmJzcDsgSSBhbSBuZXdi
-aWUgdG8gQmx1ZVouIEkgdHJpZWQgdG8gaW5zdGFsbCBpdCBvbiBsaW51eCBtYWNoaW5lIHdpdGgg
-a2VybmVsIHZlcnNpb24gMi40LjEwLiBJIHRyaWVkIHRvIGluc3RhbGwgdGhlIGxpc3Qgb2YgYmVs
-b3cgbW9kdWxlcyBmcm9tIAo8YSBvbmNsaWNrPSJyZXR1cm4gdG9wLmpzLk9wZW5FeHRMaW5rKHdp
-bmRvdyxldmVudCx0aGlzKSIgaHJlZj0iaHR0cDovL3d3dy5ibHVlei5vcmcvZG93bmxvYWQuaHRt
-bCIgdGFyZ2V0PSJfYmxhbmsiPmh0dHA6Ly93d3cuYmx1ZXoub3JnL2Rvd25sb2FkLmh0bWw8L2E+
-IDwvc3Bhbj48L2ZvbnQ+PC9wPgo8cD48Zm9udCBmYWNlPSJBcmlhbCIgc2l6ZT0iMiI+PHNwYW4g
-c3R5bGU9IkZPTlQtU0laRTogMTBwdDsgRk9OVC1GQU1JTFk6IEFyaWFsIj4mbmJzcDs8L3NwYW4+
-PC9mb250PjwvcD4KPHA+PGZvbnQgZmFjZT0iQXJpYWwiIHNpemU9IjIiPjxzcGFuIHN0eWxlPSJG
-T05ULVNJWkU6IDEwcHQ7IEZPTlQtRkFNSUxZOiBBcmlhbCI+VGhlIGluc3RhbGxhdGlvbiBvZiA8
-c3BhbiBzdHlsZT0iTEVUVEVSLVNQQUNJTkc6IDAuNjVwdCI+PGEgb25jbGljaz0icmV0dXJuIHRv
-cC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiIGhyZWY9Imh0dHA6Ly93d3cuYmx1
-ZXoub3JnL3JlZGlyZWN0LnBocD91cmw9aHR0cCUzQSUyRiUyRmJsdWV6LnNmLm5ldCUyRmRvd25s
-b2FkJTJGYmx1ZXotZmlybXdhcmUtMS4yLnRhci5neiIgdGFyZ2V0PSJfYmxhbmsiPgpibHVlei1m
-aXJtd2FyZS0xLjIudGFyLmd6PC9hPiBhbmQmbmJzcDsgPGEgb25jbGljaz0icmV0dXJuIHRvcC5q
-cy5PcGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiIGhyZWY9Imh0dHA6Ly93d3cuYmx1ZXou
-b3JnL3JlZGlyZWN0LnBocD91cmw9aHR0cCUzQSUyRiUyRmJsdWV6LnNmLm5ldCUyRmRvd25sb2Fk
-JTJGYmx1ZXotbGlicy0zLjEudGFyLmd6IiB0YXJnZXQ9Il9ibGFuayI+Ymx1ZXotbGlicy0zLjEu
-dGFyLmd6CjwvYT4gd2VudCB0aHJvdWdoIGZpbmUuIEJ1dCB3aGVuIEkgdHJpZWQgdGhlIHNhbWUg
-cHJvY2VkdXJlIGZvciBvdGhlciBtb2R1bGVzIDxhIG9uY2xpY2s9InJldHVybiB0b3AuanMuT3Bl
-bkV4dExpbmsod2luZG93LGV2ZW50LHRoaXMpIiBocmVmPSJodHRwOi8vd3d3LmJsdWV6Lm9yZy9y
-ZWRpcmVjdC5waHA/dXJsPWh0dHAlM0ElMkYlMkZibHVlei5zZi5uZXQlMkZkb3dubG9hZCUyRmJs
-dWV6LWhjaWR1bXAtMS4zMS50YXIuZ3oiIHRhcmdldD0iX2JsYW5rIj4KYmx1ZXotaGNpZHVtcC0x
-LjMxLnRhci5nejwvYT4gYW5kIDxhIG9uY2xpY2s9InJldHVybiB0b3AuanMuT3BlbkV4dExpbmso
-d2luZG93LGV2ZW50LHRoaXMpIiBocmVmPSJodHRwOi8vd3d3LmJsdWV6Lm9yZy9yZWRpcmVjdC5w
-aHA/dXJsPWh0dHAlM0ElMkYlMkZibHVlei5zZi5uZXQlMkZkb3dubG9hZCUyRmJsdWV6LXV0aWxz
-LTMuMS50YXIuZ3oiIHRhcmdldD0iX2JsYW5rIj5ibHVlei11dGlscy0zLjEudGFyLmd6CjwvYT4g
-LCBJIGFtIGdldHRpbmcgYmVsb3cgZXJyb3IsPC9zcGFuPjwvc3Bhbj48L2ZvbnQ+PC9wPgo8cD48
-Zm9udCBmYWNlPSJIZWx2ZXRpY2EiIHNpemU9IjEiPjxzcGFuIHN0eWxlPSJGT05ULVNJWkU6IDcu
-NXB0OyBGT05ULUZBTUlMWTogSGVsdmV0aWNhOyBMRVRURVItU1BBQ0lORzogMC42NXB0Ij4mbmJz
-cDs8L3NwYW4+PC9mb250PjwvcD4KPHA+PGZvbnQgZmFjZT0iSGVsdmV0aWNhIiBzaXplPSIxIj48
-c3BhbiBzdHlsZT0iRk9OVC1TSVpFOiA3LjVwdDsgRk9OVC1GQU1JTFk6IEhlbHZldGljYTsgTEVU
-VEVSLVNQQUNJTkc6IDAuNjVwdCI+Jm5ic3A7Jm5ic3A7IDxmb250IGNvbG9yPSIjZmY2NjAwIj48
-c3BhbiBzdHlsZT0iQ09MT1I6ICNmZjY2MDAiPkNoZWNraW5nIGZvciBCTFVFWqGtLiBDb25maWd1
-cmUgZXJyb3I6IEJsdWV0b290aCBsaWJyYXJ5IGlzIHJlcXVpcmVkLgo8L3NwYW4+PC9mb250Pjwv
-c3Bhbj48L2ZvbnQ+PC9wPgo8cD48Zm9udCBmYWNlPSJIZWx2ZXRpY2EiIHNpemU9IjEiPjxzcGFu
-IHN0eWxlPSJGT05ULVNJWkU6IDcuNXB0OyBGT05ULUZBTUlMWTogSGVsdmV0aWNhOyBMRVRURVIt
-U1BBQ0lORzogMC42NXB0Ij4mbmJzcDs8L3NwYW4+PC9mb250PjwvcD4KPHA+PGZvbnQgZmFjZT0i
-QXJpYWwiIHNpemU9IjIiPjxzcGFuIHN0eWxlPSJGT05ULVNJWkU6IDEwcHQ7IEZPTlQtRkFNSUxZ
-OiBBcmlhbDsgTEVUVEVSLVNQQUNJTkc6IDAuNjVwdCI+VGhlIHN0ZXBzIGZvbGxvd2VkIGFyZSw8
-L3NwYW4+PC9mb250PjwvcD4KPG9sIHN0eWxlPSJNQVJHSU4tVE9QOiAwaW4iIHR5cGU9IjEiPgo8
-bGk+PGZvbnQgZmFjZT0iQXJpYWwiIHNpemU9IjIiPjxzcGFuIHN0eWxlPSJGT05ULVNJWkU6IDEw
-cHQ7IEZPTlQtRkFNSUxZOiBBcmlhbDsgTEVUVEVSLVNQQUNJTkc6IDAuNjVwdCI+Z3VuemlwICZs
-dDttb2R1bGUmZ3Q7Lmd6PC9zcGFuPjwvZm9udD4gCjxsaT48Zm9udCBmYWNlPSJBcmlhbCIgc2l6
-ZT0iMiI+PHNwYW4gc3R5bGU9IkZPTlQtU0laRTogMTBwdDsgRk9OVC1GQU1JTFk6IEFyaWFsOyBM
-RVRURVItU1BBQ0lORzogMC42NXB0Ij50YXIgeHZmICZsdDttb2R1bGUmZ3Q7LnRhcjwvc3Bhbj48
-L2ZvbnQ+IAo8bGk+PGZvbnQgZmFjZT0iQXJpYWwiIHNpemU9IjIiPjxzcGFuIHN0eWxlPSJGT05U
-LVNJWkU6IDEwcHQ7IEZPTlQtRkFNSUxZOiBBcmlhbDsgTEVUVEVSLVNQQUNJTkc6IDAuNjVwdCI+
-Y2QgJmx0O21vZHVsZSZndDsgZGlyZWN0b3J5PC9zcGFuPjwvZm9udD4gCjxsaT48Zm9udCBmYWNl
-PSJBcmlhbCIgc2l6ZT0iMiI+PHNwYW4gc3R5bGU9IkZPTlQtU0laRTogMTBwdDsgRk9OVC1GQU1J
-TFk6IEFyaWFsOyBMRVRURVItU1BBQ0lORzogMC42NXB0Ij4uL2NvbmZpZ3VyZSc8L3NwYW4+PC9m
-b250PiAKPGxpPjxmb250IGZhY2U9IkFyaWFsIiBzaXplPSIyIj48c3BhbiBzdHlsZT0iRk9OVC1T
-SVpFOiAxMHB0OyBGT05ULUZBTUlMWTogQXJpYWw7IExFVFRFUi1TUEFDSU5HOiAwLjY1cHQiPm1h
-a2UgaW5zdGFsbDwvc3Bhbj48L2ZvbnQ+IDwvbGk+PC9saT48L2xpPjwvbGk+PC9saT48L29sPgo8
-cCBzdHlsZT0iTUFSR0lOLUxFRlQ6IDAuMjVpbiI+PGZvbnQgZmFjZT0iQXJpYWwiIHNpemU9IjIi
-PjxzcGFuIHN0eWxlPSJGT05ULVNJWkU6IDEwcHQ7IEZPTlQtRkFNSUxZOiBBcmlhbCI+Jm5ic3A7
-PC9zcGFuPjwvZm9udD48L3A+CjxwIHN0eWxlPSJNQVJHSU4tTEVGVDogMC4yNWluIj48Zm9udCBm
-YWNlPSJBcmlhbCIgc2l6ZT0iMiI+PHNwYW4gc3R5bGU9IkZPTlQtU0laRTogMTBwdDsgRk9OVC1G
-QU1JTFk6IEFyaWFsIj5QbGVhc2UsIGxldCBtZSBrbm93IGhvdyB0byByZXNvbHZlIHRoZSBpc3N1
-ZSBvciBwb2ludGVycyB0byBpbmZvLjwvc3Bhbj48L2ZvbnQ+PC9wPgo8cCBzdHlsZT0iTUFSR0lO
-LUxFRlQ6IDAuMjVpbiI+PGZvbnQgZmFjZT0iQXJpYWwiIHNpemU9IjIiPjxzcGFuIHN0eWxlPSJG
-T05ULVNJWkU6IDEwcHQ7IEZPTlQtRkFNSUxZOiBBcmlhbCI+Jm5ic3A7PC9zcGFuPjwvZm9udD48
-L3A+CjxwPjxmb250IGZhY2U9IkFyaWFsIiBzaXplPSIyIj48c3BhbiBzdHlsZT0iRk9OVC1TSVpF
-OiAxMHB0OyBGT05ULUZBTUlMWTogQXJpYWwiPlRoYW5rcyEhPC9zcGFuPjwvZm9udD48L3A+Cjxw
-Pjxmb250IGZhY2U9IkFyaWFsIiBzaXplPSIyIj48c3BhbiBzdHlsZT0iRk9OVC1TSVpFOiAxMHB0
-OyBGT05ULUZBTUlMWTogQXJpYWwiPk1haGVzaDwvc3Bhbj48L2ZvbnQ+PC9wPjwvZGl2PjwvZGl2
-PjwvZGl2Pjxicj4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPGJyPlRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJ
-bmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJVAo8YnI+Sm9pbiBTb3VyY2VGb3JnZS5uZXQncyBUZWNo
-c2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hhcmUgeW91cjxicj5vcGlu
-aW9ucyBvbiBJVCAmYW1wOyBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0t
-IGFuZCBlYXJuIGNhc2g8YnI+PGEgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3
-aW5kb3csZXZlbnQsdGhpcykiIGhyZWY9Imh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5w
-aHA/cGFnZT1qb2luLnBocCZhbXA7cD1zb3VyY2Vmb3JnZSZhbXA7Q0lEPURFVkRFViIgdGFyZ2V0
-PSJfYmxhbmsiPgpodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5w
-aHAmYW1wO3A9c291cmNlZm9yZ2UmYW1wO0NJRD1ERVZERVY8L2E+PGJyPjxicj5fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXzxicj5CbHVlei11c2VycyBtYWls
-aW5nIGxpc3Q8YnI+PGEgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5kb3cs
-ZXZlbnQsdGhpcykiIGhyZWY9Im1haWx0bzpCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5u
-ZXQiPgpCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQ8L2E+PGJyPjxhIG9uY2xpY2s9
-InJldHVybiB0b3AuanMuT3BlbkV4dExpbmsod2luZG93LGV2ZW50LHRoaXMpIiBocmVmPSJodHRw
-czovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2VycyIgdGFy
-Z2V0PSJfYmxhbmsiPmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZv
-L2JsdWV6LXVzZXJzCjwvYT48YnI+PGJyPjxicj48L2Jsb2NrcXVvdGU+PC9kaXY+PGJyPgo=
-------=_Part_19337_24907510.1153179523735--
+Hi All,
+
+   I am newbie to BlueZ. I tried to install it on linux machine with
+kernel version 2.4.10. I tried to install the list of below modules from
+http://www.bluez.org/download.html=20
+
+=20
+
+The installation of bluez-firmware-1.2.tar.gz
+<http://www.bluez.org/redirect.php?url=3Dhttp%3A%2F%2Fbluez.sf.net%2Fdown=
+l
+oad%2Fbluez-firmware-1.2.tar.gz>  and  bluez-libs-3.1.tar.gz
+<http://www.bluez.org/redirect.php?url=3Dhttp%3A%2F%2Fbluez.sf.net%2Fdown=
+l
+oad%2Fbluez-libs-3.1.tar.gz>  went through fine. But when I tried the
+same procedure for other modules bluez-hcidump-1.31.tar.gz
+<http://www.bluez.org/redirect.php?url=3Dhttp%3A%2F%2Fbluez.sf.net%2Fdown=
+l
+oad%2Fbluez-hcidump-1.31.tar.gz>  and bluez-utils-3.1.tar.gz
+<http://www.bluez.org/redirect.php?url=3Dhttp%3A%2F%2Fbluez.sf.net%2Fdown=
+l
+oad%2Fbluez-utils-3.1.tar.gz>  , I am getting below error,
+
+=20
+
+   Checking for BLUEZ.... Configure error: Bluetooth library is
+required.
+
+=20
+
+The steps followed are,
+
+1.	gunzip <module>.gz
+2.	tar xvf <module>.tar
+3.	cd <module> directory
+4.	./configure'
+5.	make install
+
+=20
+
+Please, let me know how to resolve the issue or pointers to info.
+
+=20
+
+Thanks!!
+
+Mahesh
 
 
---===============1694496387==
+------_=_NextPart_001_01C6A9F3.AD22561A
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dus-ascii">
+<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Helvetica;
+	panose-1:2 11 6 4 2 2 2 2 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+ ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+-->
+</style>
+
+</head>
+
+<body lang=3DEN-US link=3Dblue vlink=3Dpurple>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Hi All,</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>&nbsp;&nbsp; I am newbie to BlueZ. I tried to install =
+it on
+linux machine with kernel version 2.4.10. I tried to install the list of =
+below
+modules from <a =
+href=3D"http://www.bluez.org/download.html">http://www.bluez.org/download=
+.html</a>
+</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>The installation of <span =
+style=3D'letter-spacing:.65pt'><a
+href=3D"http://www.bluez.org/redirect.php?url=3Dhttp%3A%2F%2Fbluez.sf.net=
+%2Fdownload%2Fbluez-firmware-1.2.tar.gz">bluez-firmware-1.2.tar.gz</a>
+and&nbsp; <a
+href=3D"http://www.bluez.org/redirect.php?url=3Dhttp%3A%2F%2Fbluez.sf.net=
+%2Fdownload%2Fbluez-libs-3.1.tar.gz">bluez-libs-3.1.tar.gz</a>
+went through fine. But when I tried the same procedure for other modules =
+<a
+href=3D"http://www.bluez.org/redirect.php?url=3Dhttp%3A%2F%2Fbluez.sf.net=
+%2Fdownload%2Fbluez-hcidump-1.31.tar.gz">bluez-hcidump-1.31.tar.gz</a>
+and <a
+href=3D"http://www.bluez.org/redirect.php?url=3Dhttp%3A%2F%2Fbluez.sf.net=
+%2Fdownload%2Fbluez-utils-3.1.tar.gz">bluez-utils-3.1.tar.gz</a>
+, I am getting below error,</span></span></font></p>
+
+<p class=3DMsoNormal><font size=3D1 face=3DHelvetica><span =
+style=3D'font-size:7.5pt;
+font-family:Helvetica;letter-spacing:.65pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D1 face=3DHelvetica><span =
+style=3D'font-size:7.5pt;
+font-family:Helvetica;letter-spacing:.65pt'>&nbsp;&nbsp; <font =
+color=3D"#ff6600"><span
+style=3D'color:#FF6600'>Checking for BLUEZ&#8230;. Configure error: =
+Bluetooth
+library is required.</span></font></span></font></p>
+
+<p class=3DMsoNormal><font size=3D1 face=3DHelvetica><span =
+style=3D'font-size:7.5pt;
+font-family:Helvetica;letter-spacing:.65pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial;letter-spacing:.65pt'>The steps followed =
+are,</span></font></p>
+
+<ol style=3D'margin-top:0in' start=3D1 type=3D1>
+ <li class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+     font-family:Arial;letter-spacing:.65pt'>gunzip =
+&lt;module&gt;.gz</span></font></li>
+ <li class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+     font-family:Arial;letter-spacing:.65pt'>tar xvf =
+&lt;module&gt;.tar</span></font></li>
+ <li class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+     font-family:Arial;letter-spacing:.65pt'>cd &lt;module&gt; =
+directory</span></font></li>
+ <li class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+     =
+font-family:Arial;letter-spacing:.65pt'>./configure&#8217;</span></font><=
+/li>
+ <li class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+     font-family:Arial;letter-spacing:.65pt'>make =
+install</span></font></li>
+</ol>
+
+<p class=3DMsoNormal style=3D'margin-left:.25in'><font size=3D2 =
+face=3DArial><span
+style=3D'font-size:10.0pt;font-family:Arial'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal style=3D'margin-left:.25in'><font size=3D2 =
+face=3DArial><span
+style=3D'font-size:10.0pt;font-family:Arial'>Please, let me know how to =
+resolve
+the issue or pointers to info.</span></font></p>
+
+<p class=3DMsoNormal style=3D'margin-left:.25in'><font size=3D2 =
+face=3DArial><span
+style=3D'font-size:10.0pt;font-family:Arial'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Thanks!!</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Mahesh</span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------_=_NextPart_001_01C6A9F3.AD22561A--
+
+
+--===============1135435343==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -188,7 +256,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1694496387==
+--===============1135435343==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -199,4 +267,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1694496387==--
+--===============1135435343==--
