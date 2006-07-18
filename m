@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-In-Reply-To: <1153218888.2497.15.camel@johannes.berg>
-References: <1153218888.2497.15.camel@johannes.berg>
-Date: Tue, 18 Jul 2006 12:40:54 +0200
-Message-Id: <1153219254.4639.2.camel@localhost>
-Mime-Version: 1.0
-Cc: bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] K600i and hidp
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Tue, 18 Jul 2006 16:44:04 +1000
+MIME-Version: 1.0
+Message-Id: <200607181644.05026.denis.kenzior@trolltech.com>
+Subject: [Bluez-devel] DBUS API - Service Classes as ints?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,36 +18,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Johannes,
+Marcel,
 
-> When I recently tried the remote control feature on my K600i, I noticed
-> that it wouldn't work because the phone doesn't advertise proper
-> capabilities. I put into my notes:
-> 
-> [...]
-> Apparently the phone has a bug and doesn't describe its subclass
-> properly, it seems to never send the bits 0x80 or 0x40 in it, while that
-> is required. I had to patch the hidp_setup_input function in
-> net/bluetooth/hidp/core.c (lines 546 and 562) to ignore the subclass
-> bits.
-> [...]
-> 
-> Can we have some sort of device quirk table here to ignore the subclass
-> bits for certain devices?
+Is it a good idea/Are there any plans to extend the current DBUS API to enable 
+Major/Minor/Service classes of the local Adapter to be available/settable in 
+integer form? The string representations are nice and user-friendly, however 
+we need to maintain internationalized versions of these, so doing conversion 
+ourselves is much easier.  
 
-you can use "hidd --subclass=<val> ..." for this.
+This would also solve the problem of combination minor device numbers (e.g. in 
+case of peripherals).  How would you set "Pointing device" + "Joystick" via 
+the current API?  It would also bring the API closer in line with the 
+RemoteDevice API which uses uint32 to represent the class.
 
-> (Oh and another question is -- how about moving all this into the
-> userspace daemon and using uinput?)
+Perhaps SetClass(uint32) and 
+uint32 GetClass()?
 
-The overall goal is to merge the USB HID driver with the Bluetooth HID
-and this is one reason why it is inside the kernel. The other is that we
-need good latency for HID.
+If this is wanted, I can work on a patch.
 
-Regards
-
-Marcel
-
+-Denis
 
 
 -------------------------------------------------------------------------
