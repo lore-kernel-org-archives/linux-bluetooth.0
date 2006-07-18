@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1153205453.7078.12.camel@pc044.coreteam.oslo.opera.com>
-References: <1153205453.7078.12.camel@pc044.coreteam.oslo.opera.com>
-Date: Tue, 18 Jul 2006 12:42:22 +0200
-Message-Id: <1153219342.4639.5.camel@localhost>
+From: Per Thomas Jahr <perja@extern.uio.no>
+To: bluez-users@lists.sourceforge.net
+Date: Tue, 18 Jul 2006 08:50:53 +0200
+Message-Id: <1153205453.7078.12.camel@pc044.coreteam.oslo.opera.com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Is the CNET CBD-220 bluetooth adapter supported?
+Subject: [Bluez-users] Is the CNET CBD-220 bluetooth adapter supported?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,25 +18,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Per,
+Hi, 
 
-> I'm planning to get a new bluetooth adapter. Does anyone know if this
-> adapter is supported by bluez:
-> 
-> CBD-220 Bluetooth V2.0 USB Adapter
-> http://www.cnet.com.tw/product/cbd-220.htm
+I'm planning to get a new bluetooth adapter. Does anyone know if this
+adapter is supported by bluez:
 
-I don't see any reason why this adapter doesn't. If it doesn't work, we
-make it work.
+CBD-220 Bluetooth V2.0 USB Adapter
+http://www.cnet.com.tw/product/cbd-220.htm
 
-However you might wanna make sure to buy an adapter with a CSR BlueCore4
-chip inside to not see any weird surprises. These chips are known to
-work best.
-
-Regards
-
-Marcel
-
+Thanks
+-- 
+Per Thomas
 
 
 -------------------------------------------------------------------------
