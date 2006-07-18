@@ -1,20 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Dan Williams <dcbw@redhat.com>
-In-Reply-To: <1152900486.15253.0.camel@localhost.localdomain>
-References: <1152893105.14037.21.camel@localhost.localdomain>
-	<1152894124.25660.33.camel@localhost>
-	<1152894617.14037.45.camel@localhost.localdomain>
-	<1152895158.25660.37.camel@localhost>
-	<1152895689.14037.50.camel@localhost.localdomain>
-	<1152896210.25660.39.camel@localhost>
-	<1152900486.15253.0.camel@localhost.localdomain>
-Date: Tue, 18 Jul 2006 13:02:14 +0200
-Message-Id: <1153220534.4639.25.camel@localhost>
+To: Kamil =?UTF-8?Q?Kami=C5=84ski?= <kamilkaminski@1liceum.pl>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200607171807.03528.kamilkaminski@1liceum.pl>
+References: <200607171807.03528.kamilkaminski@1liceum.pl>
+Date: Tue, 18 Jul 2006 12:55:14 +0200
+Message-Id: <1153220114.4639.19.camel@localhost>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SCO MTU fix needed for Kensington Bluetooth USB
-	Adapter
+Subject: Re: [Bluez-devel] Bluex 3.x pairing devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -28,36 +21,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Dan,
+Hi Kamil,
 
-> > > > please also send "hciconfig hci0 features" (I don't like to decode that
-> > > 
-> > > [localhost ~]# /usr/sbin/hciconfig hci0 features
-> > > hci0:   Type: USB
-> > >         BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 377:10 SCO MTU: 16:0
-> > >         Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-> > >                 <3-slot packets> <5-slot packets> <encryption> <slot offset> 
-> > >                 <timing accuracy> <role switch> <hold mode> <sniff mode> 
-> > >                 <RSSI> <channel quality> <SCO link> <HV2 packets> 
-> > >                 <HV3 packets> <u-law log> <A-law log> <CVSD> <power control> 
-> > >                 <transparent SCO> <enhanced iscan> <interlaced iscan> 
-> > >                 <interlaced pscan> <AFH cap. slave> <AFH cap. master> 
-> > > 
-> > > 
-> > > > by hand). And check if "hciconfig hci0 inqmode 1" succeeds.
-> > > 
-> > > [localhost ~]# /usr/sbin/hciconfig hci0 inqmode 1
-> > > [localhost ~]# 
-> > > 
-> > > (ie, nothing printed out)
-> > 
-> > if "hciconfig hci0 inqmode" return Inquiry with RSSI as mode then this
-> > dongle also supports it, even if it is not mentioned in the features.
-> 
-> It does return that, yes.
+> Maybe this question is stupid, but.. how to pair devices using blueZ 3.x (have 
+> latest) and kde 3.5.x (svn)? Since I have installed 3.x I cannot pair devices 
+> anymore. My friend hace the same problem, but he simply deletes keyfile and 
+> other made by hcid and then pairing works (once)... I cannot :/ Is there my 
+> problem or something with kde / blueZ? :>
 
-I added a quirk to hcid to enable Inquiry with RSSI for your dongle by
-default.
+show us the output of "hcidump -X -V" when the pairing fails.
 
 Regards
 
