@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20060714164706.GB25533@inf.fu-berlin.de>
-References: <20060714161657.GA25533@inf.fu-berlin.de>
-	<1152894175.25660.35.camel@localhost>
-	<20060714164706.GB25533@inf.fu-berlin.de>
-Date: Tue, 18 Jul 2006 13:01:31 +0200
-Message-Id: <1153220491.4639.23.camel@localhost>
+In-Reply-To: <1153205453.7078.12.camel@pc044.coreteam.oslo.opera.com>
+References: <1153205453.7078.12.camel@pc044.coreteam.oslo.opera.com>
+Date: Tue, 18 Jul 2006 12:42:22 +0200
+Message-Id: <1153219342.4639.5.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] SCO mapping, bccmd mapsco
+Subject: Re: [Bluez-users] Is the CNET CBD-220 bluetooth adapter supported?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,42 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcus,
+Hi Per,
 
-> > >   coach:~# bccmd psset mapsco 0
-> > >   coach:~# bccmd psget mapsco
-> > >   Map SCO over PCM: 0x0001 (1)
-> > >   coach:~# bccmd psset mapsco 1
-> > >   coach:~# bccmd psget mapsco
-> > >   Map SCO over PCM: 0x0001 (1)
-> > 
-> > use "bccmd psset --stores psf mapsco 0".
+> I'm planning to get a new bluetooth adapter. Does anyone know if this
+> adapter is supported by bluez:
 > 
-> Wow, that was quick. But using "--stores psf" doesn't seem to
-> help; and even the hciconfig output remains unchanged:
-> 
->   coach:~# hciconfig hci0 revision
->   hci0:   Type: USB
->           BD Address: 08:00:46:EB:0E:B6 ACL MTU: 192:8 SCO MTU: 64:8
->           HCI 18.1
->           Chip version: BlueCore02-External
->           Max key size: 56 bit
->           SCO mapping:  PCM
->   coach:~# bccmd psset --stores psf mapsco 0
->   coach:~# bccmd psget mapsco
->   Map SCO over PCM: 0x0001 (1)
->   coach:~# hciconfig hci0 revision
->   hci0:   Type: USB
->           BD Address: 08:00:46:EB:0E:B6 ACL MTU: 192:8 SCO MTU: 64:8
->           HCI 18.1
->           Chip version: BlueCore02-External
->           Max key size: 56 bit
->           SCO mapping:  PCM
-> 
-> I'll be happy to try anything else. :-)
+> CBD-220 Bluetooth V2.0 USB Adapter
+> http://www.cnet.com.tw/product/cbd-220.htm
 
-try "bccmd psset --stores psi mapsco 0". If this still doesn't work then
-replace "psi" with "0".
+I don't see any reason why this adapter doesn't. If it doesn't work, we
+make it work.
+
+However you might wanna make sure to buy an adapter with a CSR BlueCore4
+chip inside to not see any weird surprises. These chips are known to
+work best.
 
 Regards
 
