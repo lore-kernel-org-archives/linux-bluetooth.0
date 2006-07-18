@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Kamil =?UTF-8?Q?Kami=C5=84ski?= <kamilkaminski@1liceum.pl>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200607181639.36560.kamilkaminski@1liceum.pl>
-References: <200607171807.03528.kamilkaminski@1liceum.pl>
-	<1153220114.4639.19.camel@localhost>
-	<200607181639.36560.kamilkaminski@1liceum.pl>
-Date: Tue, 18 Jul 2006 19:14:02 +0200
-Message-Id: <1153242842.21024.19.camel@localhost>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <44BB3BFB.80104@free.fr>
+References: <44B3F51E.1070009@free.fr> <1152644670.15028.42.camel@localhost>
+	<44BB3BFB.80104@free.fr>
+Date: Tue, 18 Jul 2006 19:12:03 +0200
+Message-Id: <1153242723.21024.15.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Bluex 3.x pairing devices
+Subject: Re: [Bluez-devel] Broadcom 2035 SCO question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,30 +21,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Kamil,
+Hi Fabien,
 
-> > > Maybe this question is stupid, but.. how to pair devices using blueZ 3.x
-> > > (have latest) and kde 3.5.x (svn)? Since I have installed 3.x I cannot
-> > > pair devices anymore. My friend hace the same problem, but he simply
-> > > deletes keyfile and other made by hcid and then pairing works (once)... I
-> > > cannot :/ Is there my problem or something with kde / blueZ? :>
-> >
-> > show us the output of "hcidump -X -V" when the pairing fails.
+> >> I recently purchased a class 1 "sweex" bluetooth USB dongle.  It has a 
+> >> broadcom bcm2035
+> >> usb chip( idVendor = 0x0a5c, idProduct = 0x200a). It advertises SCO 
+> >> mtu=16, sco packets = 0.
+> >> I tryed to use it with SCO, no luck.(I wasn't surprised by that, given 
+> >> sco packets = 0) Then i looked at hci usb driver and found it was in the 
+> >> blacklist, with HCI_BROKEN_ISOC.
+> >>
+> >> I then removed it from this list, forced SCO mtu to 48 and packets 
+> >> number to 8 by hacking hci_event.c... and guess what, it works !!
+> >>
+> >> So my question is: shouldn't this product marked as HCI_WRONG_SCO_MTU 
+> >> mtu instead of HCI_BROKEN_ISOC?
+> > 
+> > is it enough to change HCI_BROKEN_ISOC into HCI_WRONG_SCO_MTU to make
+> > this work. If yes, then I am happy to submit a patch.
+> > 
 > 
-> Here it is :-) :
-> --------------------------------------------------------------------------------------------------
+> Yes. It is not perfect (i have some noise sometimes at startup), but it
+> is enough to make it work.
 > 
-> > HCI Event: PIN Code Request (0x16) plen 6
->     bdaddr 00:0F:DE:EB:B6:D4
-> < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
->     bdaddr 00:0F:DE:EB:B6:D4
-> > HCI Event: Command Complete (0x0e) plen 10
->     PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
->     status 0x00 bdaddr 00:0F:DE:EB:B6:D4
+> Please find attached one-line patch for this.
 
-this means that now passkey agent has been installed. The bluez-utils
-source code contains a sample passkey-agent that can be used to provide
-the PIN code.
+a patch for this is in my tree now.
 
 Regards
 
