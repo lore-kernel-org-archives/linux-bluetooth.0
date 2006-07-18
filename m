@@ -1,15 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <28c817710607182109l7518990fqc45ea07198919363@mail.gmail.com>
-Date: Wed, 19 Jul 2006 12:09:56 +0800
-From: ifq <ifqqfi@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1151516020.26495.10.camel@localhost>
+To: bluez-devel@lists.sourceforge.net
+Date: Tue, 18 Jul 2006 19:21:52 +0200
 MIME-Version: 1.0
-References: <loom.20060628T033626-329@post.gmane.org>
-	<1151479698.9544.1.camel@localhost>
-	<loom.20060628T190947-394@post.gmane.org>
-	<1151516020.26495.10.camel@localhost>
-Subject: Re: [Bluez-devel] cross-compiling bluez-utils.3.1
+Message-Id: <200607181921.52647.Kevin.Baradon@gmail.com>
+From: Kevin Baradon <kevin.baradon@gmail.com>
+Subject: [Bluez-devel] Lockdep: possible recursive locking detected in hidd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,117 +14,65 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1549437704=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1549437704==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_29435_17707867.1153282196807"
+[Please CC me as I'm not on the list]
 
-------=_Part_29435_17707867.1153282196807
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi,
 
-hello,marcel:
-I have a stupid question:can Bluez 3.1 run on ARM system?
-I cross-compiled the 3.1.and got lots of error.
-is there anyone have success cross-compile 3.1 to ARM?could you give me some
-advice?
-thanks very much.
+I've got a Logitech Bluetooth keyboard. 
+With lockdep enabled, I've got the following message just after boot, after 
+having pressed a key on keyboard : 
 
-2006/6/29, Marcel Holtmann <marcel@holtmann.org>:
->
-> Hi Steve,
->
-> > D-Bus seems like a useful tool for desktops, but possibly overkill
-> > and/or unnecessary for embedded systems. Also, as noted before, D-Bus
-> > will not build out of the box for cross-compiled systems such as ARM.
-> > Since a lot of embedded systems use Bluetooth, this seems problematic.
->
-> I am aware of embedded systems and a long time this was the reason for
-> keeping D-Bus optional. In the long run it is not worth it and it would
-> only increase the complexity. Devices like the Nokia 770 proved that we
-> can handle D-Bus in the embedded area and if there are problems, they
-> must be addressed in D-Bus.
->
-> > What exactly does D-Bus supply in terms of necessary/useful
-> functionality for
-> > Bluetooth, and how difficult would it be to work around having to use
-> it? (I
-> > have not taken a serious look at the new release yet, as I'm still
-> working
-> > on a basic understanding of the 2.21 version).
->
-> D-Bus is a message bus (IPC based). Something like RPC and it makes
-> writing client applications a lot easier. The BlueZ D-Bus API provides a
-> clean interface to basic Bluetooth tasks. You don't need any knowledge
-> about HCI anymore. You can also write your application in C, C++, Java,
-> Python, C# etc. and they don't need to be put under GPL.
->
-> Trying to implement your own message bus to avoid the D-Bus dependency
-> is not worth it. We considered it in the beginning, but this would
-> increase the complexity without any real benefit.
->
-> Regards
->
-> Marcel
->
->
->
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job
-> easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+=============================================
+[ INFO: possible recursive locking detected ]
+---------------------------------------------
+hidd/3150 is trying to acquire lock:
+ (sk_lock-AF_BLUETOOTH){--..}, at: [<c038a85c>] bt_accept_dequeue+0x54/0xd3
 
-------=_Part_29435_17707867.1153282196807
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+but task is already holding lock:
+ (sk_lock-AF_BLUETOOTH){--..}, at: [<c0392e5c>] l2cap_sock_accept+0x42/0x12f
 
-hello,marcel:<br>I have a stupid question:can Bluez 3.1 run on ARM system?<br>I cross-compiled the 3.1.and got lots of error.<br>is there anyone have success cross-compile 3.1 to ARM?could you give me some advice?<br>thanks very much.
-<br><br><div><span class="gmail_quote">2006/6/29, Marcel Holtmann &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt;:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-Hi Steve,<br><br>&gt; D-Bus seems like a useful tool for desktops, but possibly overkill<br>&gt; and/or unnecessary for embedded systems. Also, as noted before, D-Bus<br>&gt; will not build out of the box for cross-compiled systems such as ARM.
-<br>&gt; Since a lot of embedded systems use Bluetooth, this seems problematic.<br><br>I am aware of embedded systems and a long time this was the reason for<br>keeping D-Bus optional. In the long run it is not worth it and it would
-<br>only increase the complexity. Devices like the Nokia 770 proved that we<br>can handle D-Bus in the embedded area and if there are problems, they<br>must be addressed in D-Bus.<br><br>&gt; What exactly does D-Bus supply in terms of necessary/useful functionality for
-<br>&gt; Bluetooth, and how difficult would it be to work around having to use it? (I<br>&gt; have not taken a serious look at the new release yet, as I'm still working<br>&gt; on a basic understanding of the 2.21 version).
-<br><br>D-Bus is a message bus (IPC based). Something like RPC and it makes<br>writing client applications a lot easier. The BlueZ D-Bus API provides a<br>clean interface to basic Bluetooth tasks. You don't need any knowledge
-<br>about HCI anymore. You can also write your application in C, C++, Java,<br>Python, C# etc. and they don't need to be put under GPL.<br><br>Trying to implement your own message bus to avoid the D-Bus dependency<br>is not worth it. We considered it in the beginning, but this would
-<br>increase the complexity without any real benefit.<br><br>Regards<br><br>Marcel<br><br><br><br>Using Tomcat but need to do more? Need to support web services, security?<br>Get stuff done quickly with pre-integrated technology to make your job easier
-<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo<br><a href="http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642">http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642
-</a><br>_______________________________________________<br>Bluez-devel mailing list<br><a href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-devel">
-https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br></blockquote></div><br>
+other info that might help us debug this:
+1 lock held by hidd/3150:
+ #0:  (sk_lock-AF_BLUETOOTH){--..}, at: [<c0392e5c>] 
+l2cap_sock_accept+0x42/0x12f
 
-------=_Part_29435_17707867.1153282196807--
+stack backtrace:
+ [<c0103fb9>] show_trace_log_lvl+0x11d/0x137
+ [<c01046b2>] show_trace+0x12/0x14
+ [<c010477a>] dump_stack+0x19/0x1b
+ [<c0134c31>] __lock_acquire+0x9e1/0xcf5
+ [<c0135271>] lock_acquire+0x5d/0x79
+ [<c02f0fa3>] lock_sock+0xb4/0xc1
+ [<c038a85c>] bt_accept_dequeue+0x54/0xd3
+ [<c0392eeb>] l2cap_sock_accept+0xd1/0x12f
+ [<c02f013a>] sys_accept+0xd7/0x1a0
+ [<c02f02c4>] sys_socketcall+0xc1/0x254
+ [<c0102df5>] sysenter_past_esp+0x56/0x8d
+ [<b7fea410>] 0xb7fea410
+input: Bluetooth HID Boot Protocol Device as /class/input/input5
 
+Kernel: Linux kev1 2.6.18-rc2 #2 SMP PREEMPT Tue Jul 18 11:44:18 CEST 2006 
+i686 GNU/Linux
 
---===============1549437704==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Distribution: Debian
+bluez-utils 3.1-2
+libbluetooth2 3.1-1
+
+-- 
+Kevin Baradon
+Networks & Telecom Student
+-
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1549437704==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1549437704==--
