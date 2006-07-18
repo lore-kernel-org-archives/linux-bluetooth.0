@@ -1,10 +1,20 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 18 Jul 2006 16:13:57 +0200
-From: Stefan Seyfried <seife@suse.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060718141357.GO10190@suse.de>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dan Williams <dcbw@redhat.com>
+In-Reply-To: <1152900486.15253.0.camel@localhost.localdomain>
+References: <1152893105.14037.21.camel@localhost.localdomain>
+	<1152894124.25660.33.camel@localhost>
+	<1152894617.14037.45.camel@localhost.localdomain>
+	<1152895158.25660.37.camel@localhost>
+	<1152895689.14037.50.camel@localhost.localdomain>
+	<1152896210.25660.39.camel@localhost>
+	<1152900486.15253.0.camel@localhost.localdomain>
+Date: Tue, 18 Jul 2006 13:02:14 +0200
+Message-Id: <1153220534.4639.25.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Belkin F8T013 needs SCO MTU fix.
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] SCO MTU fix needed for Kensington Bluetooth USB
+	Adapter
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,52 +24,52 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all,
+Hi Dan,
 
-It looks like the Belkin F8T013 needs the SCO MTU fix from
-http://bluetooth-alsa.sourceforge.net/sco-mtu.patch like the F8T012 does.
-With the patch, i can use btsco to record and play back from a Belkin
-F8T060xHDST just fine.
+> > > > please also send "hciconfig hci0 features" (I don't like to decode that
+> > > 
+> > > [localhost ~]# /usr/sbin/hciconfig hci0 features
+> > > hci0:   Type: USB
+> > >         BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 377:10 SCO MTU: 16:0
+> > >         Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+> > >                 <3-slot packets> <5-slot packets> <encryption> <slot offset> 
+> > >                 <timing accuracy> <role switch> <hold mode> <sniff mode> 
+> > >                 <RSSI> <channel quality> <SCO link> <HV2 packets> 
+> > >                 <HV3 packets> <u-law log> <A-law log> <CVSD> <power control> 
+> > >                 <transparent SCO> <enhanced iscan> <interlaced iscan> 
+> > >                 <interlaced pscan> <AFH cap. slave> <AFH cap. master> 
+> > > 
+> > > 
+> > > > by hand). And check if "hciconfig hci0 inqmode 1" succeeds.
+> > > 
+> > > [localhost ~]# /usr/sbin/hciconfig hci0 inqmode 1
+> > > [localhost ~]# 
+> > > 
+> > > (ie, nothing printed out)
+> > 
+> > if "hciconfig hci0 inqmode" return Inquiry with RSSI as mode then this
+> > dongle also supports it, even if it is not mentioned in the features.
+> 
+> It does return that, yes.
 
-Details:
+I added a quirk to hcid to enable Inquiry with RSSI for your dongle by
+default.
 
-lsusb:
-Bus 001 Device 003: ID 050d:0013 Belkin Components
+Regards
 
-root@strolchi:~# hciconfig -a
-hci1:   Type: USB
-        BD Address: 00:0A:3A:67:58:A1 ACL MTU: 1017:8 SCO MTU: 64:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:661 acl:0 sco:0 events:20 errors:0
-        TX bytes:328 acl:0 sco:0 commands:20 errors:0
-        Features: 0xff 0xfb 0x8d 0xfe 0x9f 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ (none) (1)'
-        Class: 0x100100
-        Service Classes:
-        Device Class: Computer, Uncategorized
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x2073 LMP Ver: 2.0 (0x3) LMP Subver: 0=
-x410e
-        Manufacturer: Broadcom Corporation (15)
+Marcel
 
--- =
 
-Stefan Seyfried                     | "Please, just tell people
-QA / R&D Team Mobile Devices        |               to use KDE."
-SUSE LINUX Products GmbH, N=FCrnberg  |          -- Linus Torvalds
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
