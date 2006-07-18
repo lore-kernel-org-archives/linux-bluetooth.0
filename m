@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-Date: Tue, 18 Jul 2006 19:21:52 +0200
-MIME-Version: 1.0
-Message-Id: <200607181921.52647.Kevin.Baradon@gmail.com>
-From: Kevin Baradon <kevin.baradon@gmail.com>
-Subject: [Bluez-devel] Lockdep: possible recursive locking detected in hidd
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Kamil =?UTF-8?Q?Kami=C5=84ski?= <kamilkaminski@1liceum.pl>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200607181639.36560.kamilkaminski@1liceum.pl>
+References: <200607171807.03528.kamilkaminski@1liceum.pl>
+	<1153220114.4639.19.camel@localhost>
+	<200607181639.36560.kamilkaminski@1liceum.pl>
+Date: Tue, 18 Jul 2006 19:14:02 +0200
+Message-Id: <1153242842.21024.19.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Bluex 3.x pairing devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,54 +23,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-[Please CC me as I'm not on the list]
+Hi Kamil,
 
-Hi,
+> > > Maybe this question is stupid, but.. how to pair devices using blueZ 3.x
+> > > (have latest) and kde 3.5.x (svn)? Since I have installed 3.x I cannot
+> > > pair devices anymore. My friend hace the same problem, but he simply
+> > > deletes keyfile and other made by hcid and then pairing works (once)... I
+> > > cannot :/ Is there my problem or something with kde / blueZ? :>
+> >
+> > show us the output of "hcidump -X -V" when the pairing fails.
+> 
+> Here it is :-) :
+> --------------------------------------------------------------------------------------------------
+> 
+> > HCI Event: PIN Code Request (0x16) plen 6
+>     bdaddr 00:0F:DE:EB:B6:D4
+> < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+>     bdaddr 00:0F:DE:EB:B6:D4
+> > HCI Event: Command Complete (0x0e) plen 10
+>     PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
+>     status 0x00 bdaddr 00:0F:DE:EB:B6:D4
 
-I've got a Logitech Bluetooth keyboard. 
-With lockdep enabled, I've got the following message just after boot, after 
-having pressed a key on keyboard : 
+this means that now passkey agent has been installed. The bluez-utils
+source code contains a sample passkey-agent that can be used to provide
+the PIN code.
 
-=============================================
-[ INFO: possible recursive locking detected ]
----------------------------------------------
-hidd/3150 is trying to acquire lock:
- (sk_lock-AF_BLUETOOTH){--..}, at: [<c038a85c>] bt_accept_dequeue+0x54/0xd3
+Regards
 
-but task is already holding lock:
- (sk_lock-AF_BLUETOOTH){--..}, at: [<c0392e5c>] l2cap_sock_accept+0x42/0x12f
+Marcel
 
-other info that might help us debug this:
-1 lock held by hidd/3150:
- #0:  (sk_lock-AF_BLUETOOTH){--..}, at: [<c0392e5c>] 
-l2cap_sock_accept+0x42/0x12f
 
-stack backtrace:
- [<c0103fb9>] show_trace_log_lvl+0x11d/0x137
- [<c01046b2>] show_trace+0x12/0x14
- [<c010477a>] dump_stack+0x19/0x1b
- [<c0134c31>] __lock_acquire+0x9e1/0xcf5
- [<c0135271>] lock_acquire+0x5d/0x79
- [<c02f0fa3>] lock_sock+0xb4/0xc1
- [<c038a85c>] bt_accept_dequeue+0x54/0xd3
- [<c0392eeb>] l2cap_sock_accept+0xd1/0x12f
- [<c02f013a>] sys_accept+0xd7/0x1a0
- [<c02f02c4>] sys_socketcall+0xc1/0x254
- [<c0102df5>] sysenter_past_esp+0x56/0x8d
- [<b7fea410>] 0xb7fea410
-input: Bluetooth HID Boot Protocol Device as /class/input/input5
-
-Kernel: Linux kev1 2.6.18-rc2 #2 SMP PREEMPT Tue Jul 18 11:44:18 CEST 2006 
-i686 GNU/Linux
-
-Distribution: Debian
-bluez-utils 3.1-2
-libbluetooth2 3.1-1
-
--- 
-Kevin Baradon
-Networks & Telecom Student
--
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
