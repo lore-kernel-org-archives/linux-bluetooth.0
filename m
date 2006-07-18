@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200607181644.05026.denis.kenzior@trolltech.com>
-References: <200607181644.05026.denis.kenzior@trolltech.com>
-Date: Tue, 18 Jul 2006 12:54:17 +0200
-Message-Id: <1153220057.4639.17.camel@localhost>
+To: Johannes Berg <johannes@sipsolutions.net>
+In-Reply-To: <1153218888.2497.15.camel@johannes.berg>
+References: <1153218888.2497.15.camel@johannes.berg>
+Date: Tue, 18 Jul 2006 12:40:54 +0200
+Message-Id: <1153219254.4639.2.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] DBUS API - Service Classes as ints?
+Cc: bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] K600i and hidp
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,42 +21,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Hi Johannes,
 
-> Is it a good idea/Are there any plans to extend the current DBUS API to enable 
-> Major/Minor/Service classes of the local Adapter to be available/settable in 
-> integer form? The string representations are nice and user-friendly, however 
-> we need to maintain internationalized versions of these, so doing conversion 
-> ourselves is much easier.  
+> When I recently tried the remote control feature on my K600i, I noticed
+> that it wouldn't work because the phone doesn't advertise proper
+> capabilities. I put into my notes:
 > 
-> This would also solve the problem of combination minor device numbers (e.g. in 
-> case of peripherals).  How would you set "Pointing device" + "Joystick" via 
-> the current API?  It would also bring the API closer in line with the 
-> RemoteDevice API which uses uint32 to represent the class.
+> [...]
+> Apparently the phone has a bug and doesn't describe its subclass
+> properly, it seems to never send the bits 0x80 or 0x40 in it, while that
+> is required. I had to patch the hidp_setup_input function in
+> net/bluetooth/hidp/core.c (lines 546 and 562) to ignore the subclass
+> bits.
+> [...]
 > 
-> Perhaps SetClass(uint32) and 
-> uint32 GetClass()?
-> 
-> If this is wanted, I can work on a patch.
+> Can we have some sort of device quirk table here to ignore the subclass
+> bits for certain devices?
 
-the choice for strings has been made to make it easier for languages
-like Python etc. to handle this. Another thing is that we only support
-the change of the minor class if the major class is "computer". No other
-change through the D-Bus API makes really sense.
+you can use "hidd --subclass=<val> ..." for this.
 
-If another major class has to be supported, then this has to be set in
-hcid.conf and it will disable the ListAvailableMinorClasses() and
-SetMinorClass() methods. This will be true for all embedded devices
-running BlueZ. They will set the major and minor class through hcid.conf
-and then no more changes to it are needed. The only exception at the
-moment will be an access point where the minor class indicates the
-number of connected clients. However this should also not be changed
-through the D-Bus API. We will integrate another method for this once we
-started working on the access point daemon.
+> (Oh and another question is -- how about moving all this into the
+> userspace daemon and using uinput?)
 
-The service classes are need to be under control of sdpd, because they
-depend on the registered services. So a generic method to change the
-class of device is not a good idea.
+The overall goal is to merge the USB HID driver with the Bluetooth HID
+and this is one reason why it is inside the kernel. The other is that we
+need good latency for HID.
 
 Regards
 
