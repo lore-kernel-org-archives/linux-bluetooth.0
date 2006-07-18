@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Per Thomas Jahr <perja@extern.uio.no>
+Date: Tue, 18 Jul 2006 15:53:25 +0200
+From: "Marcus C. Gottwald" <gottwald@inf.fu-berlin.de>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1153219342.4639.5.camel@localhost>
-References: <1153205453.7078.12.camel@pc044.coreteam.oslo.opera.com>
-	<1153219342.4639.5.camel@localhost>
-Date: Tue, 18 Jul 2006 21:04:18 +0200
-Message-Id: <1153249459.4161.3.camel@localhost.localdomain>
+Message-ID: <20060718135325.GA19893@inf.fu-berlin.de>
+References: <20060714161657.GA25533@inf.fu-berlin.de>
+	<1152894175.25660.35.camel@localhost>
+	<20060714164706.GB25533@inf.fu-berlin.de>
+	<1153220491.4639.23.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Is the CNET CBD-220 bluetooth adapter supported?
+In-Reply-To: <1153220491.4639.23.camel@localhost>
+Subject: Re: [Bluez-users] SCO mapping, bccmd mapsco
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,39 +19,58 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-tir, 18,.07.2006 kl. 12.42 +0200, skrev Marcel Holtmann:
-> Hi Per,
-> 
-> > I'm planning to get a new bluetooth adapter. Does anyone know if this
-> > adapter is supported by bluez:
-> > 
-> > CBD-220 Bluetooth V2.0 USB Adapter
-> > http://www.cnet.com.tw/product/cbd-220.htm
-> 
-> I don't see any reason why this adapter doesn't. If it doesn't work, we
-> make it work.
-> 
-> However you might wanna make sure to buy an adapter with a CSR BlueCore4
-> chip inside to not see any weird surprises. These chips are known to
-> work best.
 
-OK. So maybe the Epox BT-DG07A+ is a better choice then? I'm not sure it
-uses bluecore4, but some googling suggests that. Am I correct?
+Hello Marcel,
 
---
-Per Thomas
+Marcel Holtmann wrote (Tue 2006-Jul-18 13:01:31 +0200):
 
+> > > use "bccmd psset --stores psf mapsco 0".
+> > =
+
+> > Wow, that was quick. But using "--stores psf" doesn't seem to
+> > help; and even the hciconfig output remains unchanged:
+..
+> try "bccmd psset --stores psi mapsco 0". If this still doesn't work then
+> replace "psi" with "0".
+
+Good news is: It works!
+
+Bad news is: I don't really know why. A simple "psget mapsco"
+currently doesn't work anymore, though after issuing a "psset
+mapsco" the output of "hciconfig hci0 revision" keeps changing
+as exepcted and as it always did.
+
+While testing with "--stores" I realized that having "btsco"
+running and/or having "snd-bt-sco" loaded might make a
+difference, so I currently can't tell what exactly made it work
+while I was playing around. If I ever find out for sure, I'll
+post it. :-)
+
+I now have my notebook computer with builtin Bluetooth adapter
+(internally connected via USB, switched on and off by software)
+online via a Bluetooth connection to my UMTS mobile and talking
+to a Bluetooth headset at the same time.
+
+
+Thanks again!
+
+Marcus
+
+-- =
+
+   Marcus C. Gottwald  =B7  http://www.inf.fu-berlin.de/~gottwald/
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
