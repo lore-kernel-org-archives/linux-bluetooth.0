@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44BB3BFB.80104@free.fr>
-References: <44B3F51E.1070009@free.fr> <1152644670.15028.42.camel@localhost>
-	<44BB3BFB.80104@free.fr>
-Date: Tue, 18 Jul 2006 19:12:03 +0200
-Message-Id: <1153242723.21024.15.camel@localhost>
+In-Reply-To: <20060718141357.GO10190@suse.de>
+References: <20060718141357.GO10190@suse.de>
+Date: Tue, 18 Jul 2006 18:48:50 +0200
+Message-Id: <1153241330.21024.7.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Broadcom 2035 SCO question
+Subject: Re: [Bluez-devel] Belkin F8T013 needs SCO MTU fix.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,32 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
+Hi Stefan,
 
-> >> I recently purchased a class 1 "sweex" bluetooth USB dongle.  It has a 
-> >> broadcom bcm2035
-> >> usb chip( idVendor = 0x0a5c, idProduct = 0x200a). It advertises SCO 
-> >> mtu=16, sco packets = 0.
-> >> I tryed to use it with SCO, no luck.(I wasn't surprised by that, given 
-> >> sco packets = 0) Then i looked at hci usb driver and found it was in the 
-> >> blacklist, with HCI_BROKEN_ISOC.
-> >>
-> >> I then removed it from this list, forced SCO mtu to 48 and packets 
-> >> number to 8 by hacking hci_event.c... and guess what, it works !!
-> >>
-> >> So my question is: shouldn't this product marked as HCI_WRONG_SCO_MTU 
-> >> mtu instead of HCI_BROKEN_ISOC?
-> > 
-> > is it enough to change HCI_BROKEN_ISOC into HCI_WRONG_SCO_MTU to make
-> > this work. If yes, then I am happy to submit a patch.
-> > 
-> 
-> Yes. It is not perfect (i have some noise sometimes at startup), but it
-> is enough to make it work.
-> 
-> Please find attached one-line patch for this.
+> It looks like the Belkin F8T013 needs the SCO MTU fix from
+> http://bluetooth-alsa.sourceforge.net/sco-mtu.patch like the F8T012 does.
+> With the patch, i can use btsco to record and play back from a Belkin
+> F8T060xHDST just fine.
 
-a patch for this is in my tree now.
+I have a patch for this one now. Thanks.
 
 Regards
 
