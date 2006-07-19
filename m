@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: David Geiger <info@david-geiger.de>
-To: bluez-users@lists.sourceforge.net
-Date: Thu, 20 Jul 2006 00:28:46 +0200
-MIME-Version: 1.0
-Message-Id: <200607200028.47928.info@david-geiger.de>
-Subject: [Bluez-users] CSR BlueCore4 dongles
+Date: Wed, 19 Jul 2006 23:42:42 +0200
+From: Mathias Adam <a2@adamis.de>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20060719214242.GA20848@adamis.de>
+References: <44BE9DE5.7000000@over-here.org>
+Mime-Version: 1.0
+In-Reply-To: <44BE9DE5.7000000@over-here.org>
+Subject: Re: [Bluez-users] Problems with Ambicom BT-2000E
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,40 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi everybody,
+Hello,
 
-I was just doing an internet search on USB bluetooth dongles and would be 
-happy to get some feed-back on the results.
+On 20.07.06 00:02:29, Eran wrote:
+> Can anyone with knowledge about this card direct me? or tell me any 
+> other way to make this card working under kernel 2.6?
 
-My requirements were:
-- CSR BlueCore4 (as I have heard it is best supported with btsco)
-- Class1
-Are there any other important criteria?
+I don't know this card, but if its UART is a 16C950 and it does run fine
+with a kernel 2.4 you might try the kernel patch which I have posted on
+this list some time ago concerning a Socket Bluetooth CF Card.
 
-The only devices I have found are:
-- Level One MDU-0025USB (A2DP, USB 1.1)
-- B-Speech Data speed (A2DP)
-- Cellink BTA-6030 (USB 2.0)
-- EPoX BT-DG07A+ (A2DP?)
-- Bluetake BT007EX (A2DP, USB 1.1)
-
-Any experiences with one of the devices or additions are welcome! :)
-
-There are a few questions left, maybe someone can help me here:
-- Does the dongle explicitely have to support A2DP?
-- What is an "AV profile"? Almost all websites list the "Advanced Audio 
-Distribution Profile" as an AV profile and say Windows only. Does that mean 
-it doesn't support A2DP on linux?
-E.g. 
-http://www.b-speech.de/en/produkt-information/stereo-headsets-und-adapter/b-speech_data-speed/
-- Does it make sense to buy a dongle with USB 2.0 support? The USB 1.1 
-datarate is already 12mbit/s which should be enough by far.
-
-Best regards, 
-David
--- 
-David Geiger
-info@david-geiger.de
+Regards,
+Mathias
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
