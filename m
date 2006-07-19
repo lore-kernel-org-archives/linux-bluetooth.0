@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <20060719085107.34521.qmail@web15806.mail.cnb.yahoo.com>
-Date: Wed, 19 Jul 2006 01:51:07 -0700 (PDT)
-From: Mingfan lu <lucharse@yahoo.com.cn>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <24a5055d0607190005r519be8f6t9c7af64a0138e8eb@mail.gmail.com>
+Date: Wed, 19 Jul 2006 12:35:47 +0530
+From: "Rahul Tank" <tank.rahul@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <28c817710607182109l7518990fqc45ea07198919363@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] About the transfering speed of bluez RFCOMM socket
+References: <loom.20060628T033626-329@post.gmane.org>
+	<1151479698.9544.1.camel@localhost>
+	<loom.20060628T190947-394@post.gmane.org>
+	<1151516020.26495.10.camel@localhost>
+	<28c817710607182109l7518990fqc45ea07198919363@mail.gmail.com>
+Subject: Re: [Bluez-devel] cross-compiling bluez-utils.3.1
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,48 +20,50 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0168947832=="
+Content-Type: multipart/mixed; boundary="===============0883329325=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0168947832==
-Content-Type: multipart/alternative; boundary="0-1546605997-1153299067=:32686"
-Content-Transfer-Encoding: 8bit
+--===============0883329325==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_3384_29032724.1153292747380"
 
---0-1546605997-1153299067=:32686
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+------=_Part_3384_29032724.1153292747380
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Env:
-  Machine A and machine B are the same.
-  But
-  suse10.1 for A   ---bluez
-  windowsXP(SP2) for B ---bluesoleil
-  We use the same bluetooth dongle and mobile device(symbian) in the test.
-  When I use OpenObex(based on bluez Rfcomm socket) to send a file from machieA to the mobile device the transfering speed is about 10K BytePerSec.
-  When I use Bluesoleil to send the same file from machine B to the mobile device the transfering speed is about 40K-50K BytePerSec.
-   
-  Why is  B much better than A?
-  is it not efficient of Bluez Rfcomm socket? or other reason.
-
-
-With respects,
-        Mingfan.Lu 
-
- 		
----------------------------------
-How low will we go? Check out Yahoo! Messenger’s low  PC-to-Phone call rates.
---0-1546605997-1153299067=:32686
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-<DIV>Env:</DIV>  <DIV>Machine A and machine B are the same.</DIV>  <DIV>But</DIV>  <DIV>suse10.1 for A&nbsp;&nbsp; ---bluez</DIV>  <DIV>windowsXP(SP2) for B ---bluesoleil</DIV>  <DIV>We use the same bluetooth dongle and mobile device(symbian) in the test.</DIV>  <DIV>When I use OpenObex(based on bluez Rfcomm socket) to send a file from machieA to the mobile device the transfering speed is about 10K BytePerSec.</DIV>  <DIV>When I use Bluesoleil to send&nbsp;the same&nbsp;file from machine B to the mobile device the transfering speed is about 40K-50K BytePerSec.</DIV>  <DIV>&nbsp;</DIV>  <DIV>Why is&nbsp; B&nbsp;much better than A?</DIV>  <DIV>is it not efficient of Bluez Rfcomm socket? or other reason.</DIV><BR><BR><DIV id=RTEContent><FONT face="comic sans ms" color=#bc6e6e size=5>With respects,</FONT></DIV>  <DIV>&nbsp;<FONT size=4>&nbsp;&nbsp;&nbsp;&nbsp;<FONT color=#ff0000>&nbsp;<FONT face="comic sans ms">Mingfan.Lu</FONT></FONT></FONT> <IMG
- src="http://us.i1.yimg.com/us.yimg.com/i/mesg/tsmileys2/01.gif"></DIV><p>&#32;
-		<hr size=1>How low will we go? Check out Yahoo! Messenger’s low <a href="http://us.rd.yahoo.com/mail_us/taglines/postman8/*http://us.rd.yahoo.com/evt=39663/*http://voice.yahoo.com"> PC-to-Phone call rates.
---0-1546605997-1153299067=:32686--
+On 7/19/06, ifq <ifqqfi@gmail.com> wrote:
+>
+> hello,marcel:
+> I have a stupid question:can Bluez 3.1 run on ARM system?
+> I cross-compiled the 3.1.and got lots of error.
+> is there anyone have success cross-compile 3.1 to ARM?could you give me
+> some advice?
+> thanks very much.
+>
 
 
---===============0168947832==
+  Yes, U can . I myself did it using scratchbox for
+cross-compilation.Itworked fine.
+
+ regards,
+   rahul
+
+------=_Part_3384_29032724.1153292747380
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<br><br><div><span class="gmail_quote">On 7/19/06, <b class="gmail_sendername">ifq</b> &lt;<a href="mailto:ifqqfi@gmail.com">ifqqfi@gmail.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+<div>hello,marcel:<br>I have a stupid question:can <span id="st" name="st" class="st">Bluez</span> 3.1 run on ARM system?<br>I cross-compiled the 3.1.and got lots of error.<br>is there anyone have success cross-compile 3.1
+ to ARM?could you give me some advice?<br>thanks very much.
+</div></blockquote><div><br><br>&nbsp; Yes, U can . I myself did it using scratchbox for cross-compilation.It worked fine.<br></div><br>&nbsp;regards,<br>&nbsp;&nbsp; rahul<br><br></div><br>
+
+------=_Part_3384_29032724.1153292747380--
+
+
+--===============0883329325==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -66,7 +74,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0168947832==
+--===============0883329325==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -77,4 +85,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0168947832==--
+--===============0883329325==--
