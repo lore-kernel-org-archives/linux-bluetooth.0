@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 19 Jul 2006 23:42:42 +0200
-From: Mathias Adam <a2@adamis.de>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20060719214242.GA20848@adamis.de>
-References: <44BE9DE5.7000000@over-here.org>
-Mime-Version: 1.0
-In-Reply-To: <44BE9DE5.7000000@over-here.org>
-Subject: Re: [Bluez-users] Problems with Ambicom BT-2000E
+Message-ID: <44BE9DE5.7000000@over-here.org>
+Date: Thu, 20 Jul 2006 00:02:29 +0300
+From: Eran <eran_l@over-here.org>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Problems with Ambicom BT-2000E
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,16 +20,30 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hello,
 
-On 20.07.06 00:02:29, Eran wrote:
-> Can anyone with knowledge about this card direct me? or tell me any 
-> other way to make this card working under kernel 2.6?
 
-I don't know this card, but if its UART is a 16C950 and it does run fine
-with a kernel 2.4 you might try the kernel patch which I have posted on
-this list some time ago concerning a Socket Bluetooth CF Card.
+I am the not-so-proud owner of an Ambicom BT-2000E card.
 
-Regards,
-Mathias
+I tried using it both on a Zaurus running OZ 3.5.4.1 (kernel 2.6.16) and 
+a Tablet PC with similar kernel version (might have been 2.6.16.14).
+
+Pcmcia configuration for bluetooth still says this card should get the 
+bt950_cs module, which I understood is a goner.
+
+I modified the pcmcia package to use "serial_cs" class bluetooth for 
+this device, however - the best I get is that upon insertion of the card 
+I get a ttyS0 (I can see on dmesg) and after modifying the bluetooth 
+script itself to run hciattach /dev/ttyS0 ericsson - I see on hciconfig 
+a device with 00:00:00:00:00:00 as the mac address (which I can't take 
+up) and bluetooth will not work.
+
+Can anyone with knowledge about this card direct me? or tell me any 
+other way to make this card working under kernel 2.6?
+
+
+Thank you,
+
+ERan
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
