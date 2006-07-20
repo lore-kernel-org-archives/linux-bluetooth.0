@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44BF9F02.2040103@xmission.com>
-Date: Thu, 20 Jul 2006 09:19:30 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Date: Thu, 20 Jul 2006 16:51:30 +0200
+From: Mathias Adam <a2@adamis.de>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <44BE9DE5.7000000@over-here.org>
-	<20060719214242.GA20848@adamis.de>	<44BECE23.8080004@xmission.com>
-	<20060720145130.GA19833@adamis.de>
-In-Reply-To: <20060720145130.GA19833@adamis.de>
+Message-ID: <20060720145130.GA19833@adamis.de>
+References: <44BE9DE5.7000000@over-here.org> <20060719214242.GA20848@adamis.de>
+	<44BECE23.8080004@xmission.com>
+Mime-Version: 1.0
+In-Reply-To: <44BECE23.8080004@xmission.com>
 Subject: Re: [Bluez-users] Problems with Ambicom BT-2000E
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -22,23 +21,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hello Brad,
+
+On 19.07.06 18:28:19, Brad Midgley wrote:
+> > I don't know this card, but if its UART is a 16C950 and it does run fine
+> > with a kernel 2.4 you might try the kernel patch which I have posted on
+> > this list some time ago concerning a Socket Bluetooth CF Card.
+> 
+> this is the same thing you discussed on lkml almost a year ago? Did
+> Russel King ever follow up after that last submission of the patch?
+> 
+> http://lkml.org/lkml/2005/9/9/158
+
+yes, that's still the same thing. Unfortunately I didn't get any
+response after that post even when e-mailed Russell directly,
+and back then I didn't have the time to push it any further.
+
+However it wouldn't be that bad not having to patch each new kernel
+again and again... maybe you know some contact to get this thing solved?
+
+Regards,
 Mathias
 
-> However it wouldn't be that bad not having to patch each new kernel
-> again and again... maybe you know some contact to get this thing solved?
 
-I don't know anyone like that--sorry.
-
-One reason I think it got overlooked is you claimed to support hardware
-that you didn't have around to test. Keep the scope and impact limited
-and if it supports something new as a side effect, you may want to keep
-that under your hat if you don't have someone to test it.
-
-The other route you can go is ask a vendor to support it. I think ubuntu
-is in a good position for that. If people start to benefit from a vendor
-patch, the kernel guys may see it differently.
-
-Brad
+-- 
+Twenty years from now you will be more disappointed by the things that
+you didn't do than by the ones you did do. So throw off the bowlines.
+Sail away from the safe harbor. Catch the trade winds in your sails.
+Explore. Dream. Discover.  (Mark Twain)
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
