@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Fri, 21 Jul 2006 15:02:24 +1000
-References: <200607181644.05026.denis.kenzior@trolltech.com>
-	<1153220057.4639.17.camel@localhost>
-In-Reply-To: <1153220057.4639.17.camel@localhost>
-MIME-Version: 1.0
-Message-Id: <200607211502.24913.denis.kenzior@trolltech.com>
-Subject: Re: [Bluez-devel] DBUS API - Service Classes as ints?
+From: "Collin R. Mulliner" <collin@betaversion.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4688DDA1-7466-48A2-A968-1636CE3E4C50@infitsrl.com>
+References: <4688DDA1-7466-48A2-A968-1636CE3E4C50@infitsrl.com>
+Date: Fri, 21 Jul 2006 00:02:01 +0200
+Message-Id: <1153432921.23838.27.camel@panic>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Many simultaneous BtOBEX_TransportConnect ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,61 +20,59 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel,
+I think this is a OpenOBEX limitation, the workaround is to create the
+rfcomm connections "by hand" and then use the OpenOBEX file descriptor
+interface.
 
-What you say makes sense, but I'd like to raise the same question about the 
-Remote device class.  Currently the RemoteDeviceFound and RemoteClassUpdated 
-signals use the numberic form of the device class.   However, 
-GetRemoteMajorClass, GetRemoteMinorClass and GetRemoteServiceClasses use the 
-string format.  Would it make sense to add the GetRemoteClass method which 
-would return the uint32 format as well?  Would certainly make some tasks 
-easier to program than having to rely on RemoteClassUpdated signal.
+...
+context.libObex = OBEX_Init(OBEX_TRANS_FD, eventhandler, 0);
+...
+FdOBEX_TransportSetup(...)
+...
 
-Another question, I noticed that Manufacturer, Company, Revision, Version 
-attributes are not discovered until an initial connection is made.  A user 
-might want to take extra steps to be presented with such information (e.g. 
-remote device properties dialog), and it would be nice if I could force the 
-DBUS API to get that information for me somehow, even if the device has not 
-been previously connected to.  Is there a solution? 
+Collin
 
--Denis
-
-On Tuesday 18 July 2006 20:54, Marcel Holtmann wrote:
-> the choice for strings has been made to make it easier for languages
-> like Python etc. to handle this. Another thing is that we only support
-> the change of the minor class if the major class is "computer". No other
-> change through the D-Bus API makes really sense.
->
-> If another major class has to be supported, then this has to be set in
-> hcid.conf and it will disable the ListAvailableMinorClasses() and
-> SetMinorClass() methods. This will be true for all embedded devices
-> running BlueZ. They will set the major and minor class through hcid.conf
-> and then no more changes to it are needed. The only exception at the
-> moment will be an access point where the minor class indicates the
-> number of connected clients. However this should also not be changed
-> through the D-Bus API. We will integrate another method for this once we
-> started working on the access point daemon.
->
-> The service classes are need to be under control of sdpd, because they
-> depend on the registered services. So a generic method to change the
-> class of device is not a good idea.
->
-> Regards
->
-> Marcel
->
->
->
+On Thu, 2006-07-20 at 22:36 +0200, Fabrizio Guglielmino wrote:
+> I'm facing a problem with bluez and I can't found the solution.
+> Situation is:
+>       bluez-libs-3.1
+>       openobex-1.2
+>       linux kernel 2.6.12
+> 
+> I'm simply trying to send a file (vcard) to two cellular phones
+> simultaneous using object push profile.
+> I've writed a little C program based on obex_test that take btaddr,
+> channel and filename and push the last.
+> If I send to only one device all it'ok, but if I try to send
+> simultaneous launcing two commands in cascade the first go ok but the
+> second
+> always fail in BtOBEX_TransportConnect of openobex ibrary.
+> 
+> Testing two rfcomm connection to same devices all works....
+> 
+> Is this a bluez (or openopex) limitation?
+> 
+> I've implemented the same on windows xp with microsoft stack without  
+> problems and
+> I'm testing the solutions with the same bluetooth usd dongles.
+> 
+> 
+> 
 > -------------------------------------------------------------------------
 > Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share
-> your opinions on IT & business topics through brief surveys -- and earn
-> cash
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys -- and earn cash
 > http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 > _______________________________________________
 > Bluez-devel mailing list
 > Bluez-devel@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+He is dead Jim! --Dr. McCoy
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
