@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: "=?UTF-8?B?Qmx1ZVogZGV2ZWxvcG1lbnQ=?= " <bluez-devel@lists.sourceforge.net>
-From: "=?UTF-8?B?S2FtaWwgS2FtacWEc2tp?= " <kamilkaminski@1liceum.pl>
-Date: Thu, 20 Jul 2006 09:19:48 +0200
-MIME-Version: 1.0
-Message-Id: <20060720071948.5B7B7240@stroboskop.1liceum.pl>
-Subject: Re: [Bluez-devel]
-	=?utf-8?q?About_the_transfering_speed_of_bluez_RFCO?=
-	=?utf-8?q?MM_socket?=
-Reply-To: =?UTF-8?B?S2FtaWwgS2FtacWEc2tp?= <kamilkaminski@1liceum.pl>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20060719085107.34521.qmail@web15806.mail.cnb.yahoo.com>
+References: <20060719085107.34521.qmail@web15806.mail.cnb.yahoo.com>
+Date: Thu, 20 Jul 2006 02:51:37 +0200
+Message-Id: <1153356697.4094.12.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] About the transfering speed of bluez RFCOMM	socket
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -17,39 +16,46 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-TWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPiBuYXBpc2HFgihhKSA6Cgo+IEhp
-LAo+IAo+ID4gRW52Ogo+ID4gTWFjaGluZSBBIGFuZCBtYWNoaW5lIEIgYXJlIHRoZSBzYW1lLgo+
-ID4gQnV0Cj4gPiBzdXNlMTAuMSBmb3IgQSAgIC0tLWJsdWV6Cj4gPiB3aW5kb3dzWFAoU1AyKSBm
-b3IgQiAtLS1ibHVlc29sZWlsCj4gPiBXZSB1c2UgdGhlIHNhbWUgYmx1ZXRvb3RoIGRvbmdsZSBh
-bmQgbW9iaWxlIGRldmljZShzeW1iaWFuKSBpbiB0aGUKPiA+IHRlc3QuCj4gPiBXaGVuIEkgdXNl
-IE9wZW5PYmV4KGJhc2VkIG9uIGJsdWV6IFJmY29tbSBzb2NrZXQpIHRvIHNlbmQgYSBmaWxlIGZy
-b20KPiA+IG1hY2hpZUEgdG8gdGhlIG1vYmlsZSBkZXZpY2UgdGhlIHRyYW5zZmVyaW5nIHNwZWVk
-IGlzIGFib3V0IDEwSwo+ID4gQnl0ZVBlclNlYy4KPiA+IFdoZW4gSSB1c2UgQmx1ZXNvbGVpbCB0
-byBzZW5kIHRoZSBzYW1lIGZpbGUgZnJvbSBtYWNoaW5lIEIgdG8gdGhlCj4gPiBtb2JpbGUgZGV2
-aWNlIHRoZSB0cmFuc2ZlcmluZyBzcGVlZCBpcyBhYm91dCA0MEstNTBLIEJ5dGVQZXJTZWMuCj4g
-PiAgCj4gPiBXaHkgaXMgIEIgbXVjaCBiZXR0ZXIgdGhhbiBBPwo+ID4gaXMgaXQgbm90IGVmZmlj
-aWVudCBvZiBCbHVleiBSZmNvbW0gc29ja2V0PyBvciBvdGhlciByZWFzb24uCgpOb3QgdHJ1ZS4g
-T24gbXkgSzcwMGkgT2JleCBjb25uZWN0aW9uIGlzIGFib3V0IDIgdGltZXMgZmFzdGVyIHRoYW4g
-aW4gd2luZG93cy4gSSdtIHVzaW5nIGxpbnV4IGJlY2F1c2Ugb2YgaXRzIHNwZWVkLiBBbmQgZmls
-ZSB0cmFuc2ZlciBpcyAxMC0yMGsgZmFzdGVyIG9uIGxpbnV4Li4uIEkgdGhpbmsgdGhpcyBkZXBl
-bmRzIG9uIGRvbmdsZTw+ZGV2aWNlIHBhaXIgOykKCj4gdGhlIEJsdWVaIFJGQ09NTSBjYW4gZ28g
-ZnVsbCBzcGVlZC4gTWF5YmUgdGhlIE9CRVggcGFydCBpcyBhIGxpdHRsZSBiaXQKPiBzY3Jld2Vk
-IHVwLiBIb3dldmVyIEkgY2FuJ3Qgc2F5IGFueXRoaW5nIHdpdGhvdXQgY29tcGFyaW5nIHRoZSBz
-ZXR1cHMgb2YKPiBib3RoIGNvbm5lY3Rpb25zLiBGb3IgdGhlIEJsdWVTb2xlaWwgY29ubmVjdGlv
-biB5b3Ugd291bGQgbmVlZCB0byBtYWtlCj4gYW4gYWlyIHRyYWNlLiBGb3IgdGhlIEJsdWVaIGNv
-bm5lY3Rpb24gaXQgaXMgZW5vdWdoIGlmIHlvdSBjcmVhdGUgYQo+IHRyYWNlIHdpdGggImhjaWR1
-bXAgLVggLVYiLgo+IAoKCgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KSSBM
-aWNldW0gT2dvbG5va3N6dGFsY2FjZSB3ZWJtYWlsCgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGFrZSBT
-dXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUCkpvaW4gU291cmNl
-Rm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0aGUgY2hhbmNlIHRvIHNo
-YXJlIHlvdXIKb3BpbmlvbnMgb24gSVQgJiBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBz
-dXJ2ZXlzIC0tIGFuZCBlYXJuIGNhc2gKaHR0cDovL3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0LnBo
-cD9wYWdlPWpvaW4ucGhwJnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgpfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QK
-Qmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9y
-Z2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
+Hi,
+
+> Env:
+> Machine A and machine B are the same.
+> But
+> suse10.1 for A   ---bluez
+> windowsXP(SP2) for B ---bluesoleil
+> We use the same bluetooth dongle and mobile device(symbian) in the
+> test.
+> When I use OpenObex(based on bluez Rfcomm socket) to send a file from
+> machieA to the mobile device the transfering speed is about 10K
+> BytePerSec.
+> When I use Bluesoleil to send the same file from machine B to the
+> mobile device the transfering speed is about 40K-50K BytePerSec.
+>  
+> Why is  B much better than A?
+> is it not efficient of Bluez Rfcomm socket? or other reason.
+
+the BlueZ RFCOMM can go full speed. Maybe the OBEX part is a little bit
+screwed up. However I can't say anything without comparing the setups of
+both connections. For the BlueSoleil connection you would need to make
+an air trace. For the BlueZ connection it is enough if you create a
+trace with "hcidump -X -V".
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys -- and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
