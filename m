@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Wolfgang =?iso-8859-1?q?M=FCes?= <wolfgang@iksw-muees.de>
-To: bluez-users@lists.sourceforge.net
-Date: Thu, 20 Jul 2006 17:52:47 +0200
-References: <200607200028.47928.info@david-geiger.de>
-	<44BEC4AC.4050203@xmission.com>
-	<1153379075.25515.5.camel@pc044.coreteam.oslo.opera.com>
-In-Reply-To: <1153379075.25515.5.camel@pc044.coreteam.oslo.opera.com>
+Message-ID: <44BF9F02.2040103@xmission.com>
+Date: Thu, 20 Jul 2006 09:19:30 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Message-Id: <200607201752.47834.wolfgang@iksw-muees.de>
-Subject: Re: [Bluez-users] CSR BlueCore4 dongles
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <44BE9DE5.7000000@over-here.org>
+	<20060719214242.GA20848@adamis.de>	<44BECE23.8080004@xmission.com>
+	<20060720145130.GA19833@adamis.de>
+In-Reply-To: <20060720145130.GA19833@adamis.de>
+Subject: Re: [Bluez-users] Problems with Ambicom BT-2000E
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,30 +22,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Thursday 20 July 2006 09:04, Per Thomas Jahr wrote:
-> On Wed, 2006-07-19 at 17:47 -0600, Brad Midgley wrote:
-> > the bus has to fall back to usb1 speeds when a usb1 device
-> > on the bus is active.
->
-> That was really useful information!
+Mathias
 
-And a really wrong information....
+> However it wouldn't be that bad not having to patch each new kernel
+> again and again... maybe you know some contact to get this thing solved?
 
-The truth is: every USB device needs time to make their transfers.
-Slow devices need more time than fast. The host is switching between 
-slow, fast and high speed devices dynamicly.
+I don't know anyone like that--sorry.
 
-So a slow device can "steal" much of the available transfer time of the 
-bus, and slow down fast devices on the same bus. But a slow device can 
-not urge the host to serve a high speed device with a lower speed.
+One reason I think it got overlooked is you claimed to support hardware
+that you didn't have around to test. Keep the scope and impact limited
+and if it supports something new as a side effect, you may want to keep
+that under your hat if you don't have someone to test it.
 
-regards
-Wolfgang
--- 
-We're back to the times when men were men 
-and wrote their own device drivers.
+The other route you can go is ask a vendor to support it. I think ubuntu
+is in a good position for that. If people start to benefit from a vendor
+patch, the kernel guys may see it differently.
 
-(Linus Torvalds)
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
