@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: David Geiger <info@david-geiger.de>
-To: bluez-users@lists.sourceforge.net
-Date: Sat, 22 Jul 2006 18:24:33 +0200
+Message-ID: <d23110170607211624r5b3c915av2acd3139388d7d0@mail.gmail.com>
+Date: Fri, 21 Jul 2006 20:24:28 -0300
+From: "Ulisses Furquim" <ulissesf@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1153249459.4161.3.camel@localhost.localdomain>
 MIME-Version: 1.0
-Message-Id: <200607221824.34271.info@david-geiger.de>
-Subject: [Bluez-users] Plantronics Voyager 510 - experiences?
+References: <1153205453.7078.12.camel@pc044.coreteam.oslo.opera.com>
+	<1153219342.4639.5.camel@localhost>
+	<1153249459.4161.3.camel@localhost.localdomain>
+Subject: Re: [Bluez-users] Is the CNET CBD-220 bluetooth adapter supported?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +22,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Per,
 
-does anyone have experiences with the Plantronics Voyager 510? Reviews sound 
-quite good so far and it supports multipoint, which would be great for use 
-with btsco and my mobile phone at the same time.
+> OK. So maybe the Epox BT-DG07A+ is a better choice then? I'm not sure it
+> uses bluecore4, but some googling suggests that. Am I correct?
 
-Link: 
-http://www.plantronics.com/north_america/en_US/products/cat1150057/cat5420035/prod5460010
+I'm not sure about this one, but I do know that an Epox BT-DG06+ has a
+CSR BlueCore4 chip (it's ROM and not External, though).
 
-Best regards, 
-David
--- 
-David Geiger
-info@david-geiger.de
+# hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:04:61:85:CA:73 ACL MTU: 384:8 SCO MTU: 64:8
+        HCI 19.2
+        Chip version: BlueCore4-ROM
+        Max key size: 128 bit
+        SCO mapping:  HCI
+
+Regards,
+
+-- Ulisses
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
