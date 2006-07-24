@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Mon, 24 Jul 2006 06:15:24 +0200
+From: "Tamas, Gergely" <dice@mfa.kfki.hu>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20060724041524.GB5734@felix.mfa.kfki.hu>
-References: <20060724041524.GB5734@felix.mfa.kfki.hu>
-Date: Mon, 24 Jul 2006 09:41:33 +0200
-Message-Id: <1153726893.5050.21.camel@aeonflux.holtmann.net>
+Message-ID: <20060724041524.GB5734@felix.mfa.kfki.hu>
 Mime-Version: 1.0
 Cc: sysadmin@mfa.kfki.hu
-Subject: Re: [Bluez-users] any ides how to get d-link dbt-122 (bcm
-	2035)	working ?
+Subject: [Bluez-users] any ides how to get d-link dbt-122 (bcm 2035) working
+	?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,20 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Gergely,
+Hi!
 
-> Any ideas how to get D-Link DBT-122 (bcm2035) working? Do I need a
-> firmware as for dbt-120 (bcm2033)? If yes, where can I download one? The
-> bluez-firmware package only contains one for bcm2033.
+Any ideas how to get D-Link DBT-122 (bcm2035) working? Do I need a
+firmware as for dbt-120 (bcm2033)? If yes, where can I download one? The
+bluez-firmware package only contains one for bcm2033.
 
-this device should work automatically. If not, send in the content
-of /proc/bus/usb/devices.
-
-Regards
-
-Marcel
-
-
+Thanks in advance,
+Gergely
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
