@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Mon, 24 Jul 2006 08:56:59 -0300
-From: Nelson Murilo <nelson@pangeia.com.br>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060724115659.GA22058@pangeia.com.br>
+To: bluez-devel@lists.sourceforge.net
+From: Yuriy Vikulov <vikulov@rscenter.ru>
+Date: Mon, 24 Jul 2006 10:30:22 +0000 (UTC)
+Message-ID: <loom.20060724T122817-768@post.gmane.org>
 References: <loom.20060724T115557-613@post.gmane.org>
 	<1153735723.4366.4.camel@localhost>
+	<loom.20060724T121442-62@post.gmane.org>
+	<1153736502.4366.6.camel@localhost>
 Mime-Version: 1.0
-In-Reply-To: <1153735723.4366.4.camel@localhost>
 Subject: Re: [Bluez-devel] Database of MAC addresses
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,15 +22,9 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Mon, Jul 24, 2006 at 12:08:43PM +0200, Marcel Holtmann wrote:
-> However  this doesn't mean that you can easily identify the 
-> phone manufacturer. It is simply not enough.
+Great Thanks!
+This was very helpful, indeed!
 
-Yes, this is true.
-
-Btw, blueprint[1] may can help Yuriy. 
-
-[1] - http://trifinite.org/trifinite_stuff_blueprinting.html
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
