@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Yuriy Vikulov <vikulov@rscenter.ru>
-Date: Wed, 26 Jul 2006 07:10:39 +0000 (UTC)
-Message-ID: <loom.20060726T090256-627@post.gmane.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20060725165124.GB14679@esaurito.net>
+References: <20060725165124.GB14679@esaurito.net>
+Date: Tue, 25 Jul 2006 19:24:01 +0200
+Message-Id: <1153848241.31069.31.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Connecting on the first computer with bluetooth and
-	interacting on another computer
+Cc: Kay Sievers <kay.sievers@vrfy.org>, Felix Homann <fexpop@onlinehome.de>,
+        bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] bluez udev rules for pcmcia devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,17 +22,52 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello!
+Hi Filippo,
 
-Does anybody know is it possible to connect with phone (or something else) on
-the first computer and, while sending some data, can i make the phone to send
-and be conecting with another computer without loosing connection.
-This means Can i change connected bluetooth dongle to another, after sending
-some data without loosing connection.
+> I think we should discuss udev rules for bluez (WRT pcmcia cards) as pointed out
+> by Marcel while discussing debian bug #378839.
+> So far there's a rules file here:
+> http://bugs.debian.org/cgi-bin/bugreport.cgi/bluez-pcmcia-support.rules?bug=378839;msg=72;att=1
+> and the bluetooth.sh script here:
+> http://bugs.debian.org/cgi-bin/bugreport.cgi/bluetooth.sh?bug=378839;msg=72;att=2
+> both borrowed in the wild (from SuSE IIRC). See the full bug log for further
+> discussion. I basically agree with Marcel because while the bluetooth.sh script
+> is invoked /usr might not be mounted yet thus it should not try to execute
+> /etc/init.d/bluetooth.
 
-Thanks
+the first thing is that every line for dtl1_cs, bt3c_cs, bluecard_cs,
+bt950_cs and btuart_cs must be removed. These are not TTY drivers and
+totally useless lines anyway.
 
-Yuriy
+Second is that I prefer to call the script "bluetooth_hciattach" or
+better maybe "bluetooth_serial", because this is what it is doing. It is
+not a generic udev helper for Bluetooth. The job is to attach the serial
+port to the hci_uart driver. We can also strip the "/lib/udev/" prefix
+and the ".sh" suffix.
+
+Calling /etc/init.d/bluetooth from the script must go away. Either the
+support for Bluetooth is enabled or not. The udev helper shouldn't care
+about it at all.
+
+Also the line "DEVICE=`echo $DEVNAME|sed -e 's_/dev/__'`" in the script
+is not needed at all, because hciattach can handle full device names
+without any problems. And in case of some crazy persistent naming rules
+it is the safer choice.
+
+>>From a programming perspective, the TYPEID should be moved into
+start_serial, because it is its only user.
+
+If this script isn't distributed via bluez-utils, then the script must
+check if hciattach is installed. Otherwise you will see errors and this
+might not be what users expect.
+
+And we should actually only call hciattach instances using the specified
+device. Don't kill something that you didn't start.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
