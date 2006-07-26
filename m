@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Linux@feline-soul.com, BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200607260027.41270.Linux@feline-soul.com>
-References: <200607260027.41270.Linux@feline-soul.com>
-Date: Wed, 26 Jul 2006 09:19:06 +0200
-Message-Id: <1153898346.746.4.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Page timeout on Logetech cordless elite
-	keyboard	but mouse works
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+From: "Bearcat M. Sandor" <Linux@feline-soul.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Date: Wed, 26 Jul 2006 00:27:41 -0600
+Message-Id: <200607260027.41270.Linux@feline-soul.com>
+Subject: [Bluez-users] Page timeout on Logetech cordless elite keyboard but
+	mouse works
+Reply-To: Linux@feline-soul.com,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,39 +20,59 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Bearcat,
+Hello folks,
 
-> I am running sourcemage gnu/linux. My kernel is 2.6.17 and blues-libs and 
-> bluez-utils are versions 3.1. I have a Logitech cordless elite set (keyboard 
-> and MX 900 mouse).
-> 
-> The basis for my work on it so far is here: 
-> http://www.bueche.ch/comp/mx900/mx900.html
-> 
-> The logitech hub switches over to hci just fine and the mouse is successfully 
-> connected via blue tooth. (Note, both mouse and kb work in pure hid mode with 
-> no bluetooth). I need the bluetooth hub working as i will be getting a 
-> headset this week, that i need to have operational
-> 
-> However, i can not get the keyboard to connect. When i enter a "hidd --connect 
-> 00:07:61:1d:29:32" i get "Can't get device information: Host is down" from 
-> the terminal  and "Problem connecting with 00:07:61:1d:29:32: Page Timeout" 
-> on a kdebluetooth tool tip.
-> 
-> I have hit the connect button on the keyboard repeatedly and even taken out a 
-> battery for a few seconds. I have verified that i am using the correct MAC 
-> address via the printing on the bottom of the keyboard.
-> 
-> I'll be happy to provide what ever config info you all need to help me resolve 
-> this.
+I am running sourcemage gnu/linux. My kernel is 2.6.17 and blues-libs and 
+bluez-utils are versions 3.1. I have a Logitech cordless elite set (keyboard 
+and MX 900 mouse).
 
-make sure that "hidd --server" is running, because the keyboard will
-re-connect to you.
+The basis for my work on it so far is here: 
+http://www.bueche.ch/comp/mx900/mx900.html
 
-Regards
+The logitech hub switches over to hci just fine and the mouse is successfully 
+connected via blue tooth. (Note, both mouse and kb work in pure hid mode with 
+no bluetooth). I need the bluetooth hub working as i will be getting a 
+headset this week, that i need to have operational
 
-Marcel
+However, i can not get the keyboard to connect. When i enter a "hidd --connect 
+00:07:61:1d:29:32" i get "Can't get device information: Host is down" from 
+the terminal  and "Problem connecting with 00:07:61:1d:29:32: Page Timeout" 
+on a kdebluetooth tool tip.
 
+I have hit the connect button on the keyboard repeatedly and even taken out a 
+battery for a few seconds. I have verified that i am using the correct MAC 
+address via the printing on the bottom of the keyboard.
+
+I'll be happy to provide what ever config info you all need to help me resolve 
+this.
+
+One thought is that i do have a spare keyboard plugged into the keyboard port 
+while i'm testing, or else i would not be able to type the commands to 
+connect the bluetooth one.  Could this be blocking it? If so, how the heck 
+would i resolve that?!
+
+Thank you for your time,
+
+Bearcat M. Sandor
+
+-- 
+Bearcat M. Sandor
+Bearcat@feline-soul.com
+ICQ: 6628727
+MSN: bearcatsandor@hotmail.com
+Yahoo: bearcatsandor
+AIM: bearcatmsandor
+Jabber: bearcatsandor@jabber.org
+
+
+-- 
+Bearcat M. Sandor
+Bearcat@feline-soul.com
+ICQ: 6628727
+MSN: bearcatsandor@hotmail.com
+Yahoo: bearcatsandor
+AIM: bearcatmsandor
+Jabber: bearcatsandor@jabber.org
 
 
 -------------------------------------------------------------------------
