@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44C73308.3010903@gmail.com>
-Date: Wed, 26 Jul 2006 05:16:56 -0400
-From: JP Freeley <jpf321@gmail.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Unable to get on on the D-Bus
+In-Reply-To: <4688DDA1-7466-48A2-A968-1636CE3E4C50@infitsrl.com>
+References: <4688DDA1-7466-48A2-A968-1636CE3E4C50@infitsrl.com>
+Date: Wed, 26 Jul 2006 09:22:16 +0200
+Message-Id: <1153898536.746.9.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Many simultaneous BtOBEX_TransportConnect ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,46 +20,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I have moved to the debian "sid" branch as it has 3.1 bluez included.
+Hi Fabrizio,
 
-When I first apt-get'd the necessary packages everything seemed to work OK.
-After REBOOT I am getting the following messages about HCID:
+> I'm facing a problem with bluez and I can't found the solution.
+> Situation is:
+>       bluez-libs-3.1
+>       openobex-1.2
+>       linux kernel 2.6.12
+> 
+> I'm simply trying to send a file (vcard) to two cellular phones
+> simultaneous using object push profile.
+> I've writed a little C program based on obex_test that take btaddr,
+> channel and filename and push the last.
+> If I send to only one device all it'ok, but if I try to send
+> simultaneous launcing two commands in cascade the first go ok but the
+> second
+> always fail in BtOBEX_TransportConnect of openobex ibrary.
+> 
+> Testing two rfcomm connection to same devices all works....
+> 
+> Is this a bluez (or openopex) limitation?
+> 
+> I've implemented the same on windows xp with microsoft stack without  
+> problems and
+> I'm testing the solutions with the same bluetooth usd dongles.
 
-Jul 27 03:41:37  hcid[1460]: Bluetooth HCI daemon
-Jul 27 03:41:37 sdpd[1462]: Bluetooth SDP daemon
-Jul 27 03:41:37 hcid[1460]: Service could not become the primary owner.
-Jul 27 03:41:37 hcid[1460]: Unable to get on D-Bus
-Jul 27 03:41:38 dund[1481]: Bluetooth DUN daemon version 3.1
+run "hcidump -X -V" and check if you might create the ACL connections at
+the same time. This will fail with most dongles.
 
-Yes, I have dbus installed and presumably running:
-% ps -ef | grep dbus
-100       1412     1  0 03:41 ?        00:00:00 /usr/bin/dbus-daemon 
---system
+Regards
 
-Here are my installed versions:
-% apt-show-versions | grep -e dbus -e bluez
-libdbus-1-2/sid uptodate 0.62-4
-libdbus-glib-1-2/sid uptodate 0.62-4
-bluez-utils/sid uptodate 3.1-2
-bluez-firmware/sid uptodate 1.0-3
-dbus/sid uptodate 0.62-4
-bluez-hcidump/sid uptodate 1.31-1
-libbluetooth2/sid uptodate 3.1-1
+Marcel
 
-On boot-up here are the reported versions:
-Kernel ver. 2.4.32
-BlueZ Core 2.4
-HCI USB 2.7
-l2cap 2.3
-rfcomm 1.1
 
-I should mention, I suppose, that I am running low on available disk 
-space, I will work towards cleaning that up, could this be the root of 
-this error?
-
-Thanks,
-
-jpf
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
