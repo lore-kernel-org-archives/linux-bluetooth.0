@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <78338BC4EB35DC488A56F870C94161F1331D92@si-cmn1.coind.dom>
-References: <78338BC4EB35DC488A56F870C94161F1331D92@si-cmn1.coind.dom>
-Date: Wed, 26 Jul 2006 09:25:32 +0200
-Message-Id: <1153898732.746.13.camel@localhost>
+In-Reply-To: <44BF9F02.2040103@xmission.com>
+References: <44BE9DE5.7000000@over-here.org>
+	<20060719214242.GA20848@adamis.de>	<44BECE23.8080004@xmission.com>
+	<20060720145130.GA19833@adamis.de>  <44BF9F02.2040103@xmission.com>
+Date: Wed, 26 Jul 2006 09:29:36 +0200
+Message-Id: <1153898976.746.18.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] ARM-linux and multiple USB dongles
+Subject: Re: [Bluez-users] Problems with Ambicom BT-2000E
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,36 +22,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Francesco,
+Hi Brad,
 
-> I'm facing this problem on ARM-linux (2.4.26) and 2 USB dongles on a
-> TS-7200 SBC by technologic systems.
->  
-> When I plug the 1st dongle, it is correctly initialized and it works
-> okay.
-> When I plug the 2nd one, it is regognized but I can't get it working:
-> hciconfig hc1 up returns timeout(110).
->  
-> If I unplug hci0 (the first dongle) then hci1 starts working.
->  
-> I have been trying this with different dongles & different chipsets
-> but I still get the same results.
-> On the development machine (i86 with same Kernel version) everything
-> works ok.
->  
-> At the beginning I thought this might be some problem with USB support
-> on the board. But I have been able to operate up to 7 simultaneous USB
-> devices on the board (not bluetooth) and they work ok.
->  
-> Are there any known issues about multiple devices and ARM? 
+> > However it wouldn't be that bad not having to patch each new kernel
+> > again and again... maybe you know some contact to get this thing solved?
+> 
+> I don't know anyone like that--sorry.
+> 
+> One reason I think it got overlooked is you claimed to support hardware
+> that you didn't have around to test. Keep the scope and impact limited
+> and if it supports something new as a side effect, you may want to keep
+> that under your hat if you don't have someone to test it.
+> 
+> The other route you can go is ask a vendor to support it. I think ubuntu
+> is in a good position for that. If people start to benefit from a vendor
+> patch, the kernel guys may see it differently.
 
-no, they are working perfectly. Why don't you try to use a recent 2.6
-kernel on your system. Sticking to 2.4 is not a good idea at all.
+most of the times, Russell is kinda busy. Prepare a clean patch against
+the latest 2.6 repository of Linus and post it to LKML for inclusion.
 
 Regards
 
 Marcel
-
 
 
 
