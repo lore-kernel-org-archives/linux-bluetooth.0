@@ -1,17 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bearcat@feline-soul.com
-In-Reply-To: <200607272126.48317.Bearcat@feline-soul.com>
-References: <44C8FB2F.9070403@kernelconcepts.de>
-	<1171.216.47.50.125.1154031396.squirrel@webmail.feline-soul.net>
-	<1154049725.7650.8.camel@localhost>
-	<200607272126.48317.Bearcat@feline-soul.com>
-Date: Fri, 28 Jul 2006 09:21:30 +0200
-Message-Id: <1154071290.2298.1.camel@localhost>
+To: Linux@feline-soul.com
+In-Reply-To: <200607260140.10216.Linux@feline-soul.com>
+References: <200607260027.41270.Linux@feline-soul.com>
+	<1153898346.746.4.camel@localhost>
+	<200607260140.10216.Linux@feline-soul.com>
+Date: Wed, 26 Jul 2006 09:46:10 +0200
+Message-Id: <1153899970.746.28.camel@localhost>
 Mime-Version: 1.0
-Cc: BlueZ users <bluez-users@lists.sourceforge.net>,
-        Nils Faerber <nils.faerber@kernelconcepts.de>
-Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
+Cc: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Page timeout on Logetech cordless elite
+	keyboard	but mouse works
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -27,35 +26,22 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi Bearcat,
 
-> I installed the hcidump program (and made/distributed a package for my 
-> distro).
+> hidd --server is indeed running. 
 > 
-> When i press buttons on my keyboards hcidump reports nothing. There is nothing 
-> about a pin or security when i turn auth on and try to reestablish 
-> connections with the mouse. After auth is off the mouse works fine.
+> At my start up i do:
+> modprobe hidp
+> /usr/bin/hidd --server
+> hid2hci -0
+> /usr/bin/hidd --connect 00:07:61:1d:29:32
 > 
-> When trying to connect the keyboard i get a lot of:
-> < HCI Command: Role Discovery (0x02|0x0009) plen 2
->     handle 41
-> > HCI Event: Command Complete (0x0e) plen 7
->     Role Discovery (0x02|0x0009) ncmd 1
->     0000: 00 29 00 00                                       .)..
-> < HCI Command: Read RSSI (0x05|0x0005) plen 2
->     handle 41
-> > HCI Event: Command Complete (0x0e) plen 7
->     Read RSSI (0x05|0x0005) ncmd 1
->     status 0x00 handle 41 rssi 0
-> < HCI Command: Role Discovery (0x02|0x0009) plen 2
->     handle 41
-> 
-> Does that mean anything?
+> That connects the mouse just fine. However the keyboard never wakes up.  Even 
+> removing and replacing a battery does nothing. A "/usr/bin/hidd --connect 
+> 00:07:61:1B:50:9B" just gives me the time out error. (forget the MAC i 
+> entered below, i cut/paste the wrong one). Nothing appears in my syslogs when 
+> i do a hdd --connect.
 
-this is totally out of context. Make sure that we at least see the
-create connection command.
-
-And don't use "hciconfig hci0 auth" unless you know what you are doing.
-This is security mode 3 and its config option has been removed for a
-very good reason.
+the "hidd --connect ..." should only be used once. Every further connect
+will be done by the keyboard or the mouse. I stated this various times.
 
 Regards
 
