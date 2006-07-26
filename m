@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <44BF9B15.1020607@uen.org>
-References: <44BF9B15.1020607@uen.org>
-Date: Wed, 26 Jul 2006 09:24:09 +0200
-Message-Id: <1153898649.746.11.camel@localhost>
+To: Linux@feline-soul.com, BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200607260027.41270.Linux@feline-soul.com>
+References: <200607260027.41270.Linux@feline-soul.com>
+Date: Wed, 26 Jul 2006 09:19:06 +0200
+Message-Id: <1153898346.746.4.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] verizon locking out dialout linux
+Subject: Re: [Bluez-users] Page timeout on Logetech cordless elite
+	keyboard	but mouse works
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,15 +21,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Brad,
+Hi Bearcat,
 
-> Verizon Wireless here in the US is intentionally locking out linux and
-> other standards-based clients from its dialup networking. There may be a
-> technical solution, like ignoring sdp and scanning for open rfcomm
-> channels but I really would rather have them give me back the feature.
-> I'm really bugged.
+> I am running sourcemage gnu/linux. My kernel is 2.6.17 and blues-libs and 
+> bluez-utils are versions 3.1. I have a Logitech cordless elite set (keyboard 
+> and MX 900 mouse).
+> 
+> The basis for my work on it so far is here: 
+> http://www.bueche.ch/comp/mx900/mx900.html
+> 
+> The logitech hub switches over to hci just fine and the mouse is successfully 
+> connected via blue tooth. (Note, both mouse and kb work in pure hid mode with 
+> no bluetooth). I need the bluetooth hub working as i will be getting a 
+> headset this week, that i need to have operational
+> 
+> However, i can not get the keyboard to connect. When i enter a "hidd --connect 
+> 00:07:61:1d:29:32" i get "Can't get device information: Host is down" from 
+> the terminal  and "Problem connecting with 00:07:61:1d:29:32: Page Timeout" 
+> on a kdebluetooth tool tip.
+> 
+> I have hit the connect button on the keyboard repeatedly and even taken out a 
+> battery for a few seconds. I have verified that i am using the correct MAC 
+> address via the printing on the bottom of the keyboard.
+> 
+> I'll be happy to provide what ever config info you all need to help me resolve 
+> this.
 
-can you try a "sdptool records <bdaddr>" from the CVS?
+make sure that "hidd --server" is running, because the keyboard will
+re-connect to you.
 
 Regards
 
