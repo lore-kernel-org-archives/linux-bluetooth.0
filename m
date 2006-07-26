@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <5f30e2610607260812p561f00aar8cf2e0b79a247cbb@mail.gmail.com>
+Date: Wed, 26 Jul 2006 10:12:33 -0500
+From: "Jeff Wilson" <jazzbotley@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-From: Yuriy Vikulov <vikulov@rscenter.ru>
-Date: Thu, 27 Jul 2006 10:53:27 +0000 (UTC)
-Message-ID: <loom.20060727T124321-180@post.gmane.org>
-References: <loom.20060726T090256-627@post.gmane.org>
-	<1153898432.746.7.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Connecting on the first computer with bluetooth and
-	interacting on another computer
+MIME-Version: 1.0
+Subject: [Bluez-devel] DBus and BlueZ 3.x
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,24 +18,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello
+I've been following the list for a while, but I never picked up on
+what exactly DBus does for BlueZ.  It is my understanding that in
+BlueZ before 3.0, the socket() interface for userland API is
+implemented by an ioctl() interface to the kernel.  In BlueZ 3.x, is
+all the HCI is handled by passing messages via DBus instead of
+ioctl()?
 
-May be, my english not well and you may be not understand me.
+If this conversation is already laid to rest in the archives, please
+send me a URL.
 
-I have a situation
-Man is walking at one computer and at this moment bluetooth adapter
-is begining to send a file (my own code). While it sending, he goes out 
-and comes to another computer, where the link is bad with the 
-first computer and is good with another. The file is sending.
-
-Is it possible to continue sending this file from another computer without
-breaking transmitting and to stop the first computer sending. And for man 
-it would be like just file sending without reconnecting
-
-Thanks
-
-Yuriy
-
+   Thanks for your time,
+      Jeff
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
