@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <d23110170607211624r5b3c915av2acd3139388d7d0@mail.gmail.com>
-References: <1153205453.7078.12.camel@pc044.coreteam.oslo.opera.com>
-	<1153219342.4639.5.camel@localhost>
-	<1153249459.4161.3.camel@localhost.localdomain>
-	<d23110170607211624r5b3c915av2acd3139388d7d0@mail.gmail.com>
-Date: Wed, 26 Jul 2006 09:36:22 +0200
-Message-Id: <1153899382.746.25.camel@localhost>
+In-Reply-To: <78338BC4EB35DC488A56F870C94161F1331DF6@si-cmn1.coind.dom>
+References: <78338BC4EB35DC488A56F870C94161F1331DF6@si-cmn1.coind.dom>
+Date: Wed, 26 Jul 2006 13:34:44 +0200
+Message-Id: <1153913684.746.40.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Is the CNET CBD-220 bluetooth adapter supported?
+Subject: Re: [Bluez-users] R:  ARM-linux and multiple USB dongles
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,24 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Ulisses,
+Hi Francesco,
 
-> > OK. So maybe the Epox BT-DG07A+ is a better choice then? I'm not sure it
-> > uses bluecore4, but some googling suggests that. Am I correct?
+> I have switched to 2.6 and the dongles now are working. I have been able to plug up to 8 BT dongles on the system using two usb hubs.
 > 
-> I'm not sure about this one, but I do know that an Epox BT-DG06+ has a
-> CSR BlueCore4 chip (it's ROM and not External, though).
-> 
-> # hciconfig hci0 revision
-> hci0:   Type: USB
->         BD Address: 00:04:61:85:CA:73 ACL MTU: 384:8 SCO MTU: 64:8
->         HCI 19.2
->         Chip version: BlueCore4-ROM
->         Max key size: 128 bit
->         SCO mapping:  HCI
+> Sometimes, though, we have the same problem. It seems related to the order in which we install the dongles. Maybe there's something wrong with the usb driver...
 
-the ROM chips are perfectly fine. The only disadvantage is that you
-can't update their firmware.
+if you don't need the SCO support then you can load hci_usb with isoc=0
+to disable the ISOC transfers.
 
 Regards
 
