@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Anselm Martin Hoffmeister <anselm@hoffmeister-online.de>
+Message-ID: <44C73308.3010903@gmail.com>
+Date: Wed, 26 Jul 2006 05:16:56 -0400
+From: JP Freeley <jpf321@gmail.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Tue, 25 Jul 2006 21:51:09 +0200
-Message-Id: <1153857069.6181.26.camel@anselm.venusberg.augustinnetz.de>
-Mime-Version: 1.0
-Subject: [Bluez-devel] HIDclient: Using a Bluez PC as virtual Bluetooth
-	keyboard and mouse
+Subject: [Bluez-devel] Unable to get on on the D-Bus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,62 +14,56 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello list,
+I have moved to the debian "sid" branch as it has 3.1 bluez included.
 
-with this posting I publish a software that mimicks a Bluetooth HID
-(keyboard and mouse combo device) on a Linux PC. Thus you can
-remote-control other Bluez-equipped PCs, Widcomm-stack equipped windows
-boxes, and basically any machine that knows how to talk to Bluetooth
-keyboards in non-boot-protocol mode.
+When I first apt-get'd the necessary packages everything seemed to work OK.
+After REBOOT I am getting the following messages about HCID:
 
-Source code is GNU GPLd, and can be found on
-http://www.hoffmeister-online.de/bluez/hidclient-20060725.tar.bz2
+Jul 27 03:41:37  hcid[1460]: Bluetooth HCI daemon
+Jul 27 03:41:37 sdpd[1462]: Bluetooth SDP daemon
+Jul 27 03:41:37 hcid[1460]: Service could not become the primary owner.
+Jul 27 03:41:37 hcid[1460]: Unable to get on D-Bus
+Jul 27 03:41:38 dund[1481]: Bluetooth DUN daemon version 3.1
 
-Short instructions (for root users):
-Download the file and unpack it
-# wget -q
-http://www.hoffmeister-online.de/bluez/hidclient-20060725.tar.bz2
-# tar -xjvf hidclient-20060725.tar.bz2
+Yes, I have dbus installed and presumably running:
+% ps -ef | grep dbus
+100       1412     1  0 03:41 ?        00:00:00 /usr/bin/dbus-daemon 
+--system
 
-Run make and copy the hid-sdp-record.bin into /etc/bluetooth/
+Here are my installed versions:
+% apt-show-versions | grep -e dbus -e bluez
+libdbus-1-2/sid uptodate 0.62-4
+libdbus-glib-1-2/sid uptodate 0.62-4
+bluez-utils/sid uptodate 3.1-2
+bluez-firmware/sid uptodate 1.0-3
+dbus/sid uptodate 0.62-4
+bluez-hcidump/sid uptodate 1.31-1
+libbluetooth2/sid uptodate 3.1-1
 
-Make sure bluez is installed (else the "make" will most probably fail
-anyway) and the SDP daemon is running (which it should by default).
+On boot-up here are the reported versions:
+Kernel ver. 2.4.32
+BlueZ Core 2.4
+HCI USB 2.7
+l2cap 2.3
+rfcomm 1.1
 
-Change to a Linux textmode console (e.g. Ctrl+Alt+F1) and run
-./hidclient
-from there. Then, startup the other machine and discover the "HID"
-service available on your virtual-HID box. Connect to it.
+I should mention, I suppose, that I am running low on available disk 
+space, I will work towards cleaning that up, could this be the root of 
+this error?
 
-Move the mouse, touch the keyboard, enjoy.
+Thanks,
 
-Hint: The bluetooth connection can be interrupted by pressing "Pause",
-the program can be aborted altogether with LeftCtrl+LeftAlt+Pause
-
-Beware, all keyboard and mouse input will simultaneously be read by your
-virtual-HID computer as well! That's why running hidclient from a
-textmode console is a good idea.
-
-Code history: Developped as a practical work during the "Networks"
-course at Rheinische Friedrich-Wilhelms-Universit=E4t, Bonn, Germany in
-2004/2005 for the Nokia-supported, GPLd, Affix Bluetooth stack.
-Ported in July/2006 to bluez, several code cleanups and improvements.
-
-Questions welcome.
-
-Regards
-Anselm
+jpf
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
