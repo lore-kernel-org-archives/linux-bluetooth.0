@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Anselm Martin Hoffmeister <anselm@hoffmeister-online.de>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1153932509.13885.74.camel@panic>
-References: <1153857069.6181.26.camel@anselm.venusberg.augustinnetz.de>
-	<1153932509.13885.74.camel@panic>
-Date: Thu, 27 Jul 2006 16:51:21 +0200
-Message-Id: <1154011882.6222.10.camel@anselm.venusberg.augustinnetz.de>
+In-Reply-To: <20060726094906.GB6549@esaurito.net>
+References: <20060725165124.GB14679@esaurito.net>
+	<1153848241.31069.31.camel@localhost>
+	<20060726094906.GB6549@esaurito.net>
+Date: Wed, 26 Jul 2006 16:20:21 +0200
+Message-Id: <1153923621.746.47.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] HIDclient: Using a Bluez PC as
-	virtual	Bluetooth	keyboard and mouse
+Cc: Kay Sievers <kay.sievers@vrfy.org>, Felix Homann <fexpop@onlinehome.de>,
+        bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] bluez udev rules for pcmcia devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,55 +24,67 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Am Mittwoch, den 26.07.2006, 18:48 +0200 schrieb Collin R. Mulliner:
-> Cool, but do I read right - it only supports REPORT mode? 
+Hi Filippo,
+
+> > the first thing is that every line for dtl1_cs, bt3c_cs, bluecard_cs,
+> > bt950_cs and btuart_cs must be removed. These are not TTY drivers and
+> > totally useless lines anyway.
+> > 
+> > Second is that I prefer to call the script "bluetooth_hciattach" or
+> > better maybe "bluetooth_serial", because this is what it is doing. It is
+> > not a generic udev helper for Bluetooth. The job is to attach the serial
+> > port to the hci_uart driver. We can also strip the "/lib/udev/" prefix
+> > and the ".sh" suffix.
+> > 
+> > Calling /etc/init.d/bluetooth from the script must go away. Either the
+> > support for Bluetooth is enabled or not. The udev helper shouldn't care
+> > about it at all.
+> > 
+> > Also the line "DEVICE=`echo $DEVNAME|sed -e 's_/dev/__'`" in the script
+> > is not needed at all, because hciattach can handle full device names
+> > without any problems. And in case of some crazy persistent naming rules
+> > it is the safer choice.
 > 
-> My HID keyboard (http://www.mulliner.org/bluetooth/xkbdbthid.php) so far
-> only supports BOOT mode... I allways wanted to implement report mode.
+> agreed, I've fixed this in
+> http://svn.debian.org/wsvn/pkg-bluetooth/bluez-utils/trunk/debian/bluetooth_serial?op=file&rev=0&sc=0
+> and
+> http://svn.debian.org/wsvn/pkg-bluetooth/bluez-utils/trunk/debian/bluez-pcmcia-support.udev?op=file&rev=0&sc=0
 
-It is a matter of choice. The boot mode is not at all BAD, and in
-reality, iirc, the "report mode" report can look exactly like the "boot
-mode" reports. The difficulty with boot mode though is that a given
-device can only be keyboard OR mouse, so for mimicking both from the
-same computer, you would need two connections. This again will hinder
-you from using the standard "ports" for the HID protocol (namely the
-0x11/0x13 pair) for both those devices, and most probably one of the two
-will not work with the more braindead implementations out there. Let us
-name the Widcomm stack which sometimes behaves oddly, for my
-understanding.
+looks good.
 
-That is the reason why I chose the "report mode" - it gives me the
-opportunity to deliver both mouse and keyboard data over the same data
-channel.
+> > >From a programming perspective, the TYPEID should be moved into
+> > start_serial, because it is its only user.
+> 
+> I'm failing to understand this :(
 
-Looking at the code you will find that I use two different reports
-though, with ID "1" for mouse reports and ID "2" for keyboard reports.
-Moving the mouse, you generate a "1" record, which only contains mouse
-information, and vice versa, and those two reports are iirc fairly
-similar to the boot protocol reports. You will find more detailed
-information in the Bluetooth HID spec, and, most probably also in the
-USB HID spec. If you intend to make my hidclient code boot-mode
-compatible, you could drop either keyboard or mouse functions, set the
-appropriate flags in the SDP information (is_bootmode_device or
-similar), and change the details of the report that are not exactly boot
-mode. That is why I hand out a hex mode report descriptor - so that it
-can be adapted to the developer's needs.
+You have a generic TYPEID variable that you define at the top of the
+script. Don't do this until you have to use it for all function. So
+define it just before you need it. Like in your new version of the
+script.
 
-Let's say you wish to add joystick support. Yes, that would be possible:
-Go into the input event handling subroutine, implement some code that
-reads the Linux joystick events and generates a "joystick report" -
-which would be defined in the HID descriptor as well. Not too much magic
-needed ;-) You might to implement a logic to recognize switching between
-the two modes - I cannot tell you out of my head. A boot-mode-only thing
-would of course live without that logic.
+> > If this script isn't distributed via bluez-utils, then the script must
+> > check if hciattach is installed. Otherwise you will see errors and this
+> > might not be what users expect.
+> 
+> fixed as well
 
-If you want to implement report mode for your Xkbdbt, you will need a
-proper report descriptor, the rest is mostly straightforward. If you
-want me to have a look over your code, feel free to write PM or ask
-questions on the list.
+In case of stop_serial() you might wanna do the same. If hciattach is
+not installed then we are not responsible for cleaning up.
+
+> > And we should actually only call hciattach instances using the specified
+> > device. Don't kill something that you didn't start.
+> 
+> agreed but since the script is (supposed to be) invoked only by udev on
+> add/remove pcmcia bt cards, I think we can assume the script is the only user of
+> $DEVNAME.
+
+You can't make that assumption.
 
 Regards
-Anselm
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
