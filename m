@@ -1,12 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5f30e2610607260812p561f00aar8cf2e0b79a247cbb@mail.gmail.com>
-References: <5f30e2610607260812p561f00aar8cf2e0b79a247cbb@mail.gmail.com>
-Date: Thu, 27 Jul 2006 09:39:37 +0200
-Message-Id: <1153985977.9543.1.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] DBus and BlueZ 3.x
+From: Felix Homann <fexpop@onlinehome.de>
+To: Filippo Giunchedi <filippo@esaurito.net>
+Date: Wed, 26 Jul 2006 12:07:41 +0200
+References: <20060725165124.GB14679@esaurito.net>
+	<1153848241.31069.31.camel@localhost>
+	<20060726094906.GB6549@esaurito.net>
+In-Reply-To: <20060726094906.GB6549@esaurito.net>
+MIME-Version: 1.0
+Message-Id: <200607261207.41398.fexpop@onlinehome.de>
+Cc: Kay Sievers <kay.sievers@vrfy.org>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>,
+        bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] bluez udev rules for pcmcia devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,24 +25,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jeff,
+On Wednesday 26 July 2006 11:49, Filippo Giunchedi wrote:
+> > >From a programming perspective, the TYPEID should be moved into
+> >
+> > start_serial, because it is its only user.
+>
+> I'm failing to understand this :(
 
-> I've been following the list for a while, but I never picked up on
-> what exactly DBus does for BlueZ.  It is my understanding that in
-> BlueZ before 3.0, the socket() interface for userland API is
-> implemented by an ioctl() interface to the kernel.  In BlueZ 3.x, is
-> all the HCI is handled by passing messages via DBus instead of
-> ioctl()?
+It's been related to my quick-hacked script where I had TYPEID (~MANF_CARD_ID) 
+set outside of start_serial() . You already fixed it.
 
-with our D-Bus API for BlueZ we provide a really nice an easy
-configuration interface that can be used without linking the Bluetooth
-library or be bound the C/C++ language.
+Kind regards,
 
-Regards
-
-Marcel
-
-
+Felix
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
