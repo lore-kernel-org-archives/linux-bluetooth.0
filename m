@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Felix Homann <fexpop@onlinehome.de>
-To: bluez-users@lists.sourceforge.net
-Date: Thu, 27 Jul 2006 12:40:49 +0200
-MIME-Version: 1.0
-Message-Id: <200607271240.49400.fexpop@onlinehome.de>
-Subject: [Bluez-users] Several problems with bluez-utils 3.1,
-	kbluetoothd and a Belkin dongle in Debian
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d23110170607211624r5b3c915av2acd3139388d7d0@mail.gmail.com>
+References: <1153205453.7078.12.camel@pc044.coreteam.oslo.opera.com>
+	<1153219342.4639.5.camel@localhost>
+	<1153249459.4161.3.camel@localhost.localdomain>
+	<d23110170607211624r5b3c915av2acd3139388d7d0@mail.gmail.com>
+Date: Wed, 26 Jul 2006 09:36:22 +0200
+Message-Id: <1153899382.746.25.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Is the CNET CBD-220 bluetooth adapter supported?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,29 +23,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Ulisses,
 
-though I already filed bug reports to the Debian BTS [1],[2] I'd like to ask 
-for advice here, too.
+> > OK. So maybe the Epox BT-DG07A+ is a better choice then? I'm not sure it
+> > uses bluecore4, but some googling suggests that. Am I correct?
+> 
+> I'm not sure about this one, but I do know that an Epox BT-DG06+ has a
+> CSR BlueCore4 chip (it's ROM and not External, though).
+> 
+> # hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:04:61:85:CA:73 ACL MTU: 384:8 SCO MTU: 64:8
+>         HCI 19.2
+>         Chip version: BlueCore4-ROM
+>         Max key size: 128 bit
+>         SCO mapping:  HCI
 
-First, using bluez-utils 3.1-* from Debian/Sid I can't discover my PC from 
-other BT devices. I tried this with 3 different BT cards/dongles. Downgrading 
-to bluez-utils 2.25-1 makes my system visible again.
+the ROM chips are perfectly fine. The only disadvantage is that you
+can't update their firmware.
 
-Second, kbluetoothd will not find other BT devices when I use a Belkin F8T013 
-dongle and bluez-utils 3.1-*, 'hcitool scan' works fine, though. While a  
-SPHINX PCMCIA card and an EPoX BT-DG03 work fine with kbluetoothd and 
-bluez-utils 3.1-* the Belkin dongle will only play together with bluez-utils 
-<=2.25-1.
+Regards
 
-Any ideas?
+Marcel
 
-Kind regards,
 
-Felix
-
-[1] http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=379401
-[2] http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=379403
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
