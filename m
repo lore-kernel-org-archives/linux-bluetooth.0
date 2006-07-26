@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <20060726211333.50028.qmail@web27904.mail.ukl.yahoo.com>
+Date: Wed, 26 Jul 2006 21:13:33 +0000 (GMT)
+From: Wolfram Reda <wolfram_reda@yahoo.de>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Date: Thu, 27 Jul 2006 14:02:13 -0700
-Message-ID: <DDBA30BC801ABE439B575D8A7AA3413602906E8B@SJEXCH03.ds.jdsu.net>
-From: "Atif Ikram" <Atif.Ikram@jdsu.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] bluez-utils-3.2 confiuration question
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
+Reply-To: Wolfram Reda <wolfram_reda@yahoo.de>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,266 +15,74 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2140167957=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+Hello,
+I'm trying to connect my Buetooth Keyboard BT-KB01B but without success so far. The error message is:
 
---===============2140167957==
-Content-class: urn:content-classes:message
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C6B1BF.EF4E4C30"
+ hcitool conf
+Connections:
+        > ACL 00:04:61:81:F7:C8 handle 44 state 1 lm SLAVE
+        < ACL 00:04:61:82:03:4A handle 41 state 1 lm MASTER
+root@woraBox:/home/rw024419# hidd --connect 00:04:61:82:03:4A
+Can't create HID control channel: Connection timed out
 
-This is a multi-part message in MIME format.
-
-------_=_NextPart_001_01C6B1BF.EF4E4C30
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-Greetings,
-
-=20
-
-I am brand new to BlueZ and the first thing I am trying to do is to
-download and configure it for my system.  I downloaded the latest bluez
-files as follows:
-
-=20
-
-bluez-libs-3.2.tar.gz
-
-bluez-utils-3.2.tar.gz
-
-bluez-hcidump-1.31.tar.gz
-
-=20
-
-I have been able to configure and build the bluez-libs3.2.tar.gz but I
-cannot configure bluez-utils-3.2.tar.gz.  The "configure" script is
-looking for BLUEZ libraries apparently and cannot find it and I don't
-know how to provide the path for it.  Can someone help ?
-
-=20
-
-Following is the snippet of trace trace:
-
-=20
-
-.............................
-
-Configure: creating libtool
-
-Checking for BLUEZ...
-
-Configure: error: Bluetooth library is required
-
-=20
-
-=20
-
-Regards,
-
-Atif
-
-=20
+here the info from the Keyboard:
 
 
-------_=_NextPart_001_01C6B1BF.EF4E4C30
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+hcitool info 00:04:61:82:03:4A
+Requesting information ...
+        BD Address:  00:04:61:82:03:4A
+        Device Name: Bluetooth-Keyboard 82034A
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x356
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+                <transparent SCO>
 
-<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
-xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns=3D"http://www.w3.org/TR/REC-html40">
-
-<head>
-<meta http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dus-ascii">
-<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
-<style>
-<!--
- /* Font Definitions */
- @font-face
-	{font-family:Wingdings;
-	panose-1:5 0 0 0 0 0 0 0 0 0;}
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0in;
-	margin-bottom:.0001pt;
-	font-size:12.0pt;
-	font-family:"Times New Roman";}
-a:link, span.MsoHyperlink
-	{color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{color:purple;
-	text-decoration:underline;}
-span.EmailStyle17
-	{mso-style-type:personal-compose;
-	font-family:Arial;
-	color:windowtext;}
-@page Section1
-	{size:8.5in 11.0in;
-	margin:1.0in 1.25in 1.0in 1.25in;}
-div.Section1
-	{page:Section1;}
- /* List Definitions */
- @list l0
-	{mso-list-id:465318849;
-	mso-list-template-ids:-2068926904;}
-@list l0:level1
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0B7;
-	mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	mso-ansi-font-size:10.0pt;
-	font-family:Symbol;}
-ol
-	{margin-bottom:0in;}
-ul
-	{margin-bottom:0in;}
--->
-</style>
-
-</head>
-
-<body lang=3DEN-US link=3Dblue vlink=3Dpurple>
-
-<div class=3DSection1>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Greetings,<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>I am brand new to BlueZ and the first thing I am =
-trying to
-do is to download and configure it for my system.&nbsp; I downloaded the =
-latest
-bluez files as follows:<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>bluez-libs-3.2.tar.gz<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>bluez-utils-3.2.tar.gz<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>bluez-hcidump-1.31.tar.gz<o:p></o:p></span></font></p>=
+and here the info from the bluetooth usb dongle:
 
 
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:04:61:81:5A:A8 ACL MTU: 192:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:967334 acl:38241 sco:0 events:47990 errors:0
+        TX bytes:244813 acl:260 sco:0 commands:47588 errors:0
+        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy:
+        Link mode: SLAVE ACCEPT
+        Name: 'BlueZ linux (0)'
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
 
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>I have been able to configure and build the
-bluez-libs3.2.tar.gz but I cannot configure =
-bluez-utils-3.2.tar.gz.&nbsp; The &#8220;configure&#8221;
-script is looking for BLUEZ libraries apparently and cannot find it and =
-I don&#8217;t
-know how to provide the path for it.&nbsp; Can someone help =
-?<o:p></o:p></span></font></p>
+The EPOX Mous BT-MS02B works perfectly.
 
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+I'm using a Kanotix Linux with Kernel 2.6.17.7.
 
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Following is the snippet of trace =
-trace:<o:p></o:p></span></font></p>
+Can somebody help meor give me some hint what i did wrong?
 
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+Thanks in advance.
 
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>&#8230;&#8230;&#8230;&#8230;&#8230;&#8230;&#8230;&#823=
-0;&#8230;..<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Configure: creating =
-libtool<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Checking for =
-BLUEZ&#8230;<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Configure: error: Bluetooth library is =
-required<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Regards,<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Atif<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-</div>
-
-</body>
-
-</html>
-
-------_=_NextPart_001_01C6B1BF.EF4E4C30--
+Wolfram
 
 
---===============2140167957==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============2140167957==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============2140167957==--
