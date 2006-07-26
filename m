@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <loom.20060726T090256-627@post.gmane.org>
-References: <loom.20060726T090256-627@post.gmane.org>
-Date: Wed, 26 Jul 2006 09:20:32 +0200
-Message-Id: <1153898432.746.7.camel@localhost>
+In-Reply-To: <200607181921.52647.Kevin.Baradon@gmail.com>
+References: <200607181921.52647.Kevin.Baradon@gmail.com>
+Date: Wed, 26 Jul 2006 09:35:29 +0200
+Message-Id: <1153899329.746.24.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Connecting on the first computer with
-	bluetooth	and interacting on another computer
+Cc: Kevin Baradon <kevin.baradon@gmail.com>
+Subject: Re: [Bluez-devel] Lockdep: possible recursive locking detected
+	in	hidd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,17 +22,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Yuriy,
+Hi Kevin,
 
-> Does anybody know is it possible to connect with phone (or something else) on
-> the first computer and, while sending some data, can i make the phone to send
-> and be conecting with another computer without loosing connection.
-> This means Can i change connected bluetooth dongle to another, after sending
-> some data without loosing connection.
+> I've got a Logitech Bluetooth keyboard. 
+> With lockdep enabled, I've got the following message just after boot, after 
 
-in general this is possible as long as the computer is the master of the
-piconet. If it is a slave you need a dongle that supports scatternet.
-You also can either page for a new connection or run an inquiry.
+this looks like a lock problem in L2CAP. We fixed one, but I am not sure
+if it already made it into 2.6.18-rc2 or not. Can you give the latest
+tree from Linus repository a try?
 
 Regards
 
