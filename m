@@ -1,14 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Yuriy Vikulov <vikulov@rscenter.ru>
-Date: Thu, 27 Jul 2006 04:35:23 +0000 (UTC)
-Message-ID: <loom.20060727T062423-657@post.gmane.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <loom.20060727T124321-180@post.gmane.org>
 References: <loom.20060726T090256-627@post.gmane.org>
 	<1153898432.746.7.camel@localhost>
+	<loom.20060727T124321-180@post.gmane.org>
+Date: Thu, 27 Jul 2006 13:05:12 +0200
+Message-Id: <1153998312.9543.10.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel]
-	=?utf-8?q?Connecting_on_the_first_computer_with=09b?=
-	=?utf-8?q?luetooth=09and_interacting_on_another_computer?=
+Subject: Re: [Bluez-devel] Connecting on the first computer with
+	bluetooth	and interacting on another computer
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,25 +23,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello
+Hi Yuriy,
 
-May be, my english not well and you don't understand me
+> I have a situation
+> Man is walking at one computer and at this moment bluetooth adapter
+> is begining to send a file (my own code). While it sending, he goes out 
+> and comes to another computer, where the link is bad with the 
+> first computer and is good with another. The file is sending.
+> 
+> Is it possible to continue sending this file from another computer without
+> breaking transmitting and to stop the first computer sending. And for man 
+> it would be like just file sending without reconnecting
 
-For example, someone is going not far away one computer
-and at this moment my programm ist starting to send a file.
-some time some data is sent. he goes away form this computer
-and goes not far away to another computer and distance is too big
-to have a good link. but is small to have a good link with another computer
+no. Bluetooth doesn't support this kind of roaming or handover
 
-The 1st questions:
-Is possible not to break link with a someone and to continue sending a file
-from the second computer?
+Regards
 
-The 2st questions:
-if it is possible how in generally can i make this?
+Marcel
 
-thanks 
-Yuriy
 
 
 -------------------------------------------------------------------------
