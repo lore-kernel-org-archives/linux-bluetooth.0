@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 27 Jul 2006 12:10:38 -0300
-From: Nelson Murilo <nelson@pangeia.com.br>
+From: Anselm Martin Hoffmeister <anselm@hoffmeister-online.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060727151038.GE28854@pangeia.com.br>
+In-Reply-To: <20060727143305.GC28854@pangeia.com.br>
 References: <1153915377.6149.1.camel@anselm.venusberg.augustinnetz.de>
 	<20060727143305.GC28854@pangeia.com.br>
-	<1154012213.6222.16.camel@anselm.venusberg.augustinnetz.de>
+Date: Thu, 27 Jul 2006 16:56:53 +0200
+Message-Id: <1154012213.6222.16.camel@anselm.venusberg.augustinnetz.de>
 Mime-Version: 1.0
-In-Reply-To: <1154012213.6222.16.camel@anselm.venusberg.augustinnetz.de>
 Subject: Re: [Bluez-devel] HIDclient: Using a Bluez PC as virtual
 	Bluetooth	keyboard and	mouse [repost]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -23,32 +22,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Am Donnerstag, den 27.07.2006, 11:33 -0300 schrieb Nelson Murilo:
+> Great job!
+> 
+> I got tarball, ran make and copied hdi*.bin to /etc/bluetooth
+> 
+> After run hdiclient, I get: 
+>  ./hidclient 
+> HID keyboard/mouse service registered
+> Opened event device [/dev/input/event0]
+> Opened event device [/dev/input/event1]
+> Opened event device [/dev/input/event2]
+> Opened event device [/dev/input/event3]
+> Bind error (PSM 19): Address already in use
+> Failed to bind sockets (9/8) to PSM (17/19)
+> 
+> #  hciconfig hci0 version
+> hci0:   Type: USB
+>         BD Address: 00:02:C7:96:9C:74 ACL MTU: 192:8 SCO MTU: 64:8
+>         HCI Ver: 1.2 (0x2) HCI Rev: 0x570 LMP Ver: 1.2 (0x2) LMP Subver: 0x570
+>         Manufacturer: Cambridge Silicon Radio (10)
+> 
+> Any hints? 
 
-Hmmm.
+It seems you already have a bluetooth daemon using the PSM 19. I do not
+know which one that might be, but if I remember right, that should be
+reserved for HID!? Sorry I cannot tell you how to find out which program
+that might be. If possible, you could try to shutdown the bluetooth
+daemons currently running, and see wether that port becomes free.
 
-ps auwx | grep hi
-root      6147  0.0  0.0   1816   444 ?        Ss   12:08   0:00 /usr/bin/hidd --server
+Sorry for being so unspecific.
 
-After killed it all works fine now...
-
-./hidclient 
-HID keyboard/mouse service registered
-Opened event device [/dev/input/event0]
-Opened event device [/dev/input/event1]
-Opened event device [/dev/input/event2]
-Opened event device [/dev/input/event3]
-The HID-Client is now ready to accept connections from another machine
-
-Thanks for your help,
-
-./nelson -murilo
-
-
-> It seems you already have a bluetooth daemon using the PSM 19. I do not
-> know which one that might be, but if I remember right, that should be
-> reserved for HID!? Sorry I cannot tell you how to find out which program
-> that might be. If possible, you could try to shutdown the bluetooth
-> daemons currently running, and see wether that port becomes free.
+Anselm
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
