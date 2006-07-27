@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Anselm Martin Hoffmeister <anselm@hoffmeister-online.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20060727143305.GC28854@pangeia.com.br>
-References: <1153915377.6149.1.camel@anselm.venusberg.augustinnetz.de>
-	<20060727143305.GC28854@pangeia.com.br>
-Date: Thu, 27 Jul 2006 16:56:53 +0200
-Message-Id: <1154012213.6222.16.camel@anselm.venusberg.augustinnetz.de>
+In-Reply-To: <1153932509.13885.74.camel@panic>
+References: <1153857069.6181.26.camel@anselm.venusberg.augustinnetz.de>
+	<1153932509.13885.74.camel@panic>
+Date: Thu, 27 Jul 2006 16:51:21 +0200
+Message-Id: <1154011882.6222.10.camel@anselm.venusberg.augustinnetz.de>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] HIDclient: Using a Bluez PC as virtual
-	Bluetooth	keyboard and	mouse [repost]
+Subject: Re: [Bluez-devel] HIDclient: Using a Bluez PC as
+	virtual	Bluetooth	keyboard and mouse
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,37 +22,54 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Am Donnerstag, den 27.07.2006, 11:33 -0300 schrieb Nelson Murilo:
-> Great job!
+Am Mittwoch, den 26.07.2006, 18:48 +0200 schrieb Collin R. Mulliner:
+> Cool, but do I read right - it only supports REPORT mode? 
 > 
-> I got tarball, ran make and copied hdi*.bin to /etc/bluetooth
-> 
-> After run hdiclient, I get: 
->  ./hidclient 
-> HID keyboard/mouse service registered
-> Opened event device [/dev/input/event0]
-> Opened event device [/dev/input/event1]
-> Opened event device [/dev/input/event2]
-> Opened event device [/dev/input/event3]
-> Bind error (PSM 19): Address already in use
-> Failed to bind sockets (9/8) to PSM (17/19)
-> 
-> #  hciconfig hci0 version
-> hci0:   Type: USB
->         BD Address: 00:02:C7:96:9C:74 ACL MTU: 192:8 SCO MTU: 64:8
->         HCI Ver: 1.2 (0x2) HCI Rev: 0x570 LMP Ver: 1.2 (0x2) LMP Subver: 0x570
->         Manufacturer: Cambridge Silicon Radio (10)
-> 
-> Any hints? 
+> My HID keyboard (http://www.mulliner.org/bluetooth/xkbdbthid.php) so far
+> only supports BOOT mode... I allways wanted to implement report mode.
 
-It seems you already have a bluetooth daemon using the PSM 19. I do not
-know which one that might be, but if I remember right, that should be
-reserved for HID!? Sorry I cannot tell you how to find out which program
-that might be. If possible, you could try to shutdown the bluetooth
-daemons currently running, and see wether that port becomes free.
+It is a matter of choice. The boot mode is not at all BAD, and in
+reality, iirc, the "report mode" report can look exactly like the "boot
+mode" reports. The difficulty with boot mode though is that a given
+device can only be keyboard OR mouse, so for mimicking both from the
+same computer, you would need two connections. This again will hinder
+you from using the standard "ports" for the HID protocol (namely the
+0x11/0x13 pair) for both those devices, and most probably one of the two
+will not work with the more braindead implementations out there. Let us
+name the Widcomm stack which sometimes behaves oddly, for my
+understanding.
 
-Sorry for being so unspecific.
+That is the reason why I chose the "report mode" - it gives me the
+opportunity to deliver both mouse and keyboard data over the same data
+channel.
 
+Looking at the code you will find that I use two different reports
+though, with ID "1" for mouse reports and ID "2" for keyboard reports.
+Moving the mouse, you generate a "1" record, which only contains mouse
+information, and vice versa, and those two reports are iirc fairly
+similar to the boot protocol reports. You will find more detailed
+information in the Bluetooth HID spec, and, most probably also in the
+USB HID spec. If you intend to make my hidclient code boot-mode
+compatible, you could drop either keyboard or mouse functions, set the
+appropriate flags in the SDP information (is_bootmode_device or
+similar), and change the details of the report that are not exactly boot
+mode. That is why I hand out a hex mode report descriptor - so that it
+can be adapted to the developer's needs.
+
+Let's say you wish to add joystick support. Yes, that would be possible:
+Go into the input event handling subroutine, implement some code that
+reads the Linux joystick events and generates a "joystick report" -
+which would be defined in the HID descriptor as well. Not too much magic
+needed ;-) You might to implement a logic to recognize switching between
+the two modes - I cannot tell you out of my head. A boot-mode-only thing
+would of course live without that logic.
+
+If you want to implement report mode for your Xkbdbt, you will need a
+proper report descriptor, the rest is mostly straightforward. If you
+want me to have a look over your code, feel free to write PM or ask
+questions on the list.
+
+Regards
 Anselm
 
 -------------------------------------------------------------------------
