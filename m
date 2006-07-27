@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20060727115514.51745.qmail@web27911.mail.ukl.yahoo.com>
-Date: Thu, 27 Jul 2006 11:55:14 +0000 (GMT)
+Message-ID: <20060727074608.19672.qmail@web27901.mail.ukl.yahoo.com>
+Date: Thu, 27 Jul 2006 07:46:08 +0000 (GMT)
 From: Wolfram Reda <wolfram_reda@yahoo.de>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] WG: can't connect EPOX Keyboard BT-KB01B
+Subject: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
 Reply-To: Wolfram Reda <wolfram_reda@yahoo.de>,
         BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -20,7 +20,7 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hello,
-I'm trying to connect my EPOX Buetooth Keyboard BT-KB01B but without success so far. The error message is:
+I'm trying to connect my Buetooth Keyboard EPOX BT-KB01B but without success so far. The error message is:
 
  hcitool conf
 Connections:
@@ -67,17 +67,13 @@ hci0:   Type: USB
 
 The EPOX Mous BT-MS02B works perfectly.
 
-I'm using a Kanotix(Debian-Sid) Linux with Kernel 2.6.17.7.
+I'm using a Kanotix Linux with Kernel 2.6.17.7.
 
-Can somebody help me or give me some hint what i did wrong?
+Can somebody help meor give me some hint what i did wrong?
 
 Thanks in advance.
 
 Wolfram
-
-
-
-
 
 
 
