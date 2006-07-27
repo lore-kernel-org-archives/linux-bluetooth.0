@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44C697FF.3040702@gmail.com>
-Date: Tue, 25 Jul 2006 18:15:27 -0400
-From: JP Freeley <jpf321@gmail.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Can't read local name on hci0: Connection timed out
-	(110)
+In-Reply-To: <db89df390607271105h5b11d1afj803c42ef42e3a70b@mail.gmail.com>
+References: <db89df390607271105h5b11d1afj803c42ef42e3a70b@mail.gmail.com>
+Date: Thu, 27 Jul 2006 20:38:27 +0200
+Message-Id: <1154025507.9543.39.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] bluez usb
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,39 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-OK.. so I built from source 3.1 source last night and everything was 
-going well.
+Hi Henry,
 
-Today I come to find this pesky little error:
-    % hciconfig -a
-        ......
-       before REOBOOT
-       Can't read local name on hci0: Out of available memory space (or 
-something close to that)
-       after REBOOT:
-       Can't read local name on hci0: Connection timed out (110)
+> I am using HCI RAW socket to communicate with a bluetooth device. I
+> was able to do cmd/event between the host and the device. I am able to
+> receive ACL data from the raw socket too. However, I can not send ACL
+> data. I looked into the hci_usb.c and found that after it submit the
+> ACL data by
+> usb_submit_urb using bulk mode, it never completed. Any hints?
 
-    ERROR ON CONSOLE:
-       hci_cmd_task: hci0 command tx timeout
+simply don't try to send ACL data. Use the L2CAP layer instead.
 
-    RESULTS OF hcidump -X -V:
-        HCI sniffer - Bluetooth packet analyzer ver 1.31
-        device: hci0 snap_len: 1028 filter: 0xffffffff
-        < HCI Command: Read Local Name (0x03|0x0014) plen 0
+Regards
+
+Marcel
 
 
-So I unplugged/replugged the USB  dongle
-
-   usb.c: USB disconnect on device 00:0f.4-1 address 2
-   hub.c: new USB device 00:0f.4-1, assigned address 3
-
-and NOW everything is working fine again.
-
-Can anyone shed any light on this?
-
-Thanks,
-
-jpf
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
