@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <20060727115514.51745.qmail@web27911.mail.ukl.yahoo.com>
+Date: Thu, 27 Jul 2006 11:55:14 +0000 (GMT)
+From: Wolfram Reda <wolfram_reda@yahoo.de>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Date: Thu, 27 Jul 2006 12:06:57 -0400
-Message-ID: <E65CD2CAB74C80498703D6EF7624BB4C023974A7@zmaex.zma.zoran.com>
-From: "Lan Zhang" <Lan.Zhang@Zoran.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Hci Reset Problem
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] WG: can't connect EPOX Keyboard BT-KB01B
+Reply-To: Wolfram Reda <wolfram_reda@yahoo.de>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,54 +19,66 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi, 
+Hello,
+I'm trying to connect my EPOX Buetooth Keyboard BT-KB01B but without success so far. The error message is:
 
-I try to setup openobex on my linux, but each time I send out obex
-connect request, instead of getting a connect response, the device will
-be reset, HCIDUMP is like below:
+ hcitool conf
+Connections:
+        > ACL 00:04:61:81:F7:C8 handle 44 state 1 lm SLAVE
+        < ACL 00:04:61:82:03:4A handle 41 state 1 lm MASTER
+root@woraBox:/home/rw024419# hidd --connect 00:04:61:82:03:4A
+Can't create HID control channel: Connection timed out
 
-...
-...
-...
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 6 pf 1 ilen 0 fcs 0x18
-< ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0040 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 6 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
-> ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0040 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 6 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
-< ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0040 len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 6 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0040 len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 6 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
-< ACL data: handle 41 flags 0x02 dlen 9
-    L2CAP(d): cid 0x0040 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 6 pf 1 ilen 0 fcs 0x93 credits 33
-< ACL data: handle 41 flags 0x02 dlen 34
-    L2CAP(d): cid 0x0040 len 30 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 6 pf 0 ilen 26 fcs 0x8f
-        OBEX: Connect cmd(f): len 26 version 1.1 flags 0 mtu 1024
-        Target (0x46) = Sequence length 16
-< HCI Command: Reset (0x03|0x0003) plen 0
+here the info from the Keyboard:
 
-The system I have is Linux 2.6.9-34, bluez-lib-2.25 and bluez-util-2.25,
-bluez-hcidump-1.30, and openobex-1.0.1 version. I don't know who send
-this reset, and why. 
 
-Thanks. 
+hcitool info 00:04:61:82:03:4A
+Requesting information ...
+        BD Address:  00:04:61:82:03:4A
+        Device Name: Bluetooth-Keyboard 82034A
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x356
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+                <transparent SCO>
 
-Lan
+and here the info from the bluetooth usb dongle:
+
+
+hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:04:61:81:5A:A8 ACL MTU: 192:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:967334 acl:38241 sco:0 events:47990 errors:0
+        TX bytes:244813 acl:260 sco:0 commands:47588 errors:0
+        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy:
+        Link mode: SLAVE ACCEPT
+        Name: 'BlueZ linux (0)'
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
+
+The EPOX Mous BT-MS02B works perfectly.
+
+I'm using a Kanotix(Debian-Sid) Linux with Kernel 2.6.17.7.
+
+Can somebody help me or give me some hint what i did wrong?
+
+Thanks in advance.
+
+Wolfram
+
+
+
+
+
 
 
 -------------------------------------------------------------------------
