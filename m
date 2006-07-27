@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200607281700.24209.fexpop@onlinehome.de>
+In-Reply-To: <200607271258.45178.fexpop@onlinehome.de>
 References: <200607271240.49400.fexpop@onlinehome.de>
-	<200607281203.27951.fexpop@onlinehome.de>
-	<1154081170.2298.26.camel@localhost>
-	<200607281700.24209.fexpop@onlinehome.de>
-Date: Fri, 28 Jul 2006 17:07:50 +0200
-Message-Id: <1154099270.2298.41.camel@localhost>
+	<1153997014.9543.4.camel@localhost>
+	<200607271258.45178.fexpop@onlinehome.de>
+Date: Thu, 27 Jul 2006 13:04:07 +0200
+Message-Id: <1153998247.9543.8.camel@localhost>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] Several problems with bluez-utils 3.1,
 	kbluetoothd and a Belkin dongle in Debian
@@ -26,21 +25,17 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi Felix,
 
-> > > BTW, if I could change settings via dbus-test would they be remembered
-> > > the next time I plug the dongle in?
-> >
-> > Yes. All changes over the D-Bus API will be remembered. This is also
-> > includes the device name and the class of device.
+> > maybe the Inquiry with RSSI quirks are messing it up.
 > 
-> No, unfortunately the settings I've changed via dbus-test are lost after 
-> unplugging the dongle.
-> 
-> So, I'm stuck again: My system won't be visible after plugging the dongle in 
-> unless I manually make it visible again, and there's no way to configure it 
-> differently...or am I missing something?
+> Whatever that means ;-)
 
-they must stay, because otherwise it is a bug. You did set the
-discoverable timeout to zero, do you?
+with bluez-utils-3.x we try to activate Inquiry with RSSI by default and
+in your case it doesn't seem to work.
+
+What does "hciconfig hci0 features version" tell you about your dongle.
+
+Please also include the output of "hcidump -X -V" while starting an
+inquiry. With inqmode 0 and inqmode 1.
 
 Regards
 
