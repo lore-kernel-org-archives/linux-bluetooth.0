@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20060727185006.69823.qmail@web27915.mail.ukl.yahoo.com>
-Date: Thu, 27 Jul 2006 18:50:06 +0000 (GMT)
-From: Wolfram Reda <wolfram_reda@yahoo.de>
-To: Nils Faerber <nils.faerber@kernelconcepts.de>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <44C8FB2F.9070403@kernelconcepts.de>
+Message-ID: <44C8FB2F.9070403@kernelconcepts.de>
+Date: Thu, 27 Jul 2006 19:43:11 +0200
+From: Nils Faerber <nils.faerber@kernelconcepts.de>
 MIME-Version: 1.0
-Cc: Bearcat@feline-soul.com
+To: Bearcat@feline-soul.com, BlueZ users <bluez-users@lists.sourceforge.net>
+References: <20060727074608.19672.qmail@web27901.mail.ukl.yahoo.com>
+	<200607271130.03437.Bearcat@feline-soul.com>
+In-Reply-To: <200607271130.03437.Bearcat@feline-soul.com>
 Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
-Reply-To: Wolfram Reda <wolfram_reda@yahoo.de>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,71 +17,19 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
-
-Hi nils,
-Now it's working Yeah!!!!!!!!!!!!
-
-I followed  your recommendation and switched auth on via hcitool and looked=
- to the hcidump but everything moved very fast and i didn't see any popup w=
-here i can put in the pin string?
-
-But after doing =
-
-
- hidd --connect 00:04:61:82:03:4A i can write suddenly on my keyboar which =
-i'm using now to write the email !!!
-
-here is the evidence:
-
-hidd --connect show
-
-root@woraBox:/home/rw024419# hidd --show
-00:04:61:82:03:4A Bluetooth HID Boot Protocol Device [0000:0000] connected =
-[boot-protocol]
-00:04:61:81:F7:C8 Bluetooth HID Boot Protocol Device [0000:0000] connected =
-[boot-protocol]
-
-So now i'm hapy that everything works but i'm a little afraid to disconnect=
- and try again to understand really what happend. Nothing to see in the sys=
-log!
-
-But it looks like auth is required. But the pin input via hcidump is really=
- weard isn't ist?
-
-Next Step  would be to make this permanent that after boot the keyboard and=
- mouse is connected automatically! Any hint on that?
-
-Nils, many thanks for your great idea and help.
-
-Best Regards
-Wolfram
-
------ Urspr=FCngliche Mail ----
-Von: Nils Faerber <nils.faerber@kernelconcepts.de>
-An: Bearcat@feline-soul.com; BlueZ users <bluez-users@lists.sourceforge.net>
-CC: Wolfram Reda <wolfram_reda@yahoo.de>
-Gesendet: Donnerstag, den 27. Juli 2006, 19:43:11 Uhr
-Betreff: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
 
 Bearcat M. Sandor schrieb:
 > Wolfram,
 Hi!
 
-> I'm having the same problem with my logitech Cordless Elite. The mouse wo=
-rks =
-
-> great, but the keyboard just won't connect.  Perhaps there is something w=
-rong =
-
+> I'm having the same problem with my logitech Cordless Elite. The mouse works 
+> great, but the keyboard just won't connect.  Perhaps there is something wrong 
 > with keyboards in general or our keyboards are based on the same topology.
-> =
-
-> If i figure it out, i'll let you know. In the mean time, we ought to comp=
-are =
-
+> 
+> If i figure it out, i'll let you know. In the mean time, we ought to compare 
 > notes.
 
 Hmm.. usually those keyboards want to be paired first.
@@ -112,9 +59,9 @@ OK, take two.
 
 Make the keyboard visible again.
 Now create a L2CAP connection manually by doing
-    hcitool cc <bdaddr>
+	hcitool cc <bdaddr>
 And now trigger the auth process manually
-    hcitool auth <bdaddr>
+	hcitool auth <bdaddr>
 
 And then follow the above steps right _after_ the connect hidd step.
 
@@ -129,13 +76,10 @@ Cheers
 
 
 
-> On Thursday 27 July 2006 01:46 in an email titled "[Bluez-users] can't co=
-nnect =
-
+> On Thursday 27 July 2006 01:46 in an email titled "[Bluez-users] can't connect 
 > EPOX Keyboard BT-KB01B" Wolfram Reda wrote:
 >> Hello,
->> I'm trying to connect my Buetooth Keyboard EPOX BT-KB01B but without suc=
-cess
+>> I'm trying to connect my Buetooth Keyboard EPOX BT-KB01B but without success
 >> so far. The error message is:
 >>
 >> hcitool conf
@@ -157,8 +101,7 @@ cess
 >>        LMP Version: 1.1 (0x1) LMP Subversion: 0x356
 >>        Manufacturer: Cambridge Silicon Radio (10)
 >>        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
->>                <3-slot packets> <5-slot packets> <encryption> <slot offs=
-et>
+>>                <3-slot packets> <5-slot packets> <encryption> <slot offset>
 >>                <timing accuracy> <role switch> <hold mode> <sniff mode>
 >>                <park state> <RSSI> <channel quality> <SCO link> <HV2
 >> packets> <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
@@ -195,22 +138,17 @@ et>
 >> Wolfram
 >>
 
--- =
-
+-- 
 kernel concepts          Tel: +49-271-771091-12
 Dreisbachstr. 24         Fax: +49-271-771091-19
 D-57250 Netphen          Mob: +49-176-21024535
 --
 
-
-
-
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
