@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44C73308.3010903@gmail.com>
-References: <44C73308.3010903@gmail.com>
-Date: Wed, 26 Jul 2006 17:42:11 +0200
-Message-Id: <1153928531.5075.0.camel@localhost>
+In-Reply-To: <5f30e2610607260812p561f00aar8cf2e0b79a247cbb@mail.gmail.com>
+References: <5f30e2610607260812p561f00aar8cf2e0b79a247cbb@mail.gmail.com>
+Date: Thu, 27 Jul 2006 09:39:37 +0200
+Message-Id: <1153985977.9543.1.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Unable to get on on the D-Bus
+Subject: Re: [Bluez-devel] DBus and BlueZ 3.x
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Jeff,
 
-> I have moved to the debian "sid" branch as it has 3.1 bluez included.
-> 
-> When I first apt-get'd the necessary packages everything seemed to work OK.
-> After REBOOT I am getting the following messages about HCID:
-> 
-> Jul 27 03:41:37  hcid[1460]: Bluetooth HCI daemon
-> Jul 27 03:41:37 sdpd[1462]: Bluetooth SDP daemon
-> Jul 27 03:41:37 hcid[1460]: Service could not become the primary owner.
-> Jul 27 03:41:37 hcid[1460]: Unable to get on D-Bus
-> Jul 27 03:41:38 dund[1481]: Bluetooth DUN daemon version 3.1
+> I've been following the list for a while, but I never picked up on
+> what exactly DBus does for BlueZ.  It is my understanding that in
+> BlueZ before 3.0, the socket() interface for userland API is
+> implemented by an ioctl() interface to the kernel.  In BlueZ 3.x, is
+> all the HCI is handled by passing messages via DBus instead of
+> ioctl()?
 
-do you have a correct installed bluez-hcid.conf for the D-Bus service?
+with our D-Bus API for BlueZ we provide a really nice an easy
+configuration interface that can be used without linking the Bluetooth
+library or be bound the C/C++ language.
 
 Regards
 
