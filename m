@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200607271240.49400.fexpop@onlinehome.de>
-References: <200607271240.49400.fexpop@onlinehome.de>
-Date: Thu, 27 Jul 2006 12:43:34 +0200
-Message-Id: <1153997014.9543.4.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Several problems with bluez-utils 3.1,
+From: Felix Homann <fexpop@onlinehome.de>
+To: bluez-users@lists.sourceforge.net
+Date: Thu, 27 Jul 2006 12:40:49 +0200
+MIME-Version: 1.0
+Message-Id: <200607271240.49400.fexpop@onlinehome.de>
+Subject: [Bluez-users] Several problems with bluez-utils 3.1,
 	kbluetoothd and a Belkin dongle in Debian
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,33 +19,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Felix,
+Hi,
 
-> though I already filed bug reports to the Debian BTS [1],[2] I'd like to ask 
-> for advice here, too.
-> 
-> First, using bluez-utils 3.1-* from Debian/Sid I can't discover my PC from 
-> other BT devices. I tried this with 3 different BT cards/dongles. Downgrading 
-> to bluez-utils 2.25-1 makes my system visible again.
-> 
-> Second, kbluetoothd will not find other BT devices when I use a Belkin F8T013 
-> dongle and bluez-utils 3.1-*, 'hcitool scan' works fine, though. While a  
-> SPHINX PCMCIA card and an EPoX BT-DG03 work fine with kbluetoothd and 
-> bluez-utils 3.1-* the Belkin dongle will only play together with bluez-utils 
-> <=2.25-1.
-> 
-> Any ideas?
+though I already filed bug reports to the Debian BTS [1],[2] I'd like to ask 
+for advice here, too.
 
-maybe the Inquiry with RSSI quirks are messing it up. Please post the
-output of "hciconfig -a".
+First, using bluez-utils 3.1-* from Debian/Sid I can't discover my PC from 
+other BT devices. I tried this with 3 different BT cards/dongles. Downgrading 
+to bluez-utils 2.25-1 makes my system visible again.
 
-What happens if you call "hciconfig hci0 inqmode 0"?
+Second, kbluetoothd will not find other BT devices when I use a Belkin F8T013 
+dongle and bluez-utils 3.1-*, 'hcitool scan' works fine, though. While a  
+SPHINX PCMCIA card and an EPoX BT-DG03 work fine with kbluetoothd and 
+bluez-utils 3.1-* the Belkin dongle will only play together with bluez-utils 
+<=2.25-1.
 
-Regards
+Any ideas?
 
-Marcel
+Kind regards,
 
+Felix
 
+[1] http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=379401
+[2] http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=379403
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
