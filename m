@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20060727074608.19672.qmail@web27901.mail.ukl.yahoo.com>
-Date: Thu, 27 Jul 2006 07:46:08 +0000 (GMT)
-From: Wolfram Reda <wolfram_reda@yahoo.de>
+From: Felix Homann <fexpop@onlinehome.de>
 To: bluez-users@lists.sourceforge.net
+Date: Thu, 27 Jul 2006 12:58:45 +0200
+References: <200607271240.49400.fexpop@onlinehome.de>
+	<1153997014.9543.4.camel@localhost>
+In-Reply-To: <1153997014.9543.4.camel@localhost>
 MIME-Version: 1.0
-Subject: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
-Reply-To: Wolfram Reda <wolfram_reda@yahoo.de>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+Message-Id: <200607271258.45178.fexpop@onlinehome.de>
+Subject: Re: [Bluez-users] Several problems with bluez-utils 3.1,
+	kbluetoothd and a Belkin dongle in Debian
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,62 +22,64 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
-I'm trying to connect my Buetooth Keyboard EPOX BT-KB01B but without success so far. The error message is:
+On Thursday 27 July 2006 12:43, Marcel Holtmann wrote:
+Hi Marcel,
 
- hcitool conf
-Connections:
-        > ACL 00:04:61:81:F7:C8 handle 44 state 1 lm SLAVE
-        < ACL 00:04:61:82:03:4A handle 41 state 1 lm MASTER
-root@woraBox:/home/rw024419# hidd --connect 00:04:61:82:03:4A
-Can't create HID control channel: Connection timed out
+thanks for replying so quickly!
 
-here the info from the Keyboard:
+> maybe the Inquiry with RSSI quirks are messing it up.
 
+Whatever that means ;-)
 
-hcitool info 00:04:61:82:03:4A
-Requesting information ...
-        BD Address:  00:04:61:82:03:4A
-        Device Name: Bluetooth-Keyboard 82034A
-        LMP Version: 1.1 (0x1) LMP Subversion: 0x356
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
-                <transparent SCO>
+> Please post the output of "hciconfig -a".
 
-and here the info from the bluetooth usb dongle:
+Here's the output:
 
-
-hciconfig -a
 hci0:   Type: USB
-        BD Address: 00:04:61:81:5A:A8 ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:967334 acl:38241 sco:0 events:47990 errors:0
-        TX bytes:244813 acl:260 sco:0 commands:47588 errors:0
-        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
+        BD Address: 00:00:3A:6A:1B:A0 ACL MTU: 1017:8 SCO MTU: 64:0
+        UP RUNNING PSCAN
+        RX bytes:592 acl:0 sco:0 events:32 errors:0
+        TX bytes:337 acl:0 sco:0 commands:22 errors:0
+        Features: 0xff 0xfb 0x8d 0xfe 0x9f 0xf9 0x00 0x80
         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
+        Link policy: RSWITCH HOLD SNIFF PARK
         Link mode: SLAVE ACCEPT
-        Name: 'BlueZ linux (0)'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
-        Manufacturer: Cambridge Silicon Radio (10)
+        Name: 'jawaka (Belkin)'
+        Class: 0xbe010c
+        Service Classes: Networking, Rendering, Capturing, Object Transfer, Audio, Information
+        Device Class: Computer, Laptop
+        HCI Ver: 2.0 (0x3) HCI Rev: 0x2073 LMP Ver: 2.0 (0x3) LMP Subver: 0x410e
+        Manufacturer: Broadcom Corporation (15)
 
-The EPOX Mous BT-MS02B works perfectly.
+> What happens if you call "hciconfig hci0 inqmode 0"?
 
-I'm using a Kanotix Linux with Kernel 2.6.17.7.
+kbluetoothd finds other devices after that command! (It doesn't make my PC visible to other 
+devices though). Here's the output of "hciconfig -a" afterwards:
 
-Can somebody help meor give me some hint what i did wrong?
+hci0:   Type: USB
+        BD Address: 00:00:3A:6A:1B:A0 ACL MTU: 1017:8 SCO MTU: 64:0
+        UP RUNNING PSCAN
+        RX bytes:592 acl:0 sco:0 events:32 errors:0
+        TX bytes:337 acl:0 sco:0 commands:22 errors:0
+        Features: 0xff 0xfb 0x8d 0xfe 0x9f 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'jawaka (Belkin)'
+        Class: 0xbe010c
+        Service Classes: Networking, Rendering, Capturing, Object Transfer, Audio, Information
+        Device Class: Computer, Laptop
+        HCI Ver: 2.0 (0x3) HCI Rev: 0x2073 LMP Ver: 2.0 (0x3) LMP Subver: 0x410e
+        Manufacturer: Broadcom Corporation (15)
 
-Thanks in advance.
 
-Wolfram
+Is this a bug within the Belkin dongle? Can I change something in hcid.conf?
 
+Kind regards,
+
+Felix
+
+ 
 
 
 -------------------------------------------------------------------------
