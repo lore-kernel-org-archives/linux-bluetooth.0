@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <db89df390607271105h5b11d1afj803c42ef42e3a70b@mail.gmail.com>
-Date: Thu, 27 Jul 2006 11:05:01 -0700
-From: LAColiseum <lacoliseum@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] bluez usb
+Date: Thu, 27 Jul 2006 12:10:38 -0300
+From: Nelson Murilo <nelson@pangeia.com.br>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20060727151038.GE28854@pangeia.com.br>
+References: <1153915377.6149.1.camel@anselm.venusberg.augustinnetz.de>
+	<20060727143305.GC28854@pangeia.com.br>
+	<1154012213.6222.16.camel@anselm.venusberg.augustinnetz.de>
+Mime-Version: 1.0
+In-Reply-To: <1154012213.6222.16.camel@anselm.venusberg.augustinnetz.de>
+Subject: Re: [Bluez-devel] HIDclient: Using a Bluez PC as virtual
+	Bluetooth	keyboard and	mouse [repost]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,69 +19,43 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1270649113=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1270649113==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_22921_14610268.1154023501283"
 
-------=_Part_22921_14610268.1154023501283
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hmmm.
 
-Hi,
+ps auwx | grep hi
+root      6147  0.0  0.0   1816   444 ?        Ss   12:08   0:00 /usr/bin/hidd --server
 
-I am using HCI RAW socket to communicate with a bluetooth device. I was able
-to do cmd/event between the host and the device. I am able to receive ACL
-data from the raw socket too. However, I can not send ACL data. I looked
-into the hci_usb.c and found that after it submit the ACL data by
-usb_submit_urb using bulk mode, it never completed. Any hints?
+After killed it all works fine now...
 
-Thanks,
+./hidclient 
+HID keyboard/mouse service registered
+Opened event device [/dev/input/event0]
+Opened event device [/dev/input/event1]
+Opened event device [/dev/input/event2]
+Opened event device [/dev/input/event3]
+The HID-Client is now ready to accept connections from another machine
 
-Henry
+Thanks for your help,
 
-------=_Part_22921_14610268.1154023501283
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>Hi,</div>
-<div>&nbsp;</div>
-<div>I am using HCI RAW socket to communicate with a bluetooth device. I was able to do cmd/event between the host and the device. I am able to receive ACL data from the raw socket too. However, I can not send ACL data. I looked into the hci_usb.c and found that after it submit the ACL data by
-</div>
-<div>usb_submit_urb using bulk mode, it never completed. Any hints?</div>
-<div>&nbsp;</div>
-<div>Thanks,</div>
-<div>&nbsp;</div>
-<div>Henry</div>
-
-------=_Part_22921_14610268.1154023501283--
+./nelson -murilo
 
 
---===============1270649113==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> It seems you already have a bluetooth daemon using the PSM 19. I do not
+> know which one that might be, but if I remember right, that should be
+> reserved for HID!? Sorry I cannot tell you how to find out which program
+> that might be. If possible, you could try to shutdown the bluetooth
+> daemons currently running, and see wether that port becomes free.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1270649113==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1270649113==--
