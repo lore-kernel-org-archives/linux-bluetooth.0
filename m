@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E65CD2CAB74C80498703D6EF7624BB4C023974A7@zmaex.zma.zoran.com>
-References: <E65CD2CAB74C80498703D6EF7624BB4C023974A7@zmaex.zma.zoran.com>
-Date: Fri, 28 Jul 2006 03:56:09 +0200
-Message-Id: <1154051769.7650.20.camel@localhost>
+In-Reply-To: <1154042299.16913.6.camel@localhost>
+References: <1154042299.16913.6.camel@localhost>
+Content-Type: multipart/mixed; boundary="=-P4IEboEv/jUq4uSuquVe"
+Date: Fri, 28 Jul 2006 03:32:40 +0200
+Message-Id: <1154050360.7650.13.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Hci Reset Problem
+Subject: Re: [Bluez-users] Several problems with bluez-utils 3.1,
+	kbluetoothd and a	Belkin dongle in Debian
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,70 +18,109 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Lan,
 
-> I try to setup openobex on my linux, but each time I send out obex
-> connect request, instead of getting a connect response, the device will
-> be reset, HCIDUMP is like below:
-> 
-> ...
-> ...
-> ...
-> > HCI Event: Number of Completed Packets (0x13) plen 5
-> > ACL data: handle 41 flags 0x02 dlen 8
->     L2CAP(d): cid 0x0040 len 4 [psm 3]
->       RFCOMM(s): UA: cr 1 dlci 6 pf 1 ilen 0 fcs 0x18
-> < ACL data: handle 41 flags 0x02 dlen 12
->     L2CAP(d): cid 0x0040 len 8 [psm 3]
->       RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
->       dlci 6 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
-> > ACL data: handle 41 flags 0x02 dlen 12
->     L2CAP(d): cid 0x0040 len 8 [psm 3]
->       RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
->       dlci 6 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
-> < ACL data: handle 41 flags 0x02 dlen 12
->     L2CAP(d): cid 0x0040 len 8 [psm 3]
->       RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
->       dlci 6 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
-> > HCI Event: Number of Completed Packets (0x13) plen 5
-> > HCI Event: Number of Completed Packets (0x13) plen 5
-> > ACL data: handle 41 flags 0x02 dlen 12
->     L2CAP(d): cid 0x0040 len 8 [psm 3]
->       RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
->       dlci 6 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
-> < ACL data: handle 41 flags 0x02 dlen 9
->     L2CAP(d): cid 0x0040 len 5 [psm 3]
->       RFCOMM(d): UIH: cr 1 dlci 6 pf 1 ilen 0 fcs 0x93 credits 33
-> < ACL data: handle 41 flags 0x02 dlen 34
->     L2CAP(d): cid 0x0040 len 30 [psm 3]
->       RFCOMM(d): UIH: cr 1 dlci 6 pf 0 ilen 26 fcs 0x8f
->         OBEX: Connect cmd(f): len 26 version 1.1 flags 0 mtu 1024
->         Target (0x46) = Sequence length 16
-> < HCI Command: Reset (0x03|0x0003) plen 0
-> 
-> The system I have is Linux 2.6.9-34, bluez-lib-2.25 and bluez-util-2.25,
-> bluez-hcidump-1.30, and openobex-1.0.1 version. I don't know who send
-> this reset, and why. 
+--=-P4IEboEv/jUq4uSuquVe
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-the reset is really strange. It comes from our side. What does
-"hciconfig -a" say about your dongle.
+Hi Alastair,
+
+> I'm also experiencing the same behaviour as Felix with a Belkin dongle
+> (Broadcom) with bluez-libs-3.2, bluez-utils-3.2. This is where ISCAN is
+> not set even though it is enabled in hcid.conf. I've compiled from
+> source on a Gentoo Linux box.
+> 
+> One additional thing that I would like to add is that I see this in my
+> syslog:
+> 
+> Jul 28 00:10:15 qoo hcid[23009]: HCI dev 0 registered
+> Jul 28 00:10:15 qoo hcid[23009]: Device hci0 has been added
+> Jul 28 00:10:15 qoo hcid[23009]: Register path:/org/bluez/hci0
+> fallback:0
+> Jul 28 00:10:15 qoo hcid[23009]: HCI dev 0 up
+> Jul 28 00:10:15 qoo hcid[23009]: Starting security manager 0
+> Jul 28 00:10:16 qoo hcid[23009]: Can't write inquiry mode for hci0:
+> Connection timed out (110)
+
+the attached patch might help. If we have a Bluetooth 1.0b or 1.1 device
+without a quirk to enable inqmode, we shouldn't even try to change the
+inquiry mode. Seems that the Broadcom dongles are really sensible if you
+try to send a command they don't support.
 
 Regards
 
 Marcel
 
 
+--=-P4IEboEv/jUq4uSuquVe
+Content-Disposition: attachment; filename=patch
+Content-Type: text/x-patch; name=patch; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+Index: hcid/device.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/device.c,v
+retrieving revision 1.14
+diff -u -r1.14 device.c
+--- hcid/device.c	26 Jul 2006 13:42:10 -0000	1.14
++++ hcid/device.c	28 Jul 2006 01:30:41 -0000
+@@ -189,6 +189,7 @@
+ 	if (hci_read_local_version(dd, &ver, 1000) < 0) {
+ 		error("Can't read version info for hci%d: %s (%d)",
+ 					dev_id, strerror(errno), errno);
++		hci_close_dev(dd);
+ 		return -errno;
+ 	}
+ 
+@@ -200,19 +201,24 @@
+ 	if (hci_read_local_features(dd, features, 1000) < 0) {
+ 		error("Can't read features for hci%d: %s (%d)",
+ 					dev_id, strerror(errno), errno);
++		hci_close_dev(dd);
+ 		return -errno;
+ 	}
+ 
+ 	memcpy(dev->features, features, 8);
+ 
+ 	inqmode = get_inquiry_mode(dev);
++	if (inqmode < 1)
++		goto done;
+ 
+ 	if (hci_write_inquiry_mode(dd, inqmode, 1000) < 0) {
+ 		error("Can't write inquiry mode for hci%d: %s (%d)",
+ 					dev_id, strerror(errno), errno);
++		hci_close_dev(dd);
+ 		return -errno;
+ 	}
+ 
++done:
+ 	hci_close_dev(dd);
+ 
+ 	info("Device hci%d has been activated", dev_id);
+
+--=-P4IEboEv/jUq4uSuquVe
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--=-P4IEboEv/jUq4uSuquVe
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--=-P4IEboEv/jUq4uSuquVe--
