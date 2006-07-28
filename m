@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 28 Jul 2006 13:39:33 +0200
-From: Andreas Gaufer <Andreas.Gaufer@bluecellnetworks.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20060728133933.034e4e13@localhost.localdomain>
-In-Reply-To: <20060728123724.47e76a7f@localhost.localdomain>
-References: <E65CD2CAB74C80498703D6EF7624BB4C023974A7@zmaex.zma.zoran.com>
-	<1154051769.7650.20.camel@localhost>
-	<20060728123724.47e76a7f@localhost.localdomain>
+Message-ID: <BAY107-F22A1A1C4932DC8BBF0358D80590@phx.gbl>
+From: "julien giraudi" <ju_lausanne@hotmail.com>
+To: bluez-users@lists.sourceforge.net
+Date: Fri, 28 Jul 2006 11:34:38 +0000
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Hci Reset Problem
+Subject: [Bluez-users] FW: Re:  RfCOMM connection problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,144 +18,286 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
-
-I have evidence that this may be caused by the usb-part of these devices
-(B-Speech, Model: DataSpeed). Other devices (Level One, MDU-0025USB)
-don't show this problem on first sight. Both use BlueCore04, HCI 19.2.
-
-The tests where run using USB 2 Hub with 4 bt-devices pumping obex
-traffic at max possible speed and this Host Controller:
-
-00:11.2 USB Controller: VIA Technologies, Inc. USB (rev 1e) (prog-if 00 [UH=
-CI])
-        Subsystem: VIA Technologies, Inc. (Wrong ID) USB Controller
-        Flags: bus master, medium devsel, latency 32, IRQ 12
-        I/O ports at d400 [size=3D32]
-        Capabilities: [80] Power Management version 2
-
-## dmesg ##
-hub 1-1:1.0: port 2 disabled by hub (EMI?), re-enabling...
-usb 1-1.2: USB disconnect, address 31
-usb 1-1.2: new full speed USB device using address 34
-hub 1-1:1.0: port 3 disabled by hub (EMI?), re-enabling...
-usb 1-1.3: USB disconnect, address 32
-hub 1-1:1.0: cannot reset port 3 (err =3D -71)
-hub 1-1:1.0: cannot reset port 3 (err =3D -71)
-hub 1-1:1.0: cannot reset port 3 (err =3D -71)
-hub 1-1:1.0: cannot reset port 3 (err =3D -71)
-hub 1-1:1.0: cannot reset port 3 (err =3D -71)
-hub 1-1:1.0: Cannot enable port 3.  Maybe the USB cable is bad?
-hub 1-1:1.0: cannot disable port 3 (err =3D -71)
-hub 1-1:1.0: cannot reset port 3 (err =3D -71)
-hub 1-1:1.0: cannot reset port 3 (err =3D -71)
-hub 1-1:1.0: cannot reset port 3 (err =3D -71)
-hub 1-1:1.0: cannot reset port 3 (err =3D -71)
-hub 1-1:1.0: cannot reset port 3 (err =3D -71)
-hub 1-1:1.0: Cannot enable port 3.  Maybe the USB cable is bad?
-hub 1-1:1.0: cannot disable port 3 (err =3D -71)
-hub 1-1:1.0: cannot disable port 3 (err =3D -71)
-hub 1-0:1.0: port 1 disabled by hub (EMI?), re-enabling...
-usb 1-1: USB disconnect, address 29
-usb 1-1.1: USB disconnect, address 30
-usb 1-1.2: USB disconnect, address 34
-usb 1-1.4: USB disconnect, address 33
-usb 1-1: new full speed USB device using address 37
-hub 1-1:1.0: USB hub found
-hub 1-1:1.0: 4 ports detected
-usb 1-1.1: new full speed USB device using address 38
-
-Do you want one of these for your "nightmare chamber" marcel? ;)
-
-Lan, can you check your dmesg/syslog for usb related problems please.
-
-Greetings
-
-Andy
-
-On Fri, 28 Jul 2006 12:37:24 +0200
-Andreas Gaufer <Andreas.Gaufer@bluecellnetworks.com> wrote:
-
-> Hi,
-> =
-
-> I guess I'm approaching the same or at least a related problem. I don't
-> feel like getting close the root of the problem yet but maybe the
-> attached output helps marcel or someone else to see clearer.
-> =
-
-> I can't pretend that the reset in the attached log is not beeing sent fro=
-m a
-> user-application but i felt like the oops is worth posting.
-> =
-
-> Kernel used is 2.6.8.1 but i know that the thing happens also with 2.6.17=
-.6.
-> =
-
-> Hardware used:
-> =
-
-> hci1:   Type: USB
->         BD Address: 00:02:5B:00:BF:66 ACL MTU: 384:8 SCO MTU: 64:8
->         HCI 19.2
->         Chip version: BlueCore4-ROM
->         Max key size: 128 bit
->         SCO mapping:  HCI
->         BD Address: 00:02:5B:00:BF:66 ACL MTU: 384:8 SCO MTU: 64:8
->         Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
->                 <3-slot packets> <5-slot packets> <encryption> <slot offs=
-et> =
-
->                 <timing accuracy> <role switch> <hold mode> <sniff mode> =
-
->                 <park state> <RSSI> <channel quality> <SCO link> <HV2 pac=
-kets> =
-
->                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging sche=
-me> =
-
->                 <power control> <transparent SCO> <broadcast encrypt> =
-
->                 <EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan> =
-
->                 <interlaced iscan> <interlaced pscan> <inquiry with RSSI> =
-
->                 <extended SCO> <EV4 packets> <EV5 packets> <AFH cap. slav=
-e> =
-
->                 <AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL> =
-
->                 <AFH cap. master> <AFH class. master> <EDR eSCO 2 Mbps> =
-
->                 <EDR eSCO 3 Mbps> <3-slot EDR eSCO> <extended features> =
-
-> =
-
-> I don't expect any feedback on this, I'll post in this thread if I find a=
-nything..
-> =
-
-> Greetings
-> =
-
-> Andy
-> =
-
-> =
+Hi Marcel,
 
 
--- =
+Thanks for your reply.
 
-mit freundlichen Gr=FC=DFen / best regards,
+I am asking you this question because I am using a Bluez Rfcomm server.
+One SDK from Broadcom is available for free:
 
-Andreas Gaufer
+http://www.broadcom.com/products/bluetooth_sdk.php
 
-Office: +49 951-700428-91
-Fax: 	+49 951-700428-87
-Mail: 	Andreas.Gaufer@bluecellnetworks.com
 
-I fully agree with RFC 1855
+My question was about rfcomm layer and services and you guys seem to be =
+
+expert in bluetooth so you may have play around with bluetooth of ipaqs and =
+
+bluez servers...
+I read that it was not possible at all to use the microsoft API cause Ipacs =
+
+are using broadcom stack.
+
+My problem may come from the security handshake...but I don't know how to =
+
+fix it.
+I though the security parameters should be set by the server but according =
+
+to the Broadcom specification...both client and server should set them.
+
+The problem is that on the client side, using broadcom SDK, setting securit=
+y =
+
+parameters requires a service name...that 's what i don't get. How to get a =
+
+service from the bluez server and must i use a service??
+A program in java on a sony ericsson works fine with your Bluez =
+
+server...only simple socket programming. I just want to do the same with my =
+
+ipac in C/C++
+
+
+
+This is my master project...and I really need to fix this, I am sure it is =
+
+not a big deal...but I am novice in this field
+
+
+Thanks a lot for your help
+
+
+Regards
+Julien
+
+
+
+
+---------------------------------------------------------------------------=
+-----------------------------------------------------------
+
+Hi Julien,
+
+>I just want to connect my ipac to a RFcomm Bluez linux server through
+>bluetooth. I only want to send some "char arrays" through a socket to the =
+
+>linux
+>machine. (i.e. use Write() of widcomm stack for ipac) I would like to
+>know if it should be possible to create such a connection at the Rfcomm
+>layer without using a higher level protocol (FTP,OBEX,...)?
+>
+>i.e. for the moment I use the following command:
+>
+>obj2.OpenClient(1,addr) ;
+>
+>Can we assign the channel 1 like this or must I use the function
+>"obj2.AssignScnValue (p_service_guid,1)" ?
+>I do not want to use this function since I don't want to use any
+>service...
+
+you are not seriously asking Widcomm related questions on a Linux
+mailing list. How should we know? The Widcomm SDK is not available for
+free.
+
+>It is trying to connect to the Bluez server and gives me the following
+>response using hcidump:
+
+Do you mind sending this with an email client that doesn't screw up
+pre-formatted text.
+
+>It seems that the server does even not receive the tentative of
+>connection of my client. The Disconnection packet DISC is sent by the
+>client, like a timeout.
+
+Your client sends the DISC. Fix your client and try again.
+
+Regards
+
+Marcel
+
+
+---------------------------------------------------------------------------=
+--------------------------------------------------------
+
+Hello,
+
+
+
+I just want to connect my ipac to a RFcomm Bluez linux server through =
+
+bluetooth.
+I only want to send some "char arrays" through a socket to the linux =
+
+machine. (i.e. use Write() of widcomm stack for ipac) I would like to know =
+
+if it should be possible to create such a connection at the Rfcomm layer =
+
+without using a higher level protocol (FTP,OBEX,...)?
+
+i.e. for the moment I use the following command:
+
+obj2.OpenClient(1,addr) ;
+
+Can we assign the channel 1 like this or must I use the function =
+
+"obj2.AssignScnValue (p_service_guid,1)" ?
+I do not want to use this function since I don't want to use any service...
+
+
+
+It is trying to connect to the Bluez server and gives me the following =
+
+response using hcidump:
+
+HCIDump - HCI packet analyzer ver 1.11
+device: hci0 snap_len: 1028 filter: 0xffffffff
+>HCI Event: Connect Request (0x04) plen 10
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+>HCI Event: Command Status (0x0f) plen 4 HCI Event: Connect Complete (0x03) =
+
+>plen 11
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+>HCI Event: Page Scan Repetition Mode Change (0x20) plen 7 HCI Event: =
+
+>Command Complete (0x0e) plen 6
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+>HCI Event: Command Status (0x0f) plen 4 ACL data: handle 0x0029 flags 0x02 =
+
+>dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0041 < ACL data: handle 0x0029 flag=
+s =
+
+0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 0 status 0
+>HCI Event: Connection Packet Type Changed (0x1d) plen 5 HCI Event: Number =
+
+>of Completed Packets (0x13) plen 5 HCI Event: Max Slots Change (0x1b) plen =
+
+>3 ACL data: handle 0x0029 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
+    MTU 1691
+< ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0041 flags 0x0000 result 0 clen 0 < ACL =
+
+data: handle 0x0029 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0041 flags 0x0000 clen 4
+    MTU 1024
+>HCI Event: Number of Completed Packets (0x13) plen 5 HCI Event: Number of =
+
+>Completed Packets (0x13) plen 5 ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
+>ACL data: handle 0x0029 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c < ACL data: handle =
+
+0x0029 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+>HCI Event: Number of Completed Packets (0x13) plen 5 ACL data: handle =
+
+>0x0029 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd < ACL data: handle =
+
+0x0029 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+>HCI Event: Number of Completed Packets (0x13) plen 5 ACL data: handle =
+
+>0x0029 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0041 < ACL data: handle 0x002=
+9 =
+
+flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0041
+>HCI Event: Number of Completed Packets (0x13) plen 5 HCI Event: Disconn =
+
+>Complete (0x05) plen 4
+
+
+
+It seems that the server does even not receive the tentative of connection =
+
+of my client. The Disconnection packet DISC is sent by the client, like a =
+
+timeout.
+
+
+
+Here is the server code Bluez:
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/rfcomm.h>
+
+int main(int argc, char **argv)
+{
+    struct sockaddr_rc loc_addr =3D { 0 }, rem_addr =3D { 0 };
+    char buf[1024] =3D { 0 };
+    int s, client, bytes_read;
+    int opt =3D sizeof(rem_addr);
+
+    // allocate socket
+    s =3D socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+
+    // bind socket to port 1 of the first available
+    // local bluetooth adapter
+    loc_addr.rc_family =3D AF_BLUETOOTH;
+    loc_addr.rc_bdaddr =3D *BDADDR_ANY;
+    loc_addr.rc_channel =3D (uint8_t) 1;
+    bind(s, (struct sockaddr *)&loc_addr, sizeof(loc_addr));
+
+    // put socket into listening mode
+    listen(s, 1);
+
+    // accept one connection
+    client =3D accept(s, (struct sockaddr *)&rem_addr, &opt);
+
+    ba2str( &rem_addr.rc_bdaddr, buf );
+    fprintf(stderr, "accepted connection from %s\n", buf);
+    memset(buf, 0, sizeof(buf));
+
+    // read data from the client
+    bytes_read =3D read(client, buf, sizeof(buf));
+    if( bytes_read > 0 ) {
+        printf("received [%s]\n", buf);
+    }
+
+    // close connection
+    close(client);
+    close(s);
+    return 0;
+}
+
+
+Here is a part of my client code where addr is the server adresse:
+
+        CRfCommPort obj2;
+        obj2.OpenClient(1, addr) ;
+        Sleep (5000) ;
+        BOOL test_connection =3D obj2.IsConnected(&addr);
+        fprintf(fp3,"Connection Statut %d",test_connection);
+        obj1.Close();
+
+
+
+
+Please tell me what is wrong and why the connection fails
+
+
+
+Thanks a lot
+
+
+
+Julien
+
+_________________________________________________________________
+Retrouvez tout en un clin d'=9Cil avec Windows Desktop Search ! =
+
+http://desktop.msn.fr/
 
 
 -------------------------------------------------------------------------
