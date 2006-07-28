@@ -1,10 +1,20 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Hugues Lafarge <Hugues.Lafarge@afp.com>
-Date: Fri, 28 Jul 2006 14:05:11 +0200
-Message-ID: <87zmeuq6iw.fsf@phugues.par.afp.com>
-MIME-Version: 1.0
-Subject: [Bluez-devel] typo in dbus-test python script
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <44C881B5.7060809@infitsrl.com>
+References: <44BE5DB3.7090406@gmail.com>
+	<1153356539.4094.9.camel@aeonflux.holtmann.net>
+	<2172AACE-61A5-4D43-90E2-059D659D8830@infitsrl.com>
+	<20060724103824.1ff98fa6@McGee-XPC> <44C4CC37.1060308@infitsrl.com>
+	<20060724155621.02cd5e11@localhost.localdomain>
+	<1153758912.25058.3.camel@localhost>
+	<20060724203433.7184d301@localhost.localdomain>
+	<7359D844-F738-4AD1-A1FD-F59BEFD149EC@infitsrl.com>
+	<1153775541.25058.6.camel@localhost>  <44C881B5.7060809@infitsrl.com>
+Date: Fri, 28 Jul 2006 13:14:21 +0200
+Message-Id: <1154085261.2298.34.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] It's rfcomm connect problem
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,40 +28,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Fabrizio,
 
-Hi,
+> I'm trying to use the patch to handle multiple l2cap connection, I'm not 
+> a kernel/modules expert developer so
+> I need a little help.
+> Firts I'm trying to understand what the patch do and I think it's clear 
+> (is used a linked list to handle multiple connection).
 
-Just in case you did'nt notice, there is apparently a typo in the
-dbus-test python script in the CVS repository.
+one warning up-front. I never actually ran this patch on any machine. It
+is only compile tested. So it might crash your system.
 
-Index: hcid/dbus-test
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus-test,v
-retrieving revision 1.20
-diff -u -r1.20 dbus-test
---- hcid/dbus-test	26 Jun 2006 12:33:13 -0000	1.20
-+++ hcid/dbus-test	28 Jul 2006 12:01:58 -0000
-@@ -186,7 +186,7 @@
-     @dbus.decorators.explicitly_pass_message
-     def mgr_signal_handler(*args, **keywords):
-         dbus_message = keywords["dbus_message"]
--        print '%s: ' % dbus_messsage.get_member()
-+        print '%s: ' % dbus_message.get_member()
-         for arg in args[1:]:
-             print '%s   ' % arg,
-         print
+> My problems are with kernel programming enviromnment:
+> 
+> 1) I'm using kernel-2.6.10 I have to update to a more recent version?
 
--- 
-Hugues Lafarge                    || Email: Hugues.Lafarge@afp.com
-Agence France Presse              || Phone: +33 1 40 41 77 15
-4 rue de la bourse, 75002 Paris   ||   Fax: +33 1 40 41 79 24
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+It might work, but I advise you to develop against 2.6.18-rc2 or even
+the Git repository from Linus.
 
-This e-mail, and any file transmitted with it, is confidential and  intended solely for the use of the individual or entity to whom it is addressed. If you have received this email in error, please  contact the sender and delete the email from your system. If you are  not the named addressee you should not disseminate, distribute or copy  this email.
+> 2) Is there some documentation about bluez kernel modules? I need to 
+> understand how modules works to make try to make the patch.
 
-For more information on Agence France-Presse, please visit our web site at http://www.afp.com
+Check out the kernel documentation itself. There exists no specific
+BlueZ documentation for kernel programming.
 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
