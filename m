@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Felix Homann <fexpop@onlinehome.de>
-To: bluez-users@lists.sourceforge.net
-Date: Fri, 28 Jul 2006 12:14:55 +0200
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200607281203.27951.fexpop@onlinehome.de>
 References: <200607271240.49400.fexpop@onlinehome.de>
+	<200607281128.09414.fexpop@onlinehome.de>
+	<1154079513.2298.20.camel@localhost>
 	<200607281203.27951.fexpop@onlinehome.de>
-	<1154081170.2298.26.camel@localhost>
-In-Reply-To: <1154081170.2298.26.camel@localhost>
-MIME-Version: 1.0
-Message-Id: <200607281214.55877.fexpop@onlinehome.de>
+Date: Fri, 28 Jul 2006 12:06:10 +0200
+Message-Id: <1154081170.2298.26.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] Several problems with bluez-utils 3.1,
 	kbluetoothd and a Belkin dongle in Debian
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -23,21 +24,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Felix,
 
-On Friday 28 July 2006 12:06, Marcel Holtmann wrote:
-> This stuff will all go away. It is part of the cleanup process.
->
-> Regards
->
-> Marcel
+> > the dbus-test is a Python script. Simple checkout the CVS and use this
+> > one. You need to modify DiscoverableTimeout and Mode. No need to update
+> > the whole BlueZ packages.
+> 
+> Here's what I get:
+> 
+> #./dbus-test
+>   File "./dbus-test", line 178
+>     @dbus.decorators.explicitly_pass_message
+>     ^
+> SyntaxError: invalid syntax
 
-thank you very much for your efforts! I think I'll go back to bluez-utils 
-2.25-1 then until I can control the visibility somehow. 
+no idea what's wrong here. I am not a Python expert.
 
-Kind regards,
+> BTW, if I could change settings via dbus-test would they be remembered the 
+> next time I plug the dongle in?
 
-Felix
+Yes. All changes over the D-Bus API will be remembered. This is also
+includes the device name and the class of device.
+
+> Furthermore, if iscan/pscan options in hcid.conf are not working as before it 
+> shoud be mentioned somewhere in the documentation.
+
+This stuff will all go away. It is part of the cleanup process.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
