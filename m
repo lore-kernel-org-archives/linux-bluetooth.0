@@ -1,78 +1,85 @@
-Return-Path: <Bearcat@feline-soul.com>
-From: "Bearcat M. Sandor" <Bearcat@feline-soul.com>
-Reply-To: Bearcat@feline-soul.com
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
-Date: Thu, 27 Jul 2006 21:26:47 -0600
-Cc: BlueZ users <bluez-users@lists.sourceforge.net>,
-        Nils Faerber <nils.faerber@kernelconcepts.de>
-References: <44C8FB2F.9070403@kernelconcepts.de> <1171.216.47.50.125.1154031396.squirrel@webmail.feline-soul.net> <1154049725.7650.8.camel@localhost>
-In-Reply-To: <1154049725.7650.8.camel@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200607272126.48317.Bearcat@feline-soul.com>
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <E65CD2CAB74C80498703D6EF7624BB4C023974A7@zmaex.zma.zoran.com>
+References: <E65CD2CAB74C80498703D6EF7624BB4C023974A7@zmaex.zma.zoran.com>
+Date: Fri, 28 Jul 2006 03:56:09 +0200
+Message-Id: <1154051769.7650.20.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Hci Reset Problem
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I installed the hcidump program (and made/distributed a package for my 
-distro).
+Hi Lan,
 
-When i press buttons on my keyboards hcidump reports nothing. There is nothing 
-about a pin or security when i turn auth on and try to reestablish 
-connections with the mouse. After auth is off the mouse works fine.
+> I try to setup openobex on my linux, but each time I send out obex
+> connect request, instead of getting a connect response, the device will
+> be reset, HCIDUMP is like below:
+> 
+> ...
+> ...
+> ...
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+> > ACL data: handle 41 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x0040 len 4 [psm 3]
+>       RFCOMM(s): UA: cr 1 dlci 6 pf 1 ilen 0 fcs 0x18
+> < ACL data: handle 41 flags 0x02 dlen 12
+>     L2CAP(d): cid 0x0040 len 8 [psm 3]
+>       RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+>       dlci 6 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
+> > ACL data: handle 41 flags 0x02 dlen 12
+>     L2CAP(d): cid 0x0040 len 8 [psm 3]
+>       RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+>       dlci 6 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
+> < ACL data: handle 41 flags 0x02 dlen 12
+>     L2CAP(d): cid 0x0040 len 8 [psm 3]
+>       RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+>       dlci 6 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+> > ACL data: handle 41 flags 0x02 dlen 12
+>     L2CAP(d): cid 0x0040 len 8 [psm 3]
+>       RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+>       dlci 6 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
+> < ACL data: handle 41 flags 0x02 dlen 9
+>     L2CAP(d): cid 0x0040 len 5 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 6 pf 1 ilen 0 fcs 0x93 credits 33
+> < ACL data: handle 41 flags 0x02 dlen 34
+>     L2CAP(d): cid 0x0040 len 30 [psm 3]
+>       RFCOMM(d): UIH: cr 1 dlci 6 pf 0 ilen 26 fcs 0x8f
+>         OBEX: Connect cmd(f): len 26 version 1.1 flags 0 mtu 1024
+>         Target (0x46) = Sequence length 16
+> < HCI Command: Reset (0x03|0x0003) plen 0
+> 
+> The system I have is Linux 2.6.9-34, bluez-lib-2.25 and bluez-util-2.25,
+> bluez-hcidump-1.30, and openobex-1.0.1 version. I don't know who send
+> this reset, and why. 
 
-When trying to connect the keyboard i get a lot of:
-< HCI Command: Role Discovery (0x02|0x0009) plen 2
-    handle 41
-> HCI Event: Command Complete (0x0e) plen 7
-    Role Discovery (0x02|0x0009) ncmd 1
-    0000: 00 29 00 00                                       .)..
-< HCI Command: Read RSSI (0x05|0x0005) plen 2
-    handle 41
-> HCI Event: Command Complete (0x0e) plen 7
-    Read RSSI (0x05|0x0005) ncmd 1
-    status 0x00 handle 41 rssi 0
-< HCI Command: Role Discovery (0x02|0x0009) plen 2
-    handle 41
+the reset is really strange. It comes from our side. What does
+"hciconfig -a" say about your dongle.
 
-Does that mean anything?
+Regards
 
-Bearcat
+Marcel
 
 
 
-
-On Thursday 27 July 2006 19:22 in an email titled "Re: [Bluez-users] can't 
-connect EPOX Keyboard BT-KB01B" Marcel Holtmann wrote:
->Hi Bearcat,
->
->> No such luck for me yet. Strangly the hcitool does not allow the auth
->> option for me. I had to do a hciconfig /dev/usb/hci0 auth to turn the auth
->> on the hub. Auth is now on but the keyboard still doesn't connect. As
->> usuall nothing is reported in the syslogs.
->>
->> Do i need to turn on the auth for the keyboard too (is that even an
->> option)?
->>
->> I am never prompted for a pin and even if i was, i don't know what it
->> would be. Is the pin connected to the keyboard, the hub (should i find out
->> from logitech what their default is) or is it a pin kept by bluez?
->>
->> Also, i don't have a program called hcidump. Is that part of the bluez
->> package?
->
->it is in bluez-hcidump and you should start using it. Otherwise you are
->starting to speculate and this doesn't help.
->
->Regards
->
->Marcel
-
--- 
-Bearcat M. Sandor
-Bearcat@feline-soul.com
-ICQ: 6628727
-MSN: bearcatsandor@hotmail.com
-Yahoo: bearcatsandor
-AIM: bearcatmsandor
-Jabber: bearcatsandor@jabber.org
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys -- and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
