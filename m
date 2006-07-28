@@ -1,15 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bearcat@feline-soul.com, BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1171.216.47.50.125.1154031396.squirrel@webmail.feline-soul.net>
-References: <44C8FB2F.9070403@kernelconcepts.de>
-	<20060727185006.69823.qmail@web27915.mail.ukl.yahoo.com>
-	<1171.216.47.50.125.1154031396.squirrel@webmail.feline-soul.net>
-Date: Fri, 28 Jul 2006 03:22:05 +0200
-Message-Id: <1154049725.7650.8.camel@localhost>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200607272208.06047.fexpop@onlinehome.de>
+References: <200607271240.49400.fexpop@onlinehome.de>
+	<1153997014.9543.4.camel@localhost>
+	<200607271258.45178.fexpop@onlinehome.de>
+	<200607272208.06047.fexpop@onlinehome.de>
+Date: Fri, 28 Jul 2006 03:20:00 +0200
+Message-Id: <1154049600.7650.6.camel@localhost>
 Mime-Version: 1.0
-Cc: Nils Faerber <nils.faerber@kernelconcepts.de>
-Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
+Subject: Re: [Bluez-users] Several problems with bluez-utils 3.1,
+	kbluetoothd and a Belkin dongle in Debian
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,24 +24,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Bearcat,
+Hi Felix,
 
-> No such luck for me yet. Strangly the hcitool does not allow the auth
-> option for me. I had to do a hciconfig /dev/usb/hci0 auth to turn the auth
-> on the hub. Auth is now on but the keyboard still doesn't connect. As
-> usuall nothing is reported in the syslogs.
+> > kbluetoothd finds other devices after that command! (It doesn't make my PC
+> > visible to other devices though). 
 > 
-> Do i need to turn on the auth for the keyboard too (is that even an option)?
-> 
-> I am never prompted for a pin and even if i was, i don't know what it
-> would be. Is the pin connected to the keyboard, the hub (should i find out
-> from logitech what their default is) or is it a pin kept by bluez?
-> 
-> Also, i don't have a program called hcidump. Is that part of the bluez
-> package?
+> Part of the visibility issue seems to be that only PSCAN will be enabled 
+> regardless of what I specify in hcid.conf. If I manually do a 'hciconfig hci0 
+> piscan' everything is fine again. 
 
-it is in bluez-hcidump and you should start using it. Otherwise you are
-starting to speculate and this doesn't help.
+now you are mixing things. The inquiry mode has nothing to do with the
+scan mode.
+
+The inquiry mode defines what inquiry result events you will see.
+Basically you wanna use Inquiry with RSSI from the Bluetooth 1.2
+specification to additionally get the RSSI value.
+
+The scan mode defines is you are visible and connectable. The D-Bus API
+sets you to connectable only unless you disable the discoverable timeout
+and set your yourself to discoverable. This is a feature of the new 3.x
+generation that will make you automatically unvisible after a certain
+amount of time.
+
+These two things are not related. And start sending in "hcidump -X -V"
+outputs instead of speculating.
 
 Regards
 
