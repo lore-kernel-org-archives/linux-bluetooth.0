@@ -1,14 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Alastair Tse <liquidx@gentoo.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1154050360.7650.13.camel@localhost>
-References: <1154042299.16913.6.camel@localhost>
-	<1154050360.7650.13.camel@localhost>
-Date: Fri, 28 Jul 2006 10:43:53 +0100
-Message-Id: <1154079833.10564.5.camel@localhost>
+In-Reply-To: <200607281700.24209.fexpop@onlinehome.de>
+References: <200607271240.49400.fexpop@onlinehome.de>
+	<200607281203.27951.fexpop@onlinehome.de>
+	<1154081170.2298.26.camel@localhost>
+	<200607281700.24209.fexpop@onlinehome.de>
+Date: Fri, 28 Jul 2006 17:07:50 +0200
+Message-Id: <1154099270.2298.41.camel@localhost>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] Several problems with bluez-utils 3.1,
-	kbluetoothd and a	Belkin dongle in Debian
+	kbluetoothd and a Belkin dongle in Debian
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,27 +24,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Fri, 2006-07-28 at 03:32 +0200, Marcel Holtmann wrote:
-> > Jul 28 00:10:16 qoo hcid[23009]: Can't write inquiry mode for hci0:
-> > Connection timed out (110)
+Hi Felix,
+
+> > > BTW, if I could change settings via dbus-test would they be remembered
+> > > the next time I plug the dongle in?
+> >
+> > Yes. All changes over the D-Bus API will be remembered. This is also
+> > includes the device name and the class of device.
 > 
-> the attached patch might help. If we have a Bluetooth 1.0b or 1.1 device
-> without a quirk to enable inqmode, we shouldn't even try to change the
-> inquiry mode. Seems that the Broadcom dongles are really sensible if you
-> try to send a command they don't support.
+> No, unfortunately the settings I've changed via dbus-test are lost after 
+> unplugging the dongle.
+> 
+> So, I'm stuck again: My system won't be visible after plugging the dongle in 
+> unless I manually make it visible again, and there's no way to configure it 
+> differently...or am I missing something?
 
-Marcel,
+they must stay, because otherwise it is a bug. You did set the
+discoverable timeout to zero, do you?
 
-Thanks for the patch. That does get rid of the connection timed out
-error in syslog. Although I'm still experiencing the fact that ISCAN is
-not enabled, although that seems to be another problem associated with
-the way 3.x works for detecting features (According to the another
-thread).
+Regards
 
-Thanks,
-
-Alastair
-
+Marcel
 
 
 
