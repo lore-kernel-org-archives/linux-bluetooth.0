@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20060727083312.81035.qmail@web27915.mail.ukl.yahoo.com>
-Date: Thu, 27 Jul 2006 08:33:12 +0000 (GMT)
-From: Wolfram Reda <wolfram_reda@yahoo.de>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <c5cec3110607272048n5caaa944me0fc4bf74a58591@mail.gmail.com>
+Date: Fri, 28 Jul 2006 11:48:47 +0800
+From: bees <guoqibi@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1153898826.746.16.camel@localhost>
 MIME-Version: 1.0
-Subject: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
-Reply-To: Wolfram Reda <wolfram_reda@yahoo.de>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+References: <c5cec3110607192037w3d5a3086ib00ff4d6c8b5c93@mail.gmail.com>
+	<1153898826.746.16.camel@localhost>
+Subject: Re: [Bluez-users] usb device problem
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,74 +17,109 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0202101228=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
-I'm trying to connect my EPOX Buetooth Keyboard BT-KB01B but without success so far. The error message is:
+--===============0202101228==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_79049_7678552.1154058527454"
 
- hcitool conf
-Connections:
-        > ACL 00:04:61:81:F7:C8 handle 44 state 1 lm SLAVE
-        < ACL 00:04:61:82:03:4A handle 41 state 1 lm MASTER
-root@woraBox:/home/rw024419# hidd --connect 00:04:61:82:03:4A
-Can't create HID control channel: Connection timed out
+------=_Part_79049_7678552.1154058527454
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-here the info from the Keyboard:
+Hi Marcel:
+thank you for reply.
+my kernel is 2.4.20, and proecssor is imx21 of freescale.
+According your reply, if i use the 2.6 kernel , the usb device will be ok?
 
+Best Regards
 
-hcitool info 00:04:61:82:03:4A
-Requesting information ...
-        BD Address:  00:04:61:82:03:4A
-        Device Name: Bluetooth-Keyboard 82034A
-        LMP Version: 1.1 (0x1) LMP Subversion: 0x356
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
-                <transparent SCO>
-
-and here the info from the bluetooth usb dongle:
+Bees
 
 
-hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:04:61:81:5A:A8 ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:967334 acl:38241 sco:0 events:47990 errors:0
-        TX bytes:244813 acl:260 sco:0 commands:47588 errors:0
-        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ linux (0)'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
-        Manufacturer: Cambridge Silicon Radio (10)
+2006/7/26, Marcel Holtmann <marcel@holtmann.org>:
+>
+> Hi Bees,
+>
+> >     I ported the bluez-libs-2.25 and bluez-utils-2.25 to an embedded
+> > system last week, but when I plug my usb bluetooth dongle into the
+> > board, it says"usb device not accepting new address", so I can't use
+> > my bluetooth dongle in this embedded system.
+> >     I'sure my usb bluetooth is well, it worked normally on PC
+> > (FedoraCore4).
+> >     And the usb interface on board is well too, because when I pluged
+> > my U-disk into it ,the U-disk worked normally.
+> >     Then why my usb dongle didn't work on the embedded system board?
+>
+> what kernel version are you using? The recent 2.6 kernels are a little
+> bit more robust when it comes to cheap USB hardware.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share
+> your
+> opinions on IT & business topics through brief surveys -- and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
-The EPOX Mous BT-MS02B works perfectly.
+------=_Part_79049_7678552.1154058527454
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-I'm using a Kanotix Linux with Kernel 2.6.17.7.
+<div>Hi Marcel:</div>
+<div>thank you for reply.</div>
+<div>my kernel is 2.4.20, and proecssor is imx21 of freescale.</div>
+<div>According your reply, if i use the 2.6 kernel ,&nbsp;the usb device&nbsp;will be ok?</div>
+<div>&nbsp;</div>
+<div>Best Regards</div>
+<div>&nbsp;</div>
+<div>Bees<br><br>&nbsp;</div>
+<div><span class="gmail_quote">2006/7/26, Marcel Holtmann &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt;:</span>
+<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Hi Bees,<br><br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; I ported the bluez-libs-2.25 and bluez-utils-2.25 to an embedded<br>&gt; system last week, but when I plug my usb bluetooth dongle into the
+<br>&gt; board, it says&quot;usb device not accepting new address&quot;, so I can't use<br>&gt; my bluetooth dongle in this embedded system.<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; I'sure my usb bluetooth is well, it worked normally on PC<br>&gt; (FedoraCore4).
+<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; And the usb interface on board is well too, because when I pluged<br>&gt; my U-disk into it ,the U-disk worked normally.<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; Then why my usb dongle didn't work on the embedded system board?<br><br>what kernel version are you using? The recent 
+2.6 kernels are a little<br>bit more robust when it comes to cheap USB hardware.<br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>Take Surveys. Earn Cash. Influence the Future of IT
+<br>Join SourceForge.net's Techsay panel and you'll get the chance to share your<br>opinions on IT &amp; business topics through brief surveys -- and earn cash<br><a href="http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV">
+http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net
+</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br>
 
-Can somebody help meor give me some hint what i did wrong?
-
-Thanks in advance.
-
-Wolfram
+------=_Part_79049_7678552.1154058527454--
 
 
+--===============0202101228==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============0202101228==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0202101228==--
