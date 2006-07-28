@@ -1,49 +1,95 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d23110170607281121s3dbf5c6brde2156d3f1c01b73@mail.gmail.com>
-Date: Fri, 28 Jul 2006 15:21:36 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: Bearcat@feline-soul.com, "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200607281048.07126.Bearcat@feline-soul.com>
-MIME-Version: 1.0
-References: <44C8FB2F.9070403@kernelconcepts.de>
-	<44C9DB62.1000103@kernelconcepts.de>
-	<1154079988.2298.23.camel@localhost>
-	<200607281048.07126.Bearcat@feline-soul.com>
+Return-Path: <Bearcat@feline-soul.com>
+From: "Bearcat M. Sandor" <Bearcat@feline-soul.com>
+Reply-To: Bearcat@feline-soul.com
+To: Marcel Holtmann <marcel@holtmann.org>
 Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Date: Fri, 28 Jul 2006 10:48:06 -0600
+Cc: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <44C8FB2F.9070403@kernelconcepts.de> <44C9DB62.1000103@kernelconcepts.de> <1154079988.2298.23.camel@localhost>
+In-Reply-To: <1154079988.2298.23.camel@localhost>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200607281048.07126.Bearcat@feline-soul.com>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Bearcat,
+Folks, 
 
-On 7/28/06, Bearcat M. Sandor <Bearcat@feline-soul.com> wrote:
-> Thank you again for the help so far. I have placed a bunch of output files on
-> my server for your viewing pleasure, instead of giving you large outputs in
-> an email body.
+Thank you again for the help so far. I have placed a bunch of output files on 
+my server for your viewing pleasure, instead of giving you large outputs in 
+an email body.
 
-Sorry, but I couldn't see any of those files (all links end up with
-"404 Not found" error). Can you send those files inline so we can see
-what's happening, please?
+This is the output from hcidump -X -V while just pressing keys on the keyboard 
+after pressing the connect button:
+http://www.feline-soul.com/files/hcidump
 
-Regards,
+This is the output from hcidump -X -V when a "hcitool cc 00:07:61:1B:50:9B" is 
+run:
+http://www.feline-soul.com/files/hcidump_hcitool_connect
 
--- Ulisses
+This is the output from hcidump -X -V when a "hidd --connect 
+00:07:61:1B:50:9B" is run:
+http://www.feline-soul.com/files/hcidump_hidd_connect
 
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+My hcid configuration file:
+http://www.feline-soul.com/files/hcid.conf
+
+My rfcomm configuration file (I have never altered it)
+http://www.feline-soul.com/files/rfcomm.conf
+
+The daemon hidd is indeed running:
+root      4750  0.0  0.0   5040   484 ?        Ss   Jul26   
+0:00 /usr/bin/hidd --server
+
+Pertainent modules are as follows:
+hidp                   17152  3
+l2cap                  22408  14 rfcomm,hidp
+usbhid                 37024  0
+bluetooth              47268  12 rfcomm,hidp,l2cap,hci_usb
+hci_usb                15892  6
+
+
+I have taken the batteries out of the keyboard, pressed the gray button, 
+pressed the button on my hub, unplugged and plugged the hub back in, and 
+sacrificed AOL Cd's on an alter in the name of Tux.
+
+I am never prompted for a pin (and i don't know what it would be if i was). I 
+have taken the kde pin handler line out of the config and still i am never 
+asked for a pin. Truthfully, i don' t even know if i should be or not.
+
+What else can i provide?
+
+Thank you again,
+
+Bearcat M. Sandor
+
+On Friday 28 July 2006 03:46 in an email titled "Re: [Bluez-users] can't 
+connect EPOX Keyboard BT-KB01B" Marcel Holtmann wrote:
+>Hi Nils,
+>
+>> > No such luck for me yet. Strangly the hcitool does not allow the auth
+>> > option for me. I had to do a hciconfig /dev/usb/hci0 auth to turn the
+>> > auth on the hub. Auth is now on but the keyboard still doesn't connect.
+>> > As usuall nothing is reported in the syslogs.
+>> >
+>> > Do i need to turn on the auth for the keyboard too (is that even an
+>> > option)?
+>>
+>> No, the keyboard will require that automatically.
+>
+>actually only the Apple keyboards require this and this is wrong
+>according to the HID specification. The host must make the decision to
+>authenticate and switch on encryption.
+>
+>Regards
+>
+>Marcel
+
+-- 
+Bearcat M. Sandor
+Bearcat@feline-soul.com
+ICQ: 6628727
+MSN: bearcatsandor@hotmail.com
+Yahoo: bearcatsandor
+AIM: bearcatmsandor
+Jabber: bearcatsandor@jabber.org
