@@ -1,15 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44C8867F.5050504@infitsrl.com>
-Date: Thu, 27 Jul 2006 11:25:19 +0200
-From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
+Message-ID: <44CA1039.8040704@gmail.com>
+Date: Fri, 28 Jul 2006 15:25:13 +0200
+From: Sebastien Henrio <sebastien.henrio@gmail.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44BE5DB3.7090406@gmail.com>	<1153356539.4094.9.camel@aeonflux.holtmann.net>	<2172AACE-61A5-4D43-90E2-059D659D8830@infitsrl.com>	<20060724103824.1ff98fa6@McGee-XPC>
-	<44C4CC37.1060308@infitsrl.com>	<20060724155621.02cd5e11@localhost.localdomain>	<1153758912.25058.3.camel@localhost>	<20060724203433.7184d301@localhost.localdomain>	<7359D844-F738-4AD1-A1FD-F59BEFD149EC@infitsrl.com>
-	<1153775541.25058.6.camel@localhost>
-	<44C881B5.7060809@infitsrl.com>
-In-Reply-To: <44C881B5.7060809@infitsrl.com>
-Subject: Re: [Bluez-devel] It's rfcomm connect problem [ERRATA]
+References: <99f8b4660607261555t5a297fe1y6df50e93b9517548@mail.gmail.com>
+	<44C80C19.80409@xmission.com>
+In-Reply-To: <44C80C19.80409@xmission.com>
+Content-Type: multipart/mixed; boundary="------------030406040703080906050500"
+Cc: Sebastien HENRIO <sebastien.henrio@gmail.com>
+Subject: Re: [Bluez-devel] A2DP: signaling channel never closed
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,245 +19,172 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-15"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Kernel is 2.6.12 non .10 ...sorry...
+This is a multi-part message in MIME format.
+--------------030406040703080906050500
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-Fabrizio Guglielmino ha scritto:
-> I Marcel,
-> I'm trying to use the patch to handle multiple l2cap connection, I'm =
+Hi Brad,
 
-> not a kernel/modules expert developer so
-> I need a little help.
-> Firts I'm trying to understand what the patch do and I think it's =
+sorry for the patch, you can find in attachement the new patch in the
+correct format
 
-> clear (is used a linked list to handle multiple connection).
->
-> My problems are with kernel programming enviromnment:
->
-> 1) I'm using kernel-2.6.10 I have to update to a more recent version?
->
-> 2) Is there some documentation about bluez kernel modules? I need to =
+Best Regards
+Sebastien
 
-> understand how modules works to make try to make the patch.
->
-> Many thanks
-> Fabrizio
->
->
-> Marcel Holtmann ha scritto:
->> Hi Fabrizio,
->>
->>  =
-
->>> Last solutions it's to see at l2cap layer and try to understand ho =
-
->>> wo  write the patch, if
->>> I will succeed to find  the past Marcel's thread about it I'll try =
-
->>> to  write this patch.
->>>     =
-
->>
->> it must look something like the attached one. However that one might
->> crash your machine.
->>
->> Regards
->>
->> Marcel
->>
->>   =
-
->> ------------------------------------------------------------------------
->>
->> diff --git a/include/net/bluetooth/l2cap.h =
-
->> b/include/net/bluetooth/l2cap.h
->> index 8242a0e..cb19e66 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -183,6 +183,8 @@ struct l2cap_chan_list {
->>  };
->>  =
-
->>  struct l2cap_conn {
->> +    struct list_head list;
->> +
->>      struct hci_conn    *hcon;
->>  =
-
->>      bdaddr_t    *dst;
->> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
->> index eaaad65..1d1c423 100644
->> --- a/net/bluetooth/l2cap.c
->> +++ b/net/bluetooth/l2cap.c
->> @@ -63,6 +63,9 @@ static struct bt_sock_list l2cap_sk_list
->>      .lock =3D RW_LOCK_UNLOCKED
->>  };
->>  =
-
->> +static LIST_HEAD(l2cap_conn_list);
->> +static DEFINE_SPINLOCK(l2cap_conn_lock);
->> +
->>  static void __l2cap_sock_close(struct sock *sk, int reason);
->>  static void l2cap_sock_close(struct sock *sk);
->>  static void l2cap_sock_kill(struct sock *sk);
->> @@ -295,6 +298,10 @@ static void l2cap_conn_del(struct hci_co
->>  =
-
->>      BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
->>  =
-
->> +    spin_lock_bh(&l2cap_conn_lock);
->> +    list_del(&conn->list);
->> +    spin_unlock_bh(&l2cap_conn_lock);
->> +
->>      if (conn->rx_skb)
->>          kfree_skb(conn->rx_skb);
->>  =
-
->> @@ -642,18 +649,23 @@ static int l2cap_do_connect(struct sock      =
-
->> sk->sk_state =3D BT_CONNECT;
->>      l2cap_sock_set_timer(sk, sk->sk_sndtimeo);
->>  =
-
->> -    if (hcon->state =3D=3D BT_CONNECTED) {
->> -        if (sk->sk_type =3D=3D SOCK_SEQPACKET) {
->> -            struct l2cap_conn_req req;
->> -            l2cap_pi(sk)->ident =3D l2cap_get_ident(conn);
->> -            req.scid =3D __cpu_to_le16(l2cap_pi(sk)->scid);
->> -            req.psm  =3D l2cap_pi(sk)->psm;
->> -            l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
->> -                    L2CAP_CONN_REQ, sizeof(req), &req);
->> -        } else {
->> -            l2cap_sock_clear_timer(sk);
->> -            sk->sk_state =3D BT_CONNECTED;
->> -        }
->> +    if (hcon->state !=3D BT_CONNECTED) {
->> +        spin_lock_bh(&l2cap_conn_lock);
->> +        list_add_tail(&conn->list, &l2cap_conn_list);
->> +        spin_unlock_bh(&l2cap_conn_lock);
->> +        goto done;
->> +    }
->> +
->> +    if (sk->sk_type =3D=3D SOCK_SEQPACKET) {
->> +        struct l2cap_conn_req req;
->> +        l2cap_pi(sk)->ident =3D l2cap_get_ident(conn);
->> +        req.scid =3D __cpu_to_le16(l2cap_pi(sk)->scid);
->> +        req.psm  =3D l2cap_pi(sk)->psm;
->> +        l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
->> +                L2CAP_CONN_REQ, sizeof(req), &req);
->> +    } else {
->> +        l2cap_sock_clear_timer(sk);
->> +        sk->sk_state =3D BT_CONNECTED;
->>      }
->>  =
-
->>  done:
->> @@ -1926,12 +1938,35 @@ static int l2cap_connect_cfm(struct hci_
->>      if (hcon->type !=3D ACL_LINK)
->>          return 0;
->>  =
-
->> -    if (!status) {
->> +    switch (status) {
->> +    case 0x00:
->>          conn =3D l2cap_conn_add(hcon, status);
->> -        if (conn)
->> -            l2cap_conn_ready(conn);
->> -    } else
->> +        if (!conn)
->> +            break;
->> +
->> +        spin_lock_bh(&l2cap_conn_lock);
->> +        list_del(&conn->list);
->> +        spin_unlock_bh(&l2cap_conn_lock);
->> +
->> +        l2cap_conn_ready(conn);
->> +
->> +        spin_lock_bh(&l2cap_conn_lock);
->> +        if (!list_empty(&l2cap_conn_list)) {
->> +            conn =3D list_entry(l2cap_conn_list.next, struct =
-
->> l2cap_conn, list);
->> +            list_move_tail(&conn->list, &l2cap_conn_list);
->> +            hci_conn_put(conn->hcon);
->> +            hci_connect(conn->hcon->hdev, ACL_LINK, conn->dst);
->> +        }
->> +        spin_unlock_bh(&l2cap_conn_lock);
->> +        break;
->> +
->> +    case 0x0c:
->> +        break;
->> +
->> +    default:
->>          l2cap_conn_del(hcon, bt_err(status));
->> +        break;
->> +    }
->>  =
-
->>      return 0;
->>  }
->>   =
-
->> ------------------------------------------------------------------------
->>
->> ------------------------------------------------------------------------=
-- =
-
->>
->> Take Surveys. Earn Cash. Influence the Future of IT
->> Join SourceForge.net's Techsay panel and you'll get the chance to =
-
->> share your
->> opinions on IT & business topics through brief surveys -- and earn cash
->> http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=
-=3DDEVDEV =
-
->>
->> ------------------------------------------------------------------------
->>
->> _______________________________________________
->> Bluez-devel mailing list
->> Bluez-devel@lists.sourceforge.net
->> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->>   =
-
->
->
+Brad Midgley wrote:
+> Sebastien
+> 
+> I'm glad you came across this. Would you mind resending the patch using
+> the output from
+>  diff -u
+> so it's easier to read and apply?
+> 
+> Which headset did you observe the problem on?
+> 
+> thanks
+> Brad
+> 
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys -- and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
 
 
--- =
+--------------030406040703080906050500
+Content-Type: text/plain;
+ name="patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="patch"
 
-______________________________
-Fabrizio Guglielmino =
+Index: pcm_a2dp.c
+===================================================================
+RCS file: /cvsroot/bluetooth-alsa/btsco/alsa-plugins/pcm_a2dp.c,v
+retrieving revision 1.13
+diff -u -r1.13 pcm_a2dp.c
+--- pcm_a2dp.c	12 Jul 2006 05:47:07 -0000	1.13
++++ pcm_a2dp.c	28 Jul 2006 12:58:26 -0000
+@@ -974,9 +974,6 @@
+ 
+ 	a2dp->sbc.rate = io->rate;
+ 	a2dp->sbc.channels = io->channels;
+-	a2dp->sbc.subbands = 8; // safe default
+-	a2dp->sbc.blocks = 16; // safe default
+-	a2dp->sbc.bitpool = 32; // recommended value 53, safe default is 32
+ 
+ 	return 0;
+ }
+@@ -1210,6 +1207,9 @@
+ 	if (a2dp->sk > fileno(stderr))
+ 		close(a2dp->sk);
+ 
++	if (a2dp->control_sk > fileno(stderr))
++		close(a2dp->control_sk);
++
+ 	sbc_finish(&a2dp->sbc);
+ 
+ 	free(a2dp);
+@@ -1343,6 +1343,8 @@
+ 	snd_config_iterator_t i, next;
+ 	bdaddr_t src, dst;
+ 	int err, n, pos = -1, use_rfcomm = 0;
++	long bitpool = -1,subbnd = -1, blklen = -1;
++
+ 
+ 	DBG("name %s mode %d", name, mode);
+ 
+@@ -1378,6 +1380,34 @@
+ 			continue;
+ 		}
+ 
++		if (!strcmp(id, "sbc_bitpool")) {
++			if ((err = snd_config_get_integer(n, &bitpool )) < 0 &&
++					( bitpool < 0 || 254 < bitpool))  {
++                                SNDERR("The field for bitpool must be an unsigned integer");
++                                return err;
++                        }
++			continue;
++		}
++
++		if (!strcmp(id, "sbc_blklen")) {
++			if ((err = snd_config_get_integer(n, &blklen)) < 0 &&
++					( blklen != 4 && blklen != 8 && blklen != 12 && blklen != 16)) {
++				SNDERR("The field for blocklen must be either 4, 8, 12 or 16");
++				return err;
++			}
++			continue;
++		}
++
++		if (!strcmp(id, "sbc_subband")) {
++			if ((err = snd_config_get_integer(n, &subbnd)) < 0 &&
++				 ( subbnd != 4 && subbnd != 8)) {
++				SNDERR("The field for subband must be either 4 or 8");
++				return err;
++			}
++			continue;
++		}
++
++
+ 		if (!strcmp(id, "use_rfcomm")) {
+ 			if ((err = snd_config_get_bool(n)) < 0) {
+                                 SNDERR("The field use_rfcomm must be a boolean type");
+@@ -1426,6 +1456,25 @@
+ 		bacpy(&a2dp->dst, &dst);
+ 		a2dp->use_rfcomm = use_rfcomm;
+ 	}
++	a2dp->sbc.subbands = 8; // safe default
++	a2dp->sbc.blocks = 16; // safe default
++	a2dp->sbc.bitpool = 32; // recommended value 53, safe default is 32
++
++	if (bitpool != -1){
++		DBG("sbc : bitpool %d" , (int)bitpool);
++		a2dp->sbc.bitpool = (int)bitpool;
++	}
++
++	if (blklen != -1){
++		DBG("sbc : subbands %d" , (int)subbnd);
++		a2dp->sbc.subbands = (int)subbnd;
++	}
++
++	if (blklen != -1){
++		DBG("sbc : blklen %d" , (int)blklen);
++		a2dp->sbc.blocks = (int)blklen;
++	}
++
+ 
+ 	a2dp_unlock();
+ 
 
-Infit Srl
-Software Engineering
-Tel. +39 11 7410915
-Fax. +39 11 7410915
-www.infitsrl.com
-C.so Svizzera, 79/8 - Torino
-______________________________
-
-Il presente messaggio ed ogni eventuale allegato hanno natura
-confidenziale e sono riservati ai destinatari indicati. La diffusione a
-terzi e qualsiasi altro uso non autorizzato sono proibiti. I messaggi ed
-i relativi allegati possono essere soggetti ad alterazioni. Il mittente
-declina ogni responsabilit=E0 per le eventuali alterazioni, modificazioni
-o falsificazioni.
-
+--------------030406040703080906050500
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--------------030406040703080906050500
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------030406040703080906050500--
