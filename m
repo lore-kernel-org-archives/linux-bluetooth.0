@@ -1,14 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <c5cec3110607272048n5caaa944me0fc4bf74a58591@mail.gmail.com>
-References: <c5cec3110607192037w3d5a3086ib00ff4d6c8b5c93@mail.gmail.com>
-	<1153898826.746.16.camel@localhost>
-	<c5cec3110607272048n5caaa944me0fc4bf74a58591@mail.gmail.com>
-Date: Fri, 28 Jul 2006 09:23:01 +0200
-Message-Id: <1154071381.2298.3.camel@localhost>
+To: Bearcat@feline-soul.com
+In-Reply-To: <200607272126.48317.Bearcat@feline-soul.com>
+References: <44C8FB2F.9070403@kernelconcepts.de>
+	<1171.216.47.50.125.1154031396.squirrel@webmail.feline-soul.net>
+	<1154049725.7650.8.camel@localhost>
+	<200607272126.48317.Bearcat@feline-soul.com>
+Date: Fri, 28 Jul 2006 09:21:30 +0200
+Message-Id: <1154071290.2298.1.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] usb device problem
+Cc: BlueZ users <bluez-users@lists.sourceforge.net>,
+        Nils Faerber <nils.faerber@kernelconcepts.de>
+Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,14 +25,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Bearcat,
 
-> my kernel is 2.4.20, and proecssor is imx21 of freescale.
-> According your reply, if i use the 2.6 kernel , the usb device will be
-> ok?
+> I installed the hcidump program (and made/distributed a package for my 
+> distro).
+> 
+> When i press buttons on my keyboards hcidump reports nothing. There is nothing 
+> about a pin or security when i turn auth on and try to reestablish 
+> connections with the mouse. After auth is off the mouse works fine.
+> 
+> When trying to connect the keyboard i get a lot of:
+> < HCI Command: Role Discovery (0x02|0x0009) plen 2
+>     handle 41
+> > HCI Event: Command Complete (0x0e) plen 7
+>     Role Discovery (0x02|0x0009) ncmd 1
+>     0000: 00 29 00 00                                       .)..
+> < HCI Command: Read RSSI (0x05|0x0005) plen 2
+>     handle 41
+> > HCI Event: Command Complete (0x0e) plen 7
+>     Read RSSI (0x05|0x0005) ncmd 1
+>     status 0x00 handle 41 rssi 0
+> < HCI Command: Role Discovery (0x02|0x0009) plen 2
+>     handle 41
+> 
+> Does that mean anything?
 
-it is not a 100% guarantee, but the USB stack from a recent 2.6 kernel
-improved a lot compared to any 2.4 kernel.
+this is totally out of context. Make sure that we at least see the
+create connection command.
+
+And don't use "hciconfig hci0 auth" unless you know what you are doing.
+This is security mode 3 and its config option has been removed for a
+very good reason.
 
 Regards
 
