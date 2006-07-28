@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <44C89EEF.3060003@student.uib.no>
-References: <44C89EEF.3060003@student.uib.no>
-Date: Fri, 28 Jul 2006 21:25:05 +0200
-Message-Id: <1154114705.2298.46.camel@localhost>
+In-Reply-To: <44C9DB62.1000103@kernelconcepts.de>
+References: <44C8FB2F.9070403@kernelconcepts.de>
+	<20060727185006.69823.qmail@web27915.mail.ukl.yahoo.com>
+	<1171.216.47.50.125.1154031396.squirrel@webmail.feline-soul.net>
+	<44C9DB62.1000103@kernelconcepts.de>
+Date: Fri, 28 Jul 2006 11:46:28 +0200
+Message-Id: <1154079988.2298.23.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Enabling authentication and encryption in C
+Cc: Bearcat@feline-soul.com
+Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,54 +24,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Stale,
+Hi Nils,
 
-> I'm working on my master thesis about Bluetooth security, and are going 
-> to test the security and possibly implement some improvements. I program 
-> in C, and am currently trying to enable authentication and encryption 
-> through some function calls in hci_lib.h, namly hci_authenticate_link 
-> and hci_encrypt_link respectively. Below is a part of my code.
+> > No such luck for me yet. Strangly the hcitool does not allow the auth
+> > option for me. I had to do a hciconfig /dev/usb/hci0 auth to turn the auth
+> > on the hub. Auth is now on but the keyboard still doesn't connect. As
+> > usuall nothing is reported in the syslogs.
+> > 
+> > Do i need to turn on the auth for the keyboard too (is that even an option)?
 > 
-> int main(void) {
->     struct hci_conn_info_req *cr;
->     struct sockaddr_rc resciever = { 0 };
->     struct sockaddr_rc local = { 0 };
->     uint16_t handle;
->     int s, status, dd;
-> 
->     char destination[17] = "00:09:DD:60:02:45";
-> 
->     resciever.rc_family = AF_BLUETOOTH;
->     resciever.rc_channel = (uint8_t) 1;
->     str2ba( destination, &resciever.rc_bdaddr );
-> 
->     local.rc_family = AF_BLUETOOTH;
->     local.rc_channel = (uint8_t) 1;
->     //lokal_addr.rc_bdaddr = *BDADDR_ANY;
->     str2ba("00:14:A4:D4:0F:A1", &local.rc_bdaddr);
->    
->     dd = hci_open_dev(hci_get_route(&local.rc_bdaddr));
->     cr = (struct hci_conn_info_req*) malloc(sizeof(struct 
-> hci_conn_info_req));
->     ioctl(dd, HCIGETCONNINFO, (unsigned long) cr);
->     handle = cr->conn_info->handle;
-> 
->     status = hci_authenticate_link(dd, handle, 0);
->     printf("status: %d\n", status);
->     status = hci_encrypt_link(dd, handle, (uint8_t)1, 0);
->     printf("status: %d\n", status);
->     ....
->     .... }
-> 
-> Both calls always return -1, and things obviously aren't going as 
-> expected. I've managed to digg down through several function calls:
-> hci_authenticate_link -> hci_send_req -> hci_send_cmd -> writev.
-> writev returns -1 as well and sets the error code variable 'errno' to 77 
-> (EBADFD, defined in asm/errno.h and means 'File descriptor in bad state').
-> I'm not sure what this means.
+> No, the keyboard will require that automatically.
 
-run "hcidump -X -V" and see if they really got sent. And take a look at
-hidd, because this daemon already implements this.
+actually only the Apple keyboards require this and this is wrong
+according to the HID specification. The host must make the decision to
+authenticate and switch on encryption.
 
 Regards
 
