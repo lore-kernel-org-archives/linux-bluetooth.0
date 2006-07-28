@@ -1,17 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "Bearcat M. Sandor" <Bearcat@feline-soul.com>
-Date: Sat, 29 Jul 2006 00:35:01 -0600
-Cc: bluez-users@lists.sourceforge.net
-References: <44C8FB2F.9070403@kernelconcepts.de>
-	<d23110170607281121s3dbf5c6brde2156d3f1c01b73@mail.gmail.com>
-	<1281.216.47.50.125.1154111937.squirrel@webmail.feline-soul.net>
-In-Reply-To: <1281.216.47.50.125.1154111937.squirrel@webmail.feline-soul.net>
+Message-ID: <20060728225605.90189.qmail@web51403.mail.yahoo.com>
+Date: Fri, 28 Jul 2006 15:56:05 -0700 (PDT)
+From: manojt ambe <mp_tambe@yahoo.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: "Undisclosed.Recipients": ;
-Message-Id: <200607290035.01939.Bearcat@feline-soul.com>
-Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
-Reply-To: Bearcat@feline-soul.com,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] rfcomm connection disconnects immediately
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -24,594 +18,198 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-An update I just recieved my logitech headset and i'm making some headway. 
-It's actually giving my some clues about the keyboard
+Hello,
 
-I did the following:
-
-1. in the hcid.conf file i changed the passkey to "0000"
-2. Reloaded bluez.
-3. hiconfig up and down
-4. hold power button on headset
-5. hcitool scan
-I see 00:0D:44:4F:37:72       Logitech HS03  V04
-then a hidd --connect 00:0D:44:4F:37:72 or a hcitool cc 00:0D:44:4F:37:72 
-starts the connection.
-
-In hcidump  i see:
+Thanks Marcel for you earlier reply. I am new to
+Bluetooth programming.
+I am trying to make RFcomm connection with Motorola
+HS850 through a DBT120 dongle. I am using linux
+2.4.21-40 kernel and bluez 3.1 .
+I see that the rfcomm connection gets disconnected
+immediately. Is this how it is supposed to work? I
+have pasted hcidump below. Pls let me know. thanks,
+Manoj
 
 < HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:13:17:03:46:88 ptype 0xcc18 rswitch 0x01
+clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
 > HCI Event: Command Status (0x0f) plen 4
-> HCI Event: PIN Code Request (0x16) plen 6
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> HCI Event: Link Key Request (0x17) plen 6
+    bdaddr 00:13:17:03:46:88
+< HCI Command: Link Key Request Reply (0x01|0x000b)
+plen 22
+    bdaddr 00:13:17:03:46:88 key
+9B5BBF681BF037F70F25654204DB5E99
+> HCI Event: Command Complete (0x0e) plen 10
+    Link Key Request Reply (0x01|0x000b) ncmd 1
+    status 0x00 bdaddr 00:13:17:03:46:88
 > HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 41 bdaddr 00:13:17:03:46:88
+type ACL encrypt 0x01
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< HCI Command: Write Link Policy Settings
+(0x02|0x000d) plen 4
+    handle 41 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> HCI Event: Command Complete (0x0e) plen 6
+    Write Link Policy Settings (0x02|0x000d) ncmd 1
+    status 0x00 handle 41
+< HCI Command: Remote Name Request (0x01|0x0019) plen
+10
+    bdaddr 00:13:17:03:46:88 mode 2 clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd
+1
+> ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x004c scid 0x0040
+result 1 status 2
+      Connection pending - Authorization pending
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:13:17:03:46:88 name
+'Motorola HS850'
+> ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x004c scid 0x0040
+result 0 status 0
+      Connection successful
+< ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x004c flags 0x00 clen
+4
+      MTU 1024
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> ACL data: handle 41 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00
+result 0 clen 0
+      Success
+> ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen
+4
+      MTU 1024
+< ACL data: handle 41 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x004c flags 0x00
+result 0 clen 0
+      Success
+< ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x004c len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs
+0x1c
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+< ACL data: handle 41 flags 0x02 dlen 18
+    L2CAP(d): cid 0x004c len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs
+0x70 mcc_len 8
+      dlci 2 frame_type 0 credit_flow 15 pri 0
+ack_timer 0
+      frame_size 1019 max_retrans 0 credits 7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> ACL data: handle 41 flags 0x02 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 1
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs
+0xaa mcc_len 8
+      dlci 2 frame_type 0 credit_flow 14 pri 0
+ack_timer 0
+      frame_size 127 max_retrans 0 credits 0
+< ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x004c len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs
+0x59
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(d): cid 0x004c len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs
+0x70 mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 0 b2 0 b3 0
+len 0
+< ACL data: handle 41 flags 0x02 dlen 9
+    L2CAP(d): cid 0x004c len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 1 ilen 0 fcs 0x86
+credits 33
+< ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x004c len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs
+0xb8
+> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs
+0xaa mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 0 b2 0 b3 0
+len 0
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(d): cid 0x004c len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs
+0x70 mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 0 b2 0 b3 0
+len 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs
+0xaa mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 0 b2 0 b3 0
+len 0
+> ACL data: handle 41 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c
+credits 15
+> ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
+< ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x004c len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs
+0xfd
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x004c scid 0x0040
+> ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x004c scid 0x0040
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+    handle 41 reason 0x13
+    Reason: Remote User Terminated Connection
+> HCI Event: Command Status (0x0f) plen 4
+    Disconnect (0x01|0x0006) status 0x00 ncmd 1
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 41 reason 0x16
+    Reason: Connection Terminated by Local Host
 
-I am never prompted for a pin code. I even made a script which contains:   
-	echo "PIN:0000"
-but no pin is ever entered.
 
-Thus kdebluetooth sees the headset but it is never connected.
-
-The keyboard on the other hand is never seen at all. A hcitool scan does not 
-show it, nor does it ever appear in kdebluetooth.  However, the mouse is 
-never seen in a scan either, yet it works perfectly and is seen in 
-kdebluetooth.
-
-I'm very confused.
-
-Bearcat
-
-
-On Friday 28 July 2006 12:38 in an email titled "Re: [Bluez-users] can't 
-connect EPOX Keyboard BT-KB01B" Bearcat M. Sandor wrote:
->Sorry about that. I meant to say files/bluetooth on all those.
->
->They are here: http://www.feline-soul.com/files/bluetooth/
->
->Here the are inline:
->http://www.feline-soul.net/files/bluetooth/hcid.conf:
->#
-># HCI daemon configuration file.
->#
->
-># HCId options
->options {
->	# Automatically initialize new devices
->	autoinit yes;
->
->	# Security Manager mode
->	#   none - Security manager disabled
->	#   auto - Use local PIN for incoming connections
->	#   user - Always ask user for a PIN
->	#
->	security user;
->
->	# Pairing mode
->	#   none  - Pairing disabled
->	#   multi - Allow pairing with already paired devices
->	#   once  - Pair once and deny successive attempts
->	pairing multi;
->
->	# Default PIN code for incoming connections
->	passkey "BlueZ";
->
->	# PIN helper
->     #pin_helper /usr/bin/bluepin;
->     #pin_helper /etc/bluetooth/cbpinscript;
->     pin_helper /usr/lib/kdebluetooth/kbluepin;
->}
->
-># Default settings for HCI devices
->device {
->	# Local device name
->	#   %d - device id
->	#   %h - host name
->	name "BlueZ (%d)";
->
->	# Local device class
->	class 0x100000;
->
->	# Default packet type
->	#pkt_type DH1,DM1,HV1;
->
->	# Inquiry and Page scan
->	iscan enable; pscan enable;
->
->	# Default link mode
->	#   none   - no specific policy
->	#   accept - always accept incoming connections
->	#   master - become master on incoming connections,
->	#            deny role switch on outgoing connections
->	lm accept;
->
->	# Default link policy
->	#   none    - no specific policy
->	#   rswitch - allow role switch
->	#   hold    - allow hold mode
->	#   sniff   - allow sniff mode
->	#   park    - allow park mode
->	lp rswitch,hold,sniff,park;
->}
->-------------------------------------------------------------------
->http://www.feline-soul.net/files/bluetooth/hcidev_-a_output:
->hci0:	Type: USB
->	BD Address: 00:07:61:1C:9F:D3 ACL MTU: 192:8 SCO MTU: 64:8
->	UP RUNNING PSCAN ISCAN
->	RX bytes:8886937 acl:584808 sco:0 events:79865 errors:0
->	TX bytes:392377 acl:192 sco:0 commands:77281 errors:0
->	Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->	Link policy: RSWITCH HOLD SNIFF PARK
->	Link mode: SLAVE ACCEPT
->	Name: 'BlueZ (0)'
->	Class: 0x000000
->	Service Classes: Unspecified
->	Device Class: Miscellaneous,
->	HCI Ver: 1.1 (0x1) HCI Rev: 0x34e LMP Ver: 1.1 (0x1) LMP Subver: 0x34e
->Manufacturer: Cambridge Silicon Radio (10)
->--------------------------------------------------------------------
->http://www.feline-soul.net/files/bluetooth/hcidump:
->HCI sniffer - Bluetooth packet analyzer ver 1.31
->device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
->
->> HCI Event: Mode Change (0x14) plen 6
->
->    status 0x00 handle 41 mode 0x00 interval 0
->    Mode: Active
->
->> HCI Event: Mode Change (0x14) plen 6
->
->    status 0x00 handle 41 mode 0x02 interval 126
->    Mode: Sniff
->-----------------------------------------------------------------
->http://www.feline-soul.net/files/bluetooth/hcidump_hcitool_connect HCI
->sniffer - Bluetooth packet analyzer ver 1.31
->device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Create Connection (0x01|0x0005) plen 13
->    bdaddr 00:07:61:1B:50:9B ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
->Packet type: DM1 DM3 DM5 DH1 DH3 DH5
->
->> HCI Event: Command Status (0x0f) plen 4
->
->    Create Connection (0x01|0x0005) status 0x0c ncmd 1
->    Error: Command Disallowed
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->< HCI Command: Read RSSI (0x05|0x0005) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Read RSSI (0x05|0x0005) ncmd 1
->    status 0x00 handle 41 rssi 0
->< HCI Command: Role Discovery (0x02|0x0009) plen 2
->    handle 41
->
->> HCI Event: Command Complete (0x0e) plen 7
->
->    Role Discovery (0x02|0x0009) ncmd 1
->    0000: 00 29 00 00                                       .)..
->
->> HCI Event: Connect Complete (0x03) plen 11
->
->    status 0x04 handle 0 bdaddr 00:07:61:1B:50:9B type ACL encrypt 0x00
->Error: Page Timeout
->--------------------------------------------------------------------
->http://www.feline-soul.net/files/bluetooth/hcidump_hidd_connect
->HCI sniffer - Bluetooth packet analyzer ver 1.31
->device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
->
->> HCI Event: Mode Change (0x14) plen 6
->
->    status 0x00 handle 41 mode 0x00 interval 0
->    Mode: Active
->
->> HCI Event: Mode Change (0x14) plen 6
->
->    status 0x00 handle 41 mode 0x02 interval 126
->    Mode: Sniff
->< HCI Command: Create Connection (0x01|0x0005) plen 13
->    bdaddr 00:07:61:1B:50:9B ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
->Packet type: DM1 DM3 DM5 DH1 DH3 DH5
->
->> HCI Event: Command Status (0x0f) plen 4
->
->    Create Connection (0x01|0x0005) status 0x00 ncmd 1
->
->> HCI Event: Connect Complete (0x03) plen 11
->
->    status 0x04 handle 0 bdaddr 00:07:61:1B:50:9B type ACL encrypt 0x00
->Error: Page Timeout
->< HCI Command: Create Connection (0x01|0x0005) plen 13
->    bdaddr 00:07:61:1B:50:9B ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
->Packet type: DM1 DM3 DM5 DH1 DH3 DH5
->
->> HCI Event: Command Status (0x0f) plen 4
->
->    Create Connection (0x01|0x0005) status 0x00 ncmd 1
->
->> HCI Event: Connect Complete (0x03) plen 11
->
->    status 0x04 handle 0 bdaddr 00:07:61:1B:50:9B type ACL encrypt 0x00
->Error: Page Timeout
->-----------------------------------------------------------
->http://www.feline-soul.net/files/bluetooth/rfcomm.conf
->#
-># RFCOMM configuration file.
->#
->
->rfcomm0 {
->	# Automatically bind the device at startup
->	bind no;
->
->	# Bluetooth address of the device
->	device 11:22:33:44:55:66;
->
->	# RFCOMM channel for the connection
->	channel	1;
->
->	# Description of the connection
->	comment "Example Bluetooth device";
->---------------------------------------------
->
->That's it. The commands i used to get these sets of output are in the
->previous email.
->
->Thanks all,
->
->Bearcat
->
->> Hi Bearcat,
->>
->> On 7/28/06, Bearcat M. Sandor <Bearcat@feline-soul.com> wrote:
->>> Thank you again for the help so far. I have placed a bunch of output
->
->files on
->
->>> my server for your viewing pleasure, instead of giving you large
->
->outputs
->
->>> in
->>> an email body.
->>
->> Sorry, but I couldn't see any of those files (all links end up with "404
->
->Not found" error). Can you send those files inline so we can see what's
->happening, please?
->
->> Regards,
->>
->> -- Ulisses
-
--- 
-Bearcat M. Sandor
-Bearcat@feline-soul.com
-ICQ: 6628727
-MSN: bearcatsandor@hotmail.com
-Yahoo: bearcatsandor
-AIM: bearcatmsandor
-Jabber: bearcatsandor@jabber.org
-
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
