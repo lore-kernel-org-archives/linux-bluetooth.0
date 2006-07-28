@@ -1,52 +1,78 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <c5cec3110607192037w3d5a3086ib00ff4d6c8b5c93@mail.gmail.com>
-References: <c5cec3110607192037w3d5a3086ib00ff4d6c8b5c93@mail.gmail.com>
-Date: Wed, 26 Jul 2006 09:27:06 +0200
-Message-Id: <1153898826.746.16.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] usb device problem
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Return-Path: <Bearcat@feline-soul.com>
+From: "Bearcat M. Sandor" <Bearcat@feline-soul.com>
+Reply-To: Bearcat@feline-soul.com
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
+Date: Thu, 27 Jul 2006 21:26:47 -0600
+Cc: BlueZ users <bluez-users@lists.sourceforge.net>,
+        Nils Faerber <nils.faerber@kernelconcepts.de>
+References: <44C8FB2F.9070403@kernelconcepts.de> <1171.216.47.50.125.1154031396.squirrel@webmail.feline-soul.net> <1154049725.7650.8.camel@localhost>
+In-Reply-To: <1154049725.7650.8.camel@localhost>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200607272126.48317.Bearcat@feline-soul.com>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Bees,
+I installed the hcidump program (and made/distributed a package for my 
+distro).
 
->     I ported the bluez-libs-2.25 and bluez-utils-2.25 to an embedded
-> system last week, but when I plug my usb bluetooth dongle into the
-> board, it says"usb device not accepting new address", so I can't use
-> my bluetooth dongle in this embedded system.
->     I'sure my usb bluetooth is well, it worked normally on PC
-> (FedoraCore4). 
->     And the usb interface on board is well too, because when I pluged
-> my U-disk into it ,the U-disk worked normally.
->     Then why my usb dongle didn't work on the embedded system board?
+When i press buttons on my keyboards hcidump reports nothing. There is nothing 
+about a pin or security when i turn auth on and try to reestablish 
+connections with the mouse. After auth is off the mouse works fine.
 
-what kernel version are you using? The recent 2.6 kernels are a little
-bit more robust when it comes to cheap USB hardware.
+When trying to connect the keyboard i get a lot of:
+< HCI Command: Role Discovery (0x02|0x0009) plen 2
+    handle 41
+> HCI Event: Command Complete (0x0e) plen 7
+    Role Discovery (0x02|0x0009) ncmd 1
+    0000: 00 29 00 00                                       .)..
+< HCI Command: Read RSSI (0x05|0x0005) plen 2
+    handle 41
+> HCI Event: Command Complete (0x0e) plen 7
+    Read RSSI (0x05|0x0005) ncmd 1
+    status 0x00 handle 41 rssi 0
+< HCI Command: Role Discovery (0x02|0x0009) plen 2
+    handle 41
 
-Regards
+Does that mean anything?
 
-Marcel
+Bearcat
 
 
 
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+On Thursday 27 July 2006 19:22 in an email titled "Re: [Bluez-users] can't 
+connect EPOX Keyboard BT-KB01B" Marcel Holtmann wrote:
+>Hi Bearcat,
+>
+>> No such luck for me yet. Strangly the hcitool does not allow the auth
+>> option for me. I had to do a hciconfig /dev/usb/hci0 auth to turn the auth
+>> on the hub. Auth is now on but the keyboard still doesn't connect. As
+>> usuall nothing is reported in the syslogs.
+>>
+>> Do i need to turn on the auth for the keyboard too (is that even an
+>> option)?
+>>
+>> I am never prompted for a pin and even if i was, i don't know what it
+>> would be. Is the pin connected to the keyboard, the hub (should i find out
+>> from logitech what their default is) or is it a pin kept by bluez?
+>>
+>> Also, i don't have a program called hcidump. Is that part of the bluez
+>> package?
+>
+>it is in bluez-hcidump and you should start using it. Otherwise you are
+>starting to speculate and this doesn't help.
+>
+>Regards
+>
+>Marcel
+
+-- 
+Bearcat M. Sandor
+Bearcat@feline-soul.com
+ICQ: 6628727
+MSN: bearcatsandor@hotmail.com
+Yahoo: bearcatsandor
+AIM: bearcatmsandor
+Jabber: bearcatsandor@jabber.org
