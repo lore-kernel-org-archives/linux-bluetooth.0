@@ -1,15 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44C9DB62.1000103@kernelconcepts.de>
-Date: Fri, 28 Jul 2006 11:39:46 +0200
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
-MIME-Version: 1.0
-To: Bearcat@feline-soul.com
-References: <44C8FB2F.9070403@kernelconcepts.de>
-	<20060727185006.69823.qmail@web27915.mail.ukl.yahoo.com>
-	<1171.216.47.50.125.1154031396.squirrel@webmail.feline-soul.net>
-In-Reply-To: <1171.216.47.50.125.1154031396.squirrel@webmail.feline-soul.net>
-Cc: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200607281128.09414.fexpop@onlinehome.de>
+References: <200607271240.49400.fexpop@onlinehome.de>
+	<200607281100.44745.fexpop@onlinehome.de>
+	<1154077745.2298.17.camel@localhost>
+	<200607281128.09414.fexpop@onlinehome.de>
+Date: Fri, 28 Jul 2006 11:38:33 +0200
+Message-Id: <1154079513.2298.20.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Several problems with bluez-utils 3.1,
+	kbluetoothd and a Belkin dongle in Debian
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,47 +24,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Bearcat M. Sandor schrieb:
-> Wolfram, Nils,
-Hi!
+Hi Felix,
 
-> No such luck for me yet. Strangly the hcitool does not allow the auth
-> option for me. I had to do a hciconfig /dev/usb/hci0 auth to turn the auth
-> on the hub. Auth is now on but the keyboard still doesn't connect. As
-> usuall nothing is reported in the syslogs.
+> > First of all the setting iscan on and pscan off somehow works, but is
+> > totally stupid. It means you set your device visible, but not
+> > connectable. This also means that the remote side can find you, but
+> > can't resolve your name. Think about it.
 > 
-> Do i need to turn on the auth for the keyboard too (is that even an option)?
+> Sure it's stupid. I did it only for testing purposes. I've mentioned it here 
+> just to illustrate that nothing in hcid.conf related to pscan/iscan seems to 
+> have any effect at all. (I've "iscan enable; pscan enable;" in my hcid.conf). 
+> 
+> > > How do I set the discoverable timeout? How am I supposed to set myself
+> > > discoverable? Are there new options in hcid.conf? Where is it documented?
+> >
+> > Check utils/hcid/dbus-api.txt in the CVS. It also contains a dbus-test
+> > script that can be used to modify these settings.
+> 
+> So, there's no way to make my system visible directly after plugging the 
+> dongle in without switching to CVS versions???? 
 
-No, the keyboard will require that automatically.
+the dbus-test is a Python script. Simple checkout the CVS and use this
+one. You need to modify DiscoverableTimeout and Mode. No need to update
+the whole BlueZ packages.
 
-> I am never prompted for a pin and even if i was, i don't know what it
-> would be. Is the pin connected to the keyboard, the hub (should i find out
-> from logitech what their default is) or is it a pin kept by bluez?
+Regards
 
-The problem is that the keyboards I have seen so far require that you
-input the PIN on the keyboard first and then you will be prompted to
-second this on the desktop PC.
-So what might happen at your side now is that the keyboard is waiting
-for the PIN to be input.
-Maybe try again and try to connect to the keyboard using hidd then type
-in a PIN code on the keyboard and press ENTER. If you are lucky the
-dialog the pops up.
+Marcel
 
-> Also, i don't have a program called hcidump. Is that part of the bluez
-> package?
 
-In Debian it is a seperate package but it belongs to the BlueZ project.
-
-> Thanks all,
-> Bearcat
-Cheers
-  nils faerber
-
--- 
-kernel concepts          Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          Mob: +49-176-21024535
---
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
