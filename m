@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <d23110170607281121s3dbf5c6brde2156d3f1c01b73@mail.gmail.com>
+Date: Fri, 28 Jul 2006 15:21:36 -0300
+From: "Ulisses Furquim" <ulissesf@gmail.com>
+To: Bearcat@feline-soul.com, "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200607281048.07126.Bearcat@feline-soul.com>
 MIME-Version: 1.0
-Date: Fri, 28 Jul 2006 14:37:44 -0400
-Message-ID: <E65CD2CAB74C80498703D6EF7624BB4C023974AE@zmaex.zma.zoran.com>
-From: "Lan Zhang" <Lan.Zhang@Zoran.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Hci Reset Problem
+References: <44C8FB2F.9070403@kernelconcepts.de>
+	<44C9DB62.1000103@kernelconcepts.de>
+	<1154079988.2298.23.camel@localhost>
+	<200607281048.07126.Bearcat@feline-soul.com>
+Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,104 +23,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi, Marcel:
+Hi Bearcat,
 
-I forgot the system we had is using vmware system, and that may cause
-the HCI to reset. Anyway, I tested all the BT dongle I had here with a
-stang along Linux, I attached result below. I htink you may interested. 
+On 7/28/06, Bearcat M. Sandor <Bearcat@feline-soul.com> wrote:
+> Thank you again for the help so far. I have placed a bunch of output files on
+> my server for your viewing pleasure, instead of giving you large outputs in
+> an email body.
+
+Sorry, but I couldn't see any of those files (all links end up with
+"404 Not found" error). Can you send those files inline so we can see
+what's happening, please?
 
 Regards,
-Lan
 
-
-EPSON --- WORK
-hci0:   Type: USB
-        BD Address: 00:03:7A:2A:CD:D8 ACL MTU: 384:8 SCO MTU: 64:8
-        HCI 19.2
-        Chip version: BlueCore4-External
-        Max key size: 56 bit
-        SCO mapping:  HCI
-        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-                <3-slot packets> <5-slot packets> <encryption> <slot
-offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <channel quality> <SCO link> <HV2
-packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging
-scheme>
-                <power control> <transparent SCO> <broadcast encrypt>
-                <EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan>
-                <interlaced iscan> <interlaced pscan> <inquiry with
-RSSI>
-                <extended SCO> <EV4 packets> <EV5 packets> <AFH cap.
-slave>
-                <AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL>
-                <AFH cap. master> <AFH class. master> <EDR eSCO 2 Mbps>
-                <EDR eSCO 3 Mbps> <3-slot EDR eSCO> <extended features>
-
-Belkin, linksys, D-link --- WORK
-hci0:   Type: USB
-        BD Address: 00:0A:3A:55:C3:4C ACL MTU: 192:8 SCO MTU: 64:8
-        HCI 16.4
-        Chip version: BlueCore02-External
-        Max key size: 56 bit
-        SCO mapping:  HCI
-        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot
-offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <channel quality> <SCO link> <HV2
-packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging
-scheme>
-                <transparent SCO>
-
-
-CNet --- WORK
-hci0:   Type: USB
-        BD Address: 00:11:F6:02:85:C8 ACL MTU: 120:20 SCO MTU: 64:0
-        Unsupported manufacturer
-        Features: 0xff 0xff 0x05 0x38 0x18 0x18 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot
-offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <channel quality> <SCO link> <HV2
-packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <power
-control>
-                <enhanced iscan> <interlaced iscan> <interlaced pscan>
-                <AFH cap. slave> <AFH class. slave> <AFH cap. master>
-                <AFH class. master>
-
-
-
-AmbiCom --- DIDN'T WORK at all, cannot send out inquire. 
-hci0:   Type: USB
-        BD Address: 00:0E:A1:32:CA:E1 ACL MTU: 377:10 SCO MTU: 16:0
-        Firmware 0.105 / 97
-        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot
-offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <RSSI> <channel quality> <SCO link> <HV2 packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <power
-control>
-                <transparent SCO> <enhanced iscan> <interlaced iscan>
-                <interlaced pscan> <AFH cap. slave> <AFH cap. master>
-
-Kensington --- DIDN'T WORK at all. 
-hci0:   Type: USB
-        BD Address: 00:0C:55:F6:6A:01 ACL MTU: 377:10 SCO MTU: 16:0
-        Firmware 0.105 / 101
-        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot
-offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <RSSI> <channel quality> <SCO link> <HV2 packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <power
-control>
-                <transparent SCO> <enhanced iscan> <interlaced iscan>
-                <interlaced pscan> <AFH cap. slave> <AFH cap. master>
+-- Ulisses
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
