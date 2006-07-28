@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200607281128.09414.fexpop@onlinehome.de>
+From: Felix Homann <fexpop@onlinehome.de>
+To: bluez-users@lists.sourceforge.net
+Date: Fri, 28 Jul 2006 11:28:09 +0200
 References: <200607271240.49400.fexpop@onlinehome.de>
 	<200607281100.44745.fexpop@onlinehome.de>
 	<1154077745.2298.17.camel@localhost>
-	<200607281128.09414.fexpop@onlinehome.de>
-Date: Fri, 28 Jul 2006 11:38:33 +0200
-Message-Id: <1154079513.2298.20.camel@localhost>
-Mime-Version: 1.0
+In-Reply-To: <1154077745.2298.17.camel@localhost>
+MIME-Version: 1.0
+Message-Id: <200607281128.09414.fexpop@onlinehome.de>
 Subject: Re: [Bluez-users] Several problems with bluez-utils 3.1,
 	kbluetoothd and a Belkin dongle in Debian
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -24,35 +23,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Felix,
+On Friday 28 July 2006 11:09, Marcel Holtmann wrote:
+> First of all the setting iscan on and pscan off somehow works, but is
+> totally stupid. It means you set your device visible, but not
+> connectable. This also means that the remote side can find you, but
+> can't resolve your name. Think about it.
 
-> > First of all the setting iscan on and pscan off somehow works, but is
-> > totally stupid. It means you set your device visible, but not
-> > connectable. This also means that the remote side can find you, but
-> > can't resolve your name. Think about it.
-> 
-> Sure it's stupid. I did it only for testing purposes. I've mentioned it here 
-> just to illustrate that nothing in hcid.conf related to pscan/iscan seems to 
-> have any effect at all. (I've "iscan enable; pscan enable;" in my hcid.conf). 
-> 
-> > > How do I set the discoverable timeout? How am I supposed to set myself
-> > > discoverable? Are there new options in hcid.conf? Where is it documented?
-> >
-> > Check utils/hcid/dbus-api.txt in the CVS. It also contains a dbus-test
-> > script that can be used to modify these settings.
-> 
-> So, there's no way to make my system visible directly after plugging the 
-> dongle in without switching to CVS versions???? 
+Sure it's stupid. I did it only for testing purposes. I've mentioned it here 
+just to illustrate that nothing in hcid.conf related to pscan/iscan seems to 
+have any effect at all. (I've "iscan enable; pscan enable;" in my hcid.conf). 
 
-the dbus-test is a Python script. Simple checkout the CVS and use this
-one. You need to modify DiscoverableTimeout and Mode. No need to update
-the whole BlueZ packages.
+> > How do I set the discoverable timeout? How am I supposed to set myself
+> > discoverable? Are there new options in hcid.conf? Where is it documented?
+>
+> Check utils/hcid/dbus-api.txt in the CVS. It also contains a dbus-test
+> script that can be used to modify these settings.
 
-Regards
+So, there's no way to make my system visible directly after plugging the 
+dongle in without switching to CVS versions???? 
 
-Marcel
+Kind regards,
 
-
+Felix
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
