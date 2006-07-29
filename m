@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Wolfram Reda <wolfram_reda@yahoo.de>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20060727083312.81035.qmail@web27915.mail.ukl.yahoo.com>
-References: <20060727083312.81035.qmail@web27915.mail.ukl.yahoo.com>
-Date: Sat, 29 Jul 2006 14:57:47 +0200
-Message-Id: <1154177867.25939.15.camel@localhost>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY107-F22A1A1C4932DC8BBF0358D80590@phx.gbl>
+References: <BAY107-F22A1A1C4932DC8BBF0358D80590@phx.gbl>
+Date: Sat, 29 Jul 2006 14:56:47 +0200
+Message-Id: <1154177807.25939.13.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
+Subject: Re: [Bluez-users] FW: Re:  RfCOMM connection problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,19 +20,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Wolfram,
+Hi Julien,
 
-> I'm trying to connect my EPOX Buetooth Keyboard BT-KB01B but without success so far. The error message is:
+> I am asking you this question because I am using a Bluez Rfcomm server.
+> One SDK from Broadcom is available for free:
 > 
->  hcitool conf
-> Connections:
->         > ACL 00:04:61:81:F7:C8 handle 44 state 1 lm SLAVE
->         < ACL 00:04:61:82:03:4A handle 41 state 1 lm MASTER
-> root@woraBox:/home/rw024419# hidd --connect 00:04:61:82:03:4A
-> Can't create HID control channel: Connection timed out
+> http://www.broadcom.com/products/bluetooth_sdk.php
+> 
+> 
+> My question was about rfcomm layer and services and you guys seem to be 
+> expert in bluetooth so you may have play around with bluetooth of ipaqs and 
+> bluez servers...
+> I read that it was not possible at all to use the microsoft API cause Ipacs 
+> are using broadcom stack.
+> 
+> My problem may come from the security handshake...but I don't know how to 
+> fix it.
+> I though the security parameters should be set by the server but according 
+> to the Broadcom specification...both client and server should set them.
+> 
+> The problem is that on the client side, using broadcom SDK, setting security 
+> parameters requires a service name...that 's what i don't get. How to get a 
+> service from the bluez server and must i use a service??
+> A program in java on a sony ericsson works fine with your Bluez 
+> server...only simple socket programming. I just want to do the same with my 
+> ipac in C/C++
 
-how many times do I have to mention this. Include "hcidump -X -V" output
-or nobody will ever will be able to help you.
+as I said, this is about Linux and I can't give you any help when it
+comes to Programming with JSR-82, the Widcomm API or the Microsoft API,
+because I simply don't use any of them.
 
 Regards
 
