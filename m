@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1154079833.10564.5.camel@localhost>
-References: <1154042299.16913.6.camel@localhost>
-	<1154050360.7650.13.camel@localhost>
-	<1154079833.10564.5.camel@localhost>
-Date: Sat, 29 Jul 2006 14:58:53 +0200
-Message-Id: <1154177933.25939.17.camel@localhost>
+To: Wolfram Reda <wolfram_reda@yahoo.de>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20060727083312.81035.qmail@web27915.mail.ukl.yahoo.com>
+References: <20060727083312.81035.qmail@web27915.mail.ukl.yahoo.com>
+Date: Sat, 29 Jul 2006 14:57:47 +0200
+Message-Id: <1154177867.25939.15.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Several problems with bluez-utils 3.1,
-	kbluetoothd and a	Belkin dongle in Debian
+Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,20 +21,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Alastair,
+Hi Wolfram,
 
-> > the attached patch might help. If we have a Bluetooth 1.0b or 1.1 device
-> > without a quirk to enable inqmode, we shouldn't even try to change the
-> > inquiry mode. Seems that the Broadcom dongles are really sensible if you
-> > try to send a command they don't support.
+> I'm trying to connect my EPOX Buetooth Keyboard BT-KB01B but without success so far. The error message is:
 > 
-> Thanks for the patch. That does get rid of the connection timed out
-> error in syslog. Although I'm still experiencing the fact that ISCAN is
-> not enabled, although that seems to be another problem associated with
-> the way 3.x works for detecting features (According to the another
-> thread).
+>  hcitool conf
+> Connections:
+>         > ACL 00:04:61:81:F7:C8 handle 44 state 1 lm SLAVE
+>         < ACL 00:04:61:82:03:4A handle 41 state 1 lm MASTER
+> root@woraBox:/home/rw024419# hidd --connect 00:04:61:82:03:4A
+> Can't create HID control channel: Connection timed out
 
-it really looks like a bug. Feel free to send in a patch to fix it.
+how many times do I have to mention this. Include "hcidump -X -V" output
+or nobody will ever will be able to help you.
 
 Regards
 
