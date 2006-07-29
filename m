@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200607291426.26109.fexpop@onlinehome.de>
+In-Reply-To: <200607291411.23859.fexpop@onlinehome.de>
 References: <200607271240.49400.fexpop@onlinehome.de>
-	<200607271258.45178.fexpop@onlinehome.de>
-	<1153998247.9543.8.camel@localhost>
-	<200607291426.26109.fexpop@onlinehome.de>
-Date: Sat, 29 Jul 2006 14:42:05 +0200
-Message-Id: <1154176925.25939.5.camel@localhost>
+	<200607281700.24209.fexpop@onlinehome.de>
+	<1154099270.2298.41.camel@localhost>
+	<200607291411.23859.fexpop@onlinehome.de>
+Date: Sat, 29 Jul 2006 14:33:31 +0200
+Message-Id: <1154176411.25124.2.camel@localhost>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] Several problems with bluez-utils 3.1,
 	kbluetoothd and a Belkin dongle in Debian
@@ -26,42 +26,41 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi Felix,
 
-> > with bluez-utils-3.x we try to activate Inquiry with RSSI by default and
-> > in your case it doesn't seem to work.
+> > > No, unfortunately the settings I've changed via dbus-test are lost after
+> > > unplugging the dongle.
+> >
+> > they must stay, because otherwise it is a bug. You did set the
+> > discoverable timeout to zero, do you?
 > 
-> Thanks, for clarifying.
+> sure, I have. It's probably a bug then. But keep in mind I'm using dbus-test 
+> with the Debian distributed bluez-utils (3.1-3), maybe it's already fixed in 
+> 3.2..
 > 
-> > What does "hciconfig hci0 features version" tell you about your dongle.
+> Here's what I did:
 > 
-> Please, take a look into the attached features-version.log.
+> # dbus-test -i hci0 SetDiscoverableTimeout 0
+> # dbus-test -i hci0 SetMode discoverable
+> # dbus-test -i hci0 GetMode
+> discoverable
+> # dbus-test -i hci0 GetDiscoverableTimeout
+> 0
 > 
-> > Please also include the output of "hcidump -X -V" while starting an
-> > inquiry. With inqmode 0 and inqmode 1.
+> Unplug the dongle, then immediately after plugging it in again:
 > 
-> I've attached some files containing the ouptut of 'hcidump -X -V'. Those with 
-> hcitool in their name have been produced while doing a 'hcitool scan', those 
-> with kdebluetooth while scanning for devices with kdebluetoothd. The 
-> corresponding inqmode should be obvious from the file names.
+> # dbus-test -i hci0 GetDiscoverableTimeout
+> 180
+> # dbus-test -i hci0 GetMode
+> discoverable
+> 
+> Wait some (~3) minutes:
+> 
+> # dbus-test -i hci0 GetMode
+> connectable
 
-the dumps are fine. With inquiry mode 0 you see only Inquiry Result
-events and with inquiry mode 1 (in your case the default that hcid will
-set on adapter init) you see only Inquiry Result with RSSI events. The
-Linux kernel and hcid+hcitool are capable of handling all for possible
-events that are out there:
-
-	inqmode 0: Inquiry Result
-	inqmode 1: Inquiry Result with RSSI
-	inqmode 1: Inquiry Result with RSSI and Page Scan
-	inqmode 2: Extended Inquiry Result
-
-The Inquiry Result with RSSI and Page Scan shows only up on a couple of
-broken Silicon Wave based adapters where these guys where to stupid to
-read the final Bluetooth 1.2 specification. However BlueZ works around
-their mistake.
-
-It seems that kdebluetoothd needs to updated and the best would be if
-they start using the new D-Bus interface, because this takes care of all
-this adapter specific things.
+that is a bug and it is still present in bluez-utils-3.2. I have no idea
+how, but somehow the unplug and replug sets the default discoverable
+timeout of 3 minutes. If you look at the stored value it is still 0, but
+this doesn't help.
 
 Regards
 
