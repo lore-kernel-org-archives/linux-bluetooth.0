@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5f30e2610607300852v675f0436od327a39c2946f9c9@mail.gmail.com>
-Date: Sun, 30 Jul 2006 10:52:02 -0500
-From: "Jeff Wilson" <jazzbotley@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] poll() on RFCOMM socket
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <87zmeuq6iw.fsf@phugues.par.afp.com>
+References: <87zmeuq6iw.fsf@phugues.par.afp.com>
+Date: Sat, 29 Jul 2006 14:54:50 +0200
+Message-Id: <1154177690.25939.10.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] typo in dbus-test python script
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,41 +20,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all,
+Hi Hugues,
 
-I'm on 2.6.11-mh2, running bluez-libs-2.25. I can't seem to get the
-following example to work (I edited out the error checking, etc, to
-shorten the code segment)  I have a similar function that works fine
-with TCP sockets
+> Just in case you did'nt notice, there is apparently a typo in the
+> dbus-test python script in the CVS repository.
+> 
+> Index: hcid/dbus-test
+> ===================================================================
+> RCS file: /cvsroot/bluez/utils/hcid/dbus-test,v
+> retrieving revision 1.20
+> diff -u -r1.20 dbus-test
+> --- hcid/dbus-test	26 Jun 2006 12:33:13 -0000	1.20
+> +++ hcid/dbus-test	28 Jul 2006 12:01:58 -0000
+> @@ -186,7 +186,7 @@
+>      @dbus.decorators.explicitly_pass_message
+>      def mgr_signal_handler(*args, **keywords):
+>          dbus_message = keywords["dbus_message"]
+> -        print '%s: ' % dbus_messsage.get_member()
+> +        print '%s: ' % dbus_message.get_member()
+>          for arg in args[1:]:
+>              print '%s   ' % arg,
+>          print
 
-// begin code segment
-int fd = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-/* accept(), connection setup, etc */
-fcntl(fd, F_SETFL, O_NONBLOCK);
-struct pollfd pfd;
-pfd.fd = fd;
-pfd.events = POLLIN;
-pfd.revents = 0;
-int res = 0;
-while ((res = poll(&poll_struct, 1, 5000)) < 1)
-{
-   if(res < 0) /* check errno */
-   else if(res == 0) /* handle timeout */
-}
-if (poll_struct.revents & POLLIN) {
-  /* do the read ... never gets called :( */
-}
-// end of code segment
+you are right. Thanks for pointing this out. It is fixed in the CVS now.
+
+Regards
+
+Marcel
 
 
-If I take out the fcntl() and poll() and just read() instead, it
-blocks until data arrives and then read() works as expected.
-
-Does it matter to the BlueZ implementation if I expand that fd set to
-include sockets of other domains, such as UNIX or IP?
-
-     Thanks,
-       Jeff
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
