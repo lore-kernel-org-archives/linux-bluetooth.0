@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY107-F22A1A1C4932DC8BBF0358D80590@phx.gbl>
-References: <BAY107-F22A1A1C4932DC8BBF0358D80590@phx.gbl>
-Date: Sat, 29 Jul 2006 14:56:47 +0200
-Message-Id: <1154177807.25939.13.camel@localhost>
+In-Reply-To: <20060728225605.90189.qmail@web51403.mail.yahoo.com>
+References: <20060728225605.90189.qmail@web51403.mail.yahoo.com>
+Date: Sat, 29 Jul 2006 14:53:28 +0200
+Message-Id: <1154177608.25939.8.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] FW: Re:  RfCOMM connection problem
+Subject: Re: [Bluez-users] rfcomm connection disconnects immediately
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,35 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Julien,
+Hi Manoj,
 
-> I am asking you this question because I am using a Bluez Rfcomm server.
-> One SDK from Broadcom is available for free:
-> 
-> http://www.broadcom.com/products/bluetooth_sdk.php
-> 
-> 
-> My question was about rfcomm layer and services and you guys seem to be 
-> expert in bluetooth so you may have play around with bluetooth of ipaqs and 
-> bluez servers...
-> I read that it was not possible at all to use the microsoft API cause Ipacs 
-> are using broadcom stack.
-> 
-> My problem may come from the security handshake...but I don't know how to 
-> fix it.
-> I though the security parameters should be set by the server but according 
-> to the Broadcom specification...both client and server should set them.
-> 
-> The problem is that on the client side, using broadcom SDK, setting security 
-> parameters requires a service name...that 's what i don't get. How to get a 
-> service from the bluez server and must i use a service??
-> A program in java on a sony ericsson works fine with your Bluez 
-> server...only simple socket programming. I just want to do the same with my 
-> ipac in C/C++
+> I am trying to make RFcomm connection with Motorola
+> HS850 through a DBT120 dongle. I am using linux
+> 2.4.21-40 kernel and bluez 3.1 .
+> I see that the rfcomm connection gets disconnected
+> immediately. Is this how it is supposed to work? I
+> have pasted hcidump below.
 
-as I said, this is about Linux and I can't give you any help when it
-comes to Programming with JSR-82, the Widcomm API or the Microsoft API,
-because I simply don't use any of them.
+it would be best if you switch to a recent 2.6 kernel instead of using
+an old 2.4 kernel.
+
+What commands are using to connect to that headset? Are you sure that
+you are using the correct RFCOMM channel.
 
 Regards
 
