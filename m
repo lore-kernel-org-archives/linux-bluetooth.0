@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Gael Beaudoin <mailinglists@gaboo.org>
+Message-ID: <20060730152448.42415.qmail@web51409.mail.yahoo.com>
+Date: Sun, 30 Jul 2006 08:24:48 -0700 (PDT)
+From: manojt ambe <mp_tambe@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Date: Mon, 31 Jul 2006 02:43:22 +0200
 MIME-Version: 1.0
-Message-Id: <200607310243.22194.mailinglists@gaboo.org>
-Subject: [Bluez-users] logitech dinovo media desktop laser doesn't work
-Reply-To: gaboo@gaboo.org, BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] rfcomm connection disconnects immediately
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,142 +14,94 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1568458690=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+--===============1568458690==
+Content-Type: multipart/alternative; boundary="0-112205384-1154273088=:39283"
+Content-Transfer-Encoding: 8bit
 
-I tried for several hours now to make my linux system recognize the logitech bluetooth receiver. I failed :)
+--0-112205384-1154273088=:39283
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-First of all, here's what I've done :
+Hi Marcel,
+   
+  I am using a C program to connect RFCOMM channel to headset.
+  How do i find out which RFCOMM channel is supported by headset HS850? Is there any bluez command i can use? 
+   
+  Pls. let me know.
+   
+  regards,
+  Manoj
+   
+   
+   
+   
+  Date: Sat, 29 Jul 2006 14:53:28 +0200
+From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-users] rfcomm connection disconnects immediately
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <1154177608.25939.8.camel@localhost>
+Content-Type: text/plain
 
-- patched my gentoo 2.6.17 kernel with the patch given on the bluez site.
-- recompiled my kernel with everything bluetooth related enabled
+Hi Manoj,
 
-Rebooted and tried hid2hci : 
----------
-muadib gaboo # hid2hci
-Switching device 046d:0b02 to HCI mode was successful
----------
-But hciconfig returns nothing.
+> I am trying to make RFcomm connection with Motorola
+> HS850 through a DBT120 dongle. I am using linux
+> 2.4.21-40 kernel and bluez 3.1 .
+> I see that the rfcomm connection gets disconnected
+> immediately. Is this how it is supposed to work? I
+> have pasted hcidump below.
 
-Then I tried to apply this patch :
+it would be best if you switch to a recent 2.6 kernel instead of using
+an old 2.4 kernel.
 
---- drivers/bluetooth/hci_usb.orig      2005-10-21 23:37:25.000000000 -0400
-+++ drivers/bluetooth/hci_usb.c 2005-10-21 22:11:02.000000000 -0400
- <at>  <at>  -119,6 +119,9  <at>  <at> 
-        /* Kensington Bluetooth USB adapter */
-        { USB_DEVICE(0x047d, 0x105d), .driver_info = HCI_RESET },
+What commands are using to connect to that headset? Are you sure that
+you are using the correct RFCOMM channel.
 
-+       /* Logitech diNovo Media Desktop Laser Transceiver for Bluetooth 2.0 */
-+        { USB_DEVICE(0x046d, 0xc709), .driver_info = HCI_RESET },
-+
-        /* ISSC Bluetooth Adapter v3.1 */
-        { USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET },
+Regards
 
-Rebooted, hid2hci, hciconfig : nothing.
+Marcel
 
-My system is an up to date gentoo :
-uname -a : Linux muadib 2.6.17-gentoo-r4-mh5 #1 SMP PREEMPT Mon Jul 31 01:27:43 CEST 2006 i686 AMD Athlon(tm) 64 X2 Dual Core Processor 3800+ GNU/Linux
-bluez version :
--------------
-muadib gaboo # equery list bluez
-[ Searching for package 'bluez' in all categories among: ]
- * installed packages
-[I--] [  ] net-wireless/bluez-firmware-1.1 (0)
-[I--] [  ] net-wireless/bluez-libs-2.25 (0)
-[I--] [  ] net-wireless/bluez-utils-2.25-r1 (0)
--------------
 
-I checked that bluez-utils/tools/hid2hci.c contains :   "{ HCI, 0x046d, 0x0b02, switch_logitech },       /* Logitech diNovo Media Desktop Laser */"
 
-And here is my /proc/bus/usb/devices  (I don't think hid2hci changed something because hid2hci -1 telle me : "No devices in HID mode found")
-------------------------------------------
-T:  Bus=02 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh=10
-B:  Alloc=  6/900 us ( 1%), #Int=  3, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.17-gentoo-r4-mh5 ohci_hcd
-S:  Product=OHCI Host Controller
-S:  SerialNumber=0000:00:02.0
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
 
-T:  Bus=02 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12  MxCh= 3
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=046d ProdID=0b02 Rev=40.02
-S:  Manufacturer=Logitech
-S:  Product=Logitech BT Mini-Receiver
-C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   1 Ivl=255ms
+ 		
+---------------------------------
+Do you Yahoo!?
+ Everyone is raving about the  all-new Yahoo! Mail Beta.
+--0-112205384-1154273088=:39283
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-T:  Bus=02 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=046d ProdID=c70b Rev=40.02
-S:  Manufacturer=Logitech
-S:  Product=Logitech BT Mini-Receiver
-S:  SerialNumber=00076141F47E
-C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr= 98mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=usbhid
-E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
+<div>Hi Marcel,</div>  <div>&nbsp;</div>  <div>I am using a C program to connect RFCOMM channel to headset.</div>  <div>How do i find out which RFCOMM channel is supported by headset HS850? Is there any bluez command i can use? </div>  <div>&nbsp;</div>  <div>Pls. let me know.</div>  <div>&nbsp;</div>  <div>regards,</div>  <div>Manoj</div>  <div>&nbsp;</div>  <div>&nbsp;</div>  <div>&nbsp;</div>  <div>&nbsp;</div>  <div>Date: Sat, 29 Jul 2006 14:53:28 +0200<BR>From: Marcel Holtmann &lt;<A href="http://us.f514.mail.yahoo.com/ym/Compose?To=marcel@holtmann.org&amp;YY=77208&amp;y5beta=yes&amp;y5beta=yes&amp;order=down&amp;sort=date&amp;pos=0&amp;view=a&amp;head=b"><FONT color=#003399>marcel@holtmann.org</FONT></A>&gt;<BR>Subject: Re: [Bluez-users] rfcomm connection disconnects immediately<BR>To: BlueZ users &lt;<A
+ href="http://us.f514.mail.yahoo.com/ym/Compose?To=bluez-users@lists.sourceforge.net&amp;YY=77208&amp;y5beta=yes&amp;y5beta=yes&amp;order=down&amp;sort=date&amp;pos=0&amp;view=a&amp;head=b"><FONT color=#003399>bluez-users@lists.sourceforge.net</FONT></A>&gt;<BR>Message-ID: &lt;1154177608.25939.8.camel@localhost&gt;<BR>Content-Type: text/plain<BR><BR>Hi Manoj,<BR><BR>&gt; I am trying to make RFcomm connection with Motorola<BR>&gt; HS850 through a DBT120 dongle. I am using linux<BR>&gt; 2.4.21-40 kernel and bluez 3.1 .<BR>&gt; I see that the rfcomm connection gets disconnected<BR>&gt; immediately. Is this how it is supposed to work? I<BR>&gt; have pasted hcidump below.<BR><BR>it would be best if you switch to a recent 2.6 kernel instead of using<BR>an old 2.4 kernel.<BR><BR>What commands are using to connect to that headset? Are you sure that<BR>you are using the correct RFCOMM channel.<BR><BR>Regards<BR><BR>Marcel<BR><BR><BR></div><p>&#32;
+		<hr size=1>Do you Yahoo!?<br> Everyone is raving about the <a href="http://us.rd.yahoo.com/evt=42297/*http://advision.webevents.yahoo.com/handraisers"> all-new Yahoo! Mail Beta.</a>
+--0-112205384-1154273088=:39283--
 
-T:  Bus=02 Lev=02 Prnt=02 Port=02 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=046d ProdID=c70c Rev=40.02
-S:  Manufacturer=Logitech
-S:  Product=Logitech BT Mini-Receiver
-S:  SerialNumber=00076141F47E
-C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr= 98mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=usbhid
-E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=5ms
 
-T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480 MxCh=10
-B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.17-gentoo-r4-mh5 ehci_hcd
-S:  Product=EHCI Host Controller
-S:  SerialNumber=0000:00:02.1
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=256ms
-------------------------------------------
-
-Do you know what are the  ProdID=c70c and  ProdID=c70b product ?
-Maybe I could try to change the hid2hci patch with these product ids ?
-
-And meybe this can be useful:
-------------------------------
-muadib tools # dmesg |grep -i bluetooth
-Bluetooth: Core ver 2.10
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: HCI USB driver ver 2.9
-Bluetooth: HCI UART driver ver 2.2
-Bluetooth: HCI H4 protocol initialized
-Bluetooth: HCI BCSP protocol initialized
-Bluetooth: L2CAP ver 2.8
-Bluetooth: L2CAP socket layer initialized
-Bluetooth: HIDP (Human Interface Emulation) ver 1.1-mh1
-Bluetooth: RFCOMM socket layer initialized
-Bluetooth: RFCOMM TTY layer initialized
-Bluetooth: RFCOMM ver 1.8
-------------------------------
-
-So, do you have any idea ? It seems it should work, but I cannot manage to find what's wrong.
-
-Thanks !
-Gael Beaudoin
+--===============1568458690==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1568458690==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1568458690==--
