@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <44CE11FA.7020302@kernelconcepts.de>
-References: <20060727083312.81035.qmail@web27915.mail.ukl.yahoo.com>
-	<1154177867.25939.15.camel@localhost>
-	<44CE11FA.7020302@kernelconcepts.de>
-Date: Mon, 31 Jul 2006 20:17:05 +0200
-Message-Id: <1154369825.4982.12.camel@aeonflux.holtmann.net>
+In-Reply-To: <20060731145507.69939.qmail@web51407.mail.yahoo.com>
+References: <20060731145507.69939.qmail@web51407.mail.yahoo.com>
+Date: Mon, 31 Jul 2006 20:15:20 +0200
+Message-Id: <1154369720.4982.11.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
+Subject: Re: [Bluez-users] rfcomm connection disconnects immediately
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,25 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Nils,
+Hi,
 
-> >> I'm trying to connect my EPOX Buetooth Keyboard BT-KB01B but without success so far. The error message is:
-> >>  hcitool conf
-> >> Connections:
-> >>         > ACL 00:04:61:81:F7:C8 handle 44 state 1 lm SLAVE
-> >>         < ACL 00:04:61:82:03:4A handle 41 state 1 lm MASTER
-> >> root@woraBox:/home/rw024419# hidd --connect 00:04:61:82:03:4A
-> >> Can't create HID control channel: Connection timed out
-> > 
-> > how many times do I have to mention this. Include "hcidump -X -V" output
-> > or nobody will ever will be able to help you.
-> 
-> Probably make it as default for hcidump and let "-X" and "-V" turn it off?
+> I did find sdptool browse command to search for rfcomm
+> channel for various services. But SDPTool output is
+> always empty. Why is this? Pls let me know. 
 
-it is too late for that :(
-
-Maybe at some point when I rewrite hcidump, but I don't see that happen
-in the near future.
+if the remote side doesn't support a public browse group then you won't
+see any records. In this case you have to explicitly search for a
+specific service with "sdptool search ...".
 
 Regards
 
