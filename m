@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 31 Jul 2006 17:12:07 -0700
-From: John Gruenenfelder <johng@as.arizona.edu>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20060801001207.GA5092@as.arizona.edu>
+Message-ID: <20060731185815.56428.qmail@web51403.mail.yahoo.com>
+Date: Mon, 31 Jul 2006 11:58:15 -0700 (PDT)
+From: manojt ambe <mp_tambe@yahoo.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1154369720.4982.11.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] Pairing problem with Plantronics headset
+Subject: Re: [Bluez-users] rfcomm connection disconnects immediately
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,49 +19,125 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I am attempting to use btsco with my Plantronics M2500 headset.  I am using
-the most recent Debian bluez-utils packages (3.1-3).
-
-The headset's passkey/pin is "0000" which I have set in both
-/etc/bluetooth/hcid.conf as:
-  passkey "0000";
-
-and in /etc/bluetooth/passkeys/default as just "0000".
-
-When I turn on the headset, put it in pairing mode, and then attempt to run
-btsco, I get the following from btsco:
-
------
-./btsco 00:03:89:6E:C9:11
-Error: Failed to connect to SDP server: Permission denied
-Assuming channel 2
-
-Can't connect RFCOMM channel: Permission denied
------
-
-In the system logs the only new entries generated are:
-
-Jul 31 19:32:52 Redtail hcid[5743]: pin_code_request (sba=00:16:41:89:98:00, dba=00:03:89:6E:C9:11)
-Jul 31 19:32:52 Redtail hcid[5743]: Calling PasskeyAgent.Request: name=:1.5, path=/org/bluez/passkey_agent_5755
-Jul 31 19:32:56 Redtail hcid[5743]: pin_code_request (sba=00:16:41:89:98:00, dba=00:03:89:6E:C9:11)
-Jul 31 19:32:56 Redtail hcid[5743]: Calling PasskeyAgent.Request: name=:1.5, path=/org/bluez/passkey_agent_5755
-
-To me, these seem to indicate that the PIN is being requested, but perhaps not
-being returned properly?  I also tried creating a passkey explicitly for this
-device as:
-  /etc/bluetooth/passkeys/00:03:89:6E:C9:11
-
-But the log messages were the same for this instance.  What am I doing wrong?
-Thanks in advance.
+Hi Marcel,
+The sdptool records showed following services
+supported by the headset: Headset(chan 1),
+Headset-support(2) and serial port services(chan 3).  
 
 
--- 
---John Gruenenfelder    Research Assistant, UMass Amherst student
-                        Systems Manager, MKS Imaging Technology, LLC.
-Try Weasel Reader for PalmOS  --  http://gutenpalm.sf.net
-"This is the most fun I've had without being drenched in the blood
-of my enemies!"
-        --Sam of Sam & Max
+I modified channel to 3 from 1 and now it is able to
+connect. But getsockopt shows following error.
+
+Can't get RFCOMM connection information: Protocol not
+available (92)
+Connected [handle 0, class 0x000000]
+I have pasted function below.
+
+regards,
+Manoj
+
+int BTPushBtnDaemon::rfcomm_connect(bdaddr_t *src,
+bdaddr_t *dst, uint8_t channel)
+{
+  struct sockaddr_rc addr;
+  int s;
+  struct rfcomm_conninfo conn;
+  socklen_t optlen;
+
+
+  if ((s = socket(PF_BLUETOOTH, SOCK_STREAM,
+BTPROTO_RFCOMM)) < 0) {
+     fprintf(stderr, "Create socket error %d\n",s);
+     return -1;
+  }
+  fprintf(stderr, "Socket %d\n",s);
+
+  memset(&addr, 0, sizeof(addr));
+  addr.rc_family = AF_BLUETOOTH;
+  bacpy(&addr.rc_bdaddr, src);
+  addr.rc_channel = 3;
+  if (bind(s, (struct sockaddr *)&addr, sizeof(addr))
+< 0) {
+     fprintf(stderr, "Bind socket error ");
+     ::close(s);
+      return -1;
+  }
+
+  memset(&addr, 0, sizeof(addr));
+  addr.rc_family = AF_BLUETOOTH;
+  bacpy(&addr.rc_bdaddr, dst);
+  addr.rc_channel = 3;
+  if (connect(s, (struct sockaddr *)&addr,
+sizeof(addr)) < 0 ){
+     fprintf(stderr, "Connect socket error ");
+     ::close(s);
+     return -1;
+  }
+
+   /* Get connection information */
+    memset(&conn, 0, sizeof(conn));
+    optlen = sizeof(conn);
+
+    if (getsockopt(s, SOL_RFCOMM, RFCOMM_CONNINFO,
+&conn, &optlen) < 0) {
+       fprintf(stderr, "Can't get RFCOMM connection
+information: %s (%d)\n", strerror(errno), errno);
+        }
+
+        fprintf(stderr, "Connected [handle %d, class
+0x%02x%02x%02x]\n",
+                conn.hci_handle,
+                conn.dev_class[2], conn.dev_class[1],
+conn.dev_class[0]);
+
+  fprintf(stderr, "Socket %d\n",s);
+  return s;
+}
+
+
+--- Marcel Holtmann <marcel@holtmann.org> wrote:
+
+> Hi,
+> 
+> > I did find sdptool browse command to search for
+> rfcomm
+> > channel for various services. But SDPTool output
+> is
+> > always empty. Why is this? Pls let me know. 
+> 
+> if the remote side doesn't support a public browse
+> group then you won't
+> see any records. In this case you have to explicitly
+> search for a
+> specific service with "sdptool search ...".
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+>
+-------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get
+> the chance to share your
+> opinions on IT & business topics through brief
+> surveys -- and earn cash
+>
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
