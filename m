@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200607312232.58278.thermal@o2.pl>
-References: <200607312232.58278.thermal@o2.pl>
-Date: Tue, 01 Aug 2006 00:41:16 +0200
-Message-Id: <1154385676.4982.39.camel@aeonflux.holtmann.net>
+In-Reply-To: <200607312007.23046.dgollub@suse.de>
+References: <200607311518.57014.dgollub@suse.de>
+	<200607311850.09567.dgollub@suse.de>
+	<1154373472.4982.21.camel@aeonflux.holtmann.net>
+	<200607312007.23046.dgollub@suse.de>
+Date: Tue, 01 Aug 2006 00:21:35 +0200
+Message-Id: <1154384495.4982.33.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] inline keyword & ansi-C compilers
+Subject: Re: [Bluez-devel] Addition for hcid passkey dbus request
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,39 +23,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Daniel,
 
-> Recently when I`ve tried to compile KDE (ktnef to be exact) I came upon 
-> an error in your include files:
-
-no idea what ktnef has to do with BlueZ. This seems to be the main
-problem here.
-
-> So I wrote a tiny patch to fix this:
+> > So if you wanna have a random key generated on one side, then you need
+> > to be the initiator of the pairing request. This can be achieved with
+> > calling CreateBonding() and in this case you can register a device
+> > specific passkey agent to create your random number.
+> >
+> > The default passkey agent is really meant to be default. It will do the
+> > same task for every pairing request. If you need a specific, like random
+> > number or fixed PIN then use a per device passkey agent.
 > 
-> --- bluez-libs-3.2/include/bluetooth.h  2006-07-31 20:57:08.000000000 
-> +0200
-> +++ /usr/include/bluetooth/bluetooth.h  2006-07-31 20:55:55.000000000 
-> +0200
-> @@ -109,12 +109,19 @@
->  #define BDADDR_ALL   (&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 
-> 0xff}})
->  #define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
+> Thanks for  the hint!
 > 
-> +/* No inline keyword in the iso8988:1990 standard */
-> +#ifdef __STRICT_ANSI__
-> +    #define __INLINE
-> +#else
-> +    #define __INLINE inline
-> +#endif
-> +
+> I planned to register kbluetoothd as default passkey agent and listen for all 
+> passkey request. Have to recjet this and think about a new solution. I am 
+> confused now, how to achieve that the pin dialog now can detect if it is the 
+> initiator side. When another application triggers the pairing without calling 
+> CreateBonding().
 
-I don't like to provide any workarounds for any crazy standard that
-forcing it makes no real sense to me. However what about this:
-
-#ifdef __STRICT_ANSI__
-#define inline
-#endif
+see my other email for how this is supposed to work. And you should play
+with the example passkey-agent from bluez-utils source. This one can be
+a default or a device specific passkey-agent. Then you will understand
+how this is working.
 
 Regards
 
