@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Daniel Gollub <dgollub@suse.de>
-To: bluez-devel@lists.sourceforge.net
-Date: Mon, 31 Jul 2006 18:50:09 +0200
-References: <200607311518.57014.dgollub@suse.de>
-	<20060731132652.GA29003@localhost.localdomain>
-	<1154369499.4982.6.camel@aeonflux.holtmann.net>
-In-Reply-To: <1154369499.4982.6.camel@aeonflux.holtmann.net>
+Date: Mon, 31 Jul 2006 18:33:01 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1154369637.4982.8.camel@aeonflux.holtmann.net>
+Message-ID: <Pine.LNX.4.63.0607311820370.31025@redbean.intranet.gw-instruments.de>
+References: <Pine.LNX.4.63.0607311627330.31025@redbean.intranet.gw-instruments.de>
+	<1154369637.4982.8.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-Message-Id: <200607311850.09567.dgollub@suse.de>
-Subject: Re: [Bluez-devel] Addition for hcid passkey dbus request
+Subject: Re: [Bluez-devel] Refcounting problem in rfcomm
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,29 +21,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Monday 31 July 2006 20:11, Marcel Holtmann wrote:
-> someone has to convince me, why the direction information is needed at
-> all. If I remember correctly, then we dropped it on purpose. I simply
-> don't see any useful need for it. Except maybe displaying the "incoming"
-> or "outgoing" and this doesn't really have to do anything with the
-> pairing process.
 
-The pin dialog has to know if the user have to reply a pin from an incoming 
-pairing request from another device (only provide a plain input field). Or if 
-the pin dialog can suggest a randomly generated pin which have to be replied 
-by the other device.
 
-Example:
+Hi Marcel, 
 
-Outgoing Connection
-The user on the computer triggers a pairing request (outgoing connection). The 
-pin get randomly generated and displayed in the pairing dialog and have to 
-replied by the cellphone.
+> the RFCOMM module reference counting is not funny and you can mess it up
+> on so many level. So be careful with it. I haven't looked at it, but
+> from past experience I know that you can easily break things. So please
+> give us some more details or code to show the problem.
 
-Incoming Connection
-The user triggers a pairing from the cellphone with the computer (incoming 
-connection). A pin dialog appears on the computer with an input filed to 
-reply the same pin.
+You're right, the ref counting is realy something I don't want to change. 
+For now I've fixed it by a module_put() right after accept() returns with 
+a BT_CONNECTED state. I will do some more testing and code clean up and 
+then send in a patch for tty.c. Maybe I will send it in two steps because 
+I also don't like some general things in tty.c. E.g. rfcomm_dlc_lock / 
+unlock is used there several times but in parts of the codes which realy 
+don't deal with dlcs. 
+So adding a dev_lock is something which is independend of my other 
+changes. 
+
+Best regards, 
+
+Peter 
+ 
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
