@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44CE11FA.7020302@kernelconcepts.de>
-Date: Mon, 31 Jul 2006 16:21:46 +0200
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
-MIME-Version: 1.0
+Date: Mon, 31 Jul 2006 09:00:24 +0200 (CEST)
+From: Andreas Fehr <andreas@mrs.ch>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <20060727083312.81035.qmail@web27915.mail.ukl.yahoo.com>
-	<1154177867.25939.15.camel@localhost>
-In-Reply-To: <1154177867.25939.15.camel@localhost>
-Subject: Re: [Bluez-users] can't connect EPOX Keyboard BT-KB01B
+In-Reply-To: <Pine.LNX.4.64.0607132135350.4704@ybpnyubfg.ybpnyqbznva>
+Message-ID: <Pine.LNX.4.64.0607310852470.16545@ybpnyubfg.ybpnyqbznva>
+References: <Pine.LNX.4.64.0607132135350.4704@ybpnyubfg.ybpnyqbznva>
+MIME-Version: 1.0
+Subject: Re: [Bluez-users] rfcomm pairing and timeout
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,33 +20,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel Holtmann schrieb:
-> Hi Wolfram,
-Hi!
+On Thursday, 13. July 2006, 21:57, Andreas Fehr (as AF) wrote:
 
->> I'm trying to connect my EPOX Buetooth Keyboard BT-KB01B but without success so far. The error message is:
->>  hcitool conf
->> Connections:
->>         > ACL 00:04:61:81:F7:C8 handle 44 state 1 lm SLAVE
->>         < ACL 00:04:61:82:03:4A handle 41 state 1 lm MASTER
->> root@woraBox:/home/rw024419# hidd --connect 00:04:61:82:03:4A
->> Can't create HID control channel: Connection timed out
-> 
-> how many times do I have to mention this. Include "hcidump -X -V" output
-> or nobody will ever will be able to help you.
+>AF: I've still a problem with pairing my phone with my bluetooth 
+>AF: dongle. My phone asks me if I want a serial port connection with 
+>AF: computer. As soon as I accept this, the dialog to enter the pin 
+>AF: shows but disappears within about 1 second. Far to few time to 
+>AF: enter any pin.
 
-Probably make it as default for hcidump and let "-X" and "-V" turn it off?
+Hi again
 
-> Regards
-> Marcel
-Cheers
-  nils faerber
+I finally had time to test the 3.2 release of bluez. But I got the same 
+result as described above with the 3.1 release.
 
--- 
-kernel concepts          Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          Mob: +49-176-21024535
---
+I have to admit that I use a different phone now as my original crashed 
+on me (not during a bluetooth session). But this shows me, that this is 
+not necessarily phone dependent.
+
+Any news on the developer front, what should I try to help resolving the 
+problem?
+
+Thanks,
+Andreas
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
