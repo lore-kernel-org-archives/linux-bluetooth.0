@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200607311850.09567.dgollub@suse.de>
+From: Daniel Gollub <dgollub@suse.de>
+To: bluez-devel@lists.sourceforge.net
+Date: Mon, 31 Jul 2006 18:50:09 +0200
 References: <200607311518.57014.dgollub@suse.de>
 	<20060731132652.GA29003@localhost.localdomain>
 	<1154369499.4982.6.camel@aeonflux.holtmann.net>
-	<200607311850.09567.dgollub@suse.de>
-Date: Mon, 31 Jul 2006 21:17:52 +0200
-Message-Id: <1154373472.4982.21.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+In-Reply-To: <1154369499.4982.6.camel@aeonflux.holtmann.net>
+MIME-Version: 1.0
+Message-Id: <200607311850.09567.dgollub@suse.de>
 Subject: Re: [Bluez-devel] Addition for hcid passkey dbus request
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,50 +22,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Daniel,
+On Monday 31 July 2006 20:11, Marcel Holtmann wrote:
+> someone has to convince me, why the direction information is needed at
+> all. If I remember correctly, then we dropped it on purpose. I simply
+> don't see any useful need for it. Except maybe displaying the "incoming"
+> or "outgoing" and this doesn't really have to do anything with the
+> pairing process.
 
-> > someone has to convince me, why the direction information is needed at
-> > all. If I remember correctly, then we dropped it on purpose. I simply
-> > don't see any useful need for it. Except maybe displaying the "incoming"
-> > or "outgoing" and this doesn't really have to do anything with the
-> > pairing process.
-> 
-> The pin dialog has to know if the user have to reply a pin from an incoming 
-> pairing request from another device (only provide a plain input field). Or if 
-> the pin dialog can suggest a randomly generated pin which have to be replied 
-> by the other device.
-> 
-> Example:
-> 
-> Outgoing Connection
-> The user on the computer triggers a pairing request (outgoing connection). The 
-> pin get randomly generated and displayed in the pairing dialog and have to 
-> replied by the cellphone.
-> 
-> Incoming Connection
-> The user triggers a pairing from the cellphone with the computer (incoming 
-> connection). A pin dialog appears on the computer with an input filed to 
-> reply the same pin.
+The pin dialog has to know if the user have to reply a pin from an incoming 
+pairing request from another device (only provide a plain input field). Or if 
+the pin dialog can suggest a randomly generated pin which have to be replied 
+by the other device.
 
-you can't bind incoming or outgoing connections with the assumption that
-this implies the initiator of the authentication request. It is not
-working this way. Both are two independent procedures (except for
-security mode 3, which is not really supported by BlueZ anymore).
+Example:
 
-So if you wanna have a random key generated on one side, then you need
-to be the initiator of the pairing request. This can be achieved with
-calling CreateBonding() and in this case you can register a device
-specific passkey agent to create your random number.
+Outgoing Connection
+The user on the computer triggers a pairing request (outgoing connection). The 
+pin get randomly generated and displayed in the pairing dialog and have to 
+replied by the cellphone.
 
-The default passkey agent is really meant to be default. It will do the
-same task for every pairing request. If you need a specific, like random
-number or fixed PIN then use a per device passkey agent.
-
-Regards
-
-Marcel
-
-
+Incoming Connection
+The user triggers a pairing from the cellphone with the computer (incoming 
+connection). A pin dialog appears on the computer with an input filed to 
+reply the same pin.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
