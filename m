@@ -1,59 +1,60 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44A6A236.8010006@runbox.com>
-Date: Sat, 01 Jul 2006 17:26:30 +0100
-From: Tom K <tomk@runbox.com>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Date: Mon, 31 Jul 2006 18:06:45 -0700
+From: John Gruenenfelder <johng@as.arizona.edu>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20060801010645.GA5482@as.arizona.edu>
+References: <20060801001207.GA5092@as.arizona.edu>
+	<1154398819.4982.63.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] hcid fails to start after upgrade to
-	bluez-libs/bluez-utils 3.1
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+In-Reply-To: <1154398819.4982.63.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-users] Pairing problem with Plantronics headset
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I was looking for a bug-tracker, and couldn't find it, so I hope this is 
-in the right place.
+On Tue, Aug 01, 2006 at 04:20:19AM +0200, Marcel Holtmann wrote:
+>Hi John,
+>
+>run "hcidump -X -V" and try again to see what is going on.
+>
+>Regards
+>Marcel
 
-Yesterday I upgraded bluez-libs and bluez-utils from 2.25 to 3.1. hcid 
-now fails to start - here are the log entries:
+Thanks for the quick reply.  I ran the above command and saw in the output
+that the requested pin was being delivered as 0000.  But I also noticed that
+the length was 5 bytes.
 
-Jul  1 16:47:43 tk-i5ka hcid[4240]: Bluetooth HCI daemon
-Jul  1 16:47:43 tk-i5ka hcid[4240]: Unknown option 'pin_helper' line 26
-Jul  1 16:47:43 tk-i5ka hcid[4240]: syntax error line 26
-Jul  1 16:47:43 tk-i5ka hcid[4240]: Unknown option 'auth' line 70
-Jul  1 16:47:43 tk-i5ka hcid[4240]: Can't open system message bus 
-connection: Failed to connect to socket /var/run/dbus/system_bus_socket: 
-Connection refused
-Jul  1 16:47:43 tk-i5ka hcid[4240]: Unable to get on D-Bus
+Looking closer, I see that the pin is actually 0000 plus 0x0A.  I had set the
+pin by:
+  echo "0000" > default
 
-Downgrading to 2.25 again solves the problem:
+But that tacked on a linefeed.  Using "echo -n" instead solved the problem and
+now the headset pairs and I get audio via btsco.  Thanks.
 
-Jul  1 16:53:38 tk-i5ka hcid[4316]: Bluetooth HCI daemon
-Jul  1 16:53:38 tk-i5ka hcid[4316]: HCI dev 0 up
-Jul  1 16:53:38 tk-i5ka hcid[4316]: Starting security manager 0
 
-The system is running kernel 2.6.17-ck1, using hci_usb with a 3Com 
-3CREB96 USB dongle. No changes were made to hcid.conf or any other conf 
-files.
+-- 
+--John Gruenenfelder    Research Assistant, UMass Amherst student
+                        Systems Manager, MKS Imaging Technology, LLC.
+Try Weasel Reader for PalmOS  --  http://gutenpalm.sf.net
+"This is the most fun I've had without being drenched in the blood
+of my enemies!"
+        --Sam of Sam & Max
 
-Please advise if any additional information is required.
-
-Regards
-Tom K.
-
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys -- and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
