@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 31 Jul 2006 18:06:45 -0700
+Date: Mon, 31 Jul 2006 17:12:07 -0700
 From: John Gruenenfelder <johng@as.arizona.edu>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20060801010645.GA5482@as.arizona.edu>
-References: <20060801001207.GA5092@as.arizona.edu>
-	<1154398819.4982.63.camel@aeonflux.holtmann.net>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20060801001207.GA5092@as.arizona.edu>
 MIME-Version: 1.0
-In-Reply-To: <1154398819.4982.63.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] Pairing problem with Plantronics headset
+Subject: [Bluez-users] Pairing problem with Plantronics headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,24 +18,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Tue, Aug 01, 2006 at 04:20:19AM +0200, Marcel Holtmann wrote:
->Hi John,
->
->run "hcidump -X -V" and try again to see what is going on.
->
->Regards
->Marcel
+I am attempting to use btsco with my Plantronics M2500 headset.  I am using
+the most recent Debian bluez-utils packages (3.1-3).
 
-Thanks for the quick reply.  I ran the above command and saw in the output
-that the requested pin was being delivered as 0000.  But I also noticed that
-the length was 5 bytes.
+The headset's passkey/pin is "0000" which I have set in both
+/etc/bluetooth/hcid.conf as:
+  passkey "0000";
 
-Looking closer, I see that the pin is actually 0000 plus 0x0A.  I had set the
-pin by:
-  echo "0000" > default
+and in /etc/bluetooth/passkeys/default as just "0000".
 
-But that tacked on a linefeed.  Using "echo -n" instead solved the problem and
-now the headset pairs and I get audio via btsco.  Thanks.
+When I turn on the headset, put it in pairing mode, and then attempt to run
+btsco, I get the following from btsco:
+
+-----
+./btsco 00:03:89:6E:C9:11
+Error: Failed to connect to SDP server: Permission denied
+Assuming channel 2
+
+Can't connect RFCOMM channel: Permission denied
+-----
+
+In the system logs the only new entries generated are:
+
+Jul 31 19:32:52 Redtail hcid[5743]: pin_code_request (sba=00:16:41:89:98:00, dba=00:03:89:6E:C9:11)
+Jul 31 19:32:52 Redtail hcid[5743]: Calling PasskeyAgent.Request: name=:1.5, path=/org/bluez/passkey_agent_5755
+Jul 31 19:32:56 Redtail hcid[5743]: pin_code_request (sba=00:16:41:89:98:00, dba=00:03:89:6E:C9:11)
+Jul 31 19:32:56 Redtail hcid[5743]: Calling PasskeyAgent.Request: name=:1.5, path=/org/bluez/passkey_agent_5755
+
+To me, these seem to indicate that the PIN is being requested, but perhaps not
+being returned properly?  I also tried creating a passkey explicitly for this
+device as:
+  /etc/bluetooth/passkeys/00:03:89:6E:C9:11
+
+But the log messages were the same for this instance.  What am I doing wrong?
+Thanks in advance.
 
 
 -- 
