@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: thermal@o2.pl
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Tue, 1 Aug 2006 18:23:37 +0200
-References: <200607312232.58278.thermal@o2.pl>
-	<1154385676.4982.39.camel@aeonflux.holtmann.net>
-In-Reply-To: <1154385676.4982.39.camel@aeonflux.holtmann.net>
+Message-ID: <44CF7738.6060101@xmission.com>
+Date: Tue, 01 Aug 2006 09:46:00 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Message-Id: <200608011823.37945.thermal@o2.pl>
-Subject: Re: [Bluez-devel] [PATCH] inline keyword & ansi-C compilers
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <056BF200E9632F4285220E570FEED673D03062@GBMDDMH202AMSX.gb001.siemens.net>
+	<44CF529B.2000503@palmsource.com>
+In-Reply-To: <44CF529B.2000503@palmsource.com>
+Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,32 +21,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On wtorek, 1 sierpnia 2006 00:41, Marcel Holtmann wrote:
-> Hi,
->
-> > Recently when I`ve tried to compile KDE (ktnef to be exact) I came
-> > upon an error in your include files:
->
-> no idea what ktnef has to do with BlueZ. This seems to be the main
-> problem here.
->
+Guys
 
-Yes, this may look a bit weird but ktnef is a part of the kdepim source 
-bundle which contains addressbook, organizer, etc. and thus can make 
-use of Bluetooth.
+>>Maybe the build doc in the plugin directory needs updating ???
 
->
-> #ifdef __STRICT_ANSI__
-> #define inline
-> #endif
->
+I've been waffling on how to go forward. What do you think of this plan?
 
-You`re right, that will be much better.
+- minimal update to btsco documents to bring in line
+- make a btsco snapshot release .43
+- use new wavez sourceforge project for alsa (both sco and a2dp)
+plugins, for a2play test code and eventually gstreamer plugins
+- create wavez as a cvs project (was tempted by svn but there's a
+learning curve for everyone)
+- leave out libsbc from the new project so we cleanly use the standalone
+library
+- eventually remove pieces from bluetooth-alsa's btsco project (alsa
+plugins etc) to leave it mostly as it originally was, just the kernel
+sco audio
+- obviously refactor the documentation, simplifying btsco and updating wavez
 
--- 
-|   ******* Maciek Grela RV409b *********
-|        JID: thermal@jabber.wroc.pl
-| Linux user #319794 ++ There is no spoon ...
+I want to send the message especially for distros that wavez is where
+they should put packaging effort and all the plugins there will be past
+experimental and worth giving to users.
+
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
