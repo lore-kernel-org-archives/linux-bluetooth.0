@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44CF7738.6060101@xmission.com>
-Date: Tue, 01 Aug 2006 09:46:00 -0600
+Message-ID: <44CF7366.7000605@xmission.com>
+Date: Tue, 01 Aug 2006 09:29:42 -0600
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <056BF200E9632F4285220E570FEED673D03062@GBMDDMH202AMSX.gb001.siemens.net>
-	<44CF529B.2000503@palmsource.com>
-In-Reply-To: <44CF529B.2000503@palmsource.com>
-Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error
+References: <20060801133009.8463.qmail@web509.biz.mail.mud.yahoo.com>
+In-Reply-To: <20060801133009.8463.qmail@web509.biz.mail.mud.yahoo.com>
+Subject: Re: [Bluez-devel] Gumstix headset status
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,30 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Guys
+Yusuf
 
->>Maybe the build doc in the plugin directory needs updating ???
+> Hi, I've looked at the Bluez Gumstix website and
+> searched the archive for this mailing list, but I
+> can't figure out if anyone has consistently been able
+> to use a bluetooth headset with a Gumstix platform.
 
-I've been waffling on how to go forward. What do you think of this plan?
+stereo or mono/voice?
 
-- minimal update to btsco documents to bring in line
-- make a btsco snapshot release .43
-- use new wavez sourceforge project for alsa (both sco and a2dp)
-plugins, for a2play test code and eventually gstreamer plugins
-- create wavez as a cvs project (was tempted by svn but there's a
-learning curve for everyone)
-- leave out libsbc from the new project so we cleanly use the standalone
-library
-- eventually remove pieces from bluetooth-alsa's btsco project (alsa
-plugins etc) to leave it mostly as it originally was, just the kernel
-sco audio
-- obviously refactor the documentation, simplifying btsco and updating wavez
+we are waiting on some kernel development.
 
-I want to send the message especially for distros that wavez is where
-they should put packaging effort and all the plugins there will be past
-experimental and worth giving to users.
+http://bluetooth-alsa.sourceforge.net/embed.html
 
-Brad
+brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
