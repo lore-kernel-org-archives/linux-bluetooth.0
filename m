@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200608011329.03106.denis.kenzior@trolltech.com>
-References: <200608011329.03106.denis.kenzior@trolltech.com>
-Date: Wed, 02 Aug 2006 05:13:26 +0200
-Message-Id: <1154488406.3905.37.camel@aeonflux.holtmann.net>
+In-Reply-To: <Pine.LNX.4.63.0608011659100.2567@redbean.intranet.gw-instruments.de>
+References: <Pine.LNX.4.63.0608011659100.2567@redbean.intranet.gw-instruments.de>
+Date: Wed, 02 Aug 2006 05:09:11 +0200
+Message-Id: <1154488151.3905.34.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Patch: GetRemoteClass
+Subject: Re: [Bluez-devel] Patch for rfcomm tty server ports
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Hi Peter,
 
-> Attached is a patch to get remote class of device information as a uint32.  
-> This introduces a new method with signature:
-> uint32 GetRemoteClass(string address), which returns the class of device 
-> information encoded as a 32 bit integer.
+> this patch allows the use of tty server ports. If a rfcomm tty port 
+> is bound to BDADDR_ANY e.g. : 
 > 
-> The reasoning is that some applications might want to rely on their own 
-> conversion routines for the Major, Minor and Service class attributes, and 
-> thus the DBUS GetRemoteMajorClass, GetRemoteMinorClass, etc methods that 
-> return strings are not useful.
+> rfcomm bind /dev/rfcomm0 00:00:00:00:00:00 1 
+> 
+> it will start listening on the channel supplied once opened (and will 
+> stop listening when the port is closed...). This allows rfcomm ttys in 
+> server mode without the need for an additional user space daemon. 
 
-the patch is clean. So before I apply it and so extend the API, does
-someone else thinks it is useful to have?
+the idea of using BDADDR_ANY is kinda nice, but the use of another
+kernel thread for the listen RFCOMM socket within the RFCOMM module is
+not good. We need to integrate all the processing for the server state
+in the DLC itself.
+
+I am not gonna working on this, but I am supporting it and happy to
+review any patches.
 
 Regards
 
