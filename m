@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 2 Aug 2006 19:16:32 +0200
-From: Stefan Maintz <stefanmaintz@gmx.de>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20060802191632.090909b3@p4.prod.lan>
-In-Reply-To: <1154525837.3905.49.camel@aeonflux.holtmann.net>
-References: <20060802120735.632c4f18@p4.prod.lan>
-	<1154525837.3905.49.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] system freeze in 2.6.17-mh5
+Message-ID: <44D0D695.6060709@palmsource.com>
+Date: Wed, 02 Aug 2006 18:45:09 +0200
+From: Frederic Danis <frederic.danis@palmsource.com>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <44D0D1BB.7010400@palmsource.com>
+	<Pine.LNX.4.63.0608021833340.6321@redbean.intranet.gw-instruments.de>
+In-Reply-To: <Pine.LNX.4.63.0608021833340.6321@redbean.intranet.gw-instruments.de>
+Subject: Re: [Bluez-devel] rfcomm command output
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,19 +21,48 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
- 
-> this looks like a problem with the kthread API. We converted BNEP,
-> CMTP and HIDP to it with 2.6.17-mh3. So a 2.6.17-mh2 kernel should
-> work without any problems.
-> 
-> Christoph, any ideas. Did you see a similar problem before.
-> 
-> Regards
-> 
-> Marcel
+Hello Peter,
 
-Just patched my kernel with the mh2-patch and it works nicely! Thx a
-lot so far!
+
+Peter Wippich wrote:
+
+>Hi Fred, 
+>
+>On Wed, 2 Aug 2006, Frederic Danis wrote:
+>
+>  
+>
+>>Hello
+>>
+>>I want to use rfcomm command and start a program when a connection is 
+>>made. To do this I try "rfcomm listen 0 > rfcomm.log 2>&1" but nothing 
+>>is written to rfcomm.log file. (same problem happens if I try to pipe 
+>>output to another program). Do you have any idea why I can not redirect 
+>>rfcomm output ?
+>>Is there another way to start a program on rfcomm connection ?
+>>    
+>>
+>
+>You have to give a device (e.g. /dev/rfcomm0) on which you want to listen. 
+>  
+>
+I understand that "rfcomm listen 0" will create /dev/rfcomm0 when a 
+client connects to my device, but I want to start my program (that can 
+use a device like /dev/rfcomm0 or /dev/ttyS0) after this creation (and 
+don't know how to do this in a shell).
+
+Thanks
+
+Fred
+
+-----------------------------------------------
+It is not by improving the oil lamp that one invents the electric bulb!
+-----------------------------------------------
+Danis Frederic            PalmSource Europe
+Software engineer
+Mail : mailto:frederic.danis@palmsource.com
+-----------------------------------------------
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
