@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <DDBA30BC801ABE439B575D8A7AA341360295E34C@SJEXCH03.ds.jdsu.net>
-References: <DDBA30BC801ABE439B575D8A7AA341360295E34C@SJEXCH03.ds.jdsu.net>
-Date: Wed, 02 Aug 2006 03:18:11 +0200
-Message-Id: <1154481491.3905.3.camel@aeonflux.holtmann.net>
+In-Reply-To: <200608011823.37945.thermal@o2.pl>
+References: <200607312232.58278.thermal@o2.pl>
+	<1154385676.4982.39.camel@aeonflux.holtmann.net>
+	<200608011823.37945.thermal@o2.pl>
+Date: Wed, 02 Aug 2006 03:13:38 +0200
+Message-Id: <1154481218.3905.1.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] BlueZ 3.2/libdbus 0.91 cross compile issue
+Subject: Re: [Bluez-devel] [PATCH] inline keyword & ansi-C compilers
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,18 +22,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Atif,
+Hi,
 
-> I am trying to cross compile BlueZ 3.2 for ARM. The configure script
-> said it needed libdbus version > 0.35.  So I downloaded libdbus 0.91,
-> however, I cannot configure the libdbus script to generate Makefiles
-> for ARM processor running Linux.  Can someone please help and tell me
-> how to cross compile libdbus 0.91on ARM ??  My compiler name is
-> arm-linux-gcc.  I am using following command for libdbus:
+> > > Recently when I`ve tried to compile KDE (ktnef to be exact) I came
+> > > upon an error in your include files:
+> >
+> > no idea what ktnef has to do with BlueZ. This seems to be the main
+> > problem here.
+> >
+> 
+> Yes, this may look a bit weird but ktnef is a part of the kdepim source 
+> bundle which contains addressbook, organizer, etc. and thus can make 
+> use of Bluetooth.
+> 
+> >
+> > #ifdef __STRICT_ANSI__
+> > #define inline
+> > #endif
+> >
+> 
+> You`re right, that will be much better.
 
-this is a question for the D-Bus mailing list.
+and why not including this into the ktnef source. I personally don't
+like this hack to be in bluez-libs.
 
-regards
+Regards
 
 Marcel
 
