@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <30252b3b0608020926w1482ff40l777c86989b5e50ea@mail.gmail.com>
-Date: Thu, 3 Aug 2006 00:26:23 +0800
-From: "Anton Bolshakov" <anton@bolshakov.name>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <30252b3b0608020908m4c97c870uf70aca79f1b33aab@mail.gmail.com>
+Message-ID: <44D0D1BB.7010400@palmsource.com>
+Date: Wed, 02 Aug 2006 18:24:27 +0200
+From: Frederic Danis <frederic.danis@palmsource.com>
 MIME-Version: 1.0
-References: <30252b3b0608020908m4c97c870uf70aca79f1b33aab@mail.gmail.com>
-Subject: Re: [Bluez-devel] btsco 100% cpu utilization
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] rfcomm command output
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,38 +18,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi list,
+Hello
 
-I found that btsco kernel module hands with 100% utilization if a
-bluethooth connection get interrupted during using it with the follow
-message in the syslog:
-"file_count is 2 (expected 3)"
+I want to use rfcomm command and start a program when a connection is 
+made. To do this I try "rfcomm listen 0 > rfcomm.log 2>&1" but nothing 
+is written to rfcomm.log file. (same problem happens if I try to pipe 
+output to another program). Do you have any idea why I can not redirect 
+rfcomm output ?
+Is there another way to start a program on rfcomm connection ?
 
+Thanks
 
-                 /* Expect this to be 3 because we (this thead) have a copy,
-                    the driver process keeps one, and the app has the
- socket open.
-                  */
-                 if (file_count(sock->file) != 3) {
-                         dprintk("file_count is %d (expected 3)\n",
-                                 file_count(sock->file));
-                 }
+Fred
 
+-- 
+-----------------------------------------------
+It is not by improving the oil lamp that one invents the electric bulb!
+-----------------------------------------------
+Danis Frederic            PalmSource Europe
+Software engineer
+Mail : mailto:frederic.danis@palmsource.com
+-----------------------------------------------
 
-It seems error doesn't handle here properly.
-file_count equals 1 if you stop a conversation.
-file_count equals 2 if it got disconnected during a conversation.
-
-The simple patch will be adding the check:
-                 if (file_count(sock-file) ==2) break;
-
-but this is not proper solution because it won't open new connection after this.
-
-ps
-sorry for sending you the draft mail in the previous mail.
-
-Regards,
-Anton
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
