@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44D0B1F7.2@xmission.com>
-Date: Wed, 02 Aug 2006 08:08:55 -0600
+Message-ID: <44D0B02A.2080800@xmission.com>
+Date: Wed, 02 Aug 2006 08:01:14 -0600
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-References: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C2E7@eumonex01.palmsource.com>
-In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE46C2E7@eumonex01.palmsource.com>
-Subject: Re: [Bluez-devel] A2DP and Alsa Plugin
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <20060801203227.77604.qmail@web507.biz.mail.mud.yahoo.com>
+In-Reply-To: <20060801203227.77604.qmail@web507.biz.mail.mud.yahoo.com>
+Subject: Re: [Bluez-devel] Gumstix headset status
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,22 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Frederic
+Yusuf
 
->> I've read about ALP. It looks exciting. I was glad to see ALP 
->> will include gstreamer as part of the foundation. You should 
->> help me write proper gstreamer plugins.
-> 
-> 	I did not worry about gstreamer as I tried the gstreamer
-> alsasink yesterday. This allow you to create a graph with either
-> bluetooth output or alsa output without modifying your .asoundrc. Just
-> modify the device field. One address only as set in filename.
+> Thanks for responding. Mono is good enough. Are you waiting on kernel
+> development for both? Do you mean you are waiting for a newer version of
+> the Linux kernel? I didn't grok that from the Bluez/Gumstix website.
 
-I was just cleaning out my mailbox and saw this discussion.
-
-Is the memory footprint acceptable when introducing the alsa dependency
-on your embedded platform? In my experience lib-alsa itself builds to
-about 800KB on arm. The difference in cpu load is probably negligible.
+I don't know how to write the kernel audio driver to talk to the
+bluetooth adapter, so Craig would have to do it.
 
 Brad
 
