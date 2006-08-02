@@ -1,17 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44D08B77.4010302@infitsrl.com>
-Date: Wed, 02 Aug 2006 13:24:39 +0200
-From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
-MIME-Version: 1.0
+Date: Wed, 2 Aug 2006 13:04:53 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44BE5DB3.7090406@gmail.com>	<1153356539.4094.9.camel@aeonflux.holtmann.net>	<2172AACE-61A5-4D43-90E2-059D659D8830@infitsrl.com>	<20060724103824.1ff98fa6@McGee-XPC>
-	<44C4CC37.1060308@infitsrl.com>	<20060724155621.02cd5e11@localhost.localdomain>	<1153758912.25058.3.camel@localhost>	<20060724203433.7184d301@localhost.localdomain>	<7359D844-F738-4AD1-A1FD-F59BEFD149EC@infitsrl.com>	<1153775541.25058.6.camel@localhost>
-	<44C881B5.7060809@infitsrl.com>	<1154085261.2298.34.camel@localhost>
-	<44CDD529.6030001@infitsrl.com>
-	<1154355262.4982.2.camel@aeonflux.holtmann.net>
-In-Reply-To: <1154355262.4982.2.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] About l2cap patch to handle multiple
-	connections....
+In-Reply-To: <1154488406.3905.37.camel@aeonflux.holtmann.net>
+Message-ID: <Pine.LNX.4.63.0608021302130.6321@redbean.intranet.gw-instruments.de>
+References: <200608011329.03106.denis.kenzior@trolltech.com>
+	<1154488406.3905.37.camel@aeonflux.holtmann.net>
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Patch: GetRemoteClass
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,81 +21,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I have not made great progresses but I try to explain them looking some 
-one can help me.
-System hangs after l2cap_connect_cfm function, this is called for every 
-device to which I try to connect to (in my case only 2).
 
-In non-patched version of l2cap_connect_cfm there was a call to 
-l2cap_conn_ready if status was 0x00 on a valid conn.
-In patched version l2cap_conn_ready is no more called. l2cap_conn_ready 
-it seems to execute the l2cap connection request so is
-this a forgetfulness? I've try to insert the call but without success 
-(system hangs again) so if the response to previous question is true this
-is not the only problem.
 
-I hope someone (more expert of me on this layer) can help to make me to 
-work this patch.
+Hi All, 
 
-thanks
-Fabrizio
+On Wed, 2 Aug 2006, Marcel Holtmann wrote:
+> Hi Denis,
+> 
+> > Attached is a patch to get remote class of device information as a uint32.  
+> > This introduces a new method with signature:
+> > uint32 GetRemoteClass(string address), which returns the class of device 
+> > information encoded as a 32 bit integer.
+> > 
+> > The reasoning is that some applications might want to rely on their own 
+> > conversion routines for the Major, Minor and Service class attributes, and 
+> > thus the DBUS GetRemoteMajorClass, GetRemoteMinorClass, etc methods that 
+> > return strings are not useful.
+> 
+> the patch is clean. So before I apply it and so extend the API, does
+> someone else thinks it is useful to have?
+> 
+I'm currently not using the DBUS API, but I think this would be something 
+very usefull. 
 
-Marcel Holtmann ha scritto:
-> Hi Fabrizio,
->
->   
->> Hi I'm trying to play with the patch to make it work (as Marcel said it 
->> hangs my machine).
->>
->> First I'm trying a simple debug by printing to find where it hangs...
->>
->> There is a first question about this: various BT_DBG statements that 
->> print bluetooth address
->> in string format (using batostr) print them in reverse 
->> order(00:01:02.... is printed 02:01:00).
->> My test machine is a powerpc based mac, I've used in user-space the 
->> ba2str  without problems in same architecture
->> so I'm confused about this.
->>     
->
-> this is normal. We don't bother to swap the address for the debug
-> messages. In Bluetooth the address is always used in the reversed order,
-> but for the human eyes it is swapped.
->
->   
->> An other dubt is about following log :
->>
->> Jul 31 10:36:39 localhost kernel: [  596.604617] Bluetooth: 
->> 00:00:00:00:00:00 -> 44:53:25:E3:01:00 psm 0x300
->> Jul 31 10:36:39 localhost kernel: [  596.606752] Bluetooth: 
->> 00:00:00:00:00:00 -> 20:68:2A:2D:09:00 psm 0x300
->> (address are in reverse order as I said above)
->>
->> Why psm is 0x300? May be also the psm in reverse order and really it's 
->> 0x003 (RFCOMM) as I would have expected ?
->>     
->
-> This looks like a big endian bug. The PSM value is in little endian
-> order.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys -- and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->
->   
+Ciao, 
+
+Peter 
+
 
 
 -------------------------------------------------------------------------
