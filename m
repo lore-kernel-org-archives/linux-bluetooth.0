@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44D0D695.6060709@palmsource.com>
-Date: Wed, 02 Aug 2006 18:45:09 +0200
-From: Frederic Danis <frederic.danis@palmsource.com>
-MIME-Version: 1.0
+Date: Wed, 2 Aug 2006 18:35:25 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <44D0D1BB.7010400@palmsource.com>
+Message-ID: <Pine.LNX.4.63.0608021833340.6321@redbean.intranet.gw-instruments.de>
 References: <44D0D1BB.7010400@palmsource.com>
-	<Pine.LNX.4.63.0608021833340.6321@redbean.intranet.gw-instruments.de>
-In-Reply-To: <Pine.LNX.4.63.0608021833340.6321@redbean.intranet.gw-instruments.de>
+MIME-Version: 1.0
 Subject: Re: [Bluez-devel] rfcomm command output
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,48 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello Peter,
 
 
-Peter Wippich wrote:
+Hi Fred, 
 
->Hi Fred, 
->
->On Wed, 2 Aug 2006, Frederic Danis wrote:
->
->  
->
->>Hello
->>
->>I want to use rfcomm command and start a program when a connection is 
->>made. To do this I try "rfcomm listen 0 > rfcomm.log 2>&1" but nothing 
->>is written to rfcomm.log file. (same problem happens if I try to pipe 
->>output to another program). Do you have any idea why I can not redirect 
->>rfcomm output ?
->>Is there another way to start a program on rfcomm connection ?
->>    
->>
->
->You have to give a device (e.g. /dev/rfcomm0) on which you want to listen. 
->  
->
-I understand that "rfcomm listen 0" will create /dev/rfcomm0 when a 
-client connects to my device, but I want to start my program (that can 
-use a device like /dev/rfcomm0 or /dev/ttyS0) after this creation (and 
-don't know how to do this in a shell).
+On Wed, 2 Aug 2006, Frederic Danis wrote:
 
-Thanks
+> Hello
+> 
+> I want to use rfcomm command and start a program when a connection is 
+> made. To do this I try "rfcomm listen 0 > rfcomm.log 2>&1" but nothing 
+> is written to rfcomm.log file. (same problem happens if I try to pipe 
+> output to another program). Do you have any idea why I can not redirect 
+> rfcomm output ?
+> Is there another way to start a program on rfcomm connection ?
 
-Fred
+You have to give a device (e.g. /dev/rfcomm0) on which you want to listen. 
 
------------------------------------------------
-It is not by improving the oil lamp that one invents the electric bulb!
------------------------------------------------
-Danis Frederic            PalmSource Europe
-Software engineer
-Mail : mailto:frederic.danis@palmsource.com
------------------------------------------------
+Ciao, 
 
+Peter 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
