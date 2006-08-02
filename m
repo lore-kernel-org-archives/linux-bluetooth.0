@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 2 Aug 2006 12:07:35 +0200
-From: Stefan Maintz <stefanmaintz@gmx.de>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20060802120735.632c4f18@p4.prod.lan>
-Mime-Version: 1.0
-Subject: [Bluez-devel] system freeze in 2.6.17-mh5
+Message-ID: <44D06E28.1000909@palmsource.com>
+Date: Wed, 02 Aug 2006 11:19:36 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Sonorix Headset works with modification + sbc
+	questions
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,69 +15,54 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi there,
-I am using gentoo linux and recently updated my kernel to
-gentoo-sources-2.6.17-r4 and patched it with the -mh5 patches from
-bluez.org. I need this patch for getting my Logitech Dinovo desktop to
-work.
-After upgrading I discovered that my machine freezes after being left
-idle for approximately 30 min.
-I posted this problem already at forums.gentoo.org and someone
-suggested me to remove the bluez-patch and see whether the problem
-still occurs and it does not without the patch. This makes me think
-that the system crash must somehow be related to your patch.
-The console log of the crash is as follows:
+Hi all,
 
-BUG: scheduling while atomic: swapper/0x00000100/0
- <c02ecbd2> wait_for_completion+0x82/0xb6  <c0115504>
-default_wake_function+0x0/0x12 <c0115504>
-default_wake_function+0x0/0x12  <c0113c8e> wake_up_process+0xd/0xf
-<c02e8b6f> hidp_idle_timeout+0x0/0x10  <c01297e2>
-kthread_stop_sem+0x74/0x93 <c012976b> kthread_stop+0xb/0xe  <c01213bb>
-run_timer_softirq+0x138/0x17d <c011dd7f> __do_softirq+0x5b/0xc2
-<c011de13> do_softirq+0x2d/0x31 <c010315c>
-apic_timer_interrupt+0x1c/0x24  <c0100aec> default_idle+0x0/0x55
-<c0100b18> default_idle+0x2c/0x55  <c0100baf> cpu_idle+0x5a/0x6f
-<c03b2757> start_kernel+0x157/0x159 BUG: unable to handle kernel NULL
-pointer dereference at virtual address 00000000 printing eip: c0113241
-*pde = 00000000
-Oops: 0002 [#1]
-SMP
-Modules linked in: nfsd exportfs lockd sunrpc ipt_TCPMSS xt_state
-ipt_REJECT xt_tcpudp iptable_filter ipt_MASQUERADE iptable_nat ip_nat
-ip_conntrack ip_tables x_tables hci_usb pppoe pppox ppp_synctty
-ppp_async crc_ccitt ppp_generic slhc snd_seq_midi snd_emu10k1_synth
-snd_emux_synth snd_seq_virmidi snd_seq_midi_emul snd_pcm_oss
-snd_mixer_oss snd_seq_oss snd_seq_midi_event snd_seq usbhid snd_emu10k1
-snd_rawmidi snd_ac97_codec snd_ac97_bus snd_pcm snd_seq_device
-snd_timer snd_page_alloc snd_util_mem snd_hwdep snd CPU:    0 EIP:
-0060:[<c0113241>]    Not tainted VLI EFLAGS: 00010046
-(2.6.17-gentoo-r4 #2) EIP is at dequeue_task+0xb/0x3f eax: c1c09b20
-ebx: c03473c0   ecx: c1c09b20   edx: c03473c0 esi: 00000000   edi:
-c03adf1c   ebp: c03ade98   esp: c03ade90 ds: 007b   es: 007b   ss: 0068
-Process swapper (pid: 0, threadinfo=c03ac000 task=c03473c0) Stack:
-c03473c0 c03473c0 c03adeac c01134e4 c03473c0 00000000 c03474c8 c03adf00
-c02ec68a c03473c0 c1c09b20 00000001 c03adee8 c0113481 c1ef4a90 c1c09b20
-00000000 c03adee8 c1c09b20 02255100 964e6c00 003d0a85 c03adf3c c03473c0
-Call Trace: <c01134e4> deactivate_task+0x16/0x22  <c02ec68a>
-schedule+0x186/0x64c <c0113481> activate_task+0x5a/0xa7  <c02ecbd2> 
+I've got a Sonorix (openbrain?) Headset OBH-100.
+As it is a bluetooth.org certified A2DP device, it should have worked =
 
-I can post any config-files as needed and I am willing to support the
-debugging if told how to.
-Thanks in advance,
-Stefan
+flawlessly at 44100hz. Maker says a failsafe value is 32000hz bitpool 44.
+It had to patch a little bit to make it work :
 
-PS: I cannot post again between Thursday and Sunday, I'm sorry.
+At 44100 hz, sbc bitpool of 32, music is recognizable but too slow, and =
+
+full of gaps.
+At 32000 hz, sbc bitpool of 32, music is good, but 32000hz really loses =
+
+quality. However, all my headsets have worked, but the audio player must =
+
+support the conversion.
+At any rate sbc bitpool of 44, music is recognizable but ways ways too =
+
+slow, and full of gaps.
+
+My question is : Are there restriction on using sbc encoder with bitpool =
+
+values other than defaults?
+
+Does anyone know if this formula is right to calculate packet length to =
+
+give to sbc encoder? Should I take bitpool into account?
+
+        /// 16 bits * 2 channels * 16 blocks * 8 subbands =3D 4096bits =3D =
+512 o/
+        codesize=3Da2dp->sbc.subbands*a2dp->sbc.blocks*a2dp->sbc.channels*2;
+
+
+Thank you,
+
+Fr=E9d=E9ric
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
