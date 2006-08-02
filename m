@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44D06E28.1000909@palmsource.com>
-Date: Wed, 02 Aug 2006 11:19:36 +0200
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
-MIME-Version: 1.0
+From: Milind Dumbare <milind@linsyssoft.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Sonorix Headset works with modification + sbc
-	questions
+In-Reply-To: <1154514862.3905.40.camel@aeonflux.holtmann.net>
+References: <1154441823.5306.13.camel@Shadowfox.linsyssoft.com>
+	<d23110170608011015h3bef584cn65a7d24fc73ec931@mail.gmail.com>
+	<1154499074.2302.2.camel@Shadowfox.linsyssoft.com>
+	<1154514862.3905.40.camel@aeonflux.holtmann.net>
+Date: Wed, 02 Aug 2006 14:21:10 +0530
+Message-Id: <1154508670.2302.10.camel@Shadowfox.linsyssoft.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Reboot notifier
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,54 +19,54 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all,
-
-I've got a Sonorix (openbrain?) Headset OBH-100.
-As it is a bluetooth.org certified A2DP device, it should have worked =
-
-flawlessly at 44100hz. Maker says a failsafe value is 32000hz bitpool 44.
-It had to patch a little bit to make it work :
-
-At 44100 hz, sbc bitpool of 32, music is recognizable but too slow, and =
-
-full of gaps.
-At 32000 hz, sbc bitpool of 32, music is good, but 32000hz really loses =
-
-quality. However, all my headsets have worked, but the audio player must =
-
-support the conversion.
-At any rate sbc bitpool of 44, music is recognizable but ways ways too =
-
-slow, and full of gaps.
-
-My question is : Are there restriction on using sbc encoder with bitpool =
-
-values other than defaults?
-
-Does anyone know if this formula is right to calculate packet length to =
-
-give to sbc encoder? Should I take bitpool into account?
-
-        /// 16 bits * 2 channels * 16 blocks * 8 subbands =3D 4096bits =3D =
-512 o/
-        codesize=3Da2dp->sbc.subbands*a2dp->sbc.blocks*a2dp->sbc.channels*2;
+The first most useful think is doing module cleanup while rebooting.
+About other things, you will know them more deeply. May be like keeping
+informing user level utilities to do some interesting stuff like.
+Keeping connection settings live post reboot or other.
 
 
-Thank you,
-
-Fr=E9d=E9ric
+On Wed, 2006-08-02 at 12:34 +0200, Marcel Holtmann wrote:
+> Hi Milind,
+> 
+> > 	 Reboot notifier will register bluetooth driver to reboot notification
+> > list of kernel. Whenever machine will get rebooted bluetooth drvier will
+> > get notified by type of reboot(Halt/reboot/poweroff). We can do
+> > interesting things after we get notified that reboot will be there.
+> 
+> you must be more specific, because I don't see any need for such a
+> notifier. What do we get from knowing such events.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys -- and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
+> 
+-- 
+-Milind
+"There is no place like 127.0.0.1"
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
