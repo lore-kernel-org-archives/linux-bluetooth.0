@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <44CFEF39.9000604@xmission.com>
+Date: Tue, 01 Aug 2006 18:18:01 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0608011659100.2567@redbean.intranet.gw-instruments.de>
-References: <Pine.LNX.4.63.0608011659100.2567@redbean.intranet.gw-instruments.de>
-Date: Wed, 02 Aug 2006 05:09:11 +0200
-Message-Id: <1154488151.3905.34.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Patch for rfcomm tty server ports
+References: <3837d8b10608010954l1cba6660g296de8379b2b8022@mail.gmail.com>
+In-Reply-To: <3837d8b10608010954l1cba6660g296de8379b2b8022@mail.gmail.com>
+Subject: Re: [Bluez-devel] Bluetooth Headset Error
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,30 +20,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Peter,
+keith
 
-> this patch allows the use of tty server ports. If a rfcomm tty port 
-> is bound to BDADDR_ANY e.g. : 
-> 
-> rfcomm bind /dev/rfcomm0 00:00:00:00:00:00 1 
-> 
-> it will start listening on the channel supplied once opened (and will 
-> stop listening when the port is closed...). This allows rfcomm ttys in 
-> server mode without the need for an additional user space daemon. 
+> I have been working to try and get a bluetooth headset to work
+> preston@ubuntu:~/bluetooth/btsco$ sudo mpg123 --au - ~/music/throne.mp3
+> | ./a2play 00:0D:44:6F:C4:50
 
-the idea of using BDADDR_ANY is kinda nice, but the use of another
-kernel thread for the listen RFCOMM socket within the RFCOMM module is
-not good. We need to integrate all the processing for the server state
-in the DLC itself.
+you shouldn't have to use sudo fwiw
 
-I am not gonna working on this, but I am supporting it and happy to
-review any patches.
+> Sample Rate:44100
+> Channels:1
 
-Regards
+try something in stereo just in case we don't set things right for mono.
 
-Marcel
+> received signal 8 from set
+> unexpected headset directive 8
 
+this is strange. I'm looking around p. 41 of the avdtp spec and this
+might mean the headset wants to release or reconfigure the stream. I
+can't find exactly which thing the 8 indicates.
 
+> write failed: Connection reset by peer
+> error while receiving 2
+
+i'm not very good at reading the dump so i can't help much here. maybe
+the set wants us to ack the directive 8 and hangs up on us when we fail
+to do it.
+
+brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
