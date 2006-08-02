@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <5f30e2610608021526g5083268mad6565d7c13877f9@mail.gmail.com>
-Date: Wed, 2 Aug 2006 17:26:40 -0500
-From: "Jeff Wilson" <jazzbotley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+From: neci <robo.neci@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Date: Wed, 2 Aug 2006 23:50:07 +0200
+References: <200608021725.01649.robo.neci@gmail.com>
+	<200608022226.21020.robo.neci@gmail.com>
+	<20060802214634.GD25403@suse.de>
+In-Reply-To: <20060802214634.GD25403@suse.de>
 MIME-Version: 1.0
-Subject: [Bluez-users] nonblocking socket
+Message-Id: <200608022350.09592.robo.neci@gmail.com>
+Cc: Stefan Seyfried <seife@suse.de>
+Subject: Re: [Bluez-users] Can't connect RFCOMM socket: Connection refused
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,21 +23,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I am using bluez-libs-2.25 on 2.6.11-mh2 to develop BlueZ support for
-a multithreaded process.  My BlueZ contribution opens a non-blocking
-RFCOMM socket in one thread, and blocking SDP query in another.  So
-far, I have RFCOMM support working, and I have also integrated
-Bluetooth inquiry and SDP queries.
+linux:/dev # rfcomm
+rfcomm0: 00:01:E3:58:23:EA channel 1 closed
 
-When I set RFCOMM to nonblocking, the sdp_connect returns an error,
-with errno set to EALREADY.  Why does one thread affect the other?
-
-This same SDP query worked fine before I change the RFCOMM to nonblocking.
-
-I can provide hcidump or source code if needed.
-
-    Thanks,
-       Jeff
+Stefan Seyfried write:
+> On Wed, Aug 02, 2006 at 10:26:19PM +0200, neci wrote:
+> > doing something wrong? i can upload files with OBEX object push client.
+> >
+> > linux:/dev # cd /dev && mknod rfcomm0 c 216 0 && mknod rfcomm1 c 216 1
+> > linux:/dev # chmod 666 /dev/rfcomm*
+> > linux:/dev # ls | grep rfcomm
+> > rfcomm0
+> > rfcomm1
+> > linux:/dev # hcitool scan
+> > Scanning ...
+> >         00:01:E3:58:23:EA       Neci
+> > linux:/dev # rfcomm bind 0 00:01:E3:58:23:EA 1
+> > Can't create device: Address already in use
+>
+> output of just plain "rfcomm"?
+>
+> Oh - and stripping a bit of the useless quotes surely would not
+> hurt :-)
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
