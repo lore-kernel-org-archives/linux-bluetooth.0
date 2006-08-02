@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Milind Dumbare <milind@linsyssoft.com>
+Message-ID: <44D0350A.8090904@xmission.com>
+Date: Tue, 01 Aug 2006 23:15:54 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <d23110170608011015h3bef584cn65a7d24fc73ec931@mail.gmail.com>
-References: <1154441823.5306.13.camel@Shadowfox.linsyssoft.com>
-	<d23110170608011015h3bef584cn65a7d24fc73ec931@mail.gmail.com>
-Date: Wed, 02 Aug 2006 11:41:14 +0530
-Message-Id: <1154499074.2302.2.camel@Shadowfox.linsyssoft.com>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Reboot notifier
+References: <002a01c6b5e5$5e6b0cd0$9d0cc70a@dlh.st.com>
+In-Reply-To: <002a01c6b5e5$5e6b0cd0$9d0cc70a@dlh.st.com>
+Subject: Re: [Bluez-devel] Bluetooth Headset Error
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,39 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-	 Reboot notifier will register bluetooth driver to reboot notification
-list of kernel. Whenever machine will get rebooted bluetooth drvier will
-get notified by type of reboot(Halt/reboot/poweroff). We can do
-interesting things after we get notified that reboot will be there.
-	
+Mayank
 
-On Tue, 2006-08-01 at 14:15 -0300, Ulisses Furquim wrote:
-> Hi Milind,
-> 
-> On 8/1/06, Milind Dumbare <milind@linsyssoft.com> wrote:
-> >         I think bluetooth stack for linux needs reboot notifier. I am thinking
-> > of writing it. Shall I?
-> 
-> Sorry, but I don't know what this "reboot notifier" feature really is.
-> Do you mind explaining it, please?
-> 
-> -- Ulisses
-> 
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys -- and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-> 
--- 
--Milind
-"There is no place like 127.0.0.1"
+>      > ACL data: handle 44 flags 0x02 dlen 12
+>         L2CAP(s): Connect req: psm 23 scid 0x0051 < ACL data: handle 44
+>     flags 0x02 dlen 16
+>         L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0051 result 2 status 0
+>           Connection refused - PSM not supported   
+>     There is a connection request from the headset on PSM 23 (0x17)
+>     which is AVCTP.
+>     So probably, the headset is trying to connect on AVRCP, which we reject.
+
+good find here.
+
+Keith, could you run
+ sdptool add AVRTG
+ ./avrecv
+and see if the headset is sending avrcp messages?
+
+Brad
 
 
 -------------------------------------------------------------------------
