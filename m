@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44CFEF39.9000604@xmission.com>
-Date: Tue, 01 Aug 2006 18:18:01 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <3837d8b10608010954l1cba6660g296de8379b2b8022@mail.gmail.com>
-In-Reply-To: <3837d8b10608010954l1cba6660g296de8379b2b8022@mail.gmail.com>
-Subject: Re: [Bluez-devel] Bluetooth Headset Error
+In-Reply-To: <DDBA30BC801ABE439B575D8A7AA341360295E34C@SJEXCH03.ds.jdsu.net>
+References: <DDBA30BC801ABE439B575D8A7AA341360295E34C@SJEXCH03.ds.jdsu.net>
+Date: Wed, 02 Aug 2006 03:18:11 +0200
+Message-Id: <1154481491.3905.3.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] BlueZ 3.2/libdbus 0.91 cross compile issue
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,34 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-keith
+Hi Atif,
 
-> I have been working to try and get a bluetooth headset to work
-> preston@ubuntu:~/bluetooth/btsco$ sudo mpg123 --au - ~/music/throne.mp3
-> | ./a2play 00:0D:44:6F:C4:50
+> I am trying to cross compile BlueZ 3.2 for ARM. The configure script
+> said it needed libdbus version > 0.35.  So I downloaded libdbus 0.91,
+> however, I cannot configure the libdbus script to generate Makefiles
+> for ARM processor running Linux.  Can someone please help and tell me
+> how to cross compile libdbus 0.91on ARM ??  My compiler name is
+> arm-linux-gcc.  I am using following command for libdbus:
 
-you shouldn't have to use sudo fwiw
+this is a question for the D-Bus mailing list.
 
-> Sample Rate:44100
-> Channels:1
+regards
 
-try something in stereo just in case we don't set things right for mono.
+Marcel
 
-> received signal 8 from set
-> unexpected headset directive 8
 
-this is strange. I'm looking around p. 41 of the avdtp spec and this
-might mean the headset wants to release or reconfigure the stream. I
-can't find exactly which thing the 8 indicates.
-
-> write failed: Connection reset by peer
-> error while receiving 2
-
-i'm not very good at reading the dump so i can't help much here. maybe
-the set wants us to ack the directive 8 and hangs up on us when we fail
-to do it.
-
-brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
