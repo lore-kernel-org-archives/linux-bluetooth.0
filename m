@@ -1,12 +1,18 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: neci <robo.neci@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Date: Wed, 2 Aug 2006 17:24:59 +0200
-MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_NPM0EZfXDak4yH7"
-Message-Id: <200608021725.01649.robo.neci@gmail.com>
-Subject: [Bluez-users] Can't connect RFCOMM socket: Connection refused
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20060801153929.27b21990@localhost.localdomain>
+References: <E65CD2CAB74C80498703D6EF7624BB4C023974A7@zmaex.zma.zoran.com>
+	<1154051769.7650.20.camel@localhost>
+	<20060728123724.47e76a7f@localhost.localdomain>
+	<20060728133933.034e4e13@localhost.localdomain>
+	<20060731182135.488b017c@localhost.localdomain>
+	<1154369980.4982.14.camel@aeonflux.holtmann.net>
+	<20060801153929.27b21990@localhost.localdomain>
+Date: Wed, 02 Aug 2006 03:21:18 +0200
+Message-Id: <1154481678.3905.7.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Hci Reset Problem - Caused by USB Hub
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,243 +22,46 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---Boundary-00=_NPM0EZfXDak4yH7
-Content-Type: text/plain;
-  charset="windows-1250"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi Andreas,
 
-Hello,
-i can't create /dev/rfcomm. What is wrong? attach config files and out from 
-hcidump.
+> > > further tests proofed that the problem described here are caused by
+> > > the USB-hub used. It seems to be unable to handle the load and just
+> > > breaks down. The same operations are working on other (higher quality) hubs.
+> > > 
+> > > Watch out for lines like
+> > > 
+> > >     usb 1-1: USB disconnect, address 29
+> > > 
+> > > in syslog and/or dmesg to check if your problem is similar. Make sure
+> > > not to mess with real physical disconnects which produce the same log
+> > > output.
+> > 
+> > does this also happens if you load the hci_usb driver with "isoc=0" to
+> > disable all ISOC transfers.
+> > 
+> 
+> Confuses me a bit... my kernel (2.6.8.1) says:  kernel: hci_usb: Unknown parameter `isoc'
+> my modinfo -p hci_usb says: "nothing".
 
-# rfcomm connect rfcomm0
-Can't connect RFCOMM socket: Connection refused
+this is a fairly old kernel. This also means that this can be a bug in
+the USB subsystem. Move to the latest 2.6.17 or even 2.6.18-rc3 kernel.
 
-# hcidump
-HCI sniffer - Bluetooth packet analyzer ver 1.24
-device: hci0 snap_len: 1028 filter: 0xffffffff
+Regards
 
-linux:/etc # hcidump
-HCI sniffer - Bluetooth packet analyzer ver 1.24
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Connect Complete (0x03) plen 11
-< ACL data: handle 42 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0040
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Max Slots Change (0x1b) plen 3
-> HCI Event: Command Complete (0x0e) plen 6
-> ACL data: handle 42 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
-< ACL data: handle 42 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 1024
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 42 flags 0x02 dlen 17
-> ACL data: handle 42 flags 0x01 dlen 1
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-      Success
-      MTU 335
-> ACL data: handle 42 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 335
-< ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-< ACL data: handle 42 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 42 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-< ACL data: handle 42 flags 0x02 dlen 18
-    L2CAP(d): cid 0x0040 len 14 [psm 3]
-      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
-      dlci 2 frame_type 0 credit_flow 15 pri 7 ack_timer 0
-      frame_size 330 max_retrans 0 credits 7
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 42 flags 0x02 dlen 18
-    L2CAP(d): cid 0x0040 len 14 [psm 3]
-      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
-      dlci 2 frame_type 0 credit_flow 14 pri 0 ack_timer 0
-      frame_size 330 max_retrans 0 credits 4
-< ACL data: handle 42 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-> HCI Event: Role Change (0x12) plen 8
-> HCI Event: Max Slots Change (0x1b) plen 3
-> HCI Event: Link Key Request (0x17) plen 6
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-> HCI Event: Command Complete (0x0e) plen 10
-> ACL data: handle 42 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73
-< ACL data: handle 42 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
-< ACL data: handle 42 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 42 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> ACL data: handle 42 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Disconn Complete (0x05) plen 4
+Marcel
 
---Boundary-00=_NPM0EZfXDak4yH7
-Content-Type: text/x-java;
-  charset="windows-1250";
-  name="hcid.conf"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="hcid.conf"
 
-#
-# HCI daemon configuration file.
-#
-# $Id: hcid.conf,v 1.7 2004/12/13 14:16:03 holtmann Exp $
-#
-
-# HCId options
-options {
-	# Automatically initialize new devices
-	autoinit yes;
-
-	# Security Manager mode
-	#   none - Security manager disabled
-	#   auto - Use local PIN for incoming connections
-	#   user - Always ask user for a PIN
-	#
-	security auto;
-
-	# Pairing mode
-	#   none  - Pairing disabled
-	#   multi - Allow pairing with already paired devices
-	#   once  - Pair once and deny successive attempts
-	pairing multi;
-
-	# PIN helper
-	# if you want a interactiv query of your pin use /usr/bin/bluepin
-	# /bin/bluepincat is using the pin in the /etc/bluetooth/pin file
-	# pin_helper /usr/bin/bluepin;
-	pin_helper /bin/bluepincat;
-
-	# D-Bus PIN helper
-	#dbus_pin_helper;
-}
-
-# Default settings for HCI devices
-device {
-	# Local device name
-	#   %d - device id
-	#   %h - host name
-	name "PC";
-
-	# Local device class
-	# e.g.
-	#  0xsss100 = Computer
-	#  0xsss104 = Computer Desktop
-	#  0xsss108 = Computer Server
-	#  0xsss10c = Computer Laptop
-	# The 'sss' above defines the service-class (not quite, only the
-	# first 11 bits, the next 11 define the device-class, than 2 format bits.)
-	# See https://www.bluetooth.org/foundry/assignnumb/document/baseband
-	# for more information.
-	# 0x100bbb stands for "Object Transfer  (v-Inbox, v-Folder, ...)"
-	# 0x020bbb stands for "Networking (LAN, Ad hoc, ...)"
-	class 0xdb0100;
-
-	# Default packet type
-	#pkt_type DH1,DM1,HV1;
-
-	# Inquiry and Page scan
-	# valid parameters: enable | disable
-	iscan enable;
-	pscan enable;
-
-	# Default link mode
-	#   none   - no specific policy 
-	#   accept - always accept incoming connections
-	#   master - become master on incoming connections,
-	#            deny role switch on outgoing connections
-	lm accept;
-
-	# Default link policy
-	#   none    - no specific policy
-	#   rswitch - allow role switch
-	#   hold    - allow hold mode
-	#   sniff   - allow sniff mode
-	#   park    - allow park mode
-	lp rswitch,hold,sniff,park;
-
-	# Authentication and Encryption (Security Mode 3)
-	auth disable;
-	encrypt disable;
-}
-
---Boundary-00=_NPM0EZfXDak4yH7
-Content-Type: text/plain;
-  charset="windows-1250";
-  name="rfcomm.conf"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="rfcomm.conf"
-
-#
-# RFCOMM configuration file.
-#
-# $Id: rfcomm.conf,v 1.1 2002/10/07 05:58:18 maxk Exp $
-#
-
-rfcomm0 {
-	# Automatically bind the device at startup
-	bind yes;
-
-	# Bluetooth address of the device
-	device 00:01:E3:58:23:EA;
-
-	# RFCOMM channel for the connection
-	channel	1;
-
-	# Description of the connection
-	comment "Mobil";
-}
-
---Boundary-00=_NPM0EZfXDak4yH7
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---Boundary-00=_NPM0EZfXDak4yH7
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---Boundary-00=_NPM0EZfXDak4yH7--
