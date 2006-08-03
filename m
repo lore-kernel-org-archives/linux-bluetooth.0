@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44D1CEA0.4080205@flcd.net>
-Date: Thu, 03 Aug 2006 13:23:28 +0300
-From: Denis <denis@flcd.net>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] can't change HCI and LMP version on Cellink BTA-6030
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <5f30e2610608021526g5083268mad6565d7c13877f9@mail.gmail.com>
+References: <5f30e2610608021526g5083268mad6565d7c13877f9@mail.gmail.com>
+Date: Thu, 03 Aug 2006 12:29:45 +0200
+Message-Id: <1154600985.3905.58.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] nonblocking socket
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,40 +20,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello!
-Few days ago I've got Cellink BTA-6030 Bluetooth dongle but have a 
-problem installing it on my Debian box for which it was bought.
-It works slower than my previous LinkSys BT100 V1.1 Bluetooth, on other 
-end I've got Canyon V1.2
+Hi Jeff,
 
-After some reading I've checked how device is identify itself and spot 
-that from remote WinXP notebook it's reported that LMP feature - unknown 
-and LMP Version is simply blank. I've recompiled BlueZ 3.2 with bccmd 
-enabled and tried perform these steps:
-----------------------------------------------------------------------------------------------
-# bccmd psget version
-The HCI and LMP version reported locally: 0x0101 (257)
-# bccmd psset version 0x0303
-# bccmd psget remver
-Can't execute command: No such device or address (6)
-# bccmd psset remver 0x0003
-# bccmd warmreset
-# bccmd psget version
-The HCI and LMP version reported locally: 0x0101 (257)
-# bccmd psget remver
-Can't execute command: No such device or address (6)
-----------------------------------------------------------------------------------------------
+> I am using bluez-libs-2.25 on 2.6.11-mh2 to develop BlueZ support for
+> a multithreaded process.  My BlueZ contribution opens a non-blocking
+> RFCOMM socket in one thread, and blocking SDP query in another.  So
+> far, I have RFCOMM support working, and I have also integrated
+> Bluetooth inquiry and SDP queries.
+> 
+> When I set RFCOMM to nonblocking, the sdp_connect returns an error,
+> with errno set to EALREADY.  Why does one thread affect the other?
+> 
+> This same SDP query worked fine before I change the RFCOMM to nonblocking.
 
-But as you can see it doesn't let me to reset LMP version. From other 
-side if plug this device in WinXP notebook it's reported as v2.0 device.
+can you provide a simple test program for this? It sounds like a strange
+bug with threading. However why do you need a non-blocking socket when
+you are using threading?
 
-Any ideas how this could be fixed and maybe I'm doing something wrong?
+Regards
 
-Thank you!
-Best Regards,
-Denis Stenderchuck
-http://forum.weblamp.net/linux
-http://www.pharos-search.com
+Marcel
+
 
 
 -------------------------------------------------------------------------
