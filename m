@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Stefan Rompf <stefan@loplof.de>
-To: bluez-users@lists.sourceforge.net
-Date: Thu, 3 Aug 2006 17:04:58 +0200
+Message-ID: <44D20E67.5060802@flcd.net>
+Date: Thu, 03 Aug 2006 17:55:35 +0300
+From: Denis <denis@flcd.net>
 MIME-Version: 1.0
-Message-Id: <200608031704.59095.stefan@loplof.de>
-Subject: [Bluez-users] rfcomm-"server" for linux wanted
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <44D1CEA0.4080205@flcd.net>
+	<1154621543.3905.68.camel@aeonflux.holtmann.net>
+In-Reply-To: <1154621543.3905.68.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-users] can't change HCI and LMP version
+	on	Cellink	BTA-6030
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,15 +22,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Marcel! First of all let me thank you for making great peace of 
+software, I'd be lost without it!
+> In general if you don't know what you are doing, then don't touch the PS
+> keys.
+yeah I know this rule, but I'd like to learn this, and correct the way 
+dongle behave so I can utilize it at full power. So maybe you can 
+provide me with more information on this issue, I'd like to take a risk 
+and wouldn't blame you if dongle become not useable.
 
-I'm searching for a program that allows announcing an rfcomm service on 
-bluetooth and sending a file (with delays) after connection. I want to 
-simulate the datastream of a GPS receiver for debugging reasons.
+> the bccmd defaults for the used stores are chosen the way that you can't
+> mess up your dongle. This means that you have explicitly choose a store
+> that is persistent. However the best is to use psread and then simply
+> use psclr to remove the bogus PS key.
+not sure which key to remove as I've run psread before and didn't find 
+key representing bluetooth protocol for remote PC.
 
-Anyone can hint me to such an utility? Thanks!
+Maybe you can point me on where to look for information so I can 
+understand how it works or maybe I can post readout of psread and you 
+advice me what needs to be corrected?
 
-Stefan
+Thank you!
+Best Regards,
+Denis Stenderchuck
+http://forum.weblamp.net/linux
+http://www.pharos-search.com
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
