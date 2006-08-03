@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20060802210008.GA3043@lst.de>
-References: <20060802120735.632c4f18@p4.prod.lan>
-	<1154525837.3905.49.camel@aeonflux.holtmann.net>
-	<20060802210008.GA3043@lst.de>
-Date: Thu, 03 Aug 2006 12:39:39 +0200
-Message-Id: <1154601579.3905.64.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] system freeze in 2.6.17-mh5
+MIME-Version: 1.0
+Date: Thu, 3 Aug 2006 08:49:20 +0100
+Message-ID: <056BF200E9632F4285220E570FEED673D3ADC9@GBMDDMH202AMSX.gb001.siemens.net>
+In-Reply-To: <056BF200E9632F4285220E570FEED673D035B8@GBMDDMH202AMSX.gb001.siemens.net>
+From: "Waldram, Andrew (SBS UK)" <andrew.waldram@siemens.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error
+	(trials and tribulations) how cool is this!!!
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,46 +20,94 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Christoph,
+Just thought I'd let you know of my success's and problems with my HP
+blutooth headphones (a2dpd & avrcp) and broadcom bcm2045 dongle
 
-> > > BUG: scheduling while atomic: swapper/0x00000100/0
-> > >  <c02ecbd2> wait_for_completion+0x82/0xb6  <c0115504>
-> > > default_wake_function+0x0/0x12 <c0115504>
-> > > default_wake_function+0x0/0x12  <c0113c8e> wake_up_process+0xd/0xf
-> > > <c02e8b6f> hidp_idle_timeout+0x0/0x10  <c01297e2>
-> > > kthread_stop_sem+0x74/0x93 <c012976b> kthread_stop+0xb/0xe  <c01213bb>
-> 
-> > this looks like a problem with the kthread API. We converted BNEP, CMTP
-> > and HIDP to it with 2.6.17-mh3. So a 2.6.17-mh2 kernel should work
-> > without any problems.
-> > 
-> > Christoph, any ideas. Did you see a similar problem before.
-> 
-> kthread_stop can sleep, hidp_idle_timeout is called from a timer, thus
-> running in softirq context.
-> 
-> Why does hidp try to tear down the thread on this timeout anyway?  It
-> seems much more logical to me to only do it in hidp_del_connection so
-> that it's symmetric to starting the thread in hidp_add_connection.
+Modified acrecv.c replacing the printk's with appropiate system("xmms
+-s") comands recompiled
 
-previously, it was only marking the connection for disconnect:
+Ran this script
 
-        atomic_inc(&session->terminate);
-        hidp_schedule(session);
+ #!/bin/sh -e
+#
+# BTXMMS
+#
 
-After the conversion to kthread API we call kthread_stop() directly and
-this is not gonna work.
+sdptool add AVRTG
 
-The hidp_del_connection() is triggered from userspace to terminate an
-active HIDP session. Additionally we also need to terminate the HIDP
-session after a certain amount of idle time to safe power. In general
-the HID input device itself should take care of this, but some of them
-simply don't.
 
-Regards
+if [ -x /usr/bin/a2dpd ]; then
+	/home/andy/blueheadphones/avrecv &
+	vlc &
+	xmms &
+	/usr/bin/a2dpd 00:0D:44:2A:5C:12 
+fi
+# fi
+			
 
-Marcel
+exit 0
 
+Pressed play on the screen and sound in all it's beauty came from my
+speakers (this wasn't new) then press next on the headphones and viola
+the track jumped forward same for back and pause.
+
+Then the fly in the ointment
+
+If you press pause (either on xmms or headphones) wait 10 secs then
+press play again on headphones it appears the heaphones recreate a avrcp
+connection but no a2dpd (bugger bugger bugger) the only way out of this
+is switch off the headphones and restart.
+
+This is the log output
+
+PCM thread 0.5 started
+DEBUG: a2dp_params: (errno=0:Success)a2dp 0x821d4e8
+DEBUG: a2dp_params: (errno=0:Success)format S16_LE rate 44100 channels 2
+DEBUG: a2dp_params: (errno=0:Success)frame_bytes 4 period_bytes 8192
+period_size 2048 buffer_size 4096
+DEBUG: a2dp_prepare: (errno=0:Success)a2dp 0x821d4e8
+Accepting incoming stream connection
+DEBUG: a2dp_prepare: (errno=4:Interrupted system call)a2dp 0x821d4e8
+<--------------- PAUSE Pressed
+[1] Receiving failed on socket 0.5 error (-1/4 bytes) errno=11:Resource
+temporarily unavailable
+Client thread 0.5 ending: timeout
+Destroying lpA2dp, destroy_count is 5001
+DEBUG: a2dp_destroy: Begin
+DEBUG: a2dp_free: Begin
+DEBUG: a2dp_destroy: a2dp_destroy(0x8053090) OK
+Connectedreceived 0 bytes:
+
+transaction_label = 0
+packet_type = 0
+cr = 1
+ipid = 0
+pid = e11
+zeroes = 0
+ctype = 9
+subunit_type = 9
+subunit_id = 0
+opcode = 7c
+operand0 = 4b
+operand1 = 0
+accepting next connection
+DEBUG: a2dp_wait_connection: Begin
+DEBUG: a2dp_wait_connection: Connected [imtu 672, omtu 0, flush_to
+65535]
+
+socket 5: Connection from 12:5C:2A:44:0D:00, mtu=672
+<----------------- Play Pressed on headphones
+socket 5: Received 2 bytes
+00000: 00 01
+
+
+This is with a  Broadcom BCM2045 usb dongle standars Ubuntu 6.06 kernel
+(checked looks like the patch is applied).
+HP fa303 headset 
+ 
+
+------------------------------------------------------------------------
+---------- 
 
 
 -------------------------------------------------------------------------
