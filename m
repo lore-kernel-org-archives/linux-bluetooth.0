@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: menace82 <menace82@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Date: Thu, 3 Aug 2006 15:12:03 +0300
+Message-ID: <44D1CEA0.4080205@flcd.net>
+Date: Thu, 03 Aug 2006 13:23:28 +0300
+From: Denis <denis@flcd.net>
 MIME-Version: 1.0
-Message-Id: <200608031512.03622.menace82@gmail.com>
-Subject: [Bluez-users] Bluez + Planet BT-320 + SE P910i + SuSE Linux 10.1
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] can't change HCI and LMP version on Cellink BTA-6030
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,10 +18,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello... I just bought a bluetooth dongle... My system recognise it as 
-bluetooth but i cannot find any devices. I've tried "hcitool scan" but i got 
-a "Inquiry failed: Connection timed out" message... My mobile phone can 
-detect my pc, but while i try to pair it i get an error message.... help!
+Hello!
+Few days ago I've got Cellink BTA-6030 Bluetooth dongle but have a 
+problem installing it on my Debian box for which it was bought.
+It works slower than my previous LinkSys BT100 V1.1 Bluetooth, on other 
+end I've got Canyon V1.2
+
+After some reading I've checked how device is identify itself and spot 
+that from remote WinXP notebook it's reported that LMP feature - unknown 
+and LMP Version is simply blank. I've recompiled BlueZ 3.2 with bccmd 
+enabled and tried perform these steps:
+----------------------------------------------------------------------------------------------
+# bccmd psget version
+The HCI and LMP version reported locally: 0x0101 (257)
+# bccmd psset version 0x0303
+# bccmd psget remver
+Can't execute command: No such device or address (6)
+# bccmd psset remver 0x0003
+# bccmd warmreset
+# bccmd psget version
+The HCI and LMP version reported locally: 0x0101 (257)
+# bccmd psget remver
+Can't execute command: No such device or address (6)
+----------------------------------------------------------------------------------------------
+
+But as you can see it doesn't let me to reset LMP version. From other 
+side if plug this device in WinXP notebook it's reported as v2.0 device.
+
+Any ideas how this could be fixed and maybe I'm doing something wrong?
+
+Thank you!
+Best Regards,
+Denis Stenderchuck
+http://forum.weblamp.net/linux
+http://www.pharos-search.com
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
