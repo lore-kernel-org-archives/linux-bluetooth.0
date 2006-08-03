@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Warp <warp@adygtelecom.com>
-To: bluez-devel@lists.sourceforge.net
-Message-Id: <1154607738.10276.11.camel@warptech>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20060802210008.GA3043@lst.de>
+References: <20060802120735.632c4f18@p4.prod.lan>
+	<1154525837.3905.49.camel@aeonflux.holtmann.net>
+	<20060802210008.GA3043@lst.de>
+Date: Thu, 03 Aug 2006 12:39:39 +0200
+Message-Id: <1154601579.3905.64.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Date: Thu, 03 Aug 2006 16:22:18 +0400
-Subject: [Bluez-devel] Mobidick BDU33A + SCO
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] system freeze in 2.6.17-mh5
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,58 +23,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Christoph,
 
-I have problem with SCO link over Mobidick BDU33A , after 1-3 minutes
-established connection adapter may restart. 
-My configuration:
+> > > BUG: scheduling while atomic: swapper/0x00000100/0
+> > >  <c02ecbd2> wait_for_completion+0x82/0xb6  <c0115504>
+> > > default_wake_function+0x0/0x12 <c0115504>
+> > > default_wake_function+0x0/0x12  <c0113c8e> wake_up_process+0xd/0xf
+> > > <c02e8b6f> hidp_idle_timeout+0x0/0x10  <c01297e2>
+> > > kthread_stop_sem+0x74/0x93 <c012976b> kthread_stop+0xb/0xe  <c01213bb>
+> 
+> > this looks like a problem with the kthread API. We converted BNEP, CMTP
+> > and HIDP to it with 2.6.17-mh3. So a 2.6.17-mh2 kernel should work
+> > without any problems.
+> > 
+> > Christoph, any ideas. Did you see a similar problem before.
+> 
+> kthread_stop can sleep, hidp_idle_timeout is called from a timer, thus
+> running in softirq context.
+> 
+> Why does hidp try to tear down the thread on this timeout anyway?  It
+> seems much more logical to me to only do it in hidp_del_connection so
+> that it's symmetric to starting the thread in hidp_add_connection.
 
-hciconfig hci0 -a
-hci0:   Type: USB
-        BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 384:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:101 acl:0 sco:0 events:13 errors:0
-        TX bytes:300 acl:0 sco:0 commands:13 errors:0
-        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'Bluez-0'
-        Class: 0x200404
-        Service Classes: Audio
-        Device Class: Audio/Video, Device conforms to the Headset
-profile
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x6e6 LMP Ver: 2.0 (0x3) LMP Subver:
-0x6e6
-        Manufacturer: Cambridge Silicon Radio (10)
+previously, it was only marking the connection for disconnect:
 
-# hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 384:8 SCO MTU: 64:8
-        Build 1766
-        Chip version: BlueCore4-External
-        Max key size: 56 bit
-        SCO mapping:  HCI
+        atomic_inc(&session->terminate);
+        hidp_schedule(session);
 
-# hciconfig hci0 voice
-hci0:   Type: USB
-        BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 384:8 SCO MTU: 64:8
-        Voice setting: 0x0060 (Default Condition)
-        Input Coding: Linear
-        Input Data Format: 2's complement
-        Input Sample Size: 16 bit
-        # of bits padding at MSB: 0
-        Air Coding Format: CVSD
+After the conversion to kthread API we call kthread_stop() directly and
+this is not gonna work.
 
+The hidp_del_connection() is triggered from userspace to terminate an
+active HIDP session. Additionally we also need to terminate the HIDP
+session after a certain amount of idle time to safe power. In general
+the HID input device itself should take care of this, but some of them
+simply don't.
 
-Kernel 2.6.17.7 with patch from bluez.org
+Regards
 
-Latest libs & utils.
+Marcel
 
-Howto fix this problem?
-
-Best Reagrds,
- Warp.
 
 
 -------------------------------------------------------------------------
