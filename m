@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <5f30e2610608021526g5083268mad6565d7c13877f9@mail.gmail.com>
-References: <5f30e2610608021526g5083268mad6565d7c13877f9@mail.gmail.com>
-Date: Thu, 03 Aug 2006 12:29:45 +0200
-Message-Id: <1154600985.3905.58.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] nonblocking socket
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20060803073108.60537.qmail@web30306.mail.mud.yahoo.com>
+Date: Thu, 3 Aug 2006 00:31:08 -0700 (PDT)
+From: "Martin (KaFai), Lau" <iamkafai2002@yahoo.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-users] Problem with bluetooh mouse/keyboard + evdev + xorg
+	7.0
+Reply-To: "Martin (KaFai), Lau" <iamkafai2002@yahoo.com>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -20,26 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Jeff,
+I am using a microsoft bluetooth mouse and keyboard.  I am using evdev in xorg 7.0 to access them.  However, something weird happened when some kind of timeout occurs.  For example, my mouse used to be /dev/input/event3. After I didn't move the mouse for a few minutes, my mouse cannot move forever....After puzzling for awhile, I realized the /dev/input/event3 disappeared and /dev/input/event4 created instead...
 
-> I am using bluez-libs-2.25 on 2.6.11-mh2 to develop BlueZ support for
-> a multithreaded process.  My BlueZ contribution opens a non-blocking
-> RFCOMM socket in one thread, and blocking SDP query in another.  So
-> far, I have RFCOMM support working, and I have also integrated
-> Bluetooth inquiry and SDP queries.
-> 
-> When I set RFCOMM to nonblocking, the sdp_connect returns an error,
-> with errno set to EALREADY.  Why does one thread affect the other?
-> 
-> This same SDP query worked fine before I change the RFCOMM to nonblocking.
+Any clue what may be wrong?  Any workaround I can do?
 
-can you provide a simple test program for this? It sounds like a strange
-bug with threading. However why do you need a non-blocking socket when
-you are using threading?
+kafai-desk ~ # uname -a
+Linux kafai-desk 2.6.17-gentoo-r4 #2 PREEMPT Wed Aug 2 16:25:07 PDT 2006 i686 AMD Sempron(tm)   2200+ GNU/Linux
 
-Regards
+kafai-desk ~ # hidd --show
+00:50:F2:E3:0A:CA Bluetooth HID Boot Protocol Device [045e:007c] connected [boot-protocol]
+00:50:F2:E4:15:68 Bluetooth HID Boot Protocol Device [045e:007b] connected [boot-protocol]
 
-Marcel
+Many thanks
+
+--Martin
 
 
 
