@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <5f30e2610608031445qf67c5e8p12ea39b8be27077@mail.gmail.com>
-Date: Thu, 3 Aug 2006 16:45:22 -0500
+Message-ID: <5f30e2610608031017w1d65e4dakb9f2ef2144670f5a@mail.gmail.com>
+Date: Thu, 3 Aug 2006 12:17:26 -0500
 From: "Jeff Wilson" <jazzbotley@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <5f30e2610608031017w1d65e4dakb9f2ef2144670f5a@mail.gmail.com>
+In-Reply-To: <1154600985.3905.58.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
 References: <5f30e2610608021526g5083268mad6565d7c13877f9@mail.gmail.com>
 	<1154600985.3905.58.camel@aeonflux.holtmann.net>
-	<5f30e2610608031017w1d65e4dakb9f2ef2144670f5a@mail.gmail.com>
 Subject: Re: [Bluez-users] nonblocking socket
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -22,76 +21,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Never mind on the example program, no need to create one, I can
-reproduce the problem with sdptool v2.25:
+I will put together an example and post it in the next day or two.  As
+to "why nonblocking?" it's to service multiple sockets with a single
+thread (event-based approach).
 
-`sdptool browse <remote-addr>`
+Thanks,
+Jeff
 
-Failed to connect to SDP server on <remote-addr>: Operation already in progress
-
-local hcidump -X -V
-
-HCI sniffer - Bluetooth packet analyzer ver 1.30
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr remote-addr ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x0b ncmd 1
-    Error: ACL Connection Already Exists
-
-remote hcidump -X -V
-
-(nothing)
-
-Any ideas?  I have rebooted the client since this started up.  Thanks
-for your time.
-
-       Regards,
-          Jeff
-
-On 8/3/06, Jeff Wilson <jazzbotley@gmail.com> wrote:
-> I will put together an example and post it in the next day or two.  As
-> to "why nonblocking?" it's to service multiple sockets with a single
-> thread (event-based approach).
+On 8/3/06, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Jeff,
 >
-> Thanks,
-> Jeff
+> > I am using bluez-libs-2.25 on 2.6.11-mh2 to develop BlueZ support for
+> > a multithreaded process.  My BlueZ contribution opens a non-blocking
+> > RFCOMM socket in one thread, and blocking SDP query in another.  So
+> > far, I have RFCOMM support working, and I have also integrated
+> > Bluetooth inquiry and SDP queries.
+> >
+> > When I set RFCOMM to nonblocking, the sdp_connect returns an error,
+> > with errno set to EALREADY.  Why does one thread affect the other?
+> >
+> > This same SDP query worked fine before I change the RFCOMM to nonblocking.
 >
-> On 8/3/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > Hi Jeff,
-> >
-> > > I am using bluez-libs-2.25 on 2.6.11-mh2 to develop BlueZ support for
-> > > a multithreaded process.  My BlueZ contribution opens a non-blocking
-> > > RFCOMM socket in one thread, and blocking SDP query in another.  So
-> > > far, I have RFCOMM support working, and I have also integrated
-> > > Bluetooth inquiry and SDP queries.
-> > >
-> > > When I set RFCOMM to nonblocking, the sdp_connect returns an error,
-> > > with errno set to EALREADY.  Why does one thread affect the other?
-> > >
-> > > This same SDP query worked fine before I change the RFCOMM to nonblocking.
-> >
-> > can you provide a simple test program for this? It sounds like a strange
-> > bug with threading. However why do you need a non-blocking socket when
-> > you are using threading?
-> >
-> > Regards
-> >
-> > Marcel
-> >
-> >
-> >
-> > -------------------------------------------------------------------------
-> > Take Surveys. Earn Cash. Influence the Future of IT
-> > Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> > opinions on IT & business topics through brief surveys -- and earn cash
-> > http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >
+> can you provide a simple test program for this? It sounds like a strange
+> bug with threading. However why do you need a non-blocking socket when
+> you are using threading?
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys -- and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 >
 
 -------------------------------------------------------------------------
