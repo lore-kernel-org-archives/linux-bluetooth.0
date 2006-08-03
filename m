@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <5f30e2610608031017w1d65e4dakb9f2ef2144670f5a@mail.gmail.com>
-Date: Thu, 3 Aug 2006 12:17:26 -0500
-From: "Jeff Wilson" <jazzbotley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1154600985.3905.58.camel@aeonflux.holtmann.net>
+From: Stefan Rompf <stefan@loplof.de>
+To: bluez-users@lists.sourceforge.net
+Date: Thu, 3 Aug 2006 17:04:58 +0200
 MIME-Version: 1.0
-References: <5f30e2610608021526g5083268mad6565d7c13877f9@mail.gmail.com>
-	<1154600985.3905.58.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] nonblocking socket
+Message-Id: <200608031704.59095.stefan@loplof.de>
+Subject: [Bluez-users] rfcomm-"server" for linux wanted
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,47 +18,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I will put together an example and post it in the next day or two.  As
-to "why nonblocking?" it's to service multiple sockets with a single
-thread (event-based approach).
+Hi,
 
-Thanks,
-Jeff
+I'm searching for a program that allows announcing an rfcomm service on 
+bluetooth and sending a file (with delays) after connection. I want to 
+simulate the datastream of a GPS receiver for debugging reasons.
 
-On 8/3/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jeff,
->
-> > I am using bluez-libs-2.25 on 2.6.11-mh2 to develop BlueZ support for
-> > a multithreaded process.  My BlueZ contribution opens a non-blocking
-> > RFCOMM socket in one thread, and blocking SDP query in another.  So
-> > far, I have RFCOMM support working, and I have also integrated
-> > Bluetooth inquiry and SDP queries.
-> >
-> > When I set RFCOMM to nonblocking, the sdp_connect returns an error,
-> > with errno set to EALREADY.  Why does one thread affect the other?
-> >
-> > This same SDP query worked fine before I change the RFCOMM to nonblocking.
->
-> can you provide a simple test program for this? It sounds like a strange
-> bug with threading. However why do you need a non-blocking socket when
-> you are using threading?
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys -- and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+Anyone can hint me to such an utility? Thanks!
+
+Stefan
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
