@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <44D17895.6050001@xmission.com>
+Date: Wed, 02 Aug 2006 22:16:21 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Date: Thu, 3 Aug 2006 08:49:20 +0100
-Message-ID: <056BF200E9632F4285220E570FEED673D3ADC9@GBMDDMH202AMSX.gb001.siemens.net>
-In-Reply-To: <056BF200E9632F4285220E570FEED673D035B8@GBMDDMH202AMSX.gb001.siemens.net>
-From: "Waldram, Andrew (SBS UK)" <andrew.waldram@siemens.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error
-	(trials and tribulations) how cool is this!!!
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <002a01c6b5e5$5e6b0cd0$9d0cc70a@dlh.st.com>	<44D0350A.8090904@xmission.com>
+	<3837d8b10608020729i5bab5ea6vbc18b0ad502b11de@mail.gmail.com>
+In-Reply-To: <3837d8b10608020729i5bab5ea6vbc18b0ad502b11de@mail.gmail.com>
+Subject: Re: [Bluez-devel] Bluetooth Headset Error
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,95 +21,69 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Just thought I'd let you know of my success's and problems with my HP
-blutooth headphones (a2dpd & avrcp) and broadcom bcm2045 dongle
+keith
 
-Modified acrecv.c replacing the printk's with appropiate system("xmms
--s") comands recompiled
+>>> Sample Rate:44100
+>>> Channels:1
+>>
+>>try something in stereo just in case we don't set things right for mono.
+> 
+> I tried a stereo file and now it works! 
 
-Ran this script
+ok, maybe what we're calling "directive 8" is a reconfigure request
+because the set doesn't like mono. if we're doing it right then it's
+another case of a set that drifts from the spec.
 
- #!/bin/sh -e
-#
-# BTXMMS
-#
+>     >     So probably, the headset is trying to connect on AVRCP, which
+>     we reject.
+> 
+>     good find here.
+> 
+>     Keith, could you run
+>     sdptool add AVRTG
+>     ./avrecv
+>     and see if the headset is sending avrcp messages?
+> 
+> 
+> I tried those commands and it looks like no luck.  The output is below.
+>   A little about the headset, it comes in a pack with a bluetooth
+> transmitter that hooks into the ipod nano.  The headset has controls for
+> volume and also for track forward and track backward.   I don't know if
+> these commands are part of the headset profile, so that might make this
+> headset a bit off the standard.
 
-sdptool add AVRTG
+these buttons are what avrcp is about. it is optional but it's pretty
+much expected from any current set. avrecv listens for an avrcp
+connection coming back from the set. most sets will turn around and try
+to connect back using avrcp when the stream is opened. you can also try
+avsnd to initiate the avrcp connection to the set and listen for events.
 
+> Ok, so now on to my next mission to get the alsa plugin to work.  Here
+> is the error I am experiencing now with the alsa plugin.
+> 
+> 
+> preston@ubuntu:~/bluetooth/btsco/alsa-plugins$ aplay -B 1000000 -D
+> pcm.headphone ~/music/41_30sec.wav
+> DEBUG: _snd_pcm_a2dp_open: name pcm.headphone mode 0
+> DEBUG: _snd_pcm_a2dp_open: bdaddr/dest is 00:0D:44:6F:C4:50
+> DEBUG: a2dp_alloc: init
+> DEBUG: a2dp_connect: a2dp 0x8076478 (sk=0, control_sk=0)
+> DEBUG: connect_stream: Using address: 50:C4:6F:44:0D:00
+> DEBUG: detect_a2dp: retrying sdp connect: Interrupted system call
+> DEBUG: detect_a2dp: Found A2DP Sink
+> DEBUG: connect_stream: Found A2DP Sink at the destination
+> DEBUG: do_connect: Connected [imtu 672, omtu 672, flush_to 65535]
+> DEBUG: connect_stream: Sent the Stream End Point Discovery Command
+> DEBUG: connect_stream: couldn't get avdtp_discover
 
-if [ -x /usr/bin/a2dpd ]; then
-	/home/andy/blueheadphones/avrecv &
-	vlc &
-	xmms &
-	/usr/bin/a2dpd 00:0D:44:2A:5C:12 
-fi
-# fi
-			
+it doesn't like the value of size of the avdtp_discover response.
 
-exit 0
+there's code in a2play.c but not in pcm_a2dp that retries this call if
+the size read is short (2 bytes) instead of the full response. would you
+like to try to modify pcm_a2dp.c to contain this exception? Look for
+"blueant" in a2play.c.
 
-Pressed play on the screen and sound in all it's beauty came from my
-speakers (this wasn't new) then press next on the headphones and viola
-the track jumped forward same for back and pause.
-
-Then the fly in the ointment
-
-If you press pause (either on xmms or headphones) wait 10 secs then
-press play again on headphones it appears the heaphones recreate a avrcp
-connection but no a2dpd (bugger bugger bugger) the only way out of this
-is switch off the headphones and restart.
-
-This is the log output
-
-PCM thread 0.5 started
-DEBUG: a2dp_params: (errno=0:Success)a2dp 0x821d4e8
-DEBUG: a2dp_params: (errno=0:Success)format S16_LE rate 44100 channels 2
-DEBUG: a2dp_params: (errno=0:Success)frame_bytes 4 period_bytes 8192
-period_size 2048 buffer_size 4096
-DEBUG: a2dp_prepare: (errno=0:Success)a2dp 0x821d4e8
-Accepting incoming stream connection
-DEBUG: a2dp_prepare: (errno=4:Interrupted system call)a2dp 0x821d4e8
-<--------------- PAUSE Pressed
-[1] Receiving failed on socket 0.5 error (-1/4 bytes) errno=11:Resource
-temporarily unavailable
-Client thread 0.5 ending: timeout
-Destroying lpA2dp, destroy_count is 5001
-DEBUG: a2dp_destroy: Begin
-DEBUG: a2dp_free: Begin
-DEBUG: a2dp_destroy: a2dp_destroy(0x8053090) OK
-Connectedreceived 0 bytes:
-
-transaction_label = 0
-packet_type = 0
-cr = 1
-ipid = 0
-pid = e11
-zeroes = 0
-ctype = 9
-subunit_type = 9
-subunit_id = 0
-opcode = 7c
-operand0 = 4b
-operand1 = 0
-accepting next connection
-DEBUG: a2dp_wait_connection: Begin
-DEBUG: a2dp_wait_connection: Connected [imtu 672, omtu 0, flush_to
-65535]
-
-socket 5: Connection from 12:5C:2A:44:0D:00, mtu=672
-<----------------- Play Pressed on headphones
-socket 5: Received 2 bytes
-00000: 00 01
-
-
-This is with a  Broadcom BCM2045 usb dongle standars Ubuntu 6.06 kernel
-(checked looks like the patch is applied).
-HP fa303 headset 
- 
-
-------------------------------------------------------------------------
----------- 
-
+brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
