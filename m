@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <44D37064.9070206@palmsource.com>
+Date: Fri, 04 Aug 2006 18:05:56 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-Date: Sat, 5 Aug 2006 14:54:31 +0100
-Message-ID: <056BF200E9632F4285220E570FEED673D7A30F@GBMDDMH202AMSX.gb001.siemens.net>
-In-Reply-To: <44D3631D.503@palmsource.com>
-From: "Waldram, Andrew (SBS UK)" <andrew.waldram@siemens.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error
-	(trials and tribulations) how cool is this!!! new patch
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <002a01c6b5e5$5e6b0cd0$9d0cc70a@dlh.st.com>	<44D0350A.8090904@xmission.com>	<3837d8b10608020729i5bab5ea6vbc18b0ad502b11de@mail.gmail.com>	<44D17895.6050001@xmission.com>	<3837d8b10608030747v551aa4a7t719aa57aa5ffc986@mail.gmail.com>	<44D24BD3.4010404@xmission.com>	<44D30F07.4050509@palmsource.com>
+	<44D35F70.7070101@xmission.com>
+In-Reply-To: <44D35F70.7070101@xmission.com>
+Subject: Re: [Bluez-devel] Bluetooth Headset Error
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,115 +21,83 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
- Hi
+Hi Brad,
 
-Don't know if its my headphones but pressing play does not start xmms.
-
-If I manuly start Xmms then fwd rev play pause work
-
-But still once 10 secs has done then pressinf play on the headphones does n=
-othing and if I press play on xmms it still just doesn't work
-
-Accepting incoming tcp stream connection
-[pause] xmms --pause
-Forked xmms --pause         <----------------------Pause press ;-)
-[1] Receiving failed on socket 0.6 error (-1/4 bytes) errno=3D11:Resource
-temporarily unavailable  <---------------------  press play repeatedly on h=
-ead phones nothing happens
-Client thread 0.6 ending: timeout =
-
-Destroying lpA2dp, destroy_count is 2001
-DEBUG: a2dp_destroy: Begin
-DEBUG: a2dp_free: Begin
-DEBUG: a2dp_destroy: a2dp_destroy(0x80561f0) OK
-avrcp: socket 9: timed out
-Accepted 6
-PCM thread 0.6 started  < ------------------------------ press play on xmms =
-
-DEBUG: a2dp_new: Begin
-DEBUG: a2dp_new: bdaddr/dest is 00:0D:44:2A:5C:12
-DEBUG: a2dp_alloc: Begin
-DEBUG: a2dp_connect: a2dp 0x8076d58
-DEBUG: connect_stream: Begin
-DEBUG: connect_stream: Using address: 12:5C:2A:44:0D:00
-DEBUG: detect_a2dp: Begin
-Accepting incoming tcp stream connection
-DEBUG: detect_a2dp: Found A2DP Sink
-DEBUG: connect_stream: Found A2DP Sink at the destination (psm_cmd=3D25)
-DEBUG: do_connect: Begin
-DEBUG: do_connect: Connecting to bluetooth
-DEBUG: do_connect: (errno=3D111:Connection refused)Can't connect to
-12:5C:2A:44:0D:00 on psm 25. Connection refused(111)
-DEBUG: do_connect: (errno=3D77:File descriptor in bad state)Can't connect to
-12:5C:2A:44:0D:00 on psm 25. File descriptor in bad state(77)
-DEBUG: do_connect: (errno=3D77:File descriptor in bad state)Can't connect to
-12:5C:2A:44:0D:00 on psm 25. File descriptor in bad state(77)
-DEBUG: connect_stream: cannot open psm_cmd =3D 25
-
-Any ideas
-
-
----------------------------------------------------------------------------=
-------- =
-
-
-
------Original Message-----
-From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounces=
-@lists.sourceforge.net] On Behalf Of Fr=E9d=E9ric DALLEAU
-Sent: 04 August 2006 16:09
-To: BlueZ development
-Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error (=
-trials and tribulations) how cool is this!!! new patch
-
-Hi all,
-
-Now the a2dpd handles avrcp too. Only play / pause / next / prev but =
-
-other commands if any should go straight away.
-
-Waldram, Andrew (SBS UK) a =E9crit :
-
->When you say you integrated it into a2dpd do you mean all the a2recv stuff=
-, if so doean't that make the deamon a xmms dependant tool?
+>then you have the perfect job... embedded linux
+>hacking without management telling you to optimize, optimize :)
 >  =
 
 >
-No thanks to the config file
+Don't hesitate to optimize a2dpd :D
+What are your harware requirements?
 
->It'd be real cool if it'd parse a config file so something like the follow=
-ing could be done
->
->/etc/a2dpd.conf
+>In any case, I thought ALP was already going to use gstreamer, so the
+>difference is in effect just the size/overhead of alsa?
 >  =
 
 >
-done, see attachment
-$HOME/.a2dprc for now
+Yes, but without alsa, who will write to the device ? And really, is it =
 
->For now, it is not yet handled but you see the daemon receive a frame of =
+not possible to strip code out of alsa ?
 
->the form 0x00 0x01 (AVDTP_DISCOVER).
->I will try today reject the frame and system(xmms --play).
+>choosing the headset should also be easy and not require typing in an
+>address (and usually not a pin! they're all 0000 or 8888)
 >  =
 
 >
-done, see patch
+Are there not some already sort of graphical discovery available? The =
 
-Two commands line options appeared:
--d forks (+d no fork) on startup
--v redirect output to stdout (+v to logfile specified in rc def : =
+gnome bluetooth does this, doesn't it?
+A tool that does a discovery pairing and write address to stdout would =
 
-/tmp/a2dpd.log)
+be nice. Easy to use in a wide variety of projects.
 
-If your headset is avrcp, what can you do :
-start a2dpd
-press play on the headset, and it will start up xmms. You should hear music
-press play again, it will pause xmms.
-press play again, music restart.
-press next or prev to switch song.
+>There are distro people and others using the older code in btsco. I want
+>to have a new project that does not have to include and build btsco. It
+>should be maintained independently. I could just do a different cvs
+>project within bluetooth-alsa maybe.
+>  =
 
-you can also try alsamixer -D ctl.a2dpd
+>
+The same project, but you could reorganize folders :
+- alsa-plugins
+- gstreamer-stuff
+- playground
+- sbc
+    -fixed
+    -floating
+-...
+
+add configure script options to enable/disable by folder what is needed.
+
+>btw, are you basing on avsnd or avrecv? (ie are you listening for
+>connections or making them or both)
+>  =
+
+>
+avrecv.c, I just looked at avsnd it seems to sends volume control =
+
+messages? Can you set arbitrary values? This would be useful to the =
+
+plugin! However, I do not receive volume changes from the headset, any =
+
+ideas?
+
+>The hybrid is
+>what's in btsco/sbc and the fixed-only is in the separate sbc project.
+>messy.
+>  =
+
+>
+Ok, that's why it worked nicely on arm : it already used fixed version. =
+
+It may explain my other problems with different bitpool values.
+At least, try to provide a link to libsbc. So that it can be easily =
+
+found and downloaded.
+As always, the best being configure --enable-fixed or --enable-floating
+
+I'm on week end see u on monday!
 
 Fr=E9d=E9ric
 
