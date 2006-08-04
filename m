@@ -1,16 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "Bearcat M. Sandor" <Bearcat@feline-soul.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Date: Fri, 4 Aug 2006 11:29:58 -0600
-References: <200608031855.50972.Bearcat@feline-soul.com>
-	<1154686183.3905.84.camel@aeonflux.holtmann.net>
-In-Reply-To: <1154686183.3905.84.camel@aeonflux.holtmann.net>
-MIME-Version: 1.0
-Message-Id: <200608041129.59081.Bearcat@feline-soul.com>
-Cc: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users]  error when starting bluetooth..any ideas?
-Reply-To: Bearcat@feline-soul.com,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <44D35444.8000304@xmission.com>
+References: <44D35444.8000304@xmission.com>
+Date: Fri, 04 Aug 2006 18:39:50 +0200
+Message-Id: <1154709590.3905.97.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] channel-surfing cellphone
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -23,46 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel,
+Hi Brad,
 
-Thanks. This may be the root of my problems. I'll wait till the next version 
-to play with all this again. Any ideas when it may be out?
+> I have a Treo 700p that I use for dialup networking. I have to reset the
+> thing every once in a while and it seems to invariably alternate between
+> channel 1 and 4 for dialup networking.
+> 
+> I'm all set up with the rfcomm mapping, ppp settings, and diald to fire
+> up the network using this phone but sometimes things break down because
+> the channel has changed! Has anyone worked out a good way to see this
+> coming and adapt automatically? I'd like to avoid parsing sdptool output.
 
-Bearcat M. Sandor
-On Friday 04 August 2006 04:09 in an email titled "Re: [Bluez-users] error 
-when starting bluetooth..any ideas?" Marcel Holtmann wrote:
->Hi Bearcat,
->
->> I'm still working on connecting this keyboard and headset. However i
->> noticed something in my logs that is probably pertainent:
->> Aug  3 18:42:53 [sdpd] Bluetooth SDP daemon_
->> Aug  3 18:43:59 [hcid] Bluetooth HCI daemon
->> Aug  3 18:43:59 [hcid] Register path:/org/bluez fallback:1
->> Aug  3 18:43:59 [hcid] Device hci0 has been added
->> Aug  3 18:43:59 [hcid] Starting security manager 0
->> Aug  3 18:43:59 [hcid] Can't write inquiry mode for hci0: Input/output
->> error (5)
->> Aug  3 18:43:59 [hcid] Register path:/org/bluez/hci0 fallback:0
->> Aug  3 18:44:38 [hidd] Bluetooth HID daemon
->>
->> Note the [hcid} lines seem to have an error. I have looked all over google
->> and the bluetooth mailing lists and not found anything regarding it.
->
->looks like some chips get confused when trying to set the inquiry mode
->and they don't support this command. It has been fixed in the CVS now.
->
->Regards
->
->Marcel
+so far the only way is to write a wrapper that queries the SDP database
+of the phone and creates RFCOMM TTY devices dynamically. The nice static
+mapping will no longer work. We don't have SDP support in the Linux
+kernel and we will _never_ move this protocol into the kernel.
 
--- 
-Bearcat M. Sandor
-Bearcat@feline-soul.com
-ICQ: 6628727
-MSN: bearcatsandor@hotmail.com
-Yahoo: bearcatsandor
-AIM: bearcatmsandor
-Jabber: bearcatsandor@jabber.org
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
