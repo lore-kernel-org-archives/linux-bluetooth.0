@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <44D2FF72.6050309@palmsource.com>
+Date: Fri, 04 Aug 2006 10:04:02 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-Date: Fri, 4 Aug 2006 09:46:31 +0100
-Message-ID: <056BF200E9632F4285220E570FEED673D3B631@GBMDDMH202AMSX.gb001.siemens.net>
-In-Reply-To: <44D2FF72.6050309@palmsource.com>
-From: "Waldram, Andrew (SBS UK)" <andrew.waldram@siemens.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <056BF200E9632F4285220E570FEED673D3ADC9@GBMDDMH202AMSX.gb001.siemens.net>
+In-Reply-To: <056BF200E9632F4285220E570FEED673D3ADC9@GBMDDMH202AMSX.gb001.siemens.net>
 Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error
-	(trials and tribulations) how cool is this!!!
+ (trials and tribulations) how cool is this!!!
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,91 +20,6 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
-
-Hi,
-
-Glad it worked for you =
-
-
-Thought it was something along those lines as the button press did cause a =
-response.
-
-I followed you up until
-
- "I will try today reject the frame and system(xmms --play)."
-
-Don't understand are your saying you'll handle the call by issuing xmms -- =
-play so the links recreated from the PC end ??
-
-Or try and handle the call and create the link from a2dp headset initiated =
-conextion??
-
-Must admit you guys rock I tried this stuff 6-8 months ago and nothing work=
-ed now it all works (a bit of spit and polish required) but definitely work=
-s.
-
-Watch out UWB ;-)
-
-When you say you integrated it into a2dpd do you mean all the a2recv stuff,=
- if so doean't that make the deamon a xmms dependant tool?
-
-It'd be real cool if it'd parse a config file so something like the followi=
-ng could be done
-
-/etc/a2dpd.conf
-
-Device 00:0D:44:2A:5C:12
-Play xmms -p
-Pause xmms -p
-........etc
-
-This way any app could be catered for
-
-Please ignore the capitals Outlook being an arse !!!
-
-
----------------------------------------------------------------------------=
-------- =
-
-
-SIEMENS =
-
-Andrew Waldram
-Technical Implementations Group =
-
-Server Specialist - South =
-
-
-*  Tel: +44 (0) 1344 396619
-*  Mob: +44 (0) 7808 827469
-*   Fax: +44 (0) 1344 358056 =
-
-* Email:  Andrew.waldram@siemens.com =
-
-
-This e-mail contains confidential information and is for the exclusive use =
-of the addressee/s. If you are not the addressee, then any distribution, co=
-pying or use of this e-mail is prohibited. If received in error, please adv=
-ise the sender and delete it immediately. We accept no liability for any lo=
-ss or damage suffered by any person arising from use of this e-mail. =
-
-
-Siemens Business Services Limited =
-
-
-Registered No: 1203466 England =
-
-Registered Office: Siemens House, Oldbury, Bracknell, Berkshire, RG12 8FZ =
-
-
-
------Original Message-----
-From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounces=
-@lists.sourceforge.net] On Behalf Of Fr=E9d=E9ric DALLEAU
-Sent: 04 August 2006 09:04
-To: BlueZ development
-Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error (=
-trials and tribulations) how cool is this!!!
 
 Hi,
 Until today I've not even tried anything avrcp related.
@@ -237,17 +153,6 @@ EVDEV
 
 >
 
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
