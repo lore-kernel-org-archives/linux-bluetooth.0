@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44D35F70.7070101@xmission.com>
-Date: Fri, 04 Aug 2006 08:53:36 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <44D319B4.6050106@palmsource.com>
+Date: Fri, 04 Aug 2006 11:56:04 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <002a01c6b5e5$5e6b0cd0$9d0cc70a@dlh.st.com>	<44D0350A.8090904@xmission.com>	<3837d8b10608020729i5bab5ea6vbc18b0ad502b11de@mail.gmail.com>	<44D17895.6050001@xmission.com>	<3837d8b10608030747v551aa4a7t719aa57aa5ffc986@mail.gmail.com>	<44D24BD3.4010404@xmission.com>
-	<44D30F07.4050509@palmsource.com>
-In-Reply-To: <44D30F07.4050509@palmsource.com>
+References: <001101c6b7a9$97b4c380$9d0cc70a@dlh.st.com>
+In-Reply-To: <001101c6b7a9$97b4c380$9d0cc70a@dlh.st.com>
 Subject: Re: [Bluez-devel] Bluetooth Headset Error
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -17,115 +16,41 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fr=E9d=E9ric
 
-> The a2dpd allow you to use whatever framework you need, since it's a =
+>>About features for future:
+>>- A2DP SINK for pc computer? So that when you go home you can listen 
+>>music with your home sound system.
+>>    
+>>
+>
+>Its already there, isn't it? I mean, do you need something different than
+>what a2recv does?
+>  
+>
+You're right, it is there but for now there is still some work to obtain 
+a commercial quality software.
 
-> socket connection, minor fixes would allow to send mp3. However, the use =
+>But, I did not understand you very well. Does your sound system have
+>bluetooth?
+>  
+>
+What I called sound system here is a pc with bluetooth and a good sound 
+card and a good speaker. Don't you have a dedicated pc under your tv?
 
-> of alsa do not seems to me as such a big problem, moreover we still need =
+A2DP spreads the world : ipod having A2DP emitter. All Windows ce 2005 
+being  A2DP source now!
+I just saw on tv a car stereo with a2dp sink.
 
-> some kind of hardware abstraction. A gstreamer plugin is still a great =
-
-> improvement  : an application could either load alsa or gstreamer. Have =
-
-> anyone measured the cost of integrating gstreamer instead of alsa?
-
-Fr=E9d=E9ric I thought if anyone had to worry about constraints in embedding
-it would be you. If not, then you have the perfect job... embedded linux
-hacking without management telling you to optimize, optimize :)
-
-In any case, I thought ALP was already going to use gstreamer, so the
-difference is in effect just the size/overhead of alsa?
-
-> A new release would be cool, specially if a2dpd is enabled by default =
-
-> :D. We should also try to simplify setup and usage. Things like writing =
-
-> the .asoundrc can be automated. We can also create start/stop scripts =
-
-> for a2dpd in /etc/init.d and we should provide screenshots of =
-
-> parameterizing applications. I thought about automatically starting the =
-
-> daemon when a plugin is loaded + ending daemon on timeout but this will =
-
-> disallow the use of avrcp. What bout automaticaly start daemon but do =
-
-> not end daemon after that!
-
-choosing the headset should also be easy and not require typing in an
-address (and usually not a pin! they're all 0000 or 8888)
-
-> IMHO changing the name of the project can be harmfull. All existing =
-
-> referencing will be lost and knowledge like the current mailing list =
-
-> will have to be moved. wavez do not indicate anything related to =
-
-> bluetooth neither sound.
-
-There are distro people and others using the older code in btsco. I want
-to have a new project that does not have to include and build btsco. It
-should be maintained independently. I could just do a different cvs
-project within bluetooth-alsa maybe.
-
-> About toys projects, they should be kept in: I loved what Andrew did by =
-
-> playing with these projects. The difference should be between what is =
-
-> installed and what is not installed. (bin_PROGRAMS vs noinst_PROGRAMS). =
-
-> However, installed projects should be bulletproof.
-
-ok, yeah, the playground has been great. I was excited to see you picked
-up one of the avrcp prototypes from the playground and integrated it.
-
-btw, are you basing on avsnd or avrecv? (ie are you listening for
-connections or making them or both)
-
-> Also, we should keep libsbc for now  but we need to make sure we can =
-
-> build a2dp without installing libsbc first. This IS possible and should =
-
-> be done. Alsa, and bluetooth are already setup everywhere. but sbc =
-
-> really isn't. It would be better to have a one step setup project.
-
-I believe libsbc inside btsco is not being built properly for use in
-another shared object. We get away with it on intel because they've
-worked out a way to relocate code that doesn't work on other
-archictectures.
-
-I want to keep the hybrid fixed/floating around somewhere for
-experimenting but work mostly on the fixed-only version. The hybrid is
-what's in btsco/sbc and the fixed-only is in the separate sbc project.
-messy.
-
-> - I would also love to see SCO in a2dpd. The work of fabien will =
-
-> certainly be easy to integrate. The config file now make this possible =
-
-> (what about rereading the config file periodically to face changes)
-
-it would be nice to make it all work together. then rename a2dpd? :)
-
-> You read me till the end, bravo!
-
-sure. it's all good fun.
-
-brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
