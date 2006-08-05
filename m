@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Warp <warp@adygtelecom.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1154607738.10276.11.camel@warptech>
-References: <1154607738.10276.11.camel@warptech>
-Message-Id: <1154866769.3670.9.camel@warptech>
-Mime-Version: 1.0
-Date: Sun, 06 Aug 2006 16:19:30 +0400
-Subject: Re: [Bluez-devel] Mobidick BDU33A + SCO
+Message-ID: <7ceeaed30608051104n266c2cd4m28382c474a41dc58@mail.gmail.com>
+Date: Sat, 5 Aug 2006 20:04:14 +0200
+From: Arkaitz <arkaitzj@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] SCO Connection not working in handsfree with a Nokia
+	6600
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,88 +19,62 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi, all.
+Hi,
+I've been using bluez stack for a project and i've a trouble. I
+managed to do a stable handsfree connection with a Nokia N90 and a
+Motorola V3 using something like the following but through JNI from
+java.
+As I am unable to make it work with the 6600 i mtrying it in c++ to be
+sure that its not a java or JNI problem.
+The fact is that i follow these steps:
+1) I manually add HF profile to my pc(sdptool add HF)
+2) I open a rfcomm connection to the mobile phone at the HFAG service
+channel and i send:
+        sendCommand(rfsocket,"AT+CGMI\r");
+        sleep(1);
+        sendCommand(rfsocket,"AT+BRSF=31\r");
+        sleep(1);
+        sendCommand(rfsocket,"AT+CIND=?\r");
+        sleep(1);
+        sendCommand(rfsocket,"AT+CIND?\r");
+        sleep(1);
+        sendCommand(rfsocket,"AT+CMER=?\r");
+        sleep(1);
+        sendCommand(rfsocket,"AT+CMER=3,0,0,1\r");
+        sleep(1);
+        sendCommand(rfsocket,"AT+CLIP=1\r");
+        sleep(1);
+        sendCommand(rfsocket,"AT+NREC=0\r");
+        sleep(1);
+        sendCommand(rfsocket,"AT+CHLD=?\r");
+        sleep(1);
 
-I try lokalize problem and i find SIGSEGV into function
-hci_usb_send_frame (hci_usb.c) structure skb has invalid pointer! Some
-times adapter reinit or kernel going to Ooops... Next i try dont send
-packets only receive and problem has gone. Look like problem in write
-stream only. I use O_NONBLOCK streams.
+        pthread_create(&scoconth, NULL, scoControllerThread, (void *)sbdaddr);
+        sendCommand(rfsocket,"AT+BLDN\r");
 
-Any comments?
+3) Before the last command that should do a recall, i start a thread
+that will manage the sco connection
+3.1) I create a SCO socket, i bind it, listen and the thread waits in
+an accept function
+4) After asking the recall, the phone should open the scoconnection to
+my phone through the socket that is waiting in the accept function,
+but it doesnt!!!
 
-Best Regards,
- Warp.
+The N90 and V3 opened that socket but the 6600 doesn't. Im a bit
+confused, because the 6600 lights the handsfree icon in the screen,
+but nothing more.
+
+In another code using handsfree i saw a kind of initialization, it
+opened the sco socket in client mode and sent a 48 byte packet full of
+0s, after taht it closed the socket and opened again in server mode to
+start accepting. Ive tried tat kind of initialization too but no way.
+
+Maybe im missing something?
+Thanks a lot for your time
 
 
-
-
-On Thu, 2006-08-03 at 16:22, Warp wrote:
-> Hi,
-> 
-> I have problem with SCO link over Mobidick BDU33A , after 1-3 minutes
-> established connection adapter may restart. 
-> My configuration:
-> 
-> hciconfig hci0 -a
-> hci0:   Type: USB
->         BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 384:8 SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:101 acl:0 sco:0 events:13 errors:0
->         TX bytes:300 acl:0 sco:0 commands:13 errors:0
->         Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'Bluez-0'
->         Class: 0x200404
->         Service Classes: Audio
->         Device Class: Audio/Video, Device conforms to the Headset
-> profile
->         HCI Ver: 2.0 (0x3) HCI Rev: 0x6e6 LMP Ver: 2.0 (0x3) LMP Subver:
-> 0x6e6
->         Manufacturer: Cambridge Silicon Radio (10)
-> 
-> # hciconfig hci0 revision
-> hci0:   Type: USB
->         BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 384:8 SCO MTU: 64:8
->         Build 1766
->         Chip version: BlueCore4-External
->         Max key size: 56 bit
->         SCO mapping:  HCI
-> 
-> # hciconfig hci0 voice
-> hci0:   Type: USB
->         BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 384:8 SCO MTU: 64:8
->         Voice setting: 0x0060 (Default Condition)
->         Input Coding: Linear
->         Input Data Format: 2's complement
->         Input Sample Size: 16 bit
->         # of bits padding at MSB: 0
->         Air Coding Format: CVSD
-> 
-> 
-> Kernel 2.6.17.7 with patch from bluez.org
-> 
-> Latest libs & utils.
-> 
-> Howto fix this problem?
-> 
-> Best Reagrds,
->  Warp.
-> 
-> 
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys -- and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-
+-- 
+Arkaitz
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
