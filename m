@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 MIME-Version: 1.0
-Date: Sat, 5 Aug 2006 16:03:27 +0100
-Message-ID: <056BF200E9632F4285220E570FEED673D7A311@GBMDDMH202AMSX.gb001.siemens.net>
-In-Reply-To: <056BF200E9632F4285220E570FEED673D7A30F@GBMDDMH202AMSX.gb001.siemens.net>
+Date: Sat, 5 Aug 2006 14:54:31 +0100
+Message-ID: <056BF200E9632F4285220E570FEED673D7A30F@GBMDDMH202AMSX.gb001.siemens.net>
+In-Reply-To: <44D3631D.503@palmsource.com>
 From: "Waldram, Andrew (SBS UK)" <andrew.waldram@siemens.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms
-	error(trials and tribulations) how cool is this!!! new patch
+Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error
+	(trials and tribulations) how cool is this!!! new patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,30 +19,6 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
-
-Hi again =
-
-
-It's permissions needed to start a2dp as sudo -u andy -H a2dpd =
-
-Else xmms and the controls didn't synchronise (had extra xmms sesions appea=
-ring )
-
-Now seems pretty slick =
-
-
-Will continue to play and report back later after day to day use..
----------------------------------------------------------------------------=
-------- =
-
-
------Original Message-----
-From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounces=
-@lists.sourceforge.net] On Behalf Of Waldram, Andrew (SBS UK)
-Sent: 05 August 2006 14:55
-To: BlueZ development
-Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error(t=
-rials and tribulations) how cool is this!!! new patch
 
  Hi
 
@@ -157,17 +133,6 @@ you can also try alsamixer -D ctl.a2dpd
 Fr=E9d=E9ric
 
 
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
