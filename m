@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Anselm Martin Hoffmeister <anselm@hoffmeister-online.de>
+Message-ID: <44D489D5.2040509@schugy.de>
+Date: Sat, 05 Aug 2006 14:06:45 +0200
+From: Christian Schuglitsch <subjectbluez@schugy.de>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20060804133201.95997.qmail@web27910.mail.ukl.yahoo.com>
-References: <20060804133201.95997.qmail@web27910.mail.ukl.yahoo.com>
-Date: Sat, 05 Aug 2006 14:39:26 +0200
-Message-Id: <1154781567.6425.16.camel@anselm.venusberg.augustinnetz.de>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] bluez on debian
+References: <20060805103737.GB6035@jimmi.home>
+In-Reply-To: <20060805103737.GB6035@jimmi.home>
+Subject: Re: [Bluez-users] Again down with Jabra BT250V
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,83 +20,170 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Am Freitag, den 04.08.2006, 15:32 +0200 schrieb j b:
-> Hi @ll 
->  
-> I'm trying to get something working and have some problems on my
-> search for infos: 
->  
->  
-> idea: 
-> PDA to PDA text and voice communication 
->  
-> how? 
-> PDA-bluetooth-PC-elthernet/inet-PC-bluetooth-PDA 
->  
-> at moment: 
-> PDA-bluetooth-PC
->  
-> problem: 
-> don't know a lot about bluetooth and bluez
-> just few weeks experiencie with debian
-> can't find any info/tutorial about bluez, their functions,
-> explanations, applications, examples 
->  
-> steps: 
-> connect PDA - PC (i believed is reached) 
-> text an voice communication PDA - PC 
->  
-> i got some examples how to set it up but any explanation about what it
-> means, how it works, why it works etc 
->  
-> goal: 
-> study project, going to be diploma proyect for engineering study
-> (finishing) and i haven't any more much time, just a few days. 
-
-Dear xen,
-
-it seems as if you do not know what exactly you want to achieve in your
-project, neither have the technical background to describe that.
-
-If you want to have a kind of Messenger app between two PDAs, or
-something like a VoiceOverIP-speech solution, then the easiest would be
-to take the software that is already available, install it and use it.
-
-I will give you a scenario, to outline what is involved in having two
-PDAs with a SIP (VoIP) client contact each other:
-
-Each PDA runs the VoIP software (there are few, but look for MS Portrait
-or SJphone). That software communicates over IP based networks, so the
-PDA will connect to a kind of "access point" via bluetooth to get IP
-connectivity. There are two common ways of doing this: Either via the
-proper BNEP (bluetooth networking, emulates an ethernet connection over
-which IP packets can travel) or DUN (dialup networking, emulates a
-serial modem, running PPP over bluetooth). Windows CE seems to only
-support the latter, so you will need an "access point" for your PDA.
-
-The SIP phone software registers with a SIP server (for example,
-asterisk). Note this is not strictly necessary, but once setup makes
-scaling up to multiple devices easy, and it cares for all those
-NAT/routing/dynamic IP problems that you would run into when trying to
-communicate directly between two sip phones behind a firewall.
-
-The most complicated part (besides setting up asterisk, but there are
-howtos that explain it quite well, and prepackaged DEBs) is to get your
-Linux box act as a DUN access point.
-
-This does not require any low-level bluetooth programming, or no
-programming at all. Just get your Linux box setup as a DUN server.
-
-No, I cannot help at that detail because I tried and did not manage: My
-PDA's windows CE plainly refuses to do any networking over Bluetooth.
-Generally that seems to be possible though, I have seen howtos that
-would just not work on my PDA. Try those, ask google.
-
-If you have precise questions, then ask. Try to give as much details of
-what exactly you try and what does not work, as possible and reasonable.
-
-My 2 cents,
-Anselm
+Am 05.08.2006 12:37 schrieb Jimmi:
+> Hi everybody,
+>
+> It happened already, but the previous  times I found always some "magic"
+> procedure to get out. This time it seems I cannot :(
+>
+> I'm using  almost the same  configuration of Sweta (bluez-devel)  with a
+> dongle DLink DBT120 Rev  B4 and a Jabra BT250v, the OS  is a Debian Sid,
+> and I use btsco 0.42. My  error is slightly different: "Error: Failed to
+> connect to SDP Iserver: Permission denied"
+>
+> I  got  the  same  problem  several  times  in  past,  almost  everytime
+> the  kernel  changed (actual  is  a  2.6.16-2-k7)  but by  deleting  the
+> /var/lib/bluetooth/00:11:95:7D:83:E9 and restarting the bluetooth daemon
+> (sometimes several times  in different order) I could  always obtain the
+> headset  working. This  time it  seems  not anymore  possible. I  attach
+> herebelow some output:
+>
+> $ hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:11:95:7D:83:E9 ACL MTU: 192:8 SCO MTU: 64:8
+>         UP RUNNING PSCAN
+>         RX bytes:413 acl:0 sco:0 events:19 errors:0
+>         TX bytes:320 acl:0 sco:0 commands:18 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: ACCEPT MASTER
+>         Name: 'Titanic-0'
+>         Class: 0x120104
+>         Service Classes: Networking, Object Transfer
+>         Device Class: Computer, Desktop workstation
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
+>         Manufacturer: Cambridge Silicon Radio (10)
+>
+> $ hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:11:95:7D:83:E9 ACL MTU: 192:8 SCO MTU: 64:8
+>         HCI 16.4
+>         Chip version: BlueCore02-External
+>         Max key size: 56 bit
+>         SCO mapping:  HCI
+>
+> $ hcitool scan
+> Scanning ...
+>         00:07:A4:14:0F:BF       Jabra BT 250v
+>
+> $ hcitool info 00:07:A4:14:0F:BF
+> Requesting information ...
+> Can't create connection: Input/output error
+>
+> The corresponding output of $hcidump -X -V -i hci0 is:
+>
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:07:A4:14:0F:BF ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+>   
+>> HCI Event: Command Status (0x0f) plen 4
+>>     
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+>   
+>> HCI Event: PIN Code Request (0x16) plen 6
+>>     
+>     bdaddr 00:07:A4:14:0F:BF
+> < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+>     bdaddr 00:07:A4:14:0F:BF
+>   
+>> HCI Event: Command Complete (0x0e) plen 10
+>>     
+>     PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
+>     status 0x00 bdaddr 00:07:A4:14:0F:BF
+>   
+>> HCI Event: Connect Complete (0x03) plen 11
+>>     
+>     status 0x18 handle 41 bdaddr 00:07:A4:14:0F:BF type ACL encrypt 0x00
+>     Error: Pairing Not Allowed
+>
+> $btsco 00:07:A4:14:0F:BF
+> Error: Failed to connect to SDP server: Permission denied
+> Assuming channel 2
+>
+> Can't connect RFCOMM channel: Permission denied
+>
+> The corresponding output of $hcidump -X -V -i hci0 is:
+>
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:07:A4:14:0F:BF ptype 0xcc18 rswitch 0x00 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+>   
+>> HCI Event: Command Status (0x0f) plen 4
+>>     
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+>   
+>> HCI Event: PIN Code Request (0x16) plen 6
+>>     
+>     bdaddr 00:07:A4:14:0F:BF
+> < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+>     bdaddr 00:07:A4:14:0F:BF
+>   
+>> HCI Event: Command Complete (0x0e) plen 10
+>>     
+>     PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
+>     status 0x00 bdaddr 00:07:A4:14:0F:BF
+>   
+>> HCI Event: Connect Complete (0x03) plen 11
+>>     
+>     status 0x18 handle 41 bdaddr 00:07:A4:14:0F:BF type ACL encrypt 0x00
+>     Error: Pairing Not Allowed
+> < HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+>   
+>> HCI Event: Command Complete (0x0e) plen 6
+>>     
+>     Read Voice Setting (0x03|0x0025) ncmd 1
+>     status 0x00 voice setting 0x0060
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:07:A4:14:0F:BF ptype 0xcc18 rswitch 0x00 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+>   
+>> HCI Event: Command Status (0x0f) plen 4
+>>     
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+>   
+>> HCI Event: PIN Code Request (0x16) plen 6
+>>     
+>     bdaddr 00:07:A4:14:0F:BF
+> < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+>     bdaddr 00:07:A4:14:0F:BF
+>   
+>> HCI Event: Command Complete (0x0e) plen 10
+>>     
+>     PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
+>     status 0x00 bdaddr 00:07:A4:14:0F:BF
+>   
+>> HCI Event: Connect Complete (0x03) plen 11
+>>     
+>     status 0x18 handle 42 bdaddr 00:07:A4:14:0F:BF type ACL encrypt 0x00
+>     Error: Pairing Not Allowed
+> < HCI Command: Write Scan Enable (0x03|0x001a) plen 1
+>     enable 2
+>   
+>> HCI Event: Command Complete (0x0e) plen 4
+>>     
+>     Write Scan Enable (0x03|0x001a) ncmd 1
+>     status 0x00
+> < HCI Command: Read Scan Enable (0x03|0x0019) plen 0
+>   
+>> HCI Event: Command Complete (0x0e) plen 5
+>>     
+>     Read Scan Enable (0x03|0x0019) ncmd 1
+>     status 0x00 enable 2
+>
+> I didn't  change anything  in my  configuration, and  I also  many times
+> send  in  different  orders  "esdctl stop"  and  "hciconfig  hci0  voice
+> 0x0060", together with deleting the /var/lib/bluetooth/00:11:95:7D:83:E9
+> directory and restaring the bluetooth daemon, of course with the headset
+> in pairing mode. Is there anything else I may try ?
+>
+> Thanks for everything ;)
+>   
+Sometimes switching my headset (JABRA BT200) on and off didn't work. I 
+had to charge it for a few seconds to reset it. Sometimes there stayed 
+the rfcomm binding. Become root and release rfcomm0 with "rfcomm" if it 
+is left after the connection broke down.
+I hope that helps.
 
 
 -------------------------------------------------------------------------
