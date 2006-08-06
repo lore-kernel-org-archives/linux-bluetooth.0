@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44D63AF2.7030208@xmission.com>
-Date: Sun, 06 Aug 2006 12:54:42 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Warp <warp@adygtelecom.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <002a01c6b5e5$5e6b0cd0$9d0cc70a@dlh.st.com>	<44D0350A.8090904@xmission.com>	<3837d8b10608020729i5bab5ea6vbc18b0ad502b11de@mail.gmail.com>	<44D17895.6050001@xmission.com>	<3837d8b10608030747v551aa4a7t719aa57aa5ffc986@mail.gmail.com>	<44D24BD3.4010404@xmission.com>	<44D30F07.4050509@palmsource.com>	<44D35F70.7070101@xmission.com>
-	<44D37064.9070206@palmsource.com>
-In-Reply-To: <44D37064.9070206@palmsource.com>
-Subject: Re: [Bluez-devel] Bluetooth Headset Error
+In-Reply-To: <1154607738.10276.11.camel@warptech>
+References: <1154607738.10276.11.camel@warptech>
+Message-Id: <1154866769.3670.9.camel@warptech>
+Mime-Version: 1.0
+Date: Sun, 06 Aug 2006 16:19:30 +0400
+Subject: Re: [Bluez-devel] Mobidick BDU33A + SCO
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,30 +16,98 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fr=E9d=E9ric
+Hi, all.
 
->> then you have the perfect job... embedded linux
->> hacking without management telling you to optimize, optimize :)
->>  =
+I try lokalize problem and i find SIGSEGV into function
+hci_usb_send_frame (hci_usb.c) structure skb has invalid pointer! Some
+times adapter reinit or kernel going to Ooops... Next i try dont send
+packets only receive and problem has gone. Look like problem in write
+stream only. I use O_NONBLOCK streams.
 
-> Don't hesitate to optimize a2dpd :D
-> What are your harware requirements?
+Any comments?
 
-fwiw, I would like to have it working on the nokia 770. They use
-gstreamer but no alsa stuff.
+Best Regards,
+ Warp.
 
-Brad
+
+
+
+On Thu, 2006-08-03 at 16:22, Warp wrote:
+> Hi,
+> 
+> I have problem with SCO link over Mobidick BDU33A , after 1-3 minutes
+> established connection adapter may restart. 
+> My configuration:
+> 
+> hciconfig hci0 -a
+> hci0:   Type: USB
+>         BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 384:8 SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:101 acl:0 sco:0 events:13 errors:0
+>         TX bytes:300 acl:0 sco:0 commands:13 errors:0
+>         Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'Bluez-0'
+>         Class: 0x200404
+>         Service Classes: Audio
+>         Device Class: Audio/Video, Device conforms to the Headset
+> profile
+>         HCI Ver: 2.0 (0x3) HCI Rev: 0x6e6 LMP Ver: 2.0 (0x3) LMP Subver:
+> 0x6e6
+>         Manufacturer: Cambridge Silicon Radio (10)
+> 
+> # hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 384:8 SCO MTU: 64:8
+>         Build 1766
+>         Chip version: BlueCore4-External
+>         Max key size: 56 bit
+>         SCO mapping:  HCI
+> 
+> # hciconfig hci0 voice
+> hci0:   Type: USB
+>         BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 384:8 SCO MTU: 64:8
+>         Voice setting: 0x0060 (Default Condition)
+>         Input Coding: Linear
+>         Input Data Format: 2's complement
+>         Input Sample Size: 16 bit
+>         # of bits padding at MSB: 0
+>         Air Coding Format: CVSD
+> 
+> 
+> Kernel 2.6.17.7 with patch from bluez.org
+> 
+> Latest libs & utils.
+> 
+> Howto fix this problem?
+> 
+> Best Reagrds,
+>  Warp.
+> 
+> 
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys -- and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
