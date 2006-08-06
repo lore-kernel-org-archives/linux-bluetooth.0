@@ -1,15 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 07 Aug 2006 12:29:40 -0500
-From: digitalfredy <digitalfredy@debiancolombia.org>
-In-reply-to: <20060806203043.GA17698@refinery.twat.com.ar>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-id: <1154971782.4625.6.camel@YODA>
-MIME-version: 1.0
-References: <20060803043158.GA13259@refinery.twat.com.ar>
-	<1154888079.7923.13.camel@YODA>
-	<20060806203043.GA17698@refinery.twat.com.ar>
-Subject: Re: [Bluez-users] Cannot transfer files via OBEX
-Reply-To: digitalfredy@debiancolombia.org,
+Message-ID: <44D67602.2070605@blueyonder.co.uk>
+Date: Mon, 07 Aug 2006 00:06:42 +0100
+From: Sid Boyce <sboyce@blueyonder.co.uk>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] static burst with btsco
+Reply-To: sboyce@blueyonder.co.uk,
         BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,40 +19,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Try get any file from the phone, for example for get any video:
-
-obexftp -b 00:16:20:F1:47:68 -B 6 -l -c Videos
-
-when you know the name of the videofile to like get made it
-
-obexftp -b 00:16:20:F1:47:68 -B 6 -c Videos -g videoname.3gp
-
-send my the log
-> 
-> [1038] # obexftp -b 00:16:20:F1:47:68 -B 6 -l
-> Browsing 00:16:20:F1:47:68 ...
-> Channel: 6
-> Connecting...done
-> Receiving "(null)"... <?xml version="1.0" encoding="UTF-8"?>
-> <!DOCTYPE folder-listing SYSTEM "obex-folder-listing.dtd">
-> <!--
->  XML Coder, Nov 14 2005, 23:41:10, (C) 2001 Sony Ericsson Mobile Communications AB 
-> -->
-> <folder-listing version="1.0"><folder name="Pictures"/>
-> <folder name="Sounds"/>
-> <folder name="Themes"/>
-> <folder name="Videos"/>
-> <folder name="Other"/>
-> </folder-listing>
-> done
-> Disconnecting...done
+Going back a number of months I suddenly started to experienced the 
+problem on a NOKIA HDW-3 headset and assumed it was the headset at 
+fault, so I stopped using it.
+Regards
+Sid.
+-- 
+Sid Boyce ... Hamradio License G3VBV, Licensed Private Pilot
+Retired IBM/Amdahl Mainframes and Sun/Fujitsu Servers Tech Support 
+Specialist, Cricket Coach
+Microsoft Windows Free Zone - Linux used for all Computing Tasks
 
 
 -------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys -- and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
