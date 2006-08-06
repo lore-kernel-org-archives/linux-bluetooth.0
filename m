@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 6 Aug 2006 12:38:03 -0700
-From: John Gruenenfelder <johng@as.arizona.edu>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20060806193803.GA3758@as.arizona.edu>
-References: <20060806022037.GA2763@as.arizona.edu>
-	<44D6339E.5050500@xmission.com>
+Message-ID: <44D6339E.5050500@xmission.com>
+Date: Sun, 06 Aug 2006 12:23:26 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-In-Reply-To: <44D6339E.5050500@xmission.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <20060806022037.GA2763@as.arizona.edu>
+In-Reply-To: <20060806022037.GA2763@as.arizona.edu>
 Subject: Re: [Bluez-users] static burst with btsco
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,42 +20,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Sun, Aug 06, 2006 at 12:23:26PM -0600, Brad Midgley wrote:
->John
->
->Are you into hacking?
->
->I need to find out the status on the sco alsa driver kernel work, but it
->may improve things if you use it with the alsa sco plugin. It's now in
->cvs but I haven't rewritten the docs. It's all a work in progress at the
->moment.
->
->Brad
+John
 
-That depends on what needs hacking.  :)
-I'm no stranger to C or to programming, but my experience with the internals
-of ALSA is quite limited.
+Are you into hacking?
 
-To that end, I have the alsa plugins compiled now, but I'm rather unsure how
-to make use of them.  The phone app I've been using, iaxcomm, does not use
-ALSA directly, so it's probably not of much use.  Ekiga, however, does use
-ALSA natively so I can use that instead.
+I need to find out the status on the sco alsa driver kernel work, but it
+may improve things if you use it with the alsa sco plugin. It's now in
+cvs but I haven't rewritten the docs. It's all a work in progress at the
+moment.
 
-The ALSA documentation describes using plugins in a very general sense.  I see
-that there is an asound.conf file in the alsa-plugins directory for use in my
-.asoundrc file.
+Brad
 
-I'm definitely willing to test, but I'll need a little help sticking all the
-parts together.
+> I'm using btsco with a Plantronics M2500 headset.  The connection is up and
+> working fine, for the most part.
+> 
+> The problem I am having now is that at seemingly random instances, the headset
+> will emit a burst of static (white noise) at maximum volume to whomever I am
+> talking to.
+> 
+> It took a while to track down because I cannot hear this.  It only occurs in
+> the outbound audio stream.  The connection doesn't falter and the conversation
+> can continue, though the person I am talking to is none too happy.
+> 
+> I'm assuming this is a bug in btsco, but I'm not sure how to narrow it down.
+> I can make a recording of the audio, perhaps, or run hcidump... but because
+> the problem occurs randomly it might take awhile.
+> 
+> What would be the best course of action to track down this problem?  What
+> would be of most use to the developers?
+> 
+> 
 
-
--- 
---John Gruenenfelder    Research Assistant, UMass Amherst student
-                        Systems Manager, MKS Imaging Technology, LLC.
-Try Weasel Reader for PalmOS  --  http://gutenpalm.sf.net
-"This is the most fun I've had without being drenched in the blood
-of my enemies!"
-        --Sam of Sam & Max
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
