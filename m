@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170608080613wbeba2d4j1295fe0a5cf6fabf@mail.gmail.com>
-Date: Tue, 8 Aug 2006 10:13:33 -0300
+Message-ID: <d23110170608080552gcfb8ad3tb341ea0b08083172@mail.gmail.com>
+Date: Tue, 8 Aug 2006 09:52:57 -0300
 From: "Ulisses Furquim" <ulissesf@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0608081338140.26758@redbean.intranet.gw-instruments.de>
+In-Reply-To: <000c01c6ba9e$b7480f70$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-References: <44D88EC1.7010009@pracucci.com>
-	<Pine.LNX.4.63.0608081338140.26758@redbean.intranet.gw-instruments.de>
-Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
+References: <000c01c6ba9e$b7480f70$9d0cc70a@dlh.st.com>
+Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,27 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Peter,
+On 8/8/06, Mayank BATRA <mayank.batra@st.com> wrote:
+> I wanted to know whether Host Controller to Host Flow Control has been implemented in the BlueZ stack?
+> I am interested in giving it a shot in case it is not already there or someone is not working on it.
 
-On 8/8/06, Peter Wippich <pewi@gw-instruments.de> wrote:
-> > I have a problem with multiple concurrent calls to sdp_connect(). In
-> > particular, I have a simple application that search a service on
-> > different remote devices: the searches are done concurrently (until 7 in
-> > parallel), each from within a different pthread. I have experienced
-> > that, with a lot of Bluetooth dongles (example Surecom, D-Link), it
-> > occurs an "File descriptor in bad state" error. Debugging the
-> > sdp_connect() function I have founded that the error occurs on connect()
-> > system call.
-> >
-> This problem has been discussed here several times for various
-> applications. It is not related to SDP but to the general problem that
-> (all ?) commercial available Bluetooth adaptors do not support multiple
-> (concurrent) connection requests. The only solution is to serialize the
-> connect requests. Until now nobody voluntered to do this in the kernel.
-
-I'm working on this right now. I think I've found the problems with
-that Marcel Holtmann's patch. I'm gonna test it a little bit more and
-then I'll send the patch to the list. :-)
+No, it's not implemented in the BlueZ stack. I've done a preliminary
+work on this but haven't completed it yet. You can see my and Marcel
+Holtmann e-mails on the bluez-devel mailing list archive about this.
+If you want to help us, please feel free to send in patches.
 
 Regards,
 
