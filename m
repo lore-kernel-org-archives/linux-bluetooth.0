@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <7ceeaed30608080311i110e67a4x822d22692f4ff5ac@mail.gmail.com>
-Date: Tue, 8 Aug 2006 12:11:57 +0200
-From: Arkaitz <arkaitzj@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <7ceeaed30608051104n266c2cd4m28382c474a41dc58@mail.gmail.com>
 MIME-Version: 1.0
-References: <7ceeaed30608051104n266c2cd4m28382c474a41dc58@mail.gmail.com>
-Subject: Re: [Bluez-devel] SCO Connection not working in handsfree with a
-	Nokia 6600
+Date: Tue, 8 Aug 2006 11:04:40 +0100
+Message-ID: <056BF200E9632F4285220E570FEED673D7AE42@GBMDDMH202AMSX.gb001.siemens.net>
+In-Reply-To: <44D84DD2.7020102@palmsource.com>
+From: "Waldram, Andrew (SBS UK)" <andrew.waldram@siemens.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX)
+	plus	xmmserror(trials and tribulations) how cool is this!!!
+	new patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,94 +17,356 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-I've trying with hcidump but i'm unable to understand exactly what is
-happening, could somebody tell me what should i search in the dump?
-I've found this:
-> ACL data: handle 46 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x004b
-< ACL data: handle 46 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x004b
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 46 packets 1
-> ACL data: handle 46 flags 0x02 dlen 16
-> ACL data: handle 46 flags 0x01 dlen 20
-    L2CAP(d): cid 0x0040 len 32 [psm 0]
+ =
 
-And those Disconn don't sound good.
-Any help?
-Thanks for your time
+It's a real lock no mouse capslock or numlock
 
-On 8/5/06, Arkaitz <arkaitzj@gmail.com> wrote:
-> Hi,
-> I've been using bluez stack for a project and i've a trouble. I
-> managed to do a stable handsfree connection with a Nokia N90 and a
-> Motorola V3 using something like the following but through JNI from
-> java.
-> As I am unable to make it work with the 6600 i mtrying it in c++ to be
-> sure that its not a java or JNI problem.
-> The fact is that i follow these steps:
-> 1) I manually add HF profile to my pc(sdptool add HF)
-> 2) I open a rfcomm connection to the mobile phone at the HFAG service
-> channel and i send:
->         sendCommand(rfsocket,"AT+CGMI\r");
->         sleep(1);
->         sendCommand(rfsocket,"AT+BRSF=31\r");
->         sleep(1);
->         sendCommand(rfsocket,"AT+CIND=?\r");
->         sleep(1);
->         sendCommand(rfsocket,"AT+CIND?\r");
->         sleep(1);
->         sendCommand(rfsocket,"AT+CMER=?\r");
->         sleep(1);
->         sendCommand(rfsocket,"AT+CMER=3,0,0,1\r");
->         sleep(1);
->         sendCommand(rfsocket,"AT+CLIP=1\r");
->         sleep(1);
->         sendCommand(rfsocket,"AT+NREC=0\r");
->         sleep(1);
->         sendCommand(rfsocket,"AT+CHLD=?\r");
->         sleep(1);
+Four sec power button press to shut off =
+
+
+Start it from rc.local kernel 2.6.15 (has done it on the last 3)
+
+Sudo -u andy -H a2dpd -d +v
+
+Don't use it as default so it's not the default alsa device =
+
+
+Normal soundcard (i810) sound still functions.
+
+It still does it if you've been using the headphones then desconnect them, =
+approx 30 mins later locked.
+
+It's fine while headphones in use (fell asleep with them on 3 hours all OK)
+
+Tmp is mounted as logging starts in it OK.
+
+Will try a custom 2.6.16 I have hanging around ;-) tonight. =
+
+
+---------------------------------------------------------------------------=
+------- =
+
+
+
+
+-----Original Message-----
+From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounces=
+@lists.sourceforge.net] On Behalf Of Fr=E9d=E9ric DALLEAU
+Sent: 08 August 2006 09:40
+To: BlueZ development
+Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmmserror(tr=
+ials and tribulations) how cool is this!!! new patch
+
+Hi Andrew,
+
+By lock solid do you mean system freeze or a 100% cpu time? Does your =
+
+mouse move? Do capslock & numlock still light on/off?
+When you start it as a daemon, how do you do it? Is it from a =
+
+shell/rootshell/startup script/sysinit?
+Are you sure that you have not attempted to use headset, it is not your =
+
+default alsa plugin, and you have not started xmms. If it is default, =
+
+another application could have started sound.
+
+
+Since we only work in user mode, we should not lock solid the system!  I =
+
+used to consider this assumption valid when I was a Windows programmer =
+
+so it should be under linux :D ...
+
+This reminds me the lock problem that was signaled last week, Look at =
+
+this thread:
+http://sourceforge.net/mailarchive/forum.php?thread_id=3D29109531&forum_id=
+=3D1881
+
+It said :
+
+ After upgrading I discovered that my machine freezes after being left
+ idle for approximately 30 min.
+
+...
+this looks like a problem with the kthread API. We converted BNEP, CMTP
+
+ and HIDP to it with 2.6.17-mh3. So a 2.6.17-mh2 kernel should work
+ without any problems.
+
+If you have unbuntu, you will certainly have multiple kernel to boot, =
+
+can you try an older one to see if it is the same.
+
+
+Moreover, I confirm that the log file is filed while in daemon mode. =
+
+Maybe the daemon is started before /tmp is mounted. Try another =
+
+location, simply add
+
+logfile=3D/what_you_want_but_you_need_write_permission
+
+to the config file before startup.
+
+
+Fr=E9d=E9ric
+
+
+
+Waldram, Andrew (SBS UK) a =E9crit :
+
+> =
+
+>Still have the issue were if I start it as a deamon (a2dpd -d +v) then aft=
+er about 30 minutes my system just locks solid
 >
->         pthread_create(&scoconth, NULL, scoControllerThread, (void *)sbdaddr);
->         sendCommand(rfsocket,"AT+BLDN\r");
+>This only happenes if you have no connection i.e the deamon is started but=
+ you have not attempted to use headset.
 >
-> 3) Before the last command that should do a recall, i start a thread
-> that will manage the sco connection
-> 3.1) I create a SCO socket, i bind it, listen and the thread waits in
-> an accept function
-> 4) After asking the recall, the phone should open the scoconnection to
-> my phone through the socket that is waiting in the accept function,
-> but it doesnt!!!
+>I thought initialy it was loging but after you've added the logging code g=
+uess not.
 >
-> The N90 and V3 opened that socket but the 6600 doesn't. Im a bit
-> confused, because the 6600 lights the handsfree icon in the screen,
-> but nothing more.
->
-> In another code using handsfree i saw a kind of initialization, it
-> opened the sco socket in client mode and sent a 48 byte packet full of
-> 0s, after taht it closed the socket and opened again in server mode to
-> start accepting. Ive tried tat kind of initialization too but no way.
->
-> Maybe im missing something?
-> Thanks a lot for your time
+>Got no idea how to debug this as nothing  appears in any log it just locks=
+ solid.
 >
 >
-> --
-> Arkaitz
+>--------------------------------------------------------------------------=
+-------- =
+
 >
--- 
-Arkaitz
+>
+>-----Original Message-----
+>From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounce=
+s@lists.sourceforge.net] On Behalf Of Waldram, Andrew (SBS UK)
+>Sent: 05 August 2006 16:03
+>To: BlueZ development
+>Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmmserror(t=
+rials and tribulations) how cool is this!!! new patch
+>
+>Hi again =
+
+>
+>It's permissions needed to start a2dp as sudo -u andy -H a2dpd =
+
+>Else xmms and the controls didn't synchronise (had extra xmms sesions appe=
+aring )
+>
+>Now seems pretty slick =
+
+>
+>Will continue to play and report back later after day to day use..
+>--------------------------------------------------------------------------=
+-------- =
+
+>
+>-----Original Message-----
+>From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounce=
+s@lists.sourceforge.net] On Behalf Of Waldram, Andrew (SBS UK)
+>Sent: 05 August 2006 14:55
+>To: BlueZ development
+>Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error(=
+trials and tribulations) how cool is this!!! new patch
+>
+> Hi
+>
+>Don't know if its my headphones but pressing play does not start xmms.
+>
+>If I manuly start Xmms then fwd rev play pause work
+>
+>But still once 10 secs has done then pressinf play on the headphones does =
+nothing and if I press play on xmms it still just doesn't work
+>
+>Accepting incoming tcp stream connection
+>[pause] xmms --pause
+>Forked xmms --pause         <----------------------Pause press ;-)
+>[1] Receiving failed on socket 0.6 error (-1/4 bytes) errno=3D11:Resource
+>temporarily unavailable  <---------------------  press play repeatedly on =
+head phones nothing happens
+>Client thread 0.6 ending: timeout =
+
+>Destroying lpA2dp, destroy_count is 2001
+>DEBUG: a2dp_destroy: Begin
+>DEBUG: a2dp_free: Begin
+>DEBUG: a2dp_destroy: a2dp_destroy(0x80561f0) OK
+>avrcp: socket 9: timed out
+>Accepted 6
+>PCM thread 0.6 started  < ------------------------------ press play on xmm=
+s =
+
+>DEBUG: a2dp_new: Begin
+>DEBUG: a2dp_new: bdaddr/dest is 00:0D:44:2A:5C:12
+>DEBUG: a2dp_alloc: Begin
+>DEBUG: a2dp_connect: a2dp 0x8076d58
+>DEBUG: connect_stream: Begin
+>DEBUG: connect_stream: Using address: 12:5C:2A:44:0D:00
+>DEBUG: detect_a2dp: Begin
+>Accepting incoming tcp stream connection
+>DEBUG: detect_a2dp: Found A2DP Sink
+>DEBUG: connect_stream: Found A2DP Sink at the destination (psm_cmd=3D25)
+>DEBUG: do_connect: Begin
+>DEBUG: do_connect: Connecting to bluetooth
+>DEBUG: do_connect: (errno=3D111:Connection refused)Can't connect to
+>12:5C:2A:44:0D:00 on psm 25. Connection refused(111)
+>DEBUG: do_connect: (errno=3D77:File descriptor in bad state)Can't connect =
+to
+>12:5C:2A:44:0D:00 on psm 25. File descriptor in bad state(77)
+>DEBUG: do_connect: (errno=3D77:File descriptor in bad state)Can't connect =
+to
+>12:5C:2A:44:0D:00 on psm 25. File descriptor in bad state(77)
+>DEBUG: connect_stream: cannot open psm_cmd =3D 25
+>
+>Any ideas
+>
+>
+>--------------------------------------------------------------------------=
+-------- =
+
+>
+>
+>-----Original Message-----
+>From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounce=
+s@lists.sourceforge.net] On Behalf Of Fr=E9d=E9ric DALLEAU
+>Sent: 04 August 2006 16:09
+>To: BlueZ development
+>Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error =
+(trials and tribulations) how cool is this!!! new patch
+>
+>Hi all,
+>
+>Now the a2dpd handles avrcp too. Only play / pause / next / prev but =
+
+>other commands if any should go straight away.
+>
+>Waldram, Andrew (SBS UK) a =E9crit :
+>
+>  =
+
+>
+>>When you say you integrated it into a2dpd do you mean all the a2recv stuf=
+f, if so doean't that make the deamon a xmms dependant tool?
+>> =
+
+>>
+>>    =
+
+>>
+>No thanks to the config file
+>
+>  =
+
+>
+>>It'd be real cool if it'd parse a config file so something like the follo=
+wing could be done
+>>
+>>/etc/a2dpd.conf
+>> =
+
+>>
+>>    =
+
+>>
+>done, see attachment
+>$HOME/.a2dprc for now
+>
+>  =
+
+>
+>>For now, it is not yet handled but you see the daemon receive a frame of =
+
+>>the form 0x00 0x01 (AVDTP_DISCOVER).
+>>I will try today reject the frame and system(xmms --play).
+>> =
+
+>>
+>>    =
+
+>>
+>done, see patch
+>
+>Two commands line options appeared:
+>-d forks (+d no fork) on startup
+>-v redirect output to stdout (+v to logfile specified in rc def : =
+
+>/tmp/a2dpd.log)
+>
+>If your headset is avrcp, what can you do :
+>start a2dpd
+>press play on the headset, and it will start up xmms. You should hear music
+>press play again, it will pause xmms.
+>press play again, music restart.
+>press next or prev to switch song.
+>
+>you can also try alsamixer -D ctl.a2dpd
+>
+>Fr=E9d=E9ric
+>
+>
+>
+>-------------------------------------------------------------------------
+>Take Surveys. Earn Cash. Influence the Future of IT
+>Join SourceForge.net's Techsay panel and you'll get the chance to share yo=
+ur
+>opinions on IT & business topics through brief surveys -- and earn cash
+>http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DD=
+EVDEV
+>_______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+>-------------------------------------------------------------------------
+>Take Surveys. Earn Cash. Influence the Future of IT
+>Join SourceForge.net's Techsay panel and you'll get the chance to share yo=
+ur
+>opinions on IT & business topics through brief surveys -- and earn cash
+>http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DD=
+EVDEV
+>_______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+>-------------------------------------------------------------------------
+>Using Tomcat but need to do more? Need to support web services, security?
+>Get stuff done quickly with pre-integrated technology to make your job eas=
+ier
+>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+>http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D=
+121642
+>_______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>  =
+
+>
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
