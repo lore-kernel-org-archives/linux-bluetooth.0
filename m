@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <7ceeaed30608092348o338062f5kc5be0801477880be@mail.gmail.com>
-Date: Thu, 10 Aug 2006 08:48:59 +0200
-From: Arkaitz <arkaitzj@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <7b9ca310608080731k1a74a219q3f6c2fa18e0beda3@mail.gmail.com>
+Date: Tue, 8 Aug 2006 10:31:48 -0400
+From: "Michael Ellis" <michael.f.ellis@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <7b9ca310608080658h4e5e64c3i2e3448bc67fc5278@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] SCO Connection for the handsfree service with a N6600
+References: <7b9ca310608071427nb9b9d28u86251148f66d7bac@mail.gmail.com>
+	<1154999049.3905.108.camel@aeonflux.holtmann.net>
+	<7b9ca310608071818v5871bb19y2593b7a693ca4ab6@mail.gmail.com>
+	<7b9ca310608080658h4e5e64c3i2e3448bc67fc5278@mail.gmail.com>
+Subject: Re: [Bluez-users] dbus-1.pc not found
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,94 +19,73 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1042267224=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
-I've been using bluez stack for a project and i've a trouble. I
-managed to do a stable handsfree connection with a Nokia N90 and a
-Motorola V3 using something like the following but through JNI from
-java.
-As I am unable to make it work with the 6600 i mtrying it in c++ to be
-sure that its not a java or JNI problem.
-The fact is that i follow these steps:
-1) I manually add HF profile to my pc(sdptool add HF)
-2) I open a rfcomm connection to the mobile phone at the HFAG service
-channel and i send:
-       sendCommand(rfsocket,"AT+CGMI\r");
-       sleep(1);
-       sendCommand(rfsocket,"AT+BRSF=31\r");
-       sleep(1);
-       sendCommand(rfsocket,"AT+CIND=?\r");
-       sleep(1);
-       sendCommand(rfsocket,"AT+CIND?\r");
-       sleep(1);
-       sendCommand(rfsocket,"AT+CMER=?\r");
-       sleep(1);
-       sendCommand(rfsocket,"AT+CMER=3,0,0,1\r");
-       sleep(1);
-       sendCommand(rfsocket,"AT+CLIP=1\r");
-       sleep(1);
-       sendCommand(rfsocket,"AT+NREC=0\r");
-       sleep(1);
-       sendCommand(rfsocket,"AT+CHLD=?\r");
-       sleep(1);
+--===============1042267224==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_12327_31663417.1155047508286"
 
-       pthread_create(&scoconth, NULL, scoControllerThread, (void *)sbdaddr);
-       sendCommand(rfsocket,"AT+BLDN\r");
+------=_Part_12327_31663417.1155047508286
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-3) Before the last command that should do a recall, i start a thread
-that will manage the sco connection
-3.1) I create a SCO socket, i bind it, listen and the thread waits in
-an accept function
-4) After asking the recall, the phone should open the scoconnection to
-my phone through the socket that is waiting in the accept function,
-but it doesnt!!!
+On 8/8/06, Michael Ellis <michael.f.ellis@gmail.com> wrote:
+>
+>
+>
+>
+> > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x06 handle 41 bdaddr 00:0C:84:00:16:51 type ACL encrypt 0x00
+>     Error: PIN or Key Missing
+>
+> Found it.  In hcid.conf, I had pin-helper instead of pin_helper.  Is there
+a setting that will cause hcid to log messages about invalid parameters in
+the hcid.conf file? That would have saved me a couple of hours.
+Mike
 
-The N90 and V3 opened that socket but the 6600 doesn't. Im a bit
-confused, because the 6600 lights the handsfree icon in the screen,
-but nothing more.
+------=_Part_12327_31663417.1155047508286
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-In another code using handsfree i saw a kind of initialization, it
-opened the sco socket in client mode and sent a 48 byte packet full of
-0s, after taht it closed the socket and opened again in server mode to
-start accepting. Ive tried tat kind of initialization too but no way.
-Hi,
-I've been trying with hcidump but i'm unable to understand exactly what is
-happening, could somebody tell me what should i search in the dump?
-I've found this:
-> ACL data: handle 46 flags 0x02 dlen 12
-   L2CAP(s): Disconn req: dcid 0x0041 scid 0x004b
-< ACL data: handle 46 flags 0x02 dlen 12
-   L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x004b
-> HCI Event: Number of Completed Packets (0x13) plen 5
-   handle 46 packets 1
-> ACL data: handle 46 flags 0x02 dlen 16
-> ACL data: handle 46 flags 0x01 dlen 20
-   L2CAP(d): cid 0x0040 len 32 [psm 0]
+<br><br><div><span class="gmail_quote">On 8/8/06, <b class="gmail_sendername">Michael Ellis</b> &lt;<a href="mailto:michael.f.ellis@gmail.com">michael.f.ellis@gmail.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+<div><span class="q"><br><br></span></div><div><br>
+&gt; HCI Event: Connect Complete (0x03) plen 11<br>
+&nbsp;&nbsp;&nbsp; status 0x06 handle 41 bdaddr 00:0C:84:00:16:51 type ACL encrypt 0x00<br>
+&nbsp;&nbsp;&nbsp; Error: PIN or Key Missing<br>
+<br></div></blockquote></div>Found it.&nbsp; In hcid.conf, I had
+pin-helper instead of pin_helper.&nbsp; Is there a setting that will
+cause hcid to log messages about invalid parameters in the hcid.conf
+file? That would have saved me a couple of hours.<br>
+Mike<br>
 
-The whole dump is at:
 
-http://wiki.liakona.com/Hcidump_disconnect
+------=_Part_12327_31663417.1155047508286--
 
-I see that the 6600 is doing some SDP, maybe asking for some service
-in my laptop? After that when I try to call it asks a disconnection to
-the cid 0x0041. The SCO socket is never opened, but I think that that
-cid 0x041 connection is something related to the sco connection.
-The fact is that I've registered with sdptool add all the services
-that sdptool can handle and the disconnection is always there.
-Maybe somebody can take a look to the dump and tell me something i don't know.
-Thanks a lot for your time.
--- 
-Arkaitz
+
+--===============1042267224==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============1042267224==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1042267224==--
