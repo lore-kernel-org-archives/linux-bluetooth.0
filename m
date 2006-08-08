@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 8 Aug 2006 13:43:55 +0200 (CEST)
-From: Peter Wippich <pewi@gw-instruments.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44D88EC1.7010009@pracucci.com>
-Message-ID: <Pine.LNX.4.63.0608081338140.26758@redbean.intranet.gw-instruments.de>
-References: <44D88EC1.7010009@pracucci.com>
+Message-ID: <7ceeaed30608080425w46302cadk554001c7d3830e3a@mail.gmail.com>
+Date: Tue, 8 Aug 2006 13:25:18 +0200
+From: Arkaitz <arkaitzj@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <7ceeaed30608080311i110e67a4x822d22692f4ff5ac@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
+References: <7ceeaed30608051104n266c2cd4m28382c474a41dc58@mail.gmail.com>
+	<7ceeaed30608080311i110e67a4x822d22692f4ff5ac@mail.gmail.com>
+Subject: Re: [Bluez-devel] SCO Connection not working in handsfree with a
+	Nokia 6600
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,32 +22,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi,
+I've uploaded one dump of my problem at:
 
-Hi Marco, 
+http://wiki.liakona.com/Hcidump_disconnect
 
-On Tue, 8 Aug 2006, Marco Pracucci wrote:
+I see that the 6600 is doing some SDP, maybe asking for some service
+in my laptop? After that when I try to call it asks a disconnection to
+the cid 0x0041. The SCO socket is never opened, but I think that that
+cid 0x041 connection is something related to the sco connection.
+The fact is that I've registered with sdptool add all the services
+that sdptool can handle and the disconnection is always there.
+Maybe somebody can take a look to the dump and tell me something i don't know.
+Thanks a lot for your time and sorry if i am writing too much to the
+list, im a bit worried with this.
 
-> Hi,
-> 
-> I have a problem with multiple concurrent calls to sdp_connect(). In
-> particular, I have a simple application that search a service on
-> different remote devices: the searches are done concurrently (until 7 in
-> parallel), each from within a different pthread. I have experienced
-> that, with a lot of Bluetooth dongles (example Surecom, D-Link), it
-> occurs an "File descriptor in bad state" error. Debugging the
-> sdp_connect() function I have founded that the error occurs on connect()
-> system call.
-> 
-This problem has been discussed here several times for various 
-applications. It is not related to SDP but to the general problem that 
-(all ?) commercial available Bluetooth adaptors do not support multiple 
-(concurrent) connection requests. The only solution is to serialize the 
-connect requests. Until now nobody voluntered to do this in the kernel. 
 
-Ciao, 
-
-Peter 
-
+-- 
+Arkaitz
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
