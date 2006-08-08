@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 08 Aug 2006 16:08:40 +0200
-From: =?windows-1252?Q?G=F6tz_Issel?= <g.issel@fh-wolfenbuettel.de>
-To: bluez-devel@lists.sourceforge.net
-Message-id: <1cae6f1ca7af.1ca7af1cae6f@fh-wolfenbuettel.de>
-MIME-version: 1.0
-Subject: Re: [Bluez-devel] Bluez-devel Digest, Vol 4, Issue 19
+Message-ID: <44D8815D.4000108@infitsrl.com>
+Date: Tue, 08 Aug 2006 14:19:41 +0200
+From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <44D88EC1.7010009@pracucci.com>
+In-Reply-To: <44D88EC1.7010009@pracucci.com>
+Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,26 +20,52 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi,
+I have had a similar problem ....I've discovered (with Marcel help) is a 
+problem in l2cap layer.
+l2cap kernel module do not handle multiple connect, Marcel send to me a 
+patch I am trying to make to work
+ but I'm very busy with my job and is not still clear where the patch 
+hangs the system.
 
-> 
-> Hi Goetz,
-> 
-> Can you release the source code? I'll try at my end. I have a phone
-> supporting SAP.
-> 
-> Regards,
-> Mayank
+You can found some information searching in old messages....
 
-Hi Mayank, 
+Ciao
+Fabrizio
 
-the source code won't help you if you do not have a Siemens GSM module
-that supports the SIMAccessProfile. Then again if you have a different
-GSM module you can of course use your own implementation of the programm
-part concered with the modem. I will release the code once it is a bit
-cleaner and better to understand. The curent chaos in my code is not
-"nice" but works. Sorry.
 
-Goetz
+Marco Pracucci ha scritto:
+> Hi,
+>
+> I have a problem with multiple concurrent calls to sdp_connect(). In
+> particular, I have a simple application that search a service on
+> different remote devices: the searches are done concurrently (until 7 in
+> parallel), each from within a different pthread. I have experienced
+> that, with a lot of Bluetooth dongles (example Surecom, D-Link), it
+> occurs an "File descriptor in bad state" error. Debugging the
+> sdp_connect() function I have founded that the error occurs on connect()
+> system call.
+>
+> Has anyone had a similar problem?
+> Do you have any suggestion?
+>
+> Thanks,
+> Marco Pracucci
+>
+>
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+>
+>   
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
