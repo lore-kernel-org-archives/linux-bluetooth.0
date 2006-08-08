@@ -1,18 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Milind Dumbare <milind@linsyssoft.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1154528519.2302.22.camel@shadowfox.linsyssoft.com>
-References: <1154441823.5306.13.camel@Shadowfox.linsyssoft.com>
-	<d23110170608011015h3bef584cn65a7d24fc73ec931@mail.gmail.com>
-	<1154499074.2302.2.camel@Shadowfox.linsyssoft.com>
-	<1154514862.3905.40.camel@aeonflux.holtmann.net>
-	<1154508670.2302.10.camel@Shadowfox.linsyssoft.com>
-	<1154525531.3905.45.camel@aeonflux.holtmann.net>
-	<1154528519.2302.22.camel@shadowfox.linsyssoft.com>
-Date: Tue, 08 Aug 2006 15:49:12 +0530
-Message-Id: <1155032352.2313.8.camel@shadowfox.linsyssoft.com>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Reboot notifier
+Message-ID: <7ceeaed30608080311i110e67a4x822d22692f4ff5ac@mail.gmail.com>
+Date: Tue, 8 Aug 2006 12:11:57 +0200
+From: Arkaitz <arkaitzj@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <7ceeaed30608051104n266c2cd4m28382c474a41dc58@mail.gmail.com>
+MIME-Version: 1.0
+References: <7ceeaed30608051104n266c2cd4m28382c474a41dc58@mail.gmail.com>
+Subject: Re: [Bluez-devel] SCO Connection not working in handsfree with a
+	Nokia 6600
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -26,60 +21,84 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel, 
-	I didn't get any reply.
+Hi,
+I've trying with hcidump but i'm unable to understand exactly what is
+happening, could somebody tell me what should i search in the dump?
+I've found this:
+> ACL data: handle 46 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0041 scid 0x004b
+< ACL data: handle 46 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x004b
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 46 packets 1
+> ACL data: handle 46 flags 0x02 dlen 16
+> ACL data: handle 46 flags 0x01 dlen 20
+    L2CAP(d): cid 0x0040 len 32 [psm 0]
 
-On Wed, 2006-08-02 at 19:51 +0530, Milind Dumbare wrote:
-> Hi Marcel,
-> 	I have attached patch for reboot notifier. Any suggestions are
-> appreciated.
-> 
-> Thanks 
-> On Wed, 2006-08-02 at 15:32 +0200, Marcel Holtmann wrote:
-> > Hi Milind,
-> > 
-> > > The first most useful think is doing module cleanup while rebooting.
-> > > About other things, you will know them more deeply. May be like keeping
-> > > informing user level utilities to do some interesting stuff like.
-> > > Keeping connection settings live post reboot or other.
-> > 
-> > there is no need for a module cleanup. And unloading of kernel modules
-> > still has to be considered as a race condition.
-> > 
-> > Once you reset the USB bus for example all USB Bluetooth dongles will
-> > disconnect and be powered off and all connections will go away anyway.
-> > There is no real chance to keep connections over reboot.
-> > 
-> > So I don't see any need for this, but feel free to send in patches for
-> > it and convince me otherwise.
-> > 
-> > Regards
-> > 
-> > Marcel
-> > 
-> > 
-> > 
-> > -------------------------------------------------------------------------
-> > Take Surveys. Earn Cash. Influence the Future of IT
-> > Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> > opinions on IT & business topics through brief surveys -- and earn cash
-> > http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> > _______________________________________________
-> > Bluez-devel mailing list
-> > Bluez-devel@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> > 
-> > 
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys -- and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________ Bluez-devel mailing list Bluez-devel@lists.sourceforge.net https://lists.sourceforge.net/lists/listinfo/bluez-devel
+And those Disconn don't sound good.
+Any help?
+Thanks for your time
+
+On 8/5/06, Arkaitz <arkaitzj@gmail.com> wrote:
+> Hi,
+> I've been using bluez stack for a project and i've a trouble. I
+> managed to do a stable handsfree connection with a Nokia N90 and a
+> Motorola V3 using something like the following but through JNI from
+> java.
+> As I am unable to make it work with the 6600 i mtrying it in c++ to be
+> sure that its not a java or JNI problem.
+> The fact is that i follow these steps:
+> 1) I manually add HF profile to my pc(sdptool add HF)
+> 2) I open a rfcomm connection to the mobile phone at the HFAG service
+> channel and i send:
+>         sendCommand(rfsocket,"AT+CGMI\r");
+>         sleep(1);
+>         sendCommand(rfsocket,"AT+BRSF=31\r");
+>         sleep(1);
+>         sendCommand(rfsocket,"AT+CIND=?\r");
+>         sleep(1);
+>         sendCommand(rfsocket,"AT+CIND?\r");
+>         sleep(1);
+>         sendCommand(rfsocket,"AT+CMER=?\r");
+>         sleep(1);
+>         sendCommand(rfsocket,"AT+CMER=3,0,0,1\r");
+>         sleep(1);
+>         sendCommand(rfsocket,"AT+CLIP=1\r");
+>         sleep(1);
+>         sendCommand(rfsocket,"AT+NREC=0\r");
+>         sleep(1);
+>         sendCommand(rfsocket,"AT+CHLD=?\r");
+>         sleep(1);
+>
+>         pthread_create(&scoconth, NULL, scoControllerThread, (void *)sbdaddr);
+>         sendCommand(rfsocket,"AT+BLDN\r");
+>
+> 3) Before the last command that should do a recall, i start a thread
+> that will manage the sco connection
+> 3.1) I create a SCO socket, i bind it, listen and the thread waits in
+> an accept function
+> 4) After asking the recall, the phone should open the scoconnection to
+> my phone through the socket that is waiting in the accept function,
+> but it doesnt!!!
+>
+> The N90 and V3 opened that socket but the 6600 doesn't. Im a bit
+> confused, because the 6600 lights the handsfree icon in the screen,
+> but nothing more.
+>
+> In another code using handsfree i saw a kind of initialization, it
+> opened the sco socket in client mode and sent a 48 byte packet full of
+> 0s, after taht it closed the socket and opened again in server mode to
+> start accepting. Ive tried tat kind of initialization too but no way.
+>
+> Maybe im missing something?
+> Thanks a lot for your time
+>
+>
+> --
+> Arkaitz
+>
 -- 
--Milind
-"There is no place like 127.0.0.1"
-
+Arkaitz
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
