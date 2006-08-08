@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44D8815D.4000108@infitsrl.com>
-Date: Tue, 08 Aug 2006 14:19:41 +0200
-From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
+Message-ID: <d23110170608080613wbeba2d4j1295fe0a5cf6fabf@mail.gmail.com>
+Date: Tue, 8 Aug 2006 10:13:33 -0300
+From: "Ulisses Furquim" <ulissesf@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.63.0608081338140.26758@redbean.intranet.gw-instruments.de>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <44D88EC1.7010009@pracucci.com>
-In-Reply-To: <44D88EC1.7010009@pracucci.com>
+	<Pine.LNX.4.63.0608081338140.26758@redbean.intranet.gw-instruments.de>
 Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,52 +21,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-I have had a similar problem ....I've discovered (with Marcel help) is a 
-problem in l2cap layer.
-l2cap kernel module do not handle multiple connect, Marcel send to me a 
-patch I am trying to make to work
- but I'm very busy with my job and is not still clear where the patch 
-hangs the system.
+Hi Peter,
 
-You can found some information searching in old messages....
+On 8/8/06, Peter Wippich <pewi@gw-instruments.de> wrote:
+> > I have a problem with multiple concurrent calls to sdp_connect(). In
+> > particular, I have a simple application that search a service on
+> > different remote devices: the searches are done concurrently (until 7 in
+> > parallel), each from within a different pthread. I have experienced
+> > that, with a lot of Bluetooth dongles (example Surecom, D-Link), it
+> > occurs an "File descriptor in bad state" error. Debugging the
+> > sdp_connect() function I have founded that the error occurs on connect()
+> > system call.
+> >
+> This problem has been discussed here several times for various
+> applications. It is not related to SDP but to the general problem that
+> (all ?) commercial available Bluetooth adaptors do not support multiple
+> (concurrent) connection requests. The only solution is to serialize the
+> connect requests. Until now nobody voluntered to do this in the kernel.
 
-Ciao
-Fabrizio
+I'm working on this right now. I think I've found the problems with
+that Marcel Holtmann's patch. I'm gonna test it a little bit more and
+then I'll send the patch to the list. :-)
 
+Regards,
 
-Marco Pracucci ha scritto:
-> Hi,
->
-> I have a problem with multiple concurrent calls to sdp_connect(). In
-> particular, I have a simple application that search a service on
-> different remote devices: the searches are done concurrently (until 7 in
-> parallel), each from within a different pthread. I have experienced
-> that, with a lot of Bluetooth dongles (example Surecom, D-Link), it
-> occurs an "File descriptor in bad state" error. Debugging the
-> sdp_connect() function I have founded that the error occurs on connect()
-> system call.
->
-> Has anyone had a similar problem?
-> Do you have any suggestion?
->
-> Thanks,
-> Marco Pracucci
->
->
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->
->   
-
+-- Ulisses
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
