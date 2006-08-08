@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <7ceeaed30608080425w46302cadk554001c7d3830e3a@mail.gmail.com>
-Date: Tue, 8 Aug 2006 13:25:18 +0200
-From: Arkaitz <arkaitzj@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <7ceeaed30608080311i110e67a4x822d22692f4ff5ac@mail.gmail.com>
+Message-ID: <44D88EC1.7010009@pracucci.com>
+Date: Tue, 08 Aug 2006 13:16:49 +0000
+From: Marco Pracucci <development@pracucci.com>
 MIME-Version: 1.0
-References: <7ceeaed30608051104n266c2cd4m28382c474a41dc58@mail.gmail.com>
-	<7ceeaed30608080311i110e67a4x822d22692f4ff5ac@mail.gmail.com>
-Subject: Re: [Bluez-devel] SCO Connection not working in handsfree with a
-	Nokia 6600
+To: Bluez Development ML <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,23 +19,22 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
-I've uploaded one dump of my problem at:
 
-http://wiki.liakona.com/Hcidump_disconnect
+I have a problem with multiple concurrent calls to sdp_connect(). In
+particular, I have a simple application that search a service on
+different remote devices: the searches are done concurrently (until 7 in
+parallel), each from within a different pthread. I have experienced
+that, with a lot of Bluetooth dongles (example Surecom, D-Link), it
+occurs an "File descriptor in bad state" error. Debugging the
+sdp_connect() function I have founded that the error occurs on connect()
+system call.
 
-I see that the 6600 is doing some SDP, maybe asking for some service
-in my laptop? After that when I try to call it asks a disconnection to
-the cid 0x0041. The SCO socket is never opened, but I think that that
-cid 0x041 connection is something related to the sco connection.
-The fact is that I've registered with sdptool add all the services
-that sdptool can handle and the disconnection is always there.
-Maybe somebody can take a look to the dump and tell me something i don't know.
-Thanks a lot for your time and sorry if i am writing too much to the
-list, im a bit worried with this.
+Has anyone had a similar problem?
+Do you have any suggestion?
 
+Thanks,
+Marco Pracucci
 
--- 
-Arkaitz
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
