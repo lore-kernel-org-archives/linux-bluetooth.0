@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Date: Tue, 8 Aug 2006 11:04:40 +0100
-Message-ID: <056BF200E9632F4285220E570FEED673D7AE42@GBMDDMH202AMSX.gb001.siemens.net>
-In-Reply-To: <44D84DD2.7020102@palmsource.com>
-From: "Waldram, Andrew (SBS UK)" <andrew.waldram@siemens.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX)
-	plus	xmmserror(trials and tribulations) how cool is this!!!
-	new patch
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1c86461cc9a5.1cc9a51c8646@fh-wolfenbuettel.de>
+References: <1c86461cc9a5.1cc9a51c8646@fh-wolfenbuettel.de>
+Date: Tue, 08 Aug 2006 13:56:04 +0200
+Message-Id: <1155038164.3905.121.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Multiplexing for SimAccessProfile
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,356 +16,69 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
- =
+Hi Goetz,
+
+> I am still working on the Sim Access Profile implementation and am now
+> stuck on the communnication with the GSM module I use, the serial port
+> multiplexing. 
+> 
+> The connection to the bluetooth device and all the messages and
+> responses to and from the mobile phone work fine. So the bluetooth part
+> is done. Now the GSM module will need to have the data from the SIM of
+> the mobile phone to use it for connectiong to the GSM network. Since I
+> use a device from Siemens (AC45) it already has the multiplexing (GSM
+> 07.10) integrated meaning that I can send an AT-command (at+cmux=0) and
+> it will switch to multiplexing mode and work as required. It will know
+> how to handle data packets coming in from the serial port to divide them
+> into each channel and how to pack the data with the apppropriate header
+> from each multiplexing channel to be sent back over the single serial port. 
+> 
+> The missing part is in my software. It will need to wrap and unwrap the
+> messages to and from the GSM modem in the form it is defined in the
+> specification for this multiplexing. 
+> 
+> There is solution of a final year project of a student in Finnland
+> available, but it seems to possible have a few bugs.
+> (http://users.tkk.fi/~tkarvone/). Compiling is fine and the load of user
+> space serial port module at runtime is ok too. To my understanding a
+> controlling application is the second part of this project, which will
+> open the port and enable the multiplexing of the GSM device and then
+> wait for data coming into or out of the "virtual" ports, wrapping or
+> unwrapping the data packets. Or am I wrong and have to replace the
+> application with my blueZ-SAP-application?
+
+everything depends on what you actually need. An overall general
+solution would be a GSM 07.10 for the Linux kernel that allows us to
+multiplex any TTY supporting it. We don't have this and so far nobody
+actually tried to work on this. There are some efforts with the guys
+hacking the Motorola Linux phones, but so far I am not aware of any real
+useable code.
+
+The question for you should be if you need this running inside the
+kernel or is some userspace library or self-written code enough. To
+answer this you must answer if this GSM module will be only used by your
+SAP-Gateway or do you wanna also share it with other applications. If
+you wanna share it then you need to focus on a kernel implementation
+that does the multiplexing and then present independent TTYs for each
+channel. If you are the only user of the GSM module, then you might
+simply implement GSM 07.10 directly into your SAP-Gateway. This will
+make you independent.
+
+Regards
+
+Marcel
 
-It's a real lock no mouse capslock or numlock
-
-Four sec power button press to shut off =
-
-
-Start it from rc.local kernel 2.6.15 (has done it on the last 3)
-
-Sudo -u andy -H a2dpd -d +v
-
-Don't use it as default so it's not the default alsa device =
-
-
-Normal soundcard (i810) sound still functions.
-
-It still does it if you've been using the headphones then desconnect them, =
-approx 30 mins later locked.
-
-It's fine while headphones in use (fell asleep with them on 3 hours all OK)
-
-Tmp is mounted as logging starts in it OK.
-
-Will try a custom 2.6.16 I have hanging around ;-) tonight. =
-
-
----------------------------------------------------------------------------=
-------- =
-
-
-
-
------Original Message-----
-From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounces=
-@lists.sourceforge.net] On Behalf Of Fr=E9d=E9ric DALLEAU
-Sent: 08 August 2006 09:40
-To: BlueZ development
-Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmmserror(tr=
-ials and tribulations) how cool is this!!! new patch
-
-Hi Andrew,
-
-By lock solid do you mean system freeze or a 100% cpu time? Does your =
-
-mouse move? Do capslock & numlock still light on/off?
-When you start it as a daemon, how do you do it? Is it from a =
-
-shell/rootshell/startup script/sysinit?
-Are you sure that you have not attempted to use headset, it is not your =
-
-default alsa plugin, and you have not started xmms. If it is default, =
-
-another application could have started sound.
-
-
-Since we only work in user mode, we should not lock solid the system!  I =
-
-used to consider this assumption valid when I was a Windows programmer =
-
-so it should be under linux :D ...
-
-This reminds me the lock problem that was signaled last week, Look at =
-
-this thread:
-http://sourceforge.net/mailarchive/forum.php?thread_id=3D29109531&forum_id=
-=3D1881
-
-It said :
-
- After upgrading I discovered that my machine freezes after being left
- idle for approximately 30 min.
-
-...
-this looks like a problem with the kthread API. We converted BNEP, CMTP
-
- and HIDP to it with 2.6.17-mh3. So a 2.6.17-mh2 kernel should work
- without any problems.
-
-If you have unbuntu, you will certainly have multiple kernel to boot, =
-
-can you try an older one to see if it is the same.
-
-
-Moreover, I confirm that the log file is filed while in daemon mode. =
-
-Maybe the daemon is started before /tmp is mounted. Try another =
-
-location, simply add
-
-logfile=3D/what_you_want_but_you_need_write_permission
-
-to the config file before startup.
-
-
-Fr=E9d=E9ric
-
-
-
-Waldram, Andrew (SBS UK) a =E9crit :
-
-> =
-
->Still have the issue were if I start it as a deamon (a2dpd -d +v) then aft=
-er about 30 minutes my system just locks solid
->
->This only happenes if you have no connection i.e the deamon is started but=
- you have not attempted to use headset.
->
->I thought initialy it was loging but after you've added the logging code g=
-uess not.
->
->Got no idea how to debug this as nothing  appears in any log it just locks=
- solid.
->
->
->--------------------------------------------------------------------------=
--------- =
-
->
->
->-----Original Message-----
->From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounce=
-s@lists.sourceforge.net] On Behalf Of Waldram, Andrew (SBS UK)
->Sent: 05 August 2006 16:03
->To: BlueZ development
->Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmmserror(t=
-rials and tribulations) how cool is this!!! new patch
->
->Hi again =
-
->
->It's permissions needed to start a2dp as sudo -u andy -H a2dpd =
-
->Else xmms and the controls didn't synchronise (had extra xmms sesions appe=
-aring )
->
->Now seems pretty slick =
-
->
->Will continue to play and report back later after day to day use..
->--------------------------------------------------------------------------=
--------- =
-
->
->-----Original Message-----
->From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounce=
-s@lists.sourceforge.net] On Behalf Of Waldram, Andrew (SBS UK)
->Sent: 05 August 2006 14:55
->To: BlueZ development
->Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error(=
-trials and tribulations) how cool is this!!! new patch
->
-> Hi
->
->Don't know if its my headphones but pressing play does not start xmms.
->
->If I manuly start Xmms then fwd rev play pause work
->
->But still once 10 secs has done then pressinf play on the headphones does =
-nothing and if I press play on xmms it still just doesn't work
->
->Accepting incoming tcp stream connection
->[pause] xmms --pause
->Forked xmms --pause         <----------------------Pause press ;-)
->[1] Receiving failed on socket 0.6 error (-1/4 bytes) errno=3D11:Resource
->temporarily unavailable  <---------------------  press play repeatedly on =
-head phones nothing happens
->Client thread 0.6 ending: timeout =
-
->Destroying lpA2dp, destroy_count is 2001
->DEBUG: a2dp_destroy: Begin
->DEBUG: a2dp_free: Begin
->DEBUG: a2dp_destroy: a2dp_destroy(0x80561f0) OK
->avrcp: socket 9: timed out
->Accepted 6
->PCM thread 0.6 started  < ------------------------------ press play on xmm=
-s =
-
->DEBUG: a2dp_new: Begin
->DEBUG: a2dp_new: bdaddr/dest is 00:0D:44:2A:5C:12
->DEBUG: a2dp_alloc: Begin
->DEBUG: a2dp_connect: a2dp 0x8076d58
->DEBUG: connect_stream: Begin
->DEBUG: connect_stream: Using address: 12:5C:2A:44:0D:00
->DEBUG: detect_a2dp: Begin
->Accepting incoming tcp stream connection
->DEBUG: detect_a2dp: Found A2DP Sink
->DEBUG: connect_stream: Found A2DP Sink at the destination (psm_cmd=3D25)
->DEBUG: do_connect: Begin
->DEBUG: do_connect: Connecting to bluetooth
->DEBUG: do_connect: (errno=3D111:Connection refused)Can't connect to
->12:5C:2A:44:0D:00 on psm 25. Connection refused(111)
->DEBUG: do_connect: (errno=3D77:File descriptor in bad state)Can't connect =
-to
->12:5C:2A:44:0D:00 on psm 25. File descriptor in bad state(77)
->DEBUG: do_connect: (errno=3D77:File descriptor in bad state)Can't connect =
-to
->12:5C:2A:44:0D:00 on psm 25. File descriptor in bad state(77)
->DEBUG: connect_stream: cannot open psm_cmd =3D 25
->
->Any ideas
->
->
->--------------------------------------------------------------------------=
--------- =
-
->
->
->-----Original Message-----
->From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounce=
-s@lists.sourceforge.net] On Behalf Of Fr=E9d=E9ric DALLEAU
->Sent: 04 August 2006 16:09
->To: BlueZ development
->Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmms error =
-(trials and tribulations) how cool is this!!! new patch
->
->Hi all,
->
->Now the a2dpd handles avrcp too. Only play / pause / next / prev but =
-
->other commands if any should go straight away.
->
->Waldram, Andrew (SBS UK) a =E9crit :
->
->  =
-
->
->>When you say you integrated it into a2dpd do you mean all the a2recv stuf=
-f, if so doean't that make the deamon a xmms dependant tool?
->> =
-
->>
->>    =
-
->>
->No thanks to the config file
->
->  =
-
->
->>It'd be real cool if it'd parse a config file so something like the follo=
-wing could be done
->>
->>/etc/a2dpd.conf
->> =
-
->>
->>    =
-
->>
->done, see attachment
->$HOME/.a2dprc for now
->
->  =
-
->
->>For now, it is not yet handled but you see the daemon receive a frame of =
-
->>the form 0x00 0x01 (AVDTP_DISCOVER).
->>I will try today reject the frame and system(xmms --play).
->> =
-
->>
->>    =
-
->>
->done, see patch
->
->Two commands line options appeared:
->-d forks (+d no fork) on startup
->-v redirect output to stdout (+v to logfile specified in rc def : =
-
->/tmp/a2dpd.log)
->
->If your headset is avrcp, what can you do :
->start a2dpd
->press play on the headset, and it will start up xmms. You should hear music
->press play again, it will pause xmms.
->press play again, music restart.
->press next or prev to switch song.
->
->you can also try alsamixer -D ctl.a2dpd
->
->Fr=E9d=E9ric
->
->
->
->-------------------------------------------------------------------------
->Take Surveys. Earn Cash. Influence the Future of IT
->Join SourceForge.net's Techsay panel and you'll get the chance to share yo=
-ur
->opinions on IT & business topics through brief surveys -- and earn cash
->http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DD=
-EVDEV
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->-------------------------------------------------------------------------
->Take Surveys. Earn Cash. Influence the Future of IT
->Join SourceForge.net's Techsay panel and you'll get the chance to share yo=
-ur
->opinions on IT & business topics through brief surveys -- and earn cash
->http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DD=
-EVDEV
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->-------------------------------------------------------------------------
->Using Tomcat but need to do more? Need to support web services, security?
->Get stuff done quickly with pre-integrated technology to make your job eas=
-ier
->Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
->http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D=
-121642
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
->  =
-
->
 
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
