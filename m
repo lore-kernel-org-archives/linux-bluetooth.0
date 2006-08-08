@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <44D8A430.6080502@palmsource.com>
+Date: Tue, 08 Aug 2006 16:48:16 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-Date: Tue, 8 Aug 2006 16:07:49 +0100
-Message-ID: <056BF200E9632F4285220E570FEED673D7B21F@GBMDDMH202AMSX.gb001.siemens.net>
-In-Reply-To: <44D8A430.6080502@palmsource.com>
-From: "Waldram, Andrew (SBS UK)" <andrew.waldram@siemens.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <056BF200E9632F4285220E570FEED673D7AE42@GBMDDMH202AMSX.gb001.siemens.net>
+In-Reply-To: <056BF200E9632F4285220E570FEED673D7AE42@GBMDDMH202AMSX.gb001.siemens.net>
 Subject: Re: [Bluez-devel] a2pd btsco won't compile
-	(FIX)	plus	xmmserror(trials and tribulations) how cool is
-	this!!!	new patch
+ (FIX)	plus	xmmserror(trials and tribulations) how cool is this!!!	new patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,44 +20,6 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
-
-Fr=E9d=E9ric
-
-
- Thanks for your time,
-
-No my laptop is not overclocked single pIII 1Ghz =
-
-
-Ubuntu stock 2.6.15-26 6.06 kernel with patches for apanel and fujacpi adde=
-d =
-
-
-These patches are to allow ancillary buttons and screen brightness to be co=
-ntrolled
-
-I'd be supprised if my machine stops overheated as I'd have thought my fan =
-would ramp up prior to problem, but some of my acpi/apanel modules use poll=
-ing (sloppy I know) that they  kill the machine when resources are scarce.
-
-Sounds like you've got a handle on the issue though.
-
-It's not patience but gratitude for all your hard work ;-)
-
-
----------------------------------------------------------------------------=
-------- =
-
-
-
-
------Original Message-----
-From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounces=
-@lists.sourceforge.net] On Behalf Of Fr=E9d=E9ric DALLEAU
-Sent: 08 August 2006 15:48
-To: BlueZ development
-Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX) plus xmmserror(tr=
-ials and tribulations) how cool is this!!! new patch
 
 Andrew,
 
@@ -465,18 +427,6 @@ ier
 
 >
 
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
