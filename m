@@ -1,58 +1,104 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ulisses Furquim <ulissesf@gmail.com>
-In-Reply-To: <d23110170608091452k5b03cf2aoda2e6ee3801168e3@mail.gmail.com>
-References: <44D88EC1.7010009@pracucci.com> <44D8815D.4000108@infitsrl.com>
-	<d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
-	<1155160601.4492.10.camel@aeonflux.holtmann.net>
-	<d23110170608091452k5b03cf2aoda2e6ee3801168e3@mail.gmail.com>
-Date: Thu, 10 Aug 2006 02:49:43 +0200
-Message-Id: <1155170983.4492.25.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Return-Path: <ulissesf@gmail.com>
+Message-ID: <d23110170608091452k5b03cf2aoda2e6ee3801168e3@mail.gmail.com>
+Date: Wed, 9 Aug 2006 18:52:38 -0300
+From: "Ulisses Furquim" <ulissesf@gmail.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
 Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Cc: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1155160601.4492.10.camel@aeonflux.holtmann.net>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_38803_14255120.1155160358753"
+References: <44D88EC1.7010009@pracucci.com> <44D8815D.4000108@infitsrl.com>
+	 <d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
+	 <1155160601.4492.10.camel@aeonflux.holtmann.net>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Ulisses,
+------=_Part_38803_14255120.1155160358753
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> > > I've done some modifications (and also included some bits from -mh)
-> > > and it seems to be working. However, I'm hitting a kernel bug at
-> > > kernel/timer.c inside cascade() from time to time. I haven't found
-> > > what is causing this yet, but the patch I'm sending is against 2.6.17
-> > > and I haven't tested with latest git snapshot so maybe this issue is
-> > > already fixed upstream (kernel/timer.c:cascade() was changed [1]).
-> >
-> > please redo the patch against 2.6.18-rc4 and I will do some additional
-> > testing.
-> 
-> Done. Here is the same patch against 2.6.18-rc4.
+Hi Marcel,
 
-I tested this patch on my Quad G5. I don't see any timer issues, but it
-also doesn't work either.
+On 8/9/06, Marcel Holtmann <marcel@holtmann.org> wrote:
+> > I've done some modifications (and also included some bits from -mh)
+> > and it seems to be working. However, I'm hitting a kernel bug at
+> > kernel/timer.c inside cascade() from time to time. I haven't found
+> > what is causing this yet, but the patch I'm sending is against 2.6.17
+> > and I haven't tested with latest git snapshot so maybe this issue is
+> > already fixed upstream (kernel/timer.c:cascade() was changed [1]).
+>
+> please redo the patch against 2.6.18-rc4 and I will do some additional
+> testing.
 
-Regards
+Done. Here is the same patch against 2.6.18-rc4.
 
-Marcel
+Regards,
 
+-- Ulisses
 
+------=_Part_38803_14255120.1155160358753
+Content-Type: text/x-patch;
+	name=l2cap-handle-multiple-connects-2.6.18-rc4.patch;
+	charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_eqo8gsy6
+Content-Disposition: attachment; filename="l2cap-handle-multiple-connects-2.6.18-rc4.patch"
 
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+ZGlmZiAtdXJOIGxpbnV4LTIuNi4xOC1yYzQvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmgg
+bGludXgtMi42LjE4LXJjNC1kZXYvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmgKLS0tIGxp
+bnV4LTIuNi4xOC1yYzQvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmgJMjAwNi0wNi0xNyAy
+Mjo0OTozNS4wMDAwMDAwMDAgLTAzMDAKKysrIGxpbnV4LTIuNi4xOC1yYzQtZGV2L2luY2x1ZGUv
+bmV0L2JsdWV0b290aC9sMmNhcC5oCTIwMDYtMDgtMDkgMTg6MDQ6MjYuMDAwMDAwMDAwIC0wMzAw
+CkBAIC0xODMsNiArMTgzLDggQEAKIH07CiAKIHN0cnVjdCBsMmNhcF9jb25uIHsKKwlzdHJ1Y3Qg
+bGlzdF9oZWFkIGxpc3Q7CisKIAlzdHJ1Y3QgaGNpX2Nvbm4JKmhjb247CiAKIAliZGFkZHJfdAkq
+ZHN0OwpkaWZmIC11ck4gbGludXgtMi42LjE4LXJjNC9uZXQvYmx1ZXRvb3RoL2wyY2FwLmMgbGlu
+dXgtMi42LjE4LXJjNC1kZXYvbmV0L2JsdWV0b290aC9sMmNhcC5jCi0tLSBsaW51eC0yLjYuMTgt
+cmM0L25ldC9ibHVldG9vdGgvbDJjYXAuYwkyMDA2LTA4LTA5IDE4OjI4OjMxLjAwMDAwMDAwMCAt
+MDMwMAorKysgbGludXgtMi42LjE4LXJjNC1kZXYvbmV0L2JsdWV0b290aC9sMmNhcC5jCTIwMDYt
+MDgtMDkgMTg6MjY6MDYuMDAwMDAwMDAwIC0wMzAwCkBAIC02Myw2ICs2Myw5IEBACiAJLmxvY2sg
+PSBSV19MT0NLX1VOTE9DS0VECiB9OwogCitzdGF0aWMgTElTVF9IRUFEKGwyY2FwX2Nvbm5fbGlz
+dCk7CitzdGF0aWMgREVGSU5FX1NQSU5MT0NLKGwyY2FwX2Nvbm5fbG9jayk7CisKIHN0YXRpYyB2
+b2lkIF9fbDJjYXBfc29ja19jbG9zZShzdHJ1Y3Qgc29jayAqc2ssIGludCByZWFzb24pOwogc3Rh
+dGljIHZvaWQgbDJjYXBfc29ja19jbG9zZShzdHJ1Y3Qgc29jayAqc2spOwogc3RhdGljIHZvaWQg
+bDJjYXBfc29ja19raWxsKHN0cnVjdCBzb2NrICpzayk7CkBAIC0yODIsNiArMjg1LDggQEAKIAlz
+cGluX2xvY2tfaW5pdCgmY29ubi0+bG9jayk7CiAJcndsb2NrX2luaXQoJmNvbm4tPmNoYW5fbGlz
+dC5sb2NrKTsKIAorCUlOSVRfTElTVF9IRUFEKCZjb25uLT5saXN0KTsKKwogCXJldHVybiBjb25u
+OwogfQogCkBAIC02NDIsMTggKzY0NywyMyBAQAogCXNrLT5za19zdGF0ZSA9IEJUX0NPTk5FQ1Q7
+CiAJbDJjYXBfc29ja19zZXRfdGltZXIoc2ssIHNrLT5za19zbmR0aW1lbyk7CiAKLQlpZiAoaGNv
+bi0+c3RhdGUgPT0gQlRfQ09OTkVDVEVEKSB7Ci0JCWlmIChzay0+c2tfdHlwZSA9PSBTT0NLX1NF
+UVBBQ0tFVCkgewotCQkJc3RydWN0IGwyY2FwX2Nvbm5fcmVxIHJlcTsKLQkJCWwyY2FwX3BpKHNr
+KS0+aWRlbnQgPSBsMmNhcF9nZXRfaWRlbnQoY29ubik7Ci0JCQlyZXEuc2NpZCA9IF9fY3B1X3Rv
+X2xlMTYobDJjYXBfcGkoc2spLT5zY2lkKTsKLQkJCXJlcS5wc20gID0gbDJjYXBfcGkoc2spLT5w
+c207Ci0JCQlsMmNhcF9zZW5kX2NtZChjb25uLCBsMmNhcF9waShzayktPmlkZW50LAotCQkJCQlM
+MkNBUF9DT05OX1JFUSwgc2l6ZW9mKHJlcSksICZyZXEpOwotCQl9IGVsc2UgewotCQkJbDJjYXBf
+c29ja19jbGVhcl90aW1lcihzayk7Ci0JCQlzay0+c2tfc3RhdGUgPSBCVF9DT05ORUNURUQ7Ci0J
+CX0KKwlpZiAoaGNvbi0+c3RhdGUgIT0gQlRfQ09OTkVDVEVEKSB7CisJCXNwaW5fbG9jaygmbDJj
+YXBfY29ubl9sb2NrKTsKKwkJbGlzdF9hZGRfdGFpbCgmY29ubi0+bGlzdCwgJmwyY2FwX2Nvbm5f
+bGlzdCk7CisJCXNwaW5fdW5sb2NrKCZsMmNhcF9jb25uX2xvY2spOworCQlnb3RvIGRvbmU7CisJ
+fQorCisJaWYgKHNrLT5za190eXBlID09IFNPQ0tfU0VRUEFDS0VUKSB7CisJCXN0cnVjdCBsMmNh
+cF9jb25uX3JlcSByZXE7CisJCWwyY2FwX3BpKHNrKS0+aWRlbnQgPSBsMmNhcF9nZXRfaWRlbnQo
+Y29ubik7CisJCXJlcS5zY2lkID0gX19jcHVfdG9fbGUxNihsMmNhcF9waShzayktPnNjaWQpOwor
+CQlyZXEucHNtICA9IGwyY2FwX3BpKHNrKS0+cHNtOworCQlsMmNhcF9zZW5kX2NtZChjb25uLCBs
+MmNhcF9waShzayktPmlkZW50LAorCQkJCUwyQ0FQX0NPTk5fUkVRLCBzaXplb2YocmVxKSwgJnJl
+cSk7CisJfSBlbHNlIHsKKwkJbDJjYXBfc29ja19jbGVhcl90aW1lcihzayk7CisJCXNrLT5za19z
+dGF0ZSA9IEJUX0NPTk5FQ1RFRDsKIAl9CiAKIGRvbmU6CkBAIC0xOTI2LDEyICsxOTM2LDQwIEBA
+CiAJaWYgKGhjb24tPnR5cGUgIT0gQUNMX0xJTkspCiAJCXJldHVybiAwOwogCi0JaWYgKCFzdGF0
+dXMpIHsKKwlzd2l0Y2ggKHN0YXR1cykgeworCWNhc2UgMHgwMDoKIAkJY29ubiA9IGwyY2FwX2Nv
+bm5fYWRkKGhjb24sIHN0YXR1cyk7Ci0JCWlmIChjb25uKQotCQkJbDJjYXBfY29ubl9yZWFkeShj
+b25uKTsKLQl9IGVsc2UKKwkJaWYgKCFjb25uKQorCQkJYnJlYWs7CisKKwkJc3Bpbl9sb2NrX2Jo
+KCZsMmNhcF9jb25uX2xvY2spOworCQlsaXN0X2RlbCgmY29ubi0+bGlzdCk7CisJCXNwaW5fdW5s
+b2NrX2JoKCZsMmNhcF9jb25uX2xvY2spOworCisJCWwyY2FwX2Nvbm5fcmVhZHkoY29ubik7CisK
+KwkJc3Bpbl9sb2NrX2JoKCZsMmNhcF9jb25uX2xvY2spOworCQlpZiAoIWxpc3RfZW1wdHkoJmwy
+Y2FwX2Nvbm5fbGlzdCkpIHsKKwkJCXN0cnVjdCBsMmNhcF9jb25uICpuZXh0OworCQkJbmV4dCA9
+IGxpc3RfZW50cnkobDJjYXBfY29ubl9saXN0Lm5leHQsIHN0cnVjdCBsMmNhcF9jb25uLCBsaXN0
+KTsKKwkJCWxpc3RfbW92ZV90YWlsKCZuZXh0LT5saXN0LCAmbDJjYXBfY29ubl9saXN0KTsKKwkJ
+CWhjaV9jb25uX3B1dChuZXh0LT5oY29uKTsKKwkJCWhjaV9jb25uZWN0KG5leHQtPmhjb24tPmhk
+ZXYsIEFDTF9MSU5LLCBuZXh0LT5kc3QpOworCQl9CisJCXNwaW5fdW5sb2NrX2JoKCZsMmNhcF9j
+b25uX2xvY2spOworCQlicmVhazsKKworCWNhc2UgMHgwYzoKKwkJYnJlYWs7CisKKwlkZWZhdWx0
+OgorCQlzcGluX2xvY2tfYmgoJmwyY2FwX2Nvbm5fbG9jayk7CisJCWlmICgoY29ubiA9IGhjb24t
+PmwyY2FwX2RhdGEpKQorCQkJbGlzdF9kZWwoJmNvbm4tPmxpc3QpOworCQlzcGluX3VubG9ja19i
+aCgmbDJjYXBfY29ubl9sb2NrKTsKIAkJbDJjYXBfY29ubl9kZWwoaGNvbiwgYnRfZXJyKHN0YXR1
+cykpOworCQlicmVhazsKKwl9CiAKIAlyZXR1cm4gMDsKIH0K
+------=_Part_38803_14255120.1155160358753--
