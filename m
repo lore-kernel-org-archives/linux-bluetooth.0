@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44DA4876.1080207@prolly.org>
-Date: Wed, 09 Aug 2006 16:41:26 -0400
-From: Douglas Ward <douglas.ward@prolly.org>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44D9CCF1.9060102@prolly.org>
-	<1155160128.4492.0.camel@aeonflux.holtmann.net>
-In-Reply-To: <1155160128.4492.0.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] logitech mx 5000
+In-Reply-To: <44D8AC0E.1080308@palmsource.com>
+References: <44859045.7090208@palmsource.com>
+	<1150263854.5359.1.camel@aeonflux.holtmann.net>
+	<44969FA3.7030805@palmsource.com> <1151325308.7694.16.camel@localhost>
+	<44D8AC0E.1080308@palmsource.com>
+Date: Thu, 10 Aug 2006 00:20:00 +0200
+Message-Id: <1155162001.4492.19.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] Minor classes support
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,130 +23,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-douglas@saphron:~$ cat /proc/bus/usb/devices
+Hi Frederic,
 
-T:  Bus=05 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480 MxCh= 8
-B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.15-26-686 ehci_hcd
-S:  Product=EHCI Host Controller
-S:  SerialNumber=0000:00:1d.7
-C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=256ms
+> We found a bug in DBus function GetRemoteMinorClass when major class is 
+> "imaging". In this case, the minor class can be a combo of minor values 
+> (minor part of the class is not an "index" in a table but a "field of 
+> bit", e.g. "scanner printer").
+> The patch attached returns the first matching value. It may be useful to 
+> change this API to allow it to return multiple values.
 
-T:  Bus=04 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
-B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.15-26-686 uhci_hcd
-S:  Product=UHCI Host Controller
-S:  SerialNumber=0000:00:1d.3
-C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
+I applied the patch to the CVS. We might need some more defined minor
+class strings in the documentation. Feel free to propose something, but
+actually I prefer not to return more than one value or a list of
+strings. This API is supposed to be simple.
 
-T:  Bus=03 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
-B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.15-26-686 uhci_hcd
-S:  Product=UHCI Host Controller
-S:  SerialNumber=0000:00:1d.2
-C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
+I also added a GetRemoteClass to return the full 3 bytes class value.
 
-T:  Bus=02 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
-B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.15-26-686 uhci_hcd
-S:  Product=UHCI Host Controller
-S:  SerialNumber=0000:00:1d.1
-C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
+Regards
 
-T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
-B:  Alloc= 45/900 us ( 5%), #Int=  3, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.15-26-686 uhci_hcd
-S:  Product=UHCI Host Controller
-S:  SerialNumber=0000:00:1d.0
-C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
+Marcel
 
-T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 3
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=046d ProdID=0b02 Rev=40.02
-S:  Manufacturer=Logitech
-S:  Product=Logitech BT Mini-Receiver
-C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   1 Ivl=255ms
-
-T:  Bus=01 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=046d ProdID=c70e Rev=40.02
-S:  Manufacturer=Logitech
-S:  Product=Logitech BT Mini-Receiver
-S:  SerialNumber=00076142BE6D
-C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr= 98mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=usbhid
-E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
-
-T:  Bus=01 Lev=02 Prnt=02 Port=02 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=046d ProdID=c70a Rev=40.02
-S:  Manufacturer=Logitech
-S:  Product=Logitech BT Mini-Receiver
-S:  SerialNumber=00076142BE6D
-C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr= 98mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=usbhid
-E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=5ms
-
-I removed the other line because it isn't used when switching to HCI
-mode. using switch_logitech on it doesn't do anything, yet reports
-success. that is the correct usb id for the emulated usb hub generated
-by the dongle however.
-
-Marcel Holtmann wrote:
-> Hi Douglas,
->
->   
->> here... this makes (046d:0b02) switch to HCI mode. I'm not sure why
->> but it requires that the switch command be sent to both the emulated
->> keyboard and mouse devices. switching one seems to make the hci device
->> show up, but it doesn't actually function. I don't know enough about
->> bluez to do anymore then this. my mx 5000 combo have been working in
->> bluetooth mode for quite some time now and i even reported my success
->> on this mailing list. the other keyboard set (dinovo?) with this
->> dongle may need its emulated devices added as well.
->>     
->
-> can you send in the content from /proc/bus/usb/devices before switching
-> into HCI mode. Why do you removed the other line?
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->   
 
 
 -------------------------------------------------------------------------
