@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <d23110170608080552gcfb8ad3tb341ea0b08083172@mail.gmail.com>
-References: <000c01c6ba9e$b7480f70$9d0cc70a@dlh.st.com>
-	<d23110170608080552gcfb8ad3tb341ea0b08083172@mail.gmail.com>
-Date: Wed, 09 Aug 2006 23:58:24 +0200
-Message-Id: <1155160704.4492.13.camel@aeonflux.holtmann.net>
+To: Ulisses Furquim <ulissesf@gmail.com>
+In-Reply-To: <d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
+References: <44D88EC1.7010009@pracucci.com> <44D8815D.4000108@infitsrl.com>
+	<d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
+Date: Wed, 09 Aug 2006 23:56:41 +0200
+Message-Id: <1155160601.4492.10.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,16 +24,29 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Ulisses,
 
-> > I wanted to know whether Host Controller to Host Flow Control has been implemented in the BlueZ stack?
-> > I am interested in giving it a shot in case it is not already there or someone is not working on it.
+> > I have had a similar problem ....I've discovered (with Marcel help) is a
+> > problem in l2cap layer.
+> > l2cap kernel module do not handle multiple connect, Marcel send to me a
+> > patch I am trying to make to work
+> >  but I'm very busy with my job and is not still clear where the patch
+> > hangs the system.
 > 
-> No, it's not implemented in the BlueZ stack. I've done a preliminary
-> work on this but haven't completed it yet. You can see my and Marcel
-> Holtmann e-mails on the bluez-devel mailing list archive about this.
-> If you want to help us, please feel free to send in patches.
+> We thought we had a deadlock somewhere but it wasn't the case. We had
+> two problems:
+> 
+>  - trying to list_del() the same list entry twice leading us to a page fault
+>  - we've forgotten to INIT_LIST_HEAD() our l2cap_conn->list leading us
+> to a NULL pointer dereference
+> 
+> I've done some modifications (and also included some bits from -mh)
+> and it seems to be working. However, I'm hitting a kernel bug at
+> kernel/timer.c inside cascade() from time to time. I haven't found
+> what is causing this yet, but the patch I'm sending is against 2.6.17
+> and I haven't tested with latest git snapshot so maybe this issue is
+> already fixed upstream (kernel/timer.c:cascade() was changed [1]).
 
-feel free to work together with Mayank to get a testing version we can
-include into the -mh patch.
+please redo the patch against 2.6.18-rc4 and I will do some additional
+testing.
 
 Regards
 
