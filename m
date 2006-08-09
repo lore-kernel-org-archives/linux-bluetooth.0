@@ -1,51 +1,153 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44D9CCF1.9060102@prolly.org>
-References: <44D9CCF1.9060102@prolly.org>
-Date: Wed, 09 Aug 2006 23:48:48 +0200
-Message-Id: <1155160128.4492.0.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] logitech mx 5000
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Return-Path: <ulissesf@gmail.com>
+Message-ID: <d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
+Date: Wed, 9 Aug 2006 12:06:10 -0300
+From: "Ulisses Furquim" <ulissesf@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
+Cc: "Marcel Holtmann" <marcel@holtmann.org>
+In-Reply-To: <44D8815D.4000108@infitsrl.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_30816_7328466.1155135970341"
+References: <44D88EC1.7010009@pracucci.com> <44D8815D.4000108@infitsrl.com>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Douglas,
+------=_Part_30816_7328466.1155135970341
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> here... this makes (046d:0b02) switch to HCI mode. I'm not sure why
-> but it requires that the switch command be sent to both the emulated
-> keyboard and mouse devices. switching one seems to make the hci device
-> show up, but it doesn't actually function. I don't know enough about
-> bluez to do anymore then this. my mx 5000 combo have been working in
-> bluetooth mode for quite some time now and i even reported my success
-> on this mailing list. the other keyboard set (dinovo?) with this
-> dongle may need its emulated devices added as well.
+Hi Fabrizio,
 
-can you send in the content from /proc/bus/usb/devices before switching
-into HCI mode. Why do you removed the other line?
+On 8/8/06, Fabrizio Guglielmino <guglielmino@infitsrl.com> wrote:
+> I have had a similar problem ....I've discovered (with Marcel help) is a
+> problem in l2cap layer.
+> l2cap kernel module do not handle multiple connect, Marcel send to me a
+> patch I am trying to make to work
+>  but I'm very busy with my job and is not still clear where the patch
+> hangs the system.
 
-Regards
+We thought we had a deadlock somewhere but it wasn't the case. We had
+two problems:
 
-Marcel
+ - trying to list_del() the same list entry twice leading us to a page fault
+ - we've forgotten to INIT_LIST_HEAD() our l2cap_conn->list leading us
+to a NULL pointer dereference
+
+I've done some modifications (and also included some bits from -mh)
+and it seems to be working. However, I'm hitting a kernel bug at
+kernel/timer.c inside cascade() from time to time. I haven't found
+what is causing this yet, but the patch I'm sending is against 2.6.17
+and I haven't tested with latest git snapshot so maybe this issue is
+already fixed upstream (kernel/timer.c:cascade() was changed [1]).
+Marcel, do you have any idea of what might be happening?
+
+If anyone wants to give this beast a try you're warned that it might
+lock up your system. FWIW, a quick test can be done using l2test from
+CVS like:
+
+  $ ./l2test -m bd_addr1 bd_addr2 ...
+
+Best regards,
+
+-- Ulisses
 
 
+[1] http://www.kernel.org/git/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blobdiff;h=b650f04888ed6dbc6abb07adcee5c58a8f27c374;hp=9062a82ee8ec40d9a6ef985c625bd8daaf5778c5;hb=a2c348fe0117adced11e374329a5ea3f7c43cb41;f=kernel/timer.c
 
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+------=_Part_30816_7328466.1155135970341
+Content-Type: text/x-patch; name=l2cap-handle-multiple-connects.patch;
+	charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_eqntt7oy
+Content-Disposition: attachment; filename="l2cap-handle-multiple-connects.patch"
+
+ZGlmZiAtdXJOIGxpbnV4LTIuNi4xNy9pbmNsdWRlL25ldC9ibHVldG9vdGgvbDJjYXAuaCBsaW51
+eC0yLjYuMTctZGV2L2luY2x1ZGUvbmV0L2JsdWV0b290aC9sMmNhcC5oCi0tLSBsaW51eC0yLjYu
+MTcvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmgJMjAwNi0wNi0xNyAyMjo0OTozNS4wMDAw
+MDAwMDAgLTAzMDAKKysrIGxpbnV4LTIuNi4xNy1kZXYvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2wy
+Y2FwLmgJMjAwNi0wOC0wNyAxNzowNTo0OS4wMDAwMDAwMDAgLTAzMDAKQEAgLTE4Myw2ICsxODMs
+OCBAQAogfTsKIAogc3RydWN0IGwyY2FwX2Nvbm4geworCXN0cnVjdCBsaXN0X2hlYWQgbGlzdDsK
+KwogCXN0cnVjdCBoY2lfY29ubgkqaGNvbjsKIAogCWJkYWRkcl90CSpkc3Q7CmRpZmYgLXVyTiBs
+aW51eC0yLjYuMTcvbmV0L2JsdWV0b290aC9sMmNhcC5jIGxpbnV4LTIuNi4xNy1kZXYvbmV0L2Js
+dWV0b290aC9sMmNhcC5jCi0tLSBsaW51eC0yLjYuMTcvbmV0L2JsdWV0b290aC9sMmNhcC5jCTIw
+MDYtMDYtMTcgMjI6NDk6MzUuMDAwMDAwMDAwIC0wMzAwCisrKyBsaW51eC0yLjYuMTctZGV2L25l
+dC9ibHVldG9vdGgvbDJjYXAuYwkyMDA2LTA4LTA4IDE3OjIzOjQ0LjAwMDAwMDAwMCAtMDMwMApA
+QCAtNjksNiArNjksOSBAQAogc3RhdGljIHZvaWQgX19sMmNhcF9jaGFuX2FkZChzdHJ1Y3QgbDJj
+YXBfY29ubiAqY29ubiwgc3RydWN0IHNvY2sgKnNrLCBzdHJ1Y3Qgc29jayAqcGFyZW50KTsKIHN0
+YXRpYyB2b2lkIGwyY2FwX2NoYW5fZGVsKHN0cnVjdCBzb2NrICpzaywgaW50IGVycik7CiAKK3N0
+YXRpYyBMSVNUX0hFQUQobDJjYXBfY29ubl9saXN0KTsKK3N0YXRpYyBERUZJTkVfU1BJTkxPQ0so
+bDJjYXBfY29ubl9sb2NrKTsKKwogc3RhdGljIHZvaWQgX19sMmNhcF9zb2NrX2Nsb3NlKHN0cnVj
+dCBzb2NrICpzaywgaW50IHJlYXNvbik7CiBzdGF0aWMgdm9pZCBsMmNhcF9zb2NrX2Nsb3NlKHN0
+cnVjdCBzb2NrICpzayk7CiBzdGF0aWMgdm9pZCBsMmNhcF9zb2NrX2tpbGwoc3RydWN0IHNvY2sg
+KnNrKTsKQEAgLTEzNSw2ICsxMzgsOCBAQAogCXNwaW5fbG9ja19pbml0KCZjb25uLT5sb2NrKTsK
+IAlyd2xvY2tfaW5pdCgmY29ubi0+Y2hhbl9saXN0LmxvY2spOwogCisJSU5JVF9MSVNUX0hFQUQo
+JmNvbm4tPmxpc3QpOworCiAJQlRfREJHKCJoY29uICVwIGNvbm4gJXAiLCBoY29uLCBjb25uKTsK
+IAlyZXR1cm4gY29ubjsKIH0KQEAgLTE2OCw5ICsxNzMsOSBAQAogc3RhdGljIGlubGluZSB2b2lk
+IGwyY2FwX2NoYW5fYWRkKHN0cnVjdCBsMmNhcF9jb25uICpjb25uLCBzdHJ1Y3Qgc29jayAqc2ss
+IHN0cnVjdCBzb2NrICpwYXJlbnQpCiB7CiAJc3RydWN0IGwyY2FwX2NoYW5fbGlzdCAqbCA9ICZj
+b25uLT5jaGFuX2xpc3Q7Ci0Jd3JpdGVfbG9jaygmbC0+bG9jayk7CisJd3JpdGVfbG9ja19iaCgm
+bC0+bG9jayk7CiAJX19sMmNhcF9jaGFuX2FkZChjb25uLCBzaywgcGFyZW50KTsKLQl3cml0ZV91
+bmxvY2soJmwtPmxvY2spOworCXdyaXRlX3VubG9ja19iaCgmbC0+bG9jayk7CiB9CiAKIHN0YXRp
+YyBpbmxpbmUgdTggbDJjYXBfZ2V0X2lkZW50KHN0cnVjdCBsMmNhcF9jb25uICpjb25uKQpAQCAt
+MTgzLDE0ICsxODgsMTQgQEAKIAkgKiAgMjAwIC0gMjU0IGFyZSB1c2VkIGJ5IHV0aWxpdGllcyBs
+aWtlIGwycGluZywgZXRjLgogCSAqLwogCi0Jc3Bpbl9sb2NrKCZjb25uLT5sb2NrKTsKKwlzcGlu
+X2xvY2tfYmgoJmNvbm4tPmxvY2spOwogCiAJaWYgKCsrY29ubi0+dHhfaWRlbnQgPiAxMjgpCiAJ
+CWNvbm4tPnR4X2lkZW50ID0gMTsKIAogCWlkID0gY29ubi0+dHhfaWRlbnQ7CiAKLQlzcGluX3Vu
+bG9jaygmY29ubi0+bG9jayk7CisJc3Bpbl91bmxvY2tfYmgoJmNvbm4tPmxvY2spOwogCiAJcmV0
+dXJuIGlkOwogfQpAQCAtNDk3LDE4ICs1MDIsMjMgQEAKIAlzay0+c2tfc3RhdGUgPSBCVF9DT05O
+RUNUOwogCWwyY2FwX3NvY2tfc2V0X3RpbWVyKHNrLCBzay0+c2tfc25kdGltZW8pOwogCi0JaWYg
+KGhjb24tPnN0YXRlID09IEJUX0NPTk5FQ1RFRCkgewotCQlpZiAoc2stPnNrX3R5cGUgPT0gU09D
+S19TRVFQQUNLRVQpIHsKLQkJCXN0cnVjdCBsMmNhcF9jb25uX3JlcSByZXE7Ci0JCQlsMmNhcF9w
+aShzayktPmlkZW50ID0gbDJjYXBfZ2V0X2lkZW50KGNvbm4pOwotCQkJcmVxLnNjaWQgPSBfX2Nw
+dV90b19sZTE2KGwyY2FwX3BpKHNrKS0+c2NpZCk7Ci0JCQlyZXEucHNtICA9IGwyY2FwX3BpKHNr
+KS0+cHNtOwotCQkJbDJjYXBfc2VuZF9jbWQoY29ubiwgbDJjYXBfcGkoc2spLT5pZGVudCwKLQkJ
+CQkJTDJDQVBfQ09OTl9SRVEsIHNpemVvZihyZXEpLCAmcmVxKTsKLQkJfSBlbHNlIHsKLQkJCWwy
+Y2FwX3NvY2tfY2xlYXJfdGltZXIoc2spOwotCQkJc2stPnNrX3N0YXRlID0gQlRfQ09OTkVDVEVE
+OwotCQl9CisJaWYgKGhjb24tPnN0YXRlICE9IEJUX0NPTk5FQ1RFRCkgeworCQlzcGluX2xvY2so
+JmwyY2FwX2Nvbm5fbG9jayk7CisJCWxpc3RfYWRkX3RhaWwoJmNvbm4tPmxpc3QsICZsMmNhcF9j
+b25uX2xpc3QpOworCQlzcGluX3VubG9jaygmbDJjYXBfY29ubl9sb2NrKTsKKwkJZ290byBkb25l
+OworCX0KKworCWlmIChzay0+c2tfdHlwZSA9PSBTT0NLX1NFUVBBQ0tFVCkgeworCQlzdHJ1Y3Qg
+bDJjYXBfY29ubl9yZXEgcmVxOworCQlsMmNhcF9waShzayktPmlkZW50ID0gbDJjYXBfZ2V0X2lk
+ZW50KGNvbm4pOworCQlyZXEuc2NpZCA9IF9fY3B1X3RvX2xlMTYobDJjYXBfcGkoc2spLT5zY2lk
+KTsKKwkJcmVxLnBzbSAgPSBsMmNhcF9waShzayktPnBzbTsKKwkJbDJjYXBfc2VuZF9jbWQoY29u
+biwgbDJjYXBfcGkoc2spLT5pZGVudCwKKwkJCQlMMkNBUF9DT05OX1JFUSwgc2l6ZW9mKHJlcSks
+ICZyZXEpOworCX0gZWxzZSB7CisJCWwyY2FwX3NvY2tfY2xlYXJfdGltZXIoc2spOworCQlzay0+
+c2tfc3RhdGUgPSBCVF9DT05ORUNURUQ7CiAJfQogCiBkb25lOgpAQCAtMTAwNyw3ICsxMDE3LDcg
+QEAKIHsKIAlzdHJ1Y3Qgc29jayAqbmV4dCA9IGwyY2FwX3BpKHNrKS0+bmV4dF9jLCAqcHJldiA9
+IGwyY2FwX3BpKHNrKS0+cHJldl9jOwogCi0Jd3JpdGVfbG9jaygmbC0+bG9jayk7CisJd3JpdGVf
+bG9ja19iaCgmbC0+bG9jayk7CiAJaWYgKHNrID09IGwtPmhlYWQpCiAJCWwtPmhlYWQgPSBuZXh0
+OwogCkBAIC0xMDE1LDcgKzEwMjUsNyBAQAogCQlsMmNhcF9waShuZXh0KS0+cHJldl9jID0gcHJl
+djsKIAlpZiAocHJldikKIAkJbDJjYXBfcGkocHJldiktPm5leHRfYyA9IG5leHQ7Ci0Jd3JpdGVf
+dW5sb2NrKCZsLT5sb2NrKTsKKwl3cml0ZV91bmxvY2tfYmgoJmwtPmxvY2spOwogCiAJX19zb2Nr
+X3B1dChzayk7CiB9CkBAIC0xNDI1LDExICsxNDM1LDExIEBACiAJaWYgKCFzaykKIAkJZ290byBy
+ZXNwb25zZTsKIAotCXdyaXRlX2xvY2soJmxpc3QtPmxvY2spOworCXdyaXRlX2xvY2tfYmgoJmxp
+c3QtPmxvY2spOwogCiAJLyogQ2hlY2sgaWYgd2UgYWxyZWFkeSBoYXZlIGNoYW5uZWwgd2l0aCB0
+aGF0IGRjaWQgKi8KIAlpZiAoX19sMmNhcF9nZXRfY2hhbl9ieV9kY2lkKGxpc3QsIHNjaWQpKSB7
+Ci0JCXdyaXRlX3VubG9jaygmbGlzdC0+bG9jayk7CisJCXdyaXRlX3VubG9ja19iaCgmbGlzdC0+
+bG9jayk7CiAJCXNvY2tfc2V0X2ZsYWcoc2ssIFNPQ0tfWkFQUEVEKTsKIAkJbDJjYXBfc29ja19r
+aWxsKHNrKTsKIAkJZ290byByZXNwb25zZTsKQEAgLTE0NjcsNyArMTQ3Nyw3IEBACiAJcmVzdWx0
+ID0gc3RhdHVzID0gMDsKIAogZG9uZToKLQl3cml0ZV91bmxvY2soJmxpc3QtPmxvY2spOworCXdy
+aXRlX3VubG9ja19iaCgmbGlzdC0+bG9jayk7CiAKIHJlc3BvbnNlOgogCWJoX3VubG9ja19zb2Nr
+KHBhcmVudCk7CkBAIC0xOTI2LDE5ICsxOTM2LDQ3IEBACiAKIHN0YXRpYyBpbnQgbDJjYXBfY29u
+bmVjdF9jZm0oc3RydWN0IGhjaV9jb25uICpoY29uLCB1OCBzdGF0dXMpCiB7CisJc3RydWN0IGwy
+Y2FwX2Nvbm4gKmNvbm47CisKIAlCVF9EQkcoImhjb24gJXAgYmRhZGRyICVzIHN0YXR1cyAlZCIs
+IGhjb24sIGJhdG9zdHIoJmhjb24tPmRzdCksIHN0YXR1cyk7CiAKIAlpZiAoaGNvbi0+dHlwZSAh
+PSBBQ0xfTElOSykKIAkJcmV0dXJuIDA7CiAKLQlpZiAoIXN0YXR1cykgewotCQlzdHJ1Y3QgbDJj
+YXBfY29ubiAqY29ubjsKLQorCXN3aXRjaCAoc3RhdHVzKSB7CisJY2FzZSAweDAwOgogCQljb25u
+ID0gbDJjYXBfY29ubl9hZGQoaGNvbiwgc3RhdHVzKTsKLQkJaWYgKGNvbm4pCi0JCQlsMmNhcF9j
+b25uX3JlYWR5KGNvbm4pOwotCX0gZWxzZSAKKwkJaWYgKCFjb25uKQorCQkJYnJlYWs7CisKKwkJ
+c3Bpbl9sb2NrX2JoKCZsMmNhcF9jb25uX2xvY2spOworCQlsaXN0X2RlbCgmY29ubi0+bGlzdCk7
+CisJCXNwaW5fdW5sb2NrX2JoKCZsMmNhcF9jb25uX2xvY2spOworCisJCWwyY2FwX2Nvbm5fcmVh
+ZHkoY29ubik7CisKKwkJc3Bpbl9sb2NrX2JoKCZsMmNhcF9jb25uX2xvY2spOworCQlpZiAoIWxp
+c3RfZW1wdHkoJmwyY2FwX2Nvbm5fbGlzdCkpIHsKKwkJCXN0cnVjdCBsMmNhcF9jb25uICpuZXh0
+OworCQkJbmV4dCA9IGxpc3RfZW50cnkobDJjYXBfY29ubl9saXN0Lm5leHQsIHN0cnVjdCBsMmNh
+cF9jb25uLCBsaXN0KTsKKwkJCWxpc3RfbW92ZV90YWlsKCZuZXh0LT5saXN0LCAmbDJjYXBfY29u
+bl9saXN0KTsKKwkJCWhjaV9jb25uX3B1dChuZXh0LT5oY29uKTsKKwkJCWhjaV9jb25uZWN0KG5l
+eHQtPmhjb24tPmhkZXYsIEFDTF9MSU5LLCBuZXh0LT5kc3QpOworCQl9CisJCXNwaW5fdW5sb2Nr
+X2JoKCZsMmNhcF9jb25uX2xvY2spOworCQlicmVhazsKKworCWNhc2UgMHgwYzoKKwkJYnJlYWs7
+CisKKwlkZWZhdWx0OgorCQlzcGluX2xvY2tfYmgoJmwyY2FwX2Nvbm5fbG9jayk7CisJCWlmICgo
+Y29ubiA9IGhjb24tPmwyY2FwX2RhdGEpKQorCQkJbGlzdF9kZWwoJmNvbm4tPmxpc3QpOworCQlz
+cGluX3VubG9ja19iaCgmbDJjYXBfY29ubl9sb2NrKTsKIAkJbDJjYXBfY29ubl9kZWwoaGNvbiwg
+YnRfZXJyKHN0YXR1cykpOworCQlicmVhazsKKwl9CiAKIAlyZXR1cm4gMDsKIH0K
+------=_Part_30816_7328466.1155135970341--
