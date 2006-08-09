@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0608021302130.6321@redbean.intranet.gw-instruments.de>
-References: <200608011329.03106.denis.kenzior@trolltech.com>
-	<1154488406.3905.37.camel@aeonflux.holtmann.net>
-	<Pine.LNX.4.63.0608021302130.6321@redbean.intranet.gw-instruments.de>
-Date: Thu, 10 Aug 2006 00:09:34 +0200
-Message-Id: <1155161374.4492.15.camel@aeonflux.holtmann.net>
+In-Reply-To: <d23110170608080552gcfb8ad3tb341ea0b08083172@mail.gmail.com>
+References: <000c01c6ba9e$b7480f70$9d0cc70a@dlh.st.com>
+	<d23110170608080552gcfb8ad3tb341ea0b08083172@mail.gmail.com>
+Date: Wed, 09 Aug 2006 23:58:24 +0200
+Message-Id: <1155160704.4492.13.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Patch: GetRemoteClass
+Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,25 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Peter,
+Hi Ulisses,
 
-> > > Attached is a patch to get remote class of device information as a uint32.  
-> > > This introduces a new method with signature:
-> > > uint32 GetRemoteClass(string address), which returns the class of device 
-> > > information encoded as a 32 bit integer.
-> > > 
-> > > The reasoning is that some applications might want to rely on their own 
-> > > conversion routines for the Major, Minor and Service class attributes, and 
-> > > thus the DBUS GetRemoteMajorClass, GetRemoteMinorClass, etc methods that 
-> > > return strings are not useful.
-> > 
-> > the patch is clean. So before I apply it and so extend the API, does
-> > someone else thinks it is useful to have?
-> > 
-> I'm currently not using the DBUS API, but I think this would be something 
-> very usefull. 
+> > I wanted to know whether Host Controller to Host Flow Control has been implemented in the BlueZ stack?
+> > I am interested in giving it a shot in case it is not already there or someone is not working on it.
+> 
+> No, it's not implemented in the BlueZ stack. I've done a preliminary
+> work on this but haven't completed it yet. You can see my and Marcel
+> Holtmann e-mails on the bluez-devel mailing list archive about this.
+> If you want to help us, please feel free to send in patches.
 
-that's fair enough. I applied the patch to the CVS now.
+feel free to work together with Mayank to get a testing version we can
+include into the -mh patch.
 
 Regards
 
