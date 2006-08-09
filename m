@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44DA046D.7020600@pracucci.com>
-References: <44DA046D.7020600@pracucci.com>
-Date: Wed, 09 Aug 2006 23:53:40 +0200
-Message-Id: <1155160420.4492.6.camel@aeonflux.holtmann.net>
+In-Reply-To: <44D9B6A6.4030706@palmsource.com>
+References: <44D9B6A6.4030706@palmsource.com>
+Date: Wed, 09 Aug 2006 23:50:47 +0200
+Message-Id: <1155160247.4492.3.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] connect() and L2CAP_CONN_TIMEOUT
+Subject: Re: [Bluez-devel] rfcomm utility patch to loop and
+	startup	executable when connection received
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +21,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marco,
+Hi Frederic,
 
-> I need to be sure that an SDP connection does not take more than X
-> seconds. In order to achieve my goal, I have correctly set the page
-> timeout of my local device. However, if I'm right, the page timeout is
-> the max time the local Link Manager will wait for a baseband page
-> response. But what does it happen if the page request is successfully
-> completed and an error occur during the connection to L2CAP remote
-> "layer"? Is there a timeout for this? Maybe L2CAP_CONN_TIMEOUT...
+> I came accross the need to startup an executable when rfcomm receives a 
+> connection. I also added an option called watch that allows rfcomm not 
+> to exit when the rfcomm connection is closed. It simply loops and calls 
+> listen.
 > 
-> I have posted this message, because practical experiments demonstrate
-> that sometimes the sdp_connect() timeout expires after 40 seconds.
+> listen   <dev> [channel [cmd]]          Listen
+> watch    <dev> [channel [cmd]]          Watch
+> 
+> rfcomm --raw watch 0 1 "cat {}"
+> rfcomm --raw listen 0 1 "cat {}"
+> 
+> Not specifying the cmd parameter will simply wait for [control-c] as before.
+> 
+> the {} will be replaced by the address of the rfcomm device created. In 
+> the example the command run will be 'cat /dev/rfcomm0'.
 
-run "hcidump -X -V" to check what timeout you really run into.
+the feature looks useful, but the patch is not acceptable. You need to
+fix the coding style. What is the difference between listen and watch?
 
 Regards
 
