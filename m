@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44D8AC0E.1080308@palmsource.com>
-References: <44859045.7090208@palmsource.com>
-	<1150263854.5359.1.camel@aeonflux.holtmann.net>
-	<44969FA3.7030805@palmsource.com> <1151325308.7694.16.camel@localhost>
-	<44D8AC0E.1080308@palmsource.com>
-Date: Thu, 10 Aug 2006 00:20:00 +0200
-Message-Id: <1155162001.4492.19.camel@aeonflux.holtmann.net>
+In-Reply-To: <Pine.LNX.4.63.0608021302130.6321@redbean.intranet.gw-instruments.de>
+References: <200608011329.03106.denis.kenzior@trolltech.com>
+	<1154488406.3905.37.camel@aeonflux.holtmann.net>
+	<Pine.LNX.4.63.0608021302130.6321@redbean.intranet.gw-instruments.de>
+Date: Thu, 10 Aug 2006 00:09:34 +0200
+Message-Id: <1155161374.4492.15.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Minor classes support
+Subject: Re: [Bluez-devel] Patch: GetRemoteClass
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,21 +22,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
+Hi Peter,
 
-> We found a bug in DBus function GetRemoteMinorClass when major class is 
-> "imaging". In this case, the minor class can be a combo of minor values 
-> (minor part of the class is not an "index" in a table but a "field of 
-> bit", e.g. "scanner printer").
-> The patch attached returns the first matching value. It may be useful to 
-> change this API to allow it to return multiple values.
+> > > Attached is a patch to get remote class of device information as a uint32.  
+> > > This introduces a new method with signature:
+> > > uint32 GetRemoteClass(string address), which returns the class of device 
+> > > information encoded as a 32 bit integer.
+> > > 
+> > > The reasoning is that some applications might want to rely on their own 
+> > > conversion routines for the Major, Minor and Service class attributes, and 
+> > > thus the DBUS GetRemoteMajorClass, GetRemoteMinorClass, etc methods that 
+> > > return strings are not useful.
+> > 
+> > the patch is clean. So before I apply it and so extend the API, does
+> > someone else thinks it is useful to have?
+> > 
+> I'm currently not using the DBUS API, but I think this would be something 
+> very usefull. 
 
-I applied the patch to the CVS. We might need some more defined minor
-class strings in the documentation. Feel free to propose something, but
-actually I prefer not to return more than one value or a list of
-strings. This API is supposed to be simple.
-
-I also added a GetRemoteClass to return the full 3 bytes class value.
+that's fair enough. I applied the patch to the CVS now.
 
 Regards
 
