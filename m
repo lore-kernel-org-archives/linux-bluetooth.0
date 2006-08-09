@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ulisses Furquim <ulissesf@gmail.com>
-In-Reply-To: <d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
-References: <44D88EC1.7010009@pracucci.com> <44D8815D.4000108@infitsrl.com>
-	<d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
-Date: Wed, 09 Aug 2006 23:56:41 +0200
-Message-Id: <1155160601.4492.10.camel@aeonflux.holtmann.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <44DA046D.7020600@pracucci.com>
+References: <44DA046D.7020600@pracucci.com>
+Date: Wed, 09 Aug 2006 23:53:40 +0200
+Message-Id: <1155160420.4492.6.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
+Subject: Re: [Bluez-devel] connect() and L2CAP_CONN_TIMEOUT
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,31 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ulisses,
+Hi Marco,
 
-> > I have had a similar problem ....I've discovered (with Marcel help) is a
-> > problem in l2cap layer.
-> > l2cap kernel module do not handle multiple connect, Marcel send to me a
-> > patch I am trying to make to work
-> >  but I'm very busy with my job and is not still clear where the patch
-> > hangs the system.
+> I need to be sure that an SDP connection does not take more than X
+> seconds. In order to achieve my goal, I have correctly set the page
+> timeout of my local device. However, if I'm right, the page timeout is
+> the max time the local Link Manager will wait for a baseband page
+> response. But what does it happen if the page request is successfully
+> completed and an error occur during the connection to L2CAP remote
+> "layer"? Is there a timeout for this? Maybe L2CAP_CONN_TIMEOUT...
 > 
-> We thought we had a deadlock somewhere but it wasn't the case. We had
-> two problems:
-> 
->  - trying to list_del() the same list entry twice leading us to a page fault
->  - we've forgotten to INIT_LIST_HEAD() our l2cap_conn->list leading us
-> to a NULL pointer dereference
-> 
-> I've done some modifications (and also included some bits from -mh)
-> and it seems to be working. However, I'm hitting a kernel bug at
-> kernel/timer.c inside cascade() from time to time. I haven't found
-> what is causing this yet, but the patch I'm sending is against 2.6.17
-> and I haven't tested with latest git snapshot so maybe this issue is
-> already fixed upstream (kernel/timer.c:cascade() was changed [1]).
+> I have posted this message, because practical experiments demonstrate
+> that sometimes the sdp_connect() timeout expires after 40 seconds.
 
-please redo the patch against 2.6.18-rc4 and I will do some additional
-testing.
+run "hcidump -X -V" to check what timeout you really run into.
 
 Regards
 
