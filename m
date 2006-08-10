@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <44DB5364.8020009@myTUM.de>
-References: <44DB5364.8020009@myTUM.de>
-Date: Thu, 10 Aug 2006 20:58:17 +0200
-Message-Id: <1155236298.4492.37.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Inquiry time
+From: menace82 <menace82@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Date: Thu, 10 Aug 2006 18:05:15 +0300
+MIME-Version: 1.0
+Message-Id: <200608101805.15810.menace82@gmail.com>
+Subject: [Bluez-users] Bluez + Planet BT-320 + SE P910i + SuSE Linux 10.1
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,22 +18,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Walter,
+Hello... I just bought a bluetooth dongle... My system recognise it as 
+bluetooth but i cannot find any devices. I've tried "hcitool scan" but i got 
+a "Inquiry failed: Connection timed out" message... My mobile phone can 
+detect my pc, but while i try to pair it i get an error message....
 
-> I have a Nokia N70 mobile phone and a MSI 3X BTOES (Ver. 476-BW). Both
-> claim to be Bluetooth 2.0+EDR devices. As I read, those device have an
-> improved device inquiry time of about 4 seconds.
-
-there exists nothing like this. You can decrease the time a device
-spends in inquiry, but then you might also only find a small fraction of
-devices. Check the hcitool manual page for options to change the inquiry
-time.
-
-Regards
-
-Marcel
-
-
+hcidump -X -V
+linux:/home/user # hcidump -X -V
+HCI sniffer - Bluetooth packet analyzer ver 1.29
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+    lap 0x9e8b33 len 6 num 0
+> HCI Event: Command Status (0x0f) plen 4
+    Inquiry (0x01|0x0001) status 0x00 ncmd 1
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+    lap 0x9e8b33 len 6 num 0
+> HCI Event: Command Status (0x0f) plen 4
+    Inquiry (0x01|0x0001) status 0x00 ncmd 1
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+    lap 0x9e8b33 len 6 num 0
+> HCI Event: Command Status (0x0f) plen 4
+    Inquiry (0x01|0x0001) status 0x00 ncmd 1
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+    lap 0x9e8b33 len 6 num 0
+> HCI Event: Command Status (0x0f) plen 4
+    Inquiry (0x01|0x0001) status 0x00 ncmd 1
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
