@@ -1,17 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <d23110170608100541o4bdf7ac0j9ac961287d267c0f@mail.gmail.com>
-References: <44D88EC1.7010009@pracucci.com> <44D8815D.4000108@infitsrl.com>
-	<d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
-	<1155160601.4492.10.camel@aeonflux.holtmann.net>
-	<d23110170608091452k5b03cf2aoda2e6ee3801168e3@mail.gmail.com>
-	<1155170983.4492.25.camel@aeonflux.holtmann.net>
-	<d23110170608100541o4bdf7ac0j9ac961287d267c0f@mail.gmail.com>
-Date: Thu, 10 Aug 2006 18:38:39 +0200
-Message-Id: <1155227919.4492.34.camel@aeonflux.holtmann.net>
+In-Reply-To: <004b01c6bc7e$11d83100$9d0cc70a@dlh.st.com>
+References: <004b01c6bc7e$11d83100$9d0cc70a@dlh.st.com>
+Date: Thu, 10 Aug 2006 18:24:19 +0200
+Message-Id: <1155227059.4492.31.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
+Subject: Re: [Bluez-devel] HCRP Printer Application
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,22 +20,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ulisses,
+Hi Mayank,
 
-> > > > please redo the patch against 2.6.18-rc4 and I will do some additional
-> > > > testing.
-> > >
-> > > Done. Here is the same patch against 2.6.18-rc4.
-> >
-> > I tested this patch on my Quad G5. I don't see any timer issues, but it
-> > also doesn't work either.
-> 
-> Damn it. You don't have an HCI dump while l2test is running, do you?
-> (or even l2test output, debug messages..). Thanks.
+> Please find attached the source code for an application written on the BlueZ Stack that will emulate an HCRP Printer.
+> The source code is divided into three files (main.c, sdp.c and hcrp.c).
 
-now my machine freezed when I tried to get a hcidump for you. However I
-remember seeing the Command Disallowed error and after the Connect
-Complete, I didn't see the additional Create Connection.
+this is still on my todo list. I haven't found time to actually look at
+it and integrate it.
 
 Regards
 
