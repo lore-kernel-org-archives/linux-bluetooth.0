@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44DB1CEA.2070001@pracucci.com>
-References: <44DA046D.7020600@pracucci.com>
-	<1155160420.4492.6.camel@aeonflux.holtmann.net>
-	<44DB1CEA.2070001@pracucci.com>
-Date: Thu, 10 Aug 2006 18:22:40 +0200
-Message-Id: <1155226960.4492.28.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] connect() and L2CAP_CONN_TIMEOUT
+From: Mayank BATRA <mayank.batra@st.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Thu, 10 Aug 2006 19:13:35 +0530
+Message-ID: <005901c6bc82$fa60b510$9d0cc70a@dlh.st.com>
+MIME-Version: 1.0
+In-Reply-To: <d23110170608100600m26c94ba8ua9ca68ad8c8eab86@mail.gmail.com>
+Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,39 +19,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marco,
+Hi Ulisses,
 
-> I have dump it (hcidump -i hci1 -t -X -V). Here I publish only
-> interesting commands and events:
+> > (iii) Host will send a Host Number of Completed Packets 
+> Command to the
+> > controller. But my question is when??
+> > After every ACL Packet received?
 > 
-> 2006-08-10 11:10:51.168745 < HCI Command: Create Connection
-> (0x01|0x0005) plen 13
-> bdaddr 00:07:80:81:03:E0 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-> Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> 2006-08-10 11:10:51.171492 > HCI Event: Command Status (0x0f) plen 4
-> Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> 
-> 2006-08-10 11:10:54.773623 > HCI Event: Role Change (0x12) plen 8
-> status 0x00 bdaddr 7B:00:00:01:C3:E0 role 0x00
-> Role: Master
-> 2006-08-10 11:10:54.921650 > HCI Event: Connect Complete (0x03) plen 11
-> status 0x21 handle 1 bdaddr 7B:00:00:01:C3:E0 type ACL encrypt 0x00
-> Error: Role Change Not Allowed
-> 
-> No other related event has been received, but the connect() system call
-> returns after 40 seconds (2006-08-10 11:11:31). Have you any idea and/or
-> suggestion?
-> 
-> P.S. bdaddr 7B:00:00:01:C3:E0 is wrong: is it a little bug of hcidump?
+> Yeah, that is exactly what we've already discussed [1] and Marcel
+> suggested to send a Host Number of Completed Packets command after
+> every packtet for starters even though that is not what we really want
+> (we might want to wait for 8 packets he said).
 
-I don't know of any bug in hcidump. What version are you using. If the
-address is displayed wrong then actually the wrong address might be
-used.
+We can wait for 8 packets. But what if at the time of ACL disconnection,
+less than 8 packets have been received?
 
-Regards
-
-Marcel
-
+Regards,
+Mayank
 
 
 -------------------------------------------------------------------------
