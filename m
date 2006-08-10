@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44DB5B71.2080601@xmission.com>
-Date: Thu, 10 Aug 2006 10:14:41 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <44DB5935.6050608@palmsource.com>
+Date: Thu, 10 Aug 2006 18:05:09 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <056BF200E9632F4285220E570FEED673DBCA31@GBMDDMH202AMSX.gb001.siemens.net>
-	<44DB5935.6050608@palmsource.com>
-In-Reply-To: <44DB5935.6050608@palmsource.com>
+In-Reply-To: <056BF200E9632F4285220E570FEED673DBCA31@GBMDDMH202AMSX.gb001.siemens.net>
 Subject: Re: [Bluez-devel] a2pd
  btsco	won'tcompile	(FIX)	plus	xmmserror(trials and tribulations)	howcool
  is	this!!!	new patch
@@ -23,18 +22,52 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Andrew;
+
+>First good news your patch does fix the lock extensive testing (sit and wa=
+it) and no locks.
+>  =
+
+>
+This patch correct an integer overflow, if it is not heat, maybe the =
+
+overflow does something in the kernel?
+In any case, it is better to have it corrected.
+
+>Then the not so good avrcp seems very flaky now =
+
+>  =
+
+>
+Looking to traces, it seems that I do not received any data.
+hcidump could help us to see what happens at bluez level.
+Try hcidump first to see if you receive a packet. Be very fast I only =
+
+need a few first line, and you'll be flooded when sound start
+use it like that : sudo hcidump AVDTP
+
+HCI sniffer - Bluetooth packet analyzer ver 1.23
+device: hci0 snap_len: 1028 filter: 0x400
+ > AVDTP(s): Discover cmd: transaction 0
+< AVDTP(s): Discover rej: transaction 0
+
+This is what the headset sends us :
+ > AVDTP(s): Discover cmd: transaction 0
+
+This is what we answer :
+< AVDTP(s): Discover rej: transaction 0
+
+Then music should start.
+
+>This is a regression from your previous patch where pause always worked an=
+d pressing play on the headphones started xmms if it wasn't running.
+>  =
+
+>
+Are you sure the previous patch was so good ??? :D
+
 Fr=E9d=E9ric
 
->>Then the not so good avrcp seems very flaky now =
-
-
-fyi, I think I forgot to comment on volume control with avrcp. I put
-code in the playground that I understood from the ieee1394 docs would
-control volume on the set. It didn't work, so I may be doing it wrong or
-it may just not be implemented in the set. the avrcp spec is a mix of
-bluetooth and ieee1394 which leads to a lack of clarity on these points.
-
-Brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
