@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44DB1CEA.2070001@pracucci.com>
-Date: Thu, 10 Aug 2006 11:47:54 +0000
-From: Marco Pracucci <development@pracucci.com>
+From: Mayank BATRA <mayank.batra@st.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Thu, 10 Aug 2006 14:05:38 +0530
+Message-ID: <003c01c6bc57$f5b033e0$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44DA046D.7020600@pracucci.com>
-	<1155160420.4492.6.camel@aeonflux.holtmann.net>
-In-Reply-To: <1155160420.4492.6.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] connect() and L2CAP_CONN_TIMEOUT
+In-Reply-To: <d23110170608080552gcfb8ad3tb341ea0b08083172@mail.gmail.com>
+Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,48 +19,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Ulisses,
 
-I have dump it (hcidump -i hci1 -t -X -V). Here I publish only
-interesting commands and events:
+> If you want to help us, please feel free to send in patches.
 
-2006-08-10 11:10:51.168745 < HCI Command: Create Connection
-(0x01|0x0005) plen 13
-bdaddr 00:07:80:81:03:E0 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-2006-08-10 11:10:51.171492 > HCI Event: Command Status (0x0f) plen 4
-Create Connection (0x01|0x0005) status 0x00 ncmd 1
+Here are some of my observations, please correct me in case I am wrong.
 
-2006-08-10 11:10:54.773623 > HCI Event: Role Change (0x12) plen 8
-status 0x00 bdaddr 7B:00:00:01:C3:E0 role 0x00
-Role: Master
-2006-08-10 11:10:54.921650 > HCI Event: Connect Complete (0x03) plen 11
-status 0x21 handle 1 bdaddr 7B:00:00:01:C3:E0 type ACL encrypt 0x00
-Error: Role Change Not Allowed
+(i) For enabling FC from HC to Host, the host first of all sends Host Buffer
+Size Command providing the number of ACL and SCO buffers and their
+respective sizes.
+(ii) The host then issues Set Host Controller To Host Flow Control Command.
+(iii) Host will send a Host Number of Completed Packets Command to the
+controller. But my question is when??
+After every ACL Packet received?
 
-No other related event has been received, but the connect() system call
-returns after 40 seconds (2006-08-10 11:11:31). Have you any idea and/or
-suggestion?
-
-Marco Pracucci
-
-
-P.S. bdaddr 7B:00:00:01:C3:E0 is wrong: is it a little bug of hcidump?
-
->> I need to be sure that an SDP connection does not take more than X
->> seconds. In order to achieve my goal, I have correctly set the page
->> timeout of my local device. However, if I'm right, the page timeout is
->> the max time the local Link Manager will wait for a baseband page
->> response. But what does it happen if the page request is successfully
->> completed and an error occur during the connection to L2CAP remote
->> "layer"? Is there a timeout for this? Maybe L2CAP_CONN_TIMEOUT...
->>
->> I have posted this message, because practical experiments demonstrate
->> that sometimes the sdp_connect() timeout expires after 40 seconds.
->>     
->
-> run "hcidump -X -V" to check what timeout you really run into.
->   
+Regards,
+Mayank
 
 
 -------------------------------------------------------------------------
