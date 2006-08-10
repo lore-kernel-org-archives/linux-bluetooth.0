@@ -1,13 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170608100600m26c94ba8ua9ca68ad8c8eab86@mail.gmail.com>
-Date: Thu, 10 Aug 2006 10:00:36 -0300
+Message-ID: <d23110170608100541o4bdf7ac0j9ac961287d267c0f@mail.gmail.com>
+Date: Thu, 10 Aug 2006 09:41:55 -0300
 From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <003c01c6bc57$f5b033e0$9d0cc70a@dlh.st.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+In-Reply-To: <1155170983.4492.25.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-References: <d23110170608080552gcfb8ad3tb341ea0b08083172@mail.gmail.com>
-	<003c01c6bc57$f5b033e0$9d0cc70a@dlh.st.com>
-Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
+References: <44D88EC1.7010009@pracucci.com> <44D8815D.4000108@infitsrl.com>
+	<d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
+	<1155160601.4492.10.camel@aeonflux.holtmann.net>
+	<d23110170608091452k5b03cf2aoda2e6ee3801168e3@mail.gmail.com>
+	<1155170983.4492.25.camel@aeonflux.holtmann.net>
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,29 +25,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mayank,
+Hi Marcel,
 
-On 8/10/06, Mayank BATRA <mayank.batra@st.com> wrote:
-> Here are some of my observations, please correct me in case I am wrong.
+On 8/9/06, Marcel Holtmann <marcel@holtmann.org> wrote:
+> > > please redo the patch against 2.6.18-rc4 and I will do some additional
+> > > testing.
+> >
+> > Done. Here is the same patch against 2.6.18-rc4.
 >
-> (i) For enabling FC from HC to Host, the host first of all sends Host Buffer
-> Size Command providing the number of ACL and SCO buffers and their
-> respective sizes.
-> (ii) The host then issues Set Host Controller To Host Flow Control Command.
-> (iii) Host will send a Host Number of Completed Packets Command to the
-> controller. But my question is when??
-> After every ACL Packet received?
+> I tested this patch on my Quad G5. I don't see any timer issues, but it
+> also doesn't work either.
 
-Yeah, that is exactly what we've already discussed [1] and Marcel
-suggested to send a Host Number of Completed Packets command after
-every packtet for starters even though that is not what we really want
-(we might want to wait for 8 packets he said).
+Damn it. You don't have an HCI dump while l2test is running, do you?
+(or even l2test output, debug messages..). Thanks.
 
-Best regards,
+Regards,
 
 -- Ulisses
-
-[1] http://article.gmane.org/gmane.linux.bluez.devel/8188
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
