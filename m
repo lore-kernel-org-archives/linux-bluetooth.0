@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44DB7700.2040501@pracucci.com>
-Date: Thu, 10 Aug 2006 18:12:16 +0000
-From: Marco Pracucci <development@pracucci.com>
+Message-ID: <44DB5B71.2080601@xmission.com>
+Date: Thu, 10 Aug 2006 10:14:41 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44DA046D.7020600@pracucci.com>	<1155160420.4492.6.camel@aeonflux.holtmann.net>	<44DB1CEA.2070001@pracucci.com>
-	<1155226960.4492.28.camel@aeonflux.holtmann.net>
-In-Reply-To: <1155226960.4492.28.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] connect() and L2CAP_CONN_TIMEOUT
+References: <056BF200E9632F4285220E570FEED673DBCA31@GBMDDMH202AMSX.gb001.siemens.net>
+	<44DB5935.6050608@palmsource.com>
+In-Reply-To: <44DB5935.6050608@palmsource.com>
+Subject: Re: [Bluez-devel] a2pd
+ btsco	won'tcompile	(FIX)	plus	xmmserror(trials and tribulations)	howcool
+ is	this!!!	new patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,45 +19,30 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
->> 2006-08-10 11:10:54.773623 > HCI Event: Role Change (0x12) plen 8
->> status 0x00 bdaddr 7B:00:00:01:C3:E0 role 0x00
->> Role: Master
->> 2006-08-10 11:10:54.921650 > HCI Event: Connect Complete (0x03) plen 11
->> status 0x21 handle 1 bdaddr 7B:00:00:01:C3:E0 type ACL encrypt 0x00
->> Error: Role Change Not Allowed
->>
->> P.S. bdaddr 7B:00:00:01:C3:E0 is wrong: is it a little bug of hcidump?
->>     
->
-> I don't know of any bug in hcidump. What version are you using. If the
-> address is displayed wrong then actually the wrong address might be
-> used.
->   
+Fr=E9d=E9ric
 
-hcidump version: 1.30
-Bluez libs: 2.25
-
-If it's not an hcidump bug, it could be a protocol stack. Since the
-remote device implements a closed/proprietary Bluetooth stack (from
-BlueGiga Technologies), it could be a bug of it.
-
-What do you think? Have you any other suggestion?
+>>Then the not so good avrcp seems very flaky now =
 
 
-Regards,
-Marco Pracucci
+fyi, I think I forgot to comment on volume control with avrcp. I put
+code in the playground that I understood from the ieee1394 docs would
+control volume on the set. It didn't work, so I may be doing it wrong or
+it may just not be implemented in the set. the avrcp spec is a mix of
+bluetooth and ieee1394 which leads to a lack of clarity on these points.
 
+Brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
