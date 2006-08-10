@@ -1,16 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44DB7700.2040501@pracucci.com>
-References: <44DA046D.7020600@pracucci.com>
-	<1155160420.4492.6.camel@aeonflux.holtmann.net>
-	<44DB1CEA.2070001@pracucci.com>
-	<1155226960.4492.28.camel@aeonflux.holtmann.net>
-	<44DB7700.2040501@pracucci.com>
-Date: Thu, 10 Aug 2006 21:04:34 +0200
-Message-Id: <1155236674.4492.44.camel@aeonflux.holtmann.net>
+In-Reply-To: <44DB45DD.3050900@palmsource.com>
+References: <44859045.7090208@palmsource.com>
+	<1150263854.5359.1.camel@aeonflux.holtmann.net>
+	<44969FA3.7030805@palmsource.com> <1151325308.7694.16.camel@localhost>
+	<44D8AC0E.1080308@palmsource.com>
+	<1155162001.4492.19.camel@aeonflux.holtmann.net>
+	<44DB45DD.3050900@palmsource.com>
+Date: Thu, 10 Aug 2006 21:02:34 +0200
+Message-Id: <1155236554.4492.41.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] connect() and L2CAP_CONN_TIMEOUT
+Subject: Re: [Bluez-devel] [PATCH] Minor classes support
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,34 +25,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marco,
+Hi Frederic,
 
-> >> 2006-08-10 11:10:54.773623 > HCI Event: Role Change (0x12) plen 8
-> >> status 0x00 bdaddr 7B:00:00:01:C3:E0 role 0x00
-> >> Role: Master
-> >> 2006-08-10 11:10:54.921650 > HCI Event: Connect Complete (0x03) plen 11
-> >> status 0x21 handle 1 bdaddr 7B:00:00:01:C3:E0 type ACL encrypt 0x00
-> >> Error: Role Change Not Allowed
-> >>
-> >> P.S. bdaddr 7B:00:00:01:C3:E0 is wrong: is it a little bug of hcidump?    
+> >>We found a bug in DBus function GetRemoteMinorClass when major class is 
+> >>"imaging". In this case, the minor class can be a combo of minor values 
+> >>(minor part of the class is not an "index" in a table but a "field of 
+> >>bit", e.g. "scanner printer").
+> >>The patch attached returns the first matching value. It may be useful to 
+> >>change this API to allow it to return multiple values.
 > >
-> > I don't know of any bug in hcidump. What version are you using. If the
-> > address is displayed wrong then actually the wrong address might be
-> > used.
+> >I applied the patch to the CVS. We might need some more defined minor
+> >class strings in the documentation. Feel free to propose something, but
+> >actually I prefer not to return more than one value or a list of
+> >strings. This API is supposed to be simple.
+> >
+> Personnally, I think that returning a list of strings for minor class 
+> can be the best way (for class of device with minor and subminor like 
+> peripheral (i.e. "keyboard" "card reader"), or class that can have 
+> multiple values for minor like imaging(i.e. "scanner" "printer")). If 
+> you are okay with this I can try to work on a patch.
 > 
-> hcidump version: 1.30
-> Bluez libs: 2.25
-> 
-> If it's not an hcidump bug, it could be a protocol stack. Since the
-> remote device implements a closed/proprietary Bluetooth stack (from
-> BlueGiga Technologies), it could be a bug of it.
-> 
-> What do you think? Have you any other suggestion?
+> Regarding documentation in CVS (dbus-api.txt), only subminor for 
+> peripheral seems to be missing. Am I right ?
 
-it must be actually a bug on our side. I actually trust hcidump to do
-the right thing and this means that somehow the wrong address gets used.
-Please include some more information about your system and kernel
-version you use. You should also create a binary dump in BTSnoop format.
+the class stuff is messed up and I personally think that we might should
+not support all of their weird things. If we can decode it in a sane and
+simple way, then we should return an error. In this case the raw three
+bytes class values can used and the application has to implement its own
+decoder.
 
 Regards
 
