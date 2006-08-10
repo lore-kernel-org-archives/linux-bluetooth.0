@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44DABCEE.3010005@xmission.com>
-Date: Wed, 09 Aug 2006 22:58:22 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+From: Mayank BATRA <mayank.batra@st.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Thu, 10 Aug 2006 10:03:19 +0530
+Message-ID: <003101c6bc36$1b8a1d50$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] merging Fabien Chevalier's sco plugin
+In-Reply-To: <1155160704.4492.13.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,19 +19,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hey
+Hi Marcel, Ulisses,
 
-I moved Fabien's plugin into the main btsco cvs project and renamed it
-to {pcm,ctl}-sco to be in line with the -a2dp plugins. My documentation
-is lacking still but things are a little more unified.
+> feel free to work together with Mayank to get a testing version we can
+> include into the -mh patch.
 
-I don't think I have Fabien's very last changes however... he posted
-them as an attachment and neither gmane nor sf.net seem to archive that.
-Does anyone have it handy? (let me know offlist)
+I am ready to help as much as possible. I was reading the spec over the
+weekend to understand what HC to Host FC requires.
+Ulisses, can you please provide me some starting ground?
 
-What was the status of his sco flow control kernel submission?
+Regards,
+Mayank
 
-Brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
