@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: menace82 <menace82@gmail.com>
+Date: Thu, 10 Aug 2006 13:05:26 -0300
+From: redondos <redondos@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Date: Thu, 10 Aug 2006 18:05:15 +0300
+Message-ID: <20060810160526.GC16806@refinery.twat.com.ar>
+References: <20060803043158.GA13259@refinery.twat.com.ar>
 MIME-Version: 1.0
-Message-Id: <200608101805.15810.menace82@gmail.com>
-Subject: [Bluez-users] Bluez + Planet BT-320 + SE P910i + SuSE Linux 10.1
+In-Reply-To: <20060803043158.GA13259@refinery.twat.com.ar>
+Subject: Re: [Bluez-users] Cannot transfer files via OBEX
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,42 +16,80 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0349394910=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello... I just bought a bluetooth dongle... My system recognise it as 
-bluetooth but i cannot find any devices. I've tried "hcitool scan" but i got 
-a "Inquiry failed: Connection timed out" message... My mobile phone can 
-detect my pc, but while i try to pair it i get an error message....
 
-hcidump -X -V
-linux:/home/user # hcidump -X -V
-HCI sniffer - Bluetooth packet analyzer ver 1.29
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
-> HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
-> HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
-> HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
-> HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
+--===============0349394910==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="tEFtbjk+mNEviIIX"
+Content-Disposition: inline
+
+
+--tEFtbjk+mNEviIIX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+It's pointless, no matter how many different configurations I try, I       =
+=20
+just can't upload anything to the phone. Am I doing something wrong? Is    =
+=20
+it supposed to be possible to upload, say, a theme using obexft -b         =
+=20
+<device> -B <channel> -c Themes -p <theme-name>?                           =
+=20
+
+The dump always shows a piece of the file (hex dump) and then:
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 12 pf 1 ilen 0 fcs 0xa2
+> HCI Event: Disconn Complete (0x05) plen 4                                =
+=20
+    status 0x00 handle 1 reason 0x08
+    Reason: Connection Timeout
+
+Fredy: Can I see your scripts for doing such things, please?
+
+--=20
+redondos
+
+--tEFtbjk+mNEviIIX
+Content-Type: application/pgp-signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.4 (GNU/Linux)
+
+iD8DBQFE21lGJZ/yCc25j3IRAtBeAKCxRyrC4TEP9qgu34OjzGs/VDvfSgCdEd/T
+RendjTJ/uIAKxi5YfggQxr0=
+=cbxu
+-----END PGP SIGNATURE-----
+
+--tEFtbjk+mNEviIIX--
+
+
+--===============0349394910==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0349394910==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0349394910==--
