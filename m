@@ -1,14 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44DB45DD.3050900@palmsource.com>
-Date: Thu, 10 Aug 2006 16:42:37 +0200
-From: Frederic Danis <frederic.danis@palmsource.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44859045.7090208@palmsource.com>	<1150263854.5359.1.camel@aeonflux.holtmann.net>	<44969FA3.7030805@palmsource.com>
-	<1151325308.7694.16.camel@localhost>	<44D8AC0E.1080308@palmsource.com>
-	<1155162001.4492.19.camel@aeonflux.holtmann.net>
-In-Reply-To: <1155162001.4492.19.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] [PATCH] Minor classes support
+In-Reply-To: <d23110170608100541o4bdf7ac0j9ac961287d267c0f@mail.gmail.com>
+References: <44D88EC1.7010009@pracucci.com> <44D8815D.4000108@infitsrl.com>
+	<d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
+	<1155160601.4492.10.camel@aeonflux.holtmann.net>
+	<d23110170608091452k5b03cf2aoda2e6ee3801168e3@mail.gmail.com>
+	<1155170983.4492.25.camel@aeonflux.holtmann.net>
+	<d23110170608100541o4bdf7ac0j9ac961287d267c0f@mail.gmail.com>
+Date: Thu, 10 Aug 2006 18:38:39 +0200
+Message-Id: <1155227919.4492.34.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,45 +25,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hi Ulisses,
 
->>We found a bug in DBus function GetRemoteMinorClass when major class is 
->>"imaging". In this case, the minor class can be a combo of minor values 
->>(minor part of the class is not an "index" in a table but a "field of 
->>bit", e.g. "scanner printer").
->>The patch attached returns the first matching value. It may be useful to 
->>change this API to allow it to return multiple values.
->>    
->>
->
->I applied the patch to the CVS. We might need some more defined minor
->class strings in the documentation. Feel free to propose something, but
->actually I prefer not to return more than one value or a list of
->strings. This API is supposed to be simple.
->
->
->  
->
-Personnally, I think that returning a list of strings for minor class 
-can be the best way (for class of device with minor and subminor like 
-peripheral (i.e. "keyboard" "card reader"), or class that can have 
-multiple values for minor like imaging(i.e. "scanner" "printer")). If 
-you are okay with this I can try to work on a patch.
+> > > > please redo the patch against 2.6.18-rc4 and I will do some additional
+> > > > testing.
+> > >
+> > > Done. Here is the same patch against 2.6.18-rc4.
+> >
+> > I tested this patch on my Quad G5. I don't see any timer issues, but it
+> > also doesn't work either.
+> 
+> Damn it. You don't have an HCI dump while l2test is running, do you?
+> (or even l2test output, debug messages..). Thanks.
 
-Regarding documentation in CVS (dbus-api.txt), only subminor for 
-peripheral seems to be missing. Am I right ?
+now my machine freezed when I tried to get a hcidump for you. However I
+remember seeing the Command Disallowed error and after the Connect
+Complete, I didn't see the additional Create Connection.
 
 Regards
 
-Fred
-
------------------------------------------------
-It is not by improving the oil lamp that one invents the electric bulb!
------------------------------------------------
-Danis Frederic            PalmSource Europe
-Software engineer
-Mail : mailto:frederic.danis@palmsource.com
------------------------------------------------
+Marcel
 
 
 
