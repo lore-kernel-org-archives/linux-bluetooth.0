@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <c49421c50608101218v4838ca3at9e84e463041459a1@mail.gmail.com>
-References: <c49421c50608101218v4838ca3at9e84e463041459a1@mail.gmail.com>
-Date: Sat, 12 Aug 2006 02:01:16 +0200
-Message-Id: <1155340876.4518.70.camel@aeonflux.holtmann.net>
+In-Reply-To: <44DCF45E.8010502@freemail.hu>
+References: <c5cec3110608110427m6669470bt629c145b717a1a1e@mail.gmail.com>
+	<44DCF45E.8010502@freemail.hu>
+Date: Sat, 12 Aug 2006 01:25:39 +0200
+Message-Id: <1155338739.4518.62.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Inquiry failed: Connection timed out
+Subject: Re: [Bluez-users] hcid problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,27 +21,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Loreno,
+Hi Mate,
 
-> I'm on troubles with a BT USB dongle I've just bougth. When I try
-> "hcitool scan" the inquiry is not completed and a message "Inquiry
-> failed: Connection timed out" is displayed instead.
-> 
-> Does my dongle is not supported by bluez?? Bellow are the output of
-> some commands.
-> 
-> loreno@teckiller:~$ hciconfig
-> hci0:   Type: USB
->         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
->         DOWN 
->         RX bytes:0 acl:0 sco:0 events:0 errors:0
->         TX bytes:0 acl:0 sco:0 commands:1 errors:1
-> 
-> loreno@teckiller:~$ hcitool scan
-> Scanning ...
-> Inquiry failed: Connection timed out
+> I had the same *really annoying* problem. There is a cache for the
+> library in some obscure place like
+> /usr/lib/libbluetooth/something_or_other - delete the cache and it will
+> work. BTW, to the developers: this is a BUG. Take care of it, please.
 
-make sure you started hcid or called "hciconfig hci0 up" first.
+please be specific what's the actual problem is. I can't see any
+problems that relates to hcid.conf.
 
 Regards
 
