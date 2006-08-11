@@ -1,42 +1,28 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44DD3481.5070505@xmission.com>
-Date: Fri, 11 Aug 2006 19:53:05 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Return-Path: <ulissesf@gmail.com>
+Message-ID: <d23110170608111309q263bc87fyf6474dce4d0e535e@mail.gmail.com>
+Date: Fri, 11 Aug 2006 17:09:40 -0300
+From: "Ulisses Furquim" <ulissesf@gmail.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
+Cc: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1155333717.4518.14.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <1155277491.5059.4.camel@localhost>
-	<1155312296.5059.10.camel@localhost>
-In-Reply-To: <1155312296.5059.10.camel@localhost>
-Subject: Re: [Bluez-devel] tiny, tiny fix for btsco
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+References: <44D88EC1.7010009@pracucci.com> <44D8815D.4000108@infitsrl.com>
+	 <d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
+	 <1155236923.4492.49.camel@aeonflux.holtmann.net>
+	 <d23110170608111203g590369d4qdc4592c284eafa55@mail.gmail.com>
+	 <1155333717.4518.14.camel@aeonflux.holtmann.net>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Scott
+On 8/11/06, Marcel Holtmann <marcel@holtmann.org> wrote:
+> look into l2cap_conn_del() and check what happens if l2cap_data is NULL.
+> This doesn't change the behavior.
 
-> ...which would be great, except it now (apparently) needs to be
-> "sbc.cvs.sourceforge.net" (try it without the sbc for an example).
+Doooh. Right. We shouldn't be calling l2cap_conn_del() at all if
+l2cap_data is NULL so it doesn't change any behavior and we actually
+save one function call. :-)
 
-fixed... let me know if you feel like improving any of the other docs...
+Regards,
 
-brad
-
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- Ulisses
