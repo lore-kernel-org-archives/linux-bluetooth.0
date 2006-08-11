@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Scott Gilliland <scott.gilliland@gatech.edu>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1155277491.5059.4.camel@localhost>
-References: <1155277491.5059.4.camel@localhost>
-Date: Fri, 11 Aug 2006 12:04:55 -0400
-Message-Id: <1155312296.5059.10.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-devel] tiny, tiny fix for btsco
+MIME-Version: 1.0
+Date: Fri, 11 Aug 2006 08:53:01 +0100
+Message-ID: <056BF200E9632F4285220E570FEED673DF3B3B@GBMDDMH202AMSX.gb001.siemens.net>
+In-Reply-To: <44DB5935.6050608@palmsource.com>
+From: "Waldram, Andrew (SBS UK)" <andrew.waldram@siemens.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] a2pd
+	btsco	won'tcompile	(FIX)	plus	xmmserror(trials and
+	tribulations)	howcool is	this!!!	new patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,33 +17,97 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all, 
+I'll give it a spin this evenning =
 
-I was just looking at the source for the a2dp alsa plugin, and in the
-build instructions, it says:
+'Are you sure the previous patch was so good ??? :D'
+Nah the new ones better found it difilcult to play sound on locked machine =
+;-)
 
-cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/sbc co -P sbc
+---------------------------------------------------------------------------=
+------- =
 
-...which would be great, except it now (apparently) needs to be
-"sbc.cvs.sourceforge.net" (try it without the sbc for an example).
 
-If anyone has write access, can you toss that change in cvs for the
-greater good of all? 
 
-Thanks,
-Scott Gilliland
 
+
+-----Original Message-----
+From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounces=
+@lists.sourceforge.net] On Behalf Of Fr=E9d=E9ric DALLEAU
+Sent: 10 August 2006 17:05
+To: BlueZ development
+Subject: Re: [Bluez-devel] a2pd btsco won'tcompile (FIX) plus xmmserror(tri=
+als and tribulations) howcool is this!!! new patch
+
+Hi Andrew;
+
+>First good news your patch does fix the lock extensive testing (sit and wa=
+it) and no locks.
+>  =
+
+>
+This patch correct an integer overflow, if it is not heat, maybe the =
+
+overflow does something in the kernel?
+In any case, it is better to have it corrected.
+
+>Then the not so good avrcp seems very flaky now =
+
+>  =
+
+>
+Looking to traces, it seems that I do not received any data.
+hcidump could help us to see what happens at bluez level.
+Try hcidump first to see if you receive a packet. Be very fast I only =
+
+need a few first line, and you'll be flooded when sound start
+use it like that : sudo hcidump AVDTP
+
+HCI sniffer - Bluetooth packet analyzer ver 1.23
+device: hci0 snap_len: 1028 filter: 0x400
+ > AVDTP(s): Discover cmd: transaction 0
+< AVDTP(s): Discover rej: transaction 0
+
+This is what the headset sends us :
+ > AVDTP(s): Discover cmd: transaction 0
+
+This is what we answer :
+< AVDTP(s): Discover rej: transaction 0
+
+Then music should start.
+
+>This is a regression from your previous patch where pause always worked an=
+d pressing play on the headphones started xmms if it wasn't running.
+>  =
+
+>
+Are you sure the previous patch was so good ??? :D
+
+Fr=E9d=E9ric
 
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
