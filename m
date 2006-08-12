@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sat, 12 Aug 2006 09:05:25 -0300
-From: Cris <ml133@netpole.com.br>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <20060812090525.14568a99.ml133@netpole.com.br>
-Mime-Version: 1.0
-Subject: [Bluez-users] inquiry scan
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Sat, 12 Aug 2006 01:21:47 -0500
+From: digitalfredy <digitalfredy@debiancolombia.org>
+In-reply-to: <20060810160526.GC16806@refinery.twat.com.ar>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-id: <1155363708.21165.7.camel@YODA>
+MIME-version: 1.0
+References: <20060803043158.GA13259@refinery.twat.com.ar>
+	<20060810160526.GC16806@refinery.twat.com.ar>
+Subject: Re: [Bluez-users] Cannot transfer files via OBEX
+Reply-To: digitalfredy@debiancolombia.org,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,38 +18,58 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi list,
+El jue, 10-08-2006 a las 13:05 -0300, redondos escribi=F3:
+> It's pointless, no matter how many different configurations I try, I     =
+   =
 
-I'm trying to write a server which, among other things, also works
-with bluetooth. I've got two questions:
+> just can't upload anything to the phone. Am I doing something wrong? Is  =
+   =
 
-First, is it actually true, that there is no way to perform an inquiry
-scan and an obex transfer at the same time? Wouldn't there be a moment
-in which the radio is idle, in which I could do other things with it?
+> it supposed to be possible to upload, say, a theme using obexft -b       =
+   =
 
-The second question: In hci.h there is defined EVT_INQUIRY_COMPLETE
-and EVT_INQUIRY_RESULT. My guess would be that, if I set the flag
-O_NONBLOCK and revolve around a select, I should get notified as soon
-as the inquiry is finished and a result is available. This is just
-what I would like to do, but unfortunately, O_NONBLOCK after
-hci_open_dev() won't cause hci_inquiry() to return before the inquiry
-of the given length has finished. So, how can I get hci_inquiry to
-return immediately?
+> <device> -B <channel> -c Themes -p <theme-name>?                         =
+   =
 
-Thanks,
+obexftp -b <device> -B <channel> -p <theme-name>
+> =
 
--- 
-Cris
+> The dump always shows a piece of the file (hex dump) and then:
+> < ACL data: handle 1 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x0040 len 4 [psm 3]
+>       RFCOMM(s): DISC: cr 1 dlci 12 pf 1 ilen 0 fcs 0xa2
+> > HCI Event: Disconn Complete (0x05) plen 4                              =
+   =
+
+>     status 0x00 handle 1 reason 0x08
+>     Reason: Connection Timeout
+> =
+
+> Fredy: Can I see your scripts for doing such things, please?
+> =
+
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job ea=
+sier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________ Bluez-users mailing list =
+Bluez-users@lists.sourceforge.net https://lists.sourceforge.net/lists/listi=
+nfo/bluez-users
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
