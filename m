@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <cb1138d80608121115p3cccdf36m16541c0e832707ec@mail.gmail.com>
-Date: Sat, 12 Aug 2006 13:15:29 -0500
-From: "Philip Mateescu" <philipmateescu@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Date: Sat, 12 Aug 2006 14:16:42 -0300
+From: redondos <redondos@gmail.com>
+To: digitalfredy@debiancolombia.org,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20060812171642.GD14086@refinery.twat.com.ar>
+References: <20060803043158.GA13259@refinery.twat.com.ar>
+	<20060810160526.GC16806@refinery.twat.com.ar>
+	<1155363708.21165.7.camel@YODA>
 MIME-Version: 1.0
-Subject: [Bluez-users] HID create error 13 (Permission denied)
+In-Reply-To: <1155363708.21165.7.camel@YODA>
+Subject: Re: [Bluez-users] Cannot transfer files via OBEX
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,50 +19,77 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1236873495=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
 
-I'm running 2.6.15 (Ubuntu) and I'm trying to get my MX900 to work
-with my laptop (using the built-in BT receiver not the Logitech
-craddle).
-
-My box seems to detect the mouse as hcidump shows activity when I move
-the mouse.
-However, everytime i move the mouse I also I keep getting these
-message in daemon.log:
-hidd[7264]: New HID device 00:07:61:14:CC:73 (Logitech Bluetooth Mouse)
-hidd[7264]: HID create error 13 (Permission denied)
+--===============1236873495==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="XMCwj5IQnwKtuyBG"
+Content-Disposition: inline
 
 
-I've noticed that when starting the bluez-utils service I get these
-entries in daemon.log:
-hcid[8528]: Bluetooth HCI daemon
-hcid[8528]: Can't get system message bus name: Connection ":1.11" is
-not allowed to own the service "org.bluez" due to security policies in
-the configuration file
-hcid[8528]: Starting security manager 0
-sdpd[8533]: Bluetooth SDP daemon
+--XMCwj5IQnwKtuyBG
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I suspect they're somehow connected...
+On Sat, Aug 12 01:21, digitalfredy wrote:
+> El jue, 10-08-2006 a las 13:05 -0300, redondos escribi=F3:
+> > It's pointless, no matter how many different configurations I try, I   =
+    =20
+> > just can't upload anything to the phone. Am I doing something wrong? Is=
+    =20
+> > it supposed to be possible to upload, say, a theme using obexft -b     =
+    =20
+> > <device> -B <channel> -c Themes -p <theme-name>?                       =
+    =20
+> obexftp -b <device> -B <channel> -p <theme-name>
 
-There's a lot on configuration files involved which I haven't really
-touched, save for /etc/bluetooth/pin which I tried changing from 1234
-to 0000 to no change in messages. I'd be more than happy to post any
-relevant config file in here.
+Same problem.
 
-Any help would be tremendously appreciated.
-Thanks
-philip
+Can anyone please at least tell me what's going on? Something that might
+be obvious to a developer can be hard enough to find for a new user.
+
+--=20
+redondos
+
+--XMCwj5IQnwKtuyBG
+Content-Type: application/pgp-signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.4 (GNU/Linux)
+
+iD8DBQFE3gz6JZ/yCc25j3IRAkGFAKCfqrHpvsnDWxJXt5XdDKkB6Npr/ACfY6El
++PXul4zTem6MXFvuWSvtBwg=
+=k83m
+-----END PGP SIGNATURE-----
+
+--XMCwj5IQnwKtuyBG--
+
+
+--===============1236873495==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============1236873495==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1236873495==--
