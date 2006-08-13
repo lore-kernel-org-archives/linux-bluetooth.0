@@ -1,14 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44DF7029.3050402@freemail.hu>
-Date: Sun, 13 Aug 2006 20:32:09 +0200
-From: Mate Soos <msoos@freemail.hu>
-MIME-Version: 1.0
+Date: Sun, 13 Aug 2006 00:56:48 -0500
+From: digitalfredy <digitalfredy@debiancolombia.org>
+In-reply-to: <20060810160526.GC16806@refinery.twat.com.ar>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <20060812154121.GB28903@unununium.org>
-In-Reply-To: <20060812154121.GB28903@unununium.org>
-Subject: Re: [Bluez-users] Transfering contacts, pictures,
- etc on samsung a640
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-id: <1155448610.22835.4.camel@YODA>
+MIME-version: 1.0
+Content-type: multipart/mixed; boundary="Boundary_(ID_Q28qtQRg408YD5/MFIfu+Q)"
+References: <20060803043158.GA13259@refinery.twat.com.ar>
+	<20060810160526.GC16806@refinery.twat.com.ar>
+Subject: Re: [Bluez-users] Cannot transfer files via OBEX
+Reply-To: digitalfredy@debiancolombia.org,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -17,157 +19,188 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-2"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Get kdebluetooth and you will be enlightened.
 
-M=E1t=E9
+--Boundary_(ID_Q28qtQRg408YD5/MFIfu+Q)
+Content-type: text/plain; charset=ISO-8859-1
+Content-transfer-encoding: 8BIT
 
-Phil Frost wrote:
-> I just got a Samsung A640 and I've been trying to get some sort of
-> commuinication between it and my linux box working. I'd like to be able
-> to transfer contacts and pictures between the two machines. The device
-> info screen on the phone says it supports the "OPP" bluetooth profile,
-> and when I run sdptool browse at the phone I get this output:
->
-> Service Name: OBEX Object Push
-> Service RecHandle: 0x10000
-> Service Class ID List:
->   "OBEX Object Push" (0x1105)
-> Protocol Descriptor List:
->   "L2CAP" (0x0100)
->   "RFCOMM" (0x0003)
->     Channel: 1
->   "OBEX" (0x0008)
-> Language Base Attr List:
->   code_ISO639: 0x656e
->   encoding:    0x6a
->   base_offset: 0x100
->
-> The phone has in most of the menus when viewing a contact or picture or
-> whatnot a "send contact" option, so I figure what I want to do should be
-> at least possible.
->
-> However, I'm a little confused about what to actually do, and my
-> confused attempts have been unsucessful. After much searching I found
-> this page <http://www.caside.lancs.ac.uk/java_bt.php#BlueZ_-_OBEX> that
-> has a link to a tarball with programs "opd" and "ussp-push". I found
-> that ussp-push is available from most distributions so I've been using
-> that, but I can't find this opd anywhere else, although from the mailing
-> list archives it seems some people are using it.
->
-> I tried running the opd as suggested on previously mentioned page:
->
-> $ opd --mode OBEX --channel 10 --path /tmp/opd --sdp --metadata
-> opd[6614]: OBEX Push Daemon - version 0.2 started
-> opd[6614]: OBEX Object Push service registered with sdpd
-> opd[6614]: OBEX server listening on channel 10
->
-> All seems well; I can see the service on local with sdptool:
->
-> $ sdptool browse local
-> Browsing FF:FF:FF:00:00:00 ...
-> Service Name: OBEX Object Pus
-> Service RecHandle: 0x10000
-> Service Class ID List:
->   "OBEX Object Push" (0x1105)
-> Protocol Descriptor List:
->   "L2CAP" (0x0100)
->   "RFCOMM" (0x0003)
->     Channel: 10
->   "OBEX" (0x0008)
-> Profile Descriptor List:
->   "OBEX Object Push" (0x1105)
->     Version: 0x0100
->
-> However, when I ask the phone to send a contact, it asks, "would you
-> like to search?", to which I reply "yes", and it will then display
-> "searching..." and a busy indicator for 20 seconds or so, then report
-> that no devices were found. If I run hcidump during this process I see
-> no output. Here is my hcid.conf, which I believe should make my computer
-> discoverable:
->
-> options {
->         autoinit yes;
->         security auto;
->         pairing multi;
->         passkey "613273";
-> }
->
-> device {
->         name "%h-%d";
->         class 0xff0100;         (have tried 0xff0200 as well, with identi=
-cal results)
->         iscan enable; pscan enable;
->         lm accept;
->         lp rswitch,hold,sniff,park;
-> }
->
-> "All right", I thought, "maybe I can send something to the phone". From
-> above output of sdptool browse it seems that the obex object push
-> service is running on channel 1 of the phone. So, I run the command:
->
-> sudo rfcomm bind /dev/rfcomm1 00:12:D1:C4:5F:BB 1
->
-> all good there. Now:
->
-> -------------------
-> $ echo foo > foo.txt
-> $ ussp-push /dev/rfcomm1 foo.txt foo.txt
->
-> pushing file foo.txt
-> name=3Dfoo.txt, size=3D4
-> Registered transport
->
-> set user data
->
-> created new objext
->
-> started a new request
-> reqdone
-> Command (00) has now finished, rsp: 20Connected!
->
-> Connection return code: 0, id: 0
-> Connection established
-> connected to server
-> Sending file: foo.txt, path: foo.txt, size: 4
-> reqdone
-> Command (02) has now finished, rsp: 4freqdone
-> Command (01) has now finished, rsp: 20Disconnect done!pushed!!
-> ------------------
->
-> This seems to have worked, but I can't figure out what the phone did
-> with it! Is there some file format or additional options I need to use
-> to do something useful, like upload some text notes or a contact? Thanks
-> for any help.
->
+El jue, 10-08-2006 a las 13:05 -0300, redondos escribió:
+> It's pointless, no matter how many different configurations I try, I        
+> just can't upload anything to the phone. Am I doing something wrong? Is     
+> it supposed to be possible to upload, say, a theme using obexft -b          
+> <device> -B <channel> -c Themes -p <theme-name>?                            
+> 
+> The dump always shows a piece of the file (hex dump) and then:
+> < ACL data: handle 1 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x0040 len 4 [psm 3]
+>       RFCOMM(s): DISC: cr 1 dlci 12 pf 1 ilen 0 fcs 0xa2
+> > HCI Event: Disconn Complete (0x05) plen 4                                 
+>     status 0x00 handle 1 reason 0x08
+>     Reason: Connection Timeout
+> 
+> Fredy: Can I see your scripts for doing such things, please?
+the *.conf file is for put in the home desktop, changue Foto in it for
+the name to put the phone
+> 
 > -------------------------------------------------------------------------
 > Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job ea=
-sier
+> Get stuff done quickly with pre-integrated technology to make your job easier
 > Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
-=3D121642
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
->   =
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+> _______________________________________________ Bluez-users mailing list Bluez-users@lists.sourceforge.net https://lists.sourceforge.net/lists/listinfo/bluez-users
 
+--Boundary_(ID_Q28qtQRg408YD5/MFIfu+Q)
+Content-type: application/x-shellscript; name=getmovil
+Content-transfer-encoding: 7bit
+Content-disposition: attachment; filename=getmovil
 
+#!/bin/bash
+
+###############################################################
+## ATENCION este script puede presentar problemas debido
+## a la codificacion de caracteres -ojo con las tildes-
+###############################################################
+
+PHONEMAC=$(cat $HOME/.getmovil.conf | grep phonemac | awk '{print $2}')
+case "$1" in
+    -p)
+    REGEXP=$(cat $HOME/.getmovil.conf | grep phtregexp | awk '{print $2}')
+    PHONEDIR=$(cat $HOME/.getmovil.conf | grep phonephtdir | awk '{print $2}')
+    OBJETSDIR=$(cat $HOME/.getmovil.conf | grep pcphtdir | awk '{print $2}')/$(date +%Y)
+    ;;
+    -i)
+    REGEXP=$(cat $HOME/.getmovil.conf | grep imgregexp | awk '{print $2}')
+    PHONEDIR=$(cat $HOME/.getmovil.conf | grep phoneimgdir | awk '{print $2}')
+    OBJETSDIR=$(cat $HOME/.getmovil.conf | grep pcimgdir | awk '{print $2}')/$(date +%Y)
+    ;;
+    -r)
+    REGEXP=$(cat $HOME/.getmovil.conf | grep recregexp | awk '{print $2}')
+    PHONEDIR=$(cat $HOME/.getmovil.conf | grep phonesnddir | awk '{print $2}')
+    OBJETSDIR=$(cat $HOME/.getmovil.conf | grep pcrecdir | awk '{print $2}')/$(date +%Y)
+    ;;
+    -v)
+    REGEXP=$(cat $HOME/.getmovil.conf | grep vidregexp | awk '{print $2}')
+    PHONEDIR=$(cat $HOME/.getmovil.conf | grep phoneviddir | awk '{print $2}')
+    OBJETSDIR=$(cat $HOME/.getmovil.conf | grep pcviddir | awk '{print $2}')/$(date +%Y)
+    ;;
+    -s)
+    REGEXP=$(cat $HOME/.getmovil.conf | grep sndregexp | awk '{print $2}')
+    PHONEDIR=$(cat $HOME/.getmovil.conf | grep phonesnddir | awk '{print $2}')
+    OBJETSDIR=$(cat $HOME/.getmovil.conf | grep pcsnddir | awk '{print $2}')/$(date +%Y)
+    echo -e "\033[1;5mSin implementar\033[0;0m"
+    ;;
+    -t)
+    REGEXP=$(cat $HOME/.getmovil.conf | grep thmregexp | awk '{print $2}')
+    PHONEDIR=$(cat $HOME/.getmovil.conf | grep phonethmdir | awk '{print $2}')
+    OBJETSDIR=$(cat $HOME/.getmovil.conf | grep pcsnddir | awk '{print $2}')/$(date +%Y)
+    echo -e "\033[1;5mSin implementar\033[0;0m"
+    ;;
+    *)
+    echo -e "\033[1;5mPrimer parametro: [-p|-i|-r|-v|-s|-t]\033[0;0m"
+    ;;
+esac
+
+#Funcion para obtener la lista con los nombres de los objetos (fotos, sonidos ...)
+function get_list 
+{
+LISTA=$(obexftp -b $PHONEMAC  -l $PHONEDIR | grep file\ name | cut -d\" -f2 | grep "$REGEXP")
+}
+
+#Funcion para descargar objetos (fotos, sonidos ...) al pc eliminandolos del telefono
+function mv_objets
+{
+cd $OBJETSDIR
+for i in $(echo $LISTA);do
+obexftp -b $PHONEMAC  -c $PHONEDIR -G $i
+#mv $i $(date +%B_%d)_$i && chmod 440 $(date +%B_%d)_$i
+done
+}
+
+#Funcion para descargar objetos (fotos, sonidos ...) al pc sin eliminarlos del telefono
+function cp_objets
+{
+cd $OBJETSDIR
+for i in $(echo $LISTA);do
+obexftp -b $PHONEMAC  -c $PHONEDIR -g $i
+#mv $i $(date +%B_%d)_$i && chmod 440 $(date +%B_%d)_$i
+done
+}
+
+#Funcion para revisar existencia de directorios, si no existen los crea
+function test_dir
+{
+test -d $OBJETSDIR
+if [ $? -eq 1 ]
+    then mkdir -p $OBJETSDIR
+fi
+}
+
+case "$2" in
+    -m)
+    test_dir
+    get_list
+    mv_objets
+    ;;
+    -c)
+    test_dir
+    get_list
+    cp_objets
+    ;;
+    -l)
+    get_list
+    echo $LISTA
+    ;;
+    *)
+    echo -e "\033[1;5mSegundo parametro: [-m|-c|-l]\033[0;0m"
+    ;;
+esac
+
+--Boundary_(ID_Q28qtQRg408YD5/MFIfu+Q)
+Content-type: text/plain; NAME=.getmovil.conf; charset=us-ascii
+Content-transfer-encoding: 8BIT
+Content-disposition: attachment; filename=.getmovil.conf
+Content-description: 
+
+phonemac 00:0A:D9:78:ED:5E
+
+#patron en el nombre, soporta expresiones regulares de grep (no entrecomillar)
+phtregexp Foto
+recregexp .amr
+imgregexp ^[^Foto]
+
+#carpetas en el telefono
+phonephtdir Imágenes
+phonesnddir Sonidos
+phoneimgdir Imágenes
+
+#carpetas en el computador
+pcphtdir /home/digitalfredy/avi-local/img/t610/fotos
+pcimgdir /home/digitalfredy/avi-local/img/t610/imagenes
+pcrecdir /home/digitalfredy/avi-local/audio/t610/grabaciones
+
+--Boundary_(ID_Q28qtQRg408YD5/MFIfu+Q)
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--Boundary_(ID_Q28qtQRg408YD5/MFIfu+Q)
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--Boundary_(ID_Q28qtQRg408YD5/MFIfu+Q)--
