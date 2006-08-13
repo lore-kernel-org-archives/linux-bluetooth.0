@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Craig Shelley <craig@microtron.org.uk>
-To: bluez-users@lists.sourceforge.net
-Date: Sun, 13 Aug 2006 20:26:10 +0100
-Message-Id: <1155497170.5142.24.camel@localhost.localdomain>
-Mime-Version: 1.0
-Subject: [Bluez-users] Problems using Zoom 4310 USB Bluetooth Dongle
+Message-ID: <44DF7029.3050402@freemail.hu>
+Date: Sun, 13 Aug 2006 20:32:09 +0200
+From: Mate Soos <msoos@freemail.hu>
+MIME-Version: 1.0
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <20060812154121.GB28903@unununium.org>
+In-Reply-To: <20060812154121.GB28903@unununium.org>
+Subject: Re: [Bluez-users] Transfering contacts, pictures,
+ etc on samsung a640
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,102 +17,157 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1114128928=="
+Content-Type: text/plain; charset="iso-8859-2"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Get kdebluetooth and you will be enlightened.
 
---===============1114128928==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-GFqNaKeKIS7m7sukPsw5"
+M=E1t=E9
+
+Phil Frost wrote:
+> I just got a Samsung A640 and I've been trying to get some sort of
+> commuinication between it and my linux box working. I'd like to be able
+> to transfer contacts and pictures between the two machines. The device
+> info screen on the phone says it supports the "OPP" bluetooth profile,
+> and when I run sdptool browse at the phone I get this output:
+>
+> Service Name: OBEX Object Push
+> Service RecHandle: 0x10000
+> Service Class ID List:
+>   "OBEX Object Push" (0x1105)
+> Protocol Descriptor List:
+>   "L2CAP" (0x0100)
+>   "RFCOMM" (0x0003)
+>     Channel: 1
+>   "OBEX" (0x0008)
+> Language Base Attr List:
+>   code_ISO639: 0x656e
+>   encoding:    0x6a
+>   base_offset: 0x100
+>
+> The phone has in most of the menus when viewing a contact or picture or
+> whatnot a "send contact" option, so I figure what I want to do should be
+> at least possible.
+>
+> However, I'm a little confused about what to actually do, and my
+> confused attempts have been unsucessful. After much searching I found
+> this page <http://www.caside.lancs.ac.uk/java_bt.php#BlueZ_-_OBEX> that
+> has a link to a tarball with programs "opd" and "ussp-push". I found
+> that ussp-push is available from most distributions so I've been using
+> that, but I can't find this opd anywhere else, although from the mailing
+> list archives it seems some people are using it.
+>
+> I tried running the opd as suggested on previously mentioned page:
+>
+> $ opd --mode OBEX --channel 10 --path /tmp/opd --sdp --metadata
+> opd[6614]: OBEX Push Daemon - version 0.2 started
+> opd[6614]: OBEX Object Push service registered with sdpd
+> opd[6614]: OBEX server listening on channel 10
+>
+> All seems well; I can see the service on local with sdptool:
+>
+> $ sdptool browse local
+> Browsing FF:FF:FF:00:00:00 ...
+> Service Name: OBEX Object Pus
+> Service RecHandle: 0x10000
+> Service Class ID List:
+>   "OBEX Object Push" (0x1105)
+> Protocol Descriptor List:
+>   "L2CAP" (0x0100)
+>   "RFCOMM" (0x0003)
+>     Channel: 10
+>   "OBEX" (0x0008)
+> Profile Descriptor List:
+>   "OBEX Object Push" (0x1105)
+>     Version: 0x0100
+>
+> However, when I ask the phone to send a contact, it asks, "would you
+> like to search?", to which I reply "yes", and it will then display
+> "searching..." and a busy indicator for 20 seconds or so, then report
+> that no devices were found. If I run hcidump during this process I see
+> no output. Here is my hcid.conf, which I believe should make my computer
+> discoverable:
+>
+> options {
+>         autoinit yes;
+>         security auto;
+>         pairing multi;
+>         passkey "613273";
+> }
+>
+> device {
+>         name "%h-%d";
+>         class 0xff0100;         (have tried 0xff0200 as well, with identi=
+cal results)
+>         iscan enable; pscan enable;
+>         lm accept;
+>         lp rswitch,hold,sniff,park;
+> }
+>
+> "All right", I thought, "maybe I can send something to the phone". From
+> above output of sdptool browse it seems that the obex object push
+> service is running on channel 1 of the phone. So, I run the command:
+>
+> sudo rfcomm bind /dev/rfcomm1 00:12:D1:C4:5F:BB 1
+>
+> all good there. Now:
+>
+> -------------------
+> $ echo foo > foo.txt
+> $ ussp-push /dev/rfcomm1 foo.txt foo.txt
+>
+> pushing file foo.txt
+> name=3Dfoo.txt, size=3D4
+> Registered transport
+>
+> set user data
+>
+> created new objext
+>
+> started a new request
+> reqdone
+> Command (00) has now finished, rsp: 20Connected!
+>
+> Connection return code: 0, id: 0
+> Connection established
+> connected to server
+> Sending file: foo.txt, path: foo.txt, size: 4
+> reqdone
+> Command (02) has now finished, rsp: 4freqdone
+> Command (01) has now finished, rsp: 20Disconnect done!pushed!!
+> ------------------
+>
+> This seems to have worked, but I can't figure out what the phone did
+> with it! Is there some file format or additional options I need to use
+> to do something useful, like upload some text notes or a contact? Thanks
+> for any help.
+>
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job ea=
+sier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>
+>   =
 
 
---=-GFqNaKeKIS7m7sukPsw5
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-
-Hi,
-
-After upgrading bluez-utils from version 2.25 to version 3.1, my
-bluetooth has stopped working.
-
-I get the following error in syslog:
-Aug 13 19:48:07 localhost hcid[5991]: Bluetooth HCI daemon
-Aug 13 19:48:07 localhost hcid[5991]: Register path:/org/bluez
-fallback:1
-Aug 13 19:48:07 localhost hcid[5991]: Device hci0 has been added
-Aug 13 19:48:07 localhost hcid[5991]: Can't write inquiry mode for hci0:
-Input/output error (5)
-Aug 13 19:48:07 localhost hcid[5991]: Register path:/org/bluez/hci0
-fallback:0
-Aug 13 19:48:07 localhost hcid[5991]: HCI dev 0 up
-Aug 13 19:48:07 localhost hcid[5991]: Starting security manager 0
-Aug 13 19:48:08 localhost hcid[5991]: Can't write inquiry mode for hci0:
-Input/output error (5)
-
-If I downgrade to version 2.25 everything works again.
-I have also tried the latest CVS, and although the error message does
-not appear, my phone is still unable to find my PC when searching for
-devices.
-
-"hcitool scan" does however return positive results:
-
-I have two systems is running debian etch, one (desktop) with 2.6.17.8
-and the other (laptop) with 2.6.16.2.
-I am using a Zoom 4310 USB dongle, as described on the following
-datasheet:
-http://www.zoom.com/graphics/datasheets/bluetooth/BT_4310BF_BT_4312AF_1716.=
-pdf
-
-Any help/advice is greatly appreciated. I am willing to help diagnose
-what is going wrong, I just need pointing in the right direction.
-
-Many Thanks,
-
-PS - I am not on this list so please CC me.
-
---=20
-Craig Shelley
-EMail: craig@microtron.org.uk
-Jabber: shell@jabber.earth.li
-
---=-GFqNaKeKIS7m7sukPsw5
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.3 (GNU/Linux)
-
-iD8DBQBE33zS5OI9vmOoVqERAq3WAKCItKARcS9DuKN8IQq8aixIFdxbRACeNUbC
-/CCs4FmGVeymSRPod08NF2E=
-=OTzo
------END PGP SIGNATURE-----
-
---=-GFqNaKeKIS7m7sukPsw5--
-
-
-
---===============1114128928==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============1114128928==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1114128928==--
