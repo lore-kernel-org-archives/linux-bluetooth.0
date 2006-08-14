@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Mayank BATRA <mayank.batra@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Mon, 14 Aug 2006 20:54:33 +0530
-Message-ID: <000401c6bfb5$be812bc0$9d0cc70a@dlh.st.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Mon, 14 Aug 2006 20:38:26 +0530
+Message-ID: <000301c6bfb3$830a4f60$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-In-Reply-To: <d23110170608100600m26c94ba8ua9ca68ad8c8eab86@mail.gmail.com>
-Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
+Subject: [Bluez-devel] Phonebook Access Profile (Server)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,65 +18,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ulisses and Marcel,
+Hi Marcel and all,
 
-I propose the following changes (in addition to those suggested by Ulisses
-earlier) for implementing Controller to Host Flow Control:
+I've been working on the Phonebook Access Profile (PBAP) Server for quite some time now.
+I've come up with an implementation which does the following:
 
-(i) Update hci.h to include commands like host number of completed packets
-cmd and set controller to host flow control cmd.
-(ii) Update hcid.h file to include an additional member to the enum:
-enum {
-	HCID_SET_NAME,
-	HCID_SET_CLASS,
-	HCID_SET_VOICE,
-	HCID_SET_INQMODE,
-	HCID_SET_PAGETO,
-	HCID_SET_DISCOVTO,
-	HCID_SET_PTYPE,
-	HCID_SET_LM,
-	HCID_SET_LP,
-+	HCID_SET_C_TO_HOST_FC,
-};
+(i) Store SDP Record for PBAP Server.
+(ii) Receive Connections on OBEX.
+(iii) Implements the mandatory SetPhoneBook Function (Using OBEX SetPath)
+(iv) Implements the mandatory PullPhoneBook Function (Using OBEX Get)
+(v) Implements the mandatory PullvCardListing Function (Using OBEX Get)
+(vi) Implements the mandatory PullvCardEntry Function (Using OBEX Get)
 
-And update the structure device_opts:
-struct device_opts {
-	unsigned long flags;
-	char    *name;
-	uint32_t class;
-	uint16_t voice;
-	uint8_t  inqmode;
-	uint16_t pageto;
-	uint16_t pkt_type;
-	uint16_t link_mode;
-	uint16_t link_policy;
-	uint16_t scan;
-	int      discovto;
-+	int		c_to_host_fc;
-};
+For building the vCard Listing XML Object, I've written a Tcl script, which takes the necessary information from the user, builds the vCard File (.vcf) and simultaneously updates the vCardListing Object.
 
-Of course, this means that the hcid.conf (and parser.y) will contain another
-entry to enable/disable flow control.
+Now, my question is that since this application links with libopenobex.a, can it be included in the bluez-utils? Because, I've not seen any application in bluez-utils that links with libopenobex.a.
 
-> > (i) For enabling FC from HC to Host, the host first of all 
-> sends Host Buffer
-> > Size Command providing the number of ACL and SCO buffers and their
-> > respective sizes.
-> > (ii) The host then issues Set Host Controller To Host Flow 
-> Control Command.
-
-
-(iii) The host buffer size command and set controller to host flow
-controller command can be sent from configure_device() of hcid/main.c
-
-
-> > (iii) Host will send a Host Number of Completed Packets 
-> Command to the
-> > controller.
-
-But, I could not figure out from where should we send the Host Number of
-completed packets command. Do you have any suggestions. I mean, can you give
-me an idea where can we get to know the receipt of ACL Data at user level?
+Any suggestions, would be appreciated.
 
 Thanks.
 
