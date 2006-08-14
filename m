@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44E0F288.2000107@pracucci.com>
-Date: Mon, 14 Aug 2006 22:00:40 +0000
-From: Marco Pracucci <development@pracucci.com>
-MIME-Version: 1.0
-To: Bluez Development ML <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] hcidump-1.30 segmentation fault
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <000301c6bfb3$830a4f60$9d0cc70a@dlh.st.com>
+References: <000301c6bfb3$830a4f60$9d0cc70a@dlh.st.com>
+Date: Mon, 14 Aug 2006 22:29:20 +0200
+Message-Id: <1155587360.4075.14.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Phonebook Access Profile (Server)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,44 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all,
+Hi Mayank,
 
-I get a segmentation fault when I dump an OBEX connection with hcidump
-1.30 (I have not tried with 1.31). I have compiled hcidump with
---enable-debug and debugged it with gdb. I have got the following backtrace:
+> I've been working on the Phonebook Access Profile (PBAP) Server for quite some time now.
+> I've come up with an implementation which does the following:
+> 
+> (i) Store SDP Record for PBAP Server.
+> (ii) Receive Connections on OBEX.
+> (iii) Implements the mandatory SetPhoneBook Function (Using OBEX SetPath)
+> (iv) Implements the mandatory PullPhoneBook Function (Using OBEX Get)
+> (v) Implements the mandatory PullvCardListing Function (Using OBEX Get)
+> (vi) Implements the mandatory PullvCardEntry Function (Using OBEX Get)
+> 
+> For building the vCard Listing XML Object, I've written a Tcl script, which takes the necessary information from the user, builds the vCard File (.vcf) and simultaneously updates the vCardListing Object.
+> 
+> Now, my question is that since this application links with libopenobex.a, can it be included in the bluez-utils? Because, I've not seen any application in bluez-utils that links with libopenobex.a.
 
-2006-08-14 21:59:11.118487 > ACL data: handle 8 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0040 len 8 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 6 pf 1 ilen 3 fcs 0x49 credits 2
-        OBEX: Connect rsp(f): status 100 len 3 version 11.7 flags 136
-mtu 18681
-        Status 100 = Continue
+no problem to link with OpenOBEX. Works perfectly fine. The configure
+script already checks for the presence of OpenOBEX.
 
-(gdb) bt
-#0  parse_headers (level=3, frm=0x8066e78) at parser.h:157
-#1  0x080562f4 in obex_dump (level=3, frm=0x8066e78) at obex.c:323
-#2  0x08052d83 in rfcomm_dump (level=2, frm=0xbf85ae50) at rfcomm.c:325
-#3  0x08049285 in process_frames (dev=0, sock=6, fd=-1, flags=4864) at
-parser.h:245
-#4  0x0804a565 in main (argc=-1, argv=0xbf85af9c) at hcidump.c:850
+Regards
 
-The problem seems to be in obex_dump() function at row 273:
+Marcel
 
-case 0x00:    /* Connect */
-            version = get_u8(frm);
-            flags   = get_u8(frm);
-            pktlen  = get_u16(frm);
-            printf(" version %d.%d flags %d mtu %d\n",
-                version >> 4, version & 0xf, flags, pktlen);
-            break;
-
-Before to enter the "case" above, frm->len is set to 0... so, get_u*
-calls decrease the frm->len to 4294967292 and the next call to
-parse_headers() fails.
-
-
-Regards,
-Marco pracucci
 
 
 -------------------------------------------------------------------------
