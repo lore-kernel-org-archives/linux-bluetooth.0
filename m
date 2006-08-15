@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44E1A281.3090803@ipb.pt>
-Date: Tue, 15 Aug 2006 11:31:29 +0100
-From: Rui Pedro Lopes <rlopes@ipb.pt>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <44E1187E.6030401@mackintoshweb.com>
-	<20060815012354.GB15576@refinery.twat.com.ar>
-In-Reply-To: <20060815012354.GB15576@refinery.twat.com.ar>
-Subject: Re: [Bluez-users] Totally confused
+Date: Mon, 14 Aug 2006 23:20:48 -0700
+From: Steven Yap <syap@shaw.ca>
+In-reply-to: <20060815020521.GE15576@refinery.twat.com.ar>
+To: bluez-users@lists.sourceforge.net
+Message-id: <1155622848.11881.4.camel@localhost.localdomain>
+MIME-version: 1.0
+References: <20060803043158.GA13259@refinery.twat.com.ar>
+	<20060815020521.GE15576@refinery.twat.com.ar>
+Subject: Re: [Bluez-users] Cannot transfer files via OBEX
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,29 +21,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+On Mon, 2006-14-08 at 23:05 -0300, redondos wrote:
+>                                                             
+> Summary: Can *always* download, can *never* upload. 
+> 
+> redondos@injector redondos $ obexftp -b 00:16:20:F1:47:68 -B 6 -c Sounds -p Overdub2.mp3
 
-redondos wrote:
-> Check the many HOWTOs that can be found on the net.
->
-Is there any HOWTO focusing on the connection with a stereo headset?
-I have only found the one on http://bluetooth-alsa.sourceforge.net/,
-but it is not working because of some PIN Code Request Negative Reply
-error...
+For some reason, with Sony Ericsson phones, you need to use -C instead
+of -c to upload, even if the directory already exist.
 
-
-Cheers,
-
-/rp
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iD8DBQFE4aKBAhGrHSs5PNIRAkWpAKDEx7+Dp2Iz7h+Fqt6Ou0sWFNuMJgCeLH1f
-s8nh+x1t5UfrEXXOp8//Ytw=
-=8OMN
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------------------------
