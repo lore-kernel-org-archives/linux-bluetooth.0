@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44E1F035.3050305@csr.com>
-Date: Tue, 15 Aug 2006 17:03:01 +0100
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <056BF200E9632F4285220E570FEED673D7AE42@GBMDDMH202AMSX.gb001.siemens.net>	<44D8A430.6080502@palmsource.com>	<5256d0b0608080813r4d47ca8p6e55fcd91a2175df@mail.gmail.com>
-	<44D8BE3E.3000308@palmsource.com>
-In-Reply-To: <44D8BE3E.3000308@palmsource.com>
-Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX)
- plus	xmmserror(trials and tribulations) how cool is this!!! new patch
+In-Reply-To: <44E0F288.2000107@pracucci.com>
+References: <44E0F288.2000107@pracucci.com>
+Date: Tue, 15 Aug 2006 02:01:25 +0200
+Message-Id: <1155600085.4075.36.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] hcidump-1.30 segmentation fault
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,39 +16,60 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fr=E9d=E9ric DALLEAU wrote:
-> certainly, but for now i'm not used to gdb, this will come
-> moreover, i will still have to wait 36 minutes before it crashes
+Hi Marco,
 
-Call me paranoid, but 36 minutes is the time after which a 32 bit
-microsecond counter will half-wrap.
+> I get a segmentation fault when I dump an OBEX connection with hcidump
+> 1.30 (I have not tried with 1.31). I have compiled hcidump with
+> --enable-debug and debugged it with gdb. I have got the following backtrace:
+> 
+> 2006-08-14 21:59:11.118487 > ACL data: handle 8 flags 0x02 dlen 12
+>     L2CAP(d): cid 0x0040 len 8 [psm 3]
+>       RFCOMM(d): UIH: cr 0 dlci 6 pf 1 ilen 3 fcs 0x49 credits 2
+>         OBEX: Connect rsp(f): status 100 len 3 version 11.7 flags 136
+> mtu 18681
+>         Status 100 = Continue
+> 
+> (gdb) bt
+> #0  parse_headers (level=3, frm=0x8066e78) at parser.h:157
+> #1  0x080562f4 in obex_dump (level=3, frm=0x8066e78) at obex.c:323
+> #2  0x08052d83 in rfcomm_dump (level=2, frm=0xbf85ae50) at rfcomm.c:325
+> #3  0x08049285 in process_frames (dev=0, sock=6, fd=-1, flags=4864) at
+> parser.h:245
+> #4  0x0804a565 in main (argc=-1, argv=0xbf85af9c) at hcidump.c:850
+> 
+> The problem seems to be in obex_dump() function at row 273:
+> 
+> case 0x00:    /* Connect */
+>             version = get_u8(frm);
+>             flags   = get_u8(frm);
+>             pktlen  = get_u16(frm);
+>             printf(" version %d.%d flags %d mtu %d\n",
+>                 version >> 4, version & 0xf, flags, pktlen);
+>             break;
+> 
+> Before to enter the "case" above, frm->len is set to 0... so, get_u*
+> calls decrease the frm->len to 4294967292 and the next call to
+> parse_headers() fails.
 
-So, if you were doing 32 bit calculations from a base time in units
-of microseconds then after 36 minutes the calculations will wrap
-giving negative results. This might make your system think that it has
-to do some work now as opposed to at some time in the future. This
-could lead to a busy loop (which will then stop after another 36
-minutes).
+this should not happen, because the connect header must include these
+parameters. However we should not segfault. It is better to simple stop
+processing. Added patch to the CVS repository.
 
-	- Steven
--- =
+Regards
+
+Marcel
 
 
-
-To access the latest news from CSR copy this link into a web browser:  http=
-://www.csr.com/email_sig.php
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
