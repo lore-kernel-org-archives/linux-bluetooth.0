@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 14 Aug 2006 23:20:48 -0700
-From: Steven Yap <syap@shaw.ca>
-In-reply-to: <20060815020521.GE15576@refinery.twat.com.ar>
+From: Ioannis Iossifidis <iossifidis@neuroinformatik.rub.de>
 To: bluez-users@lists.sourceforge.net
-Message-id: <1155622848.11881.4.camel@localhost.localdomain>
-MIME-version: 1.0
-References: <20060803043158.GA13259@refinery.twat.com.ar>
-	<20060815020521.GE15576@refinery.twat.com.ar>
-Subject: Re: [Bluez-users] Cannot transfer files via OBEX
+Date: Tue, 15 Aug 2006 08:12:04 +0200
+MIME-Version: 1.0
+Message-Id: <200608150812.04785.iossifidis@neuroinformatik.rub.de>
+Subject: [Bluez-users] Crazy Mouse - logitech V270
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,16 +18,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Mon, 2006-14-08 at 23:05 -0300, redondos wrote:
->                                                             
-> Summary: Can *always* download, can *never* upload. 
-> 
-> redondos@injector redondos $ obexftp -b 00:16:20:F1:47:68 -B 6 -c Sounds -p Overdub2.mp3
+Hi,
 
-For some reason, with Sony Ericsson phones, you need to use -C instead
-of -c to upload, even if the directory already exist.
+I have the same problem  reported in 
+
+http://sourceforge.net/mailarchive/message.php?msg_id=18104806
+
+with the subject "crazy mouse".
 
 
+In addition to that,  I observed in my case, that when I run "sdptool browse" 
+while my mouse is connect the mouse works fine as long the "sdptool browse" 
+process is active.
+
+
+My System:
+
+-Ubuntu-Linux 
+-2.6.15-26-686 #1 SMP PREEMPT
+-bluez-utils_2.24
+
+Regards,
+ioannis
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
