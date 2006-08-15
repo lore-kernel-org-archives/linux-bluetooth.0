@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44E237D5.50202@zubrowka.org>
-Date: Tue, 15 Aug 2006 23:08:37 +0200
-From: Emmanuel Lesouef <elesouef+lists@zubrowka.org>
+Message-ID: <44E1EAB3.8000308@mackintoshweb.com>
+Date: Tue, 15 Aug 2006 11:39:31 -0400
+From: Terry Mackintosh <terry@mackintoshweb.com>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Problem transferring file to a Sony T630 cellular
-	phone
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <44E1187E.6030401@mackintoshweb.com>
+	<20060815012354.GB15576@refinery.twat.com.ar>
+In-Reply-To: <20060815012354.GB15576@refinery.twat.com.ar>
+Subject: Re: [Bluez-users] Totally confused
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,54 +21,47 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello bluez-users list,
+Hi
 
-I'm currently trying to setup the communication between my laptop and my
-cell phone (Sony Ericsson T630)
+redondos wrote:
+> On Mon, Aug 14 20:42, Terry Mackintosh wrote:
+> 
+>>Hi
+>>
+>>
+>>There are so many pieces to the puzzle: hci* sdp* rfcomm others?
+>>
+>>What comes first? second? ...?
+>>
+>>I just want to get pictures off my Motorola V710 picture phone.
+>>Has anyone done this?
+>>
+>>What programs do I run in what order and what config/password files need 
+>>to be messed with?
+>>
+> Check the many HOWTOs that can be found on the net.
 
-elesouef@lothlorien:~$ hcitool scan
-Scanning ...
-        00:0F:DE:CB:D4:04       Manu-T630
-elesouef@lothlorien:~$ sdptool browse 00:0F:DE:CB:D4:04 |grep "Service Name"
-Service Name: Dial-up Networking
-Service Name: Voice gateway
-Service Name: Serial Port 1
-Service Name: Serial Port 2
-Service Name: OBEX Object Push
-Service Name: IrMC Synchronization
-Service Name: HF Voice gateway
-Service Name: OBEX Basic Imaging
-Service Name: OBEX File Transfer
+I have, none seem to directly apply and all are confusing at best.
 
-Everything seems to be OK for now.
+> You can use obexftp(1) to fetch files from your phone.
+> 
+> Something like:
+> $ obexftp -b AA:BB:CC:DD:EE:FF -B <channel> -c Pictures -g Pic1.jpg
+> should work.
 
-I tried the simple way (gnome-bluetooth, "Send file to..." etc...) but
-that didn't work and I didn't saw any messages on the cellular.
+Will try it, however the manual for the phone says it does not support 
+obex, so this probably will not work.
 
-I then tried obexftp :
+No other programs need run to setup the connection? no config files 
+setup? no rfcomm? just obexftp by itself?
 
-elesouef@lothlorien:~$ obexftp -b -l
-Scanning ...
-Using   00:0F:DE:CB:D4:04       Manu-T630
-Failed to connect to SDP server: Operation already in progress
+Thanks
 
-I suppose there's something wrong in my setup.
-
-Anyone got an idea ?
-
-TIA
-
-Emmanuel
-
-PS : Using Ubuntu 6.06 :
-
-elesouef@lothlorien:~$ dpkg -l \*bluez\* |grep ii
-ii  bluez-cups           2.24-0ubuntu6  Bluetooth printer driver for CUPS
-ii  bluez-pcmcia-support 2.24-0ubuntu6  PCMCIA support files for BlueZ
-2.0 Bluetooth
-ii  bluez-pin            0.25-1ubuntu2  Bluetooth PIN helper with D-BUS
-support
-ii  bluez-utils          2.24-0ubuntu6  Bluetooth tools and daemons
+-- 
+Terry Mackintosh <terry@mackintoshweb.com>
+http://www.mackintoshweb.com/mars/ Mars Society, FL chapter.
+Proudly powered by ROCKLinux, Apache, PHP, PostgreSQL, etc.
+"If you don't know where you are going, how can you get there?"
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
