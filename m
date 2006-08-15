@@ -1,15 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 15 Aug 2006 19:12:40 -0300
-From: redondos <redondos@gmail.com>
+Date: Tue, 15 Aug 2006 16:42:04 -0500
+From: digitalfredy <digitalfredy@debiancolombia.org>
+In-reply-to: <44E237D5.50202@zubrowka.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20060815221240.GG15576@refinery.twat.com.ar>
-References: <20060803043158.GA13259@refinery.twat.com.ar>
-	<20060815020521.GE15576@refinery.twat.com.ar>
-	<1155622848.11881.4.camel@localhost.localdomain>
-MIME-Version: 1.0
-In-Reply-To: <1155622848.11881.4.camel@localhost.localdomain>
-Subject: Re: [Bluez-users] Cannot transfer files via OBEX
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-id: <1155678126.9855.32.camel@YODA>
+MIME-version: 1.0
+References: <44E237D5.50202@zubrowka.org>
+Subject: Re: [Bluez-users] Problem transferring file to a Sony
+	T630	cellular	phone
+Reply-To: digitalfredy@debiancolombia.org,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,109 +18,101 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0955102526=="
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hello, review this link
+http://es.wikibooks.org/wiki/Hacks_para_sistemas_operativos_Unix-like/Redes=
+/Bluetooth/Linux
 
---===============0955102526==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="j2AXaZ4YhVcLc+PQ"
-Content-Disposition: inline
+and try use the obexftp from debian repository, some time ago i use
+ubuntu but the obexftp of ubuntu don't work
 
+El mar, 15-08-2006 a las 23:08 +0200, Emmanuel Lesouef escribi=F3:
+> Hello bluez-users list,
+> =
 
---j2AXaZ4YhVcLc+PQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> I'm currently trying to setup the communication between my laptop and my
+> cell phone (Sony Ericsson T630)
+> =
 
-On Mon, Aug 14 23:20, Steven Yap wrote:
-> On Mon, 2006-14-08 at 23:05 -0300, redondos wrote:
-> >                                                            =20
-> > Summary: Can *always* download, can *never* upload.=20
-> >=20
-> > redondos@injector redondos $ obexftp -b 00:16:20:F1:47:68 -B 6 -c Sound=
-s -p Overdub2.mp3
->=20
-> For some reason, with Sony Ericsson phones, you need to use -C instead
-> of -c to upload, even if the directory already exist.
+> elesouef@lothlorien:~$ hcitool scan
+> Scanning ...
+>         00:0F:DE:CB:D4:04       Manu-T630
+> elesouef@lothlorien:~$ sdptool browse 00:0F:DE:CB:D4:04 |grep "Service Na=
+me"
+> Service Name: Dial-up Networking
+> Service Name: Voice gateway
+> Service Name: Serial Port 1
+> Service Name: Serial Port 2
+> Service Name: OBEX Object Push
+> Service Name: IrMC Synchronization
+> Service Name: HF Voice gateway
+> Service Name: OBEX Basic Imaging
+> Service Name: OBEX File Transfer
+> =
 
-Thanks for your reply, Steven. Unfortunately, that didn't help, either.
+> Everything seems to be OK for now.
+> =
 
-After testing on my laptop, then on my desktop, reconnects,
-enabling/disabling bluetooth, installing packages and testing some more,
-it started working. Magically[1].
+> I tried the simple way (gnome-bluetooth, "Send file to..." etc...) but
+> that didn't work and I didn't saw any messages on the cellular.
+> =
 
-[533] # obexftp -b 00:16:20:F1:47:68 -B 6 -p AppleZ52046400.thm=20
-Browsing 00:16:20:F1:47:68 ...
-Channel: 6
-Connecting...done
-Sending "AppleZ52046400.thm"...|done
-Disconnecting...done
+> I then tried obexftp :
+> =
 
-[524] # ussp-push /dev/rfcomm0 MailaRed47045.thm Themes/Maila.thm
-name=3DMailaRed47045.thm, size=3D266240
-Connection established
+> elesouef@lothlorien:~$ obexftp -b -l
+> Scanning ...
+> Using   00:0F:DE:CB:D4:04       Manu-T630
+> Failed to connect to SDP server: Operation already in progress
+> =
 
-It looks like the phone is deciding where to put the files. If I try to
-name them "Themes/themename.thm", then that's the exact name they get,
-inside the Themes folder. Same thing for Pictures, Sounds, etc.
+> I suppose there's something wrong in my setup.
+> =
 
-[1] Not so magically. I think my USB dongle is of a questionable
-quality, or maybe it is the phone. Suspended opinion until further
-investigation.
+> Anyone got an idea ?
+> =
 
-I have to move the phone *very* close to the USB dongle for the transfer
-to work. Almost touching it. Otherwise it just stalls for a few seconds
-then it exits as it did in my previous logs.
+> TIA
+> =
 
-One curiosity: l2ping replies are received even if I move the phone 3
-meters away from the computer, without affecting the latency
-substantially. Shouldn't the OBEX protocol be more friendly to
-connection errors? Or is it not the protocol but the programs? ussp-push
-behaves in the same way.
+> Emmanuel
+> =
 
-Thanks everyone for all the fish, will come back to this issue if more
-problems arise, which means I guess I'll definitely be back soon.
+> PS : Using Ubuntu 6.06 :
+> =
 
---=20
-redondos
+> elesouef@lothlorien:~$ dpkg -l \*bluez\* |grep ii
+> ii  bluez-cups           2.24-0ubuntu6  Bluetooth printer driver for CUPS
+> ii  bluez-pcmcia-support 2.24-0ubuntu6  PCMCIA support files for BlueZ
+> 2.0 Bluetooth
+> ii  bluez-pin            0.25-1ubuntu2  Bluetooth PIN helper with D-BUS
+> support
+> ii  bluez-utils          2.24-0ubuntu6  Bluetooth tools and daemons
+> =
 
---j2AXaZ4YhVcLc+PQ
-Content-Type: application/pgp-signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.4 (GNU/Linux)
-
-iD8DBQFE4kbYJZ/yCc25j3IRAjoUAJ9NFlU7hthoci+FkteO8Er1rFN3ngCffAQ+
-DkjmmOdhzW2IeOehMnQUmc4=
-=M1VX
------END PGP SIGNATURE-----
-
---j2AXaZ4YhVcLc+PQ--
-
-
---===============0955102526==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job ea=
+sier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0955102526==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0955102526==--
