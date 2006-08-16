@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200608161159.35033.akohlsmith-bluez@benshaw.com>
-References: <200608161159.35033.akohlsmith-bluez@benshaw.com>
-Date: Thu, 17 Aug 2006 01:11:39 +0200
-Message-Id: <1155769899.4075.95.camel@aeonflux.holtmann.net>
+In-Reply-To: <c49421c50608161305l2785e2bdvbadde3fefeddbaa0@mail.gmail.com>
+References: <c49421c50608161305l2785e2bdvbadde3fefeddbaa0@mail.gmail.com>
+Date: Thu, 17 Aug 2006 01:02:35 +0200
+Message-Id: <1155769355.4075.88.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: bluez-users@lists.sf.net
-Subject: Re: [Bluez-users] turning OFF dbus and other extras support?
+Subject: Re: [Bluez-users] pand problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,39 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Andrew,
+Hi Loreno,
 
-> It appears that the autoconf process is a little wonky at the present.  Are 
-> these known issues?
+> I'm getting troubles with pand. On the server side I start the pand
+> daemon in the NAP role. On the client side I try to connect to the
+> server using:
 > 
-> Specifically, autoconf doesn't seem to listen to the negative-versions of 
-> --enable (i.e. disable support), and the pkg-config output is taken as 
-> gospel.
+> # pand -c xx:xx:xx:xx:xx:xx
+> 
+> The command returns exit value 0 and no error/warning message is
+> printed on screen, but when I type: 
+> 
+> # pand -l
+> 
+> there is no output.
+> 
+> Does anybody knows what is going wrong here??
 
-the pkg-config part only sets *_found and you need *_enable to actually
-activate an optional feature.
-
-> I can't disable fuse support with --enable-fuse=no or --disable-fuse (nor 
-> cups, haven't tried others).  I'm running Slackware 10.2 which does have 
-> pkg-config, and which does respond correctly.  I did not install bluez-libs 
-> as a package, but it *is* installed; the environment variable overrides are 
-> not heeded, so I have to mangle the Makefile or configure script manually to 
-> get the thing to compile.
-
-You should have. The sample calls for configure can be found in the
-README and I simply don't see any problem at the moment. I need some
-more input here.
-
-> I was also hoping that you'd hear my plea for the ability to make dbus support 
-> *optional* -- I'm using bluez in an embedded system and have to thus stick 
-> with an older (and non-supported) version.  dbus support adds a LOT of 
-> additional requirements, including XML, and that's a significant addition to 
-> any small system.
-
-I am not going to change this back. Otherwise we would have needed a
-complete separate protocol and this would have bloated the Bluetooth
-code. And the requirement of XML is a myth. It brings its own XML parser
-with it.
+run "hcidump -X -V" as root to see what happens.
 
 Regards
 
