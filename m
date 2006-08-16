@@ -1,11 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44E33635.1030007@ipb.pt>
-Date: Wed, 16 Aug 2006 16:13:57 +0100
-From: Rui Pedro Lopes <rlopes@ipb.pt>
-MIME-Version: 1.0
+Date: Wed, 16 Aug 2006 12:16:10 -0300
+From: redondos <redondos@gmail.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <20060816142750.29806.qmail@web51415.mail.yahoo.com>
-In-Reply-To: <20060816142750.29806.qmail@web51415.mail.yahoo.com>
+Message-ID: <20060816151610.GD2993@refinery.twat.com.ar>
+References: <44E1187E.6030401@mackintoshweb.com>
+	<20060815012354.GB15576@refinery.twat.com.ar>
+	<44E1A281.3090803@ipb.pt>
+	<20060815222203.GI15576@refinery.twat.com.ar>
+	<44E2D4D4.6030304@ipb.pt>
+	<20060816133901.GA2993@refinery.twat.com.ar>
+	<44E31FDC.7010508@ipb.pt>
+MIME-Version: 1.0
+In-Reply-To: <44E31FDC.7010508@ipb.pt>
 Subject: Re: [Bluez-users] Totally confused
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -16,47 +22,76 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============2018299524=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
 
-manojt ambe wrote:
-> I modified /usr/local/etc/dbus-1/system.conf as below. After this
-> the pin problem went away. I am using bluez 3.1 and dbus 0.62.  Pls
-> find system.conf attached.
-> 
-> <!-- This is included last so local configuration can override what's
-> in this standard file -->
-> <include
-> ignore_missing="yes">/etc/dbus-1/system.d/bluez-hcid.conf</include>
->
-I believe that this line is useless, because the previous includes
-everything in the system.d directory, including bluez-hcid.conf.
-However, I tried using yout system.conf and I keep getting the same
-problem...
+--===============2018299524==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="C1iGAkRnbeBonpVg"
+Content-Disposition: inline
 
-Cheers,
 
-/rp
+--C1iGAkRnbeBonpVg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Aug 16 14:38, Rui Pedro Lopes wrote:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+>=20
+> redondos wrote:
+> > I forgot the ';' at the end of the line. Did you add that? Can we
+> > see your hcid.conf at its full extent?
+> I added the ';'... :)
+> >
+> > Oh, you're using 3.x. I don't know, haven't played with it yet,
+> > sorry.
+> :) all right... I'll wait a bit until the problem is better known...
+
+I'm sure it's widely known, it's just me who hasn't used v3. Try
+following Manojt's advice, and perhaps you will succeed.
+
+--=20
+redondos
+
+--C1iGAkRnbeBonpVg
+Content-Type: application/pgp-signature
+Content-Disposition: inline
+
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+Version: GnuPG v1.4.4 (GNU/Linux)
 
-iD8DBQFE4zY1AhGrHSs5PNIRAhXBAJ9iI56ZHOlbiLOQnp14lttQlVTjEwCghOAz
-hh7EwZaL8ODWxuA3/c3ndZA=
-=J/+l
+iD8DBQFE4za6JZ/yCc25j3IRAnFdAKCwTKRQi+LZkpqk/peg6BcBIkgIQQCdEuQd
+Bq12oKRfVM7RHzUdl27F+CE=
+=88KA
 -----END PGP SIGNATURE-----
 
+--C1iGAkRnbeBonpVg--
+
+
+--===============2018299524==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============2018299524==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============2018299524==--
