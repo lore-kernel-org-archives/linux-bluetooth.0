@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44E3462D.6030003@xmission.com>
-Date: Wed, 16 Aug 2006 10:22:05 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <44E34359.3040004@palmsource.com>
+Date: Wed, 16 Aug 2006 18:10:01 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <056BF200E9632F4285220E570FEED673D7AE42@GBMDDMH202AMSX.gb001.siemens.net>	<44D8A430.6080502@palmsource.com>	<5256d0b0608080813r4d47ca8p6e55fcd91a2175df@mail.gmail.com>	<44D8BE3E.3000308@palmsource.com>	<44E1F035.3050305@csr.com>	<44E31E8C.4030903@palmsource.com>	<44E3398F.8040602@xmission.com>
-	<44E34359.3040004@palmsource.com>
-In-Reply-To: <44E34359.3040004@palmsource.com>
+References: <056BF200E9632F4285220E570FEED673D7AE42@GBMDDMH202AMSX.gb001.siemens.net>	<44D8A430.6080502@palmsource.com>	<5256d0b0608080813r4d47ca8p6e55fcd91a2175df@mail.gmail.com>	<44D8BE3E.3000308@palmsource.com>	<44E1F035.3050305@csr.com>	<44E31E8C.4030903@palmsource.com>
+	<44E3398F.8040602@xmission.com>
+In-Reply-To: <44E3398F.8040602@xmission.com>
 Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX)
  plus	xmmserror(trials and tribulations) how cool is this!!! new patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -22,13 +22,37 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+
+>> This was the problem for 100% cpu usage, it is now fixed but not yet in =
+cvs.
+>> However we still wonder why it freezed Andrew's computer.
+>>     =
+
+>
+> great... send me the final patch if it's ready for cvs.
+>   =
+
+
+Brad,
+I just repatched the patch :D . I use long integer, and reset the frame =
+
+counter after a big value. Drawback : you can hear a crack but this =
+
+happens after about 500 hours (depending upon the wisely named constant =
+
+MAXTOTALCOUNT). However, this one is nearly not tested as I'm busy =
+
+elsewhere. Feel free to have a look.
+You can find it here http://fdalleau.free.fr/patch_to_try
+It also feature a new rate key in .a2dprc. You can say rate=3D32000 or =
+
+rate=3D44100 to try different headsets. It works with Sonorix.
+
+What about the release plans? What is missing?
+
+Regards,
 Fr=E9d=E9ric
 
-> What about the release plans? What is missing?
-
-integration testing with the alsa sco plugin and overall documentation.
-
-brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
