@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44E34359.3040004@palmsource.com>
-Date: Wed, 16 Aug 2006 18:10:01 +0200
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <056BF200E9632F4285220E570FEED673D7AE42@GBMDDMH202AMSX.gb001.siemens.net>	<44D8A430.6080502@palmsource.com>	<5256d0b0608080813r4d47ca8p6e55fcd91a2175df@mail.gmail.com>	<44D8BE3E.3000308@palmsource.com>	<44E1F035.3050305@csr.com>	<44E31E8C.4030903@palmsource.com>
-	<44E3398F.8040602@xmission.com>
-In-Reply-To: <44E3398F.8040602@xmission.com>
-Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX)
- plus	xmmserror(trials and tribulations) how cool is this!!! new patch
+Date: Wed, 16 Aug 2006 16:34:32 +0100
+From: Matthew Garrett <mjg59@srcf.ucam.org>
+To: bluez-devel@lists.sf.net
+Message-ID: <20060816153432.GA13691@srcf.ucam.org>
+Mime-Version: 1.0
+Subject: [Bluez-devel] DBus interface - determining whether a device exists
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,49 +14,25 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+I'd like to use the DBus interface to determine whether or not a 
+Bluetooth device is currently in range of the computer in order to work 
+out whether or not it's possible to connect to it. Checking through the 
+API suggests that there's currently nothing suitable for doing that. 
+What would be the best way to implement it?
 
->> This was the problem for 100% cpu usage, it is now fixed but not yet in =
-cvs.
->> However we still wonder why it freezed Andrew's computer.
->>     =
-
->
-> great... send me the final patch if it's ready for cvs.
->   =
-
-
-Brad,
-I just repatched the patch :D . I use long integer, and reset the frame =
-
-counter after a big value. Drawback : you can hear a crack but this =
-
-happens after about 500 hours (depending upon the wisely named constant =
-
-MAXTOTALCOUNT). However, this one is nearly not tested as I'm busy =
-
-elsewhere. Feel free to have a look.
-You can find it here http://fdalleau.free.fr/patch_to_try
-It also feature a new rate key in .a2dprc. You can say rate=3D32000 or =
-
-rate=3D44100 to try different headsets. It works with Sonorix.
-
-What about the release plans? What is missing?
-
-Regards,
-Fr=E9d=E9ric
-
+Thanks,
+-- 
+Matthew Garrett | mjg59@srcf.ucam.org
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
