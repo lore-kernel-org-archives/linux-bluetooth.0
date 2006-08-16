@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <c49421c50608161305l2785e2bdvbadde3fefeddbaa0@mail.gmail.com>
-Date: Wed, 16 Aug 2006 17:05:46 -0300
-From: "Loreno Oliveira" <lorenooliveira@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
+To: bluez-users@lists.sf.net
+Date: Wed, 16 Aug 2006 11:59:34 -0400
 MIME-Version: 1.0
-Subject: [Bluez-users] pand problem
+Message-Id: <200608161159.35033.akohlsmith-bluez@benshaw.com>
+Subject: [Bluez-users] turning OFF dbus and other extras support?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,70 +14,38 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2002998580=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============2002998580==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_2400_23269280.1155758746620"
+It appears that the autoconf process is a little wonky at the present.  Are 
+these known issues?
 
-------=_Part_2400_23269280.1155758746620
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Specifically, autoconf doesn't seem to listen to the negative-versions of 
+--enable (i.e. disable support), and the pkg-config output is taken as 
+gospel.
 
-Hi list,
+I can't disable fuse support with --enable-fuse=no or --disable-fuse (nor 
+cups, haven't tried others).  I'm running Slackware 10.2 which does have 
+pkg-config, and which does respond correctly.  I did not install bluez-libs 
+as a package, but it *is* installed; the environment variable overrides are 
+not heeded, so I have to mangle the Makefile or configure script manually to 
+get the thing to compile.
 
-I'm getting troubles with pand. On the server side I start the pand daemon
-in the NAP role. On the client side I try to connect to the server using:
+I was also hoping that you'd hear my plea for the ability to make dbus support 
+*optional* -- I'm using bluez in an embedded system and have to thus stick 
+with an older (and non-supported) version.  dbus support adds a LOT of 
+additional requirements, including XML, and that's a significant addition to 
+any small system.
 
-# pand -c xx:xx:xx:xx:xx:xx
-
-The command returns exit value 0 and no error/warning message is printed on
-screen, but when I type:
-
-# pand -l
-
-there is no output.
-
-Does anybody knows what is going wrong here??
-
-Thanks in advance,
-
-Loreno
-
-------=_Part_2400_23269280.1155758746620
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi list,<br><br>I'm getting troubles with pand. On the server side I start the pand daemon in the NAP role. On the client side I try to connect to the server using:<br><br># pand -c xx:xx:xx:xx:xx:xx<br><br>The command returns exit value 0 and no error/warning message is printed on screen, but when I type:
-<br><br># pand -l<br><br>there is no output.<br><br>Does anybody knows what is going wrong here??<br><br>Thanks in advance,<br><br>Loreno<br>
-
-------=_Part_2400_23269280.1155758746620--
-
-
---===============2002998580==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-A.
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============2002998580==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============2002998580==--
