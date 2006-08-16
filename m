@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 16 Aug 2006 16:34:32 +0100
-From: Matthew Garrett <mjg59@srcf.ucam.org>
-To: bluez-devel@lists.sf.net
-Message-ID: <20060816153432.GA13691@srcf.ucam.org>
-Mime-Version: 1.0
-Subject: [Bluez-devel] DBus interface - determining whether a device exists
+Message-ID: <44E3398F.8040602@xmission.com>
+Date: Wed, 16 Aug 2006 09:28:15 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <056BF200E9632F4285220E570FEED673D7AE42@GBMDDMH202AMSX.gb001.siemens.net>	<44D8A430.6080502@palmsource.com>	<5256d0b0608080813r4d47ca8p6e55fcd91a2175df@mail.gmail.com>	<44D8BE3E.3000308@palmsource.com>	<44E1F035.3050305@csr.com>
+	<44E31E8C.4030903@palmsource.com>
+In-Reply-To: <44E31E8C.4030903@palmsource.com>
+Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX)
+ plus	xmmserror(trials and tribulations) how cool is this!!! new patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,25 +18,27 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I'd like to use the DBus interface to determine whether or not a 
-Bluetooth device is currently in range of the computer in order to work 
-out whether or not it's possible to connect to it. Checking through the 
-API suggests that there's currently nothing suitable for doing that. 
-What would be the best way to implement it?
+Fr=E9d=E9ric
 
-Thanks,
--- 
-Matthew Garrett | mjg59@srcf.ucam.org
+> This was the problem for 100% cpu usage, it is now fixed but not yet in c=
+vs.
+> However we still wonder why it freezed Andrew's computer.
+
+great... send me the final patch if it's ready for cvs.
+
+brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
