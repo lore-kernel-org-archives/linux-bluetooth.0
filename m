@@ -1,17 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v752.2)
-In-Reply-To: <d23110170608111309q263bc87fyf6474dce4d0e535e@mail.gmail.com>
-References: <44D88EC1.7010009@pracucci.com> <44D8815D.4000108@infitsrl.com>
-	<d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
-	<1155236923.4492.49.camel@aeonflux.holtmann.net>
-	<d23110170608111203g590369d4qdc4592c284eafa55@mail.gmail.com>
-	<1155333717.4518.14.camel@aeonflux.holtmann.net>
-	<d23110170608111309q263bc87fyf6474dce4d0e535e@mail.gmail.com>
-Message-Id: <15FB7B62-A264-458C-8960-BE999D3D1A29@infitsrl.com>
-From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
-Date: Wed, 16 Aug 2006 22:21:18 +0200
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
+MIME-Version: 1.0
+Date: Wed, 16 Aug 2006 21:14:12 +0100
+Message-ID: <04ED5B65E3B4A64B97C16E22E0DF16D51848C6@mh23ex03.informatica.com>
+From: "Deiters, Michael" <mdeiters@Informatica.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] BT connection hangs above a certain speed - help
+	needed
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,45 +19,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ulisses,
-I have been outside for a few days...and now I'm reading all the mail  
-about sdp_connect problem.
-if I find the time I install the patch on a development system so I  
-try to contribute to the final version.
+Hello everybody,
 
-bye
+I am currently stuck with BlueZ Version xxxx and seek help by posting to this list.
 
+Technical environment:
+- Several 3G Mobile Phones
+- Sharp Zaurus 2.4.18 Kernel, Nokia DTL4
+- Dell Laptop, 2.6.xx  (SuSE 10.1) 3Com BT Card.
 
-Il giorno 11/ago/06, alle ore 22:09, Ulisses Furquim ha scritto:
+Synthom:
+- Connection between paired devices hangs - no transfer after a while.
 
-> On 8/11/06, Marcel Holtmann <marcel@holtmann.org> wrote:
->> look into l2cap_conn_del() and check what happens if l2cap_data is  
->> NULL.
->> This doesn't change the behavior.
->
-> Doooh. Right. We shouldn't be calling l2cap_conn_del() at all if
-> l2cap_data is NULL so it doesn't change any behavior and we actually
-> save one function call. :-)
->
-> Regards,
->
-> -- Ulisses
->
-> ---------------------------------------------------------------------- 
-> ---
-> Using Tomcat but need to do more? Need to support web services,  
-> security?
-> Get stuff done quickly with pre-integrated technology to make your  
-> job easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache  
-> Geronimo
-> http://sel.as-us.falkag.net/sel? 
-> cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+Description:
+a) pair the Zaurus via DTL4 Card with the 3G Mobile Phone. Use pppd to initiate an internet connection. Works fine.
+After transfering an arbitrary amount of data, the connection finally "hangs". Happens only if 3G Mode (UMTS) is used. Never hangs in GPRS Mode.
+Hangs occur with any 3G fone used. After an amount of abt. 0.5 ... 2 MB the transfer stops. pppd times out. L2PING to the fone will no longer be replied. Using the slower GPRS Mode results in no hangs at all (but the transfer is very slow and not the preferred solution...)
+
+b) Same setup as a).  Same results. Checked with 3 different 3G fones and with the DTL4 as well as with the 3Com BT Card.
+
+c) pair the Zaurus with the 3Com card driven by SuSE 10.1 on Laptop. There, a modem emulator is used as a "landing point" for a "calling-in" pppd from the Zaurus. Thus, the both pppd's (one on Zaurus and second on the SuSE Laptop) are representing a dial-up connection via BT resulting in a TCP/IP connection.
+Same behaviour as in a) and b).  After a certain amount of fast transfered data, the connection hangs and l2ping gets no replies.
+
+a)...c) are using rfcomm to attach the pppd's to Bluetooth via /dev/rfcommX
+
+I observe, the problem has to do with transfer speeds. Above a speed of around 5..6 kB / sec the "hang" will be unavoidable.
+
+To re-initiate the environment, the BT card(s) has to be ejected and re-inserted (Modules re-load?). A simple disconnect and re-connect (pairing) will not work after a prior "hang".
+
+I posted (in German) recently that problem in one of the Zaurus forums and it appears, that other users have the same problem.
+
+I need some hints where to start searching for the reasons of that.  As I am not a BT developer, maybe some of you guys have some ideas th share with me or the community resp.
+
+Thanks for reading!!  Please "cc" michael@deiters.net in case of answers. Thanks.
+
+Kind regards
+Mike
+
 
 
 -------------------------------------------------------------------------
