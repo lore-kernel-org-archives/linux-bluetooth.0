@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44E3320D.3040506@palmsource.com>
-Date: Wed, 16 Aug 2006 16:56:13 +0200
+Message-ID: <44E31E8C.4030903@palmsource.com>
+Date: Wed, 16 Aug 2006 15:33:00 +0200
 From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <056BF200E9632F4285220E570FEED673DF41C2@GBMDDMH202AMSX.gb001.siemens.net>
-In-Reply-To: <056BF200E9632F4285220E570FEED673DF41C2@GBMDDMH202AMSX.gb001.siemens.net>
-Subject: Re: [Bluez-devel]
- a2pdbtsco	won'tcompile	(FIX)	plus	xmmserror(trials andtribulations)	howcool
- is	this!!!	new patch
+References: <056BF200E9632F4285220E570FEED673D7AE42@GBMDDMH202AMSX.gb001.siemens.net>	<44D8A430.6080502@palmsource.com>	<5256d0b0608080813r4d47ca8p6e55fcd91a2175df@mail.gmail.com>	<44D8BE3E.3000308@palmsource.com>
+	<44E1F035.3050305@csr.com>
+In-Reply-To: <44E1F035.3050305@csr.com>
+Subject: Re: [Bluez-devel] a2pd btsco won't compile (FIX)
+ plus	xmmserror(trials and tribulations) how cool is this!!! new patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,74 +22,35 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Andrew,
+Hi,
 
-Sorry to have waited so long, thank you for the tests! I really appreciate!
+This was the problem for 100% cpu usage, it is now fixed but not yet in cvs.
+However we still wonder why it freezed Andrew's computer.
 
-When I asked you the hcidump, I thought that the headset would not =
+Fr=E9d=E9ric
 
-connect to the daemon.
-But the first test shows us that the heaset sends Discover cmd and the =
 
-Discover rej answer is sent. I really doubt it is something else than =
+Steven Singer a =E9crit :
+> Fr=E9d=E9ric DALLEAU wrote:
+>   =
 
-a2dpd (avrecv?) who answer. So I assume we got the message. Thus, there =
+>> certainly, but for now i'm not used to gdb, this will come
+>> moreover, i will still have to wait 36 minutes before it crashes
+>>     =
 
-is no reason why xmms is not started. Make sure you have a cmdnew=3D line =
-
-in .a2dprc. Try giving full path to xmms in config file.
-The command line parser is really weak only the first param is used : =
-
-things like 'xmms --play' will work, but 'xmms xyz --play ' won't. even =
-
-using a space between =3D and xmms will fail. Also using more than one =
-
-space between xmms and --play will fail! To see if it has been parsed =
-
-correctly, there are some 'forked...' messages in a2dpd output. TAB =
-
-instead of space will fail too. In fact, the line must be exactly: =
-
-cmdnew=3Dxmms[space]--play
-
-Apart from that, here are a few keys in order to have more informations =
-
-: It seems that the headset will feel better if the sdp record is =
-
-advertised first : sdptool add A2SRC; sdptool add AVRTG
-
-Make sure only one instance of a2dpd is started by issuing 'killall =
-
-a2dpd' or 'killall -9 a2dpd' before testing.
-
-The daemon is slow to react if you are not connected so make sure you =
-
-wait a few seconds before pressing play multiple times.
-
-When the headset is disconnected, the only accepted command is play. In =
-
-other words, pause, next and prev only works when sound is sent. There =
-
-are two distinct plays : one when sound has been sent during the last =
-
-previous 15 seconds. The other one is when there has been no sound : =
-
-headset initiated connexion. Do you see some "avdtp:" prefixed messages =
-
-in a2dpd output?
-
-Last, my HP headphone must be switched on first (long press on play =3D> =
-
-blue led blinking slowly), then only play can be pressed (short press) =
-
-to make connection. And it will automatically switch off on timeout. So =
-
-sometimes, you believe it is on, and it is not, so pressing anything =
-
-will fail.
-
-Thanks,
-Fr=E9d=E9ric.
+>
+> Call me paranoid, but 36 minutes is the time after which a 32 bit
+> microsecond counter will half-wrap.
+>
+> So, if you were doing 32 bit calculations from a base time in units
+> of microseconds then after 36 minutes the calculations will wrap
+> giving negative results. This might make your system think that it has
+> to do some work now as opposed to at some time in the future. This
+> could lead to a busy loop (which will then stop after another 36
+> minutes).
+>
+> 	- Steven
+>   =
 
 
 
