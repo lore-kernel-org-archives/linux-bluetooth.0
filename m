@@ -1,12 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 16 Aug 2006 21:41:32 +0100
-From: Matthew Garrett <mjg59@srcf.ucam.org>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20060816204132.GA20440@srcf.ucam.org>
-References: <20060816153432.GA13691@srcf.ucam.org>
-Mime-Version: 1.0
-In-Reply-To: <20060816153432.GA13691@srcf.ucam.org>
-Subject: [Bluez-devel] [PATCH] - add ConnectRemoteDevice method to dbus
+Mime-Version: 1.0 (Apple Message framework v752.2)
+In-Reply-To: <d23110170608111309q263bc87fyf6474dce4d0e535e@mail.gmail.com>
+References: <44D88EC1.7010009@pracucci.com> <44D8815D.4000108@infitsrl.com>
+	<d23110170608090806j2b39e87eqd84ba9843d216153@mail.gmail.com>
+	<1155236923.4492.49.camel@aeonflux.holtmann.net>
+	<d23110170608111203g590369d4qdc4592c284eafa55@mail.gmail.com>
+	<1155333717.4518.14.camel@aeonflux.holtmann.net>
+	<d23110170608111309q263bc87fyf6474dce4d0e535e@mail.gmail.com>
+Message-Id: <15FB7B62-A264-458C-8960-BE999D3D1A29@infitsrl.com>
+From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
+Date: Wed, 16 Aug 2006 22:21:18 +0200
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] "File descriptor in bad state" on sdp_connect()
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,143 +25,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I'm not sure if this is the best approach, but still:
+Hi Ulisses,
+I have been outside for a few days...and now I'm reading all the mail  
+about sdp_connect problem.
+if I find the time I install the patch on a development system so I  
+try to contribute to the final version.
 
-The included patch adds a ConnectRemoteDevice method to the Bluez DBus 
-interface. It's the effective equivalent of hcitool cc. The idea is to 
-have somthing that can be used by a session daemon when it wants to 
-reconnect to devices on login.
+bye
 
-Index: dbus-adapter.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus-adapter.c,v
-retrieving revision 1.70
-diff -u -r1.70 dbus-adapter.c
---- dbus-adapter.c	15 Aug 2006 14:55:55 -0000	1.70
-+++ dbus-adapter.c	16 Aug 2006 20:35:50 -0000
-@@ -1648,6 +1648,56 @@
- 
- }
- 
-+static DBusHandlerResult handle_dev_connect_remote_device_req(DBusConnection *conn, DBusMessage *msg, void *data)
-+{
-+	DBusMessage *reply;
-+	DBusError err;
-+
-+	struct hci_dbus_data *dbus_data = data;
-+
-+	const char *peer_addr;
-+	bdaddr_t peer_bdaddr;
-+	int dd, ptype;
-+	uint16_t handle = 0;
-+
-+	dbus_error_init(&err);
-+	dbus_message_get_args(msg, &err,
-+				DBUS_TYPE_STRING, &peer_addr,
-+				DBUS_TYPE_INVALID);
-+
-+	if (dbus_error_is_set(&err)) {
-+		error("Can't extract message arguments:%s", err.message);
-+		dbus_error_free(&err);
-+		return error_invalid_arguments(conn, msg);
-+	}
-+
-+	if (check_address(peer_addr) < 0)
-+		return error_invalid_arguments(conn, msg);
-+
-+	str2ba(peer_addr, &peer_bdaddr);
-+
-+	dd = hci_open_dev(dbus_data->dev_id);
-+	if (dd < 0)
-+		return error_no_such_adapter(conn, msg);
-+
-+	ptype = HCI_DM1 | HCI_DM3 | HCI_DM5 | HCI_DH1 | HCI_DH3 | HCI_DH5;
-+
-+	/* Send the HCI connect command */
-+	if (hci_create_connection (dd, &peer_bdaddr, htobs(ptype), 0, 0x01, &handle, 25000) < 0) {		
-+		error("Connect failed");
-+		hci_close_dev(dd);
-+		return error_failed(conn, msg, errno);
-+	}
-+
-+	hci_close_dev(dd);
-+
-+	reply = dbus_message_new_method_return(msg);
-+	if (!reply)
-+		return DBUS_HANDLER_RESULT_NEED_MEMORY;
-+
-+	return send_reply_and_unref(conn, reply);
-+}
-+
- static DBusHandlerResult handle_dev_create_bonding_req(DBusConnection *conn, DBusMessage *msg, void *data)
- {
- 	char filename[PATH_MAX + 1];
-@@ -2365,6 +2415,7 @@
- 
- 	{ "DisconnectRemoteDevice",			handle_dev_disconnect_remote_device_req	},
- 
-+	{ "ConnectRemoteDevice",                        handle_dev_connect_remote_device_req },
- 	{ "CreateBonding",				handle_dev_create_bonding_req		},
- 	{ "CancelBonding",				handle_dev_cancel_bonding_req		},
- 	{ "RemoveBonding",				handle_dev_remove_bonding_req		},
-Index: dbus-api.txt
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus-api.txt,v
-retrieving revision 1.40
-diff -u -r1.40 dbus-api.txt
---- dbus-api.txt	9 Aug 2006 20:10:50 -0000	1.40
-+++ dbus-api.txt	16 Aug 2006 20:35:51 -0000
-@@ -553,6 +553,15 @@
- 
- 			Question: Can we find a better name?
- 
-+		void ConnectRemoteDevice(string address)
-+
-+		        This method creates a baseband connection to a specific
-+			remote device.
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.NoSuchAdapter
-+					 org.bluez.Error.Failed
-+
- 		void DisconnectRemoteDevice(string address)
- 
- 			This method disconnects a specific remote device by
 
-Index: dbus-test
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus-test,v
-retrieving revision 1.22
-diff -u -r1.22 dbus-test
---- dbus-test	9 Aug 2006 20:10:50 -0000	1.22
-+++ dbus-test	16 Aug 2006 20:35:52 -0000
-@@ -45,6 +45,7 @@
-              "ClearRemoteAlias",
-              "LastSeen",
-              "LastUsed",
-+	     "ConnectRemoteDevice",
-              "DisconnectRemoteDevice",
-              "CreateBonding",
-              "CancelBondingProcess",
-@@ -343,9 +344,14 @@
-                    print self.device.LastUsed(self.cmd_args[0])
-                else:
-                    print 'Usage: %s -i <dev> LastUsed address' % self.name
-+           elif self.cmd == 'ConnectRemoteDevice':
-+               if len(self.cmd_args) == 1:
-+                   print self.device.ConnectRemoteDevice(self.cmd_args[0])
-+               else:
-+                   print 'Usage: %s -i <dev> ConnectRemoteDevice address' % self.name
-            elif self.cmd == 'DisconnectRemoteDevice':
-                if len(self.cmd_args) == 1:
--                   print self.device.LastUsed(self.cmd_args[0])
-+                   print self.device.DisconnectRemoteDevice(self.cmd_args[0])
-                else:
-                    print 'Usage: %s -i <dev> DisconnectRemoteDevice address' % self.name
-            elif self.cmd == 'CreateBonding':
+Il giorno 11/ago/06, alle ore 22:09, Ulisses Furquim ha scritto:
 
--- 
-Matthew Garrett | mjg59@srcf.ucam.org
+> On 8/11/06, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> look into l2cap_conn_del() and check what happens if l2cap_data is  
+>> NULL.
+>> This doesn't change the behavior.
+>
+> Doooh. Right. We shouldn't be calling l2cap_conn_del() at all if
+> l2cap_data is NULL so it doesn't change any behavior and we actually
+> save one function call. :-)
+>
+> Regards,
+>
+> -- Ulisses
+>
+> ---------------------------------------------------------------------- 
+> ---
+> Using Tomcat but need to do more? Need to support web services,  
+> security?
+> Get stuff done quickly with pre-integrated technology to make your  
+> job easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache  
+> Geronimo
+> http://sel.as-us.falkag.net/sel? 
+> cmd=lnk&kid=120709&bid=263057&dat=121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
