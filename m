@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20060816153432.GA13691@srcf.ucam.org>
+In-Reply-To: <20060816204132.GA20440@srcf.ucam.org>
 References: <20060816153432.GA13691@srcf.ucam.org>
-Date: Thu, 17 Aug 2006 01:16:17 +0200
-Message-Id: <1155770177.4075.102.camel@aeonflux.holtmann.net>
+	<20060816204132.GA20440@srcf.ucam.org>
+Date: Thu, 17 Aug 2006 01:13:25 +0200
+Message-Id: <1155770005.4075.98.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] DBus interface - determining whether a
-	device	exists
+Subject: Re: [Bluez-devel] [PATCH] - add ConnectRemoteDevice method to dbus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,20 +23,16 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Matthew,
 
-> I'd like to use the DBus interface to determine whether or not a 
-> Bluetooth device is currently in range of the computer in order to work 
-> out whether or not it's possible to connect to it. Checking through the 
-> API suggests that there's currently nothing suitable for doing that. 
-> What would be the best way to implement it?
+> I'm not sure if this is the best approach, but still:
+> 
+> The included patch adds a ConnectRemoteDevice method to the Bluez DBus 
+> interface. It's the effective equivalent of hcitool cc. The idea is to 
+> have somthing that can be used by a session daemon when it wants to 
+> reconnect to devices on login.
 
-this is a general Bluetooth problem. If you don't have a connection
-between two devices then there is no radio traffic. This is one of big
-difference between Bluetooth and WiFi.
-
-The only possible solution is to have the other device always be in
-discoverable mode and use periodic inquiry with the RSSI values or
-defines something for extended inquiry to transmit additional
-information.
+we left this out on purpose. The disconnect was a compromise for systems
+where we might end up with stuck connections. The "hcitool cc ..." is
+for debugging purpose only and so this patch is not acceptable.
 
 Regards
 
