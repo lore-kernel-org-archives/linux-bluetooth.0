@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 16 Aug 2006 22:46:06 +0100
-From: Matthew Garrett <mjg59@srcf.ucam.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060816214606.GA21719@srcf.ucam.org>
+In-Reply-To: <20060816153432.GA13691@srcf.ucam.org>
 References: <20060816153432.GA13691@srcf.ucam.org>
-	<1155770177.4075.102.camel@aeonflux.holtmann.net>
+Date: Thu, 17 Aug 2006 01:16:17 +0200
+Message-Id: <1155770177.4075.102.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-In-Reply-To: <1155770177.4075.102.camel@aeonflux.holtmann.net>
+Cc: bluez-devel@lists.sf.net
 Subject: Re: [Bluez-devel] DBus interface - determining whether a
 	device	exists
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -22,25 +22,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, Aug 17, 2006 at 01:16:17AM +0200, Marcel Holtmann wrote:
+Hi Matthew,
 
-> this is a general Bluetooth problem. If you don't have a connection
-> between two devices then there is no radio traffic. This is one of big
-> difference between Bluetooth and WiFi.
+> I'd like to use the DBus interface to determine whether or not a 
+> Bluetooth device is currently in range of the computer in order to work 
+> out whether or not it's possible to connect to it. Checking through the 
+> API suggests that there's currently nothing suitable for doing that. 
+> What would be the best way to implement it?
 
-Right. But the DBus interface doesn't seem to provide any mechanism for 
-initiating a connection to the device. GetName and the like appear to 
-provide cached results even if the device is now out of range, which 
-isn't what I want.
+this is a general Bluetooth problem. If you don't have a connection
+between two devices then there is no radio traffic. This is one of big
+difference between Bluetooth and WiFi.
 
-There's an obvious use case for having a function that is, effectively, 
-"Can I currently connect to the device with this bluetooth address". The 
-patch I sent provides that, but if that's unacceptable then what should 
-the interface look like?
+The only possible solution is to have the other device always be in
+discoverable mode and use periodic inquiry with the RSSI values or
+defines something for extended inquiry to transmit additional
+information.
 
-Thanks,
--- 
-Matthew Garrett | mjg59@srcf.ucam.org
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
