@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Mayank BATRA <mayank.batra@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Thu, 17 Aug 2006 10:13:14 +0530
-Message-ID: <000301c6c1b7$a75d3fc0$9d0cc70a@dlh.st.com>
+Message-ID: <66dc03c80608161821pda00e42ra69e3775814614de@mail.gmail.com>
+Date: Wed, 16 Aug 2006 22:21:19 -0300
+From: "=?ISO-8859-1?Q?Cezar_S=E1_Espinola?=" <cezarsa@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20060816214606.GA21719@srcf.ucam.org>
 MIME-Version: 1.0
-In-Reply-To: <1155587165.4075.10.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
+References: <20060816153432.GA13691@srcf.ucam.org>
+	<1155770177.4075.102.camel@aeonflux.holtmann.net>
+	<20060816214606.GA21719@srcf.ucam.org>
+Subject: Re: [Bluez-devel] DBus interface - determining whether a device
+	exists
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,34 +23,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+> Right. But the DBus interface doesn't seem to provide any mechanism for
+> initiating a connection to the device. GetName and the like appear to
+> provide cached results even if the device is now out of range, which
+> isn't what I want.
+Hi Matthew,
 
-> > (iii) The host buffer size command and set controller to host flow
-> > controller command can be sent from configure_device() of 
-> hcid/main.c
-> 
-> No. This must be done in the kernel. It is not the job of hcid.
+What about RFCOMM ConnectByChannel? Wouldn't it do the job?
 
-I still feel that these two commands should be sent from hcid at the time of
-initialization amd the user should have option to enable/disable this flow
-control from hcid.conf
-
-> > But, I could not figure out from where should we send the 
-> Host Number of
-> > completed packets command. Do you have any suggestions. I 
-> mean, can you give
-> > me an idea where can we get to know the receipt of ACL Data 
-> at user level?
-> 
-> This must be done in the kernel. It is like sniff mode 
-> support. Only the
-> kernel knows all facts.
-
-I agree with this.
-
-Regards,
-Mayank
-
+Best Regards,
+Cezar
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
