@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000301c6c1b7$a75d3fc0$9d0cc70a@dlh.st.com>
-References: <000301c6c1b7$a75d3fc0$9d0cc70a@dlh.st.com>
-Date: Thu, 17 Aug 2006 14:59:23 +0200
-Message-Id: <1155819564.4075.128.camel@aeonflux.holtmann.net>
+In-Reply-To: <20060817100604.GA3350@srcf.ucam.org>
+References: <20060817100604.GA3350@srcf.ucam.org>
+Date: Thu, 17 Aug 2006 15:04:18 +0200
+Message-Id: <1155819858.4075.134.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
+Cc: bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] [PATCH] implement RFCOMM Connect and
+	Disconnect	methods
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,21 +22,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mayank,
+Hi Matthew,
 
-> > > (iii) The host buffer size command and set controller to host flow
-> > > controller command can be sent from configure_device() of 
-> > hcid/main.c
-> > 
-> > No. This must be done in the kernel. It is not the job of hcid.
+> I sent this a couple of weeks ago, but didn't get any feedback. This 
+> patch implements the Connect and Disconnect methods in the 
+> org.bluez.RFCOMM namespace. I've changed it to use integers for services 
+> rather than the string identifiers for a couple of reasons:
 > 
-> I still feel that these two commands should be sent from hcid at the time of
-> initialization amd the user should have option to enable/disable this flow
-> control from hcid.conf
+> 1) Nothing else seems to actually use the strings right now, even when 
+> the docs suggest they do
+> 2) The service values don't appear to be complete and don't deal with 
+> the case of having multiple services of the same general type on a 
+> device
+> 
+> Based on previous discussion with Marcel, this patch may not be ideal 
+> since it doesn't deal with the case of the whether or not cached values 
+> are valid. However, if the API is considered correct, then it would be 
+> nice to add it with a note that it may not work under certain 
+> circumstances and then fix that at some later stage.
 
-to start something we can do this. Remember that the kernel then have to
-track these commands to see if it has to use host controller to host
-flow control or not.
+I haven't payed much attention to the RFCOMM parts of our D-Bus API
+since I declared it as experimental and it might still change. However
+one thing is that we wanna use strings. They are more flexible and if
+you use languages like Python they can come in handy.
+
+In this case for example you might use "spp" (service name) or
+"0x10000" (record handle) to connect to a specific RFCOMM channel.
+
+The SDP caching is still something that needs a lot of thinking before
+we will finally solve it. It is not as easy as people thing and always
+requesting a SDP record first is not a good idea either. However a lot
+of this depends on how broken the SDP records of the remote devices are.
 
 Regards
 
