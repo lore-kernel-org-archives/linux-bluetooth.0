@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44E4290D.1000402@ipb.pt>
-Date: Thu, 17 Aug 2006 09:30:05 +0100
-From: Rui Pedro Lopes <rlopes@ipb.pt>
+From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
+To: bluez-users@lists.sourceforge.net
+Date: Wed, 16 Aug 2006 22:08:37 -0400
+References: <200608161159.35033.akohlsmith-bluez@benshaw.com>
+	<1155769899.4075.95.camel@aeonflux.holtmann.net>
+In-Reply-To: <1155769899.4075.95.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <44E1187E.6030401@mackintoshweb.com>	<20060815012354.GB15576@refinery.twat.com.ar>	<44E1A281.3090803@ipb.pt>	<20060815222203.GI15576@refinery.twat.com.ar>	<44E2D4D4.6030304@ipb.pt>	<20060816133901.GA2993@refinery.twat.com.ar>	<44E31FDC.7010508@ipb.pt>
-	<20060816151610.GD2993@refinery.twat.com.ar>
-In-Reply-To: <20060816151610.GD2993@refinery.twat.com.ar>
-Subject: Re: [Bluez-users] Totally confused
+Message-Id: <200608162208.37986.akohlsmith-bluez@benshaw.com>
+Subject: Re: [Bluez-users] turning OFF dbus and other extras support?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,28 +21,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+On Wednesday 16 August 2006 19:11, Marcel Holtmann wrote:
+> the pkg-config part only sets *_found and you need *_enable to actually
+> activate an optional feature.
 
-redondos wrote:
-> I'm sure it's widely known, it's just me who hasn't used v3. Try
-> following Manojt's advice, and perhaps you will succeed.
-Got it to work!
-The solution is here:
-http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=383188
+Seems like a weak way to check for a library, but I imagine that only the 
+slackware and slackware-derived distros would have this particular issue:
 
-Cheers,
+checking pkg-config is at least version 0.9.0... yes
+checking for BLUEZ... Package bluez was not found in the pkg-config search 
+path.
+Perhaps you should add the directory containing `bluez.pc'
+to the PKG_CONFIG_PATH environment variable
+No package 'bluez' found
+configure: error: Bluetooth library is required
 
-/rp
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+$ BLUEZ_CFLAGS=-I~/files/bluez-libs-3.2/include 
+BLUEZ_LIBS="-L~/files/bluez-libs/src/.libs -lbluetooth" ./configure
 
-iD8DBQFE5CkNAhGrHSs5PNIRAoeNAJ9qJjxp1etQaL8cR4tmNbQSkyALzACeLZl6
-TM09Ds2cD29BSDObLg1Os3s=
-=XOXd
------END PGP SIGNATURE-----
+This lets it work, so there's a viable workaround for us old coots.  :-)
 
+> You should have. The sample calls for configure can be found in the
+> README and I simply don't see any problem at the moment. I need some
+> more input here.
+
+No, I was mistaken here.  I reran the configuration with the command line 
+above and pkg-config told the configure script that fuse, openobex and libusb 
+weren't found, but let it build regardless.
+
+> I am not going to change this back. Otherwise we would have needed a
+> complete separate protocol and this would have bloated the Bluetooth
+> code. And the requirement of XML is a myth. It brings its own XML parser
+> with it.
+
+A complete separate protocol to do what?  v2.25 seems to get by fine without a 
+notification subsystem.
+
+Regarding dbus and an xml requirement -- the dbus wiki page seems to disagree 
+with you on this.  From http://www.freedesktop.org/wiki/Software/dbus:
+
+"D-Bus' only *required* dependency is an XML parser (either libxml or expat)."
+
+I will make another attempt at building dbus and bluez-3.2 under my embedded 
+environment.  I may have been overly impatient in trying to get it to work.
+
+-A.
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
