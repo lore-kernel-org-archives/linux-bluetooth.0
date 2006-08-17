@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Mayank BATRA <mayank.batra@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Thu, 17 Aug 2006 16:50:47 +0530
-Message-ID: <000f01c6c1ef$306137e0$9d0cc70a@dlh.st.com>
-MIME-Version: 1.0
-In-Reply-To: <1155819564.4075.128.camel@aeonflux.holtmann.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <000301c6c1b7$a75d3fc0$9d0cc70a@dlh.st.com>
+References: <000301c6c1b7$a75d3fc0$9d0cc70a@dlh.st.com>
+Date: Thu, 17 Aug 2006 14:59:23 +0200
+Message-Id: <1155819564.4075.128.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,23 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Mayank,
 
-> to start something we can do this. Remember that the kernel 
-> then have to
-> track these commands to see if it has to use host controller to host
-> flow control or not.
+> > > (iii) The host buffer size command and set controller to host flow
+> > > controller command can be sent from configure_device() of 
+> > hcid/main.c
+> > 
+> > No. This must be done in the kernel. It is not the job of hcid.
 > 
+> I still feel that these two commands should be sent from hcid at the time of
+> initialization amd the user should have option to enable/disable this flow
+> control from hcid.conf
 
-Hmmm.... I think I understand now why you were insisting this to be done at
-the kernel side.
-Because if we set flow control from user side then it will be difficult to
-inform the kernel about this.
-I'll try both things (setting flow control and sending host no of completed
-packets) from kernel side only.
+to start something we can do this. Remember that the kernel then have to
+track these commands to see if it has to use host controller to host
+flow control or not.
 
-Regards,
-Mayank
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
