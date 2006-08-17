@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Thu, 17 Aug 2006 12:41:16 +0100
+From: Matthew Garrett <mjg59@srcf.ucam.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000f01c6c1ef$306137e0$9d0cc70a@dlh.st.com>
-References: <000f01c6c1ef$306137e0$9d0cc70a@dlh.st.com>
-Date: Thu, 17 Aug 2006 15:45:51 +0200
-Message-Id: <1155822351.4075.136.camel@aeonflux.holtmann.net>
+Message-ID: <20060817114116.GC5118@srcf.ucam.org>
+References: <20060817100604.GA3350@srcf.ucam.org>
+	<1155819858.4075.134.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
+In-Reply-To: <1155819858.4075.134.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] [PATCH] implement RFCOMM Connect and
+	Disconnect	methods
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,31 +22,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mayank,
+On Thu, Aug 17, 2006 at 03:04:18PM +0200, Marcel Holtmann wrote:
 
-> > to start something we can do this. Remember that the kernel 
-> > then have to
-> > track these commands to see if it has to use host controller to host
-> > flow control or not.
-> > 
+> I haven't payed much attention to the RFCOMM parts of our D-Bus API
+> since I declared it as experimental and it might still change. However
+> one thing is that we wanna use strings. They are more flexible and if
+> you use languages like Python they can come in handy.
 > 
-> Hmmm.... I think I understand now why you were insisting this to be done at
-> the kernel side.
-> Because if we set flow control from user side then it will be difficult to
-> inform the kernel about this.
-> I'll try both things (setting flow control and sending host no of completed
-> packets) from kernel side only.
+> In this case for example you might use "spp" (service name) or
+> "0x10000" (record handle) to connect to a specific RFCOMM channel.
 
-it is not that complicated. We have to do this for a lot of commands
-that you can use from userspace and the kernel has to detect its
-execution. You might wanna do it anyway so you should have a look at the
-examples in hci_event.c inside the kernel code.
+I'm not entirely clear on what a service name represents. Is it a 
+specific service, or is it the profile implemented by that service? What 
+string should represent non-standard services? As an example, my phone 
+has a service called "Nokia OBEX PC Suite Services". If I want to use 
+that via the DBus interface, I'll presumably need to use the record 
+handle anyway?
 
-Regards
+> The SDP caching is still something that needs a lot of thinking before
+> we will finally solve it. It is not as easy as people thing and always
+> requesting a SDP record first is not a good idea either. However a lot
+> of this depends on how broken the SDP records of the remote devices are.
 
-Marcel
+I agree that always requesting the SDP record first is less than ideal, 
+but I'd argue that it's better to have suboptimal functionality than no 
+functionality :)
 
-
+Thanks,
+-- 
+Matthew Garrett | mjg59@srcf.ucam.org
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
