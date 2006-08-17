@@ -1,16 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 17 Aug 2006 13:25:59 +0100
-From: Matthew Garrett <mjg59@srcf.ucam.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060817122559.GA6422@srcf.ucam.org>
+In-Reply-To: <20060817113538.GB5118@srcf.ucam.org>
 References: <20060816153432.GA13691@srcf.ucam.org>
 	<1155770177.4075.102.camel@aeonflux.holtmann.net>
 	<20060816214606.GA21719@srcf.ucam.org>
 	<1155819360.4075.123.camel@aeonflux.holtmann.net>
 	<20060817113538.GB5118@srcf.ucam.org>
-	<1155823499.4075.157.camel@aeonflux.holtmann.net>
+Date: Thu, 17 Aug 2006 16:04:59 +0200
+Message-Id: <1155823499.4075.157.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-In-Reply-To: <1155823499.4075.157.camel@aeonflux.holtmann.net>
 Subject: Re: [Bluez-devel] DBus interface - determining
 	whether	a	device	exists
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -26,41 +25,109 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, Aug 17, 2006 at 04:04:59PM +0200, Marcel Holtmann wrote:
+Hi Matthew,
 
-> For this specific case we should only page the device if the audio
-> device has been opened and there is actually an audio stream. I is not
-> important if the device is in range or not. If it is not in range then
-> you won't hear anything or we need to choose a fallback. I think that
-> these stuff doesn't belong in the core Bluetooth daemon. You want to
-> have an btaudiod that handles all these stuff in the back for you. The
-> user only configures once the possible connections to headphones and
-> headsets and then the daemon will take care of everything.
+> > You must understand that you can't do this with Bluetooth. If you wanna
+> > know if you can connect to a device then the baseband has to page the
+> > other device. This is an expensive operation and it will stall all
+> > ongoing paging or inquiry operations. So in general you don't wanna do
+> > this unless you are in a special environment and know what all users are
+> > doing. For the normal desktop case we simply don't know this. So it is
+> > not a good idea. Not speaking of the higher power consumption of such
+> > operations.
+> 
+> In this specific case, it's done at login time. That's a point where we 
+> /do/ know whether or not there are any existing connections (I'm 
+> ignoring the multiple user case, because the DBus API doesn't really 
+> deal with that at the moment anyway).
 
-The problem isn't just in actually setting up the connections, it's in 
-providing the information about available devices to other applications. 
-Nowadays, the right layer for device enumeration is HAL. If I tell my 
-system about a mobile phone, then the correct behaviour is for it to 
-appear as a HAL object. In order for Network Manager to offer me the 
-choice of connecting via my phone, the phone needs to be in HAL. So, 
-somehow, at login time the phone needs to be added.
+actually the API can handle it, but we don't honor different users from
+the backend part at the moment. We talked about it, but it was put off
+as something to address later when all Bluetooth parts are working
+smoothly together.
 
-There's two ways of dealing with this. The one that I prefer is that we 
-make some effort to determine that the phone actually exists, and then 
-add it to HAL in the same way that we would if we'd just done device 
-discovery and the phone was discoverable. This needs us to have some 
-mechanism for determining whether the phone actually exists. The second 
-is that we store the HAL data and repopulate HAL at login time. This is 
-more hacky, since we're adding information without even having made a 
-token effort to determine whether the device exists or not.
+> > You also have to think about moving targets. For example at an airport
+> > where a lot of devices will pass you. Trying to page them and waiting
+> > for a page timeout is an even more expensive operation.
+> 
+> Sorry, possibly I should be clearer about the behaviour I'm talking 
+> about here.
+> 
+> Imagine the case where a user has bound a set of headphones. They've 
+> chosen to make them their default audio device. At login time, we wish 
+> to attempt to reconnect to the headphones. It would be nice to be able 
+> to do so by checking whether the device exists or not first.
+> 
+> At the moment, the method for doing that would appear to be to store the 
+> following information:
+> 
+> 1) The bluetooth address
+> 2) The fact that it's a set of headphones
+> 3) Whether it uses rfcomm or l2cap
+> 
+> and then at login time do service discovery (because we don't know 
+> whether the channel may have changed) and attempt to set up a 
+> connection. The alternative would be to store:
+> 
+> 1) The bluetooth address
+> 
+> and then at login time attempt a baseband connection to the device. If 
+> it exists, then we can do service discovery and worry about the other 
+> pieces of information. If we can't set up a baseband connection, we 
+> don't need to bother.
+> 
+> The second approach strikes me as simpler than the first approach, but 
+> it requires the ability to set up that baseband connection which you're 
+> clearly unhappy with. Is the first approach how I should be doing this?
 
-I guess that since we don't have any guarantees that the device exists 
-at any given point in time anyway, this makes less difference and we 
-should just populate HAL regardless. I suppose I'm open to that.
- 
-Thanks,
--- 
-Matthew Garrett | mjg59@srcf.ucam.org
+I personally don't like to page a bunch of devices at login time. This
+can end up in a bad user experience. For example if they use a Bluetooth
+mouse and keyboard. This might block with some older chips or they
+experience some rough time.
+
+For this specific case we should only page the device if the audio
+device has been opened and there is actually an audio stream. I is not
+important if the device is in range or not. If it is not in range then
+you won't hear anything or we need to choose a fallback. I think that
+these stuff doesn't belong in the core Bluetooth daemon. You want to
+have an btaudiod that handles all these stuff in the back for you. The
+user only configures once the possible connections to headphones and
+headsets and then the daemon will take care of everything.
+
+This will be complete new D-Bus API for Bluetooth. I talked about my
+ideas for it at the OLS, but no actual code has been written so far.
+
+> > So what you actually want is to set a device in periodic inquiry mode
+> > and then make it constantly report devices in range. 
+> 
+> Well, no - I don't actually care what happens to the device after that. 
+> If the user moves the device out of range, or if the user logs in 
+> without the device being switched on, then it's acceptable to require 
+> the user to manually reenable the device. But it's entirely reasonable 
+> for the user to say "If the device is switched on when I log in, please 
+> automatically connect to it". That's the problem that I'm trying to 
+> solve. Unlike periodic inquiry, this wouldn't result in any significant 
+> increase in power consumption. It's a one-shot-per-session thing.
+
+Except that you wanna keep up the connection. Even with sniff mode, this
+consumes more power than a disconnected device. This is one of the
+reasons why mice and keyboards are shutting down the connections after a
+specific idle time. Same applies to other devices. If you don't actually
+need the connection, then don't have it. In the case of headphones you
+don't wanna have a connection if you don't have any audio.
+
+I know that these models doesn't really fit into the Linux way at the
+moment, but we will see them more and more. Bluetooth is only the first
+technology used a "disconnected model". Wireless USB and UWB will have
+to deal with it, too. And power consumption is a big factor. I just
+applied a patch to use ppoll() instead of poll() for a couple of our
+deaemons.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
