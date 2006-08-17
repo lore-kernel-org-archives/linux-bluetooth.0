@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 17 Aug 2006 13:01:59 +0100
-From: Matthew Garrett <mjg59@srcf.ucam.org>
+Date: Thu, 17 Aug 2006 14:59:12 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060817120159.GA5996@srcf.ucam.org>
+Message-ID: <20060817115912.GA24906@localhost.localdomain>
 References: <20060817100604.GA3350@srcf.ucam.org>
 	<1155819858.4075.134.camel@aeonflux.holtmann.net>
 	<20060817114116.GC5118@srcf.ucam.org>
-	<20060817115912.GA24906@localhost.localdomain>
-Mime-Version: 1.0
-In-Reply-To: <20060817115912.GA24906@localhost.localdomain>
+MIME-Version: 1.0
+In-Reply-To: <20060817114116.GC5118@srcf.ucam.org>
 Subject: Re: [Bluez-devel] [PATCH] implement RFCOMM Connect and
 	Disconnect	methods
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -24,19 +23,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, Aug 17, 2006 at 02:59:12PM +0300, Johan Hedberg wrote:
+Hi Matthew,
 
-> Or its UUID (presumably 128bit) in string format. It seems that we'd 
-> have three different ways for specifying the target service:
-> 1. friendly name (e.g. "ftp")
-> 2. record handle
-> 3. UUID
+On Thu, Aug 17, 2006, Matthew Garrett wrote:
+> I'm not entirely clear on what a service name represents. Is it a 
+> specific service, or is it the profile implemented by that service? What 
+> string should represent non-standard services? As an example, my phone 
+> has a service called "Nokia OBEX PC Suite Services". If I want to use 
+> that via the DBus interface, I'll presumably need to use the record 
+> handle anyway?
 
-Ok. So we pass all of these as strings, parse them in the method and 
-then connect to the appropriate channel? That seems doable.
+Or its UUID (presumably 128bit) in string format. It seems that we'd 
+have three different ways for specifying the target service:
+1. friendly name (e.g. "ftp")
+2. record handle
+3. UUID
 
--- 
-Matthew Garrett | mjg59@srcf.ucam.org
+Johan
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
