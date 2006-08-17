@@ -1,18 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 17 Aug 2006 12:22:26 +0100
-From: Matthew Garrett <mjg59@srcf.ucam.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060817112226.GA5118@srcf.ucam.org>
-References: <20060816153432.GA13691@srcf.ucam.org>
-	<1155770177.4075.102.camel@aeonflux.holtmann.net>
-	<20060816214606.GA21719@srcf.ucam.org>
-	<66dc03c80608161821pda00e42ra69e3775814614de@mail.gmail.com>
-	<20060817081503.GA1086@srcf.ucam.org>
-	<1155819475.4075.126.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-In-Reply-To: <1155819475.4075.126.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] DBus interface - determining whether a
-	device	exists
+From: Mayank BATRA <mayank.batra@st.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Thu, 17 Aug 2006 16:50:47 +0530
+Message-ID: <000f01c6c1ef$306137e0$9d0cc70a@dlh.st.com>
+MIME-Version: 1.0
+In-Reply-To: <1155819564.4075.128.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -26,17 +19,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, Aug 17, 2006 at 02:57:55PM +0200, Marcel Holtmann wrote:
+Hi Marcel,
 
-> what you actually want is something like l2ping so see if a device is
-> alive or not. At the moment I am not considering such an extension,
-> because we shouldn't page devices to see if they are active or not.
+> to start something we can do this. Remember that the kernel 
+> then have to
+> track these commands to see if it has to use host controller to host
+> flow control or not.
+> 
 
-Why not? It seems more sensible to do that than to blindly attempt to 
-set up a hid connection without knowing whether the device actually 
-exists or not.
--- 
-Matthew Garrett | mjg59@srcf.ucam.org
+Hmmm.... I think I understand now why you were insisting this to be done at
+the kernel side.
+Because if we set flow control from user side then it will be difficult to
+inform the kernel about this.
+I'll try both things (setting flow control and sending host no of completed
+packets) from kernel side only.
+
+Regards,
+Mayank
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
