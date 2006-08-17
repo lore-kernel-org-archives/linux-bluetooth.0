@@ -1,15 +1,20 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44E477EB.4060000@xmission.com>
-Date: Thu, 17 Aug 2006 08:06:35 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <056BF200E9632F4285220E570FEED673E7F222@GBMDDMH202AMSX.gb001.siemens.net>
-	<44E422A6.3000204@palmsource.com>
-In-Reply-To: <44E422A6.3000204@palmsource.com>
-Subject: Re: [Bluez-devel]
- a2pdbtsco	won'tcompile	(FIX)	plus	xmmserror(trials andtribulations)	howcool
- is	this!!!	new patch
+In-Reply-To: <20060817124514.GA27427@localhost.localdomain>
+References: <20060816153432.GA13691@srcf.ucam.org>
+	<1155770177.4075.102.camel@aeonflux.holtmann.net>
+	<20060816214606.GA21719@srcf.ucam.org>
+	<1155819360.4075.123.camel@aeonflux.holtmann.net>
+	<20060817113538.GB5118@srcf.ucam.org>
+	<1155823499.4075.157.camel@aeonflux.holtmann.net>
+	<20060817122559.GA6422@srcf.ucam.org>
+	<20060817124514.GA27427@localhost.localdomain>
+Date: Thu, 17 Aug 2006 14:03:33 +0100
+Message-Id: <1155819813.18545.36.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] DBus interface -
+	determining	whether	a	device	exists
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,26 +24,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fr=E9d=E9ric
+On Thu, 2006-08-17 at 15:45 +0300, Johan Hedberg wrote:
+> Hi Matthew,
+> 
+> On Thu, Aug 17, 2006, Matthew Garrett wrote:
+<snip>
+> > I guess that since we don't have any guarantees that the device exists 
+> > at any given point in time anyway, this makes less difference and we 
+> > should just populate HAL regardless. I suppose I'm open to that.
+> 
+> Maybe you could simply use the list of bonded devices to populate HAL?
+> You could use the ListBondings method and BondingCreated/BondingRemoved 
+> signals for that.
 
-> Try to use the latest patch http://fdalleau.free.fr/patch_to_try
-> Minor changes has been done. It worked all night long!
+This is how MacOS X populates its selection lists. They have the list of
+paired devices, as well as "Favourite" devices.
 
-FYI I just applied this.
+-- 
+Bastien Nocera <hadess@hadess.net> 
 
-Brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
