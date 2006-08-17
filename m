@@ -1,19 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20060817112226.GA5118@srcf.ucam.org>
-References: <20060816153432.GA13691@srcf.ucam.org>
-	<1155770177.4075.102.camel@aeonflux.holtmann.net>
-	<20060816214606.GA21719@srcf.ucam.org>
-	<66dc03c80608161821pda00e42ra69e3775814614de@mail.gmail.com>
-	<20060817081503.GA1086@srcf.ucam.org>
-	<1155819475.4075.126.camel@aeonflux.holtmann.net>
-	<20060817112226.GA5118@srcf.ucam.org>
-Date: Thu, 17 Aug 2006 15:51:04 +0200
-Message-Id: <1155822664.4075.142.camel@aeonflux.holtmann.net>
+In-Reply-To: <000f01c6c1ef$306137e0$9d0cc70a@dlh.st.com>
+References: <000f01c6c1ef$306137e0$9d0cc70a@dlh.st.com>
+Date: Thu, 17 Aug 2006 15:45:51 +0200
+Message-Id: <1155822351.4075.136.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] DBus interface - determining whether
-	a	device	exists
+Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -27,29 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Matthew,
+Hi Mayank,
 
-> > what you actually want is something like l2ping so see if a device is
-> > alive or not. At the moment I am not considering such an extension,
-> > because we shouldn't page devices to see if they are active or not.
+> > to start something we can do this. Remember that the kernel 
+> > then have to
+> > track these commands to see if it has to use host controller to host
+> > flow control or not.
+> > 
 > 
-> Why not? It seems more sensible to do that than to blindly attempt to 
-> set up a hid connection without knowing whether the device actually 
-> exists or not.
+> Hmmm.... I think I understand now why you were insisting this to be done at
+> the kernel side.
+> Because if we set flow control from user side then it will be difficult to
+> inform the kernel about this.
+> I'll try both things (setting flow control and sending host no of completed
+> packets) from kernel side only.
 
-the HID case doesn't fly. All HID devices only need an initial connect
-and the they reconnect to the host.
-
-But again, the costs of getting this knowledge are to expensive. In most
-cases you have to serialize page attempts and make sure you don't
-interrupt inquiries or disturb other connections. For example the high
-quality audio part might not really like that you try to page other
-devices a lot of times. It will work, but if the audio stream breaks to
-often you have a bad user experience.
-
-Once we offer such a method it gets used and it will get abused for
-weird tricks application wanna play. So you need a better argument to
-convince me to include something like this.
+it is not that complicated. We have to do this for a lot of commands
+that you can use from userspace and the kernel has to detect its
+execution. You might wanna do it anyway so you should have a look at the
+examples in hci_event.c inside the kernel code.
 
 Regards
 
