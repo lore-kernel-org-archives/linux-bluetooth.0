@@ -1,8 +1,8 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 17 Aug 2006 16:01:42 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Date: Thu, 17 Aug 2006 13:52:12 +0100
+From: Matthew Garrett <mjg59@srcf.ucam.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060817130142.GA28489@localhost.localdomain>
+Message-ID: <20060817125212.GA7171@srcf.ucam.org>
 References: <20060816153432.GA13691@srcf.ucam.org>
 	<1155770177.4075.102.camel@aeonflux.holtmann.net>
 	<20060816214606.GA21719@srcf.ucam.org>
@@ -11,9 +11,8 @@ References: <20060816153432.GA13691@srcf.ucam.org>
 	<1155823499.4075.157.camel@aeonflux.holtmann.net>
 	<20060817122559.GA6422@srcf.ucam.org>
 	<20060817124514.GA27427@localhost.localdomain>
-	<20060817125212.GA7171@srcf.ucam.org>
-MIME-Version: 1.0
-In-Reply-To: <20060817125212.GA7171@srcf.ucam.org>
+Mime-Version: 1.0
+In-Reply-To: <20060817124514.GA27427@localhost.localdomain>
 Subject: Re: [Bluez-devel] DBus interface - determining
 	whether	a	device	exists
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -29,18 +28,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, Aug 17, 2006, Matthew Garrett wrote:
-> On Thu, Aug 17, 2006 at 03:45:14PM +0300, Johan Hedberg wrote:
-> 
-> > Maybe you could simply use the list of bonded devices to populate HAL?
-> > You could use the ListBondings method and BondingCreated/BondingRemoved 
-> > signals for that.
-> 
-> Is that persistant over restarts of the daemon?
+On Thu, Aug 17, 2006 at 03:45:14PM +0300, Johan Hedberg wrote:
 
-Yes.
+> Maybe you could simply use the list of bonded devices to populate HAL?
+> You could use the ListBondings method and BondingCreated/BondingRemoved 
+> signals for that.
 
-Johan
+Is that persistant over restarts of the daemon? I've remembered why 
+repopulating HAL is difficult - only root can add devices (for fairly 
+obvious reasons). I'll have to see what I can do about that.
+
+-- 
+Matthew Garrett | mjg59@srcf.ucam.org
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
