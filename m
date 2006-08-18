@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: John Morton <jwm@angrymonkey.net.nz>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Fri, 18 Aug 2006 21:55:07 +1200
-References: <200608180117.02770.jwm@angrymonkey.net.nz>
-	<200608181617.59981.jwm@angrymonkey.net.nz>
-	<1155899424.4075.179.camel@aeonflux.holtmann.net>
-In-Reply-To: <1155899424.4075.179.camel@aeonflux.holtmann.net>
-MIME-Version: 1.0
-Message-Id: <200608182155.07984.jwm@angrymonkey.net.nz>
-Subject: Re: [Bluez-users] Keyboard woe
+In-Reply-To: <20060818034832.77424.qmail@web37109.mail.mud.yahoo.com>
+References: <20060818034832.77424.qmail@web37109.mail.mud.yahoo.com>
+Date: Fri, 18 Aug 2006 13:12:45 +0200
+Message-Id: <1155899565.4075.183.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] bluez compile problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,44 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Friday 18 August 2006 23:10, Marcel Holtmann wrote:
->  please redo it with "sdptool records --raw <bdaddr>".
+Hi Winter,
 
-> sdptool records --raw 00:0A:3A:30:D4:40
-Sequence
-        Attribute 0x0000 - ServiceRecordHandle
-                UINT32 0x00010000
-        Attribute 0x0001 - ServiceClassIDList
-                Sequence
-                        UUID16 0x1101 - SerialPort
-        Attribute 0x0004 - ProtocolDescriptorList
-                Sequence
-                        Sequence
-                                UUID16 0x0100 - L2CAP
-                        Sequence
-                                UUID16 0x0003 - RFCOMM
-                                UINT8 0x01
-        Attribute 0x0006 - LanguageBaseAttributeIDList
-                Sequence
-                        UINT16 0x656e
-                        UINT16 0x006a
-                        UINT16 0x0100
-        Attribute 0x0100
-                String SPP slave
+> I can't compile  file avctrl.c. 
+> Some errors: undefined references to functions in include file usb.h
+> (usb_open, usb_close, usb_control_msg,...).
 
->  You need to know what protocol are they using or I need a donation of
->  such a keyboard to actually hack the protocol.
+what system is this and what version of libusb has been installed.
 
-Unfortunately, I bought it because I can't afford anything better at the 
-moment, but they can be picked up for less than retail on Trademe (a local 
-eBay-a-like trading site), so if my fortunes improve, I'll try and arrange 
-it.
+Regards
 
-Might try contacting the manufacturers as they might prove to be helpful. 
-Stranger things have happened...
+Marcel
 
-Thanks,
-John
 
 
 -------------------------------------------------------------------------
