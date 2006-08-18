@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Mayank BATRA <mayank.batra@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Fri, 18 Aug 2006 17:56:25 +0530
-Message-ID: <000801c6c2c1$85dcbaf0$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_NextPart_000_0009_01C6C2EF.9F94F6F0"
-In-Reply-To: <1155909848.4075.185.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
+Date: Fri, 18 Aug 2006 13:24:12 +0100
+Message-ID: <056BF200E9632F4285220E570FEED673E7FDA1@GBMDDMH202AMSX.gb001.siemens.net>
+In-Reply-To: <44E58F90.2010108@palmsource.com>
+From: "Waldram, Andrew (SBS UK)" <andrew.waldram@siemens.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] a2pdbtsco	won'tcompile	(FIX)	plus	xmmserror(trials
+	andtribulations)	howcool is	this!!!	new patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,289 +16,250 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+ =
 
-------=_NextPart_000_0009_01C6C2EF.9F94F6F0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+This is what I get when it's failing you can see why I don't have  a clue
 
-Hi Marcel,
+Accepting incoming tcp stream connection
+New connection to bluetooth [44100 hz]
+avrcp: Accepting incoming connection
+avdtp: Accepting incoming connection
 
-> > Sending Host No of Completed Packets:
-> > Sending Host No of Completed Packets:
-> > Sending Host No of Completed Packets:
-> > Sending Host No of Completed Packets:
-> > Sending Host No of Completed Packets:
-> > Sending Host No of Completed Packets:
-> > Sending Host No of Completed Packets:
-> > Sending Host No of Completed Packets:
-> > Sending Host No of Completed Packets:
-> > hci_cmd_task: hci0 command tx timeout
-> > Sending Host No of Completed Packets:
-> >=20
-> >=20
-> > =
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >=20
-> > Note that "Sending Host No of Completed Packets:" has been=20
-> added by me. Can
-> > you tell me the reason for "hci_cmd_task: hci0 command tx timeout"
->=20
-> I have to see the source code. Otherwise it would be only a=20
-> wild guess.
+Pressed play 2 times from switched off headset switched on then pressed pla=
+y.
 
-Here you go. Though, it is not the latest version of files that I am =
-working
-on.
-It's a quick and dirty approach right now. Sending Host Number of =
-Completed
-Packets as soon as we receive ACL Data Packet on any connection handle.
-Once this works, I'll try to send Host Number of completed packets after
-reception of 8 packets.
+Hcidump does show the connections but a2dpd does nothing at all just sits t=
+here looking pretty.
 
-Regards,
-Mayank
+HCI sniffer - Bluetooth packet analyzer ver 1.28
+device: hci0 snap_len: 1028 filter: 0x400
+> AVDTP(s): Discover cmd: transaction 0
+< AVDTP(s): Discover rej: transaction 0
+    Error code 6
+> AVDTP(s): Discover cmd: transaction 0
+< AVDTP(s): Discover rej: transaction 0
+    Error code 6
 
-------=_NextPart_000_0009_01C6C2EF.9F94F6F0
-Content-Type: application/octet-stream;
-	name="hci.h.diff"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="hci.h.diff"
+>>Is the alsa plugin setup as default or explicitly set to xmms?
+Explicitly set to xmms =
 
---- C:\Copy of hci.h	2006-05-31 21:12:40.000000000 +-0530
-+++ C:\hci.h	2006-08-18 17:43:09.000000000 +-0530
-@@ -817,20 +817,38 @@
- 	uint8_t		status;
- 	uint16_t	handle;
- 	int8_t		level;
- } __attribute__ ((packed)) read_transmit_power_level_rp;
- #define READ_TRANSMIT_POWER_LEVEL_RP_SIZE 4
- 
-+#define OCF_SET_CONTROLLER_TO_HOST_FC	0x0031
-+typedef struct {
-+	uint8_t		flow_control_enable;
-+} __attribute__ ((packed)) set_controller_to_host_fc_cp;
-+#define SET_CONTROLLER_TO_HOST_FC_CP_SIZE	1
-+typedef struct {
-+	uint8_t		status;
-+} __attribute__ ((packed)) set_controller_to_host_fc_rp;
-+#define SET_CONTROLLER_TO_HOST_FC_RP_SIZE	1
-+
- #define OCF_HOST_BUFFER_SIZE		0x0033
- typedef struct {
- 	uint16_t	acl_mtu;
- 	uint8_t		sco_mtu;
- 	uint16_t	acl_max_pkt;
- 	uint16_t	sco_max_pkt;
- } __attribute__ ((packed)) host_buffer_size_cp;
- #define HOST_BUFFER_SIZE_CP_SIZE 7
-+
-+#define OCF_HOST_NUM_OF_COMPLETED_PACKETS	0x0035
-+typedef struct {
-+	uint8_t		num_of_handles;
-+	uint16_t	handle;
-+	uint16_t	host_num_of_completed_packets;
-+} __attribute__ ((packed)) host_num_of_completed_packets_cp;
-+#define OCF_HOST_NUM_OF_COMPLETED_PACKETS_CP_SIZE 5
- 
- #define OCF_READ_LINK_SUPERVISION_TIMEOUT	0x0036
- typedef struct {
- 	uint8_t		status;
- 	uint16_t	handle;
- 	uint16_t	link_sup_to;
 
-------=_NextPart_000_0009_01C6C2EF.9F94F6F0
-Content-Type: application/octet-stream;
-	name="hci_core.diff"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
-	filename="hci_core.diff"
+Of interest the only time I got it to work was when a2dpd was running in th=
+e forground (from console) never works when running from deamon.
 
---- C:\Copy of hci_core.c	2003-03-14 03:53:16.000000000 +-0530
-+++ C:\hci_core.c	2006-08-18 17:50:19.000000000 +-0530
-@@ -73,12 +73,13 @@
- #define HCI_MAX_PROTO	2
- struct hci_proto *hci_proto[HCI_MAX_PROTO];
-=20
- /* HCI notifiers list */
- static struct notifier_block *hci_notifier;
-=20
-+extern int __controller_to_host_fc;
-=20
- /* ---- HCI notifications ---- */
-=20
- int hci_register_notifier(struct notifier_block *nb)
- {
- 	return notifier_chain_register(&hci_notifier, nb);
-@@ -221,24 +222,22 @@
- 	/* Read Local Supported Features */
- 	hci_send_cmd(hdev, OGF_INFO_PARAM, OCF_READ_LOCAL_FEATURES, 0, NULL);
-=20
- 	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
- 	hci_send_cmd(hdev, OGF_INFO_PARAM, OCF_READ_BUFFER_SIZE, 0, NULL);
-=20
--#if 0
- 	/* Host buffer size */
- 	{
- 		host_buffer_size_cp bs;
- 		bs.acl_mtu =3D __cpu_to_le16(HCI_MAX_ACL_SIZE);
- 		bs.sco_mtu =3D HCI_MAX_SCO_SIZE;
- 		bs.acl_max_pkt =3D __cpu_to_le16(0xffff);
- 		bs.sco_max_pkt =3D __cpu_to_le16(0xffff);
- 		hci_send_cmd(hdev, OGF_HOST_CTL, OCF_HOST_BUFFER_SIZE,
- 				HOST_BUFFER_SIZE_CP_SIZE, &bs);
- 	}
--#endif
-=20
- 	/* Read BD Address */
- 	hci_send_cmd(hdev, OGF_INFO_PARAM, OCF_READ_BD_ADDR, 0, NULL);
-=20
- 	/* Optional initialization */
-=20
-@@ -1273,12 +1272,13 @@
- /* ACL data packet */
- static inline void hci_acldata_packet(struct hci_dev *hdev, struct =
-sk_buff *skb)
- {
- 	hci_acl_hdr *ah =3D (void *) skb->data;
- 	struct hci_conn *conn;
- 	__u16 handle, flags;
-+	host_num_of_completed_packets_cp cp;
-=20
- 	skb_pull(skb, HCI_ACL_HDR_SIZE);
-=20
- 	handle =3D __le16_to_cpu(ah->handle);
- 	flags  =3D acl_flags(handle);
- 	handle =3D acl_handle(handle);
-@@ -1287,12 +1287,24 @@
-=20
- 	hdev->stat.acl_rx++;
-=20
- 	hci_dev_lock(hdev);
- 	conn =3D conn_hash_lookup_handle(hdev, handle);
- 	hci_dev_unlock(hdev);
-+	/* If flow control has been enabled from Controller to Host
-+	 * send Host Number of Completed Packets Command
-+	 * Note that there is no event generated for this command
-+	 */
-+
-+	if(__controller_to_host_fc) {
-+		cp.num_of_handles =3D 0x01;
-+		cp.handle =3D handle;
-+		cp.host_num_of_completed_packets =3D 0x01;
-+		hci_send_cmd(hdev, OGF_HOST_CTL, OCF_HOST_NUM_OF_COMPLETED_PACKETS,=20
-+				OCF_HOST_NUM_OF_COMPLETED_PACKETS_CP_SIZE, &cp);
-+	}
- =09
- 	if (conn) {
- 		register struct hci_proto *hp;
-=20
- 		/* Send to upper protocol */
- 		if ((hp =3D hci_proto[HCI_PROTO_L2CAP]) && hp->recv_acldata) {
+All other avtp funtions work great play pause<10secs skip and rev
 
-------=_NextPart_000_0009_01C6C2EF.9F94F6F0
-Content-Type: application/octet-stream;
-	name="hci_event.diff"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
-	filename="hci_event.diff"
+Volume also works great but as that's a built in hardware funstion of the h=
+eadset ;-)
 
---- C:\Copy of hci_event.c	2006-08-17 17:37:06.000000000 +-0530
-+++ C:\hci_event.c	2006-08-18 17:51:37.000000000 +-0530
-@@ -54,12 +54,14 @@
-=20
- #ifndef HCI_CORE_DEBUG
- #undef  BT_DBG
- #define BT_DBG( A... )
- #endif
-=20
-+int __controller_to_host_fc =3D 0;
-+
- /* Handle HCI Event packets */
-=20
- /* Command Complete OGF LINK_CTL  */
- static void hci_cc_link_ctl(struct hci_dev *hdev, __u16 ocf, struct =
-sk_buff *skb)
- {
- 	BT_DBG("%s ocf 0x%x", hdev->name, ocf);
-@@ -108,12 +110,13 @@
-=20
- /* Command Complete OGF HOST_CTL  */
- static void hci_cc_host_ctl(struct hci_dev *hdev, __u16 ocf, struct =
-sk_buff *skb)
- {
- 	__u8 status, param;
- 	void *sent;
-+	set_controller_to_host_fc_cp cp;
-=20
- 	BT_DBG("%s ocf 0x%x", hdev->name, ocf);
-=20
- 	switch (ocf) {
- 	case OCF_RESET:
- 		status =3D *((__u8 *) skb->data);
-@@ -205,12 +208,33 @@
- 	case OCF_HOST_BUFFER_SIZE:
- 		status =3D *((__u8 *) skb->data);
- 		if (status) {
- 			BT_DBG("%s OCF_BUFFER_SIZE failed %d", hdev->name, status);
- 			hci_req_complete(hdev, status);
- 		}
-+		else {
-+			memset(&cp, 0, sizeof(cp));
-+			/* Set Flow Control on for HCI ACL Data Packets
-+			 * and off for HCI Synchronous Data Packets
-+			 */
-+			cp.flow_control_enable =3D 0x01;
-+			=09
-+			hci_send_cmd(hdev, OGF_HOST_CTL, OCF_SET_CONTROLLER_TO_HOST_FC,
-+				SET_CONTROLLER_TO_HOST_FC_CP_SIZE, &cp);
-+		}
-+		break;
-+
-+	case OCF_SET_CONTROLLER_TO_HOST_FC:
-+		status =3D *((__u8 *) skb->data);
-+		if (status) {
-+			BT_DBG("%s OCF_SET_CONTROLLER_TO_HOST_FC failed %d", hdev->name, =
-status);
-+			hci_req_complete(hdev, status);
-+		}
-+		else {
-+			__controller_to_host_fc =3D 1; /* Start using Controller to Host =
-Flow Control */
-+		}
- 		break;
-=20
- 	default:
- 		BT_DBG("%s Command complete: ogf HOST_CTL ocf %x", hdev->name, ocf);
- 		break;
- 	};
+---------------------------------------------------------------------------=
+------- =
 
-------=_NextPart_000_0009_01C6C2EF.9F94F6F0
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+
+
+
+-----Original Message-----
+From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounces=
+@lists.sourceforge.net] On Behalf Of Fr=E9d=E9ric DALLEAU
+Sent: 18 August 2006 11:00
+To: BlueZ development
+Subject: Re: [Bluez-devel] a2pdbtsco won'tcompile (FIX) plus xmmserror(tria=
+ls andtribulations) howcool is this!!! new patch
+
+Hi,
+
+Could you give me the failing log? Is the alsa plugin setup as default =
+
+or explicitly set to xmms?
+A few comments about the traces :
+
+avdtp: Accepting incoming connection
+
+That line shows we are awaiting an incoming connexion, you should always ha=
+ve it since starting a2dpd. If you start up a2dpd without sending sound, th=
+is is one of the two last lines. Nothing should be displayed after.
+
+
+avdtp: socket 7: Connection from 12:5C:2A:44:0D:00, mtu=3D672
+
+That one show we received an incoming connexion, if we don't have this =
+
+one, it's the headset that do not connect. It will be difficult to know =
+
+why! Try to switch off then on!
+
+
+avdtp: socket 7: Received failed result=3D-1 (errno=3D11:Resource
+temporarily unavailable)
+This one is too say we wait for answer but it is just a timeout.
+
+ =
+
+socket 7: Received 2 bytes
+00000: 00 01
+Those two lines follow the connection from the headset. It's an AVDTP_DISCO=
+VER we answer by rejecting the DISCOVER, but we launch xmms who in turn wil=
+l start a brand new connection.
+
+
+Forked xmms --play
+
+That line show we forked to start xmms. It should appear a few seconds =
+
+after the previous one.
+
+
+Fr=E9d=E9ric
+
+
+
+
+Waldram, Andrew (SBS UK) a =E9crit :
+>  =
+
+> Fr=E9d=E9ric
+>
+> Tried everything you sugested still the same play from start will not sta=
+rt xmms (mormaly see below) and pressing pause wait 15 sec then play result=
+s in nothing. I would say it was my headphones but it did work from avrcp a=
+nd your first patch.
+>
+> Hcidump does show the press's but a2dpd does not show anything at all jus=
+t sits waiting incomming connection.
+>
+> After repeated tries I did get it once to start xmms (output follows) so =
+I'm confident my configuration is correct (could it be timming/parsing blue=
+tooth response)
+>
+> The logs look a little  strange and it doesn't work 99.9% of the time =
+
+>
+> I've put markers where I think something may be wrong can you think of an=
+ything else I can tru to pin this down (so close yet so far).
+>
+> On a plus note your latest patches seem to have reduced the latency for s=
+kip forward and back .
+>   =
+
+Really? I'm really sure to have done nothing about this :D
+>  Accepting incoming tcp stream connection
+> New connection to bluetooth [44100 hz]
+> avrcp: Accepting incoming connection
+> avdtp: Accepting incoming connection
+> avdtp: socket 7: Connection from 12:5C:2A:44:0D:00, mtu=3D672
+> avdtp: socket 7: Received failed result=3D-1 (errno=3D11:Resource
+> temporarily unavailable)<------------------------------------------------=
+-------
+> avdtp: socket 7: Received failed result=3D-1 (errno=3D11:Resource
+> temporarily unavailable)<------------------------------------------------=
+-------
+> socket 7: Received 2 bytes
+> 00000: 00 01
+> DEBUG: a2dp_handle_avdtp_message: (errno=3D11:Resource temporarily
+> unavailable)Unexpected headset directive 1  <----------------------------=
+---------------------------
+> DEBUG: a2dp_handle_avdtp_message: Answering command packet
+> (msgtype=3DMESSAGE_TYPE_REJECT,signal=3D1)
+> avdtp: socket 7: Received frame, start xmms --play
+> avdtp: socket 7: timed out
+> Forked xmms --play
+> Message: device: pcm.a2dpd
+> immsd: version 3.0.1 ready...
+> DEBUG: _snd_pcm_a2dpd_open: (errno=3D0:Success)name pcm.a2dpd mode 1
+> DEBUG: a2dp_alloc: (errno=3D0:Success)Init
+> DEBUG: a2dp_alloc: (errno=3D0:Success)OK
+> DEBUG: a2dp_params: (errno=3D0:Success)a2dp 0x8295e18
+> DEBUG: a2dp_params: (errno=3D0:Success)format S16_LE rate 44100 channels 2
+> DEBUG: a2dp_params: (errno=3D0:Success)frame_bytes 4 period_bytes 8192
+> period_size 2048 buffer_size 4096
+> DEBUG: a2dp_prepare: (errno=3D0:Success)a2dp 0x8295e18
+> Accepted 7
+> PCM thread 0.7 started
+> Accepting incoming tcp stream connection
+> DEBUG: a2dp_new: Begin
+> DEBUG: a2dp_new: bdaddr/dest is 00:0D:44:2A:5C:12
+> DEBUG: a2dp_alloc: Begin
+> DEBUG: a2dp_connect: a2dp 0x8057810
+> DEBUG: connect_stream: Begin
+> DEBUG: connect_stream: Using address: 12:5C:2A:44:0D:00
+> DEBUG: detect_a2dp: Begin
+>
+> -------------------------------------------------------------------------=
+--------- =
+
+>
+> -----Original Message-----
+> From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounc=
+es@lists.sourceforge.net] On Behalf Of Brad Midgley
+> Sent: 17 August 2006 15:07
+> To: BlueZ development
+> Subject: Re: [Bluez-devel] a2pdbtsco won'tcompile (FIX) plus xmmserror(tr=
+ials andtribulations) howcool is this!!! new patch
+>
+> Fr=E9d=E9ric
+>
+>   =
+
+>> Try to use the latest patch http://fdalleau.free.fr/patch_to_try
+>> Minor changes has been done. It worked all night long!
+>>     =
+
+>
+> FYI I just applied this.
+>
+> Brad
+>
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job ea=
+sier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job ea=
+sier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>   =
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-------=_NextPart_000_0009_01C6C2EF.9F94F6F0
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-------=_NextPart_000_0009_01C6C2EF.9F94F6F0--
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
