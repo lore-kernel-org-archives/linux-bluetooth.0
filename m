@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44E5C7E4.9030605@sd-6.org>
-Date: Fri, 18 Aug 2006 09:00:04 -0500
-From: Jon Ferguson <jon@sd-6.org>
+From: John Morton <jwm@angrymonkey.net.nz>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Fri, 18 Aug 2006 21:55:07 +1200
+References: <200608180117.02770.jwm@angrymonkey.net.nz>
+	<200608181617.59981.jwm@angrymonkey.net.nz>
+	<1155899424.4075.179.camel@aeonflux.holtmann.net>
+In-Reply-To: <1155899424.4075.179.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Can't create connection: Input/output error
+Message-Id: <200608182155.07984.jwm@angrymonkey.net.nz>
+Subject: Re: [Bluez-users] Keyboard woe
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,65 +22,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I have been fighting a Motorola headset for several days and can't get
-it to connect.  It appears to me that the pin is getting sent correctly
-but it still fails to pair the device.
+On Friday 18 August 2006 23:10, Marcel Holtmann wrote:
+>  please redo it with "sdptool records --raw <bdaddr>".
 
+> sdptool records --raw 00:0A:3A:30:D4:40
+Sequence
+        Attribute 0x0000 - ServiceRecordHandle
+                UINT32 0x00010000
+        Attribute 0x0001 - ServiceClassIDList
+                Sequence
+                        UUID16 0x1101 - SerialPort
+        Attribute 0x0004 - ProtocolDescriptorList
+                Sequence
+                        Sequence
+                                UUID16 0x0100 - L2CAP
+                        Sequence
+                                UUID16 0x0003 - RFCOMM
+                                UINT8 0x01
+        Attribute 0x0006 - LanguageBaseAttributeIDList
+                Sequence
+                        UINT16 0x656e
+                        UINT16 0x006a
+                        UINT16 0x0100
+        Attribute 0x0100
+                String SPP slave
 
-blackhawk:~# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:11:F6:08:99:88 ACL MTU: 120:20 SCO MTU: 64:0
-        UP RUNNING PSCAN
-        RX bytes:480 acl:0 sco:0 events:25 errors:0
-        TX bytes:372 acl:0 sco:0 commands:23 errors:0
-        Features: 0xff 0xff 0x05 0x38 0x18 0x18 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'blackhawk-0'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing, Object
-Transfer, Audio
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x757
-        Manufacturer: Silicon Wave (11)
+>  You need to know what protocol are they using or I need a donation of
+>  such a keyboard to actually hack the protocol.
 
+Unfortunately, I bought it because I can't afford anything better at the 
+moment, but they can be picked up for less than retail on Trademe (a local 
+eBay-a-like trading site), so if my fortunes improve, I'll try and arrange 
+it.
 
+Might try contacting the manufacturers as they might prove to be helpful. 
+Stranger things have happened...
 
-
-Syslog output:
-
-Aug 18 08:50:03 localhost hcid[22950]: Bluetooth HCI daemon
-Aug 18 08:50:03 localhost hcid[22950]: Register path:/org/bluez fallback:1
-Aug 18 08:50:03 localhost hcid[22950]: Device hci0 has been added
-Aug 18 08:50:03 localhost sdpd[22953]: Bluetooth SDP daemon
-Aug 18 08:50:03 localhost hidd[22955]: Bluetooth HID daemon
-Aug 18 08:50:03 localhost hcid[22950]: Device hci0 has been activated
-Aug 18 08:50:03 localhost hcid[22950]: Register path:/org/bluez/hci0
-fallback:0
-Aug 18 08:50:03 localhost hcid[22950]: HCI dev 0 up
-Aug 18 08:50:03 localhost hcid[22950]: Starting security manager 0
-Aug 18 08:50:03 localhost hcid[22950]: Device hci0 has been activated
-Aug 18 08:50:03 localhost hcid[22950]: name_listener_add(:1.53)
-Aug 18 08:50:03 localhost hcid[22950]: name_listener_add(:1.54)
-Aug 18 08:50:03 localhost hcid[22950]: Default passkey agent (:1.54,
-/org/bluez/passkey_agent_22968) registered
-Aug 18 08:50:45 localhost hcid[22950]: pin_code_request
-(sba=00:11:F6:08:99:88, dba=00:0B:2E:38:0D:C3)
-Aug 18 08:50:45 localhost hcid[22950]: Calling PasskeyAgent.Request:
-name=:1.53, path=/org/bluez/passkey_agent_2296
-
-
-
-hcidump
-HCI sniffer - Bluetooth packet analyzer ver 1.31
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: PIN Code Request (0x16) plen 6
-< HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
-> HCI Event: Command Complete (0x0e) plen 10
-> HCI Event: Connect Complete (0x03) plen 11
+Thanks,
+John
 
 
 -------------------------------------------------------------------------
