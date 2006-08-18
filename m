@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <44E5BDB1.1030904@palmsource.com>
+Date: Fri, 18 Aug 2006 15:16:33 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-Date: Fri, 18 Aug 2006 14:24:10 +0100
-Message-ID: <056BF200E9632F4285220E570FEED673E7FE61@GBMDDMH202AMSX.gb001.siemens.net>
-In-Reply-To: <44E5BDB1.1030904@palmsource.com>
-From: "Waldram, Andrew (SBS UK)" <andrew.waldram@siemens.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] a2pdbtsco	won'tcompile	(FIX)	plus	xmmserror(trials
-	andtribulations)	howcool is	this!!!	new patch
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <056BF200E9632F4285220E570FEED673E7FDA1@GBMDDMH202AMSX.gb001.siemens.net>
+In-Reply-To: <056BF200E9632F4285220E570FEED673E7FDA1@GBMDDMH202AMSX.gb001.siemens.net>
+Subject: Re: [Bluez-devel]
+ a2pdbtsco	won'tcompile	(FIX)	plus	xmmserror(trials andtribulations)	howcool
+ is	this!!!	new patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,20 +21,6 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
-
- =
-
-
-Ok on it this evening
-
-
------Original Message-----
-From: bluez-devel-bounces@lists.sourceforge.net [mailto:bluez-devel-bounces=
-@lists.sourceforge.net] On Behalf Of Fr=E9d=E9ric DALLEAU
-Sent: 18 August 2006 14:17
-To: BlueZ development
-Subject: Re: [Bluez-devel] a2pdbtsco won'tcompile (FIX) plus xmmserror(tria=
-ls andtribulations) howcool is this!!! new patch
 
 Hi Andrew,
 
@@ -352,18 +340,6 @@ sier
 >   =
 
 
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
