@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1155932042.213626.26343.nullmailer@galant.ukfsn.org>
-References: <1155932042.213626.26343.nullmailer@galant.ukfsn.org>
-Date: Sat, 19 Aug 2006 13:39:56 +0200
-Message-Id: <1155987596.3989.4.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Cc: bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] bluez-firmware-1.2.tar.gz licence
+Message-ID: <20060819094153.56998.qmail@web54001.mail.yahoo.com>
+Date: Sat, 19 Aug 2006 02:41:53 -0700 (PDT)
+From: Auer Michael <netmicha@yahoo.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] SCO Command Disallowed
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,39 +18,71 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Iain,
+Hi,
 
->    I was wondering what the licence terms were on the bluez-firmware
-> tarball, can anybody say?
-> 
->    The only 'licence' I see there is a GPLv2 file but surely that does not
-> cover the firmware files?
-> 
->    What I have done is create a program to load the broadcom firmware for
-> NetBSD, and have created a pkgsrc package to bind it all together, so I'm
-> wondering if I should limit the redistribution of
-> 
-> 	a) the bluez-firmware-1.2.tar.gz file, and
-> 
-> 	b) the binary package which will contain BCM2033-MD.hex,
-> 	BCM2033-FW.bin and BCM-LEGAL.txt
-> 
-> since it is possible that either could end up on mirror sites.
+I wanted to use the PC as an handsfree. Everything is
+working all right so far. Rfcomm connection is
+established, settings are exchanged via AT commands
+-the mobile phone accepts the HF profile
+(Icon,Connection OK), I can also receive the pressed
+key messages from the phone. An SCO link was also
+established successfull. But the phone cannot
+transmitt SCO (audio) data, because the connection
+request is canceld with an "Command Disallowed".
 
-we have permission from Broadcom and ST to distribute these firmware
-files. I am still missing permission from AVM and 3Com for their files.
+The hstest test programm is working perfectly with an
+connected headset (play and record) so the BT adapter
+is capable of sending,transmitting SCO data.
 
-Non of the firmware files are GPL. The package itself is GPL, but this
-only covers some configure and Makefile data. The binary blobs are
-copyright by the manufacturers. You can contact Broadcom at any time to
-let them clarify this. There is an email address in the BCM-LEGAL.txt
-file.
+Any hints what's wrong.
 
-Regards
-
-Marcel
+PS: I've been reading almost every post on this list,
+but cannot find anything about this :)
 
 
+Thanks in advance.
+
+
+
+Output of hcidump -X -V:
+
+> ACL data: handle 42 flags 0x02 dlen 24
+    L2CAP(d): cid 0x0040 len 20 [psm 0]
+      0000: 19 ef 1e 00 0d 0a 2b 43  49 45 56 3a 20 31
+30 2c  ......+CIEV: 10,
+      0010: 32 0d 0a 55                               
+       2..U
+> ACL data: handle 42 flags 0x02 dlen 23
+    L2CAP(d): cid 0x0040 len 19 [psm 0]
+      0000: 19 ef 1c 00 0d 0a 2b 43  4b 45 56 3a 20 5b
+2c 30  ......+CKEV: [,0
+      0010: 0d 0a 55                                  
+       ..U
+> HCI Event: Max Slots Change (0x1b) plen 3
+  0000: 2a 00 01                                      
+   *..
+> HCI Event: Connect Request (0x04) plen 10
+    bdaddr 00:12:EE:6D:FB:B6 class 0x520204 type SCO
+< HCI Command: Accept Connection Request (0x01|0x0009)
+plen 7
+    bdaddr 00:12:EE:6D:FB:B6 role 0x01
+    Role: Slave
+> HCI Event: Command Status (0x0f) plen 4
+    Accept Connection Request (0x01|0x0009) status
+0x0c ncmd 1
+    Error: Command Disallowed
+
+
+
+
+
+
+
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
