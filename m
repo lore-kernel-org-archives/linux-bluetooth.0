@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sat, 19 Aug 2006 15:40:29 +0200 (CEST)
-From: Peter Wippich <pewi@gw-instruments.de>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <04ED5B65E3B4A64B97C16E22E0DF16D5184947@mh23ex03.informatica.com>
-Message-ID: <Pine.LNX.4.63.0608191533270.32617@redbean.intranet.gw-instruments.de>
-References: <04ED5B65E3B4A64B97C16E22E0DF16D5184947@mh23ex03.informatica.com>
-MIME-Version: 1.0
-Cc: mdeiters@Informatica.com
-Subject: Re: [Bluez-devel] BT connection hangs above a certain speed - help
- needed
+In-Reply-To: <1155932042.213626.26343.nullmailer@galant.ukfsn.org>
+References: <1155932042.213626.26343.nullmailer@galant.ukfsn.org>
+Date: Sat, 19 Aug 2006 13:39:56 +0200
+Message-Id: <1155987596.3989.4.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Cc: bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] bluez-firmware-1.2.tar.gz licence
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,38 +21,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Iain,
 
-Hello Michael, 
+>    I was wondering what the licence terms were on the bluez-firmware
+> tarball, can anybody say?
+> 
+>    The only 'licence' I see there is a GPLv2 file but surely that does not
+> cover the firmware files?
+> 
+>    What I have done is create a program to load the broadcom firmware for
+> NetBSD, and have created a pkgsrc package to bind it all together, so I'm
+> wondering if I should limit the redistribution of
+> 
+> 	a) the bluez-firmware-1.2.tar.gz file, and
+> 
+> 	b) the binary package which will contain BCM2033-MD.hex,
+> 	BCM2033-FW.bin and BCM-LEGAL.txt
+> 
+> since it is possible that either could end up on mirror sites.
 
-On Sat, 19 Aug 2006, Deiters, Michael wrote:
+we have permission from Broadcom and ST to distribute these firmware
+files. I am still missing permission from AVM and 3Com for their files.
 
-> > Hello everybody,
-> > 
-> > I am currently stuck with BlueZ Version 3.2 and seek help by posting to this list.
-> > 
-> > Technical environment:
-> > - Several 3G Mobile Phones
-> > - Sharp Zaurus 2.4.18 Kernel, Nokia DTL4
-> > - Dell Laptop, 2.6.xx  (SuSE 10.1) 3Com BT Card.
+Non of the firmware files are GPL. The package itself is GPL, but this
+only covers some configure and Makefile data. The binary blobs are
+copyright by the manufacturers. You can contact Broadcom at any time to
+let them clarify this. There is an email address in the BCM-LEGAL.txt
+file.
 
-This sounds very much like a hardware problem. I'm not familiar with 
-the Zaurus but from our experience I would say there is a problem either 
-with te HCI communication or with the Bluetooth Chip itself. 
+Regards
 
-First, make sure you use hardware handshake for the HCI port (see 
-hciattach dokumentation). If this doesn't work you may also try to use 
-BCSP protocol if the Zaurus uses a CSR chip. 
+Marcel
 
-Good luck, 
-
-Pete 
-
-
-
-|       Peter Wippich                   Voice: +49 30 46776411          |
-|       G&W Instruments GmbH            fax:   +49 30 46776419          |
-|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
-|       D-13355 Berlin  / Germany                                       |
 
 
 -------------------------------------------------------------------------
