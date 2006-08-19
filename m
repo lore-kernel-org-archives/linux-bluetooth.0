@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <8712867d0608190931o3f6042eyfdb6fdff805f91b@mail.gmail.com>
-References: <8712867d0608190931o3f6042eyfdb6fdff805f91b@mail.gmail.com>
-Date: Sun, 20 Aug 2006 03:35:32 +0200
-Message-Id: <1156037732.3989.10.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] libbluetooth usage
+Message-ID: <8712867d0608190931o3f6042eyfdb6fdff805f91b@mail.gmail.com>
+Date: Sat, 19 Aug 2006 11:31:21 -0500
+From: "Jaime Alberto Silva" <jaimealbertosilva@gmail.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-users] libbluetooth usage
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,33 +18,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Jaime,
+Hi everyone!
 
-> Can someone please point me to some documentation about libbluetooth usage?
-> 
-> How can I use this library to establish comunication with a BT device?
-> 
-> I'm trying to write a program in J2ME for my Nokia 6670 that
-> communicates with my Linux PC via RFCOMM. If I use the rfcomm utility
-> like this:
-> 
-> # rfcomm bind 0 00:02:5B:00:A5:A5
-> 
-> All I have to do is write a program that opens the rfcomm0 serial port
-> and waits for data? How can I detect when the client connects?
+Can someone please point me to some documentation about libbluetooth usage?
 
-who is the client?
+How can I use this library to establish comunication with a BT device?
 
-> How do I use the RFCOMM socket interface?
+I'm trying to write a program in J2ME for my Nokia 6670 that
+communicates with my Linux PC via RFCOMM. If I use the rfcomm utility
+like this:
 
-The programs rctest.c and attest.c give a good example on how to use the
-RFCOMM socket interface.
+# rfcomm bind 0 00:02:5B:00:A5:A5
 
-Regards
+All I have to do is write a program that opens the rfcomm0 serial port
+and waits for data? How can I detect when the client connects?
 
-Marcel
+How do I use the RFCOMM socket interface?
 
 
+Thanks in advance for your attention and any help you can bring me.
+
+-- 
+Jaime Alberto Silva       L I N U X       .~.
+                                   The Choice     /V\
+                                    of a GNU      / ( ) \
+                                   Generation    ^^-^^
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
