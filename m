@@ -1,19 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20060819235330.GA16375@srcf.ucam.org>
-References: <20060817100604.GA3350@srcf.ucam.org>
-	<1155819858.4075.134.camel@aeonflux.holtmann.net>
-	<20060817114116.GC5118@srcf.ucam.org>
-	<20060817115912.GA24906@localhost.localdomain>
-	<20060819143608.GA31812@srcf.ucam.org>
-	<1156037973.3989.14.camel@aeonflux.holtmann.net>
-	<20060819235330.GA16375@srcf.ucam.org>
-Date: Sun, 20 Aug 2006 04:13:48 +0200
-Message-Id: <1156040029.3989.22.camel@aeonflux.holtmann.net>
+Date: Sun, 20 Aug 2006 00:55:54 +0100
+From: Matthew Garrett <mjg59@srcf.ucam.org>
+To: bluez-devel@lists.sf.net
+Message-ID: <20060819235554.GB16375@srcf.ucam.org>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] implement RFCOMM
-	Connect	and	Disconnect	methods
+Subject: [Bluez-devel] [PATCH] - add lockfile support to a2dpd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -27,59 +18,175 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Matthew,
+It currently doesn't seem possible to run multiple a2dpds 
+simultaneously, but the failure mode isn't especially nice. This patch 
+adds lockfile support, so a2dpd will exit on startup if another is 
+alread running. There's also a -k option which will kill the first a2dpd 
+and allow the second to take over.
 
-> > thanks for the patch, but what is the problem with sticking to Connect
-> > and CancelConnect and use their service string to identify UUID, handle
-> > or service name bases connections.
-> 
-> I'm not quite clear on what you mean here. The service string seems 
-> unacceptable because it requires bluez to have a table of every possible 
-> service and UUID in existence. Or are we talking about different things? 
-> Right now, the API gives us the following things that potentially 
-> identify an object:
-> 
-> 1) The identifiers returned by GetIdentifiers (currently an arbitrary 
-> but unique integer, despite dbus-api.txt claiming it returns strings)
-> 2) The UUID
-> 3) The service handle
-> 4) The ascii service string
-> 
-> My implementation provides connect methods for (2), (3) and (4). You 
-> didn't seem too happy about my patch providing support for (1), so I've 
-> dropped it :) Or do you just mean that there should be a single method 
-> and it should work out which piece of information has been passed by the 
-> app? In that case, I didn't implement it that way because determining 
-> the type was a bit of a pain and struck me as potentially fragile.
+? .deps
+? .libs
+? Makefile
+? Makefile.in
+? a2dp_ipc.lo
+? a2dp_timer.lo
+? a2dpd
+? core.31404
+? core.31840
+? core.32296
+? ctl_a2dpd.lo
+? ctl_sco.lo
+? libasound_module_ctl_a2dpd.la
+? libasound_module_ctl_sco.la
+? libasound_module_pcm_a2dp.la
+? libasound_module_pcm_a2dpd.la
+? libasound_module_pcm_sco.la
+? pcm_a2dp.lo
+? pcm_a2dpd.lo
+? pcm_sco.lo
+Index: a2dpd.c
+===================================================================
+RCS file: /cvsroot/bluetooth-alsa/btsco/alsa-plugins/a2dpd.c,v
+retrieving revision 1.4
+diff -u -r1.4 a2dpd.c
+--- a2dpd.c	17 Aug 2006 14:06:27 -0000	1.4
++++ a2dpd.c	19 Aug 2006 23:46:31 -0000
+@@ -45,6 +45,7 @@
+ #define MAXCLIENTSPERDEVICE    8
+ #define MAXCLIENTSRINGSIZE     64
+ #define POOLENTRYSIZE          A2DPD_BLOCK_SIZE
++#define PIDFILE                "/var/run/a2dp.pid"
+ 
+ #define A2DPD_CONFIG_FILE       ".a2dpdrc"
+ 
+@@ -86,7 +87,7 @@
+                         case -1:
+                                 exit(-1);
+                         case 0:
+-                                break;
++				break;
+                         default:
+                                 exit(0);
+                 }
+@@ -117,6 +118,17 @@
+         printf("a2dpd [%s %s] starting ...", __DATE__, __TIME__);
+ }
+ 
++static int lock_fd(int fd)
++{
++	struct flock lock;
++	lock.l_type = F_WRLCK;
++	lock.l_whence = SEEK_SET;
++	lock.l_start = 0;
++	lock.l_len = 0;
++
++	return fcntl(fd, F_SETLK, &lock);
++}
++
+ //////////////////////////////////////////
+ //////////////////////////////////////////
+ // AVRCP CODE BEGIN //////////////////////
+@@ -131,6 +143,7 @@
+         header->packet_type = PACKET_TYPE_SINGLE;
+ }
+ 
++
+ // This function handle the bluetooth connection
+ int a2dp_handle_avrcp_message(int sockfd)
+ {
+@@ -953,6 +966,7 @@
+ int main(int argc, char *argv[])
+ {
+         int i = 0;
++	int fd;
+         struct timespec timer_resolution = { 0, 0 };
+         char address[256] = "";
+         char* addr = &address[0];
+@@ -960,7 +974,9 @@
+         //char* iphono420= "C2:00:08:F4:30:07:64";
+         //char* hpheadphone= "00:0D:44:2A:17:C7";
+         struct sched_param schedparam = { sched_get_priority_max(SCHED_FIFO) };
+-        int res=0,  bFork=0, bVerbose=1;
++        int res=0,  bFork=0, bVerbose=1, bKill=0;
++	FILE *fp;
++	pid_t pid;
+ 
+         // Read config values from config file
+         get_config_filename(g_srcfilename, sizeof(g_srcfilename));
+@@ -993,6 +1009,10 @@
+                 {
+                         bVerbose=1;
+                 }
++		else if(!strcmp(argv[i], "-k"))
++		{
++			bKill=1;
++		}
+                 else if(!strcmp(argv[i], "+n"))
+                 {
+                         bFork=1;
+@@ -1017,6 +1037,50 @@
+         // Redirect outputs
+         make_daemon_process(bFork, bVerbose, g_sOutputFilename);
+ 
++	// Generate the lockfile
++	fd = open(PIDFILE, O_RDWR | O_CREAT | O_EXCL, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
++
++	if (fd == -1) {
++		if (errno != EEXIST) // If we can't write the lock, then ignore
++			goto post_lock;
++		
++		if ((fd = open(PIDFILE, O_RDWR)) < 0)
++			goto post_lock;
++		
++		fp = fdopen(fd, "rw");
++		if (fp == NULL)
++			goto post_lock;
++
++		pid = -1;
++		if ((fscanf(fp, "%d", &pid) != 1) || (pid == getpid())
++		    || (lock_fd(fileno(fp)) == 0)) {
++			unlink (PIDFILE);
++		} else {
++			if (bKill) {
++				kill (pid, 15);
++				sleep (5); // let the other daemon die
++			} else
++				goto shutdown;
++		}
++		fclose(fp);
++
++		unlink(PIDFILE);
++		fd = open(PIDFILE, O_RDWR | O_CREAT | O_EXCL,
++			  S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
++
++		if (fd == -1)
++			goto post_lock;
++		
++	}
++	
++	lock_fd(fd);
++
++	fp = fdopen(fd, "w");
++	fprintf(fp, "%d\n", getpid());
++	fflush(fp);
++	fcntl(fd, F_SETFD, (long) 1);
++
++ post_lock:
+         printf("%s addr=%s timer=%d us [%s %s]\n", argv[0], addr, (int)(timer_resolution.tv_nsec/1000), __DATE__, __TIME__);
+ 
+         // If we can be realtime it will be better
+@@ -1036,6 +1100,7 @@
+         // global free
+         a2dp_exit();
+ 
++shutdown:
+         printf("A2DPD terminated succesfully\n");
+ 
+         return 0;
 
-I meant exactly that. The method should work out what information got
-passed to it. Of course this might not be easy to implement, but that is
-not the point behind this API. The whole API is designed to make it easy
-for all kind of applications. And the main focus is not the C language.
 
-We have been through a lot of trouble and parts of hcid look really
-horrible, but for the end user (the application) the interface is easy
-to use.
-
-I also don't see the problem here. The ASCII service string are a
-predefined list of names that actually match to specific UUID. Since in
-the end we will implement all needed service names for all known
-profiles, we only need to support UUID128. These have a unique form and
-are kinda easy to detect. If the provided UUID128 matches the Bluetooth
-base string, then we can internally use UUID32 or UUID16. As simple as
-that. For the record handles we give them in hex and so they are also
-easy to identify. And I would check the string in this order.
-
-And as said, this might require a little bit more code in hcid, but that
-is the price to pay if we wanna have a simple API for the application
-and I am paying it gladly.
-
-Regards
-
-Marcel
-
-
-
+-- 
+Matthew Garrett | mjg59@srcf.ucam.org
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
