@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sat, 19 Aug 2006 18:01:45 +0100
+Date: Sat, 19 Aug 2006 15:36:08 +0100
 From: Matthew Garrett <mjg59@srcf.ucam.org>
-To: bluez-devel@lists.sf.net
-Message-ID: <20060819170145.GA5833@srcf.ucam.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20060819143608.GA31812@srcf.ucam.org>
+References: <20060817100604.GA3350@srcf.ucam.org>
+	<1155819858.4075.134.camel@aeonflux.holtmann.net>
+	<20060817114116.GC5118@srcf.ucam.org>
+	<20060817115912.GA24906@localhost.localdomain>
 Mime-Version: 1.0
-Subject: [Bluez-devel] [PATCH] - add uinput support to a2dpd
+In-Reply-To: <20060817115912.GA24906@localhost.localdomain>
+Subject: Re: [Bluez-devel] [PATCH] implement RFCOMM Connect and
+	Disconnect	methods
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,161 +24,537 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-The included patch adds support for using uinput with a2dpd. As a 
-result, pressing buttons on the headphones generates input events that 
-are accessible to userspace applications.
+Right. How about this (not heavily tested, more proof of concept) - it 
+removes the unimplemented Connect and CancelConnect methods, and 
+replaces them with ConnectByUUID, ConnectByService and ConnectByHandle 
+methods with the appropriate CancelConnect methods.
 
-Index: a2dpd.c
+Index: dbus-api.txt
 ===================================================================
-RCS file: /cvsroot/bluetooth-alsa/btsco/alsa-plugins/a2dpd.c,v
-retrieving revision 1.4
-diff -u -r1.4 a2dpd.c
---- a2dpd.c	17 Aug 2006 14:06:27 -0000	1.4
-+++ a2dpd.c	19 Aug 2006 16:59:07 -0000
-@@ -33,6 +33,8 @@
- #include <sys/types.h>
- #include <sys/time.h>
- #include <sys/stat.h>
-+#include <linux/input.h>
-+#include <linux/uinput.h>
+RCS file: /cvsroot/bluez/utils/hcid/dbus-api.txt,v
+retrieving revision 1.41
+diff -u -r1.41 dbus-api.txt
+--- dbus-api.txt	18 Aug 2006 19:50:27 -0000	1.41
++++ dbus-api.txt	19 Aug 2006 14:34:32 -0000
+@@ -901,11 +901,11 @@
+ Interface	org.bluez.RFCOMM
+ Object path	/org/bluez/{hci0,hci1,...}
  
- #include "a2dplib.h"
- #include "a2dpd_protocol.h"
-@@ -45,6 +47,7 @@
- #define MAXCLIENTSPERDEVICE    8
- #define MAXCLIENTSRINGSIZE     64
- #define POOLENTRYSIZE          A2DPD_BLOCK_SIZE
-+#define UINPUT_DEVICE "/dev/input/uinput"
+-Methods		string Connect(string address, string service)
++Methods		string ConnectByService(string address, string service)
  
- #define A2DPD_CONFIG_FILE       ".a2dpdrc"
+ 			This creates a connection to a remote RFCOMM based
+-			service. The service string can either be a UUID-16,
+-			a UUID-32, a UUID-128 or a service abbreviation.
++			service. The service string must be a service 
++			abbreviation.
  
-@@ -57,6 +60,7 @@
- static char     g_sCmdNext              [512];
- static char     g_sCmdNew               [512];
- static int      g_nbdeviceconnected     = 0;
-+static int      uinput_fd               = -1;
+ 			The return value will be the path of the newly
+ 			created RFCOMM TTY device (for example /dev/rfcomm0).
+@@ -917,9 +917,46 @@
+ 			                      "ftp", "bpp", "bip", "synch",
+ 			                      "dun", "opp", "fax", "spp"
  
- // This function is needed to destroy zombies processes
- // On Unix, any forked process which terminate before its parent create a zombie until parent call waitpid()
-@@ -131,6 +135,77 @@
-         header->packet_type = PACKET_TYPE_SINGLE;
+-		void CancelConnect(string address, string service)
++		void CancelConnectByService(string address, string service)
+ 
+-			This method cancels a previous Connect method call.
++			This method cancels a previous ConnectByService method
++			 call.
++
++		string ConnectByUUID(string address, string uuid)
++
++			This creates a connection to a remote RFCOMM based
++			service. The uuid string must be a UUID-128.
++
++			The return value will be the path of the newly
++			created RFCOMM TTY device (for example /dev/rfcomm0).
++
++			If the application disconnects from the D-Bus this
++			connection will be terminated.
++
++		void CancelConnectByUUID(string address, string uuid)
++
++			This method cancels a previous ConnectByUUID method 
++			call.
++
++		string ConnectByHandle(string address, uint32 handle)
++
++			This creates a connection to a remote RFCOMM based
++			service. The handle must be a servicerecord handle.
++
++			The return value will be the path of the newly
++			created RFCOMM TTY device (for example /dev/rfcomm0).
++
++			If the application disconnects from the D-Bus this
++			connection will be terminated.
++
++			Valid service values: "vcp", "map", "pbap", "sap",
++			                      "ftp", "bpp", "bip", "synch",
++			                      "dun", "opp", "fax", "spp"
++
++		void CancelConnectByHandle(string address, string uuid)
++
++			This method cancels a previous ConnectByHandle method 
++			call.
+ 
+ 		string ConnectByChannel(string address, byte channel)
+ 
+Index: dbus-rfcomm.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/dbus-rfcomm.c,v
+retrieving revision 1.10
+diff -u -r1.10 dbus-rfcomm.c
+--- dbus-rfcomm.c	18 Aug 2006 18:29:40 -0000	1.10
++++ dbus-rfcomm.c	19 Aug 2006 14:34:32 -0000
+@@ -33,11 +33,14 @@
+ #include <fcntl.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
++#include <arpa/inet.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/rfcomm.h>
+ #include <bluetooth/hci.h>
+ #include <bluetooth/hci_lib.h>
++#include <bluetooth/sdp.h>
++#include <bluetooth/sdp_lib.h>
+ 
+ #include <dbus/dbus.h>
+ 
+@@ -452,18 +455,308 @@
+ 	return node;
  }
  
-+static int init_uinput ()
+-static DBusHandlerResult rfcomm_connect_req(DBusConnection *conn,
+-						DBusMessage *msg, void *data)
++static DBusHandlerResult rfcomm_get_ch_from_uuid_t(DBusConnection *conn,
++						   DBusMessage *msg,
++						   const char *dst, 
++						   uuid_t *uuid,
++						   int *ch,
++						   void *data)
 +{
-+	int fd, i;
-+	struct uinput_user_dev dev = {
-+		.id = {
-+			.bustype = BUS_BLUETOOTH,
-+			.version = 0x0001,
-+		}
-+	};
++	sdp_record_t *rec;
++	sdp_list_t *protos;
 +
-+	if((fd = open(UINPUT_DEVICE, O_WRONLY)) < 0)
-+	{
-+		perror("Cannot open " UINPUT_DEVICE);
-+		goto shutdown;
++	rec = find_record_by_uuid (dst, uuid);
++	if (!rec)
++		return error_record_does_not_exist (conn, msg);
++	
++	if (sdp_get_access_protos(rec, &protos) == 0)
++		*ch = sdp_get_proto_port (protos, RFCOMM_UUID);
++
++	if (*ch == -1)
++		return error_record_does_not_exist (conn, msg);
++
++	return DBUS_HANDLER_RESULT_HANDLED;
++}
++
++static DBusHandlerResult rfcomm_get_ch_from_handle(DBusConnection *conn,
++						   DBusMessage *msg,
++						   const char *dst, 
++						   int handle,
++						   int *ch,
++						   void *data)
+ {
+-	error("RFCOMM.Connect not implemented");
+-	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
++	bdaddr_t bdaddr;
++	sdp_record_t *rec;
++	sdp_list_t *protos;
++	struct hci_dbus_data *dbus_data = data;
++
++	hci_devba(dbus_data->dev_id, &bdaddr);
++
++	rec = find_record_by_handle (dst, handle);
++	if (!rec)
++		return error_record_does_not_exist (conn, msg);
++	
++	if (sdp_get_access_protos(rec, &protos) == 0)
++		*ch = sdp_get_proto_port (protos, RFCOMM_UUID);
++
++	if (*ch == -1)
++		return error_record_does_not_exist (conn, msg);
++
++	return DBUS_HANDLER_RESULT_HANDLED;
+ }
+ 
+-static DBusHandlerResult rfcomm_cancel_connect_req(DBusConnection *conn,
+-						DBusMessage *msg, void *data)
++static DBusHandlerResult rfcomm_connect_uuid_t(DBusConnection *conn, 
++					       DBusMessage *msg, 
++					       const char *dst, uuid_t *uuid,
++					       void *data)
+ {
+-	error("RFCOMM.CancelConnect not implemented");
+-	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
++	int ch = -1;
++	DBusHandlerResult ret;
++	struct hci_dbus_data *dbus_data = data;
++	bdaddr_t bdaddr;
++	int err;
++
++	hci_devba(dbus_data->dev_id, &bdaddr);
++	
++	ret = rfcomm_get_ch_from_uuid_t(conn, msg, dst, uuid, &ch, data);
++
++	if (ret != DBUS_HANDLER_RESULT_HANDLED)
++		return ret;
++
++	if (find_pending_connect(dst, ch))
++		return error_connect_in_progress(conn, msg);
++	
++	if (rfcomm_connect(conn, msg, &bdaddr, dst, NULL, ch, &err) < 0)
++		return error_failed(conn, msg, err);
++
++	return DBUS_HANDLER_RESULT_HANDLED;
++}
++
++static DBusHandlerResult rfcomm_cancel_connect_uuid_t(DBusConnection *conn, 
++						      DBusMessage *msg, 
++						      const char *dst, 
++						      uuid_t *uuid,
++						      void *data)
++{
++	int ch = -1;
++	DBusHandlerResult ret;
++	DBusMessage *reply;
++	struct hci_dbus_data *dbus_data = data;
++	struct pending_connect *pending;
++	bdaddr_t bdaddr;
++
++	hci_devba(dbus_data->dev_id, &bdaddr);
++	
++	ret = rfcomm_get_ch_from_uuid_t(conn, msg, dst, uuid, &ch, data);
++
++	if (ret != DBUS_HANDLER_RESULT_HANDLED)
++		return ret;
++
++	reply = dbus_message_new_method_return(msg);
++	if (!reply)
++		return DBUS_HANDLER_RESULT_NEED_MEMORY;
++	
++	pending = find_pending_connect(dst, ch);
++	if (!pending)
++		return error_connect_in_progress(conn, msg);
++	
++	pending->canceled = 1;
++
++	return send_reply_and_unref(conn, reply);
++
++	return DBUS_HANDLER_RESULT_HANDLED;
++}
++
++static DBusHandlerResult rfcomm_connect_uuid_req(DBusConnection *conn,
++						 DBusMessage *msg, void *data)
++{
++	uuid_t uuid;
++	const char *dst;
++	const char *string_uuid;
++	unsigned int data0, data4;
++	unsigned short data1, data2, data3, data5;
++
++	if (!dbus_message_get_args(msg, NULL,
++				   DBUS_TYPE_STRING, &dst,
++				   DBUS_TYPE_STRING, &string_uuid,
++				   DBUS_TYPE_INVALID))
++		return error_invalid_arguments(conn, msg);
++
++	sscanf (string_uuid, "%8x-%4hx-%4hx-%4hx-%8x%4hx", &data0, &data1, 
++		&data2, &data3,	&data4, &data5);
++
++	data0 = htonl(data0);
++	data1 = htons(data1);
++	data2 = htons(data2);
++	data3 = htons(data3);
++	data4 = htonl(data4);
++	data5 = htons(data5);
++
++	uuid.type = SDP_UUID128;
++	memcpy (&uuid.value.uuid128.data[0], &data0, 4);
++	memcpy (&uuid.value.uuid128.data[4], &data1, 2);
++	memcpy (&uuid.value.uuid128.data[6], &data2, 2);
++	memcpy (&uuid.value.uuid128.data[8], &data3, 2);
++	memcpy (&uuid.value.uuid128.data[10], &data4, 4);
++	memcpy (&uuid.value.uuid128.data[14], &data5, 2);
++
++	return rfcomm_connect_uuid_t(conn, msg, dst, &uuid, data);
++}
++
++static DBusHandlerResult rfcomm_cancel_connect_uuid_req(DBusConnection *conn,
++							DBusMessage *msg, 
++							void *data)
++{
++	uuid_t uuid;
++	const char *dst;
++	const char *string_uuid;
++	unsigned int data0, data4;
++	unsigned short data1, data2, data3, data5;
++
++	if (!dbus_message_get_args(msg, NULL,
++				   DBUS_TYPE_STRING, &dst,
++				   DBUS_TYPE_STRING, &string_uuid,
++				   DBUS_TYPE_INVALID))
++		return error_invalid_arguments(conn, msg);
++
++	sscanf (string_uuid, "%8x-%4hx-%4hx-%4hx-%8x%4hx", &data0, &data1, 
++		&data2, &data3,	&data4, &data5);
++
++	data0 = htonl(data0);
++	data1 = htons(data1);
++	data2 = htons(data2);
++	data3 = htons(data3);
++	data4 = htonl(data4);
++	data5 = htons(data5);
++
++	uuid.type = SDP_UUID128;
++	memcpy (&uuid.value.uuid128.data[0], &data0, 4);
++	memcpy (&uuid.value.uuid128.data[4], &data1, 2);
++	memcpy (&uuid.value.uuid128.data[6], &data2, 2);
++	memcpy (&uuid.value.uuid128.data[8], &data3, 2);
++	memcpy (&uuid.value.uuid128.data[10], &data4, 4);
++	memcpy (&uuid.value.uuid128.data[14], &data5, 2);
++
++	return rfcomm_cancel_connect_uuid_t(conn, msg, dst, &uuid, data);
++}
++
++static DBusHandlerResult rfcomm_connect_service_req(DBusConnection *conn,
++						    DBusMessage *msg, 
++						    void *data)
++{
++	char *dst;
++	char *service;
++	uuid_t short_uuid;
++	uuid_t *uuid;
++
++	if (!dbus_message_get_args(msg, NULL,
++				   DBUS_TYPE_STRING, &dst,
++				   DBUS_TYPE_STRING, &service,
++				   DBUS_TYPE_INVALID))
++		return error_invalid_arguments(conn, msg);
++	
++	short_uuid.type = SDP_UUID16;
++	short_uuid.value.uuid16 = sdp_str2svclass (service);
++
++	uuid = sdp_uuid_to_uuid128 (&short_uuid);
++
++	return rfcomm_connect_uuid_t(conn, msg, dst, uuid, data);
++}
++
++static DBusHandlerResult rfcomm_cancel_connect_service_req(DBusConnection *conn,
++							   DBusMessage *msg, 
++							   void *data)
++{
++	char *dst;
++	char *service;
++	uuid_t short_uuid;
++	uuid_t *uuid;
++
++	if (!dbus_message_get_args(msg, NULL,
++				   DBUS_TYPE_STRING, &dst,
++				   DBUS_TYPE_STRING, &service,
++				   DBUS_TYPE_INVALID))
++		return error_invalid_arguments(conn, msg);
++	
++	short_uuid.type = SDP_UUID16;
++	short_uuid.value.uuid16 = sdp_str2svclass (service);
++
++	uuid = sdp_uuid_to_uuid128 (&short_uuid);
++
++	return rfcomm_cancel_connect_uuid_t(conn, msg, dst, uuid, data);
++}
++
++static DBusHandlerResult rfcomm_connect_handle_req (DBusConnection *conn,
++						    DBusMessage *msg,
++						    void *data)
++{
++	int ch = -1;
++	const char *dst;
++	DBusHandlerResult ret;
++	int handle;
++	struct hci_dbus_data *dbus_data = data;
++	bdaddr_t bdaddr;
++	int err;
++
++	hci_devba(dbus_data->dev_id, &bdaddr);
++
++	if (!dbus_message_get_args(msg, NULL,
++				   DBUS_TYPE_STRING, &dst,
++				   DBUS_TYPE_UINT32, &handle,
++				   DBUS_TYPE_INVALID))
++		return error_invalid_arguments(conn, msg);
++
++	ret = rfcomm_get_ch_from_handle(conn, msg, dst, handle, &ch, data);
++
++	if (ret != DBUS_HANDLER_RESULT_HANDLED)
++		return ret;
++
++	if (find_pending_connect(dst, ch))
++		return error_connect_in_progress(conn, msg);
++	
++	if (rfcomm_connect(conn, msg, &bdaddr, dst, NULL, ch, &err) < 0)
++		return error_failed(conn, msg, err);
++
++	return DBUS_HANDLER_RESULT_HANDLED;
++}
++
++static DBusHandlerResult rfcomm_cancel_connect_handle_req (DBusConnection *conn,
++							   DBusMessage *msg,
++							   void *data)
++{
++	int ch = -1;
++	const char *dst;
++	DBusHandlerResult ret;
++	DBusMessage *reply;
++	int handle;
++	struct hci_dbus_data *dbus_data = data;
++	bdaddr_t bdaddr;
++	struct pending_connect *pending;
++
++	hci_devba(dbus_data->dev_id, &bdaddr);
++
++	if (!dbus_message_get_args(msg, NULL,
++				   DBUS_TYPE_STRING, &dst,
++				   DBUS_TYPE_UINT32, &handle,
++				   DBUS_TYPE_INVALID))
++		return error_invalid_arguments(conn, msg);
++
++	ret = rfcomm_get_ch_from_handle(conn, msg, dst, handle, &ch, data);
++
++	if (ret != DBUS_HANDLER_RESULT_HANDLED)
++		return ret;
++
++	reply = dbus_message_new_method_return(msg);
++	if (!reply)
++		return DBUS_HANDLER_RESULT_NEED_MEMORY;
++	
++	pending = find_pending_connect(dst, ch);
++	if (!pending)
++		return error_connect_in_progress(conn, msg);
++	
++	pending->canceled = 1;
++
++	return send_reply_and_unref(conn, reply);
+ }
+ 
+ static DBusHandlerResult rfcomm_connect_by_ch_req(DBusConnection *conn,
+@@ -685,8 +978,12 @@
+ }
+ 
+ static struct service_data rfcomm_services[] = {
+-	{ "Connect",			rfcomm_connect_req,			},
+-	{ "CancelConnect",		rfcomm_cancel_connect_req,		},
++	{ "ConnectByUUID",			rfcomm_connect_uuid_req,	},
++	{ "ConnectByService",			rfcomm_connect_service_req,	},
++	{ "ConnectByHandle",			rfcomm_connect_handle_req,	},
++	{ "CancelConnectByUUID",		rfcomm_cancel_connect_uuid_req,	},
++	{ "CancelConnectByService",		rfcomm_cancel_connect_service_req,	},
++	{ "CancelConnectByHandle",		rfcomm_cancel_connect_handle_req,	},
+ 	{ "ConnectByChannel",		rfcomm_connect_by_ch_req,		},
+ 	{ "CancelConnectByChannel",	rfcomm_cancel_connect_by_ch_req,	},
+ 	{ "Disconnect",			rfcomm_disconnect_req,			},
+Index: dbus-sdp.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/dbus-sdp.c,v
+retrieving revision 1.9
+diff -u -r1.9 dbus-sdp.c
+--- dbus-sdp.c	18 Aug 2006 18:29:40 -0000	1.9
++++ dbus-sdp.c	19 Aug 2006 14:34:33 -0000
+@@ -855,6 +855,77 @@
+ 
+ }
+ 
++static int sdp_uuid_comp_func(const void *key1, const void *key2)
++{	
++	const uuid_t *a = (const uuid_t *)key1;
++	const uuid_t *b = (const uuid_t *)key2;
++
++	if (a->type != b->type)
++		return 1;
++	
++	switch (a->type) {
++	case SDP_UUID16:		
++		return !(a->value.uuid16 == b->value.uuid16);
++		break;
++        case SDP_UUID32:
++		return !(a->value.uuid32 == b->value.uuid32);
++		break;
++        case SDP_UUID128:
++		return !memcmp(&a->value.uuid128, &b->value.uuid128, 
++			       sizeof(uint128_t));
++		break;
 +	}
-+
-+	if(write(fd, &dev, sizeof(dev)) < sizeof(dev))
-+	{
-+		perror("Cannot create a uinput device");
-+		goto release;
-+	}
-+
-+	if(ioctl(fd, UI_SET_EVBIT, EV_KEY))
-+		goto release;
-+
-+	for(i = 0; i <= KEY_MAX; i++)
-+		if(ioctl(fd, UI_SET_KEYBIT, i))
-+			goto release;
-+	if(ioctl(fd, UI_DEV_CREATE))
-+		goto release;
-+
-+	uinput_fd = fd;
-+
-+	return 0;
-+ release:
-+	ioctl(fd, UI_DEV_DESTROY);
-+ shutdown:
-+	close(fd);
 +	return 1;
 +}
 +
-+static void kill_uinput ()
++sdp_record_t *find_record_by_uuid(const char *address, uuid_t *uuid)
 +{
-+	if (uinput_fd == -1)
-+		return;
++	struct slist *lp, *lr;
++	struct service_provider *p;
++	struct service_record *r;
++	sdp_list_t *list = 0;
++	
 +
-+	ioctl(uinput_fd, UI_DEV_DESTROY);
-+	close(uinput_fd);
++	for (lp = sdp_cache; lp; lp = lp->next) {
++		p = lp->data;
++		if (strcmp(p->prov, address))
++			continue;
++
++		for (lr = p->lrec; lr; lr = lr->next) {
++			r = lr->data;
++			/* Check whether the record has the correct uuid */
++			if (sdp_get_service_classes(r->record, &list) !=0)
++				continue;
++			
++			if (sdp_list_find (list, &uuid, sdp_uuid_comp_func))
++				return r->record;
++		}
++	}
++
++	return NULL;
++}	
++
++sdp_record_t *find_record_by_handle(const char *address, int handle)
++{
++	struct slist *lp, *lr;
++	struct service_provider *p;
++	struct service_record *r;
++
++	for (lp = sdp_cache; lp; lp = lp->next) {
++		p = lp->data;
++		if (strcmp(p->prov, address))
++			continue;
++
++		for (lr = p->lrec; lr; lr = lr->next) {
++			r = lr->data;
++			if (r->record->handle == handle)
++				return r->record;
++		}
++	}
++
++	return NULL;
 +}
 +
-+static void send_key (unsigned short code)
-+{
-+	struct input_event ev = {
-+		.type = EV_KEY,
-+		.code = code,
-+		.time = {0, }
-+	};
-+
-+	if (uinput_fd == -1)
-+		return;
-+
-+	if(code > KEY_MAX)
-+		return;
-+  
-+	ev.value = 1; // press...
-+	write(uinput_fd, &ev, sizeof(ev));
-+
-+	ev.value = 0; // then release
-+	write(uinput_fd, &ev, sizeof(ev));
-+}
-+
- // This function handle the bluetooth connection
- int a2dp_handle_avrcp_message(int sockfd)
+ static sdp_record_t *find_record(const char *address, int id)
  {
-@@ -148,18 +223,22 @@
-                         case PLAY_OP:
-                                 printf("[play] %s\n", g_sCmdPlay);
-                                 if(g_sCmdPlay[0]) async_run_process(g_sCmdPlay);
-+				send_key (KEY_PLAY);
-                                 break;
-                         case PAUSE_OP:
-                                 printf("[pause] %s\n", g_sCmdPause);
-                                 if(g_sCmdPause[0]) async_run_process(g_sCmdPause);
-+				send_key (KEY_PAUSE);
-                                 break;
-                         case NEXT_OP:
-                                 printf("[next] %s\n", g_sCmdNext);
-                                 if(g_sCmdNext[0]) async_run_process(g_sCmdNext);
-+				send_key (KEY_NEXTSONG);
-                                 break;
-                         case PREV_OP:
-                                 printf("[previous] %s\n", g_sCmdPrev);
-                                 if(g_sCmdPrev[0]) async_run_process(g_sCmdPrev);
-+				send_key (KEY_PREVIOUSSONG);
-                                 break;
-                         default:
-                                 printf("received passthrough %d bytes:\n", iReceived);
-@@ -1012,6 +1091,8 @@
-         }
-         clock_getres(CLOCK_REALTIME, &timer_resolution);
+ 	struct slist *lp, *lr;
+Index: dbus.h
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/dbus.h,v
+retrieving revision 1.98
+diff -u -r1.98 dbus.h
+--- dbus.h	19 Aug 2006 00:30:46 -0000	1.98
++++ dbus.h	19 Aug 2006 14:34:33 -0000
+@@ -214,4 +214,8 @@
  
-+	init_uinput ();
+ int discoverable_timeout_handler(void *data);
+ 
++sdp_record_t *find_record_by_uuid(const char *address, uuid_t *uuid);
++sdp_record_t *find_record_by_handle(const char *address, int handle);
++uint16_t sdp_str2svclass(const char *str);
 +
-         ignore_child_processes_return_values();
-         
-         // Redirect outputs
-@@ -1036,6 +1117,8 @@
-         // global free
-         a2dp_exit();
- 
-+	kill_uinput();
-+
-         printf("A2DPD terminated succesfully\n");
- 
-         return 0;
+ #endif /* __H_BLUEZ_DBUS_H__ */
 
 -- 
 Matthew Garrett | mjg59@srcf.ucam.org
