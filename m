@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <8712867d0608190931o3f6042eyfdb6fdff805f91b@mail.gmail.com>
-Date: Sat, 19 Aug 2006 11:31:21 -0500
-From: "Jaime Alberto Silva" <jaimealbertosilva@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] libbluetooth usage
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <44E6C978.7040504@newkirk.us>
+References: <44E6C978.7040504@newkirk.us>
+Date: Sat, 19 Aug 2006 13:36:59 +0200
+Message-Id: <1155987420.3989.1.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Error:  This is uuid32
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,31 +20,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi everyone!
+Hi Joel,
 
-Can someone please point me to some documentation about libbluetooth usage?
+> I just got a Samsung T509 handset.  Paired a BT headset with it fine. 
+> But my primary use for it is a data connection from a Zaurus, running
+> pdaXrom.  sdptool is version 1.5, BT is a compactflash Billionton card,
+> all works fine talking to a Nokia 6600.
+> 
+> "sdptool search OPUSH" works fine, gives me OBEX Object Push with L2DAP
+> and RFComm, channel 5.
+> 
+> "sdptool search DUN" gives me:
+> Inquiring ...
+> Searching for DUN on 00:16:DB:D8:xx:xx ...
+> Service Name: Dial-up networking
+> Service RecHandle: 0x10002
+> Service Class ID List:
+>     "Error: This is uuid32" (0x00001103)
+> Protocol Descriptor List:
+>     "Error: " (0x00000100)
+>     "Error: " (0x00000003)
+>     uint8: 0x1
+> Profile Descriptor List:
+>     "Dialup Networking" (0x1103)
+>     Version: 0x0100
+> 
+> 
+> Is this a lame bluetooth implementation by samsung, a defective phone,
+> or a problem relating to bluez?  I can't tell if the errors are coming
+> from the phone, or from bluez, and I'm down to a few days remaining to
+> return the phone if its bluetooth is buggy.
 
-How can I use this library to establish comunication with a BT device?
+what version of sdptool is this. I actually thought we fixed this. It is
+not an error. It is only something you wouldn't expect. Since the first
+two bytes are zero anyway a type of UUID16 would have been enough.
 
-I'm trying to write a program in J2ME for my Nokia 6670 that
-communicates with my Linux PC via RFCOMM. If I use the rfcomm utility
-like this:
+Regards
 
-# rfcomm bind 0 00:02:5B:00:A5:A5
-
-All I have to do is write a program that opens the rfcomm0 serial port
-and waits for data? How can I detect when the client connects?
-
-How do I use the RFCOMM socket interface?
+Marcel
 
 
-Thanks in advance for your attention and any help you can bring me.
-
--- 
-Jaime Alberto Silva       L I N U X       .~.
-                                   The Choice     /V\
-                                    of a GNU      / ( ) \
-                                   Generation    ^^-^^
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
