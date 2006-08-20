@@ -1,16 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 20 Aug 2006 00:53:30 +0100
-From: Matthew Garrett <mjg59@srcf.ucam.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060819235330.GA16375@srcf.ucam.org>
+In-Reply-To: <20060819143608.GA31812@srcf.ucam.org>
 References: <20060817100604.GA3350@srcf.ucam.org>
 	<1155819858.4075.134.camel@aeonflux.holtmann.net>
 	<20060817114116.GC5118@srcf.ucam.org>
 	<20060817115912.GA24906@localhost.localdomain>
 	<20060819143608.GA31812@srcf.ucam.org>
-	<1156037973.3989.14.camel@aeonflux.holtmann.net>
+Date: Sun, 20 Aug 2006 03:39:33 +0200
+Message-Id: <1156037973.3989.14.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-In-Reply-To: <1156037973.3989.14.camel@aeonflux.holtmann.net>
 Subject: Re: [Bluez-devel] [PATCH] implement RFCOMM Connect
 	and	Disconnect	methods
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -26,33 +25,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sun, Aug 20, 2006 at 03:39:33AM +0200, Marcel Holtmann wrote:
+Hi Matthew,
 
-> thanks for the patch, but what is the problem with sticking to Connect
-> and CancelConnect and use their service string to identify UUID, handle
-> or service name bases connections.
+> Right. How about this (not heavily tested, more proof of concept) - it 
+> removes the unimplemented Connect and CancelConnect methods, and 
+> replaces them with ConnectByUUID, ConnectByService and ConnectByHandle 
+> methods with the appropriate CancelConnect methods.
 
-I'm not quite clear on what you mean here. The service string seems 
-unacceptable because it requires bluez to have a table of every possible 
-service and UUID in existence. Or are we talking about different things? 
-Right now, the API gives us the following things that potentially 
-identify an object:
+thanks for the patch, but what is the problem with sticking to Connect
+and CancelConnect and use their service string to identify UUID, handle
+or service name bases connections.
 
-1) The identifiers returned by GetIdentifiers (currently an arbitrary 
-but unique integer, despite dbus-api.txt claiming it returns strings)
-2) The UUID
-3) The service handle
-4) The ascii service string
+Remember that the goal of the D-Bus based API is to make it easy for the
+applications. So they can give us whatever they have and we then request
+the right information from the remote device and then connect to the
+right RFCOMM channel.
 
-My implementation provides connect methods for (2), (3) and (4). You 
-didn't seem too happy about my patch providing support for (1), so I've 
-dropped it :) Or do you just mean that there should be a single method 
-and it should work out which piece of information has been passed by the 
-app? In that case, I didn't implement it that way because determining 
-the type was a bit of a pain and struck me as potentially fragile.
+Regards
 
--- 
-Matthew Garrett | mjg59@srcf.ucam.org
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
