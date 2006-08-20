@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Bruce Bertrand <lists@brucebertrand.com>
-To: Bluez-users@lists.sourceforge.net
-Date: Sun, 20 Aug 2006 18:31:42 -0400
-Message-Id: <1156113102.26061.5.camel@localhost>
+Message-ID: <BAY117-F1966F7989B8F722F1E1F59BF400@phx.gbl>
+From: "Kelvin Xu" <kyoxu@hotmail.com>
+To: bluez-users@lists.sourceforge.net
+Date: Sun, 20 Aug 2006 23:35:54 +0800
 Mime-Version: 1.0
-Subject: [Bluez-users] Is the Cellink BTA-3120 a CSR chip?
+Subject: [Bluez-users] Hardware for A2DP?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,16 +18,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Greetings all,
+Hi,
 
-I know that the Cellink BTA-3000 uses a CSR chip, but does anyone know
-if the 3120 does as well?
+Do we need specific bluetooth adapters such as A2DP-enabled adapters to send 
+and receive audio using A2DP? Thanks
 
-If not, can anyone recommend a supported USB dongle with a bluecore4
-chip?
 
-Thanks,
-Bruce
+Kelvin
+
 
 
 -------------------------------------------------------------------------
