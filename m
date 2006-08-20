@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY112-F193F49DA8B7C4EF7C0A893E9400@phx.gbl>
-From: "bram diederik" <daft_dutch@hotmail.com>
-To: bluez-users@lists.sourceforge.net
-Date: Mon, 21 Aug 2006 00:52:09 +0200
+From: Bruce Bertrand <lists@brucebertrand.com>
+To: Bluez-users@lists.sourceforge.net
+Date: Sun, 20 Aug 2006 18:31:42 -0400
+Message-Id: <1156113102.26061.5.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-users] pairing was gone, cant pair
+Subject: [Bluez-users] Is the Cellink BTA-3120 a CSR chip?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +18,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I wanted to backup my phonebook again with bluetooth ofc.
-but the pairing wasnt working any more. tryed any thing. at the end i 
-apt-get --purged <the lot>
-and then reinstalled.
+Greetings all,
 
-still i cant pair.
-the phone cant find the computer, and the computer can find the phone but 
-the default key is not accepted.
+I know that the Cellink BTA-3000 uses a CSR chip, but does anyone know
+if the 3120 does as well?
 
-Im using debian sid. and at the moment the config files are the standard 
-configs of apt-get
+If not, can anyone recommend a supported USB dongle with a bluecore4
+chip?
 
-I hope some one can help me with this.
-chears
-
-bram diederik
-
+Thanks,
+Bruce
 
 
 -------------------------------------------------------------------------
