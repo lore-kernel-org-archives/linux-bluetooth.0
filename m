@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20060820105235.GB12991@esaurito.net>
-References: <20060820105235.GB12991@esaurito.net>
-Date: Sun, 20 Aug 2006 16:26:05 +0200
-Message-Id: <1156083965.23331.5.camel@aeonflux.holtmann.net>
+In-Reply-To: <20060820103420.GB11669@esaurito.net>
+References: <20060820103420.GB11669@esaurito.net>
+Date: Sun, 20 Aug 2006 16:24:53 +0200
+Message-Id: <1156083893.23331.3.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: fexpop@onlinehome.de, bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] [fexpop@onlinehome.de:	[Pkg-bluetooth-maintainers]
-	Bug#379401: bluez-utils: 3.1-2 renders system	invisible for
-	other BT devices]
+Cc: bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] handling of default outgoing pin in hcid
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,16 +23,25 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Filippo,
 
-> I'm forwarding this bug upstream also because I've received another private
-> report with the same problem.
-> The problem is that [ip]scan isn't enabled on device even if specified into
-> hcid.conf, but setting it with hciconfig works.
-> I suspect that this is dongle-specific because on my system it works as
-> expected.
+> I would like to hear opinions on handling of default outgoing pin/passkey in
+> hcid. It is my understanding that there is no way to actually set a default
+> outgoing pin from /var/lib/bluetooth/<sba>/pincodes. The only way to set it
+> is through the dbus interface, right?
+> Would be a patch to read default outgoing pincode from pincodes suitable?
+> 
+> Right now in debian I've implemented a (suboptimal) solution like pincodes but
+> with a modified passkey-agent, reading the pincode from stdin (so it doesn't
+> show up in ps) and using --default. See also
+> http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=378850 
 
-if I am not mistaken, then this is the problem with actually setting the
-inquiry mode on a dongle that doesn't support this command. This is
-fixed in the CVS and will show up in the next release.
+the idea of a default PIN for outgoing connections is actually kinda
+stupid. You don't wanna do this on a system with input capabilities. And
+so far we never had a default PIN for outgoing connections.
+
+Check the bluez-gnome CVS repository. It now contains a fully
+replacement for the bluez-pin that works with the new passkey agent
+interface of hcid. It is only based on GTK and the D-Bus GLib bindings
+and works pretty well so far.
 
 Regards
 
