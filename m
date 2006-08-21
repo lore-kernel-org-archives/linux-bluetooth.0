@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170608211410l1c4cae0aufa41d8f589bda68d@mail.gmail.com>
-Date: Mon, 21 Aug 2006 18:10:55 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <004b01c6c518$d298e400$9d0cc70a@dlh.st.com>
-MIME-Version: 1.0
-References: <1156167261.3956.20.camel@aeonflux.holtmann.net>
-	<004b01c6c518$d298e400$9d0cc70a@dlh.st.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <006101c6c522$7be5de60$9d0cc70a@dlh.st.com>
+References: <006101c6c522$7be5de60$9d0cc70a@dlh.st.com>
+Date: Mon, 21 Aug 2006 16:00:11 +0200
+Message-Id: <1156168811.4318.2.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,27 +22,50 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Mayank,
 
-On 8/21/06, Mayank BATRA <mayank.batra@st.com> wrote:
-> There is no wrong behaviour as such. Just that Host Number of completed
-> packets is being sent as soon as we get ACL Data on any connection handle.
->
-> Do you think that the attached patch is decent enough for sending Host
-> Number of completed packets to the raw queue? (or is there a better way than
-> this?)
+> > I added the two missing decodings to hcidump now.
+> 
+> I see the following five missing decodings in hcidump. Which ones did you
+> miss out?
+> 
+> (1)< HCI Command: Host Buffer Size (0x03|0x0033) plen 7
+>    0000: 00 04 ff 08 00 08 00                              .......
+> 
+> (2) > HCI Event: Command Complete (0x0e) plen 4
+>     Host Buffer Size (0x03|0x0033) ncmd 1
+>     0000: 00                                                .
+> 
+> (3) < HCI Command: Set Host Controller To Host Flow Control (0x03|0x0031)
+> plen 1
+>     0000: 01                                                .
+> 
+> (4) > HCI Event: Command Complete (0x0e) plen 4
+>     Set Host Controller To Host Flow Control (0x03|0x0031) ncmd 1
+>     0000: 00                                                .
+> 
+> (5) < HCI Command: Host Number of Completed Packets (0x03|0x0035) plen 5
+>   0000: 01 28 00 01 00                                    .(...
 
-I've noticed you sent a diff against hci.h from bluez-libs and not the
-one in the kernel, so please check that. One other thing is that you
-have to be careful with endianess issues (please check your patch
-against hci_core.c).
+the code in the CVS should now take care of all five.
 
-And I really think we should have a hci_send_cmd_raw() or something
-like that instead of messing with hci_send_cmd(). Or maybe a new
-function that creates a skb from scratch just to send the host number
-of completed packets command? Marcel, what do you think?
+> > You have to
+> > store the setting for host_fc in hci_dev, because it can be different
+> > for separate controllers.
+> 
+> I agree. But how to provide the user with the facility to switch flow
+> control on/off? Like we modify security settings through hcid.conf.
 
-Regards,
+As I said, the kernel can track HCI command and their results. So you
+can actually detect inside the kernel if someone switched it on. See the
+page and inquiry scan for an example.
 
--- Ulisses
+After that you can simply add an additional command to hciconfig to set
+the host flow control and everything is fine.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
