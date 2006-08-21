@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <003501c6c506$04e4ffb0$9d0cc70a@dlh.st.com>
-References: <003501c6c506$04e4ffb0$9d0cc70a@dlh.st.com>
-Date: Mon, 21 Aug 2006 13:51:34 +0200
-Message-Id: <1156161094.3956.12.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+From: Mayank BATRA <mayank.batra@st.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Mon, 21 Aug 2006 15:11:46 +0530
+Message-ID: <003501c6c506$04e4ffb0$9d0cc70a@dlh.st.com>
+MIME-Version: 1.0
+In-Reply-To: <000801c6c2c1$85dcbaf0$9d0cc70a@dlh.st.com>
 Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,33 +19,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mayank,
+Hi Marcel,
 
-> > Here you go. Though, it is not the latest version of files 
-> > that I am working
-> > on.
-> > It's a quick and dirty approach right now. Sending Host 
-> > Number of Completed
-> > Packets as soon as we receive ACL Data Packet on any 
-> > connection handle.
-> > Once this works, I'll try to send Host Number of completed 
-> > packets after
-> > reception of 8 packets.
-> 
-> I am still facing the same issue that since there is no event generated for
-> Host Number of Completed packets command and the BlueZ stack is expecting an
-> event for this command, the command finally times out. dmesg shows
-> "hci_cmd_task: hci0 command tx timeout". The ACL data transfer stops after
-> this. Also, when I disconnect, I see that all the remaining Host Number of
-> completed packets commands that were queued earlier on, are sent finally.
+> Here you go. Though, it is not the latest version of files 
+> that I am working
+> on.
+> It's a quick and dirty approach right now. Sending Host 
+> Number of Completed
+> Packets as soon as we receive ACL Data Packet on any 
+> connection handle.
+> Once this works, I'll try to send Host Number of completed 
+> packets after
+> reception of 8 packets.
 
-you need to use the raw queue for sending this command. You can't use
-the normal sent queue. We do the same for vendor specific commands.
 
-Regards
+I am still facing the same issue that since there is no event generated for
+Host Number of Completed packets command and the BlueZ stack is expecting an
+event for this command, the command finally times out. dmesg shows
+"hci_cmd_task: hci0 command tx timeout". The ACL data transfer stops after
+this. Also, when I disconnect, I see that all the remaining Host Number of
+completed packets commands that were queued earlier on, are sent finally.
 
-Marcel
-
+Regards,
+Mayank
 
 
 -------------------------------------------------------------------------
