@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 21 Aug 2006 13:47:23 +0200
-From: automatic_jack <automatic_jack@katamail.com>
+From: menace82 <menace82@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20060821134723.68c21ab8@debian>
-Mime-Version: 1.0
-Subject: [Bluez-users] Bluetooth 2.0 + EDR dongle
+Date: Mon, 21 Aug 2006 13:06:29 +0300
+MIME-Version: 1.0
+Message-Id: <200608211306.30192.menace82@gmail.com>
+Subject: [Bluez-users] No connection...
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +18,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all,
+Dongle: Planet BT-320
+Distro: SuSE 10.1
 
-I should like to buy a Bluetooth 2.0 + EDR dongle to use, under
-Debian GNU/Linux (Sid), with my Pda (Hp Ipaq h2210) and mobile phone
-(Sony Ericsson W810i)
+Hello... I bought a bluetooth dongle... My system recognise it as 
+bluetooth but i cannot find any devices. I've tried "hcitool scan" but i got 
+a "Inquiry failed: Connection timed out" message... My mobile phone can 
+detect my pc, but while i try to pair it i get an error message....
 
-An italian e-shop sells the Bluetake BT007EX  so...is it a good choice
-or should I look for another product?
-
-I also can buy a B-Speech Data Speed (Class 2 version) on eBay...
-
-Thanks and sorry for my poor English
-
-Regards
+hcidump -X -V
+linux:/home/user # hcidump -X -V
+HCI sniffer - Bluetooth packet analyzer ver 1.29
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+    lap 0x9e8b33 len 6 num 0
+> HCI Event: Command Status (0x0f) plen 4
+    Inquiry (0x01|0x0001) status 0x00 ncmd 1
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+    lap 0x9e8b33 len 6 num 0
+> HCI Event: Command Status (0x0f) plen 4
+    Inquiry (0x01|0x0001) status 0x00 ncmd 1
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+    lap 0x9e8b33 len 6 num 0
+> HCI Event: Command Status (0x0f) plen 4
+    Inquiry (0x01|0x0001) status 0x00 ncmd 1
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+    lap 0x9e8b33 len 6 num 0
+> HCI Event: Command Status (0x0f) plen 4
+    Inquiry (0x01|0x0001) status 0x00 ncmd 1
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
