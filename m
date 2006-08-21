@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44E9C1E6.1090500@xmission.com>
-Date: Mon, 21 Aug 2006 08:23:34 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Date: Mon, 21 Aug 2006 09:50:11 -0400
+From: Phil Frost <indigo@bitglue.com>
+To: KS H <kspam1234@yahoo.com.hk>
+Message-ID: <20060821135011.GA32133@unununium.org>
+References: <20060821095738.33656.qmail@web53315.mail.yahoo.com>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <20060821134723.68c21ab8@debian>
-In-Reply-To: <20060821134723.68c21ab8@debian>
-Subject: Re: [Bluez-users] Bluetooth 2.0 + EDR dongle
+In-Reply-To: <20060821095738.33656.qmail@web53315.mail.yahoo.com>
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] configurate bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,14 +21,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi
+On Mon, Aug 21, 2006 at 05:57:38PM +0800, KS H wrote:
+> Dear All
+> 
+> Can any one point me to the document that describe how to use
+> hcid.conf. I would like to configurate Bluez using UART to communicate
+> with BT device. 
+> 
+> Regards
+> ks
 
-> An italian e-shop sells the Bluetake BT007EX  so...is it a good choice
-> or should I look for another product?
-
-yes this one is great. class 1, csr bluecore4, edr.
-
-brad
+"man hcid.conf". I'm not sure what you mean by "using UART to
+communicate with BT device", but maybe you mean rfcomm, which also has a
+man page.
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
