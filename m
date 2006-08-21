@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: menace82 <menace82@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Date: Mon, 21 Aug 2006 13:06:29 +0300
+Message-ID: <20060821095738.33656.qmail@web53315.mail.yahoo.com>
+Date: Mon, 21 Aug 2006 17:57:38 +0800 (CST)
+From: KS H <kspam1234@yahoo.com.hk>
+To: Bluez <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Message-Id: <200608211306.30192.menace82@gmail.com>
-Subject: [Bluez-users] No connection...
+Subject: [Bluez-users] configurate bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,45 +14,57 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0423114393=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dongle: Planet BT-320
-Distro: SuSE 10.1
+--===============0423114393==
+Content-Type: multipart/alternative; boundary="0-1517059612-1156154258=:33366"
+Content-Transfer-Encoding: 8bit
 
-Hello... I bought a bluetooth dongle... My system recognise it as 
-bluetooth but i cannot find any devices. I've tried "hcitool scan" but i got 
-a "Inquiry failed: Connection timed out" message... My mobile phone can 
-detect my pc, but while i try to pair it i get an error message....
+--0-1517059612-1156154258=:33366
+Content-Type: text/plain; charset=big5
+Content-Transfer-Encoding: 8bit
 
-hcidump -X -V
-linux:/home/user # hcidump -X -V
-HCI sniffer - Bluetooth packet analyzer ver 1.29
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
-> HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
-> HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
-> HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
-> HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
+Dear All
+
+Can any one point me to the document that describe how to use hcid.conf. I would like to configurate Bluez using UART to communicate with BT device. 
+
+Regards
+ks
+
+ _______________________________________
+ YM - 離線訊息
+ 就算你沒有上網，你的朋友仍可以留下訊息給你，當你上網時就能立即看到，任何說話都冇走失。
+ http://messenger.yahoo.com.hk
+--0-1517059612-1156154258=:33366
+Content-Type: text/html; charset=big5
+Content-Transfer-Encoding: 8bit
+
+Dear All<br><br>Can any one point me to the document that describe how to use hcid.conf. I would like to configurate Bluez using UART to communicate with BT device. <br><br>Regards<br>ks<br><p>&#32;_______________________________________<br> YM - 離線訊息<br> 就算你沒有上網，你的朋友仍可以留下訊息給你，當你上網時就能立即看到，任何說話都冇走失。<br> http://messenger.yahoo.com.hk
+--0-1517059612-1156154258=:33366--
+
+
+--===============0423114393==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0423114393==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0423114393==--
