@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 21 Aug 2006 09:50:11 -0400
-From: Phil Frost <indigo@bitglue.com>
-To: KS H <kspam1234@yahoo.com.hk>
-Message-ID: <20060821135011.GA32133@unununium.org>
-References: <20060821095738.33656.qmail@web53315.mail.yahoo.com>
-MIME-Version: 1.0
-In-Reply-To: <20060821095738.33656.qmail@web53315.mail.yahoo.com>
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] configurate bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20060821134723.68c21ab8@debian>
+References: <20060821134723.68c21ab8@debian>
+Date: Mon, 21 Aug 2006 15:55:04 +0200
+Message-Id: <1156168504.3956.27.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Bluetooth 2.0 + EDR dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,19 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Mon, Aug 21, 2006 at 05:57:38PM +0800, KS H wrote:
-> Dear All
-> 
-> Can any one point me to the document that describe how to use
-> hcid.conf. I would like to configurate Bluez using UART to communicate
-> with BT device. 
-> 
-> Regards
-> ks
+Hi,
 
-"man hcid.conf". I'm not sure what you mean by "using UART to
-communicate with BT device", but maybe you mean rfcomm, which also has a
-man page.
+> I should like to buy a Bluetooth 2.0 + EDR dongle to use, under
+> Debian GNU/Linux (Sid), with my Pda (Hp Ipaq h2210) and mobile phone
+> (Sony Ericsson W810i)
+> 
+> An italian e-shop sells the Bluetake BT007EX  so...is it a good choice
+> or should I look for another product?
+> 
+> I also can buy a B-Speech Data Speed (Class 2 version) on eBay...
+
+I am really happy with the B-Speech dongle. Don't know if the Bluetake
+is Broadcom or CSR based. If you decide to buy, please let use know.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
