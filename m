@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44EA6D69.1090708@xmission.com>
-Date: Mon, 21 Aug 2006 20:35:21 -0600
+Message-ID: <44EA6D22.5030101@xmission.com>
+Date: Mon, 21 Aug 2006 20:34:10 -0600
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: Linux@feline-soul.com, BlueZ users <bluez-users@lists.sourceforge.net>
-References: <200608192203.34883.Linux@feline-soul.com>
-In-Reply-To: <200608192203.34883.Linux@feline-soul.com>
-Subject: Re: [Bluez-users] Logitech Traveler Headset. Progress but not there
- yet. Advice wanted.
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <BAY117-F1966F7989B8F722F1E1F59BF400@phx.gbl>
+In-Reply-To: <BAY117-F1966F7989B8F722F1E1F59BF400@phx.gbl>
+Subject: Re: [Bluez-users] Hardware for A2DP?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,18 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Bearcat
+Kelvin
 
-> on button to get it to start paring. Then i issue a "hidd --connect 
-> 00:0D:44:4F:37:72" After awhile the headset stops blinking and "Can't get 
-> device information: Function not implemented" is returned for the 
-> hidd --connect.
+> Do we need specific bluetooth adapters such as A2DP-enabled adapters to send 
+> and receive audio using A2DP? Thanks
 
-hidd is for connecting the keyboard/mouse/etc but not the headset. Check
-with the docs at bluetooth-alsa.sf.net.
+no...
 
-Brad
-
+brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
