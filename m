@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Mayank BATRA <mayank.batra@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Tue, 22 Aug 2006 09:22:30 +0530
-Message-ID: <000f01c6c59e$67014940$9d0cc70a@dlh.st.com>
-MIME-Version: 1.0
-In-Reply-To: <1156225161.3956.46.camel@aeonflux.holtmann.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <d23110170608211410l1c4cae0aufa41d8f589bda68d@mail.gmail.com>
+References: <1156167261.3956.20.camel@aeonflux.holtmann.net>
+	<004b01c6c518$d298e400$9d0cc70a@dlh.st.com>
+	<d23110170608211410l1c4cae0aufa41d8f589bda68d@mail.gmail.com>
+Date: Tue, 22 Aug 2006 07:42:00 +0200
+Message-Id: <1156225320.3956.50.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,28 +22,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Ulisses,
 
-> please follow the names, I just introduced for the libraray. 
-> They don't
-> have to match, but I prefer if they do. The structs for 
-> setting the host
-> to host controller flow control are also not needed. Only the 
-> OCF value.
+> And I really think we should have a hci_send_cmd_raw() or something
+> like that instead of messing with hci_send_cmd(). Or maybe a new
+> function that creates a skb from scratch just to send the host number
+> of completed packets command? Marcel, what do you think?
 
-But actually, set controller to host flow control requires a parameter to
-tell which flow control we want to set. ACL, SCO or both. So a uint8_t
-parameter is required and hence the struct.
+no additional function for only one call. We either make hci_send_cmd()
+aware of the special case or we need to queue this command by hand. I
+have to check the internals of the command flow before I can actually
+tell you what's the best way. Haven't looked at that for quite some time
+and don't know it from memory.
 
-> And the number of completed packets struct is variable. Please compare
-> the number of completed packets events.
+Regards
 
-But a variable sized host number of completed packets command is required if
-we are sending number of completed packets for more than one connection
-handle in the same command, which is not the case currently.
+Marcel
 
-Regards,
-Mayank
 
 
 -------------------------------------------------------------------------
