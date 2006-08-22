@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: sean <seandarcy2@gmail.com>
-Date: Tue, 22 Aug 2006 16:08:59 -0400
-Message-ID: <ecfo8s$790$1@sea.gmane.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <000f01c6c59e$67014940$9d0cc70a@dlh.st.com>
+References: <000f01c6c59e$67014940$9d0cc70a@dlh.st.com>
+Date: Tue, 22 Aug 2006 07:54:27 +0200
+Message-Id: <1156226067.3956.57.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] recursive locking on pairing: 2.6.18-rc4
+Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,71 +20,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I'm trying to pair my nokia 770 with my desktop which is 
-running fc6t2, kernel-2.6.18-rc4. bluez-libs-3.0. Using a 
-zonet usb dongle.
+Hi Mayank,
 
-The 770 returns a "no services" message. On the desktop, 
-/var/log/messages:
+> > please follow the names, I just introduced for the libraray. 
+> > They don't
+> > have to match, but I prefer if they do. The structs for 
+> > setting the host
+> > to host controller flow control are also not needed. Only the 
+> > OCF value.
+> 
+> But actually, set controller to host flow control requires a parameter to
+> tell which flow control we want to set. ACL, SCO or both. So a uint8_t
+> parameter is required and hence the struct.
 
-Aug 22 15:41:57 localhost hcid[24880]: pin_code_request 
-(sba=00:02:72:C4:26:F1, dba=00:12:37:46:DB:31)
-Aug 22 15:41:57 localhost hcid[24880]: link_key_notify 
-(sba=00:02:72:C4:26:F1, dba=00:12:37:46:DB:31)
-Aug 22 15:41:59 localhost kernel:
-Aug 22 15:41:59 localhost kernel: 
-=============================================
-Aug 22 15:41:59 localhost kernel: [ INFO: possible recursive 
-locking detected ]
-Aug 22 15:41:59 localhost kernel: 2.6.17-1.2573.fc6 #1
-Aug 22 15:41:59 localhost kernel: 
----------------------------------------------
-Aug 22 15:41:59 localhost kernel: sdpd/24884 is trying to 
-acquire lock:
-Aug 22 15:41:59 localhost kernel: 
-(sk_lock-AF_BLUETOOTH){--..}, at: [<ffffffff885622b8>] 
-bt_accept_dequeue+0x37/0xfa [bluetooth]
-Aug 22 15:41:59 localhost kernel:
-Aug 22 15:41:59 localhost kernel: but task is already 
-holding lock:
-Aug 22 15:41:59 localhost kernel: 
-(sk_lock-AF_BLUETOOTH){--..}, at: [<ffffffff88584464>] 
-l2cap_sock_accept+0x52/0x162 [l2cap]
-Aug 22 15:41:59 localhost kernel:
-Aug 22 15:41:59 localhost kernel: other info that might help 
-us debug this:
-Aug 22 15:41:59 localhost kernel: 1 lock held by sdpd/24884:
-Aug 22 15:41:59 localhost kernel:  #0: 
-(sk_lock-AF_BLUETOOTH){--..}, at: [<ffffffff88584464>] 
-l2cap_sock_accept+0x52/0x162 [l2cap]
-Aug 22 15:41:59 localhost kernel:
-Aug 22 15:41:59 localhost kernel: stack backtrace:
-Aug 22 15:41:59 localhost kernel:
-Aug 22 15:41:59 localhost kernel: Call Trace:
-Aug 22 15:41:59 localhost kernel:  [<ffffffff8026e8fd>] 
-show_trace+0xae/0x319
-Aug 22 15:41:59 localhost kernel:  [<ffffffff8026eb7d>] 
-dump_stack+0x15/0x17
-Aug 22 15:41:59 localhost kernel:  [<ffffffff802a8278>] 
-__lock_acquire+0x135/0xa64
-Aug 22 15:41:59 localhost kernel:  [<ffffffff802a914a>] 
-lock_acquire+0x4b/0x69
-Aug 22 15:41:59 localhost kernel:  [<ffffffff802360ca>] 
-lock_sock+0xd5/0xe7
-Aug 22 15:41:59 localhost kernel:  [<ffffffff885622b8>] 
-:bluetooth:bt_accept_dequeue+0x37/0xfa
-Aug 22 15:41:59 localhost kernel:  [<ffffffff88584528>] 
-:l2cap:l2cap_sock_accept+0x116/0x162
-Aug 22 15:41:59 localhost kernel:  [<ffffffff8041f9cd>] 
-sys_accept+0x102/0x1af
-Aug 22 15:41:59 localhost kernel:  [<ffffffff8026058e>] 
-system_call+0x7e/0x83
-Aug 22 15:41:59 localhost kernel: DWARF2 unwinder stuck at 
-system_call+0x7e/0x83
-Aug 22 15:41:59 localhost kernel: Leftover inexact backtrace:
-Aug 22 15:41:59 localhost kernel:
+we don't send it from the kernel, do we? And even if we do, please check
+the HCI Write Scan Enable command.
 
-sean
+> > And the number of completed packets struct is variable. Please compare
+> > the number of completed packets events.
+> 
+> But a variable sized host number of completed packets command is required if
+> we are sending number of completed packets for more than one connection
+> handle in the same command, which is not the case currently.
+
+Even if we don't do it at the moment, this doesn't mean that we mess up
+the kernel with wrong structs.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
