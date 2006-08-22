@@ -1,11 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20060822094156.27087.qmail@web25406.mail.ukl.yahoo.com>
-Date: Tue, 22 Aug 2006 11:41:56 +0200 (CEST)
-From: Dirk Vornheder <dirk_vornheder@yahoo.de>
+From: "Bearcat M. Sandor" <Linux@feline-soul.com>
 To: bluez-users@lists.sourceforge.net
+Date: Tue, 22 Aug 2006 00:37:19 -0600
+References: <200608192203.34883.Linux@feline-soul.com>
+	<44EA6D69.1090708@xmission.com>
+	<200608212131.03574.Linux@feline-soul.com>
+In-Reply-To: <200608212131.03574.Linux@feline-soul.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] pand connection fails
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-Id: <200608220037.20159.Linux@feline-soul.com>
+Subject: Re: [Bluez-users] Logitech Traveler Headset. Progress but not there
+	yet. Advice wanted.
+Reply-To: Linux@feline-soul.com,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,97 +20,109 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1403583857=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1403583857==
-Content-Type: multipart/alternative; boundary="0-138094537-1156239716=:23466"
-Content-Transfer-Encoding: 8bit
+Ok, I am getting further. I have the snd_bt_sco module loaded.
 
---0-138094537-1156239716=:23466
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Doing a btsco  00:0D:44:4F:37:72 gives me
 
-Hi !
-   
-  After compile and installation bluez-libs/utils 3.x including
-   
-  kernel patch mh5 under SUSE 10.0 and kernel 2.6.17.9
-   
-  i plugin my AVM Bluetooth Stick and get the following messages:
-   
-  Aug 20 21:04:31 pcmini kernel: Bluetooth: BlueFRITZ! USB loading firmware
-  Aug 20 21:04:34 pcmini kernel: Bluetooth: BlueFRITZ! USB device ready
-  Aug 20 21:04:39 pcmini ifup: No configuration found for ippp*
-  Aug 20 21:04:44 pcmini ifup: No configuration found for isdn*
-  Aug 20 21:04:52 pcmini hcid[6804]: Bluetooth HCI daemon
-  Aug 20 21:04:52 pcmini hcid[6804]: Register path:/org/bluez fallback:1
-  Aug 20 21:04:52 pcmini sdpd[6806]: Bluetooth SDP daemon
-  Aug 20 21:04:52 pcmini hcid[6804]: Device hci0 has been added
-  Aug 20 21:04:53 pcmini hcid[6804]: Can't write inquiry mode for hci0: 
-  Connection timed out (110)
-  Aug 20 21:04:53 pcmini hcid[6804]: Register path:/org/bluez/hci0 fallback:0
-  Aug 20 21:04:54 pcmini hcid[6804]: Sending read scan enable command failed: 
-  Connection timed out (110)
-  Aug 20 21:04:54 pcmini kernel: hci_cmd_task: hci0 command tx timeout
-  Aug 20 21:04:54 pcmini hcid[6804]: HCI dev 0 up
-  Aug 20 21:04:54 pcmini hcid[6804]: Starting security manager 0
-  Aug 20 21:04:55 pcmini hcid[6804]: Can't write inquiry mode for hci0: 
-  Connection timed out (110)
-  Aug 20 21:04:55 pcmini hcid[6804]: Sending read scan enable command failed: 
-  Connection timed out (110)
-  Aug 20 21:04:55 pcmini kernel: hci_cmd_task: hci0 command tx timeout
-   
-  hcitool scan works but building a pand connection fails:
-   
-  Aug 20 21:05:35 pcmini kernel: Bluetooth: BNEP (Ethernet Emulation) ver 1.2
-  Aug 20 21:05:35 pcmini kernel: Bluetooth: BNEP filters: protocol multicast
-  Aug 20 21:05:35 pcmini pand[6815]: Bluetooth PAN daemon version 3.2
-  Aug 20 21:05:35 pcmini pand[6815]: Connecting to 00:04:0E:85:35:15
-  Aug 20 21:05:41 pcmini hcid[6804]: pin_code_request (sba=00:04:0E:85:2E:9A, 
-  dba=00:04:0E:85:35:15)
-  Aug 20 21:05:41 pcmini hcid[6804]: call_passkey_agent(): no agent registered
-  Aug 20 21:05:41 pcmini pand[6815]: Connect to 00:04:0E:85:35:15 failed. 
-  Connection refused(111)
-  Aug 20 21:05:43 pcmini kernel: hci_cmd_task: hci0 command tx timeout
-   
-  Dirk
+Error: Failed to connect to SDP server: Function not implemented
+Assuming channel 2
 
- 		
----------------------------------
-Was ist Glück? Schlafen Fische überhaupt? Die Antworten gibt’s auf Yahoo! Clever.
---0-138094537-1156239716=:23466
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Can't connect RFCOMM channel: Resource temporarily unavailable
 
-<div>Hi !</div>  <div>&nbsp;</div>  <div>After compile and installation bluez-libs/utils 3.x including</div>  <div>&nbsp;</div>  <div>kernel patch mh5 under SUSE 10.0 and kernel 2.6.17.9</div>  <div>&nbsp;</div>  <div>i plugin my AVM Bluetooth Stick and get the following messages:</div>  <div>&nbsp;</div><FONT size=2>  <div>Aug 20 21:04:31 pcmini kernel: Bluetooth: BlueFRITZ! USB loading firmware</div>  <div>Aug 20 21:04:34 pcmini kernel: Bluetooth: BlueFRITZ! USB device ready</div>  <div>Aug 20 21:04:39 pcmini ifup: No configuration found for ippp*</div>  <div>Aug 20 21:04:44 pcmini ifup: No configuration found for isdn*</div>  <div>Aug 20 21:04:52 pcmini hcid[6804]: Bluetooth HCI daemon</div>  <div>Aug 20 21:04:52 pcmini hcid[6804]: Register path:/org/bluez fallback:1</div>  <div>Aug 20 21:04:52 pcmini sdpd[6806]: Bluetooth SDP daemon</div>  <div>Aug 20 21:04:52 pcmini hcid[6804]: Device hci0 has been added</div>  <div>Aug 20 21:04:53 pcmini hcid[6804]: Can't write
- inquiry mode for hci0: </div>  <div>Connection timed out (110)</div>  <div>Aug 20 21:04:53 pcmini hcid[6804]: Register path:/org/bluez/hci0 fallback:0</div>  <div>Aug 20 21:04:54 pcmini hcid[6804]: Sending read scan enable command failed: </div>  <div>Connection timed out (110)</div>  <div>Aug 20 21:04:54 pcmini kernel: hci_cmd_task: hci0 command tx timeout</div>  <div>Aug 20 21:04:54 pcmini hcid[6804]: HCI dev 0 up</div>  <div>Aug 20 21:04:54 pcmini hcid[6804]: Starting security manager 0</div>  <div>Aug 20 21:04:55 pcmini hcid[6804]: Can't write inquiry mode for hci0: </div>  <div>Connection timed out (110)</div>  <div>Aug 20 21:04:55 pcmini hcid[6804]: Sending read scan enable command failed: </div>  <div>Connection timed out (110)</div>  <div>Aug 20 21:04:55 pcmini kernel: hci_cmd_task: hci0 command tx timeout</div>  <div>&nbsp;</div>  <div>hcitool scan works but building a pand connection fails:</div>  <div>&nbsp;</div>  <div>Aug 20 21:05:35 pcmini kernel: Bluetooth:
- BNEP (Ethernet Emulation) ver 1.2</div>  <div>Aug 20 21:05:35 pcmini kernel: Bluetooth: BNEP filters: protocol multicast</div>  <div>Aug 20 21:05:35 pcmini pand[6815]: Bluetooth PAN daemon version 3.2</div>  <div>Aug 20 21:05:35 pcmini pand[6815]: Connecting to 00:04:0E:85:35:15</div>  <div>Aug 20 21:05:41 pcmini hcid[6804]: pin_code_request (sba=00:04:0E:85:2E:9A, </div>  <div>dba=00:04:0E:85:35:15)</div>  <div>Aug 20 21:05:41 pcmini hcid[6804]: call_passkey_agent(): no agent registered</div>  <div>Aug 20 21:05:41 pcmini pand[6815]: Connect to 00:04:0E:85:35:15 failed. </div>  <div>Connection refused(111)</div>  <div>Aug 20 21:05:43 pcmini kernel: hci_cmd_task: hci0 command tx timeout</div>  <div>&nbsp;</div>  <div>Dirk</div></FONT><p>&#32;
-		<hr size=1>Was ist Glück? Schlafen Fische überhaupt? Die Antworten gibt’s auf <a href=http://de.rd.yahoo.com/xx/searchpromo/i/tagline/cleverfp/*http://de.answers.yahoo.com>Yahoo! Clever</a>.
---0-138094537-1156239716=:23466--
+I'm a newbie at this bluetooth stuff. I'm not sure if i'm supposed to start 
+the rfcomm program or what parameters i should send.
+
+My config files are listed in the preceding emails.
+
+Thank you for the help so far,
+
+Bearcat M. Sandor
+On Monday 21 August 2006 21:31 in an email titled "Re: [Bluez-users] Logitech 
+Traveler Headset. Progress but not there yet. Advice wanted." Bearcat M. 
+Sandor wrote:
+>Brad,
+>Thank you. That was immensely helpful. I have btsco installed.  I have
+>followed the steps at the link you provided.
+>I change to root user.
+>
+>After the "hciconfig hci0 voice 0x0060" is given my hciconfig looks like:
+>hci0:   Type: USB
+>        BD Address: 00:07:61:1C:9F:D3 ACL MTU: 192:8 SCO MTU: 64:8
+>        UP RUNNING PSCAN
+>        RX bytes:3908436 acl:279025 sco:0 events:1181 errors:0
+>        TX bytes:1936 acl:16 sco:0 commands:192 errors:0
+>        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>        Link policy: RSWITCH HOLD SNIFF PARK
+>        Link mode: SLAVE ACCEPT
+>        Name: 'BlueZ (0)'
+>        Class: 0x3e0100
+>        Service Classes: Networking, Rendering, Capturing, Object Transfer,
+>Audio
+>        Device Class: Computer, Uncategorized
+>        HCI Ver: 1.1 (0x1) HCI Rev: 0x34e LMP Ver: 1.1 (0x1) LMP Subver:
+> 0x34e Manufacturer: Cambridge Silicon Radio (10)
+>
+>Then i issue the "btsco 00:0D:44:4F:37:72" and i get:
+>Error: hwdep next device (hw:0): Operation not permitted
+>Error: hwdep next device (hw:1): Operation not permitted
+>Error: control open (hw:2): No such device
+>Error: Can't find device. Bail
+>
+>Bearcat M. Sandor
+>
+>
+>
+>On Monday 21 August 2006 20:35 in an email titled "Re: [Bluez-users]
+> Logitech Traveler Headset. Progress but not there yet. Advice wanted." Brad
+> Midgley
+>
+>wrote:
+>>Bearcat
+>>
+>>> on button to get it to start paring. Then i issue a "hidd --connect
+>>> 00:0D:44:4F:37:72" After awhile the headset stops blinking and "Can't get
+>>> device information: Function not implemented" is returned for the
+>>> hidd --connect.
+>>
+>>hidd is for connecting the keyboard/mouse/etc but not the headset. Check
+>>with the docs at bluetooth-alsa.sf.net.
+>>
+>>Brad
+>>
+>>
+>>-------------------------------------------------------------------------
+>>Using Tomcat but need to do more? Need to support web services, security?
+>>Get stuff done quickly with pre-integrated technology to make your job
+>> easier Download IBM WebSphere Application Server v.1.0.1 based on Apache
+>> Geronimo
+>> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+>> _______________________________________________
+>>Bluez-users mailing list
+>>Bluez-users@lists.sourceforge.net
+>>https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+-- 
+Bearcat M. Sandor
+Bearcat@feline-soul.com
+Jabber: bearcat@jabber.feline-soul.net
+ICQ: 6628727
+MSN: bearcatsandor@hotmail.com
+Yahoo: bearcatsandor
+AIM: bearcatmsandor
 
 
---===============1403583857==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============1403583857==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1403583857==--
