@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 23 Aug 2006 00:10:38 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060822211038.GA24883@localhost.localdomain>
-References: <ecfo8s$790$1@sea.gmane.org>
+Message-ID: <d23110170608221347p37bc87a5mbdd1271eaf7631c3@mail.gmail.com>
+Date: Tue, 22 Aug 2006 17:47:33 -0300
+From: "Ulisses Furquim" <ulissesf@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1156226067.3956.57.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-In-Reply-To: <ecfo8s$790$1@sea.gmane.org>
-Subject: Re: [Bluez-devel] recursive locking on pairing: 2.6.18-rc4
+Content-Type: multipart/mixed;
+	boundary="----=_Part_51457_107232.1156279653079"
+References: <000f01c6c59e$67014940$9d0cc70a@dlh.st.com>
+	<1156226067.3956.57.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,35 +19,170 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi sean,
+------=_Part_51457_107232.1156279653079
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-On Tue, Aug 22, 2006, sean wrote:
-> I'm trying to pair my nokia 770 with my desktop which is 
-> running fc6t2, kernel-2.6.18-rc4. bluez-libs-3.0. Using a 
-> zonet usb dongle.
-> 
-> The 770 returns a "no services" message. On the desktop, 
-> /var/log/messages:
+Hi Marcel, Mayank,
 
-I can't say anything about the desktop side problems, but the reason you 
-get "no services" is that the 770 will only pair with devices that have 
-either a Dial-up Networking (DUN) or OBEX File Transfer profile service 
-records (or both) in its SDP server. So if you e.g. do a "sdptool add 
-DUN" and "sdptool add FTP" on the desktop side you shouldn't get that 
-error message.
+how about something like the attached patch? I've used some of
+Mayank's code and added some other parts. It's not complete and it's
+only compile-tested yet.
 
-Johan
+I haven't done the interface to change the hci_dev->host_flow_ctl
+parameter from user space and we're sending the host number of
+completed packtes command after each packet (ACL or SCO, depending on
+the host_flow_ctl value). We're gonna need counters on both hci_dev
+and hci_conn structures to "ack" more than one packet and change
+hci_send_host_num_comp_pkts().
+
+I'm also still not sure when we should send the host number of
+completed packets command. The specification says this command must be
+sent after the buffers are freed on the host but I don't know if we
+have to be strict about this. :-)
+
+Best regards,
+
+-- Ulisses
+
+------=_Part_51457_107232.1156279653079
+Content-Type: text/x-patch; name=host-flow-ctl-v0.patch;
+	charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_er6qs2pp
+Content-Disposition: attachment; filename="host-flow-ctl-v0.patch"
+
+ZGlmZiAtLWdpdCBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaCBiL2luY2x1ZGUvbmV0L2Js
+dWV0b290aC9oY2kuaAppbmRleCBiMmJkYjFhLi4wYzVjZDJjIDEwMDY0NAotLS0gYS9pbmNsdWRl
+L25ldC9ibHVldG9vdGgvaGNpLmgKKysrIGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaS5oCkBA
+IC0xODQsNiArMTg0LDEyIEBAICNkZWZpbmUgSENJX0xNX1RSVVNURUQJMHgwMDA4CiAjZGVmaW5l
+IEhDSV9MTV9SRUxJQUJMRQkweDAwMTAKICNkZWZpbmUgSENJX0xNX1NFQ1VSRQkweDAwMjAKIAor
+LyogSG9zdCBmbG93IGNvbnRyb2wgKi8KKyNkZWZpbmUgSENJX0hGQ19OT05FCTB4MDAKKyNkZWZp
+bmUgSENJX0hGQ19BQ0wJMHgwMQorI2RlZmluZSBIQ0lfSEZDX1NDTwkweDAyCisjZGVmaW5lIEhD
+SV9IRkNfQk9USAkweDAzCisKIC8qIC0tLS0tICBIQ0kgQ29tbWFuZHMgLS0tLSAqLwogLyogT0dG
+ICYgT0NGIHZhbHVlcyAqLwogCkBAIC0yODYsNiArMjkyLDExIEBAIHN0cnVjdCBoY2lfY3Bfd3Jp
+dGVfdm9pY2Vfc2V0dGluZyB7CiAJX19sZTE2ICAgdm9pY2Vfc2V0dGluZzsKIH0gX19hdHRyaWJ1
+dGVfXyAoKHBhY2tlZCkpOwogCisjZGVmaW5lIE9DRl9TRVRfSE9TVF9GTE9XX0NUTAkweDAwMzEK
+K3N0cnVjdCBoY2lfY3Bfc2V0X2hvc3RfZmxvd19jdGwgeworCV9fdTggICAgIGhvc3RfZmxvd19j
+dGw7Cit9IF9fYXR0cmlidXRlX18gKChwYWNrZWQpKTsKKwogI2RlZmluZSBPQ0ZfSE9TVF9CVUZG
+RVJfU0laRQkweDAwMzMKIHN0cnVjdCBoY2lfY3BfaG9zdF9idWZmZXJfc2l6ZSB7CiAJX19sZTE2
+ICAgYWNsX210dTsKQEAgLTI5NCw2ICszMDUsMTYgQEAgc3RydWN0IGhjaV9jcF9ob3N0X2J1ZmZl
+cl9zaXplIHsKIAlfX2xlMTYgICBzY29fbWF4X3BrdDsKIH0gX19hdHRyaWJ1dGVfXyAoKHBhY2tl
+ZCkpOwogCisjZGVmaW5lIE9DRl9IT1NUX05VTV9DT01QX1BLVFMJMHgwMDM1CitzdHJ1Y3QgaGNp
+X2NwX2hvc3RfbnVtX2NvbXBfcGt0cyB7CisJX191OCAgICAgbnVtX2huZGw7CisJLyogdmFyaWFi
+bGUgbGVuZ3RoIHBhcnQgKi8KK30gX19hdHRyaWJ1dGVfXyAoKHBhY2tlZCkpOworc3RydWN0IGhj
+aV9jcF9oYW5kbGVfbnVtX2NvbXBfcGt0cyB7CisJX19sZTE2ICAgaGFuZGxlOworCV9fbGUxNiAg
+IG51bV9jb21wX3BrdHM7Cit9IF9fYXR0cmlidXRlX18gKChwYWNrZWQpKTsKKwogLyogTGluayBD
+b250cm9sICovCiAjZGVmaW5lIE9HRl9MSU5LX0NUTAkweDAxIAogI2RlZmluZSBPQ0ZfQ1JFQVRF
+X0NPTk4JCTB4MDAwNQpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3Jl
+LmggYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaAppbmRleCBkODQ4NTVmLi5kY2E2
+Nzk3IDEwMDY0NAotLS0gYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaAorKysgYi9p
+bmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaApAQCAtODIsNiArODIsMTIgQEAgc3RydWN0
+IGhjaV9kZXYgewogCV9fdTE2CQlzbmlmZl9taW5faW50ZXJ2YWw7CiAJX191MTYJCXNuaWZmX21h
+eF9pbnRlcnZhbDsKIAorCV9fdTgJCWhvc3RfZmxvd19jdGw7CisJX191MTYJCWhvc3RfYWNsX210
+dTsKKwlfX3U4CQlob3N0X3Njb19tdHU7CisJX191MTYJCWFjbF9tYXhfcGt0OworCV9fdTE2CQlz
+Y29fbWF4X3BrdDsKKwogCXVuc2lnbmVkIGxvbmcJcXVpcmtzOwogCiAJYXRvbWljX3QJY21kX2Nu
+dDsKZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYyBiL25ldC9ibHVldG9vdGgv
+aGNpX2NvcmUuYwppbmRleCA1ZWQ0NzQyLi5kZjkxZDgyIDEwMDY0NAotLS0gYS9uZXQvYmx1ZXRv
+b3RoL2hjaV9jb3JlLmMKKysrIGIvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jCkBAIC0yMDksMTcg
+KzIwOSwxNSBAQCBzdGF0aWMgdm9pZCBoY2lfaW5pdF9yZXEoc3RydWN0IGhjaV9kZXYgCiAJLyog
+UmVhZCBCdWZmZXIgU2l6ZSAoQUNMIG10dSwgbWF4IHBrdCwgZXRjLikgKi8KIAloY2lfc2VuZF9j
+bWQoaGRldiwgT0dGX0lORk9fUEFSQU0sIE9DRl9SRUFEX0JVRkZFUl9TSVpFLCAwLCBOVUxMKTsK
+IAotI2lmIDAKIAkvKiBIb3N0IGJ1ZmZlciBzaXplICovCiAJewogCQlzdHJ1Y3QgaGNpX2NwX2hv
+c3RfYnVmZmVyX3NpemUgY3A7Ci0JCWNwLmFjbF9tdHUgPSBfX2NwdV90b19sZTE2KEhDSV9NQVhf
+QUNMX1NJWkUpOwotCQljcC5zY29fbXR1ID0gSENJX01BWF9TQ09fU0laRTsKLQkJY3AuYWNsX21h
+eF9wa3QgPSBfX2NwdV90b19sZTE2KDB4ZmZmZik7Ci0JCWNwLnNjb19tYXhfcGt0ID0gX19jcHVf
+dG9fbGUxNigweGZmZmYpOworCQljcC5hY2xfbXR1ID0gX19jcHVfdG9fbGUxNihoZGV2LT5ob3N0
+X2FjbF9tdHUpOworCQljcC5zY29fbXR1ID0gaGRldi0+aG9zdF9zY29fbXR1OworCQljcC5hY2xf
+bWF4X3BrdCA9IF9fY3B1X3RvX2xlMTYoaGRldi0+YWNsX21heF9wa3QpOworCQljcC5zY29fbWF4
+X3BrdCA9IF9fY3B1X3RvX2xlMTYoaGRldi0+c2NvX21heF9wa3QpOwogCQloY2lfc2VuZF9jbWQo
+aGRldiwgT0dGX0hPU1RfQ1RMLCBPQ0ZfSE9TVF9CVUZGRVJfU0laRSwgc2l6ZW9mKGNwKSwgJmNw
+KTsKIAl9Ci0jZW5kaWYKIAogCS8qIFJlYWQgQkQgQWRkcmVzcyAqLwogCWhjaV9zZW5kX2NtZCho
+ZGV2LCBPR0ZfSU5GT19QQVJBTSwgT0NGX1JFQURfQkRfQUREUiwgMCwgTlVMTCk7CkBAIC0xMDQ3
+LDYgKzEwNDUsNDYgQEAgaW50IGhjaV9zZW5kX2NtZChzdHJ1Y3QgaGNpX2RldiAqaGRldiwgXwog
+CXJldHVybiAwOwogfQogCitzdGF0aWMgaW50IGhjaV9zZW5kX2hvc3RfbnVtX2NvbXBfcGt0cyhz
+dHJ1Y3QgaGNpX2RldiAqaGRldiwgX191MTYgaGFuZGxlKQoreworCXN0cnVjdCBoY2lfY3BfaGFu
+ZGxlX251bV9jb21wX3BrdHMgKmhudW07CisJc3RydWN0IGhjaV9jcF9ob3N0X251bV9jb21wX3Br
+dHMgKmNwOworCXN0cnVjdCBoY2lfY29tbWFuZF9oZHIgKmhkcjsKKwlzdHJ1Y3Qgc2tfYnVmZiAq
+c2tiOworCV9fdTMyIHBsZW4sIGxlbjsKKworCXBsZW4gPSBzaXplb2YoKmNwKSArIHNpemVvZigq
+aG51bSk7CisJbGVuID0gSENJX0NPTU1BTkRfSERSX1NJWkUgKyBwbGVuOworCisJc2tiID0gYnRf
+c2tiX2FsbG9jKGxlbiwgR0ZQX0FUT01JQyk7CisJaWYgKCFza2IpIHsKKwkJQlRfRVJSKCIlcyBj
+YW4ndCBhbGxvY2F0ZSBtZW1vcnkgZm9yIEhDSSBjb21tYW5kIiwgaGRldi0+bmFtZSk7CisJCXJl
+dHVybiAtRU5PTUVNOworCX0KKworCWhkciA9IChzdHJ1Y3QgaGNpX2NvbW1hbmRfaGRyICopc2ti
+X3B1dChza2IsIEhDSV9DT01NQU5EX0hEUl9TSVpFKTsKKwloZHItPm9wY29kZSA9IF9fY3B1X3Rv
+X2xlMTYoaGNpX29wY29kZV9wYWNrKE9HRl9IT1NUX0NUTCwKKwkJCQkJCSAgICBPQ0ZfSE9TVF9O
+VU1fQ09NUF9QS1RTKSk7CisJaGRyLT5wbGVuID0gcGxlbjsKKworCWNwID0gKHN0cnVjdCBoY2lf
+Y3BfaG9zdF9udW1fY29tcF9wa3RzICopc2tiX3B1dChza2IsIHNpemVvZigqY3ApKTsKKwlobnVt
+ID0gKHN0cnVjdCBoY2lfY3BfaGFuZGxlX251bV9jb21wX3BrdHMgKilza2JfcHV0KHNrYiwKKwkJ
+CQkJCQkgICAgIHNpemVvZigqaG51bSkpOworCisJY3AtPm51bV9obmRsID0gMTsKKwlobnVtLT5o
+YW5kbGUgPSBfX2NwdV90b19sZTE2KGhhbmRsZSk7CisJaG51bS0+bnVtX2NvbXBfcGt0cyA9IF9f
+Y29uc3RhbnRfY3B1X3RvX2xlMTYoMSk7CisKKwlCVF9EQkcoInNrYiBsZW4gJWQiLCBza2ItPmxl
+bik7CisKKwlidF9jYihza2IpLT5wa3RfdHlwZSA9IEhDSV9DT01NQU5EX1BLVDsKKwlza2ItPmRl
+diA9ICh2b2lkICopaGRldjsKKwlza2JfcXVldWVfdGFpbCgmaGRldi0+cmF3X3EsIHNrYik7CisJ
+aGNpX3NjaGVkX3R4KGhkZXYpOworCisJcmV0dXJuIDA7Cit9CisKIC8qIEdldCBkYXRhIGZyb20g
+dGhlIHByZXZpb3VzbHkgc2VudCBjb21tYW5kICovCiB2b2lkICpoY2lfc2VudF9jbWRfZGF0YShz
+dHJ1Y3QgaGNpX2RldiAqaGRldiwgX191MTYgb2dmLCBfX3UxNiBvY2YpCiB7CkBAIC0xMzAzLDEw
+ICsxMzQxLDEzIEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBoY2lfYWNsZGF0YV9wYWNrZXQoc3QKIAlo
+Y2lfZGV2X2xvY2soaGRldik7CiAJY29ubiA9IGhjaV9jb25uX2hhc2hfbG9va3VwX2hhbmRsZSho
+ZGV2LCBoYW5kbGUpOwogCWhjaV9kZXZfdW5sb2NrKGhkZXYpOwotCQorCiAJaWYgKGNvbm4pIHsK
+IAkJcmVnaXN0ZXIgc3RydWN0IGhjaV9wcm90byAqaHA7CiAKKwkJaWYgKGhkZXYtPmhvc3RfZmxv
+d19jdGwgJiBIQ0lfSEZDX0FDTCkKKwkJCWhjaV9zZW5kX2hvc3RfbnVtX2NvbXBfcGt0cyhoZGV2
+LCBoYW5kbGUpOworCiAJCWhjaV9jb25uX2VudGVyX2FjdGl2ZV9tb2RlKGNvbm4pOwogCiAJCS8q
+IFNlbmQgdG8gdXBwZXIgcHJvdG9jb2wgKi8KQEAgLTEzNDQsNiArMTM4NSw5IEBAIHN0YXRpYyBp
+bmxpbmUgdm9pZCBoY2lfc2NvZGF0YV9wYWNrZXQoc3QKIAlpZiAoY29ubikgewogCQlyZWdpc3Rl
+ciBzdHJ1Y3QgaGNpX3Byb3RvICpocDsKIAorCQlpZiAoaGRldi0+aG9zdF9mbG93X2N0bCAmIEhD
+SV9IRkNfU0NPKQorCQkJaGNpX3NlbmRfaG9zdF9udW1fY29tcF9wa3RzKGhkZXYsIGhhbmRsZSk7
+CisKIAkJLyogU2VuZCB0byB1cHBlciBwcm90b2NvbCAqLwogCQlpZiAoKGhwID0gaGNpX3Byb3Rv
+W0hDSV9QUk9UT19TQ09dKSAmJiBocC0+cmVjdl9zY29kYXRhKSB7CiAJCQlocC0+cmVjdl9zY29k
+YXRhKGNvbm4sIHNrYik7CmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jIGIv
+bmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYwppbmRleCAzODk2ZGFiLi43ODc5NWZmIDEwMDY0NAot
+LS0gYS9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jCisrKyBiL25ldC9ibHVldG9vdGgvaGNpX2V2
+ZW50LmMKQEAgLTEzOSw3ICsxMzksNyBAQCBzdGF0aWMgdm9pZCBoY2lfY2NfbGlua19wb2xpY3ko
+c3RydWN0IGhjCiAvKiBDb21tYW5kIENvbXBsZXRlIE9HRiBIT1NUX0NUTCAgKi8KIHN0YXRpYyB2
+b2lkIGhjaV9jY19ob3N0X2N0bChzdHJ1Y3QgaGNpX2RldiAqaGRldiwgX191MTYgb2NmLCBzdHJ1
+Y3Qgc2tfYnVmZiAqc2tiKQogewotCV9fdTggc3RhdHVzLCBwYXJhbTsKKwlfX3U4IHN0YXR1cywg
+cGFyYW0sIGhvc3RfZmxvd19jdGw7CiAJX191MTYgc2V0dGluZzsKIAlzdHJ1Y3QgaGNpX3JwX3Jl
+YWRfdm9pY2Vfc2V0dGluZyAqdnM7CiAJdm9pZCAqc2VudDsKQEAgLTI4MCw5ICsyODAsMzMgQEAg
+c3RhdGljIHZvaWQgaGNpX2NjX2hvc3RfY3RsKHN0cnVjdCBoY2lfZAogCQloY2lfcmVxX2NvbXBs
+ZXRlKGhkZXYsIHN0YXR1cyk7CiAJCWJyZWFrOwogCisJY2FzZSBPQ0ZfU0VUX0hPU1RfRkxPV19D
+VEw6CisJCXNlbnQgPSBoY2lfc2VudF9jbWRfZGF0YShoZGV2LCBPR0ZfSE9TVF9DVEwsCisJCQkJ
+CSBPQ0ZfU0VUX0hPU1RfRkxPV19DVEwpOworCQlpZiAoIXNlbnQpCisJCQlicmVhazsKKworCQlz
+dGF0dXMgPSAqKChfX3U4ICopc2tiLT5kYXRhKTsKKwkJaG9zdF9mbG93X2N0bCA9ICooKF9fdTgg
+KilzZW50KTsKKworCQlpZiAoIXN0YXR1cyAmJiBoZGV2LT5ob3N0X2Zsb3dfY3RsICE9IGhvc3Rf
+Zmxvd19jdGwpIHsKKwkJCWhkZXYtPmhvc3RfZmxvd19jdGwgPSBob3N0X2Zsb3dfY3RsOworCQkJ
+QlRfREJHKCIlczogaG9zdCBmbG93IGN0bCAweCV4IiwgaGRldi0+bmFtZSwKKwkJCSAgICAgICBo
+b3N0X2Zsb3dfY3RsKTsKKwkJfQorCQlicmVhazsKKwogCWNhc2UgT0NGX0hPU1RfQlVGRkVSX1NJ
+WkU6CiAJCXN0YXR1cyA9ICooKF9fdTggKikgc2tiLT5kYXRhKTsKLQkJaWYgKHN0YXR1cykgewor
+CQlpZiAoIXN0YXR1cykgeworCQkJc3RydWN0IGhjaV9jcF9zZXRfaG9zdF9mbG93X2N0bCBjcDsK
+KworCQkJaWYgKCEoY3AuaG9zdF9mbG93X2N0bCA9IGhkZXYtPmhvc3RfZmxvd19jdGwpKQorCQkJ
+CWJyZWFrOworCisJCQloY2lfc2VuZF9jbWQoaGRldiwgT0dGX0hPU1RfQ1RMLAorCQkJCSAgICAg
+T0NGX1NFVF9IT1NUX0ZMT1dfQ1RMLCBzaXplb2YoY3ApLCAmY3ApOworCQl9IGVsc2UgewogCQkJ
+QlRfREJHKCIlcyBPQ0ZfQlVGRkVSX1NJWkUgZmFpbGVkICVkIiwgaGRldi0+bmFtZSwgc3RhdHVz
+KTsKIAkJCWhjaV9yZXFfY29tcGxldGUoaGRldiwgc3RhdHVzKTsKIAkJfQo=
+------=_Part_51457_107232.1156279653079
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+------=_Part_51457_107232.1156279653079
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_51457_107232.1156279653079--
