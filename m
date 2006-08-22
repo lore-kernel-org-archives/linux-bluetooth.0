@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 23 Aug 2006 01:22:31 +0200
-From: The Peach <smartart@tiscali.it>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20060823012231.1f6ce777@localhost>
-In-Reply-To: <200608221357.31980.akohlsmith-bluez@benshaw.com>
+From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Tue, 22 Aug 2006 13:57:31 -0400
 References: <20060822181532.6fea4851@localhost>
 	<200608221227.15052.akohlsmith-bluez@benshaw.com>
 	<20060822195219.7cef2680@localhost>
-	<200608221357.31980.akohlsmith-bluez@benshaw.com>
-Mime-Version: 1.0
+In-Reply-To: <20060822195219.7cef2680@localhost>
+MIME-Version: 1.0
+Message-Id: <200608221357.31980.akohlsmith-bluez@benshaw.com>
 Subject: Re: [Bluez-users] rfcomm hell
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -23,35 +22,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Tue, 22 Aug 2006 13:57:31 -0400
-Andrew Kohlsmith <akohlsmith-bluez@benshaw.com> wrote:
+On Tuesday 22 August 2006 13:52, The Peach wrote:
+> really nice tools and they all work flawless! :)
+> The problem now is another: if I want to connect to a GPS reciever to use
+> gpsd and gpsdrive I do need a physical device: can I accompilsh this task
+> with any of these tools?
 
-> I'd imagine you could use rfcomm-listen-start and tell gpsd to look at stdin.  
-> If not, just use rfcomm --bind; I've never had issue with that.  it's 
-> --connect that gets my goat.
+I'd imagine you could use rfcomm-listen-start and tell gpsd to look at stdin.  
+If not, just use rfcomm --bind; I've never had issue with that.  it's 
+--connect that gets my goat.
 
-it's getting me more errors than expected:
-if I use the rfcomm-listen I get a timeout (is there no association
-with the device? no pin input or such things? I cannot disable it on the GPS device).
-if I use the rfcomm-read I get a 
-
-connect: : Resource temporarily unavailable
-
-probably I start it the right way... any hint about it?
-
-instead if I try to just bind the interface with rfcomm I get an hardlock and I must reboot when I start gpsdrive.
-
-is there no other solution to `rfcomm connect` to work than not using it?
-
-
-thanks,
--- 
-Matteo 'Peach' Pescarin
-
-ICQ UIN = 71110111
-Jabber ID = smartart@unstable.nl
-Web Site = http://www.smartart.it
-GeCHI = http://www.gechi.it
+-A.
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
