@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: sean <seandarcy2@gmail.com>
-Date: Tue, 22 Aug 2006 18:03:39 -0400
-Message-ID: <ecfuvs$tjj$1@sea.gmane.org>
+Date: Wed, 23 Aug 2006 00:10:38 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20060822211038.GA24883@localhost.localdomain>
 References: <ecfo8s$790$1@sea.gmane.org>
-	<20060822211038.GA24883@localhost.localdomain>
-Mime-Version: 1.0
-In-Reply-To: <20060822211038.GA24883@localhost.localdomain>
+MIME-Version: 1.0
+In-Reply-To: <ecfo8s$790$1@sea.gmane.org>
 Subject: Re: [Bluez-devel] recursive locking on pairing: 2.6.18-rc4
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,34 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Johan Hedberg wrote:
-> Hi sean,
-> 
-> On Tue, Aug 22, 2006, sean wrote:
-> 
->>I'm trying to pair my nokia 770 with my desktop which is 
->>running fc6t2, kernel-2.6.18-rc4. bluez-libs-3.0. Using a 
->>zonet usb dongle.
->>
->>The 770 returns a "no services" message. On the desktop, 
->>/var/log/messages:
-> 
-> 
-> I can't say anything about the desktop side problems, but the reason you 
-> get "no services" is that the 770 will only pair with devices that have 
-> either a Dial-up Networking (DUN) or OBEX File Transfer profile service 
-> records (or both) in its SDP server. So if you e.g. do a "sdptool add 
-> DUN" and "sdptool add FTP" on the desktop side you shouldn't get that 
-> error message.
-> 
-> Johan
-> 
+Hi sean,
 
-That was it. Once I sdptool add FTP , pairing succeeded, 
-without any kernel error messages.
+On Tue, Aug 22, 2006, sean wrote:
+> I'm trying to pair my nokia 770 with my desktop which is 
+> running fc6t2, kernel-2.6.18-rc4. bluez-libs-3.0. Using a 
+> zonet usb dongle.
+> 
+> The 770 returns a "no services" message. On the desktop, 
+> /var/log/messages:
 
-sean
+I can't say anything about the desktop side problems, but the reason you 
+get "no services" is that the 770 will only pair with devices that have 
+either a Dial-up Networking (DUN) or OBEX File Transfer profile service 
+records (or both) in its SDP server. So if you e.g. do a "sdptool add 
+DUN" and "sdptool add FTP" on the desktop side you shouldn't get that 
+error message.
 
+Johan
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
