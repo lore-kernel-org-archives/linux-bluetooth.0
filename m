@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e4f1f0110608230129y73240448ufc024c1c99810789@mail.gmail.com>
-Date: Wed, 23 Aug 2006 09:29:17 +0100
-From: "jonny Linux" <jonnylinux@gmail.com>
+Date: Wed, 23 Aug 2006 01:22:31 +0200
+From: The Peach <smartart@tiscali.it>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] How do I reset a pairing?
+Message-ID: <20060823012231.1f6ce777@localhost>
+In-Reply-To: <200608221357.31980.akohlsmith-bluez@benshaw.com>
+References: <20060822181532.6fea4851@localhost>
+	<200608221227.15052.akohlsmith-bluez@benshaw.com>
+	<20060822195219.7cef2680@localhost>
+	<200608221357.31980.akohlsmith-bluez@benshaw.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] rfcomm hell
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,69 +19,46 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1603655640=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1603655640==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_49304_25844455.1156321757950"
+On Tue, 22 Aug 2006 13:57:31 -0400
+Andrew Kohlsmith <akohlsmith-bluez@benshaw.com> wrote:
 
-------=_Part_49304_25844455.1156321757950
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> I'd imagine you could use rfcomm-listen-start and tell gpsd to look at stdin.  
+> If not, just use rfcomm --bind; I've never had issue with that.  it's 
+> --connect that gets my goat.
 
-Hi,
+it's getting me more errors than expected:
+if I use the rfcomm-listen I get a timeout (is there no association
+with the device? no pin input or such things? I cannot disable it on the GPS device).
+if I use the rfcomm-read I get a 
 
-I'm quite new to bluetooth, and very new to bluez. I have a desktop and a
-laptop both running Fedora Core 5. I'm trying to connect to my Lego
-Mindstorms NXT. If I try to connect from the laptop I get no problems
-connecting. But if I try to connect from the desktop I get a "Permission
-denied error", or if I try "hcitool cc <ba>" I get "Can't create connection:
-Input/output error".
+connect: : Resource temporarily unavailable
 
-I don't get asked for a pin when I connect from the desktop, but I think I
-was once asked for a pin. So I think somehow the pairing between the devices
-has been broken. Is there anyway I can reset the pairing between the desktop
-and the NXT?
+probably I start it the right way... any hint about it?
 
-Thanks,
+instead if I try to just bind the interface with rfcomm I get an hardlock and I must reboot when I start gpsdrive.
 
-Jonny
-
-------=_Part_49304_25844455.1156321757950
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,<br><br>I'm quite new to bluetooth, and very new to bluez. I have a desktop and a laptop both running Fedora Core 5. I'm trying to connect to my Lego Mindstorms NXT. If I try to connect from the laptop I get no problems connecting. But if I try to connect from the desktop I get a &quot;Permission denied error&quot;, or if I try &quot;hcitool cc &lt;ba&gt;&quot; I get &quot;Can't create connection: Input/output error&quot;.
-<br><br>I don't get asked for a pin when I connect from the desktop, but I think I was once asked for a pin. So I think somehow the pairing between the devices has been broken. Is there anyway I can reset the pairing between the desktop and the NXT?
-<br><br>Thanks,<br><br>Jonny<br>
-
-------=_Part_49304_25844455.1156321757950--
+is there no other solution to `rfcomm connect` to work than not using it?
 
 
---===============1603655640==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+thanks,
+-- 
+Matteo 'Peach' Pescarin
+
+ICQ UIN = 71110111
+Jabber ID = smartart@unstable.nl
+Web Site = http://www.smartart.it
+GeCHI = http://www.gechi.it
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============1603655640==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1603655640==--
