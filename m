@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <44EC7C9B.40302@pracucci.com>
+Date: Wed, 23 Aug 2006 16:04:43 +0000
+From: Marco Pracucci <development@pracucci.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.21.0608211349380.27134-200000@bugs.comnets.uni-bremen.de>
-References: <Pine.LNX.4.21.0608211349380.27134-200000@bugs.comnets.uni-bremen.de>
-Date: Wed, 23 Aug 2006 19:35:54 +0200
-Message-Id: <1156354555.4133.42.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Cc: Markus Becker <mab@comnets.uni-bremen.de>
-Subject: Re: [Bluez-devel] [PATCH] bluez-libs UUID-128 support for
-	Protocol	Descriptor List
+References: <44DA046D.7020600@pracucci.com>	<1155160420.4492.6.camel@aeonflux.holtmann.net>
+	<44DB1CEA.2070001@pracucci.com>
+In-Reply-To: <44DB1CEA.2070001@pracucci.com>
+Subject: Re: [Bluez-devel] connect() and L2CAP_CONN_TIMEOUT
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,45 +21,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Markus,
+Hi Marcel,
 
-> I've created a patch for bluez-libs/src/sdp.c to support the finding of
-> UUID128 encoded protocols. So that also kdebluetooth and others can
-> recognize those protocols. It changes the display of the Protocol
-> Descriptor List for example from:
-> 
-> Service Name: ATEmulator
-> Service RecHandle: 0x10010
-> Service Class ID List:
->   "Error: This is UUID-128" (0x7dd6b763-99a9-4a92-87b5-bc8efe565c37)
->   "Error: This is UUID-128" (0x00001101-0000-1000-8000-00805f9b34fb)
-> Protocol Descriptor List:
->   "Error: " (0x00000100-0000-1000-8000-00805f9b34fb)
->   "Error: " (0x00000003-0000-1000-8000-00805f9b34fb)
->     Channel: 25
-> 
-> to:
-> 
-> Service Name: ATEmulator
-> Service RecHandle: 0x10010
-> Service Class ID List:
->   UUID 128: 7dd6b763-99a9-4a92-87b5-bc8efe565c37
->   UUID 128: 00001101-0000-1000-8000-00805f9b34fb
-> Protocol Descriptor List:
->   "L2CAP" (0x00000100-0000-1000-8000-00805f9b34fb)
->   "RFCOMM" (0x00000003-0000-1000-8000-00805f9b34fb)
->     Channel: 25
-> 
-> Please consider it for integration into mainline bluez-libs.
+>>> I need to be sure that an SDP connection does not take more than X
+>>> seconds. In order to achieve my goal, I have correctly set the page
+>>> timeout of my local device. However, if I'm right, the page timeout is
+>>> the max time the local Link Manager will wait for a baseband page
+>>> response. But what does it happen if the page request is successfully
+>>> completed and an error occur during the connection to L2CAP remote
+>>> "layer"? Is there a timeout for this? Maybe L2CAP_CONN_TIMEOUT...
+>>>
+>>> I have posted this message, because practical experiments demonstrate
+>>> that sometimes the sdp_connect() timeout expires after 40 seconds.
+>>>     
+>>>       
+>> run "hcidump -X -V" to check what timeout you really run into.
+>>     
 
-the patch is wrong. Before you are doing a lookup against the short
-UUIDs of Bluetooth you should check if the base UUID is the Bluetooth
-base UUID. Otherwise you can't do the lookup.
+I have resolved the connect() timeout problem, setting two socket
+options before connect() system call: SO_SNDTIMEO, SO_RCVTIMEO. Now, it
+seems to work fine.
 
-Regards
-
-Marcel
-
+Marco Pracucci
 
 
 -------------------------------------------------------------------------
