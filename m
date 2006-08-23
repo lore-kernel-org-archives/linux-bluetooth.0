@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <c49421c50608231355x7039baax7a28868d8e99ee1@mail.gmail.com>
-Date: Wed, 23 Aug 2006 17:55:14 -0300
+Message-ID: <c49421c50608231349v55a0a6a3ibf8a80e1937a6d@mail.gmail.com>
+Date: Wed, 23 Aug 2006 17:49:38 -0300
 From: "Loreno Oliveira" <lorenooliveira@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <c49421c50608231349v55a0a6a3ibf8a80e1937a6d@mail.gmail.com>
+In-Reply-To: <1155769355.4075.88.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_52664_19545959.1156366178722"
 References: <c49421c50608161305l2785e2bdvbadde3fefeddbaa0@mail.gmail.com>
 	<1155769355.4075.88.camel@aeonflux.holtmann.net>
-	<c49421c50608231349v55a0a6a3ibf8a80e1937a6d@mail.gmail.com>
 Subject: Re: [Bluez-users] pand problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -18,123 +19,350 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1949105554=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1949105554==
+------=_Part_52664_19545959.1156366178722
 Content-Type: multipart/alternative;
-	boundary="----=_Part_52841_10671720.1156366514006"
+	boundary="----=_Part_52665_11045624.1156366178722"
 
-------=_Part_52841_10671720.1156366514006
+------=_Part_52665_11045624.1156366178722
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Some more details about the problem:
+Hi Marcel,
 
-Well, first I start both hosts. In the server one, I load the bnep module
-and start the pand daemon as NAP. In the client side, I type "hcitool cc
-......" with the address of the server. The connection goes fine. Then I
-request a pan connection with "pand -c ......" and everything goes fine ok.
+here are the dumps of both client and server hosts in two situations: pand
+connects successfuly and the problem I'm experiencing.
 
-At this moment, I kill the pand processes on both client and server, and
-disconnect them by typing "hcitool dc ...." the server address in the client
-host. Now I repeat the whole process for connecting  the hosts, and the pand
-connection is no more stablished.
+I've read the dumps and could not determine what can be going wrong. Do you
+have any hint?
+
+Thanks in advance!
 
 Loreno
 
-On 8/23/06, Loreno Oliveira <lorenooliveira@gmail.com> wrote:
+On 8/16/06, Marcel Holtmann <marcel@holtmann.org> wrote:
 >
-> Hi Marcel,
+> Hi Loreno,
 >
-> here are the dumps of both client and server hosts in two situations: pand
-> connects successfuly and the problem I'm experiencing.
+> > I'm getting troubles with pand. On the server side I start the pand
+> > daemon in the NAP role. On the client side I try to connect to the
+> > server using:
+> >
+> > # pand -c xx:xx:xx:xx:xx:xx
+> >
+> > The command returns exit value 0 and no error/warning message is
+> > printed on screen, but when I type:
+> >
+> > # pand -l
+> >
+> > there is no output.
+> >
+> > Does anybody knows what is going wrong here??
 >
-> I've read the dumps and could not determine what can be going wrong. Do
-> you have any hint?
+> run "hcidump -X -V" as root to see what happens.
 >
-> Thanks in advance!
+> Regards
 >
-> Loreno
->
->
-> On 8/16/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> >
-> > Hi Loreno,
-> >
-> > > I'm getting troubles with pand. On the server side I start the pand
-> > > daemon in the NAP role. On the client side I try to connect to the
-> > > server using:
-> > >
-> > > # pand -c xx:xx:xx:xx:xx:xx
-> > >
-> > > The command returns exit value 0 and no error/warning message is
-> > > printed on screen, but when I type:
-> > >
-> > > # pand -l
-> > >
-> > > there is no output.
-> > >
-> > > Does anybody knows what is going wrong here??
-> >
-> > run "hcidump -X -V" as root to see what happens.
-> >
-> > Regards
-> >
-> > Marcel
-> >
-> >
-> >
-> >
-> > -------------------------------------------------------------------------
-> > Using Tomcat but need to do more? Need to support web services,
-> > security?
-> > Get stuff done quickly with pre-integrated technology to make your job
-> > easier
-> > Download IBM WebSphere Application Server v.1.0.1 based on Apache
-> > Geronimo
-> > http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> >
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >
+> Marcel
 >
 >
+>
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job
+> easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 >
 
-------=_Part_52841_10671720.1156366514006
+------=_Part_52665_11045624.1156366178722
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Some more details about the problem:<br><br>Well, first I start both hosts. In the server one, I load the bnep module and start the pand daemon as NAP. In the client side, I type &quot;hcitool cc ......&quot; with the address of the server. The connection goes fine. Then I request a pan connection with &quot;pand -c ......&quot; and everything goes fine ok. 
-<br><br>At this moment, I kill the pand processes on both client and server, and disconnect them by typing &quot;hcitool dc ....&quot; the server address in the client host. Now I repeat the whole process for connecting&nbsp; the hosts, and the pand connection is no more stablished.
-<br><br>Loreno<br><br><div><span class="gmail_quote">On 8/23/06, <b class="gmail_sendername">Loreno Oliveira</b> &lt;<a href="mailto:lorenooliveira@gmail.com">lorenooliveira@gmail.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-<div>Hi Marcel,<br><br>here are the dumps of both client and server hosts in two situations: pand connects successfuly and the problem I'm experiencing.<br><br>I've read the dumps and could not determine what can be going wrong. Do you have any hint?
-<br><br>Thanks in advance!<br></div><div><span class="sg"><br>Loreno</span></div><div><span class="e" id="q_10d3ccb99260f060_2"><br><br><div><span class="gmail_quote">On 8/16/06, <b class="gmail_sendername">Marcel Holtmann
-</b> &lt;<a href="mailto:marcel@holtmann.org" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">marcel@holtmann.org</a>&gt; wrote:</span>
+Hi Marcel,<br><br>here are the dumps of both client and server hosts in two situations: pand connects successfuly and the problem I'm experiencing.<br><br>I've read the dumps and could not determine what can be going wrong. Do you have any hint?
+<br><br>Thanks in advance!<br><br>Loreno<br><br><div><span class="gmail_quote">On 8/16/06, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:</span>
 <blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi Loreno,<br><br>&gt; I'm getting troubles with pand. On the server side I start the pand<br>
-
 &gt; daemon in the NAP role. On the client side I try to connect to the<br>&gt; server using:<br>&gt;<br>&gt; # pand -c xx:xx:xx:xx:xx:xx<br>&gt;<br>&gt; The command returns exit value 0 and no error/warning message is<br>
-
 &gt; printed on screen, but when I type:<br>&gt;<br>&gt; # pand -l<br>&gt;<br>&gt; there is no output.<br>&gt;<br>&gt; Does anybody knows what is going wrong here??<br><br>run &quot;hcidump -X -V&quot; as root to see what happens.
 <br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>Using Tomcat but need to do more? Need to support web services, security?<br>Get stuff done quickly with pre-integrated technology to make your job easier
-<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo<br><a href="http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">
-http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642
-</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">Bluez-users@lists.sourceforge.net
-</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">
+<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo<br><a href="http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642">http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642
+</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">
 https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br>
 
-</span></div><br clear="all"></blockquote></div><br>
+------=_Part_52665_11045624.1156366178722--
 
-------=_Part_52841_10671720.1156366514006--
+------=_Part_52664_19545959.1156366178722
+Content-Type: application/octet-stream; name=clientDump.ok
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_er86i327
+Content-Disposition: attachment; filename="clientDump.ok"
 
+KioqKioqKioqKiAoMSkgaGNpdG9vbCBjYyAwMDoxMTo2Nzo0ZjplYzo4ZgoKPCBIQ0kgQ29tbWFu
+ZDogQ3JlYXRlIENvbm5lY3Rpb24gKDB4MDF8MHgwMDA1KSBwbGVuIDEzCiAgICBiZGFkZHIgMDA6
+MTE6Njc6NEY6RUM6OEYgcHR5cGUgMHhjYzE4IHJzd2l0Y2ggMHgwMSBjbGtvZmZzZXQgMHgwMDAw
+CiAgICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUgREgxIERIMyBESDUgCj4gSENJIEV2ZW50OiBD
+b21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0CiAgICBDcmVhdGUgQ29ubmVjdGlvbiAoMHgwMXww
+eDAwMDUpIHN0YXR1cyAweDAwIG5jbWQgMQo+IEhDSSBFdmVudDogUm9sZSBDaGFuZ2UgKDB4MTIp
+IHBsZW4gOAogICAgc3RhdHVzIDB4MDAgYmRhZGRyIDAwOjExOjY3OjRGOkVDOjhGIHJvbGUgMHgw
+MQogICAgUm9sZTogU2xhdmUKPiBIQ0kgRXZlbnQ6IENvbm5lY3QgQ29tcGxldGUgKDB4MDMpIHBs
+ZW4gMTEKICAgIHN0YXR1cyAweDAwIGhhbmRsZSAxIGJkYWRkciAwMDoxMTo2Nzo0RjpFQzo4RiB0
+eXBlIEFDTCBlbmNyeXB0IDB4MDAKPCBIQ0kgQ29tbWFuZDogV3JpdGUgTGluayBQb2xpY3kgU2V0
+dGluZ3MgKDB4MDJ8MHgwMDBkKSBwbGVuIDQKICAgIGhhbmRsZSAxIHBvbGljeSAweDBmCiAgICBM
+aW5rIHBvbGljeTogUlNXSVRDSCBIT0xEIFNOSUZGIFBBUksgCj4gSENJIEV2ZW50OiBNYXggU2xv
+dHMgQ2hhbmdlICgweDFiKSBwbGVuIDMKICAgIGhhbmRsZSAxIHNsb3RzIDUKPiBIQ0kgRXZlbnQ6
+IENvbm5lY3Rpb24gUGFja2V0IFR5cGUgQ2hhbmdlZCAoMHgxZCkgcGxlbiA1CiAgICBzdGF0dXMg
+MHgwMCBoYW5kbGUgMSBwdHlwZSAweGNjMTgKICAgIFBhY2tldCB0eXBlOiBETTEgRE0zIERNNSBE
+SDEgREgzIERINSAKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUgKDB4MGUpIHBsZW4gNgog
+ICAgV3JpdGUgTGluayBQb2xpY3kgU2V0dGluZ3MgKDB4MDJ8MHgwMDBkKSBuY21kIDEKICAgIHN0
+YXR1cyAweDAwIGhhbmRsZSAxCj4gSENJIEV2ZW50OiBDb25uZWN0aW9uIFBhY2tldCBUeXBlIENo
+YW5nZWQgKDB4MWQpIHBsZW4gNQogICAgc3RhdHVzIDB4MDAgaGFuZGxlIDEgcHR5cGUgMHhjYzE4
+CiAgICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUgREgxIERIMyBESDUgCgoKKioqKioqKioqKiAo
+MykgcGFuZCAtYyAwMDoxMTo2Nzo0ZjplYzo4ZgoKPCBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3Mg
+MHgwMiBkbGVuIDEyCiAgICBMMkNBUChzKTogQ29ubmVjdCByZXE6IHBzbSAxNSBzY2lkIDB4MDA0
+MAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUK
+ICAgIGhhbmRsZSAxIHBhY2tldHMgMQo+IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRs
+ZW4gMTYKICAgIEwyQ0FQKHMpOiBDb25uZWN0IHJzcDogZGNpZCAweDAwNDAgc2NpZCAweDAwNDAg
+cmVzdWx0IDAgc3RhdHVzIDAKICAgICAgQ29ubmVjdGlvbiBzdWNjZXNzZnVsCjwgQUNMIGRhdGE6
+IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiAxNgogICAgTDJDQVAocyk6IENvbmZpZyByZXE6IGRj
+aWQgMHgwMDQwIGZsYWdzIDB4MDAgY2xlbiA0CiAgICAgIE1UVSAxNjkxIAo+IEhDSSBFdmVudDog
+TnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSAxIHBh
+Y2tldHMgMQo+IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMTQKICAgIEwyQ0FQ
+KHMpOiBDb25maWcgcnNwOiBzY2lkIDB4MDA0MCBmbGFncyAweDAwIHJlc3VsdCAwIGNsZW4gMAog
+ICAgICBTdWNjZXNzCj4gQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiAxNgogICAg
+TDJDQVAocyk6IENvbmZpZyByZXE6IGRjaWQgMHgwMDQwIGZsYWdzIDB4MDAgY2xlbiA0CiAgICAg
+IE1UVSAxNjkxIAo8IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMTQKICAgIEwy
+Q0FQKHMpOiBDb25maWcgcnNwOiBzY2lkIDB4MDA0MCBmbGFncyAweDAwIHJlc3VsdCAwIGNsZW4g
+MAogICAgICBTdWNjZXNzCjwgQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiAxMQog
+ICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDcgW3BzbSAxNV0KICAgICAgQk5FUDogQ29udHJv
+bCgweDAxfDApCiAgICAgICAgU2V0dXAgUmVxKDB4MDEpIHNpemUgMHgwMiBkc3QgMHgxMTE2KE5B
+UCkgc3JjIDB4MTExNShQQU5VKQo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNr
+ZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSAxIHBhY2tldHMgMQo+IEhDSSBFdmVudDogTnVt
+YmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSAxIHBhY2tl
+dHMgMQo+IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gOAogICAgTDJDQVAoZCk6
+IGNpZCAweDAwNDAgbGVuIDQgW3BzbSAxNV0KICAgICAgQk5FUDogQ29udHJvbCgweDAxfDApCiAg
+ICAgICAgU2V0dXAgUnNwKDB4MDIpIHJlcyAweDAwMDAKPiBBQ0wgZGF0YTogaGFuZGxlIDEgZmxh
+Z3MgMHgwMiBkbGVuIDIwCiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gMTYgW3BzbSAxNV0K
+ICAgICAgQk5FUDogQ29udHJvbCgweDAxfDApCiAgICAgICAgRmlsdGVyIE11bHRBZGRyIFNldCgw
+eDA1KSBsZW4gMHgwMDBjCiAgICAgICAgICAwMTowMDowMDowMDowMDowMCAtIGZmOmZmOmZmOmZm
+OmZmOmZmCjwgQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiA4CiAgICBMMkNBUChk
+KTogY2lkIDB4MDA0MCBsZW4gNCBbcHNtIDE1XQogICAgICBCTkVQOiBDb250cm9sKDB4MDF8MCkK
+ICAgICAgICBGaWx0ZXIgTXVsdEFkZHIgUnNwKDB4MDYpIHJlcyAweDAwMDAKPiBBQ0wgZGF0YTog
+aGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDIwCiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4g
+MTYgW3BzbSAxNV0KICAgICAgQk5FUDogQ29udHJvbCgweDAxfDApCiAgICAgICAgRmlsdGVyIE11
+bHRBZGRyIFNldCgweDA1KSBsZW4gMHgwMDBjCiAgICAgICAgICAwMTowMDowMDowMDowMDowMCAt
+IGZmOmZmOmZmOmZmOmZmOmZmCjwgQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiA4
+CiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gNCBbcHNtIDE1XQogICAgICBCTkVQOiBDb250
+cm9sKDB4MDF8MCkKICAgICAgICBGaWx0ZXIgTXVsdEFkZHIgUnNwKDB4MDYpIHJlcyAweDAwMDAK
+PiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAg
+ICBoYW5kbGUgMSBwYWNrZXRzIDEKPiBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVu
+IDIwCiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gMTYgW3BzbSAxNV0KICAgICAgQk5FUDog
+Q29udHJvbCgweDAxfDApCiAgICAgICAgRmlsdGVyIE11bHRBZGRyIFNldCgweDA1KSBsZW4gMHgw
+MDBjCiAgICAgICAgICAwMTowMDowMDowMDowMDowMCAtIGZmOmZmOmZmOmZmOmZmOmZmCjwgQUNM
+IGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiA4CiAgICBMMkNBUChkKTogY2lkIDB4MDA0
+MCBsZW4gNCBbcHNtIDE1XQogICAgICBCTkVQOiBDb250cm9sKDB4MDF8MCkKICAgICAgICBGaWx0
+ZXIgTXVsdEFkZHIgUnNwKDB4MDYpIHJlcyAweDAwMDAKPiBBQ0wgZGF0YTogaGFuZGxlIDEgZmxh
+Z3MgMHgwMiBkbGVuIDIwCiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gMTYgW3BzbSAxNV0K
+ICAgICAgQk5FUDogQ29udHJvbCgweDAxfDApCiAgICAgICAgRmlsdGVyIE11bHRBZGRyIFNldCgw
+eDA1KSBsZW4gMHgwMDBjCiAgICAgICAgICAwMTowMDowMDowMDowMDowMCAtIGZmOmZmOmZmOmZm
+OmZmOmZmCjwgQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiA4CiAgICBMMkNBUChk
+KTogY2lkIDB4MDA0MCBsZW4gNCBbcHNtIDE1XQogICAgICBCTkVQOiBDb250cm9sKDB4MDF8MCkK
+ICAgICAgICBGaWx0ZXIgTXVsdEFkZHIgUnNwKDB4MDYpIHJlcyAweDAwMDAKPiBIQ0kgRXZlbnQ6
+IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5kbGUgMSBw
+YWNrZXRzIDEKPiBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDIwCiAgICBMMkNB
+UChkKTogY2lkIDB4MDA0MCBsZW4gMTYgW3BzbSAxNV0KICAgICAgQk5FUDogQ29udHJvbCgweDAx
+fDApCiAgICAgICAgRmlsdGVyIE11bHRBZGRyIFNldCgweDA1KSBsZW4gMHgwMDBjCiAgICAgICAg
+ICAwMTowMDowMDowMDowMDowMCAtIGZmOmZmOmZmOmZmOmZmOmZmCjwgQUNMIGRhdGE6IGhhbmRs
+ZSAxIGZsYWdzIDB4MDIgZGxlbiA4CiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gNCBbcHNt
+IDE1XQogICAgICBCTkVQOiBDb250cm9sKDB4MDF8MCkKICAgICAgICBGaWx0ZXIgTXVsdEFkZHIg
+UnNwKDB4MDYpIHJlcyAweDAwMDAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFj
+a2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5kbGUgMSBwYWNrZXRzIDEKPiBIQ0kgRXZlbnQ6IE51
+bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5kbGUgMSBwYWNr
+ZXRzIDEKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxl
+biA1CiAgICBoYW5kbGUgMSBwYWNrZXRzIDEK
+------=_Part_52664_19545959.1156366178722
+Content-Type: application/octet-stream; name=serverDump.ok
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_er86i4mx
+Content-Disposition: attachment; filename="serverDump.ok"
 
---===============1949105554==
+KioqKioqKioqKiAoMikgcmVzcG9uc2UgdG8gImhjaXRvb2wgY2MgMDA6MTE6Njc6NGY6ZWM6OGYi
+Cgo+IEhDSSBFdmVudDogQ29ubmVjdCBSZXF1ZXN0ICgweDA0KSBwbGVuIDEwCiAgICBiZGFkZHIg
+MDA6MTE6Njc6NEY6RjA6ODYgY2xhc3MgMHgzZTAxMDAgdHlwZSBBQ0wKPCBIQ0kgQ29tbWFuZDog
+QWNjZXB0IENvbm5lY3Rpb24gUmVxdWVzdCAoMHgwMXwweDAwMDkpIHBsZW4gNwogICAgYmRhZGRy
+IDAwOjExOjY3OjRGOkYwOjg2IHJvbGUgMHgwMAogICAgUm9sZTogTWFzdGVyCj4gSENJIEV2ZW50
+OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0CiAgICBBY2NlcHQgQ29ubmVjdGlvbiBSZXF1
+ZXN0ICgweDAxfDB4MDAwOSkgc3RhdHVzIDB4MDAgbmNtZCAxCj4gSENJIEV2ZW50OiBSb2xlIENo
+YW5nZSAoMHgxMikgcGxlbiA4CiAgICBzdGF0dXMgMHgwMCBiZGFkZHIgMDA6MTE6Njc6NEY6RjA6
+ODYgcm9sZSAweDAwCiAgICBSb2xlOiBNYXN0ZXIKPiBIQ0kgRXZlbnQ6IE1heCBTbG90cyBDaGFu
+Z2UgKDB4MWIpIHBsZW4gMwogICAgaGFuZGxlIDQgc2xvdHMgNQo+IEhDSSBFdmVudDogQ29ubmVj
+dCBDb21wbGV0ZSAoMHgwMykgcGxlbiAxMQogICAgc3RhdHVzIDB4MDAgaGFuZGxlIDEgYmRhZGRy
+IDAwOjExOjY3OjRGOkYwOjg2IHR5cGUgQUNMIGVuY3J5cHQgMHgwMAo8IEhDSSBDb21tYW5kOiBX
+cml0ZSBMaW5rIFBvbGljeSBTZXR0aW5ncyAoMHgwMnwweDAwMGQpIHBsZW4gNAogICAgaGFuZGxl
+IDEgcG9saWN5IDB4MGYKICAgIExpbmsgcG9saWN5OiBSU1dJVENIIEhPTEQgU05JRkYgUEFSSyAK
+PiBIQ0kgRXZlbnQ6IENvbm5lY3Rpb24gUGFja2V0IFR5cGUgQ2hhbmdlZCAoMHgxZCkgcGxlbiA1
+CiAgICBzdGF0dXMgMHgwMCBoYW5kbGUgMSBwdHlwZSAweGNjMTgKICAgIFBhY2tldCB0eXBlOiBE
+TTEgRE0zIERNNSBESDEgREgzIERINSAKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUgKDB4
+MGUpIHBsZW4gNgogICAgV3JpdGUgTGluayBQb2xpY3kgU2V0dGluZ3MgKDB4MDJ8MHgwMDBkKSBu
+Y21kIDEKICAgIHN0YXR1cyAweDAwIGhhbmRsZSAxCjwgSENJIENvbW1hbmQ6IENoYW5nZSBDb25u
+ZWN0aW9uIFBhY2tldCBUeXBlICgweDAxfDB4MDAwZikgcGxlbiA0CiAgICBoYW5kbGUgMSBwdHlw
+ZSAweGNjMTgKICAgIFBhY2tldCB0eXBlOiBETTEgRE0zIERNNSBESDEgREgzIERINSAKPiBIQ0kg
+RXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKICAgIENoYW5nZSBDb25uZWN0aW9u
+IFBhY2tldCBUeXBlICgweDAxfDB4MDAwZikgc3RhdHVzIDB4MDAgbmNtZCAxCj4gSENJIEV2ZW50
+OiBDb25uZWN0aW9uIFBhY2tldCBUeXBlIENoYW5nZWQgKDB4MWQpIHBsZW4gNQogICAgc3RhdHVz
+IDB4MDAgaGFuZGxlIDEgcHR5cGUgMHhjYzE4CiAgICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUg
+REgxIERIMyBESDUgCgoKKioqKioqKioqKiAoNCkgcmVzcG9uc2UgdG8gInBhbmQgLWMgMDA6MTE6
+Njc6NGY6ZWM6OGYiCgo+IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMTIKICAg
+IEwyQ0FQKHMpOiBDb25uZWN0IHJlcTogcHNtIDE1IHNjaWQgMHgwMDQwCjwgQUNMIGRhdGE6IGhh
+bmRsZSAxIGZsYWdzIDB4MDIgZGxlbiAxNgogICAgTDJDQVAocyk6IENvbm5lY3QgcnNwOiBkY2lk
+IDB4MDA0MCBzY2lkIDB4MDA0MCByZXN1bHQgMCBzdGF0dXMgMAogICAgICBDb25uZWN0aW9uIHN1
+Y2Nlc3NmdWwKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykg
+cGxlbiA1CiAgICBoYW5kbGUgMSBwYWNrZXRzIDEKPiBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3Mg
+MHgwMiBkbGVuIDE2CiAgICBMMkNBUChzKTogQ29uZmlnIHJlcTogZGNpZCAweDAwNDAgZmxhZ3Mg
+MHgwMCBjbGVuIDQKICAgICAgTVRVIDE2OTEgCjwgQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4
+MDIgZGxlbiAxNAogICAgTDJDQVAocyk6IENvbmZpZyByc3A6IHNjaWQgMHgwMDQwIGZsYWdzIDB4
+MDAgcmVzdWx0IDAgY2xlbiAwCiAgICAgIFN1Y2Nlc3MKPCBBQ0wgZGF0YTogaGFuZGxlIDEgZmxh
+Z3MgMHgwMiBkbGVuIDE2CiAgICBMMkNBUChzKTogQ29uZmlnIHJlcTogZGNpZCAweDAwNDAgZmxh
+Z3MgMHgwMCBjbGVuIDQKICAgICAgTVRVIDE2OTEgCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29t
+cGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQogICAgaGFuZGxlIDEgcGFja2V0cyAxCj4gSENJ
+IEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQogICAgaGFu
+ZGxlIDEgcGFja2V0cyAxCj4gQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiAxNAog
+ICAgTDJDQVAocyk6IENvbmZpZyByc3A6IHNjaWQgMHgwMDQwIGZsYWdzIDB4MDAgcmVzdWx0IDAg
+Y2xlbiAwCiAgICAgIFN1Y2Nlc3MKPiBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVu
+IDExCiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gNyBbcHNtIDE1XQogICAgICBCTkVQOiBD
+b250cm9sKDB4MDF8MCkKICAgICAgICBTZXR1cCBSZXEoMHgwMSkgc2l6ZSAweDAyIGRzdCAweDEx
+MTYoTkFQKSBzcmMgMHgxMTE1KFBBTlUpCjwgQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIg
+ZGxlbiA4CiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gNCBbcHNtIDE1XQogICAgICBCTkVQ
+OiBDb250cm9sKDB4MDF8MCkKICAgICAgICBTZXR1cCBSc3AoMHgwMikgcmVzIDB4MDAwMAo+IEhD
+SSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhh
+bmRsZSAxIHBhY2tldHMgMQo8IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMjAK
+ICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiAxNiBbcHNtIDE1XQogICAgICBCTkVQOiBDb250
+cm9sKDB4MDF8MCkKICAgICAgICBGaWx0ZXIgTXVsdEFkZHIgU2V0KDB4MDUpIGxlbiAweDAwMGMK
+ICAgICAgICAgIDAxOjAwOjAwOjAwOjAwOjAwIC0gZmY6ZmY6ZmY6ZmY6ZmY6ZmYKPCBBQ0wgZGF0
+YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDIwCiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBs
+ZW4gMTYgW3BzbSAxNV0KICAgICAgQk5FUDogQ29udHJvbCgweDAxfDApCiAgICAgICAgRmlsdGVy
+IE11bHRBZGRyIFNldCgweDA1KSBsZW4gMHgwMDBjCiAgICAgICAgICAwMTowMDowMDowMDowMDow
+MCAtIGZmOmZmOmZmOmZmOmZmOmZmCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBh
+Y2tldHMgKDB4MTMpIHBsZW4gNQogICAgaGFuZGxlIDEgcGFja2V0cyAxCjwgQUNMIGRhdGE6IGhh
+bmRsZSAxIGZsYWdzIDB4MDIgZGxlbiAyMAogICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDE2
+IFtwc20gMTVdCiAgICAgIEJORVA6IENvbnRyb2woMHgwMXwwKQogICAgICAgIEZpbHRlciBNdWx0
+QWRkciBTZXQoMHgwNSkgbGVuIDB4MDAwYwogICAgICAgICAgMDE6MDA6MDA6MDA6MDA6MDAgLSBm
+ZjpmZjpmZjpmZjpmZjpmZgo8IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMjAK
+ICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiAxNiBbcHNtIDE1XQogICAgICBCTkVQOiBDb250
+cm9sKDB4MDF8MCkKICAgICAgICBGaWx0ZXIgTXVsdEFkZHIgU2V0KDB4MDUpIGxlbiAweDAwMGMK
+ICAgICAgICAgIDAxOjAwOjAwOjAwOjAwOjAwIC0gZmY6ZmY6ZmY6ZmY6ZmY6ZmYKPCBBQ0wgZGF0
+YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDIwCiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBs
+ZW4gMTYgW3BzbSAxNV0KICAgICAgQk5FUDogQ29udHJvbCgweDAxfDApCiAgICAgICAgRmlsdGVy
+IE11bHRBZGRyIFNldCgweDA1KSBsZW4gMHgwMDBjCiAgICAgICAgICAwMTowMDowMDowMDowMDow
+MCAtIGZmOmZmOmZmOmZmOmZmOmZmCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBh
+Y2tldHMgKDB4MTMpIHBsZW4gNQogICAgaGFuZGxlIDEgcGFja2V0cyAxCj4gQUNMIGRhdGE6IGhh
+bmRsZSAxIGZsYWdzIDB4MDIgZGxlbiA4CiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gNCBb
+cHNtIDE1XQogICAgICBCTkVQOiBDb250cm9sKDB4MDF8MCkKICAgICAgICBGaWx0ZXIgTXVsdEFk
+ZHIgUnNwKDB4MDYpIHJlcyAweDAwMDAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQg
+UGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5kbGUgMSBwYWNrZXRzIDEKPiBBQ0wgZGF0YTog
+aGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDgKICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiA0
+IFtwc20gMTVdCiAgICAgIEJORVA6IENvbnRyb2woMHgwMXwwKQogICAgICAgIEZpbHRlciBNdWx0
+QWRkciBSc3AoMHgwNikgcmVzIDB4MDAwMAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRl
+ZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSAxIHBhY2tldHMgMQo+IEFDTCBkYXRh
+OiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gOAogICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVu
+IDQgW3BzbSAxNV0KICAgICAgQk5FUDogQ29udHJvbCgweDAxfDApCiAgICAgICAgRmlsdGVyIE11
+bHRBZGRyIFJzcCgweDA2KSByZXMgMHgwMDAwCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxl
+dGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQogICAgaGFuZGxlIDEgcGFja2V0cyAxCj4gQUNMIGRh
+dGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiA4CiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBs
+ZW4gNCBbcHNtIDE1XQogICAgICBCTkVQOiBDb250cm9sKDB4MDF8MCkKICAgICAgICBGaWx0ZXIg
+TXVsdEFkZHIgUnNwKDB4MDYpIHJlcyAweDAwMDAKPiBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3Mg
+MHgwMiBkbGVuIDgKICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiA0IFtwc20gMTVdCiAgICAg
+IEJORVA6IENvbnRyb2woMHgwMXwwKQogICAgICAgIEZpbHRlciBNdWx0QWRkciBSc3AoMHgwNikg
+cmVzIDB4MDAwMAo=
+------=_Part_52664_19545959.1156366178722
+Content-Type: application/octet-stream; name=clientDump.failure
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_er86i552
+Content-Disposition: attachment; filename="clientDump.failure"
+
+KioqKioqKioqKiAoMSkgaGNpdG9vbCBjYyAwMDoxMTo2Nzo0ZjplYzo4ZgoKPCBIQ0kgQ29tbWFu
+ZDogQ3JlYXRlIENvbm5lY3Rpb24gKDB4MDF8MHgwMDA1KSBwbGVuIDEzCiAgICBiZGFkZHIgMDA6
+MTE6Njc6NEY6RUM6OEYgcHR5cGUgMHhjYzE4IHJzd2l0Y2ggMHgwMSBjbGtvZmZzZXQgMHgwMDAw
+CiAgICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUgREgxIERIMyBESDUKPiBIQ0kgRXZlbnQ6IENv
+bW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKICAgIENyZWF0ZSBDb25uZWN0aW9uICgweDAxfDB4
+MDAwNSkgc3RhdHVzIDB4MDAgbmNtZCAxCj4gSENJIEV2ZW50OiBSb2xlIENoYW5nZSAoMHgxMikg
+cGxlbiA4CiAgICBzdGF0dXMgMHgwMCBiZGFkZHIgMDA6MTE6Njc6NEY6RUM6OEYgcm9sZSAweDAx
+CiAgICBSb2xlOiBTbGF2ZQo+IEhDSSBFdmVudDogQ29ubmVjdCBDb21wbGV0ZSAoMHgwMykgcGxl
+biAxMQogICAgc3RhdHVzIDB4MDAgaGFuZGxlIDEgYmRhZGRyIDAwOjExOjY3OjRGOkVDOjhGIHR5
+cGUgQUNMIGVuY3J5cHQgMHgwMAo8IEhDSSBDb21tYW5kOiBXcml0ZSBMaW5rIFBvbGljeSBTZXR0
+aW5ncyAoMHgwMnwweDAwMGQpIHBsZW4gNAogICAgaGFuZGxlIDEgcG9saWN5IDB4MGYKICAgIExp
+bmsgcG9saWN5OiBSU1dJVENIIEhPTEQgU05JRkYgUEFSSwo+IEhDSSBFdmVudDogTWF4IFNsb3Rz
+IENoYW5nZSAoMHgxYikgcGxlbiAzCiAgICBoYW5kbGUgMSBzbG90cyA1Cj4gSENJIEV2ZW50OiBD
+b25uZWN0aW9uIFBhY2tldCBUeXBlIENoYW5nZWQgKDB4MWQpIHBsZW4gNQogICAgc3RhdHVzIDB4
+MDAgaGFuZGxlIDEgcHR5cGUgMHhjYzE4CiAgICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUgREgx
+IERIMyBESDUKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUgKDB4MGUpIHBsZW4gNgogICAg
+V3JpdGUgTGluayBQb2xpY3kgU2V0dGluZ3MgKDB4MDJ8MHgwMDBkKSBuY21kIDEKICAgIHN0YXR1
+cyAweDAwIGhhbmRsZSAxCj4gSENJIEV2ZW50OiBDb25uZWN0aW9uIFBhY2tldCBUeXBlIENoYW5n
+ZWQgKDB4MWQpIHBsZW4gNQogICAgc3RhdHVzIDB4MDAgaGFuZGxlIDEgcHR5cGUgMHhjYzE4CiAg
+ICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUgREgxIERIMyBESDUKCgoqKioqKioqKioqICgzKSBw
+YW5kIC1jIDAwOjExOjY3OjRmOmVjOjhmCgo8IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAy
+IGRsZW4gMTIKICAgIEwyQ0FQKHMpOiBDb25uZWN0IHJlcTogcHNtIDE1IHNjaWQgMHgwMDQwCj4g
+SENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQogICAg
+aGFuZGxlIDEgcGFja2V0cyAxCgoKKioqKioqKioqKiAoNSkgYXV0b21hdGljYWx5IGNsaWVudCBk
+aXNjb25lY3RzCgo8IEhDSSBDb21tYW5kOiBEaXNjb25uZWN0ICgweDAxfDB4MDAwNikgcGxlbiAz
+CiAgICBoYW5kbGUgMSByZWFzb24gMHgxMwogICAgUmVhc29uOiBSZW1vdGUgVXNlciBUZXJtaW5h
+dGVkIENvbm5lY3Rpb24KPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQK
+ICAgIERpc2Nvbm5lY3QgKDB4MDF8MHgwMDA2KSBzdGF0dXMgMHgwMCBuY21kIDEKPiBIQ0kgRXZl
+bnQ6IERpc2Nvbm4gQ29tcGxldGUgKDB4MDUpIHBsZW4gNAogICAgc3RhdHVzIDB4MDAgaGFuZGxl
+IDEgcmVhc29uIDB4MTYKICAgIFJlYXNvbjogQ29ubmVjdGlvbiBUZXJtaW5hdGVkIGJ5IExvY2Fs
+IEhvc3QK
+------=_Part_52664_19545959.1156366178722
+Content-Type: application/octet-stream; name=serverDump.failure
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_er86i5lk
+Content-Disposition: attachment; filename="serverDump.failure"
+
+KioqKioqKioqKiAoMikgcmVzcG9uc2UgdG8gImhjaXRvb2wgY2MgMDA6MTE6Njc6NGY6ZWM6OGYi
+Cgo+IEhDSSBFdmVudDogQ29ubmVjdCBSZXF1ZXN0ICgweDA0KSBwbGVuIDEwCiAgICBiZGFkZHIg
+MDA6MTE6Njc6NEY6RjA6ODYgY2xhc3MgMHgzZTAxMDAgdHlwZSBBQ0wKPCBIQ0kgQ29tbWFuZDog
+QWNjZXB0IENvbm5lY3Rpb24gUmVxdWVzdCAoMHgwMXwweDAwMDkpIHBsZW4gNwogICAgYmRhZGRy
+IDAwOjExOjY3OjRGOkYwOjg2IHJvbGUgMHgwMAogICAgUm9sZTogTWFzdGVyCj4gSENJIEV2ZW50
+OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0CiAgICBBY2NlcHQgQ29ubmVjdGlvbiBSZXF1
+ZXN0ICgweDAxfDB4MDAwOSkgc3RhdHVzIDB4MDAgbmNtZCAxCj4gSENJIEV2ZW50OiBSb2xlIENo
+YW5nZSAoMHgxMikgcGxlbiA4CiAgICBzdGF0dXMgMHgwMCBiZGFkZHIgMDA6MTE6Njc6NEY6RjA6
+ODYgcm9sZSAweDAwCiAgICBSb2xlOiBNYXN0ZXIKPiBIQ0kgRXZlbnQ6IE1heCBTbG90cyBDaGFu
+Z2UgKDB4MWIpIHBsZW4gMwogICAgaGFuZGxlIDQgc2xvdHMgNQo+IEhDSSBFdmVudDogQ29ubmVj
+dCBDb21wbGV0ZSAoMHgwMykgcGxlbiAxMQogICAgc3RhdHVzIDB4MDAgaGFuZGxlIDEgYmRhZGRy
+IDAwOjExOjY3OjRGOkYwOjg2IHR5cGUgQUNMIGVuY3J5cHQgMHgwMAo8IEhDSSBDb21tYW5kOiBX
+cml0ZSBMaW5rIFBvbGljeSBTZXR0aW5ncyAoMHgwMnwweDAwMGQpIHBsZW4gNAogICAgaGFuZGxl
+IDEgcG9saWN5IDB4MGYKICAgIExpbmsgcG9saWN5OiBSU1dJVENIIEhPTEQgU05JRkYgUEFSSyAK
+PiBIQ0kgRXZlbnQ6IENvbm5lY3Rpb24gUGFja2V0IFR5cGUgQ2hhbmdlZCAoMHgxZCkgcGxlbiA1
+CiAgICBzdGF0dXMgMHgwMCBoYW5kbGUgMSBwdHlwZSAweGNjMTgKICAgIFBhY2tldCB0eXBlOiBE
+TTEgRE0zIERNNSBESDEgREgzIERINSAKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUgKDB4
+MGUpIHBsZW4gNgogICAgV3JpdGUgTGluayBQb2xpY3kgU2V0dGluZ3MgKDB4MDJ8MHgwMDBkKSBu
+Y21kIDEKICAgIHN0YXR1cyAweDAwIGhhbmRsZSAxCjwgSENJIENvbW1hbmQ6IENoYW5nZSBDb25u
+ZWN0aW9uIFBhY2tldCBUeXBlICgweDAxfDB4MDAwZikgcGxlbiA0CiAgICBoYW5kbGUgMSBwdHlw
+ZSAweGNjMTgKICAgIFBhY2tldCB0eXBlOiBETTEgRE0zIERNNSBESDEgREgzIERINSAKPiBIQ0kg
+RXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKICAgIENoYW5nZSBDb25uZWN0aW9u
+IFBhY2tldCBUeXBlICgweDAxfDB4MDAwZikgc3RhdHVzIDB4MDAgbmNtZCAxCj4gSENJIEV2ZW50
+OiBDb25uZWN0aW9uIFBhY2tldCBUeXBlIENoYW5nZWQgKDB4MWQpIHBsZW4gNQogICAgc3RhdHVz
+IDB4MDAgaGFuZGxlIDEgcHR5cGUgMHhjYzE4CiAgICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUg
+REgxIERIMyBESDUgCgoKCioqKioqKioqKiogKDQpIHJlc3BvbnNlIHRvICJwYW5kIC1jIDAwOjEx
+OjY3OjRmOmVjOjhmIgoKPiBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDEyCiAg
+ICBMMkNBUChzKTogQ29ubmVjdCByZXE6IHBzbSAxNSBzY2lkIDB4MDA0MAo8IEFDTCBkYXRhOiBo
+YW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMTYKICAgIEwyQ0FQKHMpOiBDb25uZWN0IHJzcDogZGNp
+ZCAweDAwNDAgc2NpZCAweDAwNDAgcmVzdWx0IDAgc3RhdHVzIDAKICAgICAgQ29ubmVjdGlvbiBz
+dWNjZXNzZnVsCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMp
+IHBsZW4gNQogICAgaGFuZGxlIDEgcGFja2V0cyAxCgoKKioqKioqKioqKiAoNikgcmVzcG9uc2Ug
+dG8gY2xpZW50IGRpc2Nvbm5lY3Rpb24KCjwgQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIg
+ZGxlbiAxMgogICAgTDJDQVAocyk6IERpc2Nvbm4gcmVxOiBkY2lkIDB4MDA0MCBzY2lkIDB4MDA0
+MAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUK
+ICAgIGhhbmRsZSAxIHBhY2tldHMgMQo+IEhDSSBFdmVudDogRGlzY29ubiBDb21wbGV0ZSAoMHgw
+NSkgcGxlbiA0CiAgICBzdGF0dXMgMHgwMCBoYW5kbGUgMSByZWFzb24gMHgxMwogICAgUmVhc29u
+OiBSZW1vdGUgVXNlciBUZXJtaW5hdGVkIENvbm5lY3Rpb24K
+------=_Part_52664_19545959.1156366178722
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -145,7 +373,7 @@ Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============1949105554==
+------=_Part_52664_19545959.1156366178722
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -156,4 +384,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1949105554==--
+------=_Part_52664_19545959.1156366178722--
