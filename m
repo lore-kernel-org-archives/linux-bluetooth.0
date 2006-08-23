@@ -1,15 +1,22 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170608231314h5daa41f4s4fe0ddc31df87ca7@mail.gmail.com>
-Date: Wed, 23 Aug 2006 17:14:07 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44ECA22B.6050703@csr.com>
+Date: Wed, 23 Aug 2006 23:13:53 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20060823201353.GA29549@localhost.localdomain>
+References: <1155819858.4075.134.camel@aeonflux.holtmann.net>
+	<20060817114116.GC5118@srcf.ucam.org>
+	<20060817115912.GA24906@localhost.localdomain>
+	<20060819143608.GA31812@srcf.ucam.org>
+	<1156037973.3989.14.camel@aeonflux.holtmann.net>
+	<20060819235330.GA16375@srcf.ucam.org>
+	<1156040029.3989.22.camel@aeonflux.holtmann.net>
+	<20060820003154.GA17093@srcf.ucam.org>
+	<1156043737.3989.32.camel@aeonflux.holtmann.net>
+	<20060820175957.GA2750@srcf.ucam.org>
 MIME-Version: 1.0
-References: <000f01c6c59e$67014940$9d0cc70a@dlh.st.com>
-	<1156226067.3956.57.camel@aeonflux.holtmann.net>
-	<d23110170608221347p37bc87a5mbdd1271eaf7631c3@mail.gmail.com>
-	<44ECA22B.6050703@csr.com>
-Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
+In-Reply-To: <20060820175957.GA2750@srcf.ucam.org>
+Subject: Re: [Bluez-devel] [PATCH] implement RFCOMM Connect and Disconnect
+	methods
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,35 +30,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Steven,
+Hi Matthew,
 
-On 8/23/06, Steven Singer <steven.singer@csr.com> wrote:
-> Sending back the command gives a commitment to the chip that you will
-> be able to take another maximum size block of data. Sending the command
-> before this is true will lead to a disaster.
+On Sun, Aug 20, 2006, Matthew Garrett wrote:
+> Ok, how's this? Again not heavily tested, but just to make sure that the 
+> style is right.
 
-Yes, you're right. The problem seems to be knowing when this
-commitment can be given if we don't have a preallocated static buffer
-or some dynamic allocation strategy implemented.
+The patch is now commited to the CVS along with some coding style 
+changes and a few other fixes. It's a good start, but one major thing 
+missing is that the Connect method should initiate an SDP query to the 
+remote device if necessary (if the record isn't found in the local 
+cache) to find out the correct channel to connect to.
 
-[ snip ]
-
-> These are all advanced techniques. For the moment, it's probably
-> easiest just to send tokens as soon as they become available. Worry
-> about optimising it once it's working properly.
-
-Thanks for pointing all that out. :-) We're trying to make it work but
-we really have to know when we can be sure a flow control token became
-avaialble.
-
-> Don't forget that when a disconnection occurs, all outstanding
-> flow control tokens for that handle are returned implicitly.
-
-Right, I won't forget, thanks.
-
-Best regards,
-
--- Ulisses
+Johan
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
