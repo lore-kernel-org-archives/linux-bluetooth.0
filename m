@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170608230606i7b03a68ele44294096746475b@mail.gmail.com>
-Date: Wed, 23 Aug 2006 10:06:07 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001b01c6c677$b6a851d0$9d0cc70a@dlh.st.com>
-MIME-Version: 1.0
-References: <d23110170608221347p37bc87a5mbdd1271eaf7631c3@mail.gmail.com>
-	<001b01c6c677$b6a851d0$9d0cc70a@dlh.st.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <001f01c6c68a$a5af6680$9d0cc70a@dlh.st.com>
+References: <001f01c6c68a$a5af6680$9d0cc70a@dlh.st.com>
+Date: Wed, 23 Aug 2006 16:28:43 +0200
+Message-Id: <1156343323.4133.39.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,33 +22,26 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Mayank,
 
-On 8/23/06, Mayank BATRA <mayank.batra@st.com> wrote:
->         case OCF_HOST_BUFFER_SIZE:
->                 status = *((__u8 *) skb->data);
-> -               if (status) {
-> +               if (!status) {
-> +                       struct hci_cp_set_host_flow_ctl cp;
-> +
-> +                       if (!(cp.host_flow_ctl = hdev->host_flow_ctl))
-> +                               break;
-> +
-> +                       hci_send_cmd(hdev, OGF_HOST_CTL,
-> +                                    OCF_SET_HOST_FLOW_CTL, sizeof(cp),
-> &cp);
-> +               } else {
->                         BT_DBG("%s OCF_BUFFER_SIZE failed %d", hdev->name,
-> status);
->                         hci_req_complete(hdev, status);
->                 }
->
-> If status = 0 it means that the command was success. But in the patch that
-> you sent, it's the other way round. Is it a mistake?
+> > how about something like the attached patch? I've used some of
+> > Mayank's code and added some other parts. It's not complete and it's
+> > only compile-tested yet.
+> 
+> I think we will require the attached patch for setting the various
+> parameters of hci_dev structure from hciconfig (through ioctls).
 
-I think it's right, take a look at the patch again (there's a !status there).
+no. The kernel will find out what host flow control mode to use when
+someone sends the HCI command. And hciconfig should only send this
+command.
 
-Regards,
+Variable buffer size are not making sense in my opinion. We know what
+can handle and we should always accept the maximum. Let the chip decide
+the actual used buffer size.
 
--- Ulisses
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
