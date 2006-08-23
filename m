@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44EC7C9B.40302@pracucci.com>
-Date: Wed, 23 Aug 2006 16:04:43 +0000
-From: Marco Pracucci <development@pracucci.com>
+Message-ID: <d23110170608230606i7b03a68ele44294096746475b@mail.gmail.com>
+Date: Wed, 23 Aug 2006 10:06:07 -0300
+From: "Ulisses Furquim" <ulissesf@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <001b01c6c677$b6a851d0$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44DA046D.7020600@pracucci.com>	<1155160420.4492.6.camel@aeonflux.holtmann.net>
-	<44DB1CEA.2070001@pracucci.com>
-In-Reply-To: <44DB1CEA.2070001@pracucci.com>
-Subject: Re: [Bluez-devel] connect() and L2CAP_CONN_TIMEOUT
+References: <d23110170608221347p37bc87a5mbdd1271eaf7631c3@mail.gmail.com>
+	<001b01c6c677$b6a851d0$9d0cc70a@dlh.st.com>
+Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,29 +21,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Mayank,
 
->>> I need to be sure that an SDP connection does not take more than X
->>> seconds. In order to achieve my goal, I have correctly set the page
->>> timeout of my local device. However, if I'm right, the page timeout is
->>> the max time the local Link Manager will wait for a baseband page
->>> response. But what does it happen if the page request is successfully
->>> completed and an error occur during the connection to L2CAP remote
->>> "layer"? Is there a timeout for this? Maybe L2CAP_CONN_TIMEOUT...
->>>
->>> I have posted this message, because practical experiments demonstrate
->>> that sometimes the sdp_connect() timeout expires after 40 seconds.
->>>     
->>>       
->> run "hcidump -X -V" to check what timeout you really run into.
->>     
+On 8/23/06, Mayank BATRA <mayank.batra@st.com> wrote:
+>         case OCF_HOST_BUFFER_SIZE:
+>                 status = *((__u8 *) skb->data);
+> -               if (status) {
+> +               if (!status) {
+> +                       struct hci_cp_set_host_flow_ctl cp;
+> +
+> +                       if (!(cp.host_flow_ctl = hdev->host_flow_ctl))
+> +                               break;
+> +
+> +                       hci_send_cmd(hdev, OGF_HOST_CTL,
+> +                                    OCF_SET_HOST_FLOW_CTL, sizeof(cp),
+> &cp);
+> +               } else {
+>                         BT_DBG("%s OCF_BUFFER_SIZE failed %d", hdev->name,
+> status);
+>                         hci_req_complete(hdev, status);
+>                 }
+>
+> If status = 0 it means that the command was success. But in the patch that
+> you sent, it's the other way round. Is it a mistake?
 
-I have resolved the connect() timeout problem, setting two socket
-options before connect() system call: SO_SNDTIMEO, SO_RCVTIMEO. Now, it
-seems to work fine.
+I think it's right, take a look at the patch again (there's a !status there).
 
-Marco Pracucci
+Regards,
 
+-- Ulisses
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
