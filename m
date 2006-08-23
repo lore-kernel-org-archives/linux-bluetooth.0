@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Mayank BATRA <mayank.batra@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Wed, 23 Aug 2006 09:24:40 +0530
-Message-ID: <001401c6c667$dcfbabd0$9d0cc70a@dlh.st.com>
+Message-ID: <44EBC0D4.8070009@bartol.udel.edu>
+Date: Tue, 22 Aug 2006 22:43:32 -0400
+From: Rich Townsend <rhdt@bartol.udel.edu>
 MIME-Version: 1.0
-In-Reply-To: <d23110170608221347p37bc87a5mbdd1271eaf7631c3@mail.gmail.com>
-Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <7ceeaed30608051104n266c2cd4m28382c474a41dc58@mail.gmail.com>
+In-Reply-To: <7ceeaed30608051104n266c2cd4m28382c474a41dc58@mail.gmail.com>
+Subject: [Bluez-devel] Frames too long in sco_send_frame
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,17 +20,60 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ulisses,
+Hi all --
 
-> how about something like the attached patch? I've used some of
-> Mayank's code and added some other parts. It's not complete and it's
-> only compile-tested yet.
+I'm experiencing a problem with my Belkin Compact Flash Bluetooth adapter
+(F8T020 v.2). When trying to get a headset working with the adapter (via
+snd-bt-sco), I've discovered that no SCO packets are being transmitted:
 
-I'll try this today.
+hciconfig -a hci0:
 
-Regards,
-Mayank
+hci0:   Type: UART
+        BD Address: 00:02:72:81:23:27 ACL MTU: 192:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN AUTH ENCRYPT
+        RX bytes:63524 acl:27 sco:361 events:59 errors:0
+        TX bytes:2004 acl:22 sco:0 commands:29 errors:0
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'BlueZ (0)'
+        Class: 0x120104
+        Service Classes: Networking
+        Device Class: Computer, Desktop workstation
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x110 LMP Ver: 1.1 (0x1) LMP Subver: 0x110
+        Manufacturer: Cambridge Silicon Radio (10)
 
+hciconfig hci0 revision:
+
+hci0:   Type: UART
+         BD Address: 00:02:72:81:23:27 ACL MTU: 192:8 SCO MTU: 64:8
+         HCI 14.3
+         Chip version: BlueCore02-External (ES2)
+         Max key size: 56 bit
+         SCO mapping:  HCI
+
+The adapter is CSR based (not Broadcom), and the problem therefore doesn't seem
+to be MTU based.
+
+However, inserting debugging code in net/bluetooth/sco.c, I discover that the
+problem lies within sco_send_frame (or its caller). When the code fragment
+
+	/* Check outgoing MTU */
+	if (len > conn->mtu)
+		return -EINVAL;
+
+is reached, conn->mtu has the expected value of 64, but len is consistently
+larger. Hence, sco_send_frame exits with -EINVAL, and the frame never leaves the
+adapter.
+
+I'd appreciate assistance in working out the source of the problem. I'm new to
+the bluetooth code, so it's not clear to me why sco_send_frame is being passed
+frames that are larger than the MTU.
+
+cheers,
+
+Rich
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
