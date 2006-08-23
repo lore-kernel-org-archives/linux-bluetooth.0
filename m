@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <8712867d0608231418ld76b304oc8ae4ba1d8269d56@mail.gmail.com>
-Date: Wed, 23 Aug 2006 16:18:07 -0500
-From: "Jaime Alberto Silva" <jaimealbertosilva@gmail.com>
+Message-ID: <c49421c50608231355x7039baax7a28868d8e99ee1@mail.gmail.com>
+Date: Wed, 23 Aug 2006 17:55:14 -0300
+From: "Loreno Oliveira" <lorenooliveira@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <8712867d0608231353l6aa027bbha331a44392231f92@mail.gmail.com>
+In-Reply-To: <c49421c50608231349v55a0a6a3ibf8a80e1937a6d@mail.gmail.com>
 MIME-Version: 1.0
-References: <8712867d0608231353l6aa027bbha331a44392231f92@mail.gmail.com>
-Subject: [Bluez-users] Fwd: bluez-utils: The inquiry scan (ISCAN) gets
-	turned off
+References: <c49421c50608161305l2785e2bdvbadde3fefeddbaa0@mail.gmail.com>
+	<1155769355.4075.88.camel@aeonflux.holtmann.net>
+	<c49421c50608231349v55a0a6a3ibf8a80e1937a6d@mail.gmail.com>
+Subject: Re: [Bluez-users] pand problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,162 +18,142 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1949105554=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I'm forwarding this message I recently posted to debian-bugs in order
-to see if some of you know how to solve the problem:
+--===============1949105554==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_52841_10671720.1156366514006"
 
----------- Forwarded message ----------
-From: Jaime Alberto Silva <jaimealbertosilva@gmail.com>
-Date: Aug 23, 2006 3:53 PM
-Subject: bluez-utils: The inquiry scan (ISCAN) gets turned off
-To: Debian Bug Tracking System <submit@bugs.debian.org>
+------=_Part_52841_10671720.1156366514006
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
+Some more details about the problem:
 
-Package: bluez-utils
-Version: 3.1-3.1
-Severity: important
+Well, first I start both hosts. In the server one, I load the bnep module
+and start the pand daemon as NAP. In the client side, I type "hcitool cc
+......" with the address of the server. The connection goes fine. Then I
+request a pan connection with "pand -c ......" and everything goes fine ok.
 
-Whenever I try to discover the local system (Debian computer) from a remote
-system (mobile device, or other computer) it can't be found. After
-some research I found out that the ISCAN mode is disabled:
+At this moment, I kill the pand processes on both client and server, and
+disconnect them by typing "hcitool dc ...." the server address in the client
+host. Now I repeat the whole process for connecting  the hosts, and the pand
+connection is no more stablished.
 
---------------------------------------------------------------------
-# hciconfig hci0
-hci0:   Type: USB
-        BD Address: 00:0E:6D:3B:31:AE ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN
-        RX bytes:3190 acl:16 sco:0 events:208 errors:0
-        TX bytes:1840 acl:17 sco:0 commands:105 errors:0
---------------------------------------------------------------------
+Loreno
 
-But according to my hcid.conf file it should be enabled by default for
-all devices, I'm using the prepackaged hcid.conf :
+On 8/23/06, Loreno Oliveira <lorenooliveira@gmail.com> wrote:
+>
+> Hi Marcel,
+>
+> here are the dumps of both client and server hosts in two situations: pand
+> connects successfuly and the problem I'm experiencing.
+>
+> I've read the dumps and could not determine what can be going wrong. Do
+> you have any hint?
+>
+> Thanks in advance!
+>
+> Loreno
+>
+>
+> On 8/16/06, Marcel Holtmann <marcel@holtmann.org> wrote:
+> >
+> > Hi Loreno,
+> >
+> > > I'm getting troubles with pand. On the server side I start the pand
+> > > daemon in the NAP role. On the client side I try to connect to the
+> > > server using:
+> > >
+> > > # pand -c xx:xx:xx:xx:xx:xx
+> > >
+> > > The command returns exit value 0 and no error/warning message is
+> > > printed on screen, but when I type:
+> > >
+> > > # pand -l
+> > >
+> > > there is no output.
+> > >
+> > > Does anybody knows what is going wrong here??
+> >
+> > run "hcidump -X -V" as root to see what happens.
+> >
+> > Regards
+> >
+> > Marcel
+> >
+> >
+> >
+> >
+> > -------------------------------------------------------------------------
+> > Using Tomcat but need to do more? Need to support web services,
+> > security?
+> > Get stuff done quickly with pre-integrated technology to make your job
+> > easier
+> > Download IBM WebSphere Application Server v.1.0.1 based on Apache
+> > Geronimo
+> > http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+> >
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >
+>
+>
+>
 
---------------------------------------------------------------------
-# cat /etc/bluetooth/hcid.conf
-#
-# HCI daemon configuration file.
-#
+------=_Part_52841_10671720.1156366514006
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-# HCId options
-options {
-        # Automatically initialize new devices
-        autoinit yes;
+Some more details about the problem:<br><br>Well, first I start both hosts. In the server one, I load the bnep module and start the pand daemon as NAP. In the client side, I type &quot;hcitool cc ......&quot; with the address of the server. The connection goes fine. Then I request a pan connection with &quot;pand -c ......&quot; and everything goes fine ok. 
+<br><br>At this moment, I kill the pand processes on both client and server, and disconnect them by typing &quot;hcitool dc ....&quot; the server address in the client host. Now I repeat the whole process for connecting&nbsp; the hosts, and the pand connection is no more stablished.
+<br><br>Loreno<br><br><div><span class="gmail_quote">On 8/23/06, <b class="gmail_sendername">Loreno Oliveira</b> &lt;<a href="mailto:lorenooliveira@gmail.com">lorenooliveira@gmail.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+<div>Hi Marcel,<br><br>here are the dumps of both client and server hosts in two situations: pand connects successfuly and the problem I'm experiencing.<br><br>I've read the dumps and could not determine what can be going wrong. Do you have any hint?
+<br><br>Thanks in advance!<br></div><div><span class="sg"><br>Loreno</span></div><div><span class="e" id="q_10d3ccb99260f060_2"><br><br><div><span class="gmail_quote">On 8/16/06, <b class="gmail_sendername">Marcel Holtmann
+</b> &lt;<a href="mailto:marcel@holtmann.org" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">marcel@holtmann.org</a>&gt; wrote:</span>
+<blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi Loreno,<br><br>&gt; I'm getting troubles with pand. On the server side I start the pand<br>
 
-        # Security Manager mode
-        #   none - Security manager disabled
-        #   auto - Use local PIN for incoming connections
-        #   user - Always ask user for a PIN
-        #
-        security auto;
+&gt; daemon in the NAP role. On the client side I try to connect to the<br>&gt; server using:<br>&gt;<br>&gt; # pand -c xx:xx:xx:xx:xx:xx<br>&gt;<br>&gt; The command returns exit value 0 and no error/warning message is<br>
 
-        # Pairing mode
-        #   none  - Pairing disabled
-        #   multi - Allow pairing with already paired devices
-        #   once  - Pair once and deny successive attempts
-        pairing multi;
+&gt; printed on screen, but when I type:<br>&gt;<br>&gt; # pand -l<br>&gt;<br>&gt; there is no output.<br>&gt;<br>&gt; Does anybody knows what is going wrong here??<br><br>run &quot;hcidump -X -V&quot; as root to see what happens.
+<br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>Using Tomcat but need to do more? Need to support web services, security?<br>Get stuff done quickly with pre-integrated technology to make your job easier
+<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo<br><a href="http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">
+http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642
+</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">Bluez-users@lists.sourceforge.net
+</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">
+https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br>
 
-        # Default PIN code for incoming connections
-        passkey "1234";
-}
+</span></div><br clear="all"></blockquote></div><br>
 
-# Default settings for HCI devices
-device {
-        # Local device name
-        #   %d - device id
-        #   %h - host name
-        name "%h-%d";
-
-        # Local device class
-        class 0x3e0100;
-
-        # Default packet type
-        #pkt_type DH1,DM1,HV1;
-
-        # Inquiry and Page scan
-        pscan enable; iscan enable;
-
-        # Default link mode
-        #   none   - no specific policy
-        #   accept - always accept incoming connections
-        #   master - become master on incoming connections,
-        #            deny role switch on outgoing connections
-        lm accept;
-
-        # Default link policy
-        #   none    - no specific policy
-        #   rswitch - allow role switch
-        #   hold    - allow hold mode
-        #   sniff   - allow sniff mode
-        #   park    - allow park mode
-        lp rswitch,hold,sniff,park;
-}
---------------------------------------------------------------------
-
-In an effort to make the Debian computer visible to other devices
-I'm running the following command:
-
---------------------------------------------------------------------
-# hciconfig hci0 piscan
-# hciconfig hci0
-hci0:   Type: USB
-        BD Address: 00:0E:6D:3B:31:AE ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:3294 acl:16 sco:0 events:221 errors:0
-        TX bytes:1878 acl:17 sco:0 commands:112 errors:0
---------------------------------------------------------------------
-
-But after a while the ISCAN mode gets disabled and I must keep running
-hciconfig to make the computer visible again.
-
-I have tried with two USB-BLUETOOTH dongles of different brands
-and the problem persists.
-
-I have also tried it in sid and etch with the same results.
-
--- System Information:
-Debian Release: testing/unstable
-  APT prefers unstable
-  APT policy: (500, 'unstable')
-Architecture: i386 (i686)
-Shell:  /bin/sh linked to /bin/bash
-Kernel: Linux 2.6.15-1-k7
-Locale: LANG=es_CO, LC_CTYPE=es_CO (charmap=ISO-8859-1)
-
-Versions of packages bluez-utils depends on:
-ii  libbluetooth2                3.1-1       Library to use the BlueZ Linux Blu
-ii  libc6                        2.3.6-18    GNU C Library: Shared libraries
-ii  libdbus-1-2                  0.62-4      simple interprocess messaging syst
-ii  libdbus-glib-1-2             0.62-4      simple interprocess messaging syst
-ii  libglib2.0-0                 2.10.3-3    The GLib library of C routines
-ii  libusb-0.1-4                 2:0.1.12-2  userspace USB programming library
-ii  lsb-base                     3.1-12      Linux Standard Base 3.1 init scrip
-ii  makedev                      2.3.1-82    creates device files in /dev
-ii  module-init-tools            3.2.2-3     tools for managing Linux kernel mo
-ii  modutils                     2.4.27.0-6  Linux module utilities
-ii  sysvinit                     2.86.ds1-15 System-V-like init utilities
-ii  udev                         0.093-1     /dev/ and hotplug management daemo
-
-bluez-utils recommends no packages.
-
--- no debconf information
+------=_Part_52841_10671720.1156366514006--
 
 
---
-Jaime Alberto Silva       L I N U X       .~.
-                                   The Choice     /V\
-                                    of a GNU      / ( ) \
-                                   Generation    ^^-^^
+--===============1949105554==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============1949105554==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1949105554==--
