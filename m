@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001f01c6c68a$a5af6680$9d0cc70a@dlh.st.com>
-References: <001f01c6c68a$a5af6680$9d0cc70a@dlh.st.com>
-Date: Wed, 23 Aug 2006 16:28:43 +0200
-Message-Id: <1156343323.4133.39.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
+Message-ID: <67c64b720608230313le3928e9qd86b76021244abf1@mail.gmail.com>
+Date: Wed, 23 Aug 2006 15:43:58 +0530
+From: "sujith sankar" <sujithsankar2@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] Generic Access Profile !!!
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,28 +18,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mayank,
+Hi all,
+I could not find a matching profile for my requirement. When I went
+through the documentation, I saw that in such cases, it is compulsory
+to follow Generic Access Profile. The problem is that I could not find
+a specification for that anywhere. There were some links to
+bluetooth_k1.pdf but those links have expired.
 
-> > how about something like the attached patch? I've used some of
-> > Mayank's code and added some other parts. It's not complete and it's
-> > only compile-tested yet.
-> 
-> I think we will require the attached patch for setting the various
-> parameters of hci_dev structure from hciconfig (through ioctls).
+Could anyone help.
+Pls correct me if i am wrong.
 
-no. The kernel will find out what host flow control mode to use when
-someone sends the HCI command. And hciconfig should only send this
-command.
-
-Variable buffer size are not making sense in my opinion. We know what
-can handle and we should always accept the maximum. Let the chip decide
-the actual used buffer size.
-
-Regards
-
-Marcel
-
-
+Thanks,
+-Sujith
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
