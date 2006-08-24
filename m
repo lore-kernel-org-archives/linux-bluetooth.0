@@ -1,10 +1,18 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 24 Aug 2006 23:50:05 +0300
-From: Niv <nivv@cs.bgu.ac.il>
+Date: Thu, 24 Aug 2006 23:31:30 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-id: <44EE10FD.5060404@cs.bgu.ac.il>
-MIME-version: 1.0
-Subject: [Bluez-users] 2.25->3.3 can't ping headset
+Message-ID: <20060824203130.GA7420@localhost.localdomain>
+References: <8712867d0608231353l6aa027bbha331a44392231f92@mail.gmail.com>
+	<8712867d0608231418ld76b304oc8ae4ba1d8269d56@mail.gmail.com>
+	<1156410090.4133.68.camel@aeonflux.holtmann.net>
+	<8712867d0608240646n3ae773d6h271ba57ef06771cf@mail.gmail.com>
+	<20060824141134.GA3181@localhost.localdomain>
+	<8712867d0608240751g5efef440q4474334bc7d0a7fc@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <8712867d0608240751g5efef440q4474334bc7d0a7fc@mail.gmail.com>
+Subject: Re: [Bluez-users] Fwd: bluez-utils: The inquiry scan (ISCAN) gets
+	turned off
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,39 +26,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hay,
-I decided to try 3.3 in a manual install. I am 2.6.17 gentoo user. I got 
-  libs and utils as well as hcidump.
-I can ping my nokia cell , but not my headset. I tried erasing  #rm -rf 
-/var/lib/bluetooth/ ; then put the headset in pairing mode. then "saw" 
-it via hcitool scan; then tried pinging it -> Can't connect: Permission 
-denied
+On Thu, Aug 24, 2006, Jaime Alberto Silva wrote:
+> Can you, please, point me to some documentation about dbus usage and
+> how to discover the methods registered by bluez?.
 
-all services are up (hcid,sdp,rfcomm) and  hcidump -X -V is:
+You can find a description of the bluez D-Bus API in the 
+hcid/dbus-api.txt file that comes along with bluez-utils (you'll have to 
+use version 3.3 since it wasn't included before that).
 
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-     bdaddr 00:0D:44:33:E1:63 ptype 0xcc18 rswitch 0x01 clkoffset 0x61fa 
-(valid)
-     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
- > HCI Event: Command Status (0x0f) plen 4
-     Create Connection (0x01|0x0005) status 0x00 ncmd 1
- > HCI Event: Link Key Request (0x17) plen 6
-     bdaddr 00:0D:44:33:E1:63
-< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
-     bdaddr 00:0D:44:33:E1:63
- > HCI Event: Command Complete (0x0e) plen 10
-     Link Key Request Negative Reply (0x01|0x000c) ncmd 1
-     status 0x00 bdaddr 00:0D:44:33:E1:63
- > HCI Event: PIN Code Request (0x16) plen 6
-     bdaddr 00:0D:44:33:E1:63
-< HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
-     bdaddr 00:0D:44:33:E1:63
- > HCI Event: Command Complete (0x0e) plen 10
-     PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
+About D-Bus usage, well, by googling you should be able to find several 
+places with some documentation, though I have to admit that some of the 
+higher level bindings lack good documentation. E.g. the lowlevel API 
+description can be found here:
+http://dbus.freedesktop.org/doc/api/html/group__DBus.html
 
-it used to work with 2.25.
+If you want to specifically use the bluez D-Bus API you could e.g. take 
+a look at the source code of the new bluez-gnome package (which uses the 
+GLib bindings of D-Bus) or the hcid/dbus-test script which is part of 
+the bluez-utils package (it uses the python bindings and contains 
+examples of pretty much every feature of the bluez D-Bus API).
 
-how to fix?
+> Another example will be nice, something like... How to set the 
+> discover timeout with dbus
+
+Set the discoverable timeout:
+dbus-send --system --dest=org.bluez /org/bluez/hci0 \
+	org.bluez.Adapter.SetDiscoverableTimeout uint32:100
+
+Get the discoverable timeout:
+dbus-send --system --dest=org.bluez --print-reply /org/bluez/hci0 \
+	org.bluez.Adapter.GetDiscoverableTimeout
+
+> Thanks for your help!
+
+No problem :)
+
+Johan
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
