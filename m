@@ -1,16 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44ED589B.7080101@xmission.com>
-Date: Thu, 24 Aug 2006 01:43:23 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: Linux@feline-soul.com, bluez-users@lists.sourceforge.net
-References: <1597.216.47.59.131.1156371924.squirrel@webmail.feline-soul.net>
-	<200608232205.01719.Linux@feline-soul.com>
-	<44ED2C3B.9020400@xmission.com>
-	<200608232300.58022.Linux@feline-soul.com>
-In-Reply-To: <200608232300.58022.Linux@feline-soul.com>
-Subject: Re: [Bluez-users] Logitech Traveler Headset. pin never seen and i
- am never asked.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <8712867d0608231418ld76b304oc8ae4ba1d8269d56@mail.gmail.com>
+References: <8712867d0608231353l6aa027bbha331a44392231f92@mail.gmail.com>
+	<8712867d0608231418ld76b304oc8ae4ba1d8269d56@mail.gmail.com>
+Date: Thu, 24 Aug 2006 11:01:29 +0200
+Message-Id: <1156410090.4133.68.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Fwd: bluez-utils: The inquiry scan (ISCAN)
+	gets	turned off
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,30 +22,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Bearcat
+Hi Jaime,
 
-> mode?  *These files have never existed and it has never been paired. How do i 
-> put it in paired mode?*
+> Whenever I try to discover the local system (Debian computer) from a remote
+> system (mobile device, or other computer) it can't be found. After
+> some research I found out that the ISCAN mode is disabled:
 
-most headsets go into pairing mode by holding down the power until the
-led flashes red/blue. check your manual if you can find one.
+this should have been fixed in bluez-utils-3.3. You have to set the
+discoverable timeout to 0 and the mode to "discoverable" over the new
+D-Bus API and then it will stay visible forever. Otherwise it goes back
+to being non-discoverable after the discoverable timeout.
 
-> This is a headset that i ordered from Ebay. A white box.  Do i *know* that the 
-> pin is still the default? No. However i should still be asked for the pin at 
-> some point.
-> 
-> Again, when i issue a btsco 00:0D:44:4F:37:72 i get:
-> Error: Failed to connect to SDP server: Permission denied
-> Assuming channel 2
-> 
-> Can't connect RFCOMM channel: Permission denied
+Regards
 
-hmm. yeah this one has come up from time to time. the headset *should*
-respond to sdp even when not in pairing mode. sdp shouldn't require the
-pin code either. so it's going wrong even before you can start to pair
-with it. did you get the address in the first place with hcitool scan?
+Marcel
 
-Brad
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
