@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
-To: bluez-users@lists.sourceforge.net
-Date: Thu, 24 Aug 2006 10:31:03 -0400
-References: <200608241010.15024.akohlsmith-bluez@benshaw.com>
-In-Reply-To: <200608241010.15024.akohlsmith-bluez@benshaw.com>
+To: bluez-users@lists.sf.net
+Date: Thu, 24 Aug 2006 10:10:14 -0400
 MIME-Version: 1.0
-Message-Id: <200608241031.04136.akohlsmith-bluez@benshaw.com>
-Subject: Re: [Bluez-users] dumb questions (hopefully)
+Message-Id: <200608241010.15024.akohlsmith-bluez@benshaw.com>
+Subject: [Bluez-users] dumb questions (hopefully)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,135 +18,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Thursday 24 August 2006 10:10, Andrew Kohlsmith wrote:
-> Has anyone managed to use a laptop or PDA to use a phone to dial a number
-> and carry on the resultant conversation on a headset?
+I'm playing around with a cell phone, a headset and a PDA.
 
-Just some more datapoints:
+The phone: Nokia 6265i
+The headset: Sony-Ericson HBH-662 and Motorola HS-850
+The PDA: Tungsten T|X
 
-When the headset is on, the phone is in "headset" mode (icon on the screen) 
-and it "drops out" of the bluetooth network.  hcitool, sdptool... nothing 
-sees it anymore.
+(I'm foregoing the PDA for my Linux laptop running Bluez and a USB BT dongle 
+(DBT-122)).
 
-The sdptool browse output for the phone is as follows.  None of the RFCOMM 
-channels responds when the headset is on (either actively transferring audio 
-or just idle).
+I want to do what Bluetooth promised us ages ago: Use the PDA (laptop) to dial 
+the phone, then have the conversation using the headset.
 
-hcitool cc (master or slave) fails with "Can't create connection: Input/output 
-error"
+I can connect to the RFCOMM channel of the Audio Gateway or Voice Gateway 
+profiles of the phone and issue "ATD5551212;" to cause the phone to place a 
+voice call.  (I can't use the DUN profile or it's *always* a data call, which 
+in hindsight makes sense.)
 
-$ sdptool browse 00:12:D2:4C:CE:2D
-Browsing 00:12:D2:4C:CE:2D ...
-Service Name: Dial-up networking
-Service RecHandle: 0x10000
-Service Class ID List:
-  "Dialup Networking" (0x1103)
-  "Generic Networking" (0x1201)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 1
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Dialup Networking" (0x1103)
-    Version: 0x0100
+If I connect to the AG profile, the phone wants to route audio to the laptop.  
+Again, this makes sense according to the BT spec.  I use the VG profile 
+instead.  Using the VG profile lets me use the laptop to dial and audio is 
+still available on the phone's normal earpiece.
 
-Service Name: Nokia PC Suite
-Service RecHandle: 0x10001
-Service Class ID List:
-  "Serial Port" (0x1101)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 15
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
+Where this all falls down is when I actually have the headset on.  Every phone 
+I've tried so far (Motorola RAZR, Nokia 6265i, Motorola v190) seems to 
+completely disappear from the BT network when the headset is on (not 
+necessarily transferring audio, but just on).  I understand that audio and 
+SCO channel data can be very taxing on a phone's processor and that as a 
+result when audio is *active* that it may drop out of the network, but when 
+the audio channel is "idle" I can't imagine why the phone wouldn't listen on 
+its other channels.
 
-Service Name: COM 1
-Service RecHandle: 0x10002
-Service Class ID List:
-  "Serial Port" (0x1101)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 3
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
+It's been suggested that it may be possible to have the phone be a master to 
+the headset, and the laptop or PDA be a master to the phone, but I'm at a 
+loss as to how to go about doing this.
 
-Service Name: Voice Gateway
-Service RecHandle: 0x10003
-Service Class ID List:
-  "Handfree Audio Gateway" (0x111f)
-  "Generic Audio" (0x1203)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 13
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Handsfree" (0x111e)
-    Version: 0x0101
+Has anyone managed to use a laptop or PDA to use a phone to dial a number and 
+carry on the resultant conversation on a headset? 
 
-Service Name: Audio Gateway
-Service RecHandle: 0x10004
-Service Class ID List:
-  "Headset Audio Gateway" (0x1112)
-  "Generic Audio" (0x1203)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 12
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Headset" (0x1108)
-    Version: 0x0100
-
-Service Name: OBEX Object Push
-Service RecHandle: 0x1000a
-Service Class ID List:
-  "OBEX Object Push" (0x1105)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 9
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "OBEX Object Push" (0x1105)
-    Version: 0x0100
-
-Service Name: OBEX File Transfer
-Service RecHandle: 0x1000b
-Service Class ID List:
-  "OBEX File Transfer" (0x1106)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 10
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "OBEX File Transfer" (0x1106)
-    Version: 0x0100
+-A.
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
