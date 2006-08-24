@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <8712867d0608231418ld76b304oc8ae4ba1d8269d56@mail.gmail.com>
-References: <8712867d0608231353l6aa027bbha331a44392231f92@mail.gmail.com>
-	<8712867d0608231418ld76b304oc8ae4ba1d8269d56@mail.gmail.com>
-Date: Thu, 24 Aug 2006 11:01:29 +0200
-Message-Id: <1156410090.4133.68.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Fwd: bluez-utils: The inquiry scan (ISCAN)
-	gets	turned off
+From: CIJOML <cijoml@volny.cz>
+To: bluez-users@lists.sf.net, linux-kernel@vger.kernel.org
+Date: Thu, 24 Aug 2006 08:59:11 +0200
+MIME-Version: 1.0
+Message-Id: <200608240859.11195.cijoml@volny.cz>
+Subject: [Bluez-users] Microsoft BT mouse's optical sensor switches off???
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,22 +18,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Jaime,
+Hi,
 
-> Whenever I try to discover the local system (Debian computer) from a remote
-> system (mobile device, or other computer) it can't be found. After
-> some research I found out that the ISCAN mode is disabled:
+I upgraded my debian linux to newest testing version:
 
-this should have been fixed in bluez-utils-3.3. You have to set the
-discoverable timeout to 0 and the mode to "discoverable" over the new
-D-Bus API and then it will stay visible forever. Otherwise it goes back
-to being non-discoverable after the discoverable timeout.
+notas:/usr/src/linux-2.6.18-rc4# dpkg -l|grep -i bluez
+ii  bluez-hcidump                    1.31-1                      Analyses 
+Bluetooth HCI packets
+ii  bluez-utils                      3.1-3.1                     Bluetooth 
+tools and daemons
+ii  libbluetooth1                    2.25-2                      Library to 
+use the BlueZ Linux Bluetooth stack
+ii  libbluetooth2                    3.1-1                       Library to 
+use the BlueZ Linux Bluetooth stack
 
-Regards
+and linux kernel to 2.6.18-rc4 to have also latest BlueZ kernel.
 
-Marcel
+Everything works fine, except mouse?!
 
+Mouse works, but it sensor getts off in a very short time. I have to click 
+2times any button on it to start it again to move cursor?!
 
+This really p*ss me off.
+
+Where can I switch off this "feature"??
+
+Until now everything worked fine.
+
+Thanks a lot for reply
+
+Michal
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
