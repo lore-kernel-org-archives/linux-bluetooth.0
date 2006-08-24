@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <A984CC9EDAD168478B41BCBFA06E8D4D023565A5@xmb-rtp-203.amer.cisco.com>
-References: <A984CC9EDAD168478B41BCBFA06E8D4D023565A5@xmb-rtp-203.amer.cisco.com>
-Date: Thu, 24 Aug 2006 23:27:35 +0200
-Message-Id: <1156454855.4133.110.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Can't get 'hciattach' to work with Broadcom USB	BT
+Message-ID: <c49421c50608241151u64079792h110bc36642517b65@mail.gmail.com>
+Date: Thu, 24 Aug 2006 15:51:04 -0300
+From: "Loreno Oliveira" <lorenooliveira@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-users] best dongle for working with bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,35 +14,61 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1805574553=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Larry,
+--===============1805574553==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_7540_18013584.1156445464998"
 
-> I'm using the 2.6 Kernel on RedHat Desktop 4 (2.6.9-42)  
-> BT adapter is Kensington USB 2.0 (Broadcom chipset)  
-> BlueZ tools seem to mostly work.  All commands like "lsusb", "hciconfig", "hcitool", "l2ping" work fine.  
-> 
-> But "hciattach" does not work for me.  It yields this:  
-> [root@localhost init.d]# lsusb                                                   
-> Bus 001 Device 002: ID 047d:105e Kensington     
+------=_Part_7540_18013584.1156445464998
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-if you use a USB Bluetooth dongle, then you don't need hciattach. It is
-only needed for UART/serial based adapters.
+Hi,
 
-Regards
+is there a fully compatible bluetooth dongle for working with bluez? That
+is, a dongle that traditionally has no compatibility issues for working with
+bluez. Some link in amazon, or other on line shops, will be really useful
+:-)
 
-Marcel
+Regards,
+
+Loreno
+
+------=_Part_7540_18013584.1156445464998
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi,<br><br>is there a fully compatible bluetooth dongle for working with bluez? That is, a dongle that traditionally has no compatibility issues for working with bluez. Some link in amazon, or other on line shops, will be really useful :-)
+<br><br>Regards,<br><br>Loreno<br>
+
+------=_Part_7540_18013584.1156445464998--
 
 
+--===============1805574553==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============1805574553==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1805574553==--
