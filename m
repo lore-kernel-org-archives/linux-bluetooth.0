@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20060824221125.35372.qmail@web61218.mail.yahoo.com>
-Date: Thu, 24 Aug 2006 15:11:25 -0700 (PDT)
-From: deva seetharam <tagsense@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <d23110170608241406r558970ebm8cd8fa121f785ea7@mail.gmail.com>
+Date: Thu, 24 Aug 2006 18:06:32 -0300
+From: "Ulisses Furquim" <ulissesf@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <44EE10FD.5060404@cs.bgu.ac.il>
 MIME-Version: 1.0
-Subject: [Bluez-users] sensing client timeout/disconnect
+References: <44EE10FD.5060404@cs.bgu.ac.il>
+Subject: Re: [Bluez-users] 2.25->3.3 can't ping headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,62 +16,48 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1475227941=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1475227941==
-Content-Type: multipart/alternative; boundary="0-1233301669-1156457485=:35096"
-Content-Transfer-Encoding: 8bit
+Hi Niv,
 
---0-1233301669-1156457485=:35096
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+On 8/24/06, Niv <nivv@cs.bgu.ac.il> wrote:
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>      bdaddr 00:0D:44:33:E1:63 ptype 0xcc18 rswitch 0x01 clkoffset 0x61fa
+> (valid)
+>      Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+>  > HCI Event: Command Status (0x0f) plen 4
+>      Create Connection (0x01|0x0005) status 0x00 ncmd 1
+>  > HCI Event: Link Key Request (0x17) plen 6
+>      bdaddr 00:0D:44:33:E1:63
+> < HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
+>      bdaddr 00:0D:44:33:E1:63
+>  > HCI Event: Command Complete (0x0e) plen 10
+>      Link Key Request Negative Reply (0x01|0x000c) ncmd 1
+>      status 0x00 bdaddr 00:0D:44:33:E1:63
+>  > HCI Event: PIN Code Request (0x16) plen 6
+>      bdaddr 00:0D:44:33:E1:63
+> < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+>      bdaddr 00:0D:44:33:E1:63
+>  > HCI Event: Command Complete (0x0e) plen 10
+>      PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
 
+It seems your headset wants to pair with you but you don't have a
+passkey agent. You really want the new bluez-gnome package (you can
+find a link on the Download page) so you can use bt-applet as your
+default passkey agent.
 
-greetings!
-i have developed an application that opens an rfcomm socket and waits for messages from bluetooth remote control devices. the application needs to know when the client disconnects (for example, when the remote control is taken out of the range). 
+Regards,
 
-i see that hcidump prints a timeout message when the client is not heard for a while. i am wondering whether there is a signal/mechanism for the client app to know that the device has disconnected or timedout. 
-
-pls. let me know.
-
-thanks in advance,
-david
-
-
- 		
----------------------------------
-Yahoo! Messenger with Voice. Make PC-to-Phone Calls to the US (and 30+ countries) for 2¢/min or less.
---0-1233301669-1156457485=:35096
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-<br>greetings!<br>i have developed an application that opens an rfcomm socket and waits for messages from bluetooth remote control devices. the application needs to know when the client disconnects (for example, when the remote control is taken out of the range). <br><br>i see that hcidump prints a timeout message when the client is not heard for a while. i am wondering whether there is a signal/mechanism for the client app to know that the device has disconnected or timedout. <br><br>pls. let me know.<br><br>thanks in advance,<br>david<br><br><p>&#32;
-		<hr size=1>Yahoo! Messenger with Voice. <a href="http://us.rd.yahoo.com/mail_us/taglines/postman1/*http://us.rd.yahoo.com/evt=39663/*http://voice.yahoo.com">Make PC-to-Phone Calls</a> to the US (and 30+ countries) for 2¢/min or less.
---0-1233301669-1156457485=:35096--
-
-
---===============1475227941==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- Ulisses
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============1475227941==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1475227941==--
