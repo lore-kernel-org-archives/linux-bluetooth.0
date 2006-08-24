@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170608241129w5db6bffdq5c616f98ad74e509@mail.gmail.com>
-Date: Thu, 24 Aug 2006 15:29:04 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20060824150926.GQ8944@null.research.nokia.com>
+Date: Thu, 24 Aug 2006 18:09:26 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20060824150926.GQ8944@null.research.nokia.com>
 MIME-Version: 1.0
-References: <20060824150926.GQ8944@null.research.nokia.com>
-Subject: Re: [Bluez-devel] [PATCH] rfcomm_dev_del is called twice if
+Content-Type: multipart/mixed; boundary="yVhtmJPUSI46BTXb"
+Subject: [Bluez-devel] [PATCH] rfcomm_dev_del is called twice if
 	RFCOMM_HANGUP_NOW flag is used
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -17,52 +16,73 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ville,
 
-On 8/24/06, Ville Tervo <ville.tervo@nokia.com> wrote:
-> I noticed that rfcomm_dev_del() may be called twice if
-> RFCOMM_HANGUP_NOW flags is used with RFCOMMRELEASEDEV ioctl.
+--yVhtmJPUSI46BTXb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I think you're right but we must have the RFCOMM_RELEASE_ONHUP bit set
-on dev->flags also, right?
+Hi Marcel,
 
-> I made a patch that checks if dev is still in the device list before
-> calling deleting device.
-> The checking is done now in rfcomm_release_dev. Maybe better place would
-> be rfcomm_dev_del?
+I noticed that rfcomm_dev_del() may be called twice if
+RFCOMM_HANGUP_NOW flags is used with RFCOMMRELEASEDEV ioctl.
 
-Actually calling list_del_init() on an item thas was already deleted
-with list_del_init() won't hurt anyone but it seems we can mess up the
-reference counting by calling rfcomm_dev_del() twice.
+I made a patch that checks if dev is still in the device list before
+calling deleting device.
 
-I think your patch doesn't completely solve the problem because
-rfcomm_dev_get() will hold a reference to the device if we still
-manage to find it on the list and we will have reference counting
-problems too. Adding a call to rfcomm_dev_put() before the call to
-rfcomm_dev_del() in your patch will keep the reference counting
-correct, I guess. Something like this:
+The checking is done now in rfcomm_release_dev. Maybe better place would
+be rfcomm_dev_del?
 
-  if ((dev = rfcomm_dev_get(req.dev_id))) {
-		rfcomm_dev_put(dev);
-		rfcomm_dev_del(dev);
-  }
+-- 
+Ville
 
-What do you think, Marcel?
+--yVhtmJPUSI46BTXb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment;
+	filename="20060824_rfcomm_tty_dev_double_del_fix.txt"
 
-Best regards,
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index bd8d671..330760f 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -364,8 +364,13 @@ static int rfcomm_release_dev(void __use
+ 	if (req.flags & (1 << RFCOMM_HANGUP_NOW))
+ 		rfcomm_dlc_close(dev->dlc, 0);
+ 
+-	rfcomm_dev_del(dev);
+ 	rfcomm_dev_put(dev);
++
++	/* dev might be deleted allready by rfcomm_dlc_close.
++	 * Check that device is still on the list. */
++	if ((dev = rfcomm_dev_get(req.dev_id)))
++		rfcomm_dev_del(dev);
++
+ 	return 0;
+ }
+ 
 
--- Ulisses
+--yVhtmJPUSI46BTXb
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--yVhtmJPUSI46BTXb
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--yVhtmJPUSI46BTXb--
