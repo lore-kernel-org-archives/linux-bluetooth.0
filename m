@@ -1,17 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <8712867d0608240751g5efef440q4474334bc7d0a7fc@mail.gmail.com>
-Date: Thu, 24 Aug 2006 09:51:49 -0500
-From: "Jaime Alberto Silva" <jaimealbertosilva@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20060824141134.GA3181@localhost.localdomain>
-MIME-Version: 1.0
-References: <8712867d0608231353l6aa027bbha331a44392231f92@mail.gmail.com>
-	<8712867d0608231418ld76b304oc8ae4ba1d8269d56@mail.gmail.com>
-	<1156410090.4133.68.camel@aeonflux.holtmann.net>
-	<8712867d0608240646n3ae773d6h271ba57ef06771cf@mail.gmail.com>
-	<20060824141134.GA3181@localhost.localdomain>
-Subject: Re: [Bluez-users] Fwd: bluez-utils: The inquiry scan (ISCAN) gets
-	turned off
+Date: Thu, 24 Aug 2006 16:49:42 +0200
+From: automatic_jack <automatic_jack@katamail.com>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20060824164942.1240954c@debian>
+In-Reply-To: <1156421401.4133.101.camel@aeonflux.holtmann.net>
+References: <20060824104106.36b89a2e@debian>
+	<1156418652.4133.85.camel@aeonflux.holtmann.net>
+	<20060824114851.4cb413db@debian>
+	<1156421401.4133.101.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] CSR Bluetooth firmware upgrade
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -25,32 +23,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 8/24/06, Johan Hedberg <johan.hedberg@nokia.com> wrote:
-> On Thu, Aug 24, 2006, Jaime Alberto Silva wrote:
-> > Is there any tool in bluez-utils to achieve that? or some new entries
-> > in the hcid.conf? so it can be done in an init script.
->
-> Adding "discovto 0;" to hcid.conf should do the trick.
->
-> You can change the settings from the command line using dbus-send, but I
-> don't think it's a good idea to put it into a init script. E.g. the
-> following would put the device in discoverable mode:
-> dbus-send --system --dest=org.bluez /org/bluez/hci0 \
->         org.bluez.Adapter.SetMode string:discoverable
->
+On Thu, 24 Aug 2006 14:10:01 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-Can you, please, point me to some documentation about dbus usage and
-how to discover the methods registered by bluez?. Another example will
-be nice, something like... How to set the discover timeout with dbus
-;^)
+> depends on how much you like your device. You can always try to load
+> an unsigned firmware, but this can render the Bluetooth chip useless
+> and without SPI access to the chip there is no way of getting it back.
 
-Thanks for your help!
+I really love my device so...I'll try to aks on h2200 port list if
+someone has just tried to load an unigned firmware
 
--- 
-Jaime Alberto Silva       L I N U X       .~.
-                                   The Choice     /V\
-                                    of a GNU      / ( ) \
-                                   Generation    ^^-^^
+
+Regards,
+
+jack
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
