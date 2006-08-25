@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 25 Aug 2006 17:14:43 +0200
-From: automatic_jack <automatic_jack@katamail.com>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20060825171443.4549dd33@debian>
-In-Reply-To: <44EF0CCB.4010103@xmission.com>
-References: <20060821134723.68c21ab8@debian>
-	<1156168504.3956.27.camel@aeonflux.holtmann.net>
-	<loom.20060821T180305-246@post.gmane.org>
+Message-ID: <44EF0CCB.4010103@xmission.com>
+Date: Fri, 25 Aug 2006 08:44:27 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <20060821134723.68c21ab8@debian>	<1156168504.3956.27.camel@aeonflux.holtmann.net>	<loom.20060821T180305-246@post.gmane.org>
 	<loom.20060825T104609-996@post.gmane.org>
-	<44EF0CCB.4010103@xmission.com>
-Mime-Version: 1.0
+In-Reply-To: <loom.20060825T104609-996@post.gmane.org>
 Subject: Re: [Bluez-users] Bluetooth 2.0 + EDR dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -24,21 +21,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Fri, 25 Aug 2006 08:44:27 -0600
-Brad Midgley <bmidgley@xmission.com> wrote:
+aj
 
-> most or all of the usb adapters still use usb 1.1.
+>> Is the B-Speech dongle USB 2.0 or 1.x? The web page don' t say it
+> 
+> eBay seller has written to me that B-Speech Data Speed is an USB 1.1 device, can
+> you confirm, please?
 
-Thanks for the information Brad :)
+most or all of the usb adapters still use usb 1.1. the bt007ex i usually
+recommend is usb 1.1 as well.
 
-> the bt007ex i usually recommend is usb 1.1 as well.
+if you can put your usb2 devices on a separate usb bus it will be less
+an issue.
 
-I have also seen the Bluetake bt007sx dongle (bluetooth 2.0 + edr), are
-there any differences between the EX and SX? Maybe the chipset...
- 
-Regards,
-
-jack
+brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
