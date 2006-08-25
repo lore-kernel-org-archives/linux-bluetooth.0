@@ -1,13 +1,19 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <1777.216.47.59.131.1156544567.squirrel@webmail.feline-soul.net>
-Date: Fri, 25 Aug 2006 16:22:47 -0600 (MDT)
-From: "Bearcat M. Sandor" <linux@feline-soul.com>
+Message-ID: <1774.216.47.59.131.1156544437.squirrel@webmail.feline-soul.net>
+In-Reply-To: <1156421933.7759.7.camel@trevor.KIRK.KY>
+References: <1597.216.47.59.131.1156371924.squirrel@webmail.feline-soul.net>
+	<200608232205.01719.Linux@feline-soul.com>
+	<44ED2C3B.9020400@xmission.com>
+	<200608232300.58022.Linux@feline-soul.com>
+	<1156421933.7759.7.camel@trevor.KIRK.KY>
+Date: Fri, 25 Aug 2006 16:20:37 -0600 (MDT)
+From: "Bearcat M. Sandor" <Bearcat@feline-soul.com>
 To: jmcdougald@kirkiss.ky
 MIME-Version: 1.0
 Cc: BlueZ users <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Logitech Traveler Headset. pin never seen and i
  am	never asked.
-Reply-To: linux@feline-soul.com,
+Reply-To: Bearcat@feline-soul.com,
         BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -32,24 +38,24 @@ I *really* need to get this working.
 Bearcat M. Sandor
 
 > I have the same problem.  It appears that the latest version of hcid no
-longer recognizes the pin_helper definition inside the hcid.conf file.
-As I am also running Debian (unstable) I hoped that the bluez-pin
-package would be "linked" to the hcitool cc xx:xx:xx:xx:xx:xx
+> longer recognizes the pin_helper definition inside the hcid.conf file.
+> As I am also running Debian (unstable) I hoped that the bluez-pin
+> package would be "linked" to the hcitool cc xx:xx:xx:xx:xx:xx
 > application and would pop up a window allowing me to enter a password
-during the pairing phase.  However, there is a dependancy problem and
-the bluez-pin package cannot be installed.  I crammed it in (using dpkg
--i --force-all) and the bluez-pin package installed and the hcid
-application showed that a pin application was registered, but, when I
-tried to pair I was never presented with a dialog box requesting a pin
-and the pairing failed.
+> during the pairing phase.  However, there is a dependancy problem and
+> the bluez-pin package cannot be installed.  I crammed it in (using dpkg
+> -i --force-all) and the bluez-pin package installed and the hcid
+> application showed that a pin application was registered, but, when I
+> tried to pair I was never presented with a dialog box requesting a pin
+> and the pairing failed.
 >
 > I should mention that this logitech headset (HS04 V01) pairs with this
-notebook when I boot into windowsXP so there is no hardware problem.
+> notebook when I boot into windowsXP so there is no hardware problem.
 >
 > I am hoping that I am just an "apt-get update; apt-get dist-upgrade"
-away from a working bluetooth headset }:-) as the "break" with the
-pin_helper option in hcid.conf must have broken a lot of working
-bluetooth configurations.
+> away from a working bluetooth headset }:-) as the "break" with the
+> pin_helper option in hcid.conf must have broken a lot of working
+> bluetooth configurations.
 >
 > John
 >
@@ -60,23 +66,23 @@ bluetooth configurations.
 >>   If you can't pair or connect with the headset, did you pair it with
 >> another
 >> device?  *There is no other device*
->> Did it help to reset the pairing by removing /etc/bluetooth/link_key or
-/var/lib/bluetooth/[dongleaddr]/linkkeys or by putting the headset in
-pair
->> mode?  *These files have never existed and it has never been paired.
-How do i
+>> Did it help to reset the pairing by removing /etc/bluetooth/link_key
+>> or /var/lib/bluetooth/[dongleaddr]/linkkeys or by putting the headset in
+>> pair
+>> mode?  *These files have never existed and it has never been paired. How
+>> do i
 >> put it in paired mode?*
 >>
 >> You may have to redo this often if you try to dual-boot windows or if
-you use
+>> you use
 >> the same dongle on another computer. *Never been done*
 >> Be sure to set "auth disable" and "encrypt disable"
 >> in /etc/bluetooth/hcid.conf. *Done*
 >>
 >> This is a headset that i ordered from Ebay. A white box.  Do i *know*
-that the
+>> that the
 >> pin is still the default? No. However i should still be asked for the
-pin at
+>> pin at
 >> some point.
 >>
 >> Again, when i issue a btsco 00:0D:44:4F:37:72 i get:
@@ -86,13 +92,14 @@ pin at
 >> Can't connect RFCOMM channel: Permission denied
 >>
 >>
->> Thank you for the help. Any other suggestions? I have to get this working.
+>> Thank you for the help. Any other suggestions? I have to get this
+>> working.
 >>
 >> Bearcat
 >>
 >> On Wednesday 23 August 2006 22:34 in an email titled "Re: [Bluez-users]
-Logitech Traveler Headset. pin never seen and i am	never asked." Brad
-Midgley
+>> Logitech Traveler Headset. pin never seen and i am	never asked." Brad
+>> Midgley
 >> wrote:
 >> >Bearcat
 >> >
@@ -103,8 +110,8 @@ Midgley
 >> >> for a pin no matter what i put into the config file.
 >> >
 >> >we've had this problem from time to time... the only thing that
-sometimes works is to reset the pairing. some suggestions are listed
-at the end of bluetooth-alsa.sf.net.
+>> >sometimes works is to reset the pairing. some suggestions are listed at
+>> >the end of bluetooth-alsa.sf.net.
 >> >
 >> >brad
 >> >
@@ -112,22 +119,20 @@ at the end of bluetooth-alsa.sf.net.
 >> >
 >> >
 >> >-------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services,
+>> >Using Tomcat but need to do more? Need to support web services,
 >> security?
 >> >Get stuff done quickly with pre-integrated technology to make your job
 >> > easier Download IBM WebSphere Application Server v.1.0.1 based on
 >> Apache
 >> > Geronimo
 >> > http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
+>> > _______________________________________________
 >> >Bluez-users mailing list
 >> >Bluez-users@lists.sourceforge.net
 >> >https://lists.sourceforge.net/lists/listinfo/bluez-users
 >>
 >
 >
-
-
 
 
 
