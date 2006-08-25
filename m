@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <1999a7e40608250248h4fe44645g2d46008f5a8f874c@mail.gmail.com>
-Date: Fri, 25 Aug 2006 06:48:04 -0300
-From: "Dalmo Oliveira" <dalmo2004@gmail.com>
+Date: Fri, 25 Aug 2006 10:42:32 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
 To: bluez-devel@lists.sourceforge.net
+Message-ID: <20060825074232.GR8944@null.research.nokia.com>
+References: <20060824150926.GQ8944@null.research.nokia.com>
+	<d23110170608241129w5db6bffdq5c616f98ad74e509@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] HCI host
+In-Reply-To: <d23110170608241129w5db6bffdq5c616f98ad74e509@mail.gmail.com>
+Subject: Re: [Bluez-devel] [PATCH] rfcomm_dev_del is called twice if
+	RFCOMM_HANGUP_NOW flag is used
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,59 +18,57 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0671167478=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0671167478==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_128675_6650865.1156499284206"
+On Thu, Aug 24, 2006 at 03:29:04PM -0300, ext Ulisses Furquim wrote:
+> Hi Ville,
+> 
+> On 8/24/06, Ville Tervo <ville.tervo@nokia.com> wrote:
+> > I noticed that rfcomm_dev_del() may be called twice if
+> > RFCOMM_HANGUP_NOW flags is used with RFCOMMRELEASEDEV ioctl.
+> 
+> I think you're right but we must have the RFCOMM_RELEASE_ONHUP bit set
+> on dev->flags also, right?
+> 
 
-------=_Part_128675_6650865.1156499284206
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Yep that is right.
 
-    Hi, i am in a group that is developing a bluetooth firmware (in C
-language). We are developing the hci host, baseband, lmp.
-   I would like to test the hci host with bluez, to see if the packets that
-i am expecting are right. How can i use bluez to do this?
+> > I made a patch that checks if dev is still in the device list before
+> > calling deleting device.
+> > The checking is done now in rfcomm_release_dev. Maybe better place would
+> > be rfcomm_dev_del?
+> 
+> Actually calling list_del_init() on an item thas was already deleted
+> with list_del_init() won't hurt anyone but it seems we can mess up the
+> reference counting by calling rfcomm_dev_del() twice.
+> 
+> I think your patch doesn't completely solve the problem because
+> rfcomm_dev_get() will hold a reference to the device if we still
+> manage to find it on the list and we will have reference counting
+> problems too. Adding a call to rfcomm_dev_put() before the call to
+> rfcomm_dev_del() in your patch will keep the reference counting
+> correct, I guess. Something like this:
+> 
+>   if ((dev = rfcomm_dev_get(req.dev_id))) {
+> 		rfcomm_dev_put(dev);
+> 		rfcomm_dev_del(dev);
+>   }
+> 
 
-  Tks!
+You are right.
 
-------=_Part_128675_6650865.1156499284206
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+Ville
 
-<div>&nbsp;&nbsp;&nbsp; Hi, i am in a group that is developing a bluetooth firmware (in C language). We are developing the hci host, baseband, lmp.</div>
-<div>&nbsp;&nbsp; I would like to test the hci host with bluez, to see if the packets that i am expecting are right. How can i use bluez to do this?</div>
-<div>&nbsp;</div>
-<div>&nbsp; Tks!</div>
-
-------=_Part_128675_6650865.1156499284206--
-
-
---===============0671167478==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0671167478==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0671167478==--
