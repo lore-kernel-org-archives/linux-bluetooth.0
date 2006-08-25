@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Sat, 26 Aug 2006 00:45:33 +0300
+From: Niv <nivv@cs.bgu.ac.il>
+In-reply-to: <44EF2EC6.2080503@xmission.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <44EF5754.5080402@cs.bgu.ac.il>
-References: <44EE10FD.5060404@cs.bgu.ac.il>
-	<d23110170608241406r558970ebm8cd8fa121f785ea7@mail.gmail.com>
-	<44EF5754.5080402@cs.bgu.ac.il>
-Date: Sat, 26 Aug 2006 02:07:51 +0200
-Message-Id: <1156550871.4133.129.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] 2.25->3.3 can't ping headset
+Message-id: <44EF6F7D.80003@cs.bgu.ac.il>
+MIME-version: 1.0
+References: <c49421c50608241151u64079792h110bc36642517b65@mail.gmail.com>
+	<44EF2EC6.2080503@xmission.com>
+Subject: Re: [Bluez-users] best dongle for working with bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,21 +21,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Niv,
+Brad Midgley wrote:
+> Loreno
+> 
+> this is becoming a faq... my favorite is the bluetake bt007ex.
+> 
+> brad
+> 
+>> is there a fully compatible bluetooth dongle for working with bluez?
+>> That is, a dongle that traditionally has no compatibility issues for
+>> working with bluez. Some link in amazon, or other on line shops, will be
+>> really useful :-)
+>>
+>> Regards,
+>>
+>> Loreno
 
-> so I see lots of executables in /bluez-gnome, which should I run?
-> I run one that gave me a icon in the taskbar , but didnt give any menus 
-> on right click .
-> where may I read on it? no info in the .gz downlaods
+Hay Brad and Loreno,
+I like to agree I like the 007ex, but upgrading to it from a zonet 1.1 
+adapter , didnt solve the occasion transmitted noise from my headset. 
+Having to use my headset for telephony , this is a problem for me.
+I was sure bluetooth >1.1 was capable of detecting busy channels and not 
+using them, thus if someone in my building is using the microoven I 
+would not hear it. I was wrong, by the way connection to my 1.1 cellular 
+- is noiseless.
 
-I actually only see one executable (two if you count noinst targets) and
-this is bt-applet. This is the actual passkey agent. However you have to
-actually pair with another device to see more than a status icon.
+Oh I do like the way it changes the flashing light according to the 
+bluetooth usage. sweet.
 
-Regards
-
-Marcel
-
+Niv
 
 
 -------------------------------------------------------------------------
