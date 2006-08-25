@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44EF2AF4.8000307@over-here.org>
-Date: Fri, 25 Aug 2006 19:53:08 +0300
-From: Eran <eran_l@over-here.org>
-MIME-Version: 1.0
+Date: Fri, 25 Aug 2006 17:14:43 +0200
+From: automatic_jack <automatic_jack@katamail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Still couldn't get AmbiCom BT2000E card to work...
+Message-ID: <20060825171443.4549dd33@debian>
+In-Reply-To: <44EF0CCB.4010103@xmission.com>
+References: <20060821134723.68c21ab8@debian>
+	<1156168504.3956.27.camel@aeonflux.holtmann.net>
+	<loom.20060821T180305-246@post.gmane.org>
+	<loom.20060825T104609-996@post.gmane.org>
+	<44EF0CCB.4010103@xmission.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Bluetooth 2.0 + EDR dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,73 +24,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+On Fri, 25 Aug 2006 08:44:27 -0600
+Brad Midgley <bmidgley@xmission.com> wrote:
 
+> most or all of the usb adapters still use usb 1.1.
 
-I know this is a problem that's have been on this list for more than 
-once. However, since I gave it somre more time trying to make the card 
-work without success, I would really appreciate it if someone could take 
-a look into my description and let me know if he/she has any insights.
+Thanks for the information Brad :)
 
+> the bt007ex i usually recommend is usb 1.1 as well.
 
-I have an AmbiCom BT2000E card. The identification:
+I have also seen the Bluetake bt007sx dongle (bluetooth 2.0 + edr), are
+there any differences between the EX and SX? Maybe the chipset...
+ 
+Regards,
 
-
-  product info: "AmbiCom,Inc", "BT2000E", "Bluetooth PC/CF Card"
-  manfid: 0x022d, 0x2000
-
-
-Inside /etc/pcmcia/bluetooth.conf:
-
-card "AmbiCom BT2000E Bluetooth Card"
-  version "AmbiCom,Inc", "BT2000E"
-  manfid 0x022d, 0x2000
-  bind "serial_cs"
-
-
-So far, so good.
-
-hciattach /dev/ttyS1 ericsson
-
-would return with no errors, however hcid will be unable to take device 
-up and return a timeout.
-
-The MAC address of the device would be all 00's.
-
-
-I knew, from the past, that a kernel patch may help. I found it on this 
-list and eventually applied it from:
-
-http://www.summet.com/x31/socket.html
-
-
-Still, hcid timed out:
-
-Aug 25 19:55:58 hulud hcid[2954]: Sending read scan enable command 
-failed: Connection timed out (110)
-Aug 25 19:56:00 hulud hcid[2954]: Can't read address for hci0: 
-Connection timed out (110)
-Aug 25 19:56:07 hulud hcid[3108]: Can't init device hci0: Connection 
-timed out (110)
-
-
-Then I stumbled into this post to the list: 
-http://sourceforge.net/mailarchive/message.php?msg_id=11189831
-
-So I tried setserial /dev/ttyS1 baud_base with various values, low as 
-well as high, each time - trying hciattach -s <selected speed> 
-/dev/ttyS1 ericsson.
-Each and every time I had the same problem - hcid could not bring the 
-interface up.
-I've also tried appending a speed to hciattach, to no avail.
-
-I forgot to mention that I'm on a 2.6.17.11 kernel.
-Has this card been reported to work for anyone on a 2.6 kernel?
-
-I will appreciate any help anyone can give.
-
-Thank you all in advance,
-ERan
+jack
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
