@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sat, 26 Aug 2006 00:45:33 +0300
+Date: Fri, 25 Aug 2006 23:02:28 +0300
 From: Niv <nivv@cs.bgu.ac.il>
-In-reply-to: <44EF2EC6.2080503@xmission.com>
+In-reply-to: <d23110170608241406r558970ebm8cd8fa121f785ea7@mail.gmail.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-id: <44EF6F7D.80003@cs.bgu.ac.il>
+Message-id: <44EF5754.5080402@cs.bgu.ac.il>
 MIME-version: 1.0
-References: <c49421c50608241151u64079792h110bc36642517b65@mail.gmail.com>
-	<44EF2EC6.2080503@xmission.com>
-Subject: Re: [Bluez-users] best dongle for working with bluez
+References: <44EE10FD.5060404@cs.bgu.ac.il>
+	<d23110170608241406r558970ebm8cd8fa121f785ea7@mail.gmail.com>
+Subject: Re: [Bluez-users] 2.25->3.3 can't ping headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,33 +21,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Brad Midgley wrote:
-> Loreno
+Ulisses Furquim wrote:
+> Hi Niv,
 > 
-> this is becoming a faq... my favorite is the bluetake bt007ex.
+> On 8/24/06, Niv <nivv@cs.bgu.ac.il> wrote:
+>> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>>      bdaddr 00:0D:44:33:E1:63 ptype 0xcc18 rswitch 0x01 clkoffset 0x61fa
+>> (valid)
+>>      Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+>>  > HCI Event: Command Status (0x0f) plen 4
+>>      Create Connection (0x01|0x0005) status 0x00 ncmd 1
+>>  > HCI Event: Link Key Request (0x17) plen 6
+>>      bdaddr 00:0D:44:33:E1:63
+>> < HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
+>>      bdaddr 00:0D:44:33:E1:63
+>>  > HCI Event: Command Complete (0x0e) plen 10
+>>      Link Key Request Negative Reply (0x01|0x000c) ncmd 1
+>>      status 0x00 bdaddr 00:0D:44:33:E1:63
+>>  > HCI Event: PIN Code Request (0x16) plen 6
+>>      bdaddr 00:0D:44:33:E1:63
+>> < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+>>      bdaddr 00:0D:44:33:E1:63
+>>  > HCI Event: Command Complete (0x0e) plen 10
+>>      PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
 > 
-> brad
+> It seems your headset wants to pair with you but you don't have a
+> passkey agent. You really want the new bluez-gnome package (you can
+> find a link on the Download page) so you can use bt-applet as your
+> default passkey agent.
 > 
->> is there a fully compatible bluetooth dongle for working with bluez?
->> That is, a dongle that traditionally has no compatibility issues for
->> working with bluez. Some link in amazon, or other on line shops, will be
->> really useful :-)
->>
->> Regards,
->>
->> Loreno
+> Regards,
+> 
+> -- Ulisses
 
-Hay Brad and Loreno,
-I like to agree I like the 007ex, but upgrading to it from a zonet 1.1 
-adapter , didnt solve the occasion transmitted noise from my headset. 
-Having to use my headset for telephony , this is a problem for me.
-I was sure bluetooth >1.1 was capable of detecting busy channels and not 
-using them, thus if someone in my building is using the microoven I 
-would not hear it. I was wrong, by the way connection to my 1.1 cellular 
-- is noiseless.
-
-Oh I do like the way it changes the flashing light according to the 
-bluetooth usage. sweet.
+Thanks Ulisses for your replay,
+so I see lots of executables in /bluez-gnome, which should I run?
+I run one that gave me a icon in the taskbar , but didnt give any menus 
+on right click .
+where may I read on it? no info in the .gz downlaods
 
 Niv
 
