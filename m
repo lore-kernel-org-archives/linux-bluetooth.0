@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44EF0CCB.4010103@xmission.com>
-Date: Fri, 25 Aug 2006 08:44:27 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <20060821134723.68c21ab8@debian>	<1156168504.3956.27.camel@aeonflux.holtmann.net>	<loom.20060821T180305-246@post.gmane.org>
-	<loom.20060825T104609-996@post.gmane.org>
-In-Reply-To: <loom.20060825T104609-996@post.gmane.org>
+To: bluez-users@lists.sourceforge.net
+From: automatic_jack <automatic_jack@katamail.com>
+Date: Fri, 25 Aug 2006 08:51:41 +0000 (UTC)
+Message-ID: <loom.20060825T104609-996@post.gmane.org>
+References: <20060821134723.68c21ab8@debian>
+	<1156168504.3956.27.camel@aeonflux.holtmann.net>
+	<loom.20060821T180305-246@post.gmane.org>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] Bluetooth 2.0 + EDR dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,20 +21,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-aj
+automatic_jack <automatic_jack <at> katamail.com> writes:
 
->> Is the B-Speech dongle USB 2.0 or 1.x? The web page don' t say it
-> 
-> eBay seller has written to me that B-Speech Data Speed is an USB 1.1 device, can
-> you confirm, please?
+> Is the B-Speech dongle USB 2.0 or 1.x? The web page don' t say it
 
-most or all of the usb adapters still use usb 1.1. the bt007ex i usually
-recommend is usb 1.1 as well.
+eBay seller has written to me that B-Speech Data Speed is an USB 1.1 device, can
+you confirm, please?
 
-if you can put your usb2 devices on a separate usb bus it will be less
-an issue.
+Thanks :)
 
-brad
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
