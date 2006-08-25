@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sat, 26 Aug 2006 15:13:06 +0200
-From: "Matteo 'Peach' Pescarin" <peach@smartart.it>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20060826151306.012c633a@localhost>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1999a7e40608250248h4fe44645g2d46008f5a8f874c@mail.gmail.com>
+References: <1999a7e40608250248h4fe44645g2d46008f5a8f874c@mail.gmail.com>
+Date: Fri, 25 Aug 2006 15:05:20 +0200
+Message-Id: <1156511120.4133.121.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] rfcomm hell
+Subject: Re: [Bluez-devel] HCI host
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,83 +16,40 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0890781373=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0890781373==
-Content-Type: multipart/signed; boundary=Sig_YmWPBt1ya70oibnrZXCWz7s;
-	protocol="application/pgp-signature"; micalg=PGP-SHA1
+Hi Dalmo,
 
---Sig_YmWPBt1ya70oibnrZXCWz7s
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+>     Hi, i am in a group that is developing a bluetooth firmware (in C
+> language). We are developing the hci host, baseband, lmp.
 
-I've tried everything, I'm going to suspect something in my machine is brok=
-en (udev?), but I can go no further and I am here to ask any developer if h=
-e can help me.
+is this an open project? What hardware are you using for the radio and
+the baseband?
 
-the hcitool works good as long as the usb BT dongle
-I can't rfcomm connect in any way: the error is always reproducible and
-here's the output:
+>    I would like to test the hci host with bluez, to see if the packets
+> that i am expecting are right. How can i use bluez to do this?
 
-# hcitool scan
-Scanning ...
-        00:12:62:A8:12:FE       Miditree
-# rfcomm connect 0
-Can't create RFCOMM TTY: Address already in use
-# rfcomm
-rfcomm0: 00:12:62:A8:12:FE channel 1 clean
-# rfcomm release 0; rfcomm connect 0
-Can't open RFCOMM device: No such file or directory
+If you have USB or UART as transport then you don't need anything
+special. If you only have the raw HCI packets, then you might wanna look
+at the hci_vhci kernel module which allows you to write a virtual
+Bluetooth adapter. The hciemu program for example is using it to emulate
+a HCI device.
 
-I can provide any output you need, but pls help me :(
+Regards
+
+Marcel
 
 
---=20
-Matteo 'Peach' Pescarin
 
-ICQ UIN =3D 71110111
-Jabber ID =3D smartart@unstable.nl
-Web Site =3D http://www.smartart.it
-GPG key =3D http://www.smartart.it/temp/peach.asc
-Key fingerprint =3D C882 C029 540F 0EA3 5318  D2C3 1E4C 8167 0055 105D
-
---Sig_YmWPBt1ya70oibnrZXCWz7s
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-
-iD8DBQFE8EjtHkyBZwBVEF0RAkdoAKC/Ng8tvoCaTuB7Ofz2gZ2PB2EZrQCbBDyn
-uHWCcmgg3LXbZjH13FigClk=
-=X+Rw
------END PGP SIGNATURE-----
-
---Sig_YmWPBt1ya70oibnrZXCWz7s--
-
-
---===============0890781373==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0890781373==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0890781373==--
