@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: CIJOML <cijoml@volny.cz>
 To: bluez-users@lists.sf.net
-Date: Sat, 26 Aug 2006 13:38:13 +0200
-References: <200608261313.21709.cijoml@volny.cz>
-In-Reply-To: <200608261313.21709.cijoml@volny.cz>
+Date: Sat, 26 Aug 2006 13:13:21 +0200
 MIME-Version: 1.0
-Message-Id: <200608261338.13850.cijoml@volny.cz>
-Subject: Re: [Bluez-users] hidd 2.25 and sensor
+Message-Id: <200608261313.21709.cijoml@volny.cz>
+Subject: [Bluez-users] hidd 2.25 and sensor
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,21 +20,11 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi Marcel,
 
-I went down up to 2.15 bluez-utils and behaviour is still the same. Which 
-version introduced hidd in bluez-utils?
-
-Thanks for reply
+I tested 2.25 bluez libs and utils and sensor also switches off, BUT!!! I need 
+click only 1x to "enter" button to activate it back not 2x (random button) 
+like in 3.x row. I gotta check older versions now.
 
 Michal
-
-Dne sobota 26 srpen 2006 13:13 jste napsal(a):
-> Hi Marcel,
->
-> I tested 2.25 bluez libs and utils and sensor also switches off, BUT!!! I
-> need click only 1x to "enter" button to activate it back not 2x (random
-> button) like in 3.x row. I gotta check older versions now.
->
-> Michal
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
