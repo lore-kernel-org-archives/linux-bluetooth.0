@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: CIJOML <cijoml@volny.cz>
 To: bluez-users@lists.sf.net
-Date: Sat, 26 Aug 2006 13:13:21 +0200
+Date: Sat, 26 Aug 2006 12:50:16 +0200
 MIME-Version: 1.0
-Message-Id: <200608261313.21709.cijoml@volny.cz>
-Subject: [Bluez-users] hidd 2.25 and sensor
+Message-Id: <200608261250.16206.cijoml@volny.cz>
+Subject: [Bluez-users] need old bluez-libs and bluez-utils
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,9 +20,12 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi Marcel,
 
-I tested 2.25 bluez libs and utils and sensor also switches off, BUT!!! I need 
-click only 1x to "enter" button to activate it back not 2x (random button) 
-like in 3.x row. I gotta check older versions now.
+I think that in new release 3.x is bug which causes my mouse's sensor go off. 
+So I would like verify that with old 2.X release.
+
+Can you please tell me where to download? 
+
+Thanks a lot
 
 Michal
 
