@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200608261536.11895.akohlsmith-asterisk@benshaw.com>
-References: <200608261250.16206.cijoml@volny.cz>
-	<200608261536.11895.akohlsmith-asterisk@benshaw.com>
-Date: Sun, 27 Aug 2006 16:11:26 +0200
-Message-Id: <1156687886.5613.3.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] need old bluez-libs and bluez-utils
+Message-ID: <44F183CE.5030402@pracucci.com>
+Date: Sun, 27 Aug 2006 11:36:46 +0000
+From: Marco Pracucci <development@pracucci.com>
+MIME-Version: 1.0
+To: Bluez Users ML <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Cross compiling bluez-utils dependancies (dbus)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,25 +18,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Andrew,
+Dear list,
 
-> > I think that in new release 3.x is bug which causes my mouse's sensor go
-> > off. So I would like verify that with old 2.X release.
-> 
-> Yes, please don't hide the old releases!  Make them (easily) available -- I 
-> had to play around with some hit-and-miss filename guessing to get them.
+I have cross compiled (for ARM) latests bluez-libs and openobex libs,
+but I can't cross compile dbus (required for bluez-utils). I have posted
+a message to dbus mailing list, but I can't get any reply.
 
-come on. I is actually not that hard to get the latest bluez-utils-2.x
-release. If you don't know how to get them, then you might should not
-get them at all. I am not going to announce old versions. They are
-available, but not linked. I am not fixing stuff in old versions and so
-there is no reason for linking them. People should us and test the
-latest version.
+Dbus configure script fails when cross compiling, because it tries to
+compile and *run* several test programs (for example, to check for
+getpwnam_r function).
 
-Regards
+---
+./configure --host=arm-linux --prefix=/path --with-expat
+[...]
+checking for posix getpwnam_r... configure: error: cannot run test
+program while cross compiling
+---
 
-Marcel
+Did you ever cross compiled dbus and bluez-utils?
 
+
+Thanks,
+Marco Pracucci
 
 
 -------------------------------------------------------------------------
