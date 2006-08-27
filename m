@@ -1,14 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44F216FA.3020502@over-here.org>
-Date: Mon, 28 Aug 2006 01:04:42 +0300
-From: Eran <eran_l@over-here.org>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <44EF2AF4.8000307@over-here.org>
-	<44F0AC32.5030405@libero.it>	<44F0AFEC.2060707@over-here.org>
-	<44F0B3D2.2060102@libero.it>
-In-Reply-To: <44F0B3D2.2060102@libero.it>
-Subject: Re: [Bluez-users] Still couldn't get AmbiCom BT2000E card to work...
+In-Reply-To: <200608271150.52362.akohlsmith-bluez@benshaw.com>
+References: <200608261250.16206.cijoml@volny.cz>
+	<200608261536.11895.akohlsmith-asterisk@benshaw.com>
+	<1156687886.5613.3.camel@aeonflux.holtmann.net>
+	<200608271150.52362.akohlsmith-bluez@benshaw.com>
+Date: Sun, 27 Aug 2006 22:38:38 +0200
+Message-Id: <1156711118.5613.26.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] need old bluez-libs and bluez-utils
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,189 +23,62 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Andrew,
 
-Yes, I did setserial as you wrote (also tried that to many different 
-speeds).
+> > come on. I is actually not that hard to get the latest bluez-utils-2.x
+> > release. If you don't know how to get them, then you might should not
+> > get them at all. I am not going to announce old versions. They are
+> 
+> If you do not know the exact point-release then yes, it's a pain in the ass to 
+> get the older version.  The latest release at the time I was messing around 
+> with it was 3.2.  The release before was 2.25.  Without googling or going 
+> through the archives to see what the rev before was, it is a pain in the ass.
 
-dmesg shows nothing, but then again - I'm on a 2.6.17.11 kernel compiled 
-by myself.
+you can look at the news list or the archive of the mailing list
+archive. This is not a pain in the ass. It is kinda simple actually.
 
-I've added some debug printouts in the serial driver. I will mail them 
-to you , if you are interested...
+> Honestly, Marcel... we're not asking you to "announce" old releases, simply 
+> give access to an indexed HTML or FTP directory so we can grab old versions 
+> as needed.  May I ask why this is such a problem for you?  Do you presume 
+> that the latest is always superior to the older releases and once something 
+> new is released nobody would ever want an older release?
+
+The latest release is of course always superior. The process is open and
+all of the previous releases are available. The CVS also contains tags
+for all releases. They are simply not linked from the main BlueZ website
+and I don't see any need for it. Trying to stick with an old version is
+never a good idea.
+
+> > available, but not linked. I am not fixing stuff in old versions and so
+> > there is no reason for linking them. People should us and test the
+> > latest version.
+> 
+> I do understand that you're not fixing older versions, but you are adding more 
+> and more "weight" to the BlueZ stack... dbus in particular.  I intend to get 
+> the dbus stuff working on my particular cross-compilation environment, but to 
+> get it working right now I needed an older version.  You make it difficult to 
+> get older versions in some mistaken attempt to gain more testers, but all 
+> you're doing is alienating users who have the wherewithal to help.
+
+This is again about D-Bus. The choice for D-Bus was a hard one and I
+resisted a very long time. However the problem was that the 2.x code
+base became unmaintainable, because of its option to disable D-Bus. The
+D-Bus interface is an essential part for driving the integration of
+Bluetooth forward. At some point it made no longer sense to install it
+without D-Bus support and so it became mandatory.
+
+If you have problems with D-Bus then complain on their mailing list. I
+think they are happy to hear about cross-complication and embedded
+system problems and they are willing to help and solve them.
+
+And even if BlueZ 4.x is a big step away, it seems that we go back to
+require GLib support.
+
+Regards
+
+Marcel
 
 
-Massimo Piccioni wrote:
-
-> Did you setserial /dev/ttyS1 baud_base 912600 ?
-> Your dmesg?
->
-> I'm using kernel 2.6.16.16.
->
->
->
-> Eran wrote:
->   
->> Hi!
->>
->>
->> First, thanks for the advice.
->>
->> Second, I've just tried it and got:
->>
->> [root@hulud /etc/bluetooth]# hciattach /dev/ttyS1 bcsp -s 912600
->> BCSP initialization timed out
->>
->> It doesn't matter if I try it with or without special speeds... it still 
->> wouldn't do.
->>
->>
->> Any ideas?
->>
->>
->> Massimo Piccioni wrote:
->>
->>   
->>     
->>> Hi,
->>>
->>> you should use bcsp type, not ericsson.
->>> Try:
->>>
->>> setserial /dev/ttyS1 baud_base 912600
->>> hciattach /dev/ttyS1 bcsp -s 912600
->>> hciattach hci0 up
->>>
->>> (where /dev/ttyS1 is the serial dev reported by PCMCIA subsystem)
->>> It works fine with my Hamlet HCFBT2, that should be an Ambicom BT2000E 
->>> clone (same PCMCIA manfid ...).
->>>
->>> Ciao
->>> Massimo
->>>
->>>
->>>
->>> Eran wrote:
->>>   
->>>     
->>>       
->>>> Hello,
->>>>
->>>>
->>>> I know this is a problem that's have been on this list for more than 
->>>> once. However, since I gave it somre more time trying to make the card 
->>>> work without success, I would really appreciate it if someone could take 
->>>> a look into my description and let me know if he/she has any insights.
->>>>
->>>>
->>>> I have an AmbiCom BT2000E card. The identification:
->>>>
->>>>
->>>>   product info: "AmbiCom,Inc", "BT2000E", "Bluetooth PC/CF Card"
->>>>   manfid: 0x022d, 0x2000
->>>>
->>>>
->>>> Inside /etc/pcmcia/bluetooth.conf:
->>>>
->>>> card "AmbiCom BT2000E Bluetooth Card"
->>>>   version "AmbiCom,Inc", "BT2000E"
->>>>   manfid 0x022d, 0x2000
->>>>   bind "serial_cs"
->>>>
->>>>
->>>> So far, so good.
->>>>
->>>> hciattach /dev/ttyS1 ericsson
->>>>
->>>> would return with no errors, however hcid will be unable to take device 
->>>> up and return a timeout.
->>>>
->>>> The MAC address of the device would be all 00's.
->>>>
->>>>
->>>> I knew, from the past, that a kernel patch may help. I found it on this 
->>>> list and eventually applied it from:
->>>>
->>>> http://www.summet.com/x31/socket.html
->>>>
->>>>
->>>> Still, hcid timed out:
->>>>
->>>> Aug 25 19:55:58 hulud hcid[2954]: Sending read scan enable command 
->>>> failed: Connection timed out (110)
->>>> Aug 25 19:56:00 hulud hcid[2954]: Can't read address for hci0: 
->>>> Connection timed out (110)
->>>> Aug 25 19:56:07 hulud hcid[3108]: Can't init device hci0: Connection 
->>>> timed out (110)
->>>>
->>>>
->>>> Then I stumbled into this post to the list: 
->>>> http://sourceforge.net/mailarchive/message.php?msg_id=11189831
->>>>
->>>> So I tried setserial /dev/ttyS1 baud_base with various values, low as 
->>>> well as high, each time - trying hciattach -s <selected speed> 
->>>> /dev/ttyS1 ericsson.
->>>> Each and every time I had the same problem - hcid could not bring the 
->>>> interface up.
->>>> I've also tried appending a speed to hciattach, to no avail.
->>>>
->>>> I forgot to mention that I'm on a 2.6.17.11 kernel.
->>>> Has this card been reported to work for anyone on a 2.6 kernel?
->>>>
->>>> I will appreciate any help anyone can give.
->>>>
->>>> Thank you all in advance,
->>>> ERan
->>>>
->>>> -------------------------------------------------------------------------
->>>> Using Tomcat but need to do more? Need to support web services, security?
->>>> Get stuff done quickly with pre-integrated technology to make your job easier
->>>> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
->>>> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
->>>> _______________________________________________
->>>> Bluez-users mailing list
->>>> Bluez-users@lists.sourceforge.net
->>>> https://lists.sourceforge.net/lists/listinfo/bluez-users
->>>>
->>>>   
->>>>     
->>>>       
->>>>         
->>> -------------------------------------------------------------------------
->>> Using Tomcat but need to do more? Need to support web services, security?
->>> Get stuff done quickly with pre-integrated technology to make your job easier
->>> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
->>> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
->>> _______________________________________________
->>> Bluez-users mailing list
->>> Bluez-users@lists.sourceforge.net
->>> https://lists.sourceforge.net/lists/listinfo/bluez-users
->>>   
->>>     
->>>       
->> -------------------------------------------------------------------------
->> Using Tomcat but need to do more? Need to support web services, security?
->> Get stuff done quickly with pre-integrated technology to make your job easier
->> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
->> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
->> _______________________________________________
->> Bluez-users mailing list
->> Bluez-users@lists.sourceforge.net
->> https://lists.sourceforge.net/lists/listinfo/bluez-users
->>
->>   
->>     
->
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->   
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
