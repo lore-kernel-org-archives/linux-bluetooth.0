@@ -1,109 +1,42 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20060829001859.79329.qmail@web25713.mail.ukl.yahoo.com>
-Date: Tue, 29 Aug 2006 01:18:59 +0100 (BST)
-From: Ray <whatdoineed2do@yahoo.co.uk>
-To: bluez-users@lists.sourceforge.net
+Return-Path: <linux@feline-soul.com>
+Message-ID: <2056.216.47.59.131.1156803892.squirrel@webmail.feline-soul.net>
+In-Reply-To: <1156809299.5613.56.camel@aeonflux.holtmann.net>
+References: <e4f1f0110608230129y73240448ufc024c1c99810789@mail.gmail.com>
+    <e4f1f0110608270518v15039332v87d3f90a9fd8d823@mail.gmail.com>
+    <e1effdeb0608280517l13c117fg4f958870027c4595@mail.gmail.com>
+    <e4f1f0110608280930l3475b147ob2f7f3e5e6bf5efe@mail.gmail.com>
+    <e1effdeb0608281114l3b6a29barfb8c6b29b7197638@mail.gmail.com>
+    <1270.216.47.59.131.1156790715.squirrel@webmail.feline-soul.net>
+    <1156799718.5613.48.camel@aeonflux.holtmann.net>
+    <36756.216.47.59.131.1156793990.squirrel@webmail.feline-soul.net>
+    <1156809299.5613.56.camel@aeonflux.holtmann.net>
+Date: Mon, 28 Aug 2006 16:24:52 -0600 (MDT)
+Subject: Re: [Bluez-users] How do I reset a pairing?
+From: "Bearcat M. Sandor" <linux@feline-soul.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Reply-To: linux@feline-soul.com
 MIME-Version: 1.0
-Subject: [Bluez-users] hci0 only comes up with PSCAN (no ISCAN)
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Content-Type: text/plain;charset=iso-8859-1
+List-ID: <bluez-users.lists.sourceforge.net>
 
-hi,
+Marcel,
 
-i have a problem in that my hci0 device only ever
-comes up with pscan (without iscan) and this is
-causing me problems.
+What do i put in my hcid.conf file to make sure the passkey agent is used?
 
-i have started the manually started the daemons but no
-luck
+Bearcat
 
-    $ hcid; sdpd; hciconfig hci0 up piscan noauth
-
-still shows up as (just pscan!!!)
-
-    $ hciconfig -a
-    hci0:   Type: USB
-        BD Address: 00:0E:9B:68:B8:37 ACL MTU: 192:8
-SCO MTU: 64:8
-        UP RUNNING PSCAN
-        RX bytes:12448 acl:176 sco:0 events:322
-errors:0
-        TX bytes:4767 acl:157 sco:0 commands:104
-errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00
-0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2
-HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ@marty (0)'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering,
-Capturing, Object Transfer,
-Audio
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1
-(0x1) LMP Subver: 0x20d
-        Manufacturer: Cambridge Silicon Radio (10) =
-
-
-i googled this and found another person with the same
-problem but no ans.  using linux 2.6.15 with bluez 3.4
-utils/libs
-
-can anyone suggest what i'm doing wrong
-thanks
--r
-
-# /etc/bluetooth/hcid.conf
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        passkey "1234";
-}
-
-device {
-        name "BlueZ@%h (%d)";
-
-        class 0x3e0100;
-
-        # Inquiry and Page scan
-        iscan enable;
-        pscan enable;
-
-        lm accept;
-        lp rswitch,hold,sniff,park;
-}
-
-
-		=
-
-___________________________________________________________ =
-
-Try the all-new Yahoo! Mail. "The New Version is radically easier to use" =
-=96 The Wall Street Journal =
-
-http://uk.docs.yahoo.com/nowyoucan.html
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+> Hi Bearcat,
+>
+>> Thank you!! I've been stressing over this for a month now.  Does the
+>> configuration file changed in order to accomodate this?
+>
+> yes, all the useless config options are gone. The passkey agent is the
+> way to go with the 3.x releases.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
