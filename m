@@ -1,13 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e1effdeb0608280517l13c117fg4f958870027c4595@mail.gmail.com>
-Date: Mon, 28 Aug 2006 09:17:36 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <e4f1f0110608270518v15039332v87d3f90a9fd8d823@mail.gmail.com>
-MIME-Version: 1.0
-References: <e4f1f0110608230129y73240448ufc024c1c99810789@mail.gmail.com>
-	<e4f1f0110608270518v15039332v87d3f90a9fd8d823@mail.gmail.com>
-Subject: Re: [Bluez-users] How do I reset a pairing?
+Date: Mon, 28 Aug 2006 10:32:32 +0200
+From: automatic_jack <automatic_jack@katamail.com>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20060828103232.1f50b8ea@debian>
+In-Reply-To: <20060825171443.4549dd33@debian>
+References: <20060821134723.68c21ab8@debian>
+	<1156168504.3956.27.camel@aeonflux.holtmann.net>
+	<loom.20060821T180305-246@post.gmane.org>
+	<loom.20060825T104609-996@post.gmane.org>
+	<44EF0CCB.4010103@xmission.com> <20060825171443.4549dd33@debian>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Bluetooth 2.0 + EDR dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,78 +24,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Jonny,
+On Fri, 25 Aug 2006 17:14:43 +0200
+automatic_jack <automatic_jack@katamail.com> wrote:
 
-You can use the D-Bus services to do remove the link key:
-$dbus-send --system --type=method_call --print-reply --dest=org.bluez
-/org/bluez/hci0 org.bluez.Adapter.RemoveBonding
-string:XX:XX:XX:XX:XX:XX
+> I have also seen the Bluetake bt007sx dongle (bluetooth 2.0 + edr),
+> are there any differences between the EX and SX? Maybe the chipset...
 
+Bluetake has written to me that there is no difference on chipset. The
+difference is only on software (BT007EX is Toshiba; BT007/9SX is IVT).
 
-or remove the entry in the file:
-/var/lib/bluetooth/local_bt_address/linkkeys
+Regards,
 
-
-Send us the hcidump(hcidump -X -a -V) if you still having problems.
-
-BR,
-Claudio.
-
-
-On 8/27/06, jonny Linux <jonnylinux@gmail.com> wrote:
->
->
-> >
-> > If I try to connect from the laptop I get no problems connecting. But if I
-> try to connect from the desktop I get a "Permission denied error", or if I
-> try "hcitool cc <ba>" I get "Can't create connection: Input/output error".
-> >
-> > I don't get asked for a pin when I connect from the desktop, but I think I
-> was once asked for a pin. So I think somehow the pairing between the devices
-> has been broken. Is there anyway I can reset the pairing between the desktop
-> and the NXT?
->
->
->
-> Hi,
->
-> Sorry to reply to my own post, but I'm still having problems with this and
-> I'd really like to get it working. I've tried using hciconfig delkey, but
-> nothing seems to happen. Is delkey the command I should be trying to use?
-> Which address should I give as a parameter to delkey, should it be the
-> address of the bluetooth device I'm trying to connect to (the NXT) or the
-> local bluetooth device (the USB dongle plugged into the computer)?
->
-> Whenever I try to use "hciconfig delkey" there is no output, and it always
-> exits with exit code 0. Is there any way to make it ask me which pin I want
-> to use with the device?
->
-> Thanks,
->
-> Jonny
->
->
->
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job
-> easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
->
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
->
-
-
--- 
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+jack
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
