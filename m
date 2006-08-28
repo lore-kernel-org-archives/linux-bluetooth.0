@@ -1,16 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 28 Aug 2006 10:32:32 +0200
-From: automatic_jack <automatic_jack@katamail.com>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20060828103232.1f50b8ea@debian>
-In-Reply-To: <20060825171443.4549dd33@debian>
-References: <20060821134723.68c21ab8@debian>
-	<1156168504.3956.27.camel@aeonflux.holtmann.net>
-	<loom.20060821T180305-246@post.gmane.org>
-	<loom.20060825T104609-996@post.gmane.org>
-	<44EF0CCB.4010103@xmission.com> <20060825171443.4549dd33@debian>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluetooth 2.0 + EDR dongle
+Message-ID: <44F2A960.7040002@tootai.net>
+Date: Mon, 28 Aug 2006 10:29:20 +0200
+From: Administrator TOOTAI <admin@tootai.net>
+MIME-Version: 1.0
+To: Bluetooth <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Bluetooth with Windows CE5 problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,18 +18,56 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Fri, 25 Aug 2006 17:14:43 +0200
-automatic_jack <automatic_jack@katamail.com> wrote:
+Mornibg,
 
-> I have also seen the Bluetake bt007sx dongle (bluetooth 2.0 + edr),
-> are there any differences between the EX and SX? Maybe the chipset...
+I use bluetooth stack on my Debian SID since ages, specially for headset 
+(BT100 and B-Speach) and it work well. Now I bought a smartphone -O2 XDA 
+Atom- which is running Windows CE5.
 
-Bluetake has written to me that there is no difference on chipset. The
-difference is only on software (BT007EX is Toshiba; BT007/9SX is IVT).
+The problem I face is that I can't use the device as a Headset. I can 
+beam files from device to notebook. On the device, I only have the 
+serial port service from my USB dongle (Linksys Class1 BT100)
 
-Regards,
+Here is the output of sdptool browse --l2cap 00:02:C7:EF:8C:CB
 
-jack
+Service Name: Voice Gateway
+Service RecHandle: 0x10002
+Service Class ID List:
+   "Headset Audio Gateway" (0x1112)
+   "Generic Audio" (0x1203)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 1
+Profile Descriptor List:
+   "Headset" (0x1108)
+     Version: 0x0100
+
+Service Name: Voice Gateway
+Service RecHandle: 0x10003
+Service Class ID List:
+   "Handfree Audio Gateway" (0x111f)
+   "Generic Audio" (0x1203)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 2
+Profile Descriptor List:
+   "Handsfree" (0x111e)
+     Version: 0x0101
+
+What is strange is that browsing the device without --l2cap shows nothing:
+
+nomade:/etc/bluetooth# sdptool browse 00:02:C7:EF:8C:CB
+Browsing 00:02:C7:EF:8C:CB ...
+nomade:/etc/bluetooth#
+
+If someone has a way to get it work, would be great to share.
+
+Thanks
+
+-- 
+Daniel
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
