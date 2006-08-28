@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44F32933.90808@evilgenius.de>
-Date: Mon, 28 Aug 2006 19:34:43 +0200
-From: Martin Karger <martin@evilgenius.de>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44F22717.1080308@evilgenius.de>
-	<1156772287.5613.31.camel@aeonflux.holtmann.net>
-In-Reply-To: <1156772287.5613.31.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] flexible bt-dongle and bccmd
+In-Reply-To: <1156770065.8576.71.camel@localhost>
+References: <1156757049.8576.62.camel@localhost>
+	<1156772367.5613.33.camel@aeonflux.holtmann.net>
+	<1156770065.8576.71.camel@localhost>
+Date: Mon, 28 Aug 2006 21:15:34 +0200
+Message-Id: <1156792534.5613.42.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] rfcomm in TTY raw mode from DBus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,43 +22,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Martin,
+Hi Pierre-Yves,
+
+> > > I can get the rfcomm connected nicely from the DBus, I only miss how to
+> > > have it done in "raw".
+> > 
+> > this is the job the application using that TTY. It is the same as you
+> > need to /dev/ttyS0 etc.
 > 
->> i am looking for a (csr-based) bt-dongle where you can at least change
->> the following things: bdaddr, features, remver and manufacturer.
->>
->> i am currently owning a bt-6030. i am able to change the key "version",
->> but not "remver". does anyone have an idea on this?
+> Thank you for your answer Marcel. After some investigation, it seems
+> that switching a virtual TTY into raw mode is not possible in pure JAVA
+> (a native call (eg JNI) to C code has to be used).
 > 
-> maybe this firmware doesn't have the key for remote version. You can use
-> hcidump -X -V to check the actual return value of the command.
+> As the DBus interface is meant to be used from various languages which
+> may or may not have the ability to configure TTYs, wouldn't it make
+> sense to offer the possibility to get the TTY in one mode or the other
+> at the time of the DBus "connect" call? Or am  missing other important
+> points? To make it short, I do not understand why it is a good idea to
+> offer this option from the "rfcomm" utility, and not from the DBus
+> interface.
 
-hi marcel,
+the rfcomm utility has this capability, because I needed it for some
+early kernel RFCOMM demonstrations. I wrote that tool back in 2002 and
+in general the application should set the TTY in the needed mode. Only
+cat is too stupid for this.
 
-i just realised that the problem is not changing the value of remver.
-the output of hcidump looks good. i can store differnt values in psi or
-psram.
+If Java or any other language is too stupid to handle a TTY correctly
+then it also will have problems with serial ports and other TTY based
+services. This is a problem of the language you choose. So in this case
+you have to fix the language and not make our D-Bus API workaround these
+problems.
 
-the problem seems to be somewhere else:
+Regards
 
-PSKEY_LMP_REMOTE_VERSION has the value 0x0003 which is for LMP Version
-2.0 i guess. but the output of hcitool info shows the wrong value (0x2)
-
-# bccmd -i hci1 psget remver
-The LMP version reported remotely: 0x0003 (3)
-# hcitool info 00:0A:94:02:12:34
-Requesting information ...
-        BD Address:  00:0A:94:02:12:34
-        Device Name: BlueZ (1)
-        LMP Version: 1.2 (0x2) LMP Subversion: 0x5dc
-        Manufacturer: Cambridge Silicon Radio (10)
+Marcel
 
 
-and btw, what is PSKEY_HOST_INTERFACE for?
-
-thanks,
-martin
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
