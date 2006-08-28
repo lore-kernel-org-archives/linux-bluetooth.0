@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44F32933.90808@evilgenius.de>
-References: <44F22717.1080308@evilgenius.de>
-	<1156772287.5613.31.camel@aeonflux.holtmann.net>
-	<44F32933.90808@evilgenius.de>
-Date: Mon, 28 Aug 2006 23:17:53 +0200
-Message-Id: <1156799873.5613.51.camel@aeonflux.holtmann.net>
+In-Reply-To: <44F33232.8030505@arcor.de>
+References: <44F33232.8030505@arcor.de>
+Date: Mon, 28 Aug 2006 23:13:09 +0200
+Message-Id: <1156799590.5613.45.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] flexible bt-dongle and bccmd
+Subject: Re: [Bluez-devel] Asynchronous inquiry
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,29 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Martin,
+Hi Simon,
 
-> i just realised that the problem is not changing the value of remver.
-> the output of hcidump looks good. i can store differnt values in psi or
-> psram.
-> 
-> the problem seems to be somewhere else:
-> 
-> PSKEY_LMP_REMOTE_VERSION has the value 0x0003 which is for LMP Version
-> 2.0 i guess. but the output of hcitool info shows the wrong value (0x2)
-> 
-> # bccmd -i hci1 psget remver
-> The LMP version reported remotely: 0x0003 (3)
-> # hcitool info 00:0A:94:02:12:34
-> Requesting information ...
->         BD Address:  00:0A:94:02:12:34
->         Device Name: BlueZ (1)
->         LMP Version: 1.2 (0x2) LMP Subversion: 0x5dc
->         Manufacturer: Cambridge Silicon Radio (10)
+> Is there a way, to do an asynchronous inquiry. I only know the
+> hci_inquiry function, which gives you a complete list of the found
+> devices. For two projects (a GUI and a research project) I would like to
+> present each device as soon as it has been found. Is it possible to have
+> some kind of notification each time a device sends the inquiry response
+> message? (Something like multi-processing / multi-threading)?
 
-the remote version is the version that the other side will see. However
-what is the reason for playing around with this. You better use psclr to
-remove this key and let the firmware set the default value.
+you can either use the HCI raw socket directly or use the new D-Bus
+based API. I would propose you use the D-Bus API. An example might
+follow in the next couple of days in the bluez-gnome CVS repository.
 
 Regards
 
