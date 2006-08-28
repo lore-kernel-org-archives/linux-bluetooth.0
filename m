@@ -1,15 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Pierre-Yves Paulus <py@idlum.be>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1156792534.5613.42.camel@aeonflux.holtmann.net>
-References: <1156757049.8576.62.camel@localhost>
-	<1156772367.5613.33.camel@aeonflux.holtmann.net>
-	<1156770065.8576.71.camel@localhost>
-	<1156792534.5613.42.camel@aeonflux.holtmann.net>
-Date: Tue, 29 Aug 2006 09:53:51 +0200
-Message-Id: <1156838032.8576.93.camel@localhost>
+In-Reply-To: <44F353E9.7080406@evilgenius.de>
+References: <44F22717.1080308@evilgenius.de>
+	<1156772287.5613.31.camel@aeonflux.holtmann.net>
+	<44F32933.90808@evilgenius.de>
+	<1156799873.5613.51.camel@aeonflux.holtmann.net>
+	<44F353E9.7080406@evilgenius.de>
+Date: Tue, 29 Aug 2006 01:57:07 +0200
+Message-Id: <1156809428.5613.59.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] rfcomm in TTY raw mode from DBus
+Subject: Re: [Bluez-devel] flexible bt-dongle and bccmd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,35 +24,49 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Mon, 2006-08-28 at 21:15 +0200, Marcel Holtmann wrote:
+Hi Martin,
 
-> the rfcomm utility has this capability, because I needed it for some
-> early kernel RFCOMM demonstrations. I wrote that tool back in 2002 and
-> in general the application should set the TTY in the needed mode. Only
-> cat is too stupid for this.
+> >> i just realised that the problem is not changing the value of remver.
+> >> the output of hcidump looks good. i can store differnt values in psi or
+> >> psram.
+> >>
+> >> the problem seems to be somewhere else:
+> >>
+> >> PSKEY_LMP_REMOTE_VERSION has the value 0x0003 which is for LMP Version
+> >> 2.0 i guess. but the output of hcitool info shows the wrong value (0x2)
+> >>
+> >> # bccmd -i hci1 psget remver
+> >> The LMP version reported remotely: 0x0003 (3)
+> >> # hcitool info 00:0A:94:02:12:34
+> >> Requesting information ...
+> >>         BD Address:  00:0A:94:02:12:34
+> >>         Device Name: BlueZ (1)
+> >>         LMP Version: 1.2 (0x2) LMP Subversion: 0x5dc
+> >>         Manufacturer: Cambridge Silicon Radio (10)
+> > 
+> > the remote version is the version that the other side will see. However
+> > what is the reason for playing around with this. You better use psclr to
+> > remove this key and let the firmware set the default value.
+> > 
+> 
+> first reason to play around with it: the remote version is wrong for
+> this bt-dongle. i think it should be 0x3 not 0x2.
+> second reason is, i want to find out, if its possible to "clone" a
+> bt-device. not only the address but also things like lmp-version or
+> features of a device.
 
-Ok.
+you can change the LMP version and the features. In case of CSR the LMP
+subver is not changeable, because this is the build id of the firmware.
 
-> If Java or any other language is too stupid to handle a TTY correctly
-> then it also will have problems with serial ports and other TTY based
-> services. This is a problem of the language you choose. So in this case
-> you have to fix the language and not make our D-Bus API workaround these
-> problems.
+> when i am able to delete/clear a pskey, can also wonder if i can create
+> a new pskey entry.
 
-The reason why I asked for the DBus to do so was also driven by a
-mistake in my understanding of the action to be performed. Your answers
-and further investigation made the point clearer for me.
+Sure. You can do whatever you want the PS storage. Including rendering
+your device useless.
 
-The JAVA language does not completely lack the ability to manage it, as
-it allows a native call to perform the task. I think the reason it does
-not offer high level methods to perform this kind of task is its aim to
-platform independance. But anyway, I did write a small C function and
-call it using JNI, and it is working smoothly.
+Regards
 
-Thanks for your support,
-Best Regards.
-
-Pierre-Yves
+Marcel
 
 
 
