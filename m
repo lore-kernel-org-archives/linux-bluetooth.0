@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Pierre-Yves Paulus <py@idlum.be>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1156772367.5613.33.camel@aeonflux.holtmann.net>
+In-Reply-To: <1156757049.8576.62.camel@localhost>
 References: <1156757049.8576.62.camel@localhost>
-	<1156772367.5613.33.camel@aeonflux.holtmann.net>
-Date: Mon, 28 Aug 2006 15:01:04 +0200
-Message-Id: <1156770065.8576.71.camel@localhost>
+Date: Mon, 28 Aug 2006 15:39:26 +0200
+Message-Id: <1156772367.5613.33.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] rfcomm in TTY raw mode from DBus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -21,30 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Pierre-Yves,
 
-> > I can get the rfcomm connected nicely from the DBus, I only miss how to
-> > have it done in "raw".
+> How can I open an rfcomm connection into TTY raw mode from DBus? I mean,
+> something equivalent to the command "rfcomm --raw". Is it possible at
+> the moment?
 > 
-> this is the job the application using that TTY. It is the same as you
-> need to /dev/ttyS0 etc.
+> I can get the rfcomm connected nicely from the DBus, I only miss how to
+> have it done in "raw".
 
-Thank you for your answer Marcel. After some investigation, it seems
-that switching a virtual TTY into raw mode is not possible in pure JAVA
-(a native call (eg JNI) to C code has to be used).
-
-As the DBus interface is meant to be used from various languages which
-may or may not have the ability to configure TTYs, wouldn't it make
-sense to offer the possibility to get the TTY in one mode or the other
-at the time of the DBus "connect" call? Or am  missing other important
-points? To make it short, I do not understand why it is a good idea to
-offer this option from the "rfcomm" utility, and not from the DBus
-interface.
-
-Any light would be appreciated!
+this is the job the application using that TTY. It is the same as you
+need to /dev/ttyS0 etc.
 
 Regards
 
-Pierre-Yves
+Marcel
+
 
 
 -------------------------------------------------------------------------
