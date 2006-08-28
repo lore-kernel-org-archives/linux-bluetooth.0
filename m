@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1999a7e40608271848u75892dd0q251f973cfd2133b7@mail.gmail.com>
-References: <1999a7e40608271848u75892dd0q251f973cfd2133b7@mail.gmail.com>
-Date: Mon, 28 Aug 2006 15:36:50 +0200
-Message-Id: <1156772211.5613.29.camel@aeonflux.holtmann.net>
+From: Pierre-Yves Paulus <py@idlum.be>
+To: bluez-devel@lists.sourceforge.net
+Date: Mon, 28 Aug 2006 11:24:08 +0200
+Message-Id: <1156757049.8576.62.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] HCI host
+Subject: [Bluez-devel] rfcomm in TTY raw mode from DBus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,19 +18,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Dalmo,
+Hello,
 
-> 
-> Hi Marcel, i would like to know if is possible to create a program in
-> C that receive HCI packet from bluez. Is it possible?
+How can I open an rfcomm connection into TTY raw mode from DBus? I mean,
+something equivalent to the command "rfcomm --raw". Is it possible at
+the moment?
 
-as I said, you need to use the hci_vhci kernel module and then write a
-program that feeds HCI data into /dev/vhci and back to your system. The
-hciemu program is doing something like this.
+I can get the rfcomm connected nicely from the DBus, I only miss how to
+have it done in "raw".
 
-Regards
+Thanks,
+Best Regards
 
-Marcel
+Pierre-Yves Paulus
+
 
 
 
