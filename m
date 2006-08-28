@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <44F32B56.3010803@evilgenius.de>
+Date: Mon, 28 Aug 2006 19:43:50 +0200
+From: Martin Karger <martin@evilgenius.de>
 MIME-Version: 1.0
-Date: Mon, 28 Aug 2006 13:46:37 -0400
-Message-ID: <70DCB28C5BB04A4BBB1C8512589BAC65012DD940@MAIL006.mail.lan>
-In-Reply-To: <44F32B56.3010803@evilgenius.de>
-From: "Brand, Chris" <chris.brand@qwikker.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <70DCB28C5BB04A4BBB1C8512589BAC65012DD931@MAIL006.mail.lan>
+In-Reply-To: <70DCB28C5BB04A4BBB1C8512589BAC65012DD931@MAIL006.mail.lan>
 Subject: Re: [Bluez-devel] flexible bt-dongle and bccmd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,20 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
- 
-> >> and btw, what is PSKEY_HOST_INTERFACE for?
-> > 
-> > It controls how the host interfaces with the BlueCore chip (USB or 
-> > UART).
+Brand, Chris wrote:
+>  
+>> and btw, what is PSKEY_HOST_INTERFACE for?
 > 
-> i guess 0x0002 stands for usb? so 0x0001 should be uart? any 
-> other possible values?
+> It controls how the host interfaces with the BlueCore chip (USB or
+> UART).
 
-1 = UART running BCSP
-2 = USB
-3 = UART (H4)
-
-Chris
+i guess 0x0002 stands for usb? so 0x0001 should be uart? any other
+possible values?
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
