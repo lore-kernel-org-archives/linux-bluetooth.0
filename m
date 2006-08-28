@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44F22717.1080308@evilgenius.de>
-References: <44F22717.1080308@evilgenius.de>
-Date: Mon, 28 Aug 2006 15:38:06 +0200
-Message-Id: <1156772287.5613.31.camel@aeonflux.holtmann.net>
+In-Reply-To: <1999a7e40608271848u75892dd0q251f973cfd2133b7@mail.gmail.com>
+References: <1999a7e40608271848u75892dd0q251f973cfd2133b7@mail.gmail.com>
+Date: Mon, 28 Aug 2006 15:36:50 +0200
+Message-Id: <1156772211.5613.29.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] flexible bt-dongle and bccmd
+Subject: Re: [Bluez-devel] HCI host
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,16 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Martin,
+Hi Dalmo,
 
-> i am looking for a (csr-based) bt-dongle where you can at least change
-> the following things: bdaddr, features, remver and manufacturer.
 > 
-> i am currently owning a bt-6030. i am able to change the key "version",
-> but not "remver". does anyone have an idea on this?
+> Hi Marcel, i would like to know if is possible to create a program in
+> C that receive HCI packet from bluez. Is it possible?
 
-maybe this firmware doesn't have the key for remote version. You can use
-hcidump -X -V to check the actual return value of the command.
+as I said, you need to use the hci_vhci kernel module and then write a
+program that feeds HCI data into /dev/vhci and back to your system. The
+hciemu program is doing something like this.
 
 Regards
 
