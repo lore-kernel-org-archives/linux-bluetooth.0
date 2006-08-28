@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1156757049.8576.62.camel@localhost>
-References: <1156757049.8576.62.camel@localhost>
-Date: Mon, 28 Aug 2006 15:39:26 +0200
-Message-Id: <1156772367.5613.33.camel@aeonflux.holtmann.net>
+In-Reply-To: <44F22717.1080308@evilgenius.de>
+References: <44F22717.1080308@evilgenius.de>
+Date: Mon, 28 Aug 2006 15:38:06 +0200
+Message-Id: <1156772287.5613.31.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] rfcomm in TTY raw mode from DBus
+Subject: Re: [Bluez-devel] flexible bt-dongle and bccmd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,17 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pierre-Yves,
+Hi Martin,
 
-> How can I open an rfcomm connection into TTY raw mode from DBus? I mean,
-> something equivalent to the command "rfcomm --raw". Is it possible at
-> the moment?
+> i am looking for a (csr-based) bt-dongle where you can at least change
+> the following things: bdaddr, features, remver and manufacturer.
 > 
-> I can get the rfcomm connected nicely from the DBus, I only miss how to
-> have it done in "raw".
+> i am currently owning a bt-6030. i am able to change the key "version",
+> but not "remver". does anyone have an idea on this?
 
-this is the job the application using that TTY. It is the same as you
-need to /dev/ttyS0 etc.
+maybe this firmware doesn't have the key for remote version. You can use
+hcidump -X -V to check the actual return value of the command.
 
 Regards
 
