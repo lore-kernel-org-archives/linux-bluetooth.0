@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <44F1A585.8050408@prodigy7.de>
-References: <44F1A585.8050408@prodigy7.de>
-Date: Tue, 29 Aug 2006 23:52:23 +0200
-Message-Id: <1156888343.4026.39.camel@aeonflux.holtmann.net>
+In-Reply-To: <20060829180123.GD12634@suse.de>
+References: <20060822181532.6fea4851@localhost>
+	<20060829110613.49f2a9a4@localhost>  <20060829180123.GD12634@suse.de>
+Date: Tue, 29 Aug 2006 22:49:38 +0200
+Message-Id: <1156884578.4026.25.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Can't use capi/cmtp with bfusb
+Subject: Re: [Bluez-users] rfcomm hell
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,15 +21,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Manuel,
+Hi Stefan,
 
-> i try to get my BlueFritz! USB-Stick get working on my Kurobox (An NAS 
-> based on an PPC-CPU) but i've the problem, that i can't use the capi 
-> device after loading all modules (See messages at the end of this mail).
+> > I found what was wrong, and it was udev.
+> > After following a tutorial I added the following rule to change the permissions upon dev creation:
+> > 
+> > # cat /etc/udev/rules.d/10-udev.rules 
+> > KERNEL="rfcomm[0-9]*", NAME="bluetooth/%k", GROUP="users", MODE="0660"
+> > 
+> > after commenting it rfcomm started connecting :-D
+> 
+> i have
+> root@susi:/tmp# cat /etc/udev/rules.d/47-rfcomm.rules
+> # udev-rules for rfcomm devices
+> KERNEL=="rfcomm*", NAME="%k" GROUP="uucp" MODE="0660" OPTIONS="resmgr"
 
-I think the problem is that your CPU is big endian and the CAPI
-subsystem is not working on big endian systems. I tried to fix it at one
-point, but never succeeded.
+these should be needed at all. The rfcommX devices are TTYs and a
+
+	SUBSYSTEM=="tty", GROUP="dialout"
+
+or similar should take care of the correct permissions and group
+assignment.
+
+> The OPTIONS=resmgr is probably SUSE specific, but the rest should be generic
+> and works just fine for me.
+
+Yes, it is.
 
 Regards
 
