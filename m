@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <10d5a94bb15.squonimo@virgilio.it>
-Date: Tue, 29 Aug 2006 16:38:19 +0100 (GMT+01:00)
+Message-ID: <10d5a90c0da.squonimo@virgilio.it>
+Date: Tue, 29 Aug 2006 16:33:58 +0100 (GMT+01:00)
 From: Alex B <squonimo@virgilio.it>
-To: Bluez-devel@lists.sourceforge.net
+To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
-Subject: [Bluez-devel] problem with bluez-utils 3.4 and dbus
+Subject: [Bluez-devel] Problems with bluez-utils 3.4
 Reply-To: Alex B <squonimo@virgilio.it>,
         BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,12 +19,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I'm trying to croos compile bluez-utils for XScale.
-
-when I write make 
-Install the error is:
-/usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2
-/../../../../arm-linux/bin/ld:
+hi all,
+I'm trying to croos compile the bluez utils 3.4 for arm-linux 
+(XScale PXA270).
+I read many tutorial and howto, but i've always the 
+same problem with dbus-glib.1 when I write make Install:
+-----------------------------------
+/usr/local/arm-linux/lib/gcc-
+lib/arm-linux/3.3.2/../../../../arm-linux/bin/ld:
 skipping incompatible 
 /opt/gnome/lib/libdbus-glib-1.so when searching
 for -ldbus-glib-1
@@ -32,22 +34,16 @@ for -ldbus-glib-1
 linux/bin/ld:
 cannot find -ldbus-glib-1
 collect2: ld returned 1 exit 
-status
+status 
+-----------------------------------
 
+in /opt/gnome/lib libdbus-
+glib-1.so it's a simlink to /usr/lib/libdbus-glib-1.so
 
-/opt/gnome/lib/libdbus-glib-1.so it's a simlink to 
-/usr/lib/libdbus-glib-1.so
+Can someone 
+help me???
 
-I read all old topics about this problem, 
-but I never found a solution.
-
-the configure string is:
-./configure --
-host=arm-linux --prefix=/mydir --whit-bluez=/mydir
-
-Can someone help 
-me???
-tnx
+tnx 
 Alex B
 
 -------------------------------------------------------------------------
