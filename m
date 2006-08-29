@@ -1,10 +1,26 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20060829212436.50217.qmail@web25713.mail.ukl.yahoo.com>
-Date: Tue, 29 Aug 2006 22:24:36 +0100 (BST)
-From: Ray <whatdoineed2do@yahoo.co.uk>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: Re: [Bluez-users] hci0 only comes up with PSCAN (no ISCAN)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux@feline-soul.com
+In-Reply-To: <4253.216.47.59.131.1156884752.squirrel@webmail.feline-soul.net>
+References: <e4f1f0110608230129y73240448ufc024c1c99810789@mail.gmail.com>
+	<e4f1f0110608270518v15039332v87d3f90a9fd8d823@mail.gmail.com>
+	<e1effdeb0608280517l13c117fg4f958870027c4595@mail.gmail.com>
+	<e4f1f0110608280930l3475b147ob2f7f3e5e6bf5efe@mail.gmail.com>
+	<e1effdeb0608281114l3b6a29barfb8c6b29b7197638@mail.gmail.com>
+	<1270.216.47.59.131.1156790715.squirrel@webmail.feline-soul.net>
+	<1156799718.5613.48.camel@aeonflux.holtmann.net>
+	<36756.216.47.59.131.1156793990.squirrel@webmail.feline-soul.net>
+	<1156809299.5613.56.camel@aeonflux.holtmann.net>
+	<2056.216.47.59.131.1156803892.squirrel@webmail.feline-soul.net>
+	<1156848432.5613.67.camel@aeonflux.holtmann.net>
+	<1345.216.47.59.131.1156883686.squirrel@webmail.feline-soul.net>
+	<1156890900.4026.49.camel@aeonflux.holtmann.net>
+	<4253.216.47.59.131.1156884752.squirrel@webmail.feline-soul.net>
+Date: Wed, 30 Aug 2006 01:00:59 +0200
+Message-Id: <1156892459.4026.56.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Cc: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] How do I reset a pairing?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,43 +34,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi Marcel
+Hi Bearcat,
 
-> > i am currently using bluez 3.4 (hcid has dynamic
-dep
-> > on libbluetooth-2.2.1) so the disable iscan bug
-still
-> > exists.
-> 
-> I have no idea what you mean. This bug has nothing
-to do with the
-> library version you use. However if you use
-bluez-utils-3.4 the you
-> should also use bluez-libs-3.4 as stated in the
-ChangeLog file. A
-> previous library version might work, but it can also
-have side effects.
+> I've looked through the blues-utils 3.2 source code directories and not
+> seen such a script. Can you point it out to me, or is it code that need to
+> be compiled, or a pice of code that needs to be extracted/followed.
 
-what i meant to say was that i was using both the 3.4
-versions of the bluez-libs and bluez-utils;  i was
-saying that the hcid binary (from the utils pkg) has a
-dynamic dep (ldd) against the libbluetooth.so.2.2.1
-just to prove that everything i have used is from the
-3.4 bluez libs/utils
+it is hcid/passkey-agent.c and it is a C program. You can of course do
+the same in Python or any other language with D-Bus bindings.
 
-given this situation, would you say that there is
-still a bug?
+Regards
 
-thanks
-ray
+Marcel
 
 
-	
-	
-		
-___________________________________________________________ 
-All new Yahoo! Mail "The new Interface is stunning in its simplicity and ease of use." - PC Magazine 
-http://uk.docs.yahoo.com/nowyoucan.html
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
