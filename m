@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <50269.157.193.214.17.1156867288.squirrel@www.ibcn.intec.ugent.be>
-References: <50269.157.193.214.17.1156867288.squirrel@www.ibcn.intec.ugent.be>
-Date: Tue, 29 Aug 2006 22:56:45 +0200
-Message-Id: <1156885005.4026.33.camel@aeonflux.holtmann.net>
+In-Reply-To: <44F4A0FC.3090809@pracucci.com>
+References: <10d5a94bb15.squonimo@virgilio.it> <44F4A0FC.3090809@pracucci.com>
+Date: Tue, 29 Aug 2006 22:53:48 +0200
+Message-Id: <1156884828.4026.30.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Registering service / Getting data
+Subject: Re: [Bluez-devel] problem with bluez-utils 3.4 and dbus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,34 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Dieter,
+Hi Marco,
 
-> I'm developing an application that should capture some data sent by a
-> bluetooth device.
-> The device is not discoverable, only comes up when it has some data to send.
-> It searches for devices with a certain PIN. When it can pair, it queries
-> the sdpd for
-> services meeting the Serial Port Profile (0x1101) and sends the data to
-> this service.
+> > /usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2/../../../../arm-
+> > linux/bin/ld:
+> > cannot find -ldbus-glib-1
+> > collect2: ld returned 1 exit 
+> > status
 > 
-> When I use hcidump, i can see the data pass, but I can't figure out how to
-> get it in a C program.
-> 
-> I used http://people.csail.mit.edu/albert/bluez-intro/index.html as
-> reference to program in C.
-> 
-> When I register my service with the sdpd daemon, i don't know how to query
-> the sdpd. At least i don't see my service using sdptool. When I run the C
-> program, nothing happens, the app keeps listening for incoming
-> connections.
-> 
-> In attachment my hcidump and c-file.
+> Have you cross compiled dbus?
+> If you have cross compiled dbus you should add -L<dbus library path> to
+> LDFLAG, where <dbus library path> is the path to the cross compiled dbus
+> library.
 
-first of all the preferred mode is "hcidump -X -V", because I am not
-going to decode any HCI traffic by hand.
-
-Second, the RFCOMM channel in the SDP service registration (in your case
-it is 11) should match the channel you listen on (which is 1).
+I would prefer if you actually trust pkg-config to configure this
+correctly. Messing around with the linker path can have weird side
+effects if you don't know exactly what you are doing.
 
 Regards
 
