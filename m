@@ -1,17 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1156857801.8576.117.camel@localhost>
-References: <1156839814.8576.104.camel@localhost>
-	<1156848370.5613.66.camel@aeonflux.holtmann.net>
-	<1156854435.8576.113.camel@localhost>
-	<1156862083.6183.3.camel@aeonflux.holtmann.net>
-	<1156857801.8576.117.camel@localhost>
-Date: Tue, 29 Aug 2006 19:44:55 +0200
-Message-Id: <1156873495.4026.6.camel@aeonflux.holtmann.net>
+Message-ID: <10d5a94bb15.squonimo@virgilio.it>
+Date: Tue, 29 Aug 2006 16:38:19 +0100 (GMT+01:00)
+From: Alex B <squonimo@virgilio.it>
+To: Bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] hcid crash
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] problem with bluez-utils 3.4 and dbus
+Reply-To: Alex B <squonimo@virgilio.it>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -24,24 +19,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pierre-Yves,
+I'm trying to croos compile bluez-utils for XScale.
 
-> > you need to install the libs from CVS, too. We are in the process of
-> > adding an async API to SDP.
-> 
-> Indeed, after compiling and installing (using the autoconf scripts from
-> the 3.4 release) the libs from CVS, the utils from CVS do compile fine,
-> and the crash is gone! Not a bug anymore :-) Thanks for the good work!
-
-the thanks go to Johan. He fixed our buggy mainloop, but it was not in
-time for the 3.4 release. And 3.5 has to wait until we stabilized the
-async SDP functions.
-
-Regards
-
-Marcel
+when I write make 
+Install the error is:
+/usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2
+/../../../../arm-linux/bin/ld:
+skipping incompatible 
+/opt/gnome/lib/libdbus-glib-1.so when searching
+for -ldbus-glib-1
+/usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2/../../../../arm-
+linux/bin/ld:
+cannot find -ldbus-glib-1
+collect2: ld returned 1 exit 
+status
 
 
+/opt/gnome/lib/libdbus-glib-1.so it's a simlink to 
+/usr/lib/libdbus-glib-1.so
+
+I read all old topics about this problem, 
+but I never found a solution.
+
+the configure string is:
+./configure --
+host=arm-linux --prefix=/mydir --whit-bluez=/mydir
+
+Can someone help 
+me???
+tnx
+Alex B
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
