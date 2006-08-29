@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Date: Wed, 30 Aug 2006 10:03:45 +0800
-Message-ID: <554C5F4C5BA7384EB2B412FD46A3BAD1012AEF87@pdsmsx411.ccr.corp.intel.com>
-From: "Li, Lea" <lea.li@intel.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>,
-        "Alex B" <squonimo@virgilio.it>
-Subject: Re: [Bluez-devel] problem with bluez-utils 3.4 and dbus
+From: Andrew Waldram <andy@samuri.demon.co.uk>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6E8F@eumonex01.palmsource.com>
+References: <1155918829.6708.16.camel@localhost>
+	<7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6E8F@eumonex01.palmsource.com>
+Date: Tue, 29 Aug 2006 23:22:30 +0100
+Message-Id: <1156890150.19173.8.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] RE : a2pdbtsco won'tcompile (FIX)
+	plus	xmmserror(trialsandtribulations) howcool is this!!! new patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,108 +18,157 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0563505105=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0563505105==
-Content-class: urn:content-classes:message
-Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: quoted-printable
-
-Hi Alex,=20
-
-You should add "DBUS_CFLAGS" & "DBUS_LIBS" options when you executing =
-"./configure" from bluez-utils DIR. Of course, D-Bus should be =
-cross-compiled successfully before bluez.=20
-
-
-Thanks,
-Lea
-=20
------Original Message-----
-From: bluez-devel-bounces@lists.sourceforge.net =
-[mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf Of Marcel =
-Holtmann
-Sent: 2006=C4=EA8=D4=C230=C8=D5 1:53
-To: Alex B; BlueZ development
-Subject: Re: [Bluez-devel] problem with bluez-utils 3.4 and dbus
-
-Hi Alex,
-
-> I'm trying to croos compile bluez-utils for XScale.
->=20
-> when I write make=20
-> Install the error is:
-> /usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2
-> /../../../../arm-linux/bin/ld:
-> skipping incompatible=20
-> /opt/gnome/lib/libdbus-glib-1.so when searching
-> for -ldbus-glib-1
-> /usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2/../../../../arm-
-> linux/bin/ld:
-> cannot find -ldbus-glib-1
-> collect2: ld returned 1 exit=20
-> status
->=20
->=20
-> /opt/gnome/lib/libdbus-glib-1.so it's a simlink to=20
-> /usr/lib/libdbus-glib-1.so
->=20
-> I read all old topics about this problem,=20
-> but I never found a solution.
->=20
-> the configure string is:
-> ./configure --
-> host=3Darm-linux --prefix=3D/mydir --whit-bluez=3D/mydir
-
-I don't have a solution for this, because I don't do that much cross
-compiling by myself. However since we use pkg-config, it should be
-really easy to tell it which libraries to use.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------=
-
-Using Tomcat but need to do more? Need to support web services, =
-security?
-Get stuff done quickly with pre-integrated technology to make your job =
-easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache =
-Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D=
-121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
---===============0563505105==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0563505105==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0563505105==--
+SGkgRnJlZGVyaWMsCgogdG9vayB5b3VyIGFkdmlzZSBhbmQgY29tcGlsZWQgbGF0ZXN0IEJsdWV6
+ICgzLjQpIHlldCBzdGlsbCBwcmVzc2luZwpwbGF5IGdpdmVzCgpyb290QHNpZG5leTovaG9tZS9h
+bmR5IyAvdXNyL2xvY2FsL3NiaW4vaGNpZHVtcApIQ0kgc25pZmZlciAtIEJsdWV0b290aCBwYWNr
+ZXQgYW5hbHl6ZXIgdmVyIDEuMzIKZGV2aWNlOiBoY2kwIHNuYXBfbGVuOiAxMDI4IGZpbHRlcjog
+MHhmZmZmZmZmZgo+IEhDSSBFdmVudDogQ29ubmVjdCBSZXF1ZXN0ICgweDA0KSBwbGVuIDEwCjwg
+SENJIENvbW1hbmQ6IEFjY2VwdCBDb25uZWN0aW9uIFJlcXVlc3QgKDB4MDF8MHgwMDA5KSBwbGVu
+IDcKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKPiBIQ0kgRXZlbnQ6
+IExpbmsgS2V5IFJlcXVlc3QgKDB4MTcpIHBsZW4gNgo8IEhDSSBDb21tYW5kOiBMaW5rIEtleSBS
+ZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAwYikgcGxlbiAyMgo+IEhDSSBFdmVudDogQ29tbWFuZCBD
+b21wbGV0ZSAoMHgwZSkgcGxlbiAxMAo+IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgwMiBk
+bGVuIDEyCiAgICBMMkNBUChzKTogQ29ubmVjdCByZXE6IHBzbSAyNSBzY2lkIDB4MDA0MAo+IEhD
+SSBFdmVudDogQ29ubmVjdCBDb21wbGV0ZSAoMHgwMykgcGxlbiAxMQo8IEhDSSBDb21tYW5kOiBX
+cml0ZSBMaW5rIFBvbGljeSBTZXR0aW5ncyAoMHgwMnwweDAwMGQpIHBsZW4gNAo+IEhDSSBFdmVu
+dDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiA2CjwgSENJIENvbW1hbmQ6IENoYW5nZSBD
+b25uZWN0aW9uIFBhY2tldCBUeXBlICgweDAxfDB4MDAwZikgcGxlbiA0Cj4gSENJIEV2ZW50OiBD
+b21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0CjwgSENJIENvbW1hbmQ6IFJlbW90ZSBOYW1lIFJl
+cXVlc3QgKDB4MDF8MHgwMDE5KSBwbGVuIDEwCj4gSENJIEV2ZW50OiBDb25uZWN0aW9uIFBhY2tl
+dCBUeXBlIENoYW5nZWQgKDB4MWQpIHBsZW4gNQo+IEhDSSBFdmVudDogTWF4IFNsb3RzIENoYW5n
+ZSAoMHgxYikgcGxlbiAzCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0
+Cj4gSENJIEV2ZW50OiBSZW1vdGUgTmFtZSBSZXEgQ29tcGxldGUgKDB4MDcpIHBsZW4gMjU1CgpJ
+dCBsb29rcyBsaWtlIHRoZSBjb25uZWN0aW9uIGlzIGZvcm1lZCBidXQgdGhlIHBsYXkgY29tbWFu
+ZCBpcyBuZXZlcgpyZWNpZXZlZCA/Pz8KCkFueSBoZWxwIGFueW9uZSB3aXRoIG1vcmUgZXhwZXJp
+ZW5jZSBvZiBoY2lkdW1wIHRoYW4gbWUuCgpEbyB5b3UgdGhpbmsgaXQgbWF5IGJlIHRoZSBicm9h
+ZGNvbSBkb25nbGUgSSd2ZSBidWlsdCBpbnRvIG15IG1hY2hpbmUgKEkKaGF2ZSB0aGUga2VybmVs
+IHBhdGNoZXMgZm9yIGl0KS4KCk9uIGEgcGx1cyBub3RlIGZvcndhcmQgYW5kIHJldmVyc2Ugc2tp
+cCBpcyBhIGxvdCBtb3JlIHJlc3BvbnNpdmUgd2l0aAozLjQgLi4KClRoaXMgaXNuJ3QgYSBzaG93
+IHN0b3BwZXIganVzdCBhbiBhbm95YW5jZS4KCkp1c3QgdG8gcmVjYXAgCnByZXNzaW5nIHBsYXkg
+b24gaGVhZHBob25lcyBmcm9tICdvbicgZG9lcyBub3Qgc3RhcnQgeG1tcyAuaWUgaGVhZHBob25l
+CmluaXRpYXRlZCBwbGF5CnBhdXNlIGZvciA+MTAgc2VjcyBsZWFkcyB0byBoYXZpbmcgdG8gcmVz
+dGFydCBzZXNzaW9uIGFzIGhlYWRwaG9uZSBzdGF5cwpkaXNjb25uZWN0ZWQgYWdhaW4gaGVhZHBo
+b25lIGluaXRpYXRlZCAoc29tZXRpbWVzIHdvcmtzKS4KCmV2ZXJ5dGhpbmcgZWxzZSBpcyByZWFs
+bHkgd29ya2luZyB3ZWxsIChwYyBpbml0aWF0ZWQgc2Vzc2lvbikKCm9mIGNhdXNlIG9uZSBzb2x1
+dGlvbiB3b3VsZCBiZSB0byBzdG9wIHRoZSB3aWZlIHRhbGtpbmcgdG8gbWUgZm9yIG1vcmUKdGhh
+biAxMHNlYyA7PSkKCgpPbiBTYXQsIDIwMDYtMDgtMTkgYXQgMTA6MTIgKzAxMDAsIEZyZWRlcmlj
+IERhbGxlYXUgd3JvdGU6Cj4gSGksCj4gCj4gSSByZWFsbHkgZG9uJ3Qga25vdyBhYm91dCB0aGUg
+aW50ZXJuYWxzIG9mIGJsdWV6LiBUaGUgb25seSB0aGluZyBpcywKPiB0cnkgdG8gdXBkYXRlIHlv
+dXIgYmx1ZXogaWYgeW91IGRvIG5vdCBhbHJlYWR5IHVzZSB0aGUgbGF0ZXN0LiBPbmx5Cj4gc29t
+ZW9uZSByZWFsbHkgaW4gdGhlIGRlZXAgY291bGQgaGVscC4KPiAKPiBBZHZpY2UgYW55b25lPwo+
+IAo+IEZyw6lkw6lyaWMKPiAKPiAKPiAtLS0tLS0tLSBNZXNzYWdlIGQnb3JpZ2luZS0tLS0tLS0t
+IAo+IERlOiBibHVlei1kZXZlbC1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCBkZSBsYSBw
+YXJ0IGRlIEFuZHJldwo+IFdhbGRyYW0gCj4gRGF0ZTogdmVuLiAxOC8wOC8yMDA2IDE4OjMzIAo+
+IMOAOiBCbHVlWiBkZXZlbG9wbWVudCAKPiBPYmpldCA6IFtCbHVlei1kZXZlbF0gYTJwZGJ0c2Nv
+IHdvbid0Y29tcGlsZSAoRklYKSBwbHVzCj4geG1tc2Vycm9yKHRyaWFsc2FuZHRyaWJ1bGF0aW9u
+cykgaG93Y29vbCBpcyB0aGlzISEhIG5ldyBwYXRjaCAKPiAgIAo+IEZyw6lkw6lyaWMKPiAKPiAK
+PiBPayB0aG91Z2h0IEknZCBzdGFydCBmcm9tIHNjcmF0Y2gKPiAKPiBlbnN1cmUgYTJkcGQgaGFz
+IG9ubHkgMSBzZXNzaW9uICAKPiBmaXJzdCBhdHRlbXB0IGl0IGFsbCB3b3JrZWQgPz8/Pz8/IAo+
+IG5leHQgYXR0ZW1wdCBhbmQgc3Vic2VxdWVudAo+IAo+IHN1ZG8gaGNpZHVtcCA9Cj4gCj4gYW5k
+eUBzaWRuZXk6L2V0Yy9hcGFuZWwkIHN1ZG8gaGNpZHVtcCAKPiBIQ0kgc25pZmZlciAtIEJsdWV0
+b290aCBwYWNrZXQgYW5hbHl6ZXIgdmVyIDEuMjggCj4gZGV2aWNlOiBoY2kwIHNuYXBfbGVuOiAx
+MDI4IGZpbHRlcjogMHhmZmZmZmZmZiAKPiA+IEhDSSBFdmVudDogQ29ubmVjdCBSZXF1ZXN0ICgw
+eDA0KSBwbGVuIDEwIAo+IDwgSENJIENvbW1hbmQ6IEFjY2VwdCBDb25uZWN0aW9uIFJlcXVlc3Qg
+KDB4MDF8MHgwMDA5KSBwbGVuIDcgCj4gPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBm
+KSBwbGVuIDQgCj4gPiBIQ0kgRXZlbnQ6IExpbmsgS2V5IFJlcXVlc3QgKDB4MTcpIHBsZW4gNiAK
+PiA8IEhDSSBDb21tYW5kOiBMaW5rIEtleSBSZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAwYikgcGxl
+biAyMiAKPiA+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiAxMCAKPiA+
+IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgwMiBkbGVuIDEyIAo+ICAgICBMMkNBUChzKTog
+Q29ubmVjdCByZXE6IHBzbSAyNSBzY2lkIDB4MDA0MCAKPiA+IEhDSSBFdmVudDogQ29ubmVjdCBD
+b21wbGV0ZSAoMHgwMykgcGxlbiAxMSAKPiA8IEhDSSBDb21tYW5kOiBXcml0ZSBMaW5rIFBvbGlj
+eSBTZXR0aW5ncyAoMHgwMnwweDAwMGQpIHBsZW4gNCAKPiA+IEhDSSBFdmVudDogQ29tbWFuZCBD
+b21wbGV0ZSAoMHgwZSkgcGxlbiA2IAo+IDwgSENJIENvbW1hbmQ6IENoYW5nZSBDb25uZWN0aW9u
+IFBhY2tldCBUeXBlICgweDAxfDB4MDAwZikgcGxlbiA0IAo+ID4gSENJIEV2ZW50OiBDb21tYW5k
+IFN0YXR1cyAoMHgwZikgcGxlbiA0IAo+ID4gSENJIEV2ZW50OiBDb25uZWN0aW9uIFBhY2tldCBU
+eXBlIENoYW5nZWQgKDB4MWQpIHBsZW4gNSAKPiA+IEhDSSBFdmVudDogTWF4IFNsb3RzIENoYW5n
+ZSAoMHgxYikgcGxlbiAzCj4gCj4gYTJkcGQgCj4gYW5keUBzaWRuZXk6fiQgYTJkcGQgCj4gYTJk
+cGQgW0F1ZyAxNyAyMDA2IDIxOjI0OjA5XSBzdGFydGluZyAuLi5hMmRwZCBhZGRyPTAwOjBEOjQ0
+OjJBOjVDOjEyIAo+IHRpbWVyPTQwMDAgdXMgW0F1ZyAxNyAyMDA2IDIxOjI0OjA5XSAKPiBzZXRz
+Y2hlZHVsZXIgcmV0dXJucyAwIChlcnJubz0wOlN1Y2Nlc3MpIAo+IEFjY2VwdGluZyBpbmNvbWlu
+ZyB0Y3Agc3RyZWFtIGNvbm5lY3Rpb24gCj4gTmV3IGNvbm5lY3Rpb24gdG8gYmx1ZXRvb3RoIFs0
+NDEwMCBoel0gCj4gYXZyY3A6IEFjY2VwdGluZyBpbmNvbWluZyBjb25uZWN0aW9uIAo+IGF2ZHRw
+OiBBY2NlcHRpbmcgaW5jb21pbmcgY29ubmVjdGlvbgo+IAo+IAo+IEFuZCBub3cgd2hlbiBpdCB3
+b3Jrcy4KPiAKPiBIQ0kgc25pZmZlciAtIEJsdWV0b290aCBwYWNrZXQgYW5hbHl6ZXIgdmVyIDEu
+MjggCj4gZGV2aWNlOiBoY2kwIHNuYXBfbGVuOiAxMDI4IGZpbHRlcjogMHhmZmZmZmZmZiAKPiA+
+IEhDSSBFdmVudDogQ29ubmVjdCBSZXF1ZXN0ICgweDA0KSBwbGVuIDEwIAo+IDwgSENJIENvbW1h
+bmQ6IEFjY2VwdCBDb25uZWN0aW9uIFJlcXVlc3QgKDB4MDF8MHgwMDA5KSBwbGVuIDcgCj4gPiBI
+Q0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQgCj4gPiBIQ0kgRXZlbnQ6IExp
+bmsgS2V5IFJlcXVlc3QgKDB4MTcpIHBsZW4gNiAKPiA8IEhDSSBDb21tYW5kOiBMaW5rIEtleSBS
+ZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAwYikgcGxlbiAyMiAKPiA+IEhDSSBFdmVudDogQ29tbWFu
+ZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiAxMCAKPiA+IEhDSSBFdmVudDogQ29ubmVjdCBDb21wbGV0
+ZSAoMHgwMykgcGxlbiAxMSAKPiA8IEhDSSBDb21tYW5kOiBXcml0ZSBMaW5rIFBvbGljeSBTZXR0
+aW5ncyAoMHgwMnwweDAwMGQpIHBsZW4gNCAKPiA+IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3Mg
+MHgwMiBkbGVuIDEyIAo+ICAgICBMMkNBUChzKTogQ29ubmVjdCByZXE6IHBzbSAyNSBzY2lkIDB4
+MDA0MCAKPiA8IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgwMiBkbGVuIDE2IAo+ICAgICBM
+MkNBUChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgwMDQwIHNjaWQgMHgwMDQwIHJlc3VsdCAwIHN0
+YXR1cyAwIAo+ICAgICAgIENvbm5lY3Rpb24gc3VjY2Vzc2Z1bCAKPiA+IEhDSSBFdmVudDogQ29t
+bWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiA2IAo+IDwgSENJIENvbW1hbmQ6IENoYW5nZSBDb25u
+ZWN0aW9uIFBhY2tldCBUeXBlICgweDAxfDB4MDAwZikgcGxlbiA0IAo+ID4gSENJIEV2ZW50OiBD
+b21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0IAo+ID4gSENJIEV2ZW50OiBDb25uZWN0aW9uIFBh
+Y2tldCBUeXBlIENoYW5nZWQgKDB4MWQpIHBsZW4gNSAKPiA+IEhDSSBFdmVudDogTWF4IFNsb3Rz
+IENoYW5nZSAoMHgxYikgcGxlbiAzIAo+ID4gQUNMIGRhdGE6IGhhbmRsZSAxMSBmbGFncyAweDAy
+IGRsZW4gMTYgCj4gICAgIEwyQ0FQKHMpOiBDb25maWcgcmVxOiBkY2lkIDB4MDA0MCBmbGFncyAw
+eDAwIGNsZW4gNCAKPiAgICAgICBGbHVzaFRPIDY1NTM1IAo+IDwgQUNMIGRhdGE6IGhhbmRsZSAx
+MSBmbGFncyAweDAyIGRsZW4gMTQgCj4gICAgIEwyQ0FQKHMpOiBDb25maWcgcnNwOiBzY2lkIDB4
+MDA0MCBmbGFncyAweDAwIHJlc3VsdCAwIGNsZW4gMCAKPiAgICAgICBTdWNjZXNzIAo+IDwgQUNM
+IGRhdGE6IGhhbmRsZSAxMSBmbGFncyAweDAyIGRsZW4gMTIgCj4gICAgIEwyQ0FQKHMpOiBDb25m
+aWcgcmVxOiBkY2lkIDB4MDA0MCBmbGFncyAweDAwIGNsZW4gMCAKPiA+IEFDTCBkYXRhOiBoYW5k
+bGUgMTEgZmxhZ3MgMHgwMiBkbGVuIDE0IAo+ICAgICBMMkNBUChzKTogQ29uZmlnIHJzcDogc2Np
+ZCAweDAwNDAgZmxhZ3MgMHgwMCByZXN1bHQgMCBjbGVuIDAgCj4gICAgICAgU3VjY2VzcyAKPiA+
+IEhDSSBFdmVudDogRW5jcnlwdCBDaGFuZ2UgKDB4MDgpIHBsZW4gNCAKPiA+IEhDSSBFdmVudDog
+TnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUgCj4gPiBBQ0wgZGF0YTog
+aGFuZGxlIDExIGZsYWdzIDB4MDIgZGxlbiA2IAo+ICAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBs
+ZW4gMiBbcHNtIDI1XSAKPiAgICAgICBBVkRUUChzKTogRGlzY292ZXIgY21kOiB0cmFuc2FjdGlv
+biAwIAo+IDwgQUNMIGRhdGE6IGhhbmRsZSAxMSBmbGFncyAweDAyIGRsZW4gNiAKPiAgICAgTDJD
+QVAoZCk6IGNpZCAweDAwNDAgbGVuIDIgW3BzbSAyNV0gCj4gICAgICAgQVZEVFAocyk6IERpc2Nv
+dmVyIHJlajogdHJhbnNhY3Rpb24gMCAKPiAgICAgICAgIEVycm9yIGNvZGUgNiAKPiA8IEFDTCBk
+YXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgwMiBkbGVuIDEyCj4gCj4gYTJkcGQKPiAKPiBhbmR5QHNp
+ZG5leTp+JCBhMmRwZCAKPiBhMmRwZCBbQXVnIDE3IDIwMDYgMjE6MjQ6MDldIHN0YXJ0aW5nIC4u
+LmEyZHBkIGFkZHI9MDA6MEQ6NDQ6MkE6NUM6MTIgCj4gdGltZXI9NDAwMCB1cyBbQXVnIDE3IDIw
+MDYgMjE6MjQ6MDldIAo+IHNldHNjaGVkdWxlciByZXR1cm5zIDAgKGVycm5vPTA6U3VjY2Vzcykg
+Cj4gQWNjZXB0aW5nIGluY29taW5nIHRjcCBzdHJlYW0gY29ubmVjdGlvbiAKPiBOZXcgY29ubmVj
+dGlvbiB0byBibHVldG9vdGggWzQ0MTAwIGh6XSAKPiBhdnJjcDogQWNjZXB0aW5nIGluY29taW5n
+IGNvbm5lY3Rpb24gCj4gYXZkdHA6IEFjY2VwdGluZyBpbmNvbWluZyBjb25uZWN0aW9uIAo+IGF2
+ZHRwOiBzb2NrZXQgNzogQ29ubmVjdGlvbiBmcm9tIDEyOjVDOjJBOjQ0OjBEOjAwLCBtdHU9Njcy
+IAo+IGF2ZHRwOiBzb2NrZXQgNzogUmVjZWl2ZWQgZmFpbGVkIHJlc3VsdD0tMSAoZXJybm89MTE6
+UmVzb3VyY2UgCj4gdGVtcG9yYXJpbHkgdW5hdmFpbGFibGUpIAo+IGF2ZHRwOiBzb2NrZXQgNzog
+UmVjZWl2ZWQgZmFpbGVkIHJlc3VsdD0tMSAoZXJybm89MTE6UmVzb3VyY2UgCj4gdGVtcG9yYXJp
+bHkgdW5hdmFpbGFibGUpIAo+IHNvY2tldCA3OiBSZWNlaXZlZCAyIGJ5dGVzIAo+IDAwMDAwOiAw
+MCAwMSAKPiBERUJVRzogYTJkcF9oYW5kbGVfYXZkdHBfbWVzc2FnZTogKGVycm5vPTExOlJlc291
+cmNlIHRlbXBvcmFyaWx5IAo+IHVuYXZhaWxhYmxlKVVuZXhwZWN0ZWQgaGVhZHNldCBkaXJlY3Rp
+dmUgMSAKPiBERUJVRzogYTJkcF9oYW5kbGVfYXZkdHBfbWVzc2FnZTogQW5zd2VyaW5nIGNvbW1h
+bmQgcGFja2V0IAo+IChtc2d0eXBlPU1FU1NBR0VfVFlQRV9SRUpFQ1Qsc2lnbmFsPTEpIAo+IGF2
+ZHRwOiBzb2NrZXQgNzogUmVjZWl2ZWQgZnJhbWUsIHN0YXJ0IHhtbXMgLS1wbGF5Cj4gCj4gCj4g
+c28gaXQgbG9va3MgdG8gbXkgc2ltcGxlIG1pbmQgdGhhdCBsMmNhcCBuZXZlciBjb21wbGV0ZXMg
+cHJvcGVybHkuCj4gCj4gTm90IHN1cmUgd2h5IHdoZW4gcnVubmluZyBib3RoIGFzIGZvcmdyb3Vu
+ZCB0YXNrcyBhcHBlYXIgdG8gZ2V0IAo+IGRpZmZlcmVudCByZXN1bHQgdG8gd2hhdCBJJ3ZlIHBv
+c3RlZCBwcmV2aW91c2x5IGJ1dCBwb3NzaWJseSBJJ20gYW4gCj4gaWRpb3QgOy0pLCBPciBtYXli
+ZSB0aGVyZSBpcyBtb3JlIHRoYW4gb25lIHByb2JsZW0sIG9yIHRvIG1hbnkKPiBjaGFuZ2VzIAo+
+IGludmFsaWRhdGluZyBmaW5kaW5ncy4KPiAKPiBBdCBsZWFzdCBJIGNhbiBzZWUgd2h5IGl0cyBu
+b3Qgd29ya2luZyBub3cgYnV0IGRvbid0IGtub3cgd2hhdCB0b2RvIAo+IGFib3V0IGl0Cj4gCj4g
+bWF5YmUgSSBzaG91bGQgbmV2ZXIgaGF2ZSBsb29rZWQgYXQgZWFjaCBsb2cgaW4gaXNvbGF0aW9u
+IHNvIHRoaW5rIHdlIAo+IHNob3VsZCBnbyBmcm9tIGhlcmUgYXMgSSBjYW4gcmVwcm9kdWNlIHRo
+aXMgZWFzaWx5Lgo+IAo+IAo+IAo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gCj4gVXNpbmcgVG9tY2F0IGJ1
+dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8gc3VwcG9ydCB3ZWIgc2VydmljZXMsCj4gc2VjdXJp
+dHk/IAo+IEdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9s
+b2d5IHRvIG1ha2UgeW91ciBqb2IKPiBlYXNpZXIgCj4gRG93bmxvYWQgSUJNIFdlYlNwaGVyZSBB
+cHBsaWNhdGlvbiBTZXJ2ZXIgdi4xLjAuMSBiYXNlZCBvbiBBcGFjaGUKPiBHZXJvbmltbyAKPiBo
+dHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lkPTEyMDcwOSZiaWQ9MjYz
+MDU3JmRhdD0xMjE2NDIgCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18gCj4gQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0IAo+IEJsdWV6LWRldmVsQGxpc3Rz
+LnNvdXJjZWZvcmdlLm5ldCAKPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9s
+aXN0aW5mby9ibHVlei1kZXZlbAo+IAoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpVc2luZyBUb21jYXQgYnV0
+IG5lZWQgdG8gZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0IHdlYiBzZXJ2aWNlcywgc2VjdXJpdHk/
+CkdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRv
+IG1ha2UgeW91ciBqb2IgZWFzaWVyCkRvd25sb2FkIElCTSBXZWJTcGhlcmUgQXBwbGljYXRpb24g
+U2VydmVyIHYuMS4wLjEgYmFzZWQgb24gQXBhY2hlIEdlcm9uaW1vCmh0dHA6Ly9zZWwuYXMtdXMu
+ZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZraWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0PTEyMTY0Mgpf
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZl
+bCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8v
+bGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
