@@ -1,12 +1,19 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44F4A0FC.3090809@pracucci.com>
-Date: Tue, 29 Aug 2006 20:18:04 +0000
-From: Marco Pracucci <development@pracucci.com>
-MIME-Version: 1.0
+Date: Tue, 29 Aug 2006 18:43:10 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <10d5a94bb15.squonimo@virgilio.it>
-In-Reply-To: <10d5a94bb15.squonimo@virgilio.it>
-Subject: Re: [Bluez-devel] problem with bluez-utils 3.4 and dbus
+In-Reply-To: <1156874442.4026.22.camel@aeonflux.holtmann.net>
+Message-ID: <Pine.LNX.4.63.0608291840350.30948@redbean.intranet.gw-instruments.de>
+References: <44F22717.1080308@evilgenius.de>
+	<1156772287.5613.31.camel@aeonflux.holtmann.net>
+	<44F32933.90808@evilgenius.de>
+	<1156799873.5613.51.camel@aeonflux.holtmann.net>
+	<44F353E9.7080406@evilgenius.de>
+	<1156809428.5613.59.camel@aeonflux.holtmann.net>
+	<44F43AA3.3020600@evilgenius.de>
+	<1156874442.4026.22.camel@aeonflux.holtmann.net>
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] flexible bt-dongle and bccmd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,24 +27,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Alex,
 
-> /usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2/../../../../arm-
-> linux/bin/ld:
-> cannot find -ldbus-glib-1
-> collect2: ld returned 1 exit 
-> status
+Hi Marcel, 
 
-Have you cross compiled dbus?
-If you have cross compiled dbus you should add -L<dbus library path> to
-LDFLAG, where <dbus library path> is the path to the cross compiled dbus
-library.
+On Tue, 29 Aug 2006, Marcel Holtmann wrote:
 
-Moreover, if you have cross compiled dbus, can you tell us how you have
-successfully run the configure script?
+> and remember that it is dangerous. I already killed a couple of my
+> dongles and I only use a Casira development kit from CSR when playing
+> with this stuff. In the cases I screwed up, I can reset the module and
+> get it back working. Most times at least. I already killed one module
+> some time ago.
 
-Regards,
-Marco Pracucci
+You normaly can recover from this by doing a full chip erase and 
+reprogramming from scratch. However, any module specific PS settings will 
+be lost if you don't have a "backup".......
+
+Ciao, 
+
+Peter 
+
+
+
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
 
 
 -------------------------------------------------------------------------
