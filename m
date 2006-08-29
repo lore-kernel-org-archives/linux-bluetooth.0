@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44F44D31.4030603@xmission.com>
-Date: Tue, 29 Aug 2006 08:20:33 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <e1effdeb0608290502t2aff9e6fq4d6f8018a0d1d22e@mail.gmail.com>
+Date: Tue, 29 Aug 2006 09:02:03 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <8712867d0608281814v3dc61491u1251bc54ee6cb660@mail.gmail.com>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] bluetooth gps repeater
+References: <20060829001859.79329.qmail@web25713.mail.ukl.yahoo.com>
+	<8712867d0608281814v3dc61491u1251bc54ee6cb660@mail.gmail.com>
+Subject: Re: [Bluez-users] hci0 only comes up with PSCAN (no ISCAN)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,27 +17,172 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="windows-1252"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hey
+Hi folks,
 
-I was discussing this on the list a while back but wanted to report back
-that I got it working. At least on the little gumstix board, I can have
-two (or more with some tweaks) gps clients connecting simultaneously. I
-do it by changing the sdp record to the next port as soon as a
-connection is made:
+The release 3.X introduced the D-Bus methods for adapter setup and
+basic remote services(inquiry, name, manufacturer, ...). Some bugs
+related to discoverable mode were detected but they are now fixed in
+the release 3.4. The adapter interface supports the following
+discoverable modes:
+discoverable: PSCAN ISCAN
+connectable: PSCAN
+off: NOSCAN
 
- http://www.xmission.com/~bmidgley/gumstix/
+The default discoverable timeout is 180sec. If you set it to 0 +
+discoverable mode to "discoverable" the device will be always visible.
+If you set the discoverable timeout to X + mode to discoverable, the
+mode will be changed automatically to connectable mode after X
+seconds.
 
-Brad
+While we don't have good client application to manage this methods you
+can send commands using dbus-send:
+$dbus-send --system --type=3Dmethod_call --print-reply --dest=3Dorg.bluez
+/org/bluez/hci0 org.bluez.Adapter.SetDiscoverableTimeout uint32:0
+$dbus-send --system --type=3Dmethod_call --print-reply --dest=3Dorg.bluez
+/org/bluez/hci0 org.bluez.Adapter.SetMode string:discoverable
+
+BR,
+Claudio.
+
+On 8/28/06, Jaime Alberto Silva <jaimealbertosilva@gmail.com> wrote:
+> Hi Ray, I had the same problem, checkout:
+>
+> http://thread.gmane.org/gmane.linux.bluez.user/10386/focus=3D10386
+>
+> It has been treated in this list before under the topic:
+>
+> Fwd: bluez-utils: The inquiry scan (ISCAN) gets turned off
+>
+> On 8/28/06, Ray <whatdoineed2do@yahoo.co.uk> wrote:
+> > hi,
+> >
+> > i have a problem in that my hci0 device only ever
+> > comes up with pscan (without iscan) and this is
+> > causing me problems.
+> >
+> > i have started the manually started the daemons but no
+> > luck
+> >
+> >     $ hcid; sdpd; hciconfig hci0 up piscan noauth
+> >
+> > still shows up as (just pscan!!!)
+> >
+> >     $ hciconfig -a
+> >     hci0:   Type: USB
+> >         BD Address: 00:0E:9B:68:B8:37 ACL MTU: 192:8
+> > SCO MTU: 64:8
+> >         UP RUNNING PSCAN
+> >         RX bytes:12448 acl:176 sco:0 events:322
+> > errors:0
+> >         TX bytes:4767 acl:157 sco:0 commands:104
+> > errors:0
+> >         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00
+> > 0x00
+> >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2
+> > HV3
+> >         Link policy: RSWITCH HOLD SNIFF PARK
+> >         Link mode: SLAVE ACCEPT
+> >         Name: 'BlueZ@marty (0)'
+> >         Class: 0x3e0100
+> >         Service Classes: Networking, Rendering,
+> > Capturing, Object Transfer,
+> > Audio
+> >         Device Class: Computer, Uncategorized
+> >         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1
+> > (0x1) LMP Subver: 0x20d
+> >         Manufacturer: Cambridge Silicon Radio (10)
+> >
+> > i googled this and found another person with the same
+> > problem but no ans.  using linux 2.6.15 with bluez 3.4
+> > utils/libs
+> >
+> > can anyone suggest what i'm doing wrong
+> > thanks
+> > -r
+> >
+> > # /etc/bluetooth/hcid.conf
+> > options {
+> >         autoinit yes;
+> >         security auto;
+> >         pairing multi;
+> >         passkey "1234";
+> > }
+> >
+> > device {
+> >         name "BlueZ@%h (%d)";
+> >
+> >         class 0x3e0100;
+> >
+> >         # Inquiry and Page scan
+> >         iscan enable;
+> >         pscan enable;
+> >
+> >         lm accept;
+> >         lp rswitch,hold,sniff,park;
+> > }
+> >
+> >
+> >
+> > ___________________________________________________________
+> > Try the all-new Yahoo! Mail. "The New Version is radically easier to us=
+e" =96 The Wall Street Journal
+> > http://uk.docs.yahoo.com/nowyoucan.html
+> >
+> > -----------------------------------------------------------------------=
+--
+> > Using Tomcat but need to do more? Need to support web services, securit=
+y?
+> > Get stuff done quickly with pre-integrated technology to make your job =
+easier
+> > Download IBM WebSphere Application Server v.1.0.1 based on Apache Geron=
+imo
+> > http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >
+>
+>
+> --
+> Jaime Alberto Silva
+>    L I N U X      .~.
+> The Choice     /V\
+>  of a GNU      / ( ) \
+> Generation    ^^-^^
+>
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job ea=
+sier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+
+-- =
+
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
