@@ -1,12 +1,22 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 29 Aug 2006 11:06:13 +0200
-From: The Peach <smartart@tiscali.it>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20060829110613.49f2a9a4@localhost>
-In-Reply-To: <20060822181532.6fea4851@localhost>
-References: <20060822181532.6fea4851@localhost>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux@feline-soul.com
+In-Reply-To: <2056.216.47.59.131.1156803892.squirrel@webmail.feline-soul.net>
+References: <e4f1f0110608230129y73240448ufc024c1c99810789@mail.gmail.com>
+	<e4f1f0110608270518v15039332v87d3f90a9fd8d823@mail.gmail.com>
+	<e1effdeb0608280517l13c117fg4f958870027c4595@mail.gmail.com>
+	<e4f1f0110608280930l3475b147ob2f7f3e5e6bf5efe@mail.gmail.com>
+	<e1effdeb0608281114l3b6a29barfb8c6b29b7197638@mail.gmail.com>
+	<1270.216.47.59.131.1156790715.squirrel@webmail.feline-soul.net>
+	<1156799718.5613.48.camel@aeonflux.holtmann.net>
+	<36756.216.47.59.131.1156793990.squirrel@webmail.feline-soul.net>
+	<1156809299.5613.56.camel@aeonflux.holtmann.net>
+	<2056.216.47.59.131.1156803892.squirrel@webmail.feline-soul.net>
+Date: Tue, 29 Aug 2006 12:47:12 +0200
+Message-Id: <1156848432.5613.67.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] rfcomm hell
+Cc: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] How do I reset a pairing?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,28 +30,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Tue, 22 Aug 2006 18:15:32 +0200
-The Peach <smartart@tiscali.it> wrote:
+Hi Bearcat,
 
-> Objective: connect to the mobile (a nokia 6680) and to the GPS reciver
+> What do i put in my hcid.conf file to make sure the passkey agent is used?
 
-I found what was wrong, and it was udev.
-After following a tutorial I added the following rule to change the permissions upon dev creation:
+nothing. You simply start the passkey agent in your desktop session. I
+will register itself into hcid and then work. It is like magic ;)
 
-# cat /etc/udev/rules.d/10-udev.rules 
-KERNEL="rfcomm[0-9]*", NAME="bluetooth/%k", GROUP="users", MODE="0660"
+Regards
 
-after commenting it rfcomm started connecting :-D
+Marcel
 
-thanks for the help :)
 
--- 
-Matteo 'Peach' Pescarin
-
-ICQ UIN = 71110111
-Jabber ID = smartart@unstable.nl
-Web Site = http://www.smartart.it
-GeCHI = http://www.gechi.it
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
