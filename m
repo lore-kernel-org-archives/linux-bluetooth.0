@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <44F4A0FC.3090809@pracucci.com>
+Date: Tue, 29 Aug 2006 20:18:04 +0000
+From: Marco Pracucci <development@pracucci.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44F4A0FC.3090809@pracucci.com>
-References: <10d5a94bb15.squonimo@virgilio.it> <44F4A0FC.3090809@pracucci.com>
-Date: Tue, 29 Aug 2006 22:53:48 +0200
-Message-Id: <1156884828.4026.30.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+References: <10d5a94bb15.squonimo@virgilio.it>
+In-Reply-To: <10d5a94bb15.squonimo@virgilio.it>
 Subject: Re: [Bluez-devel] problem with bluez-utils 3.4 and dbus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,27 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marco,
+Hi Alex,
 
-> > /usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2/../../../../arm-
-> > linux/bin/ld:
-> > cannot find -ldbus-glib-1
-> > collect2: ld returned 1 exit 
-> > status
-> 
-> Have you cross compiled dbus?
-> If you have cross compiled dbus you should add -L<dbus library path> to
-> LDFLAG, where <dbus library path> is the path to the cross compiled dbus
-> library.
+> /usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2/../../../../arm-
+> linux/bin/ld:
+> cannot find -ldbus-glib-1
+> collect2: ld returned 1 exit 
+> status
 
-I would prefer if you actually trust pkg-config to configure this
-correctly. Messing around with the linker path can have weird side
-effects if you don't know exactly what you are doing.
+Have you cross compiled dbus?
+If you have cross compiled dbus you should add -L<dbus library path> to
+LDFLAG, where <dbus library path> is the path to the cross compiled dbus
+library.
 
-Regards
+Moreover, if you have cross compiled dbus, can you tell us how you have
+successfully run the configure script?
 
-Marcel
-
+Regards,
+Marco Pracucci
 
 
 -------------------------------------------------------------------------
