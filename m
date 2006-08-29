@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <44F45E3F.7050507@csr.com>
-References: <44EC4CFC.4060400@arcor.de>  <44F45E3F.7050507@csr.com>
-Date: Tue, 29 Aug 2006 19:56:10 +0200
-Message-Id: <1156874170.4026.17.camel@aeonflux.holtmann.net>
+In-Reply-To: <44F44D31.4030603@xmission.com>
+References: <44F44D31.4030603@xmission.com>
+Date: Tue, 29 Aug 2006 19:50:48 +0200
+Message-Id: <1156873849.4026.11.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Inquiry in Bluetooth 1.2
+Subject: Re: [Bluez-users] bluetooth gps repeater
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,14 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Steven,
+Hi Brad,
 
-> Here's an answer I wrote to someone else who asked me this question
-> today.
+> I was discussing this on the list a while back but wanted to report back
+> that I got it working. At least on the little gumstix board, I can have
+> two (or more with some tweaks) gps clients connecting simultaneously. I
+> do it by changing the sdp record to the next port as soon as a
+> connection is made:
+> 
+>  http://www.xmission.com/~bmidgley/gumstix/
 
-I think it is time for a "Steven Singer FAQ for Bluetooth" ;)
+you should actually write a generic multiplexing daemon for this kind of
+scenarios. The shell script approach looks a little bit racy.
 
-Thanks for all your detailed answers. They are really appreciated.
+You can use one SDP record for it and update it one demand, but in this
+case I would purpose to include a TTL in the record.
 
 Regards
 
