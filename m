@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Pierre-Yves Paulus <py@idlum.be>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1156848370.5613.66.camel@aeonflux.holtmann.net>
+In-Reply-To: <1156839814.8576.104.camel@localhost>
 References: <1156839814.8576.104.camel@localhost>
-	<1156848370.5613.66.camel@aeonflux.holtmann.net>
-Date: Tue, 29 Aug 2006 14:27:14 +0200
-Message-Id: <1156854435.8576.113.camel@localhost>
+Date: Tue, 29 Aug 2006 12:46:10 +0200
+Message-Id: <1156848370.5613.66.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] hcid crash
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -21,45 +20,61 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Pierre-Yves,
 
-> can you try the latest version from the CVS. I think that Johan fixed
-> this with the mainloop rewrite.
+> There seems to be a bug causing a crash in hcid, ver. 3.4.
+> 
+> 1) Using the DBus API, I open an RFCOMM connection to the OPP channel on
+> a phone (tested with nokia n-gage and SE Z600)
+> 
+> 2) Once the connection is established, I shut the phone down, or force a
+> bluetooth shtudown (only possible on the nokia, not allowed on the SE)
+> 
+> 3) hcid will crash (instantly with the nokia, after a few seconds with
+> the SE).
+> 
+> Backtrace:
+> 
+> # gdb --quiet --args hcid -xn
+> Using host libthread_db library "/lib/tls/libthread_db.so.1".
+> (gdb) run
+> Starting program: /usr/sbin/hcid -xn
+> hcid[14874]: Bluetooth HCI daemon
+> hcid[14874]: Register path:/org/bluez fallback:1
+> hcid[14874]: HCI dev 0 registered
+> hcid[14874]: Register path:/org/bluez/hci0 fallback:0
+> hcid[14874]: HCI dev 0 already up
+> hcid[14874]: Device hci0 has been added
+> hcid[14874]: Starting security manager 0
+> hcid[14874]: Device hci0 has been activated
+> hcid[14874]: Connect in progress
+> hcid[14874]: rfcomm_connect_cb: connected
+> hcid[14874]: RFCOMM node /dev/rfcomm0 was disconnected
+> *** glibc detected *** double free or corruption (fasttop): 0x080708d8
+> ***
+> 
+> Program received signal SIGABRT, Aborted.
+> 0xffffe410 in __kernel_vsyscall ()
+> (gdb) bt
+> #0  0xffffe410 in __kernel_vsyscall ()
+> #1  0xb7e44101 in raise () from /lib/tls/libc.so.6
+> #2  0xb7e457fd in abort () from /lib/tls/libc.so.6
+> #3  0xb7e76ef7 in __fsetlocking () from /lib/tls/libc.so.6
+> #4  0xb7e7cc16 in malloc_usable_size () from /lib/tls/libc.so.6
+> #5  0xb7e7d5d9 in free () from /lib/tls/libc.so.6
+> #6  0x08061096 in watch_remove (w=0x0) at glib-ectomy.c:116
+> #7  0x0806146c in g_main_loop_run (loop=0x806a108) at glib-ectomy.c:324
+> #8  0x0804c59b in main (argc=0, argv=0x0) at main.c:729
+> 
+> It is always reproducible here. I'll be glad to give any other output or
+> info that may prove useful, just ask.
 
-The CVS version compile is failing at the moment:
+can you try the latest version from the CVS. I think that Johan fixed
+this with the mainloop rewrite.
 
-gcc -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
--DDBUS_API_SUBJECT_TO_CHANGE -Wall -O2 -D_FORTIFY_SOURCE=2 -g -o hcid
-main.o security.o device.o logging.o storage.o sdp.o parser.o lexer.o
-kword.o dbus.o dbus-common.o dbus-error.o dbus-manager.o dbus-adapter.o
-dbus-device.o dbus-service.o dbus-security.o dbus-sdp.o
-dbus-rfcomm.o  /usr/lib/libdbus-1.so /usr/lib/libbluetooth.so ../common/libhelper.a
-dbus-sdp.o: In function `search_process_cb':
-/tmp/Bluez_cvs/bluez-utils-3.4/hcid/dbus-sdp.c:484: undefined reference
-to `sdp_process'
-dbus-sdp.o: In function `sdp_client_connect_cb':
-/tmp/Bluez_cvs/bluez-utils-3.4/hcid/dbus-sdp.c:625: undefined reference
-to `sdp_create'
-/tmp/Bluez_cvs/bluez-utils-3.4/hcid/dbus-sdp.c:632: undefined reference
-to `sdp_set_notify'
-/tmp/Bluez_cvs/bluez-utils-3.4/hcid/dbus-sdp.c:635: undefined reference
-to `sdp_service_search_async'
+Regards
 
-I am new to the use of CVS, so I may have made something wrong: as
-running (from bluez.org website)
-
-cvs -d:pserver:anonymous@cvs.bluez.org:/cvsroot/bluez co -P utils 
-
-doesn't create the autoconf scripts, I assumed (sounds strange to me)
-that I had to use those from the released version. So after running the
-command above, I copied the new files from the CVS over the old ones
-from the 3.4 release. Is it the way I am supposed to do, or is there
-another way to retrieve the full "utils" modules, including the scripts
-needed to compile it?
-
-Regards,
-
-Pierre-Yves
+Marcel
 
 
 
