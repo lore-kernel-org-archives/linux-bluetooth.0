@@ -1,13 +1,21 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 29 Aug 2006 20:01:24 +0200
-From: Stefan Seyfried <seife@suse.de>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20060829180123.GD12634@suse.de>
-References: <20060822181532.6fea4851@localhost>
-	<20060829110613.49f2a9a4@localhost>
-Mime-Version: 1.0
-In-Reply-To: <20060829110613.49f2a9a4@localhost>
-Subject: Re: [Bluez-users] rfcomm hell
+Message-ID: <e4f1f0110608291003w655b3d0bu44a41dd164533e4c@mail.gmail.com>
+Date: Tue, 29 Aug 2006 18:03:54 +0100
+From: "jonny Linux" <jonnylinux@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1156848432.5613.67.camel@aeonflux.holtmann.net>
+MIME-Version: 1.0
+References: <e4f1f0110608230129y73240448ufc024c1c99810789@mail.gmail.com>
+	<e1effdeb0608280517l13c117fg4f958870027c4595@mail.gmail.com>
+	<e4f1f0110608280930l3475b147ob2f7f3e5e6bf5efe@mail.gmail.com>
+	<e1effdeb0608281114l3b6a29barfb8c6b29b7197638@mail.gmail.com>
+	<1270.216.47.59.131.1156790715.squirrel@webmail.feline-soul.net>
+	<1156799718.5613.48.camel@aeonflux.holtmann.net>
+	<36756.216.47.59.131.1156793990.squirrel@webmail.feline-soul.net>
+	<1156809299.5613.56.camel@aeonflux.holtmann.net>
+	<2056.216.47.59.131.1156803892.squirrel@webmail.feline-soul.net>
+	<1156848432.5613.67.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-users] How do I reset a pairing?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,54 +25,59 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============1743995307=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Tue, Aug 29, 2006 at 11:06:13AM +0200, The Peach wrote:
-> On Tue, 22 Aug 2006 18:15:32 +0200
-> The Peach <smartart@tiscali.it> wrote:
-> =
+--===============1743995307==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_10879_15223455.1156871034824"
 
-> > Objective: connect to the mobile (a nokia 6680) and to the GPS reciver
-> =
+------=_Part_10879_15223455.1156871034824
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> I found what was wrong, and it was udev.
-> After following a tutorial I added the following rule to change the permi=
-ssions upon dev creation:
-> =
+Excellent, I've finally got it working - I realised I had installed
+the 2.xbinaries from Fedora RPMs, so I couldn't get the bt-applet
+working. I've now
+upgraded to 3.4, and its working!
 
-> # cat /etc/udev/rules.d/10-udev.rules =
+Thanks to everyone for helping!
 
-> KERNEL=3D"rfcomm[0-9]*", NAME=3D"bluetooth/%k", GROUP=3D"users", MODE=3D"=
-0660"
-> =
+Jonny
 
-> after commenting it rfcomm started connecting :-D
+------=_Part_10879_15223455.1156871034824
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-i have
-root@susi:/tmp# cat /etc/udev/rules.d/47-rfcomm.rules
-# udev-rules for rfcomm devices
-KERNEL=3D=3D"rfcomm*", NAME=3D"%k" GROUP=3D"uucp" MODE=3D"0660" OPTIONS=3D"=
-resmgr"
+Excellent, I've finally got it working - I realised I had installed the 2.x binaries from Fedora RPMs, so I couldn't get the bt-applet working. I've now upgraded to 3.4, and its working!<br><br>Thanks to everyone for helping!
+<br><br>Jonny<br>
 
-The OPTIONS=3Dresmgr is probably SUSE specific, but the rest should be gene=
-ric
-and works just fine for me.
--- =
+------=_Part_10879_15223455.1156871034824--
 
-Stefan Seyfried                  \ "I didn't want to write for pay. I
-QA / R&D Team Mobile Devices      \ wanted to be paid for what I write."
-SUSE LINUX Products GmbH, N=FCrnberg \                    -- Leonard Cohen
+
+--===============1743995307==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============1743995307==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1743995307==--
