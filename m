@@ -1,18 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44F43AA3.3020600@evilgenius.de>
-References: <44F22717.1080308@evilgenius.de>
-	<1156772287.5613.31.camel@aeonflux.holtmann.net>
-	<44F32933.90808@evilgenius.de>
-	<1156799873.5613.51.camel@aeonflux.holtmann.net>
-	<44F353E9.7080406@evilgenius.de>
-	<1156809428.5613.59.camel@aeonflux.holtmann.net>
-	<44F43AA3.3020600@evilgenius.de>
-Date: Tue, 29 Aug 2006 20:00:42 +0200
-Message-Id: <1156874442.4026.22.camel@aeonflux.holtmann.net>
+To: Alex B <squonimo@virgilio.it>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <10d5a94bb15.squonimo@virgilio.it>
+References: <10d5a94bb15.squonimo@virgilio.it>
+Date: Tue, 29 Aug 2006 19:52:59 +0200
+Message-Id: <1156873979.4026.14.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] flexible bt-dongle and bccmd
+Subject: Re: [Bluez-devel] problem with bluez-utils 3.4 and dbus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -26,24 +21,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Martin,
+Hi Alex,
 
-> as peter already pointed out bccmd is a very powerful program, i guess
-> reading the csr-documentation about the bccmd commands is a good idea.
+> I'm trying to croos compile bluez-utils for XScale.
+> 
+> when I write make 
+> Install the error is:
+> /usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2
+> /../../../../arm-linux/bin/ld:
+> skipping incompatible 
+> /opt/gnome/lib/libdbus-glib-1.so when searching
+> for -ldbus-glib-1
+> /usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2/../../../../arm-
+> linux/bin/ld:
+> cannot find -ldbus-glib-1
+> collect2: ld returned 1 exit 
+> status
+> 
+> 
+> /opt/gnome/lib/libdbus-glib-1.so it's a simlink to 
+> /usr/lib/libdbus-glib-1.so
+> 
+> I read all old topics about this problem, 
+> but I never found a solution.
+> 
+> the configure string is:
+> ./configure --
+> host=arm-linux --prefix=/mydir --whit-bluez=/mydir
 
-and remember that it is dangerous. I already killed a couple of my
-dongles and I only use a Casira development kit from CSR when playing
-with this stuff. In the cases I screwed up, I can reset the module and
-get it back working. Most times at least. I already killed one module
-some time ago.
-
-> right now i am having no idea how to add a new pskey. modifying and
-> delting works for me, but i did not yet found out how to create a new
-> one. it would be great if i could add a pskey with features to ps storage.
-
-No need for that. You can simply set it. However you must select the
-correct store (default will be volatile memory). Can't remember that
-from memory. Look it up in the documentation.
+I don't have a solution for this, because I don't do that much cross
+compiling by myself. However since we use pkg-config, it should be
+really easy to tell it which libraries to use.
 
 Regards
 
