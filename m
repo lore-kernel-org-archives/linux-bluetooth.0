@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <10d5a90c0da.squonimo@virgilio.it>
-Date: Tue, 29 Aug 2006 16:33:58 +0100 (GMT+01:00)
-From: Alex B <squonimo@virgilio.it>
-To: bluez-devel@lists.sourceforge.net
+From: Pierre-Yves Paulus <py@idlum.be>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1156862083.6183.3.camel@aeonflux.holtmann.net>
+References: <1156839814.8576.104.camel@localhost>
+	<1156848370.5613.66.camel@aeonflux.holtmann.net>
+	<1156854435.8576.113.camel@localhost>
+	<1156862083.6183.3.camel@aeonflux.holtmann.net>
+Date: Tue, 29 Aug 2006 15:23:20 +0200
+Message-Id: <1156857801.8576.117.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Problems with bluez-utils 3.4
-Reply-To: Alex B <squonimo@virgilio.it>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] hcid crash
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,32 +23,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-hi all,
-I'm trying to croos compile the bluez utils 3.4 for arm-linux 
-(XScale PXA270).
-I read many tutorial and howto, but i've always the 
-same problem with dbus-glib.1 when I write make Install:
------------------------------------
-/usr/local/arm-linux/lib/gcc-
-lib/arm-linux/3.3.2/../../../../arm-linux/bin/ld:
-skipping incompatible 
-/opt/gnome/lib/libdbus-glib-1.so when searching
-for -ldbus-glib-1
-/usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2/../../../../arm-
-linux/bin/ld:
-cannot find -ldbus-glib-1
-collect2: ld returned 1 exit 
-status 
------------------------------------
+Hi Marcel,
 
-in /opt/gnome/lib libdbus-
-glib-1.so it's a simlink to /usr/lib/libdbus-glib-1.so
+> you need to install the libs from CVS, too. We are in the process of
+> adding an async API to SDP.
 
-Can someone 
-help me???
+Indeed, after compiling and installing (using the autoconf scripts from
+the 3.4 release) the libs from CVS, the utils from CVS do compile fine,
+and the crash is gone! Not a bug anymore :-) Thanks for the good work!
 
-tnx 
-Alex B
+Regards,
+
+Pierre-Yves
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
