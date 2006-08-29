@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <44F45E3F.7050507@csr.com>
+Date: Tue, 29 Aug 2006 16:33:19 +0100
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <44F44D31.4030603@xmission.com>
-References: <44F44D31.4030603@xmission.com>
-Date: Tue, 29 Aug 2006 19:50:48 +0200
-Message-Id: <1156873849.4026.11.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] bluetooth gps repeater
+References: <44EC4CFC.4060400@arcor.de>
+In-Reply-To: <44EC4CFC.4060400@arcor.de>
+Subject: Re: [Bluez-users] Inquiry in Bluetooth 1.2
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,27 +20,80 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Brad,
+Simon Siemens wrote:
+> So what is this enhanced inquiry scan? How is it compared to the old
+> v1.1 inquiry scan? How can I activate it?
 
-> I was discussing this on the list a while back but wanted to report back
-> that I got it working. At least on the little gumstix board, I can have
-> two (or more with some tweaks) gps clients connecting simultaneously. I
-> do it by changing the sdp record to the next port as soon as a
-> connection is made:
-> 
->  http://www.xmission.com/~bmidgley/gumstix/
+Here's an answer I wrote to someone else who asked me this question
+today.
 
-you should actually write a generic multiplexing daemon for this kind of
-scenarios. The shell script approach looks a little bit racy.
+I've not checked all the details and I may have simplified in places, but
+it should be close enough for you to understand the difference.
 
-You can use one SDP record for it and update it one demand, but in this
-case I would purpose to include a TTL in the record.
+-------------------------------------------------------------------------
+Enhanced inquiry scan is a mandatory feature in 1.2 and is not a feature
+that can be turned on and off. All 1.2 devices do enhanced inquiry scan
+all the time.
 
-Regards
+Enhanced inquiry scan is entirely backwards compatible with the inquiry
+procedure in 1.1 and earlier (in fact, the inquiry procedure was not
+changed between 1.1 and 1.2).
 
-Marcel
+The enhancement is just a minor change to the inquiry scan timing. In
+BT 1.1 the inquiry scan procedure is:
+
+    1) Go into scan for the time specified by the inquiry scan window.
+    2a) If you don't receive an ID packet before the end of the window:
+       + wait until the next inquiry scan interval
+       + go to stage 1
+    2b) if you receive an ID packet before the end of the window:
+       + back off for 0..1023 slots
+       + go into inquiry scan again for 128 slots.
+       + if you receive an ID packet before the end of the 128 slots:
+         * send an FHS packet
+         * go to stage 1
+       + If you don't receive an ID packet before the end of the 128
+         slots:
+         * go to stage 1
+
+In 1.2, the procedure is simplified to:
+
+    1) Go into scan for the time specified by the inquiry scan window.
+    2a) If you don't receive an ID packet before the end of the window:
+       + wait until the next inquiry scan interval
+       + go to stage 1
+    2b) if you receive an ID packet before the end of the window:
+       + send an FHS packet
+       + back off for 0..1023 slots
+       + go to stage 1
+
+The big difference is that in 1.1 you a device backs off before it
+responds and then must be hit in a window after the backoff, whereas,
+in 1.2 a device responds in its normal window before it backs off.
+
+This means that 1.2 devices respond sooner than 1.1 devices. This
+means that responses can be collected faster.
+
+Also, with the 1.1 procedure, there was a chance that even with perfect
+radio conditions, it was possible to have a timing such that not all
+devices could respond. In 1.2, that pathology has been removed so that
+all devices should be detected (assuming there are no collisions).
+-------------------------------------------------------------------------
+
+The timing pathology I refer to is when a 1.1 device receives the initial
+ID packet just before the inquirer changes trains (which someone's
+already explained in this thread). In that case, after the backoff, the
+scanner is listening while the inquirer is on the other train. By the
+time the inquirer has returned to this train, the 128 slot timeout has
+expired and the scanner needs to be hit twice to respond.
+
+I hope this helps.
+
+	- Steven
+-- 
 
 
+To access the latest news from CSR copy this link into a web browser:  http://www.csr.com/email_sig.php
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
