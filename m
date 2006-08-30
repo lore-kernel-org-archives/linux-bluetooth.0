@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44F5A472.30003@xmission.com>
-Date: Wed, 30 Aug 2006 08:45:06 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <44F598FC.4040803@ipb.pt>
+Date: Wed, 30 Aug 2006 14:56:12 +0100
+From: Rui Pedro Lopes <rlopes@ipb.pt>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44EC8877.8050200@palmsource.com>
-In-Reply-To: <44EC8877.8050200@palmsource.com>
-Subject: Re: [Bluez-devel] Small patch to a2dpd
+References: <44F55552.4050502@ipb.pt> <44F55B85.6010800@palmsource.com>
+In-Reply-To: <44F55B85.6010800@palmsource.com>
+Subject: Re: [Bluez-devel] Some tests with the userland ALSA plugin for
+ A2DP: problem with changing tracks
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +21,63 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fr=E9d=E9ric
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> Latest patch : Default daemon logfile is /dev/null. Try to open an l2cap
-> socket with short timeout before doing  sdp_connect that can last very
-> long. Also a script called a2dpair that wrap hcitool and passkey-agent
-> as an effort to simplify pairing and a2dpd setup :D
-> What about Matthew's patches? I plan to move to getopt and cleanup
-> indent and traces so having them integrated first would be better as
-> there are new options.
+Fr=E9d=E9ric DALLEAU wrote:
+> Hi, There exists another alsa driver for a2dp. It's based upon the
+> previous but uses a daemon instead of being standalone. It really
+> miss documentation, but you can have a look at :
+> http://sourceforge.net/mailarchive/forum.php?thread_id=3D20199009&forum_i=
+d=3D1881
+>  You'll need the latest cvs.
+>
+> If your headset support AVRCP (next/prev buttons) you may also use
+> it, see somewhere in this thread :
+> http://sourceforge.net/mailarchive/forum.php?thread_id=3D29326874&forum_i=
+d=3D1881
+>
+>
+> Let us know if it works! Fr=E9d=E9ric
+>
+It did!
+I had to change the Makefile a bit though...
+Here goes the diff:
+=3D=3D=3D snip =3D=3D=3D
+- --- alsa-plugins/Makefile.am    2006-07-26 10:56:20.000000000 +0100
++++ /home/rlopes/tash/btsco/alsa-plugins/Makefile.am    2006-08-30
+14:39:00.000000000 +0100
+@@ -5,7 +5,7 @@
 
-I looked over Matthew's patches and applied them. I applied your "small
-patch" which turns out to be bigger than it sounds :)
+ if ALSAPLUGIN
 
-Brad
+- -LIBS =3D
++#LIBS =3D
+
+ alsadir =3D $(libdir)/alsa-lib
+
+@@ -25,6 +25,7 @@
+
+ bin_PROGRAMS =3D a2dpd
+ a2dpd_SOURCES =3D a2dpd.c a2dplib.c a2dp_timer.c a2dp_ipc.c
++a2dpd_CFLAGS =3D $(AM_CFLAGS)
+ a2dpd_LDADD =3D @BLUEZ_LIBS@ -lsbc -lpthread -lrt
+
+ AM_CFLAGS =3D @ALSA_CFLAGS@ @BLUEZ_CFLAGS@ -pthread
+=3D=3D=3D snip =3D=3D=3D
+
+Cheers,
+
+/rp
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iD8DBQFE9Zj8AhGrHSs5PNIRAi8bAJ9DQCZ+xZ89LyDUGAtgV72XV9zDgACfS4pO
+NKzVAgM5zsbWcTN3oLYN3x4=3D
+=3DSHLH
+-----END PGP SIGNATURE-----
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
