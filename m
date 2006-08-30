@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44F55222.1030700@palmsource.com>
-Date: Wed, 30 Aug 2006 10:53:54 +0200
-From: =?UTF-8?B?RnLDqWTDqXJpYyBEQUxMRUFV?= <frederic.dalleau@palmsource.com>
+Message-ID: <44F54A39.6060704@intec.ugent.be>
+Date: Wed, 30 Aug 2006 10:20:09 +0200
+From: Dieter Verslype <Dieter.Verslype@intec.ugent.be>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <1155918829.6708.16.camel@localhost>	<7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6E8F@eumonex01.palmsource.com>
-	<1156890150.19173.8.camel@localhost>
-In-Reply-To: <1156890150.19173.8.camel@localhost>
-Subject: Re: [Bluez-devel] RE : a2pdbtsco won'tcompile
- (FIX)	plus	xmmserror(trialsandtribulations) howcool is this!!! new patch
+To: Bluez Developers List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Registering service / Getting data
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,191 +14,192 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGkgQW5kcmV3LAoKRG9uJ3Qgc3RvcCB5b3VyIHdpZmUgZnJvbSB0YWxraW5nIHlldCwgSSBzdGls
-bCBkbyBub3QgdW5kZXJzdGFuZCB3aGF0IApoYXBwZW4gYnV0IEkgaGF2ZSBhIG5ldyB0ZXN0LiBJ
-ZiB5b3UgaGF2ZSBjb21waWxlZCAoYW5kIGluc3RhbGxlZCkgCmJsdWV6LXV0aWxzLCB5b3Ugc2hv
-dWxkIGhhdmUgYSB0b29sIGNhbGxlZCBsMnRlc3QuIElmIG5vdCBnZXQgaXQsIHRoZW4gCnN0b3Ag
-dGhlIGEyZHBkIGRhZW1vbiBhbmQgcnVuIDoKa2lsbGFsbCBhMmRwZApsMnRlc3QgLVAgMjUgLWQK
-VGhlbiBzd2l0Y2ggb24geW91ciBoZWFkc2V0IGFuZCBjb25uZWN0IGl0LiBHaXZlIG1lIHRoZSBm
-dWxsIG91dHB1dC4gCk1pbmUgaXMgdGhlIGZvbGxvd2luZyA6CgpmcmVkZXJpYy5kYWxsZWF1QGZk
-YWxsZWF1On4+bDJ0ZXN0IC1QIDI1IC1kCmwydGVzdFs0NDU3XTogV2FpdGluZyBmb3IgY29ubmVj
-dGlvbiBvbiBwc20gMjUgLi4uCmwydGVzdFs0NDU4XTogQ29ubmVjdCBmcm9tIDAwOjBEOjQ0OjJB
-OjE3OkM3IFtpbXR1IDY3Miwgb210dSA2NzIsIApmbHVzaF90byA2NTUzNSwgbW9kZSAwLCBoYW5k
-bGUgNDIsIGNsYXNzIDB4MDQwNDE4XQpsMnRlc3RbNDQ1OF06IFJlY2VpdmluZyAuLi4KbDJ0ZXN0
-WzQ0NThdOiBSZWNldmllZCAyIGJ5dGVzCjAwMDAwMDAwOiAwMCAwMSAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgLi4KCkhleSwgdGhlcmUncyBhIHR5cG8gaW4gdGhp
-cyBsb2cgOkQKCkZyw6lkw6lyaWMKCkFuZHJldyBXYWxkcmFtIGEgw6ljcml0IDoKPiBIaSBGcmVk
-ZXJpYywKPgo+ICB0b29rIHlvdXIgYWR2aXNlIGFuZCBjb21waWxlZCBsYXRlc3QgQmx1ZXogKDMu
-NCkgeWV0IHN0aWxsIHByZXNzaW5nCj4gcGxheSBnaXZlcwo+Cj4gcm9vdEBzaWRuZXk6L2hvbWUv
-YW5keSMgL3Vzci9sb2NhbC9zYmluL2hjaWR1bXAKPiBIQ0kgc25pZmZlciAtIEJsdWV0b290aCBw
-YWNrZXQgYW5hbHl6ZXIgdmVyIDEuMzIKPiBkZXZpY2U6IGhjaTAgc25hcF9sZW46IDEwMjggZmls
-dGVyOiAweGZmZmZmZmZmCj4gICAKPj4gSENJIEV2ZW50OiBDb25uZWN0IFJlcXVlc3QgKDB4MDQp
-IHBsZW4gMTAKPj4gICAgIAo+IDwgSENJIENvbW1hbmQ6IEFjY2VwdCBDb25uZWN0aW9uIFJlcXVl
-c3QgKDB4MDF8MHgwMDA5KSBwbGVuIDcKPiAgIAo+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVz
-ICgweDBmKSBwbGVuIDQKPj4gSENJIEV2ZW50OiBMaW5rIEtleSBSZXF1ZXN0ICgweDE3KSBwbGVu
-IDYKPj4gICAgIAo+IDwgSENJIENvbW1hbmQ6IExpbmsgS2V5IFJlcXVlc3QgUmVwbHkgKDB4MDF8
-MHgwMDBiKSBwbGVuIDIyCj4gICAKPj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRlICgweDBl
-KSBwbGVuIDEwCj4+IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgwMiBkbGVuIDEyCj4+ICAg
-ICAKPiAgICAgTDJDQVAocyk6IENvbm5lY3QgcmVxOiBwc20gMjUgc2NpZCAweDAwNDAKPiAgIAo+
-PiBIQ0kgRXZlbnQ6IENvbm5lY3QgQ29tcGxldGUgKDB4MDMpIHBsZW4gMTEKPj4gICAgIAo+IDwg
-SENJIENvbW1hbmQ6IFdyaXRlIExpbmsgUG9saWN5IFNldHRpbmdzICgweDAyfDB4MDAwZCkgcGxl
-biA0Cj4gICAKPj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDYKPj4g
-ICAgIAo+IDwgSENJIENvbW1hbmQ6IENoYW5nZSBDb25uZWN0aW9uIFBhY2tldCBUeXBlICgweDAx
-fDB4MDAwZikgcGxlbiA0Cj4gICAKPj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikg
-cGxlbiA0Cj4+ICAgICAKPiA8IEhDSSBDb21tYW5kOiBSZW1vdGUgTmFtZSBSZXF1ZXN0ICgweDAx
-fDB4MDAxOSkgcGxlbiAxMAo+ICAgCj4+IEhDSSBFdmVudDogQ29ubmVjdGlvbiBQYWNrZXQgVHlw
-ZSBDaGFuZ2VkICgweDFkKSBwbGVuIDUKPj4gSENJIEV2ZW50OiBNYXggU2xvdHMgQ2hhbmdlICgw
-eDFiKSBwbGVuIDMKPj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0Cj4+
-IEhDSSBFdmVudDogUmVtb3RlIE5hbWUgUmVxIENvbXBsZXRlICgweDA3KSBwbGVuIDI1NQo+PiAg
-ICAgCj4KPiBJdCBsb29rcyBsaWtlIHRoZSBjb25uZWN0aW9uIGlzIGZvcm1lZCBidXQgdGhlIHBs
-YXkgY29tbWFuZCBpcyBuZXZlcgo+IHJlY2lldmVkID8/Pwo+Cj4gQW55IGhlbHAgYW55b25lIHdp
-dGggbW9yZSBleHBlcmllbmNlIG9mIGhjaWR1bXAgdGhhbiBtZS4KPgo+IERvIHlvdSB0aGluayBp
-dCBtYXkgYmUgdGhlIGJyb2FkY29tIGRvbmdsZSBJJ3ZlIGJ1aWx0IGludG8gbXkgbWFjaGluZSAo
-SQo+IGhhdmUgdGhlIGtlcm5lbCBwYXRjaGVzIGZvciBpdCkuCj4KPiBPbiBhIHBsdXMgbm90ZSBm
-b3J3YXJkIGFuZCByZXZlcnNlIHNraXAgaXMgYSBsb3QgbW9yZSByZXNwb25zaXZlIHdpdGgKPiAz
-LjQgLi4KPgo+IFRoaXMgaXNuJ3QgYSBzaG93IHN0b3BwZXIganVzdCBhbiBhbm95YW5jZS4KPgo+
-IEp1c3QgdG8gcmVjYXAgCj4gcHJlc3NpbmcgcGxheSBvbiBoZWFkcGhvbmVzIGZyb20gJ29uJyBk
-b2VzIG5vdCBzdGFydCB4bW1zIC5pZSBoZWFkcGhvbmUKPiBpbml0aWF0ZWQgcGxheQo+IHBhdXNl
-IGZvciA+MTAgc2VjcyBsZWFkcyB0byBoYXZpbmcgdG8gcmVzdGFydCBzZXNzaW9uIGFzIGhlYWRw
-aG9uZSBzdGF5cwo+IGRpc2Nvbm5lY3RlZCBhZ2FpbiBoZWFkcGhvbmUgaW5pdGlhdGVkIChzb21l
-dGltZXMgd29ya3MpLgo+Cj4gZXZlcnl0aGluZyBlbHNlIGlzIHJlYWxseSB3b3JraW5nIHdlbGwg
-KHBjIGluaXRpYXRlZCBzZXNzaW9uKQo+Cj4gb2YgY2F1c2Ugb25lIHNvbHV0aW9uIHdvdWxkIGJl
-IHRvIHN0b3AgdGhlIHdpZmUgdGFsa2luZyB0byBtZSBmb3IgbW9yZQo+IHRoYW4gMTBzZWMgOz0p
-Cj4KPgo+IE9uIFNhdCwgMjAwNi0wOC0xOSBhdCAxMDoxMiArMDEwMCwgRnJlZGVyaWMgRGFsbGVh
-dSB3cm90ZToKPiAgIAo+PiBIaSwKPj4KPj4gSSByZWFsbHkgZG9uJ3Qga25vdyBhYm91dCB0aGUg
-aW50ZXJuYWxzIG9mIGJsdWV6LiBUaGUgb25seSB0aGluZyBpcywKPj4gdHJ5IHRvIHVwZGF0ZSB5
-b3VyIGJsdWV6IGlmIHlvdSBkbyBub3QgYWxyZWFkeSB1c2UgdGhlIGxhdGVzdC4gT25seQo+PiBz
-b21lb25lIHJlYWxseSBpbiB0aGUgZGVlcCBjb3VsZCBoZWxwLgo+Pgo+PiBBZHZpY2UgYW55b25l
-Pwo+Pgo+PiBGcsOpZMOpcmljCj4+Cj4+Cj4+IC0tLS0tLS0tIE1lc3NhZ2UgZCdvcmlnaW5lLS0t
-LS0tLS0gCj4+IERlOiBibHVlei1kZXZlbC1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCBk
-ZSBsYSBwYXJ0IGRlIEFuZHJldwo+PiBXYWxkcmFtIAo+PiBEYXRlOiB2ZW4uIDE4LzA4LzIwMDYg
-MTg6MzMgCj4+IMOAOiBCbHVlWiBkZXZlbG9wbWVudCAKPj4gT2JqZXQgOiBbQmx1ZXotZGV2ZWxd
-IGEycGRidHNjbyB3b24ndGNvbXBpbGUgKEZJWCkgcGx1cwo+PiB4bW1zZXJyb3IodHJpYWxzYW5k
-dHJpYnVsYXRpb25zKSBob3djb29sIGlzIHRoaXMhISEgbmV3IHBhdGNoIAo+PiAgIAo+PiBGcsOp
-ZMOpcmljCj4+Cj4+Cj4+IE9rIHRob3VnaHQgSSdkIHN0YXJ0IGZyb20gc2NyYXRjaAo+Pgo+PiBl
-bnN1cmUgYTJkcGQgaGFzIG9ubHkgMSBzZXNzaW9uICAKPj4gZmlyc3QgYXR0ZW1wdCBpdCBhbGwg
-d29ya2VkID8/Pz8/PyAKPj4gbmV4dCBhdHRlbXB0IGFuZCBzdWJzZXF1ZW50Cj4+Cj4+IHN1ZG8g
-aGNpZHVtcCA9Cj4+Cj4+IGFuZHlAc2lkbmV5Oi9ldGMvYXBhbmVsJCBzdWRvIGhjaWR1bXAgCj4+
-IEhDSSBzbmlmZmVyIC0gQmx1ZXRvb3RoIHBhY2tldCBhbmFseXplciB2ZXIgMS4yOCAKPj4gZGV2
-aWNlOiBoY2kwIHNuYXBfbGVuOiAxMDI4IGZpbHRlcjogMHhmZmZmZmZmZiAKPj4gICAgIAo+Pj4g
-SENJIEV2ZW50OiBDb25uZWN0IFJlcXVlc3QgKDB4MDQpIHBsZW4gMTAgCj4+PiAgICAgICAKPj4g
-PCBIQ0kgQ29tbWFuZDogQWNjZXB0IENvbm5lY3Rpb24gUmVxdWVzdCAoMHgwMXwweDAwMDkpIHBs
-ZW4gNyAKPj4gICAgIAo+Pj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0
-IAo+Pj4gSENJIEV2ZW50OiBMaW5rIEtleSBSZXF1ZXN0ICgweDE3KSBwbGVuIDYgCj4+PiAgICAg
-ICAKPj4gPCBIQ0kgQ29tbWFuZDogTGluayBLZXkgUmVxdWVzdCBSZXBseSAoMHgwMXwweDAwMGIp
-IHBsZW4gMjIgCj4+ICAgICAKPj4+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkg
-cGxlbiAxMCAKPj4+IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgwMiBkbGVuIDEyIAo+Pj4g
-ICAgICAgCj4+ICAgICBMMkNBUChzKTogQ29ubmVjdCByZXE6IHBzbSAyNSBzY2lkIDB4MDA0MCAK
-Pj4gICAgIAo+Pj4gSENJIEV2ZW50OiBDb25uZWN0IENvbXBsZXRlICgweDAzKSBwbGVuIDExIAo+
-Pj4gICAgICAgCj4+IDwgSENJIENvbW1hbmQ6IFdyaXRlIExpbmsgUG9saWN5IFNldHRpbmdzICgw
-eDAyfDB4MDAwZCkgcGxlbiA0IAo+PiAgICAgCj4+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxl
-dGUgKDB4MGUpIHBsZW4gNiAKPj4+ICAgICAgIAo+PiA8IEhDSSBDb21tYW5kOiBDaGFuZ2UgQ29u
-bmVjdGlvbiBQYWNrZXQgVHlwZSAoMHgwMXwweDAwMGYpIHBsZW4gNCAKPj4gICAgIAo+Pj4gSENJ
-IEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0IAo+Pj4gSENJIEV2ZW50OiBDb25u
-ZWN0aW9uIFBhY2tldCBUeXBlIENoYW5nZWQgKDB4MWQpIHBsZW4gNSAKPj4+IEhDSSBFdmVudDog
-TWF4IFNsb3RzIENoYW5nZSAoMHgxYikgcGxlbiAzCj4+PiAgICAgICAKPj4gYTJkcGQgCj4+IGFu
-ZHlAc2lkbmV5On4kIGEyZHBkIAo+PiBhMmRwZCBbQXVnIDE3IDIwMDYgMjE6MjQ6MDldIHN0YXJ0
-aW5nIC4uLmEyZHBkIGFkZHI9MDA6MEQ6NDQ6MkE6NUM6MTIgCj4+IHRpbWVyPTQwMDAgdXMgW0F1
-ZyAxNyAyMDA2IDIxOjI0OjA5XSAKPj4gc2V0c2NoZWR1bGVyIHJldHVybnMgMCAoZXJybm89MDpT
-dWNjZXNzKSAKPj4gQWNjZXB0aW5nIGluY29taW5nIHRjcCBzdHJlYW0gY29ubmVjdGlvbiAKPj4g
-TmV3IGNvbm5lY3Rpb24gdG8gYmx1ZXRvb3RoIFs0NDEwMCBoel0gCj4+IGF2cmNwOiBBY2NlcHRp
-bmcgaW5jb21pbmcgY29ubmVjdGlvbiAKPj4gYXZkdHA6IEFjY2VwdGluZyBpbmNvbWluZyBjb25u
-ZWN0aW9uCj4+Cj4+Cj4+IEFuZCBub3cgd2hlbiBpdCB3b3Jrcy4KPj4KPj4gSENJIHNuaWZmZXIg
-LSBCbHVldG9vdGggcGFja2V0IGFuYWx5emVyIHZlciAxLjI4IAo+PiBkZXZpY2U6IGhjaTAgc25h
-cF9sZW46IDEwMjggZmlsdGVyOiAweGZmZmZmZmZmIAo+PiAgICAgCj4+PiBIQ0kgRXZlbnQ6IENv
-bm5lY3QgUmVxdWVzdCAoMHgwNCkgcGxlbiAxMCAKPj4+ICAgICAgIAo+PiA8IEhDSSBDb21tYW5k
-OiBBY2NlcHQgQ29ubmVjdGlvbiBSZXF1ZXN0ICgweDAxfDB4MDAwOSkgcGxlbiA3IAo+PiAgICAg
-Cj4+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQgCj4+PiBIQ0kgRXZl
-bnQ6IExpbmsgS2V5IFJlcXVlc3QgKDB4MTcpIHBsZW4gNiAKPj4+ICAgICAgIAo+PiA8IEhDSSBD
-b21tYW5kOiBMaW5rIEtleSBSZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAwYikgcGxlbiAyMiAKPj4g
-ICAgIAo+Pj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDEwIAo+Pj4g
-SENJIEV2ZW50OiBDb25uZWN0IENvbXBsZXRlICgweDAzKSBwbGVuIDExIAo+Pj4gICAgICAgCj4+
-IDwgSENJIENvbW1hbmQ6IFdyaXRlIExpbmsgUG9saWN5IFNldHRpbmdzICgweDAyfDB4MDAwZCkg
-cGxlbiA0IAo+PiAgICAgCj4+PiBBQ0wgZGF0YTogaGFuZGxlIDExIGZsYWdzIDB4MDIgZGxlbiAx
-MiAKPj4+ICAgICAgIAo+PiAgICAgTDJDQVAocyk6IENvbm5lY3QgcmVxOiBwc20gMjUgc2NpZCAw
-eDAwNDAgCj4+IDwgQUNMIGRhdGE6IGhhbmRsZSAxMSBmbGFncyAweDAyIGRsZW4gMTYgCj4+ICAg
-ICBMMkNBUChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgwMDQwIHNjaWQgMHgwMDQwIHJlc3VsdCAw
-IHN0YXR1cyAwIAo+PiAgICAgICBDb25uZWN0aW9uIHN1Y2Nlc3NmdWwgCj4+ICAgICAKPj4+IEhD
-SSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiA2IAo+Pj4gICAgICAgCj4+IDwg
-SENJIENvbW1hbmQ6IENoYW5nZSBDb25uZWN0aW9uIFBhY2tldCBUeXBlICgweDAxfDB4MDAwZikg
-cGxlbiA0IAo+PiAgICAgCj4+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVu
-IDQgCj4+PiBIQ0kgRXZlbnQ6IENvbm5lY3Rpb24gUGFja2V0IFR5cGUgQ2hhbmdlZCAoMHgxZCkg
-cGxlbiA1IAo+Pj4gSENJIEV2ZW50OiBNYXggU2xvdHMgQ2hhbmdlICgweDFiKSBwbGVuIDMgCj4+
-PiBBQ0wgZGF0YTogaGFuZGxlIDExIGZsYWdzIDB4MDIgZGxlbiAxNiAKPj4+ICAgICAgIAo+PiAg
-ICAgTDJDQVAocyk6IENvbmZpZyByZXE6IGRjaWQgMHgwMDQwIGZsYWdzIDB4MDAgY2xlbiA0IAo+
-PiAgICAgICBGbHVzaFRPIDY1NTM1IAo+PiA8IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgw
-MiBkbGVuIDE0IAo+PiAgICAgTDJDQVAocyk6IENvbmZpZyByc3A6IHNjaWQgMHgwMDQwIGZsYWdz
-IDB4MDAgcmVzdWx0IDAgY2xlbiAwIAo+PiAgICAgICBTdWNjZXNzIAo+PiA8IEFDTCBkYXRhOiBo
-YW5kbGUgMTEgZmxhZ3MgMHgwMiBkbGVuIDEyIAo+PiAgICAgTDJDQVAocyk6IENvbmZpZyByZXE6
-IGRjaWQgMHgwMDQwIGZsYWdzIDB4MDAgY2xlbiAwIAo+PiAgICAgCj4+PiBBQ0wgZGF0YTogaGFu
-ZGxlIDExIGZsYWdzIDB4MDIgZGxlbiAxNCAKPj4+ICAgICAgIAo+PiAgICAgTDJDQVAocyk6IENv
-bmZpZyByc3A6IHNjaWQgMHgwMDQwIGZsYWdzIDB4MDAgcmVzdWx0IDAgY2xlbiAwIAo+PiAgICAg
-ICBTdWNjZXNzIAo+PiAgICAgCj4+PiBIQ0kgRXZlbnQ6IEVuY3J5cHQgQ2hhbmdlICgweDA4KSBw
-bGVuIDQgCj4+PiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykg
-cGxlbiA1IAo+Pj4gQUNMIGRhdGE6IGhhbmRsZSAxMSBmbGFncyAweDAyIGRsZW4gNiAKPj4+ICAg
-ICAgIAo+PiAgICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDIgW3BzbSAyNV0gCj4+ICAgICAg
-IEFWRFRQKHMpOiBEaXNjb3ZlciBjbWQ6IHRyYW5zYWN0aW9uIDAgCj4+IDwgQUNMIGRhdGE6IGhh
-bmRsZSAxMSBmbGFncyAweDAyIGRsZW4gNiAKPj4gICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxl
-biAyIFtwc20gMjVdIAo+PiAgICAgICBBVkRUUChzKTogRGlzY292ZXIgcmVqOiB0cmFuc2FjdGlv
-biAwIAo+PiAgICAgICAgIEVycm9yIGNvZGUgNiAKPj4gPCBBQ0wgZGF0YTogaGFuZGxlIDExIGZs
-YWdzIDB4MDIgZGxlbiAxMgo+Pgo+PiBhMmRwZAo+Pgo+PiBhbmR5QHNpZG5leTp+JCBhMmRwZCAK
-Pj4gYTJkcGQgW0F1ZyAxNyAyMDA2IDIxOjI0OjA5XSBzdGFydGluZyAuLi5hMmRwZCBhZGRyPTAw
-OjBEOjQ0OjJBOjVDOjEyIAo+PiB0aW1lcj00MDAwIHVzIFtBdWcgMTcgMjAwNiAyMToyNDowOV0g
-Cj4+IHNldHNjaGVkdWxlciByZXR1cm5zIDAgKGVycm5vPTA6U3VjY2VzcykgCj4+IEFjY2VwdGlu
-ZyBpbmNvbWluZyB0Y3Agc3RyZWFtIGNvbm5lY3Rpb24gCj4+IE5ldyBjb25uZWN0aW9uIHRvIGJs
-dWV0b290aCBbNDQxMDAgaHpdIAo+PiBhdnJjcDogQWNjZXB0aW5nIGluY29taW5nIGNvbm5lY3Rp
-b24gCj4+IGF2ZHRwOiBBY2NlcHRpbmcgaW5jb21pbmcgY29ubmVjdGlvbiAKPj4gYXZkdHA6IHNv
-Y2tldCA3OiBDb25uZWN0aW9uIGZyb20gMTI6NUM6MkE6NDQ6MEQ6MDAsIG10dT02NzIgCj4+IGF2
-ZHRwOiBzb2NrZXQgNzogUmVjZWl2ZWQgZmFpbGVkIHJlc3VsdD0tMSAoZXJybm89MTE6UmVzb3Vy
-Y2UgCj4+IHRlbXBvcmFyaWx5IHVuYXZhaWxhYmxlKSAKPj4gYXZkdHA6IHNvY2tldCA3OiBSZWNl
-aXZlZCBmYWlsZWQgcmVzdWx0PS0xIChlcnJubz0xMTpSZXNvdXJjZSAKPj4gdGVtcG9yYXJpbHkg
-dW5hdmFpbGFibGUpIAo+PiBzb2NrZXQgNzogUmVjZWl2ZWQgMiBieXRlcyAKPj4gMDAwMDA6IDAw
-IDAxIAo+PiBERUJVRzogYTJkcF9oYW5kbGVfYXZkdHBfbWVzc2FnZTogKGVycm5vPTExOlJlc291
-cmNlIHRlbXBvcmFyaWx5IAo+PiB1bmF2YWlsYWJsZSlVbmV4cGVjdGVkIGhlYWRzZXQgZGlyZWN0
-aXZlIDEgCj4+IERFQlVHOiBhMmRwX2hhbmRsZV9hdmR0cF9tZXNzYWdlOiBBbnN3ZXJpbmcgY29t
-bWFuZCBwYWNrZXQgCj4+IChtc2d0eXBlPU1FU1NBR0VfVFlQRV9SRUpFQ1Qsc2lnbmFsPTEpIAo+
-PiBhdmR0cDogc29ja2V0IDc6IFJlY2VpdmVkIGZyYW1lLCBzdGFydCB4bW1zIC0tcGxheQo+Pgo+
-Pgo+PiBzbyBpdCBsb29rcyB0byBteSBzaW1wbGUgbWluZCB0aGF0IGwyY2FwIG5ldmVyIGNvbXBs
-ZXRlcyBwcm9wZXJseS4KPj4KPj4gTm90IHN1cmUgd2h5IHdoZW4gcnVubmluZyBib3RoIGFzIGZv
-cmdyb3VuZCB0YXNrcyBhcHBlYXIgdG8gZ2V0IAo+PiBkaWZmZXJlbnQgcmVzdWx0IHRvIHdoYXQg
-SSd2ZSBwb3N0ZWQgcHJldmlvdXNseSBidXQgcG9zc2libHkgSSdtIGFuIAo+PiBpZGlvdCA7LSks
-IE9yIG1heWJlIHRoZXJlIGlzIG1vcmUgdGhhbiBvbmUgcHJvYmxlbSwgb3IgdG8gbWFueQo+PiBj
-aGFuZ2VzIAo+PiBpbnZhbGlkYXRpbmcgZmluZGluZ3MuCj4+Cj4+IEF0IGxlYXN0IEkgY2FuIHNl
-ZSB3aHkgaXRzIG5vdCB3b3JraW5nIG5vdyBidXQgZG9uJ3Qga25vdyB3aGF0IHRvZG8gCj4+IGFi
-b3V0IGl0Cj4+Cj4+IG1heWJlIEkgc2hvdWxkIG5ldmVyIGhhdmUgbG9va2VkIGF0IGVhY2ggbG9n
-IGluIGlzb2xhdGlvbiBzbyB0aGluayB3ZSAKPj4gc2hvdWxkIGdvIGZyb20gaGVyZSBhcyBJIGNh
-biByZXByb2R1Y2UgdGhpcyBlYXNpbHkuCj4+Cj4+Cj4+Cj4+IC0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gCj4+
-IFVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNl
-cnZpY2VzLAo+PiBzZWN1cml0eT8gCj4+IEdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUt
-aW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRvIG1ha2UgeW91ciBqb2IKPj4gZWFzaWVyIAo+PiBEb3du
-bG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFw
-YWNoZQo+PiBHZXJvbmltbyAKPj4gaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9
-bG5rJmtpZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQyIAo+PiBfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXyAKPj4gQmx1ZXotZGV2ZWwgbWFpbGluZyBs
-aXN0IAo+PiBCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQgCj4+IGh0dHBzOi8vbGlz
-dHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCj4+Cj4+ICAgICAK
-Pgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBVc2luZyBUb21jYXQgYnV0IG5lZWQgdG8gZG8gbW9yZT8g
-TmVlZCB0byBzdXBwb3J0IHdlYiBzZXJ2aWNlcywgc2VjdXJpdHk/Cj4gR2V0IHN0dWZmIGRvbmUg
-cXVpY2tseSB3aXRoIHByZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kgdG8gbWFrZSB5b3VyIGpvYiBl
-YXNpZXIKPiBEb3dubG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4x
-IGJhc2VkIG9uIEFwYWNoZSBHZXJvbmltbwo+IGh0dHA6Ly9zZWwuYXMtdXMuZmFsa2FnLm5ldC9z
-ZWw/Y21kPWxuayZraWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0PTEyMTY0Mgo+IF9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4gQmx1ZXotZGV2ZWwgbWFpbGlu
-ZyBsaXN0Cj4gQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cj4gaHR0cHM6Ly9saXN0
-cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKPiAgIAoKCi0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0KVXNpbmcgVG9tY2F0IGJ1dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8gc3Vw
-cG9ydCB3ZWIgc2VydmljZXMsIHNlY3VyaXR5PwpHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdpdGgg
-cHJlLWludGVncmF0ZWQgdGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9iIGVhc2llcgpEb3dubG9h
-ZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNo
-ZSBHZXJvbmltbwpodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lkPTEy
-MDcwOSZiaWQ9MjYzMDU3JmRhdD0xMjE2NDIKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxp
-c3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9s
-aXN0aW5mby9ibHVlei1kZXZlbAo=
+Hello list,
+
+> The RFCOMM channel in the SDP service registration (in your case it is 11)
+> should match the channel you listen on (which is 1).
+
+Thx, Marcel, that was a pretty lame mistake, so I fixed that.
+
+The machine I develop on runs Kubuntu 6.06 , and this runs the bleutooth serial chat service
+by default (Serial Port profile).
+So everytime I wanted to send data (from a scale that's sends the weight), the sender sent it to the serial chat service.
+I turned this service of, and ran my own. But now the device doesn't send the data anymore, because in the SDP request
+it doesn't find a service meeting the Serial Port profile (0x1101).
+
+Here is my dump:
+<hcidump>
+root@laptop:/home/dvrslype# hcidump -X -V
+
+HCI sniffer - Bluetooth packet analyzer ver 1.28
+device: hci0 snap_len: 1028 filter: 0xffffffff
+#INQUIRY
+...
+#CONNECTION
+...
+#
+# SDP Request for 0x1101 (Serial Port Profile)
+#
+ > ACL data: handle 41 flags 0x02 dlen 19
+    L2CAP(d): cid 0x0040 len 15 [psm 1]
+        SDP SS Req: tid 0x1 len 0xa
+          pat uuid-32 0x1101 (SP)
+          max 40
+          cont 00
+#
+# SDP Response: count 0 <<<<<<<=
+#
+< ACL data: handle 41 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0040 len 10 [psm 1]
+        SDP SS Rsp: tid 0x1 len 0x5
+          count 0
+          cont 00
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+ > HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 41 reason 0x08
+    Reason: Connection Timeout
+</hcidump>
+
+Here is my code for registering the service and listening to the right 
+channel:
+<c-code>
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/rfcomm.h>
+#include <bluetooth/sdp.h>
+#include <bluetooth/sdp_lib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/socket.h>
+
+sdp_session_t* register_service();
+
+int main(int argc, char **argv)
+{
+    //register service in SDPd
+    sdp_session_t* session = register_service();
+
+    struct sockaddr_rc loc_addr = { 0 }, rem_addr = { 0 };
+    char buf[1024] = { 0 };
+    int s, client, bytes_read;
+    int opt = sizeof(rem_addr);
+
+    // allocate socket
+    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+
+    // bind socket to port 1 of the first available
+    // local bluetooth adapter
+    loc_addr.rc_family = AF_BLUETOOTH;
+    loc_addr.rc_bdaddr = *BDADDR_ANY;
+    loc_addr.rc_channel = (uint8_t) 1;
+    bind(s, (struct sockaddr *)&loc_addr, sizeof(loc_addr));
+
+    // put socket into listening mode
+    listen(s, 1);
+
+    // accept one connection
+    client = accept(s, (struct sockaddr *)&rem_addr, &opt);
+
+    ba2str( &rem_addr.rc_bdaddr, buf );
+    fprintf(stderr, "accepted connection from %s\n", buf);
+    memset(buf, 0, sizeof(buf));
+
+    // read data from the client
+    bytes_read = read(client, buf, sizeof(buf));
+    if( bytes_read > 0 ) {
+        printf("received [%s]\n", buf);
+    }
+
+    // close connection
+    close(client);
+    close(s);
+    sdp_close(session);
+    return 0;
+}
+
+sdp_session_t* register_service() {
+    uint32_t service_uuid_int[] = { 0, 0, 0, 0x1101 };
+    uint8_t rfcomm_channel = 11;
+    const char *service_name = "Healt Monitor Service";
+    const char *service_dsc = "Captures Bluetooth packages and stores in 
+SQL_DB";
+    const char *service_prov = "IBCN-Niko";
+
+    uuid_t root_uuid, l2cap_uuid, rfcomm_uuid, svc_uuid;
+    sdp_list_t *l2cap_list = 0,
+               *rfcomm_list = 0,
+               *root_list = 0,
+               *proto_list = 0,
+               *access_proto_list = 0;
+    sdp_data_t *channel = 0, *psm = 0;
+
+    sdp_record_t *record = sdp_record_alloc();
+
+    // set the general service ID
+    sdp_uuid128_create( &svc_uuid, &service_uuid_int );
+    sdp_set_service_id( record, svc_uuid );
+
+    // make the service record publicly browsable
+    sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
+    root_list = sdp_list_append(0, &root_uuid);
+    sdp_set_browse_groups( record, root_list );
+
+    // set l2cap information
+    sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
+    l2cap_list = sdp_list_append( 0, &l2cap_uuid );
+    proto_list = sdp_list_append( 0, l2cap_list );
+
+    // set rfcomm information
+    sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
+    channel = sdp_data_alloc(SDP_UINT8, &rfcomm_channel);
+    rfcomm_list = sdp_list_append( 0, &rfcomm_uuid );
+    sdp_list_append( rfcomm_list, channel );
+    sdp_list_append( proto_list, rfcomm_list );
+
+    // attach protocol information to service record
+    access_proto_list = sdp_list_append( 0, proto_list );
+    sdp_set_access_protos( record, access_proto_list );
+
+    // set the name, provider, and description
+    sdp_set_info_attr(record, service_name, service_prov, service_dsc);
+       int err = 0;
+    sdp_session_t *session = 0;
+
+    // connect to the local SDP server, register the service record, and
+    // disconnect
+    session = sdp_connect( BDADDR_ANY, BDADDR_LOCAL, SDP_RETRY_IF_BUSY );
+    err = sdp_record_register(session, record, 0);
+
+    // cleanup
+    sdp_data_free( channel );
+    sdp_list_free( l2cap_list, 0 );
+    sdp_list_free( rfcomm_list, 0 );
+    sdp_list_free( root_list, 0 );
+    sdp_list_free( access_proto_list, 0 );
+    return session;
+}
+</c-code>
+
+What's wrong about the service registration?
+I can't seem to find out how to list it with sdptool, how does that work?
+
+thx in advance,
+
+Dieter
+
+PS: Sorry about not replying to my previous mail, I wasn't subscribed to 
+the list yet, now I am!
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
