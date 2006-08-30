@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <44F5FC57.2020305@ibdcon.org.br>
+Date: Wed, 30 Aug 2006 18:00:07 -0300
+From: Paulo Wollny <paulo.wollny@ibdcon.org.br>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <be976db60608301316g5945d06apd3b98264fe8e2405@mail.gmail.com>
-References: <be976db60608301316g5945d06apd3b98264fe8e2405@mail.gmail.com>
-Date: Thu, 31 Aug 2006 01:32:46 +0200
-Message-Id: <1156980766.4026.111.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] location of link keys
+References: <44F5EC3D.1050607@shaw.ca>
+In-Reply-To: <44F5EC3D.1050607@shaw.ca>
+Subject: Re: [Bluez-users] bash: syntax error near unexpected token `newline'
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,21 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mark,
+Strip < and > from the command... it shoud be:  sudo hidd --connect
+00:03:89:53:EC:7F
 
-> I am trying to look for where my link keys are stored by hcid.  I
-> thought it is under /var/lib/bluetooth but even with paired devices, I
-> still don't see link keys stored under /var/lib/bluetooth.  I believe
-> link keys are cached so for a device that has been paired before, the
-> same link key is handed down during pin-exchange and pairing. 
-
-the link keys are stored under /var/lib/bluetooth/<bdaddr>/linkkeys
-since quite some time now.
-
-Regards
-
-Marcel
-
+>
+> ## running: >>sudo hidd --connect <00:03:89:53:EC:7F>
+> ## bash: syntax error near unexpected token `newline'        ## gah!
+>
+> can someone where to look to address this error? thanks in advance.
+>
+>   
 
 
 -------------------------------------------------------------------------
