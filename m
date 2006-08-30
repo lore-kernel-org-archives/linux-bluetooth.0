@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44F55552.4050502@ipb.pt>
-Date: Wed, 30 Aug 2006 10:07:30 +0100
-From: Rui Pedro Lopes <rlopes@ipb.pt>
+Message-ID: <44F55222.1030700@palmsource.com>
+Date: Wed, 30 Aug 2006 10:53:54 +0200
+From: =?UTF-8?B?RnLDqWTDqXJpYyBEQUxMRUFV?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Some tests with the userland ALSA plugin for A2DP:
- problem with changing tracks
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <1155918829.6708.16.camel@localhost>	<7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6E8F@eumonex01.palmsource.com>
+	<1156890150.19173.8.camel@localhost>
+In-Reply-To: <1156890150.19173.8.camel@localhost>
+Subject: Re: [Bluez-devel] RE : a2pdbtsco won'tcompile
+ (FIX)	plus	xmmserror(trialsandtribulations) howcool is this!!! new patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,365 +18,191 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0391697757=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---===============0391697757==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="------------enig8FE293AE7A59726D426B64CD"
-
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig8FE293AE7A59726D426B64CD
-Content-Type: multipart/mixed; boundary="------------050903050704060202060807"
-
-This is a multi-part message in MIME format.
---------------050903050704060202060807
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-Hi,
-
-I've been experimenting with the user land ALSA plugin for A2DP from
-bluetooth-alsa project on Sourceforge.
-
-It works fine (tried it with xmms and rhythmbox through gstreamer-alsa)
-but there is a problem when changing tracks. When a song ends and xmms
-jumps to the next track on the playlist, the sound no longer arrives the
-headphones. If I press Stop and the Play, it starts playing again.
-I send in attach the log of the debug messages for this behavior
-(current.log).
-
-
-I then tried commenting the line for registering the close action like th=
-is:
-static snd_pcm_ioplug_callback_t a2dp_callback =3D {
-        .start                  =3D a2dp_start,
-        .stop                   =3D a2dp_stop,
-        .pointer                =3D a2dp_pointer,
-        .transfer               =3D a2dp_transfer2,
-        //.close                        =3D a2dp_close,
-        .hw_params              =3D a2dp_params,
-        .prepare                =3D a2dp_prepare,
-        .drain                  =3D a2dp_drain,
-        .poll_descriptors_count =3D a2dp_descriptors_count,
-        .poll_descriptors       =3D a2dp_descriptors,
-        .poll_revents           =3D a2dp_poll,
-};
-
-
-It no longer fails when changing tracks. Apparently, it works
-flawlessly. I also send the log for debug messages in attach (no_close.lo=
-g).
-
-
-Cheers,
-
-/rp
-
---------------050903050704060202060807
-Content-Type: text/x-log;
- name="current.log"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline;
- filename="current.log"
-
-=3D=3D=3D=3D Starting xmms
-Message: device: pcm.headphone
-
-=3D=3D=3D=3D Pressing play
-DEBUG: _snd_pcm_a2dp_open: name pcm.headphone mode 1
-DEBUG: _snd_pcm_a2dp_open: bdaddr/dest is 00:0D:44:43:B7:01
-DEBUG: a2dp_alloc: init
-DEBUG: a2dp_connect: a2dp 0x825e1c8 (sk=3D0, control_sk=3D0)
-DEBUG: connect_stream: Using address: 01:B7:43:44:0D:00
-DEBUG: detect_a2dp: Found A2DP Sink
-DEBUG: connect_stream: Found A2DP Sink at the destination
-DEBUG: do_connect: Connected [imtu 672, omtu 672, flush_to 65535]
-DEBUG: connect_stream: Sent the Stream End Point Discovery Command
-DEBUG: connect_stream: Got a Stream End Point Discovery Response
-DEBUG: connect_stream: received 1 capabilities
-DEBUG: process_seid: SEID =3D 1
-DEBUG: process_seid: Requested Capabilities for SEID =3D 1
-DEBUG: process_seid: Got capabilities response
-DEBUG: process_seid: Sent set configurations command
-DEBUG: process_seid: Set configurations command accepted
-DEBUG: process_seid: Sent open stream command
-DEBUG: process_seid: Got open stream confirm
-DEBUG: do_connect: Connected [imtu 672, omtu 678, flush_to 65535]
-DEBUG: connect_stream: Sent stream start
-DEBUG: connect_stream: Got start stream confirm
-DEBUG: a2dp_constraint: TEST a2dp 0x825e1c8
-DEBUG: a2dp_params: a2dp 0x825e1c8
-DEBUG: a2dp_params: format S16_LE rate 44100 channels 2
-DEBUG: a2dp_params: frame_bytes 4 period_bytes 8192 period_size 2048 buff=
-er_size 4096
-DEBUG: a2dp_prepare: a2dp 0x825e1c8
-Listen thread running
-Awaiting command
-SBC Bandwidth =3D 27 kbps [27945 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-Awaiting command
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-Awaiting command
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-
-=3D=3D=3D=3D Pressing Stop
-DEBUG: a2dp_stop: a2dp 0x825e1c8
-DEBUG: a2dp_stop: Listen thread terminating
-Thread in signal handler 14
-Error while receiving -1 (errno=3D4:Interrupted system call)
-listen_thread: ending perfeclty
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-DEBUG: a2dp_stop: a2dp 0x825e1c8
-DEBUG: a2dp_stop: Listen thread terminating
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-DEBUG: a2dp_close: a2dp Destroying 0x825e1c8
-DEBUG: a2dp_close: OK
-
-=3D=3D=3D=3D Pressing Play
-DEBUG: _snd_pcm_a2dp_open: name pcm.headphone mode 1
-DEBUG: _snd_pcm_a2dp_open: bdaddr/dest is 00:0D:44:43:B7:01
-DEBUG: a2dp_alloc: init
-DEBUG: a2dp_connect: a2dp 0x823ff68 (sk=3D0, control_sk=3D0)
-DEBUG: connect_stream: Using address: 01:B7:43:44:0D:00
-DEBUG: detect_a2dp: Found A2DP Sink
-DEBUG: connect_stream: Found A2DP Sink at the destination
-DEBUG: do_connect: Connected [imtu 672, omtu 672, flush_to 65535]
-DEBUG: connect_stream: Sent the Stream End Point Discovery Command
-DEBUG: connect_stream: Got a Stream End Point Discovery Response
-DEBUG: connect_stream: received 1 capabilities
-DEBUG: process_seid: SEID =3D 1
-DEBUG: process_seid: Requested Capabilities for SEID =3D 1
-DEBUG: process_seid: Got capabilities response
-DEBUG: process_seid: Sent set configurations command
-DEBUG: process_seid: Set configurations command accepted
-DEBUG: process_seid: Sent open stream command
-DEBUG: process_seid: Got open stream confirm
-DEBUG: do_connect: Connected [imtu 672, omtu 678, flush_to 65535]
-DEBUG: connect_stream: Sent stream start
-DEBUG: connect_stream: Got start stream confirm
-DEBUG: a2dp_constraint: TEST a2dp 0x823ff68
-DEBUG: a2dp_params: a2dp 0x823ff68
-DEBUG: a2dp_params: format S16_LE rate 44100 channels 2
-DEBUG: a2dp_params: frame_bytes 4 period_bytes 8192 period_size 2048 buff=
-er_size 4096
-DEBUG: a2dp_prepare: a2dp 0x823ff68
-Listen thread running
-Awaiting command
-SBC Bandwidth =3D 19 kbps [19872 bps]
-SBC Bandwidth =3D 27 kbps [27945 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-
-=3D=3D=3D=3D Pressing Next Track
-DEBUG: a2dp_stop: a2dp 0x823ff68
-DEBUG: a2dp_stop: Listen thread terminating
-Thread in signal handler 14
-Error while receiving -1 (errno=3D4:Interrupted system call)
-listen_thread: ending perfeclty
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-DEBUG: a2dp_stop: a2dp 0x823ff68
-DEBUG: a2dp_stop: Listen thread terminating
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-DEBUG: a2dp_close: a2dp Destroying 0x823ff68
-DEBUG: a2dp_close: OK
-DEBUG: _snd_pcm_a2dp_open: name pcm.headphone mode 1
-DEBUG: _snd_pcm_a2dp_open: bdaddr/dest is 00:0D:44:43:B7:01
-DEBUG: a2dp_constraint: TEST a2dp 0x823ff68
-DEBUG: a2dp_params: a2dp 0x823ff68
-DEBUG: a2dp_params: format S16_LE rate 44100 channels 2
-DEBUG: a2dp_params: frame_bytes 4 period_bytes 8192 period_size 2048 buff=
-er_size 4096
-DEBUG: a2dp_prepare: a2dp 0x823ff68
-SBC Bandwidth =3D 23 kbps [24219 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
------- no sound on the headphones ------
-
-=3D=3D=3D=3D Terminating xmms
-DEBUG: a2dp_stop: a2dp 0x823ff68
-DEBUG: a2dp_stop: Listen thread terminating
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-DEBUG: a2dp_stop: a2dp 0x823ff68
-DEBUG: a2dp_stop: Listen thread terminating
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-DEBUG: a2dp_close: a2dp Destroying 0x823ff68
-DEBUG: a2dp_close: OK
-
---------------050903050704060202060807
-Content-Type: text/x-log;
- name="no_close.log"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline;
- filename="no_close.log"
-
-=3D=3D=3D=3D Starting xmms
-Message: device: pcm.headphone
-
-=3D=3D=3D=3D Pressing Play
-DEBUG: _snd_pcm_a2dp_open: name pcm.headphone mode 1
-DEBUG: _snd_pcm_a2dp_open: bdaddr/dest is 00:0D:44:43:B7:01
-DEBUG: a2dp_alloc: init
-DEBUG: a2dp_connect: a2dp 0x824ffc8 (sk=3D0, control_sk=3D0)
-DEBUG: connect_stream: Using address: 01:B7:43:44:0D:00
-DEBUG: detect_a2dp: Found A2DP Sink
-DEBUG: connect_stream: Found A2DP Sink at the destination
-DEBUG: do_connect: Connected [imtu 672, omtu 672, flush_to 65535]
-DEBUG: connect_stream: Sent the Stream End Point Discovery Command
-DEBUG: connect_stream: Got a Stream End Point Discovery Response
-DEBUG: connect_stream: received 1 capabilities
-DEBUG: process_seid: SEID =3D 1
-DEBUG: process_seid: Requested Capabilities for SEID =3D 1
-DEBUG: process_seid: Got capabilities response
-DEBUG: process_seid: Sent set configurations command
-DEBUG: process_seid: Set configurations command accepted
-DEBUG: process_seid: Sent open stream command
-DEBUG: process_seid: Got open stream confirm
-DEBUG: do_connect: Connected [imtu 672, omtu 678, flush_to 65535]
-DEBUG: connect_stream: Sent stream start
-DEBUG: connect_stream: Got start stream confirm
-DEBUG: a2dp_constraint: TEST a2dp 0x824ffc8
-DEBUG: a2dp_params: a2dp 0x824ffc8
-DEBUG: a2dp_params: format S16_LE rate 44100 channels 2
-DEBUG: a2dp_params: frame_bytes 4 period_bytes 8192 period_size 2048 buff=
-er_size 4096
-DEBUG: a2dp_prepare: a2dp 0x824ffc8
-Listen thread running
-Awaiting command
-SBC Bandwidth =3D 27 kbps [27945 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-Awaiting command
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-
-=3D=3D=3D=3D Pressing Stop
-DEBUG: a2dp_stop: a2dp 0x824ffc8
-DEBUG: a2dp_stop: Listen thread terminating
-Thread in signal handler 14
-Error while receiving -1 (errno=3D4:Interrupted system call)
-listen_thread: ending perfeclty
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-DEBUG: a2dp_stop: a2dp 0x824ffc8
-DEBUG: a2dp_stop: Listen thread terminating
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-
-=3D=3D=3D=3D Pressing Play
-DEBUG: _snd_pcm_a2dp_open: name pcm.headphone mode 1
-DEBUG: _snd_pcm_a2dp_open: bdaddr/dest is 00:0D:44:43:B7:01
-DEBUG: a2dp_constraint: TEST a2dp 0x824ffc8
-DEBUG: a2dp_params: a2dp 0x824ffc8
-DEBUG: a2dp_params: format S16_LE rate 44100 channels 2
-DEBUG: a2dp_params: frame_bytes 4 period_bytes 8192 period_size 2048 buff=
-er_size 4096
-DEBUG: a2dp_prepare: a2dp 0x824ffc8
-SBC Bandwidth =3D 20 kbps [21114 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-
-=3D=3D=3D=3D Pressing Next Track
-DEBUG: a2dp_stop: a2dp 0x824ffc8
-DEBUG: a2dp_stop: Listen thread terminating
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-DEBUG: a2dp_stop: a2dp 0x824ffc8
-DEBUG: a2dp_stop: Listen thread terminating
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-DEBUG: _snd_pcm_a2dp_open: name pcm.headphone mode 1
-DEBUG: _snd_pcm_a2dp_open: bdaddr/dest is 00:0D:44:43:B7:01
-DEBUG: a2dp_constraint: TEST a2dp 0x824ffc8
-DEBUG: a2dp_params: a2dp 0x824ffc8
-DEBUG: a2dp_params: format S16_LE rate 44100 channels 2
-DEBUG: a2dp_params: frame_bytes 4 period_bytes 8192 period_size 2048 buff=
-er_size 4096
-DEBUG: a2dp_prepare: a2dp 0x824ffc8
-SBC Bandwidth =3D 24 kbps [25461 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
-SBC Bandwidth =3D 26 kbps [26703 bps]
-SBC Bandwidth =3D 26 kbps [27324 bps]
------- There is sound, since the connection is not closed ------
-
-=3D=3D=3D=3D Terminating xmms
-DEBUG: a2dp_stop: a2dp 0x824ffc8
-DEBUG: a2dp_stop: Listen thread terminating
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-DEBUG: a2dp_stop: a2dp 0x824ffc8
-DEBUG: a2dp_stop: Listen thread terminating
-DEBUG: a2dp_stop: Listen thread terminated
-DEBUG: a2dp_stop: OK
-
---------------050903050704060202060807--
-
---------------enig8FE293AE7A59726D426B64CD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iD8DBQFE9VVUAhGrHSs5PNIRAmeBAKCHUjZ9a8yT19g00qu7amc39RljhwCgjuNp
-nkp541cC9X3bEAvKOVdvpwg=
-=1lcI
------END PGP SIGNATURE-----
-
---------------enig8FE293AE7A59726D426B64CD--
-
-
---===============0391697757==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0391697757==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0391697757==--
+SGkgQW5kcmV3LAoKRG9uJ3Qgc3RvcCB5b3VyIHdpZmUgZnJvbSB0YWxraW5nIHlldCwgSSBzdGls
+bCBkbyBub3QgdW5kZXJzdGFuZCB3aGF0IApoYXBwZW4gYnV0IEkgaGF2ZSBhIG5ldyB0ZXN0LiBJ
+ZiB5b3UgaGF2ZSBjb21waWxlZCAoYW5kIGluc3RhbGxlZCkgCmJsdWV6LXV0aWxzLCB5b3Ugc2hv
+dWxkIGhhdmUgYSB0b29sIGNhbGxlZCBsMnRlc3QuIElmIG5vdCBnZXQgaXQsIHRoZW4gCnN0b3Ag
+dGhlIGEyZHBkIGRhZW1vbiBhbmQgcnVuIDoKa2lsbGFsbCBhMmRwZApsMnRlc3QgLVAgMjUgLWQK
+VGhlbiBzd2l0Y2ggb24geW91ciBoZWFkc2V0IGFuZCBjb25uZWN0IGl0LiBHaXZlIG1lIHRoZSBm
+dWxsIG91dHB1dC4gCk1pbmUgaXMgdGhlIGZvbGxvd2luZyA6CgpmcmVkZXJpYy5kYWxsZWF1QGZk
+YWxsZWF1On4+bDJ0ZXN0IC1QIDI1IC1kCmwydGVzdFs0NDU3XTogV2FpdGluZyBmb3IgY29ubmVj
+dGlvbiBvbiBwc20gMjUgLi4uCmwydGVzdFs0NDU4XTogQ29ubmVjdCBmcm9tIDAwOjBEOjQ0OjJB
+OjE3OkM3IFtpbXR1IDY3Miwgb210dSA2NzIsIApmbHVzaF90byA2NTUzNSwgbW9kZSAwLCBoYW5k
+bGUgNDIsIGNsYXNzIDB4MDQwNDE4XQpsMnRlc3RbNDQ1OF06IFJlY2VpdmluZyAuLi4KbDJ0ZXN0
+WzQ0NThdOiBSZWNldmllZCAyIGJ5dGVzCjAwMDAwMDAwOiAwMCAwMSAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgLi4KCkhleSwgdGhlcmUncyBhIHR5cG8gaW4gdGhp
+cyBsb2cgOkQKCkZyw6lkw6lyaWMKCkFuZHJldyBXYWxkcmFtIGEgw6ljcml0IDoKPiBIaSBGcmVk
+ZXJpYywKPgo+ICB0b29rIHlvdXIgYWR2aXNlIGFuZCBjb21waWxlZCBsYXRlc3QgQmx1ZXogKDMu
+NCkgeWV0IHN0aWxsIHByZXNzaW5nCj4gcGxheSBnaXZlcwo+Cj4gcm9vdEBzaWRuZXk6L2hvbWUv
+YW5keSMgL3Vzci9sb2NhbC9zYmluL2hjaWR1bXAKPiBIQ0kgc25pZmZlciAtIEJsdWV0b290aCBw
+YWNrZXQgYW5hbHl6ZXIgdmVyIDEuMzIKPiBkZXZpY2U6IGhjaTAgc25hcF9sZW46IDEwMjggZmls
+dGVyOiAweGZmZmZmZmZmCj4gICAKPj4gSENJIEV2ZW50OiBDb25uZWN0IFJlcXVlc3QgKDB4MDQp
+IHBsZW4gMTAKPj4gICAgIAo+IDwgSENJIENvbW1hbmQ6IEFjY2VwdCBDb25uZWN0aW9uIFJlcXVl
+c3QgKDB4MDF8MHgwMDA5KSBwbGVuIDcKPiAgIAo+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVz
+ICgweDBmKSBwbGVuIDQKPj4gSENJIEV2ZW50OiBMaW5rIEtleSBSZXF1ZXN0ICgweDE3KSBwbGVu
+IDYKPj4gICAgIAo+IDwgSENJIENvbW1hbmQ6IExpbmsgS2V5IFJlcXVlc3QgUmVwbHkgKDB4MDF8
+MHgwMDBiKSBwbGVuIDIyCj4gICAKPj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRlICgweDBl
+KSBwbGVuIDEwCj4+IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgwMiBkbGVuIDEyCj4+ICAg
+ICAKPiAgICAgTDJDQVAocyk6IENvbm5lY3QgcmVxOiBwc20gMjUgc2NpZCAweDAwNDAKPiAgIAo+
+PiBIQ0kgRXZlbnQ6IENvbm5lY3QgQ29tcGxldGUgKDB4MDMpIHBsZW4gMTEKPj4gICAgIAo+IDwg
+SENJIENvbW1hbmQ6IFdyaXRlIExpbmsgUG9saWN5IFNldHRpbmdzICgweDAyfDB4MDAwZCkgcGxl
+biA0Cj4gICAKPj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDYKPj4g
+ICAgIAo+IDwgSENJIENvbW1hbmQ6IENoYW5nZSBDb25uZWN0aW9uIFBhY2tldCBUeXBlICgweDAx
+fDB4MDAwZikgcGxlbiA0Cj4gICAKPj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikg
+cGxlbiA0Cj4+ICAgICAKPiA8IEhDSSBDb21tYW5kOiBSZW1vdGUgTmFtZSBSZXF1ZXN0ICgweDAx
+fDB4MDAxOSkgcGxlbiAxMAo+ICAgCj4+IEhDSSBFdmVudDogQ29ubmVjdGlvbiBQYWNrZXQgVHlw
+ZSBDaGFuZ2VkICgweDFkKSBwbGVuIDUKPj4gSENJIEV2ZW50OiBNYXggU2xvdHMgQ2hhbmdlICgw
+eDFiKSBwbGVuIDMKPj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0Cj4+
+IEhDSSBFdmVudDogUmVtb3RlIE5hbWUgUmVxIENvbXBsZXRlICgweDA3KSBwbGVuIDI1NQo+PiAg
+ICAgCj4KPiBJdCBsb29rcyBsaWtlIHRoZSBjb25uZWN0aW9uIGlzIGZvcm1lZCBidXQgdGhlIHBs
+YXkgY29tbWFuZCBpcyBuZXZlcgo+IHJlY2lldmVkID8/Pwo+Cj4gQW55IGhlbHAgYW55b25lIHdp
+dGggbW9yZSBleHBlcmllbmNlIG9mIGhjaWR1bXAgdGhhbiBtZS4KPgo+IERvIHlvdSB0aGluayBp
+dCBtYXkgYmUgdGhlIGJyb2FkY29tIGRvbmdsZSBJJ3ZlIGJ1aWx0IGludG8gbXkgbWFjaGluZSAo
+SQo+IGhhdmUgdGhlIGtlcm5lbCBwYXRjaGVzIGZvciBpdCkuCj4KPiBPbiBhIHBsdXMgbm90ZSBm
+b3J3YXJkIGFuZCByZXZlcnNlIHNraXAgaXMgYSBsb3QgbW9yZSByZXNwb25zaXZlIHdpdGgKPiAz
+LjQgLi4KPgo+IFRoaXMgaXNuJ3QgYSBzaG93IHN0b3BwZXIganVzdCBhbiBhbm95YW5jZS4KPgo+
+IEp1c3QgdG8gcmVjYXAgCj4gcHJlc3NpbmcgcGxheSBvbiBoZWFkcGhvbmVzIGZyb20gJ29uJyBk
+b2VzIG5vdCBzdGFydCB4bW1zIC5pZSBoZWFkcGhvbmUKPiBpbml0aWF0ZWQgcGxheQo+IHBhdXNl
+IGZvciA+MTAgc2VjcyBsZWFkcyB0byBoYXZpbmcgdG8gcmVzdGFydCBzZXNzaW9uIGFzIGhlYWRw
+aG9uZSBzdGF5cwo+IGRpc2Nvbm5lY3RlZCBhZ2FpbiBoZWFkcGhvbmUgaW5pdGlhdGVkIChzb21l
+dGltZXMgd29ya3MpLgo+Cj4gZXZlcnl0aGluZyBlbHNlIGlzIHJlYWxseSB3b3JraW5nIHdlbGwg
+KHBjIGluaXRpYXRlZCBzZXNzaW9uKQo+Cj4gb2YgY2F1c2Ugb25lIHNvbHV0aW9uIHdvdWxkIGJl
+IHRvIHN0b3AgdGhlIHdpZmUgdGFsa2luZyB0byBtZSBmb3IgbW9yZQo+IHRoYW4gMTBzZWMgOz0p
+Cj4KPgo+IE9uIFNhdCwgMjAwNi0wOC0xOSBhdCAxMDoxMiArMDEwMCwgRnJlZGVyaWMgRGFsbGVh
+dSB3cm90ZToKPiAgIAo+PiBIaSwKPj4KPj4gSSByZWFsbHkgZG9uJ3Qga25vdyBhYm91dCB0aGUg
+aW50ZXJuYWxzIG9mIGJsdWV6LiBUaGUgb25seSB0aGluZyBpcywKPj4gdHJ5IHRvIHVwZGF0ZSB5
+b3VyIGJsdWV6IGlmIHlvdSBkbyBub3QgYWxyZWFkeSB1c2UgdGhlIGxhdGVzdC4gT25seQo+PiBz
+b21lb25lIHJlYWxseSBpbiB0aGUgZGVlcCBjb3VsZCBoZWxwLgo+Pgo+PiBBZHZpY2UgYW55b25l
+Pwo+Pgo+PiBGcsOpZMOpcmljCj4+Cj4+Cj4+IC0tLS0tLS0tIE1lc3NhZ2UgZCdvcmlnaW5lLS0t
+LS0tLS0gCj4+IERlOiBibHVlei1kZXZlbC1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCBk
+ZSBsYSBwYXJ0IGRlIEFuZHJldwo+PiBXYWxkcmFtIAo+PiBEYXRlOiB2ZW4uIDE4LzA4LzIwMDYg
+MTg6MzMgCj4+IMOAOiBCbHVlWiBkZXZlbG9wbWVudCAKPj4gT2JqZXQgOiBbQmx1ZXotZGV2ZWxd
+IGEycGRidHNjbyB3b24ndGNvbXBpbGUgKEZJWCkgcGx1cwo+PiB4bW1zZXJyb3IodHJpYWxzYW5k
+dHJpYnVsYXRpb25zKSBob3djb29sIGlzIHRoaXMhISEgbmV3IHBhdGNoIAo+PiAgIAo+PiBGcsOp
+ZMOpcmljCj4+Cj4+Cj4+IE9rIHRob3VnaHQgSSdkIHN0YXJ0IGZyb20gc2NyYXRjaAo+Pgo+PiBl
+bnN1cmUgYTJkcGQgaGFzIG9ubHkgMSBzZXNzaW9uICAKPj4gZmlyc3QgYXR0ZW1wdCBpdCBhbGwg
+d29ya2VkID8/Pz8/PyAKPj4gbmV4dCBhdHRlbXB0IGFuZCBzdWJzZXF1ZW50Cj4+Cj4+IHN1ZG8g
+aGNpZHVtcCA9Cj4+Cj4+IGFuZHlAc2lkbmV5Oi9ldGMvYXBhbmVsJCBzdWRvIGhjaWR1bXAgCj4+
+IEhDSSBzbmlmZmVyIC0gQmx1ZXRvb3RoIHBhY2tldCBhbmFseXplciB2ZXIgMS4yOCAKPj4gZGV2
+aWNlOiBoY2kwIHNuYXBfbGVuOiAxMDI4IGZpbHRlcjogMHhmZmZmZmZmZiAKPj4gICAgIAo+Pj4g
+SENJIEV2ZW50OiBDb25uZWN0IFJlcXVlc3QgKDB4MDQpIHBsZW4gMTAgCj4+PiAgICAgICAKPj4g
+PCBIQ0kgQ29tbWFuZDogQWNjZXB0IENvbm5lY3Rpb24gUmVxdWVzdCAoMHgwMXwweDAwMDkpIHBs
+ZW4gNyAKPj4gICAgIAo+Pj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0
+IAo+Pj4gSENJIEV2ZW50OiBMaW5rIEtleSBSZXF1ZXN0ICgweDE3KSBwbGVuIDYgCj4+PiAgICAg
+ICAKPj4gPCBIQ0kgQ29tbWFuZDogTGluayBLZXkgUmVxdWVzdCBSZXBseSAoMHgwMXwweDAwMGIp
+IHBsZW4gMjIgCj4+ICAgICAKPj4+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkg
+cGxlbiAxMCAKPj4+IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgwMiBkbGVuIDEyIAo+Pj4g
+ICAgICAgCj4+ICAgICBMMkNBUChzKTogQ29ubmVjdCByZXE6IHBzbSAyNSBzY2lkIDB4MDA0MCAK
+Pj4gICAgIAo+Pj4gSENJIEV2ZW50OiBDb25uZWN0IENvbXBsZXRlICgweDAzKSBwbGVuIDExIAo+
+Pj4gICAgICAgCj4+IDwgSENJIENvbW1hbmQ6IFdyaXRlIExpbmsgUG9saWN5IFNldHRpbmdzICgw
+eDAyfDB4MDAwZCkgcGxlbiA0IAo+PiAgICAgCj4+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxl
+dGUgKDB4MGUpIHBsZW4gNiAKPj4+ICAgICAgIAo+PiA8IEhDSSBDb21tYW5kOiBDaGFuZ2UgQ29u
+bmVjdGlvbiBQYWNrZXQgVHlwZSAoMHgwMXwweDAwMGYpIHBsZW4gNCAKPj4gICAgIAo+Pj4gSENJ
+IEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0IAo+Pj4gSENJIEV2ZW50OiBDb25u
+ZWN0aW9uIFBhY2tldCBUeXBlIENoYW5nZWQgKDB4MWQpIHBsZW4gNSAKPj4+IEhDSSBFdmVudDog
+TWF4IFNsb3RzIENoYW5nZSAoMHgxYikgcGxlbiAzCj4+PiAgICAgICAKPj4gYTJkcGQgCj4+IGFu
+ZHlAc2lkbmV5On4kIGEyZHBkIAo+PiBhMmRwZCBbQXVnIDE3IDIwMDYgMjE6MjQ6MDldIHN0YXJ0
+aW5nIC4uLmEyZHBkIGFkZHI9MDA6MEQ6NDQ6MkE6NUM6MTIgCj4+IHRpbWVyPTQwMDAgdXMgW0F1
+ZyAxNyAyMDA2IDIxOjI0OjA5XSAKPj4gc2V0c2NoZWR1bGVyIHJldHVybnMgMCAoZXJybm89MDpT
+dWNjZXNzKSAKPj4gQWNjZXB0aW5nIGluY29taW5nIHRjcCBzdHJlYW0gY29ubmVjdGlvbiAKPj4g
+TmV3IGNvbm5lY3Rpb24gdG8gYmx1ZXRvb3RoIFs0NDEwMCBoel0gCj4+IGF2cmNwOiBBY2NlcHRp
+bmcgaW5jb21pbmcgY29ubmVjdGlvbiAKPj4gYXZkdHA6IEFjY2VwdGluZyBpbmNvbWluZyBjb25u
+ZWN0aW9uCj4+Cj4+Cj4+IEFuZCBub3cgd2hlbiBpdCB3b3Jrcy4KPj4KPj4gSENJIHNuaWZmZXIg
+LSBCbHVldG9vdGggcGFja2V0IGFuYWx5emVyIHZlciAxLjI4IAo+PiBkZXZpY2U6IGhjaTAgc25h
+cF9sZW46IDEwMjggZmlsdGVyOiAweGZmZmZmZmZmIAo+PiAgICAgCj4+PiBIQ0kgRXZlbnQ6IENv
+bm5lY3QgUmVxdWVzdCAoMHgwNCkgcGxlbiAxMCAKPj4+ICAgICAgIAo+PiA8IEhDSSBDb21tYW5k
+OiBBY2NlcHQgQ29ubmVjdGlvbiBSZXF1ZXN0ICgweDAxfDB4MDAwOSkgcGxlbiA3IAo+PiAgICAg
+Cj4+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQgCj4+PiBIQ0kgRXZl
+bnQ6IExpbmsgS2V5IFJlcXVlc3QgKDB4MTcpIHBsZW4gNiAKPj4+ICAgICAgIAo+PiA8IEhDSSBD
+b21tYW5kOiBMaW5rIEtleSBSZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAwYikgcGxlbiAyMiAKPj4g
+ICAgIAo+Pj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDEwIAo+Pj4g
+SENJIEV2ZW50OiBDb25uZWN0IENvbXBsZXRlICgweDAzKSBwbGVuIDExIAo+Pj4gICAgICAgCj4+
+IDwgSENJIENvbW1hbmQ6IFdyaXRlIExpbmsgUG9saWN5IFNldHRpbmdzICgweDAyfDB4MDAwZCkg
+cGxlbiA0IAo+PiAgICAgCj4+PiBBQ0wgZGF0YTogaGFuZGxlIDExIGZsYWdzIDB4MDIgZGxlbiAx
+MiAKPj4+ICAgICAgIAo+PiAgICAgTDJDQVAocyk6IENvbm5lY3QgcmVxOiBwc20gMjUgc2NpZCAw
+eDAwNDAgCj4+IDwgQUNMIGRhdGE6IGhhbmRsZSAxMSBmbGFncyAweDAyIGRsZW4gMTYgCj4+ICAg
+ICBMMkNBUChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgwMDQwIHNjaWQgMHgwMDQwIHJlc3VsdCAw
+IHN0YXR1cyAwIAo+PiAgICAgICBDb25uZWN0aW9uIHN1Y2Nlc3NmdWwgCj4+ICAgICAKPj4+IEhD
+SSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiA2IAo+Pj4gICAgICAgCj4+IDwg
+SENJIENvbW1hbmQ6IENoYW5nZSBDb25uZWN0aW9uIFBhY2tldCBUeXBlICgweDAxfDB4MDAwZikg
+cGxlbiA0IAo+PiAgICAgCj4+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVu
+IDQgCj4+PiBIQ0kgRXZlbnQ6IENvbm5lY3Rpb24gUGFja2V0IFR5cGUgQ2hhbmdlZCAoMHgxZCkg
+cGxlbiA1IAo+Pj4gSENJIEV2ZW50OiBNYXggU2xvdHMgQ2hhbmdlICgweDFiKSBwbGVuIDMgCj4+
+PiBBQ0wgZGF0YTogaGFuZGxlIDExIGZsYWdzIDB4MDIgZGxlbiAxNiAKPj4+ICAgICAgIAo+PiAg
+ICAgTDJDQVAocyk6IENvbmZpZyByZXE6IGRjaWQgMHgwMDQwIGZsYWdzIDB4MDAgY2xlbiA0IAo+
+PiAgICAgICBGbHVzaFRPIDY1NTM1IAo+PiA8IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgw
+MiBkbGVuIDE0IAo+PiAgICAgTDJDQVAocyk6IENvbmZpZyByc3A6IHNjaWQgMHgwMDQwIGZsYWdz
+IDB4MDAgcmVzdWx0IDAgY2xlbiAwIAo+PiAgICAgICBTdWNjZXNzIAo+PiA8IEFDTCBkYXRhOiBo
+YW5kbGUgMTEgZmxhZ3MgMHgwMiBkbGVuIDEyIAo+PiAgICAgTDJDQVAocyk6IENvbmZpZyByZXE6
+IGRjaWQgMHgwMDQwIGZsYWdzIDB4MDAgY2xlbiAwIAo+PiAgICAgCj4+PiBBQ0wgZGF0YTogaGFu
+ZGxlIDExIGZsYWdzIDB4MDIgZGxlbiAxNCAKPj4+ICAgICAgIAo+PiAgICAgTDJDQVAocyk6IENv
+bmZpZyByc3A6IHNjaWQgMHgwMDQwIGZsYWdzIDB4MDAgcmVzdWx0IDAgY2xlbiAwIAo+PiAgICAg
+ICBTdWNjZXNzIAo+PiAgICAgCj4+PiBIQ0kgRXZlbnQ6IEVuY3J5cHQgQ2hhbmdlICgweDA4KSBw
+bGVuIDQgCj4+PiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykg
+cGxlbiA1IAo+Pj4gQUNMIGRhdGE6IGhhbmRsZSAxMSBmbGFncyAweDAyIGRsZW4gNiAKPj4+ICAg
+ICAgIAo+PiAgICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDIgW3BzbSAyNV0gCj4+ICAgICAg
+IEFWRFRQKHMpOiBEaXNjb3ZlciBjbWQ6IHRyYW5zYWN0aW9uIDAgCj4+IDwgQUNMIGRhdGE6IGhh
+bmRsZSAxMSBmbGFncyAweDAyIGRsZW4gNiAKPj4gICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxl
+biAyIFtwc20gMjVdIAo+PiAgICAgICBBVkRUUChzKTogRGlzY292ZXIgcmVqOiB0cmFuc2FjdGlv
+biAwIAo+PiAgICAgICAgIEVycm9yIGNvZGUgNiAKPj4gPCBBQ0wgZGF0YTogaGFuZGxlIDExIGZs
+YWdzIDB4MDIgZGxlbiAxMgo+Pgo+PiBhMmRwZAo+Pgo+PiBhbmR5QHNpZG5leTp+JCBhMmRwZCAK
+Pj4gYTJkcGQgW0F1ZyAxNyAyMDA2IDIxOjI0OjA5XSBzdGFydGluZyAuLi5hMmRwZCBhZGRyPTAw
+OjBEOjQ0OjJBOjVDOjEyIAo+PiB0aW1lcj00MDAwIHVzIFtBdWcgMTcgMjAwNiAyMToyNDowOV0g
+Cj4+IHNldHNjaGVkdWxlciByZXR1cm5zIDAgKGVycm5vPTA6U3VjY2VzcykgCj4+IEFjY2VwdGlu
+ZyBpbmNvbWluZyB0Y3Agc3RyZWFtIGNvbm5lY3Rpb24gCj4+IE5ldyBjb25uZWN0aW9uIHRvIGJs
+dWV0b290aCBbNDQxMDAgaHpdIAo+PiBhdnJjcDogQWNjZXB0aW5nIGluY29taW5nIGNvbm5lY3Rp
+b24gCj4+IGF2ZHRwOiBBY2NlcHRpbmcgaW5jb21pbmcgY29ubmVjdGlvbiAKPj4gYXZkdHA6IHNv
+Y2tldCA3OiBDb25uZWN0aW9uIGZyb20gMTI6NUM6MkE6NDQ6MEQ6MDAsIG10dT02NzIgCj4+IGF2
+ZHRwOiBzb2NrZXQgNzogUmVjZWl2ZWQgZmFpbGVkIHJlc3VsdD0tMSAoZXJybm89MTE6UmVzb3Vy
+Y2UgCj4+IHRlbXBvcmFyaWx5IHVuYXZhaWxhYmxlKSAKPj4gYXZkdHA6IHNvY2tldCA3OiBSZWNl
+aXZlZCBmYWlsZWQgcmVzdWx0PS0xIChlcnJubz0xMTpSZXNvdXJjZSAKPj4gdGVtcG9yYXJpbHkg
+dW5hdmFpbGFibGUpIAo+PiBzb2NrZXQgNzogUmVjZWl2ZWQgMiBieXRlcyAKPj4gMDAwMDA6IDAw
+IDAxIAo+PiBERUJVRzogYTJkcF9oYW5kbGVfYXZkdHBfbWVzc2FnZTogKGVycm5vPTExOlJlc291
+cmNlIHRlbXBvcmFyaWx5IAo+PiB1bmF2YWlsYWJsZSlVbmV4cGVjdGVkIGhlYWRzZXQgZGlyZWN0
+aXZlIDEgCj4+IERFQlVHOiBhMmRwX2hhbmRsZV9hdmR0cF9tZXNzYWdlOiBBbnN3ZXJpbmcgY29t
+bWFuZCBwYWNrZXQgCj4+IChtc2d0eXBlPU1FU1NBR0VfVFlQRV9SRUpFQ1Qsc2lnbmFsPTEpIAo+
+PiBhdmR0cDogc29ja2V0IDc6IFJlY2VpdmVkIGZyYW1lLCBzdGFydCB4bW1zIC0tcGxheQo+Pgo+
+Pgo+PiBzbyBpdCBsb29rcyB0byBteSBzaW1wbGUgbWluZCB0aGF0IGwyY2FwIG5ldmVyIGNvbXBs
+ZXRlcyBwcm9wZXJseS4KPj4KPj4gTm90IHN1cmUgd2h5IHdoZW4gcnVubmluZyBib3RoIGFzIGZv
+cmdyb3VuZCB0YXNrcyBhcHBlYXIgdG8gZ2V0IAo+PiBkaWZmZXJlbnQgcmVzdWx0IHRvIHdoYXQg
+SSd2ZSBwb3N0ZWQgcHJldmlvdXNseSBidXQgcG9zc2libHkgSSdtIGFuIAo+PiBpZGlvdCA7LSks
+IE9yIG1heWJlIHRoZXJlIGlzIG1vcmUgdGhhbiBvbmUgcHJvYmxlbSwgb3IgdG8gbWFueQo+PiBj
+aGFuZ2VzIAo+PiBpbnZhbGlkYXRpbmcgZmluZGluZ3MuCj4+Cj4+IEF0IGxlYXN0IEkgY2FuIHNl
+ZSB3aHkgaXRzIG5vdCB3b3JraW5nIG5vdyBidXQgZG9uJ3Qga25vdyB3aGF0IHRvZG8gCj4+IGFi
+b3V0IGl0Cj4+Cj4+IG1heWJlIEkgc2hvdWxkIG5ldmVyIGhhdmUgbG9va2VkIGF0IGVhY2ggbG9n
+IGluIGlzb2xhdGlvbiBzbyB0aGluayB3ZSAKPj4gc2hvdWxkIGdvIGZyb20gaGVyZSBhcyBJIGNh
+biByZXByb2R1Y2UgdGhpcyBlYXNpbHkuCj4+Cj4+Cj4+Cj4+IC0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gCj4+
+IFVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNl
+cnZpY2VzLAo+PiBzZWN1cml0eT8gCj4+IEdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUt
+aW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRvIG1ha2UgeW91ciBqb2IKPj4gZWFzaWVyIAo+PiBEb3du
+bG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFw
+YWNoZQo+PiBHZXJvbmltbyAKPj4gaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9
+bG5rJmtpZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQyIAo+PiBfX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXyAKPj4gQmx1ZXotZGV2ZWwgbWFpbGluZyBs
+aXN0IAo+PiBCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQgCj4+IGh0dHBzOi8vbGlz
+dHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCj4+Cj4+ICAgICAK
+Pgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBVc2luZyBUb21jYXQgYnV0IG5lZWQgdG8gZG8gbW9yZT8g
+TmVlZCB0byBzdXBwb3J0IHdlYiBzZXJ2aWNlcywgc2VjdXJpdHk/Cj4gR2V0IHN0dWZmIGRvbmUg
+cXVpY2tseSB3aXRoIHByZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kgdG8gbWFrZSB5b3VyIGpvYiBl
+YXNpZXIKPiBEb3dubG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4x
+IGJhc2VkIG9uIEFwYWNoZSBHZXJvbmltbwo+IGh0dHA6Ly9zZWwuYXMtdXMuZmFsa2FnLm5ldC9z
+ZWw/Y21kPWxuayZraWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0PTEyMTY0Mgo+IF9fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4gQmx1ZXotZGV2ZWwgbWFpbGlu
+ZyBsaXN0Cj4gQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cj4gaHR0cHM6Ly9saXN0
+cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKPiAgIAoKCi0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0KVXNpbmcgVG9tY2F0IGJ1dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8gc3Vw
+cG9ydCB3ZWIgc2VydmljZXMsIHNlY3VyaXR5PwpHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdpdGgg
+cHJlLWludGVncmF0ZWQgdGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9iIGVhc2llcgpEb3dubG9h
+ZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNo
+ZSBHZXJvbmltbwpodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lkPTEy
+MDcwOSZiaWQ9MjYzMDU3JmRhdD0xMjE2NDIKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxp
+c3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9s
+aXN0aW5mby9ibHVlei1kZXZlbAo=
