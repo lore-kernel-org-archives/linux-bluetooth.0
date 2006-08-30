@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <10d5dfff9cd.squonimo@virgilio.it>
-Date: Wed, 30 Aug 2006 08:34:19 +0100 (GMT+01:00)
-From: Alex B <squonimo@virgilio.it>
-To: <development@pracucci.com>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-Mime-Version: 1.0
-Subject: [Bluez-devel] R: Re:  problem with bluez-utils 3.4 and dbus
-Reply-To: Alex B <squonimo@virgilio.it>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Date: Wed, 30 Aug 2006 10:27:07 +0800
+Message-ID: <554C5F4C5BA7384EB2B412FD46A3BAD1012AEFDA@pdsmsx411.ccr.corp.intel.com>
+From: "Li, Lea" <lea.li@intel.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] problem with bluez-utils 3.4 and dbus
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -16,60 +14,88 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0720262089=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Now, I'm trying to cross compile dbus library!
-When it will work I'll 
-send you a complete log of my job
+--===============0720262089==
+Content-class: urn:content-classes:message
+Content-Type: text/plain;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
 
-Bye Alex
+To cross compile D-Bus, I have to manually modify the "./configure" file =
+to skip testing of some functions, such as getpwnam_r. :(
 
-----Messaggio 
-originale----
-Da: development@pracucci.com
-Data: 29-ago-2006 20.26
-A: 
-"Alex B"<squonimo@virgilio.it>, "BlueZ development"<bluez-devel@lists.
-sourceforge.net>
-Ogg: Re: [Bluez-devel] problem with bluez-utils 3.4 
-and dbus
+=20
+Thanks,
+Lea
+=20
+
+-----Original Message-----
+From: bluez-devel-bounces@lists.sourceforge.net =
+[mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf Of Marco =
+Pracucci
+Sent: 2006=C4=EA8=D4=C230=C8=D5 4:18
+To: BlueZ development
+Subject: Re: [Bluez-devel] problem with bluez-utils 3.4 and dbus
 
 Hi Alex,
-> /usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2/..
-/../../../arm-
+
+> /usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2/../../../../arm-
 > linux/bin/ld:
 > cannot find -ldbus-glib-1
-> collect2: 
-ld returned 1 exit 
+> collect2: ld returned 1 exit=20
 > status
->   
+
 Have you cross compiled dbus?
-If you 
-have cross compiled dbus you should add -L<dbus library path> to
-LDFLAG, where <dbus library path> is the path to the cross compiled 
-dbus
+If you have cross compiled dbus you should add -L<dbus library path> to
+LDFLAG, where <dbus library path> is the path to the cross compiled dbus
 library.
 
-Moreover, if you have cross compiled dbus, can you tell 
-us how you have
+Moreover, if you have cross compiled dbus, can you tell us how you have
 successfully run the configure script?
 
 Regards,
-Marco 
-Pracucci
+Marco Pracucci
 
 
+-------------------------------------------------------------------------=
+
+Using Tomcat but need to do more? Need to support web services, =
+security?
+Get stuff done quickly with pre-integrated technology to make your job =
+easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache =
+Geronimo
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D=
+121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
+--===============0720262089==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0720262089==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0720262089==--
