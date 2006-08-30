@@ -1,8 +1,9 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <10d5e049283.squonimo@virgilio.it>
-Date: Wed, 30 Aug 2006 08:39:20 +0100 (GMT+01:00)
+Message-ID: <10d5dfff9cd.squonimo@virgilio.it>
+Date: Wed, 30 Aug 2006 08:34:19 +0100 (GMT+01:00)
 From: Alex B <squonimo@virgilio.it>
-To: <bluez-devel@lists.sourceforge.net>
+To: <development@pracucci.com>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 Mime-Version: 1.0
 Subject: [Bluez-devel] R: Re:  problem with bluez-utils 3.4 and dbus
 Reply-To: Alex B <squonimo@virgilio.it>,
@@ -15,57 +16,60 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Q2FuIHlvdSBzZW5kIG1lIGEgc2ltcGxlIGV4ZW1wbGUgb2YgY29uZmlndXJlIG9mIEQtQnVzIGxp
-YnJhcnk/Cgp0aGFua3MgCmEgbG90CkFsZXggQgoKLS0tLU1lc3NhZ2dpbyBvcmlnaW5hbGUtLS0t
-CkRhOiBsZWEubGlAaW50ZWwuY29tCkRhdGE6IDMwLQphZ28tMjAwNiA0LjI3CkE6ICJCbHVlWiBk
-ZXZlbG9wbWVudCI8Ymx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0PgpPZ2c6IFJlOiBb
-Qmx1ZXotZGV2ZWxdIHByb2JsZW0gd2l0aCBibHVlei11dGlscyAzLjQgYW5kIGRidXMKClRvIGNy
-b3NzIApjb21waWxlIEQtQnVzLCBJIGhhdmUgdG8gbWFudWFsbHkgbW9kaWZ5IHRoZSAiLi9jb25m
-aWd1cmUiIGZpbGUgdG8gc2tpcCAKdGVzdGluZyBvZiBzb21lIGZ1bmN0aW9ucywgc3VjaCBhcyBn
-ZXRwd25hbV9yLiA6KAoKIApUaGFua3MsCkxlYQogCgotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0t
-LQpGcm9tOiBibHVlei1kZXZlbC1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLgpuZXQgW21haWx0
-bzpibHVlei1kZXZlbC1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldF0gT24gQmVoYWxmIE9m
-IApNYXJjbyBQcmFjdWNjaQpTZW50OiAyMDA25bm0OOaciDMw5pelIDQ6MTgKVG86IEJsdWVaIGRl
-dmVsb3BtZW50ClN1YmplY3Q6IFJlOiAKW0JsdWV6LWRldmVsXSBwcm9ibGVtIHdpdGggYmx1ZXot
-dXRpbHMgMy40IGFuZCBkYnVzCgpIaSBBbGV4LAoKPiAKL3Vzci9sb2NhbC9hcm0tbGludXgvbGli
-L2djYy1saWIvYXJtLWxpbnV4LzMuMy4yLy4uLy4uLy4uLy4uL2FybS0KPiAKbGludXgvYmluL2xk
-Ogo+IGNhbm5vdCBmaW5kIC1sZGJ1cy1nbGliLTEKPiBjb2xsZWN0MjogbGQgcmV0dXJuZWQgMSAK
-ZXhpdCAKPiBzdGF0dXMKCkhhdmUgeW91IGNyb3NzIGNvbXBpbGVkIGRidXM/CklmIHlvdSBoYXZl
-IGNyb3NzIApjb21waWxlZCBkYnVzIHlvdSBzaG91bGQgYWRkIC1MPGRidXMgbGlicmFyeSBwYXRo
-PiB0bwpMREZMQUcsIHdoZXJlIAo8ZGJ1cyBsaWJyYXJ5IHBhdGg+IGlzIHRoZSBwYXRoIHRvIHRo
-ZSBjcm9zcyBjb21waWxlZCBkYnVzCmxpYnJhcnkuCgpNb3Jlb3ZlciwgaWYgeW91IGhhdmUgY3Jv
-c3MgY29tcGlsZWQgZGJ1cywgY2FuIHlvdSB0ZWxsIHVzIGhvdyB5b3UgaGF2ZQpzdWNjZXNzZnVs
-bHkgcnVuIHRoZSBjb25maWd1cmUgc2NyaXB0PwoKUmVnYXJkcywKTWFyY28gUHJhY3VjY2kKCgot
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tClVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRv
-IHN1cHBvcnQgd2ViIHNlcnZpY2VzLCAKc2VjdXJpdHk/CkdldCBzdHVmZiBkb25lIHF1aWNrbHkg
-d2l0aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRvIG1ha2UgCnlvdXIgam9iIGVhc2llcgpE
-b3dubG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIApv
-biBBcGFjaGUgR2Vyb25pbW8KaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD8KY21kPWxu
-ayZraWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0PTEyMTY0MgpfX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIApsaXN0CkJsdWV6
-LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLgpu
-ZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVXNpbmcgVG9t
-Y2F0IGJ1dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8gc3VwcG9ydCB3ZWIgc2VydmljZXMsIApz
-ZWN1cml0eT8KR2V0IHN0dWZmIGRvbmUgcXVpY2tseSB3aXRoIHByZS1pbnRlZ3JhdGVkIHRlY2hu
-b2xvZ3kgdG8gbWFrZSAKeW91ciBqb2IgZWFzaWVyCkRvd25sb2FkIElCTSBXZWJTcGhlcmUgQXBw
-bGljYXRpb24gU2VydmVyIHYuMS4wLjEgYmFzZWQgCm9uIEFwYWNoZSBHZXJvbmltbwpodHRwOi8v
-c2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsPwpjbWQ9bG5rJmtpZD0xMjA3MDkmYmlkPTI2MzA1NyZk
-YXQ9MTIxNjQyX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
-Qmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5l
-dApodHRwczoKLy9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2
-ZWwKCgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVXNpbmcgVG9tY2F0IGJ1dCBuZWVkIHRvIGRvIG1vcmU/
-IE5lZWQgdG8gc3VwcG9ydCB3ZWIgc2VydmljZXMsIHNlY3VyaXR5PwpHZXQgc3R1ZmYgZG9uZSBx
-dWlja2x5IHdpdGggcHJlLWludGVncmF0ZWQgdGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9iIGVh
-c2llcgpEb3dubG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJh
-c2VkIG9uIEFwYWNoZSBHZXJvbmltbwpodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2Nt
-ZD1sbmsma2lkPTEyMDcwOSZiaWQ9MjYzMDU3JmRhdD0xMjE2NDIKX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJs
-dWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdl
-Lm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
+Now, I'm trying to cross compile dbus library!
+When it will work I'll 
+send you a complete log of my job
+
+Bye Alex
+
+----Messaggio 
+originale----
+Da: development@pracucci.com
+Data: 29-ago-2006 20.26
+A: 
+"Alex B"<squonimo@virgilio.it>, "BlueZ development"<bluez-devel@lists.
+sourceforge.net>
+Ogg: Re: [Bluez-devel] problem with bluez-utils 3.4 
+and dbus
+
+Hi Alex,
+> /usr/local/arm-linux/lib/gcc-lib/arm-linux/3.3.2/..
+/../../../arm-
+> linux/bin/ld:
+> cannot find -ldbus-glib-1
+> collect2: 
+ld returned 1 exit 
+> status
+>   
+Have you cross compiled dbus?
+If you 
+have cross compiled dbus you should add -L<dbus library path> to
+LDFLAG, where <dbus library path> is the path to the cross compiled 
+dbus
+library.
+
+Moreover, if you have cross compiled dbus, can you tell 
+us how you have
+successfully run the configure script?
+
+Regards,
+Marco 
+Pracucci
+
+
+
+
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
