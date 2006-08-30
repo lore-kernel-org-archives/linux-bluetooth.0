@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44F5C672.8090709@ibdcon.org.br>
-Date: Wed, 30 Aug 2006 14:10:10 -0300
-From: Paulo Wollny <paulo.wollny@ibdcon.org.br>
-MIME-Version: 1.0
+Message-ID: <3ac7eec00608300143q7cb7a371n87179b310b6dfc80@mail.gmail.com>
+Date: Wed, 30 Aug 2006 10:43:17 +0200
+From: "Maik Barz" <barzille@googlemail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Some very objective questions.
+MIME-Version: 1.0
+Subject: [Bluez-users] Microsoft Intellimouse Explorer for Bluetooth
+	Sidebuttons and scrollwheel
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,50 +15,68 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0176308436=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi everybody,
+--===============0176308436==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_36902_10056879.1156927397644"
 
-i have some objective questions, and i need help. If anyone can help, i
-would appreciate it!
+------=_Part_36902_10056879.1156927397644
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-1) Bluez on Linux Box and Windows CE on an Ipaq with Bluetooth.
-    - both devices are paired.
-    - from the linux box i can browse the ipaq file system.
-    - from the ipaq, i cannot browse the linux box file system.
-    ? what is to be done, in order that from the ipaq i can browse the
-linux box file system?
+Hi everyone,
+for a long time I am trying to get my mouse completely working on my Suse
+10.1 system.
+Three buttons do work, but scrollwheel and sidebuttons do not seem to fire
+events. I heard about patching my kernel will help out. Is this true or are
+there some other solutions to this problem?
 
-2) Bluez on Linux Box and Windows CE on an Ipaq with Bluetooth.
-    - both devices are paired.
-    ? what is to be done to use the linux box as a network gateway for
-the ipaq, i.e, starting iexplorer on the ipaq and be able to connect
-over the linux box to the internet?
+Any hints?
 
-3) RAKI.
-    ? what is to be done (configurations), so i can synchronize the 
-ipaq with the linux box?
+Greets Maik
 
-4) Sonyericsson W900i.
-    ? is it possible do browse linux box file system from the phone?
+-- 
+Maik Barz
 
-Ok, i did read some how-to's... and tryed, but it did not work... so if
-anyone has it working (any of the 3 questions), and could send the
-configuration files as example, it will help a lot. My linux box is
-running SuSE 10.0.
+Wilhelmplatz 4 - 24116 Kiel
 
-Best regards,
+www.Barzille.de
 
-Paulo
+------=_Part_36902_10056879.1156927397644
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi everyone,<br>for a long time I am trying to get my mouse completely working on my Suse 10.1 system.<br>Three buttons do work, but scrollwheel and sidebuttons do not seem to fire events. I heard about patching my kernel will help out. Is this true or are there some other solutions to this problem?
+<br><br>Any hints?<br><br>Greets Maik<br clear="all"><br>-- <br>Maik Barz<br><br>Wilhelmplatz 4 - 24116 Kiel<br><br><a href="http://www.Barzille.de">www.Barzille.de</a>
+
+------=_Part_36902_10056879.1156927397644--
+
+
+--===============0176308436==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0176308436==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0176308436==--
