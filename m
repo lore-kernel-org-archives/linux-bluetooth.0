@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <554C5F4C5BA7384EB2B412FD46A3BAD1012AEFDA@pdsmsx411.ccr.corp.intel.com>
-References: <554C5F4C5BA7384EB2B412FD46A3BAD1012AEFDA@pdsmsx411.ccr.corp.intel.com>
-Date: Wed, 30 Aug 2006 11:40:54 +0200
-Message-Id: <1156930854.4026.68.camel@aeonflux.holtmann.net>
+In-Reply-To: <554C5F4C5BA7384EB2B412FD46A3BAD1012AEF87@pdsmsx411.ccr.corp.intel.com>
+References: <554C5F4C5BA7384EB2B412FD46A3BAD1012AEF87@pdsmsx411.ccr.corp.intel.com>
+Date: Wed, 30 Aug 2006 11:40:06 +0200
+Message-Id: <1156930806.4026.66.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] problem with bluez-utils 3.4 and dbus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -22,11 +22,11 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Lea,
 
-> To cross compile D-Bus, I have to manually modify the "./configure" file to skip testing of some functions, such as getpwnam_r. :(
+> You should add "DBUS_CFLAGS" & "DBUS_LIBS" options when you executing "./configure" from bluez-utils DIR. Of course, D-Bus should be cross-compiled successfully before bluez. 
 
-please report this back to the D-Bus mailing list. They need to know
-that they have problems in cross-compiling cases. Otherwise this will
-never get fixed.
+I am not the expert when it comes to cross-compiling, but I think all
+that you need are the pkg-config environment variables with the correct
+values. Can someone please try that without doing some nasty hacks.
 
 Regards
 
