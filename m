@@ -1,82 +1,60 @@
-Return-Path: <Linux@feline-soul.com>
-From: "Bearcat M. Sandor" <Linux@feline-soul.com>
-Reply-To: Linux@feline-soul.com
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [Bluez-users] How do I reset a pairing?
-Date: Thu, 31 Aug 2006 11:50:37 -0600
-Cc: bluez-users@lists.sourceforge.net
-References: <e4f1f0110608230129y73240448ufc024c1c99810789@mail.gmail.com> <200608302048.42931.Linux@feline-soul.com> <1157022278.4026.118.camel@aeonflux.holtmann.net>
-In-Reply-To: <1157022278.4026.118.camel@aeonflux.holtmann.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200608311150.38005.Linux@feline-soul.com>
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Date: Thu, 31 Aug 2006 08:38:53 -0700
+From: David Armour <d.f.armour@shaw.ca>
+In-reply-to: <44F6DCB0.3030400@ibdcon.org.br>
+To: Paulo Wollny <paulo.wollny@ibdcon.org.br>,
+        bluez-users@lists.sourceforge.net
+Message-id: <44F7028D.3040502@shaw.ca>
+MIME-version: 1.0
+References: <mailman.44465.1156973920.29847.bluez-users@lists.sourceforge.net>
+	<44F68535.3060409@shaw.ca> <44F6DCB0.3030400@ibdcon.org.br>
+Subject: Re: [Bluez-users] bash: syntax error near unexpected token `newline'
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel,
+hello Paulo
+> Hi,
+> did it work? let me know.
+>   
+thanks for your interest. i'm keeping a record of this experience, in 
+the hope that others can learn from it.
+now, running:
 
-Thank you. Here is the output from hcidump -X -V:
+ >> sudo hcitools auth 00:03:89:53:EC:7F   ## gives:
+ >> sudo: hcitools: command not found      ## !
 
-11:46:21 root@linux:/home/bearcat# hcidump -X -V
-HCI sniffer - Bluetooth packet analyzer ver 1.31
-device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0D:44:4F:37:72 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:0D:44:4F:37:72
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 41 mode 0x00 interval 0
-    Mode: Active
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 41 mode 0x02 interval 126
-    Mode: Sniff
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x22 handle 44 bdaddr 00:0D:44:4F:37:72 type ACL encrypt 0x00
-    Error: LMP Response Timeout
-< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
-> HCI Event: Command Complete (0x0e) plen 6
-    Read Voice Setting (0x03|0x0025) ncmd 1
-    status 0x00 voice setting 0x0060
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0D:44:4F:37:72 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:0D:44:4F:37:72
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
-> HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
-> HCI Event: Inquiry Result (0x02) plen 15
-    bdaddr 00:0D:44:4F:37:72 mode 1 clkoffset 0x50a7 class 0x200404
-> HCI Event: Inquiry Complete (0x01) plen 1
-    status 0x00
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x22 handle 45 bdaddr 00:0D:44:4F:37:72 type ACL encrypt 0x00
-    Error: LMP Response Timeout
+i'm *looking at* the hcitools icon in /usr/bin, as we speak... [slowly, 
+i turn! inch by inch...step by step!]
 
-Bearcat M. Sandor
+what do you think? a permission issue? doesn't sudo take care of that? a 
+path issue? i tried 'sudo /usr/bin/hcitools auth...' just to see. got 
+same result. <curious>
 
-On Thursday 31 August 2006 05:04 in an email titled "Re: [Bluez-users] How do 
-I reset a pairing?" Marcel Holtmann wrote:
->Hi Bearcat,
->
->
->run "hcidump -X -V". This output is not really helpful.
->
->Regards
->
->Marcel
+>>>> ## running: >>sudo hidd --connect <00:03:89:53:EC:7F>
+>>>> ## bash: syntax error near unexpected token `newline'        ## gah!
 
--- 
-Bearcat M. Sandor
-Bearcat@feline-soul.com
-Jabber: bearcat@jabber.feline-soul.net
-ICQ: 6628727
-MSN: bearcatsandor@hotmail.com
-Yahoo: bearcatsandor
-AIM: bearcatmsandor
+>>>> Strip < and > from the command... it shoud be:  sudo hidd --connect
+>>>> 00:03:89:53:EC:7F
+>>>>     
+>>>>         
+
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
