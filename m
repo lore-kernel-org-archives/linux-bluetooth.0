@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44F6F306.8040801@xmission.com>
-Date: Thu, 31 Aug 2006 08:32:38 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <44F6EC35.5090106@ibdcon.org.br>
+Date: Thu, 31 Aug 2006 11:03:33 -0300
+From: Paulo Wollny <paulo.wollny@ibdcon.org.br>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <44F6EC35.5090106@ibdcon.org.br>
-In-Reply-To: <44F6EC35.5090106@ibdcon.org.br>
-Subject: Re: [Bluez-users] libsbc
+Subject: [Bluez-users] libsbc
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,13 +18,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi,
+i'm trying to build the alsa-plugins for btsco, but i'm not being able
+to download teh cvs files.....
+cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/sbc login  returns
+the following message:
+Logging in to :pserver:anonymous@cvs.sourceforge.net:2401/cvsroot/sbc
+CVS password:
+cvs [login aborted]: connect to cvs.sourceforge.net(66.35.250.207):2401
+failed: No route to host
+Does someone has the file and if yes, can send it to me in pvt?
+Best regards,
 Paulo
-
-Marcel needs to update the docs... sf reorganized their cvs servers. try:
-
-anonymous@sbc.cvs.sourceforge.net:/cvsroot/sbc
-
-Brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
