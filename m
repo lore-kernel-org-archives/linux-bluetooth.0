@@ -1,105 +1,82 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 31 Aug 2006 15:43:16 -0300
-From: redondos <redondos@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20060831184315.GD22434@refinery.twat.com.ar>
-References: <mailman.44465.1156973920.29847.bluez-users@lists.sourceforge.net>
-	<44F68535.3060409@shaw.ca> <44F6DCB0.3030400@ibdcon.org.br>
-	<44F7028D.3040502@shaw.ca>
+Return-Path: <Linux@feline-soul.com>
+From: "Bearcat M. Sandor" <Linux@feline-soul.com>
+Reply-To: Linux@feline-soul.com
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-users] How do I reset a pairing?
+Date: Thu, 31 Aug 2006 11:50:37 -0600
+Cc: bluez-users@lists.sourceforge.net
+References: <e4f1f0110608230129y73240448ufc024c1c99810789@mail.gmail.com> <200608302048.42931.Linux@feline-soul.com> <1157022278.4026.118.camel@aeonflux.holtmann.net>
+In-Reply-To: <1157022278.4026.118.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-In-Reply-To: <44F7028D.3040502@shaw.ca>
-Subject: Re: [Bluez-users] bash: syntax error near unexpected token `newline'
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0211059320=="
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200608311150.38005.Linux@feline-soul.com>
+List-ID: <bluez-users.lists.sourceforge.net>
 
+Marcel,
 
---===============0211059320==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="hYooF8G/hrfVAmum"
-Content-Disposition: inline
+Thank you. Here is the output from hcidump -X -V:
 
+11:46:21 root@linux:/home/bearcat# hcidump -X -V
+HCI sniffer - Bluetooth packet analyzer ver 1.31
+device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:0D:44:4F:37:72 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> HCI Event: PIN Code Request (0x16) plen 6
+    bdaddr 00:0D:44:4F:37:72
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 41 mode 0x00 interval 0
+    Mode: Active
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 41 mode 0x02 interval 126
+    Mode: Sniff
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x22 handle 44 bdaddr 00:0D:44:4F:37:72 type ACL encrypt 0x00
+    Error: LMP Response Timeout
+< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+> HCI Event: Command Complete (0x0e) plen 6
+    Read Voice Setting (0x03|0x0025) ncmd 1
+    status 0x00 voice setting 0x0060
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:0D:44:4F:37:72 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> HCI Event: PIN Code Request (0x16) plen 6
+    bdaddr 00:0D:44:4F:37:72
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+    lap 0x9e8b33 len 6 num 0
+> HCI Event: Command Status (0x0f) plen 4
+    Inquiry (0x01|0x0001) status 0x00 ncmd 1
+> HCI Event: Inquiry Result (0x02) plen 15
+    bdaddr 00:0D:44:4F:37:72 mode 1 clkoffset 0x50a7 class 0x200404
+> HCI Event: Inquiry Complete (0x01) plen 1
+    status 0x00
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x22 handle 45 bdaddr 00:0D:44:4F:37:72 type ACL encrypt 0x00
+    Error: LMP Response Timeout
 
---hYooF8G/hrfVAmum
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Bearcat M. Sandor
 
-On Thu, Aug 31 08:38, David Armour wrote:
-> hello Paulo
-> > Hi,
-> > did it work? let me know.
-> >  =20
-> thanks for your interest. i'm keeping a record of this experience, in=20
-> the hope that others can learn from it.
-> now, running:
->=20
->  >> sudo hcitools auth 00:03:89:53:EC:7F   ## gives:
->  >> sudo: hcitools: command not found      ## !
->=20
-> i'm *looking at* the hcitools icon in /usr/bin, as we speak... [slowly,=
-=20
-> i turn! inch by inch...step by step!]
+On Thursday 31 August 2006 05:04 in an email titled "Re: [Bluez-users] How do 
+I reset a pairing?" Marcel Holtmann wrote:
+>Hi Bearcat,
+>
+>
+>run "hcidump -X -V". This output is not really helpful.
+>
+>Regards
+>
+>Marcel
 
-The program is called 'hcitool' and is probably located in /usr/bin.
-(Please note that you are referring to it as 'hcitools', with a tailing
-'s')
-
-Check with which, whereis, or your favorite method, where in your
-PATH this binary is located.
-
-> what do you think? a permission issue? doesn't sudo take care of that? a=
-=20
-> path issue? i tried 'sudo /usr/bin/hcitools auth...' just to see. got=20
-> same result. <curious>
-
---=20
-redondos
-
---hYooF8G/hrfVAmum
-Content-Type: application/pgp-signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.4 (GNU/Linux)
-
-iD8DBQFE9y3DJZ/yCc25j3IRAoswAJ9S05gVAh41Zwzq9z9G4vp19NTXUACfdBHl
-iZPKKPu8WYDqf3VkbMXMs0k=
-=ZbPq
------END PGP SIGNATURE-----
-
---hYooF8G/hrfVAmum--
-
-
---===============0211059320==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0211059320==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0211059320==--
+-- 
+Bearcat M. Sandor
+Bearcat@feline-soul.com
+Jabber: bearcat@jabber.feline-soul.net
+ICQ: 6628727
+MSN: bearcatsandor@hotmail.com
+Yahoo: bearcatsandor
+AIM: bearcatmsandor
