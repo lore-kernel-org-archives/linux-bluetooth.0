@@ -1,16 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Linux@feline-soul.com
-In-Reply-To: <200608302048.42931.Linux@feline-soul.com>
-References: <e4f1f0110608230129y73240448ufc024c1c99810789@mail.gmail.com>
-	<200608291908.52176.Linux@feline-soul.com>
-	<1156931555.4026.79.camel@aeonflux.holtmann.net>
-	<200608302048.42931.Linux@feline-soul.com>
-Date: Thu, 31 Aug 2006 13:04:38 +0200
-Message-Id: <1157022278.4026.118.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] How do I reset a pairing?
+Date: Wed, 30 Aug 2006 23:44:05 -0700
+From: David Armour <d.f.armour@shaw.ca>
+In-reply-to: <mailman.44465.1156973920.29847.bluez-users@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
+Message-id: <44F68535.3060409@shaw.ca>
+MIME-version: 1.0
+References: <mailman.44465.1156973920.29847.bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] bash: syntax error near unexpected token
+	`newline', (Paulo Wollny)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,40 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Bearcat,
+hello Paolo,
 
-> Alright, we're getting there. I added the line to the pincodes file and now 
-> the pin is accepted.
-> 
-> However, doing an btsco 00:0D:44:4F:37:72 i get
-> 
-> Error: Failed to connect to SDP server: Function not implemented
-> Assuming channel 2
-> 
-> Can't connect RFCOMM channel: Resource temporarily unavailable
-> 
-> hcidump gives me:
-> 
-> HCI sniffer - Bluetooth packet analyzer ver 1.31
-> device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
-> < HCI Command: Create Connection (0x01|0x0005) plen 13
-> > HCI Event: Command Status (0x0f) plen 4
-> > HCI Event: PIN Code Request (0x16) plen 6
-> > HCI Event: Mode Change (0x14) plen 6
-> > HCI Event: Mode Change (0x14) plen 6
-> > HCI Event: Connect Complete (0x03) plen 11
-> < HCI Command: Read Voice Setting (0x03|0x0025) plen 0
-> > HCI Event: Command Complete (0x0e) plen 6
-> < HCI Command: Create Connection (0x01|0x0005) plen 13
-> > HCI Event: Command Status (0x0f) plen 4
-> > HCI Event: PIN Code Request (0x16) plen 6
-> > HCI Event: Connect Complete (0x03) plen 11
+thank you for your reply.
 
-run "hcidump -X -V". This output is not really helpful.
+>> ## running: >>sudo hidd --connect <00:03:89:53:EC:7F>
+>> ## bash: syntax error near unexpected token `newline'        ## gah!
+>>
+>> can someone where to look to address this error? thanks in advance.
+>>
 
-Regards
+> Strip < and > from the command... it shoud be:  sudo hidd --connect
+> 00:03:89:53:EC:7F
 
-Marcel
+that makes so much more sense, now that you point it out. mille grazie!
+
 
 
 
