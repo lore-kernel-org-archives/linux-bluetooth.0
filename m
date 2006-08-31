@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <35861.212.58.233.129.1157016991.squirrel@samuri.demon.co.uk>
-In-Reply-To: <44F69DB8.7000107@palmsource.com>
+Message-ID: <44F69DB8.7000107@palmsource.com>
+Date: Thu, 31 Aug 2006 10:28:40 +0200
+From: =?UTF-8?B?RnLDqWTDqXJpYyBEQUxMRUFV?= <frederic.dalleau@palmsource.com>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <1155918829.6708.16.camel@localhost>	<7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6E8F@eumonex01.palmsource.com>	<1156890150.19173.8.camel@localhost>
 	<44F55222.1030700@palmsource.com>	<1156955722.19749.6.camel@localhost>
 	<1156959040.19749.19.camel@localhost>
-	<44F69DB8.7000107@palmsource.com>
-Date: Thu, 31 Aug 2006 10:36:31 +0100 (BST)
-From: andy@samuri.demon.co.uk
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
+In-Reply-To: <1156959040.19749.19.camel@localhost>
 Subject: Re: [Bluez-devel] Broadcom BCM2045 problems
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,562 +18,322 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Yea I didn't think I could disable my built in dongle as its hard waired
-and most of the apps do not support multiple dongles i.e /dev/hci1
-
-But then realised I could Down the hci0 making the other one the defaullt
-
-
-Thanks for all your help
-
-Your app is really cool now and will brin me much listening pleasure.
-
-I guess the problem with the broadcom is that by the time its
-paired/connected the command is lost. This would explain why occasionaly
-it works.
-
-Soldering iron and screwdriver time out with the broadcomm and in with a
-BT V2 CSR.
-
-> Pleased you sort it out! And pleased it's not the code. Pity we have not
-> tried another dongle first ! At least 30 mails passed in this thread :D
->
-> Fr=C3=A9d=C3=A9ric
->
-> Andrew Waldram a =C3=A9crit :
->> Hi Fr=C3=A9d=C3=A9ric,
->>
->> thought I'd change the subject to reflect my true issue ;-)
->> Got it!!
->>
->> well sort of its the Broadcom BCM2045
->>
->> I tried another dongle bringing my integrated one down with hciconfig
->> hci0 down
->> hci0:   Type: USB
->>         BD Address: 00:12:0E:2E:E9:35 ACL MTU: 1017:8 SCO MTU: 64:8
->>         DOWN
->>         RX bytes:38581 acl:54 sco:0 events:4397 errors:0
->>         TX bytes:8951643 acl:16215 sco:0 commands:177 errors:0Pleased
->> you sort it out! And pleased it's not the code. Pity we have
->> not tried another dongle first ! At least 20 mails passed in this
->> thread :D
->>
->> At least we found the 100% cpu...
->>
->> Fr=C3=A9d=C3=A9ric
->>
->>
->>         Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
->>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->>         Link policy: RSWITCH HOLD SNIFF PARK
->>         Link mode: SLAVE ACCEPT
->>
->> hci1:   Type: USB
->>         BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 64:10
->>         UP RUNNING PSCAN
->>         RX bytes:7700 acl:37 sco:0 events:848 errors:0
->>         TX bytes:414743 acl:783 sco:0 commands:35 errors:0
->>         Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
->>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->>         Link policy: RSWITCH HOLD SNIFF PARK
->>         Link mode: SLAVE ACCEPT
->>         Name: 'BlueZ (1)'
->>         Class: 0x3e0100
->>         Service Classes: Networking, Rendering, Capturing, Object
->> Transfer, Audio
->>         Device Class: Computer, Uncategorized
->>         HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP Subver:
->> 0x1fe
->>         Manufacturer: Integrated System Solution Corp. (57)
->>
->> and with the issc donble all works like this all the time not 1 in 30
->> whooo hoo
->>
->> andy@sidney:~$ l2test -i hci1 -P 25 -d
->> l2test[23181]: Waiting for connection on psm 25 ...
->> l2test[23185]: Connect from 00:0D:44:2A:5C:12 [imtu 672, omtu 672,
->> flush_to 65535, mode 0, handle 1, class 0x040418]
->> l2test[23185]: Receiving ...
->> l2test[23185]: Recevied 2 bytes
->> 00000000: 00 01
->>
->> Don't know what to try from here at least it's not your code :-)
->>
->> Could be a problem with the broadcom patch ???
->>
->> for completness here the hciconfig for the broadcom when its up
->>  hci0:   Type: USB
->>         BD Address: 00:12:0E:2E:E9:35 ACL MTU: 1017:8 SCO MTU: 64:8
->>         UP RUNNING PSCAN
->>         RX bytes:38978 acl:54 sco:0 events:4415 errors:0
->>         TX bytes:8951964 acl:16215 sco:0 commands:195 errors:0
->>         Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
->>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->>         Link policy: RSWITCH HOLD SNIFF PARK
->>         Link mode: SLAVE ACCEPT
->>         Name: 'BlueZ (0)'
->>         Class: 0x3e0100
->>         Service Classes: Networking, Rendering, Capturing, Object
->> Transfer, Audio
->>         Device Class: Computer, Uncategorized
->>         HCI Ver: 2.0 (0x3) HCI Rev: 0x2000 LMP Ver: 2.0 (0x3) LMP
->> Subver: 0x4127
->>         Manufacturer: Broadcom Corporation (15)
->>
->> Any ideas anyone????
->>
->>
->> On Wed, 2006-08-30 at 17:35 +0100, Andrew Waldram wrote:
->>
->>> Thanks for the reply
->>> Here is what I get
->>> First attempt and next 30 ;-)
->>>
->>> andy@sidney:~$ l2test -P 25 -d
->>> l2test[20236]: Waiting for connection on psm 25 ...
->>> and dmesg
->>> [17217759.712000] hci_acldata_packet: hci0 ACL packet for unknown
->>> connection handle 11
->>>
->>> 31st attempt
->>> andy@sidney:~$ l2test -P 25 -d
->>> l2test[20302]: Waiting for connection on psm 25 ...
->>> l2test[20314]: Connect from 00:0D:44:2A:5C:12 [imtu 672, omtu 672,
->>> flush_to 6553 5, mode 0, handle 11, class 0x040418]
->>> l2test[20314]: Receiving ...
->>> l2test[20314]: Recevied 2 bytes
->>> 00000000: 00 01
->>>
->>> At least the typo matches
->>> tried restarting bluez utils but it doesn't alter the situation
->>> reset headphones still no go.
->>>
->>> looks timmingish to me :-) maybe the broadcom
->>>
->>> On Wed, 2006-08-30 at 10:53 +0200, Fr=C3=A9d=C3=A9ric DALLEAU wrote:
->>>
->>>> Hi Andrew,
->>>>
->>>> Don't stop your wife from talking yet, I still do not understand what
->>>> happen but I have a new test. If you have compiled (and installed)
->>>> bluez-utils, you should have a tool called l2test. If not get it, then
->>>> stop the a2dpd daemon and run :
->>>> killall a2dpd
->>>> l2test -P 25 -d
->>>> Then switch on your headset and connect it. Give me the full output.
->>>> Mine is the following :
->>>>
->>>> frederic.dalleau@fdalleau:~>l2test -P 25 -d
->>>> l2test[4457]: Waiting for connection on psm 25 ...
->>>> l2test[4458]: Connect from 00:0D:44:2A:17:C7 [imtu 672, omtu 672,
->>>> flush_to 65535, mode 0, handle 42, class 0x040418]
->>>> l2test[4458]: Receiving ...
->>>> l2test[4458]: Recevied 2 bytes
->>>> 00000000: 00 01                                            ..
->>>>
->>>> Hey, there's a typo in this log :D
->>>>
->>>> Fr=C3=A9d=C3=A9ric
->>>>
->>>> Andrew Waldram a =C3=A9crit :
->>>>
->>>>> Hi Frederic,
->>>>>
->>>>>  took your advise and compiled latest Bluez (3.4) yet still pressing
->>>>> play gives
->>>>>
->>>>> root@sidney:/home/andy# /usr/local/sbin/hcidump
->>>>> HCI sniffer - Bluetooth packet analyzer ver 1.32
->>>>> device: hci0 snap_len: 1028 filter: 0xffffffff
->>>>>
->>>>>
->>>>>> HCI Event: Connect Request (0x04) plen 10
->>>>>>
->>>>>>
->>>>> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
->>>>>
->>>>>
->>>>>> HCI Event: Command Status (0x0f) plen 4
->>>>>> HCI Event: Link Key Request (0x17) plen 6
->>>>>>
->>>>>>
->>>>> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
->>>>>
->>>>>
->>>>>> HCI Event: Command Complete (0x0e) plen 10
->>>>>> ACL data: handle 11 flags 0x02 dlen 12
->>>>>>
->>>>>>
->>>>>     L2CAP(s): Connect req: psm 25 scid 0x0040
->>>>>
->>>>>
->>>>>> HCI Event: Connect Complete (0x03) plen 11
->>>>>>
->>>>>>
->>>>> < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
->>>>>
->>>>>
->>>>>> HCI Event: Command Complete (0x0e) plen 6
->>>>>>
->>>>>>
->>>>> < HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
->>>>>
->>>>>
->>>>>> HCI Event: Command Status (0x0f) plen 4
->>>>>>
->>>>>>
->>>>> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
->>>>>
->>>>>
->>>>>> HCI Event: Connection Packet Type Changed (0x1d) plen 5
->>>>>> HCI Event: Max Slots Change (0x1b) plen 3
->>>>>> HCI Event: Command Status (0x0f) plen 4
->>>>>> HCI Event: Remote Name Req Complete (0x07) plen 255
->>>>>>
->>>>>>
->>>>> It looks like the connection is formed but the play command is never
->>>>> recieved ???
->>>>>
->>>>> Any help anyone with more experience of hcidump than me.
->>>>>
->>>>> Do you think it may be the broadcom dongle I've built into my machine
->>>>> (I
->>>>> have the kernel patches for it).
->>>>>
->>>>> On a plus note forward and reverse skip is a lot more responsive with
->>>>> 3.4 ..
->>>>>
->>>>> This isn't a show stopper just an anoyance.
->>>>>
->>>>> Just to recap
->>>>> pressing play on headphones from 'on' does not start xmms .ie
->>>>> headphone
->>>>> initiated play
->>>>> pause for >10 secs leads to having to restart session as headphone
->>>>> stays
->>>>> disconnected again headphone initiated (sometimes works).
->>>>>
->>>>> everything else is really working well (pc initiated session)
->>>>>
->>>>> of cause one solution would be to stop the wife talking to me for
->>>>> more
->>>>> than 10sec ;=3D)
->>>>>
->>>>>
->>>>> On Sat, 2006-08-19 at 10:12 +0100, Frederic Dalleau wrote:
->>>>>
->>>>>
->>>>>> Hi,
->>>>>>
->>>>>> I really don't know about the internals of bluez. The only thing is,
->>>>>> try to update your bluez if you do not already use the latest. Only
->>>>>> someone really in the deep could help.
->>>>>>
->>>>>> Advice anyone?
->>>>>>
->>>>>> Fr=C3=A9d=C3=A9ric
->>>>>>
->>>>>>
->>>>>> -------- Message d'origine--------
->>>>>> De: bluez-devel-bounces@lists.sourceforge.net de la part de Andrew
->>>>>> Waldram
->>>>>> Date: ven. 18/08/2006 18:33
->>>>>> =C3=80: BlueZ development
->>>>>> Objet : [Bluez-devel] a2pdbtsco won'tcompile (FIX) plus
->>>>>> xmmserror(trialsandtribulations) howcool is this!!! new patch
->>>>>>
->>>>>> Fr=C3=A9d=C3=A9ric
->>>>>>
->>>>>>
->>>>>> Ok thought I'd start from scratch
->>>>>>
->>>>>> ensure a2dpd has only 1 session
->>>>>> first attempt it all worked ??????
->>>>>> next attempt and subsequent
->>>>>>
->>>>>> sudo hcidump =3D
->>>>>>
->>>>>> andy@sidney:/etc/apanel$ sudo hcidump
->>>>>> HCI sniffer - Bluetooth packet analyzer ver 1.28
->>>>>> device: hci0 snap_len: 1028 filter: 0xffffffff
->>>>>>
->>>>>>
->>>>>>> HCI Event: Connect Request (0x04) plen 10
->>>>>>>
->>>>>>>
->>>>>> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
->>>>>>
->>>>>>
->>>>>>> HCI Event: Command Status (0x0f) plen 4
->>>>>>> HCI Event: Link Key Request (0x17) plen 6
->>>>>>>
->>>>>>>
->>>>>> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
->>>>>>
->>>>>>
->>>>>>> HCI Event: Command Complete (0x0e) plen 10
->>>>>>> ACL data: handle 11 flags 0x02 dlen 12
->>>>>>>
->>>>>>>
->>>>>>     L2CAP(s): Connect req: psm 25 scid 0x0040
->>>>>>
->>>>>>
->>>>>>> HCI Event: Connect Complete (0x03) plen 11
->>>>>>>
->>>>>>>
->>>>>> < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
->>>>>>
->>>>>>
->>>>>>> HCI Event: Command Complete (0x0e) plen 6
->>>>>>>
->>>>>>>
->>>>>> < HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
->>>>>>
->>>>>>
->>>>>>> HCI Event: Command Status (0x0f) plen 4
->>>>>>> HCI Event: Connection Packet Type Changed (0x1d) plen 5
->>>>>>> HCI Event: Max Slots Change (0x1b) plen 3
->>>>>>>
->>>>>>>
->>>>>> a2dpd
->>>>>> andy@sidney:~$ a2dpd
->>>>>> a2dpd [Aug 17 2006 21:24:09] starting ...a2dpd
->>>>>> addr=3D00:0D:44:2A:5C:12
->>>>>> timer=3D4000 us [Aug 17 2006 21:24:09]
->>>>>> setscheduler returns 0 (errno=3D0:Success)
->>>>>> Accepting incoming tcp stream connection
->>>>>> New connection to bluetooth [44100 hz]
->>>>>> avrcp: Accepting incoming connection
->>>>>> avdtp: Accepting incoming connection
->>>>>>
->>>>>>
->>>>>> And now when it works.
->>>>>>
->>>>>> HCI sniffer - Bluetooth packet analyzer ver 1.28
->>>>>> device: hci0 snap_len: 1028 filter: 0xffffffff
->>>>>>
->>>>>>
->>>>>>> HCI Event: Connect Request (0x04) plen 10
->>>>>>>
->>>>>>>
->>>>>> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
->>>>>>
->>>>>>
->>>>>>> HCI Event: Command Status (0x0f) plen 4
->>>>>>> HCI Event: Link Key Request (0x17) plen 6
->>>>>>>
->>>>>>>
->>>>>> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
->>>>>>
->>>>>>
->>>>>>> HCI Event: Command Complete (0x0e) plen 10
->>>>>>> HCI Event: Connect Complete (0x03) plen 11
->>>>>>>
->>>>>>>
->>>>>> < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
->>>>>>
->>>>>>
->>>>>>> ACL data: handle 11 flags 0x02 dlen 12
->>>>>>>
->>>>>>>
->>>>>>     L2CAP(s): Connect req: psm 25 scid 0x0040
->>>>>> < ACL data: handle 11 flags 0x02 dlen 16
->>>>>>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
->>>>>>       Connection successful
->>>>>>
->>>>>>
->>>>>>> HCI Event: Command Complete (0x0e) plen 6
->>>>>>>
->>>>>>>
->>>>>> < HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
->>>>>>
->>>>>>
->>>>>>> HCI Event: Command Status (0x0f) plen 4
->>>>>>> HCI Event: Connection Packet Type Changed (0x1d) plen 5
->>>>>>> HCI Event: Max Slots Change (0x1b) plen 3
->>>>>>> ACL data: handle 11 flags 0x02 dlen 16
->>>>>>>
->>>>>>>
->>>>>>     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
->>>>>>       FlushTO 65535
->>>>>> < ACL data: handle 11 flags 0x02 dlen 14
->>>>>>     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
->>>>>>       Success
->>>>>> < ACL data: handle 11 flags 0x02 dlen 12
->>>>>>     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
->>>>>>
->>>>>>
->>>>>>> ACL data: handle 11 flags 0x02 dlen 14
->>>>>>>
->>>>>>>
->>>>>>     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
->>>>>>       Success
->>>>>>
->>>>>>
->>>>>>> HCI Event: Encrypt Change (0x08) plen 4
->>>>>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>>>>> ACL data: handle 11 flags 0x02 dlen 6
->>>>>>>
->>>>>>>
->>>>>>     L2CAP(d): cid 0x0040 len 2 [psm 25]
->>>>>>       AVDTP(s): Discover cmd: transaction 0
->>>>>> < ACL data: handle 11 flags 0x02 dlen 6
->>>>>>     L2CAP(d): cid 0x0040 len 2 [psm 25]
->>>>>>       AVDTP(s): Discover rej: transaction 0
->>>>>>         Error code 6
->>>>>> < ACL data: handle 11 flags 0x02 dlen 12
->>>>>>
->>>>>> a2dpd
->>>>>>
->>>>>> andy@sidney:~$ a2dpd
->>>>>> a2dpd [Aug 17 2006 21:24:09] starting ...a2dpd
->>>>>> addr=3D00:0D:44:2A:5C:12
->>>>>> timer=3D4000 us [Aug 17 2006 21:24:09]
->>>>>> setscheduler returns 0 (errno=3D0:Success)
->>>>>> Accepting incoming tcp stream connection
->>>>>> New connection to bluetooth [44100 hz]
->>>>>> avrcp: Accepting incoming connection
->>>>>> avdtp: Accepting incoming connection
->>>>>> avdtp: socket 7: Connection from 12:5C:2A:44:0D:00, mtu=3D672
->>>>>> avdtp: socket 7: Received failed result=3D-1 (errno=3D11:Resource
->>>>>> temporarily unavailable)
->>>>>> avdtp: socket 7: Received failed result=3D-1 (errno=3D11:Resource
->>>>>> temporarily unavailable)
->>>>>> socket 7: Received 2 bytes
->>>>>> 00000: 00 01
->>>>>> DEBUG: a2dp_handle_avdtp_message: (errno=3D11:Resource temporarily
->>>>>> unavailable)Unexpected headset directive 1
->>>>>> DEBUG: a2dp_handle_avdtp_message: Answering command packet
->>>>>> (msgtype=3DMESSAGE_TYPE_REJECT,signal=3D1)
->>>>>> avdtp: socket 7: Received frame, start xmms --play
->>>>>>
->>>>>>
->>>>>> so it looks to my simple mind that l2cap never completes properly.
->>>>>>
->>>>>> Not sure why when running both as forground tasks appear to get
->>>>>> different result to what I've posted previously but possibly I'm an
->>>>>> idiot ;-), Or maybe there is more than one problem, or to many
->>>>>> changes
->>>>>> invalidating findings.
->>>>>>
->>>>>> At least I can see why its not working now but don't know what todo
->>>>>> about it
->>>>>>
->>>>>> maybe I should never have looked at each log in isolation so think
->>>>>> we
->>>>>> should go from here as I can reproduce this easily.
->>>>>>
->>>>>>
->>>>>>
->>>>>> --------------------------------------------------------------------=
------
->>>>>> Using Tomcat but need to do more? Need to support web services,
->>>>>> security?
->>>>>> Get stuff done quickly with pre-integrated technology to make your
->>>>>> job
->>>>>> easier
->>>>>> Download IBM WebSphere Application Server v.1.0.1 based on Apache
->>>>>> Geronimo
->>>>>> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&=
-dat=3D121642
->>>>>> _______________________________________________
->>>>>> Bluez-devel mailing list
->>>>>> Bluez-devel@lists.sourceforge.net
->>>>>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->>>>>>
->>>>>>
->>>>>>
->>>>> ---------------------------------------------------------------------=
-----
->>>>> Using Tomcat but need to do more? Need to support web services,
->>>>> security?
->>>>> Get stuff done quickly with pre-integrated technology to make your
->>>>> job easier
->>>>> Download IBM WebSphere Application Server v.1.0.1 based on Apache
->>>>> Geronimo
->>>>> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&d=
-at=3D121642
->>>>> _______________________________________________
->>>>> Bluez-devel mailing list
->>>>> Bluez-devel@lists.sourceforge.net
->>>>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->>>>>
->>>>>
->>>> ----------------------------------------------------------------------=
----
->>>> Using Tomcat but need to do more? Need to support web services,
->>>> security?
->>>> Get stuff done quickly with pre-integrated technology to make your job
->>>> easier
->>>> Download IBM WebSphere Application Server v.1.0.1 based on Apache
->>>> Geronimo
->>>> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&da=
-t=3D121642
->>>> _______________________________________________
->>>> Bluez-devel mailing list
->>>> Bluez-devel@lists.sourceforge.net
->>>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->>>>
->>> -----------------------------------------------------------------------=
---
->>> Using Tomcat but need to do more? Need to support web services,
->>> security?
->>> Get stuff done quickly with pre-integrated technology to make your job
->>> easier
->>> Download IBM WebSphere Application Server v.1.0.1 based on Apache
->>> Geronimo
->>> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
-=3D121642
->>> _______________________________________________
->>> Bluez-devel mailing list
->>> Bluez-devel@lists.sourceforge.net
->>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->>>
->>
->> -------------------------------------------------------------------------
->> Using Tomcat but need to do more? Need to support web services,
->> security?
->> Get stuff done quickly with pre-integrated technology to make your job
->> easier
->> Download IBM WebSphere Application Server v.1.0.1 based on Apache
->> Geronimo
->> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
-=3D121642
->> _______________________________________________
->> Bluez-devel mailing list
->> Bluez-devel@lists.sourceforge.net
->> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->>
->
->
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job
-> easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
-=3D121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-
-
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+UGxlYXNlZCB5b3Ugc29ydCBpdCBvdXQhIEFuZCBwbGVhc2VkIGl0J3Mgbm90IHRoZSBjb2RlLiBQ
+aXR5IHdlIGhhdmUgbm90IAp0cmllZCBhbm90aGVyIGRvbmdsZSBmaXJzdCAhIEF0IGxlYXN0IDMw
+IG1haWxzIHBhc3NlZCBpbiB0aGlzIHRocmVhZCA6RAoKRnLDqWTDqXJpYwoKQW5kcmV3IFdhbGRy
+YW0gYSDDqWNyaXQgOgo+IEhpIEZyw6lkw6lyaWMsCj4KPiB0aG91Z2h0IEknZCBjaGFuZ2UgdGhl
+IHN1YmplY3QgdG8gcmVmbGVjdCBteSB0cnVlIGlzc3VlIDstKQo+IEdvdCBpdCEhCj4KPiB3ZWxs
+IHNvcnQgb2YgaXRzIHRoZSBCcm9hZGNvbSBCQ00yMDQ1IAo+Cj4gSSB0cmllZCBhbm90aGVyIGRv
+bmdsZSBicmluZ2luZyBteSBpbnRlZ3JhdGVkIG9uZSBkb3duIHdpdGggaGNpY29uZmlnCj4gaGNp
+MCBkb3duCj4gaGNpMDogICBUeXBlOiBVU0IKPiAgICAgICAgIEJEIEFkZHJlc3M6IDAwOjEyOjBF
+OjJFOkU5OjM1IEFDTCBNVFU6IDEwMTc6OCBTQ08gTVRVOiA2NDo4Cj4gICAgICAgICBET1dOCj4g
+ICAgICAgICBSWCBieXRlczozODU4MSBhY2w6NTQgc2NvOjAgZXZlbnRzOjQzOTcgZXJyb3JzOjAK
+PiAgICAgICAgIFRYIGJ5dGVzOjg5NTE2NDMgYWNsOjE2MjE1IHNjbzowIGNvbW1hbmRzOjE3NyBl
+cnJvcnM6MFBsZWFzZWQgeW91IHNvcnQgaXQgb3V0ISBBbmQgcGxlYXNlZCBpdCdzIG5vdCB0aGUg
+Y29kZS4gUGl0eSB3ZSBoYXZlCj4gbm90IHRyaWVkIGFub3RoZXIgZG9uZ2xlIGZpcnN0ICEgQXQg
+bGVhc3QgMjAgbWFpbHMgcGFzc2VkIGluIHRoaXMKPiB0aHJlYWQgOkQKPgo+IEF0IGxlYXN0IHdl
+IGZvdW5kIHRoZSAxMDAlIGNwdS4uLgo+Cj4gRnLDqWTDqXJpYwo+Cj4KPiAgICAgICAgIEZlYXR1
+cmVzOiAweGZmIDB4ZmYgMHg4ZCAweGZlIDB4OWIgMHhmOSAweDAwIDB4ODAKPiAgICAgICAgIFBh
+Y2tldCB0eXBlOiBETTEgRE0zIERNNSBESDEgREgzIERINSBIVjEgSFYyIEhWMwo+ICAgICAgICAg
+TGluayBwb2xpY3k6IFJTV0lUQ0ggSE9MRCBTTklGRiBQQVJLCj4gICAgICAgICBMaW5rIG1vZGU6
+IFNMQVZFIEFDQ0VQVAo+Cj4gaGNpMTogICBUeXBlOiBVU0IKPiAgICAgICAgIEJEIEFkZHJlc3M6
+IDExOjExOjExOjExOjExOjExIEFDTCBNVFU6IDY3ODo4IFNDTyBNVFU6IDY0OjEwCj4gICAgICAg
+ICBVUCBSVU5OSU5HIFBTQ0FOCj4gICAgICAgICBSWCBieXRlczo3NzAwIGFjbDozNyBzY286MCBl
+dmVudHM6ODQ4IGVycm9yczowCj4gICAgICAgICBUWCBieXRlczo0MTQ3NDMgYWNsOjc4MyBzY286
+MCBjb21tYW5kczozNSBlcnJvcnM6MAo+ICAgICAgICAgRmVhdHVyZXM6IDB4YmYgMHhmZSAweDhk
+IDB4NzggMHgwOCAweDE4IDB4MDAgMHgwMAo+ICAgICAgICAgUGFja2V0IHR5cGU6IERNMSBETTMg
+RE01IERIMSBESDMgREg1IEhWMSBIVjIgSFYzCj4gICAgICAgICBMaW5rIHBvbGljeTogUlNXSVRD
+SCBIT0xEIFNOSUZGIFBBUksKPiAgICAgICAgIExpbmsgbW9kZTogU0xBVkUgQUNDRVBUCj4gICAg
+ICAgICBOYW1lOiAnQmx1ZVogKDEpJwo+ICAgICAgICAgQ2xhc3M6IDB4M2UwMTAwCj4gICAgICAg
+ICBTZXJ2aWNlIENsYXNzZXM6IE5ldHdvcmtpbmcsIFJlbmRlcmluZywgQ2FwdHVyaW5nLCBPYmpl
+Y3QKPiBUcmFuc2ZlciwgQXVkaW8KPiAgICAgICAgIERldmljZSBDbGFzczogQ29tcHV0ZXIsIFVu
+Y2F0ZWdvcml6ZWQKPiAgICAgICAgIEhDSSBWZXI6IDEuMiAoMHgyKSBIQ0kgUmV2OiAweDFmZSBM
+TVAgVmVyOiAxLjIgKDB4MikgTE1QIFN1YnZlcjoKPiAweDFmZQo+ICAgICAgICAgTWFudWZhY3R1
+cmVyOiBJbnRlZ3JhdGVkIFN5c3RlbSBTb2x1dGlvbiBDb3JwLiAoNTcpCj4KPiBhbmQgd2l0aCB0
+aGUgaXNzYyBkb25ibGUgYWxsIHdvcmtzIGxpa2UgdGhpcyBhbGwgdGhlIHRpbWUgbm90IDEgaW4g
+MzAKPiB3aG9vbyBob28KPgo+IGFuZHlAc2lkbmV5On4kIGwydGVzdCAtaSBoY2kxIC1QIDI1IC1k
+Cj4gbDJ0ZXN0WzIzMTgxXTogV2FpdGluZyBmb3IgY29ubmVjdGlvbiBvbiBwc20gMjUgLi4uCj4g
+bDJ0ZXN0WzIzMTg1XTogQ29ubmVjdCBmcm9tIDAwOjBEOjQ0OjJBOjVDOjEyIFtpbXR1IDY3Miwg
+b210dSA2NzIsCj4gZmx1c2hfdG8gNjU1MzUsIG1vZGUgMCwgaGFuZGxlIDEsIGNsYXNzIDB4MDQw
+NDE4XQo+IGwydGVzdFsyMzE4NV06IFJlY2VpdmluZyAuLi4KPiBsMnRlc3RbMjMxODVdOiBSZWNl
+dmllZCAyIGJ5dGVzCj4gMDAwMDAwMDA6IDAwIDAxIAo+Cj4gRG9uJ3Qga25vdyB3aGF0IHRvIHRy
+eSBmcm9tIGhlcmUgYXQgbGVhc3QgaXQncyBub3QgeW91ciBjb2RlIDotKQo+Cj4gQ291bGQgYmUg
+YSBwcm9ibGVtIHdpdGggdGhlIGJyb2FkY29tIHBhdGNoID8/Pwo+Cj4gZm9yIGNvbXBsZXRuZXNz
+IGhlcmUgdGhlIGhjaWNvbmZpZyBmb3IgdGhlIGJyb2FkY29tIHdoZW4gaXRzIHVwCj4gIGhjaTA6
+ICAgVHlwZTogVVNCCj4gICAgICAgICBCRCBBZGRyZXNzOiAwMDoxMjowRToyRTpFOTozNSBBQ0wg
+TVRVOiAxMDE3OjggU0NPIE1UVTogNjQ6OAo+ICAgICAgICAgVVAgUlVOTklORyBQU0NBTgo+ICAg
+ICAgICAgUlggYnl0ZXM6Mzg5NzggYWNsOjU0IHNjbzowIGV2ZW50czo0NDE1IGVycm9yczowCj4g
+ICAgICAgICBUWCBieXRlczo4OTUxOTY0IGFjbDoxNjIxNSBzY286MCBjb21tYW5kczoxOTUgZXJy
+b3JzOjAKPiAgICAgICAgIEZlYXR1cmVzOiAweGZmIDB4ZmYgMHg4ZCAweGZlIDB4OWIgMHhmOSAw
+eDAwIDB4ODAKPiAgICAgICAgIFBhY2tldCB0eXBlOiBETTEgRE0zIERNNSBESDEgREgzIERINSBI
+VjEgSFYyIEhWMwo+ICAgICAgICAgTGluayBwb2xpY3k6IFJTV0lUQ0ggSE9MRCBTTklGRiBQQVJL
+Cj4gICAgICAgICBMaW5rIG1vZGU6IFNMQVZFIEFDQ0VQVAo+ICAgICAgICAgTmFtZTogJ0JsdWVa
+ICgwKScKPiAgICAgICAgIENsYXNzOiAweDNlMDEwMAo+ICAgICAgICAgU2VydmljZSBDbGFzc2Vz
+OiBOZXR3b3JraW5nLCBSZW5kZXJpbmcsIENhcHR1cmluZywgT2JqZWN0Cj4gVHJhbnNmZXIsIEF1
+ZGlvCj4gICAgICAgICBEZXZpY2UgQ2xhc3M6IENvbXB1dGVyLCBVbmNhdGVnb3JpemVkCj4gICAg
+ICAgICBIQ0kgVmVyOiAyLjAgKDB4MykgSENJIFJldjogMHgyMDAwIExNUCBWZXI6IDIuMCAoMHgz
+KSBMTVAKPiBTdWJ2ZXI6IDB4NDEyNwo+ICAgICAgICAgTWFudWZhY3R1cmVyOiBCcm9hZGNvbSBD
+b3Jwb3JhdGlvbiAoMTUpCj4KPiBBbnkgaWRlYXMgYW55b25lPz8/Pwo+ICAgICAgICAgCj4KPiBP
+biBXZWQsIDIwMDYtMDgtMzAgYXQgMTc6MzUgKzAxMDAsIEFuZHJldyBXYWxkcmFtIHdyb3RlOgo+
+ICAgCj4+IFRoYW5rcyBmb3IgdGhlIHJlcGx5Cj4+IEhlcmUgaXMgd2hhdCBJIGdldAo+PiBGaXJz
+dCBhdHRlbXB0IGFuZCBuZXh0IDMwIDstKQo+Pgo+PiBhbmR5QHNpZG5leTp+JCBsMnRlc3QgLVAg
+MjUgLWQKPj4gbDJ0ZXN0WzIwMjM2XTogV2FpdGluZyBmb3IgY29ubmVjdGlvbiBvbiBwc20gMjUg
+Li4uCj4+IGFuZCBkbWVzZwo+PiBbMTcyMTc3NTkuNzEyMDAwXSBoY2lfYWNsZGF0YV9wYWNrZXQ6
+IGhjaTAgQUNMIHBhY2tldCBmb3IgdW5rbm93bgo+PiBjb25uZWN0aW9uIGhhbmRsZSAxMQo+Pgo+
+PiAzMXN0IGF0dGVtcHQKPj4gYW5keUBzaWRuZXk6fiQgbDJ0ZXN0IC1QIDI1IC1kCj4+IGwydGVz
+dFsyMDMwMl06IFdhaXRpbmcgZm9yIGNvbm5lY3Rpb24gb24gcHNtIDI1IC4uLgo+PiBsMnRlc3Rb
+MjAzMTRdOiBDb25uZWN0IGZyb20gMDA6MEQ6NDQ6MkE6NUM6MTIgW2ltdHUgNjcyLCBvbXR1IDY3
+MiwKPj4gZmx1c2hfdG8gNjU1MyA1LCBtb2RlIDAsIGhhbmRsZSAxMSwgY2xhc3MgMHgwNDA0MThd
+Cj4+IGwydGVzdFsyMDMxNF06IFJlY2VpdmluZyAuLi4KPj4gbDJ0ZXN0WzIwMzE0XTogUmVjZXZp
+ZWQgMiBieXRlcwo+PiAwMDAwMDAwMDogMDAgMDEgICAKPj4KPj4gQXQgbGVhc3QgdGhlIHR5cG8g
+bWF0Y2hlcyAKPj4gdHJpZWQgcmVzdGFydGluZyBibHVleiB1dGlscyBidXQgaXQgZG9lc24ndCBh
+bHRlciB0aGUgc2l0dWF0aW9uCj4+IHJlc2V0IGhlYWRwaG9uZXMgc3RpbGwgbm8gZ28uCj4+Cj4+
+IGxvb2tzIHRpbW1pbmdpc2ggdG8gbWUgOi0pIG1heWJlIHRoZSBicm9hZGNvbSAKPj4KPj4gT24g
+V2VkLCAyMDA2LTA4LTMwIGF0IDEwOjUzICswMjAwLCBGcsOpZMOpcmljIERBTExFQVUgd3JvdGU6
+Cj4+ICAgICAKPj4+IEhpIEFuZHJldywKPj4+Cj4+PiBEb24ndCBzdG9wIHlvdXIgd2lmZSBmcm9t
+IHRhbGtpbmcgeWV0LCBJIHN0aWxsIGRvIG5vdCB1bmRlcnN0YW5kIHdoYXQgCj4+PiBoYXBwZW4g
+YnV0IEkgaGF2ZSBhIG5ldyB0ZXN0LiBJZiB5b3UgaGF2ZSBjb21waWxlZCAoYW5kIGluc3RhbGxl
+ZCkgCj4+PiBibHVlei11dGlscywgeW91IHNob3VsZCBoYXZlIGEgdG9vbCBjYWxsZWQgbDJ0ZXN0
+LiBJZiBub3QgZ2V0IGl0LCB0aGVuIAo+Pj4gc3RvcCB0aGUgYTJkcGQgZGFlbW9uIGFuZCBydW4g
+Ogo+Pj4ga2lsbGFsbCBhMmRwZAo+Pj4gbDJ0ZXN0IC1QIDI1IC1kCj4+PiBUaGVuIHN3aXRjaCBv
+biB5b3VyIGhlYWRzZXQgYW5kIGNvbm5lY3QgaXQuIEdpdmUgbWUgdGhlIGZ1bGwgb3V0cHV0LiAK
+Pj4+IE1pbmUgaXMgdGhlIGZvbGxvd2luZyA6Cj4+Pgo+Pj4gZnJlZGVyaWMuZGFsbGVhdUBmZGFs
+bGVhdTp+PmwydGVzdCAtUCAyNSAtZAo+Pj4gbDJ0ZXN0WzQ0NTddOiBXYWl0aW5nIGZvciBjb25u
+ZWN0aW9uIG9uIHBzbSAyNSAuLi4KPj4+IGwydGVzdFs0NDU4XTogQ29ubmVjdCBmcm9tIDAwOjBE
+OjQ0OjJBOjE3OkM3IFtpbXR1IDY3Miwgb210dSA2NzIsIAo+Pj4gZmx1c2hfdG8gNjU1MzUsIG1v
+ZGUgMCwgaGFuZGxlIDQyLCBjbGFzcyAweDA0MDQxOF0KPj4+IGwydGVzdFs0NDU4XTogUmVjZWl2
+aW5nIC4uLgo+Pj4gbDJ0ZXN0WzQ0NThdOiBSZWNldmllZCAyIGJ5dGVzCj4+PiAwMDAwMDAwMDog
+MDAgMDEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC4uCj4+Pgo+
+Pj4gSGV5LCB0aGVyZSdzIGEgdHlwbyBpbiB0aGlzIGxvZyA6RAo+Pj4KPj4+IEZyw6lkw6lyaWMK
+Pj4+Cj4+PiBBbmRyZXcgV2FsZHJhbSBhIMOpY3JpdCA6Cj4+PiAgICAgICAKPj4+PiBIaSBGcmVk
+ZXJpYywKPj4+Pgo+Pj4+ICB0b29rIHlvdXIgYWR2aXNlIGFuZCBjb21waWxlZCBsYXRlc3QgQmx1
+ZXogKDMuNCkgeWV0IHN0aWxsIHByZXNzaW5nCj4+Pj4gcGxheSBnaXZlcwo+Pj4+Cj4+Pj4gcm9v
+dEBzaWRuZXk6L2hvbWUvYW5keSMgL3Vzci9sb2NhbC9zYmluL2hjaWR1bXAKPj4+PiBIQ0kgc25p
+ZmZlciAtIEJsdWV0b290aCBwYWNrZXQgYW5hbHl6ZXIgdmVyIDEuMzIKPj4+PiBkZXZpY2U6IGhj
+aTAgc25hcF9sZW46IDEwMjggZmlsdGVyOiAweGZmZmZmZmZmCj4+Pj4gICAKPj4+PiAgICAgICAg
+IAo+Pj4+PiBIQ0kgRXZlbnQ6IENvbm5lY3QgUmVxdWVzdCAoMHgwNCkgcGxlbiAxMAo+Pj4+PiAg
+ICAgCj4+Pj4+ICAgICAgICAgICAKPj4+PiA8IEhDSSBDb21tYW5kOiBBY2NlcHQgQ29ubmVjdGlv
+biBSZXF1ZXN0ICgweDAxfDB4MDAwOSkgcGxlbiA3Cj4+Pj4gICAKPj4+PiAgICAgICAgIAo+Pj4+
+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKPj4+Pj4gSENJIEV2ZW50
+OiBMaW5rIEtleSBSZXF1ZXN0ICgweDE3KSBwbGVuIDYKPj4+Pj4gICAgIAo+Pj4+PiAgICAgICAg
+ICAgCj4+Pj4gPCBIQ0kgQ29tbWFuZDogTGluayBLZXkgUmVxdWVzdCBSZXBseSAoMHgwMXwweDAw
+MGIpIHBsZW4gMjIKPj4+PiAgIAo+Pj4+ICAgICAgICAgCj4+Pj4+IEhDSSBFdmVudDogQ29tbWFu
+ZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiAxMAo+Pj4+PiBBQ0wgZGF0YTogaGFuZGxlIDExIGZsYWdz
+IDB4MDIgZGxlbiAxMgo+Pj4+PiAgICAgCj4+Pj4+ICAgICAgICAgICAKPj4+PiAgICAgTDJDQVAo
+cyk6IENvbm5lY3QgcmVxOiBwc20gMjUgc2NpZCAweDAwNDAKPj4+PiAgIAo+Pj4+ICAgICAgICAg
+Cj4+Pj4+IEhDSSBFdmVudDogQ29ubmVjdCBDb21wbGV0ZSAoMHgwMykgcGxlbiAxMQo+Pj4+PiAg
+ICAgCj4+Pj4+ICAgICAgICAgICAKPj4+PiA8IEhDSSBDb21tYW5kOiBXcml0ZSBMaW5rIFBvbGlj
+eSBTZXR0aW5ncyAoMHgwMnwweDAwMGQpIHBsZW4gNAo+Pj4+ICAgCj4+Pj4gICAgICAgICAKPj4+
+Pj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDYKPj4+Pj4gICAgIAo+
+Pj4+PiAgICAgICAgICAgCj4+Pj4gPCBIQ0kgQ29tbWFuZDogQ2hhbmdlIENvbm5lY3Rpb24gUGFj
+a2V0IFR5cGUgKDB4MDF8MHgwMDBmKSBwbGVuIDQKPj4+PiAgIAo+Pj4+ICAgICAgICAgCj4+Pj4+
+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4gNAo+Pj4+PiAgICAgCj4+Pj4+
+ICAgICAgICAgICAKPj4+PiA8IEhDSSBDb21tYW5kOiBSZW1vdGUgTmFtZSBSZXF1ZXN0ICgweDAx
+fDB4MDAxOSkgcGxlbiAxMAo+Pj4+ICAgCj4+Pj4gICAgICAgICAKPj4+Pj4gSENJIEV2ZW50OiBD
+b25uZWN0aW9uIFBhY2tldCBUeXBlIENoYW5nZWQgKDB4MWQpIHBsZW4gNQo+Pj4+PiBIQ0kgRXZl
+bnQ6IE1heCBTbG90cyBDaGFuZ2UgKDB4MWIpIHBsZW4gMwo+Pj4+PiBIQ0kgRXZlbnQ6IENvbW1h
+bmQgU3RhdHVzICgweDBmKSBwbGVuIDQKPj4+Pj4gSENJIEV2ZW50OiBSZW1vdGUgTmFtZSBSZXEg
+Q29tcGxldGUgKDB4MDcpIHBsZW4gMjU1Cj4+Pj4+ICAgICAKPj4+Pj4gICAgICAgICAgIAo+Pj4+
+IEl0IGxvb2tzIGxpa2UgdGhlIGNvbm5lY3Rpb24gaXMgZm9ybWVkIGJ1dCB0aGUgcGxheSBjb21t
+YW5kIGlzIG5ldmVyCj4+Pj4gcmVjaWV2ZWQgPz8/Cj4+Pj4KPj4+PiBBbnkgaGVscCBhbnlvbmUg
+d2l0aCBtb3JlIGV4cGVyaWVuY2Ugb2YgaGNpZHVtcCB0aGFuIG1lLgo+Pj4+Cj4+Pj4gRG8geW91
+IHRoaW5rIGl0IG1heSBiZSB0aGUgYnJvYWRjb20gZG9uZ2xlIEkndmUgYnVpbHQgaW50byBteSBt
+YWNoaW5lIChJCj4+Pj4gaGF2ZSB0aGUga2VybmVsIHBhdGNoZXMgZm9yIGl0KS4KPj4+Pgo+Pj4+
+IE9uIGEgcGx1cyBub3RlIGZvcndhcmQgYW5kIHJldmVyc2Ugc2tpcCBpcyBhIGxvdCBtb3JlIHJl
+c3BvbnNpdmUgd2l0aAo+Pj4+IDMuNCAuLgo+Pj4+Cj4+Pj4gVGhpcyBpc24ndCBhIHNob3cgc3Rv
+cHBlciBqdXN0IGFuIGFub3lhbmNlLgo+Pj4+Cj4+Pj4gSnVzdCB0byByZWNhcCAKPj4+PiBwcmVz
+c2luZyBwbGF5IG9uIGhlYWRwaG9uZXMgZnJvbSAnb24nIGRvZXMgbm90IHN0YXJ0IHhtbXMgLmll
+IGhlYWRwaG9uZQo+Pj4+IGluaXRpYXRlZCBwbGF5Cj4+Pj4gcGF1c2UgZm9yID4xMCBzZWNzIGxl
+YWRzIHRvIGhhdmluZyB0byByZXN0YXJ0IHNlc3Npb24gYXMgaGVhZHBob25lIHN0YXlzCj4+Pj4g
+ZGlzY29ubmVjdGVkIGFnYWluIGhlYWRwaG9uZSBpbml0aWF0ZWQgKHNvbWV0aW1lcyB3b3Jrcyku
+Cj4+Pj4KPj4+PiBldmVyeXRoaW5nIGVsc2UgaXMgcmVhbGx5IHdvcmtpbmcgd2VsbCAocGMgaW5p
+dGlhdGVkIHNlc3Npb24pCj4+Pj4KPj4+PiBvZiBjYXVzZSBvbmUgc29sdXRpb24gd291bGQgYmUg
+dG8gc3RvcCB0aGUgd2lmZSB0YWxraW5nIHRvIG1lIGZvciBtb3JlCj4+Pj4gdGhhbiAxMHNlYyA7
+PSkKPj4+Pgo+Pj4+Cj4+Pj4gT24gU2F0LCAyMDA2LTA4LTE5IGF0IDEwOjEyICswMTAwLCBGcmVk
+ZXJpYyBEYWxsZWF1IHdyb3RlOgo+Pj4+ICAgCj4+Pj4gICAgICAgICAKPj4+Pj4gSGksCj4+Pj4+
+Cj4+Pj4+IEkgcmVhbGx5IGRvbid0IGtub3cgYWJvdXQgdGhlIGludGVybmFscyBvZiBibHVlei4g
+VGhlIG9ubHkgdGhpbmcgaXMsCj4+Pj4+IHRyeSB0byB1cGRhdGUgeW91ciBibHVleiBpZiB5b3Ug
+ZG8gbm90IGFscmVhZHkgdXNlIHRoZSBsYXRlc3QuIE9ubHkKPj4+Pj4gc29tZW9uZSByZWFsbHkg
+aW4gdGhlIGRlZXAgY291bGQgaGVscC4KPj4+Pj4KPj4+Pj4gQWR2aWNlIGFueW9uZT8KPj4+Pj4K
+Pj4+Pj4gRnLDqWTDqXJpYwo+Pj4+Pgo+Pj4+Pgo+Pj4+PiAtLS0tLS0tLSBNZXNzYWdlIGQnb3Jp
+Z2luZS0tLS0tLS0tIAo+Pj4+PiBEZTogYmx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vm
+b3JnZS5uZXQgZGUgbGEgcGFydCBkZSBBbmRyZXcKPj4+Pj4gV2FsZHJhbSAKPj4+Pj4gRGF0ZTog
+dmVuLiAxOC8wOC8yMDA2IDE4OjMzIAo+Pj4+PiDDgDogQmx1ZVogZGV2ZWxvcG1lbnQgCj4+Pj4+
+IE9iamV0IDogW0JsdWV6LWRldmVsXSBhMnBkYnRzY28gd29uJ3Rjb21waWxlIChGSVgpIHBsdXMK
+Pj4+Pj4geG1tc2Vycm9yKHRyaWFsc2FuZHRyaWJ1bGF0aW9ucykgaG93Y29vbCBpcyB0aGlzISEh
+IG5ldyBwYXRjaCAKPj4+Pj4gICAKPj4+Pj4gRnLDqWTDqXJpYwo+Pj4+Pgo+Pj4+Pgo+Pj4+PiBP
+ayB0aG91Z2h0IEknZCBzdGFydCBmcm9tIHNjcmF0Y2gKPj4+Pj4KPj4+Pj4gZW5zdXJlIGEyZHBk
+IGhhcyBvbmx5IDEgc2Vzc2lvbiAgCj4+Pj4+IGZpcnN0IGF0dGVtcHQgaXQgYWxsIHdvcmtlZCA/
+Pz8/Pz8gCj4+Pj4+IG5leHQgYXR0ZW1wdCBhbmQgc3Vic2VxdWVudAo+Pj4+Pgo+Pj4+PiBzdWRv
+IGhjaWR1bXAgPQo+Pj4+Pgo+Pj4+PiBhbmR5QHNpZG5leTovZXRjL2FwYW5lbCQgc3VkbyBoY2lk
+dW1wIAo+Pj4+PiBIQ0kgc25pZmZlciAtIEJsdWV0b290aCBwYWNrZXQgYW5hbHl6ZXIgdmVyIDEu
+MjggCj4+Pj4+IGRldmljZTogaGNpMCBzbmFwX2xlbjogMTAyOCBmaWx0ZXI6IDB4ZmZmZmZmZmYg
+Cj4+Pj4+ICAgICAKPj4+Pj4gICAgICAgICAgIAo+Pj4+Pj4gSENJIEV2ZW50OiBDb25uZWN0IFJl
+cXVlc3QgKDB4MDQpIHBsZW4gMTAgCj4+Pj4+PiAgICAgICAKPj4+Pj4+ICAgICAgICAgICAgIAo+
+Pj4+PiA8IEhDSSBDb21tYW5kOiBBY2NlcHQgQ29ubmVjdGlvbiBSZXF1ZXN0ICgweDAxfDB4MDAw
+OSkgcGxlbiA3IAo+Pj4+PiAgICAgCj4+Pj4+ICAgICAgICAgICAKPj4+Pj4+IEhDSSBFdmVudDog
+Q29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4gNCAKPj4+Pj4+IEhDSSBFdmVudDogTGluayBLZXkg
+UmVxdWVzdCAoMHgxNykgcGxlbiA2IAo+Pj4+Pj4gICAgICAgCj4+Pj4+PiAgICAgICAgICAgICAK
+Pj4+Pj4gPCBIQ0kgQ29tbWFuZDogTGluayBLZXkgUmVxdWVzdCBSZXBseSAoMHgwMXwweDAwMGIp
+IHBsZW4gMjIgCj4+Pj4+ICAgICAKPj4+Pj4gICAgICAgICAgIAo+Pj4+Pj4gSENJIEV2ZW50OiBD
+b21tYW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDEwIAo+Pj4+Pj4gQUNMIGRhdGE6IGhhbmRsZSAx
+MSBmbGFncyAweDAyIGRsZW4gMTIgCj4+Pj4+PiAgICAgICAKPj4+Pj4+ICAgICAgICAgICAgIAo+
+Pj4+PiAgICAgTDJDQVAocyk6IENvbm5lY3QgcmVxOiBwc20gMjUgc2NpZCAweDAwNDAgCj4+Pj4+
+ICAgICAKPj4+Pj4gICAgICAgICAgIAo+Pj4+Pj4gSENJIEV2ZW50OiBDb25uZWN0IENvbXBsZXRl
+ICgweDAzKSBwbGVuIDExIAo+Pj4+Pj4gICAgICAgCj4+Pj4+PiAgICAgICAgICAgICAKPj4+Pj4g
+PCBIQ0kgQ29tbWFuZDogV3JpdGUgTGluayBQb2xpY3kgU2V0dGluZ3MgKDB4MDJ8MHgwMDBkKSBw
+bGVuIDQgCj4+Pj4+ICAgICAKPj4+Pj4gICAgICAgICAgIAo+Pj4+Pj4gSENJIEV2ZW50OiBDb21t
+YW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDYgCj4+Pj4+PiAgICAgICAKPj4+Pj4+ICAgICAgICAg
+ICAgIAo+Pj4+PiA8IEhDSSBDb21tYW5kOiBDaGFuZ2UgQ29ubmVjdGlvbiBQYWNrZXQgVHlwZSAo
+MHgwMXwweDAwMGYpIHBsZW4gNCAKPj4+Pj4gICAgIAo+Pj4+PiAgICAgICAgICAgCj4+Pj4+PiBI
+Q0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQgCj4+Pj4+PiBIQ0kgRXZlbnQ6
+IENvbm5lY3Rpb24gUGFja2V0IFR5cGUgQ2hhbmdlZCAoMHgxZCkgcGxlbiA1IAo+Pj4+Pj4gSENJ
+IEV2ZW50OiBNYXggU2xvdHMgQ2hhbmdlICgweDFiKSBwbGVuIDMKPj4+Pj4+ICAgICAgIAo+Pj4+
+Pj4gICAgICAgICAgICAgCj4+Pj4+IGEyZHBkIAo+Pj4+PiBhbmR5QHNpZG5leTp+JCBhMmRwZCAK
+Pj4+Pj4gYTJkcGQgW0F1ZyAxNyAyMDA2IDIxOjI0OjA5XSBzdGFydGluZyAuLi5hMmRwZCBhZGRy
+PTAwOjBEOjQ0OjJBOjVDOjEyIAo+Pj4+PiB0aW1lcj00MDAwIHVzIFtBdWcgMTcgMjAwNiAyMToy
+NDowOV0gCj4+Pj4+IHNldHNjaGVkdWxlciByZXR1cm5zIDAgKGVycm5vPTA6U3VjY2VzcykgCj4+
+Pj4+IEFjY2VwdGluZyBpbmNvbWluZyB0Y3Agc3RyZWFtIGNvbm5lY3Rpb24gCj4+Pj4+IE5ldyBj
+b25uZWN0aW9uIHRvIGJsdWV0b290aCBbNDQxMDAgaHpdIAo+Pj4+PiBhdnJjcDogQWNjZXB0aW5n
+IGluY29taW5nIGNvbm5lY3Rpb24gCj4+Pj4+IGF2ZHRwOiBBY2NlcHRpbmcgaW5jb21pbmcgY29u
+bmVjdGlvbgo+Pj4+Pgo+Pj4+Pgo+Pj4+PiBBbmQgbm93IHdoZW4gaXQgd29ya3MuCj4+Pj4+Cj4+
+Pj4+IEhDSSBzbmlmZmVyIC0gQmx1ZXRvb3RoIHBhY2tldCBhbmFseXplciB2ZXIgMS4yOCAKPj4+
+Pj4gZGV2aWNlOiBoY2kwIHNuYXBfbGVuOiAxMDI4IGZpbHRlcjogMHhmZmZmZmZmZiAKPj4+Pj4g
+ICAgIAo+Pj4+PiAgICAgICAgICAgCj4+Pj4+PiBIQ0kgRXZlbnQ6IENvbm5lY3QgUmVxdWVzdCAo
+MHgwNCkgcGxlbiAxMCAKPj4+Pj4+ICAgICAgIAo+Pj4+Pj4gICAgICAgICAgICAgCj4+Pj4+IDwg
+SENJIENvbW1hbmQ6IEFjY2VwdCBDb25uZWN0aW9uIFJlcXVlc3QgKDB4MDF8MHgwMDA5KSBwbGVu
+IDcgCj4+Pj4+ICAgICAKPj4+Pj4gICAgICAgICAgIAo+Pj4+Pj4gSENJIEV2ZW50OiBDb21tYW5k
+IFN0YXR1cyAoMHgwZikgcGxlbiA0IAo+Pj4+Pj4gSENJIEV2ZW50OiBMaW5rIEtleSBSZXF1ZXN0
+ICgweDE3KSBwbGVuIDYgCj4+Pj4+PiAgICAgICAKPj4+Pj4+ICAgICAgICAgICAgIAo+Pj4+PiA8
+IEhDSSBDb21tYW5kOiBMaW5rIEtleSBSZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAwYikgcGxlbiAy
+MiAKPj4+Pj4gICAgIAo+Pj4+PiAgICAgICAgICAgCj4+Pj4+PiBIQ0kgRXZlbnQ6IENvbW1hbmQg
+Q29tcGxldGUgKDB4MGUpIHBsZW4gMTAgCj4+Pj4+PiBIQ0kgRXZlbnQ6IENvbm5lY3QgQ29tcGxl
+dGUgKDB4MDMpIHBsZW4gMTEgCj4+Pj4+PiAgICAgICAKPj4+Pj4+ICAgICAgICAgICAgIAo+Pj4+
+PiA8IEhDSSBDb21tYW5kOiBXcml0ZSBMaW5rIFBvbGljeSBTZXR0aW5ncyAoMHgwMnwweDAwMGQp
+IHBsZW4gNCAKPj4+Pj4gICAgIAo+Pj4+PiAgICAgICAgICAgCj4+Pj4+PiBBQ0wgZGF0YTogaGFu
+ZGxlIDExIGZsYWdzIDB4MDIgZGxlbiAxMiAKPj4+Pj4+ICAgICAgIAo+Pj4+Pj4gICAgICAgICAg
+ICAgCj4+Pj4+ICAgICBMMkNBUChzKTogQ29ubmVjdCByZXE6IHBzbSAyNSBzY2lkIDB4MDA0MCAK
+Pj4+Pj4gPCBBQ0wgZGF0YTogaGFuZGxlIDExIGZsYWdzIDB4MDIgZGxlbiAxNiAKPj4+Pj4gICAg
+IEwyQ0FQKHMpOiBDb25uZWN0IHJzcDogZGNpZCAweDAwNDAgc2NpZCAweDAwNDAgcmVzdWx0IDAg
+c3RhdHVzIDAgCj4+Pj4+ICAgICAgIENvbm5lY3Rpb24gc3VjY2Vzc2Z1bCAKPj4+Pj4gICAgIAo+
+Pj4+PiAgICAgICAgICAgCj4+Pj4+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUgKDB4MGUp
+IHBsZW4gNiAKPj4+Pj4+ICAgICAgIAo+Pj4+Pj4gICAgICAgICAgICAgCj4+Pj4+IDwgSENJIENv
+bW1hbmQ6IENoYW5nZSBDb25uZWN0aW9uIFBhY2tldCBUeXBlICgweDAxfDB4MDAwZikgcGxlbiA0
+IAo+Pj4+PiAgICAgCj4+Pj4+ICAgICAgICAgICAKPj4+Pj4+IEhDSSBFdmVudDogQ29tbWFuZCBT
+dGF0dXMgKDB4MGYpIHBsZW4gNCAKPj4+Pj4+IEhDSSBFdmVudDogQ29ubmVjdGlvbiBQYWNrZXQg
+VHlwZSBDaGFuZ2VkICgweDFkKSBwbGVuIDUgCj4+Pj4+PiBIQ0kgRXZlbnQ6IE1heCBTbG90cyBD
+aGFuZ2UgKDB4MWIpIHBsZW4gMyAKPj4+Pj4+IEFDTCBkYXRhOiBoYW5kbGUgMTEgZmxhZ3MgMHgw
+MiBkbGVuIDE2IAo+Pj4+Pj4gICAgICAgCj4+Pj4+PiAgICAgICAgICAgICAKPj4+Pj4gICAgIEwy
+Q0FQKHMpOiBDb25maWcgcmVxOiBkY2lkIDB4MDA0MCBmbGFncyAweDAwIGNsZW4gNCAKPj4+Pj4g
+ICAgICAgRmx1c2hUTyA2NTUzNSAKPj4+Pj4gPCBBQ0wgZGF0YTogaGFuZGxlIDExIGZsYWdzIDB4
+MDIgZGxlbiAxNCAKPj4+Pj4gICAgIEwyQ0FQKHMpOiBDb25maWcgcnNwOiBzY2lkIDB4MDA0MCBm
+bGFncyAweDAwIHJlc3VsdCAwIGNsZW4gMCAKPj4+Pj4gICAgICAgU3VjY2VzcyAKPj4+Pj4gPCBB
+Q0wgZGF0YTogaGFuZGxlIDExIGZsYWdzIDB4MDIgZGxlbiAxMiAKPj4+Pj4gICAgIEwyQ0FQKHMp
+OiBDb25maWcgcmVxOiBkY2lkIDB4MDA0MCBmbGFncyAweDAwIGNsZW4gMCAKPj4+Pj4gICAgIAo+
+Pj4+PiAgICAgICAgICAgCj4+Pj4+PiBBQ0wgZGF0YTogaGFuZGxlIDExIGZsYWdzIDB4MDIgZGxl
+biAxNCAKPj4+Pj4+ICAgICAgIAo+Pj4+Pj4gICAgICAgICAgICAgCj4+Pj4+ICAgICBMMkNBUChz
+KTogQ29uZmlnIHJzcDogc2NpZCAweDAwNDAgZmxhZ3MgMHgwMCByZXN1bHQgMCBjbGVuIDAgCj4+
+Pj4+ICAgICAgIFN1Y2Nlc3MgCj4+Pj4+ICAgICAKPj4+Pj4gICAgICAgICAgIAo+Pj4+Pj4gSENJ
+IEV2ZW50OiBFbmNyeXB0IENoYW5nZSAoMHgwOCkgcGxlbiA0IAo+Pj4+Pj4gSENJIEV2ZW50OiBO
+dW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNSAKPj4+Pj4+IEFDTCBkYXRh
+OiBoYW5kbGUgMTEgZmxhZ3MgMHgwMiBkbGVuIDYgCj4+Pj4+PiAgICAgICAKPj4+Pj4+ICAgICAg
+ICAgICAgIAo+Pj4+PiAgICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDIgW3BzbSAyNV0gCj4+
+Pj4+ICAgICAgIEFWRFRQKHMpOiBEaXNjb3ZlciBjbWQ6IHRyYW5zYWN0aW9uIDAgCj4+Pj4+IDwg
+QUNMIGRhdGE6IGhhbmRsZSAxMSBmbGFncyAweDAyIGRsZW4gNiAKPj4+Pj4gICAgIEwyQ0FQKGQp
+OiBjaWQgMHgwMDQwIGxlbiAyIFtwc20gMjVdIAo+Pj4+PiAgICAgICBBVkRUUChzKTogRGlzY292
+ZXIgcmVqOiB0cmFuc2FjdGlvbiAwIAo+Pj4+PiAgICAgICAgIEVycm9yIGNvZGUgNiAKPj4+Pj4g
+PCBBQ0wgZGF0YTogaGFuZGxlIDExIGZsYWdzIDB4MDIgZGxlbiAxMgo+Pj4+Pgo+Pj4+PiBhMmRw
+ZAo+Pj4+Pgo+Pj4+PiBhbmR5QHNpZG5leTp+JCBhMmRwZCAKPj4+Pj4gYTJkcGQgW0F1ZyAxNyAy
+MDA2IDIxOjI0OjA5XSBzdGFydGluZyAuLi5hMmRwZCBhZGRyPTAwOjBEOjQ0OjJBOjVDOjEyIAo+
+Pj4+PiB0aW1lcj00MDAwIHVzIFtBdWcgMTcgMjAwNiAyMToyNDowOV0gCj4+Pj4+IHNldHNjaGVk
+dWxlciByZXR1cm5zIDAgKGVycm5vPTA6U3VjY2VzcykgCj4+Pj4+IEFjY2VwdGluZyBpbmNvbWlu
+ZyB0Y3Agc3RyZWFtIGNvbm5lY3Rpb24gCj4+Pj4+IE5ldyBjb25uZWN0aW9uIHRvIGJsdWV0b290
+aCBbNDQxMDAgaHpdIAo+Pj4+PiBhdnJjcDogQWNjZXB0aW5nIGluY29taW5nIGNvbm5lY3Rpb24g
+Cj4+Pj4+IGF2ZHRwOiBBY2NlcHRpbmcgaW5jb21pbmcgY29ubmVjdGlvbiAKPj4+Pj4gYXZkdHA6
+IHNvY2tldCA3OiBDb25uZWN0aW9uIGZyb20gMTI6NUM6MkE6NDQ6MEQ6MDAsIG10dT02NzIgCj4+
+Pj4+IGF2ZHRwOiBzb2NrZXQgNzogUmVjZWl2ZWQgZmFpbGVkIHJlc3VsdD0tMSAoZXJybm89MTE6
+UmVzb3VyY2UgCj4+Pj4+IHRlbXBvcmFyaWx5IHVuYXZhaWxhYmxlKSAKPj4+Pj4gYXZkdHA6IHNv
+Y2tldCA3OiBSZWNlaXZlZCBmYWlsZWQgcmVzdWx0PS0xIChlcnJubz0xMTpSZXNvdXJjZSAKPj4+
+Pj4gdGVtcG9yYXJpbHkgdW5hdmFpbGFibGUpIAo+Pj4+PiBzb2NrZXQgNzogUmVjZWl2ZWQgMiBi
+eXRlcyAKPj4+Pj4gMDAwMDA6IDAwIDAxIAo+Pj4+PiBERUJVRzogYTJkcF9oYW5kbGVfYXZkdHBf
+bWVzc2FnZTogKGVycm5vPTExOlJlc291cmNlIHRlbXBvcmFyaWx5IAo+Pj4+PiB1bmF2YWlsYWJs
+ZSlVbmV4cGVjdGVkIGhlYWRzZXQgZGlyZWN0aXZlIDEgCj4+Pj4+IERFQlVHOiBhMmRwX2hhbmRs
+ZV9hdmR0cF9tZXNzYWdlOiBBbnN3ZXJpbmcgY29tbWFuZCBwYWNrZXQgCj4+Pj4+IChtc2d0eXBl
+PU1FU1NBR0VfVFlQRV9SRUpFQ1Qsc2lnbmFsPTEpIAo+Pj4+PiBhdmR0cDogc29ja2V0IDc6IFJl
+Y2VpdmVkIGZyYW1lLCBzdGFydCB4bW1zIC0tcGxheQo+Pj4+Pgo+Pj4+Pgo+Pj4+PiBzbyBpdCBs
+b29rcyB0byBteSBzaW1wbGUgbWluZCB0aGF0IGwyY2FwIG5ldmVyIGNvbXBsZXRlcyBwcm9wZXJs
+eS4KPj4+Pj4KPj4+Pj4gTm90IHN1cmUgd2h5IHdoZW4gcnVubmluZyBib3RoIGFzIGZvcmdyb3Vu
+ZCB0YXNrcyBhcHBlYXIgdG8gZ2V0IAo+Pj4+PiBkaWZmZXJlbnQgcmVzdWx0IHRvIHdoYXQgSSd2
+ZSBwb3N0ZWQgcHJldmlvdXNseSBidXQgcG9zc2libHkgSSdtIGFuIAo+Pj4+PiBpZGlvdCA7LSks
+IE9yIG1heWJlIHRoZXJlIGlzIG1vcmUgdGhhbiBvbmUgcHJvYmxlbSwgb3IgdG8gbWFueQo+Pj4+
+PiBjaGFuZ2VzIAo+Pj4+PiBpbnZhbGlkYXRpbmcgZmluZGluZ3MuCj4+Pj4+Cj4+Pj4+IEF0IGxl
+YXN0IEkgY2FuIHNlZSB3aHkgaXRzIG5vdCB3b3JraW5nIG5vdyBidXQgZG9uJ3Qga25vdyB3aGF0
+IHRvZG8gCj4+Pj4+IGFib3V0IGl0Cj4+Pj4+Cj4+Pj4+IG1heWJlIEkgc2hvdWxkIG5ldmVyIGhh
+dmUgbG9va2VkIGF0IGVhY2ggbG9nIGluIGlzb2xhdGlvbiBzbyB0aGluayB3ZSAKPj4+Pj4gc2hv
+dWxkIGdvIGZyb20gaGVyZSBhcyBJIGNhbiByZXByb2R1Y2UgdGhpcyBlYXNpbHkuCj4+Pj4+Cj4+
+Pj4+Cj4+Pj4+Cj4+Pj4+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gCj4+Pj4+IFVzaW5nIFRvbWNhdCBidXQg
+bmVlZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNlcnZpY2VzLAo+Pj4+PiBzZWN1
+cml0eT8gCj4+Pj4+IEdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUtaW50ZWdyYXRlZCB0
+ZWNobm9sb2d5IHRvIG1ha2UgeW91ciBqb2IKPj4+Pj4gZWFzaWVyIAo+Pj4+PiBEb3dubG9hZCBJ
+Qk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNoZQo+
+Pj4+PiBHZXJvbmltbyAKPj4+Pj4gaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9
+bG5rJmtpZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQyIAo+Pj4+PiBfX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXyAKPj4+Pj4gQmx1ZXotZGV2ZWwgbWFp
+bGluZyBsaXN0IAo+Pj4+PiBCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQgCj4+Pj4+
+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVs
+Cj4+Pj4+Cj4+Pj4+ICAgICAKPj4+Pj4gICAgICAgICAgIAo+Pj4+IC0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K
+Pj4+PiBVc2luZyBUb21jYXQgYnV0IG5lZWQgdG8gZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0IHdl
+YiBzZXJ2aWNlcywgc2VjdXJpdHk/Cj4+Pj4gR2V0IHN0dWZmIGRvbmUgcXVpY2tseSB3aXRoIHBy
+ZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kgdG8gbWFrZSB5b3VyIGpvYiBlYXNpZXIKPj4+PiBEb3du
+bG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFw
+YWNoZSBHZXJvbmltbwo+Pj4+IGh0dHA6Ly9zZWwuYXMtdXMuZmFsa2FnLm5ldC9zZWw/Y21kPWxu
+ayZraWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0PTEyMTY0Mgo+Pj4+IF9fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4+Pj4gQmx1ZXotZGV2ZWwgbWFpbGluZyBs
+aXN0Cj4+Pj4gQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cj4+Pj4gaHR0cHM6Ly9s
+aXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKPj4+PiAgIAo+
+Pj4+ICAgICAgICAgCj4+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4+PiBVc2luZyBUb21jYXQgYnV0IG5l
+ZWQgdG8gZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0IHdlYiBzZXJ2aWNlcywgc2VjdXJpdHk/Cj4+
+PiBHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdpdGggcHJlLWludGVncmF0ZWQgdGVjaG5vbG9neSB0
+byBtYWtlIHlvdXIgam9iIGVhc2llcgo+Pj4gRG93bmxvYWQgSUJNIFdlYlNwaGVyZSBBcHBsaWNh
+dGlvbiBTZXJ2ZXIgdi4xLjAuMSBiYXNlZCBvbiBBcGFjaGUgR2Vyb25pbW8KPj4+IGh0dHA6Ly9z
+ZWwuYXMtdXMuZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZraWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0
+PTEyMTY0Mgo+Pj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X18KPj4+IEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdAo+Pj4gQmx1ZXotZGV2ZWxAbGlzdHMuc291
+cmNlZm9yZ2UubmV0Cj4+PiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0
+aW5mby9ibHVlei1kZXZlbAo+Pj4gICAgICAgCj4+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPj4gVXNpbmcg
+VG9tY2F0IGJ1dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8gc3VwcG9ydCB3ZWIgc2VydmljZXMs
+IHNlY3VyaXR5Pwo+PiBHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdpdGggcHJlLWludGVncmF0ZWQg
+dGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9iIGVhc2llcgo+PiBEb3dubG9hZCBJQk0gV2ViU3Bo
+ZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNoZSBHZXJvbmltbwo+
+PiBodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lkPTEyMDcwOSZiaWQ9
+MjYzMDU3JmRhdD0xMjE2NDIKPj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX18KPj4gQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0Cj4+IEJsdWV6LWRldmVsQGxp
+c3RzLnNvdXJjZWZvcmdlLm5ldAo+PiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0
+cy9saXN0aW5mby9ibHVlei1kZXZlbAo+PiAgICAgCj4KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gVXNp
+bmcgVG9tY2F0IGJ1dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8gc3VwcG9ydCB3ZWIgc2Vydmlj
+ZXMsIHNlY3VyaXR5Pwo+IEdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUtaW50ZWdyYXRl
+ZCB0ZWNobm9sb2d5IHRvIG1ha2UgeW91ciBqb2IgZWFzaWVyCj4gRG93bmxvYWQgSUJNIFdlYlNw
+aGVyZSBBcHBsaWNhdGlvbiBTZXJ2ZXIgdi4xLjAuMSBiYXNlZCBvbiBBcGFjaGUgR2Vyb25pbW8K
+PiBodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lkPTEyMDcwOSZiaWQ9
+MjYzMDU3JmRhdD0xMjE2NDIKPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fXwo+IEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdAo+IEJsdWV6LWRldmVsQGxpc3Rz
+LnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xp
+c3RpbmZvL2JsdWV6LWRldmVsCj4gICAKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClVzaW5nIFRvbWNhdCBi
+dXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNlcnZpY2VzLCBzZWN1cml0
+eT8KR2V0IHN0dWZmIGRvbmUgcXVpY2tseSB3aXRoIHByZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kg
+dG8gbWFrZSB5b3VyIGpvYiBlYXNpZXIKRG93bmxvYWQgSUJNIFdlYlNwaGVyZSBBcHBsaWNhdGlv
+biBTZXJ2ZXIgdi4xLjAuMSBiYXNlZCBvbiBBcGFjaGUgR2Vyb25pbW8KaHR0cDovL3NlbC5hcy11
+cy5mYWxrYWcubmV0L3NlbD9jbWQ9bG5rJmtpZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQy
+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRl
+dmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6
+Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
