@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44F7115D.6080700@pracucci.com>
-Date: Thu, 31 Aug 2006 16:42:05 +0000
-From: Marco Pracucci <development@pracucci.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44F6EB3F.8030800@pracucci.com>	<Pine.LNX.4.63.0608311415010.8795@redbean.intranet.gw-instruments.de>	<44F6FD0A.1090900@pracucci.com>
-	<1157041796.4026.133.camel@aeonflux.holtmann.net>
-In-Reply-To: <1157041796.4026.133.camel@aeonflux.holtmann.net>
+In-Reply-To: <44F6FD0A.1090900@pracucci.com>
+References: <44F6EB3F.8030800@pracucci.com>
+	<Pine.LNX.4.63.0608311415010.8795@redbean.intranet.gw-instruments.de>
+	<44F6FD0A.1090900@pracucci.com>
+Date: Thu, 31 Aug 2006 18:29:56 +0200
+Message-Id: <1157041796.4026.133.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] ioctl: setting link mode and link policy
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,24 +22,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Marco,
 
->> I would like to set a "global" link mode and link policy that will be
->> the default for every connection. Something similar to hcid.
->>     
-> what do you expect from doing this? It is not a good idea to change it
-> globally except you know exactly what you are doing. Changes these
-> settings can have implications you might not be aware of. So what is
-> your purpose on changing them?
->   
-I would become master on incoming connections and I would deny role
-switch on outgoing connections. If I'm not wrong, I should set MASTER as
-link mode and disable role switch from link policy. However, I can't use
-hcid, so I would do this from a custom application.
-Is it possible?
+> I would like to set a "global" link mode and link policy that will be
+> the default for every connection. Something similar to hcid.
 
-Thanks,
-Marco
+what do you expect from doing this? It is not a good idea to change it
+globally except you know exactly what you are doing. Changes these
+settings can have implications you might not be aware of. So what is
+your purpose on changing them?
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
