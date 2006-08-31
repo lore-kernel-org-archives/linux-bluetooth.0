@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <44F6DE88.1020403@xmission.com>
-Date: Thu, 31 Aug 2006 07:05:12 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <62409.84.168.62.45.1157024271.overlook@webmail.prodigy7.de>
+In-Reply-To: <44F6B7AE.1030209@jambit.com>
 References: <44F6B7AE.1030209@jambit.com>
-	<62409.84.168.62.45.1157024271.overlook@webmail.prodigy7.de>
-In-Reply-To: <62409.84.168.62.45.1157024271.overlook@webmail.prodigy7.de>
+Date: Thu, 31 Aug 2006 13:37:51 +0200 (CEST)
+From: "Manuel Bernhardt" <mailinglist@prodigy7.de>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
 Subject: Re: [Bluez-users] Play received A2DP data
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,17 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Guys
+Hi Frank,
 
->> My programming task: Receive audio stream from A2DP, decode it and play
->> it.
-> 
-> maybe http://bluetooth-alsa.sourceforge.net/ is that what are you looking
-> for?
+> My programming task: Receive audio stream from A2DP, decode it and play
+> it. Reception of A2DP stream is ok for me, decoding should work with
+> sbc, but there is still the problem how to get the data to the sound
+> card. So far I thought I need a sound driver for A2DP, as a kernel
+> module and call open, ioctl and write via snd_hwdep routines. Is that
+> right?
 
-right... see the a2recv app in btsco
+maybe http://bluetooth-alsa.sourceforge.net/ is that what are you looking
+for?
 
-brad
+Manuel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
