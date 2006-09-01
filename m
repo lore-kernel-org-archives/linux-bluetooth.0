@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 01 Sep 2006 10:52:01 -0700
-From: David Armour <d.f.armour@shaw.ca>
-In-reply-to: <mailman.47971.1157055066.29847.bluez-users@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net, redondos <redondos@gmail.com>
-Message-id: <44F87341.1000501@shaw.ca>
-MIME-version: 1.0
-References: <mailman.47971.1157055066.29847.bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bash: syntax error near unexpected token `newline'
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Linux@feline-soul.com
+In-Reply-To: <200608311829.31921.Linux@feline-soul.com>
+References: <e4f1f0110608230129y73240448ufc024c1c99810789@mail.gmail.com>
+	<200608311150.38005.Linux@feline-soul.com>
+	<1157062113.4026.145.camel@aeonflux.holtmann.net>
+	<200608311829.31921.Linux@feline-soul.com>
+Date: Fri, 01 Sep 2006 13:04:45 +0200
+Message-Id: <1157108685.4026.149.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] How do I reset a pairing?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,101 +24,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hello redondos
+Hi Bearcat,
 
-thank you for your help!
-> > hello Paulo	<snip>
->   
-> > now, running:
-> > 
-> >  >> sudo hcitools auth 00:03:89:53:EC:7F   ## gives:
-> >  >> sudo: hcitools: command not found      ## !
-> > 
->   
-> The program is called 'hcitool' and is probably located in /usr/bin.
-> (Please note that you are referring to it as 'hcitools', with a tailing
-> 's')
->   
-D'oh! talk about an object lesson in failing to see something that's 
-right in front of me!
-i cut'n'pasted the line but i have NO idea how the 's' got there.
+> I killed kdebluetooth and made sure no traces of it were running. I get the 
+> same errors.
+> 
+> Here is the hcidump -X -V with kdebluetooth off:
+> 18:23:48 root@linux:/home/bearcat# hcidump -X -V
+> HCI sniffer - Bluetooth packet analyzer ver 1.31
+> device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:0D:44:4F:37:72 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> > HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x04 handle 0 bdaddr 00:0D:44:4F:37:72 type ACL encrypt 0x00
+>     Error: Page Timeout
+> < HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+> > HCI Event: Command Complete (0x0e) plen 6
+>     Read Voice Setting (0x03|0x0025) ncmd 1
+>     status 0x00 voice setting 0x0060
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:0D:44:4F:37:72 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> > HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x04 handle 0 bdaddr 00:0D:44:4F:37:72 type ACL encrypt 0x00
+>     Error: Page Timeout
 
-*now* running:
+both are a page timeout. Which means that the device is not on or not in
+page scan mode. Please turn the device on and put it into pairing mode.
 
- >> sudo hcitool auth 00:03:89:53:EC:7F    ## gives:
- >> Not connected.                                       ## ???
+Regards
 
-some of the stuff i've since tried, from:
-http://www.think-future.de/wiki/index.php?title=Bluetooth#Connection_Establishing
-
-the someone flailing around impression accurately reflects my current 
-'understanding.'
-i'm not clear, obviously, which 'address' (MAC or bd_addr) i'm supposed 
-to use.
-
- >> hciconfig
- >> hci0:   Type: USB
-        BD Address: 00:0C:76:47:81:CC ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:1094 acl:0 sco:0 events:67 errors:0
-        TX bytes:588 acl:0 sco:0 commands:40 errors:0
-
- >> hcitool inq
- >> Inquiring ...
- >>       00:03:89:53:EC:7F       clock offset: 0x4791    class: 0x200404
-
- >> hcitool dev
- >> Devices:
- >>         hci0    00:0C:76:47:81:CC
-
- >> hcitool cc 00:0C:76:47:81:CC
- >> Device is not available.                           ## ???
-
- >> hcitool cc 00:03:89:53:EC:7F
- >> Can't create connection: Operation not permitted
-
- >> sudo hidd --connect 00:0C:76:47:81:CC
- >> Can't get device information: No route to host
- >> sudo hidd --connect 00:03:89:53:EC:7F
- >> Can't get device information: Permission denied
-
- >> hcidump -X -V                                          ## gives:
- >> bash: hcidump: command not found    
-## ??? whereis, which, locate fail to return anything resembling hcidump.
-
- >> l2ping 00:03:89:53:EC:7F
- >> Can't create socket: Operation not permitted
-
-from the hcid.conf file:
-...
-options {
-    # Automatically initialize new devices
-    autoinit yes;
-
-    # Security Manager mode
-    #   none - Security manager disabled
-    #   auto - Use local PIN for incoming connections
-    #   user - Always ask user for a PIN
-    #
-    security auto;
-
-    # Pairing mode
-    #   none  - Pairing disabled
-    #   multi - Allow pairing with already paired devices
-    #   once  - Pair once and deny successive attempts
-    pairing multi;
-
-    # PIN helper
-    #pin_helper /usr/bin/pinwrapper;
-    pin_helper /usr/bin/bluepin;
-
-    # D-Bus PIN helper
-    #dbus_pin_helper;
-}
-
-....
-
-thanks in advance for any additional tips, clues, recommendations.
+Marcel
 
 
 
