@@ -1,81 +1,91 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20060731181105.GI29916@suse.de>
-References: <200607311518.57014.dgollub@suse.de>
-	<200607311850.09567.dgollub@suse.de>
-	<1154373472.4982.21.camel@aeonflux.holtmann.net>
-	<200607312007.23046.dgollub@suse.de> <20060731181105.GI29916@suse.de>
-Date: Tue, 01 Aug 2006 00:15:15 +0200
-Message-Id: <1154384115.4982.30.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Addition for hcid passkey dbus request
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <44F79A59.3020304@ba-zing.com>
+Date: Thu, 31 Aug 2006 22:26:33 -0400
+From: Christiaan Conover <cconover@ba-zing.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: multipart/mixed; boundary="------------040107060100070308010504"
+Subject: [Bluez-users] Targus/Broadcom USB Bluetooth Adapter
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
+
+This is a multi-part message in MIME format.
+--------------040107060100070308010504
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title></title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<font size="-1"><font face="Bitstream Vera Serif">I have a Targus
+ACB10US USB Bluetooth Adapter.&nbsp; I believe it has the Broadcom 2045
+Bluetooth chipset in it.&nbsp; When I insert the adapter, the KDE Bluetooth
+Framework locks up until I remove it again.&nbsp; I cannot scan for devices
+using the command line, either.&nbsp; Is this a supported device, or has
+anybody been able to get this device/chipset to work?</font></font><br>
+<pre class="moz-signature" cols="72">-- 
+Christiaan Conover
+CEO
+Ba-zing Communications
+<a class="moz-txt-link-abbreviated" href="mailto:cconover@ba-zing.com">cconover@ba-zing.com</a>
+410-980-7578</pre>
+</body>
+</html>
+
+--------------040107060100070308010504
+Content-Type: text/x-vcard; charset=utf-8;
+ name="cconover.vcf"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="cconover.vcf"
+
+begin:vcard
+fn:Christiaan Conover
+n:Conover;Christiaan
+org:Ba-zing Communications
+adr:;;;;;;United States of America
+email;internet:cconover@ba-zing.com
+title:CEO
+tel;cell:410-980-7578
+x-mozilla-html:TRUE
+url:http://www.ba-zing.com
+version:2.1
+end:vcard
+
+
+--------------040107060100070308010504
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
-
-Hi Stefan,
-
-> > I planned to register kbluetoothd as default passkey agent and listen for all 
-> > passkey request. Have to recjet this and think about a new solution. I am 
-> 
-> I believe that you still can do this.
-> 
-> > confused now, how to achieve that the pin dialog now can detect if it is the 
-> > initiator side. When another application triggers the pairing without calling 
-> > CreateBonding().
-> 
-> Well, improve kbluetoothd in a way, that it is just way more convenient
-> to pair devices by using it than with any other application :-)
-> Once you know that you initiated the pairing, you can pre-fill the pin
-> field with a generated value.
-> 
-> Basically, i think we do not want many applications doing the pairing
-> stuff, there should be one application (per desktop environment...), that
-> handles this stuff well in a centralized place. For KDE, this could be
-> kbluetoothd (or maybe a control-center plugin, which could then communicate
-> with kbluetoothd). This probably give the best user experience.
-
-don't try to over-engineer this. We thought about all this stuff
-already. You can make kbluetoothd the default passkey agent and then you
-can register a device specific passkey agent. This stuff is stacked and
-hcid will first look for a device specific agent before calling the
-default agent.
-
-So you need a default passkey agent that will be always available (take
-care of D-Bus disconnects btw.) and it has to handle unexpected pairing
-requests. In the case you connect to a phone and you want to pair (in
-somekind of connection wizard), then you register a device specific
-passkey agent and call CreateBonding(). It is that simple.
-
-If something is actually not working as expect or documented in
-dbus-api.txt then this might be simply a bug. The current D-Bus API for
-BlueZ should be enough to handle all basic tasks. We thought really
-careful about all methods and signals that are needed. However we might
-have missed something, but you need a good argument to convince me that
-something additional is needed.
-
-Regards
-
-Marcel
-
-
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--------------040107060100070308010504
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--------------040107060100070308010504--
