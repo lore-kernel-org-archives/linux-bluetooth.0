@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 MIME-Version: 1.0
-Date: Sat, 2 Sep 2006 14:21:34 +0800
-Message-ID: <554C5F4C5BA7384EB2B412FD46A3BAD1012FED83@pdsmsx411.ccr.corp.intel.com>
+Date: Sat, 2 Sep 2006 14:04:58 +0800
+Message-ID: <554C5F4C5BA7384EB2B412FD46A3BAD1012FED7C@pdsmsx411.ccr.corp.intel.com>
 From: "Li, Lea" <lea.li@intel.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Big patch to a2dpd
@@ -14,88 +14,137 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1894627063=="
+Content-Type: multipart/mixed; boundary="===============0858981583=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1894627063==
+--===============0858981583==
 Content-class: urn:content-classes:message
 Content-Type: text/plain;
 	charset="gb2312"
 Content-Transfer-Encoding: quoted-printable
 
-It's really a great patch - which is the right patch I am looking for. =
-:)
+Hi Michael,=20
 
-I've tried it on my XScale board. It is perfect but only one line to be =
-modified to make default alsa device work smoothly. See below patch:=20
-The better way is to modify the code in alsa_transfer_raw(), I think, as =
-below:=20
+'s "Big patch to a2dpd" is just the right thing you are looking for. To =
+switch to default alsa device, one way is to change ".asoundrc", the =
+other way is to enable "audio routing" (see enablerereadconfig & =
+enableredirectalsa) in ".a2dprc" which can do that on the fly. :)
 
-	case -EPIPE:
-		// To manage underrun, we will try to recover from error state
-		if(xrun_recovery(alsa->playback_handle, result) =3D=3D 0)
-			result =3D 0;
-		DBG("EPIPE(%d)", result);
-		break;
-	case -ESTRPIPE:
-		if(xrun_recovery(alsa->playback_handle, result) =3D=3D 0)
-			result=3D0;
-		DBG("ESTRPIPE(%d)", result);
-		break;
-	}
 
-=3D=3D=3D=3D=3D=3D=3D=3Dpatch begin=3D=3D=3D=3D=3D=3D=3D=3D
---- a2dpd.c.old	2006-09-02 13:53:31.601040096 +0800
-+++ a2dpd.c	2006-09-02 13:14:53.065511072 +0800
-@@ -716,7 +716,7 @@
- 								blockstart +=3D blocksize;
- 								ibytespersecond +=3D transfer;
- 								a2dp_timer_notifyframe(&TimerInfos);
--							} else {
-+							} else if (! (lpDevice->bredirectalsa)){
- 								printf("Error in a2dp_transfer_raw\n");
- 								bError =3D 1;
- 							}
-=3D=3D=3D=3D=3D=3D=3D=3Dpatch end=3D=3D=3D=3D=3D=3D=3D=3D
-=20
 Thanks,
 Lea
 =20
 
 -----Original Message-----
 From: bluez-devel-bounces@lists.sourceforge.net =
-[mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf Of =
-Fr=A8=A6d=A8=A6ric DALLEAU
-Sent: 2006=C4=EA9=D4=C21=C8=D5 0:05
+[mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf Of Michael =
+Frey
+Sent: 2006=C4=EA9=D4=C22=C8=D5 2:26
 To: BlueZ development
-Subject: [Bluez-devel] Big patch to a2dpd
+Subject: Re: [Bluez-devel] Big patch to a2dpd
 
-Hi Brad,
+Is there a way to have a2dpd use the alsa dmixer?  And does anyone =20
+know how to change the default alsa device on the fly.  I know you =20
+can change .asoundrc but any running applications need to be =20
+restarted in order to pick up the change.  Is there a better way?
+
+Michael
+
+On Sep 1, 2006, at 8:57 AM, andy@samuri.demon.co.uk wrote:
+
+> Hi Fr=A8=A6d=A8=A6ric,
 >
-> I looked over Matthew's patches and applied them. I applied your =
-"small
-> patch" which turns out to be bigger than it sounds :)
->  =20
-This one is more than bigger!
-Reindent,
-Alsa output redirection,
-New on-the-fly in-play switch from bt to alsa and reverse
-Changing bdaddr in play too.
-More options described in sample.a2dprc
+> Whoo some patch cant wait to give it a whirl..
+>
+> On the subject of your DOC nice work very concise
+>
+> You might like to add
+> ------------------
+> If you create an ~.asoundrc as follows
+>
+> pcm.a2dpd {
+>        type a2dpd
+> }
+>
+> Then you can directly add the headphone device (pcm.a2dpd) to any =20
+> app that
+> supports alsa plugins correctly, Without affecting the default =20
+> Gnome/X/KDE
+> sounds
+>
+> Known working Apps
+>
+> Xmms
+> alsaplayer
+> VLC (you have to manualy add it to the conf file as the gui wont allow
+> adding non visible plugins (bug)).
+>
+> cheers Andy
+> --------------------------------------
+>  Hi Brad,
+>>>
+>>> I looked over Matthew's patches and applied them. I applied your =20
+>>> "small
+>>> patch" which turns out to be bigger than it sounds :)
+>>>
+>> This one is more than bigger!
+>> Reindent,
+>> Alsa output redirection,
+>> New on-the-fly in-play switch from bt to alsa and reverse
+>> Changing bdaddr in play too.
+>> More options described in sample.a2dprc
+>>
+>> I removed the line LIBS=3D from Makefile.am as suggested. This line =
+was
+>> making tons of compilation problems. As a2dpd finally links to =20
+>> alsa, it
+>> is no longer needed.
+>> Please give it a try before submitting (Matthew and RUI if you =20
+>> read that).
+>>
+>> Wrote a doc : http://fdalleau.free.fr/a2dp_doc.pdf ideas welcome!
+>>
+>> Fr=A8=A6d=A8=A6ric
+>>
+>>
+>
+>
+>
+> ---------------------------------------------------------------------- =
 
-I removed the line LIBS=3D from Makefile.am as suggested. This line was=20
-making tons of compilation problems. As a2dpd finally links to alsa, it=20
-is no longer needed.
-Please give it a try before submitting (Matthew and RUI if you read =
-that).
+> ---
+> Using Tomcat but need to do more? Need to support web services, =20
+> security?
+> Get stuff done quickly with pre-integrated technology to make your =20
+> job easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache =20
+> Geronimo
+> http://sel.as-us.falkag.net/sel?=20
+> cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-Wrote a doc : http://fdalleau.free.fr/a2dp_doc.pdf ideas welcome!
 
-Fr=A8=A6d=A8=A6ric
+-------------------------------------------------------------------------=
+
+Using Tomcat but need to do more? Need to support web services, =
+security?
+Get stuff done quickly with pre-integrated technology to make your job =
+easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache =
+Geronimo
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D=
+121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
---===============1894627063==
+--===============0858981583==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -106,7 +155,7 @@ Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============1894627063==
+--===============0858981583==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -117,4 +166,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1894627063==--
+--===============0858981583==--
