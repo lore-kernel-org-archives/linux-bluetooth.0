@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v752.2)
-In-Reply-To: <554C5F4C5BA7384EB2B412FD46A3BAD1012FED7C@pdsmsx411.ccr.corp.intel.com>
-References: <554C5F4C5BA7384EB2B412FD46A3BAD1012FED7C@pdsmsx411.ccr.corp.intel.com>
-Message-Id: <D5E925E0-92EE-4A08-8B0C-42CA05C98B9D@pepper.com>
-From: Michael Frey <mfrey@pepper.com>
-Date: Sat, 2 Sep 2006 09:02:48 -0400
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Big patch to a2dpd
+Message-ID: <44F94742.5010805@strudel-hound.com>
+Date: Sat, 02 Sep 2006 18:56:34 +1000
+From: William Pettersson <enigma@strudel-hound.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] BTSCO - Alsa sound controls - Mute?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,95 +14,39 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-TGVhLAoKSSBzZWUgdGhvc2Ugb3B0aW9ucywgYnV0IEkgYW0gc3RpbGwgYSBiaXQgY29uZnVzZWQg
-aG93IHRoZXkgd29yay4gQ2FuICAKeW91IGdpdmUgbWUgYW4gZXhhbXBsZT8gIExldHMgc2F5IG1w
-bGF5ZXIgaXMgcGxheWluZyB0byB0aGUgZGVmYXVsdCAgCkFMU0EgZGV2aWNlIGFuZCBJIHdhbnQg
-dG8gdG9nZ2xlIGJldHdlZW4gc3BlYWtlcnMgYW5kIGhlYWRzZXQsIGhvdyAgCndvdWxkIHRoYXQg
-YmUgZG9uZSB3aXRoIC5hMmRwcmM/CgpUaGFua3MgZm9yIHlvdXIgaGVscCwKTWljaGFlbAoKT24g
-U2VwIDIsIDIwMDYsIGF0IDI6MDQgQU0sIExpLCBMZWEgd3JvdGU6Cgo+IEhpIE1pY2hhZWwsCj4K
-PiAncyAiQmlnIHBhdGNoIHRvIGEyZHBkIiBpcyBqdXN0IHRoZSByaWdodCB0aGluZyB5b3UgYXJl
-IGxvb2tpbmcgIAo+IGZvci4gVG8gc3dpdGNoIHRvIGRlZmF1bHQgYWxzYSBkZXZpY2UsIG9uZSB3
-YXkgaXMgdG8gY2hhbmdlICAKPiAiLmFzb3VuZHJjIiwgdGhlIG90aGVyIHdheSBpcyB0byBlbmFi
-bGUgImF1ZGlvIHJvdXRpbmciIChzZWUgIAo+IGVuYWJsZXJlcmVhZGNvbmZpZyAmIGVuYWJsZXJl
-ZGlyZWN0YWxzYSkgaW4gIi5hMmRwcmMiIHdoaWNoIGNhbiBkbyAgCj4gdGhhdCBvbiB0aGUgZmx5
-LiA6KQo+Cj4KPiBUaGFua3MsCj4gTGVhCj4KPgo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0t
-Cj4gRnJvbTogYmx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQgW21haWx0
-bzpibHVlei1kZXZlbC0gCj4gYm91bmNlc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXRdIE9uIEJlaGFs
-ZiBPZiBNaWNoYWVsIEZyZXkKPiBTZW50OiAyMDA25bm0OeaciDLml6UgMjoyNgo+IFRvOiBCbHVl
-WiBkZXZlbG9wbWVudAo+IFN1YmplY3Q6IFJlOiBbQmx1ZXotZGV2ZWxdIEJpZyBwYXRjaCB0byBh
-MmRwZAo+Cj4gSXMgdGhlcmUgYSB3YXkgdG8gaGF2ZSBhMmRwZCB1c2UgdGhlIGFsc2EgZG1peGVy
-PyAgQW5kIGRvZXMgYW55b25lCj4ga25vdyBob3cgdG8gY2hhbmdlIHRoZSBkZWZhdWx0IGFsc2Eg
-ZGV2aWNlIG9uIHRoZSBmbHkuICBJIGtub3cgeW91Cj4gY2FuIGNoYW5nZSAuYXNvdW5kcmMgYnV0
-IGFueSBydW5uaW5nIGFwcGxpY2F0aW9ucyBuZWVkIHRvIGJlCj4gcmVzdGFydGVkIGluIG9yZGVy
-IHRvIHBpY2sgdXAgdGhlIGNoYW5nZS4gIElzIHRoZXJlIGEgYmV0dGVyIHdheT8KPgo+IE1pY2hh
-ZWwKPgo+IE9uIFNlcCAxLCAyMDA2LCBhdCA4OjU3IEFNLCBhbmR5QHNhbXVyaS5kZW1vbi5jby51
-ayB3cm90ZToKPgo+PiBIaSBGcsOpZMOpcmljLAo+Pgo+PiBXaG9vIHNvbWUgcGF0Y2ggY2FudCB3
-YWl0IHRvIGdpdmUgaXQgYSB3aGlybC4uCj4+Cj4+IE9uIHRoZSBzdWJqZWN0IG9mIHlvdXIgRE9D
-IG5pY2Ugd29yayB2ZXJ5IGNvbmNpc2UKPj4KPj4gWW91IG1pZ2h0IGxpa2UgdG8gYWRkCj4+IC0t
-LS0tLS0tLS0tLS0tLS0tLQo+PiBJZiB5b3UgY3JlYXRlIGFuIH4uYXNvdW5kcmMgYXMgZm9sbG93
-cwo+Pgo+PiBwY20uYTJkcGQgewo+PiAgICAgICAgdHlwZSBhMmRwZAo+PiB9Cj4+Cj4+IFRoZW4g
-eW91IGNhbiBkaXJlY3RseSBhZGQgdGhlIGhlYWRwaG9uZSBkZXZpY2UgKHBjbS5hMmRwZCkgdG8g
-YW55Cj4+IGFwcCB0aGF0Cj4+IHN1cHBvcnRzIGFsc2EgcGx1Z2lucyBjb3JyZWN0bHksIFdpdGhv
-dXQgYWZmZWN0aW5nIHRoZSBkZWZhdWx0Cj4+IEdub21lL1gvS0RFCj4+IHNvdW5kcwo+Pgo+PiBL
-bm93biB3b3JraW5nIEFwcHMKPj4KPj4gWG1tcwo+PiBhbHNhcGxheWVyCj4+IFZMQyAoeW91IGhh
-dmUgdG8gbWFudWFseSBhZGQgaXQgdG8gdGhlIGNvbmYgZmlsZSBhcyB0aGUgZ3VpIHdvbnQgIAo+
-PiBhbGxvdwo+PiBhZGRpbmcgbm9uIHZpc2libGUgcGx1Z2lucyAoYnVnKSkuCj4+Cj4+IGNoZWVy
-cyBBbmR5Cj4+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4+ICBIaSBC
-cmFkLAo+Pj4+Cj4+Pj4gSSBsb29rZWQgb3ZlciBNYXR0aGV3J3MgcGF0Y2hlcyBhbmQgYXBwbGll
-ZCB0aGVtLiBJIGFwcGxpZWQgeW91cgo+Pj4+ICJzbWFsbAo+Pj4+IHBhdGNoIiB3aGljaCB0dXJu
-cyBvdXQgdG8gYmUgYmlnZ2VyIHRoYW4gaXQgc291bmRzIDopCj4+Pj4KPj4+IFRoaXMgb25lIGlz
-IG1vcmUgdGhhbiBiaWdnZXIhCj4+PiBSZWluZGVudCwKPj4+IEFsc2Egb3V0cHV0IHJlZGlyZWN0
-aW9uLAo+Pj4gTmV3IG9uLXRoZS1mbHkgaW4tcGxheSBzd2l0Y2ggZnJvbSBidCB0byBhbHNhIGFu
-ZCByZXZlcnNlCj4+PiBDaGFuZ2luZyBiZGFkZHIgaW4gcGxheSB0b28uCj4+PiBNb3JlIG9wdGlv
-bnMgZGVzY3JpYmVkIGluIHNhbXBsZS5hMmRwcmMKPj4+Cj4+PiBJIHJlbW92ZWQgdGhlIGxpbmUg
-TElCUz0gZnJvbSBNYWtlZmlsZS5hbSBhcyBzdWdnZXN0ZWQuIFRoaXMgbGluZSAgCj4+PiB3YXMK
-Pj4+IG1ha2luZyB0b25zIG9mIGNvbXBpbGF0aW9uIHByb2JsZW1zLiBBcyBhMmRwZCBmaW5hbGx5
-IGxpbmtzIHRvCj4+PiBhbHNhLCBpdAo+Pj4gaXMgbm8gbG9uZ2VyIG5lZWRlZC4KPj4+IFBsZWFz
-ZSBnaXZlIGl0IGEgdHJ5IGJlZm9yZSBzdWJtaXR0aW5nIChNYXR0aGV3IGFuZCBSVUkgaWYgeW91
-Cj4+PiByZWFkIHRoYXQpLgo+Pj4KPj4+IFdyb3RlIGEgZG9jIDogaHR0cDovL2ZkYWxsZWF1LmZy
-ZWUuZnIvYTJkcF9kb2MucGRmIGlkZWFzIHdlbGNvbWUhCj4+Pgo+Pj4gRnLDqWTDqXJpYwo+Pj4K
-Pj4+Cj4+Cj4+Cj4+Cj4+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSAKPj4gLQo+PiAtLS0KPj4gVXNpbmcgVG9tY2F0
-IGJ1dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8gc3VwcG9ydCB3ZWIgc2VydmljZXMsCj4+IHNl
-Y3VyaXR5Pwo+PiBHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdpdGggcHJlLWludGVncmF0ZWQgdGVj
-aG5vbG9neSB0byBtYWtlIHlvdXIKPj4gam9iIGVhc2llcgo+PiBEb3dubG9hZCBJQk0gV2ViU3Bo
-ZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNoZQo+PiBHZXJvbmlt
-bwo+PiBodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsPwo+PiBjbWQ9bG5rJmtpZD0xMjA3
-MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQyCj4+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fCj4+IEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdAo+PiBCbHVlei1k
-ZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPj4gaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5u
-ZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKPgo+Cj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSAKPiAtLS0K
-PiBVc2luZyBUb21jYXQgYnV0IG5lZWQgdG8gZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0IHdlYiBz
-ZXJ2aWNlcywgIAo+IHNlY3VyaXR5Pwo+IEdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUt
-aW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRvIG1ha2UgeW91ciAgCj4gam9iIGVhc2llcgo+IERvd25s
-b2FkIElCTSBXZWJTcGhlcmUgQXBwbGljYXRpb24gU2VydmVyIHYuMS4wLjEgYmFzZWQgb24gQXBh
-Y2hlICAKPiBHZXJvbmltbwo+IGh0dHA6Ly9zZWwuYXMtdXMuZmFsa2FnLm5ldC9zZWw/IAo+IGNt
-ZD1sbmsma2lkPTEyMDcwOSZiaWQ9MjYzMDU3JmRhdD0xMjE2NDIKPiBfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IEJsdWV6LWRldmVsIG1haWxpbmcgbGlz
-dAo+IEJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291
-cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCj4KPiAtLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-IAo+IC0tLQo+IFVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBv
-cnQgd2ViIHNlcnZpY2VzLCAgCj4gc2VjdXJpdHk/Cj4gR2V0IHN0dWZmIGRvbmUgcXVpY2tseSB3
-aXRoIHByZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kgdG8gbWFrZSB5b3VyICAKPiBqb2IgZWFzaWVy
-Cj4gRG93bmxvYWQgSUJNIFdlYlNwaGVyZSBBcHBsaWNhdGlvbiBTZXJ2ZXIgdi4xLjAuMSBiYXNl
-ZCBvbiBBcGFjaGUgIAo+IEdlcm9uaW1vCj4gaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3Nl
-bD8gCj4gY21kPWxuayZraWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0PTEyMTY0Ml9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fXyAKPiBfX19fX19fX19fX19fX19fXwo+IEJsdWV6LWRldmVsIG1h
-aWxpbmcgbGlzdAo+IEJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8v
-bGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCgoKLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLQpVc2luZyBUb21jYXQgYnV0IG5lZWQgdG8gZG8gbW9yZT8gTmVlZCB0byBzdXBw
-b3J0IHdlYiBzZXJ2aWNlcywgc2VjdXJpdHk/CkdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBw
-cmUtaW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRvIG1ha2UgeW91ciBqb2IgZWFzaWVyCkRvd25sb2Fk
-IElCTSBXZWJTcGhlcmUgQXBwbGljYXRpb24gU2VydmVyIHYuMS4wLjEgYmFzZWQgb24gQXBhY2hl
-IEdlcm9uaW1vCmh0dHA6Ly9zZWwuYXMtdXMuZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZraWQ9MTIw
-NzA5JmJpZD0yNjMwNTcmZGF0PTEyMTY0MgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlz
-dHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xp
-c3RpbmZvL2JsdWV6LWRldmVsCg==
+TLDR Summary:  BTSCO works fine, but I only have AGC (Automatic Gain 
+Control) and Loopback options in alsamixer.  There's no way I can mute 
+the microphone, which I want to do when I press the headset button.  Is 
+this because my headset doesn't support muting, or are these extra 
+features all software based?
+
+Long story version.
+So, I've gotten a bluetooth headset, it works fine.  I can talk and hear 
+people fine over Skype.  What I want to do, however, is use it for 
+things like Ventrilo and Teamspeak.  These programs are different in 
+that you don't want everything you say to go through the mic.  People 
+generally use a key to switch voice-transmit on and off.  What I wanted 
+to was use the button on the headset to do this.  I can set the program 
+to continuously transmit, and then just mute/unmute the microphone via 
+alsa.  This works on regular headsets connected to my soundcard.  But 
+alsamixer doesn't let me mute the microphone (and changing volume 
+settings does nothing).  Is this because my headset doesn't support 
+these features, or is all of this done in software.
+
+BTSCO v0.42, using a Nextlink AX2 (review @ 
+http://www.engadget.com/2005/11/07/nextlink-bluespoon-ax2-reviewed-4-5-stars/ 
+and a google search lists many more reviews).
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
