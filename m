@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: CIJOML <cijoml@volny.cz>
-To: bluez-users@lists.sf.net
-Date: Sun, 3 Sep 2006 20:15:51 +0200
-MIME-Version: 1.0
-Message-Id: <200609032015.51210.cijoml@volny.cz>
-Subject: [Bluez-users] bluez utils debian package doesn't autoswith dongle
-	on?
+To: bluez-users@lists.sourceforge.net
+From: Dick <dm@chello.nl>
+Date: Sat, 2 Sep 2006 20:41:37 +0000 (UTC)
+Message-ID: <loom.20060902T222740-106@post.gmane.org>
+References: <loom.20060902T125209-74@post.gmane.org>
+	<1157221409.32195.0.camel@aeonflux.holtmann.net>
+	<loom.20060902T200908-292@post.gmane.org>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users]
+	=?utf-8?q?adding_a_SDP_attribute_HID=5FDESCRIPTOR?=
+	=?utf-8?q?=5FLIST?=
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,20 +23,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all,
+Oh boy I've found the segfault :-)
 
-I upgraded debian bluez-utils package and now dongle when is plugged in is not 
-auto up?
+My HID descriptor is too large to fit in SDP_SEQ_PDUFORM_SIZE
+... I almost wouldn't dare to ask but ... 
+Could it please be increased from 128 to something larger or equal to 168?
 
-How to set up this behaviour? I think this was previously done by default.
+It would also be nice to have some range checking ;-)
 
-ii  bluez-utils                      3.1-3.1       Bluetooth tools and daemons
+TIA
 
-Marcel wasn't this default behaviour directly in binary?
+Dick
 
-Thanks for reply
-
-Michal
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
