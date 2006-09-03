@@ -1,10 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <7f52ac20609031839j72f98969v420375ea7f183b88@mail.gmail.com>
-Date: Mon, 4 Sep 2006 02:39:49 +0100
-From: "Hentai Pantsu" <sugoi.sama@gmail.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] Where did encrypt and passkey options go in Bluez-3.4
+From: Dick <dm@chello.nl>
+Date: Sun, 3 Sep 2006 20:07:21 +0000 (UTC)
+Message-ID: <loom.20060903T214020-327@post.gmane.org>
+References: <loom.20060902T125209-74@post.gmane.org>
+	<1157221409.32195.0.camel@aeonflux.holtmann.net>
+	<loom.20060902T200908-292@post.gmane.org>
+	<loom.20060902T222740-106@post.gmane.org>
+	<1157319129.32195.13.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users]
+	=?utf-8?q?adding_a_SDP_attribute_HID=5FDESCRIPTOR?=
+	=?utf-8?q?=5FLIST?=
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,41 +25,57 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Marcel Holtmann <marcel <at> holtmann.org> writes:
+> what are you talking about. I have no idea and it would be better if you
+> send me an example on how to reproduce this segmentation fault.
 
-*offtopic ->*
-i had Debian unstable package of Bluez-3.1, but was forced to build
-3.4 from scratch, and now things seems to be finally working thanks to
-the undocumented (and secret?) feature of "discovto 0;"
-Why isn't this feauture mentioned on the hcid.conf manual??? It caused
-me sheer hours of pain and terror... and a lot of linux cursing.
-*<- offtopic*
+Hi Marcel,
 
+try the following patch on bluez-utils-3.4:
+--- tools/sdptool.c      2006-06-17 16:31:37.000000000 +0200
++++ tools/sdptool.c      2006-09-03 21:54:54.000000000 +0200
+@@ -2139,6 +2139,21 @@
+                0x75, 0x01,
+                0x95, 0x04,
+                0x81, 0x01,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
++               0x0, 0x0,
+                0xc0         // end tag
+        };
 
+(this patch adds 30 zero's to hid_report so it is >128)
 
-But what i would like to know is how can i encrypt my bluetooth
-communications? The encrypt option went missing - it's stated on the
-Changelog.
+and see:
+$ sdptool add keyb
+Segmentation fault
 
-On hcid.conf i can only configure the default pin... How can i specify
-a PIN for each BT device?
-Ideally, i would like to be able to add some lines, on hcid.conf, like this:
-client {
-BDAddress 11:22:33:44:55:66;
-PIN 2006;
-}
+the following patch on bluez-utils:
+$ sed -i -e 's/\(#define SDP_SEQ_PDUFORM_SIZE\) 128/\1 256/' ${S}/src/sdp.c
 
+fixes the problem for me... (increasing the PDUFORM_SIZE)
 
+So my questions are:
+- could you increase the SDP_SEQ_PDUFORM_SIZE
+- it would be nice to have some range checking, it's very confusing because the
+segfault occures in sdp_record_register and not in
+sdp_attr_add()/sdp_data_alloc()/sdp_seql_alloc()
 
-One final question, i know it's silly, but i have to be sure...
-Independently of using authentication or passkeys or not, is there any
-way a BT device (e.g. phone) can issue a command for the computer to
-send file /home/user/abc.txt to the device.
-Is there any security risk like that?
+greetings,
+Dick
 
-
-Thank you for your help.
-(it isn't easy being a linux newbie)
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
