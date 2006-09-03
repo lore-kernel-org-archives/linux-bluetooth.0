@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20060902T222740-106@post.gmane.org>
-References: <loom.20060902T125209-74@post.gmane.org>
-	<1157221409.32195.0.camel@aeonflux.holtmann.net>
-	<loom.20060902T200908-292@post.gmane.org>
-	<loom.20060902T222740-106@post.gmane.org>
-Date: Sun, 03 Sep 2006 23:32:09 +0200
-Message-Id: <1157319129.32195.13.camel@aeonflux.holtmann.net>
+In-Reply-To: <200609032015.51210.cijoml@volny.cz>
+References: <200609032015.51210.cijoml@volny.cz>
+Date: Sun, 03 Sep 2006 23:27:12 +0200
+Message-Id: <1157318832.32195.6.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] adding a SDP attribute HID_DESCRIPTOR_LIST
+Cc: bluez-users@lists.sf.net
+Subject: Re: [Bluez-users] bluez utils debian package doesn't
+	autoswith	dongle on?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,18 +22,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Dick,
+Hi Michal,
 
-> Oh boy I've found the segfault :-)
+> I upgraded debian bluez-utils package and now dongle when is plugged in is not 
+> auto up?
 > 
-> My HID descriptor is too large to fit in SDP_SEQ_PDUFORM_SIZE
-> ... I almost wouldn't dare to ask but ... 
-> Could it please be increased from 128 to something larger or equal to 168?
+> How to set up this behaviour? I think this was previously done by default.
 > 
-> It would also be nice to have some range checking ;-)
+> ii  bluez-utils                      3.1-3.1       Bluetooth tools and daemons
+> 
+> Marcel wasn't this default behaviour directly in binary?
 
-what are you talking about. I have no idea and it would be better if you
-send me an example on how to reproduce this segmentation fault.
+the bluez-utils-3.1 was not one of our best ones. The Debian guys should
+go directly for the 3.4 release and once I am done with 3.5 (will be
+really soon) they should package up that one instead sticking with an
+old one. All previous ones are known to have some glitches here and
+there.
 
 Regards
 
