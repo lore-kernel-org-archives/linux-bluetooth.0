@@ -1,20 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <44FC4E5F.1000308@evilgenius.de>
+Date: Mon, 04 Sep 2006 18:03:43 +0200
+From: Martin Karger <martin@evilgenius.de>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44FC4E5F.1000308@evilgenius.de>
-References: <44F22717.1080308@evilgenius.de>
-	<1156772287.5613.31.camel@aeonflux.holtmann.net>
-	<44F32933.90808@evilgenius.de>
-	<1156799873.5613.51.camel@aeonflux.holtmann.net>
-	<44F353E9.7080406@evilgenius.de>
-	<1156809428.5613.59.camel@aeonflux.holtmann.net>
-	<44F43AA3.3020600@evilgenius.de>
-	<1156874442.4026.22.camel@aeonflux.holtmann.net>
+References: <44F22717.1080308@evilgenius.de>	<1156772287.5613.31.camel@aeonflux.holtmann.net>	<44F32933.90808@evilgenius.de>	<1156799873.5613.51.camel@aeonflux.holtmann.net>	<44F353E9.7080406@evilgenius.de>	<1156809428.5613.59.camel@aeonflux.holtmann.net>	<44F43AA3.3020600@evilgenius.de>	<1156874442.4026.22.camel@aeonflux.holtmann.net>
 	<Pine.LNX.4.63.0608291840350.30948@redbean.intranet.gw-instruments.de>
-	<44FC4E5F.1000308@evilgenius.de>
-Date: Mon, 04 Sep 2006 20:06:09 +0200
-Message-Id: <1157393169.32195.86.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+In-Reply-To: <Pine.LNX.4.63.0608291840350.30948@redbean.intranet.gw-instruments.de>
 Subject: Re: [Bluez-devel] flexible bt-dongle and bccmd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -29,30 +21,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Martin,
-
-> >> and remember that it is dangerous. I already killed a couple of my
-> >> dongles and I only use a Casira development kit from CSR when playing
-> >> with this stuff. In the cases I screwed up, I can reset the module and
-> >> get it back working. Most times at least. I already killed one module
-> >> some time ago.
-> > 
-> > You normaly can recover from this by doing a full chip erase and 
-> > reprogramming from scratch. However, any module specific PS settings will 
-> > be lost if you don't have a "backup".......
+Peter Wippich wrote:
+> Hi Marcel, 
 > 
-> is casira more than some hardware which consists of some
-> voltage-converters, and software mostly equivalent to several bluez tools?
+> On Tue, 29 Aug 2006, Marcel Holtmann wrote:
+> 
+>> and remember that it is dangerous. I already killed a couple of my
+>> dongles and I only use a Casira development kit from CSR when playing
+>> with this stuff. In the cases I screwed up, I can reset the module and
+>> get it back working. Most times at least. I already killed one module
+>> some time ago.
+> 
+> You normaly can recover from this by doing a full chip erase and 
+> reprogramming from scratch. However, any module specific PS settings will 
+> be lost if you don't have a "backup".......
 
-the Casira gives you access to the SPI interface of the BlueCore chip
-and this lets you do some of the nasty stuff you basically only need in
-pre-production.
+is casira more than some hardware which consists of some
+voltage-converters, and software mostly equivalent to several bluez tools?
 
-Regards
-
-Marcel
-
-
+bye
+martin
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
