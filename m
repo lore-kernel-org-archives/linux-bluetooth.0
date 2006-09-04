@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Mon, 4 Sep 2006 15:11:59 +0200
-From: Filippo Giunchedi <filippo@esaurito.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20060904131159.GC15023@esaurito.net>
+To: bluez-devel@lists.sourceforge.net
+From: Hentai Pantsu <sugoi.sama@gmail.com>
+Date: Mon, 4 Sep 2006 02:02:13 +0000 (UTC)
+Message-ID: <loom.20060904T035200-810@post.gmane.org>
 References: <7f52ac20609020846t3084fd6h441e2332029f9972@mail.gmail.com>
 	<1157319053.32195.11.camel@aeonflux.holtmann.net>
-	<loom.20060904T035200-810@post.gmane.org>
-MIME-Version: 1.0
-In-Reply-To: <loom.20060904T035200-810@post.gmane.org>
-Subject: Re: [Bluez-devel] hid2hic among others fails to build?in
-	bluez-utils-3.4
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel]
+	=?utf-8?q?hid2hic_among_others_fails_to_build=09in_?=
+	=?utf-8?q?bluez-utils-3=2E4?=
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,75 +18,50 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1164835269=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-
---===============1164835269==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="eJnRUKwClWJh1Khz"
-Content-Disposition: inline
-
-
---eJnRUKwClWJh1Khz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Mon, Sep 04, 2006 at 02:02:13AM +0000, Hentai Pantsu wrote:
-> Tell me about it. It's Debian *unstable*, it is supposed to have the latest
-> packages...
-> I'll msg them...
-
-thanks for your input, this is debian bug 385857, see
-http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=385857
-
-filippo
---
-Filippo Giunchedi - http://esaurito.net
-PGP key: 0x6B79D401
-random quote follows:
-
-"UNIX was not designed to stop its users from doing stupid things, as that
-would also stop them from doing clever things."
--- Doug Gwyn
-
---eJnRUKwClWJh1Khz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-
-iD8DBQFE/CYfABzeamt51AERAvs+AKC+eJH27MrzsdsLHMYoLjrL30SjiACZAe3C
-xmU8/hh1iJwi7Rm690RDuhg=
-=yG+Q
------END PGP SIGNATURE-----
-
---eJnRUKwClWJh1Khz--
+> > 
+> > When typing "make all | grep hid2" it doesn't print anything.
+> > 
+> > The bluez-utils tarball compiles and installs, among others, hidd.
+> > 
+> > 
+> > What's wrong with this? :(
+> 
+> no idea. It works fine for me.
 
 
---===============1164835269==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+shh... i finally solved the problem after some head banging... There is an order
+that needs to be followed:
+1) install bluez-libs
+2) install libopenobex1-dev, libusb-dev    # obex depends on bluez-libs
+3) install bluez-utils                     # utils depends on obex
+...
+
+
+> 
+> > I'm using Debian unstable (their package is version 3.1, that's why i
+> > have to install bluez from scratch)
+> 
+> Tell them to update their packages. The 3.1 version has too many bugs
+> anyway.
+
+
+Tell me about it. It's Debian *unstable*, it is supposed to have the latest
+packages...
+I'll msg them...
+
+Problem solved. Thanks.
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============1164835269==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1164835269==--
