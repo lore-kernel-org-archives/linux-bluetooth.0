@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <7f52ac20609040638i2c34568fu7d7820350d714d36@mail.gmail.com>
-References: <7f52ac20609040638i2c34568fu7d7820350d714d36@mail.gmail.com>
-Date: Mon, 04 Sep 2006 19:37:49 +0200
-Message-Id: <1157391469.32195.83.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Nasty bug with sdp on /etc/default/bluetooth ?
+Message-ID: <7f52ac20609040638i2c34568fu7d7820350d714d36@mail.gmail.com>
+Date: Mon, 4 Sep 2006 14:38:49 +0100
+From: "Hentai Pantsu" <sugoi.sama@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] Nasty bug with sdp on /etc/default/bluetooth ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,36 +18,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Hentai,
+A couple of lines on my /etc/default/bluetooth file
 
-> A couple of lines on my /etc/default/bluetooth file
-> 
-> SDPD_ENABLE=true
-> SDPTOOL_OPTIONS="add --channel=10 OPUSH"
-> 
-> 
-> The problem is that i can't send files from the mobile to the
-> computer, when obexserver is listening, unless i explicitly do this:
-> sdptool add --channel=10 OPUSH
-> 
-> However, i could send files from the mobile if i had kbluetooth
-> running, and it seemed to used channel 3. I suspect kbluetooth created
-> that channel automatically.
-> 
-> Can someone confirm if this is a bug or not?
-> Is there any way to list registered channels? I played with sdptool
-> but couldn't get anything from it (most of the times it says no route
-> to host).
-
-that is a bug of obexserver. It should register the appropriate SDP
-service record by itself. The "sdptool add ..." is only for debugging
-and development purpose.
-
-Regards
-
-Marcel
+SDPD_ENABLE=true
+SDPTOOL_OPTIONS="add --channel=10 OPUSH"
 
 
+The problem is that i can't send files from the mobile to the
+computer, when obexserver is listening, unless i explicitly do this:
+sdptool add --channel=10 OPUSH
+
+However, i could send files from the mobile if i had kbluetooth
+running, and it seemed to used channel 3. I suspect kbluetooth created
+that channel automatically.
+
+Can someone confirm if this is a bug or not?
+Is there any way to list registered channels? I played with sdptool
+but couldn't get anything from it (most of the times it says no route
+to host).
+
+
+
+My BT adventure sure as been interesting... :-| What other challenges
+will i encounter in the future?
+If this is a PITA from a user's point of view, i can only imagine the
+nightmares the devs must have faced :-p
+
+
+Thanks
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
