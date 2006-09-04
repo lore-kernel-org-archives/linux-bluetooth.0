@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44FC4CD8.1070304@evilgenius.de>
+In-Reply-To: <44FC4E5F.1000308@evilgenius.de>
 References: <44F22717.1080308@evilgenius.de>
 	<1156772287.5613.31.camel@aeonflux.holtmann.net>
 	<44F32933.90808@evilgenius.de>
@@ -10,9 +10,10 @@ References: <44F22717.1080308@evilgenius.de>
 	<1156809428.5613.59.camel@aeonflux.holtmann.net>
 	<44F43AA3.3020600@evilgenius.de>
 	<1156874442.4026.22.camel@aeonflux.holtmann.net>
-	<44FC4CD8.1070304@evilgenius.de>
-Date: Mon, 04 Sep 2006 20:08:16 +0200
-Message-Id: <1157393296.32195.90.camel@aeonflux.holtmann.net>
+	<Pine.LNX.4.63.0608291840350.30948@redbean.intranet.gw-instruments.de>
+	<44FC4E5F.1000308@evilgenius.de>
+Date: Mon, 04 Sep 2006 20:06:09 +0200
+Message-Id: <1157393169.32195.86.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] flexible bt-dongle and bccmd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -30,22 +31,22 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Martin,
 
-> >> right now i am having no idea how to add a new pskey. modifying and
-> >> delting works for me, but i did not yet found out how to create a new
-> >> one. it would be great if i could add a pskey with features to ps storage.
+> >> and remember that it is dangerous. I already killed a couple of my
+> >> dongles and I only use a Casira development kit from CSR when playing
+> >> with this stuff. In the cases I screwed up, I can reset the module and
+> >> get it back working. Most times at least. I already killed one module
+> >> some time ago.
 > > 
-> > No need for that. You can simply set it. However you must select the
-> > correct store (default will be volatile memory). Can't remember that
-> > from memory. Look it up in the documentation.
+> > You normaly can recover from this by doing a full chip erase and 
+> > reprogramming from scratch. However, any module specific PS settings will 
+> > be lost if you don't have a "backup".......
 > 
-> ok, works now. but i do not yet understand the syntax for setting pskey
-> "features".
-> btw, the firmware of the bt-6030 does not care about a "remver" pskey.
-> the levelone dongle does.
+> is casira more than some hardware which consists of some
+> voltage-converters, and software mostly equivalent to several bluez tools?
 
-every value in the PS keys is uint16 and it has a weird storage layout
-for uint32. You really need the documentation or a friendly guy from CSR
-to twist your mind around it. I got it wrong multiple times.
+the Casira gives you access to the SPI interface of the BlueCore chip
+and this lets you do some of the nasty stuff you basically only need in
+pre-production.
 
 Regards
 
