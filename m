@@ -1,13 +1,20 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5f30e2610609041513o8a2709bifd465e61e946261@mail.gmail.com>
-Date: Mon, 4 Sep 2006 17:13:17 -0500
-From: "Jeff Wilson" <jazzbotley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1157318936.32195.9.camel@aeonflux.holtmann.net>
-MIME-Version: 1.0
-References: <5f30e2610609021024j205f6a51id3d4b3c0f9129a3e@mail.gmail.com>
-	<1157318936.32195.9.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] off-by-one bugfix for sdp_data_alloc
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <44FC4CD8.1070304@evilgenius.de>
+References: <44F22717.1080308@evilgenius.de>
+	<1156772287.5613.31.camel@aeonflux.holtmann.net>
+	<44F32933.90808@evilgenius.de>
+	<1156799873.5613.51.camel@aeonflux.holtmann.net>
+	<44F353E9.7080406@evilgenius.de>
+	<1156809428.5613.59.camel@aeonflux.holtmann.net>
+	<44F43AA3.3020600@evilgenius.de>
+	<1156874442.4026.22.camel@aeonflux.holtmann.net>
+	<44FC4CD8.1070304@evilgenius.de>
+Date: Mon, 04 Sep 2006 20:08:16 +0200
+Message-Id: <1157393296.32195.90.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] flexible bt-dongle and bccmd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,62 +28,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Oh, I get it.  I was looking at where it was published
-(sdp_set_info_attr), but now I see where it's queried (from `sdptool
-browse`).  So maybe this patch is more appropriate.
+Hi Martin,
 
-     Regards,
-      Jeff
+> >> right now i am having no idea how to add a new pskey. modifying and
+> >> delting works for me, but i did not yet found out how to create a new
+> >> one. it would be great if i could add a pskey with features to ps storage.
+> > 
+> > No need for that. You can simply set it. However you must select the
+> > correct store (default will be volatile memory). Can't remember that
+> > from memory. Look it up in the documentation.
+> 
+> ok, works now. but i do not yet understand the syntax for setting pskey
+> "features".
+> btw, the firmware of the bt-6030 does not care about a "remver" pskey.
+> the levelone dongle does.
 
+every value in the PS keys is uint16 and it has a weird storage layout
+for uint32. You really need the documentation or a friendly guy from CSR
+to twist your mind around it. I got it wrong multiple times.
 
---- bluez-libs-3.4/src/sdp.c    2006-08-24 20:16:12.000000000 -0500
-+++ bluez-libs-3.4/src/sdp.c.mod        2006-09-04 17:07:56.000000000 -0500
-@@ -1148,13 +1148,13 @@
- {
-        sdp_data_t *d = sdp_data_get(rec, SDP_ATTR_SVCNAME_PRIMARY);
-        if (d)
--               printf("Service Name: %s\n", d->val.str);
-+               printf("Service Name: %.*s\n", d->unitSize, d->val.str);
-        d = sdp_data_get(rec, SDP_ATTR_SVCDESC_PRIMARY);
-        if (d)
--               printf("Service Description: %s\n", d->val.str);
-+               printf("Service Description: %.*s\n", d->unitSize, d->val.str);
-        d = sdp_data_get(rec, SDP_ATTR_PROVNAME_PRIMARY);
-        if (d)
--               printf("Service Provider: %s\n", d->val.str);
-+               printf("Service Provider: %.*s\n", d->unitSize, d->val.str);
- }
+Regards
 
- #ifdef SDP_DEBUG
+Marcel
 
 
-On 9/3/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jeff,
->
-> > The following patch against bluez-libs-3.4 fixes a problem where the
-> > last character of a null-terminated string is lost.  Adding the +1
-> > accounts for and preserves the null terminator.
->
-> the SDP strings are not NULL terminated strings. They a prefixed with a
-> length value. So what is the reason for storing the NULL terminator in
-> the records? Show me an example what actually goes wrong here.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
