@@ -1,17 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20060903T214020-327@post.gmane.org>
-References: <loom.20060902T125209-74@post.gmane.org>
-	<1157221409.32195.0.camel@aeonflux.holtmann.net>
-	<loom.20060902T200908-292@post.gmane.org>
-	<loom.20060902T222740-106@post.gmane.org>
-	<1157319129.32195.13.camel@aeonflux.holtmann.net>
-	<loom.20060903T214020-327@post.gmane.org>
-Date: Tue, 05 Sep 2006 12:16:54 +0200
-Message-Id: <1157451414.4206.6.camel@localhost>
+In-Reply-To: <7f52ac20609031839j72f98969v420375ea7f183b88@mail.gmail.com>
+References: <7f52ac20609031839j72f98969v420375ea7f183b88@mail.gmail.com>
+Date: Mon, 04 Sep 2006 12:35:21 +0200
+Message-Id: <1157366121.32195.39.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] adding a SDP attribute HID_DESCRIPTOR_LIST
+Subject: Re: [Bluez-users] Where did encrypt and passkey options go
+	in	Bluez-3.4
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -25,62 +21,53 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Dick,
+Hi Hentai,
 
-> > what are you talking about. I have no idea and it would be better if you
-> > send me an example on how to reproduce this segmentation fault.
-> 
-> try the following patch on bluez-utils-3.4:
-> --- tools/sdptool.c      2006-06-17 16:31:37.000000000 +0200
-> +++ tools/sdptool.c      2006-09-03 21:54:54.000000000 +0200
-> @@ -2139,6 +2139,21 @@
->                 0x75, 0x01,
->                 0x95, 0x04,
->                 0x81, 0x01,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
-> +               0x0, 0x0,
->                 0xc0         // end tag
->         };
-> 
-> (this patch adds 30 zero's to hid_report so it is >128)
+> *offtopic ->*
+> i had Debian unstable package of Bluez-3.1, but was forced to build
+> 3.4 from scratch, and now things seems to be finally working thanks to
+> the undocumented (and secret?) feature of "discovto 0;"
+> Why isn't this feauture mentioned on the hcid.conf manual??? It caused
+> me sheer hours of pain and terror... and a lot of linux cursing.
+> *<- offtopic*
 
-the used buffer is from the stack and we end up overwriting the stack.
+it is basically a missing patch for the manual page. Feel free to
+provide one or kick the original author of the patch ;)
 
-> and see:
-> $ sdptool add keyb
-> Segmentation fault
-> 
-> the following patch on bluez-utils:
-> $ sed -i -e 's/\(#define SDP_SEQ_PDUFORM_SIZE\) 128/\1 256/' ${S}/src/sdp.c
-> 
-> fixes the problem for me... (increasing the PDUFORM_SIZE)
-> 
-> So my questions are:
-> - could you increase the SDP_SEQ_PDUFORM_SIZE
+> But what i would like to know is how can i encrypt my bluetooth
+> communications? The encrypt option went missing - it's stated on the
+> Changelog.
 
-I removed the constant completely and increased the buffer to 256 byte
-for now.
+Don't confuse this. These options where security mode 3 related and we
+actually never advised anybody to use this mode. So it has been finally
+removed from the config file. The daemons can set the authentication and
+encryption for their sockets by themself.
 
-> - it would be nice to have some range checking, it's very confusing because the
-> segfault occures in sdp_record_register and not in
-> sdp_attr_add()/sdp_data_alloc()/sdp_seql_alloc()
+> On hcid.conf i can only configure the default pin... How can i specify
+> a PIN for each BT device?
 
-The problem is actually in sdp_append_to_pdu() and this needs fixing.
-Feel free to propose a patch. And it would be better to not use stack
-memory for this.
+The passkey option is for incoming connections. This is not a default
+passkey for outgoing connection. We don't have these.
+
+> Ideally, i would like to be able to add some lines, on hcid.conf, like this:
+> client {
+> BDAddress 11:22:33:44:55:66;
+> PIN 2006;
+> }
+
+Aehm. No. Period. You however can put them into the pincodes file. And
+this is a hidden feature that should stay hidden. Use a passkey agent to
+enter your PIN codes. Look at bluez-gnome for a nice GTK+ based one or
+simply write your own.
+
+> One final question, i know it's silly, but i have to be sure...
+> Independently of using authentication or passkeys or not, is there any
+> way a BT device (e.g. phone) can issue a command for the computer to
+> send file /home/user/abc.txt to the device.
+> Is there any security risk like that?
+
+No. There is no such thing that can trigger a remote action. However you
+can always implement such stuff.
 
 Regards
 
