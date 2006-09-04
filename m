@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <44FC4CD8.1070304@evilgenius.de>
-Date: Mon, 04 Sep 2006 17:57:12 +0200
-From: Martin Karger <martin@evilgenius.de>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44F22717.1080308@evilgenius.de>	<1156772287.5613.31.camel@aeonflux.holtmann.net>	<44F32933.90808@evilgenius.de>	<1156799873.5613.51.camel@aeonflux.holtmann.net>	<44F353E9.7080406@evilgenius.de>	<1156809428.5613.59.camel@aeonflux.holtmann.net>	<44F43AA3.3020600@evilgenius.de>
-	<1156874442.4026.22.camel@aeonflux.holtmann.net>
-In-Reply-To: <1156874442.4026.22.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] flexible bt-dongle and bccmd
+In-Reply-To: <7f52ac20609040638i2c34568fu7d7820350d714d36@mail.gmail.com>
+References: <7f52ac20609040638i2c34568fu7d7820350d714d36@mail.gmail.com>
+Date: Mon, 04 Sep 2006 19:37:49 +0200
+Message-Id: <1157391469.32195.83.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Nasty bug with sdp on /etc/default/bluetooth ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,24 +20,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
+Hi Hentai,
 
+> A couple of lines on my /etc/default/bluetooth file
 > 
->> right now i am having no idea how to add a new pskey. modifying and
->> delting works for me, but i did not yet found out how to create a new
->> one. it would be great if i could add a pskey with features to ps storage.
+> SDPD_ENABLE=true
+> SDPTOOL_OPTIONS="add --channel=10 OPUSH"
 > 
-> No need for that. You can simply set it. However you must select the
-> correct store (default will be volatile memory). Can't remember that
-> from memory. Look it up in the documentation.
+> 
+> The problem is that i can't send files from the mobile to the
+> computer, when obexserver is listening, unless i explicitly do this:
+> sdptool add --channel=10 OPUSH
+> 
+> However, i could send files from the mobile if i had kbluetooth
+> running, and it seemed to used channel 3. I suspect kbluetooth created
+> that channel automatically.
+> 
+> Can someone confirm if this is a bug or not?
+> Is there any way to list registered channels? I played with sdptool
+> but couldn't get anything from it (most of the times it says no route
+> to host).
 
-ok, works now. but i do not yet understand the syntax for setting pskey
-"features".
-btw, the firmware of the bt-6030 does not care about a "remver" pskey.
-the levelone dongle does.
+that is a bug of obexserver. It should register the appropriate SDP
+service record by itself. The "sdptool add ..." is only for debugging
+and development purpose.
 
-bye
-martin
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
