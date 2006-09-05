@@ -1,12 +1,23 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Message-Id: <44FE0B6A.000001.04824@nhn528>
-From: =?euc-kr?B?IsDMsaTB+CI=?= <fidelis98@naver.com>
-Date: Wed, 6 Sep 2006 08:42:34 +0900 (KST)
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Bluez HID support Think Outside Keyboard????
-Reply-To: =?euc-kr?B?IsDMsaTB+CI=?= <fidelis98@naver.com>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20060905203814.GA4515@suse.de>
+References: <20060903124043.2028.48247.reportbug@forza>
+	<1157367160.32195.54.camel@aeonflux.holtmann.net>
+	<20060904100025.GA17058@esaurito.net>
+	<1157371912.32195.69.camel@aeonflux.holtmann.net>
+	<20060905103207.GC30274@esaurito.net>
+	<1157454451.4206.17.camel@localhost>
+	<20060905164657.GA16417@suse.de> <1157476399.5963.4.camel@localhost>
+	<20060905181547.GA17557@suse.de> <1157482774.5963.27.camel@localhost>
+	<20060905203814.GA4515@suse.de>
+Date: Tue, 05 Sep 2006 23:08:31 +0200
+Message-Id: <1157490511.5963.53.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel]
+	Bug#385857:	[Pkg-bluetooth-maintainers]	Bug#385857: please
+	upgrade	to	bluez-utils and	bluez-libs 3.4
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,138 +26,42 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0899864305=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Stefan,
 
---===============0899864305==
-Content-Type: Multipart/Alternative;
-	boundary="------------Boundary-00=_YI85ULUXFQQMYJ0CCJD0"
+> > Let me put it this way. The 3.0 announcement came with a clear warning
+> > that the PIN helper is dead and we now need a default passkey agent for
+> > every desktop. It was one reason why I jumped to next major number. I
+> > don't do this without a serious reason. I provided an example of a
+> > passkey agent and the Maemo guys implemented a passkey agent for their
+> > platform, but nobody else seemed to care.
+> 
+> In the KDE case, i think that the kdebluetooth code is pretty much without
+> an active maintainer. But i have a promising new talent at hand that will
+> start fixing and bring it up to date :-)
 
+sounds great. Please tell him that he should use the BlueZ D-Bus API
+only. So a linking against libbluetooth is not an option anymore. This
+will be the way we will go for the GNOME stuff, too.
 
---------------Boundary-00=_YI85ULUXFQQMYJ0CCJD0
-Content-Type: Text/Plain;
-  charset="euc-kr"
-Content-Transfer-Encoding: base64
+Since I will travel tomorrow to Nuremberg for the Linux-Kongress, you
+might wanna send him to my talk ;)
 
-IEhpLAoKSSdtIGVuZ2luZWVyIGluIGtvcmVhLCBzbyBteSBlbmdsaXNoIGlzIG5vdCBzbyBnb29k
-Li5UXlQKCkkgZXh0ZW5kIG15IHNpbmNlcmUgYXBvbG9nbyB0byBhbGwgYWJvdXQgbXkgZW5nbGlz
-aC4KCgpNeSBxdWVzdGlvbiBpcywKCkhhdmUgeW91IGV2ZXIgdXNlZCBUaGluay1PdXRzaWRlIEJs
-dWV0b290aCBrZXlib2FyZCB3aXRoIEJsdWVaPyAKSSBjb25uZWN0IHRvIFRoaW5rLU91dHNpZGUg
-QlQgS2V5Ym9hcmQgYW5kIHJ1biBzZXJ2ZXIuIAojIGhpZGQgLS1zZWFyY2gKICAgIENvbm5lY3Rp
-bmcgdG8gZGV2aWNlIDAwOjAzOkM5OkQzOjc5OjI1IAojIGhpZGQKMDA6MDM6Qzk6RDM6Nzk6MjUg
-SElEIEJvb3QgRGV2aWNlIFswYTVjOjIwMDFdIGNvbm5lY3RlZCBbYm9vdC1wcm90b2NvbF0gCiMg
-aGlkZCAtbiAtLXNlcnZlcgpoaWRkWzExMThdOiBCbHVldG9vdGggSElEIGRhZW1vbiAKQWZ0ZXIg
-cnVuICAiaGlkZCAtbiAtLXNlcnZlciAiLCB3YWl0IHBvbGxpbmcgZGF0YSBmcm9tIGRldmljZS4g
-CkJ1dCwgRGF0YSBpcyBub3RoaW5nLiAKSG93IGFib3V0IHlvdXIgY29ubmVjdGlvbiB0byBUaGlu
-ay1PdXRzaWRlIEJUIEtleWJvYXJkPyAKTGlrZSBtZT8gb3Igbm90ID8gCkhvdyBjYW4gSSBzb2x2
-ZSB0aGlzIHByb2JsZW0/IAogClRoYW5rcyBmb3IgcmVhZGluZyBteSBlbWFpbCBkZXNwaXRlIHlv
-dXIgYnVzeSBidXNpbmVzcy4uLi4oXl4=
+Regards
 
---------------Boundary-00=_YI85ULUXFQQMYJ0CCJD0
-Content-Type: Text/HTML;
-  charset="euc-kr"
-Content-Transfer-Encoding: base64
-
-PGh0bWw+PGhlYWQ+PHN0eWxlPlAge21hcmdpbi10b3A6MnB4O21hcmdpbi1ib3R0b206MnB4O308
-L3N0eWxlPjwvaGVhZD48Ym9keT48ZGl2IHN0eWxlPSJiYWNrZ3JvdW5kOjtmb250LXNpemU6MTBw
-dDsgZm9udC1mYW1pbHk6Z3VsaW07Ij48RElWPg0KPERJViBjbGFzcz1PdXRsb29rTWVzc2FnZUhl
-YWRlciBsYW5nPWtvIGRpcj1sdHIgYWxpZ249bGVmdD48Rk9OVCBmYWNlPUFyaWFsIGNvbG9yPSMw
-MDAwODAgc2l6ZT0yPkhpLDxCUj48QlI+SSdtIGVuZ2luZWVyIGluIGtvcmVhLCBzbyBteSBlbmds
-aXNoIGlzIG5vdCBzbyBnb29kLi5UXlQ8QlI+PEJSPkkgZXh0ZW5kIG15IHNpbmNlcmUgYXBvbG9n
-byB0byBhbGwgYWJvdXQgbXkgZW5nbGlzaC48QlI+PEJSPjxCUj5NeSBxdWVzdGlvbiBpcyw8QlI+
-PEJSPkhhdmUgeW91IGV2ZXIgdXNlZCBUaGluay1PdXRzaWRlIEJsdWV0b290aCBrZXlib2FyZCZu
-YnNwO3dpdGggQmx1ZVo/PC9GT05UPjwvRElWPjwvRElWPg0KPFA+PEZPTlQgZmFjZT1BcmlhbCBj
-b2xvcj0jMDAwMDgwIHNpemU9Mj5JIGNvbm5lY3QgdG8gVGhpbmstT3V0c2lkZSBCVCBLZXlib2Fy
-ZCBhbmQgcnVuIHNlcnZlci48L0ZPTlQ+PC9QPg0KPFA+PEZPTlQgZmFjZT1BcmlhbCBjb2xvcj0j
-MDAwMDgwIHNpemU9Mj4jIGhpZGQgLS1zZWFyY2g8QlI+Jm5ic3A7Jm5ic3A7Jm5ic3A7IENvbm5l
-Y3RpbmcgdG8gZGV2aWNlIDAwOjAzOkM5OkQzOjc5OjI1PC9GT05UPjwvUD4NCjxQPjxGT05UIGZh
-Y2U9QXJpYWwgY29sb3I9IzAwMDA4MCBzaXplPTI+IyBoaWRkPEJSPjAwOjAzOkM5OkQzOjc5OjI1
-IEhJRCBCb290IERldmljZSBbMGE1YzoyMDAxXSBjb25uZWN0ZWQgW2Jvb3QtcHJvdG9jb2xdPC9G
-T05UPjwvUD4NCjxQPjxGT05UIGZhY2U9QXJpYWwgY29sb3I9IzAwMDA4MCBzaXplPTI+IyBoaWRk
-IC1uIC0tc2VydmVyPEJSPmhpZGRbMTExOF06IEJsdWV0b290aCBISUQgZGFlbW9uPC9GT05UPjwv
-UD4NCjxQPjxGT05UIGZhY2U9QXJpYWwgY29sb3I9IzAwMDA4MCBzaXplPTI+QWZ0ZXIgcnVuJm5i
-c3A7ICJoaWRkIC1uIC0tc2VydmVyICIsIHdhaXQgcG9sbGluZyBkYXRhIGZyb20gZGV2aWNlLjwv
-Rk9OVD48L1A+DQo8UD48Rk9OVCBmYWNlPUFyaWFsIGNvbG9yPSMwMDAwODAgc2l6ZT0yPkJ1dCwg
-RGF0YSBpcyBub3RoaW5nLjwvRk9OVD48L1A+DQo8UD48Rk9OVCBmYWNlPUFyaWFsIGNvbG9yPSMw
-MDAwODAgc2l6ZT0yPkhvdyBhYm91dCB5b3VyIGNvbm5lY3Rpb24gdG8gVGhpbmstT3V0c2lkZSBC
-VCBLZXlib2FyZD8gPEJSPkxpa2UgbWU/IG9yIG5vdCA/PC9GT05UPjwvUD4NCjxQPjxGT05UIGZh
-Y2U9QXJpYWwgY29sb3I9IzAwMDA4MCBzaXplPTI+SG93IGNhbiBJIHNvbHZlIHRoaXMgcHJvYmxl
-bT88L0ZPTlQ+PC9QPg0KPFA+PEZPTlQgZmFjZT1BcmlhbCBjb2xvcj0jMDAwMDgwIHNpemU9Mj48
-L0ZPTlQ+Jm5ic3A7PC9QPg0KPFA+PEZPTlQgZmFjZT1BcmlhbCBjb2xvcj0jMDAwMDgwIHNpemU9
-Mj5UaGFua3MgZm9yIHJlYWRpbmcgbXkgZW1haWwgZGVzcGl0ZSB5b3VyIGJ1c3kgYnVzaW5lc3Mu
-Li4uKF5ePC9GT05UPjwvUD48L2Rpdj48L2JvZHk+PC9odG1sPgo8IS0tc3RhcnRfc2lnbmF0dXJl
-LS0+PFA+Jm5ic3A7PEJSPjwvUD48dGFibGUgY2VsbHNwYWNpbmc9MCBjZWxscGFkZGluZz0wIGJv
-cmRlcj0wIHdpZHRoPTEwMCU+Cjx0cj48dGQ+Cjx0YWJsZSBjZWxsc3BhY2luZz0wIGNlbGxwYWRk
-aW5nPTAgd2lkdGg9MjgwIGFsaWduPXJpZ2h0IGJvcmRlcj0wPgo8dGJvZHk+Cjx0cj48dGQgYmFj
-a2dyb3VuZD1odHRwOi8vY2FmZWltZ3MubmF2ZXIuY29tL2ltZy9jb2xvcnNldC93aGl0ZS9iZ19k
-b3QwMS5naWYgY29sc3Bhbj0yIGhlaWdodD0xPjwvdGQ+PC90cj4KPHRyPjx0ZCBjb2xzcGFuPTIg
-aGVpZ2h0PTg+PC90ZD48L3RyPgo8dHI+PHRkIHZhbGlnbj10b3AgYWxpZ249cmlnaHQ+PGEgaHJl
-Zj0iaHR0cDovL2Jsb2cubmF2ZXIuY29tL2ZpZGVsaXM5OC5kbyIgdGFyZ2V0PV9ibGFuaz48Yj6+
-yLPnx8+8vL/kILi2wLvAzMDlwNS0z7TZLi4uXl48L2I+PC9hPiA8YnI+PGltZyBoZWlnaHQ9NSB3
-aWR0aD0wPjxicj48YSBocmVmPSJodHRwOi8vYmxvZy5uYXZlci5jb20vZmlkZWxpczk4LmRvIiBj
-bGFzcz1jIHRhcmdldD1fYmxhbms+seLFuLChIMDWtMIguLbAu8DMtvO0wiDIqMfHuKYgv+6/tcfP
-sO0gwNa9wLTPtNkuDQq4ucDMtekgs+63r7/AvLy/6C4uLqS+pL4NCnd3dy5ndWl0YXItdG93bi5u
-ZXQ8L2E+PC90ZD4KPHRkIHZhbGlnbj10b3AgYWxpZ249cmlnaHQgd2lkdGg9NzA+PGEgaHJlZj0i
-aHR0cDovL2Jsb2cubmF2ZXIuY29tL2ZpZGVsaXM5OC5kbyIgdGFyZ2V0PV9ibGFuaz48aW1nIGhl
-aWdodD03MCBzcmM9Imh0dHA6Ly9ibG9nZmlsZXMubmF2ZXIubmV0L2RhdGExNC8yMDA2LzMvMTIv
-MjM0L2ZmZnNhc2FhYS1maWRlbGlzOTguanBnIiB3aWR0aD01NSBib3JkZXI9MD48L2E+PC90ZD48
-L3RyPgo8L3Rib2R5Pgo8L3RhYmxlPgo8L3RkPjwvdHI+CjwvdGFibGU+Cgo8IS0tc3RhcnRfc2ln
-bmF0dXJlLS0+PFA+Jm5ic3A7PEJSPjwvUD48YSBocmVmPW1haWx0bzpmaWRlbGlzOThAbmF2ZXIu
-Y29tPjxpbWcgc3JjPSJodHRwOi8vbmFtZXRhZy5uYXZlci5jb20vMDU5NmRiTmFaWU5LbGRRbllz
-IiBib3JkZXI9MCBhbGlnbj1hYnNtaWRkbGU+PC9hPjwhLS1uYXZlcm1haWwuZm9vdGVyLnN0YXJ0
-LS0+DQo8c3R5bGUgdHlwZT10ZXh0L2Nzcz4NCmEge2NvbG9yOiAjNEY0RjMwfSwgYTpob3ZlciB7
-Y29sb3I6ICM0REE1MDB9DQppbWcge2JvcmRlcjogbm9uZTt9DQo8L3N0eWxlPg0KDQo8IS0tIFRB
-QkxFIC0tPg0KPHRhYmxlIHdpZHRoPTUzMCBoZWlnaHQ9OTMgYm9yZGVyPTAgY2VsbHBhZGRpbmc9
-MCBjZWxsc3BhY2luZz0wPg0KPHRyPjx0ZCBjb2xzcGFuPTMgaGVpZ2h0PTI1PjwvdGQ+PC90cj4N
-Cjx0cj48dGQgY29sc3Bhbj0zIGhlaWdodD0xIGJhY2tncm91bmQ9aHR0cDovL3N0YXRpYy5uYXZl
-ci5jb20vY29tbW9uL2RvdC9kb3QzLmdpZj48L3RkPjwvdHI+DQoNCjwhLS0gQ29udGVudHNab25l
-IC0tPg0KPHRyPjx0ZCB3aWR0aD00MTQgaGVpZ2h0PTM3IHN0eWxlPSdwYWRkaW5nOiA1IDAgMCAw
-O2ZvbnQtc2l6ZTogMTJweDsgZm9udC1mYW1pbHk6ILG8uLI7IGZvbnQtd2VpZ2h0OiBub3JtYWw7
-IGxldHRlci1zcGFjaW5nOiAtMXB4Jz48YSBocmVmPWh0dHA6Ly9oYXBweWJlYW4ubmF2ZXIuY29t
-L21haW4vaG9tZS5qc3AgdGFyZ2V0PV9ibGFuaz48aW1nIGJvcmRlcj0wIHNyYz0iaHR0cDovL3N0
-YXRpYy5uYXZlci5jb20vbWFpbDQvaGFwcHliZWFuX2Zvb3Rlci5naWYiIHdpZHRoPTI5IGhlaWdo
-dD0yOSBhbGlnbj1hYnNtaWRkbGUgc3R5bGU9J21hcmdpbjogMCA1IDAgMCc+PC9hPjxhIGhyZWY9
-aHR0cDovL2hhcHB5YmVhbi5uYXZlci5jb20vbWFpbi9ob21lLmpzcCB0YXJnZXQ9X2JsYW5rIHN0
-eWxlPSdmb250LXNpemU6IDEycHg7IGZvbnQtZmFtaWx5OiC1uL/yOyBmb250LXdlaWdodDogYm9s
-ZDsgbGV0dGVyLXNwYWNpbmc6IC0xcHg7IGNvbG9yOiAjNDU4RTAxOyB0ZXh0LWRlY29yYXRpb246
-IG5vbmUnPrv1t86/7iCx4rrOILmuyK3AxyC+vr7RLCDH2MfHuvM8L2E+PC90ZD4NCjwhLS0gLy9D
-b250ZW50c1pvbmUgLS0+DQoNCjx0ZCB3aWR0aD0yMD48L3RkPjx0ZCB3aWR0aD05Nj48YSBocmVm
-PWh0dHA6Ly93d3cubmF2ZXIuY29tLyB0YXJnZXQ9X2JsYW5rPjxpbWcgYm9yZGVyPTAgc3JjPSJo
-dHRwOi8vc3RhdGljLm5hdmVyLmNvbS9uZXdfbWFpbC9mb290ZXIvbG9nby5naWYiIHdpZHRoPTk2
-IGhlaWdodD0yMyBhbGlnbj1hYnNtaWRkbGUgc3R5bGU9J21hcmdpbjogLTEgMCAwIDAnPjwvYT48
-L3RkPjwvdHI+DQo8dHI+PHRkIGNvbHNwYW49MyBoZWlnaHQ9MzA+PC90ZD48L3RyPg0KPC90YWJs
-ZT4NCjwhLS0gLy9UQUJMRSAtLT4NCjwhLS1uYXZlcm1haWwuZm9vdGVyLmVuZC0tPg0KPHRhYmxl
-IHN0eWxlPSdkaXNwbGF5Om5vbmUnPjx0cj48dGQ+PElNRyBTUkM9Imh0dHA6Ly9tYWlsLm5hdmVy
-LmNvbS9tYWlsY2hlY2svUmVlR1d6a3YxNnBDV1NZZWFBMHFicXVtN1hrcXBCaXZNb2d3N3F0WDdx
-Z1o3cnBHcHprbjFCS2xhVllzRnFVWEZTbVhLb2I5YXFtZEZ1cEpLdVVydEwvbUtBZ21LQXU1S0F0
-L0tvM2dXNEM1RnhVL2hvUlNXSGswRFM5dnBCcDBXdUluMUJGZGJabHFXWGtaTXJrNFdYaU5wTGw1
-cEJ0PS5naWYiIGJvcmRlcj0wPjwvdGQ+PC90cj48L3RhYmxlPg==
-
---------------Boundary-00=_YI85ULUXFQQMYJ0CCJD0--
+Marcel
 
 
---===============0899864305==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0899864305==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0899864305==--
