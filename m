@@ -1,14 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5f30e2610609041513o8a2709bifd465e61e946261@mail.gmail.com>
-References: <5f30e2610609021024j205f6a51id3d4b3c0f9129a3e@mail.gmail.com>
-	<1157318936.32195.9.camel@aeonflux.holtmann.net>
-	<5f30e2610609041513o8a2709bifd465e61e946261@mail.gmail.com>
-Date: Tue, 05 Sep 2006 11:53:29 +0200
-Message-Id: <1157450009.4206.2.camel@localhost>
+In-Reply-To: <1157361100.18992.49.camel@localhost>
+References: <1157355863.18992.42.camel@localhost>
+	<1157366293.32195.41.camel@aeonflux.holtmann.net>
+	<1157361100.18992.49.camel@localhost>
+Date: Tue, 05 Sep 2006 11:50:10 +0200
+Message-Id: <1157449810.4206.0.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] off-by-one bugfix for sdp_data_alloc
+Subject: Re: [Bluez-devel] What's going on here? RFCOMM on OPP
+	always	gets	disconnected
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,13 +23,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jeff,
+HI Pierre-Yves,
 
-> Oh, I get it.  I was looking at where it was published
-> (sdp_set_info_attr), but now I see where it's queried (from `sdptool
-> browse`).  So maybe this patch is more appropriate.
+> > in case please to "hcidump -X -V --obex=9". I am not going to decide
+> > OBEX by hand if I don't have to.
 
-we can try this. Patch is in the CVS now.
+please check that their OPP service is still on channel 9. The channel
+numbers might have changed and you connect to the wrong channel.
 
 Regards
 
