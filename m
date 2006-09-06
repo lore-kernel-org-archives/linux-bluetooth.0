@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: CIJOML <cijoml@volny.cz>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Wed, 6 Sep 2006 20:40:14 +0200
+Date: Wed, 6 Sep 2006 20:27:01 +0200
 References: <200609032015.51210.cijoml@volny.cz>
 	<200609061935.30152.cijoml@volny.cz>
 	<d23110170609061046y6b01f1efm817ef081c302f362@mail.gmail.com>
 In-Reply-To: <d23110170609061046y6b01f1efm817ef081c302f362@mail.gmail.com>
 MIME-Version: 1.0
-Message-Id: <200609062040.14856.cijoml@volny.cz>
+Message-Id: <200609062027.01611.cijoml@volny.cz>
 Subject: Re: [Bluez-users] bluez utils debian package doesn't autoswith
 	dongle on?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -23,17 +23,11 @@ Content-Type: text/plain; charset="iso-8859-2"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Second problem is, that hcid doesn't start:
+Hi Marcel,
 
-Sep  6 20:39:17 localhost hcid[27463]: Bluetooth HCI daemon
-Sep  6 20:39:17 localhost hcid[27463]: Can't open system message bus =
+at least with version 3.5 --enable-all in utils doesn't compile hid2hci
 
-connection: Failed to connect to socket /var/run/dbus/system_bus_socket: No =
-
-such file or directory
-Sep  6 20:39:17 localhost hcid[27463]: Unable to get on D-Bus
-
-What is this about??? I can't find any Debian package for this...
+checking other things
 
 Michal
 
