@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Javier Cuesta <jcuesta@pindiatec.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Thu, 7 Sep 2006 11:25:10 +0200
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <200609061228.41138.jcuesta@pindiatec.com>
+	<5f30e2610609060501n10f77d8fj4ed489c4cc9f3ae6@mail.gmail.com>
+In-Reply-To: <5f30e2610609060501n10f77d8fj4ed489c4cc9f3ae6@mail.gmail.com>
 MIME-Version: 1.0
-Message-Id: <200609071125.10146.jcuesta@pindiatec.com>
-Subject: [Bluez-devel] problems starting to work with bluez
+Date: Thu, 7 Sep 2006 11:18:54 +0200
+Message-Id: <200609071118.54616.jcuesta@pindiatec.com>
+Subject: Re: [Bluez-devel] Starting to work with bluez
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -48,18 +51,91 @@ Thanks for your help again.
 
 Javier
 
-P.S.: im having lots of problems sending mails to the list, i ussually have=
- to =
+P.S.: im having problems sending mails to the list, i have to send each mai=
+l =
 
-send the same mail from 3  to  4 times, hope they dont reach all to the lis=
-t, =
+3/4 times becouse all of them return to me with an error, hope they are =
 
-=BFany idea why could that be happening?
+really not reaching you, =BFanyone knows what could be wrong?
 
-P.S.S. Im trying to start a new thread ebcouse im unable to answer to the m=
-ail =
+El Mi=E9rcoles, 6 de Septiembre de 2006 14:01, Jeff Wilson escribi=F3:
+> Albert Huang's work helped me to get started.
+> http://people.csail.mit.edu/albert/bluez-intro/
+>
+> After you read Albert's site, download bluez-utils (rctool, sdptool,
+> etc) and use it as an example.
+>
+>           Regards,
+>           Jeff
+>
+> On 9/6/06, Javier Cuesta <jcuesta@pindiatec.com> wrote:
+> > HI all,
+> >
+> > Here, at pindiatec, we are going to start to develop some aplications
+> > using linux and therefore bluez for bluetooth devices, im still gatheri=
+ng
+> > info on how to do things and would like to know where i can get adition=
+al
+> > information about how to use bluez, any information or advice is wellco=
+me
+> > but i have some concerns:
+> >
+> > - =BFis there any special documentation about the .h and .c libraries?
+> > maybe some short of short explanation of what its suposed to do each
+> > function and what their parameters means.
+> >
+> > - =BFis there any place i can get some short examples to start working
+> > with?
+> >
+> > - I took a look over Marcel web (wich seems quite nice) and although i
+> > didn't checked all links it seems it was more focused in how to connect
+> > devices than how to program devices, as you could supose im more
+> > interesting in programing than in any other thing, any information, web,
+> > example or manual about how to program devices using Bluez would be
+> > great.
+> >
+> > Thanks all.
+> >
+> > (this is the 3rd time i sent this, both last tryes returned with an
+> > error, hope tou dont recive this severall times)
+> > --
+> > ******************************************************
+> > Javier Cuesta Ca=F1as
+> >
+> > PINDIATEC SL
+> > Cemcam Of. 114
+> > Pg. Trascueto s/n
+> > 39600 Camargo -Cantabria- Espa=F1a
+> > Tel. +34 942059901 Fax: +34 942059902
+> > email: jcuesta@pindiatec.com
+> > ******************************************************
+> >
+> > -----------------------------------------------------------------------=
+--
+> > Using Tomcat but need to do more? Need to support web services, securit=
+y?
+> > Get stuff done quickly with pre-integrated technology to make your job
+> > easier Download IBM WebSphere Application Server v.1.0.1 based on Apache
+> > Geronimo
+> > http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> > _______________________________________________
+> > Bluez-devel mailing list
+> > Bluez-devel@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job
+> easier Download IBM WebSphere Application Server v.1.0.1 based on Apache
+> Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-that jeff answered me, maybe starting a new one it works
 -- =
 
 ******************************************************
