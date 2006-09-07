@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4500A2A7.6000606@xmission.com>
-Date: Thu, 07 Sep 2006 16:52:23 -0600
+Message-ID: <4500A151.9040300@xmission.com>
+Date: Thu, 07 Sep 2006 16:46:41 -0600
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <554C5F4C5BA7384EB2B412FD46A3BAD10135633A@pdsmsx411.ccr.corp.intel.com>	<44FE42C7.7030100@xmission.com>
-	<44FE95CE.1090502@palmsource.com>	<1157647703.16404.2.camel@localhost>
-	<45007741.8020506@xmission.com>
-	<1157663181.14539.4.camel@localhost>
-In-Reply-To: <1157663181.14539.4.camel@localhost>
+References: <554C5F4C5BA7384EB2B412FD46A3BAD10135633A@pdsmsx411.ccr.corp.intel.com>	<44FE42C7.7030100@xmission.com>	<44FE95CE.1090502@palmsource.com>	<1157647703.16404.2.camel@localhost>	<45007741.8020506@xmission.com>
+	<1CA2256D-7196-4EE3-AFA5-7EF0BD526D2B@pepper.com>
+In-Reply-To: <1CA2256D-7196-4EE3-AFA5-7EF0BD526D2B@pepper.com>
 Subject: Re: [Bluez-devel] Big patch to a2dpd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,19 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Andrew
+Michael
 
-> I notice that the maximum volume is a lot lower from my PC than my
-> wondows PDA is there anyway to increase the volume at the PC side before
-> transmission to the headset.?
+> This new version works great.  Has anyone been able to watch a movie  
+> with mplayer?  Playing audio is just fine.  Playing a movie -- the  
+> video can not keep up.  Any hints?
 
-I'm afraid the problem is in the encoder. When we went to fixed point,
-the stream would "snap" every few seconds when the math would overflow.
-we had to fiddle a lot with levels so it wouldn't overflow and now we're
-knocking out too much steam.
+latency is pretty bad. if it's at least consistent, you could try the
+mplayer prefs to delay the video for whatever fraction of a second it's
+off by.
+
+which set is this? i've noticed latency was worse on some of the first
+sets out there. we have introduced a lot of latency too with using a
+sound server.
 
 brad
-
 
 
 -------------------------------------------------------------------------
