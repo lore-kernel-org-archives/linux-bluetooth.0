@@ -1,14 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "Bearcat M. Sandor" <Linux@feline-soul.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Thu, 7 Sep 2006 09:56:13 -0600
-References: <20060906193158.36725.qmail@web51413.mail.yahoo.com>
-In-Reply-To: <20060906193158.36725.qmail@web51413.mail.yahoo.com>
-MIME-Version: 1.0
-Message-Id: <200609070956.13808.Linux@feline-soul.com>
-Subject: [Bluez-users] Kdebluetooth patch for pin agent
-Reply-To: Linux@feline-soul.com,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200609071138.33232.cijoml@volny.cz>
+References: <200609032015.51210.cijoml@volny.cz>
+	<200609062027.01611.cijoml@volny.cz>
+	<1157588804.30159.47.camel@aeonflux.holtmann.net>
+	<200609071138.33232.cijoml@volny.cz>
+Date: Thu, 07 Sep 2006 14:17:45 +0200
+Message-Id: <1157631465.30159.77.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] bluez utils debian package
+	doesn't	autoswith	dongle on?
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,9 +24,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I haven't tried it, but i thought i'd pass this page along:
+Hi Michal,
 
-http://www.kdedevelopers.org/node/2330
+> this should .configure script verify, isn't it?
+
+yes, it does. And it works for me. However I haven't tested Debian for
+quite some time. Maybe the pkg-config on Debian is broken.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
