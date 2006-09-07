@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Andrew Waldram <andy@samuri.demon.co.uk>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44FE95CE.1090502@palmsource.com>
-References: <554C5F4C5BA7384EB2B412FD46A3BAD10135633A@pdsmsx411.ccr.corp.intel.com>
-	<44FE42C7.7030100@xmission.com>  <44FE95CE.1090502@palmsource.com>
-Date: Thu, 07 Sep 2006 17:48:23 +0100
-Message-Id: <1157647703.16404.2.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Big patch to a2dpd
+Message-ID: <ef9938ec0609070921q586dfa5coaf5e8cf5eceacecb@mail.gmail.com>
+Date: Thu, 7 Sep 2006 12:21:46 -0400
+From: "Albert Huang" <albert@csail.mit.edu>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200609071125.10146.jcuesta@pindiatec.com>
+MIME-Version: 1.0
+References: <200609071125.10146.jcuesta@pindiatec.com>
+Subject: Re: [Bluez-devel] problems starting to work with bluez
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,65 +16,159 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============0891159807=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGkgRnJlZGVyaWMsCgpTaW5jZSBCcmFkIGFwcGxpZWQgdGhlIEJpZyBwYXRjaCB0byBhMmRwZCBp
-J20gZ2V0dGluZwoKYTJkcGQuYzo0MDoyMTogZXJyb3I6IGFsc2FsaWIuaDogTm8gc3VjaCBmaWxl
-IG9yIGRpcmVjdG9yeQphMmRwZC5jOiBJbiBmdW5jdGlvbiDigJhidF9oYW5kbGVy4oCZOgphMmRw
-ZC5jOjY5NTogd2FybmluZzogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g4oCYYWxz
-YV9uZXfigJkKCkkgY2FuJ3QgZmlndXJlIG91dCB3aGVyZSBhbHNhbGliLmggc2hvdWxkIGJlIGNv
-bW1pbmcgZnJvbSA/CgoKT24gV2VkLCAyMDA2LTA5LTA2IGF0IDExOjMzICswMjAwLCBGcsOpZMOp
-cmljIERBTExFQVUgd3JvdGU6Cj4gSGksCj4gCj4gPiBMZWEKPiA+Cj4gPiAgIAo+ID4+IFllcy4g
-SSBwcmVmZXIgbW9kaWZ5aW5nIGFsc2FfdHJhbnNmZXJfcmF3KCksIHdoaWNoIG1ha2VzIHRoZSBm
-cmFtZXdvcmsgbG9naWMgY29uc2lzdGVudC4gSG93IGRvIHlvdSB0aGluayBhYm91dCBpdD8gCj4g
-Pj4gICAgIAo+ID4KPiA+IEknbSBub3QgZmFtaWxpYXIgd2l0aCB0aGlzIG5ldyBzdHVmZiwgYnV0
-IGl0IHNlZW1zIHRoYXQgdGhlIHJldHVybgo+ID4gdmFsdWVzIHdlcmUgY29tbWVudGVkIG91dCBm
-b3Igc29tZSByZWFzb24gYW5kIG1heWJlIGZvcmdvdHRlbi4gSWYKPiA+IEZyZWRlcmljIGhhcyBu
-byBwcm9ibGVtcyB3aXRoIHRoZSBjaGFuZ2UgdG8gYWxzYV90cmFuc2Zlcl9yYXcsIEknbGwgZG8K
-PiA+IGl0IHRoYXQgd2F5Lgo+ID4gICAKPiAKPiBIaSBCcmFkIGFuZCBMZWEsCj4gTm8gaXQncyBu
-b3QgZm9yZ290dGVuIDogd2hhdCBJIHdhbnRlZCBpcyB0byByZXN0YXJ0IGF1ZGlvIG9uIGVycm9y
-cy4gSQo+IGhhZCBzb21lIGZhaWx1cmVzIHdoZW4gdHJ5aW5nIHRvIHJlY292ZXIgOiB3aGVuIHBh
-dXNpbmcgYSBzdHJlYW0gaW4KPiB4bW1zLCBhbiB1bmRlcnJ1biBvY2N1cnMgYXMgdGhlIGFsc2Eg
-ZGV2aWNlIGlzIG5vdCBjbG9zZWQuCj4gSG93ZXZlciwgSSBkaWRuJ3QgaW52ZXN0aWdhdGUgdGhl
-IHhydW5fcmVjb3ZlcnkgcmV0dXJuIHZhbHVlLgo+IExlYSdzIHBhdGNoIGlzIGludGVyZXN0aW5n
-IGJ1dCBpdCBtaXNzIHNvbWV0aGluZyA6IHRoZSB4cnVuX3JlY292ZXJ5Cj4gd2lsbCBBTFdBWVMg
-cmV0dXJuIDAgaWYgZmVkIHdpdGggRVBJUEUgb3IgRVNJR1BJUEUsIHdoZXRoZXIgdGhlIHJlY292
-ZXJ5Cj4gc3VjY2VlZCBvciBub3QuCj4gVGhlIGNsZWFuZXN0IGlzIHRvIGtlZXAgTGVhJ3MgcGF0
-Y2ggYnV0IHJlbW92ZSB0aGUgdHdvICJyZXR1cm4gMDsiIGNhbGxzCj4gaW4gb3JkZXIgdG8gInJl
-dHVybiBlcnI7IiBhdCB0aGUgZW5kIG9mIHRoZSBmdW5jLgo+IAo+IFRoZSBtb2RpZmljYXRpb24g
-dG8gYTJkcGQuYyBzaG91bGQgbm90IGJlIGRvbmUuCj4gCj4gU2VlIHRoZSBmb2xsb3dpbmcgOgo+
-IAo+IHN0YXRpYyBpbnQgeHJ1bl9yZWNvdmVyeShzbmRfcGNtX3QgKiBoYW5kbGUsIGludCBlcnIp
-Cj4gewo+IGlmIChlcnIgPT0gLUVQSVBFKSB7IC8qIHVuZGVyLXJ1biAqLwo+IGVyciA9IHNuZF9w
-Y21fcHJlcGFyZShoYW5kbGUpOwo+IGlmIChlcnIgPCAwKQo+IHByaW50ZigiQ2FuJ3QgcmVjb3Zl
-cnkgZnJvbSB1bmRlcnJ1biwgcHJlcGFyZSBmYWlsZWQ6ICVzXG4iLAo+IHNuZF9zdHJlcnJvcihl
-cnIpKTsKPiByZXR1cm4gMDsgLy8gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIFJlbW92ZSB0aGlz
-IGxpbmUgdG8gcmV0dXJuIGVyciBhdAo+IHRoZSBlbmQgb2YgdGhlIGZ1bmMKPiB9IGVsc2UgaWYg
-KGVyciA9PSAtRVNUUlBJUEUpIHsKPiB3aGlsZSAoKGVyciA9IHNuZF9wY21fcmVzdW1lKGhhbmRs
-ZSkpID09IC1FQUdBSU4pCj4gc2xlZXAoMSk7IC8qIHdhaXQgdW50aWwgdGhlIHN1c3BlbmQgZmxh
-ZyBpcyByZWxlYXNlZCAqLwo+IGlmIChlcnIgPCAwKSB7Cj4gZXJyID0gc25kX3BjbV9wcmVwYXJl
-KGhhbmRsZSk7Cj4gaWYgKGVyciA8IDApCj4gcHJpbnRmKCJDYW4ndCByZWNvdmVyeSBmcm9tIHN1
-c3BlbmQsIHByZXBhcmUgZmFpbGVkOiAlc1xuIiwKPiBzbmRfc3RyZXJyb3IoZXJyKSk7Cj4gfQo+
-IHJldHVybiAwOy8vIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSBSZW1vdmUgdGhpcyBsaW5lIHRv
-IHJldHVybiBlcnIgYXQKPiB0aGUgZW5kIG9mIHRoZSBmdW5jCj4gfQo+IHJldHVybiBlcnI7Cj4g
-fQo+IAo+IAo+IAo+IAo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBVc2luZyBUb21jYXQgYnV0IG5lZWQg
-dG8gZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0IHdlYiBzZXJ2aWNlcywgc2VjdXJpdHk/Cj4gR2V0
-IHN0dWZmIGRvbmUgcXVpY2tseSB3aXRoIHByZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kgdG8gbWFr
-ZSB5b3VyIGpvYiBlYXNpZXIKPiBEb3dubG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNl
-cnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNoZSBHZXJvbmltbwo+IGh0dHA6Ly9zZWwuYXMtdXMu
-ZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZraWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0PTEyMTY0Mgo+
-IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fIEJsdWV6LWRl
-dmVsIG1haWxpbmcgbGlzdCBCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQgaHR0cHM6
-Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKCi0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0KVXNpbmcgVG9tY2F0IGJ1dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8gc3Vw
-cG9ydCB3ZWIgc2VydmljZXMsIHNlY3VyaXR5PwpHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdpdGgg
-cHJlLWludGVncmF0ZWQgdGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9iIGVhc2llcgpEb3dubG9h
-ZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNo
-ZSBHZXJvbmltbwpodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lkPTEy
-MDcwOSZiaWQ9MjYzMDU3JmRhdD0xMjE2NDIKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxp
-c3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9s
-aXN0aW5mby9ibHVlei1kZXZlbAo=
+--===============0891159807==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_124298_4072622.1157646106375"
+
+------=_Part_124298_4072622.1157646106375
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+dd is an HCI socket opened either with socket() or hci_open_dev()
+
+to is a timeout, in milliseconds I think.
+
+-albert
+
+On 9/7/06, Javier Cuesta <jcuesta@pindiatec.com> wrote:
+>
+> HI jeff and thanks for your answer,
+>
+> Albert Huang's Web is helping me a lot but i still have some problems, Im
+> trying to writte some simple code, just for starting to work with bluez,
+> and
+> im findin some problems ussing the libraries, for example:
+>
+> Im trying to writte the class of device using hci_write_class_of_dev(int
+> dd,
+> uint32_t cls, int to) im having problems ussing the libraries becouse i
+> have
+> found no documentation about what "dd" and "to" means(whats suposed to be
+> sent to those variables and maybe whats that for).
+>
+> Im more interested in fidnding a documentation about the libraries
+> themselfs
+> so i can solve the problems that ill find in the future by my own than in
+> knowing what those variables means.
+>
+> Thanks for your help again.
+>
+> Javier
+>
+> P.S.: im having lots of problems sending mails to the list, i ussually
+> have to
+> send the same mail from 3  to  4 times, hope they dont reach all to the
+> list,
+> =BFany idea why could that be happening?
+>
+> P.S.S. Im trying to start a new thread ebcouse im unable to answer to the
+> mail
+> that jeff answered me, maybe starting a new one it works
+> --
+> ******************************************************
+> Javier Cuesta Ca=F1as
+>
+> PINDIATEC SL
+> Cemcam Of. 114
+> Pg. Trascueto s/n
+> 39600 Camargo -Cantabria- Espa=F1a
+> Tel. +34 942059901 Fax: +34 942059902
+> email: jcuesta@pindiatec.com
+> ******************************************************
+>
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job
+> easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronim=
+o
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+
+------=_Part_124298_4072622.1157646106375
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+dd is an HCI socket opened either with socket() or hci_open_dev()<br><br>to=
+ is a timeout, in milliseconds I think.<br><br>-albert<br><br><div><span cl=
+ass=3D"gmail_quote">On 9/7/06, <b class=3D"gmail_sendername">Javier Cuesta<=
+/b>
+ &lt;<a href=3D"mailto:jcuesta@pindiatec.com">jcuesta@pindiatec.com</a>&gt;=
+ wrote:</span><blockquote class=3D"gmail_quote" style=3D"border-left: 1px s=
+olid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">HI =
+jeff and thanks for your answer,
+<br><br>Albert Huang's Web is helping me a lot but i still have some proble=
+ms, Im<br>trying to writte some simple code, just for starting to work with=
+ bluez, and<br>im findin some problems ussing the libraries, for example:
+<br><br>Im trying to writte the class of device using hci_write_class_of_de=
+v(int dd,<br>uint32_t cls, int to) im having problems ussing the libraries =
+becouse i have<br>found no documentation about what &quot;dd&quot; and &quo=
+t;to&quot; means(whats suposed to be
+<br>sent to those variables and maybe whats that for).<br><br>Im more inter=
+ested in fidnding a documentation about the libraries themselfs<br>so i can=
+ solve the problems that ill find in the future by my own than in<br>knowin=
+g what those variables means.
+<br><br>Thanks for your help again.<br><br>Javier<br><br>P.S.: im having lo=
+ts of problems sending mails to the list, i ussually have to<br>send the sa=
+me mail from 3&nbsp;&nbsp;to&nbsp;&nbsp;4 times, hope they dont reach all t=
+o the list,<br>=BFany idea why could that be happening?
+<br><br>P.S.S. Im trying to start a new thread ebcouse im unable to answer =
+to the mail<br>that jeff answered me, maybe starting a new one it works<br>=
+--<br>******************************************************<br>Javier Cues=
+ta Ca=F1as
+<br><br>PINDIATEC SL<br>Cemcam Of. 114<br>Pg. Trascueto s/n<br>39600 Camarg=
+o -Cantabria- Espa=F1a<br>Tel. +34 942059901 Fax: +34 942059902<br>email: <=
+a href=3D"mailto:jcuesta@pindiatec.com">jcuesta@pindiatec.com</a><br>******=
+************************************************
+<br><br>-------------------------------------------------------------------=
+------<br>Using Tomcat but need to do more? Need to support web services, s=
+ecurity?<br>Get stuff done quickly with pre-integrated technology to make y=
+our job easier
+<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geron=
+imo<br><a href=3D"http://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;kid=3D12070=
+9&amp;bid=3D263057&amp;dat=3D121642">http://sel.as-us.falkag.net/sel?cmd=3D=
+lnk&amp;kid=3D120709&amp;bid=3D263057&amp;dat=3D121642
+</a><br>_______________________________________________<br>Bluez-devel mail=
+ing list<br><a href=3D"mailto:Bluez-devel@lists.sourceforge.net">Bluez-deve=
+l@lists.sourceforge.net</a><br><a href=3D"https://lists.sourceforge.net/lis=
+ts/listinfo/bluez-devel">
+https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br></blockquot=
+e></div><br>
+
+------=_Part_124298_4072622.1157646106375--
+
+
+--===============0891159807==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0891159807==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0891159807==--
