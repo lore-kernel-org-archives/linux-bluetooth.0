@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v752.2)
-In-Reply-To: <45007741.8020506@xmission.com>
+Message-ID: <45007741.8020506@xmission.com>
+Date: Thu, 07 Sep 2006 13:47:13 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <554C5F4C5BA7384EB2B412FD46A3BAD10135633A@pdsmsx411.ccr.corp.intel.com>	<44FE42C7.7030100@xmission.com>
 	<44FE95CE.1090502@palmsource.com>
 	<1157647703.16404.2.camel@localhost>
-	<45007741.8020506@xmission.com>
-Message-Id: <1CA2256D-7196-4EE3-AFA5-7EF0BD526D2B@pepper.com>
-From: Michael Frey <mfrey@pepper.com>
-Date: Thu, 7 Sep 2006 16:36:01 -0400
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1157647703.16404.2.camel@localhost>
 Subject: Re: [Bluez-devel] Big patch to a2dpd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,62 +18,23 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This new version works great.  Has anyone been able to watch a movie  =
-
-with mplayer?  Playing audio is just fine.  Playing a movie -- the  =
-
-video can not keep up.  Any hints?
-
-Michael
-
-On Sep 7, 2006, at 3:47 PM, Brad Midgley wrote:
-
-> Andrew
->
->> Since Brad applied the Big patch to a2dpd i'm getting
->>
->> a2dpd.c:40:21: error: alsalib.h: No such file or directory
->> a2dpd.c: In function =91bt_handler=92:
->> a2dpd.c:695: warning: implicit declaration of function =91alsa_new=92
->
-> doh. forgot to add newly-created files to cvs. it's in cvs now so it
-> should propogate to anon cvs shortly
->
-> brad
->
-> ---------------------------------------------------------------------- =
-
-> ---
-> Using Tomcat but need to do more? Need to support web services,  =
-
-> security?
-> Get stuff done quickly with pre-integrated technology to make your  =
-
-> job easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache  =
-
-> Geronimo
-> http://sel.as-us.falkag.net/sel? =
-
-> cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+QW5kcmV3Cgo+IFNpbmNlIEJyYWQgYXBwbGllZCB0aGUgQmlnIHBhdGNoIHRvIGEyZHBkIGknbSBn
+ZXR0aW5nCj4gCj4gYTJkcGQuYzo0MDoyMTogZXJyb3I6IGFsc2FsaWIuaDogTm8gc3VjaCBmaWxl
+IG9yIGRpcmVjdG9yeQo+IGEyZHBkLmM6IEluIGZ1bmN0aW9uIOKAmGJ0X2hhbmRsZXLigJk6Cj4g
+YTJkcGQuYzo2OTU6IHdhcm5pbmc6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uIOKA
+mGFsc2FfbmV34oCZCgpkb2guIGZvcmdvdCB0byBhZGQgbmV3bHktY3JlYXRlZCBmaWxlcyB0byBj
+dnMuIGl0J3MgaW4gY3ZzIG5vdyBzbyBpdApzaG91bGQgcHJvcG9nYXRlIHRvIGFub24gY3ZzIHNo
+b3J0bHkKCmJyYWQKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVXNpbmcgVG9tY2F0IGJ1dCBuZWVkIHRvIGRv
+IG1vcmU/IE5lZWQgdG8gc3VwcG9ydCB3ZWIgc2VydmljZXMsIHNlY3VyaXR5PwpHZXQgc3R1ZmYg
+ZG9uZSBxdWlja2x5IHdpdGggcHJlLWludGVncmF0ZWQgdGVjaG5vbG9neSB0byBtYWtlIHlvdXIg
+am9iIGVhc2llcgpEb3dubG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEu
+MC4xIGJhc2VkIG9uIEFwYWNoZSBHZXJvbmltbwpodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQv
+c2VsP2NtZD1sbmsma2lkPTEyMDcwOSZiaWQ9MjYzMDU3JmRhdD0xMjE2NDIKX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBs
+aXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJj
+ZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
