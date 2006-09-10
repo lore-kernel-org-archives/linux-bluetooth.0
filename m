@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "Bearcat M. Sandor" <Linux@feline-soul.com>
+Date: Sun, 10 Sep 2006 21:25:36 +0200
+From: adi007@germanynet.de
 To: bluez-users@lists.sourceforge.net
-Date: Sun, 10 Sep 2006 18:24:25 -0600
-MIME-Version: 1.0
-Message-Id: <200609101824.25866.Linux@feline-soul.com>
-Subject: [Bluez-users] bluetooth headset: Fuction not Implemented?
-Reply-To: Linux@feline-soul.com,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20060910192536.GA4150@physik.fu-berlin.de>
+Mime-Version: 1.0
+Subject: [Bluez-users] Short question on profiles
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,49 +18,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hello folks,
+Hello there,
 
-You may recognise my name. I hope you do 'cause i've been trying to get a 
-Logitech Bluetooth Traveler headset working for 2 months now. I am using the 
-bluetooth hub that came with my logitech keyboard and mouse.
+I'm planning to buy an USB-bluetooth adapter to connect my
+bluetooth headseat (A2DP) to my Linux laptop (2.6.17.9) to listen to
+my MP3s wirelessly. I've especially put my eyes on SONY's
+PCGA-BA2, which is very neat and small. According to the
+specs it apparently does not support A2DP :(. Before I choose
+a different model, my simple question is: Does the list of
+supported profiles of such a stick depend on the stick
+(Firmware etc) itself or is it the software (i.e. the HCI-driver)
+on the PC which determines the kind of profiles supported ?
 
-I have the pin code being processed now.  When i try to connect it i see the 
-following:
-btsco 00:0D:44:4F:37:72
-Error: Failed to connect to SDP server: Function not implemented
-Assuming channel 2
+Long text, but simple question (I hope ;)).
 
-Can't connect RFCOMM channel: Resource temporarily unavailable
-
-hcidump gives me:
-HCI sniffer - Bluetooth packet analyzer ver 1.31
-device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Mode Change (0x14) plen 6
-> HCI Event: Mode Change (0x14) plen 6
-> HCI Event: PIN Code Request (0x16) plen 6
-> HCI Event: Connect Complete (0x03) plen 11
-< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
-> HCI Event: Command Complete (0x0e) plen 6
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: PIN Code Request (0x16) plen 6
-> HCI Event: Connect Complete (0x03) plen 11
-
-
-
-
--- 
-Bearcat M. Sandor
-Bearcat@feline-soul.com
-Jabber: bearcat@jabber.feline-soul.net
-ICQ: 6628727
-MSN: bearcatsandor@hotmail.com
-Yahoo: bearcatsandor
-AIM: bearcatmsandor
-
-
+Adrian
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
