@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 10 Sep 2006 21:25:36 +0200
-From: adi007@germanynet.de
+Message-ID: <4504301E.4060402@flcd.net>
+Date: Sun, 10 Sep 2006 18:32:46 +0300
+From: Denis <denis@flcd.net>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20060910192536.GA4150@physik.fu-berlin.de>
-Mime-Version: 1.0
-Subject: [Bluez-users] Short question on profiles
+Subject: [Bluez-users] enable auth and BNEP question?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,21 +18,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello there,
+Hi I've recently switched to 3.5 from 2.25 version and have few questions:
 
-I'm planning to buy an USB-bluetooth adapter to connect my
-bluetooth headseat (A2DP) to my Linux laptop (2.6.17.9) to listen to
-my MP3s wirelessly. I've especially put my eyes on SONY's
-PCGA-BA2, which is very neat and small. According to the
-specs it apparently does not support A2DP :(. Before I choose
-a different model, my simple question is: Does the list of
-supported profiles of such a stick depend on the stick
-(Firmware etc) itself or is it the software (i.e. the HCI-driver)
-on the PC which determines the kind of profiles supported ?
+1. Here is my hcid.conf
+options {
+        autoinit yes;
+        security auto;
+        pairing multi;
+        passkey "BlueZ";
+}
+device {
+        name "%h-%d";
+        class 0x3e0100;
+        iscan enable;
+        pscan enable;
+        discovto 0;
+        lm accept;
+        lp rswitch,hold,sniff,park;
+        auth enable;
+}
 
-Long text, but simple question (I hope ;)).
+but my hciconfig still show no auth, and I can connect to PC without aut
+Of course I can bring it by "hciconfig piscan auth" but I wish to bring 
+it by default.
+Is there a way to do so?
 
-Adrian
+
+2. I mostly use my Linux box to share create bluetooth network with 
+other PC and my PDA so previously I had "pan " directory inside 
+/etc/bluetooth/ with dev-up and dev-down files which automatically bring 
+up bnep0 device, but seems that BlueZ 3.5 is working differently and I 
+need to execute "ifconfig benp0 up" to enable my connection.
+Is there a way to automate this?
+
+Best regards,
+Denis Stenderchuck
+
+http://forum.weblamp.net/linux - Webmaster Key Forums
+http://www.pharos-search.com - A Human Edited Directory
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
