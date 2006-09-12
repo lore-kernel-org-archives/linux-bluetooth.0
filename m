@@ -1,15 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <3612.89.176.57.95.1158080976.squirrel@mail.palacky.net>
-In-Reply-To: <8712867d0609120643n7fd0d072o5b0bc88541f1ae39@mail.gmail.com>
-References: <200609112146.15972.petr@palacky.net>
-	<1157998259.26541.47.camel@localhost>
-	<4304.89.176.57.95.1158012904.squirrel@mail.palacky.net>
-	<8712867d0609120643n7fd0d072o5b0bc88541f1ae39@mail.gmail.com>
-Date: Tue, 12 Sep 2006 19:09:36 +0200 (CEST)
-From: petr@palacky.net
+Message-ID: <c49421c50609120941i26ffb8dauf0ae2c0c31190808@mail.gmail.com>
+Date: Tue, 12 Sep 2006 08:41:25 -0800
+From: "Loreno Oliveira" <lorenooliveira@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] 3 or more BT dongles over 1 USB-2.0 4-port HUB
+Subject: [Bluez-users] restricting inquiry responses
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,147 +14,62 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-2"
+Content-Type: multipart/mixed; boundary="===============1645866591=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Jamie,
+--===============1645866591==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_95559_3775639.1158079285291"
 
-my USB HUB is with and can also operate without power supply.
-Today i tried these HUB and dongles on the ARM board with Debian Linux and
-kernel 2.4 and here can i set "UP" only one dongle (with or without extra
-power supply).
-This looks as hci_usb doesn't like USB 2.0 standards...
+------=_Part_95559_3775639.1158079285291
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Petr P.
+Hi there,
 
+I have different base stations that permanently try to find out new mobile
+devices on their coverage areas. Once discovered and paired with some BS, I
+need this device to be able to not answer to that BS inquiries.
 
-Dne 12 Z=E1=F8=ED 2006, 15:43, Jaime Alberto Silva napsal(a):
-> Could it be a power problem? maybe your USB port can't supply enough
-> power to all the devices.
->
-> On 9/11/06, petr@palacky.net <petr@palacky.net> wrote:
->
->> Hi Marcel,
->>
->>
->> thank you for your tip.
->>
->> I tried loading hci_usb with option isoc=3D0, but still nothing happens.
->> I don't think if this is question for USB Guys, because other devices
->> eg. printer, mouse, keyboard, flash-disk etc. works fine and all
->> together attached into one USB HUB. I think this is problem with any
->> component from bluez stack...
->>
->> BR
->> Petr
->>
->>
->> Dne 11 Z=E1=F8=ED 2006, 20:10, Marcel Holtmann napsal(a):
->>
->>> Hi Petr,
->>>
->>>
->>>
->>>> i have problem with three (and more) USB BT dongles (all are the
->>>> same, CSR-based) and 4-port USB-2.0 HUB.
->>>>
->>>>
->>>>
->>>> When i attach one USB dongle alone, everything is good (hci0 is up
->>>> and running). When i attach the second dongle (after the first),
->>>> still is everything OK (hci0 and hci1 are up and running). But when
->>>> i attach third (or fourth) dongle, this does not work.
->>>>
->>>> I tried attaching all dongles differently but every time the third
->>>> (or
->>>> fourth) dongle is not OK and dmesg says: #dmesg
->>>> hci_usb_intr_rx_submit: hci2 intr rx submit failed urb cd55b674 err
->>>> -28
->>>>
->>>>
->>>
->>> try loading the hci_usb driver with the isoc=3D0 option. This maybe
->>> helps, but it can also be a general problem with your USB root hub. In
->>> that case you have to check with the USB guys, because this is not
->>> Bluetooth
->>> specific.
->>>
->>> Regards
->>>
->>>
->>>
->>> Marcel
->>>
->>>
->>>
->>>
->>>
->>> ---------------------------------------------------------------------
->>> ----
->>> Using Tomcat but need to do more? Need to support web services,
->>> security? Get stuff done quickly with pre-integrated technology to
->>> make your job easier Download IBM WebSphere Application Server v.1.0.1
->>> based on Apache Geronimo
->>> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
-=3D1216
->>> 42
->>> _______________________________________________
->>> Bluez-users mailing list
->>> Bluez-users@lists.sourceforge.net
->>> https://lists.sourceforge.net/lists/listinfo/bluez-users
->>>
->>>
->>>
->>
->>
->>
->> -----------------------------------------------------------------------
->> --
->> Using Tomcat but need to do more? Need to support web services,
->> security? Get stuff done quickly with pre-integrated technology to make
->> your job easier Download IBM WebSphere Application Server v.1.0.1 based
->> on Apache Geronimo
->> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
-=3D12164
->> 2
->> _______________________________________________
->> Bluez-users mailing list
->> Bluez-users@lists.sourceforge.net
->> https://lists.sourceforge.net/lists/listinfo/bluez-users
->>
->>
->
->
-> --
-> Jaime Alberto Silva
-> L I N U X      .~.
-> The Choice     /V\
-> of a GNU      / ( ) \ Generation    ^^-^^
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job
-> easier Download IBM WebSphere Application Server v.1.0.1 based on Apache
-> Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
-=3D121642
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
+Is there a solution for this??
+
+Regards,
+
+Loreno
+
+------=_Part_95559_3775639.1158079285291
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi there,<br><br>I have different base stations that permanently try to find out new mobile devices on their coverage areas. Once discovered and paired with some BS, I need this device to be able to not answer to that BS inquiries.
+<br><br>Is there a solution for this??<br><br>Regards,<br><br>Loreno<br>
+
+------=_Part_95559_3775639.1158079285291--
 
 
+--===============1645866591==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============1645866591==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1645866591==--
