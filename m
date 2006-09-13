@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e1effdeb0609130548h1a6dea73vef4a6a8dc8b08d5e@mail.gmail.com>
-Date: Wed, 13 Sep 2006 09:48:46 -0300
+Message-ID: <e1effdeb0609130523g204fff2fk80a0786e92f81d89@mail.gmail.com>
+Date: Wed, 13 Sep 2006 09:23:34 -0300
 From: "Claudio Takahasi" <cktakahasi@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <e1effdeb0609130523g204fff2fk80a0786e92f81d89@mail.gmail.com>
+In-Reply-To: <c49421c50609120941i26ffb8dauf0ae2c0c31190808@mail.gmail.com>
 MIME-Version: 1.0
 References: <c49421c50609120941i26ffb8dauf0ae2c0c31190808@mail.gmail.com>
-	<e1effdeb0609130523g204fff2fk80a0786e92f81d89@mail.gmail.com>
 Subject: Re: [Bluez-users] restricting inquiry responses
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,62 +20,53 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 9/13/06, Claudio Takahasi <cktakahasi@gmail.com> wrote:
-> On 9/12/06, Loreno Oliveira <lorenooliveira@gmail.com> wrote:
-> > Hi there,
-> >
-> > I have different base stations that permanently try to find out new mobile
-> > devices on their coverage areas. Once discovered and paired with some BS, I
-> > need this device to be able to not answer to that BS inquiries.
-> >
-> > Is there a solution for this??
-> >
-> > Regards,
-> >
-> > Loreno
-> _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+On 9/12/06, Loreno Oliveira <lorenooliveira@gmail.com> wrote:
+> Hi there,
 >
-> Hi Loreno,
+> I have different base stations that permanently try to find out new mobile
+> devices on their coverage areas. Once discovered and paired with some BS, I
+> need this device to be able to not answer to that BS inquiries.
 >
-> You can use the a D-Bus method to switch the device to "Connectable"
-> mode. The adapter interface supports the following discoverable modes:
-> discoverable: PSCAN ISCAN
-> connectable: PSCAN
-> off: NOSCAN
+> Is there a solution for this??
 >
-> Use the gbluezconf(test app) to setup this mode:
-> http://www.maemo.org.br/cktakahasi/gbluezconf/gbluezconf-00.32.tar.gz
+> Regards,
 >
-> Or dbus-send:
-> $dbus-send --system --type=method_call --print-reply --dest=org.bluez
-> /org/bluez/hci0 org.bluez.Adapter.SetDiscoverableTimeout uint32:0
-> $dbus-send --system --type=method_call --print-reply --dest=org.bluez
-> /org/bluez/hci0 org.bluez.Adapter.SetMode string:discoverable
->
-> The default discoverable timeout is 180sec. Setting it to 0 +
-> discoverable mode to "discoverable" the device will be always visible.
-> Setting the discoverable timeout to X + mode to discoverable, the mode
-> will be changed automatically to connectable mode after X seconds.
->
->
-> BR,
-> Claudio.
-> --
-> ---------------------------------------------------------
-> Claudio Takahasi
-> Instituto Nokia de Tecnologia - INdT
->
+> Loreno
+_______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 Hi Loreno,
 
-Sorry, I misunderstood your question. It's not possible "not answer"
-to a specific BS inquiries.
+You can use the a D-Bus method to switch the device to "Connectable"
+mode. The adapter interface supports the following discoverable modes:
+discoverable: PSCAN ISCAN
+connectable: PSCAN
+off: NOSCAN
+
+Use the gbluezconf(test app) to setup this mode:
+http://www.maemo.org.br/cktakahasi/gbluezconf/gbluezconf-00.32.tar.gz
+
+Or dbus-send:
+$dbus-send --system --type=method_call --print-reply --dest=org.bluez
+/org/bluez/hci0 org.bluez.Adapter.SetDiscoverableTimeout uint32:0
+$dbus-send --system --type=method_call --print-reply --dest=org.bluez
+/org/bluez/hci0 org.bluez.Adapter.SetMode string:discoverable
+
+The default discoverable timeout is 180sec. Setting it to 0 +
+discoverable mode to "discoverable" the device will be always visible.
+Setting the discoverable timeout to X + mode to discoverable, the mode
+will be changed automatically to connectable mode after X seconds.
+
 
 BR,
 Claudio.
+
+-- 
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
