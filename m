@@ -1,16 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 14 Sep 2006 11:01:08 +0200 (CEST)
-From: Peter Wippich <pewi@gw-instruments.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45081402.8020909@vasmac.com>
-Message-ID: <Pine.LNX.4.63.0609141052130.22339@redbean.intranet.gw-instruments.de>
-References: <450603BA.3090302@vasmac.com>
-	<Pine.LNX.4.63.0609121038180.17868@redbean.intranet.gw-instruments.de>
-	<1158050613.14015.1.camel@localhost>
-	<Pine.LNX.4.63.0609121206040.17868@redbean.intranet.gw-instruments.de>
-	<45081402.8020909@vasmac.com>
+Message-ID: <ef9938ec0609132313q68ef09fdx48bf3bc1083922c9@mail.gmail.com>
+Date: Thu, 14 Sep 2006 02:13:17 -0400
+From: "Albert Huang" <albert@csail.mit.edu>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] socket connect returns EAGAIN
+Subject: [Bluez-devel] are bluetooth specs no longer freely available?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,57 +14,71 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0242799383=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+--===============0242799383==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_202859_30435884.1158214397740"
+
+------=_Part_202859_30435884.1158214397740
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+As I've done in the past, last week I tried downloading a copy of the specs
+from http://www.bluetooth.org/spec and found that I'm no longer allowed to
+do so.
+
+In the past, I've registered an individual level acccount on the website,
+which then let me download most of the specs and profiles.
+
+Now, it says:
+
+The document you requested requires you to be a member of the group Adopters
+
+Although Adopter membership is free, apparently only incorporated entities
+are allowed membership.  So it seems that individuals are not able to
+download the specs from the bluetooth.org website...
+
+Can anyone else confirm this?  I tried filling in the contact form on the
+bluetooth website, but don't expect a response (never get one)
+
+-albert
+
+------=_Part_202859_30435884.1158214397740
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+As I've done in the past, last week I tried downloading a copy of the specs from <a href="http://www.bluetooth.org/spec">http://www.bluetooth.org/spec</a> and found that I'm no longer allowed to do so.<br><br>In the past, I've registered an individual level acccount on the website, which then let me download most of the specs and profiles.
+<br><br>Now, it says:<br><br>The document you requested requires you to be a member of the group Adopters<br><br>Although Adopter membership is free, apparently only incorporated entities are allowed membership.&nbsp; So it seems that individuals are not able to download the specs from the 
+<a href="http://bluetooth.org">bluetooth.org</a> website...<br><br>Can anyone else confirm this?&nbsp; I tried filling in the contact form on the bluetooth website, but don't expect a response (never get one)<br><br>-albert<br>
+
+------=_Part_202859_30435884.1158214397740--
 
 
-Hi Jose, 
-
-On Wed, 13 Sep 2006, Jose Vasconcellos wrote:
-
-> > I think the problem is in bt_sock_wait_state(...). This always returns 
-> > -EAGAIN if timeout is zero (which it is if the socket is set non 
-> > blocking). But may be I'm missing something. 
-> >
-> > Ciao, 
-> >
-> > Peter 
-> >
-> >   
-> Hi Peter,
-> 
-> I've come to a similar conclusion. I'm not sure why it's returning -EAGAIN.
-> However, looking at the x25 transport (af_x25.c), it takes a different 
-> approach;
-> if O_NONBLOCK is set they don't call the blocking routine at all. Maybe a
-> similar approach should be taken here.
-> 
-returning EAGAIN is fine for a listening socket. I first thought the 
-solution of not calling bt_sock_wait_state() for a non blocking connect 
-would be the easiest solution, too. But then you have to correct it on 
-several places. Just changing bt_sock_wait_state() will solve it for 
-various socket types. 
-
-Ciao, 
-
-Peter 
-
-
-
-|       Peter Wippich                   Voice: +49 30 46776411          |
-|       G&W Instruments GmbH            fax:   +49 30 46776419          |
-|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
-|       D-13355 Berlin  / Germany                                       |
-
+--===============0242799383==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0242799383==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0242799383==--
