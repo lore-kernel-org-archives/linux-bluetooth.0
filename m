@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Fri, 15 Sep 2006 19:45:05 -0400
+From: Chris Spencer <chrisspen@gmail.com>
+In-reply-to: <1158329592.5233.32.camel@localhost>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <450B3B01.2060801@gmail.com>
+Message-id: <450B3B01.2060801@gmail.com>
+MIME-version: 1.0
 References: <beb7688e0609150702x738ad4d8re64815d12f457a76@mail.gmail.com>
-	<1158329592.5233.32.camel@localhost>  <450B3B01.2060801@gmail.com>
-Date: Sat, 16 Sep 2006 11:00:07 +0200
-Message-Id: <1158397207.6839.1.camel@localhost>
-Mime-Version: 1.0
+	<1158329592.5233.32.camel@localhost>
 Subject: Re: [Bluez-devel] Celluon Laserkey Bluetooth Keyboard
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,45 +21,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Chris,
-
-> >> The last part is interesting, because the three 255s repeat for every
-> >> keypress and mouse movement made with the device.
-> > 
-> > this is not a HID compatible keyboard and needs an extra driver to
-> > function properly. Please run "sdptool records --raw <bdaddr>" to
-> > retrieve the SDP records for this device.
+Marcel Holtmann wrote:
+>> The last part is interesting, because the three 255s repeat for every
+>> keypress and mouse movement made with the device.
 > 
-> Sure, here's the output:
-> 
-> $ sdptool records --raw 00:0B:24:40:C7:83
-> Sequence
->          Attribute 0x0000 - ServiceRecordHandle
->                  UINT32 0x00010000
->          Attribute 0x0001 - ServiceClassIDList
->                  Sequence
->                          UUID16 0x1101 - SerialPort
->          Attribute 0x0004 - ProtocolDescriptorList
->                  Sequence
->                          Sequence
->                                  UUID16 0x0100 - L2CAP
->                          Sequence
->                                  UUID16 0x0003 - RFCOMM
->                                  UINT8 0x01
->          Attribute 0x0100
->                  String Serial Port
-> 
-> Please let me know if you need any other information, or if there's 
-> anything I can do to help get this working.
+> this is not a HID compatible keyboard and needs an extra driver to
+> function properly. Please run "sdptool records --raw <bdaddr>" to
+> retrieve the SDP records for this device.
 
-this looks like the third of these. Please also run "hcitool inq" and
-"hcitool info ..." (as root) for this.
+Sure, here's the output:
 
-Regards
+$ sdptool records --raw 00:0B:24:40:C7:83
+Sequence
+         Attribute 0x0000 - ServiceRecordHandle
+                 UINT32 0x00010000
+         Attribute 0x0001 - ServiceClassIDList
+                 Sequence
+                         UUID16 0x1101 - SerialPort
+         Attribute 0x0004 - ProtocolDescriptorList
+                 Sequence
+                         Sequence
+                                 UUID16 0x0100 - L2CAP
+                         Sequence
+                                 UUID16 0x0003 - RFCOMM
+                                 UINT8 0x01
+         Attribute 0x0100
+                 String Serial Port
 
-Marcel
+Please let me know if you need any other information, or if there's 
+anything I can do to help get this working.
 
-
+Regards,
+Chris
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
