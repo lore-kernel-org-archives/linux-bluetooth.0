@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4504301E.4060402@flcd.net>
-References: <4504301E.4060402@flcd.net>
-Date: Fri, 15 Sep 2006 11:51:11 +0200
-Message-Id: <1158313871.5233.11.camel@localhost>
+In-Reply-To: <200609121230.19842.akohlsmith-bluez@benshaw.com>
+References: <200609121230.19842.akohlsmith-bluez@benshaw.com>
+Date: Fri, 15 Sep 2006 11:45:31 +0200
+Message-Id: <1158313531.5233.5.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] enable auth and BNEP question?
+Subject: Re: [Bluez-users] equivalent of /etc/hosts for bluetooth devices?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,42 +20,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Denis,
+Hi Andrew,
 
-> Hi I've recently switched to 3.5 from 2.25 version and have few questions:
-> 
-> 1. Here is my hcid.conf
-> options {
->         autoinit yes;
->         security auto;
->         pairing multi;
->         passkey "BlueZ";
-> }
-> device {
->         name "%h-%d";
->         class 0x3e0100;
->         iscan enable;
->         pscan enable;
->         discovto 0;
->         lm accept;
->         lp rswitch,hold,sniff,park;
->         auth enable;
-> }
-> 
-> but my hciconfig still show no auth, and I can connect to PC without aut
-> Of course I can bring it by "hciconfig piscan auth" but I wish to bring 
-> it by default.
-> Is there a way to do so?
-> 
-> 
-> 2. I mostly use my Linux box to share create bluetooth network with 
-> other PC and my PDA so previously I had "pan " directory inside 
-> /etc/bluetooth/ with dev-up and dev-down files which automatically bring 
-> up bnep0 device, but seems that BlueZ 3.5 is working differently and I 
-> need to execute "ifconfig benp0 up" to enable my connection.
-> Is there a way to automate this?
+> Is there a file I can place permanent mappings in so I don't have to keep 
+> referring to non-discoverable devices by their bdaddr?
 
-you might wanna try the -A, -E or -S switch for pand.
+we have general alias support, but non of the low-level tools are using
+it. It is for D-Bus based applications to display a more simple name.
 
 Regards
 
