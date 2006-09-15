@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Date: Fri, 15 Sep 2006 14:00:31 +0200
-Message-ID: <59260DC6DFC1CF40B06388D43B284EBB22FF8A@destc0strmsx02.eu.sony.com>
-From: "Hohl, Fritz" <hohl@sony.de>
-To: <Bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] SBC: Some remarks and a question
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?UTF-8?Q?=22=EC=9D=B4=EA=B4=91=EC=A7=84=22?= <fidelis98@naver.com>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <44FE0B6A.000001.04824@nhn528>
+References: <44FE0B6A.000001.04824@nhn528>
+Date: Fri, 15 Sep 2006 14:00:21 +0200
+Message-Id: <1158321621.5233.21.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Bluez HID support Think Outside Keyboard????
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,77 +21,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hi,
 
-I (try to) use the SBC package inside btsco 0.42 and want to 
-give some feedback on things I noticed:
+> My question is,
+> 
+> Have you ever used Think-Outside Bluetooth keyboard with BlueZ?
+> I connect to Think-Outside BT Keyboard and run server.
+> 
+> # hidd --search
+>     Connecting to device 00:03:C9:D3:79:25
+> 
+> # hidd
+> 00:03:C9:D3:79:25 HID Boot Device [0a5c:2001] connected
+> [boot-protocol]
+> 
+> # hidd -n --server
+> hidd[1118]: Bluetooth HID daemon
+> 
+> After run  "hidd -n --server ", wait polling data from device.
+> 
+> But, Data is nothing.
+> 
+> How about your connection to Think-Outside BT Keyboard? 
+> Like me? or not ?
+> 
+> How can I solve this problem?
 
-SBC in general
---------------
+that is enough to do. Run "hcidump -X -V" as root to see if keypresses
+get transmitted.
 
-Compared to the Philips reference en/decoder, the 
-decoded sound using the floating-point version 
-is much more quiet. 
+Regards
 
-The USE_FIXED version is even more quiet (a (signal-disturbing) 
-"<<= 2" operation seems to bring the signal to about the original 
-level, so it is really quiet).
-
-How much MIPS does the implementation needs?
-I read that once some Philips guy told something
-about 5 MIPS, but it was not clear what types of 
-MIPS he meant nor to which version this applied.
-Compared to MP3 encoding and decoding, what are your
-experiences?
-
-
-sbcenc.c
---------
-
-bug?: Files of a size <= the buffer size (i.e. 2048) 
-      are not processed.
-
-bug?: not all option shortcuts (-* forms instead of --*) can
-      be used (also holds true in sbcdec.c).
-
-feature: I wrote (imperfect) sbcenc and sbcdec versions that consume and
-         produce canonical .wav files, respectively.
-         Is somebody interested?
-         
-
-----addendum 1-----------------------------------------
-
-Proposal to add at least some lines 
-to the important functions:
-
-int sbc_encode(sbc_t *sbc, void *data, int count)
-----------------------------------------------
-Encodes PCM samples into one frame of SBC-encoded data. The PCM samples
-starts at data and are of length count. The encoded data 
-is of length sbc->len is then stored in sbc->data.
-
-Returns the length of the encoded PCM data
-
-Please note that for encoding an entire stream, you might 
-have to use sbc_encode multiple times as it encodes only 
-into 1 frame per call. 
+Marcel
 
 
-int sbc_decode(sbc_t *sbc, void *data, int count)
-----------------------------------------------
-Decodes one frame of SBC-encoded data. The SBC-encoded data
-starts at data and is of length count. The decoded data 
-of length sbc->len is then stored in sbc->data.
-
-Returns the length of the frame that was decoded.
-
-Please note that for decoding an entire stream, you might 
-have to use sbc_decode multiple times as it decodes only 
-1 frame per call. 
-
-
-Regards,
-  Fritz
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
