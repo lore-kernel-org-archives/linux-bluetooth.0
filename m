@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 15 Sep 2006 19:45:05 -0400
-From: Chris Spencer <chrisspen@gmail.com>
-In-reply-to: <1158329592.5233.32.camel@localhost>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-id: <450B3B01.2060801@gmail.com>
-MIME-version: 1.0
-References: <beb7688e0609150702x738ad4d8re64815d12f457a76@mail.gmail.com>
-	<1158329592.5233.32.camel@localhost>
-Subject: Re: [Bluez-devel] Celluon Laserkey Bluetooth Keyboard
+In-Reply-To: <1158352238.9960.5.camel@localhost>
+References: <1158352238.9960.5.camel@localhost>
+Date: Fri, 15 Sep 2006 23:12:44 +0200
+Message-Id: <1158354764.5233.59.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] L2CAP Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,38 +20,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
->> The last part is interesting, because the three 255s repeat for every
->> keypress and mouse movement made with the device.
-> 
-> this is not a HID compatible keyboard and needs an extra driver to
-> function properly. Please run "sdptool records --raw <bdaddr>" to
-> retrieve the SDP records for this device.
+Hi Martin,
 
-Sure, here's the output:
+> after some months of coding, testing, deadlocks, debugging,
+> book-readings, etc. I present my first working version of L2CAP flow
+> control for the BlueZ stack. This is an early alpha release and may
+> contain errors -- but hey, it is the first really working version here
+> so be lenient toward me :-)
 
-$ sdptool records --raw 00:0B:24:40:C7:83
-Sequence
-         Attribute 0x0000 - ServiceRecordHandle
-                 UINT32 0x00010000
-         Attribute 0x0001 - ServiceClassIDList
-                 Sequence
-                         UUID16 0x1101 - SerialPort
-         Attribute 0x0004 - ProtocolDescriptorList
-                 Sequence
-                         Sequence
-                                 UUID16 0x0100 - L2CAP
-                         Sequence
-                                 UUID16 0x0003 - RFCOMM
-                                 UINT8 0x01
-         Attribute 0x0100
-                 String Serial Port
+nice stuff and I decided to put out patch-2.6.17-mh6 with your patch
+included to open it for a wider testing audience. I will boot up my
+development system with this patch and see how it goes.
 
-Please let me know if you need any other information, or if there's 
-anything I can do to help get this working.
+I haven't done any code review, but the obvious thing you missed is the
+"select CRC16" in the Kconfig file.
 
-Regards,
-Chris
+The rumors have it that the Symbian OS 9.1 already supports L2CAP
+retransmission and flow control (RFC) and this might be a good testing
+system.
+
+Keep up the good work.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
