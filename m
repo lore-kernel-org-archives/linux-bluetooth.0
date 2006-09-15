@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <450AD1DF.2010401@flcd.net>
-Date: Fri, 15 Sep 2006 19:16:31 +0300
-From: Denis <denis@flcd.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4504301E.4060402@flcd.net> <1158313871.5233.11.camel@localhost>
-In-Reply-To: <1158313871.5233.11.camel@localhost>
-Subject: Re: [Bluez-users] enable auth and BNEP question?
+In-Reply-To: <44FE86EC.000014.12930@bj163app52.163.com>
+References: <44FE86EC.000014.12930@bj163app52.163.com>
+Date: Fri, 15 Sep 2006 13:59:03 +0200
+Message-Id: <1158321543.5233.19.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] hciemu lost its interface after I run att est
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,31 +20,57 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
->> 2. I mostly use my Linux box to share create bluetooth network with 
->> other PC and my PDA so previously I had "pan " directory inside 
->> /etc/bluetooth/ with dev-up and dev-down files which automatically bring 
->> up bnep0 device, but seems that BlueZ 3.5 is working differently and I 
->> need to execute "ifconfig benp0 up" to enable my connection.
->> Is there a way to automate this?
->>     
->
-> you might wanna try the -A, -E or -S switch for pand.
->   
-Thanks for response, Marcel!
+Hi,
 
-I've tried switches you've recommend and seems that "-S" is what I'm 
-looking for although it asked me authorization 3 times(even once devices 
-was paired) but now it seems to work like it should.
+> hi guy, I experienced one issue, can anybody help? thanks!
+> 
+> 1. setup 2 virtual hci interface hci0 and hci1
+> hciemu localhost:1000
+> hciemu localhost:2000
+> linux-l20w:~ # hciconfig
+> hci0: Type: VHCI
+> BD Address: 7F:00:00:01:03:E8 ACL MTU: 192:8 SCO MTU: 64:0
+> UP RUNNING PSCAN ISCAN
+> RX bytes:0 acl:0 sco:0 events:15 errors:0
+> TX bytes:569 acl:0 sco:0 commands:15 errors:0
+> 
+> hci1: Type: VHCI
+> BD Address: 7F:00:00:01:07:D0 ACL MTU: 192:8 SCO MTU: 64:0
+> UP RUNNING PSCAN ISCAN
+> RX bytes:0 acl:0 sco:0 events:15 errors:0
+> TX bytes:569 acl:0 sco:0 commands:15 errors:0
+> 
+> 2. run attest
+> attest 7F:00:00:01:03:E8 10
+> the $? is equal 0
+> linux-l20w:~ # attest 7F:00:00:01:03:E8 10
+> Connecting to 7F:00:00:01:03:E8 on channel 10
+> linux-l20w:~ # echo $?
+> 0
+> Everything is OK until now.
+> 
+> 3. But hci1 is lost
+> But take a look at this:
+> linux-l20w:~ # hciconfig
+> hci0: Type: VHCI
+> BD Address: 7F:00:00:01:03:E8 ACL MTU: 192:8 SCO MTU: 64:0
+> UP RUNNING PSCAN ISCAN
+> RX bytes:0 acl:15 sco:0 events:22 errors:0
+> TX bytes:797 acl:12 sco:0 commands:18 errors:0
+> hci1 is lost.
+> 
+> Otherinfo:
+> linux-l20w:~ # uname -r
+> 2.6.16.21-38-smp
 
-Maybe you can help me with brining up bnep0 interface automatically as well?
+I have no idea, but you might wanna check hciemu for a segmentation
+fault or run it within a debugger.
 
--- 
-Best regards,
-Denis Stenderchuck
+Regards
 
-http://forum.weblamp.net/linux - Webmaster Key Forums
-http://www.pharos-search.com - A Human Edited Directory
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
