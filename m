@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <44FE86EC.000014.12930@bj163app52.163.com>
-References: <44FE86EC.000014.12930@bj163app52.163.com>
-Date: Fri, 15 Sep 2006 13:59:03 +0200
-Message-Id: <1158321543.5233.19.camel@localhost>
+In-Reply-To: <4504301E.4060402@flcd.net>
+References: <4504301E.4060402@flcd.net>
+Date: Fri, 15 Sep 2006 11:51:11 +0200
+Message-Id: <1158313871.5233.11.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] hciemu lost its interface after I run att est
+Subject: Re: [Bluez-users] enable auth and BNEP question?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,51 +20,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Denis,
 
-> hi guy, I experienced one issue, can anybody help? thanks!
+> Hi I've recently switched to 3.5 from 2.25 version and have few questions:
 > 
-> 1. setup 2 virtual hci interface hci0 and hci1
-> hciemu localhost:1000
-> hciemu localhost:2000
-> linux-l20w:~ # hciconfig
-> hci0: Type: VHCI
-> BD Address: 7F:00:00:01:03:E8 ACL MTU: 192:8 SCO MTU: 64:0
-> UP RUNNING PSCAN ISCAN
-> RX bytes:0 acl:0 sco:0 events:15 errors:0
-> TX bytes:569 acl:0 sco:0 commands:15 errors:0
+> 1. Here is my hcid.conf
+> options {
+>         autoinit yes;
+>         security auto;
+>         pairing multi;
+>         passkey "BlueZ";
+> }
+> device {
+>         name "%h-%d";
+>         class 0x3e0100;
+>         iscan enable;
+>         pscan enable;
+>         discovto 0;
+>         lm accept;
+>         lp rswitch,hold,sniff,park;
+>         auth enable;
+> }
 > 
-> hci1: Type: VHCI
-> BD Address: 7F:00:00:01:07:D0 ACL MTU: 192:8 SCO MTU: 64:0
-> UP RUNNING PSCAN ISCAN
-> RX bytes:0 acl:0 sco:0 events:15 errors:0
-> TX bytes:569 acl:0 sco:0 commands:15 errors:0
+> but my hciconfig still show no auth, and I can connect to PC without aut
+> Of course I can bring it by "hciconfig piscan auth" but I wish to bring 
+> it by default.
+> Is there a way to do so?
 > 
-> 2. run attest
-> attest 7F:00:00:01:03:E8 10
-> the $? is equal 0
-> linux-l20w:~ # attest 7F:00:00:01:03:E8 10
-> Connecting to 7F:00:00:01:03:E8 on channel 10
-> linux-l20w:~ # echo $?
-> 0
-> Everything is OK until now.
 > 
-> 3. But hci1 is lost
-> But take a look at this:
-> linux-l20w:~ # hciconfig
-> hci0: Type: VHCI
-> BD Address: 7F:00:00:01:03:E8 ACL MTU: 192:8 SCO MTU: 64:0
-> UP RUNNING PSCAN ISCAN
-> RX bytes:0 acl:15 sco:0 events:22 errors:0
-> TX bytes:797 acl:12 sco:0 commands:18 errors:0
-> hci1 is lost.
-> 
-> Otherinfo:
-> linux-l20w:~ # uname -r
-> 2.6.16.21-38-smp
+> 2. I mostly use my Linux box to share create bluetooth network with 
+> other PC and my PDA so previously I had "pan " directory inside 
+> /etc/bluetooth/ with dev-up and dev-down files which automatically bring 
+> up bnep0 device, but seems that BlueZ 3.5 is working differently and I 
+> need to execute "ifconfig benp0 up" to enable my connection.
+> Is there a way to automate this?
 
-I have no idea, but you might wanna check hciemu for a segmentation
-fault or run it within a debugger.
+you might wanna try the -A, -E or -S switch for pand.
 
 Regards
 
