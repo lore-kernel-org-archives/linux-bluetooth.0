@@ -1,17 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1157464964.18992.83.camel@localhost>
-References: <1157355863.18992.42.camel@localhost>
-	<1157366293.32195.41.camel@aeonflux.holtmann.net>
-	<1157361100.18992.49.camel@localhost>
-	<1157449810.4206.0.camel@localhost>
-	<1157464964.18992.83.camel@localhost>
-Date: Fri, 15 Sep 2006 14:02:03 +0200
-Message-Id: <1158321723.5233.24.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] What's going on here? RFCOMM
-	on	OPP	always	gets	disconnected
+MIME-Version: 1.0
+Date: Fri, 15 Sep 2006 14:00:31 +0200
+Message-ID: <59260DC6DFC1CF40B06388D43B284EBB22FF8A@destc0strmsx02.eu.sony.com>
+From: "Hohl, Fritz" <hohl@sony.de>
+To: <Bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] SBC: Some remarks and a question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,39 +18,77 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pierre-Yves,
+Hello,
 
-> > > > in case please to "hcidump -X -V --obex=9". I am not going to decide
-> > > > OBEX by hand if I don't have to.
-> > 
-> > please check that their OPP service is still on channel 9. The channel
-> > numbers might have changed and you connect to the wrong channel.
-> 
-> I just checked, but it is not the case: OPP is still on the channel 9. I
-> get the prompt to accept the incoming object, but past that point it
-> always does behave like in the log I posted earlier. If I was on the
-> wrong channel, how could I get this as I do?
-> 
-> 
-> > ACL data: handle 12 flags 0x02 dlen 16
->     L2CAP(d): cid 0x0040 len 12 [psm 3]
->       RFCOMM(d): UIH: cr 0 dlci 18 pf 1 ilen 7 fcs 0x8 credits 1
->         OBEX: Connect rsp(f): status 200 len 7 version 1.0 flags 0 mtu
-> 2044
->         Status 200 = Success
-> 
-> 
-> I did the same test on another phone (SE k750i), and the log looks alike
-> (with the endless list of 0's at the end too). Here it is:
+I (try to) use the SBC package inside btsco 0.42 and want to 
+give some feedback on things I noticed:
 
-I have no clue. Maybe you wanna make sure to recompile every library. It
-looks like a nasty bug or error in your code.
+SBC in general
+--------------
 
-Regards
+Compared to the Philips reference en/decoder, the 
+decoded sound using the floating-point version 
+is much more quiet. 
 
-Marcel
+The USE_FIXED version is even more quiet (a (signal-disturbing) 
+"<<= 2" operation seems to bring the signal to about the original 
+level, so it is really quiet).
+
+How much MIPS does the implementation needs?
+I read that once some Philips guy told something
+about 5 MIPS, but it was not clear what types of 
+MIPS he meant nor to which version this applied.
+Compared to MP3 encoding and decoding, what are your
+experiences?
 
 
+sbcenc.c
+--------
+
+bug?: Files of a size <= the buffer size (i.e. 2048) 
+      are not processed.
+
+bug?: not all option shortcuts (-* forms instead of --*) can
+      be used (also holds true in sbcdec.c).
+
+feature: I wrote (imperfect) sbcenc and sbcdec versions that consume and
+         produce canonical .wav files, respectively.
+         Is somebody interested?
+         
+
+----addendum 1-----------------------------------------
+
+Proposal to add at least some lines 
+to the important functions:
+
+int sbc_encode(sbc_t *sbc, void *data, int count)
+----------------------------------------------
+Encodes PCM samples into one frame of SBC-encoded data. The PCM samples
+starts at data and are of length count. The encoded data 
+is of length sbc->len is then stored in sbc->data.
+
+Returns the length of the encoded PCM data
+
+Please note that for encoding an entire stream, you might 
+have to use sbc_encode multiple times as it encodes only 
+into 1 frame per call. 
+
+
+int sbc_decode(sbc_t *sbc, void *data, int count)
+----------------------------------------------
+Decodes one frame of SBC-encoded data. The SBC-encoded data
+starts at data and is of length count. The decoded data 
+of length sbc->len is then stored in sbc->data.
+
+Returns the length of the frame that was decoded.
+
+Please note that for decoding an entire stream, you might 
+have to use sbc_decode multiple times as it decodes only 
+1 frame per call. 
+
+
+Regards,
+  Fritz
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
