@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?UTF-8?Q?=22=EC=9D=B4=EA=B4=91=EC=A7=84=22?= <fidelis98@naver.com>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <44FF8164.000001.26960@han731>
-References: <44FF8164.000001.26960@han731>
-Date: Fri, 15 Sep 2006 13:56:41 +0200
-Message-Id: <1158321401.5233.15.camel@localhost>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <45015406.60208@vasmac.com>
+References: <45015406.60208@vasmac.com>
+Date: Fri, 15 Sep 2006 13:55:34 +0200
+Message-Id: <1158321334.5233.13.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] How can I Make HIDH??
+Subject: Re: [Bluez-devel] hcid dbus patches
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,11 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Jose,
 
-> OS is Linux and kernel version is 2.4.45.
+> Here are a couple of patches that implement the following
+> commands in dbus-test:
+> GetRemoteClass
+> GetRemoteServiceHandles
+> GetRemoteServiceRecord
+> 
+> This required modifications to dbus-sdp.c. The problem was
+> that the call to dbus_message_get_args in this file used a NULL
+> pointer for the error structure. This patch adds a pointer in
+> the same way that dbus-adapter.c calls dbus_messsage_get_args.
+> The end result is that both GetRemoteService* calls now seem
+> to work.
 
-I welcome the visitors from the future ;)
+I am not following that argument. If we don't care about the error code,
+then why should we fill one it. If this is a problem, then the problem
+is in the D-Bus low-level library or the Python bindings.
 
 Regards
 
