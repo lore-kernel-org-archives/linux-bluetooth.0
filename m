@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <beb7688e0609150702x738ad4d8re64815d12f457a76@mail.gmail.com>
-Date: Fri, 15 Sep 2006 10:02:52 -0400
-From: "Chris S" <chrisspen@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] Celluon Laserkey Bluetooth Keyboard
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <450AADD1.2040300@vasmac.com>
+References: <45015406.60208@vasmac.com> <1158321334.5233.13.camel@localhost>
+	<450AADD1.2040300@vasmac.com>
+Date: Fri, 15 Sep 2006 15:46:51 +0200
+Message-Id: <1158328011.5233.30.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] hcid dbus patches
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,78 +21,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-First, I apologize if this is off-topic for this list, but I'm not
-sure where to post general Bluetooth+Linux related questions.
+Hi Jose,
 
-I recently bought a Celluon CL800BT Bluetooth keyboard/mouse
-(http://celluon.com/products/laserkey.htm?sm=2_1) and I'd like to use
-it in Linux (Fedora Core 5). I've tried the Gnome and KDE utilities,
-but haven't had much luck. I was able to use kbluetoothd to see some
-sort of "Serial Port" file on the device, but I wasn't able to do
-anything further. I've also gotten some feedback from hcitool and hidd:
+> >> Here are a couple of patches that implement the following
+> >> commands in dbus-test:
+> >> GetRemoteClass
+> >> GetRemoteServiceHandles
+> >> GetRemoteServiceRecord
+> >>
+> >> This required modifications to dbus-sdp.c. The problem was
+> >> that the call to dbus_message_get_args in this file used a NULL
+> >> pointer for the error structure. This patch adds a pointer in
+> >> the same way that dbus-adapter.c calls dbus_messsage_get_args.
+> >> The end result is that both GetRemoteService* calls now seem
+> >> to work.
+> >>     
+> >
+> > I am not following that argument. If we don't care about the error code,
+> > then why should we fill one it. If this is a problem, then the problem
+> > is in the D-Bus low-level library or the Python bindings.
+> 
+> This was my first hack with dbus. I haven't read the docs so
+> I'm not sure how it all works. I just noticed that the code in
+> dbus-adapter.c is working so put the same changes on dbus-sdp.c
+> and it worked.
+> 
+> I don't think the patch to dbus-sdp.c should be put in. Someone
+> with more dbus expertise should fix it. The patch to dbus-test
+> is simple and adds the new commands.
 
-$ hcitool scan
-Scanning ...
-       00:0B:24:40:C7:83       CL800BT
-$ hcitool inq
-Inquiring ...
-       00:0B:24:40:C7:83       clock offset: 0x3ab6    class: 0x400210
-$ hcitool info 00:0B:24:40:C7:83
-Requesting information ...
-       BD Address:  00:0B:24:40:C7:83
-       Device Name: CL800BT
-       LMP Version: 1.1 (0x1) LMP Subversion: 0x291
-       Manufacturer: Cambridge Silicon Radio (10)
-       Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-               <3-slot packets> <5-slot packets> <encryption> <slot
-offset>
-               <timing accuracy> <role switch> <hold mode> <sniff mode>
-               <park state> <RSSI> <channel quality> <SCO link> <HV2
-packets>
-               <HV3 packets> <u-law log> <A-law log> <CVSD> <paging
-scheme>
-               <power control> <transparent SCO>
-$ hidd --connect 00:0B:24:40:C7:83
-Connected to 00:0B:24:40:C7:83 on channel 1
-Press CTRL-C for hangup
-Unknown event code 165
-Unknown event code 165
-Unknown event code 1
-Unknown event code 0
-Unknown event code 0
-Unknown event code 0
-Unknown event code 1
-Unknown event code 255
-Unknown event code 1
-Unknown event code 18
-Unknown event code 0
-Unknown event code 1
-Unknown event code 255
-Unknown event code 255
-Unknown event code 255
-Unknown event code 0
-Unknown event code 1
+every patch is welcome, but for this one, I simply don't see the need.
+For me it looks like D-Bus is at fault here and maybe updating your
+D-Bus installation and the Python bindings might fix this.
 
-The last part is interesting, because the three 255s repeat for every
-keypress and mouse movement made with the device.
+Regards
 
-Does this output match any known Bluetooth keyboard/mouse protocol?
-How can I configure Xorg to interpret this device as a keyboard and mouse?
+Marcel
 
-I've been Googling, but I haven't found many resources on the topic,
-and even less on using Bluetooth keyboards with Linux. I found the
-kbdd project (http://handhelds.org/moin/moin.cgi/kbdd) but I'm not
-sure if it's compatible with the CL800BT.
 
-I have experience with C/C++ and Python, so if there's no current
-software for handling this device, I could try and work
-something out if someone could point me in the right direction to get
-started.
-
-Any help is greatly appreciated.
-
-Regards,
-Chris Spencer
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
