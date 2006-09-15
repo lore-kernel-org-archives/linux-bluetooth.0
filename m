@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <450ABCAB.6020809@xmission.com>
-Date: Fri, 15 Sep 2006 08:46:03 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <59260DC6DFC1CF40B06388D43B284EBB22FF8A@destc0strmsx02.eu.sony.com>
-In-Reply-To: <59260DC6DFC1CF40B06388D43B284EBB22FF8A@destc0strmsx02.eu.sony.com>
-Subject: Re: [Bluez-devel] SBC: Some remarks and a question
+In-Reply-To: <beb7688e0609150702x738ad4d8re64815d12f457a76@mail.gmail.com>
+References: <beb7688e0609150702x738ad4d8re64815d12f457a76@mail.gmail.com>
+Date: Fri, 15 Sep 2006 16:13:12 +0200
+Message-Id: <1158329592.5233.32.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Celluon Laserkey Bluetooth Keyboard
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,89 +20,72 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fritz
+Hi Crhis,
 
-I'm glad someone is having a look. Yes, we have some work to do here.
-
-fyi, we're trying to limit changes to the fixed-point only version in
-the sbc sourceforge project. It does have volume problems but we'd like
-to hammer them out so fixed point is what everybody uses.
-
-> The USE_FIXED version is even more quiet (a (signal-disturbing) 
-> "<<= 2" operation seems to bring the signal to about the original 
-> level, so it is really quiet).
-
-there are some ops like this that are to avoid fixed point overflows.
-when the encoder overflows, it generates an annoying "pop" noise in the
-stream.
-
-> How much MIPS does the implementation needs?
-> I read that once some Philips guy told something
-> about 5 MIPS, but it was not clear what types of 
-> MIPS he meant nor to which version this applied.
-> Compared to MP3 encoding and decoding, what are your
-> experiences?
-
-I haven't measured it and I've only tried it on a pxa255 at 400mhz but I
-think someone had success with an arm 7...
-
-> sbcenc.c
-> --------
+> First, I apologize if this is off-topic for this list, but I'm not
+> sure where to post general Bluetooth+Linux related questions.
 > 
-> bug?: Files of a size <= the buffer size (i.e. 2048) 
->       are not processed.
+> I recently bought a Celluon CL800BT Bluetooth keyboard/mouse
+> (http://celluon.com/products/laserkey.htm?sm=2_1) and I'd like to use
+> it in Linux (Fedora Core 5). I've tried the Gnome and KDE utilities,
+> but haven't had much luck. I was able to use kbluetoothd to see some
+> sort of "Serial Port" file on the device, but I wasn't able to do
+> anything further. I've also gotten some feedback from hcitool and hidd:
+> 
+> $ hcitool scan
+> Scanning ...
+>        00:0B:24:40:C7:83       CL800BT
+> $ hcitool inq
+> Inquiring ...
+>        00:0B:24:40:C7:83       clock offset: 0x3ab6    class: 0x400210
+> $ hcitool info 00:0B:24:40:C7:83
+> Requesting information ...
+>        BD Address:  00:0B:24:40:C7:83
+>        Device Name: CL800BT
+>        LMP Version: 1.1 (0x1) LMP Subversion: 0x291
+>        Manufacturer: Cambridge Silicon Radio (10)
+>        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>                <3-slot packets> <5-slot packets> <encryption> <slot
+> offset>
+>                <timing accuracy> <role switch> <hold mode> <sniff mode>
+>                <park state> <RSSI> <channel quality> <SCO link> <HV2
+> packets>
+>                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging
+> scheme>
+>                <power control> <transparent SCO>
+> $ hidd --connect 00:0B:24:40:C7:83
+> Connected to 00:0B:24:40:C7:83 on channel 1
+> Press CTRL-C for hangup
+> Unknown event code 165
+> Unknown event code 165
+> Unknown event code 1
+> Unknown event code 0
+> Unknown event code 0
+> Unknown event code 0
+> Unknown event code 1
+> Unknown event code 255
+> Unknown event code 1
+> Unknown event code 18
+> Unknown event code 0
+> Unknown event code 1
+> Unknown event code 255
+> Unknown event code 255
+> Unknown event code 255
+> Unknown event code 0
+> Unknown event code 1
+> 
+> The last part is interesting, because the three 255s repeat for every
+> keypress and mouse movement made with the device.
 
-that would explain why some songs end prematurely
+this is not a HID compatible keyboard and needs an extra driver to
+function properly. Please run "sdptool records --raw <bdaddr>" to
+retrieve the SDP records for this device.
 
-> 
-> bug?: not all option shortcuts (-* forms instead of --*) can
->       be used (also holds true in sbcdec.c).
+Regards
 
-it would be nice to be consistent in the args
+Marcel
 
-> 
-> feature: I wrote (imperfect) sbcenc and sbcdec versions that consume and
->          produce canonical .wav files, respectively.
->          Is somebody interested?
 
-sbcenc/dec are part of the "playground" which is there for testing and
-development. If your additions make that easier then they'd be nice to have.
-
->          
-> 
-> ----addendum 1-----------------------------------------
-> 
-> Proposal to add at least some lines 
-> to the important functions:
-> 
-> int sbc_encode(sbc_t *sbc, void *data, int count)
-> ----------------------------------------------
-> Encodes PCM samples into one frame of SBC-encoded data. The PCM samples
-> starts at data and are of length count. The encoded data 
-> is of length sbc->len is then stored in sbc->data.
-> 
-> Returns the length of the encoded PCM data
-> 
-> Please note that for encoding an entire stream, you might 
-> have to use sbc_encode multiple times as it encodes only 
-> into 1 frame per call. 
-> 
-> 
-> int sbc_decode(sbc_t *sbc, void *data, int count)
-> ----------------------------------------------
-> Decodes one frame of SBC-encoded data. The SBC-encoded data
-> starts at data and is of length count. The decoded data 
-> of length sbc->len is then stored in sbc->data.
-> 
-> Returns the length of the frame that was decoded.
-> 
-> Please note that for decoding an entire stream, you might 
-> have to use sbc_decode multiple times as it decodes only 
-> 1 frame per call. 
-
-which problems are these proposals addressing?
-
-brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
