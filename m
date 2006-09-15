@@ -1,17 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0609141052130.22339@redbean.intranet.gw-instruments.de>
-References: <450603BA.3090302@vasmac.com>
-	<Pine.LNX.4.63.0609121038180.17868@redbean.intranet.gw-instruments.de>
-	<1158050613.14015.1.camel@localhost>
-	<Pine.LNX.4.63.0609121206040.17868@redbean.intranet.gw-instruments.de>
-	<45081402.8020909@vasmac.com>
-	<Pine.LNX.4.63.0609141052130.22339@redbean.intranet.gw-instruments.de>
-Date: Fri, 15 Sep 2006 11:49:51 +0200
-Message-Id: <1158313791.5233.9.camel@localhost>
+In-Reply-To: <Pine.LNX.4.63.0609141423350.22339@redbean.intranet.gw-instruments.de>
+References: <3f5a9ba20609132122ue951876kcdfaacae30110f66@mail.gmail.com>
+	<Pine.LNX.4.63.0609141101160.22339@redbean.intranet.gw-instruments.de>
+	<450940DC.5080809@infitsrl.com>
+	<Pine.LNX.4.63.0609141354070.22339@redbean.intranet.gw-instruments.de>
+	<45094871.7010003@infitsrl.com>
+	<Pine.LNX.4.63.0609141423350.22339@redbean.intranet.gw-instruments.de>
+Date: Fri, 15 Sep 2006 11:44:25 +0200
+Message-Id: <1158313465.5233.3.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] socket connect returns EAGAIN
+Subject: Re: [Bluez-devel] About concurrency sdp_connect
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -27,23 +27,31 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Peter,
 
-> > > I think the problem is in bt_sock_wait_state(...). This always returns 
-> > > -EAGAIN if timeout is zero (which it is if the socket is set non 
-> > > blocking). But may be I'm missing something. 
-> > 
-> > I've come to a similar conclusion. I'm not sure why it's returning -EAGAIN.
-> > However, looking at the x25 transport (af_x25.c), it takes a different 
-> > approach;
-> > if O_NONBLOCK is set they don't call the blocking routine at all. Maybe a
-> > similar approach should be taken here.
-> > 
-> returning EAGAIN is fine for a listening socket. I first thought the 
-> solution of not calling bt_sock_wait_state() for a non blocking connect 
-> would be the easiest solution, too. But then you have to correct it on 
-> several places. Just changing bt_sock_wait_state() will solve it for 
-> various socket types. 
+> > I'm not expert in bluez kernel driver programming but I've developed an 
+> > application using socket abstraction
+> > on Windows (microsoft stack) and I can connect simultaneously to many 
+> > devices (7 max) with the same usb dongled
+> > tested with bluez on linux. So I think it can't be a hardware problem, 
+> > or better may be the hardware limitation but I think it's bypassable
+> > in software layers.
+> > bye
+> > Fabrizio
+> 
+> The problem is not to connect to 7 devices simultaniuous. The problem is 
+> that (on the HCI level) most (or all??) devices gives you an error 
+> response when you start a new connection while there is an outstanding 
+> connection request. Of cause you can come arround this by software on the 
+> upper level. E.g. you can make sure not to send a new connect request to 
+> the device while it has not responeded to the previous one. 
 
-sounds like a good idea. Anyone preparing a patch for it?
+my last attempt to make this work actually failed, but I didn't put much
+energy into it. Feel free to come up with a working version. The path
+how to handle this is clear.
+
+> Don't know what microsoft is doing here (don't have their source ;-). 
+
+They will do something similar. If you get a HCI trace, then you can see
+for yourself what they are doing.
 
 Regards
 
