@@ -1,10 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 17 Sep 2006 19:45:08 +0800
-From: "marco" <szarm@tom.com>
-To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jean-Jacques Brucker <jjbrucker@free.fr>
+In-Reply-To: <200609161707.56327.jjbrucker@free.fr>
+References: <OF6F05A6E3.87C65DE9-ONC12571EA.005C0311-C12571EA.005E2464@sagem.com>
+	<1158408734.6839.3.camel@localhost>
+	<200609161707.56327.jjbrucker@free.fr>
+Date: Sun, 17 Sep 2006 01:18:56 +0200
+Message-Id: <1158448736.4350.2.camel@localhost>
 Mime-Version: 1.0
-Message-ID: <E1GOv4W-0006AI-Fr@mail.sourceforge.net>
-Subject: [Bluez-devel] hcid and d-bus
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel]
+	=?iso-8859-1?q?R=E9f=2E_=3A_Re=3A_bluez_=3A_new=09b?=
+	=?iso-8859-1?q?luetooth_keyboard=09supported_by_hidd=2E?=
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,46 +21,46 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2085477829=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============2085477829==
-Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
+Hi Jean-Jacques,
 
-ZXZlcnkgb25lDQpwbGVhc2UgaGVscCBtZQ0KICAgIHdoZW4gaSBzdGFydCAiaGNpZCAtbiIgLCBh
-cHBlYXJlZCBlcnJvcjoNCiAgICBCbHVldG9vdGggSENJIGRhZW1vbg0KICAgIFNlcnZpY2UgY291
-bGQgbm90IGJlY29tZSB0aGUgcHJpbWFyeSBvd25lci4NCiAgICB1bmFibGUgdG8gZ2V0IG9uIEQt
-QnVzDQoNCnRoZSB2ZXJzaW9uIG9mIHRoZSBwYWNrYWdlIEkgaGF2ZSBpbnN0YWxsZWQ6DQogICBk
-YnVzLTAuOTINCiAgIGJsdWV6LXV0aWxzLTMuNA0KICAgYmx1ZXotbGlicy0zLjQNCqGhoaGhoaGh
-oaGhoaGhoaFtYXJjbw0KoaGhoaGhoaGhoaGhoaGhoXN6YXJtQHRvbS5jb20NCqGhoaGhoaGhoaGh
-oaGhoaGhoaGhMjAwNi0wOS0xNyAgIA0K
+> OK, thx. Gonna use it monday morning, but it seems that the do_search 
+> option(function) won't find the device.
+
+I overlooked that part. Fixed now.
+
+> Note: You dislike my doxygen comments ? ;-)
+> Being serious I still ask me why people (like you) in low-level free softwares 
+> still don't use tools/comments like doxygen to make their code more easily 
+> understandable for others.
+
+I don't even looked that deeply at your patch. I took your key mapping
+table and then implemented it.
+
+And btw. the left space bar is not working.
+
+>  For exemple doxygen comments could have make me understand the fakehid 
+> variable before to send you my patch... 
+
+A lot of stuff could have made it easier, but most projects don't even
+document internal functions at all. Feel free to blame the author, oh
+wait a second that is me, so no blame allowed ;)
+
+Regards
+
+Marcel
 
 
-
-
---===============2085477829==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============2085477829==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============2085477829==--
