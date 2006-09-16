@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: CIJOML <cijoml@volny.cz>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Sat, 16 Sep 2006 17:27:43 +0200
-References: <3ac7eec00608300143q7cb7a371n87179b310b6dfc80@mail.gmail.com>
-In-Reply-To: <3ac7eec00608300143q7cb7a371n87179b310b6dfc80@mail.gmail.com>
+Message-ID: <450C04B0.3040308@fuckaround.org>
+Date: Sat, 16 Sep 2006 16:05:36 +0200
+From: Pol Hallen <bluez@fuckaround.org>
 MIME-Version: 1.0
-Message-Id: <200609161727.44085.cijoml@volny.cz>
-Subject: Re: [Bluez-users] Microsoft Intellimouse Explorer for Bluetooth
-	Sidebuttons and scrollwheel
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Problem send bt files
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,56 +14,128 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-2"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi all,
 
-I own 1st generation (no tilt wheel) and in xorg everythink works for me wi=
-th =
+I installed bluez-utils (and relative dependence and programs) on my 
+debian stable (sarge):
 
-this setup:
+ii  bluez-firmware 1.0-2          Firmware for Bluetooth devices
+ii  bluez-hcidump  1.17-1sarge1   Analyses Bluetooth HCI packets
+ii  bluez-pin      0.25-1         Bluetooth PIN helper with D-BUS support
+ii  bluez-utils    2.15-1.1       Bluetooth tools and daemons
 
-Section "InputDevice"
-       Identifier      "Bluetooth Mouse"
-       Driver          "mouse"
-       Option          "SendCoreEvents"        "true"
-        Option          "Device"                "/dev/input/mice"
-        Option          "Protocol"              "ExplorerPS/2"
-        Option          "ZAxisMapping"          "4 5"
-        Option          "Buttons"               "7"
-        Option          "Emulate3Buttons"       "false"
-        Option          "Name"                  "AutoDetected"
-       Option          "Vendor"                "AutoDetected"
-EndSection
+I do a paring from my mobile to my server and is it ok.
 
-I have hidd running with /usr/bin/hidd --master --server
+I try use obexftp to send a file to my mobile:
 
-Hope this will help you
+obexftp -v -b 00:12:62:E3:B1:DE -B 10 -p file.jpg
 
-Michal
+but I see:
 
-Dne st=F8eda 30 srpen 2006 10:43 Maik Barz napsal(a):
-> Hi everyone,
-> for a long time I am trying to get my mouse completely working on my Suse
-> 10.1 system.
-> Three buttons do work, but scrollwheel and sidebuttons do not seem to fire
-> events. I heard about patching my kernel will help out. Is this true or a=
-re
-> there some other solutions to this problem?
->
-> Any hints?
->
-> Greets Maik
+Browsing 00:12:62:E3:B1:DE ...
+Channel: 10
+No custom transport
+Connecting...bt: 1
+done
+Sending file.jpg... failed: file.jpg
+Disconnetting...done
+
+If i try send a file from my mobile to server (using obexserver) is it ok.
+
+
+/etc/bluetooth/rfcomm.conf is whole commented, pin file contain only pin 
+code..
+
+Here there is my config file:
+
+/etc/bluetooth/hcid.conf
+
+# HCId options
+options {
+         # Automatically initialize new devices
+         autoinit yes;
+
+         # Security Manager mode
+         #   none - Security manager disabled
+         #   auto - Use local PIN for incoming connections
+         #   user - Always ask user for a PIN
+         #
+         security auto;
+
+         # Pairing mode
+         #   none  - Pairing disabled
+         #   multi - Allow pairing with already paired devices
+         #   once  - Pair once and deny successive attempts
+         pairing multi;
+
+         # PIN helper
+         pin_helper /usr/bin/bluez-pin;
+
+         # D-Bus PIN helper
+         dbus_pin_helper;
+}
+
+# Default settings for HCI devices
+device {
+         # Local device name
+         #   %d - device id
+         #   %h - host name
+         name "%h-%d";
+
+
+         # Local device class
+         class 0x3e0100;
+
+         # Default packet type
+         #pkt_type DH1,DM1,HV1;
+
+         # Inquiry and Page scan
+         iscan enable; pscan enable;
+
+         # Default link mode
+         #   none   - no specific policy
+         #   accept - always accept incoming connections
+         #   master - become master on incoming connections,
+         #            deny role switch on outgoing connections
+         lm accept;
+
+         # Default link policy
+         #   none    - no specific policy
+         #   rswitch - allow role switch
+         #   hold    - allow hold mode
+         #   sniff   - allow sniff mode
+         #   park    - allow park mode
+         lp rswitch,hold,sniff,park;
+
+         # Authentication and Encryption (Security Mode 3)
+         #auth enable;
+         #encrypt enable;
+}
+
+I tried several different configs in /etc/bluetooth/hcid.conf and kill 
+hcid  and restart, i also tried /etc/init.d/bluez-utils restart, i also 
+tried init 6 but nothing..
+
+I don't understand why can't send any files from my server.. :-((
+
+in /var/log/syslog I see:
+
+hcid[26398]: link_key_request (sba=00:0F:3D:05:99:B7, dba=00:12:62:E3:B1:DE)
+
+Can anyone help me pls?!
+Thanks!
+
+Pol
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
