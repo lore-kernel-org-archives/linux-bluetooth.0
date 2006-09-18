@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 18 Sep 2006 14:05:11 -0700 (PDT)
-From: William Kreuter <billyk@drizzle.com>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.10.10609181354210.8015-100000@froya.boat.washington.edu>
+Message-ID: <450E890F.2080502@fuckaround.org>
+Date: Mon, 18 Sep 2006 13:54:55 +0200
+From: Pol Hallen <bluez@fuckaround.org>
 MIME-Version: 1.0
-Subject: [Bluez-users] rfcomm broken in RHEL-WS-3 kernel 2.4.21
+To: digitalfredy@debiancolombia.org,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+References: <450C04B0.3040308@fuckaround.org>
+	<1158427686.23847.5.camel@YODA>	<450C41B9.9000104@fuckaround.org>
+	<1158533096.3700.1.camel@YODA>	<450DCF54.3040105@fuckaround.org>
+	<1158549810.4901.3.camel@YODA>
+In-Reply-To: <1158549810.4901.3.camel@YODA>
+Subject: Re: [Bluez-users] Problem send bt files
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,47 +24,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I've installed the bluez RPMs that I saw on rpmfind for Red Hat
-Enterprise 3, which are bluez-libs-2.10-1.1.el3.rf.i386.rpm,
-bluez-utils-2.9-1.1.fc3.rf.i386.rpm and
-bluez-bluefw-1.0-1.rhel3.dag.i386.rpm.  These did not enable
-rfcomm nor install /dev/rfcomm*.  The rfcomm executable always
-reports, "Can't open RFCOMM control socket: Address family not
-supported by protocol."
+> try manual download and install obexftp from testing 
+> (for install: #dpkg -i obexftp-XXXXX.deb
+> http://packages.debian.org/cgi-bin/search_packages.pl?searchon=names&subword=1&version=all&release=all&keywords=obexftp&sourceid=mozilla-search
+If i use debian stable and try to install a package from debian testing 
+there are many dependece's problems :-((
 
-I then tried installing bluez-libs and bluez-utils from their
-tarballs.  This changed nothing; /dev/rfcomm* still isn't there
-and I still get the same error from the rfcomm executable.
-
-My machine is RHEL-WS-3, kernel 2.4.21-32.0.1.ELsmp.  I use
-whatever kernel rpm up2date gives and I don't compile kernels
-myself anymore.
-
-I got pretty much identical results from a second machine which
-also runs Red Hat Enterprise Workstation 3 and kernel 2.4.15.
-
-There were a few clues on this list's archives and elsewhere
-that I should add these lines to /etc/modules.conf:
-
-alias net-pf-31 bluez
-alias bt-proto-0 l2cap
-alias bt-proto-2 sco
-alias bt-proto-3 rfcomm
-
-Adding these didn't change anything.  Also, modprobe rfcomm
-reports, "Can't locate module rfcomm".
-
-So what should I do about the broken rfcomm?  I hope to use a
-USB bluetooth dongle to send faxes through my cellphone.
-
-Billy
-
+Pol.
 
 -------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
