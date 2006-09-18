@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Pavel Machek <pavel@ucw.cz>
-In-Reply-To: <20060917193659.GB2973@elf.ucw.cz>
-References: <20060917140952.GA3349@elf.ucw.cz>
-	<1158511979.24941.1.camel@localhost> <20060917193659.GB2973@elf.ucw.cz>
-Date: Mon, 18 Sep 2006 08:20:11 +0200
-Message-Id: <1158560411.30486.20.camel@localhost>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20060917202558.GG21347@compendium.com.ar>
+References: <20060917202558.GG21347@compendium.com.ar>
+Date: Mon, 18 Sep 2006 08:16:41 +0200
+Message-Id: <1158560201.30486.15.camel@localhost>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sf.net, kernel list <linux-kernel@vger.kernel.org>,
-        maxk@qualcomm.com
-Subject: Re: [Bluez-devel] bluetooth oops during resume from ram
+Subject: Re: [Bluez-devel] bluetooth dies when trying to use 2 sco links
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,45 +20,73 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pavel,
+Hi Horacio,
 
-> > > If I suspend-to-RAM with usb active on thinkpad x60, I get an
-> > > oops. Machine works okay after that, but...
-> > > 
-> > > it seems bluetooth is scribbling over more memory than was allocated
-> > > (?)
-> > 
-> > not that I am aware of. Is this a plain 2.6.18-rc6 or did you apply
-> > additional patches that might have caused this behavior?
+> Attached you'll find the code for a test program that makes a call using
+> the hands-free profile connected to a cell phone and when the call is
+> answered it generates echo (so the person who answers the phone will
+> hear himself)
 > 
-> I have some additional changes, but they should not affect this...
+> Running just one instance of it with just one phone, it works great.
+> When I try to run two instances, each connected to a different phone, it
+> works for a few seconds and then all the SCO data stops flowing (hcidump
+> shows nothing) The bluetooth dongle I'm using has a led indicating it's
+> working. That led gets off permanently and the phones display an
+> indication saying something like "bluebooth connection lost"
 > 
-> OTOH, I probably used this script:
+> After that, trying to do an hcitool scan dies with:
 > 
+> Scanning ...
+> Inquiry failed: Connection timed out
 > 
-> killall hciattach
-> sleep .1
-> setserial /dev/ttyBT baud_base 921600
+> On http://www.compendium.net.ar/2sco.hcidump.bz2 you can find an hcidump
+> of the tests.
+> 
+> The dongle i'm using is:
+> 
+> Bus 001 Device 004: ID 4851:1103
+> 
+> horape@nb:~$ hciconfig hci0 version
+> hci0:   Type: USB
+>         BD Address: 00:0E:A1:00:54:19 ACL MTU: 192:8 SCO MTU: 64:8
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x32e LMP Ver: 1.1 (0x1) LMP Subver: 0x32e
+>         Manufacturer: Cambridge Silicon Radio (10)
+> horape@nb:~$ hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:0E:A1:00:54:19 ACL MTU: 192:8 SCO MTU: 64:8
+>         Build 814
+> horape@nb:~$ hciconfig hci0 features
+> hci0:   Type: USB
+>         BD Address: 00:0E:A1:00:54:19 ACL MTU: 192:8 SCO MTU: 64:8
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
+>                 <timing accuracy> <role switch> <hold mode> <sniff mode>
+>                 <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+>                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+>                 <power control> <transparent SCO>
+> 
+> Kernel is:
+> 
+> Linux nb 2.6.17 #4 SMP PREEMPT Wed May 10 13:53:45 CEST 2006 i686 GNU/Linux
+> 
+> Default with KNOPPIX 5.0.1 2006-06-01
+> 
+> I'm working on a toshiba satellite P105-S6024.
+> 
+> The phones i'm using are sony ericsson z520a. The code assumes rfcomm channel 3 is
+> hands free profile (line 50) and call indicator 10 is callsetup (line 67)
+> 
+> Is somebody able to help? Is there more info I could provide to help in the search
+> for a solution?
+> 
+> I'm looking forward to have 7 phones connected to a PC, making calls all
+> at once almost 24/7. Should I try with 7 dongles, one for each phone?
+> Would that work better?
 
-whatever that is for. I thought the ttyBT was iPAQ specific or something
-like that.
-
-> hciattach -s 921600 /dev/ttyS0 bcsp
-
-This is non-sense for a X60.
-
-> hciconfig hci0 up
-> hciconfig hci0 name billionton
-> hciconfig /dev/ttyUB1
-
-And what has ttyUB1 to do with it.
-
-> ...even through there's no bluetooth at ttyS0 (as this machine has
-> bluetooth on usb).
-
-With my X41 the suspend to/from RAM works without problems.
-
-I think this is something else.
+it is an idea to go with 7 phones, because the maximum number of SCO
+channels per piconet is 3. There is simply no more bandwidth available.
+That said, 2 SCO channels should work, but I assume our USB driver or
+maybe the old CSR firmware can't really handle that smoothly.
 
 Regards
 
