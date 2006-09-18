@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <450E890F.2080502@fuckaround.org>
-Date: Mon, 18 Sep 2006 13:54:55 +0200
+Message-ID: <450E88B9.9040306@fuckaround.org>
+Date: Mon, 18 Sep 2006 13:53:29 +0200
 From: Pol Hallen <bluez@fuckaround.org>
 MIME-Version: 1.0
 To: digitalfredy@debiancolombia.org,
         BlueZ users <bluez-users@lists.sourceforge.net>
-References: <450C04B0.3040308@fuckaround.org>
-	<1158427686.23847.5.camel@YODA>	<450C41B9.9000104@fuckaround.org>
-	<1158533096.3700.1.camel@YODA>	<450DCF54.3040105@fuckaround.org>
-	<1158549810.4901.3.camel@YODA>
-In-Reply-To: <1158549810.4901.3.camel@YODA>
+References: <450C04B0.3040308@fuckaround.org> <1158550021.4901.4.camel@YODA>
+In-Reply-To: <1158550021.4901.4.camel@YODA>
 Subject: Re: [Bluez-users] Problem send bt files
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -24,13 +21,10 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-> try manual download and install obexftp from testing 
-> (for install: #dpkg -i obexftp-XXXXX.deb
-> http://packages.debian.org/cgi-bin/search_packages.pl?searchon=names&subword=1&version=all&release=all&keywords=obexftp&sourceid=mozilla-search
-If i use debian stable and try to install a package from debian testing 
-there are many dependece's problems :-((
+> You can get files from your movile?
+Yep without problems :-)
 
-Pol.
+Pol
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
