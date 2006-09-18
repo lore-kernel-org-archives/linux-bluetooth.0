@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <450EAF18.3070404@xmission.com>
-Date: Mon, 18 Sep 2006 08:37:12 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] bluetooth.org membership changes
+In-Reply-To: <Pine.LNX.4.63.0609181548170.7570@redbean.intranet.gw-instruments.de>
+References: <Pine.LNX.4.63.0609181548170.7570@redbean.intranet.gw-instruments.de>
+Date: Mon, 18 Sep 2006 16:20:15 +0200
+Message-Id: <1158589215.25125.12.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] CVS access ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,22 +20,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hey
+Hi Peter,
 
-I may have entered the discussion late, but I just got a reply from
-Lindsay Puett at bluetooth.org on why it seems we're being accidentally
-locked out of the bluetooth.org site.
+> may be I'm only stupid, but I can noot get anything from the CVS as 
+> published on www.bluez.org. 
+> 
+> pewi@Zuccini:~/bluez$ cvs -d:pserver:anonymous@cvs.bluez.org:/cvsroot/bluez login
+> Logging in to :pserver:anonymous@cvs.bluez.org:2401/cvsroot/bluez
+> CVS password: 
+> pewi@Zuccini:~/bluez$ cvs -d:pserver:anonymous@cvs.bluez.org:/cvsroot/bluez rls -P -R
+> cvs [rls aborted]: server does not support rls
+> pewi@Zuccini:~/bluez$ cvs -d:pserver:anonymous@cvs.bluez.org:/cvsroot/bluez co -P kernel
+> cvs checkout: Updating kernel
+> cvs checkout: Updating kernel/bnep
+> cvs checkout: Updating kernel/core
+> cvs checkout: Updating kernel/doc
+> cvs checkout: Updating kernel/drivers
+> cvs checkout: Updating kernel/include
+> cvs checkout: Updating kernel/misc
+> cvs checkout: Updating kernel/rfcomm
+> pewi@Zuccini:~/bluez$ ls
+> pewi@Zuccini:~/bluez$ ls -l
+> total 0
+> 
+> ?????????
+> 
+> Any hints what I'm doing wrong here ?? 
 
-She says bluetooth.org is going to become a "complete member site" (I
-think she meant must-pay-to-use) and that public stuff is going to be on
-bluetooth.com.
+you are doing nothing wrong, but the kernel repository got cleared a
+long time ago. We are not using it anymore.
 
-This .org/.com situation seems to be backward, eh? So this is a heads up
-in case anyone else missed it. Get specs at
+Regards
 
-http://www.bluetooth.com/Bluetooth/Learn/Technology/Specifications/
+Marcel
 
-Brad
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
