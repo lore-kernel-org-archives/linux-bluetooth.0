@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <E1GOv4W-0006AI-Fr@mail.sourceforge.net>
-References: <E1GOv4W-0006AI-Fr@mail.sourceforge.net>
-Date: Mon, 18 Sep 2006 08:20:52 +0200
-Message-Id: <1158560452.30486.22.camel@localhost>
+To: Pavel Machek <pavel@ucw.cz>
+In-Reply-To: <20060917193659.GB2973@elf.ucw.cz>
+References: <20060917140952.GA3349@elf.ucw.cz>
+	<1158511979.24941.1.camel@localhost> <20060917193659.GB2973@elf.ucw.cz>
+Date: Mon, 18 Sep 2006 08:20:11 +0200
+Message-Id: <1158560411.30486.20.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] hcid and d-bus
+Cc: bluez-devel@lists.sf.net, kernel list <linux-kernel@vger.kernel.org>,
+        maxk@qualcomm.com
+Subject: Re: [Bluez-devel] bluetooth oops during resume from ram
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,16 +23,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marco,
+Hi Pavel,
 
-> every one
-> please help me
->     when i start "hcid -n" , appeared error:
->     Bluetooth HCI daemon
->     Service could not become the primary owner.
->     unable to get on D-Bus
+> > > If I suspend-to-RAM with usb active on thinkpad x60, I get an
+> > > oops. Machine works okay after that, but...
+> > > 
+> > > it seems bluetooth is scribbling over more memory than was allocated
+> > > (?)
+> > 
+> > not that I am aware of. Is this a plain 2.6.18-rc6 or did you apply
+> > additional patches that might have caused this behavior?
+> 
+> I have some additional changes, but they should not affect this...
+> 
+> OTOH, I probably used this script:
+> 
+> 
+> killall hciattach
+> sleep .1
+> setserial /dev/ttyBT baud_base 921600
 
-you can have only one instance of hcid running.
+whatever that is for. I thought the ttyBT was iPAQ specific or something
+like that.
+
+> hciattach -s 921600 /dev/ttyS0 bcsp
+
+This is non-sense for a X60.
+
+> hciconfig hci0 up
+> hciconfig hci0 name billionton
+> hciconfig /dev/ttyUB1
+
+And what has ttyUB1 to do with it.
+
+> ...even through there's no bluetooth at ttyS0 (as this machine has
+> bluetooth on usb).
+
+With my X41 the suspend to/from RAM works without problems.
+
+I think this is something else.
 
 Regards
 
