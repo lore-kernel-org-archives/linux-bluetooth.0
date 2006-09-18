@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: joakim@verona.se
-Date: Mon, 18 Sep 2006 12:01:53 +0200
-Message-ID: <m33bapwl0u.fsf@kurono.home>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <eekued$aae$1@sea.gmane.org>
+References: <eekued$aae$1@sea.gmane.org>
+Date: Mon, 18 Sep 2006 08:04:55 +0200
+Message-Id: <1158559495.30486.4.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-users] a2play and btsco questions
+Subject: Re: [Bluez-users] Connection Problems
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,15 +20,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I'm using my HBH-DS970 headset with a2play, and it works nicely.
-However, I would also like o use the daemon functionality of the btsco
-key daemon at the same time, so as to control playback with the
-headset butons. Is this possible?
+Hi Chris,
 
+> I'm getting strange behavior from a device. Sometimes I can connect just
+> fine, but other times I get an error. However, the blinking blue light
+> on the device becomes solid, indicating it's connected. The device is
+> fully charged (plugged-in in fact) and my bluetooth dongle is sitting
+> right next to it, so I don't think it's a signal strength issue. Is
+> there any other reason why I would this problem?
+> 
+> []# hidd --connect 00:0B:24:40:C7:83
+> Connected to 00:0B:24:40:C7:83 on channel 1
+> 
+> []# hidd --connect 00:0B:24:40:C7:83
+> Can't open input device: No such file or directory (2)
 
--- 
-Joakim Verona
-http://www.verona.se
+make sure that the uinput kernel module has been loaded.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
