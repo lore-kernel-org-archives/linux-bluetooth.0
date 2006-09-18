@@ -1,85 +1,56 @@
-Return-Path: <jean-jacques.brucker@sagem.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: bluez-devel@lists.sourceforge.net
-Subject: =?ISO-8859-1?Q?R=E9f=2E_=3A_Re=3A_R=E9f=2E_=3A_Re=3A_bluez_=3A_new?=
- =?ISO-8859-1?Q?_bluetooth_keyboard	supported_by_hidd=2E?=
-Message-ID: <OF94D063E5.A6EB9011-ONC12571ED.0029C0F3-C12571ED.002ABA9E@sagem.com>
-Date: Mon, 18 Sep 2006 09:46:42 +0200
-From: "Jean-Jacques BRUCKER" <jean-jacques.brucker@sagem.com>
-Content-Type: multipart/alternative; boundary="=_alternative 002ABA9BC12571ED_="
-MIME-Version: 1.0
-List-ID: <bluez-devel.lists.sourceforge.net>
-
---=_alternative 002ABA9BC12571ED_=
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Chris Spencer <chrisspen@gmail.com>
+In-Reply-To: <450D7E04.6080107@gmail.com>
+References: <beb7688e0609150702x738ad4d8re64815d12f457a76@mail.gmail.com>
+	<1158329592.5233.32.camel@localhost>  <450B3B01.2060801@gmail.com>
+	<1158397207.6839.1.camel@localhost>  <450D7E04.6080107@gmail.com>
+Date: Mon, 18 Sep 2006 08:38:01 +0200
+Message-Id: <1158561481.30486.30.camel@localhost>
+Mime-Version: 1.0
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Celluon Laserkey Bluetooth Keyboard
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
- About the left space : it work but I have assigned it to Alt key. At the=20
-end we need a special kmap file to be able to use all features of this=20
-keybord, ( mine is an azerty keyboard), in this keymap file (or using=20
-xmodmap with X) we could reassign left space button to space event and Alt =
+Hi Chris,
 
-gr button to Alt and Alt gr event !
+> >> Please let me know if you need any other information, or if there's 
+> >> anything I can do to help get this working.
+> > 
+> > this looks like the third of these. Please also run "hcitool inq" and
+> > "hcitool info ..." (as root) for this.
+>
+> What do mean by the "third of these"? Is it going to be difficult to 
+> make a driver?
 
- I have assigned this button to Alt because I missed him (to switch=20
-between console for exemple), And to not loose a special keypress on the=20
-keyboard. (it already have a few keys... only 63 !).
+run "hcidump -X -V" and then connect to RFCOMM channel 1 with the rfcomm
+tool and then start pressing keys and see what hcidump shows you. Maybe
+it is a simple key mapping. Check the Smart Keyboard support for an
+example on how to add support for this keyboard.
 
- At the end my patch suggested an architecture to manage different=20
-peripherals. The code in is actual state will become a big mess if the=20
-number of differents peripheral to manage increase.
+Regards
 
-Good morning !
-
-  -  -  -  -  -  -  -
-Cordialement,
-Jean-Jacques.
-
-
-" Ce courriel et les documents qui y sont attaches peuvent contenir des inf=
-ormations confidentielles. Si vous n'etes  pas le destinataire escompte, me=
-rci d'en informer l'expediteur imm=E9diatement et de detruire ce courriel  =
-ainsi que tous les documents attaches de votre systeme informatique. Toute =
-divulgation, distribution ou copie du pr=E9sent courriel et des documents a=
-ttaches sans autorisation prealable de son emetteur est interdite."=20
-
-" This e-mail and any attached documents may contain confidential or propri=
-etary information. If you are not the intended recipient, please advise the=
- sender immediately and delete this e-mail and all attached documents from =
-your computer system. Any unauthorised disclosure, distribution or copying =
-hereof is prohibited."
---=_alternative 002ABA9BC12571ED_=
-Content-Type: text/html; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Marcel
 
 
-<br><font size=3D2 face=3D"sans-serif">&nbsp;About the left space : it work=
- but I have assigned it to Alt key. At the end we need a special kmap file =
-to be able to use all features of this keybord, ( mine is an azerty keyboar=
-d), in this keymap file (or using xmodmap with X) we could reassign left sp=
-ace button to space event and Alt gr button to Alt and Alt gr event !</font=
-><br><br><font size=3D2 face=3D"sans-serif">&nbsp;I have assigned this butt=
-on to Alt because I missed him (to switch between console for exemple), And=
- to not loose a special keypress on the keyboard. (it already have a few ke=
-ys... only 63 !).</font><br><br><font size=3D2 face=3D"sans-serif">&nbsp;At=
- the end my patch suggested an architecture to manage different peripherals=
-. The code in is actual state will become a big mess if the number of diffe=
-rents peripheral to manage increase.</font><br><br><font size=3D2 face=3D"s=
-ans-serif">Good morning !</font><br><br><font size=3D2 face=3D"sans-serif">=
-&nbsp; - &nbsp;- &nbsp;- &nbsp;- &nbsp;- &nbsp;- &nbsp;-<br>Cordialement,<b=
-r>Jean-Jacques.</font><BR>
-<BR>
-&quot; Ce courriel et les documents qui y sont attaches peuvent contenir de=
-s informations confidentielles. Si vous n'etes  pas le destinataire escompt=
-e, merci d'en informer l'expediteur imm=E9diatement et de detruire ce courr=
-iel  ainsi que tous les documents attaches de votre systeme informatique. T=
-oute divulgation, distribution ou copie du pr=E9sent courriel et des docume=
-nts attaches sans autorisation prealable de son emetteur est interdite.&quo=
-t; <BR>
-<BR>
-&quot; This e-mail and any attached documents may contain confidential or p=
-roprietary information. If you are not the intended recipient, please advis=
-e the sender immediately and delete this e-mail and all attached documents =
-from your computer system. Any unauthorised disclosure, distribution or cop=
-ying hereof is prohibited.&quot;<BR>
---=_alternative 002ABA9BC12571ED_=--
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
