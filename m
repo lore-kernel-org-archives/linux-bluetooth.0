@@ -1,6 +1,6 @@
 Return-Path: <chrisspen@gmail.com>
-Message-ID: <beb7688e0609180642i50453bdel671fb81cb50a053b@mail.gmail.com>
-Date: Mon, 18 Sep 2006 09:42:59 -0400
+Message-ID: <beb7688e0609180634t7df0e32bn4c23c40f5a0b043b@mail.gmail.com>
+Date: Mon, 18 Sep 2006 09:34:10 -0400
 From: "Chris S" <chrisspen@gmail.com>
 To: "Marcel Holtmann" <marcel@holtmann.org>
 Subject: Re: Celluon Laserkey Bluetooth Keyboard
@@ -44,6 +44,11 @@ On 9/18/06, Marcel Holtmann <marcel@holtmann.org> wrote:
 > the keyboard up on eBay and this one is too expensive to buy for testing
 > and so I have to wait for donation to add it to my device library.
 
-Btw, where in CVS is the Smart Keyboard example?
+The cheapest place I've found to buy it is Datavision
+(http://www.datavis.com/cgi-bin/ncommerce3/ExecMacro/proddisp.d2w/report?prrfnbr=464060&site=GOGL)
+for $170. If it'll help development I'll gladly chip in $90 towards a
+donation to buy this device. Let me know how you'd like me to donate
+(Paypal would probably be the easiest way).
 
+Regards,
 Chris
