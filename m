@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <450E88B9.9040306@fuckaround.org>
-Date: Mon, 18 Sep 2006 13:53:29 +0200
-From: Pol Hallen <bluez@fuckaround.org>
-MIME-Version: 1.0
-To: digitalfredy@debiancolombia.org,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-References: <450C04B0.3040308@fuckaround.org> <1158550021.4901.4.camel@YODA>
-In-Reply-To: <1158550021.4901.4.camel@YODA>
-Subject: Re: [Bluez-users] Problem send bt files
+To: bluez-users@lists.sourceforge.net
+From: joakim@verona.se
+Date: Mon, 18 Sep 2006 12:01:53 +0200
+Message-ID: <m33bapwl0u.fsf@kurono.home>
+Mime-Version: 1.0
+Subject: [Bluez-users] a2play and btsco questions
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,10 +18,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-> You can get files from your movile?
-Yep without problems :-)
+I'm using my HBH-DS970 headset with a2play, and it works nicely.
+However, I would also like o use the daemon functionality of the btsco
+key daemon at the same time, so as to control playback with the
+headset butons. Is this possible?
 
-Pol
+
+-- 
+Joakim Verona
+http://www.verona.se
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
