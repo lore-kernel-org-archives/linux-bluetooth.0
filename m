@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000001c6d9c5$53bbd040$6713a8c0@alai.alpsautomotive.com>
-References: <000001c6d9c5$53bbd040$6713a8c0@alai.alpsautomotive.com>
-Date: Mon, 18 Sep 2006 08:25:53 +0200
-Message-Id: <1158560753.30486.25.camel@localhost>
+In-Reply-To: <E1GOv4W-0006AI-Fr@mail.sourceforge.net>
+References: <E1GOv4W-0006AI-Fr@mail.sourceforge.net>
+Date: Mon, 18 Sep 2006 08:20:52 +0200
+Message-Id: <1158560452.30486.22.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] IrMC Sync Profile - OBEX GET is UNAUTHORIZED
+Subject: Re: [Bluez-devel] hcid and d-bus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,30 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Scott,
+Hi Marco,
 
-> I am currently developing Level4 IrMC Sync for use with Sony Ericsson
-> phones.  Using rfcomm socket, I can start the sync using "IRMC-SYNC"
-> OBEX TARGET header in the CONNECT request.  The server replies with
-> SUCCESS response code, plus the WHO header ("IRMC-SYNC") and a 4 byte
-> connection ID.  Problem I am having is after connect success when I go
-> to retrieve a Level4 object, in this instance the changelog
-> telecom/pb/luid/0.log, the server always reply with 0xC1
-> (UNAUTHORIZED) immediately followed by ENDOFBODY header with 21 bytes
-> of non-ascii data.  I am sending the following GET request for this :
+> every one
+> please help me
+>     when i start "hcid -n" , appeared error:
+>     Bluetooth HCI daemon
+>     Service could not become the primary owner.
+>     unable to get on D-Bus
 
-the BlueZ CVS contains the program btobex in the obex repository. This
-might help you testing it. I tried it with a T630 and it gives me the
-following output:
-
-# ./btobex pull 00:0F:DE:xx:xx:xx 10 telecom/pb/luid/0.log
-SN:354750000279937
-DID:7F90
-Total-Records:2
-Maximum-Records:510
-M:4::00001E000000
-M:5::00001F000000
-H:7::000020000000
+you can have only one instance of hcid running.
 
 Regards
 
