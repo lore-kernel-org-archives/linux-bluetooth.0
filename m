@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <3f5a9ba20609190330u7f785d88x1e054cf9b027807e@mail.gmail.com>
-Date: Tue, 19 Sep 2006 18:30:04 +0800
-From: "Mingfan.Lu" <lucharse@gmail.com>
-To: Bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] Can I search two service at the same time?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <450EAF18.3070404@xmission.com>
+References: <450EAF18.3070404@xmission.com>
+Date: Mon, 18 Sep 2006 17:05:33 +0200
+Message-Id: <1158591933.25125.18.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] bluetooth.org membership changes
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,76 +16,43 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1558560504=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1558560504==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_285256_9250753.1158661804854"
+Hi Brad,
 
-------=_Part_285256_9250753.1158661804854
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> I may have entered the discussion late, but I just got a reply from
+> Lindsay Puett at bluetooth.org on why it seems we're being accidentally
+> locked out of the bluetooth.org site.
+> 
+> She says bluetooth.org is going to become a "complete member site" (I
+> think she meant must-pay-to-use) and that public stuff is going to be on
+> bluetooth.com.
 
-Problem,
-   I have seen that there is a function named sdp_service_search_req,
-   So,I append two service uuid such as obexpush's uuid and another
-service's uuid into the search list, I want to get the two services' info
-only call search func once.
-  and then set the max_rec_num = 2,
-  then call
-       sdp_service_search_req(session,search_list,2,&rsp_list);
- but ,I have seen that the func return 0, but the rsp_list is NULL.
+actually it is not about paying, because the adopter membership is free.
+The problem is that you need to be a legal entity to get the adopter
+membership. This means that no individual person can actually get access
+to the bluetooth.org website anymore. At the moment this also includes
+the Bluetooth assigned numbers document. And this also includes my
+account.
 
- Who can you tell me why?
-thank you.
+We would need to setup a non-profit organization to get access to draft
+standards. If someone is volunteering to do so, I happy to help, but for
+me it is too much paper work at the moment.
 
--- 
-With respects,
-   Mingfan.Lu
+Regards
 
-------=_Part_285256_9250753.1158661804854
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div><br clear="all">Problem,</div>
-<div>&nbsp;&nbsp; I have seen that there is a&nbsp;function named sdp_service_search_req,</div>
-<div>&nbsp;&nbsp; So,I append two service uuid such as obexpush's uuid and another service's uuid into the search list, I want to get the two services' info only call search func once.</div>
-<div>&nbsp; and then set the max_rec_num = 2,</div>
-<div>&nbsp; then call </div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sdp_service_search_req(session,search_list,2,&amp;rsp_list);</div>
-<div>&nbsp;but ,I have seen that the func return 0, but the rsp_list is NULL.</div>
-<div>&nbsp;</div>
-<div>&nbsp;Who can you tell me why?</div>
-<div>thank you.</div>
-<div><br>-- <br>With respects,<br>&nbsp;&nbsp; Mingfan.Lu </div>
-
-------=_Part_285256_9250753.1158661804854--
+Marcel
 
 
---===============1558560504==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1558560504==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1558560504==--
