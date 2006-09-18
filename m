@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Mon, 18 Sep 2006 16:55:05 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <450EAF18.3070404@xmission.com>
-References: <450EAF18.3070404@xmission.com>
-Date: Mon, 18 Sep 2006 17:05:33 +0200
-Message-Id: <1158591933.25125.18.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bluetooth.org membership changes
+In-Reply-To: <1158589215.25125.12.camel@localhost>
+Message-ID: <Pine.LNX.4.63.0609181651370.7570@redbean.intranet.gw-instruments.de>
+References: <Pine.LNX.4.63.0609181548170.7570@redbean.intranet.gw-instruments.de>
+	<1158589215.25125.12.camel@localhost>
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] CVS access ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,31 +21,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
 
-> I may have entered the discussion late, but I just got a reply from
-> Lindsay Puett at bluetooth.org on why it seems we're being accidentally
-> locked out of the bluetooth.org site.
+Hi Marcel, 
+
+On Mon, 18 Sep 2006, Marcel Holtmann wrote:
+
+> Hi Peter,
 > 
-> She says bluetooth.org is going to become a "complete member site" (I
-> think she meant must-pay-to-use) and that public stuff is going to be on
-> bluetooth.com.
+> > may be I'm only stupid, but I can noot get anything from the CVS as 
+> > published on www.bluez.org. 
+> 
+> you are doing nothing wrong, but the kernel repository got cleared a
+> long time ago. We are not using it anymore.
 
-actually it is not about paying, because the adopter membership is free.
-The problem is that you need to be a legal entity to get the adopter
-membership. This means that no individual person can actually get access
-to the bluetooth.org website anymore. At the moment this also includes
-the Bluetooth assigned numbers document. And this also includes my
-account.
+So the stuff from kernel.org is assumed to be the most recent version (or, 
+if available, the latest .mh patch), right ? 
 
-We would need to setup a non-profit organization to get access to draft
-standards. If someone is volunteering to do so, I happy to help, but for
-me it is too much paper work at the moment.
+Thanks and best regards, 
 
-Regards
+Peter 
 
-Marcel
-
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
 
 
 -------------------------------------------------------------------------
