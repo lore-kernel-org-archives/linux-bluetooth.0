@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Chris Spencer <chrisspen@gmail.com>
-In-Reply-To: <450C3D9B.5040506@gmail.com>
-References: <beb7688e0609150702x738ad4d8re64815d12f457a76@mail.gmail.com>
-	<1158329592.5233.32.camel@localhost>  <450B3B01.2060801@gmail.com>
-	<1158397207.6839.1.camel@localhost>  <450C3D9B.5040506@gmail.com>
-Date: Mon, 18 Sep 2006 08:36:42 +0200
-Message-Id: <1158561402.30486.27.camel@localhost>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <000001c6d9c5$53bbd040$6713a8c0@alai.alpsautomotive.com>
+References: <000001c6d9c5$53bbd040$6713a8c0@alai.alpsautomotive.com>
+Date: Mon, 18 Sep 2006 08:25:53 +0200
+Message-Id: <1158560753.30486.25.camel@localhost>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Celluon Laserkey Bluetooth Keyboard
+Subject: Re: [Bluez-devel] IrMC Sync Profile - OBEX GET is UNAUTHORIZED
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,42 +20,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Chris,
+Hi Scott,
 
-> >>>> The last part is interesting, because the three 255s repeat for every
-> >>>> keypress and mouse movement made with the device.
-> >>> this is not a HID compatible keyboard and needs an extra driver to
-> >>> function properly. Please run "sdptool records --raw <bdaddr>" to
-> >>> retrieve the SDP records for this device.
-> >> Sure, here's the output:
-> >>
-> >> $ sdptool records --raw 00:0B:24:40:C7:83
-> >> Sequence
-> >>          Attribute 0x0000 - ServiceRecordHandle
-> >>                  UINT32 0x00010000
-> >>          Attribute 0x0001 - ServiceClassIDList
-> >>                  Sequence
-> >>                          UUID16 0x1101 - SerialPort
-> >>          Attribute 0x0004 - ProtocolDescriptorList
-> >>                  Sequence
-> >>                          Sequence
-> >>                                  UUID16 0x0100 - L2CAP
-> >>                          Sequence
-> >>                                  UUID16 0x0003 - RFCOMM
-> >>                                  UINT8 0x01
-> >>          Attribute 0x0100
-> >>                  String Serial Port
-> >>
-> >> Please let me know if you need any other information, or if there's 
-> >> anything I can do to help get this working.
-> > 
-> > this looks like the third of these. Please also run "hcitool inq" and
-> > "hcitool info ..." (as root) for this.
-> 
-> I may have already pasted those outputs in my original email, but here 
-> they are again:
+> I am currently developing Level4 IrMC Sync for use with Sony Ericsson
+> phones.  Using rfcomm socket, I can start the sync using "IRMC-SYNC"
+> OBEX TARGET header in the CONNECT request.  The server replies with
+> SUCCESS response code, plus the WHO header ("IRMC-SYNC") and a 4 byte
+> connection ID.  Problem I am having is after connect success when I go
+> to retrieve a Level4 object, in this instance the changelog
+> telecom/pb/luid/0.log, the server always reply with 0xC1
+> (UNAUTHORIZED) immediately followed by ENDOFBODY header with 21 bytes
+> of non-ascii data.  I am sending the following GET request for this :
 
-sorry, my bad. Too many emails.
+the BlueZ CVS contains the program btobex in the obex repository. This
+might help you testing it. I tried it with a T630 and it gives me the
+following output:
+
+# ./btobex pull 00:0F:DE:xx:xx:xx 10 telecom/pb/luid/0.log
+SN:354750000279937
+DID:7F90
+Total-Records:2
+Maximum-Records:510
+M:4::00001E000000
+M:5::00001F000000
+H:7::000020000000
 
 Regards
 
