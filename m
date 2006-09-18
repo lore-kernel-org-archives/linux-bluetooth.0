@@ -1,58 +1,30 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Mon, 18 Sep 2006 16:55:05 +0200 (CEST)
-From: Peter Wippich <pewi@gw-instruments.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1158589215.25125.12.camel@localhost>
-Message-ID: <Pine.LNX.4.63.0609181651370.7570@redbean.intranet.gw-instruments.de>
-References: <Pine.LNX.4.63.0609181548170.7570@redbean.intranet.gw-instruments.de>
-	<1158589215.25125.12.camel@localhost>
+Return-Path: <chrisspen@gmail.com>
+Message-ID: <beb7688e0609180748g1d00077lf93c6b7e6ace5821@mail.gmail.com>
+Date: Mon, 18 Sep 2006 10:48:13 -0400
+From: "Chris S" <chrisspen@gmail.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Subject: Re: Celluon Laserkey Bluetooth Keyboard
+Cc: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1158586799.25125.8.camel@localhost>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] CVS access ?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+References: <beb7688e0609150702x738ad4d8re64815d12f457a76@mail.gmail.com>
+	 <1158329592.5233.32.camel@localhost> <450B3B01.2060801@gmail.com>
+	 <1158397207.6839.1.camel@localhost> <450D7E04.6080107@gmail.com>
+	 <1158561481.30486.30.camel@localhost>
+	 <beb7688e0609180621m46e4c37al76d0dac7b7803b67@mail.gmail.com>
+	 <1158585929.25125.5.camel@localhost>
+	 <beb7688e0609180634t7df0e32bn4c23c40f5a0b043b@mail.gmail.com>
+	 <1158586799.25125.8.camel@localhost>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
+On 9/18/06, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> if you put in 90 USD, then I try to get one here in Europe for a fair
+> shipping price. So far, I have seen them around 180 EUR. The BlueZ
+> webpage has a PayPal button for donations.
 
-Hi Marcel, 
+The donation's in.
 
-On Mon, 18 Sep 2006, Marcel Holtmann wrote:
-
-> Hi Peter,
-> 
-> > may be I'm only stupid, but I can noot get anything from the CVS as 
-> > published on www.bluez.org. 
-> 
-> you are doing nothing wrong, but the kernel repository got cleared a
-> long time ago. We are not using it anymore.
-
-So the stuff from kernel.org is assumed to be the most recent version (or, 
-if available, the latest .mh patch), right ? 
-
-Thanks and best regards, 
-
-Peter 
-
-|       Peter Wippich                   Voice: +49 30 46776411          |
-|       G&W Instruments GmbH            fax:   +49 30 46776419          |
-|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
-|       D-13355 Berlin  / Germany                                       |
-
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Regards,
+Chris
