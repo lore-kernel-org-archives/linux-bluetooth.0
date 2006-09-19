@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 18 Sep 2006 22:38:16 -0500
+Date: Mon, 18 Sep 2006 22:36:13 -0500
 From: digitalfredy <digitalfredy@debiancolombia.org>
-In-reply-to: <450E88B9.9040306@fuckaround.org>
+In-reply-to: <450E890F.2080502@fuckaround.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-id: <1158637097.4975.4.camel@YODA>
+Message-id: <1158636974.4975.1.camel@YODA>
 MIME-version: 1.0
-References: <450C04B0.3040308@fuckaround.org> <1158550021.4901.4.camel@YODA>
-	<450E88B9.9040306@fuckaround.org>
+References: <450C04B0.3040308@fuckaround.org> <1158427686.23847.5.camel@YODA>
+	<450C41B9.9000104@fuckaround.org> <1158533096.3700.1.camel@YODA>
+	<450DCF54.3040105@fuckaround.org> <1158549810.4901.3.camel@YODA>
+	<450E890F.2080502@fuckaround.org>
 Subject: Re: [Bluez-users] Problem send bt files
 Reply-To: digitalfredy@debiancolombia.org,
         BlueZ users <bluez-users@lists.sourceforge.net>
@@ -22,14 +24,22 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-El lun, 18-09-2006 a las 13:53 +0200, Pol Hallen escribi=F3:
-> > You can get files from your movile?
-> Yep without problems :-)
-using obexftp? if yes you can try with other device? (for example a palm
-or other phone)
+El lun, 18-09-2006 a las 13:54 +0200, Pol Hallen escribi=F3:
+> > try manual download and install obexftp from testing =
+
+> > (for install: #dpkg -i obexftp-XXXXX.deb
+> > http://packages.debian.org/cgi-bin/search_packages.pl?searchon=3Dnames&=
+subword=3D1&version=3Dall&release=3Dall&keywords=3Dobexftp&sourceid=3Dmozil=
+la-search
+> If i use debian stable and try to install a package from debian testing =
+
+> there are many dependece's problems :-((
+
+try the oldstable version
+PD: in debian i use the obexftp in woody,sarge and etch, it work fine
 > =
 
-> Pol
+> Pol.
 > =
 
 > -------------------------------------------------------------------------
