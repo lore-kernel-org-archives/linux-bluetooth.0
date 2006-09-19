@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: joakim@verona.se
-Date: Tue, 19 Sep 2006 09:36:21 +0200
-Message-ID: <m34pv4ux3e.fsf@kurono.home>
-References: <m33bapwl0u.fsf@kurono.home> <450F208F.4080204@xmission.com>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] a2play and btsco questions
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Mon, 18 Sep 2006 22:38:16 -0500
+From: digitalfredy <digitalfredy@debiancolombia.org>
+In-reply-to: <450E88B9.9040306@fuckaround.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-id: <1158637097.4975.4.camel@YODA>
+MIME-version: 1.0
+References: <450C04B0.3040308@fuckaround.org> <1158550021.4901.4.camel@YODA>
+	<450E88B9.9040306@fuckaround.org>
+Subject: Re: [Bluez-users] Problem send bt files
+Reply-To: digitalfredy@debiancolombia.org,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,48 +18,38 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Brad Midgley <bmidgley@xmission.com> writes:
+El lun, 18-09-2006 a las 13:53 +0200, Pol Hallen escribi=F3:
+> > You can get files from your movile?
+> Yep without problems :-)
+using obexftp? if yes you can try with other device? (for example a palm
+or other phone)
+> =
 
-> joakim
->
->> I'm using my HBH-DS970 headset with a2play, and it works nicely.
->> However, I would also like o use the daemon functionality of the btsco
->> key daemon at the same time, so as to control playback with the
->> headset butons. Is this possible?
->
-> well it might be possible for you to hack something together using the
-> btsco settings file.
->
-> if your headset supports avrcp, you should be able to use the alsa
-> plugin and a2dpd daemon to control playback. that would be more flexible.
+> Pol
+> =
 
-According to the docs I need a2play to play stereo, since the
-HBH-DS970 supports stereo. Has this requirement changed? It would be
-much nicer wih a proper alsa device of course.
-
->
-> brad
->
 > -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys -- and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-
--- 
-Joakim Verona
-http://www.verona.se
-
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job ea=
+sier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
