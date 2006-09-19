@@ -1,10 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 20 Sep 2006 11:27:03 +0200 (CEST)
-From: SZABO Tamas <sza2king@freemail.hu>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <freemail.20060820112703.62459@fm06.freemail.hu>
+Message-ID: <451029FA.6030309@fuckaround.org>
+Date: Tue, 19 Sep 2006 19:33:46 +0200
+From: Pol Hallen <bluez@fuckaround.org>
 MIME-Version: 1.0
-Subject: [Bluez-users] Changing BD address on CSR based USB dongle
+To: digitalfredy@debiancolombia.org,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+References: <450C04B0.3040308@fuckaround.org>
+	<1158427686.23847.5.camel@YODA>	<450C41B9.9000104@fuckaround.org>
+	<1158533096.3700.1.camel@YODA>	<450DCF54.3040105@fuckaround.org>
+	<1158549810.4901.3.camel@YODA>	<450E890F.2080502@fuckaround.org>
+	<1158636974.4975.1.camel@YODA>
+In-Reply-To: <1158636974.4975.1.camel@YODA>
+Subject: Re: [Bluez-users] Problem send bt files
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,40 +21,27 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-2"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+> try the oldstable version
+> PD: in debian i use the obexftp in woody,sarge and etch, it work fine
+>> Pol.
+Sorry, could give me your bluetooth's config files?
 
-First of all, I have a few USB-BT dongle (no brand info, CSR
-chipset, HCI and LMP ver. 2.0, EEPROM on the board). They
-all have the same BD address (Yes, it seems I bought pirated
-dongles).
+/etc/bluetooth/* and /etc/default/
 
-As far as I know the BD has same function like ether MAC. So
-if I want to use these devices together it can cause problems...
+thanks!
 
-I would like to know, is there any way to change the BD
-address (preferable) permanently or temporary (like ifconfig
-ethX hw ether AA:BB:CC:DD:EE:FF for ethernet)?
-
-Thx,
-
-/sza2
-
-_______________________________________________________________________
-25% kedvezm=E9ny 3 k=F6nyv v=E1s=E1rl=E1sa eset=E9n! Bookline.hu
-http://www.bookline.hu/control/news?newsid=3D484&affiliate=3Dfre25skar3067
-
+Pol
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
