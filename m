@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45118E52.8080303@csr.com>
-Date: Wed, 20 Sep 2006 19:54:10 +0100
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <freemail.20060820112703.62459@fm06.freemail.hu>
-In-Reply-To: <freemail.20060820112703.62459@fm06.freemail.hu>
-Subject: Re: [Bluez-users] Changing BD address on CSR based USB dongle
+To: bluez-users@lists.sourceforge.net
+From: joakim@verona.se
+Date: Wed, 20 Sep 2006 14:20:57 +0200
+Message-ID: <m364fisp92.fsf@kurono.home>
+References: <m33bapwl0u.fsf@kurono.home> <450F208F.4080204@xmission.com>
+	<m34pv4ux3e.fsf@kurono.home> <m3venkt9uk.fsf@kurono.home>
+	<450FDFC9.6060804@palmsource.com> <m3eju8t4f2.fsf@kurono.home>
+	<m3ac4wt3qf.fsf@kurono.home> <450FEBAA.1060005@palmsource.com>
+	<m3venjsx1h.fsf@kurono.home>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] a2play and btsco questions
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,51 +19,102 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SZABO Tamas wrote:
-> First of all, I have a few USB-BT dongle (no brand info, CSR
-> chipset, HCI and LMP ver. 2.0, EEPROM on the board). They
-> all have the same BD address (Yes, it seems I bought pirated
-> dongles).
+joakim@verona.se writes:
 
-Hmm, I'm guessing you can't tell me who manufactured the dongles?
+> Fr=E9d=E9ric DALLEAU <frederic.dalleau@palmsource.com> writes:
 
-Can you tell me the firmware revision and which Bluetooth address they're
-booting up with (hciconfig version and hciconfig revision should give you
-all that information)?
+It seems I can get the AVRCP commands to work "sometimes"(for some
+unknown definition of "sometimes"), so my headset appear to support
+it.
 
-Are there any BlueZ tools that can dump all the values written to
-persistent store for a module (equivalent to CSR's btcli's psslurp
-command)? If so, a dump of the PS might be useful for me.
+so , current problems are:
+- I dont know how to make AVRCP commands work reliably, or how to
+debug it. I think maybe some command has to produce output to the
+a2dpd daemon for AVRCP commands to be received.
 
-You say they have EEPROM on board. If they were ROM parts without
-non-volatile storage then their behaviour would be reasonable. They'd
-be expecting the host to configure them. I believe there are suitable
-tools in BlueZ.
-
-If they're ROM parts with EEPROM but it's not configured, that looks
-like a manufacturing error. You'll need to assign them unique
-addresses (getting hold of such addresses can be tricky).
-
-The real question is whether any of the other settings have been
-programmed correctly.
-
-Thanks.
-
-	- Steven
--- 
+- xmms output is really choppy, whereas mplayer output is ok.
+I tried fiddling about with xmms alsa settings, like mmap and buffer
+settings and whatnot, but no real breakthrough.
 
 
-To access the latest news from CSR copy this link into a web browser:  http://www.csr.com/email_sig.php
+
+>
+>>>> Some problems remains:
+>>>> - the sound is much "choppier" than with a2play
+>>>>     =
+
+>> It should not be that bad, try another audio player ( =
+
+>> xmms/amarok/xine/mpg321 )
+>>>> I suspect this line from a2dpd output:
+>>>> setscheduler returns -1 (errno=3D1:Operation not permitted)
+>>>>
+>>>> must I run a2dpd as root?
+>>>>     =
+
+>> not necessary but can help as it increase priority
+>>>> - I only get sound in 1 earpiece, the sound is very soft in the other =
+one.
+>>>>     =
+
+>> bug, use sample.a2dprc as a base
+>> revert the value used for enablereversestereo (1 instead of 0)
+>
+> Thanks, I didnt notice this file.
+>
+>>> Forgot:
+>>> the "cmd" definitions doesnt seem to do anything!
+>>>   =
+
+>> Does your headset support AVRCP ? sdptool browse "ad:dr:ess"
+>
+> Im not sure how to interpret it. I attach the output.
+>
+>
+>
+>> Fr=E9d=E9ric
+>>
+>>
+>>
+>> -------------------------------------------------------------------------
+>> Take Surveys. Earn Cash. Influence the Future of IT
+>> Join SourceForge.net's Techsay panel and you'll get the chance to share =
+your
+>> opinions on IT & business topics through brief surveys -- and earn cash
+>> http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=
+=3DDEVDEV
+>
+> -- =
+
+> Joakim Verona
+> http://www.verona.se
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share y=
+our
+> opinions on IT & business topics through brief surveys -- and earn cash
+> http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3D=
+DEVDEV_______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+-- =
+
+Joakim Verona
+http://www.verona.se
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
