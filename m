@@ -1,16 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 20 Sep 2006 20:56:59 -0400
-From: Chris Spencer <chrisspen@gmail.com>
-In-reply-to: <1158561481.30486.30.camel@localhost>
+Message-ID: <4511BCBA.8060909@xmission.com>
+Date: Wed, 20 Sep 2006 16:12:10 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-id: <4511E35B.10200@gmail.com>
-MIME-version: 1.0
-Content-type: multipart/mixed; boundary=------------020204090405040504050101
-References: <beb7688e0609150702x738ad4d8re64815d12f457a76@mail.gmail.com>
-	<1158329592.5233.32.camel@localhost>  <450B3B01.2060801@gmail.com>
-	<1158397207.6839.1.camel@localhost>  <450D7E04.6080107@gmail.com>
-	<1158561481.30486.30.camel@localhost>
-Subject: Re: [Bluez-devel] Celluon Laserkey Bluetooth Keyboard
+Subject: [Bluez-devel] SCO using uart-connected adapter
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,183 +14,28 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------020204090405040504050101
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Hey
 
-Marcel Holtmann wrote:
+I remember there were a lot of problems in getting uart-connected
+adapters to make SCO connections. Were the problems limited to non-csr
+parts?
 
-> run "hcidump -X -V" and then connect to RFCOMM channel 1 with the rfcomm
-> tool and then start pressing keys and see what hcidump shows you. Maybe
-> it is a simple key mapping. Check the Smart Keyboard support for an
-> example on how to add support for this keyboard.
+I've been thinking about putting a blueradios.com bluecore4 adapter on a
+gumstix board. It would have to connect through a 921k uart though. Has
+anyone worked out this sort of thing?
 
-I wasn't able to connect with rfcomm, but I was with hidd --connect
-<bdaddr>. I've attached some sample output.
-
-a5.txt, s5.txt, and d5.txt are what's output when I press those keys
-five times.
-mouse.txt is what's output when I press the mouse key and move my finger
-in a Z shape from the upper left to the right, then down to the lower
-left, then over to the right.
-
-Regards,
-Chris
-
-
-
-
-
---------------020204090405040504050101
-Content-Type: application/x-bzip;
- name="cl800bt-samples.tar.bz2"
-Content-Transfer-Encoding: base64
-Content-Disposition: inline;
- filename="cl800bt-samples.tar.bz2"
-
-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
-3pO/65rv2+Zo8fXRT/4u5IpwoSDS/hGI
---------------020204090405040504050101
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---------------020204090405040504050101
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------020204090405040504050101--
