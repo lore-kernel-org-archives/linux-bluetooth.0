@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45129525.1060704@csr.com>
-Date: Thu, 21 Sep 2006 14:35:33 +0100
-From: Steven Singer <steven.singer@csr.com>
+Message-ID: <4511AD88.6030904@gzunk.com>
+Date: Wed, 20 Sep 2006 22:07:20 +0100
+From: Alasdair Thomson <alasdair@gzunk.com>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <freemail.20060820112703.62459@fm06.freemail.hu>	<45118E52.8080303@csr.com>
-	<1158779197.10356.3.camel@localhost>
-In-Reply-To: <1158779197.10356.3.camel@localhost>
-Subject: Re: [Bluez-users] Changing BD address on CSR based USB dongle
+To: Bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Minor Keyboard niggles
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,19 +18,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> with "bccmd psread" or "bccmd pslist" you can do that. However you need
-> to pick the correct stores value to get all info.
+Hello,
 
-Aha, I thought it existed.
+I have a Belkin F8T013 dongle that I've got working succesfully, but 
+there are a few things that I would like to improve - and hopefully 
+someone reading this will be able to help me.
 
-I'd like dumps of the psram, psi and psf stores.
+I've got a keyboard connected via HIDP - hidd --show gives:
 
-	- Steven
--- 
+00:07:61:06:CB:DE Bluetooth HID Boot Protocol Device [046d:b303] 
+connected [boot-protocol]
 
+But whenever I have to reboot, the connection remains between the dongle 
+and the keyboard, so it then complains at next boot. I've updated my 
+bluetooth init script to do "hciconfig hci0 reset" on shutdown and that 
+works, but I'd like to know if there's a better way of doing it.
 
-To access the latest news from CSR copy this link into a web browser:  http://www.csr.com/email_sig.php
+Next is that I've got multimedia keys on the keyboard that I can't seem 
+to use. Does this HID support provided by Bluez map those extra keys as 
+well?
+
+Thanks
+
+Alasdair
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
