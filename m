@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <feb8dc070609200304l4f3ecb05r2b844f408ef7b13@mail.gmail.com>
-Date: Wed, 20 Sep 2006 15:34:53 +0530
-From: "Jinesh K J" <jineshkj.newsletters@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1158746073.22924.4.camel@localhost>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <feb8dc070609200250i4eb3dbc2lc915bf751138cf90@mail.gmail.com>
 References: <freemail.20060820112703.62459@fm06.freemail.hu>
-	<1158746073.22924.4.camel@localhost>
+	<feb8dc070609200250i4eb3dbc2lc915bf751138cf90@mail.gmail.com>
+Date: Wed, 20 Sep 2006 11:57:44 +0200
+Message-Id: <1158746264.22924.8.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] Changing BD address on CSR based USB dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,19 +21,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-> And in general such dongles should not be put on the market. I have seen
-> this with ISSC dongles before. The BD_ADDR suppose to be unique.
->
+Hi Jinesh,
 
-Yes ! The dongle that I've recently bought is ISSC. Its windows
-utility doesn't come(AFAIK) with any option to change the BD address.
-But my vendor does provide guarantee for it. ie, even if it gets
-damaged, they will give a replacement. So, may be i should try it and
-see.
+> > First of all, I have a few USB-BT dongle (no brand info, CSR
+> > chipset, HCI and LMP ver. 2.0, EEPROM on the board). They
+> > all have the same BD address (Yes, it seems I bought pirated
+> > dongles).
+> >
+> > As far as I know the BD has same function like ether MAC. So
+> > if I want to use these devices together it can cause problems...
+> >
+> > I would like to know, is there any way to change the BD
+> > address (preferable) permanently or temporary (like ifconfig
+> > ethX hw ether AA:BB:CC:DD:EE:FF for ethernet)?
+> >
+> 
+> I'm also having almost the same situation. I bought a USB dongle and
+> its BD address seem to be 11:11:11:11:11:11 which don't seem to be
+> unique. I would like to know whether my dongle is illegal(if that's
+> the case then i need to get my money back). If the dongle is ok, then
+> how i would like to know how to change its BD address.
 
-So, since my windows utility doesn't provide any option to change its
-BD, does it mean that the dongle is illegal? Should i report this to
-some authority?
+in general such a dongle is illegal. If the Windows software that comes
+with your dongle is capable of changing this address and make it unique
+and persistent again, then it is not illegal. However this is an unclear
+area and it might help to report such dongles to the Bluetooth SIG.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
