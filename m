@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <feb8dc070609200304l4f3ecb05r2b844f408ef7b13@mail.gmail.com>
-References: <freemail.20060820112703.62459@fm06.freemail.hu>
-	<1158746073.22924.4.camel@localhost>
-	<feb8dc070609200304l4f3ecb05r2b844f408ef7b13@mail.gmail.com>
-Date: Wed, 20 Sep 2006 12:29:39 +0200
-Message-Id: <1158748179.22924.11.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Changing BD address on CSR based USB dongle
+Date: Wed, 20 Sep 2006 12:22:40 +0200 (CEST)
+From: SZABO Tamas <sza2king@freemail.hu>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <freemail.20060820122240.8417@fm12.freemail.hu>
+MIME-Version: 1.0
+Subject: Re: [Bluez-users] 3 or more BT dongles over 1 USB-2.0 4-port HUB
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,41 +14,29 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-2"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Jinesh,
+hi Petr,
 
-> > And in general such dongles should not be put on the market. I have seen
-> > this with ISSC dongles before. The BD_ADDR suppose to be unique.
-> >
-> 
-> Yes ! The dongle that I've recently bought is ISSC. Its windows
-> utility doesn't come(AFAIK) with any option to change the BD address.
-> But my vendor does provide guarantee for it. ie, even if it gets
-> damaged, they will give a replacement. So, may be i should try it and
-> see.
-> 
-> So, since my windows utility doesn't provide any option to change its
-> BD, does it mean that the dongle is illegal? Should i report this to
-> some authority?
+I was realising the same problem but in case of USB-Serial
+converter. The solution for me was to remove ehci-hcd and
+using the full speed uhci-hcd driver only. I think the lower
+12MB/s speed  can not be a problem for BT.
 
-if you start up Windows with the software for this dongle, plug it in
-and make it discoverable. Then search with another device from another
-machine and if you still see 11:11:11:11:11:11 as address, then you
-should return the dongle.
+Good luck!
 
-There are ROM based dongles/chips where the host software has to set the
-BD_ADDR. This is totally legal. However you mostly see this for chips
-used in embedded devices and not USB dongles for desktop systems.
+/sza2
 
-If you know the manufacturer of this dongle, then you might contact them
-and/or public relations of the Bluetooth SIG.
+PS: Sorry, I don't now how to reply on the sourceforge page,
+it is readonly although I logged in. So this may start a new
+thread.
 
-Regards
 
-Marcel
+_______________________________________________________________________
+25% kedvezm=E9ny 3 k=F6nyv v=E1s=E1rl=E1sa eset=E9n! Bookline.hu
+http://www.bookline.hu/control/news?newsid=3D484&affiliate=3Dfre25skar3067
 
 
 
@@ -60,7 +44,8 @@ Marcel
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
