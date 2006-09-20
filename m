@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4511AD88.6030904@gzunk.com>
-Date: Wed, 20 Sep 2006 22:07:20 +0100
-From: Alasdair Thomson <alasdair@gzunk.com>
-MIME-Version: 1.0
-To: Bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Minor Keyboard niggles
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <45118E52.8080303@csr.com>
+References: <freemail.20060820112703.62459@fm06.freemail.hu>
+	<45118E52.8080303@csr.com>
+Date: Wed, 20 Sep 2006 21:06:37 +0200
+Message-Id: <1158779197.10356.3.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Changing BD address on CSR based USB dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +21,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+Hi Steven,
 
-I have a Belkin F8T013 dongle that I've got working succesfully, but 
-there are a few things that I would like to improve - and hopefully 
-someone reading this will be able to help me.
+> > First of all, I have a few USB-BT dongle (no brand info, CSR
+> > chipset, HCI and LMP ver. 2.0, EEPROM on the board). They
+> > all have the same BD address (Yes, it seems I bought pirated
+> > dongles).
+> 
+> Hmm, I'm guessing you can't tell me who manufactured the dongles?
+> 
+> Can you tell me the firmware revision and which Bluetooth address they're
+> booting up with (hciconfig version and hciconfig revision should give you
+> all that information)?
+> 
+> Are there any BlueZ tools that can dump all the values written to
+> persistent store for a module (equivalent to CSR's btcli's psslurp
+> command)? If so, a dump of the PS might be useful for me.
 
-I've got a keyboard connected via HIDP - hidd --show gives:
+with "bccmd psread" or "bccmd pslist" you can do that. However you need
+to pick the correct stores value to get all info.
 
-00:07:61:06:CB:DE Bluetooth HID Boot Protocol Device [046d:b303] 
-connected [boot-protocol]
+Regards
 
-But whenever I have to reboot, the connection remains between the dongle 
-and the keyboard, so it then complains at next boot. I've updated my 
-bluetooth init script to do "hciconfig hci0 reset" on shutdown and that 
-works, but I'd like to know if there's a better way of doing it.
+Marcel
 
-Next is that I've got multimedia keys on the keyboard that I can't seem 
-to use. Does this HID support provided by Bluez map those extra keys as 
-well?
 
-Thanks
-
-Alasdair
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
