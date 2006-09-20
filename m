@@ -1,10 +1,19 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4511BCBA.8060909@xmission.com>
-Date: Wed, 20 Sep 2006 16:12:10 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] SCO using uart-connected adapter
+In-Reply-To: <d23110170609200748u4d16a947q9cfa716825ea44b7@mail.gmail.com>
+References: <450603BA.3090302@vasmac.com>
+	<Pine.LNX.4.63.0609121038180.17868@redbean.intranet.gw-instruments.de>
+	<1158050613.14015.1.camel@localhost>
+	<Pine.LNX.4.63.0609121206040.17868@redbean.intranet.gw-instruments.de>
+	<45081402.8020909@vasmac.com>
+	<Pine.LNX.4.63.0609141052130.22339@redbean.intranet.gw-instruments.de>
+	<1158313791.5233.9.camel@localhost>
+	<d23110170609200748u4d16a947q9cfa716825ea44b7@mail.gmail.com>
+Date: Wed, 20 Sep 2006 17:05:15 +0200
+Message-Id: <1158764715.10356.0.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] socket connect returns EAGAIN
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,17 +27,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hey
+Hi Ulisses,
 
-I remember there were a lot of problems in getting uart-connected
-adapters to make SCO connections. Were the problems limited to non-csr
-parts?
+> > > > > I think the problem is in bt_sock_wait_state(...). This always returns
+> > > > > -EAGAIN if timeout is zero (which it is if the socket is set non
+> > > > > blocking). But may be I'm missing something.
+> > > >
+> > > > I've come to a similar conclusion. I'm not sure why it's returning -EAGAIN.
+> > > > However, looking at the x25 transport (af_x25.c), it takes a different
+> > > > approach;
+> > > > if O_NONBLOCK is set they don't call the blocking routine at all. Maybe a
+> > > > similar approach should be taken here.
+> > > >
+> > > returning EAGAIN is fine for a listening socket. I first thought the
+> > > solution of not calling bt_sock_wait_state() for a non blocking connect
+> > > would be the easiest solution, too. But then you have to correct it on
+> > > several places. Just changing bt_sock_wait_state() will solve it for
+> > > various socket types.
+> >
+> > sounds like a good idea. Anyone preparing a patch for it?
+> 
+> Sorry, but I'm failing to see why we can't just do a
+> s/EAGAIN/EINPROGRESS/ inside bt_sock_wait_state(). Does anyone mind to
+> explain, please?
 
-I've been thinking about putting a blueradios.com bluecore4 adapter on a
-gumstix board. It would have to connect through a 921k uart though. Has
-anyone worked out this sort of thing?
+what about the server socket. In this case EAGAIN is fine.
 
-Brad
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
