@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <45118E52.8080303@csr.com>
+Date: Wed, 20 Sep 2006 19:54:10 +0100
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <45118E52.8080303@csr.com>
 References: <freemail.20060820112703.62459@fm06.freemail.hu>
-	<45118E52.8080303@csr.com>
-Date: Wed, 20 Sep 2006 21:06:37 +0200
-Message-Id: <1158779197.10356.3.camel@localhost>
-Mime-Version: 1.0
+In-Reply-To: <freemail.20060820112703.62459@fm06.freemail.hu>
 Subject: Re: [Bluez-users] Changing BD address on CSR based USB dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,31 +20,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Steven,
+SZABO Tamas wrote:
+> First of all, I have a few USB-BT dongle (no brand info, CSR
+> chipset, HCI and LMP ver. 2.0, EEPROM on the board). They
+> all have the same BD address (Yes, it seems I bought pirated
+> dongles).
 
-> > First of all, I have a few USB-BT dongle (no brand info, CSR
-> > chipset, HCI and LMP ver. 2.0, EEPROM on the board). They
-> > all have the same BD address (Yes, it seems I bought pirated
-> > dongles).
-> 
-> Hmm, I'm guessing you can't tell me who manufactured the dongles?
-> 
-> Can you tell me the firmware revision and which Bluetooth address they're
-> booting up with (hciconfig version and hciconfig revision should give you
-> all that information)?
-> 
-> Are there any BlueZ tools that can dump all the values written to
-> persistent store for a module (equivalent to CSR's btcli's psslurp
-> command)? If so, a dump of the PS might be useful for me.
+Hmm, I'm guessing you can't tell me who manufactured the dongles?
 
-with "bccmd psread" or "bccmd pslist" you can do that. However you need
-to pick the correct stores value to get all info.
+Can you tell me the firmware revision and which Bluetooth address they're
+booting up with (hciconfig version and hciconfig revision should give you
+all that information)?
 
-Regards
+Are there any BlueZ tools that can dump all the values written to
+persistent store for a module (equivalent to CSR's btcli's psslurp
+command)? If so, a dump of the PS might be useful for me.
 
-Marcel
+You say they have EEPROM on board. If they were ROM parts without
+non-volatile storage then their behaviour would be reasonable. They'd
+be expecting the host to configure them. I believe there are suitable
+tools in BlueZ.
+
+If they're ROM parts with EEPROM but it's not configured, that looks
+like a manufacturing error. You'll need to assign them unique
+addresses (getting hold of such addresses can be tricky).
+
+The real question is whether any of the other settings have been
+programmed correctly.
+
+Thanks.
+
+	- Steven
+-- 
 
 
+To access the latest news from CSR copy this link into a web browser:  http://www.csr.com/email_sig.php
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
