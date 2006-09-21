@@ -1,20 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170609211259j164c0167ib751ab3ee2f75079@mail.gmail.com>
-Date: Thu, 21 Sep 2006 16:59:40 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1158764715.10356.0.camel@localhost>
-MIME-Version: 1.0
-References: <450603BA.3090302@vasmac.com>
-	<Pine.LNX.4.63.0609121038180.17868@redbean.intranet.gw-instruments.de>
-	<1158050613.14015.1.camel@localhost>
-	<Pine.LNX.4.63.0609121206040.17868@redbean.intranet.gw-instruments.de>
-	<45081402.8020909@vasmac.com>
-	<Pine.LNX.4.63.0609141052130.22339@redbean.intranet.gw-instruments.de>
-	<1158313791.5233.9.camel@localhost>
-	<d23110170609200748u4d16a947q9cfa716825ea44b7@mail.gmail.com>
-	<1158764715.10356.0.camel@localhost>
-Subject: Re: [Bluez-devel] socket connect returns EAGAIN
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <een2ub$f0l$1@sea.gmane.org>
+References: <een2ub$f0l$1@sea.gmane.org>
+Date: Thu, 21 Sep 2006 18:07:49 +0200
+Message-Id: <1158854869.11194.48.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Browsing Anycom GP-600 GPS Receiver fails
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -28,18 +20,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 9/20/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> what about the server socket. In this case EAGAIN is fine.
+Hi Michael,
 
-Yes, in this case EAGAIN is fine. However, I don't think we are even
-calling bt_sock_wait_state() for a server socket (please, correct me
-if I'm wrong) so changing EAGAIN to EINPROGRESS inside
-bt_sock_wait_state() should just work, right? (we just  need to fix
-rfcomm_session_create() too and that's it).
+> I own an Anycom GP-600 GPS Receiver. This receiver might have a broken 
+> SDP stack. I use SuSE Linux 9.3.
+> 
+> When browsing the device using the sdptool browse command, it fails. 
+> However when using Konqueror to browse the SDP-record on the same 
+> distribution it works fine.
+> 
+> The difference between kde and sdptool browse seems to be, that kde uses 
+> a 32 bit UUID, while the sdptool uses a 16 bit UUID.
+> 
+> Is there any chance that bluez could handle such trouble more gracefully 
+> and issue a waring? I remember prior Bluez versions had been working 
+> slightly better.
 
-Regards,
+it simply means that this device has no public browse group. That is not
+a bug. Try "sdptool browse --l2cap <bdaddr>" and see if this works.
 
--- Ulisses
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
