@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <3f5a9ba20609202021i59b9c19eh4c62f74cd545c6f1@mail.gmail.com>
-Date: Thu, 21 Sep 2006 11:21:21 +0800
-From: "Mingfan.Lu" <lucharse@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3f5a9ba20609191809k6de962fr1de38558a380e694@mail.gmail.com>
-MIME-Version: 1.0
-References: <3f5a9ba20609190330u7f785d88x1e054cf9b027807e@mail.gmail.com>
-	<1158662153.20978.3.camel@localhost>
-	<3f5a9ba20609191809k6de962fr1de38558a380e694@mail.gmail.com>
-Subject: Re: [Bluez-devel] Can I search two service at the same time?
+Date: Wed, 20 Sep 2006 20:56:59 -0400
+From: Chris Spencer <chrisspen@gmail.com>
+In-reply-to: <1158561481.30486.30.camel@localhost>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-id: <4511E35B.10200@gmail.com>
+MIME-version: 1.0
+Content-type: multipart/mixed; boundary=------------020204090405040504050101
+References: <beb7688e0609150702x738ad4d8re64815d12f457a76@mail.gmail.com>
+	<1158329592.5233.32.camel@localhost>  <450B3B01.2060801@gmail.com>
+	<1158397207.6839.1.camel@localhost>  <450D7E04.6080107@gmail.com>
+	<1158561481.30486.30.camel@localhost>
+Subject: Re: [Bluez-devel] Celluon Laserkey Bluetooth Keyboard
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,298 +20,164 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1891018745=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1891018745==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_16687_18000722.1158808881799"
-
-------=_Part_16687_18000722.1158808881799
+This is a multi-part message in MIME format.
+--------------020204090405040504050101
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-No one can help me?
+Marcel Holtmann wrote:
 
-2006/9/20, Mingfan. Lu <lucharse@gmail.com>:
+> run "hcidump -X -V" and then connect to RFCOMM channel 1 with the rfcomm
+> tool and then start pressing keys and see what hcidump shows you. Maybe
+> it is a simple key mapping. Check the Smart Keyboard support for an
+> example on how to add support for this keyboard.
 
->  Here is the  data, maybe it can give some hits.
->
->
-> My func named getService()
->
-> int BTWorker::getService(Device * pDev)
-> {
->   int CPS_err;
->   sdp_list_t *CPS_r,*next;
->   sdp_record_t *CPS_rec;
->   sdp_list_t *CPS_proto_list;
->   bool bFound=false;
->   uint8_t numoffound=0;
->   uint8_t rfcommChannel;
->   uint8_t obexChannel;
->   char desc[100];
->
->   bdaddr_t source;//the source dongle should be saved in the adaptor, you
-> should config it in the ap.ini
->   bdaddr_t target;
->   str2ba(pDev->getDeviceAddress()->getAddress_str().c_str(),&target);
->       sdp_session_t *session = 0;
->   str2ba(adaptor->getAddress()->getAddress_str().c_str(),&source);
->   // connect to the SDP server running on the remote machine
->   session = sdp_connect_custom(&source,&target,SDP_RETRY_IF_BUSY);
->   if(session==NULL)
->   {
->       return -1;
->       }
->
->   // specify the UUID of the application service(s) we're searching for
->   uint16_t CPS_svc_uuid_int=CPS_SERV_UUID;   // 0x2222
->   uint16_t OBEX_svc_uuid_int=OBEX_SERV_UUID; // 0x 1105
->   uuid_t CPS_svc_uuid;
->   uuid_t OBEX_svc_uuid;
->   sdp_uuid16_create(&CPS_svc_uuid, CPS_svc_uuid_int);
->   sdp_uuid16_create(&OBEX_svc_uuid,OBEX_svc_uuid_int);
->
->   sdp_list_t * CPS_search_list;
->   CPS_search_list = sdp_list_append(NULL,&CPS_svc_uuid);
->   CPS_search_list = sdp_list_append(CPS_search_list,&OBEX_svc_uuid );
->
->   // specify that we want a list of all the matching services' attributes
->
->   uint16_t rec_num =2;
->   // get a list of service records that have UUID CPS_SERV_UUID +
-> OBEX_SERV_UUID
->   sdp_list_t *CPS_response_list = NULL;
->
->   // search
->
->    CPS_err =
-> sdp_service_search_req(session,CPS_search_list,255,&CPS_response_list);
->
->   printf("CPS_err is %d\n",CPS_err);
->   if(CPS_response_list == NULL)
->    printf("Rsp is NULL\n");
->   sdp_list_free(CPS_search_list,0);
->   sdp_close(session);
->   //...............other..................
-> }
->
-> My program's output is:
->
-> CPS_err is -1
-> NULL is
-> NO CPS or OBEX svc founded
-> Get service failed!00:12:D1:D1:08:47
->
-> The HCIDUMP -X -V output is:
->
->
-> ..................
->
-> < HCI Command: Create Connection (0x01|0x0005) plen 13
->     bdaddr 00:12:D1:D1:08:47 ptype 0xcc18 rswitch 0x01 clkoffset 0x40c8
-> (valid)
->     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> > HCI Event: Command Status (0x0f) plen 4
->     Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> > HCI Event: Connect Complete (0x03) plen 11
->     status 0x00 handle 1 bdaddr 00:12:D1:D1:08:47 type ACL encrypt 0x00
-> < ACL data: handle 1 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 1 scid 0x0040
-> < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
->     handle 1 policy 0x0f
->     Link policy: RSWITCH HOLD SNIFF PARK
-> > HCI Event: Command Complete (0x0e) plen 6
->     Write Link Policy Settings (0x02|0x000d) ncmd 1
->     status 0x00 handle 1
-> > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 1 packets 1
-> > HCI Event: Max Slots Change (0x1b) plen 3
->     handle 1 slots 5
-> > HCI Event: Connection Packet Type Changed (0x1d) plen 5
->     status 0x00 handle 1 ptype 0xcc18
->     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> > ACL data: handle 1 flags 0x02 dlen 10
->     L2CAP(s): Info req: type 2
-> < ACL data: handle 1 flags 0x02 dlen 12
->     L2CAP(s): Info rsp: type 2 result 1
->       Not supported
-> > ACL data: handle 1 flags 0x02 dlen 28
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 2
->       Connection pending - Authorization pending
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
->       Connection successful
-> < ACL data: handle 1 flags 0x02 dlen 12
->     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-> > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 1 packets 1
-> > ACL data: handle 1 flags 0x02 dlen 12
->     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-> > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 1 packets 1
-> < ACL data: handle 1 flags 0x02 dlen 14
->     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
->       Success
-> > ACL data: handle 1 flags 0x02 dlen 18
->     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
->       Success
->       MTU 672
-> < ACL data: handle 1 flags 0x02 dlen 20
->     L2CAP(d): cid 0x0040 len 16 [psm 1]
->         SDP SS Req: tid 0x0 len 0xb
->           pat uuid-16 0x2222 uuid-16 0x1105 (OBEXObjPush)
->           max 2
->           cont 00
-> > ACL data: handle 2 flags 0x02 dlen 14
->     L2CAP(d): cid 0x0040 len 10 [psm 1]
->         SDP SS Rsp: tid 0x0 len 0x5
->           count 0
->           cont 00
-> < ACL data: handle 2 flags 0x02 dlen 12
->     L2CAP(s): Disconn req: dcid 0x00bb scid 0x0040
-> > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 2 packets 1
-> > ACL data: handle 2 flags 0x02 dlen 12
->     L2CAP(s): Disconn rsp: dcid 0x00bb scid 0x0040
-> < HCI Command: Disconnect (0x01|0x0006) plen 3
->     handle 1 reason 0x13
->     Reason: Remote User Terminated Connection
-> > HCI Event: Command Status (0x0f) plen 4
->     Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> > HCI Event: Disconn Complete (0x05) plen 4
->     status 0x00 handle 1 reason 0x16
->     Reason: Connection Terminated by Local Host
-> < HCI Command: Disconnect (0x01|0x0006) plen 3
->     handle 2 reason 0x13
->     Reason: Remote User Terminated Connection
-> > HCI Event: Command Status (0x0f) plen 4
->     Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> > HCI Event: Disconn Complete (0x05) plen 4
->     status 0x00 handle 2 reason 0x16
->     Reason: Connection Terminated by Local Host
->
-> .........................................
->
->
->
-> 2006/9/19, Marcel Holtmann <marcel@holtmann.org>:
->
-> > Hi,
-> >
-> > > Problem,
-> > >    I have seen that there is a function named sdp_service_search_req,
-> > >    So,I append two service uuid such as obexpush's uuid and another
-> > > service's uuid into the search list, I want to get the two services'
-> > > info only call search func once.
-> > >   and then set the max_rec_num = 2,
-> > >   then call
-> > >        sdp_service_search_req(session,search_list,2,&rsp_list);
-> > >  but ,I have seen that the func return 0, but the rsp_list is NULL.
-> >
-> > I would propose you run "hcidump -X -V" as root while you are trying
-> > this and then show us that output.
-> >
-> > Regards
-> >
-> > Marcel
-> >
-> >
-> >
-> >
-> > -------------------------------------------------------------------------
-> > Take Surveys. Earn Cash. Influence the Future of IT
-> > Join SourceForge.net 's Techsay panel and you'll get the chance to share
-> > your
-> > opinions on IT & business topics through brief surveys -- and earn cash
-> >
-> > http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> > _______________________________________________
-> > Bluez-devel mailing list
-> > Bluez-devel@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> >
->
->
->
-> --
-> With respects,
->
->    Mingfan.Lu
->
+I wasn't able to connect with rfcomm, but I was with hidd --connect
+<bdaddr>. I've attached some sample output.
+
+a5.txt, s5.txt, and d5.txt are what's output when I press those keys
+five times.
+mouse.txt is what's output when I press the mouse key and move my finger
+in a Z shape from the upper left to the right, then down to the lower
+left, then over to the right.
+
+Regards,
+Chris
 
 
 
--- 
-With respects,
-   Mingfan.Lu
-
-------=_Part_16687_18000722.1158808881799
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>No one can help me?</div>
-<div><br><span class="gmail_quote">2006/9/20, Mingfan. Lu &lt;<a href="mailto:lucharse@gmail.com">lucharse@gmail.com</a>&gt;:</span></div>
-<div>
-<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">
-<div>
-<div>Here is the&nbsp; data, maybe it can give some hits.</div>
-<div>&nbsp;</div>
-<div>
-<p>My func named getService()</p>
-<p>int BTWorker::getService(Device * pDev)<br>{<br>&nbsp;&nbsp;int CPS_err;<br>&nbsp;&nbsp;sdp_list_t *CPS_r,*next;<br>&nbsp;&nbsp;sdp_record_t *CPS_rec;<br>&nbsp;&nbsp;sdp_list_t *CPS_proto_list;<br>&nbsp;&nbsp;bool bFound=false;<br>&nbsp;&nbsp;uint8_t numoffound=0;<br>&nbsp;&nbsp;uint8_t rfcommChannel; 
-<br>&nbsp;&nbsp;uint8_t obexChannel;<br>&nbsp;&nbsp;char desc[100];</p>
-<p>&nbsp;&nbsp;bdaddr_t source;//the source dongle should be saved in the adaptor, you should config it in the ap.ini<br>&nbsp;&nbsp;bdaddr_t target;<br>&nbsp;&nbsp;str2ba(pDev-&gt;getDeviceAddress()-&gt;getAddress_str().c_str(),&amp;target);<br>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;sdp_session_t *session = 0; 
-<br>&nbsp;&nbsp;str2ba(adaptor-&gt;getAddress()-&gt;getAddress_str().c_str(),&amp;source);<br>&nbsp;&nbsp;// connect to the SDP server running on the remote machine<br>&nbsp;&nbsp;session = sdp_connect_custom(&amp;source,&amp;target,SDP_RETRY_IF_BUSY); 
-<br>&nbsp;&nbsp;if(session==NULL)<br>&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return -1;<br>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;}</p>
-<p>&nbsp;&nbsp;// specify the UUID of the application service(s) we're searching for<br>&nbsp;&nbsp;uint16_t CPS_svc_uuid_int=CPS_SERV_UUID;&nbsp;&nbsp; // 0x2222<br>&nbsp;&nbsp;uint16_t OBEX_svc_uuid_int=OBEX_SERV_UUID; // 0x 1105<br>&nbsp;&nbsp;uuid_t CPS_svc_uuid;<br>
-&nbsp;&nbsp;uuid_t OBEX_svc_uuid;<br>&nbsp;&nbsp;sdp_uuid16_create(&amp;CPS_svc_uuid, CPS_svc_uuid_int);<br>&nbsp;&nbsp;sdp_uuid16_create(&amp;OBEX_svc_uuid,OBEX_svc_uuid_int);</p>
-<p>&nbsp;&nbsp;sdp_list_t * CPS_search_list;<br>&nbsp;&nbsp;CPS_search_list = sdp_list_append(NULL,&amp;CPS_svc_uuid);<br>&nbsp;&nbsp;CPS_search_list = sdp_list_append(CPS_search_list,&amp;OBEX_svc_uuid );<br>&nbsp;&nbsp;<br>&nbsp;&nbsp;// specify that we want a list of all the matching services' attributes 
-</p>
-<p>&nbsp;&nbsp;uint16_t rec_num =2;<br>&nbsp;&nbsp;// get a list of service records that have UUID CPS_SERV_UUID + OBEX_SERV_UUID<br>&nbsp;&nbsp;sdp_list_t *CPS_response_list = NULL;</p>
-<p>&nbsp;&nbsp;// search<br>&nbsp;&nbsp;<br>&nbsp; &nbsp;CPS_err = sdp_service_search_req(session,CPS_search_list,255,&amp;CPS_response_list);<br>&nbsp;&nbsp;<br>&nbsp;&nbsp;printf(&quot;CPS_err is %d\n&quot;,CPS_err);<br>&nbsp;&nbsp;if(CPS_response_list == NULL)<br>&nbsp;&nbsp;&nbsp;printf(&quot;Rsp is NULL\n&quot;); 
-<br>&nbsp;&nbsp;sdp_list_free(CPS_search_list,0);<br>&nbsp;&nbsp;sdp_close(session);<br>&nbsp;&nbsp;//...............other..................<br>}</p>
-<p>My program's output is:</p>
-<p>CPS_err is -1<br>NULL is<br>NO CPS or OBEX svc founded<br>Get service failed!00:12:D1:D1:08:47</p>
-<p>The HCIDUMP -X -V output is:</p>
-<p><br>..................</p>
-<p>&lt; HCI Command: Create Connection (0x01|0x0005) plen 13<br>&nbsp;&nbsp;&nbsp; bdaddr 00:12:D1:D1:08:47 ptype 0xcc18 rswitch 0x01 clkoffset 0x40c8 (valid)<br>&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5<br>&gt; HCI Event: Command Status (0x0f) plen 4 
-<br>&nbsp;&nbsp;&nbsp; Create Connection (0x01|0x0005) status 0x00 ncmd 1<br>&gt; HCI Event: Connect Complete (0x03) plen 11<br>&nbsp;&nbsp;&nbsp; status 0x00 handle 1 bdaddr 00:12:D1:D1:08:47 type ACL encrypt 0x00<br>&lt; ACL data: handle 1 flags 0x02 dlen 12 
-<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Connect req: psm 1 scid 0x0040<br>&lt; HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4<br>&nbsp;&nbsp;&nbsp; handle 1 policy 0x0f<br>&nbsp;&nbsp;&nbsp; Link policy: RSWITCH HOLD SNIFF PARK<br>&gt; HCI Event: Command Complete (0x0e) plen 6 
-<br>&nbsp;&nbsp;&nbsp; Write Link Policy Settings (0x02|0x000d) ncmd 1<br>&nbsp;&nbsp;&nbsp; status 0x00 handle 1<br>&gt; HCI Event: Number of Completed Packets (0x13) plen 5<br>&nbsp;&nbsp;&nbsp; handle 1 packets 1<br>&gt; HCI Event: Max Slots Change (0x1b) plen 3<br>
-&nbsp;&nbsp;&nbsp; handle 1 slots 5<br>&gt; HCI Event: Connection Packet Type Changed (0x1d) plen 5<br>&nbsp;&nbsp;&nbsp; status 0x00 handle 1 ptype 0xcc18<br>&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5<br>&gt; ACL data: handle 1 flags 0x02 dlen 10<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Info req: type 2 
-<br>&lt; ACL data: handle 1 flags 0x02 dlen 12<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Info rsp: type 2 result 1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Not supported<br>&gt; ACL data: handle 1 flags 0x02 dlen 28<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 2 
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection pending - Authorization pending<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection successful<br>&lt; ACL data: handle 1 flags 0x02 dlen 12<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0 
-<br>&gt; HCI Event: Number of Completed Packets (0x13) plen 5<br>&nbsp;&nbsp;&nbsp; handle 1 packets 1<br>&gt; ACL data: handle 1 flags 0x02 dlen 12<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0<br>&gt; HCI Event: Number of Completed Packets (0x13) plen 5 
-<br>&nbsp;&nbsp;&nbsp; handle 1 packets 1<br>&lt; ACL data: handle 1 flags 0x02 dlen 14<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Success<br>&gt; ACL data: handle 1 flags 0x02 dlen 18<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4 
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Success<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MTU 672<br>&lt; ACL data: handle 1 flags 0x02 dlen 20<br>&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0040 len 16 [psm 1]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SDP SS Req: tid 0x0 len 0xb<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pat uuid-16 0x2222 uuid-16 0x1105 (OBEXObjPush) 
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; max 2<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cont 00<br>&gt; ACL data: handle 2 flags 0x02 dlen 14<br>&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0040 len 10 [psm 1]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SDP SS Rsp: tid 0x0 len 0x5<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; count 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cont 00<br>&lt; ACL data: handle 2 flags 0x02 dlen 12 
-<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Disconn req: dcid 0x00bb scid 0x0040<br>&gt; HCI Event: Number of Completed Packets (0x13) plen 5<br>&nbsp;&nbsp;&nbsp; handle 2 packets 1<br>&gt; ACL data: handle 2 flags 0x02 dlen 12<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Disconn rsp: dcid 0x00bb scid 0x0040 
-<br>&lt; HCI Command: Disconnect (0x01|0x0006) plen 3<br>&nbsp;&nbsp;&nbsp; handle 1 reason 0x13<br>&nbsp;&nbsp;&nbsp; Reason: Remote User Terminated Connection<br>&gt; HCI Event: Command Status (0x0f) plen 4<br>&nbsp;&nbsp;&nbsp; Disconnect (0x01|0x0006) status 0x00 ncmd 1 
-<br>&gt; HCI Event: Disconn Complete (0x05) plen 4<br>&nbsp;&nbsp;&nbsp; status 0x00 handle 1 reason 0x16<br>&nbsp;&nbsp;&nbsp; Reason: Connection Terminated by Local Host<br>&lt; HCI Command: Disconnect (0x01|0x0006) plen 3<br>&nbsp;&nbsp;&nbsp; handle 2 reason 0x13 
-<br>&nbsp;&nbsp;&nbsp; Reason: Remote User Terminated Connection<br>&gt; HCI Event: Command Status (0x0f) plen 4<br>&nbsp;&nbsp;&nbsp; Disconnect (0x01|0x0006) status 0x00 ncmd 1<br>&gt; HCI Event: Disconn Complete (0x05) plen 4<br>&nbsp;&nbsp;&nbsp; status 0x00 handle 2 reason 0x16 
-<br>&nbsp;&nbsp;&nbsp; Reason: Connection Terminated by Local Host</p>
-<p>.........................................</p><br><br>&nbsp;</div>
-<div><span class="gmail_quote">2006/9/19, Marcel Holtmann &lt;<a onclick="return top.js.OpenExtLink(window,event,this)" href="mailto:marcel@holtmann.org" target="_blank">marcel@holtmann.org</a>&gt;:</span> </div>
-<div><span class="e" id="q_10dc8c4cab0b4b4b_1">
-<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Hi,<br><br>&gt; Problem,<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;I have seen that there is a function named sdp_service_search_req,<br>
-&gt;&nbsp;&nbsp;&nbsp;&nbsp;So,I append two service uuid such as obexpush's uuid and another<br>&gt; service's uuid into the search list, I want to get the two services'<br>&gt; info only call search func once.<br>&gt;&nbsp;&nbsp; and then set the max_rec_num = 2, 
-<br>&gt;&nbsp;&nbsp; then call<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sdp_service_search_req(session,search_list,2,&amp;rsp_list);<br>&gt;&nbsp;&nbsp;but ,I have seen that the func return 0, but the rsp_list is NULL.<br><br>I would propose you run &quot;hcidump -X -V&quot; as root while you are trying 
-<br>this and then show us that output.<br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>Take Surveys. Earn Cash. Influence the Future of IT<br>Join SourceForge.net
- 's Techsay panel and you'll get the chance to share your<br>opinions on IT &amp; business topics through brief surveys -- and earn cash<br><a onclick="return top.js.OpenExtLink(window,event,this)" href="http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV" target="_blank">
-http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV</a><br>_______________________________________________<br>Bluez-devel mailing list<br><a onclick="return top.js.OpenExtLink(window,event,this)" href="mailto:Bluez-devel@lists.sourceforge.net" target="_blank">
-Bluez-devel@lists.sourceforge.net </a><br><a onclick="return top.js.OpenExtLink(window,event,this)" href="https://lists.sourceforge.net/lists/listinfo/bluez-devel" target="_blank">https://lists.sourceforge.net/lists/listinfo/bluez-devel
-</a><br></blockquote></span></div>
-<div></div><br><br clear="all"><br>-- <br>With respects,<br>&nbsp;</div>
-<div><span class="sg">&nbsp;&nbsp; Mingfan.Lu </span></div></blockquote></div><br><br clear="all"><br>-- <br>With respects,<br>&nbsp;&nbsp; Mingfan.Lu 
-
-------=_Part_16687_18000722.1158808881799--
 
 
---===============1891018745==
+--------------020204090405040504050101
+Content-Type: application/x-bzip;
+ name="cl800bt-samples.tar.bz2"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="cl800bt-samples.tar.bz2"
+
+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
+3pO/65rv2+Zo8fXRT/4u5IpwoSDS/hGI
+--------------020204090405040504050101
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -320,7 +188,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1891018745==
+--------------020204090405040504050101
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -331,4 +199,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1891018745==--
+--------------020204090405040504050101--
