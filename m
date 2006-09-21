@@ -1,13 +1,21 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4512F6DA.9030604@prolly.org>
-Date: Thu, 21 Sep 2006 16:32:26 -0400
-From: Douglas Ward <douglas.ward@prolly.org>
-MIME-Version: 1.0
-To: =?EUC-KR?B?wMyxpMH4?= <fidelis98@naver.com>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <4510DA2C.000001.11749@han731>
-In-Reply-To: <4510DA2C.000001.11749@han731>
-Subject: Re: [Bluez-devel] Send me any responce, plz....
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <d23110170609211259j164c0167ib751ab3ee2f75079@mail.gmail.com>
+References: <450603BA.3090302@vasmac.com>
+	<Pine.LNX.4.63.0609121038180.17868@redbean.intranet.gw-instruments.de>
+	<1158050613.14015.1.camel@localhost>
+	<Pine.LNX.4.63.0609121206040.17868@redbean.intranet.gw-instruments.de>
+	<45081402.8020909@vasmac.com>
+	<Pine.LNX.4.63.0609141052130.22339@redbean.intranet.gw-instruments.de>
+	<1158313791.5233.9.camel@localhost>
+	<d23110170609200748u4d16a947q9cfa716825ea44b7@mail.gmail.com>
+	<1158764715.10356.0.camel@localhost>
+	<d23110170609211259j164c0167ib751ab3ee2f75079@mail.gmail.com>
+Date: Thu, 21 Sep 2006 22:05:53 +0200
+Message-Id: <1158869153.11194.60.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] socket connect returns EAGAIN
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,62 +25,34 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="euc-kr"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQpIYXNoOiBTSEExCgpNb3N0IHNwYW0g
-ZmlsdGVycyBhdXRvbWF0aWNhbGx5IGJsb2NrIG5vbiBlbmdsaXNoIHNlbmRlciBuYW1lcywgc29y
-cnkuClRoaXMgZW1haWwgd2FzIHNlbnQgdG8gbXkganVuayBmb2xkZXIgYmVjYXVzZSBvZiB0aGF0
-LiBtYXliZSB0aGF0IGlzCnlvdXIgcHJvYmxlbT8gYWxzbywgaWYgbm90IGFscmVhZHksIHNldCB5
-b3VyIGNoYXJzZXQgdG8gdXRmLTguCgrAzLGkwfggd3JvdGU6Cj4gUCB7bWFyZ2luLXRvcDoycHg7
-bWFyZ2luLWJvdHRvbToycHg7fSBIaSBhbGwsCj4KPgo+IEFueW9uZSByZXNwb25zZSB0byBtZSwg
-cGx6Cj4KPgo+Cj4gQmVjYXVzZSBNeSBlbWFpbCBpcyBub3QgZGVsaWV2ZWQgdG8gbWFpbGxpbmcg
-bGlzdC4KPgo+Cj4KPiBJIHdhbnQgdG8gdGVzdCB0aGUgbWFpbCwgc28gYW55IHJlc3BvbnNlIHRv
-IG1lLCBwbHoKPgo+Cj4KPiBUaGFua3MuLi4gKF5eCj4KPgo+Cj4KPgo+Cj4KPiA9PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Cj4KPiBMZWUgS3dhbmcg
-SmluCj4KPiBTYW1zdW5nIEVsZWN0cm9uaWNzIENPLiwgTFREIFllb25ndG9uZy1ndSwgU3V3b24t
-U2ksIEt5dW5na2ktRG8sCj4gS29yZWEgVGVsIDogODItMzEtMzAxLTA3MDMgRS1tYWlsIDoga3dh
-bmdqaW40NS5sZWVAc2Ftc3VuZy5jb20KPiBmaWRlbGlzOThAbmF2ZXIuY29tCj4KPiA9PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Cj4KPgo+Cj4gPG1h
-aWx0bzpmaWRlbGlzOThAbmF2ZXIuY29tPiBhIHtjb2xvcjogIzRGNEYzMH0sIGE6aG92ZXIge2Nv
-bG9yOgo+ICM0REE1MDB9IGltZyB7Ym9yZGVyOiBub25lO30KPiA8aHR0cDovL2hhcHB5YmVhbi5u
-YXZlci5jb20vbWFpbi9ob21lLmpzcD679bfOv+4gseK6ziC5rsitwMcgvr6+0Swgx9jHx7rzCj4g
-PGh0dHA6Ly9oYXBweWJlYW4ubmF2ZXIuY29tL21haW4vaG9tZS5qc3A+IDxodHRwOi8vd3d3Lm5h
-dmVyLmNvbS8+Cj4KPgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPgo+Cj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFRh
-a2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJVCBKb2luCj4g
-U291cmNlRm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0aGUgY2hhbmNl
-IHRvIHNoYXJlCj4geW91ciBvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdo
-IGJyaWVmIHN1cnZleXMgLS0gYW5kCj4gZWFybiBjYXNoCj4gaHR0cDovL3d3dy50ZWNoc2F5LmNv
-bS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgo+Cj4K
-PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tCj4KPgo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fIEJsdWV6LWRldmVsIG1haWxpbmcKPiBsaXN0IEJsdWV6LWRldmVsQGxpc3Rz
-LnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xp
-c3RpbmZvL2JsdWV6LWRldmVsCgotLS0tLUJFR0lOIFBHUCBTSUdOQVRVUkUtLS0tLQpWZXJzaW9u
-OiBHbnVQRyB2MS40LjUgKEdOVS9MaW51eCkKQ29tbWVudDogVXNpbmcgR251UEcgd2l0aCBNb3pp
-bGxhIC0gaHR0cDovL2VuaWdtYWlsLm1vemRldi5vcmcKCmlRSVZBd1VCUlJMMjJWS0RtbUh5OVEz
-MkFRS1NnZy85SDVRNk9seTNSU3RycXBxdXlzTXJZNDV4ZzFmL2FYQVMKTWM2K3F4WWpNTnJ3ZE9U
-eG5zanJIclBheUNtTmFkTXpjTFZUNjdFUmppMjEyK3lOMFlxS3EwRnV6RlNpVzZUOQowbHNNT1Nk
-dy9wNm9XMVdGZmo2cFRiRFR6UWFkZ3ZhSzBPMUczNWVlMlVtOXJXUVRlRWQ2R2I4MFRVeVlOM1dR
-Cm4yRkw0NzN2ZnphMDRDbFdId0NKajd0YjhsRG1uYVVjT0RRbFdxaDFYN1UxaXVjMzU5ZTU5TENE
-VjJ5ZFJCU2oKK1l6TlhIQVVGNDdpeHZtQzJYWittWDJ0elVHbVE5OGVsaVNNYU0xajhCRzZWRzhX
-NVFLSDlBZkpYcXR2cUoyawpjQlRRcUVlMEVDVDNaY3dNVmlCSWo2NnZuZkpScHF3S1Z1SG1SeXRx
-Tk9JckFOeE1RTTJMbDZYakRSN0JwaWFxCkN1aUNnM1psenBHdmRyK3FFMkFUWFJYbVM0RlZXUVRm
-WGY5Q25oaFptMTdJODJvbnpUVHVYU3RFb0VwempzZUkKVG8wcmNuZ0E2TGIwTW43TmNCZGMxVEVI
-T0pYUjdxRTdiOTg2eVB5bi95eEExNHVzOFFYc0pid2VLTEptS1Evbwpta3N1RmhlSjFOK0dTbjJ5
-dWFFMC94SFpNT0x3YkFNWTdrRnlVTk5peEdjbyt5Y2QwQWp3dU1ISHJqbUs5djh4CnZOcWhlclc2
-OWdKdTNRQVN6Z1pTWXpGdnQ5Ujd3U0JhcElPUzlxWVhkUHVuWHFJUGZ2M2VISzJCS29PUmhTanMK
-dTBCRU5keWl0WVpiVmhYbWtiR09UcnRRTytOR2x0T21UelJzbWsreTlPbi82Tm42dHdnUmJ6cndo
-eUdPOEhnVQphR3NPYjh5TmpyVT0KPWxLRXMKLS0tLS1FTkQgUEdQIFNJR05BVFVSRS0tLS0tCgoK
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLQpUYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBG
-dXR1cmUgb2YgSVQKSm9pbiBTb3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3Un
-bGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hhcmUgeW91cgpvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNz
-IHRvcGljcyB0aHJvdWdoIGJyaWVmIHN1cnZleXMgLS0gYW5kIGVhcm4gY2FzaApodHRwOi8vd3d3
-LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9
-REVWREVWCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJs
-dWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQK
-aHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
+Hi Ulisses,
+
+> > what about the server socket. In this case EAGAIN is fine.
+> 
+> Yes, in this case EAGAIN is fine. However, I don't think we are even
+> calling bt_sock_wait_state() for a server socket (please, correct me
+> if I'm wrong) so changing EAGAIN to EINPROGRESS inside
+> bt_sock_wait_state() should just work, right? (we just  need to fix
+> rfcomm_session_create() too and that's it).
+
+looks like it is okay, care to send a patch.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys -- and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
