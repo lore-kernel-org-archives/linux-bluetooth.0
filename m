@@ -1,22 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170609221047m4e0986fdt5c73b898eb84429f@mail.gmail.com>
-Date: Fri, 22 Sep 2006 14:47:07 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1158869153.11194.60.camel@localhost>
+Message-ID: <4514131B.4030609@palmsource.com>
+Date: Fri, 22 Sep 2006 18:45:15 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_35801_24103946.1158947227903"
-References: <450603BA.3090302@vasmac.com> <1158050613.14015.1.camel@localhost>
-	<Pine.LNX.4.63.0609121206040.17868@redbean.intranet.gw-instruments.de>
-	<45081402.8020909@vasmac.com>
-	<Pine.LNX.4.63.0609141052130.22339@redbean.intranet.gw-instruments.de>
-	<1158313791.5233.9.camel@localhost>
-	<d23110170609200748u4d16a947q9cfa716825ea44b7@mail.gmail.com>
-	<1158764715.10356.0.camel@localhost>
-	<d23110170609211259j164c0167ib751ab3ee2f75079@mail.gmail.com>
-	<1158869153.11194.60.camel@localhost>
-Subject: Re: [Bluez-devel] socket connect returns EAGAIN
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Content-Type: multipart/mixed; boundary="------------030208080105070906040205"
+Subject: [Bluez-devel] a2dpd patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -29,56 +18,148 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_35801_24103946.1158947227903
+This is a multi-part message in MIME format.
+--------------030208080105070906040205
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-On 9/21/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Ulisses,
->
-> > > what about the server socket. In this case EAGAIN is fine.
-> >
-> > Yes, in this case EAGAIN is fine. However, I don't think we are even
-> > calling bt_sock_wait_state() for a server socket (please, correct me
-> > if I'm wrong) so changing EAGAIN to EINPROGRESS inside
-> > bt_sock_wait_state() should just work, right? (we just  need to fix
-> > rfcomm_session_create() too and that's it).
->
-> looks like it is okay, care to send a patch.
+Hi,
 
-Here is the patch. I'm running 2.6.18-mh1 plus the attached patch and
-I have no problems so far (but it needs more testing so we can be sure
-everything works).
+This is a small patch to correct the left sound only. It also integrate 
+the underrun fix we talked about last day.
 
-Regards,
+Fred.
 
--- Ulisses
+--------------030208080105070906040205
+Content-Type: text/plain;
+ name="patch_stereo_underrun"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="patch_stereo_underrun"
 
-------=_Part_35801_24103946.1158947227903
-Content-Type: text/x-patch; name=eagain-to-einprogress.patch;
-	charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_esev81fb
-Content-Disposition: attachment; filename="eagain-to-einprogress.patch"
+? .deps
+? .libs
+? Doxyfile
+? Makefile
+? Makefile.in
+? a2play
+? a2recv
+? aclocal.m4
+? autom4te.cache
+? avrecv
+? avsnd
+? btsco
+? btsco.kdevelop
+? btsco.kdevelop.pcs
+? btsco.kdevses
+? btsco2
+? compile
+? config.guess
+? config.h
+? config.h.in
+? config.log
+? config.status
+? config.sub
+? configure
+? depcomp
+? install-sh
+? libtool
+? missing
+? stamp-h1
+? alsa-plugins/.deps
+? alsa-plugins/.libs
+? alsa-plugins/Makefile
+? alsa-plugins/Makefile.in
+? alsa-plugins/a2dp_ipc.lo
+? alsa-plugins/a2dp_timer.lo
+? alsa-plugins/a2dpd
+? alsa-plugins/ctl_a2dpd.lo
+? alsa-plugins/ctl_sco.lo
+? alsa-plugins/libasound_module_ctl_a2dpd.la
+? alsa-plugins/libasound_module_ctl_sco.la
+? alsa-plugins/libasound_module_pcm_a2dp.la
+? alsa-plugins/libasound_module_pcm_a2dpd.la
+? alsa-plugins/libasound_module_pcm_sco.la
+? alsa-plugins/pcm_a2dp.lo
+? alsa-plugins/pcm_a2dpd.lo
+? alsa-plugins/pcm_sco.lo
+? avdtp/.deps
+? avdtp/.libs
+? avdtp/Makefile
+? avdtp/Makefile.in
+? avdtp/avtest
+? sbc/.deps
+? sbc/.libs
+? sbc/Makefile
+? sbc/Makefile.in
+? sbc/rcplay
+? sbc/sbcdec
+? sbc/sbcenc
+? sbc/sbcinfo
+Index: alsa-plugins/a2dpd.c
+===================================================================
+RCS file: /cvsroot/bluetooth-alsa/btsco/alsa-plugins/a2dpd.c,v
+retrieving revision 1.8
+diff -u -r1.8 a2dpd.c
+--- alsa-plugins/a2dpd.c	6 Sep 2006 02:59:43 -0000	1.8
++++ alsa-plugins/a2dpd.c	22 Sep 2006 15:47:45 -0000
+@@ -580,9 +580,8 @@
+ 			pBuffer[j] = (((channel_1 & 0x0000FFFF) << 16) | (channel_2 & 0x0000FFFF));
+ 		} else {
+ 			//FIXME We have a reverse stereo I don't know why
+-			// The following line corrects the problem but I miss the cause so
+-			pBuffer[j] = (((channel_2&0x0000FFFF)<<16)|(channel_1&0x0000FFFF));
+-			pBuffer[j] = ( (channel_1 & 0xFFFF0000) | (channel_2 & 0x0000FFFF) );
++			// The following line corrects the problem but I miss the cause so be aware
++			pBuffer[j] = (((channel_2 & 0x0000FFFF) << 16) | (channel_1 & 0x0000FFFF));
+ 		}
+ 	}
+ 	return pcm_buffer_filed_size;
+Index: alsa-plugins/alsalib.c
+===================================================================
+RCS file: /cvsroot/bluetooth-alsa/btsco/alsa-plugins/alsalib.c,v
+retrieving revision 1.1
+diff -u -r1.1 alsalib.c
+--- alsa-plugins/alsalib.c	7 Sep 2006 19:46:02 -0000	1.1
++++ alsa-plugins/alsalib.c	22 Sep 2006 15:47:45 -0000
+@@ -70,7 +70,7 @@
+ 		err = snd_pcm_prepare(handle);
+ 		if (err < 0)
+ 			printf("Can't recovery from underrun, prepare failed: %s\n", snd_strerror(err));
+-		return 0;
++		return err;
+ 	} else if (err == -ESTRPIPE) {
+ 		while ((err = snd_pcm_resume(handle)) == -EAGAIN)
+ 			sleep(1);	/* wait until the suspend flag is released */
+@@ -79,7 +79,7 @@
+ 			if (err < 0)
+ 				printf("Can't recovery from suspend, prepare failed: %s\n", snd_strerror(err));
+ 		}
+-		return 0;
++		return err;
+ 	}
+ 	return err;
+ }
+@@ -95,13 +95,13 @@
+ 		break;
+ 	case -EPIPE:
+ 		// To manage underrun, we will try to ignore
+-		xrun_recovery(alsa->playback_handle, result);
+-		//result = 0;
++		if(xrun_recovery(alsa->playback_handle, result) == 0)
++			result = 0;
+ 		DBG("EPIPE(%d)", result);
+ 		break;
+ 	case -ESTRPIPE:
+-		xrun_recovery(alsa->playback_handle, result);
+-		//result=0;
++		if(xrun_recovery(alsa->playback_handle, result) == 0)
++			result=0;
+ 		DBG("ESTRPIPE(%d)", result);
+ 		break;
+ 	}
 
-ZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvYWZfYmx1ZXRvb3RoLmMgYi9uZXQvYmx1ZXRvb3Ro
-L2FmX2JsdWV0b290aC5jCmluZGV4IDc4OGVhN2EuLjMwNWEwOTkgMTAwNjQ0Ci0tLSBhL25ldC9i
-bHVldG9vdGgvYWZfYmx1ZXRvb3RoLmMKKysrIGIvbmV0L2JsdWV0b290aC9hZl9ibHVldG9vdGgu
-YwpAQCAtMjc2LDcgKzI3Niw3IEBAIGludCBidF9zb2NrX3dhaXRfc3RhdGUoc3RydWN0IHNvY2sg
-KnNrLCAKIAkJc2V0X2N1cnJlbnRfc3RhdGUoVEFTS19JTlRFUlJVUFRJQkxFKTsKIAogCQlpZiAo
-IXRpbWVvKSB7Ci0JCQllcnIgPSAtRUFHQUlOOworCQkJZXJyID0gLUVJTlBST0dSRVNTOwogCQkJ
-YnJlYWs7CiAJCX0KIApkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jIGIv
-bmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jCmluZGV4IDMzMmRkOGYuLjQ2OGRmM2IgMTAwNjQ0
-Ci0tLSBhL25ldC9ibHVldG9vdGgvcmZjb21tL2NvcmUuYworKysgYi9uZXQvYmx1ZXRvb3RoL3Jm
-Y29tbS9jb3JlLmMKQEAgLTY0NCw3ICs2NDQsNyBAQCBzdGF0aWMgc3RydWN0IHJmY29tbV9zZXNz
-aW9uICpyZmNvbW1fc2VzCiAJYWRkci5sMl9mYW1pbHkgPSBBRl9CTFVFVE9PVEg7CiAJYWRkci5s
-Ml9wc20gICAgPSBodG9icyhSRkNPTU1fUFNNKTsKIAkqZXJyID0gc29jay0+b3BzLT5jb25uZWN0
-KHNvY2ssIChzdHJ1Y3Qgc29ja2FkZHIgKikgJmFkZHIsIHNpemVvZihhZGRyKSwgT19OT05CTE9D
-Syk7Ci0JaWYgKCplcnIgPT0gMCB8fCAqZXJyID09IC1FQUdBSU4pCisJaWYgKCplcnIgPT0gMCB8
-fCAqZXJyID09IC1FSU5QUk9HUkVTUykKIAkJcmV0dXJuIHM7CiAKIAlyZmNvbW1fc2Vzc2lvbl9k
-ZWwocyk7Cg==
-------=_Part_35801_24103946.1158947227903
+--------------030208080105070906040205
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -89,7 +170,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-------=_Part_35801_24103946.1158947227903
+--------------030208080105070906040205
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -100,4 +181,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-------=_Part_35801_24103946.1158947227903--
+--------------030208080105070906040205--
