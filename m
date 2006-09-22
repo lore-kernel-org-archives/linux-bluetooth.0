@@ -1,14 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <beb7688e0609220628p6239199ai9c5479725e09b894@mail.gmail.com>
-Date: Fri, 22 Sep 2006 09:28:49 -0400
-From: "Chris S" <chrisspen@gmail.com>
-To: "Paul LeoNerd Evans" <leonerd@leonerd.org.uk>
-In-Reply-To: <20060922091022.3a8f4ee8@nim.leo>
+Message-ID: <45139BBC.8050606@palmsource.com>
+Date: Fri, 22 Sep 2006 10:15:56 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-References: <451334F6.2010707@gmail.com> <eevdff$gco$1@sea.gmane.org>
-	<20060922091022.3a8f4ee8@nim.leo>
-Cc: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Keyboard Device Pairing (gmane: message 13 of 20)
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <m33bapwl0u.fsf@kurono.home>
+	<450F208F.4080204@xmission.com>	<m34pv4ux3e.fsf@kurono.home>
+	<m3venkt9uk.fsf@kurono.home>	<450FDFC9.6060804@palmsource.com>
+	<m3eju8t4f2.fsf@kurono.home>	<m3ac4wt3qf.fsf@kurono.home>
+	<450FEBAA.1060005@palmsource.com>	<m3venjsx1h.fsf@kurono.home>
+	<m364fisp92.fsf@kurono.home>
+In-Reply-To: <m364fisp92.fsf@kurono.home>
+Subject: Re: [Bluez-users] a2play and btsco questions
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,28 +25,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 9/22/06, Paul LeoNerd Evans <leonerd@leonerd.org.uk> wrote:
-> On Thu, 21 Sep 2006 21:15:26 -0400
-> Chris Spencer <gmane.20.evilspam@spamgourmet.com> wrote:
+Hi,
+> It seems I can get the AVRCP commands to work "sometimes"(for some
+> unknown definition of "sometimes"), so my headset appear to support
+> it.
 >
-> > [root@localhost]# hidd --connect 00:0D:3C:40:68:7C
-> > <window popped up asking for a passkey>
-> > Can't get device information: Too many levels of symbolic links
-> > [root@localhost]# hidd --connect 00:0D:3C:40:68:7C
-> > Can't get device information: Function not implemented
->
-> Random guess, but that to me looks like "errno" is getting undefined
-> values and is printing whatever random number of error it happens to find.
+> so , current problems are:
+> - I dont know how to make AVRCP commands work reliably, or how to
+> debug it. I think maybe some command has to produce output to the
+> a2dpd daemon for AVRCP commands to be received.
+>   
+A2DPD can run some commands to control a mediaplayer remotly.
+Xmms provide such features. It is player dependent and can be customized 
+in .a2dprc.
 
-I continued to play around with it, and tried using kbluetoothd to
-connect. When I was again prompted for a passkey, I keyed it in on
-both my PC and on the keyboard, and it suddenly started working. I'm
-not confident I could get this working again if I had to. Is there a
-tutorial somewhere on pairing bluetooth devices? I didn't find
-anything on bluez.org.
+My old headset behave differently depending whether it was receiving 
+sound or not :
+When not receiving sound, it did not do AVRCP at all, but it tried to 
+establish an A2DP connection. So the daemon received this incoming A2DP 
+connection, close it and  launch the media player, wich in turn will 
+make a new outgoing A2DP connection to the headset.
 
-Regards,
-Chris
+When playing, the headset will send normal AVRCP commands.
+
+> - xmms output is really choppy, whereas mplayer output is ok.
+> I tried fiddling about with xmms alsa settings, like mmap and buffer
+> settings and whatnot, but no real breakthrough.
+>   
+Do you send 44100 Hz stereo? It's the only supported format. Other 
+format need conversion.
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
