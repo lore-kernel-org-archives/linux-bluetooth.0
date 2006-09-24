@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Reinout van Schouwen <reinout@gmail.com>
-Date: Mon, 25 Sep 2006 00:05:26 +0200
-Message-ID: <1159135525.5088.115.camel@localhost>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1159117942.5088.51.camel@localhost>
 References: <1159114194.5088.44.camel@localhost>
 	<1159116905.28425.2.camel@localhost>
 	<1159117942.5088.51.camel@localhost>
-	<1159133591.28425.8.camel@localhost>
+Date: Sun, 24 Sep 2006 23:33:11 +0200
+Message-Id: <1159133591.28425.8.camel@localhost>
 Mime-Version: 1.0
-In-Reply-To: <1159133591.28425.8.camel@localhost>
 Subject: Re: [Bluez-users] GNOME bluez applet request
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -23,25 +22,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Reinout,
 
-Op zondag 24-09-2006 om 23:33 uur [tijdzone +0200], schreef Marcel
-Holtmann:
+> > the CVS version of bluez-gnome has an option (compile time) to hide the
+> > icon, when no adapter is attached. This should become a GConf option,
+> > but it hasn't been integrated yet. 
+> 
+> Thanks for your reply. However you didn't address the crucial point of
+> my request, that is that the icon should be hidden always, whether an
+> adapter is attached or not, *except* when an event occurs that the user
+> should be notified of.
 
-> this is not my understanding of it. I might add such an option at some
-> point, but right now, I won't bother.
+this is not my understanding of it. I might add such an option at some
+point, but right now, I won't bother.
 
-That's a bit disappointing to hear. Please realize that every single
-icon on the notification area that isn't notifying the user of anything,
-is diluting the usability of the desktop. 
+Regards
 
-Thank you for your consideration.
-
-regards,
-
--- 
-Reinout van Schouwen
-
+Marcel
 
 
 
