@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1159117942.5088.51.camel@localhost>
+To: bluez-users@lists.sourceforge.net
+From: Reinout van Schouwen <reinout@gmail.com>
+Date: Sun, 24 Sep 2006 19:12:23 +0200
+Message-ID: <1159117942.5088.51.camel@localhost>
 References: <1159114194.5088.44.camel@localhost>
 	<1159116905.28425.2.camel@localhost>
-	<1159117942.5088.51.camel@localhost>
-Date: Sun, 24 Sep 2006 23:33:11 +0200
-Message-Id: <1159133591.28425.8.camel@localhost>
 Mime-Version: 1.0
+In-Reply-To: <1159116905.28425.2.camel@localhost>
 Subject: Re: [Bluez-users] GNOME bluez applet request
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -22,23 +21,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Reinout,
+Hi Marcel,
 
-> > the CVS version of bluez-gnome has an option (compile time) to hide the
-> > icon, when no adapter is attached. This should become a GConf option,
-> > but it hasn't been integrated yet. 
-> 
-> Thanks for your reply. However you didn't address the crucial point of
-> my request, that is that the icon should be hidden always, whether an
-> adapter is attached or not, *except* when an event occurs that the user
-> should be notified of.
+Op zondag 24-09-2006 om 18:55 uur [tijdzone +0200], schreef Marcel
+Holtmann:
 
-this is not my understanding of it. I might add such an option at some
-point, but right now, I won't bother.
+> the CVS version of bluez-gnome has an option (compile time) to hide the
+> icon, when no adapter is attached. This should become a GConf option,
+> but it hasn't been integrated yet. 
 
-Regards
+Thanks for your reply. However you didn't address the crucial point of
+my request, that is that the icon should be hidden always, whether an
+adapter is attached or not, *except* when an event occurs that the user
+should be notified of.
 
-Marcel
+> Feel free to send patches.
+
+If bluez were written in Java I probably would, however I have no hope
+of producing C patches for this in the forseeable future.
+
+> The mailing list is the correct of addressing this.
+
+OK then :)
+
+regards,
+
+-- 
+Reinout van Schouwen
+
 
 
 
