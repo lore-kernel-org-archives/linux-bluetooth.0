@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Reinout van Schouwen <reinout@gmail.com>
-Date: Sun, 24 Sep 2006 19:12:23 +0200
-Message-ID: <1159117942.5088.51.camel@localhost>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1159114194.5088.44.camel@localhost>
 References: <1159114194.5088.44.camel@localhost>
-	<1159116905.28425.2.camel@localhost>
+Date: Sun, 24 Sep 2006 18:55:05 +0200
+Message-Id: <1159116905.28425.2.camel@localhost>
 Mime-Version: 1.0
-In-Reply-To: <1159116905.28425.2.camel@localhost>
 Subject: Re: [Bluez-users] GNOME bluez applet request
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,34 +20,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Reinout,
 
-Op zondag 24-09-2006 om 18:55 uur [tijdzone +0200], schreef Marcel
-Holtmann:
+> As part of the Bluetooth support in Mandriva Linux 2007, which will be
+> released shortly, the GNOME bluez applet is required. "Applet" is a bit
+> of a misnomer here, because the icon settles in the notification area.
+> Once activated, it stays there and the only thing it does is showing
+> discoverability status changes.
+> 
+> I would like to point out that it goes against the GNOME Human Interface
+> Guidelines to display a notification icon perpetually.[1] The reasoning
+> behind this is that the notification area is designed to inform the user
+> of important events, and when lots of notification icons are displayed
+> at the same time, this waters down the primary function of the
+> notification area.
 
-> the CVS version of bluez-gnome has an option (compile time) to hide the
-> icon, when no adapter is attached. This should become a GConf option,
-> but it hasn't been integrated yet. 
+the CVS version of bluez-gnome has an option (compile time) to hide the
+icon, when no adapter is attached. This should become a GConf option,
+but it hasn't been integrated yet. Feel free to send patches.
 
-Thanks for your reply. However you didn't address the crucial point of
-my request, that is that the icon should be hidden always, whether an
-adapter is attached or not, *except* when an event occurs that the user
-should be notified of.
+> In fact there is another bluetooth-related icon in my notification area
+> that spends 99,9% of its time doing nothing, for which I've filed a bug
+> already.[2] Is there a bug tracker for bluez where I could file a
+> request to only display the notification icon for important events?
 
-> Feel free to send patches.
+The mailing list is the correct of addressing this.
 
-If bluez were written in Java I probably would, however I have no hope
-of producing C patches for this in the forseeable future.
+Regards
 
-> The mailing list is the correct of addressing this.
-
-OK then :)
-
-regards,
-
--- 
-Reinout van Schouwen
-
+Marcel
 
 
 
