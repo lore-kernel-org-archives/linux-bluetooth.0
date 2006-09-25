@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <45181B8C.1080505@xmission.com>
+Date: Mon, 25 Sep 2006 12:10:20 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <451426AA.7080700@verizon.net>
-References: <451426AA.7080700@verizon.net>
-Date: Mon, 25 Sep 2006 23:40:16 +0200
-Message-Id: <1159220416.20997.11.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] race condition in hci_usb.c?
+References: <4514131B.4030609@palmsource.com>
+In-Reply-To: <4514131B.4030609@palmsource.com>
+Subject: Re: [Bluez-devel] a2dpd patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,43 +16,25 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jose,
+Fr=E9d=E9ric
 
-> I'm studying the hci_usb driver and I found a possible race condition.
-> The routine hci_usb_tx_wakeup is called from hci_sub_send_frame
-> and from hci_usb_tx_complete to get some work done by calling
-> hci_usb_tx_process. It basically provides serial access to
-> hci_usb_tx_process by using a couble of bit variables:
-> HCI_USB_TX_PROCESS and HCI_USB_TX_WAKEPUP.
-> 
-> The problem is that if hci_usb_tx_wakeup is invoked again from a
-> different context while execution is just terminating hci_usb_tx_process
-> (right after the while loop), then hci_usb_tx_process will miss the
-> wakeup. This condition will correct itself when another call is made
-> to hci_usb_send_frame or another urb finishes transmission.
-> 
-> I experimented by replacing hci_usb_tx_wakeup with a tasklet
-> that schedules hci_usb_tx_process. This to me seems like a safer
-> approach.
+> This is a small patch to correct the left sound only. It also integrate
+> the underrun fix we talked about last day.
 
-feel free to provide a patch. In general the hci_usb driver needs a
-complete rewrite anyway.
+merged
 
-Regards
-
-Marcel
-
-
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
