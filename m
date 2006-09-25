@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0609181651370.7570@redbean.intranet.gw-instruments.de>
-References: <Pine.LNX.4.63.0609181548170.7570@redbean.intranet.gw-instruments.de>
-	<1158589215.25125.12.camel@localhost>
-	<Pine.LNX.4.63.0609181651370.7570@redbean.intranet.gw-instruments.de>
-Date: Mon, 25 Sep 2006 23:53:51 +0200
-Message-Id: <1159221231.20997.31.camel@localhost>
+In-Reply-To: <4510A272.6000402@vasmac.com>
+References: <4510A272.6000402@vasmac.com>
+Date: Mon, 25 Sep 2006 23:51:51 +0200
+Message-Id: <1159221111.20997.28.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] CVS access ?
+Subject: Re: [Bluez-devel] SCO flow control patches
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,20 +20,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Peter,
+Hi Jose,
 
-> > > may be I'm only stupid, but I can noot get anything from the CVS as 
-> > > published on www.bluez.org. 
-> > 
-> > you are doing nothing wrong, but the kernel repository got cleared a
-> > long time ago. We are not using it anymore.
+> Last May, Fabien Chevalier posted some SCO flow control patches
+> (now included in bluetooth-alsa). I've tried these in Ubuntu 6.06
+> (based on kernel 2.6.15.7) without much luck. My problem is that
+> packets are sent every 50ms. Anyone else tried these?
 > 
-> So the stuff from kernel.org is assumed to be the most recent version (or, 
-> if available, the latest .mh patch), right ? 
+> I do agree that it should be the responsibility of the driver to take
+> care of any timing issues. But it's not clear to me why this is not
+> done in the hci_usb driver.
 
-the kernel.org stuff is what will go into upstream. The -mh patch also
-contains development stuff that might break or isn't fully testing at
-the moment.
+he never sent any updated versions of them. Feel free to pick them up
+and send me new patches.
 
 Regards
 
