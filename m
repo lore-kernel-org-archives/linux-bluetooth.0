@@ -1,14 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <45129525.1060704@csr.com>
-References: <freemail.20060820112703.62459@fm06.freemail.hu>
-	<45118E52.8080303@csr.com> <1158779197.10356.3.camel@localhost>
-	<45129525.1060704@csr.com>
-Date: Mon, 25 Sep 2006 23:50:35 +0200
-Message-Id: <1159221035.20997.25.camel@localhost>
+In-Reply-To: <beb7688e0609220628p6239199ai9c5479725e09b894@mail.gmail.com>
+References: <451334F6.2010707@gmail.com> <eevdff$gco$1@sea.gmane.org>
+	<20060922091022.3a8f4ee8@nim.leo>
+	<beb7688e0609220628p6239199ai9c5479725e09b894@mail.gmail.com>
+Date: Mon, 25 Sep 2006 23:47:06 +0200
+Message-Id: <1159220826.20997.21.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Changing BD address on CSR based USB dongle
+Cc: Paul LeoNerd Evans <leonerd@leonerd.org.uk>
+Subject: Re: [Bluez-users] Keyboard Device Pairing (gmane: message 13 of 20)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,21 +23,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Steven,
+Hi Chris,
 
-> > with "bccmd psread" or "bccmd pslist" you can do that. However you need
-> > to pick the correct stores value to get all info.
+> > > [root@localhost]# hidd --connect 00:0D:3C:40:68:7C
+> > > <window popped up asking for a passkey>
+> > > Can't get device information: Too many levels of symbolic links
+> > > [root@localhost]# hidd --connect 00:0D:3C:40:68:7C
+> > > Can't get device information: Function not implemented
+> >
+> > Random guess, but that to me looks like "errno" is getting undefined
+> > values and is printing whatever random number of error it happens to find.
 > 
-> Aha, I thought it existed.
-> 
-> I'd like dumps of the psram, psi and psf stores.
+> I continued to play around with it, and tried using kbluetoothd to
+> connect. When I was again prompted for a passkey, I keyed it in on
+> both my PC and on the keyboard, and it suddenly started working. I'm
+> not confident I could get this working again if I had to. Is there a
+> tutorial somewhere on pairing bluetooth devices? I didn't find
+> anything on bluez.org.
 
-I don't know if you got the output that you asked for. However here are
-the needed commands (all as root):
-
-	bccmd psread --stores psram
-	bccmd psread --stores psi
-	bccmd psread --stores psf
+there is no really tutorial. And in case or pairing problems it helps to
+run "hcidump -X -V" to see what is going on. However with the D-Bus API
+you have a CreateBonding command that will take care of everything and
+at some point we will have a connection wizard. If I have enough free
+time to write all this GUI stuff. I am not really a GUI programmer.
 
 Regards
 
