@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45181B8C.1080505@xmission.com>
-Date: Mon, 25 Sep 2006 12:10:20 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <4514131B.4030609@palmsource.com>
-In-Reply-To: <4514131B.4030609@palmsource.com>
-Subject: Re: [Bluez-devel] a2dpd patch
+In-Reply-To: <1999a7e40609250338w514200c5pf7fdb977d533751b@mail.gmail.com>
+References: <1999a7e40609250338w514200c5pf7fdb977d533751b@mail.gmail.com>
+Date: Mon, 25 Sep 2006 12:51:58 +0200
+Message-Id: <1159181518.30562.0.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] FHS packet
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,25 +16,27 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fr=E9d=E9ric
+Hi Dalmo,
 
-> This is a small patch to correct the left sound only. It also integrate
-> the underrun fix we talked about last day.
+>     Is there any way to capture the fhs packet with bluez and hcidump?
 
-merged
+not with a standard dongle. It only has access to HCI.
 
-Brad
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
