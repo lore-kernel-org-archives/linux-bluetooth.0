@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <7d3798db0609260723y34fe4dcam37b9d9a9264ba282@mail.gmail.com>
-Date: Tue, 26 Sep 2006 16:23:11 +0200
-From: "=?ISO-8859-1?Q?Robert_Dahlstr=F6m?=" <robert.dahlstrom.4007@student.uu.se>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] rfcomm device names
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <feb8dc070609190416w53ce1836x82d751cef7099be3@mail.gmail.com>
+References: <feb8dc070609190416w53ce1836x82d751cef7099be3@mail.gmail.com>
+Date: Mon, 25 Sep 2006 23:52:42 +0200
+Message-Id: <1159221162.20997.29.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] bnep network not working properly
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,30 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello all, I'm currently trying to make bluez work with a Maxell
-Digital Pen (the DP-201 for interested parties)...
+Hi Jinesh,
 
-The question to make this happen is if it is possible to have generic
-rfcomm device names? I.e. can rfcomm be configured to use any device
-name that I can choose? (These pens only supply data via bluetooth to
-a specifically named port so for them to work with linux I need to be
-able to set this device/port name somehow)
+> I was trying to network two systems using pand. But it seem that even
+> after the bnep0 interfaces are provided with IP addresses they are not
+> able to ping each other. What could be wrong? I'm using FC5 on both
+> systems. One of my system is x86 and the other is x86_64. Are there
+> any issues for bluez with any of these architectures which prevent me
+> from setting up a complete network? I did my network configuration
+> according to the HOWTO-PAN document.
 
-Specifically the pen works ok out of the box with the obex transfer
-protocol but I'm trying to enable the pens streaming protocol with
-connects using the serial interface and expects to find a commport
-with a specific name. (I'm aware that this is quite bad programming in
-the pens but I cannot change that)
-
-I'd appreciate any hints/ideas that would take me in the right
-direction. Sadly I failed to find any information in the archives for
-this issue.
-
-Thanks in advance for your help!
+not to my knowledge. Run "hcidump -X -V" to check what is going on.
 
 Regards
--- 
-Robert
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
