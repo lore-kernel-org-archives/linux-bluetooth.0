@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4510A272.6000402@vasmac.com>
-References: <4510A272.6000402@vasmac.com>
-Date: Mon, 25 Sep 2006 23:51:51 +0200
-Message-Id: <1159221111.20997.28.camel@localhost>
+In-Reply-To: <451426AA.7080700@verizon.net>
+References: <451426AA.7080700@verizon.net>
+Date: Mon, 25 Sep 2006 23:40:16 +0200
+Message-Id: <1159220416.20997.11.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] SCO flow control patches
+Subject: Re: [Bluez-devel] race condition in hci_usb.c?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,17 +22,25 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Jose,
 
-> Last May, Fabien Chevalier posted some SCO flow control patches
-> (now included in bluetooth-alsa). I've tried these in Ubuntu 6.06
-> (based on kernel 2.6.15.7) without much luck. My problem is that
-> packets are sent every 50ms. Anyone else tried these?
+> I'm studying the hci_usb driver and I found a possible race condition.
+> The routine hci_usb_tx_wakeup is called from hci_sub_send_frame
+> and from hci_usb_tx_complete to get some work done by calling
+> hci_usb_tx_process. It basically provides serial access to
+> hci_usb_tx_process by using a couble of bit variables:
+> HCI_USB_TX_PROCESS and HCI_USB_TX_WAKEPUP.
 > 
-> I do agree that it should be the responsibility of the driver to take
-> care of any timing issues. But it's not clear to me why this is not
-> done in the hci_usb driver.
+> The problem is that if hci_usb_tx_wakeup is invoked again from a
+> different context while execution is just terminating hci_usb_tx_process
+> (right after the while loop), then hci_usb_tx_process will miss the
+> wakeup. This condition will correct itself when another call is made
+> to hci_usb_send_frame or another urb finishes transmission.
+> 
+> I experimented by replacing hci_usb_tx_wakeup with a tasklet
+> that schedules hci_usb_tx_process. This to me seems like a safer
+> approach.
 
-he never sent any updated versions of them. Feel free to pick them up
-and send me new patches.
+feel free to provide a patch. In general the hci_usb driver needs a
+complete rewrite anyway.
 
 Regards
 
