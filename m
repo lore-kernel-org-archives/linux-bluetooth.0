@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <45198820.8060701@ibdcon.org.br>
-References: <45198820.8060701@ibdcon.org.br>
-Date: Tue, 26 Sep 2006 22:09:09 +0200
-Message-Id: <1159301349.800.26.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] bluez-utils 3.5 and pairing
+Message-ID: <45198820.8060701@ibdcon.org.br>
+Date: Tue, 26 Sep 2006 17:05:52 -0300
+From: Paulo Wollny <paulo.wollny@ibdcon.org.br>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] bluez-utils 3.5 and pairing
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,20 +18,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Paulo,
-
-> i'm using Bluez Utils 3.5 and am having problems when trying to pair my
-> PDA.
-> I did fire passkey-agent --default XXXX and the PDA is not being able to
-> pair.
-
-show us the output of "hcidump -X -V" for this transaction.
-
-Regards
-
-Marcel
-
-
+Hi,
+i'm using Bluez Utils 3.5 and am having problems when trying to pair my
+PDA.
+I did fire passkey-agent --default XXXX and the PDA is not being able to
+pair.
+Any hint?
+Regards,
+Paulo
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
