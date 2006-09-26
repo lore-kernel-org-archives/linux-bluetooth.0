@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45195460.3040905@palmsource.com>
-Date: Tue, 26 Sep 2006 18:25:04 +0200
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <4514131B.4030609@palmsource.com> <45181B8C.1080505@xmission.com>
-In-Reply-To: <45181B8C.1080505@xmission.com>
-Subject: Re: [Bluez-devel] a2dpd patch
+In-Reply-To: <3f5a9ba20609252330p3d14854eu7b47acc600c28daf@mail.gmail.com>
+References: <3f5a9ba20609252330p3d14854eu7b47acc600c28daf@mail.gmail.com>
+Date: Tue, 26 Sep 2006 10:39:16 +0200
+Message-Id: <1159259956.1235.3.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Can I search two services at the same time?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,37 +16,37 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
+Hi,
 
-Brad Midgley a =E9crit :
-> Fr=E9d=E9ric
->
->   =
+> 
+>    I have seen that there is a function named sdp_service_search_req,
+>    So,I append two service uuid such as obexpush's uuid and another
+> service's uuid into the search list, I want to get the two services'
+> info only call search func once.
+>   and then set the max_rec_num = 2,
+>   then call 
+>        sdp_service_search_req(session,search_list,2,&rsp_list);
+>  but ,I have seen that the func return 0, but the rsp_list is NULL.
 
->> This is a small patch to correct the left sound only. It also integrate
->> the underrun fix we talked about last day.
->>     =
+this works, but your remote device does not contain any of these records
+and so it reports non back to you. What kind of remote device is it you
+are testing with.
 
-> merged
->   =
+Regards
 
+Marcel
 
-Thank you,
-Bluetooth UPF will take place in malta next month, do you plan to go there?
-
-Fr=E9d=E9ric.
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
