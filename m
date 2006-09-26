@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0609071923320.576@redbean.intranet.gw-instruments.de>
-References: <Pine.LNX.4.63.0609071923320.576@redbean.intranet.gw-instruments.de>
-Date: Tue, 26 Sep 2006 23:11:16 +0200
-Message-Id: <1159305076.800.43.camel@localhost>
+In-Reply-To: <17c5833b0609110422v1f5c6e6bk5c56482418f01a60@mail.gmail.com>
+References: <17c5833b0609110422v1f5c6e6bk5c56482418f01a60@mail.gmail.com>
+Date: Tue, 26 Sep 2006 23:10:10 +0200
+Message-Id: <1159305010.800.41.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Bug in RFCOMM (or BT general) socket layer
+Subject: Re: [Bluez-devel] TCS support
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,15 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Peter,
+Hi Sumit,
 
-> if you use a non blocking RFCOMM socket (have not tested other types) 
-> connect(..) returns EAGAIN. According to the socket documentation 
-> it shall return EINPROGRESS. 
-> 
-> However, beside of this connect(..) works as expected. 
+> Is Telephony control specification protocol  supported by 
+> the latest Bluez protocol stack .
+>  
+> Because for implementing Intercom profile i need TCS protocol stack.
 
-starting with 2.6.18-mh3 this should be fixed now.
+I am not aware of any TCS implementation for BlueZ. However it is an
+easy protocol and we have socket based access to the L2CAP layer.
 
 Regards
 
