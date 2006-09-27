@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Date: Thu, 28 Sep 2006 11:18:54 +0200
-Message-Id: <1159435134.21120.7.camel@localhost>
+From: Yuriy Vikulov <vikulov@rscenter.ru>
+Date: Wed, 27 Sep 2006 14:40:00 +0000 (UTC)
+Message-ID: <loom.20060927T163916-714@post.gmane.org>
+References: <loom.20060927T161643-542@post.gmane.org>
+	<Pine.LNX.4.63.0609271630340.5860@redbean.intranet.gw-instruments.de>
 Mime-Version: 1.0
-Subject: [Bluez-devel] L2CAP device specific information
+Subject: Re: [Bluez-devel] Encoding of name of devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,33 +20,10 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Great Thanks to you!
 
-with the release of bluez-utils-3.6 and bluez-utils-3.6.1, I added an
-additional command to the l2test program to determine the extended
-features of the remote L2CAP implementation. This will help us to
-identify which devices will support retransmission and flow control
-and/or connectionless connections.
+Peter Wippich <pewi <at> gw-instruments.de> writes:
 
-# ./l2test -z 00:04:76:*:*:*
-Connectionless MTU size is 670
-Extended feature mask is not supported
-
-The program must be run as root and can be found in the test directory
-of bluez-utils. The switch --enable-test for configure enables its
-compilation. There is not need to install it, you can run it from that
-directory directly. If it stalls, then this might be a bug in the remote
-L2CAP implementation when it doesn't answer to information requests. In
-this case you might wanna run hcidump and check what happens.
-
-So please report back information about your devices and I will collect
-them and make them public at this location:
-
-	http://www.holtmann.org/linux/bluetooth/l2cap.html
-
-Regards
-
-Marcel
 
 
 
