@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Yuriy Vikulov <vikulov@rscenter.ru>
-Date: Wed, 27 Sep 2006 14:20:30 +0000 (UTC)
-Message-ID: <loom.20060927T161643-542@post.gmane.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <3f5a9ba20609270407p4bcce4f6j99d073b626b916c@mail.gmail.com>
+References: <3f5a9ba20609252330p3d14854eu7b47acc600c28daf@mail.gmail.com>
+	<1159347649.22162.24.camel@localhost>
+	<3f5a9ba20609270407p4bcce4f6j99d073b626b916c@mail.gmail.com>
+Date: Wed, 27 Sep 2006 13:10:54 +0200
+Message-Id: <1159355454.22162.26.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Encoding of name of devices
+Subject: Re: [Bluez-devel] Can I search two services at the same time?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,15 +22,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello! 
+Hi,
 
-May be somebody knows how to get localized name of device(phone,etc)
-fr example if name has been written in english it's ok
-but if name has not been written in english(fro example in Russian) i get some
-cahracters. may be someone can tell me encoding or a way wich can be useful?
+> Thank you for your nice help.
 
-thanks
-Yuriy
+no problem.
+
+> But I think OR LIST is better :)
+
+The specification says otherwise and that is what counts.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
