@@ -1,12 +1,19 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3f5a9ba20609252330p3d14854eu7b47acc600c28daf@mail.gmail.com>
-References: <3f5a9ba20609252330p3d14854eu7b47acc600c28daf@mail.gmail.com>
-Date: Wed, 27 Sep 2006 11:00:49 +0200
-Message-Id: <1159347649.22162.24.camel@localhost>
+In-Reply-To: <3f5a9ba20609270053o46cb0ebapaca698778f277c9b@mail.gmail.com>
+References: <3f5a9ba20609132122ue951876kcdfaacae30110f66@mail.gmail.com>
+	<Pine.LNX.4.63.0609141101160.22339@redbean.intranet.gw-instruments.de>
+	<450940DC.5080809@infitsrl.com>
+	<Pine.LNX.4.63.0609141354070.22339@redbean.intranet.gw-instruments.de>
+	<45094871.7010003@infitsrl.com>
+	<Pine.LNX.4.63.0609141423350.22339@redbean.intranet.gw-instruments.de>
+	<1158313465.5233.3.camel@localhost> <1159304948.800.39.camel@localhost>
+	<3f5a9ba20609270053o46cb0ebapaca698778f277c9b@mail.gmail.com>
+Date: Wed, 27 Sep 2006 09:57:12 +0200
+Message-Id: <1159343832.22162.16.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Can I search two services at the same time?
+Subject: Re: [Bluez-devel] About concurrency sdp_connect
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,18 +29,11 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-> 
->    I have seen that there is a function named sdp_service_search_req,
->    So,I append two service uuid such as obexpush's uuid and another
-> service's uuid into the search list, I want to get the two services'
-> info only call search func once.
+>   I have test the pathc on 2.6.18-mh3
+>   When I use the dongle(bluetooth spec. 1.2), it seemed ok.
+>   but for the dongle (bluetooth spec. 1.1), it wasn't useful.
 
-I checked with the SDP specification and the UUID list for service
-search is not an OR list of UUIDs. It is an AND list of UUIDs. Which
-means you are looking for service records that contain the first and the
-second UUID. This is per service record and can't be used to find
-service records in the whole database that match either one of these.
-You have to request them sequentially.
+show me the "hcidump -X -V" output for the Bluetooth 1.1 dongle.
 
 Regards
 
