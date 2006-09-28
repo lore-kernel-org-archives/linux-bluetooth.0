@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marsette Vona <vona@mit.edu>
-MIME-Version: 1.0
-Message-ID: <17692.1030.64904.774688@altoids.csail.mit.edu>
-Date: Thu, 28 Sep 2006 13:19:02 -0400
-To: bluez-devel@lists.sourceforge.net
-Cc: carrick@csail.csail.mit.edu
-Subject: [Bluez-devel] possible regression under rf interference
-Reply-To: Marty Vona <vona@mit.edu>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1159449063.5406.22.camel@localhost>
+References: <1159435134.21120.7.camel@localhost>
+	<1159449063.5406.22.camel@localhost>
+Date: Thu, 28 Sep 2006 15:38:02 +0200
+Message-Id: <1159450682.21120.62.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] L2CAP device specific information
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -20,83 +21,84 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello -
+Hi Martin,
 
-[while the issue described below does relate to some fedora core versioning, we feel that it is also appropriate to ask for advice here in the bluez community as the core problem, or at least a better understanding of what's going on, is very likely of a technical bluetooth nature]
+> > with the release of bluez-utils-3.6 and bluez-utils-3.6.1, I added an
+> > additional command to the l2test program to determine the extended
+> > features of the remote L2CAP implementation. This will help us to
+> > identify which devices will support retransmission and flow control
+> > and/or connectionless connections.
+> 
+> This sounds pretty nice. It looks like not many devices actually provide
+> this feature (which is already more than two years old according to the
+> release of the specification).
 
-[if you prefer to skip the lengthly problem description, you can grep directly for the QUESTIONS section]
+no profile is really making use of it and that is the actual problem.
+Even if nobody likes RFCOMM, they still use it as base for a couple of
+new profiles.
 
-We've got a robot here (*) which runs a bluetooth interface.  The robot has a little bluetooth v2 module on it (a BlueRadios C40).  It communicates with a PC running Linux and a bluetooth USB dongle (**).  We use a basic "rfcomm connect" to setup a /dev/rfcommX port, and talk to the robot serially over that.  Nice.  Well, it was nice.
+> Nevertheless during my development time I encountered the Siemens S75
+> mobile phone to provide the full extended features mask as being
+> available but refusing any serious attempts during negotiation to
+> actually make use of it, e.g. sending a 0x0007 in the information
+> response, but declining any use in configuration responses ...
 
-Up until around early July of this year, everything was working well.  The PC had fedora core 4.  Then we upgraded the pc to FC5 and we started to get a very challenging problem.  It goes like this:
+It seems that only the Symbian 9.x based devices support the extended
+features of L2CAP.
 
-1) we power up the robot and do the "rfcomm connect" as usual.  Everything is happy, the robot is communicating
+> In fact from my point of view, information requests have to be answered
+> according to the specification. If a device (like the mighty mouse?!)
+> doesn't do so I consider this to be a serious bug in Apple's
+> implementation. Already the second sentence of section 4.10 (Vol 4 of
+> the Bluetooth Spec) says:
+> "L2CAP implementations _shall_ respond to a valid Information Request
+> with an Information Response."
+> And it is mandatory to make use of Information Requests to configure and
+> use Flow Control:
+> "An L2CAP implementation _shall_ only use optional features or attribute
+> ranges for which the remote L2CAP entity has indicated support through
+> an Information Response."
 
-2) we can talk to the robot over the bluetooth link apparrently normally, until
+It was the old wireless mouse from Apple and I can't really complain
+since old kernels have the same problem. We had a bug in the kernel that
+didn't respond the information requests. The problem is that this got
+never caught, because in the qualification process you can say that you
+don't support the information request and then they don't check it. Even
+if you don't support it, you still have to answer it the a command
+rejected response. Neverless I found our bug by pure luck.
 
-3) we tell the robot to turn on one of its motors.  Based on some oscilloscope measurements, we have strong evidence that this can cause some amount of RF noise reaching up into the GHz range.  Note carefully: before fc5, and even now when we substitue an RS232 bluetooth interface for the usb dongle (see below), the bluetooth protocoll error correction is apparrently sufficient to tolerate this noise without significant delays.
+> I will do so once I get the time to upgrade to the latest bluez-libs and
+> bluez-utils. I'd wish to see these latest versions finding their way
+> into Ubuntu Edgy.
 
-4) the motor goes on and the robot continues to communicate, usually, for about 1 to 10 seconds more.  It then "hiccups", i.e., there is a delay in communication for greater than 1.0 second.
+I hope that Edgy moves, but according to the release schedule they are
+already in beta freeze by now.
 
-5) for safety, we really can't tolerate comm delays that long, so the robot's on-board software shuts the motor down
+> Perhaps anybody has the chance to test Windows Vista of it's current
+> capability?
 
-6) it appears that the bluetooth link does not actually die, as we can always continue communicating with the robot (i.e. using the same previous rfcomm connection) after the motor stops
+And the Widcomm stack please.
 
-Obviously, we are trying to isolate the particular versions of things in which the above fault occurs and those in which it doesnt.  This is proving more difficult than expected (we unfortunately do not have a simple version snapshot of the setup which was working pre-fc5, doh).  We tried reverting to the kernel which we believe was in effect at the time everything was working (2.6.16-1.2069_FC4-i686), and to the most recent FC4 bluetooth rpms (which *should* have been in effect on our machine at that time...):
+> Two more things beside that.
+> First of all---my patch provides support for flow control but lacks any
+> support for retransmission mode. Supplement this mode should be a lot
+> easier today starting from the current code base. Perhaps it may even
+> serve as a student's final year project or something like that.
+> Further more I will get some help from someone else to go over my patch
+> and get some code review done. This might help fixing bugs. I am
+> currently writing up a paper about all my work done during the past
+> months. I expect this to be done within the next few days. After that I
+> will try to get a native speaker to look over my report (any interest?).
 
-bluez-pin-0.24-2.i386.rpm
-bluez-libs-2.15-1.i386.rpm
-bluez-utils-2.15-7.i386.rpm
-bluez-hcidump-1.18-1.i386.rpm
+The features mask and the actual implementation might differ in the end,
+but to collect the actual offered features is a good start. And if you
+have an updated patch, please post it. I also heard some rumors that
+your patch might be tested at the next UnPlugFest.
 
-Frustratingly, the problem seemed to persist.  Perhaps our original (working) fc4 setup was not fully up-to-date, and so was using even older bluez rpms.  Most likely the kernel version was as above though.  Or perhaps reverting the RPMS did not actually revert some /etc/ config files which had been updated by the FC5 rpms.  Or maybe we made a mistake in attemping the reversion (which took the better part of a day for reasons we're sure you don't want to even hear about).
+Regards
 
-For completeness, here are the versions of things under FC5 where the timeouts definitely do occur:
+Marcel
 
-kernel 2.6.17-1.2187_FC5-i686
-
-bluez-pin-0.30-2.i386.rpm
-bluez-libs-2.25-1.i386.rpm     
-bluez-utils-2.25-4.i386.rpm
-bluez-hcidump-1.30-1.i386.rpm  
-gnome-bluetooth-0.7.0-2.i386.rpm
-gnome-bluetooth-libs-0.7.0-2.i386.rpm
-libbtctl-0.6.0-5.i386.rpm
-
-We have entertained the possibility that the issue is being caused by some other lossage which just happened to coincide with the fc5 update.  However, that does not seem to be the case:
-
-a) if, instead of the USB dongle, we use an RS232 bluetooth interface on the pc (also based on the BlueRadios C40), everything works fine, even now
-
-b) we have tried different USB dongles from different manufacturers with the same effects
-
-c) we have even tried different linux workstations entirely, and still gotten the comm timeout when using a bluetooth USB dongle and bluez 
-
-Finally, we realize that delays over 1.0s may actually be within-spec for bluetooth comms (we have not read the specs).  However note that the delays were never observed before the fc5 update, and also note that they are not observed even now if we avoid using the bluez software stack and instead use an RS232 bluetooth module.
-
-QUESTIONS
-
-1) are long timeouts under RF interference possibly a known current regression?  does anyone regularly test bluez under significant RF inferference?
-
-2) does bluez (and if so, in what codepath) even deal with things like error detection and correction, packet retransmission, tx power management, rf interference, link quality monitoring, etc?  Or are things like that handled by firmware in the usb dongle?
-
-3) are we possibly barking up the wrong tree?  Can anyone think of any other possible cause which fits the above symptoms?
-
-4) is the issue likely in the bluez kernel code, the bluez user space code, or something else entirely?
-
-5) what else could we do to try to debug this?  we did an hcidump of a "bad" session, but our untrained eye didn't see anything suspicious in it.  Can we somehow tell the bluez {kernel,userspace} code to be more verbose about what's going on?
-
-6) what should we read to educate ourselves about what is going on here so we can better diagnose an issue like this?
-
-Any help is appreciated.
-
-Marsette (Marty) Vona
-Distributed Robotics Lab
-MIT CSAIL
-
-
-(*) http://www.mit.edu/~vona/publications/Vona_Detweiler_Rus__2006__Shady_Robust_Truss_Climbing_With_Mechanical_Compliances.pdf
-
-(**) we have tried several dongles, with apparrently identical behavior.  One is a D-Link DBT-120.  This particular one definitely worked pre-fc5, and fails as described above post-fc5.
 
 
 -------------------------------------------------------------------------
