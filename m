@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-From: Mark Hellman <markhellman@techie.com>
-Date: Thu, 28 Sep 2006 11:06:59 +0100
-Message-ID: <efg6rk$5tg$1@sea.gmane.org>
-References: <eeu5cm$25p$1@sea.gmane.org>
+Date: Thu, 28 Sep 2006 11:18:54 +0200
+Message-Id: <1159435134.21120.7.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] btsco, udev and other issues
+Subject: [Bluez-devel] L2CAP device specific information
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,48 +18,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Can'T anyone give me some hints on these questions?
+Hi,
 
+with the release of bluez-utils-3.6 and bluez-utils-3.6.1, I added an
+additional command to the l2test program to determine the extended
+features of the remote L2CAP implementation. This will help us to
+identify which devices will support retransmission and flow control
+and/or connectionless connections.
 
-Mark Hellman wrote:
+# ./l2test -z 00:04:76:*:*:*
+Connectionless MTU size is 670
+Extended feature mask is not supported
 
-> I have the following issues with btsco and Nokia HS-56W headset:
-> 
-> 1. I have seen several reports that indicate btsco can be run as a regular
->    user. But I have only been able to run it as root. When I run it as a
->    regular user I get:
->          btsco v0.42
->          Error: control open (hw:1): No such device
->          Error: Can't find device. Bail
-> 
-> 
-> 2. As a consequence of running btsco as root, the newly created sound
-> device
->    cannot be seen by regular users. What udev rule should I set so that
->    the BT headset is seen by other users when btsco is run by root?
-> 
-> 
-> 3. While using btsco with Skype, a lot of message like the following
-> appear
->    on syslog:
->       kernel: snd-bt-sco: Shift problem detected! Fixing to 1.
->       kernel: snd-bt-sco: Shift problem detected! Fixing to 0.
->    What do they mean? Should I be worried about them?
-> 
-> 
-> 4. When I hang up a call on Skype, I'm not able to place another call
-> again.
->    Skype says "Problem with sound device". I need then to restart Skype in
->    order to be able access the BT headset again. But when the other
->    calling party hangs up, this problem does not occur... It seems that
->    when I hang up a call, the SCO channel is not cleanly disconnected. Any
->    ideas why?
-> 
-> 
-> I would be grateful if someone could enlighten me on at least some of
-> these issues.
-> 
-> Mark
+The program must be run as root and can be found in the test directory
+of bluez-utils. The switch --enable-test for configure enables its
+compilation. There is not need to install it, you can run it from that
+directory directly. If it stalls, then this might be a bug in the remote
+L2CAP implementation when it doesn't answer to information requests. In
+this case you might wanna run hcidump and check what happens.
+
+So please report back information about your devices and I will collect
+them and make them public at this location:
+
+	http://www.holtmann.org/linux/bluetooth/l2cap.html
+
+Regards
+
+Marcel
 
 
 
