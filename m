@@ -1,93 +1,93 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <10d6949dedb.squonimo@virgilio.it>
-Date: Fri, 1 Sep 2006 13:10:51 +0100 (GMT+01:00)
-From: Alex B <squonimo@virgilio.it>
-To: <bluez-devel@lists.sourceforge.net>
-Mime-Version: 1.0
-Subject: [Bluez-devel] R: Re:  problem with bluez-utils 3.4 and dbus
-Reply-To: Alex B <squonimo@virgilio.it>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <451EC67E.4040706@schugy.de>
+Date: Sat, 30 Sep 2006 21:33:18 +0200
+From: Christian Schuglitsch <subjectbluez@schugy.de>
+MIME-Version: 1.0
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <200609112146.15972.petr@palacky.net>
+In-Reply-To: <200609112146.15972.petr@palacky.net>
+Subject: Re: [Bluez-users] 3 or more BT dongles over 1 USB-2.0 4-port HUB
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all,
-I solved my problems...
-I have a toolchain without:
-1) libz
-2) 
-libxml
-3) libdbus
-
-I cross compiled all this library, with the help of 
-many hotow, and then i cross compiled the bluez-utils...
-
-now I have to 
-try to use this utils...
-
-I tried to learn by myself how to regestir a 
-device in my pc using hcitool and sdptool, but it doesn't work... can 
-someone help and send me the correct sequence of commands to register, 
-pair , etc... a divece as a Headset or a mobile phone????
-
-thanks
-Alex 
-B
-
-----Messaggio originale----
-Da: chris.brand@qwikker.com
-Data: 30-ago-
-2006 19.33
-A: "BlueZ development"<bluez-devel@lists.sourceforge.net>
-Ogg: Re: [Bluez-devel] problem with bluez-utils 3.4 and dbus
-
-> please 
-report this back to the D-Bus mailing list. They need 
-> to know that 
-they have problems in cross-compiling cases. 
-> Otherwise this will 
-never get fixed.
-
-I've created dbus bug 8071 at freedesktop.org.
-https:
-//bugs.freedesktop.org/show_bug.cgi?id=8071
-
-Chris 
-
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, 
-security?
-Get stuff done quickly with pre-integrated technology to make 
-your job easier
-Download IBM WebSphere Application Server v.1.0.1 based 
-on Apache Geronimo
-http://sel.as-us.falkag.net/sel?
-cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing 
-list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.
-net/lists/listinfo/bluez-devel
-
-
-
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+VGhhdCdzIGp1c3QgdGhlIHRoaW5nIEkgaGF2ZSBwb3N0ZWQgb24gMTQuMDEuMjAwNiAxOTo1MSBh
+bHJlYWR5OgoKW0JsdWV6LXVzZXJzXSB1c2JfaGNpLCBCZWxraW4gdGV0cmEgaHViIGFuZCBlaGNp
+LWhjZCBlcnJvcnMKCgpJIGhhdmUgYm91Z2h0IEJlbGtpbiB0ZXRyYSBodWJzIHRoYXQgaGF2ZSBh
+IFRULWNoaXAgZm9yIGV2ZXJ5IFVTQiBwb3J0IAphbmQgcGx1Z2dlZCBteSBFcG94IEJUIERHMDMg
+ZG9uZ2xlIGludG8gaXQuIFRoZSBwcm9ibGVtIGlzIHRoYXQgdGhlIAp1c2JfaGNpLWRyaXZlciBk
+b2Vzbid0IHdvcmsgd2hlbiB0aGUgdGV0cmEgaHVicyBkbyB3aGF0IHRoZXkgYXJlIApkZXNpZ25l
+ZCBmb3I6IFNwbGl0dGluZyA0ODAgRUhDSS1NQml0IGludG8gNCB4IDEyT0hDSS1NQml0LiBJZiBJ
+IHVzZSB0aGUgCm9oY2ktaGNkIGRyaXZlciBpbnN0ZWFkIGV2ZXJ5dGhpbmcgd29ya3MgZmluZS4g
+VGhlcmUncmUgdHdvIGRyaXZlcnMgZm9yIApteSBoYXJkd2FyZSB0aGF0IGFyZW4ndCBjb21wYXRp
+YmxlIHdpdGggRUhDSSB0cmFuc2xhdGlvbiwgdXNiX2hjaSBhbmQgCnB3YyAoZnJvbSBzYWlsbGFy
+ZC5vcmcpLgoKUmVnYXJkcwoKU2NodWd5CgoKCgpBbSAxMS4wOS4yMDA2IDIxOjQ2IHNjaHJpZWIg
+UGV0ciBQYWxhY2vDvToKPiBIaSBhbGwsCj4KPiBpIGhhdmUgcHJvYmxlbSB3aXRoIHRocmVlIChh
+bmQgbW9yZSkgVVNCIEJUIGRvbmdsZXMgKGFsbCBhcmUgdGhlIHNhbWUsIAo+IENTUi1iYXNlZCkg
+YW5kIDQtcG9ydCBVU0ItMi4wIEhVQi4KPgo+IFdoZW4gaSBhdHRhY2ggb25lIFVTQiBkb25nbGUg
+YWxvbmUsIGV2ZXJ5dGhpbmcgaXMgZ29vZCAoaGNpMCBpcyB1cCBhbmQgCj4gcnVubmluZykuIFdo
+ZW4gaSBhdHRhY2ggdGhlIHNlY29uZCBkb25nbGUgKGFmdGVyIHRoZSBmaXJzdCksIHN0aWxsIGlz
+IAo+IGV2ZXJ5dGhpbmcgT0sgKGhjaTAgYW5kIGhjaTEgYXJlIHVwIGFuZCBydW5uaW5nKS4KPiBC
+dXQgd2hlbiBpIGF0dGFjaCB0aGlyZCAob3IgZm91cnRoKSBkb25nbGUsIHRoaXMgZG9lcyBub3Qg
+d29yay4KPgo+IEkgdHJpZWQgYXR0YWNoaW5nIGFsbCBkb25nbGVzIGRpZmZlcmVudGx5IGJ1dCBl
+dmVyeSB0aW1lIHRoZSB0aGlyZCAob3IgZm91cnRoKSAKPiBkb25nbGUgaXMgbm90IE9LIGFuZCBk
+bWVzZyBzYXlzOgo+ICNkbWVzZwo+IGhjaV91c2JfaW50cl9yeF9zdWJtaXQ6IGhjaTIgaW50ciBy
+eCBzdWJtaXQgZmFpbGVkIHVyYiBjZDU1YjY3NCBlcnIgLTI4Cj4KPiBJZiBpIGhhdmUgYXR0YWNo
+ZWQgYWxsIGZvdXIgZG9uZ2xlcyBvbmx5IHRoZSBmaXJzdCB0d28gYXJlIE9LLCBpZiBpIG1hbnVh
+bHkgCj4gY2hhbmdlIGl0cyBzdGF0ZSB0byAiRE9XTiIgYW5kIG5leHQgdHdvIHRvICJVUCIsIG5v
+dyBpIGhhdmUgYWxzbyBoY2kyIGFuZCAKPiBoY2kzIHdvcmtpbmcgKGJ1dCBuZXZlciBhbGwgdGhy
+ZWUgb3IgbW9yZSBhbG9uZykuCj4KPiBJZiBpIGhhdmUgc3RhdGUgZm9yIHRoZSBmaXJzdCB0d28g
+ZG9uZ2xlcyAiVVAiIGFuZCB0cnlpbmcgc2V0dGluZyB1cCBuZXh0IHR3byAKPiBkb25nbGVzICJV
+UCIgYWxzbywgdGhlbiBpIGdldCBtZXNzYWdlOgo+ICMgaGNpY29uZmlnIGhjaTIgdXAKPiAiQ2Fu
+J3QgaW5pdCBkZXZpY2UgaGNpMjogSW5wdXQvb3V0cHV0IGVycm9yICg1KSIKPgo+IEkgYWxzbyB0
+cmllZCBhbm90aGVyIFVTQi0yLjAgSFVCLCBidXQgZXZlcnl0aGluZyBpcyB0aGUgc2FtZSAtIG5v
+dGhpbmcgCj4gaGFwcGVucy4KPgo+IFdoZW4gaSBhdHRhY2ggdHdvIGRvbmdsZXMgYW5kIHNlY29u
+ZCBVU0IgSFVCICh3aXRoIG9uZSBvciBtb3JlIGRvbmdsZSAKPiBhdHRhY2hlZCkgaW50byBmaXJz
+dCBVU0IgSFVCLCBldmVyeXRoaW5nIGlzIE9LLiBOb3cgaSBoYXZlIGFsbCB0aHJlZSBvciBmb3Vy
+IAo+IGRvbmdsZXMgd29ya2luZywgYnV0IHRoaXMgaXNuJ3QgZ29vZCBzb2x1dGlvbi4KPgo+IElm
+IGkgYXR0YWNoIHR3byBkb25nbGVzLCBvbmUgcHJpbnRlciBhbmQgb25lIG1vdXNlIGludG8gdGhp
+cyAob3IgbXkgc2Vjb25kKSAKPiBVU0IgSFVCLCBldmVyZXl0aGluZyBpcyBnb29kIGFuZCBhbGwg
+ZGV2aWNlcyBhcmUgd29ya2luZywgc28gdGhlc2UgSFVCcyBhcmUgCj4gZ29vZC4KPgo+IEkgdHJp
+ZWQgdGhpcyBwcm9jZWR1cmUgb24gZm91ciBkaWZmZXJlbnQgY29tcHV0ZXJzICgzeCBQQywgMXgg
+TGFwdG9wIC0gYWxsIAo+IHdpdGggbGludXgtMi42Lnggd2l0aCBkaXN0cm9zIEdlbnRvbywgU1VT
+RSBhbmQgRGViaWFuKSwgYnV0IHN0aWxsIG5vdGhpbmcgCj4gaGFwcGVucy4KPgo+IFBsZWFzZSwg
+aXMgdGhlcmUgYW55IHdheSBob3cgdG8gcnVuIG1vcmUgdGhhbiB0d28gVVNCIEJUIGRvbmdsZXMg
+YXR0YWNoZWQgdG8gCj4gb25lIDQtcG9ydCBVU0ItMi4wIEhVQj8KPgo+IFRoYW5rIGZvciBhbnkg
+aWRlYQo+Cj4gSGVyZSBhcmUgc29tZSBpbmZvcm1hdGlvbnMgYWJvdXQgbXkgc3lzdGVtOgo+ID09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQo+ICN1bmFtZSAtcgo+IDIuNi4xNi1n
+ZW50b28tcjYKPgo+ICNjYXQgL3Vzci9zcmMvbGludXgvLmNvbmZpZyB8IGdyZXAgQlQKPiBDT05G
+SUdfQlQ9bQo+IENPTkZJR19CVF9MMkNBUD1tCj4gQ09ORklHX0JUX1NDTz1tCj4gQ09ORklHX0JU
+X1JGQ09NTT1tCj4gQ09ORklHX0JUX1JGQ09NTV9UVFk9eQo+IENPTkZJR19CVF9CTkVQPW0KPiBD
+T05GSUdfQlRfQk5FUF9NQ19GSUxURVI9eQo+IENPTkZJR19CVF9CTkVQX1BST1RPX0ZJTFRFUj15
+Cj4gQ09ORklHX0JUX0hJRFA9bQo+IENPTkZJR19CVF9IQ0lVU0I9bQo+IENPTkZJR19CVF9IQ0lV
+U0JfU0NPPXkKPiBDT05GSUdfQlRfSENJVUFSVD1tCj4gQ09ORklHX0JUX0hDSVVBUlRfSDQ9eQo+
+IENPTkZJR19CVF9IQ0lVQVJUX0JDU1A9eQo+IENPTkZJR19CVF9IQ0lCQ00yMDNYPW0KPiBDT05G
+SUdfQlRfSENJQlBBMTBYPW0KPiBDT05GSUdfQlRfSENJQkZVU0I9bQo+IENPTkZJR19CVF9IQ0lW
+SENJPW0KPgo+ICNsc21vZAo+IHJmY29tbSAgICAgICAgICAgICAgICAgMzY1MDAgIDAKPiBsMmNh
+cCAgICAgICAgICAgICAgICAgIDIzMjMyICA1IHJmY29tbQo+IGhjaV91c2IgICAgICAgICAgICAg
+ICAgMTQ2NzYgIDQKPiBibHVldG9vdGggICAgICAgICAgICAgIDQ1MDkyICA5IHJmY29tbSxsMmNh
+cCxoY2lfdXNiCj4KPiAjbHN1c2IKPiBCdXMgMDAxIERldmljZSAwNDE6IElEIDBhMTI6MDAwMSBD
+YW1icmlkZ2UgU2lsaWNvbiBSYWRpbywgTHRkIEJsdWV0b290aCBEb25nbGUgCj4gKEhDSSBtb2Rl
+KQo+IEJ1cyAwMDEgRGV2aWNlIDA0MDogSUQgMGExMjowMDAxIENhbWJyaWRnZSBTaWxpY29uIFJh
+ZGlvLCBMdGQgQmx1ZXRvb3RoIERvbmdsZSAKPiAoSENJIG1vZGUpCj4gQnVzIDAwMSBEZXZpY2Ug
+MDM5OiBJRCAwYTEyOjAwMDEgQ2FtYnJpZGdlIFNpbGljb24gUmFkaW8sIEx0ZCBCbHVldG9vdGgg
+RG9uZ2xlIAo+IChIQ0kgbW9kZSkKPiBCdXMgMDAxIERldmljZSAwMzg6IElEIDA1ZTM6MDYwNSBH
+ZW5lc3lzIExvZ2ljLCBJbmMuIFVTQiAyLjAgSHViIFtlZG5ldF0KPgo+ICAgCgoKLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLQpUYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2Yg
+SVQKSm9pbiBTb3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRo
+ZSBjaGFuY2UgdG8gc2hhcmUgeW91cgpvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0
+aHJvdWdoIGJyaWVmIHN1cnZleXMgLS0gYW5kIGVhcm4gY2FzaApodHRwOi8vd3d3LnRlY2hzYXku
+Y29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCl9f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJz
+IG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9s
+aXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
