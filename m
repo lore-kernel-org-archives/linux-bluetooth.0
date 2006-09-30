@@ -1,63 +1,60 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20060801001207.GA5092@as.arizona.edu>
-References: <20060801001207.GA5092@as.arizona.edu>
-Date: Tue, 01 Aug 2006 04:20:19 +0200
-Message-Id: <1154398819.4982.63.camel@aeonflux.holtmann.net>
+To: Jean-Jacques Brucker <jjbrucker@free.fr>
+In-Reply-To: <200609300218.36747.jjbrucker@free.fr>
+References: <17692.1030.64904.774688@altoids.csail.mit.edu>
+	<200609292208.33700.jjbrucker@free.fr>
+	<1159571362.29673.34.camel@localhost>
+	<200609300218.36747.jjbrucker@free.fr>
+Date: Sat, 30 Sep 2006 10:01:16 +0200
+Message-Id: <1159603276.5407.7.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Pairing problem with Plantronics headset
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] hcid pairing bug when security is auto
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi John,
+Hi Jean-Jacques,
 
-> I am attempting to use btsco with my Plantronics M2500 headset.  I am using
-> the most recent Debian bluez-utils packages (3.1-3).
-> 
-> The headset's passkey/pin is "0000" which I have set in both
-> /etc/bluetooth/hcid.conf as:
->   passkey "0000";
-> 
-> and in /etc/bluetooth/passkeys/default as just "0000".
-> 
-> When I turn on the headset, put it in pairing mode, and then attempt to run
-> btsco, I get the following from btsco:
-> 
-> -----
-> ./btsco 00:03:89:6E:C9:11
-> Error: Failed to connect to SDP server: Permission denied
-> Assuming channel 2
-> 
-> Can't connect RFCOMM channel: Permission denied
-> -----
-> 
-> In the system logs the only new entries generated are:
-> 
-> Jul 31 19:32:52 Redtail hcid[5743]: pin_code_request (sba=00:16:41:89:98:00, dba=00:03:89:6E:C9:11)
-> Jul 31 19:32:52 Redtail hcid[5743]: Calling PasskeyAgent.Request: name=:1.5, path=/org/bluez/passkey_agent_5755
-> Jul 31 19:32:56 Redtail hcid[5743]: pin_code_request (sba=00:16:41:89:98:00, dba=00:03:89:6E:C9:11)
-> Jul 31 19:32:56 Redtail hcid[5743]: Calling PasskeyAgent.Request: name=:1.5, path=/org/bluez/passkey_agent_5755
-> 
-> To me, these seem to indicate that the PIN is being requested, but perhaps not
-> being returned properly?  I also tried creating a passkey explicitly for this
-> device as:
->   /etc/bluetooth/passkeys/00:03:89:6E:C9:11
-> 
-> But the log messages were the same for this instance.  What am I doing wrong?
-> Thanks in advance.
+> > This is for debugging purpose and really special use cases.
+> Which ones (use cases) ?
 
-run "hcidump -X -V" and try again to see what is going on.
+I think the debugging purpose is clear, I needed it. The special use
+cases are fixed pair of devices with a fixed PIN or a static random PIN
+that people can remember. It is possible to implement all this using the
+passkey agent, but for some embedded devices a static PIN is needed and
+therefor it is there. However, this feature is undocumented for a
+reason, but it is not for the ordinary desktop user. The desktop user
+also has no write access to this directory.
+
+> I've tried the bluez passkey-agent, and it is not very practical to have 3 
+> "deamons" (hcid, dbus-daemon and the passkey agent) just to pair new devices.
+
+The hcid is running as root, the system D-Bus daemon as message bus user
+and the passkey agent as normal unprivileged user. It is not black and
+white and Linux (including Bluez) scales from very small system to big
+ones.
+
+> At least explain me why the auto mode make the difference between outgoing and 
+> incoming connections ? 
+> Or make the auto mode use the default passkey in both cases ! (or remove the 
+> auto mode to really force users to use dbus ...).
+
+The auto mode is no longer default. That was a mistake in the default
+config. What you really want is user, which is also more secure than a
+default PIN for all incoming connection. The reason why it exists is
+historical. We wrote it when the first chips supported authentication
+and encryption. Sounded like a nice idea back then.
 
 Regards
 
@@ -71,6 +68,6 @@ Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
