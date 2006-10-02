@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <9cc82a4d0610020710q17efb8efk99079c5f943ddaf8@mail.gmail.com>
-Date: Mon, 2 Oct 2006 14:10:03 +0000
-From: "Guylhem Aznar" <bluez-devel@externe.net>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <45206B2C.6080801@xmission.com>
+Date: Sun, 01 Oct 2006 19:28:12 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] Bluez article on OReillyNet
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <59260DC6DFC1CF40B06388D43B284EBB22FFA6@destc0strmsx02.eu.sony.com>
+In-Reply-To: <59260DC6DFC1CF40B06388D43B284EBB22FFA6@destc0strmsx02.eu.sony.com>
+Subject: Re: [Bluez-devel] SBC: Is there a way to make the decoded signal
+ louder?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,22 +21,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello
+Fritz
 
-I have written an article about Bluez. Comments, feedback, etc. are welcome.
-http://www.linuxdevcenter.com/pub/a/linux/2006/09/21/rediscovering-bluetooth.html?page=1
+I take it you mean a signal encoded with our libsbc?
 
-Suggestions for the next part are welcome.
+We need someone to go over the encoder algorithm and compare it with the
+spec, computing max/min/overflow/underflow at each step and making
+better use of the 32 bits we use for intermediate results. Some of the
+intermediate results have underused high bits because we have overflows
+happening otherwise.
 
-PS: regarding A2DP on ARM, what is the current status ? Is it working
-for a kernel 2.4/2.6 ?
+We want to focus improvements like this on the separate libsbc
+sourceforge project. It was branched off the libsbc code found inside btsco.
 
-I would like to give a *simple* command line example, like mplayer
-passing its audio output by a2dp, through a serial port dongle (if
-possible - the lowest speed, the better example).
+Brad
 
-I wouldn't want to be too confusing with pipes and stuff - mpg123 etc.
-on a PCI dongle work fine on my desktop
+> my current problem is that the SBC decoded signal is ways too quiet.
+> Are there possibilities in the SBC algorithm to get a louder signal?
+> 
+> Regards,
+>   Fritz
+> 
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys -- and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
