@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <9cc82a4d0610030425g3c078f62o77fd4d29318c4bee@mail.gmail.com>
-Date: Tue, 3 Oct 2006 11:25:11 +0000
-From: "Guylhem Aznar" <bluez-devel@externe.net>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45221882.3020809@palmsource.com>
+Message-ID: <45221882.3020809@palmsource.com>
+Date: Tue, 03 Oct 2006 10:00:02 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <9cc82a4d0610020710q17efb8efk99079c5f943ddaf8@mail.gmail.com>
-	<4521D073.1030105@xmission.com> <45221882.3020809@palmsource.com>
+	<4521D073.1030105@xmission.com>
+In-Reply-To: <4521D073.1030105@xmission.com>
 Subject: Re: [Bluez-devel] Bluez article on OReillyNet
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,24 +21,32 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hi,
+>> PS: regarding A2DP on ARM, what is the current status ? Is it working
+>> for a kernel 2.4/2.6 ?
+>>     =
 
-On 10/3/06, Fr=E9d=E9ric DALLEAU <frederic.dalleau@palmsource.com> wrote:
-> You won't get it working on serial device slower than 460800 bauds ie
-> COM ports. However, arm machines may have a serial port that can reach
-> that speed. Maybe sbc settings can be tweeked to use less bandwith but
-> this also depends on headset.
+>
+> which arm machine? If you can fit a recent alsa-lib on it, then you can
+> use Fr=E9d=E9ric Dalleau's alsa plugin (also in the btsco project). setti=
+ng
+> up audio clients to use it is simpe.
+>   =
 
-I'll use one of the dreaded HP headsets (OEM by logitech). Could I get
-it working at 230400 ?
+You won't get it working on serial device slower than 460800 bauds ie =
 
-> > I need to rewrite the install docs... (sigh)
-> In case you need it, I uploaded the original odt document I wrote last
-> day. http://fdalleau.free.fr/a2dp_doc.odt - Open Office 2.0 format
+COM ports. However, arm machines may have a serial port that can reach =
 
-Thanks !
+that speed. Maybe sbc settings can be tweeked to use less bandwith but =
 
-Guylhem
+this also depends on headset.
+> I need to rewrite the install docs... (sigh)
+In case you need it, I uploaded the original odt document I wrote last =
+
+day. http://fdalleau.free.fr/a2dp_doc.odt - Open Office 2.0 format
+
+Fr=E9d=E9ric
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
