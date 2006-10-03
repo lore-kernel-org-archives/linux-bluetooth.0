@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45227827.1090001@xmission.com>
-Date: Tue, 03 Oct 2006 08:48:07 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <9cc82a4d0610030746r7039990eie8397add3559ca80@mail.gmail.com>
+Date: Tue, 3 Oct 2006 14:46:52 +0000
+From: "Guylhem Aznar" <bluez-devel@externe.net>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <9cc82a4d0610020710q17efb8efk99079c5f943ddaf8@mail.gmail.com>	<4521D073.1030105@xmission.com>
-	<45221882.3020809@palmsource.com>	<9cc82a4d0610030425g3c078f62o77fd4d29318c4bee@mail.gmail.com>	<45226231.6080203@palmsource.com>
-	<9cc82a4d0610030619qbc160fdqe983cb529e5f8c02@mail.gmail.com>
-In-Reply-To: <9cc82a4d0610030619qbc160fdqe983cb529e5f8c02@mail.gmail.com>
-Subject: Re: [Bluez-devel] Bluez article on OReillyNet
+Subject: [Bluez-devel] High speed serial connection (Was: Bluez article on
+	OReillyNet)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,20 +19,54 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hello,
+
+On 10/3/06, Peter Wippich <pewi@gw-instruments.de> wrote:
+> Depending on your system it is most likely that the HW Uart extension is
+> not realy supported by the serial driver. I currently only know for sure
+> for PXA type system. You need a special HWUART driver to take advantage of
+> the HWUART.
+
+There are 4 ARM systems I can have access to :
+
+- A Zaurus 6000, which is a PXA 255
+
+- A Zaurus C860, which is also a PXA 255.
+
+- An Acer N30, but it's a s3c2410, which is quite different.
+
+- A Simpad - however it is a SA 1100, which has no HWUART. Moreover,
+its bluetooth module needs some reflashing (which I can't do). It is
+on ttySA1 - cf http://www.guylhem.net/r-hardware/simpad/bluetooth/ for
+the hardware part, http://opensimpad.org/index.php/Simpad.c for the
+software part.
+
+> For a PXA system we may help you out if you insist.
+
+Yes please. I would make a great base for the article.
+
+> Further you may get problems with the RS232 driver chips usualy
+> used. If you're able to connect the serial bluetooth module directly to
+> the ARM UART lines (Rx / Tx / RTS /CTS) (3 Volt interface without RS232
+> driver on both sides) this would be much better.
+
+On the Zaurus 6000, I didn't add the module myself, but I think it's
+on 3.3 V directly. It is also on the UART that can be rerouted to
+HWUART (FTUART ?)
+
+On the C860, it is directly soldered to the UART lines - yet to ones
+of the standard serial port - ttyS0, which I think is STUART (will
+check tonight) and which can not be rerouted to HWUART IIRC.
+
+On the N30, it is on ttySAC2, MMIO 0x50008000.
+
+The demo could use either a 2.4 or 2.6 kernel. There is a 2.4 on
+the 6000 and the Simpad, and a 2.6 on the N30 and 860, but putting a
+2.6 on the 6000 wouldn't be a problem.
+
+Tell me if you need more information.
+
 Guylhem
-
-> Unfortunately, the ARM machines I have only have serial ports ....
-> I will try to have them chips on HWUART which should not have speed problems.
-
-fwiw, gumstix had a promising pxa board including bluetooth but not
-quite enough flash to fit alsa. in their newer boards they have more
-flash but they can't figure out how to get the new bluetooth adapter to
-switch into a rate faster than 56kbps. :(
-
-I've been trying to connect a csr module to it but it hasn't come
-together so far.
-
-Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
