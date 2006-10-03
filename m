@@ -1,11 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <9cc82a4d0610030746r7039990eie8397add3559ca80@mail.gmail.com>
-Date: Tue, 3 Oct 2006 14:46:52 +0000
-From: "Guylhem Aznar" <bluez-devel@externe.net>
+Message-ID: <9cc82a4d0610030741t3e830a20ib170103e7d3a86c2@mail.gmail.com>
+Date: Tue, 3 Oct 2006 14:41:43 +0000
+From: "Guylhem Aznar" <guylhem@guylhem.net>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.63.0610031538100.5319@redbean.intranet.gw-instruments.de>
 MIME-Version: 1.0
-Subject: [Bluez-devel] High speed serial connection (Was: Bluez article on
-	OReillyNet)
+References: <9cc82a4d0610020710q17efb8efk99079c5f943ddaf8@mail.gmail.com>
+	<4521D073.1030105@xmission.com> <45221882.3020809@palmsource.com>
+	<9cc82a4d0610030425g3c078f62o77fd4d29318c4bee@mail.gmail.com>
+	<45226231.6080203@palmsource.com>
+	<9cc82a4d0610030619qbc160fdqe983cb529e5f8c02@mail.gmail.com>
+	<Pine.LNX.4.63.0610031538100.5319@redbean.intranet.gw-instruments.de>
+Subject: Re: [Bluez-devel] Bluez article on OReillyNet
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -27,7 +33,7 @@ On 10/3/06, Peter Wippich <pewi@gw-instruments.de> wrote:
 > for PXA type system. You need a special HWUART driver to take advantage of
 > the HWUART.
 
-There are 4 ARM systems I can have access to :
+There are 4 ARM systems I can try that with
 
 - A Zaurus 6000, which is a PXA 255
 
@@ -58,11 +64,11 @@ On the C860, it is directly soldered to the UART lines - yet to ones
 of the standard serial port - ttyS0, which I think is STUART (will
 check tonight) and which can not be rerouted to HWUART IIRC.
 
-On the N30, it is on ttySAC2, MMIO 0x50008000.
+The demo could use either a 2.4 or 2.6 kernel. I usually run a 2.4 on
+the 6000 and a 2.6 on the 860 but that's only for tests.
 
-The demo could use either a 2.4 or 2.6 kernel. There is a 2.4 on
-the 6000 and the Simpad, and a 2.6 on the N30 and 860, but putting a
-2.6 on the 6000 wouldn't be a problem.
+On the N30, I really don't know the s3c2410 - bluetooth work fine with
+a 2.6 kernel.
 
 Tell me if you need more information.
 
