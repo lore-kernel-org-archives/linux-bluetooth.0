@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4521D857.8000705@vasmac.com>
-Date: Mon, 02 Oct 2006 23:26:15 -0400
-From: Jose Vasconcellos <jose@vasmac.com>
+Message-ID: <4521D073.1030105@xmission.com>
+Date: Mon, 02 Oct 2006 20:52:35 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] SCO packet processing
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <9cc82a4d0610020710q17efb8efk99079c5f943ddaf8@mail.gmail.com>
+In-Reply-To: <9cc82a4d0610020710q17efb8efk99079c5f943ddaf8@mail.gmail.com>
+Subject: Re: [Bluez-devel] Bluez article on OReillyNet
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,62 +16,29 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Guylhem
 
-I've been studying the SCO packet processing to understand how it works.
-There are a few things that I noticed that don't seem quite right. I'll 
-attempt
-to explain.
+> PS: regarding A2DP on ARM, what is the current status ? Is it working
+> for a kernel 2.4/2.6 ?
 
-In the SCO transmit path, data gets put in a skb and then queued. There's
-a tasklet that will dequeue and send the skb to the hci driver. This 
-tasklet
-is scheduled when data needs to be sent or when there's a HCI event
-HCI_EV_NUM_COMP_PKTS. This works fine for an ACL link and it could work
-for a non-USB SCO transport. However, for USB HCI, the SCO data is carried
-by the isochronous transport that doesn't require explicit flow control. 
-The
-problem is that the current code (hci_sched_sco in hci_core.c) will send 
-all
-packets to the hci layer with no flow control. That explains why 
-application
-kludges have been introduced to avoid loosing packets.
+which arm machine? If you can fit a recent alsa-lib on it, then you can
+use Fr=E9d=E9ric Dalleau's alsa plugin (also in the btsco project). setting
+up audio clients to use it is simpe.
 
-Note that for non-USB links (i.e. UART), the current code is not correct
-either as it doesn't enable HCI_EV_NUM_COMP_PKTS anywhere. Also,
-the value of hdev->sco_cnt is never decremented.
+I need to rewrite the install docs... (sigh)
 
-Last May, Fabien Chevalier posted some patches to avoid this problem.
-His approach of using timers didn't work for me but I think this is the 
-wrong
-way to go about it. What is needed is a proper flow control mechanism 
-between
-the bluetooth module and the hci layer for the case of USB HCI transport.
-I'm thinking that a callback is necessary that is invoked by hci_usb to
-kickstart the process.
-
-I also have issues with hci_sched_sco. I think it should interleave skb 
-from
-different active SCO sockets. Currently, it sends too many skbs from the
-same socket flooding the dongle's buffers and potentially starving other
-SCO channels.
-
-I realize SCO handling has not been a priority and it sort of works.
-Is there much interest in getting it right?
-
-Regards,
-
-Jose
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
