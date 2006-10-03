@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45221882.3020809@palmsource.com>
-Date: Tue, 03 Oct 2006 10:00:02 +0200
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
+Message-ID: <4521DCC4.6090705@vasmac.com>
+Date: Mon, 02 Oct 2006 23:45:08 -0400
+From: Jose Vasconcellos <jose@vasmac.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <9cc82a4d0610020710q17efb8efk99079c5f943ddaf8@mail.gmail.com>
-	<4521D073.1030105@xmission.com>
-In-Reply-To: <4521D073.1030105@xmission.com>
-Subject: Re: [Bluez-devel] Bluez article on OReillyNet
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] Error: Authentication Failure
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,43 +14,68 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
->> PS: regarding A2DP on ARM, what is the current status ? Is it working
->> for a kernel 2.4/2.6 ?
->>     =
+I've run into authentication problems doing the following:
 
->
-> which arm machine? If you can fit a recent alsa-lib on it, then you can
-> use Fr=E9d=E9ric Dalleau's alsa plugin (also in the btsco project). setti=
-ng
-> up audio clients to use it is simpe.
->   =
+1. Pair device (say headset) with USB Bluetooth dongle on Linux with Bluez.
+2. Disconnect dongle and insert on Windows. Windows will ask for
+    the key.
+3. Disconnect device from Windows and put back on Linux.
+    Linux is unable to connect to the device.
 
-You won't get it working on serial device slower than 460800 bauds ie =
+Here's a trace for step 3:
 
-COM ports. However, arm machines may have a serial port that can reach =
+HCI sniffer - Bluetooth packet analyzer ver 1.32
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:14:CF:00:A7:76 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+ > HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+ > HCI Event: Link Key Request (0x17) plen 6
+    bdaddr 00:14:CF:00:A7:76
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+    bdaddr 00:14:CF:00:A7:76 key 3FECD3A6AB67EA063B3E78CCB155CBC1
+ > HCI Event: Command Complete (0x0e) plen 10
+    Link Key Request Reply (0x01|0x000b) ncmd 1
+    status 0x00 bdaddr 00:14:CF:00:A7:76
+ > HCI Event: Connect Complete (0x03) plen 11
+    status 0x05 handle 42 bdaddr 00:14:CF:00:A7:76 type ACL encrypt 0x00
+    Error: Authentication Failure
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:0C:55:06:CE:46 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+ > HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+ > HCI Event: Link Key Request (0x17) plen 6
+    bdaddr 00:0C:55:06:CE:46
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+    bdaddr 00:0C:55:06:CE:46 key 843E102AA026008F44FC7A2D5DDE0306
+ > HCI Event: Command Complete (0x0e) plen 10
+    Link Key Request Reply (0x01|0x000b) ncmd 1
+    status 0x00 bdaddr 00:0C:55:06:CE:46
+ > HCI Event: Connect Complete (0x03) plen 11
+    status 0x05 handle 42 bdaddr 00:0C:55:06:CE:46 type ACL encrypt 0x00
+    Error: Authentication Failure
 
-that speed. Maybe sbc settings can be tweeked to use less bandwith but =
+The problem is that hcid contains a cached key that is no longer valid.
+Once it gets the first authentication failure it should discard that
+and ask the user for a new pin (i.e. invoke the passkey agent) but it
+doesn't do that. I've tested with bluez-utils-3.7.
 
-this also depends on headset.
-> I need to rewrite the install docs... (sigh)
-In case you need it, I uploaded the original odt document I wrote last =
+Regards,
 
-day. http://fdalleau.free.fr/a2dp_doc.odt - Open Office 2.0 format
+Jose
 
-Fr=E9d=E9ric
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
