@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <9cc82a4d0610030619qbc160fdqe983cb529e5f8c02@mail.gmail.com>
-Date: Tue, 3 Oct 2006 13:19:55 +0000
-From: "Guylhem Aznar" <bluez-devel@externe.net>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45226231.6080203@palmsource.com>
+Message-ID: <45226231.6080203@palmsource.com>
+Date: Tue, 03 Oct 2006 15:14:25 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-References: <9cc82a4d0610020710q17efb8efk99079c5f943ddaf8@mail.gmail.com>
-	<4521D073.1030105@xmission.com> <45221882.3020809@palmsource.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <9cc82a4d0610020710q17efb8efk99079c5f943ddaf8@mail.gmail.com>	<4521D073.1030105@xmission.com>
+	<45221882.3020809@palmsource.com>
 	<9cc82a4d0610030425g3c078f62o77fd4d29318c4bee@mail.gmail.com>
-	<45226231.6080203@palmsource.com>
+In-Reply-To: <9cc82a4d0610030425g3c078f62o77fd4d29318c4bee@mail.gmail.com>
 Subject: Re: [Bluez-devel] Bluez article on OReillyNet
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,20 +22,31 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello
 
-On 10/3/06, Fr=E9d=E9ric DALLEAU <frederic.dalleau@palmsource.com> wrote:
-> Use stty -F /dev/ttyS0 460800 to see if your serial can be set at high
-> speed. It should display an error if the speed is not supported.
-> You will have good result with USB devices that do not need the
-> hciattach commands. They are really cheap and easy to find.
+>> You won't get it working on serial device slower than 460800 bauds ie
+>> COM ports. However, arm machines may have a serial port that can reach
+>> that speed. Maybe sbc settings can be tweeked to use less bandwith but
+>> this also depends on headset.
+>>     =
 
-Unfortunately, the ARM machines I have only have serial ports ....
+>
+> I'll use one of the dreaded HP headsets (OEM by logitech). Could I get
+> it working at 230400 ?
+>
+>   =
 
-I will try to have them chips on HWUART which should not have speed problem=
-s.
+You will hear something but this is not  usable. 460800 is the least I =
 
-Guylhem
+got a good result with.
+Use stty -F /dev/ttyS0 460800 to see if your serial can be set at high =
+
+speed. It should display an error if the speed is not supported.
+You will have good result with USB devices that do not need the =
+
+hciattach commands. They are really cheap and easy to find.
+
+Fr=E9d=E9ric.
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
