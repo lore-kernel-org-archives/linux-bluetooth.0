@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45226231.6080203@palmsource.com>
-Date: Tue, 03 Oct 2006 15:14:25 +0200
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
+Message-ID: <9cc82a4d0610030425g3c078f62o77fd4d29318c4bee@mail.gmail.com>
+Date: Tue, 3 Oct 2006 11:25:11 +0000
+From: "Guylhem Aznar" <bluez-devel@externe.net>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <45221882.3020809@palmsource.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <9cc82a4d0610020710q17efb8efk99079c5f943ddaf8@mail.gmail.com>	<4521D073.1030105@xmission.com>
-	<45221882.3020809@palmsource.com>
-	<9cc82a4d0610030425g3c078f62o77fd4d29318c4bee@mail.gmail.com>
-In-Reply-To: <9cc82a4d0610030425g3c078f62o77fd4d29318c4bee@mail.gmail.com>
+References: <9cc82a4d0610020710q17efb8efk99079c5f943ddaf8@mail.gmail.com>
+	<4521D073.1030105@xmission.com> <45221882.3020809@palmsource.com>
 Subject: Re: [Bluez-devel] Bluez article on OReillyNet
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,31 +21,24 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hello,
 
->> You won't get it working on serial device slower than 460800 bauds ie
->> COM ports. However, arm machines may have a serial port that can reach
->> that speed. Maybe sbc settings can be tweeked to use less bandwith but
->> this also depends on headset.
->>     =
+On 10/3/06, Fr=E9d=E9ric DALLEAU <frederic.dalleau@palmsource.com> wrote:
+> You won't get it working on serial device slower than 460800 bauds ie
+> COM ports. However, arm machines may have a serial port that can reach
+> that speed. Maybe sbc settings can be tweeked to use less bandwith but
+> this also depends on headset.
 
->
-> I'll use one of the dreaded HP headsets (OEM by logitech). Could I get
-> it working at 230400 ?
->
->   =
+I'll use one of the dreaded HP headsets (OEM by logitech). Could I get
+it working at 230400 ?
 
-You will hear something but this is not  usable. 460800 is the least I =
+> > I need to rewrite the install docs... (sigh)
+> In case you need it, I uploaded the original odt document I wrote last
+> day. http://fdalleau.free.fr/a2dp_doc.odt - Open Office 2.0 format
 
-got a good result with.
-Use stty -F /dev/ttyS0 460800 to see if your serial can be set at high =
+Thanks !
 
-speed. It should display an error if the speed is not supported.
-You will have good result with USB devices that do not need the =
-
-hciattach commands. They are really cheap and easy to find.
-
-Fr=E9d=E9ric.
-
+Guylhem
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
