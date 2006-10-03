@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4521B775.6040001@gmail.com>
-Date: Mon, 02 Oct 2006 21:05:57 -0400
-From: Jose Vasconcellos <vasmac@gmail.com>
+Message-ID: <e1effdeb0610030954o50ef2d6elf25e77e3a85737ac@mail.gmail.com>
+Date: Tue, 3 Oct 2006 13:54:11 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4521DCC4.6090705@vasmac.com>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] SCO packet processing
+References: <4521DCC4.6090705@vasmac.com>
+Subject: Re: [Bluez-devel] Error: Authentication Failure
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,47 +20,85 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+On 10/3/06, Jose Vasconcellos <jose@vasmac.com> wrote:
+> I've run into authentication problems doing the following:
+>
+> 1. Pair device (say headset) with USB Bluetooth dongle on Linux with Bluez.
+> 2. Disconnect dongle and insert on Windows. Windows will ask for
+>     the key.
+> 3. Disconnect device from Windows and put back on Linux.
+>     Linux is unable to connect to the device.
+>
+> Here's a trace for step 3:
+>
+> HCI sniffer - Bluetooth packet analyzer ver 1.32
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:14:CF:00:A7:76 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+>  > HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+>  > HCI Event: Link Key Request (0x17) plen 6
+>     bdaddr 00:14:CF:00:A7:76
+> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+>     bdaddr 00:14:CF:00:A7:76 key 3FECD3A6AB67EA063B3E78CCB155CBC1
+>  > HCI Event: Command Complete (0x0e) plen 10
+>     Link Key Request Reply (0x01|0x000b) ncmd 1
+>     status 0x00 bdaddr 00:14:CF:00:A7:76
+>  > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x05 handle 42 bdaddr 00:14:CF:00:A7:76 type ACL encrypt 0x00
+>     Error: Authentication Failure
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:0C:55:06:CE:46 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+>  > HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+>  > HCI Event: Link Key Request (0x17) plen 6
+>     bdaddr 00:0C:55:06:CE:46
+> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+>     bdaddr 00:0C:55:06:CE:46 key 843E102AA026008F44FC7A2D5DDE0306
+>  > HCI Event: Command Complete (0x0e) plen 10
+>     Link Key Request Reply (0x01|0x000b) ncmd 1
+>     status 0x00 bdaddr 00:0C:55:06:CE:46
+>  > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x05 handle 42 bdaddr 00:0C:55:06:CE:46 type ACL encrypt 0x00
+>     Error: Authentication Failure
+>
+> The problem is that hcid contains a cached key that is no longer valid.
+> Once it gets the first authentication failure it should discard that
+> and ask the user for a new pin (i.e. invoke the passkey agent) but it
+> doesn't do that. I've tested with bluez-utils-3.7.
+>
+> Regards,
+>
+> Jose
+>
+>
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys -- and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+Hi Jose,
 
-I've been studying the SCO packet processing to understand how it works.
-There are a few things that I noticed that don't seem quite right. I'll 
-attempt
-to explain.
+Good catch! if there is an invalid cached key the client must call
+RemoveBonding to remove the invalid entry. I will check with Marcel if
+it is possible remove the key automatically on this situation without
+insert a complex code. I am not sure, but I think some implementations
+drop the connection automatically when the pairing fails. Consequently
+ask a new PIN automatically will be more complex.
 
-In the SCO transmit path, data gets put in a skb and then queued. There's
-a tasklet that will dequeue and send the skb to the hci driver. This tasklet
-is scheduled when data needs to be sent or when there's a HCI event
-HCI_EV_NUM_COMP_PKTS. This works fine for an ACL link and it could work
-for a non-USB SCO transport. However, for USB HCI, the SCO data is carried
-by the isochronous transport that doesn't require explicit flow control. The
-problem is that the current code (hci_sched_sco in hci_core.c) will send all
-packets to the hci layer with no flow control. That explains why application
-kludges have been introduced to avoid loosing packets.
-
-Note that for non-USB links (i.e. UART), the current code is not correct
-either as it doesn't enable HCI_EV_NUM_COMP_PKTS anywhere. Also,
-the value of hdev->sco_cnt is never decremented.
-
-Last May, Fabien Chevalier posted some patches to avoid this problem.
-His approach of using timers didn't work for me but I think this is the 
-wrong
-way to go about it. What is needed is a proper flow control mechanism 
-between
-the bluetooth module and the hci layer for the case of USB HCI transport.
-I'm thinking that a callback is necessary that is invoked by hci_usb to
-kickstart the process.
-
-I also have issues with hci_sched_sco. I think it should interleave skb from
-different active SCO sockets. Currently, it sends too many skbs from the
-same socket flooding the dongle's buffers and potentially starving other
-SCO channels.
-
-I realize SCO handling has not been a priority and it sort of works.
-Is there much interest in getting it right?
-
-Regards,
-
-Jose
+BR,
+Claudio.
+-- 
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
