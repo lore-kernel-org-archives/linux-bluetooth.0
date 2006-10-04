@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <3f5a9ba20610030755y6026620as1a6df7d9d9d207@mail.gmail.com>
-Date: Tue, 3 Oct 2006 22:55:18 +0800
-From: "Mingfan.Lu" <lucharse@gmail.com>
-To: Bluez-devel@lists.sourceforge.net
-In-Reply-To: <3f5a9ba20609291930r5b4e4c97g8b33901666fef491@mail.gmail.com>
+From: Mayank BATRA <mayank.batra@st.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Wed, 4 Oct 2006 09:07:09 +0530
+Message-ID: <001801c6e766$64596b20$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-References: <3f5a9ba20609291930r5b4e4c97g8b33901666fef491@mail.gmail.com>
-Subject: [Bluez-devel] About the kernel 2.6.18
+In-Reply-To: <4523113E.4000608@vasmac.com>
+Subject: Re: [Bluez-devel] Error: Authentication Failure
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,82 +15,33 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0906201569=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0906201569==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_69528_8123221.1159887318273"
+Hi Jose,
 
-------=_Part_69528_8123221.1159887318273
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> Perhaps in security.c in utils/hcid, the routine conn_complete
+> should delete the cached entry if there's an error.
 
-All,
+In case you are planning to implement a patch to solve this problem,
+remember that the Bluetooth Spec mentions something called "Repeated
+Attempts". So, in case authentication/pairing fails, you can initiate
+another authentication/pairing only after a certain amount of time. If you
+try it before this time, the authentication/pairing would fail again. And
+this time keeps on increasing exponentially with each failure.
 
-   My oepnsuse 10.1 with the default kernel 2.6.16.13-4.
-   When 2.6.18-mh3 released, I rebuilt and updated the kernel to 2.6.18 and
-then patched it.
-   When Holtman released the patch for handling multiple l2cap connections,
-I patched the new kernel .
-   But at last, I found that the speed of  the OBEX pushing and other Rfcomm
-socket communications is slower than the original kernel.
-   Then I rebuilt the 2.6.18 without the 2.6.18-mh3 and the patch for
-handling multiple l2cap connections, I found it is still slower.
-   So I think the patch is not the reason.
-   But what makes the bluetooth communication slower? The new kernel version
-2.6.18?
+Best Regards,
 
-   Waiting for your help;
+Mayank
 
--- 
-With respects,
-   Mingfan.Lu
-
-------=_Part_69528_8123221.1159887318273
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<br><span class="gmail_quote"><br></span>
-<div>All,</div>
-<div>&nbsp;</div>
-<div>&nbsp;&nbsp; My oepnsuse 10.1 with the&nbsp;default&nbsp;kernel 2.6.16.13-4.</div>
-<div>&nbsp;&nbsp; When 2.6.18-mh3 released, I rebuilt and updated the kernel to 2.6.18 and then patched it.</div>
-<div>&nbsp;&nbsp; When Holtman released the patch for handling multiple l2cap connections, I patched the new kernel .</div>
-<div>&nbsp;&nbsp; But at last, I found that the speed of &nbsp;the OBEX pushing and other Rfcomm socket communications is slower than the original kernel.</div>
-<div>&nbsp;&nbsp; Then I rebuilt the 2.6.18 without the 2.6.18-mh3 and the patch for handling multiple l2cap connections, I found it is still slower.</div>
-<div>&nbsp;&nbsp;&nbsp;So I think the patch is not the reason.</div>
-<div>&nbsp;&nbsp;&nbsp;But what makes the bluetooth communication slower? The new kernel version 2.6.18?</div>
-<div>&nbsp;&nbsp; </div>
-<div>&nbsp;&nbsp; Waiting for your help;</div>
-<div><br>-- <br>With respects,<br>&nbsp;&nbsp; Mingfan.Lu </div><br clear="all">
-
-------=_Part_69528_8123221.1159887318273--
-
-
---===============0906201569==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0906201569==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0906201569==--
