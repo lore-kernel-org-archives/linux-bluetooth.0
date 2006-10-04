@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <9cc82a4d0610040220ldf5218bo608969a33cffd7da@mail.gmail.com>
-Date: Wed, 4 Oct 2006 09:20:27 +0000
-From: "Guylhem Aznar" <bluez-devel@externe.net>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0610031651360.5319@redbean.intranet.gw-instruments.de>
-MIME-Version: 1.0
-References: <9cc82a4d0610030746r7039990eie8397add3559ca80@mail.gmail.com>
-	<Pine.LNX.4.63.0610031651360.5319@redbean.intranet.gw-instruments.de>
-Subject: Re: [Bluez-devel] High speed serial connection (Was: Bluez article
-	on OReillyNet)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4521B775.6040001@gmail.com>
+References: <4521B775.6040001@gmail.com>
+Date: Wed, 04 Oct 2006 10:33:46 +0200
+Message-Id: <1159950826.1601.11.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] SCO packet processing
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,44 +16,74 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello
+Hi Jose,
 
-On 10/3/06, Peter Wippich <pewi@gw-instruments.de> wrote:
-> > - A Zaurus 6000, which is a PXA 255
-> > - A Zaurus C860, which is also a PXA 255.
-> This two shall work with a HWUART driver. Make sure the BT Chip is
-> connected to the BTUART, which is shared with the HWUART (/dev/ttyS1).
+> I've been studying the SCO packet processing to understand how it works.
+> There are a few things that I noticed that don't seem quite right. I'll 
+> attempt
+> to explain.
+> 
+> In the SCO transmit path, data gets put in a skb and then queued. There's
+> a tasklet that will dequeue and send the skb to the hci driver. This tasklet
+> is scheduled when data needs to be sent or when there's a HCI event
+> HCI_EV_NUM_COMP_PKTS. This works fine for an ACL link and it could work
+> for a non-USB SCO transport. However, for USB HCI, the SCO data is carried
+> by the isochronous transport that doesn't require explicit flow control. The
+> problem is that the current code (hci_sched_sco in hci_core.c) will send all
+> packets to the hci layer with no flow control. That explains why application
+> kludges have been introduced to avoid loosing packets.
+> 
+> Note that for non-USB links (i.e. UART), the current code is not correct
+> either as it doesn't enable HCI_EV_NUM_COMP_PKTS anywhere. Also,
+> the value of hdev->sco_cnt is never decremented.
+> 
+> Last May, Fabien Chevalier posted some patches to avoid this problem.
+> His approach of using timers didn't work for me but I think this is the 
+> wrong
+> way to go about it. What is needed is a proper flow control mechanism 
+> between
+> the bluetooth module and the hci layer for the case of USB HCI transport.
+> I'm thinking that a callback is necessary that is invoked by hci_usb to
+> kickstart the process.
+> 
+> I also have issues with hci_sched_sco. I think it should interleave skb from
+> different active SCO sockets. Currently, it sends too many skbs from the
+> same socket flooding the dongle's buffers and potentially starving other
+> SCO channels.
+> 
+> I realize SCO handling has not been a priority and it sort of works.
+> Is there much interest in getting it right?
 
-Not on the C860: /dev/ttyS0, and neither on the 6000 : /dev/ttyS2
+I am not actively gonna work on it, but I am going to review and test
+your patches to make it better.
 
-But sharp gives weird names to their serial ports that do not reflect
-the uart connection - I will check the addresses directly in the
-sourcecode and guess the correct uart=E9
+First of all, the HCI drivers are stupid and that is meant to be,
+because they are only transport drivers. This means if the scheduling of
+SCO packets in the core is wrong, then we should fix it there. However
+no driver should overflood the Bluetooth core with too many packets
+anyway, but the core should be able to handle it and maybe simple drop
+some packets.
 
-> Ok, but be warned. It will not run out of the box and is only tested with
-> 2.6.14 kernel. I've attached the driver source and a modified Kconfig and
-> Makefile. This will go to linux/drivers/bluetooth/ . You also have to edit
-> the Kconfig to get the driver enabled for your machine type.
+For the actual improvement, I don't seen any need of another callback in
+the core or the drivers. If SCO packets need a different sending path,
+then we are have too implement one. So please go ahead and propose
+something.
 
-I'll try to tweak it and let you know my results. Can I put a kernel
-sourcetree somewhere for you to see?
+Regards
 
-BTW I notice it comes from the ROAD S101. Any news on the device ?
-I am eager to see it reaching the market to review it. Last seen on
-press releases in Auguest.
+Marcel
 
-Guylhem
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
