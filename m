@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <3f5a9ba20610020946v10c99300pee5cc04f3f2597e6@mail.gmail.com>
-Date: Tue, 3 Oct 2006 00:46:16 +0800
-From: "Mingfan.Lu" <lucharse@gmail.com>
-To: Bluez-devel@lists.sourceforge.net
-In-Reply-To: <3f5a9ba20609291930r5b4e4c97g8b33901666fef491@mail.gmail.com>
+Message-ID: <4523113E.4000608@vasmac.com>
+Date: Tue, 03 Oct 2006 21:41:18 -0400
+From: Jose Vasconcellos <jose@vasmac.com>
 MIME-Version: 1.0
-References: <3f5a9ba20609291930r5b4e4c97g8b33901666fef491@mail.gmail.com>
-Subject: [Bluez-devel] About the kernel 2.6.18
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <4521DCC4.6090705@vasmac.com>	<e1effdeb0610030954o50ef2d6elf25e77e3a85737ac@mail.gmail.com>
+	<e1effdeb0610031048i3e290d5cu59f3d8670627d8b2@mail.gmail.com>
+In-Reply-To: <e1effdeb0610031048i3e290d5cu59f3d8670627d8b2@mail.gmail.com>
+Subject: Re: [Bluez-devel] Error: Authentication Failure
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,82 +17,119 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0168699523=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0168699523==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_49246_399080.1159807576522"
+Claudio Takahasi wrote:
+> On 10/3/06, Claudio Takahasi <cktakahasi@gmail.com> wrote:
+>   
+>> On 10/3/06, Jose Vasconcellos <jose@vasmac.com> wrote:
+>>     
+>>> I've run into authentication problems doing the following:
+>>>
+>>> 1. Pair device (say headset) with USB Bluetooth dongle on Linux with Bluez.
+>>> 2. Disconnect dongle and insert on Windows. Windows will ask for
+>>>     the key.
+>>> 3. Disconnect device from Windows and put back on Linux.
+>>>     Linux is unable to connect to the device.
+>>>
+>>> Here's a trace for step 3:
+>>>
+>>> HCI sniffer - Bluetooth packet analyzer ver 1.32
+>>> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>>>     bdaddr 00:14:CF:00:A7:76 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>>>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+>>>  > HCI Event: Command Status (0x0f) plen 4
+>>>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+>>>  > HCI Event: Link Key Request (0x17) plen 6
+>>>     bdaddr 00:14:CF:00:A7:76
+>>> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+>>>     bdaddr 00:14:CF:00:A7:76 key 3FECD3A6AB67EA063B3E78CCB155CBC1
+>>>  > HCI Event: Command Complete (0x0e) plen 10
+>>>     Link Key Request Reply (0x01|0x000b) ncmd 1
+>>>     status 0x00 bdaddr 00:14:CF:00:A7:76
+>>>  > HCI Event: Connect Complete (0x03) plen 11
+>>>     status 0x05 handle 42 bdaddr 00:14:CF:00:A7:76 type ACL encrypt 0x00
+>>>     Error: Authentication Failure
+>>> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>>>     bdaddr 00:0C:55:06:CE:46 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>>>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+>>>  > HCI Event: Command Status (0x0f) plen 4
+>>>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+>>>  > HCI Event: Link Key Request (0x17) plen 6
+>>>     bdaddr 00:0C:55:06:CE:46
+>>> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+>>>     bdaddr 00:0C:55:06:CE:46 key 843E102AA026008F44FC7A2D5DDE0306
+>>>  > HCI Event: Command Complete (0x0e) plen 10
+>>>     Link Key Request Reply (0x01|0x000b) ncmd 1
+>>>     status 0x00 bdaddr 00:0C:55:06:CE:46
+>>>  > HCI Event: Connect Complete (0x03) plen 11
+>>>     status 0x05 handle 42 bdaddr 00:0C:55:06:CE:46 type ACL encrypt 0x00
+>>>     Error: Authentication Failure
+>>>
+>>> The problem is that hcid contains a cached key that is no longer valid.
+>>> Once it gets the first authentication failure it should discard that
+>>> and ask the user for a new pin (i.e. invoke the passkey agent) but it
+>>> doesn't do that. I've tested with bluez-utils-3.7.
+>>>
+>>> Regards,
+>>>
+>>> Jose
+>>>       
+>> Hi Jose,
+>>
+>> Good catch! if there is an invalid cached key the client must call
+>> RemoveBonding to remove the invalid entry. I will check with Marcel if
+>> it is possible remove the key automatically on this situation without
+>> insert a complex code. I am not sure, but I think some implementations
+>> drop the connection automatically when the pairing fails. Consequently
+>> ask a new PIN automatically will be more complex.
+>>
+>> BR,
+>> Claudio.
+>> --
+>> ---------------------------------------------------------
+>> Claudio Takahasi
+>> Instituto Nokia de Tecnologia - INdT
+>>
+>>     
+> Hi Jose,
+>
+> Could you explain exactly how do you reproduce this issue?
+> The hcidump is not matching with our description, the connect bdaddr
+> and the link key are different. They should to be the same in the
+> second attempt. And when you disconnect the dongle the hcidump exit.
+>
+> BR,
+> Claudio.
+>   
+Claudio,
 
-------=_Part_49246_399080.1159807576522
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+It's pretty easy to reproduce. I've tried with two USB dongles
+(CSR & Broadcom) and different headsets. Connect a device
+on Linux, then take the device and dongle and connect on
+Windows; when you go back with both to Linux you get this
+problem.
 
-All,
+You are right that one can remove the bonding manually but
+this is not obvious to the uninitiated and it requires a manual
+step. Plus, the message presented to the application is
+typically "Record not found" if the first connection is an SDP
+lookup.
 
-   My oepnsuse 10.1 with the default kernel 2.6.16.13-4.
-   When 2.6.18-mh3 released, I rebuilt and updated the kernel to 2.6.18 and
-then patched it.
-   When Holtman released the patch for handling multiple l2cap connections,
-I patched the new kernel .
-   But at last, I found that the speed of  the OBEX pushing and other Rfcomm
-socket communications is slower than the original kernel.
-   Then I rebuilt the 2.6.18 without the 2.6.18-mh3 and the patch for
-handling multiple l2cap connections, I found it is still slower.
-   So I think the patch is not the reason.
-   But what makes the bluetooth communication slower? The new kernel version
-2.6.18?
+Perhaps in security.c in utils/hcid, the routine conn_complete
+should delete the cached entry if there's an error.
 
-   Waiting for your help;
+Jose
 
--- 
-With respects,
-   Mingfan.Lu
-
-------=_Part_49246_399080.1159807576522
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<br><span class="gmail_quote"><br></span>
-<div>All,</div>
-<div>&nbsp;</div>
-<div>&nbsp;&nbsp; My oepnsuse 10.1 with the&nbsp;default&nbsp;kernel 2.6.16.13-4.</div>
-<div>&nbsp;&nbsp; When 2.6.18-mh3 released, I rebuilt and updated the kernel to 2.6.18 and then patched it.</div>
-<div>&nbsp;&nbsp; When Holtman released the patch for handling multiple l2cap connections, I patched the new kernel .</div>
-<div>&nbsp;&nbsp; But at last, I found that the speed of &nbsp;the OBEX pushing and other Rfcomm socket communications is slower than the original kernel.</div>
-<div>&nbsp;&nbsp; Then I rebuilt the 2.6.18 without the 2.6.18-mh3 and the patch for handling multiple l2cap connections, I found it is still slower.</div>
-<div>&nbsp;&nbsp;&nbsp;So I think the patch is not the reason.</div>
-<div>&nbsp;&nbsp;&nbsp;But what makes the bluetooth communication slower? The new kernel version 2.6.18?</div>
-<div>&nbsp;&nbsp; </div>
-<div>&nbsp;&nbsp; Waiting for your help;</div>
-<div><br>-- <br>With respects,<br>&nbsp;&nbsp; Mingfan.Lu </div><br clear="all">
-
-------=_Part_49246_399080.1159807576522--
-
-
---===============0168699523==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0168699523==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0168699523==--
