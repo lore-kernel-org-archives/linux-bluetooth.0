@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Mayank BATRA <mayank.batra@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Wed, 4 Oct 2006 09:07:09 +0530
-Message-ID: <001801c6e766$64596b20$9d0cc70a@dlh.st.com>
+Message-ID: <45232AE9.40605@xmission.com>
+Date: Tue, 03 Oct 2006 21:30:49 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-In-Reply-To: <4523113E.4000608@vasmac.com>
-Subject: Re: [Bluez-devel] Error: Authentication Failure
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <4521D857.8000705@vasmac.com>
+In-Reply-To: <4521D857.8000705@vasmac.com>
+Subject: Re: [Bluez-devel] SCO packet processing
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,22 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jose,
+Jose
 
-> Perhaps in security.c in utils/hcid, the routine conn_complete
-> should delete the cached entry if there's an error.
+> I realize SCO handling has not been a priority and it sort of works.
+> Is there much interest in getting it right?
 
-In case you are planning to implement a patch to solve this problem,
-remember that the Bluetooth Spec mentions something called "Repeated
-Attempts". So, in case authentication/pairing fails, you can initiate
-another authentication/pairing only after a certain amount of time. If you
-try it before this time, the authentication/pairing would fail again. And
-this time keeps on increasing exponentially with each failure.
+I'm very interested in it but I've only been able to address the
+application side of things. It looks like you've dug in and reached a
+decent understanding of where problems are.
 
-Best Regards,
+Developers of embedded systems are passing linux/bluez over because
+voice is too important to just have it "mostly" work.
 
-Mayank
+It's unfortunate that Fabien is not still working at it too. I was
+hoping he would keep a dialog going long enough to find an approach that
+Marcel likes but it seems like Fabien got tired of pushing it.
 
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
