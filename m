@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 04 Oct 2006 21:12:30 +0200
-From: Michel Leconte <leconte.michel@cegetel.net>
-To: bluez-users@lists.sourceforge.net
-Message-id: <001701c6e7e9$0a0f2a00$78b44856@claudia>
-MIME-version: 1.0
-Subject: [Bluez-users] Use an ACL link when an SCO link  is established
+From: Per Thomas Jahr <perja@extern.uio.no>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1159992339.8692.0.camel@localhost>
+References: <1159992040.19347.29.camel@localhost.localdomain>
+	<1159992339.8692.0.camel@localhost>
+Content-Type: multipart/mixed; boundary="=-7vO7eGG6ZB85r9BMWh0g"
+Date: Wed, 04 Oct 2006 22:13:41 +0200
+Message-Id: <1159992821.19347.32.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Problems with security block
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,460 +18,484 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1361897382=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
 
---===============1361897382==
-Content-type: multipart/alternative;
-	boundary="Boundary_(ID_zePGruFG2hWBUJk5IMxZDA)"
+--=-7vO7eGG6ZB85r9BMWh0g
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-This is a multi-part message in MIME format.
+ons, 04,.10.2006 kl. 22.05 +0200, skrev Marcel Holtmann:
+> show us the output of "hcidump -X -V" for both attempts.
 
---Boundary_(ID_zePGruFG2hWBUJk5IMxZDA)
-Content-type: text/plain; charset=iso-8859-1
-Content-transfer-encoding: 7BIT
+That was quick :-)
 
-Hi all,
+Outputs for both attempts are attached.
 
-my goal is to use an ACL link when an SCO link is established.
+--
+Per Thomas
 
-I work with two bluetooth development kits from Semtech-Xemics (SE1441). 
+--=-7vO7eGG6ZB85r9BMWh0g
+Content-Disposition: attachment; filename=hcidump-1
+Content-Type: text/plain; name=hcidump-1; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-They are compliant Bluetooth v1.2. For the following explanations, one kit is noted "A" and the other "B".
-
-1) First, I create an ACL link between "A" and "B" with : hcitool cc BD_ADDR of "B",
-
-2) Once the ACL link is done, "A" execute an "HCI_Setup_Synchronous_Connection" command to "B",
-
-3) At the event of an SCO request connection, "B" respond with an "HCI_Accept_Synchronous_Connection_Request" command.
-
-4) When the SCO link is established, a "Synchronous Connection Complete" HCI event is visible from the hci layer of each kit.
-
-the "hcitool con" gives :
-
-> SCO AA:AA:AA:AA:AA:04 handle 0 state 5 lm SLAVE
-
-> ACL AA:AA:AA:AA:AA:04 handle 0 state 1 lm SLAVE
-
-
-
-5) I try to use the ACL link with a l2ping command from B to A
-
-the l2ping command gives :
-
-l2ping AA:AA:AA:AA:AA:04 (BD_ADDR of A)
-
-Ping: AA:AA:AA:AA:AA:04 from AA:AA:AA:AA:AA:05 (data size 44) ...
-
-no response from AA:AA:AA:AA:AA:04: id 0
-
-no response from AA:AA:AA:AA:AA:04: id 1
-
----------------------------------------------------------------------------------------------------------------------
-
-Question 1 : With this configuration (SCO and ACL links between A and B), why l2ping doesn't work ? 
-
-The ACL link can be used isn't it ?
-
-
-
-Question 2 : From the hci dump of each side, I notice that there is a difference between the information
-
-of the command and the OGF and OCF between the parenthesises. See below the hcidump results, the 
-
- red lines are those which give me a problem. At the "A" side, I send an "HCI_Setup_Asynchronous_Connection" and hcidump indicates an  "HCI_Accept_Synchronous_Connection". I get a similar problem in "B" side an "HCI_Reject_Synchronous_Connection " instead of an " HCI_Accept_Synchronous_Connection ".
-
-When you see the bluetooth spec :
-
-HCI_Setup_Asynchronous_Connection is OGF=0x01 and OCF=0x28 
-
-HCI_Accept_Synchronous_Connection is OGF=0x01 and OCF=0x29 
-
-HCI_Reject_Synchronous_Connection is OGF=0x01 and OCF=0x2A 
-
- 
-
-Do these differences are benign for the bluez stack or they can be the origine
-
-of my problem ??
-
-
-
-
-************************** HCI dump from "A" ***********************************************
-
-HCI sniffer - Bluetooth packet analyzer ver 1.30
-
+HCI sniffer - Bluetooth packet analyzer ver 1.18
 device: hci0 snap_len: 1028 filter: 0xffffffff
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-
-bdaddr AA:AA:AA:AA:AA:05 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
-
-> HCI Event: Command Status (0x0f) plen 4
-
-Create Connection (0x01|0x0005) status 0x00 ncmd 1
-
-> HCI Event: Connect Complete (0x03) plen 11
-
-status 0x00 handle 0 bdaddr AA:AA:AA:AA:AA:05 type ACL encrypt 0x00
-
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-
-handle 0 policy 0x0f
-
-Link policy: RSWITCH HOLD SNIFF PARK 
-
-> HCI Event: Command Complete (0x0e) plen 6
-
-Write Link Policy Settings (0x02|0x000d) ncmd 1
-
-status 0x00 handle 0
-
-< HCI Command: Accept Synchronous Connection (0x01|0x0028) plen 17
-
-handle 0
-
-40 1F 00 00 40 1F 00 00 FF FF C1 01 00 04 00 
-
-> HCI Event: Max Slots Change (0x1b) plen 3
-
-handle 0 slots 5
-
-> HCI Event: Command Status (0x0f) plen 4
-
-Accept Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
-
-> HCI Event: Synchronous Connect Complete (0x2c) plen 17
-
-status 0x00 handle 256 bdaddr AA:AA:AA:AA:AA:05 type SCO
-
-Air mode: u-law log
-
-************************** HCI dump from "B" ***********************************************
-
-
-HCI sniffer - Bluetooth packet analyzer ver 1.30
-
-device: hci0 snap_len: 1028 filter: 0xffffffff
-
 > HCI Event: Connect Request (0x04) plen 10
-
-bdaddr AA:AA:AA:AA:AA:04 class 0x3e0100 type ACL
-
+    bdaddr 00:16:B8:8D:EC:2B class 0x5a0204 type ACL
 < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-
-bdaddr AA:AA:AA:AA:AA:04 role 0x01
-
-Role: Slave
-
+    bdaddr 00:16:B8:8D:EC:2B role 0x01
+    Role: Slave
 > HCI Event: Command Status (0x0f) plen 4
-
-Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
-
+    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
 > HCI Event: Connect Complete (0x03) plen 11
-
-status 0x00 handle 0 bdaddr AA:AA:AA:AA:AA:04 type ACL encrypt 0x00
-
+    status 0x00 handle 6 bdaddr 00:16:B8:8D:EC:2B type ACL encrypt 0x00
 < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-
-handle 0 policy 0x0f
-
-Link policy: RSWITCH HOLD SNIFF PARK 
-
+    handle 6 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK 
 > HCI Event: Command Complete (0x0e) plen 6
-
-Write Link Policy Settings (0x02|0x000d) ncmd 1
-
-status 0x00 handle 0
-
+    Write Link Policy Settings (0x02|0x000d) ncmd 1
+    status 0x00 handle 6
 < HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
-
-handle 0 ptype 0xcc18
-
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
-
+    handle 6 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
+  0000: 06 00 18 cc                                       ....
 > HCI Event: Command Status (0x0f) plen 4
-
-Change Connection Packet Type (0x01|0x000f) status 0x00 ncmd 1
-
-> HCI Event: Connection Packet Type Changed (0x1d) plen 5
-
-status 0x00 handle 0 ptype 0x0018
-
-Packet type: DM1 DH1 
-
+    Change Connection Packet Type (0x01|0x000f) status 0x0c ncmd 1
+    Error: Command Disallowed
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:16:B8:8D:EC:2B clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:16:B8:8D:EC:2B clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x17 ncmd 1
+    Error: Pairing Not Allowed
+> HCI Event: Max Slots Change (0x1b) plen 3
+  0000: 06 00 05                                          ...
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:16:B8:8D:EC:2B name 'perja K800i'
+> ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+< ACL data: handle 6 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+      Connection successful
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6
+> ACL data: handle 6 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 1500 
+< ACL data: handle 6 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+< ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6
+> ACL data: handle 6 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+> ACL data: handle 6 flags 0x02 dlen 50
+    L2CAP(d): cid 0x0040 len 46 [psm 1]
+        SDP SSA Req: tid 0x1 len 0x29
+          pat uuid-128 c111b111-1111-111a-e113-1111df117112
+          max 1500
+          aid(s) 0x0000 (SrvRecHndl) 0x0001 (SrvClassIDList) 0x0002 (SrvRecState) 0x0003 (SrvID) 0x0004 (ProtocolDescList)
+          cont 00
+< ACL data: handle 6 flags 0x02 dlen 112
+    L2CAP(d): cid 0x0040 len 108 [psm 1]
+        SDP SSA Rsp: tid 0x1 len 0x67
+          count 100
+          record #0
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x10002
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-128 c111b111-1111-111a-e113-1111df117112 >
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) > <
+                 uuid-16 0x0003 (RFCOMM) uint 0x1 > >
+          record #1
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x10003
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-128 c111b111-1111-111a-e113-1111df117112 >
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) > <
+                 uuid-16 0x0003 (RFCOMM) uint 0x1 > >
+          cont 00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6
+> ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+< ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 6 reason 0x13
+    Reason: Remote User Teminated Connection
 > HCI Event: Connect Request (0x04) plen 10
-
-bdaddr AA:AA:AA:AA:AA:04 class 0x3e0100 type SCO
-
+    bdaddr 00:16:B8:8D:EC:2B class 0x5a0204 type ACL
 < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-
-bdaddr AA:AA:AA:AA:AA:04 role 0x01
-
-Role: Slave
-
+    bdaddr 00:16:B8:8D:EC:2B role 0x01
+    Role: Slave
 > HCI Event: Command Status (0x0f) plen 4
-
-Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
-
-< HCI Command: Reject Synchronous Connection (0x01|0x0029) plen 21
-
-bdaddr AA:AA:AA:AA:AA:04
-
-FF FF FF FF FF FF FF FF FF FF C1 01 FF 04 00 
-
+    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 7 bdaddr 00:16:B8:8D:EC:2B type ACL encrypt 0x00
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 7 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK 
+> HCI Event: Command Complete (0x0e) plen 6
+    Write Link Policy Settings (0x02|0x000d) ncmd 1
+    status 0x00 handle 7
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+    handle 7 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
+  0000: 07 00 18 cc                                       ....
 > HCI Event: Command Status (0x0f) plen 4
+    Change Connection Packet Type (0x01|0x000f) status 0x0c ncmd 1
+    Error: Command Disallowed
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:16:B8:8D:EC:2B clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:16:B8:8D:EC:2B clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x17 ncmd 1
+    Error: Pairing Not Allowed
+> HCI Event: Max Slots Change (0x1b) plen 3
+  0000: 07 00 05                                          ...
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:16:B8:8D:EC:2B name 'perja K800i'
+> ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< ACL data: handle 7 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+      Connection successful
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 7
+> ACL data: handle 7 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 1012 
+< ACL data: handle 7 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+< ACL data: handle 7 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 1024 
+> ACL data: handle 7 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+> ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c 
+< ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 7
+> ACL data: handle 7 flags 0x02 dlen 19
+    L2CAP(d): cid 0x0040 len 15 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 2 frame_type 0 credit_flow 15 pri 0 ack_timer 0
+      frame_size 1007 max_retrans 0 credits 7
+< ACL data: handle 7 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 2 frame_type 0 credit_flow 14 pri 0 ack_timer 0
+      frame_size 1007 max_retrans 0 credits 7
+> ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59 
+< ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92 
+< ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 7
+> ACL data: handle 7 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 1 ilen 0 fcs 0x86 credits 13
+> ACL data: handle 7 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0040 len 9 [psm 3]
+      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 1 len 10
+< ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
+> ACL data: handle 7 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0040 len 9 [psm 3]
+      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 1 len 10
+< ACL data: handle 7 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 33
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:16:B8:8D:EC:2B clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): RPN CMD: cr 1 dlci 0 pf 0 ilen 3 fcs 0x70 mcc_len 1
+      dlci 2 br 112 db 0 sb 0 p 0 pt 3 xi 1 xo 1
+      rtri 1 rtro 1 rtci 0 rtco 1 xon 3 xoff 0 pm 0xaa07
+< ACL data: handle 7 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): RPN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 2 br 7 db 3 sb 0 p 0 pt 0 xi 0 xo 0
+      rtri 0 rtro 0 rtci 0 rtco 0 xon 17 xoff 19 pm 0x3f7f
+> ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): RPN CMD: cr 1 dlci 0 pf 0 ilen 3 fcs 0x70 mcc_len 1
+      dlci 2 br 112 db 0 sb 0 p 0 pt 0 xi 1 xo 0
+      rtri 0 rtro 0 rtci 1 rtco 0 xon 19 xoff 127 pm 0xaa3f
+< ACL data: handle 7 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): RPN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 2 br 7 db 3 sb 0 p 0 pt 0 xi 0 xo 0
+      rtri 0 rtro 0 rtci 0 rtco 0 xon 17 xoff 19 pm 0x3f7f
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 7
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:16:B8:8D:EC:2B name 'perja K800i'
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 7
+> ACL data: handle 7 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0040 len 10 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 5 fcs 0x9a 
+      0000: 00 03 65 6e 64                                    ..end
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:16:B8:8D:EC:2B clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8 
+< ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92 
+< ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 0 dlci 0 pf 1 ilen 0 fcs 0x9c 
+< ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:16:B8:8D:EC:2B name 'perja K800i'
+> ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd 
+> ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 0 dlci 0 pf 1 ilen 0 fcs 0xb6 
+> ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 7
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 7 reason 0x13
+    Reason: Remote User Teminated Connection
 
-Reject Synchronous Connection (0x01|0x0029) status 0x00 ncmd 1
+--=-7vO7eGG6ZB85r9BMWh0g
+Content-Disposition: attachment; filename=hcidump-2
+Content-Type: text/plain; name=hcidump-2; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-> HCI Event: Synchronous Connect Complete (0x2c) plen 17
+HCI sniffer - Bluetooth packet analyzer ver 1.18
+device: hci0 snap_len: 1028 filter: 0xffffffff
+> HCI Event: Connect Request (0x04) plen 10
+    bdaddr 00:16:B8:8D:EC:2B class 0x5a0204 type ACL
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+    bdaddr 00:16:B8:8D:EC:2B role 0x01
+    Role: Slave
+> HCI Event: Command Status (0x0f) plen 4
+    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 6 bdaddr 00:16:B8:8D:EC:2B type ACL encrypt 0x00
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 6 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK 
+> HCI Event: Command Complete (0x0e) plen 6
+    Write Link Policy Settings (0x02|0x000d) ncmd 1
+    status 0x00 handle 6
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+    handle 6 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
+  0000: 06 00 18 cc                                       ....
+> HCI Event: Command Status (0x0f) plen 4
+    Change Connection Packet Type (0x01|0x000f) status 0x0c ncmd 1
+    Error: Command Disallowed
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:16:B8:8D:EC:2B clkoffset 0x0000
+> HCI Event: Max Slots Change (0x1b) plen 3
+  0000: 06 00 05                                          ...
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:16:B8:8D:EC:2B clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x17 ncmd 1
+    Error: Pairing Not Allowed
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:16:B8:8D:EC:2B name 'perja K800i'
+> ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+< ACL data: handle 6 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+      Connection successful
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6
+> ACL data: handle 6 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 1500 
+< ACL data: handle 6 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+< ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6
+> ACL data: handle 6 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+> ACL data: handle 6 flags 0x02 dlen 50
+    L2CAP(d): cid 0x0040 len 46 [psm 1]
+        SDP SSA Req: tid 0x1 len 0x29
+          pat uuid-128 c111b111-1111-111a-e113-1111df117112
+          max 1500
+          aid(s) 0x0000 (SrvRecHndl) 0x0001 (SrvClassIDList) 0x0002 (SrvRecState) 0x0003 (SrvID) 0x0004 (ProtocolDescList)
+          cont 00
+< ACL data: handle 6 flags 0x02 dlen 112
+    L2CAP(d): cid 0x0040 len 108 [psm 1]
+        SDP SSA Rsp: tid 0x1 len 0x67
+          count 100
+          record #0
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x10002
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-128 c111b111-1111-111a-e113-1111df117112 >
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) > <
+                 uuid-16 0x0003 (RFCOMM) uint 0x1 > >
+          record #1
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x10003
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-128 c111b111-1111-111a-e113-1111df117112 >
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) > <
+                 uuid-16 0x0003 (RFCOMM) uint 0x1 > >
+          cont 00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6
+> ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+< ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 6 reason 0x13
+    Reason: Remote User Teminated Connection
+> HCI Event: Connect Request (0x04) plen 10
+    bdaddr 00:16:B8:8D:EC:2B class 0x5a0204 type ACL
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+    bdaddr 00:16:B8:8D:EC:2B role 0x01
+    Role: Slave
+> HCI Event: Command Status (0x0f) plen 4
+    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 7 bdaddr 00:16:B8:8D:EC:2B type ACL encrypt 0x00
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 7 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK 
+> HCI Event: Command Complete (0x0e) plen 6
+    Write Link Policy Settings (0x02|0x000d) ncmd 1
+    status 0x00 handle 7
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+    handle 7 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
+  0000: 07 00 18 cc                                       ....
+> HCI Event: Command Status (0x0f) plen 4
+    Change Connection Packet Type (0x01|0x000f) status 0x0c ncmd 1
+    Error: Command Disallowed
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:16:B8:8D:EC:2B clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:16:B8:8D:EC:2B clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x17 ncmd 1
+    Error: Pairing Not Allowed
+> HCI Event: Max Slots Change (0x1b) plen 3
+  0000: 07 00 05                                          ...
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:16:B8:8D:EC:2B name 'perja K800i'
+> ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< ACL data: handle 7 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+      Connection successful
+> ACL data: handle 7 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 1012 
+< ACL data: handle 7 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+< ACL data: handle 7 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 1024 
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 7
+> ACL data: handle 7 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+> ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c 
+< ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 7
+> ACL data: handle 7 flags 0x02 dlen 19
+    L2CAP(d): cid 0x0040 len 15 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 2 frame_type 0 credit_flow 15 pri 0 ack_timer 0
+      frame_size 1007 max_retrans 0 credits 7
+< ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73 
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 7
+> ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd 
+< ACL data: handle 7 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
+> ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+< ACL data: handle 7 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 7
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 7 reason 0x13
+    Reason: Remote User Teminated Connection
 
-status 0x00 handle 256 bdaddr AA:AA:AA:AA:AA:04 type SCO
-
-Air mode: u-law log
-
-
-
-Question 3 : The event "Synchronous Connect Complete" gives the handle of the SCO link
-
-in my case the handle value is 256. But when you see upside the hcitool
-
-con result gives a handle 0 ? Is it normal ? 
-
-
-Question 4 : Here's my software configurations : hcidump 1.30 bluez-libs-2.25 bluez-utils-2.25 linux-debian 2.6.12.2 with an ARM target 
-
-
-
-As I have to keep the kernel 2.6.12.2, with wich higher version of bluez-libs, bluez-utils and hcidump can I use to be compliant with my kernel ? 
-
-
-
-Thanks to all for any suggestions..
-
-warm regards
-
-Michel
-
----------------------------------------------------------------------------------------------------------------------
-
-the result of an "hciconfig -a" is :
-
-hci0: Type: UART
-
-BD Address: AA:AA:AA:AA:AA:04 ACL MTU: 339:8 SCO MTU: 180:8
-
-UP RUNNING PSCAN ISCAN
-
-RX bytes:522 acl:0 sco:0 events:61 errors:0
-
-TX bytes:1367 acl:15 sco:0 commands:26 errors:0
-
-Features: 0xff 0xff 0xbd 0xf8 0x1b 0x18 0x00 0x80
-
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-
-Link policy: RSWITCH HOLD SNIFF PARK
-
-Link mode: SLAVE ACCEPT
-
-Name: 'BlueZ (0)'
-
-Class: 0x3e0100
-
-Service Classes: Networking, Rendering, Capturing
-
-Device Class: Computer, Uncategorized
-
-HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0xc
-
-Manufacturer: Newlogic (23)
-
----------------------------------------------------------------------------------------------------------------------------
-
---Boundary_(ID_zePGruFG2hWBUJk5IMxZDA)
-Content-type: text/html; charset=iso-8859-1
-Content-transfer-encoding: 7BIT
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=Content-Type content="text/html; charset=iso-8859-1">
-<META content="MSHTML 6.00.2800.1106" name=GENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=#ffffff>
-<DIV><FONT face=Arial size=2><FONT size=2>
-<P>Hi all,</P>
-<P>my goal is to use an ACL link when an SCO link is established.</P>
-<P>I work with two bluetooth development kits from Semtech-Xemics (SE1441). </P>
-<P>They are compliant Bluetooth v1.2. For the following explanations, one kit is 
-noted "A" and the other "B".</P>
-<P>1) First, I create an ACL link between "A" and "B" with : hcitool cc BD_ADDR 
-of "B",</P>
-<P>2) Once the ACL link is done, "A" execute an 
-"HCI_Setup_Synchronous_Connection" command to "B",</P>
-<P>3) At the event of an SCO request connection, "B" respond with an 
-"HCI_Accept_Synchronous_Connection_Request" command.</P>
-<P>4) When the SCO link is established, a "Synchronous Connection Complete" HCI 
-event is visible from the hci layer of each kit.</P>
-<P>the "hcitool con" gives :</P></FONT><FONT face="Courier New" size=2>
-<P>&gt; SCO AA:AA:AA:AA:AA:04 handle 0 state 5 lm SLAVE</P>
-<P>&gt; ACL AA:AA:AA:AA:AA:04 handle 0 state 1 lm SLAVE</P></FONT><FONT size=2>
-<P>&nbsp;</P>
-<P>5) I try to use the ACL link with a l2ping command from B to A</P>
-<P>the l2ping command gives :</P></FONT><FONT face="Courier New" size=2>
-<P>l2ping AA:AA:AA:AA:AA:04 (BD_ADDR of A)</P>
-<P>Ping: AA:AA:AA:AA:AA:04 from AA:AA:AA:AA:AA:05 (data size 44) ...</P>
-<P>no response from AA:AA:AA:AA:AA:04: id 0</P>
-<P>no response from AA:AA:AA:AA:AA:04: id 1</P></FONT><FONT size=2>
-<P>---------------------------------------------------------------------------------------------------------------------</P></FONT><FONT 
-color=#0000ff size=2>
-<P>Question 1 : With this configuration (SCO and ACL links between A and B), why 
-l2ping doesn't work ? </P>
-<P>The ACL link can be used isn't it ?</P></FONT><FONT size=2>
-<P>&nbsp;</P></FONT><FONT color=#0000ff size=2>
-<P>Question 2 : From the hci dump of each side, I notice that there is a 
-difference between the information</P>
-<P>of the command and the OGF and OCF between the parenthesises. See below the 
-hcidump results, the </P>
-<P>&nbsp;red lines are those which give me a problem. At the "A" side, I send an 
-"HCI_Setup_Asynchronous_Connection" and hcidump 
-indicates&nbsp;an&nbsp;&nbsp;"HCI_Accept_Synchronous_Connection". I&nbsp;get a 
-similar problem in "B" side an "HCI_Reject_Synchronous_Connection&nbsp;" instead 
-of an "&nbsp;HCI_Accept_Synchronous_Connection ".</P>
-<P>When you see the bluetooth spec :</P>
-<P>HCI_Setup_Asynchronous_Connection is OGF=0x01 and OCF=0x28 </P>
-<P>HCI_Accept_Synchronous_Connection is OGF=0x01 and OCF=0x29 </P>
-<P>HCI_Reject_Synchronous_Connection is OGF=0x01 and OCF=0x2A&nbsp;</P>
-<P>&nbsp;</P>
-<P>Do&nbsp;these differences are benign for the bluez stack or they can be the 
-origine</P>
-<P>of my problem ??</P></FONT><FONT size=2>
-<P></P>
-<P>&nbsp;</P>
-<P>************************** HCI dump from "A" 
-***********************************************</P></FONT><FONT 
-face="Courier New" size=2>
-<P>HCI sniffer - Bluetooth packet analyzer ver 1.30</P>
-<P>device: hci0 snap_len: 1028 filter: 0xffffffff</P>
-<P>&lt; HCI Command: Create Connection (0x01|0x0005) plen 13</P>
-<P>bdaddr AA:AA:AA:AA:AA:05 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000</P>
-<P>Packet type: DM1 DM3 DM5 DH1 DH3 DH5 </P>
-<P>&gt; HCI Event: Command Status (0x0f) plen 4</P>
-<P>Create Connection (0x01|0x0005) status 0x00 ncmd 1</P>
-<P>&gt; HCI Event: Connect Complete (0x03) plen 11</P>
-<P>status 0x00 handle 0 bdaddr AA:AA:AA:AA:AA:05 type ACL encrypt 0x00</P>
-<P>&lt; HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4</P>
-<P>handle 0 policy 0x0f</P>
-<P>Link policy: RSWITCH HOLD SNIFF PARK </P>
-<P>&gt; HCI Event: Command Complete (0x0e) plen 6</P>
-<P>Write Link Policy Settings (0x02|0x000d) ncmd 1</P>
-<P>status 0x00 handle 0</P>
-<P>&lt; </FONT><FONT face="Courier New" color=#ff0000 size=2>HCI Command: Accept 
-Synchronous Connection (0x01|0x0028) plen 17</P>
-<P>handle 0</P></FONT><FONT face="Courier New" size=2>
-<P>40 1F 00 00 40 1F 00 00 FF FF C1 01 00 04 00 </P>
-<P>&gt; HCI Event: Max Slots Change (0x1b) plen 3</P>
-<P>handle 0 slots 5</P>
-<P>&gt; HCI Event: Command Status (0x0f) plen 4</P>
-<P>Accept Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1</P>
-<P>&gt; HCI Event: Synchronous Connect Complete (0x2c) plen 17</P>
-<P>status 0x00 handle 256 bdaddr AA:AA:AA:AA:AA:05 type SCO</P>
-<P>Air mode: u-law log</P></FONT><FONT size=2>
-<P>************************** HCI dump from "B" 
-***********************************************</P>
-<P></P>
-<P></FONT><FONT face="Courier New" size=2>HCI sniffer - Bluetooth packet 
-analyzer ver 1.30</P>
-<P>device: hci0 snap_len: 1028 filter: 0xffffffff</P>
-<P>&gt; HCI Event: Connect Request (0x04) plen 10</P>
-<P>bdaddr AA:AA:AA:AA:AA:04 class 0x3e0100 type ACL</P>
-<P>&lt; HCI Command: Accept Connection Request (0x01|0x0009) plen 7</P>
-<P>bdaddr AA:AA:AA:AA:AA:04 role 0x01</P>
-<P>Role: Slave</P>
-<P>&gt; HCI Event: Command Status (0x0f) plen 4</P>
-<P>Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1</P>
-<P>&gt; HCI Event: Connect Complete (0x03) plen 11</P>
-<P>status 0x00 handle 0 bdaddr AA:AA:AA:AA:AA:04 type ACL encrypt 0x00</P>
-<P>&lt; HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4</P>
-<P>handle 0 policy 0x0f</P>
-<P>Link policy: RSWITCH HOLD SNIFF PARK </P>
-<P>&gt; HCI Event: Command Complete (0x0e) plen 6</P>
-<P>Write Link Policy Settings (0x02|0x000d) ncmd 1</P>
-<P>status 0x00 handle 0</P>
-<P>&lt; HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4</P>
-<P>handle 0 ptype 0xcc18</P>
-<P>Packet type: DM1 DM3 DM5 DH1 DH3 DH5 </P>
-<P>&gt; HCI Event: Command Status (0x0f) plen 4</P>
-<P>Change Connection Packet Type (0x01|0x000f) status 0x00 ncmd 1</P>
-<P>&gt; HCI Event: Connection Packet Type Changed (0x1d) plen 5</P>
-<P>status 0x00 handle 0 ptype 0x0018</P>
-<P>Packet type: DM1 DH1 </P>
-<P>&gt; HCI Event: Connect Request (0x04) plen 10</P>
-<P>bdaddr AA:AA:AA:AA:AA:04 class 0x3e0100 type SCO</P>
-<P>&lt; HCI Command: Accept Connection Request (0x01|0x0009) plen 7</P>
-<P>bdaddr AA:AA:AA:AA:AA:04 role 0x01</P>
-<P>Role: Slave</P>
-<P>&gt; HCI Event: Command Status (0x0f) plen 4</P>
-<P>Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1</P>
-<P>&lt; </FONT><FONT face="Courier New" color=#ff0000 size=2>HCI Command: Reject 
-Synchronous Connection (0x01|0x0029) plen 21</P></FONT><FONT face="Courier New" 
-size=2>
-<P>bdaddr AA:AA:AA:AA:AA:04</P>
-<P>FF FF FF FF FF FF FF FF FF FF C1 01 FF 04 00 </P>
-<P>&gt; HCI Event: Command Status (0x0f) plen 4</P>
-<P>Reject Synchronous Connection (0x01|0x0029) status 0x00 ncmd 1</P>
-<P>&gt; HCI Event: Synchronous Connect Complete (0x2c) plen 17</P>
-<P>status 0x00 handle 256 bdaddr AA:AA:AA:AA:AA:04 type SCO</P>
-<P>Air mode: u-law log</P></FONT><FONT size=2>
-<P>&nbsp;</P></FONT><FONT color=#0000ff size=2>
-<P>Question 3 : The event "</FONT><FONT face="Courier New" color=#0000ff 
-size=2>Synchronous Connect Complete" gives the handle of the SCO link</P>
-<P>in my case the handle value is 256. But when you see upside the hcitool</P>
-<P>con result gives a handle 0 ? Is it normal ? </P></FONT><FONT 
-face="Courier New" size=2>
-<P></FONT><FONT size=2></P></FONT><FONT color=#0000ff size=2>
-<P>Question 4 : Here's my software configurations : hcidump 1.30 bluez-libs-2.25 
-bluez-utils-2.25 linux-debian 2.6.12.2 with an ARM target </P></FONT><FONT 
-size=2>
-<P>&nbsp;</P></FONT><FONT color=#0000ff size=2>
-<P>As I have to&nbsp;keep the kernel 2.6.12.2, with wich higher version of 
-bluez-libs, bluez-utils and hcidump can I use to be compliant with my kernel ? 
-</P></FONT><FONT size=2>
-<P>&nbsp;</P>
-<P>Thanks to all for any suggestions..</P>
-<P>warm regards</P>
-<P>Michel</P>
-<P>---------------------------------------------------------------------------------------------------------------------</P>
-<P>the result of an "hciconfig -a" is :</P></FONT><FONT face="Courier New" 
-size=2>
-<P>hci0: Type: UART</P>
-<P>BD Address: AA:AA:AA:AA:AA:04 ACL MTU: 339:8 SCO MTU: 180:8</P>
-<P>UP RUNNING PSCAN ISCAN</P>
-<P>RX bytes:522 acl:0 sco:0 events:61 errors:0</P>
-<P>TX bytes:1367 acl:15 sco:0 commands:26 errors:0</P>
-<P>Features: 0xff 0xff 0xbd 0xf8 0x1b 0x18 0x00 0x80</P>
-<P>Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3</P>
-<P>Link policy: RSWITCH HOLD SNIFF PARK</P>
-<P>Link mode: SLAVE ACCEPT</P>
-<P>Name: 'BlueZ (0)'</P>
-<P>Class: 0x3e0100</P>
-<P>Service Classes: Networking, Rendering, Capturing</P>
-<P>Device Class: Computer, Uncategorized</P>
-<P>HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0xc</P>
-<P>Manufacturer: Newlogic (23)</P></FONT><FONT size=2>
-<P>---------------------------------------------------------------------------------------------------------------------------</P></FONT></FONT></DIV></BODY></HTML>
-
---Boundary_(ID_zePGruFG2hWBUJk5IMxZDA)--
-
-
---===============1361897382==
+--=-7vO7eGG6ZB85r9BMWh0g
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -478,7 +506,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1361897382==
+--=-7vO7eGG6ZB85r9BMWh0g
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -489,4 +517,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1361897382==--
+--=-7vO7eGG6ZB85r9BMWh0g--
