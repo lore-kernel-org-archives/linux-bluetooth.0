@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4523A57A.4020709@vasmac.com>
-Date: Wed, 04 Oct 2006 08:13:46 -0400
+Message-ID: <4523A257.60007@vasmac.com>
+Date: Wed, 04 Oct 2006 08:00:23 -0400
 From: Jose Vasconcellos <jose@vasmac.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <4521DCC4.6090705@vasmac.com>	<e1effdeb0610030954o50ef2d6elf25e77e3a85737ac@mail.gmail.com>	<e1effdeb0610031048i3e290d5cu59f3d8670627d8b2@mail.gmail.com>	<4523113E.4000608@vasmac.com>
-	<1159950383.1601.3.camel@localhost>
-In-Reply-To: <1159950383.1601.3.camel@localhost>
-Subject: Re: [Bluez-devel] Error: Authentication Failure
+References: <4521B775.6040001@gmail.com> <1159950826.1601.11.camel@localhost>
+In-Reply-To: <1159950826.1601.11.camel@localhost>
+Subject: Re: [Bluez-devel] SCO packet processing
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,33 +21,60 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Marcel Holtmann wrote:
-...
->>> It's pretty easy to reproduce. I've tried with two USB dongles
->>> (CSR & Broadcom) and different headsets. Connect a device
->>> on Linux, then take the device and dongle and connect on
->>> Windows; when you go back with both to Linux you get this
->>> problem.
->>>
->>> You are right that one can remove the bonding manually but
->>> this is not obvious to the uninitiated and it requires a manual
->>> step. Plus, the message presented to the application is
->>> typically "Record not found" if the first connection is an SDP
->>> lookup.
->>>
->>> Perhaps in security.c in utils/hcid, the routine conn_complete
->>> should delete the cached entry if there's an error.
->>>       
+> Hi Jose,
 >
-> this is not an option, because it will be a security risk. We have to
-> keep the old key until we actually generated a new one or someone
-> deleted the old one. The only think that is possible it too improve the
-> error message.
+>   
+>> I've been studying the SCO packet processing to understand how it works.
+>> There are a few things that I noticed that don't seem quite right. I'll 
+>> attempt
+>> to explain.
+>>
+>> In the SCO transmit path, data gets put in a skb and then queued. There's
+>> a tasklet that will dequeue and send the skb to the hci driver. This tasklet
+>> is scheduled when data needs to be sent or when there's a HCI event
+>> HCI_EV_NUM_COMP_PKTS. This works fine for an ACL link and it could work
+>> for a non-USB SCO transport. However, for USB HCI, the SCO data is carried
+>> by the isochronous transport that doesn't require explicit flow control. The
+>> problem is that the current code (hci_sched_sco in hci_core.c) will send all
+>> packets to the hci layer with no flow control. That explains why application
+>> kludges have been introduced to avoid loosing packets.
+>>
+>> Note that for non-USB links (i.e. UART), the current code is not correct
+>> either as it doesn't enable HCI_EV_NUM_COMP_PKTS anywhere. Also,
+>> the value of hdev->sco_cnt is never decremented.
+>>
+>> Last May, Fabien Chevalier posted some patches to avoid this problem.
+>> His approach of using timers didn't work for me but I think this is the 
+>> wrong
+>> way to go about it. What is needed is a proper flow control mechanism 
+>> between
+>> the bluetooth module and the hci layer for the case of USB HCI transport.
+>> I'm thinking that a callback is necessary that is invoked by hci_usb to
+>> kickstart the process.
+>>
+>> I also have issues with hci_sched_sco. I think it should interleave skb from
+>> different active SCO sockets. Currently, it sends too many skbs from the
+>> same socket flooding the dongle's buffers and potentially starving other
+>> SCO channels.
+>>
+>> I realize SCO handling has not been a priority and it sort of works.
+>> Is there much interest in getting it right?
+>>     
 >
-> These are also known errors and you can even switch BlueZ into a pairing
-> once mode. This is because device should implement a pairing mode. That
-> means that will never accept a pairing if they are not in that mode. So
-> if the link key is a wrong one, it simply rejects the connection instead
-> of starting a new pairing process.
+> I am not actively gonna work on it, but I am going to review and test
+> your patches to make it better.
+>
+> First of all, the HCI drivers are stupid and that is meant to be,
+> because they are only transport drivers. This means if the scheduling of
+> SCO packets in the core is wrong, then we should fix it there. However
+> no driver should overflood the Bluetooth core with too many packets
+> anyway, but the core should be able to handle it and maybe simple drop
+> some packets.
+>
+> For the actual improvement, I don't seen any need of another callback in
+> the core or the drivers. If SCO packets need a different sending path,
+> then we are have too implement one. So please go ahead and propose
+> something.
 >
 > Regards
 >
@@ -56,14 +82,18 @@ Marcel Holtmann wrote:
 >   
 Hi Marcel,
 
-I'm not familiar with the security issues; that is not my focus.
-I game a suggestion based on a cursory look at the source code.
-There is a problem here and it looks like the Windows
-environment can cope with this but Bluez can't. Granted this
-is not very common condition.
+Thanks for your input. I'm slowly working on a patch.
+
+I'm considering some kind of callback mechanism from hci_usb
+because the bluetooth core doesn't get any feedback from the
+hci_usb. In the case of hci_uart, the core should enable synchronous
+flow control to get this feedback, then the flow control would
+work the same as for ACL data. Note that I have no plans to work
+on any support for non-hci_usb devices as I don't have any.
+
+Regards,
 
 Jose
-
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
