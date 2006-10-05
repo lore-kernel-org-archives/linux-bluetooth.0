@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20061005162110.A9D22209C98@mrelay2.st2.lyceu.net>
-References: <20061005162110.A9D22209C98@mrelay2.st2.lyceu.net>
-Date: Thu, 05 Oct 2006 18:30:03 +0200
-Message-Id: <1160065803.29227.1.camel@localhost>
-Mime-Version: 1.0
+From: "Delgado, Monica (ERZIA)" <monica.delgado@erzia.com>
+To: <bluez-users@lists.sourceforge.net>
+Date: Thu, 5 Oct 2006 18:23:20 +0200
+MIME-Version: 1.0
+In-Reply-To: <mailman.52831.1160008210.16222.bluez-users@lists.sourceforge.net>
+Message-Id: <20061005162110.A9D22209C98@mrelay2.st2.lyceu.net>
 Subject: Re: [Bluez-users] PAND Network
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -16,53 +15,81 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGkgTW9uaWNhLAoKPiAgPiBJ4oCZbSB0cnlpbmcgdG8gY29uZmlndXJlIGEgUEFOIG5ldHdvcmsg
-YW5kIEkgaGF2ZSBhIHByb2JsZW0gaW4gdGhpcwo+ICA+IHNwZWNpZmljIHNjZW5hcmlvOgo+ICA+
-IAo+ICA+ICAgICAgICAgICAgIC1JIGhhdmUgb25lIEJUIGRldmljZSAgKEJUMSkgY29ubmVjdGVk
-IHRvIGEgbGludXggUEMsCj4gID4gd2hpY2ggaXMgY29uZmlndXJlZCBhcyBtYXN0ZXIKPiAgPiAK
-PiAgPiAgICAgICAgICAgICAtSSBoYXZlIHR3byBCVCBkZXZpY2VzIG1vcmUgY29ubmVjdGVkIHRv
-IGFub3RoZXIgTGludXggUEMsCj4gID4gaW4gZGlmZmVyZW50IFVTQiBwb3J0cyAoIEJUMiwgQlQz
-KS4KPiAgPiAKPiAgPiBXaGVuIEkgY3JlYXRlIGEgcGFuIGNvbm5lY3Rpb24gYmV0d2VlbiBCVDIg
-YW5kIG1hc3RlciAoQlQxKSBldmVyeXRoaW5nCj4gID4gd29ya3Mgb2ssIGJ1dCB3aGVuIEkgdHJ5
-IHRvIGNyZWF0ZSBhIHNlY29uZCBjb25uZWN0aW9uIHRvIHRoZSBzYW1lCj4gID4gbWFzdGVyIGZy
-b20gdGhlIEJUIGRldmljZSBCVDMsIEkgZ2V0IHRoaXMgZXJyb3IKPiAgPiAKPiAgPiAgICAgICAg
-ICAgICDigJxGaWxlIGV4aXN0cyAoMTcp4oCdCj4gID4gCj4gID4gSSBoYXZlIHRyaWVkIHRvIGNv
-bmZpZ3VyZSBmaXJzdCBCVDMgYW5kIHNlY29uZCBCVDIgYW5kIEkgaGF2ZSBnb3QgdGhlCj4gID4g
-c2FtZSBlcnJvciB3aXRoIEJUMiwgd2hpY2ggbWVhbnMgdGhhdCBvbmx5IHRoZSBmaXJzdCBwYW4g
-Y29ubmVjdGlvbiBpcwo+ICA+IGNvbmZpZ3VyZWQgd2l0aG91dCBwcm9ibGVtcy4gCj4gID4gCj4g
-ID4gSXMgaXQgcG9zc2libGUgdG8gY3JlYXRlIHR3byBzaW11bHRhbmVvdXMgUEFOIGNvbm5lY3Rp
-b25zIGZyb20gdHdvIEJUCj4gID4gZGV2aWNlcyBjb25uZWN0ZWQgdG8gdGhlIHNhbWUgUEM/IEhh
-dmUgYW55b25lIG9mIHlvdSBldmVyIGRvbmUgaXQ/Cj4gIAo+ICA+Pj4+Pj4geWVzLCBidXQgeW91
-IG11c3Qgc3VyZSB0byB1c2UgInBhbmQgLWkgaGNpWCIgdG8gdXNlIHRoZSBjb3JyZWN0ICAgCj4g
-ID4+Pj4+PiBhZGFwdGVyIGZvciB0aGUgQk5FUCBjb25uZWN0aW9uLgo+IAo+IAo+IAo+IAo+IFRo
-YW5rIHlvdSB2ZXJ5IG11Y2ggZm9yIHlvdXIgYW5zd2VyLiBJJ20gY29uZmlndXJpbmcgdGhlIFBB
-TiBjb25uZWN0aW9uCj4gdXNpbmcgdGhlICJwYW5kIiBmdW5jdGlvbiBhcyB5b3Ugc2F5ICJwYW5k
-IC1pIGhjaVgiICwgYnV0IEkgc3RpbGwgZ2V0IHRoZQo+IHNhbWUgZXJyb3IuIEluIHNvbWUgbWVz
-c2FnZSBwb3N0ZWQgaW4gdGhpcyBmb3J1bSAoMzAtMDktMjAwMikgSSBoYXZlIHJlYWQKPiB0aGlz
-Ogo+IAo+IAo+ICJZb3UgY2Fubm90IGhhdmUgbW9yZSB0aGFuIG9uZSBCTkVQL1BBTgo+ICBjb25u
-ZWN0aW9uIHRvIHRoZSBfc2FtZV8gYmQgYWRkcmVzcy4gSW4gb3RoZXIgd29yZHMgdGhpcwo+ICAg
-ICAgICAgICBiZDphZDpkcjoxIC0tPiBiZDphZDpkcjoyIDwtLSBiZDphZDpkcjozCj4gIGlzIG5v
-dCBhbGxvd2VkIF9pZl8gYmQ6YWQ6ZHI6MSBhbmQgYmQ6YWQ6ZHI6MyBhcmUgb24gdGhlIHNhbWUg
-bWFjaGluZSAiCj4gCj4gCj4gVGhpcyBpcyBleGFjdGx5IG15IGNhc2UsIEkgaGF2ZSB0aGUgMiBz
-bGF2ZXMgaW4gdGhlIHNhbWUgbWFjaGluZSwgYW5kIHRoZXkKPiBib3RoIHRyeSB0byBjb25uZWN0
-IHRvIHRoZSBzYW1lIG1hc3RlciBkZXZpY2UuIEFzIHRoaXMgbWVzc2FnZSBpcyBxdWl0ZSBvbGQs
-Cj4gSSBkb24ndCBrbm93IGlmIHRoaXMgaXMgcmVhbCBub3dhZGF5cy4gSSdtIHVzaW5nIEZlZG9y
-YSBDb3JlIDQgaW4gYm90aCBQQydzLgoKdGhpcyBpcyBzdGlsbCB2YWxpZCwgYnV0IHlvdXIgY2Fz
-ZSBpcyBkaWZmZXJlbnQsIGJlY2F1c2UgeW91IGFyZSB1c2luZwp0d28gYWRhcHRlcnMuIEhvd2V2
-ZXIgeW91IG11c3QgbWFrZSBzdXJlIHRoYXQgdGhleSBhcmUgdXNlZC4gU28gbWFrZQpzdXJlIGZv
-ciBvbmUgY29ubmVjdGlvbiB5b3UgdXNlIGhjaTAgYW5kIGZvciB0aGUgb3RoZXIgaGNpMS4gQW5k
-IHlvdQptaWdodCB3YW5uYSBoYXZlICJoY2lkdW1wIC1pIGhjaVggLVggLVYiIHJ1bm5pbmcgdG8g
-c2VlIHRoZSBhY3R1YWwgZXJyb3IKbWVzc2FnZS4KClJlZ2FyZHMKCk1hcmNlbAoKCgotLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tClRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBv
-ZiBJVApKb2luIFNvdXJjZUZvcmdlLm5ldCdzIFRlY2hzYXkgcGFuZWwgYW5kIHlvdSdsbCBnZXQg
-dGhlIGNoYW5jZSB0byBzaGFyZSB5b3VyCm9waW5pb25zIG9uIElUICYgYnVzaW5lc3MgdG9waWNz
-IHRocm91Z2ggYnJpZWYgc3VydmV5cyAtLSBhbmQgZWFybiBjYXNoCmh0dHA6Ly93d3cudGVjaHNh
-eS5jb20vZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVYK
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotdXNl
-cnMgbWFpbGluZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczov
-L2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
+Hi Marcel,
+ =
+
+ > I=92m trying to configure a PAN network and I have a problem in this
+ > specific scenario:
+ > =
+
+ >             -I have one BT device  (BT1) connected to a linux PC,
+ > which is configured as master
+ > =
+
+ >             -I have two BT devices more connected to another Linux PC,
+ > in different USB ports ( BT2, BT3).
+ > =
+
+ > When I create a pan connection between BT2 and master (BT1) everything
+ > works ok, but when I try to create a second connection to the same
+ > master from the BT device BT3, I get this error
+ > =
+
+ >             =93File exists (17)=94
+ > =
+
+ > I have tried to configure first BT3 and second BT2 and I have got the
+ > same error with BT2, which means that only the first pan connection is
+ > configured without problems. =
+
+ > =
+
+ > Is it possible to create two simultaneous PAN connections from two BT
+ > devices connected to the same PC? Have anyone of you ever done it?
+ =
+
+ >>>>>> yes, but you must sure to use "pand -i hciX" to use the correct   =
+
+ >>>>>> adapter for the BNEP connection.
+
+
+
+
+Thank you very much for your answer. I'm configuring the PAN connection
+using the "pand" function as you say "pand -i hciX" , but I still get the
+same error. In some message posted in this forum (30-09-2002) I have read
+this:
+
+
+"You cannot have more than one BNEP/PAN
+ connection to the _same_ bd address. In other words this
+          bd:ad:dr:1 --> bd:ad:dr:2 <-- bd:ad:dr:3
+ is not allowed _if_ bd:ad:dr:1 and bd:ad:dr:3 are on the same machine "
+
+
+This is exactly my case, I have the 2 slaves in the same machine, and they
+both try to connect to the same master device. As this message is quite old,
+I don't know if this is real nowadays. I'm using Fedora Core 4 in both PC's.
+
+Thank you and best regards,   =
+
+
+
+M=F3nica Delgado =
+
+
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys -- and earn cash
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
