@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "Delgado, Monica (ERZIA)" <monica.delgado@erzia.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Thu, 5 Oct 2006 18:23:20 +0200
-MIME-Version: 1.0
-In-Reply-To: <mailman.52831.1160008210.16222.bluez-users@lists.sourceforge.net>
-Message-Id: <20061005162110.A9D22209C98@mrelay2.st2.lyceu.net>
-Subject: Re: [Bluez-users] PAND Network
+Date: Thu, 5 Oct 2006 08:27:59 -0300
+From: Cris <ml133@netpole.com.br>
+To: bluez-users@lists.sourceforge.net
+Message-Id: <20061005082759.76270976.ml133@netpole.com.br>
+In-Reply-To: <1160032959.15505.5.camel@localhost>
+References: <4910207664.20061004141916@magitech.org>
+	<20061004212955.cc67bc36.ml133@netpole.com.br>
+	<1160032959.15505.5.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Automatic Object Pushing when Devices Enter Range
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,80 +18,45 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel,
- =
+On Thu, 05 Oct 2006 09:22:39 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
- > I=92m trying to configure a PAN network and I have a problem in this
- > specific scenario:
- > =
+[...]
 
- >             -I have one BT device  (BT1) connected to a linux PC,
- > which is configured as master
- > =
+> The only sane way of doing this is over the D-Bus API
 
- >             -I have two BT devices more connected to another Linux PC,
- > in different USB ports ( BT2, BT3).
- > =
+[...]
 
- > When I create a pan connection between BT2 and master (BT1) everything
- > works ok, but when I try to create a second connection to the same
- > master from the BT device BT3, I get this error
- > =
+> The D-Bus is not as bad everybody tries to tell you. For the hcid for
+> example we only need the additional D-Bus library:
 
- >             =93File exists (17)=94
- > =
+Nobody told me, even when I asked (but I was told to be patient
+instead of getting an answer). This is my own conclusion after many
+weeks of work. Try to install and use dbus in 8 or 16 MB RAM system
+with about 300MB permanent storage. This is a small device, not a
+desktop.
 
- > I have tried to configure first BT3 and second BT2 and I have got the
- > same error with BT2, which means that only the first pan connection is
- > configured without problems. =
-
- > =
-
- > Is it possible to create two simultaneous PAN connections from two BT
- > devices connected to the same PC? Have anyone of you ever done it?
- =
-
- >>>>>> yes, but you must sure to use "pand -i hciX" to use the correct   =
-
- >>>>>> adapter for the BNEP connection.
-
-
-
-
-Thank you very much for your answer. I'm configuring the PAN connection
-using the "pand" function as you say "pand -i hciX" , but I still get the
-same error. In some message posted in this forum (30-09-2002) I have read
-this:
-
-
-"You cannot have more than one BNEP/PAN
- connection to the _same_ bd address. In other words this
-          bd:ad:dr:1 --> bd:ad:dr:2 <-- bd:ad:dr:3
- is not allowed _if_ bd:ad:dr:1 and bd:ad:dr:3 are on the same machine "
-
-
-This is exactly my case, I have the 2 slaves in the same machine, and they
-both try to connect to the same master device. As this message is quite old,
-I don't know if this is real nowadays. I'm using Fedora Core 4 in both PC's.
-
-Thank you and best regards,   =
-
-
-
-M=F3nica Delgado =
-
-
+What is sane about having a function block, doing nothing but waiting,
+sending requests back and forth with 3 daemons, and all those message
+queues and forked children, when everything can stay in a simple main
+loop? Even the use of glib doesn't make any sense here; glib's
+interface exists to be portable even with Windows. This is something
+you just can't afford on small systems. While all this makes sense in
+other contexts, bluetooth is clearly designed for small devices, where
+that is neither clean nor sane. Bluez userland is for desktop computers
+or higher, and up to v3.4 (I didn't see 3.5 yet) not appropriate when
+there is a need to use next to all what bluetooth has to offer,
+specially in terms of multitasking.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
