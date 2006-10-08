@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Reiner Klenk <pdq808@t-online.de>
-To: bluez-devel@lists.sourceforge.net
-Date: Sun, 08 Oct 2006 19:06:10 +0200
-Message-Id: <1160327171.13162.16.camel@grappa.nowhere.de>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <3f5a9ba20610072313w41cb4aa1qf0b5a21a7199f737@mail.gmail.com>
+References: <3f5a9ba20609291930r5b4e4c97g8b33901666fef491@mail.gmail.com>
+	<3f5a9ba20610020946v10c99300pee5cc04f3f2597e6@mail.gmail.com>
+	<1159972670.1601.25.camel@localhost>
+	<3f5a9ba20610072313w41cb4aa1qf0b5a21a7199f737@mail.gmail.com>
+Date: Sun, 08 Oct 2006 15:29:03 +0200
+Message-Id: <1160314144.4258.8.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] a2dpd not executing commands
+Subject: Re: [Bluez-devel] About the kernel 2.6.18
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,26 +23,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Greetings,
-I've been playing with my new Jabra BT620s over the weekend and things
-were going quite well. I can have it connected to a2dpd (amarok) and
-btsco (ekiga) at the same time. Here's something I don't understand:
-pressing one of the keys on the headphone does nothing. I inserted a
-couple of printf in a2dp_ipc.c and could verify that the commands are
-indeed received and a child is forked. The execlp call is not returning
-(as it should), nevertheless the specified command doesn't seem to get
-executed. I've double-checked my .a2dprc entries and verified that - run
-from a shell - they behave as expected. I put system(cmd); exit(0);
-instead of the execlp call and the buttons started to work. 
+Hi,
 
-Any idea why the execlp doesn't work? I'm on Ubuntu Dapper AMD64.
+>   I have rebuilt the 2.6.17, the speed is good. so, I don't know why
+> 2.6.18 makes the RFCOMM socket communication slower.
+> Who can have a try to compare the speed using different kernel ?
+> Need your nice help. :)
 
-Thanks,
-Reiner
- 
--- 
-Reiner Klenk
-debb1046 (jabber.org, ekiga.net, gmail.com, last.fm)
+do you have a nice and simple test program and some results of your
+testing. I like to run it by myself.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
