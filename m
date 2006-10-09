@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <3ac7eec00610101556h7658f9ccvef435b7b33f53b5b@mail.gmail.com>
-Date: Wed, 11 Oct 2006 00:56:58 +0200
-From: "Maik Barz" <barzille@googlemail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200609161727.44085.cijoml@volny.cz>
+Message-ID: <7d3798db0610090212w7a14212fn76f7e6646e56e873@mail.gmail.com>
+Date: Mon, 9 Oct 2006 11:12:18 +0200
+From: "=?ISO-8859-1?Q?Robert_Dahlstr=F6m?=" <robert.dahlstrom.4007@student.uu.se>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-References: <3ac7eec00608300143q7cb7a371n87179b310b6dfc80@mail.gmail.com>
-	<200609161727.44085.cijoml@volny.cz>
-Subject: Re: [Bluez-users] Microsoft Intellimouse Explorer for Bluetooth
-	Sidebuttons and scrollwheel
+Subject: [Bluez-users] A few more RFCOMM questions
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,183 +14,108 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1467488079=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1467488079==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_24261_15990306.1160521018845"
+Thanks for all earlier replies that cleared things up a lot for me. I
+still have a few questions about the Serial Port profile though:
 
-------=_Part_24261_15990306.1160521018845
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+After registering a Serial Port profile with sdpd successfully, do I
+also need to create a RFCOMM tty to be able to communicate with it? I
+have not fully understood how they work with bluez. I looked at the
+dund source code and noticed that it did create the ttys itself. Is
+this also what I have to do?
 
-SGksCkkgdHJpZWQgeW91ciBjb25maWd1cmF0aW9uLCBpdCBpcyB0aGUgc2FtZSBhcyBtaW5lLCBJ
-IG9ubHkgaGFkIHRvIGFkZApTZW5Db3JlRXZlbnRzLiBCdXQgdGhpcyBkaWQgbm90IGNoYW5nZSBh
-bnl0aGluZy4gSSBjYW4gdXNlIG15IG1vdXNlIHdpdGgKbGVmdCBhbmQgcmlnaHQgY2xpY2suIEV2
-ZW4gbWlkZGxlLWNsaWNrIG9uIHRoZSB3aGVlbCB3b3Jrcy4gQnV0IG5laXRoZXIgdGhlCm1vdXNl
-d2hlZWwgbm9yIHRoZSBzaWRlYnV0dG9ucyBkbyB3b3JrLgoKU2VjdGlvbiAiSW5wdXREZXZpY2Ui
-CiAgRHJpdmVyICAgICAgICJtb3VzZSIKICBJZGVudGlmaWVyICAgIk1vdXNlWzFdIgogIE9wdGlv
-biAgICAgICAiQnV0dG9ucyIgIjciCiAgT3B0aW9uICAgICAgICJEZXZpY2UiICIvZGV2L2lucHV0
-L21pY2UiCiAgT3B0aW9uICAgICAgICJOYW1lIiAiQmx1ZXRvb3RoIEhJRCBCb290IFByb3RvY29s
-IERldmljZSIKICBPcHRpb24gICAgICAgIlByb3RvY29sIiAiZXhwbG9yZXJwcy8yIgogIE9wdGlv
-biAgICAgICAiVmVuZG9yIiAiU3lzcCIKICBPcHRpb24gICAgICAgIlpBeGlzTWFwcGluZyIgIjQg
-NSIKRW5kU2VjdGlvbgoKVGhpcyBpcyBteSBjb25maWd1cmF0aW9uLiBIYXMgYW55Ym9keSBlbHNl
-IHNvbWUgaGludHM/CgpNYWlrCgoKCjIwMDYvOS8xNiwgQ0lKT01MIDxjaWpvbWxAdm9sbnkuY3o+
-Ogo+Cj4gSGksCj4KPiBJIG93biAxc3QgZ2VuZXJhdGlvbiAobm8gdGlsdCB3aGVlbCkgYW5kIGlu
-IHhvcmcgZXZlcnl0aGluayB3b3JrcyBmb3IgbWUKPiB3aXRoCj4gdGhpcyBzZXR1cDoKPgo+IFNl
-Y3Rpb24gIklucHV0RGV2aWNlIgo+ICAgICAgICBJZGVudGlmaWVyICAgICAgIkJsdWV0b290aCBN
-b3VzZSIKPiAgICAgICAgRHJpdmVyICAgICAgICAgICJtb3VzZSIKPiAgICAgICAgT3B0aW9uICAg
-ICAgICAgICJTZW5kQ29yZUV2ZW50cyIgICAgICAgICJ0cnVlIgo+ICAgICAgICAgT3B0aW9uICAg
-ICAgICAgICJEZXZpY2UiICAgICAgICAgICAgICAgICIvZGV2L2lucHV0L21pY2UiCj4gICAgICAg
-ICBPcHRpb24gICAgICAgICAgIlByb3RvY29sIiAgICAgICAgICAgICAgIkV4cGxvcmVyUFMvMiIK
-PiAgICAgICAgIE9wdGlvbiAgICAgICAgICAiWkF4aXNNYXBwaW5nIiAgICAgICAgICAiNCA1Igo+
-ICAgICAgICAgT3B0aW9uICAgICAgICAgICJCdXR0b25zIiAgICAgICAgICAgICAgICI3Igo+ICAg
-ICAgICAgT3B0aW9uICAgICAgICAgICJFbXVsYXRlM0J1dHRvbnMiICAgICAgICJmYWxzZSIKPiAg
-ICAgICAgIE9wdGlvbiAgICAgICAgICAiTmFtZSIgICAgICAgICAgICAgICAgICAiQXV0b0RldGVj
-dGVkIgo+ICAgICAgICBPcHRpb24gICAgICAgICAgIlZlbmRvciIgICAgICAgICAgICAgICAgIkF1
-dG9EZXRlY3RlZCIKPiBFbmRTZWN0aW9uCj4KPiBJIGhhdmUgaGlkZCBydW5uaW5nIHdpdGggL3Vz
-ci9iaW4vaGlkZCAtLW1hc3RlciAtLXNlcnZlcgo+Cj4gSG9wZSB0aGlzIHdpbGwgaGVscCB5b3UK
-Pgo+IE1pY2hhbAo+Cj4gRG5lIHN0+GVkYSAzMCBzcnBlbiAyMDA2IDEwOjQzIE1haWsgQmFyeiBu
-YXBzYWwoYSk6Cj4gPiBIaSBldmVyeW9uZSwKPiA+IGZvciBhIGxvbmcgdGltZSBJIGFtIHRyeWlu
-ZyB0byBnZXQgbXkgbW91c2UgY29tcGxldGVseSB3b3JraW5nIG9uIG15Cj4gU3VzZQo+ID4gMTAu
-MSBzeXN0ZW0uCj4gPiBUaHJlZSBidXR0b25zIGRvIHdvcmssIGJ1dCBzY3JvbGx3aGVlbCBhbmQg
-c2lkZWJ1dHRvbnMgZG8gbm90IHNlZW0gdG8KPiBmaXJlCj4gPiBldmVudHMuIEkgaGVhcmQgYWJv
-dXQgcGF0Y2hpbmcgbXkga2VybmVsIHdpbGwgaGVscCBvdXQuIElzIHRoaXMgdHJ1ZSBvcgo+IGFy
-ZQo+ID4gdGhlcmUgc29tZSBvdGhlciBzb2x1dGlvbnMgdG8gdGhpcyBwcm9ibGVtPwo+ID4KPiA+
-IEFueSBoaW50cz8KPiA+Cj4gPiBHcmVldHMgTWFpawo+Cj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFVz
-aW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNlcnZp
-Y2VzLCBzZWN1cml0eT8KPiBHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdpdGggcHJlLWludGVncmF0
-ZWQgdGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9iCj4gZWFzaWVyCj4gRG93bmxvYWQgSUJNIFdl
-YlNwaGVyZSBBcHBsaWNhdGlvbiBTZXJ2ZXIgdi4xLjAuMSBiYXNlZCBvbiBBcGFjaGUgR2Vyb25p
-bW8KPiBodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lkPTEyMDcwOSZi
-aWQ9MjYzMDU3JmRhdD0xMjE2NDIKPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwo+IEJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdAo+IEJsdWV6LXVzZXJzQGxp
-c3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3Rz
-L2xpc3RpbmZvL2JsdWV6LXVzZXJzCj4KCgoKLS0gCk1haWsgQmFyegoKV2lsaGVsbXBsYXR6IDQg
-LSAyNDExNiBLaWVsCgp3d3cuQmFyemlsbGUuZGUK
-------=_Part_24261_15990306.1160521018845
-Content-Type: text/html; charset=ISO-8859-2
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+(The background is still the Maxell Digital Pen. I have finally got it
+to actually send the first parts of RFCOMM data to bluez which is a
+great step forward but I still need to be able to talk with it more.
+In Windows and with the widcomm stuff it is enough to simply have the
+Serial Port service (named 'anotostreaming') and the Pen happily uses
+that.)
 
-SGksIDxicj5JIHRyaWVkIHlvdXIgY29uZmlndXJhdGlvbiwgaXQgaXMgdGhlIHNhbWUgYXMgbWlu
-ZSwgSSBvbmx5IGhhZCB0byBhZGQgU2VuQ29yZUV2ZW50cy4gQnV0IHRoaXMgZGlkIG5vdCBjaGFu
-Z2UgYW55dGhpbmcuIEkgY2FuIHVzZSBteSBtb3VzZSB3aXRoIGxlZnQgYW5kIHJpZ2h0IGNsaWNr
-LiBFdmVuIG1pZGRsZS1jbGljayBvbiB0aGUgd2hlZWwgd29ya3MuIEJ1dCBuZWl0aGVyIHRoZSBt
-b3VzZXdoZWVsIG5vciB0aGUgc2lkZWJ1dHRvbnMgZG8gd29yay4KPGJyPjxicj5TZWN0aW9uICZx
-dW90O0lucHV0RGV2aWNlJnF1b3Q7PGJyPiZuYnNwOyBEcml2ZXImbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsgJnF1b3Q7bW91c2UmcXVvdDs8YnI+Jm5ic3A7IElkZW50aWZpZXIm
-bmJzcDsmbmJzcDsgJnF1b3Q7TW91c2VbMV0mcXVvdDs8YnI+Jm5ic3A7IE9wdGlvbiZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAmcXVvdDtCdXR0b25zJnF1b3Q7ICZxdW90Ozcm
-cXVvdDs8YnI+Jm5ic3A7IE9wdGlvbiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyAmcXVvdDtEZXZpY2UmcXVvdDsgJnF1b3Q7L2Rldi9pbnB1dC9taWNlJnF1b3Q7Cjxicj4mbmJz
-cDsgT3B0aW9uJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZxdW90O05hbWUm
-cXVvdDsgJnF1b3Q7Qmx1ZXRvb3RoIEhJRCBCb290IFByb3RvY29sIERldmljZSZxdW90Ozxicj4m
-bmJzcDsgT3B0aW9uJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZxdW90O1By
-b3RvY29sJnF1b3Q7ICZxdW90O2V4cGxvcmVycHMvMiZxdW90Ozxicj4mbmJzcDsgT3B0aW9uJm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZxdW90O1ZlbmRvciZxdW90OyAmcXVv
-dDtTeXNwJnF1b3Q7PGJyPiZuYnNwOyBPcHRpb24mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsgJnF1b3Q7WkF4aXNNYXBwaW5nJnF1b3Q7ICZxdW90OzQgNSZxdW90Owo8YnI+RW5k
-U2VjdGlvbjxicj48YnI+VGhpcyBpcyBteSBjb25maWd1cmF0aW9uLiBIYXMgYW55Ym9keSBlbHNl
-IHNvbWUgaGludHM/PGJyPjxicj5NYWlrPGJyPjxicj48YnI+PGJyPjxkaXY+PHNwYW4gY2xhc3M9
-ImdtYWlsX3F1b3RlIj4yMDA2LzkvMTYsIENJSk9NTCAmbHQ7PGEgaHJlZj0ibWFpbHRvOmNpam9t
-bEB2b2xueS5jeiI+Y2lqb21sQHZvbG55LmN6PC9hPiZndDs6PC9zcGFuPgo8YmxvY2txdW90ZSBj
-bGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJib3JkZXItbGVmdDogMXB4IHNvbGlkIHJnYigyMDQs
-IDIwNCwgMjA0KTsgbWFyZ2luOiAwcHQgMHB0IDBwdCAwLjhleDsgcGFkZGluZy1sZWZ0OiAxZXg7
-Ij5IaSw8YnI+PGJyPkkgb3duIDFzdCBnZW5lcmF0aW9uIChubyB0aWx0IHdoZWVsKSBhbmQgaW4g
-eG9yZyBldmVyeXRoaW5rIHdvcmtzIGZvciBtZSB3aXRoPGJyPgp0aGlzIHNldHVwOjxicj48YnI+
-U2VjdGlvbiAmcXVvdDtJbnB1dERldmljZSZxdW90Ozxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsgSWRlbnRpZmllciZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZxdW90O0JsdWV0b290aCBNb3VzZSZxdW90Ozxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsgRHJpdmVyJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7JnF1b3Q7bW91c2UmcXVvdDs8YnI+Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IE9wdGlvbiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZxdW90O1NlbmRDb3JlRXZlbnRzJnF1
-b3Q7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7JnF1b3Q7
-dHJ1ZSZxdW90Owo8YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7T3B0aW9uJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7JnF1b3Q7RGV2aWNlJnF1b3Q7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7JnF1b3Q7L2Rldi9pbnB1dC9taWNlJnF1b3Q7PGJyPiZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO09wdGlvbiZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZxdW90O1Byb3Rv
-Y29sJnF1b3Q7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7JnF1b3Q7RXhwbG9yZXJQUy8yJnF1
-b3Q7PGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO09w
-dGlvbiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZxdW90O1pBeGlzTWFwcGluZyZxdW90OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZxdW90OzQgNSZxdW90Owo8YnI+Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7T3B0aW9uJm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7JnF1
-b3Q7QnV0dG9ucyZxdW90OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAmcXVvdDs3JnF1b3Q7
-PGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO09wdGlv
-biZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZxdW90O0VtdWxhdGUzQnV0dG9ucyZxdW90OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyAmcXVvdDtmYWxzZSZxdW90Ozxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDtPcHRpb24mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmcXVvdDtOYW1lJnF1b3Q7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7JnF1b3Q7QXV0b0RldGVj
-dGVkJnF1b3Q7Cjxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgT3B0aW9u
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7JnF1b3Q7VmVuZG9yJnF1b3Q7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7JnF1b3Q7QXV0b0RldGVjdGVkJnF1b3Q7PGJyPkVuZFNlY3Rpb248YnI+PGJyPkkgaGF2ZSBo
-aWRkIHJ1bm5pbmcgd2l0aCAvdXNyL2Jpbi9oaWRkIC0tbWFzdGVyIC0tc2VydmVyPGJyPjxicj5I
-b3BlIHRoaXMgd2lsbCBoZWxwIHlvdTxicj48YnI+TWljaGFsPGJyPjxicj5EbmUgc3T4ZWRhIDMw
-IHNycGVuIDIwMDYgMTA6NDMgTWFpayBCYXJ6IG5hcHNhbChhKToKPGJyPiZndDsgSGkgZXZlcnlv
-bmUsPGJyPiZndDsgZm9yIGEgbG9uZyB0aW1lIEkgYW0gdHJ5aW5nIHRvIGdldCBteSBtb3VzZSBj
-b21wbGV0ZWx5IHdvcmtpbmcgb24gbXkgU3VzZTxicj4mZ3Q7IDEwLjEgc3lzdGVtLjxicj4mZ3Q7
-IFRocmVlIGJ1dHRvbnMgZG8gd29yaywgYnV0IHNjcm9sbHdoZWVsIGFuZCBzaWRlYnV0dG9ucyBk
-byBub3Qgc2VlbSB0byBmaXJlPGJyPiZndDsgZXZlbnRzLiBJIGhlYXJkIGFib3V0IHBhdGNoaW5n
-IG15IGtlcm5lbCB3aWxsIGhlbHAgb3V0LiBJcyB0aGlzIHRydWUgb3IgYXJlCjxicj4mZ3Q7IHRo
-ZXJlIHNvbWUgb3RoZXIgc29sdXRpb25zIHRvIHRoaXMgcHJvYmxlbT88YnI+Jmd0Ozxicj4mZ3Q7
-IEFueSBoaW50cz88YnI+Jmd0Ozxicj4mZ3Q7IEdyZWV0cyBNYWlrPGJyPjxicj4tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tPGJyPlVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBv
-cnQgd2ViIHNlcnZpY2VzLCBzZWN1cml0eT8KPGJyPkdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0
-aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRvIG1ha2UgeW91ciBqb2IgZWFzaWVyPGJyPkRv
-d25sb2FkIElCTSBXZWJTcGhlcmUgQXBwbGljYXRpb24gU2VydmVyIHYuMS4wLjEgYmFzZWQgb24g
-QXBhY2hlIEdlcm9uaW1vPGJyPjxhIGhyZWY9Imh0dHA6Ly9zZWwuYXMtdXMuZmFsa2FnLm5ldC9z
-ZWw/Y21kPWxuayZhbXA7a2lkPTEyMDcwOSZhbXA7YmlkPTI2MzA1NyZhbXA7ZGF0PTEyMTY0MiI+
-Cmh0dHA6Ly9zZWwuYXMtdXMuZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZhbXA7a2lkPTEyMDcwOSZh
-bXA7YmlkPTI2MzA1NyZhbXA7ZGF0PTEyMTY0MjwvYT48YnI+X19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX188YnI+Qmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0PGJy
-PjxhIGhyZWY9Im1haWx0bzpCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQiPgpCbHVl
-ei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQ8L2E+PGJyPjxhIGhyZWY9Imh0dHBzOi8vbGlz
-dHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzIj5odHRwczovL2xp
-c3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2VyczwvYT48YnI+PC9i
-bG9ja3F1b3RlPjwvZGl2Pjxicj48YnIgY2xlYXI9ImFsbCI+PGJyPi0tIDxicj4KTWFpayBCYXJ6
-PGJyPjxicj5XaWxoZWxtcGxhdHogNCAtIDI0MTE2IEtpZWw8YnI+PGJyPjxhIGhyZWY9Imh0dHA6
-Ly93d3cuQmFyemlsbGUuZGUiPnd3dy5CYXJ6aWxsZS5kZTwvYT4K
-------=_Part_24261_15990306.1160521018845--
+The output of the communication that takes place if someone finds it
+helpful (I took out the initial connection and service discovery
+items...): (Everything is ok until the pen detecs an error and then
+disconnects, I guess this has to with me not doing enough with the
+RFCOMM tty stuff)
+
+--- begin snip ---
+> ACL data: handle 40 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0042
+< ACL data: handle 40 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0042 result 0 status 0
+      Connection successful
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 40 packets 1
+> ACL data: handle 40 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
+      MTU 1024
+< ACL data: handle 40 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0042 flags 0x00 result 0 clen 0
+      Success
+< ACL data: handle 40 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0042 flags 0x00 clen 4
+      MTU 1013
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 40 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 40 packets 1
+> ACL data: handle 40 flags 0x02 dlen 17
+> ACL data: handle 40 flags 0x01 dlen 1
+    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
+      Success
+      MTU 1013
+> ACL data: handle 40 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+< ACL data: handle 40 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0042 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 40 packets 1
+> ACL data: handle 40 flags 0x02 dlen 17
+> ACL data: handle 40 flags 0x01 dlen 1
+    L2CAP(d): cid 0x0041 len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 2 frame_type 0 credit_flow 15 pri 0 ack_timer 0
+      frame_size 1008 max_retrans 0 credits 1
+< ACL data: handle 40 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0042 len 4 [psm 3]
+      RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 40 packets 1
+> ACL data: handle 40 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0042
+< ACL data: handle 40 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0042
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 40 packets 1
+> ACL data: handle 40 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0041
+< ACL data: handle 40 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0041
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 40 packets 1
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 40 reason 0x13
+    Reason: Remote User Terminated Connection
+---end snip---
 
 
---===============1467488079==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+
+
+Regards
+
+-- 
+Robert
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1467488079==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1467488079==--
