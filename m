@@ -1,6 +1,6 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <3f5a9ba20610090239p90a5bd8tf7267ca29e0a6db1@mail.gmail.com>
-Date: Mon, 9 Oct 2006 17:39:00 +0800
+Message-ID: <3f5a9ba20610090238w6b3686ffw1a851a4c711bdc3e@mail.gmail.com>
+Date: Mon, 9 Oct 2006 17:38:05 +0800
 From: "Mingfan.Lu" <lucharse@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <20061009090450.GI28087@suse.de>
@@ -22,20 +22,20 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1453619198=="
+Content-Type: multipart/mixed; boundary="===============0302512463=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1453619198==
+--===============0302512463==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_170599_617489.1160386740238"
+	boundary="----=_Part_170595_32770185.1160386685930"
 
-------=_Part_170599_617489.1160386740238
+------=_Part_170595_32770185.1160386685930
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-I used Vmware, I don't know it will make any effect.
+Because Vmware I used, so I don't think it will make effect to the result.
 
 2006/10/9, Stefan Seyfried <seife@suse.de>:
 >
@@ -100,12 +100,14 @@ DEVDEV
 With respects,
    Mingfan.Lu
 
-------=_Part_170599_617489.1160386740238
+------=_Part_170595_32770185.1160386685930
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-I used Vmware, I don't know it will make any effect. <br><br>
+<div>Because Vmware I used, so I don't think it will make effect to the res=
+ult.</div>
+<div>&nbsp;</div>
 <div><span class=3D"gmail_quote">2006/10/9, Stefan Seyfried &lt;<a href=3D"=
 mailto:seife@suse.de">seife@suse.de</a>&gt;:</span>
 <blockquote class=3D"gmail_quote" style=3D"PADDING-LEFT: 1ex; MARGIN: 0px 0=
@@ -153,10 +155,10 @@ z-devel mailing list<br><a href=3D"mailto:Bluez-devel@lists.sourceforge.net=
 ote></div><br><br clear=3D"all"><br>-- <br>With respects,<br>&nbsp;&nbsp; M=
 ingfan.Lu=20
 
-------=_Part_170599_617489.1160386740238--
+------=_Part_170595_32770185.1160386685930--
 
 
---===============1453619198==
+--===============0302512463==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -167,7 +169,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys -- and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1453619198==
+--===============0302512463==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -178,4 +180,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1453619198==--
+--===============0302512463==--
