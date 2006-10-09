@@ -1,12 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <452A2B45.5090200@palmsource.com>
-Date: Mon, 09 Oct 2006 12:58:13 +0200
-From: Frederic DALLEAU <frederic.dalleau@palmsource.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <1160327171.13162.16.camel@grappa.nowhere.de>
-In-Reply-To: <1160327171.13162.16.camel@grappa.nowhere.de>
-Subject: Re: [Bluez-devel] a2dpd not executing commands
+In-Reply-To: <3f5a9ba20610081957id1408a8m6f1648b8fae14e79@mail.gmail.com>
+References: <3f5a9ba20609291930r5b4e4c97g8b33901666fef491@mail.gmail.com>
+	<3f5a9ba20610020946v10c99300pee5cc04f3f2597e6@mail.gmail.com>
+	<1159972670.1601.25.camel@localhost>
+	<3f5a9ba20610072313w41cb4aa1qf0b5a21a7199f737@mail.gmail.com>
+	<1160314144.4258.8.camel@aeonflux.holtmann.net>
+	<3f5a9ba20610081957id1408a8m6f1648b8fae14e79@mail.gmail.com>
+Date: Mon, 09 Oct 2006 11:47:43 +0200
+Message-Id: <1160387263.4489.1.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] About the kernel 2.6.18
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,31 +26,33 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
-in fact the parsing of the command is very bad you should use only one 
-cmd and one parameter with exactly one space separating them ...
-so you command should be run but with only the first param
-what exactly is your cmd like?
-Fred
 
-Reiner Klenk wrote:
-> Greetings,
-> I've been playing with my new Jabra BT620s over the weekend and things
-> were going quite well. I can have it connected to a2dpd (amarok) and
-> btsco (ekiga) at the same time. Here's something I don't understand:
-> pressing one of the keys on the headphone does nothing. I inserted a
-> couple of printf in a2dp_ipc.c and could verify that the commands are
-> indeed received and a child is forked. The execlp call is not returning
-> (as it should), nevertheless the specified command doesn't seem to get
-> executed. I've double-checked my .a2dprc entries and verified that - run
-> from a shell - they behave as expected. I put system(cmd); exit(0);
-> instead of the execlp call and the buttons started to work. 
->
-> Any idea why the execlp doesn't work? I'm on Ubuntu Dapper AMD64.
->
-> Thanks,
-> Reiner
+> I am just use the Bluetooth OBEX Object Push client (0.99 beta1).
+> ====================================
+> Host:
+>  Vmware 5.5 
+>  OS: Suse 10.1 
+>  bluetooth dongle: 1.2 
+>  File pushed: testpkg whose size is 137956B
 >  
->   
+> Target: 
+>   Nokia E61 
+>  
+>   kernel version: 2.6.16.13-4 (built from Suse 10.1) about 11-12s 
+>   kernel version: 2.6.16.13-4 (rebuilt from above) about 11-12s 
+>   kernel version: 2.6.17 (built from kernel.org)  about 11-12s
+>   kernel version: 2.6.18: about  145s
+>   kernel version: 2.6.18 with mh4 (built with the patch from bluez):
+> 143s  146s
+
+since you are using VMware. Which is running the 2.6.18 kernel. The host
+or the guest operating system. This could be bottleneck in the USB part
+and not Bluetooth.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
