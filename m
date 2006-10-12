@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <452E418A.5080908@evilgenius.de>
-Date: Thu, 12 Oct 2006 15:22:18 +0200
-From: Martin Karger <martin@evilgenius.de>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <452D65AB.9050800@evilgenius.de>	<1160604568.15747.3.camel@localhost>
-	<452DCCF1.8090605@evilgenius.de>
-	<1160637830.3843.0.camel@localhost>
-In-Reply-To: <1160637830.3843.0.camel@localhost>
+In-Reply-To: <452DCCF1.8090605@evilgenius.de>
+References: <452D65AB.9050800@evilgenius.de>
+	<1160604568.15747.3.camel@localhost> <452DCCF1.8090605@evilgenius.de>
+Date: Thu, 12 Oct 2006 09:23:50 +0200
+Message-Id: <1160637830.3843.0.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] firmware upgrade
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,22 +21,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Martin,
-> 
->>>> i want to upgrade the firmware of a levelone mdu-0025usb. usually i do
->>>> this via dfu, but this dongle does not seem to support it.
->>>>
->>>> do have to mess with some pskey settings to activate it?
->>> check with "hciconfig hci0 revision" (as root). It might be ROM based
->>> chip and then you can update it.
->> it is. i guess you mean can not?
-> 
-> yes, I meant you _can't_ update ROM chips.
-> 
+Hi Martin,
 
-ok, thats why they are called rom ;)
-thank you!
+> >> i want to upgrade the firmware of a levelone mdu-0025usb. usually i do
+> >> this via dfu, but this dongle does not seem to support it.
+> >>
+> >> do have to mess with some pskey settings to activate it?
+> > 
+> > check with "hciconfig hci0 revision" (as root). It might be ROM based
+> > chip and then you can update it.
+> 
+> it is. i guess you mean can not?
+
+yes, I meant you _can't_ update ROM chips.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
