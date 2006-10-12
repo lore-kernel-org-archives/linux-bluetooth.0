@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <452DCCF1.8090605@evilgenius.de>
+Date: Thu, 12 Oct 2006 07:04:49 +0200
+From: Martin Karger <martin@evilgenius.de>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <452DCCF1.8090605@evilgenius.de>
 References: <452D65AB.9050800@evilgenius.de>
-	<1160604568.15747.3.camel@localhost> <452DCCF1.8090605@evilgenius.de>
-Date: Thu, 12 Oct 2006 09:23:50 +0200
-Message-Id: <1160637830.3843.0.camel@localhost>
-Mime-Version: 1.0
+	<1160604568.15747.3.camel@localhost>
+In-Reply-To: <1160604568.15747.3.camel@localhost>
 Subject: Re: [Bluez-devel] firmware upgrade
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,25 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Martin,
-
-> >> i want to upgrade the firmware of a levelone mdu-0025usb. usually i do
-> >> this via dfu, but this dongle does not seem to support it.
-> >>
-> >> do have to mess with some pskey settings to activate it?
-> > 
-> > check with "hciconfig hci0 revision" (as root). It might be ROM based
-> > chip and then you can update it.
+Marcel Holtmann wrote:
+> Hi Martin,
 > 
-> it is. i guess you mean can not?
+>> i want to upgrade the firmware of a levelone mdu-0025usb. usually i do
+>> this via dfu, but this dongle does not seem to support it.
+>>
+>> do have to mess with some pskey settings to activate it?
+> 
+> check with "hciconfig hci0 revision" (as root). It might be ROM based
+> chip and then you can update it.
 
-yes, I meant you _can't_ update ROM chips.
+it is. i guess you mean can not?
 
-Regards
-
-Marcel
-
-
+greets
+martin
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
