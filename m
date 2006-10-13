@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <452EF9E8.6020304@xmission.com>
-Date: Thu, 12 Oct 2006 20:28:56 -0600
+Message-ID: <452EF797.1070708@xmission.com>
+Date: Thu, 12 Oct 2006 20:19:03 -0600
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <452E84DA.9090307@free.fr> <452E99E8.6070406@vasmac.com>
-In-Reply-To: <452E99E8.6070406@vasmac.com>
+References: <452E84DA.9090307@free.fr>
+In-Reply-To: <452E84DA.9090307@free.fr>
 Subject: Re: [Bluez-devel] [PATCH] Updated sco flow control feature
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,26 +20,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Jose
+Fabien
 
-> The problem I'm running into now is with dynamic isochronous
-> allocation. By default my driver sets interface 1 to use alternative 0
-> (i.e. no bandwidth). When the SCO is opened, this is changed to
-> alternative 2. All this works great. It's when the SCO is closed or
-> a second SCO is opened that causes problems as the bandwidth
-> needs to be reallocated.
+> You will find attached an updated version of the patch against
+> 2.6.18-mh4, as well as a sample test program that shows the flow control
+> stuff is really working.
 
-You're encountering something we need to address anyway for multiple sco
-connections. I haven't had a very clear understanding of the alt
-setting. It seems that we were setting it to 2 and leaving it there but
-maybe it is actually going between 0 and 2 dynamically.
+I'm glad you're hacking at this still and I hope we are converging on
+something that everyone agrees on.
 
-What is a decent uart-connected csr platform to test sco on? I have a
-gumstix and a csr module but I'm still struggling the specs at
-http://www.semiconductorstore.com/pdf/Bluegiga/esite_wt12.pdf
+> Random notes :
+> I tryed to enable number of completed packets events for synchronous
+> connections,
+> to get rid of all the timer stuff, however it didn't succeed.
+
+How does this idea that didn't work out compare to the approach Jose is
+discussing? From what I've seen they both seem to be considering the
+problem at a lower level.
+
+FYI, on the topic of plugins... I am writing up new documentation (using
+the ubuntu wiki for now... don't hate me). I'm moving emphasis away from
+the old "btsco" daemon method for sco audio. The sco alsa plugin detail
+in the wiki is only a placeholder currently but I want to flesh it out soon.
+
+https://help.ubuntu.com/community/BluetoothAudio
 
 Brad
-
 
 
 -------------------------------------------------------------------------
