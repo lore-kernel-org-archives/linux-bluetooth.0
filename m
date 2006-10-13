@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Date: Fri, 13 Oct 2006 14:44:06 +0300
+From: Anssi Saari <anssi.saari@modeemi.fi>
 To: bluez-users@lists.sourceforge.net
-From: thouters <thomas.langewouters@gmail.com>
-Date: Sat, 14 Oct 2006 19:06:39 +0200
-Message-ID: <pan.2006.10.14.17.06.38.297781@gmail.com>
-Mime-Version: 1.0
-Subject: [Bluez-users] Problems with sourceforge?
+Message-ID: <20061013114406.GA857@jolt.modeemi.cs.tut.fi>
+MIME-Version: 1.0
+Subject: [Bluez-users] Old Socket CF BT hangs
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +18,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dear people of the bluez project,
 
-I seem to have dificulties reaching the project's released files on the
-sourceforge server.
+Hello,
 
-At http://bluez.sourceforge.net I get 'connection refused', and
-when I click 'download bluez' at http://sourceforge.net/projects/bluez I
-get a 'No File Packages Defined' message.
+I have this old Socket CF bluetooth card which uses the dtl1_cs driver.
+It works fine, except it hangs every now and then, when using it for net
+access via a GSM phone. By hanging I mean that data stops flowing over
+the ppp interface and the card won't respond to hcitool scan or other
+similar commands, I just get a timeout. I need to do pccardctl eject 1;
+pccardctl insert 1 to recover. I can't find any error messages in the
+logs when this hang occurs.
 
-Please look into this,
+Usually I can cause the hang by opening a bunch of links in a web
+browser. The odd thing is that this seems to be more common the faster
+the phone is. With my old Ericsson T68 (GPRS) it's very rare but with
+my newer Nokia 6820 (EDGE) it's annoyingly common.
 
-thank you in advance,
+I'm currently running Arch Linux with kernel 2.6.17-beyond4 on an IBM
+Thinkpad X20. Bluez-libs and bluez-utils are version 3.1. However,
+I noticed this problem in 2005 summer already with I think kernel 2.6.11
+and 2.6.12.
 
-Thomas
+Has this sort of thing been reported by anyone else?
 
 
 -------------------------------------------------------------------------
