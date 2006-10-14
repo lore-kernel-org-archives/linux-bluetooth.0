@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4531BD65.1020107@gmail.com>
-Date: Sun, 15 Oct 2006 01:47:33 -0300
-From: Manuel Naranjo <naranjo.manuel@gmail.com>
+Message-ID: <45312FB1.5090600@drick.de>
+Date: Sat, 14 Oct 2006 20:42:57 +0200
+From: Timo Drick <timo@drick.de>
 MIME-Version: 1.0
-To: Bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] PIN Authentication Problems on MDV 2007
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] How to execute a command on link_key_request?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,103 +19,22 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi,
-I have updated to Mandriva 2007, and I can't figure why, I can't make 
-things get back working, when I used mdv 2006 all bluez went on OK.
 
-Here is my hcid.conf:
-#
-# HCI daemon configuration file.
-#
+i set up my headset with a usb bluetooth dongle. With bluez and btsco it 
+works very well. I am able to use it with any voip application.
+But i have to start btsco <address of headset> every time i want to 
+establish a connection to the headset.
+I see in the syslog that hcid receive following message every time i 
+turn on my headset:
+hcid[4593]: link_key_request (sba=00:0A:3A:6B:XX:XX, dba=00:0D:44:5C:XX:XX)
 
-# HCId options
-options {
-    # Automatically initialize new devices
-    autoinit yes;
+So is it possible to execute a command (e.g. btsco) when such request is 
+received?
+If btsco is up i can modify the .btscorc file to catch commands from my 
+headset. So that is not the question.
 
-    # Security Manager mode
-    #   none - Security manager disabled
-    #   auto - Use local PIN for incoming connections
-    #   user - Always ask user for a PIN
-    #
-    security user;
-
-    # Pairing mode
-    #   none  - Pairing disabled
-    #   multi - Allow pairing with already paired devices
-    #   once  - Pair once and deny successive attempts
-    pairing multi;
-
-    # Default PIN code for incoming connections
-    passkey "1234";
-   
-    pin_helper /bin/bluepin;
-   
-    #dbus_pin_helper;
-}
-
-# Default settings for HCI devices
-device {
-    # Local device name
-    #   %d - device id
-    #   %h - host name
-    name "BlueZ (%d)";
-
-    # Local device class
-    class 0x3e0100;
-
-    # Default packet type
-    #pkt_type DH1,DM1,HV1;
-
-    # Inquiry and Page scan
-    iscan enable; pscan enable;
-
-    # Default link mode
-    #   none   - no specific policy
-    #   accept - always accept incoming connections
-    #   master - become master on incoming connections,
-    #            deny role switch on outgoing connections
-    lm accept;
-
-    # Default link policy
-    #   none    - no specific policy
-    #   rswitch - allow role switch
-    #   hold    - allow hold mode
-    #   sniff   - allow sniff mode
-    #   park    - allow park mode
-    lp rswitch,hold,sniff,park;
-}
----
-
-/bin/bluepin is no more than a link to kbluetooth pin.
-
-The thing is that, when ever I try to establish a connection, it seems 
-that BlueZ (or something else) is missing the PIN code.
-
-I'm doing:
-hcitool cc 00:50:C2:58:50:00 //To get the connection on
-hcitool key 00:50:C2:58:50:00 //To Exchange Link Kety,
-
-I have even tried with hcitool auth 00:50:C2:58:50:00, every time the 
-result is the same.
-
-hcidump -X -V shows this:
- > HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:50:C2:58:50:00
-< HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
-    bdaddr 00:50:C2:58:50:00
- > HCI Event: Command Complete (0x0e) plen 10
-    PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
-    status 0x00 bdaddr 00:50:C2:58:50:00
- > HCI Event: Auth Complete (0x06) plen 3
-    status 0x06 handle 1
-    Error: PIN or Key Missing
-
-And I never get a Pin Request from the BlueZ side.
-
-Any ideas?
-
-Cheers,
-Manuel
+best regards
+       Timo Drick
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
