@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45312FB1.5090600@drick.de>
-Date: Sat, 14 Oct 2006 20:42:57 +0200
-From: Timo Drick <timo@drick.de>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] How to execute a command on link_key_request?
+From: thouters <thomas.langewouters@gmail.com>
+Date: Sat, 14 Oct 2006 19:06:39 +0200
+Message-ID: <pan.2006.10.14.17.06.38.297781@gmail.com>
+Mime-Version: 1.0
+Subject: [Bluez-users] Problems with sourceforge?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +18,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Dear people of the bluez project,
 
-i set up my headset with a usb bluetooth dongle. With bluez and btsco it 
-works very well. I am able to use it with any voip application.
-But i have to start btsco <address of headset> every time i want to 
-establish a connection to the headset.
-I see in the syslog that hcid receive following message every time i 
-turn on my headset:
-hcid[4593]: link_key_request (sba=00:0A:3A:6B:XX:XX, dba=00:0D:44:5C:XX:XX)
+I seem to have dificulties reaching the project's released files on the
+sourceforge server.
 
-So is it possible to execute a command (e.g. btsco) when such request is 
-received?
-If btsco is up i can modify the .btscorc file to catch commands from my 
-headset. So that is not the question.
+At http://bluez.sourceforge.net I get 'connection refused', and
+when I click 'download bluez' at http://sourceforge.net/projects/bluez I
+get a 'No File Packages Defined' message.
 
-best regards
-       Timo Drick
+Please look into this,
+
+thank you in advance,
+
+Thomas
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
