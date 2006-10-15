@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <453296A6.5030505@xmission.com>
+Date: Sun, 15 Oct 2006 14:14:30 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <453296A6.5030505@xmission.com>
-References: <453296A6.5030505@xmission.com>
-Date: Sun, 15 Oct 2006 22:21:03 +0200
-Message-Id: <1160943663.14340.10.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] pskey gone, but bccmd won't build
+Subject: [Bluez-devel] pskey gone, but bccmd won't build
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,19 +18,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
-
-> I noticed pskey disappear from utils/tools in cvs. Is bccmd preferred
-> for setting pskey values? bccmd won't build from the current utils.
-
-bccmd is the successor of pskey and you should use --enable-bccmd to
-build and install it correctly.
-
-Regards
-
 Marcel
 
+I noticed pskey disappear from utils/tools in cvs. Is bccmd preferred
+for setting pskey values? bccmd won't build from the current utils.
 
+bmidgley@med:~/src/bluez/utils/tools$ make bccmd
+/bin/sh ../libtool --mode=link gcc -I/usr/local/include
+-I/usr/local/include -Wall -O2 -D_FORTIFY_SOURCE=2  -o bccmd
+gcc -I/usr/local/include -I/usr/local/include -Wall -O2
+-D_FORTIFY_SOURCE=2 -o bccmd
+gcc: no input files
+make: *** [bccmd] Error 1
+
+Brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
