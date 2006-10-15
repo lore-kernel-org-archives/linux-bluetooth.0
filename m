@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 15 Oct 2006 15:09:13 +0200
-From: Romain Quidet <romain.quidet@neuf.fr>
-To: bluez-users@lists.sourceforge.net
-Message-id: <453232F9.1070003@neuf.fr>
-MIME-version: 1.0
-Subject: [Bluez-users] not seen
-Reply-To: romain.quidet@neuf.fr,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <4531BD65.1020107@gmail.com>
+Date: Sun, 15 Oct 2006 01:47:33 -0300
+From: Manuel Naranjo <naranjo.manuel@gmail.com>
+MIME-Version: 1.0
+To: Bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] PIN Authentication Problems on MDV 2007
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,169 +18,104 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hello,
+Hi,
+I have updated to Mandriva 2007, and I can't figure why, I can't make 
+things get back working, when I used mdv 2006 all bluez went on OK.
 
-I'm using a debian (testing) with 2.6.18 kernel, bluez 3.7
-I've got a sagem phone, and a belkin BT dongle.
+Here is my hcid.conf:
+#
+# HCI daemon configuration file.
+#
 
-I don't know anything about bluetooth, and it does not work for me !!
+# HCId options
+options {
+    # Automatically initialize new devices
+    autoinit yes;
 
- From my phone I can't see my pc, can you help me ?
+    # Security Manager mode
+    #   none - Security manager disabled
+    #   auto - Use local PIN for incoming connections
+    #   user - Always ask user for a PIN
+    #
+    security user;
 
-here some info :
+    # Pairing mode
+    #   none  - Pairing disabled
+    #   multi - Allow pairing with already paired devices
+    #   once  - Pair once and deny successive attempts
+    pairing multi;
 
-dmesg :
+    # Default PIN code for incoming connections
+    passkey "1234";
+   
+    pin_helper /bin/bluepin;
+   
+    #dbus_pin_helper;
+}
 
-Oct 15 14:50:07 localhost kernel: Bluetooth: Core ver 2.10
-Oct 15 14:50:07 localhost kernel: NET: Registered protocol family 31
-Oct 15 14:50:07 localhost kernel: Bluetooth: HCI device and connection 
-manager initialized
-Oct 15 14:50:07 localhost kernel: Bluetooth: HCI socket layer initialized
-Oct 15 14:50:17 localhost kernel: Bluetooth: L2CAP ver 2.8
-Oct 15 14:50:17 localhost kernel: Bluetooth: L2CAP socket layer initialized
-Oct 15 14:50:17 localhost kernel: Bluetooth: RFCOMM socket layer initialized
-Oct 15 14:50:17 localhost kernel: Bluetooth: RFCOMM TTY layer initialized
-Oct 15 14:50:17 localhost kernel: Bluetooth: RFCOMM ver 1.8
+# Default settings for HCI devices
+device {
+    # Local device name
+    #   %d - device id
+    #   %h - host name
+    name "BlueZ (%d)";
 
-everything seems to be loaded...
+    # Local device class
+    class 0x3e0100;
 
-I run hcidump :
+    # Default packet type
+    #pkt_type DH1,DM1,HV1;
 
-CI sniffer - Bluetooth packet analyzer ver 1.31
-device: hci0 snap_len: 1028 filter: 0xffffffff
- > HCI Event: Command Complete (0x0e) plen 4
-    Write Local Name (0x03|0x0013) ncmd 1
-    status 0x00
-< HCI Command: Write Class of Device (0x03|0x0024) plen 3
-    class 0x3e0100
- > HCI Event: Command Complete (0x0e) plen 4
-    Write Class of Device (0x03|0x0024) ncmd 1
-    status 0x00
-< HCI Command: Read Local Name (0x03|0x0014) plen 0
- > HCI Event: Command Complete (0x0e) plen 252
-    Read Local Name (0x03|0x0014) ncmd 1
-    status 0x00 name 'BlueZ (0)'
-< HCI Command: Read Class of Device (0x03|0x0023) plen 0
- > HCI Event: Command Complete (0x0e) plen 7
-    Read Class of Device (0x03|0x0023) ncmd 1
-    status 0x00 class 0x3e0100
-< HCI Command: Read Class of Device (0x03|0x0023) plen 0
- > HCI Event: Command Complete (0x0e) plen 7
-    Read Class of Device (0x03|0x0023) ncmd 1
-    status 0x00 class 0x3e0100
-< HCI Command: Read Class of Device (0x03|0x0023) plen 0
- > HCI Event: Command Complete (0x0e) plen 7
-    Read Class of Device (0x03|0x0023) ncmd 1
-    status 0x00 class 0x3e0100
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
- > HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e40 class 0x7a0204 rssi -54
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e40 class 0x7a0204 rssi -56
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e40 class 0x7a0204 rssi -56
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e40 class 0x7a0204 rssi -56
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3f class 0x7a0204 rssi -55
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3f class 0x7a0204 rssi -54
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e40 class 0x7a0204 rssi -60
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e40 class 0x7a0204 rssi -60
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e40 class 0x7a0204 rssi -61
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e40 class 0x7a0204 rssi -62
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e40 class 0x7a0204 rssi -52
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3f class 0x7a0204 rssi -52
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3f class 0x7a0204 rssi -52
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3f class 0x7a0204 rssi -53
- > HCI Event: Inquiry Complete (0x01) plen 1
-    status 0x00
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
- > HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3f class 0x7a0204 rssi -67
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3f class 0x7a0204 rssi -63
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3e class 0x7a0204 rssi -60
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3e class 0x7a0204 rssi -60
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3e class 0x7a0204 rssi -60
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3f class 0x7a0204 rssi -60
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3f class 0x7a0204 rssi -59
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3f class 0x7a0204 rssi -60
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3f class 0x7a0204 rssi -59
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3e class 0x7a0204 rssi -61
- > HCI Event: Inquiry Complete (0x01) plen 1
-    status 0x00
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
- > HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3b class 0x7a0204 rssi -59
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3b class 0x7a0204 rssi -58
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3b class 0x7a0204 rssi -59
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3b class 0x7a0204 rssi -58
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3b class 0x7a0204 rssi -58
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e3b class 0x7a0204 rssi -58
- > HCI Event: Inquiry Complete (0x01) plen 1
-    status 0x00
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-    lap 0x9e8b33 len 6 num 0
- > HCI Event: Command Status (0x0f) plen 4
-    Inquiry (0x01|0x0001) status 0x00 ncmd 1
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e36 class 0x7a0204 rssi -76
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e36 class 0x7a0204 rssi -73
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e36 class 0x7a0204 rssi -73
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e36 class 0x7a0204 rssi -78
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e37 class 0x7a0204 rssi -68
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e36 class 0x7a0204 rssi -67
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e36 class 0x7a0204 rssi -67
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e37 class 0x7a0204 rssi -69
- > HCI Event: Inquiry Result with RSSI (0x22) plen 15
-    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e37 class 0x7a0204 rssi -68
- > HCI Event: Inquiry Complete (0x01) plen 1
-    status 0x00
+    # Inquiry and Page scan
+    iscan enable; pscan enable;
 
-I can get pair or see my device. The address 08:00:28:F9:9A:96 seems to 
-be correct...
+    # Default link mode
+    #   none   - no specific policy
+    #   accept - always accept incoming connections
+    #   master - become master on incoming connections,
+    #            deny role switch on outgoing connections
+    lm accept;
 
-Thank for your help !
+    # Default link policy
+    #   none    - no specific policy
+    #   rswitch - allow role switch
+    #   hold    - allow hold mode
+    #   sniff   - allow sniff mode
+    #   park    - allow park mode
+    lp rswitch,hold,sniff,park;
+}
+---
 
-Romain
+/bin/bluepin is no more than a link to kbluetooth pin.
+
+The thing is that, when ever I try to establish a connection, it seems 
+that BlueZ (or something else) is missing the PIN code.
+
+I'm doing:
+hcitool cc 00:50:C2:58:50:00 //To get the connection on
+hcitool key 00:50:C2:58:50:00 //To Exchange Link Kety,
+
+I have even tried with hcitool auth 00:50:C2:58:50:00, every time the 
+result is the same.
+
+hcidump -X -V shows this:
+ > HCI Event: PIN Code Request (0x16) plen 6
+    bdaddr 00:50:C2:58:50:00
+< HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+    bdaddr 00:50:C2:58:50:00
+ > HCI Event: Command Complete (0x0e) plen 10
+    PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
+    status 0x00 bdaddr 00:50:C2:58:50:00
+ > HCI Event: Auth Complete (0x06) plen 3
+    status 0x06 handle 1
+    Error: PIN or Key Missing
+
+And I never get a Pin Request from the BlueZ side.
+
+Any ideas?
+
+Cheers,
+Manuel
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
