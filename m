@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4532838E.4030303@drick.de>
-Date: Sun, 15 Oct 2006 20:53:02 +0200
-From: Timo Drick <timo@drick.de>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <45312FB1.5090600@drick.de> <1160917959.23675.10.camel@localhost>
-In-Reply-To: <1160917959.23675.10.camel@localhost>
-Subject: Re: [Bluez-users] How to execute a command on link_key_request?
+In-Reply-To: <20061013114406.GA857@jolt.modeemi.cs.tut.fi>
+References: <20061013114406.GA857@jolt.modeemi.cs.tut.fi>
+Date: Sun, 15 Oct 2006 15:14:57 +0200
+Message-Id: <1160918097.23675.15.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Old Socket CF BT hangs
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,42 +20,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel Holtmann schrieb:
-> Hi Timo,
->
->   
->> i set up my headset with a usb bluetooth dongle. With bluez and btsco it 
->> works very well. I am able to use it with any voip application.
->> But i have to start btsco <address of headset> every time i want to 
->> establish a connection to the headset.
->> I see in the syslog that hcid receive following message every time i 
->> turn on my headset:
->> hcid[4593]: link_key_request (sba=00:0A:3A:6B:XX:XX, dba=00:0D:44:5C:XX:XX)
->>
->> So is it possible to execute a command (e.g. btsco) when such request is 
->> received?
->> If btsco is up i can modify the .btscorc file to catch commands from my 
->> headset. So that is not the question.
->>     
->
-> the simple answer is no. You don't want such creepy hacks.
->
-> Regards
->
-> Marcel
->
->   
-Thx for that short answer.
-But i search for a solution for this problem. I do not want to start 
-btsco every time i receive a call.
-I want to connect the bluetooth headset if it turns on or i push the 
-headset button. I search the internet and many mailing lists for that 
-but do not have success :-(
-Anyone have a clean solution (If my idea is realy a "creepy hack")
+Hi Anssi,
+
+> I have this old Socket CF bluetooth card which uses the dtl1_cs driver.
+> It works fine, except it hangs every now and then, when using it for net
+> access via a GSM phone. By hanging I mean that data stops flowing over
+> the ppp interface and the card won't respond to hcitool scan or other
+> similar commands, I just get a timeout. I need to do pccardctl eject 1;
+> pccardctl insert 1 to recover. I can't find any error messages in the
+> logs when this hang occurs.
+> 
+> Usually I can cause the hang by opening a bunch of links in a web
+> browser. The odd thing is that this seems to be more common the faster
+> the phone is. With my old Ericsson T68 (GPRS) it's very rare but with
+> my newer Nokia 6820 (EDGE) it's annoyingly common.
+> 
+> I'm currently running Arch Linux with kernel 2.6.17-beyond4 on an IBM
+> Thinkpad X20. Bluez-libs and bluez-utils are version 3.1. However,
+> I noticed this problem in 2005 summer already with I think kernel 2.6.11
+> and 2.6.12.
+> 
+> Has this sort of thing been reported by anyone else?
+
+when I wrote the dtl1_cs driver it was back in 2001 and most devices
+where not capable of high speeds like EDGE. So this is actually a driver
+problem, but at the moment I have no idea on how to fix it. I haven't
+looked at this driver for a very long time.
 
 Regards
 
- Timo
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
