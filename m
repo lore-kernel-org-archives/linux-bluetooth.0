@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20061013114406.GA857@jolt.modeemi.cs.tut.fi>
-References: <20061013114406.GA857@jolt.modeemi.cs.tut.fi>
-Date: Sun, 15 Oct 2006 15:14:57 +0200
-Message-Id: <1160918097.23675.15.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Old Socket CF BT hangs
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Sun, 15 Oct 2006 15:17:18 +0200
+From: Romain Quidet <looping78@neuf.fr>
+To: bluez-users@lists.sourceforge.net
+Message-id: <453234DE.2060209@neuf.fr>
+MIME-version: 1.0
+Subject: [Bluez-users] error connecting
+Reply-To: looping78@neuf.fr, BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -20,38 +18,67 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Anssi,
+hello,
 
-> I have this old Socket CF bluetooth card which uses the dtl1_cs driver.
-> It works fine, except it hangs every now and then, when using it for net
-> access via a GSM phone. By hanging I mean that data stops flowing over
-> the ppp interface and the card won't respond to hcitool scan or other
-> similar commands, I just get a timeout. I need to do pccardctl eject 1;
-> pccardctl insert 1 to recover. I can't find any error messages in the
-> logs when this hang occurs.
-> 
-> Usually I can cause the hang by opening a bunch of links in a web
-> browser. The odd thing is that this seems to be more common the faster
-> the phone is. With my old Ericsson T68 (GPRS) it's very rare but with
-> my newer Nokia 6820 (EDGE) it's annoyingly common.
-> 
-> I'm currently running Arch Linux with kernel 2.6.17-beyond4 on an IBM
-> Thinkpad X20. Bluez-libs and bluez-utils are version 3.1. However,
-> I noticed this problem in 2005 summer already with I think kernel 2.6.11
-> and 2.6.12.
-> 
-> Has this sort of thing been reported by anyone else?
+I'm a french user of a debian and a sagem phone.
+I use a belkin BT dongle.
 
-when I wrote the dtl1_cs driver it was back in 2001 and most devices
-where not capable of high speeds like EDGE. So this is actually a driver
-problem, but at the moment I have no idea on how to fix it. I haven't
-looked at this driver for a very long time.
+I load everything : see dmesg
+Oct 15 14:50:07 localhost kernel: Bluetooth: HCI device and connection 
+manager initialized
+Oct 15 14:50:07 localhost kernel: Bluetooth: HCI socket layer initialized
+Oct 15 14:50:17 localhost kernel: Bluetooth: L2CAP ver 2.8
+Oct 15 14:50:17 localhost kernel: Bluetooth: L2CAP socket layer initialized
+Oct 15 14:50:17 localhost kernel: Bluetooth: RFCOMM socket layer initialized
+Oct 15 14:50:17 localhost kernel: Bluetooth: RFCOMM TTY layer initialized
+Oct 15 14:50:17 localhost kernel: Bluetooth: RFCOMM ver 1.8
 
-Regards
+I've got error while searching for device (can't see my pc via my phone 
+and vice versa)
 
-Marcel
+run hcidump :
 
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+    lap 0x9e8b33 len 8 num 0
+ > HCI Event: Command Status (0x0f) plen 4
+    Inquiry (0x01|0x0001) status 0x00 ncmd 1
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e33 class 0x7a0204 rssi -69
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e33 class 0x7a0204 rssi -70
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e33 class 0x7a0204 rssi -71
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e32 class 0x7a0204 rssi -70
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e32 class 0x7a0204 rssi -70
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e32 class 0x7a0204 rssi -69
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e32 class 0x7a0204 rssi -68
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e32 class 0x7a0204 rssi -65
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e32 class 0x7a0204 rssi -68
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e33 class 0x7a0204 rssi -66
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e32 class 0x7a0204 rssi -71
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+    bdaddr 08:00:28:F9:9A:96 mode 1 clkoffset 0x6e32 class 0x7a0204 rssi -69
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+    lap 0x9e8b33 len 6 num 0
+ > HCI Event: Command Status (0x0f) plen 4
+    Inquiry (0x01|0x0001) status 0x12 ncmd 1
+    Error: Invalid HCI Command Parameters
+ > HCI Event: Inquiry Complete (0x01) plen 1
+    status 0x00
 
+any suggestion ?!
+
+thank you !!
+
+Romain
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
