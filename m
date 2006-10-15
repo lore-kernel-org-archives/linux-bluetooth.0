@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <pan.2006.10.14.17.06.38.297781@gmail.com>
-References: <pan.2006.10.14.17.06.38.297781@gmail.com>
-Date: Sun, 15 Oct 2006 15:13:28 +0200
-Message-Id: <1160918008.23675.12.camel@localhost>
+In-Reply-To: <45312FB1.5090600@drick.de>
+References: <45312FB1.5090600@drick.de>
+Date: Sun, 15 Oct 2006 15:12:39 +0200
+Message-Id: <1160917959.23675.10.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Problems with sourceforge?
+Subject: Re: [Bluez-users] How to execute a command on link_key_request?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,19 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Thomas,
+Hi Timo,
 
-> I seem to have dificulties reaching the project's released files on the
-> sourceforge server.
+> i set up my headset with a usb bluetooth dongle. With bluez and btsco it 
+> works very well. I am able to use it with any voip application.
+> But i have to start btsco <address of headset> every time i want to 
+> establish a connection to the headset.
+> I see in the syslog that hcid receive following message every time i 
+> turn on my headset:
+> hcid[4593]: link_key_request (sba=00:0A:3A:6B:XX:XX, dba=00:0D:44:5C:XX:XX)
 > 
-> At http://bluez.sourceforge.net I get 'connection refused', and
-> when I click 'download bluez' at http://sourceforge.net/projects/bluez I
-> get a 'No File Packages Defined' message.
-> 
-> Please look into this,
+> So is it possible to execute a command (e.g. btsco) when such request is 
+> received?
+> If btsco is up i can modify the .btscorc file to catch commands from my 
+> headset. So that is not the question.
 
-wrong people to ask about it. This is a Sourceforge problem, so file a
-bug request with them.
+the simple answer is no. You don't want such creepy hacks.
 
 Regards
 
