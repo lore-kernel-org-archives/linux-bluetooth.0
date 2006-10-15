@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4532A5C1.4080504@xmission.com>
+Date: Sun, 15 Oct 2006 15:18:57 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4532A5C1.4080504@xmission.com>
 References: <453296A6.5030505@xmission.com>
-	<1160943663.14340.10.camel@localhost> <4532A5C1.4080504@xmission.com>
-Date: Sun, 15 Oct 2006 23:29:21 +0200
-Message-Id: <1160947761.14340.13.camel@localhost>
-Mime-Version: 1.0
+	<1160943663.14340.10.camel@localhost>
+In-Reply-To: <1160943663.14340.10.camel@localhost>
 Subject: Re: [Bluez-devel] pskey gone, but bccmd won't build
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,48 +21,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
-
-> >> I noticed pskey disappear from utils/tools in cvs. Is bccmd preferred
-> >> for setting pskey values? bccmd won't build from the current utils.
-> > 
-> > bccmd is the successor of pskey and you should use --enable-bccmd to
-> > build and install it correctly.
-> 
-> (I can't do a toplevel make: there is a dbus problem on ubuntu and
-> --disable-dbus doesn't really disable dbus)
-
-the D-Bus is mandatory, so you can't disable it. However there is no
-D-Bus problem with Ubuntu Dapper or Edgy. I tested both by myself.
-
-> shouldn't this work?
-> 
-> $ ./configure --enable-bccmd
->  ...
-> $ make -C common/
->  ...
-> $ make -C tools
->  ...
-> $ make -C tools bccmd
-> make: Entering directory
-> `/media/usbdisk/goo/home/bmidgley/src/bluez/utils/tools'
-> /bin/sh ../libtool --mode=link gcc -I/usr/local/include
-> -I/usr/local/include -Wall -O2 -D_FORTIFY_SOURCE=2  -o bccmd
-> gcc -I/usr/local/include -I/usr/local/include -Wall -O2
-> -D_FORTIFY_SOURCE=2 -o bccmd
-> gcc: no input files
-> make: *** [bccmd] Error 1
-> make: Leaving directory
-> `/media/usbdisk/goo/home/bmidgley/src/bluez/utils/tools'
-
-Call configure with --enable-bccmd and then call make in the common and
-tools directory. That should work fine.
-
-Regards
-
 Marcel
 
+>> I noticed pskey disappear from utils/tools in cvs. Is bccmd preferred
+>> for setting pskey values? bccmd won't build from the current utils.
+> 
+> bccmd is the successor of pskey and you should use --enable-bccmd to
+> build and install it correctly.
 
+(I can't do a toplevel make: there is a dbus problem on ubuntu and
+--disable-dbus doesn't really disable dbus)
+
+shouldn't this work?
+
+$ ./configure --enable-bccmd
+ ...
+$ make -C common/
+ ...
+$ make -C tools
+ ...
+$ make -C tools bccmd
+make: Entering directory
+`/media/usbdisk/goo/home/bmidgley/src/bluez/utils/tools'
+/bin/sh ../libtool --mode=link gcc -I/usr/local/include
+-I/usr/local/include -Wall -O2 -D_FORTIFY_SOURCE=2  -o bccmd
+gcc -I/usr/local/include -I/usr/local/include -Wall -O2
+-D_FORTIFY_SOURCE=2 -o bccmd
+gcc: no input files
+make: *** [bccmd] Error 1
+make: Leaving directory
+`/media/usbdisk/goo/home/bmidgley/src/bluez/utils/tools'
+
+Brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
