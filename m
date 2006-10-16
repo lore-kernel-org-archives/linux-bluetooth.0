@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
+Date: Mon, 16 Oct 2006 12:40:27 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3f5a9ba20610152225h7e020518m3c6062ce9be25044@mail.gmail.com>
-References: <3f5a9ba20610152225h7e020518m3c6062ce9be25044@mail.gmail.com>
-Date: Mon, 16 Oct 2006 14:15:50 +0200
-Message-Id: <1161000951.10392.26.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] the effect of linux 2.6.18 to the bluez
+In-Reply-To: <4532BD75.6050405@xmission.com>
+Message-ID: <Pine.LNX.4.63.0610161234370.18216@redbean.intranet.gw-instruments.de>
+References: <453296A6.5030505@xmission.com>
+	<1160943663.14340.10.camel@localhost>
+	<4532A5C1.4080504@xmission.com> <1160947761.14340.13.camel@localhost>
+	<4532BD75.6050405@xmission.com>
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] pskey gone, but bccmd won't build
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,97 +23,49 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Am Montag, den 16.10.2006, 13:25 +0800 schrieb Mingfan.Lu:
-> the following is my test result in a real machine:
-> [...]
 
-Okay, due to your tenacious demand, I compiled and installed a plain
-2.6.18.1 vanilla kernel as well as a 2.6.18.1 kernel with the latest
--mh5 patch applied.
-I will show you my test results for two files, the first being 1376034
-bytes (1,31MB) in size and the second being 2397995 bytes (2,29MB) in
-size.
-Let me at first mention the results that I got. I didn't encounter any
-slowness by using a 2.6.18.1 vanilla kernel. However it looks like the
-newly introduced and applied flow control may slow down the transfer
-speed. But be aware that (L2CAP) flow control mode is in action only by
-using two Linux kernels that have one of the latest -mh* patches
-applied! This mode is not(!) used by transmission between a Linux
-computer and another one that uses a proprietary Bluetooth software
-stack (even if the new Symbian OS may be able to use flow control mode,
-too), or say two Linux computers of which one has a kernel without this
-new patch applied.
-You didn't specify your exact settings -> did you apply one of the
-latest -mh* patches to you 2.6.18 kernel or not? Which computers did you
-use (one is the Linux computer but who is the other one)?
+Hi Brad, 
 
-So here are my results. The first three tests were done between a Linux
-computer and an Apple iMac G4 with the Apple Bluetooth stack that comes
-with Mac OS X 10.4:
+inofficial answer below ...... 
 
-Test with kernel 2.6.18.1 and Apple Bluetooth Stack:
-Retrieval:
-1376034 bytes -> 58 sec -> 23KB/s
-2397995 bytes -> 95 sec -> 25KB/s
+On Sun, 15 Oct 2006, Brad Midgley wrote:
 
-Transmission:
-1376034 bytes -> 42 sec -> 32KB/s
-2397995 bytes -> 73 sec -> 32KB/s
+> Marcel
+> 
+> I see a few values without a description. If someone knows where I can
+> look these up, I'd give you a patch.
+> 
+> # ./bccmd -t HCI psread
 
+> // 0x00dc
+Local Name 0 (only used by older FW) 
+> &00dc = 006d 0065 0064 002d 0030 0000 0000 0000 0000 0000 0000 0000 0000
+> 0000
 
-Test with kernel 2.6.15 (Ubuntu Dapper Drake) and Apple Bluetooth Stack:
-Retrieval:
-1376034 bytes -> 57 sec -> 24KB/s
-2397995 bytes -> 99 sec -> 24KB/s
+> // 0x00dd
+Local Name 1 (only used by older FW) 
+> &00dd = 002e 0063 006f 006d 002d 0030 0000 0000 0000 0000 0000 0000 0000
+> 0000
 
-Transmission:
-1376034 bytes -> 46 sec -> 29KB/s
-2397995 bytes -> 77 sec -> 30KB/s
+> // 0x00ee
+Local Name Length
+> &00ee = 0005
 
+> // 0x0191
+PSKEY_HOSTIO_UART_PS_BLOCK
+> &0191 = 03b0 00a8 00fa 0014 0004 0000 0004 001e 0064 000a
 
-Test with kernel 2.6.18.1-mh5 and Apple Bluetooth Stack:
-Retrieval:
-1376034 bytes -> 54 sec -> 25KB/s
-2397995 bytes -> 94 sec -> 25KB/s
+All keys you asked for are only used by older CSR FW Versions (I think pre 
+1.2.18 or so). 
 
-Transmission:
-1376034 bytes -> 43 sec -> 31KB/s
-2397995 bytes -> 73 sec -> 32KB/s
+Ciao, 
 
+Peter 
 
-------------(now between two Linux computers)---------
-Test with kernel 2.6.18.1-mh5 to kernel 2.6.18.1-mh5
-Retrieval:
-1376034 bytes -> 88 sec -> 15KB/s
-2397995 bytes -> 154 sec -> 15KB/s
-
-Transmission:
-1376034 bytes -> 82 sec -> 16KB/s
-2397995 bytes -> 140 sec -> 17KB/s
-
-
-Test with kernel 2.6.18.1-mh5 to kernel 2.6.15 (Ubuntu Dapper Drake)
-Retrieval:
-1376034 bytes -> 57 sec -> 24KB/s
-2397995 bytes -> 99 sec -> 24KB/s
-
-Transmission:
-1376034 bytes -> 68 sec -> 20KB/s
-2397995 bytes -> 114 sec -> 21KB/s
-
-
-As you can see -- the transmission speed is quite constant between the
-same setups. Two things would need more investigations:
-(1) Why is it that a file transfer from Linux to Apple is faster than 
-    between two Linux entities?
-(2) Is it really L2CAP Flow Control Mode that slows down the connection 
-    with its protocol overhead?
-
-If Flow Control Mode really slows down the connection, we should try to
-implement a user interface to enable or disable this mode. But currently
-this is not urgent as no other device makes use of it.
-
-Martin
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
 
 
 -------------------------------------------------------------------------
