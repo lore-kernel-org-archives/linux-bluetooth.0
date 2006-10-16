@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <3f5a9ba20610152225h7e020518m3c6062ce9be25044@mail.gmail.com>
-Date: Mon, 16 Oct 2006 13:25:28 +0800
-From: "Mingfan.Lu" <lucharse@gmail.com>
-To: "BlueZ development" <Bluez-devel@lists.sourceforge.net>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Mon, 16 Oct 2006 10:53:37 +1000
 MIME-Version: 1.0
-Subject: [Bluez-devel] the effect of linux 2.6.18 to the bluez
+Message-Id: <200610161053.38091.denis.kenzior@trolltech.com>
+Subject: [Bluez-devel] [Weekly-au] Week 41 2006
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,139 +14,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2071610705=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============2071610705==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_112721_18033689.1160976328618"
+Monday-Tuesday
+- Bluetooth on Greenphone (gave up yet again)
 
-------=_Part_112721_18033689.1160976328618
-Content-Type: text/plain; charset=GB2312; format=flowed
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+Wednesday
+- Bluetooth Sessioning for 4.2
+- Bug fixing in Bluetooth related to supporter:129628
+- Small bug fixes in 4.1
 
-SGksYWxsLAoKdGhlIGZvbGxvd2luZyBpcyBteSB0ZXN0IHJlc3VsdCBpbiBhIHJlYWwgbWFjaGlu
-ZToKCk1lbW9yeTogICAgMUcgRERSIDUzMwoKSGFyZCBEaXNrOiA1NDAw16ogOE0gY2FjaGUKCkNQ
-VTogICAgICAgICAgIFBNIDEuODZHIDJNIGNhY2hlCj09T1M6IHN1c2UgMTAuMQo9PWtlcm5lbCAy
-LjYuMTYuMTMtNCBhbmQgMi42LjE4Cj09RmlsZXM6IDIgZmlsZSxvbmUgaXMgMU0sIHRoZSBvdGhl
-ciBpcyAgNzdrCj09Qmx1ZXRvb3RoIE9CRVggT2JqZWN0IFB1c2ggY2xpZW50ICgwLjk5IGJldGEx
-KSB0byBwdXNoIGZpbGUKPT1yZXN1bHQ6CgpBdmUuIHRpbWUKCiBLZXJuZWwgIDIuNi4xNgoKIEtl
-cm5lbCAgMi42LjE4CgpGaXJzdCBGaWxlICgxTSkKCjY4IHMKCjExNSBzCgpTZWNvbmQgRmlsZSAo
-NzdrKQoKNSBzCgo5IHMKCiB+MTVLcHMgIGluIDIuNi4xNgogIH44LjVLcHMgIGluIDIuNi4xOApz
-dGlsbCBzbG93ZXIuCgoyMDA2LzEwLzksIE1pbmdmYW4uIEx1IDxsdWNoYXJzZUBnbWFpbC5jb20+
-OiAtIM/Uyr7S/dPDzsTX1iAtCgotLSAKV2l0aCByZXNwZWN0cywKICAgTWluZ2Zhbi5MdQo=
-------=_Part_112721_18033689.1160976328618
-Content-Type: text/html; charset=GB2312
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+Thursday
+- Downloading Specs off Bluetooth.org in case they get pulled
+- Reading Bluetooth Specs
+- Updating the Spec for 4.3
+- Bluetooth self-education
 
-PGJyIGNsZWFyPSJhbGwiPgo8ZGl2PkhpLGFsbCw8L2Rpdj4KPGRpdj4mbmJzcDs8L2Rpdj4KPGRp
-dj50aGUgZm9sbG93aW5nIGlzIG15IHRlc3QgcmVzdWx0IGluIGEgcmVhbCBtYWNoaW5lOjwvZGl2
-Pgo8ZGl2Pgo8cD48c3BhbiBsYW5nPSJFTi1VUyIgc3R5bGU9IkNPTE9SOiAjMWY0OTdkIj5NZW1v
-cnk6ICZuYnNwOyZuYnNwOyAxRyBERFIgNTMzPC9zcGFuPjwvcD4KPHA+PHNwYW4gbGFuZz0iRU4t
-VVMiIHN0eWxlPSJDT0xPUjogIzFmNDk3ZCI+PC9zcGFuPjxzcGFuIGxhbmc9IkVOLVVTIiBzdHls
-ZT0iQ09MT1I6ICMxZjQ5N2QiPkhhcmQgRGlzazogNTQwMDwvc3Bhbj48c3BhbiBzdHlsZT0iQ09M
-T1I6ICMxZjQ5N2QiPteqPC9zcGFuPjxzcGFuIGxhbmc9IkVOLVVTIiBzdHlsZT0iQ09MT1I6ICMx
-ZjQ5N2QiPiA4TSBjYWNoZTwvc3Bhbj48L3A+CjxwPjxzcGFuIGxhbmc9IkVOLVVTIiBzdHlsZT0i
-Q09MT1I6ICMxZjQ5N2QiPkNQVTogJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7IFBNIDEuODZHIDJNIGNhY2hlIDwvc3Bhbj48L3A+PC9kaXY+Cjxk
-aXY+PT1PUzogc3VzZSAxMC4xPC9kaXY+CjxkaXY+PT1rZXJuZWwgMi42LjE2LjEzLTQgYW5kIDIu
-Ni4xODwvZGl2Pgo8ZGl2Pj09RmlsZXM6IDIgZmlsZSxvbmUgaXMgMU0sIHRoZSBvdGhlciBpcyZu
-YnNwOyZuYnNwOzc3azwvZGl2Pgo8ZGl2Pj09Qmx1ZXRvb3RoIE9CRVggT2JqZWN0IFB1c2ggY2xp
-ZW50ICgwLjk5IGJldGExKSB0byBwdXNoIGZpbGU8L2Rpdj4KPGRpdj49PXJlc3VsdDo8L2Rpdj4K
-PGRpdj4KPHRhYmxlIHN0eWxlPSJNQVJHSU4tTEVGVDogMjEuNzVwdDsgQk9SREVSLUNPTExBUFNF
-OiBjb2xsYXBzZSIgY2VsbHNwYWNpbmc9IjAiIGNlbGxwYWRkaW5nPSIwIiBib3JkZXI9IjAiPgo8
-dGJvZHk+Cjx0cj4KPHRkIHN0eWxlPSJCT1JERVItUklHSFQ6IG1lZGl1bSBub25lOyBQQURESU5H
-LVJJR0hUOiA1LjRwdDsgQk9SREVSLVRPUDogbWVkaXVtIG5vbmU7IFBBRERJTkctTEVGVDogNS40
-cHQ7IEJBQ0tHUk9VTkQ6IHdoaXRlOyBQQURESU5HLUJPVFRPTTogMGNtOyBCT1JERVItTEVGVDog
-bWVkaXVtIG5vbmU7IFdJRFRIOiA1Y207IFBBRERJTkctVE9QOiAwY207IEJPUkRFUi1CT1RUT006
-ICM0ZjgxYmQgM3B0IHNvbGlkIiB2YWxpZ249InRvcCIgd2lkdGg9IjE4OSI+Cgo8cD5BdmUuIHRp
-bWU8L3A+PC90ZD4KPHRkIHN0eWxlPSJCT1JERVItUklHSFQ6IG1lZGl1bSBub25lOyBQQURESU5H
-LVJJR0hUOiA1LjRwdDsgQk9SREVSLVRPUDogbWVkaXVtIG5vbmU7IFBBRERJTkctTEVGVDogNS40
-cHQ7IEJBQ0tHUk9VTkQ6IHdoaXRlOyBQQURESU5HLUJPVFRPTTogMGNtOyBCT1JERVItTEVGVDog
-bWVkaXVtIG5vbmU7IFdJRFRIOiA0Mi41NXB0OyBQQURESU5HLVRPUDogMGNtOyBCT1JERVItQk9U
-VE9NOiAjNGY4MWJkIDNwdCBzb2xpZCIgdmFsaWduPSJ0b3AiIHdpZHRoPSI1NyI+Cgo8cD48c3Bh
-biBsYW5nPSJFTi1VUyIgc3R5bGU9IkNPTE9SOiBibGFjayI+Jm5ic3A7S2VybmVsPC9zcGFuPjxz
-cGFuIGxhbmc9IkVOLVVTIiBzdHlsZT0iQ09MT1I6IGJsYWNrIj4mbmJzcDsgMi42LjE2Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7PC9z
-cGFuPjwvcD48L3RkPgo8dGQgc3R5bGU9IkJPUkRFUi1SSUdIVDogbWVkaXVtIG5vbmU7IFBBRERJ
-TkctUklHSFQ6IDUuNHB0OyBCT1JERVItVE9QOiBtZWRpdW0gbm9uZTsgUEFERElORy1MRUZUOiA1
-LjRwdDsgQkFDS0dST1VORDogd2hpdGU7IFBBRERJTkctQk9UVE9NOiAwY207IEJPUkRFUi1MRUZU
-OiBtZWRpdW0gbm9uZTsgV0lEVEg6IDQyLjVwdDsgUEFERElORy1UT1A6IDBjbTsgQk9SREVSLUJP
-VFRPTTogIzRmODFiZCAzcHQgc29saWQiIHZhbGlnbj0idG9wIiB3aWR0aD0iNTciPgoKPHA+PHNw
-YW4gbGFuZz0iRU4tVVMiIHN0eWxlPSJDT0xPUjogYmxhY2siPiZuYnNwO0tlcm5lbDwvc3Bhbj48
-c3BhbiBsYW5nPSJFTi1VUyIgc3R5bGU9IkNPTE9SOiBibGFjayI+Jm5ic3A7IDIuNi4xODwvc3Bh
-bj48L3A+PC90ZD48L3RyPgo8dHI+Cjx0ZCBzdHlsZT0iQk9SREVSLVJJR0hUOiAjNGY4MWJkIDFw
-dCBzb2xpZDsgUEFERElORy1SSUdIVDogNS40cHQ7IEJPUkRFUi1UT1A6IG1lZGl1bSBub25lOyBQ
-QURESU5HLUxFRlQ6IDUuNHB0OyBCQUNLR1JPVU5EOiB3aGl0ZTsgUEFERElORy1CT1RUT006IDBj
-bTsgQk9SREVSLUxFRlQ6IG1lZGl1bSBub25lOyBXSURUSDogNWNtOyBQQURESU5HLVRPUDogMGNt
-OyBCT1JERVItQk9UVE9NOiBtZWRpdW0gbm9uZSIgdmFsaWduPSJ0b3AiIHdpZHRoPSIxODkiPgoK
-PHA+PHNwYW4gbGFuZz0iRU4tVVMiIHN0eWxlPSJDT0xPUjogYmxhY2siPkZpcnN0Jm5ic3A7Rmls
-ZSAoMU0pPC9zcGFuPjwvcD48L3RkPgo8dGQgc3R5bGU9IlBBRERJTkctUklHSFQ6IDUuNHB0OyBQ
-QURESU5HLUxFRlQ6IDUuNHB0OyBCQUNLR1JPVU5EOiAjZDNkZmVlOyBQQURESU5HLUJPVFRPTTog
-MGNtOyBXSURUSDogNDIuNTVwdDsgUEFERElORy1UT1A6IDBjbSIgdmFsaWduPSJ0b3AiIHdpZHRo
-PSI1NyI+CjxwIHN0eWxlPSJURVhULUFMSUdOOiBjZW50ZXIiIGFsaWduPSJjZW50ZXIiPjxzcGFu
-IGxhbmc9IkVOLVVTIiBzdHlsZT0iQ09MT1I6IGJsYWNrIj42OCBzPC9zcGFuPjwvcD48L3RkPgo8
-dGQgc3R5bGU9IkJPUkRFUi1SSUdIVDogIzRmODFiZCAxcHQgc29saWQ7IFBBRERJTkctUklHSFQ6
-IDUuNHB0OyBCT1JERVItVE9QOiBtZWRpdW0gbm9uZTsgUEFERElORy1MRUZUOiA1LjRwdDsgQkFD
-S0dST1VORDogI2QzZGZlZTsgUEFERElORy1CT1RUT006IDBjbTsgQk9SREVSLUxFRlQ6IG1lZGl1
-bSBub25lOyBXSURUSDogNDIuNXB0OyBQQURESU5HLVRPUDogMGNtOyBCT1JERVItQk9UVE9NOiBt
-ZWRpdW0gbm9uZSIgdmFsaWduPSJ0b3AiIHdpZHRoPSI1NyI+Cgo8cCBzdHlsZT0iVEVYVC1BTElH
-TjogY2VudGVyIiBhbGlnbj0iY2VudGVyIj48c3BhbiBsYW5nPSJFTi1VUyIgc3R5bGU9IkNPTE9S
-OiBibGFjayI+MTE1IHM8L3NwYW4+PC9wPjwvdGQ+PC90cj4KPHRyPgo8dGQgc3R5bGU9IkJPUkRF
-Ui1SSUdIVDogIzRmODFiZCAxcHQgc29saWQ7IFBBRERJTkctUklHSFQ6IDUuNHB0OyBCT1JERVIt
-VE9QOiBtZWRpdW0gbm9uZTsgUEFERElORy1MRUZUOiA1LjRwdDsgQkFDS0dST1VORDogd2hpdGU7
-IFBBRERJTkctQk9UVE9NOiAwY207IEJPUkRFUi1MRUZUOiBtZWRpdW0gbm9uZTsgV0lEVEg6IDVj
-bTsgUEFERElORy1UT1A6IDBjbTsgQk9SREVSLUJPVFRPTTogbWVkaXVtIG5vbmUiIHZhbGlnbj0i
-dG9wIiB3aWR0aD0iMTg5Ij4KCjxwPjxzcGFuIGxhbmc9IkVOLVVTIiBzdHlsZT0iQ09MT1I6IGJs
-YWNrIj5TZWNvbmQgRmlsZSZuYnNwOyg3N2spPC9zcGFuPjwvcD48L3RkPgo8dGQgc3R5bGU9IkJP
-UkRFUi1SSUdIVDogbWVkaXVtIG5vbmU7IFBBRERJTkctUklHSFQ6IDUuNHB0OyBCT1JERVItVE9Q
-OiBtZWRpdW0gbm9uZTsgUEFERElORy1MRUZUOiA1LjRwdDsgUEFERElORy1CT1RUT006IDBjbTsg
-Qk9SREVSLUxFRlQ6IG1lZGl1bSBub25lOyBXSURUSDogNDIuNTVwdDsgUEFERElORy1UT1A6IDBj
-bTsgQk9SREVSLUJPVFRPTTogIzRmODFiZCAxcHQgc29saWQiIHZhbGlnbj0idG9wIiB3aWR0aD0i
-NTciPgoKPHAgc3R5bGU9IlRFWFQtQUxJR046IGNlbnRlciIgYWxpZ249ImNlbnRlciI+PHNwYW4g
-bGFuZz0iRU4tVVMiIHN0eWxlPSJDT0xPUjogYmxhY2siPjUgczwvc3Bhbj48L3A+PC90ZD4KPHRk
-IHN0eWxlPSJCT1JERVItUklHSFQ6ICM0ZjgxYmQgMXB0IHNvbGlkOyBQQURESU5HLVJJR0hUOiA1
-LjRwdDsgQk9SREVSLVRPUDogbWVkaXVtIG5vbmU7IFBBRERJTkctTEVGVDogNS40cHQ7IFBBRERJ
-TkctQk9UVE9NOiAwY207IEJPUkRFUi1MRUZUOiBtZWRpdW0gbm9uZTsgV0lEVEg6IDQyLjVwdDsg
-UEFERElORy1UT1A6IDBjbTsgQk9SREVSLUJPVFRPTTogIzRmODFiZCAxcHQgc29saWQiIHZhbGln
-bj0idG9wIiB3aWR0aD0iNTciPgoKPHAgc3R5bGU9IlRFWFQtQUxJR046IGNlbnRlciIgYWxpZ249
-ImNlbnRlciI+PHNwYW4gbGFuZz0iRU4tVVMiIHN0eWxlPSJDT0xPUjogYmxhY2siPjkgczwvc3Bh
-bj48L3A+PC90ZD48L3RyPjwvdGJvZHk+PC90YWJsZT4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsgPC9kaXY+CjxkaXY+Jm5ic3A7fjE1S3BzICZuYnNwO2luIDIuNi4xNjwvZGl2
-Pgo8ZGl2PiZuYnNwOyB+OC41S3BzJm5ic3A7IGluIDIuNi4xODwvZGl2Pgo8ZGl2PnN0aWxsIHNs
-b3dlci48YnI+Jm5ic3A7PC9kaXY+CjxkaXY+PHNwYW4gY2xhc3M9ImdtYWlsX3F1b3RlIj4yMDA2
-LzEwLzksIE1pbmdmYW4uIEx1ICZsdDs8YSBvbmNsaWNrPSJyZXR1cm4gdG9wLmpzLk9wZW5FeHRM
-aW5rKHdpbmRvdyxldmVudCx0aGlzKSIgaHJlZj0ibWFpbHRvOmx1Y2hhcnNlQGdtYWlsLmNvbSIg
-dGFyZ2V0PSJfYmxhbmsiPmx1Y2hhcnNlQGdtYWlsLmNvbTwvYT4mZ3Q7Ojwvc3Bhbj4gCjxkaXY+
-CjxkaXYgY2xhc3M9ImVhIj48c3BhbiBpZD0iZV8xMGUzNjdlNDY4ZWYzYzIxXzEiPjxmb250IHNp
-emU9IjIiPi0gz9TKvtL908POxNfWIC08L2ZvbnQ+PC9zcGFuPjwvZGl2PjwvZGl2PjwvZGl2Pjxi
-cj4tLSA8YnI+V2l0aCByZXNwZWN0cyw8YnI+Jm5ic3A7Jm5ic3A7IE1pbmdmYW4uTHUgCg==
-------=_Part_112721_18033689.1160976328618--
-
-
---===============2071610705==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Friday
+- Updating the Spec for 4.3
+- Bluetooth Specs
+- Catching up on BlueZ-devel
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============2071610705==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============2071610705==--
