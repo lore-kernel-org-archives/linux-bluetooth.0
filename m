@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4532DBA4.5060009@gmail.com>
-Date: Sun, 15 Oct 2006 22:08:52 -0300
-From: Manuel Naranjo <naranjo.manuel@gmail.com>
-MIME-Version: 1.0
+Date: Sun, 15 Oct 2006 17:51:29 -0700
+From: Benn <bb.bluez@magitech.org>
+Message-ID: <1189514901.20061015175129@magitech.org>
 To: Bluez-users@lists.sourceforge.net
-References: <4531BD65.1020107@gmail.com> <1160917860.23675.7.camel@localhost>
-	<453233F5.3030302@gmail.com>
-In-Reply-To: <453233F5.3030302@gmail.com>
-Subject: Re: [Bluez-users] PIN Authentication Problems on MDV 2007
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-users] Test Framework
+Reply-To: Benn <bb.bluez@magitech.org>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,22 +19,11 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Manuel Naranjo wrote:
->
->>
->> starting with bluez-utils-3.x the PIN helper concept has been replaced
->> with a passkey agent interface. You need to run a passkey agent to get
->> you PIN request dialog. One example would be bt-applet from the
->> bluez-gnome package
-> Hi Marcel,
-> Ok, thanks, but.... How do I tell BlueZ which agent to use?
-> Cheers,
-> Manuel
->
-I could fix it. How do I tell BlueZ to always use the same passkey 
-agent? Like it was done in the pass with the pin stuff?
-Cheers,
-Manuel
+Hello All --
+
+Is it possible to emulate bluetooth devices in software for framework testing?
+-B
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
