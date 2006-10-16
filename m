@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: 17 Oct 2006 18:21:00 +0200
-From: Dietmar Segbert <trebges@web.de>
-To: <bluez-users@lists.sourceforge.net>
-Message-ID: <A32i87f9SyB@trebges.web.de>
-In-Reply-To: <1160984127.5498.0.camel@localhost>
-References: <1160984127.5498.0.camel@localhost>
-Subject: Re: [Bluez-users] PIN Authentication Problems on MDV 2007
+From: Per Thomas Jahr <perja@extern.uio.no>
+To: bluez-users@lists.sf.net
+Date: Mon, 16 Oct 2006 21:36:33 +0200
+Message-Id: <1161027393.3860.18.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-users] Address endianess?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,38 +14,33 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello Marcel,
+Hi, 
 
-> marcel@holtmann.org schrieb am 17.10.06:
->>>> starting with bluez-utils-3.x the PIN helper concept has been
->>>> replaced with a passkey agent interface. You need to run a
->>>> passkey agent to get you PIN request dialog. One example would
->>>> be bt-applet from the bluez-gnome package
-i have compiled bluez-utils-3.7 and copied the passkey-agent from the
-hcid/ to /usr/local/bin manually.
+Is there a standard ordering of the bytes in a bluetooth address?  
 
-I have googled and i find a line
+On my linux box (2.6.12.1):
+# hcitool dev 
+Devices:
+        hci0    00:02:72:C0:7C:2B
 
-passkey-agent --default /usr/bin/bluepin
+But when my phone (Sony Ericsson K800i) discovers my server, I get this
+address for the server:
 
-to start the agent.
+2B7CC0720200 
 
-but where i can find "blupin".
+This is from the Java bluetooth api on the device. And yes, I have to
+reverse that address in order to connect to the server.
 
-I have not installed gnome on my system and so i can't compile bluez-
-gnome. I only use a textbased slackware 10.2 with speakup and brltty for
-speech and braille.
+--
+Thanks 
+Per Thomas
 
-Must i install an other key-agent?
+ 
 
-Thanks for your help.
-
-Dietmar
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
