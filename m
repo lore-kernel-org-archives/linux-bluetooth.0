@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Daniel Gollub <dgollub@suse.de>
-To: bluez-devel@lists.sf.net
-Date: Wed, 18 Oct 2006 19:32:18 +0200
-MIME-Version: 1.0
-Message-Id: <200610181932.21788.dgollub@suse.de>
-Subject: [Bluez-devel] Bonding methods only avaliable for present adapters
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <453447B2.000105.05297@bj126app48.126.com>
+References: <453447B2.000105.05297@bj126app48.126.com>
+Date: Wed, 18 Oct 2006 19:20:19 +0200
+Message-Id: <1161192019.30606.20.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] BGB204 Can't init device hci0: Connection
+	timed	out (110)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,28 +23,26 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-i started porting the kcm_btpaired module (KDE controlcenter menu) to make use 
-of the BlueZ DBus API. The kcm_btpaired module is intended to 
-view/list/delete/export/... linkkeys of remote devices. The bonding methods 
-(and other adapter specifics methods ..) can only used when the adapter is 
-present. So the linkkey list in kcm_btpaired will be empty, when there is no 
-bluetooth dongle connected. 
+> I'm using Philips(NXP)BGB204 bluetooth Sip under the Linux 2.6.9
+> kernel and ran into problems now. The scenario was as follows:
 
-Is this intended in the DBus API? That methods, which are based on stored 
-data, not avaliable?
+I have a BGB208 for testing and have some similar problems. The 2.6.9
+should work fine, but I would prefer if you test with a 2.6.18 kernel
+instead, because that one is more recent.
 
-If not, maybe a new object path for known devices would be helpful. 
-Like: /org/bluez/FF:FF:FF:FF:FF or /org/bluez/adapters/FF:FF:FF:FF:FF
+However the following line should attach the device correctly.
 
-Which should provide near the same methods as a present adapter.  At least the 
-function which based on stored stuff from /var/lib/bluetooth/*/*
-Maybe this can also be done with the org.bluez.Adapter interface.
+	./hciattach ttyS1 any 115200 flow
 
-Other suggestions? 
-Or is direct access to linkkeys via filesystem the only way?
+If you use the Ericsson id, it will start with 57600 and then try to
+switch into the higher baudrate. As far as I know all BGB from Philips
+boot up by default in 115200.
 
-best regards,
-Daniel
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
