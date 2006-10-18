@@ -1,13 +1,22 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Wed, 18 Oct 2006 17:03:52 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <453447B2.000105.05297@bj126app48.126.com>
-References: <453447B2.000105.05297@bj126app48.126.com>
-Date: Wed, 18 Oct 2006 19:20:19 +0200
-Message-Id: <1161192019.30606.20.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] BGB204 Can't init device hci0: Connection
-	timed	out (110)
+Message-ID: <20061018140352.GA11008@localhost.localdomain>
+References: <1155819360.4075.123.camel@aeonflux.holtmann.net>
+	<20060817113538.GB5118@srcf.ucam.org>
+	<1155823499.4075.157.camel@aeonflux.holtmann.net>
+	<20060817122559.GA6422@srcf.ucam.org>
+	<20060817124514.GA27427@localhost.localdomain>
+	<1155819813.18545.36.camel@cookie.hadess.net>
+	<1155839761.4075.165.camel@aeonflux.holtmann.net>
+	<44E5B2A5.1070002@palmsource.com>
+	<1155924372.4075.191.camel@aeonflux.holtmann.net>
+	<45362E18.1040909@palmsource.com>
+MIME-Version: 1.0
+In-Reply-To: <45362E18.1040909@palmsource.com>
+Subject: Re: [Bluez-devel]
+	DBus	interface	-	determining	whether	a	device	exists
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,28 +30,81 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Fred,
 
-> I'm using Philips(NXP)BGB204 bluetooth Sip under the Linux 2.6.9
-> kernel and ran into problems now. The scenario was as follows:
+On Wed, Oct 18, 2006, Frederic Danis wrote:
+> You can find attached a new patch implementing ListRemoteDevices and 
+> ListRecentRemoteDevices.
 
-I have a BGB208 for testing and have some similar problems. The 2.6.9
-should work fine, but I would prefer if you test with a 2.6.18 kernel
-instead, because that one is more recent.
+Couple of notes about your patch:
 
-However the following line should attach the device correctly.
+> +static void list_remote_devices_do_append(char *key, char *value, void *data)
+> +{
+> +	struct remote_device_list_t *param = data;
+> +	char *address;
+> +	struct tm date;
+> +
+> +	if (slist_find(param->list, key, (cmp_func_t) bacmp))
+> +		return;
 
-	./hciattach ttyS1 any 115200 flow
+bacmp takes bdaddr_t pointers not char pointers. You probably want to 
+use strcasecmp.
 
-If you use the Ericsson id, it will start with 57600 and then try to
-switch into the higher baudrate. As far as I know all BGB from Philips
-boot up by default in 115200.
+> +	slist_append(param->list, address);
 
-Regards
+This should be:
+param->list = slist_append(param->list, address);
 
-Marcel
+> +	/* Add Bonded devices to the list */
+> +	create_name(filename, PATH_MAX, STORAGEDIR, adapter->address, "linkkeys");
+> +	textfile_foreach(filename, list_remote_devices_do_append, &param);
+> +
+> +	/* Add Last Used devices to the list */
+> +	create_name(filename, PATH_MAX, STORAGEDIR, adapter->address, "lastused");
+> +	textfile_foreach(filename, list_remote_devices_do_append, &param);
+> +
+> +	/* Add Last Seen devices to the list */
+> +	create_name(filename, PATH_MAX, STORAGEDIR, adapter->address, "lastseen");
+> +	textfile_foreach(filename, list_remote_devices_do_append, &param);
+> +
+> +	reply = dbus_message_new_method_return(msg);
+> +
+> +	dbus_message_iter_init_append(reply, &iter);
+> +
+> +	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+> +				DBUS_TYPE_STRING_AS_STRING, &array_iter);
+> +
+> +	slist_foreach(param.list, remote_devices_do_append, &array_iter);
+> +
+> +	slist_free(param.list);
 
+slist_free only frees the nodes in the list but not the data they point 
+to (the strings which have been allocated with strdup). So you probably 
+want to call slist_foreach(param.list, (slist_func_t) free, NULL) before 
+slist_free or free the data in remote_devices_do_append.
 
+> +	/* Add Bonded devices to the list */
+> +	create_name(filename, PATH_MAX, STORAGEDIR, adapter->address, "linkkeys");
+> +	textfile_foreach(filename, list_remote_devices_do_append, &param);
+> +
+> +	/* Add Last Used devices to the list */
+> +	create_name(filename, PATH_MAX, STORAGEDIR, adapter->address, "lastused");
+> +	textfile_foreach(filename, list_remote_devices_do_append, &param);
+> +
+> +	reply = dbus_message_new_method_return(msg);
+> +
+> +	dbus_message_iter_init_append(reply, &iter);
+> +
+> +	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+> +				DBUS_TYPE_STRING_AS_STRING, &array_iter);
+> +
+> +	slist_foreach(param.list, remote_devices_do_append, &array_iter);
+> +
+> +	slist_free(param.list);
+
+And same applies here.
+
+Johan
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
