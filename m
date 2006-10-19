@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
+From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Fri, 20 Oct 2006 11:27:15 +1000
-References: <200610191334.25362.denis.kenzior@trolltech.com>
-	<1161249153.27710.5.camel@localhost>
-In-Reply-To: <1161249153.27710.5.camel@localhost>
-MIME-Version: 1.0
-Message-Id: <200610201127.15801.denis.kenzior@trolltech.com>
-Subject: Re: [Bluez-devel] SDP over XML
+In-Reply-To: <3f5a9ba20610190107je24b0bbg6bd5da0a05f6e0f2@mail.gmail.com>
+References: <3f5a9ba20610152225h7e020518m3c6062ce9be25044@mail.gmail.com>
+	<1161000951.10392.26.camel@localhost>
+	<3f5a9ba20610190107je24b0bbg6bd5da0a05f6e0f2@mail.gmail.com>
+Date: Thu, 19 Oct 2006 21:03:57 +0200
+Message-Id: <1161284638.7885.11.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] the effect of linux 2.6.18 to the bluez
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,49 +22,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel,
+Am Donnerstag, den 19.10.2006, 16:07 +0800 schrieb Mingfan.Lu:
 
-On Thursday 19 October 2006 19:12, Marcel Holtmann wrote:
-> any SDP record registration will have to go over D-Bus in the future and
-> it will come along with the service registration feature. However none
-> of this has been set into to stone yet.
->
+> I don't know whether the config make it happen or there is something
+> wrong with it?
+> So, Martin, How about you make config when you building your new
+> kernel?
 
-I'd be very interested in learning what has been proposed so far for doing 
-this.  We'd be very much interested in a flexible architecture, allowing us 
-to specify dynamic records.  E.g. things like Handsfree profile requires SDP 
-records with supported features attributes.  This is something that we just 
-cannot do currently with the existing infrastructure.
+I build the kernels the "debian way" cause I use Ubuntu as well. So
+basically:
+(1) tar xjf linux-2.6.18.x.tar.bz2
+(2) cd linux-2.6.18.x
+(3) patch -p1 < ../patch-2.6.18-mh6
+(4) cp /boot/config-2.6.15-26-686 .config
+(5) make oldconfig
+[edit some config options manually if necessary]
+(6) fakeroot make-kpkg kernel_image modules_image --initrd --revision
+mh6 binary
+(7) cd ..
+(8) dpkg -i kernel-image-2.6.18.xmh6_i386.deb
 
-> The RegisterService... part is under discussion at the moment and I have
-> no idea how the final outcome will look like. I am okay with having an
-> additional method that returns the SDP service record in XML format, but
-> first you would have to define the DTD for it and we have to agree on
-> it.
+Edit /boot/grub/menu.lst if necessary and that's it.
+Your problems are really strange. How do you measure the time? I don't
+think it has anything to do with the config file per se. But I know of
+some pretty neat and improved debugging facilities -- maybe you want to
+check out that there is nothing in action that slows down the machine
+just for the purpose of deadlock detections.
 
-I shall work on forming a DTD.  It most likely will closely follow the BlueZ 
-type structure.  Should I work on the patch for registering/unregistering XML 
-SDP records against hcid as well?
+I'm sorry about it, but it seems extremely hard to me locating such a
+problem that never affects one of my machines. :-/
 
->
-> > Additionally, a lot of the code that is currently in sdptool.c could be
-> > refactored into XML files, and it would be much more trivial to add new
-> > profiles (e.g. as an XML template instead of a function inside sdptool)
->
-> The record add function of sdptool is actually more a development thing,
-> than something you should use in real applications. However I am against
-> adding a dependency on a XML parsing library to sdptool.
->
+Good luck,
+Martin
 
-I completely agree.  However, up to this point sdptool has been the only way 
-to develop "real applications."  Using sdp library directly is not an option 
-for us.  
 
-> Regards
->
-> Marcel
-
--Denis
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
