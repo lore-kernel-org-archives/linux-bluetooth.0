@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45376FBA.8070402@gmx.de>
-Date: Thu, 19 Oct 2006 14:29:46 +0200
-From: Sandro Weiser <sandro.weiser@gmx.de>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] how to disable l2cap kernel messages?
+In-Reply-To: <20061019115608.GB31910@suse.de>
+References: <20061019115608.GB31910@suse.de>
+Date: Thu, 19 Oct 2006 14:04:29 +0200
+Message-Id: <1161259469.27710.40.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] DiscoverDevices with apitest?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +20,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-My syslog is full with messages like:
+Hi Stefan,
 
-Oct 19 14:26:58 x545 kernel: l2cap_recv_acldata: conn ffff81003ed5d8c0
-len 14 fl
-ags 0x2
-Oct 19 14:26:58 x545 kernel: l2cap_recv_frame: len 10, cid 0x0041
-Oct 19 14:26:58 x545 kernel: l2cap_data_channel: sk ffff81002b743400 len
-14 mode
- 0x00
+> i tried today to discover devices with apitest (instead of "hcitool scan"),
+> but it did not work:
+> 
+> seife@strolchi:~> apitest DiscoverDevices
+> None
+> 
+> and it returns immediately. So i tried my luck with direct "dbus-send":
+> seife@strolchi:~> dbus-send --system --dest=org.bluez --print-reply /org/bluez/hci0 org.bluez.Adapter.DiscoverDevices
+> method return sender=:1.541 -> dest=:1.867
+> 
+> No luck either.
+> I always get this in my syslog from hcid:
+> Oct 19 13:52:39 strolchi hcid[17330]: Introspect path:/org/bluez
+> Oct 19 13:52:39 strolchi hcid[17330]: Introspect path:/org/bluez/hci0
+> Oct 19 13:52:39 strolchi hcid[17330]: name_listener_add(:1.869)
+> Oct 19 13:52:39 strolchi hcid[17330]: DiscoverDevices requestor at :1.869 exited before the operation finished
+> Oct 19 13:52:39 strolchi hcid[17330]: name_listener_remove(:1.869)
+> Oct 19 13:52:39 strolchi hcid[17330]: remove_name_listener: no listener for :1.869
+> 
+> So why doesn't the dbus call block? I also tried with a "apitest -l"
+> running in parallel, to see if this would get something discovered, but it
+> didn't:
+> seife@strolchi:~> apitest -l
+> Listening for events...
+> DiscoveryStarted - /org/bluez/hci0:
+> DiscoveryCompleted - /org/bluez/hci0:
+> DiscoveryStarted - /org/bluez/hci0:
+> DiscoveryCompleted - /org/bluez/hci0:
+> Caught signal, exiting
 
-how do I dissable these messages?
+You need to keep the calling application running, because otherwise hcid
+will stop the discovery. That is actually what you see in syslog.
 
-thx
-Sandro
+It is not blocking, because this is simply not a blocking task. You
+might wanna have a look at this blog on how to do it with Python:
+
+http://blogs.gnome.org/view/jamesh/2006/10/19/0
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
