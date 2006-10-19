@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <45376FBA.8070402@gmx.de>
-References: <45376FBA.8070402@gmx.de>
-Date: Thu, 19 Oct 2006 14:42:56 +0200
-Message-Id: <1161261776.27710.44.camel@localhost>
+In-Reply-To: <20061019123516.GA19233@localhost.localdomain>
+References: <20061019115608.GB31910@suse.de>
+	<1161259469.27710.40.camel@localhost>
+	<20061019123133.GA18838@localhost.localdomain>
+	<20061019123516.GA19233@localhost.localdomain>
+Date: Thu, 19 Oct 2006 14:42:10 +0200
+Message-Id: <1161261730.27710.42.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] how to disable l2cap kernel messages?
+Subject: Re: [Bluez-users] DiscoverDevices with apitest?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,22 +23,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Sandro,
+Hi Johan,
 
-> My syslog is full with messages like:
+> Should have actually tested the patch first...
 > 
-> Oct 19 14:26:58 x545 kernel: l2cap_recv_acldata: conn ffff81003ed5d8c0
-> len 14 fl
-> ags 0x2
-> Oct 19 14:26:58 x545 kernel: l2cap_recv_frame: len 10, cid 0x0041
-> Oct 19 14:26:58 x545 kernel: l2cap_data_channel: sk ffff81002b743400 len
-> 14 mode
->  0x00
+> On Thu, Oct 19, 2006, Johan Hedberg wrote:
+> > +        else if not self.listen:
 > 
-> how do I dissable these messages?
+> This should of course be "elif not self.listen:"
 
-you have to compile your kernel without debug messages. Or is this a
-kernel with -mh patch and I left them on by accident.
+commit the fixed version.
 
 Regards
 
