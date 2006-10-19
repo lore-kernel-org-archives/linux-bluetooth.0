@@ -1,16 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 19 Oct 2006 15:49:54 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20061019124954.GA20257@localhost.localdomain>
-References: <20061019115608.GB31910@suse.de>
-	<1161259469.27710.40.camel@localhost>
-	<20061019123133.GA18838@localhost.localdomain>
-	<20061019123516.GA19233@localhost.localdomain>
-	<1161261730.27710.42.camel@localhost>
-MIME-Version: 1.0
-In-Reply-To: <1161261730.27710.42.camel@localhost>
-Subject: Re: [Bluez-users] DiscoverDevices with apitest?
+In-Reply-To: <45376FBA.8070402@gmx.de>
+References: <45376FBA.8070402@gmx.de>
+Date: Thu, 19 Oct 2006 14:42:56 +0200
+Message-Id: <1161261776.27710.44.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] how to disable l2cap kernel messages?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,12 +20,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Thu, Oct 19, 2006, Marcel Holtmann wrote:
-> commit the fixed version.
+Hi Sandro,
 
-Done.
+> My syslog is full with messages like:
+> 
+> Oct 19 14:26:58 x545 kernel: l2cap_recv_acldata: conn ffff81003ed5d8c0
+> len 14 fl
+> ags 0x2
+> Oct 19 14:26:58 x545 kernel: l2cap_recv_frame: len 10, cid 0x0041
+> Oct 19 14:26:58 x545 kernel: l2cap_data_channel: sk ffff81002b743400 len
+> 14 mode
+>  0x00
+> 
+> how do I dissable these messages?
 
-Johan
+you have to compile your kernel without debug messages. Or is this a
+kernel with -mh patch and I left them on by accident.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
