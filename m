@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
+Message-ID: <4537BB8C.10104@xmission.com>
+Date: Thu, 19 Oct 2006 11:53:16 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3f5a9ba20610190107je24b0bbg6bd5da0a05f6e0f2@mail.gmail.com>
-References: <3f5a9ba20610152225h7e020518m3c6062ce9be25044@mail.gmail.com>
-	<1161000951.10392.26.camel@localhost>
-	<3f5a9ba20610190107je24b0bbg6bd5da0a05f6e0f2@mail.gmail.com>
-Date: Thu, 19 Oct 2006 21:03:57 +0200
-Message-Id: <1161284638.7885.11.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] the effect of linux 2.6.18 to the bluez
+References: <452E84DA.9090307@free.fr>
+In-Reply-To: <452E84DA.9090307@free.fr>
+Subject: Re: [Bluez-devel] [PATCH] Updated sco flow control feature
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,40 +20,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Am Donnerstag, den 19.10.2006, 16:07 +0800 schrieb Mingfan.Lu:
+Fabien
 
-> I don't know whether the config make it happen or there is something
-> wrong with it?
-> So, Martin, How about you make config when you building your new
-> kernel?
+I would like to better document how to try this patch and use it with
+the alsa sco plugin. I've started it in
 
-I build the kernels the "debian way" cause I use Ubuntu as well. So
-basically:
-(1) tar xjf linux-2.6.18.x.tar.bz2
-(2) cd linux-2.6.18.x
-(3) patch -p1 < ../patch-2.6.18-mh6
-(4) cp /boot/config-2.6.15-26-686 .config
-(5) make oldconfig
-[edit some config options manually if necessary]
-(6) fakeroot make-kpkg kernel_image modules_image --initrd --revision
-mh6 binary
-(7) cd ..
-(8) dpkg -i kernel-image-2.6.18.xmh6_i386.deb
+https://help.ubuntu.com/community/BluetoothAudio
 
-Edit /boot/grub/menu.lst if necessary and that's it.
-Your problems are really strange. How do you measure the time? I don't
-think it has anything to do with the config file per se. But I know of
-some pretty neat and improved debugging facilities -- maybe you want to
-check out that there is nothing in action that slows down the machine
-just for the purpose of deadlock detections.
+Is the sco plugin in our cvs current and will it enable your flow control?
 
-I'm sorry about it, but it seems extremely hard to me locating such a
-problem that never affects one of my machines. :-/
+Brad
 
-Good luck,
-Martin
-
-
+> After a few very busy months at work i finally had the opportunity to go
+> back to my bluez flow control patch i left in the middle of nowhere back
+> in May. :-)
+> You will find attached an updated version of the patch against
+> 2.6.18-mh4, as well as a sample test program that shows the flow control
+> stuff is really working.
+> 
+> Major changes compared to previous versions:
+> * Packets are queued in the core, and are dequeue from there.
+> * Flow control is achieved using high resolution timers. This means the
+> code is really HZ independant, and things will even go better when the
+> dyntick patch which has been in the air recently will be included in the
+> mainline kernel.
+> * Fixed a stupid bug that would cause packets to be sent really too
+> slowly when HZ was < 1000
+> * Should work with HZ = 100, 250, 1000, ... or whatever else. I tested
+> with 250 HZ only for now.
+> * Wrote a test program, "headsettest". To run this program you will need
+> an USB dongle that supports SCO, as well as a
+> headset. This program records your own voice for 30 seconds, then plays
+> what it recorded in your ears for 30 seconds. Beware : Running it
+> without the flow control patch is likely to crash your box !!
+> * The patch is cleaner. This is mainly due to the fact i am getting to a
+> better understanding of Linux socket layer.DEFAULT_SCO_RXBUFS;
+>  	sk->sk_sndtime
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
