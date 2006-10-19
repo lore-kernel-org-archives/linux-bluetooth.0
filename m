@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45379557.9040003@gmx.de>
-Date: Thu, 19 Oct 2006 17:10:15 +0200
-From: Sandro Weiser <sandro.weiser@gmx.de>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <45376FBA.8070402@gmx.de> <1161261776.27710.44.camel@localhost>
-In-Reply-To: <1161261776.27710.44.camel@localhost>
-Subject: Re: [Bluez-users] how to disable l2cap kernel messages?
+In-Reply-To: <20061019140002.EBD9A216219@mrelay1.st2.lyceu.net>
+References: <20061019140002.EBD9A216219@mrelay1.st2.lyceu.net>
+Date: Thu, 19 Oct 2006 16:17:30 +0200
+Message-Id: <1161267450.27710.47.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] PAND Network
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,14 +20,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-> you have to compile your kernel without debug messages.
-Which .config option is this exactly?
+Hi Monica,
 
-> Or is this a
-> kernel with -mh patch and I left them on by accident.
-It's a 2.6.18.1 with -mh6.
+> I have tried to find where the error "file exists" arises debugging the
+> source code, and I have found it in this function of bnep.c when trying to
+> send the ioctl command "bnepconnadd":
+> 
+> 
+> static int bnep_connadd(int sk, uint16_t role, char *dev)
+> {
+> 	struct bnep_connadd_req req;
+> 
+> 	strcpy(req.device, dev);
+> 	req.sock = sk;
+> 	req.role = role;
+> 	if (ioctl(ctl, bnepconnadd, &req))
+> 		return -1;
+> 	strcpy(dev, req.device);
+> 	return 0;
+> } 
 
-Sandro
+please check the getsockname() and getpeername() output for sk in that
+call.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
