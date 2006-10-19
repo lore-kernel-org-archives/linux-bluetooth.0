@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <ef9938ec0610191008t708c43cfjf6bae40763596eba@mail.gmail.com>
-Date: Thu, 19 Oct 2006 13:08:20 -0400
-From: "Albert Huang" <albert@csail.mit.edu>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0610191205320.29304@redbean.intranet.gw-instruments.de>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200610191334.25362.denis.kenzior@trolltech.com>
 References: <200610191334.25362.denis.kenzior@trolltech.com>
-	<Pine.LNX.4.63.0610191205320.29304@redbean.intranet.gw-instruments.de>
+Date: Thu, 19 Oct 2006 11:12:33 +0200
+Message-Id: <1161249153.27710.5.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] SDP over XML
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,23 +20,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Peter,
+Hi Denis,
+
+> I've been playing around with the idea of encapsulating SDP information over 
+> XML.  The primary aim was to enable things like sdptool or hcid to be able to 
+> exchange SDP records in an open format.  It would also enable for 
+> applications to register arbitrary SDP records without relying on the sdp 
+> library (it is GPLed and thus not useable to some people)
+
+any SDP record registration will have to go over D-Bus in the future and
+it will come along with the service registration feature. However none
+of this has been set into to stone yet.
+
+> I wrote some code for producing and parsing XML SDP records.  The aim would be 
+> to replace the current hcid GetRemoteServiceRecord method with something that 
+> produces XML, and also to have something like a RegisterServiceRecord that 
+> would take either a string description (e.g. OPUSH) and 
+> RegisterServiceRecordXML that would take an XML string.  
+
+The RegisterService... part is under discussion at the moment and I have
+no idea how the final outcome will look like. I am okay with having an
+additional method that returns the SDP service record in XML format, but
+first you would have to define the DTD for it and we have to agree on
+it.
+
+> Additionally, a lot of the code that is currently in sdptool.c could be 
+> refactored into XML files, and it would be much more trivial to add new 
+> profiles (e.g. as an XML template instead of a function inside sdptool)
+
+The record add function of sdptool is actually more a development thing,
+than something you should use in real applications. However I am against
+adding a dependency on a XML parsing library to sdptool.
+
+Regards
+
+Marcel
 
 
-> I remember there was an implementation which uses XML in the past,
-> but I think this was not for Bluez. May be XML is a little bit of an
-> overkill, but on the other hand it is a well established and flexible data
-> format
-
-Perhaps you're thinking of OS X?  All service records are stored in
-XML until they're actually advertised.
-
-http://developer.apple.com/documentation/DeviceDrivers/Conceptual/Bluetooth/BT_Develop_BT_Apps/chapter_4_section_4.html#//apple_ref/doc/uid/TP30000997-CH216-BACJGDDH
-
-I'm not sure if that link will show properly.  If not, then google for
-"OS X Bluetooth Collection Tasks"
-
--albert
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
