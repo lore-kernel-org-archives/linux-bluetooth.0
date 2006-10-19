@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4537BB8C.10104@xmission.com>
-Date: Thu, 19 Oct 2006 11:53:16 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <ef9938ec0610191008t708c43cfjf6bae40763596eba@mail.gmail.com>
+Date: Thu, 19 Oct 2006 13:08:20 -0400
+From: "Albert Huang" <albert@csail.mit.edu>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.63.0610191205320.29304@redbean.intranet.gw-instruments.de>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <452E84DA.9090307@free.fr>
-In-Reply-To: <452E84DA.9090307@free.fr>
-Subject: Re: [Bluez-devel] [PATCH] Updated sco flow control feature
+References: <200610191334.25362.denis.kenzior@trolltech.com>
+	<Pine.LNX.4.63.0610191205320.29304@redbean.intranet.gw-instruments.de>
+Subject: Re: [Bluez-devel] SDP over XML
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,42 +21,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fabien
+Hi Peter,
 
-I would like to better document how to try this patch and use it with
-the alsa sco plugin. I've started it in
 
-https://help.ubuntu.com/community/BluetoothAudio
+> I remember there was an implementation which uses XML in the past,
+> but I think this was not for Bluez. May be XML is a little bit of an
+> overkill, but on the other hand it is a well established and flexible data
+> format
 
-Is the sco plugin in our cvs current and will it enable your flow control?
+Perhaps you're thinking of OS X?  All service records are stored in
+XML until they're actually advertised.
 
-Brad
+http://developer.apple.com/documentation/DeviceDrivers/Conceptual/Bluetooth/BT_Develop_BT_Apps/chapter_4_section_4.html#//apple_ref/doc/uid/TP30000997-CH216-BACJGDDH
 
-> After a few very busy months at work i finally had the opportunity to go
-> back to my bluez flow control patch i left in the middle of nowhere back
-> in May. :-)
-> You will find attached an updated version of the patch against
-> 2.6.18-mh4, as well as a sample test program that shows the flow control
-> stuff is really working.
-> 
-> Major changes compared to previous versions:
-> * Packets are queued in the core, and are dequeue from there.
-> * Flow control is achieved using high resolution timers. This means the
-> code is really HZ independant, and things will even go better when the
-> dyntick patch which has been in the air recently will be included in the
-> mainline kernel.
-> * Fixed a stupid bug that would cause packets to be sent really too
-> slowly when HZ was < 1000
-> * Should work with HZ = 100, 250, 1000, ... or whatever else. I tested
-> with 250 HZ only for now.
-> * Wrote a test program, "headsettest". To run this program you will need
-> an USB dongle that supports SCO, as well as a
-> headset. This program records your own voice for 30 seconds, then plays
-> what it recorded in your ears for 30 seconds. Beware : Running it
-> without the flow control patch is likely to crash your box !!
-> * The patch is cleaner. This is mainly due to the fact i am getting to a
-> better understanding of Linux socket layer.DEFAULT_SCO_RXBUFS;
->  	sk->sk_sndtime
+I'm not sure if that link will show properly.  If not, then google for
+"OS X Bluetooth Collection Tasks"
+
+-albert
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
