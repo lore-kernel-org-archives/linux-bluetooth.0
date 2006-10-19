@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Atomic <atomic@baslug.org>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Date: Thu, 19 Oct 2006 21:37:07 +0200
-Message-Id: <200610192137.07419.atomic@baslug.org>
-Subject: [Bluez-users] Unsupported bluetooth device?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <45379557.9040003@gmx.de>
+References: <45376FBA.8070402@gmx.de> <1161261776.27710.44.camel@localhost>
+	<45379557.9040003@gmx.de>
+Date: Thu, 19 Oct 2006 17:35:58 +0200
+Message-Id: <1161272158.27710.58.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] how to disable l2cap kernel messages?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,19 +21,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all,
-I have an Asus A4S  (A4S-Q002H) equipped with a Toshiba usb BT device (CSR 
-chipset). 
-I use a kernel 2.6.18 (gentoo-sources) and I recompiled it to make BT working, 
-but after many attempts the system can't see the device.
-I read that on Toshiba laptops the bluetooth device isn't enabled by default, 
-but it needs to be turned on with dmabt (this solution doesn't work with 
-ACPI-enabled kernel). I must consider my Asus laptop as a 
-Toshiba laptop regarding the bluetooth device?
-Thanks. Best regards.
+Hi Sandro,
 
--- 
-Antonio
+> > you have to compile your kernel without debug messages.
+> Which .config option is this exactly?
+> 
+> > Or is this a
+> > kernel with -mh patch and I left them on by accident.
+> It's a 2.6.18.1 with -mh6.
+
+it is not a config option that is selectable. It is in the code. Try out
+the 2.6.18-mh7 patch. It should fix it.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
