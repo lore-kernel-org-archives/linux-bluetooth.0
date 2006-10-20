@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200610201127.15801.denis.kenzior@trolltech.com>
+Date: Fri, 20 Oct 2006 11:27:15 +1000
 References: <200610191334.25362.denis.kenzior@trolltech.com>
 	<1161249153.27710.5.camel@localhost>
-	<200610201127.15801.denis.kenzior@trolltech.com>
-Date: Fri, 20 Oct 2006 04:33:07 +0200
-Message-Id: <1161311587.27585.5.camel@localhost>
-Mime-Version: 1.0
+In-Reply-To: <1161249153.27710.5.camel@localhost>
+MIME-Version: 1.0
+Message-Id: <200610201127.15801.denis.kenzior@trolltech.com>
 Subject: Re: [Bluez-devel] SDP over XML
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,59 +21,49 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Marcel,
 
-> > any SDP record registration will have to go over D-Bus in the future and
-> > it will come along with the service registration feature. However none
-> > of this has been set into to stone yet.
-> 
-> I'd be very interested in learning what has been proposed so far for doing 
-> this.  We'd be very much interested in a flexible architecture, allowing us 
-> to specify dynamic records.  E.g. things like Handsfree profile requires SDP 
-> records with supported features attributes.  This is something that we just 
-> cannot do currently with the existing infrastructure.
+On Thursday 19 October 2006 19:12, Marcel Holtmann wrote:
+> any SDP record registration will have to go over D-Bus in the future and
+> it will come along with the service registration feature. However none
+> of this has been set into to stone yet.
+>
 
-at the moment these are only ideas and quite frankly most of them
-spinning somewhere in my head only. I hope that in the next few couple
-of weeks, we get them down to a written API and can start implementing
-prototypes for it.
+I'd be very interested in learning what has been proposed so far for doing 
+this.  We'd be very much interested in a flexible architecture, allowing us 
+to specify dynamic records.  E.g. things like Handsfree profile requires SDP 
+records with supported features attributes.  This is something that we just 
+cannot do currently with the existing infrastructure.
 
-> > The RegisterService... part is under discussion at the moment and I have
-> > no idea how the final outcome will look like. I am okay with having an
-> > additional method that returns the SDP service record in XML format, but
-> > first you would have to define the DTD for it and we have to agree on
-> > it.
-> 
-> I shall work on forming a DTD.  It most likely will closely follow the BlueZ 
-> type structure.  Should I work on the patch for registering/unregistering XML 
-> SDP records against hcid as well?
+> The RegisterService... part is under discussion at the moment and I have
+> no idea how the final outcome will look like. I am okay with having an
+> additional method that returns the SDP service record in XML format, but
+> first you would have to define the DTD for it and we have to agree on
+> it.
 
-If you wanna go that way, then we first need a DTD and don't follow the
-BlueZ source code. You should follow the Bluetooth specification. The
-SDP implementation of BlueZ is not one of the best examples and might be
-replaced at some point anyway.
+I shall work on forming a DTD.  It most likely will closely follow the BlueZ 
+type structure.  Should I work on the patch for registering/unregistering XML 
+SDP records against hcid as well?
 
-> > > Additionally, a lot of the code that is currently in sdptool.c could be
-> > > refactored into XML files, and it would be much more trivial to add new
-> > > profiles (e.g. as an XML template instead of a function inside sdptool)
-> >
-> > The record add function of sdptool is actually more a development thing,
-> > than something you should use in real applications. However I am against
-> > adding a dependency on a XML parsing library to sdptool.
-> 
-> I completely agree.  However, up to this point sdptool has been the only way 
-> to develop "real applications."  Using sdp library directly is not an option 
-> for us.  
+>
+> > Additionally, a lot of the code that is currently in sdptool.c could be
+> > refactored into XML files, and it would be much more trivial to add new
+> > profiles (e.g. as an XML template instead of a function inside sdptool)
+>
+> The record add function of sdptool is actually more a development thing,
+> than something you should use in real applications. However I am against
+> adding a dependency on a XML parsing library to sdptool.
+>
 
-Nobody should have to use it directly. It is actually a mess and the
-potential of memory leaks are way to big. However we first need a clean
-D-Bus API before I start thinking about replacing or rewriting it.
+I completely agree.  However, up to this point sdptool has been the only way 
+to develop "real applications."  Using sdp library directly is not an option 
+for us.  
 
-Regards
+> Regards
+>
+> Marcel
 
-Marcel
-
-
+-Denis
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
