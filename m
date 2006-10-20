@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 20 Oct 2006 13:41:54 -0400
-From: "Robert Moskowitz" <rgm@htt-consult.com>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <45390A62.4050805@htt-consult.com>
+Message-ID: <20061020093544.63213.qmail@web52002.mail.yahoo.com>
+Date: Fri, 20 Oct 2006 02:35:44 -0700 (PDT)
+From: anoop <ee02m043@yahoo.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1161334276.27585.42.camel@localhost>
 MIME-Version: 1.0
-Subject: [Bluez-users] Current information on bluetooth mouse support
+Subject: Re: [Bluez-users] Cant get dongle up
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,79 +15,42 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0122074123=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I am trying to find information on bluetooth utilities.  Everything I 
-have found so far is either at least a year old, and does not map to 
-files on my system.
+--===============0122074123==
+Content-Type: multipart/alternative; boundary="0-843856465-1161336944=:62621"
+Content-Transfer-Encoding: 8bit
 
-Anyway, I have an HP NC4010.
+--0-843856465-1161336944=:62621
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-I am using a Cables Unlimited dongle:
+Thanks Marcel. Dongle's BD address is not changing. How about buying a D-link DBT120 dongle?. I will try upgrading the kernel. Mean while can you please tell me how to load hci_usb with isoc=0 switch ?.
 
-/usr/sbin/hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:0D:18:01:20:B9 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:491300 acl:31961 sco:0 events:5005 errors:0
-        TX bytes:5297 acl:136 sco:0 commands:205 errors:0
-        Features: 0xff 0xff 0x8f 0xf8 0x18 0x18 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'nc4010.htt-consult.com-0'
-        Class: 0x120104
-        Service Classes: Networking, Object Transfer
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x512 LMP Ver: 1.2 (0x2) LMP Subver: 
-0x512
-        Manufacturer: Cambridge Silicon Radio (10)
+ Regards
+ Anoop
+Marcel Holtmann <marcel@holtmann.org> wrote: Hi,
 
+> I am new to Linux and blueZ, so may be my question may be  silly.
+> 
+> My USB BT dongle has ISSC chipset (the ebay seller claimed that it
+> will be a Bilionton dongle but it turned out to be a cheap EEPROM less
+> dongle with 11:11.. BD address ) . It works fine in windows with
+> blusoleil. But  I could not get it working in Linux - Kernerl 2.6.11 ,
+> Fedora core 3 redhat 12.0. 
 
-So far I have been working with my IOgear mouse.
+does it change the address when using it with BlueSoleil? If it doesn't
+then you might wanna return this dongle and buy a good one.
 
-After much effort, I have gotten it connected and authenticated.  Now if 
-I turn it on and press its connect button I can then do a:
+You kernel is quite ancient. You can try to load the hci_usb driver with
+the isoc=0 switch, but it might be a better idea to upgrade to Fedora
+Core 6 on Tuesday.
 
-hidd --search
-Searching ...
-        Connecting to device 00:0A:94:C0:C3:19
+Regards
 
-and
-
- hcitool info 00:0A:94:C0:C3:19
-Requesting information ...
-        BD Address:  00:0A:94:C0:C3:19
-        Device Name: Bluetooth Mouse
-        LMP Version: 1.1 (0x1) LMP Subversion: 0x356
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <channel quality> <SCO link> <HV2 
-packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
-                <power control> <transparent SCO>
-
-But I loose connection with this mouse if it goes idle long enough, and 
-so far I have had to power it off and reconnect.
-
-I have read messages like:
-
-http://article.gmane.org/gmane.linux.bluez.user/6609/match=automatically+accepting+pairing+mouse
-
-But I don't have a /etc/default/bluez-utils file to add:
-
-	HIDD_ENABLED=1
-	HIDD_OPTIONS="--server"
-
-Nor can I figure out what file this now goes into.
-
-Also how do I get the Gnome bluetooth tools working on my Centos desktop?
-
-I still have my headphone, stereo headset, and TREO 650 to connect....
+Marcel
 
 
 
@@ -99,3 +63,45 @@ _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+
+ 			
+---------------------------------
+Get your own web address for just $1.99/1st yr. We'll help. Yahoo! Small Business.
+--0-843856465-1161336944=:62621
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+Thanks Marcel. Dongle's BD address is not changing. How about buying a D-link DBT120 dongle?. I will try upgrading the kernel. Mean while can you please tell me how to load hci_usb with isoc=0 switch ?.<br><br> Regards<br> Anoop<br><b><i>Marcel Holtmann &lt;marcel@holtmann.org&gt;</i></b> wrote:<blockquote class="replbq" style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;"> Hi,<br><br>&gt; I am new to Linux and blueZ, so may be my question may be  silly.<br>&gt; <br>&gt; My USB BT dongle has ISSC chipset (the ebay seller claimed that it<br>&gt; will be a Bilionton dongle but it turned out to be a cheap EEPROM less<br>&gt; dongle with 11:11.. BD address ) . It works fine in windows with<br>&gt; blusoleil. But  I could not get it working in Linux - Kernerl 2.6.11 ,<br>&gt; Fedora core 3 redhat 12.0. <br><br>does it change the address when using it with BlueSoleil? If it doesn't<br>then you might wanna return this dongle and buy a good
+ one.<br><br>You kernel is quite ancient. You can try to load the hci_usb driver with<br>the isoc=0 switch, but it might be a better idea to upgrade to Fedora<br>Core 6 on Tuesday.<br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>Using Tomcat but need to do more? Need to support web services, security?<br>Get stuff done quickly with pre-integrated technology to make your job easier<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo<br>http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642<br>_______________________________________________<br>Bluez-users mailing list<br>Bluez-users@lists.sourceforge.net<br>https://lists.sourceforge.net/lists/listinfo/bluez-users<br></blockquote><br><p>&#32;
+	
+		<hr size=1>Get your own <a href=" http://us.rd.yahoo.com/evt=43290/*http://smallbusiness.yahoo.com/domains"
+>web address for just $1.99/1st yr</a>. We'll help. <a href="http://us.rd.yahoo.com/evt=41244/*http://smallbusiness.yahoo.com/"
+>Yahoo! Small Business</a>.
+
+--0-843856465-1161336944=:62621--
+
+
+--===============0122074123==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0122074123==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0122074123==--
