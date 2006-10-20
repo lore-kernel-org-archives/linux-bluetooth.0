@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45390275.1010607@palmsource.com>
-Date: Fri, 20 Oct 2006 19:08:05 +0200
+Message-ID: <45390262.3070206@palmsource.com>
+Date: Fri, 20 Oct 2006 19:07:46 +0200
 From: Frederic Danis <frederic.danis@palmsource.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <1155819360.4075.123.camel@aeonflux.holtmann.net>	<20060817113538.GB5118@srcf.ucam.org>	<1155823499.4075.157.camel@aeonflux.holtmann.net>	<20060817122559.GA6422@srcf.ucam.org>	<20060817124514.GA27427@localhost.localdomain>	<1155819813.18545.36.camel@cookie.hadess.net>	<1155839761.4075.165.camel@aeonflux.holtmann.net>	<44E5B2A5.1070002@palmsource.com>	<1155924372.4075.191.camel@aeonflux.holtmann.net>	<45362E18.1040909@palmsource.com>
 	<20061018140352.GA11008@localhost.localdomain>
 In-Reply-To: <20061018140352.GA11008@localhost.localdomain>
-Content-Type: multipart/mixed; boundary="------------020509090500050207070305"
+Content-Type: multipart/mixed; boundary="------------000801040108090703090909"
 Subject: Re: [Bluez-devel]
 	DBus	interface	-	determining	whether	a	device	exists
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -23,20 +23,20 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 This is a multi-part message in MIME format.
---------------020509090500050207070305
+--------------000801040108090703090909
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hello Johan,
 
 Here is a new version of the patch updated.
-Thanks for your comments.
+Thanks for your commented.
 
 
 Fred
 
 
---------------020509090500050207070305
+--------------000801040108090703090909
 Content-Type: text/x-patch;
  name="hcid.patch"
 Content-Transfer-Encoding: 7bit
@@ -221,7 +221,7 @@ diff -Naur hcid.orig/dbus-api.txt hcid.new/dbus-api.txt
  Signals		void ModeChanged(string mode)
  
 
---------------020509090500050207070305
+--------------000801040108090703090909
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -232,7 +232,7 @@ Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---------------020509090500050207070305
+--------------000801040108090703090909
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -243,4 +243,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---------------020509090500050207070305--
+--------------000801040108090703090909--
