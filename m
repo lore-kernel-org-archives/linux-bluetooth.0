@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 20 Oct 2006 12:50:29 +0200 (CEST)
-From: Peter Wippich <pewi@gw-instruments.de>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <ef9938ec0610191008t708c43cfjf6bae40763596eba@mail.gmail.com>
-Message-ID: <Pine.LNX.4.63.0610201248170.465@redbean.intranet.gw-instruments.de>
+In-Reply-To: <9307f5f20610200330s5f867c41h2dc0096c6d4e5458@mail.gmail.com>
 References: <200610191334.25362.denis.kenzior@trolltech.com>
-	<Pine.LNX.4.63.0610191205320.29304@redbean.intranet.gw-instruments.de>
-	<ef9938ec0610191008t708c43cfjf6bae40763596eba@mail.gmail.com>
-MIME-Version: 1.0
+	<1161249153.27710.5.camel@localhost>
+	<9307f5f20610200330s5f867c41h2dc0096c6d4e5458@mail.gmail.com>
+Date: Fri, 20 Oct 2006 12:41:52 +0200
+Message-Id: <1161340912.27585.53.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] SDP over XML
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,31 +22,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Paolo,
 
-Hi Albert, 
+> > The record add function of sdptool is actually more a development thing,
+> > than something you should use in real applications. However I am against
+> > adding a dependency on a XML parsing library to sdptool.
+> >
+> libdbus already pulls the expat xml parser as a dependency, so since
+> you've made D-Bus a mandatory requirement using libexpat wouldn't
+> require end users to install any additional packages
 
-> Perhaps you're thinking of OS X?  All service records are stored in
-> XML until they're actually advertised.
-> 
-> http://developer.apple.com/documentation/DeviceDrivers/Conceptual/Bluetooth/BT_Develop_BT_Apps/chapter_4_section_4.html#//apple_ref/doc/uid/TP30000997-CH216-BACJGDDH
-> 
-> I'm not sure if that link will show properly.  If not, then google for
-> "OS X Bluetooth Collection Tasks"
-> 
-> -albert
+you only need D-Bus for hcid and not sdptool. And D-Bus has support for
+two different XML parsers.
 
-No, I think it was the Axus stack. But I don't have a copy anymore to 
-crosscheck. 
+Regards
 
-Ciao, 
+Marcel
 
-Peter 
-
-
-|       Peter Wippich                   Voice: +49 30 46776411          |
-|       G&W Instruments GmbH            fax:   +49 30 46776419          |
-|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
-|       D-13355 Berlin  / Germany                                       |
 
 
 -------------------------------------------------------------------------
