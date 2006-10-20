@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Fri, 20 Oct 2006 12:50:29 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0610201248170.465@redbean.intranet.gw-instruments.de>
+In-Reply-To: <ef9938ec0610191008t708c43cfjf6bae40763596eba@mail.gmail.com>
+Message-ID: <Pine.LNX.4.63.0610201248170.465@redbean.intranet.gw-instruments.de>
 References: <200610191334.25362.denis.kenzior@trolltech.com>
 	<Pine.LNX.4.63.0610191205320.29304@redbean.intranet.gw-instruments.de>
 	<ef9938ec0610191008t708c43cfjf6bae40763596eba@mail.gmail.com>
-	<Pine.LNX.4.63.0610201248170.465@redbean.intranet.gw-instruments.de>
-Date: Fri, 20 Oct 2006 12:53:34 +0200
-Message-Id: <1161341615.27585.55.camel@localhost>
-Mime-Version: 1.0
+MIME-Version: 1.0
 Subject: Re: [Bluez-devel] SDP over XML
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,26 +22,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Peter,
 
-> > Perhaps you're thinking of OS X?  All service records are stored in
-> > XML until they're actually advertised.
-> > 
-> > http://developer.apple.com/documentation/DeviceDrivers/Conceptual/Bluetooth/BT_Develop_BT_Apps/chapter_4_section_4.html#//apple_ref/doc/uid/TP30000997-CH216-BACJGDDH
-> > 
-> > I'm not sure if that link will show properly.  If not, then google for
-> > "OS X Bluetooth Collection Tasks"
+Hi Albert, 
+
+> Perhaps you're thinking of OS X?  All service records are stored in
+> XML until they're actually advertised.
 > 
-> No, I think it was the Axus stack. But I don't have a copy anymore to 
-> crosscheck. 
+> http://developer.apple.com/documentation/DeviceDrivers/Conceptual/Bluetooth/BT_Develop_BT_Apps/chapter_4_section_4.html#//apple_ref/doc/uid/TP30000997-CH216-BACJGDDH
+> 
+> I'm not sure if that link will show properly.  If not, then google for
+> "OS X Bluetooth Collection Tasks"
+> 
+> -albert
 
-it was the Axis OpenBT stack, but I never fully liked their DTD and it
-only worked with static files from the filesystem.
+No, I think it was the Axus stack. But I don't have a copy anymore to 
+crosscheck. 
 
-Regards
+Ciao, 
 
-Marcel
+Peter 
 
+
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
 
 
 -------------------------------------------------------------------------
