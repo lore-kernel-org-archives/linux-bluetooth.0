@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Atomic <atomic@baslug.org>
-To: bluez-users@lists.sourceforge.net
-Date: Fri, 20 Oct 2006 09:34:25 +0200
-References: <200610192137.07419.atomic@baslug.org>
-	<200610192325.17260.atomic@baslug.org>
-	<20061019230405.GF7251@suse.de>
-In-Reply-To: <20061019230405.GF7251@suse.de>
-MIME-Version: 1.0
-Message-Id: <200610200934.26194.atomic@baslug.org>
-Subject: Re: [Bluez-users] Unsupported bluetooth device?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <77ADC7D0C96B1F44A924DC4E952A5E0E0112074E@AZ25EXM01.gddsi.com>
+References: <77ADC7D0C96B1F44A924DC4E952A5E0E0112074E@AZ25EXM01.gddsi.com>
+Date: Fri, 20 Oct 2006 06:29:43 +0200
+Message-Id: <1161318583.27585.24.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Bluez/bluetooth newbie
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,50 +16,56 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Alle 01:04, venerd=EC 20 ottobre 2006, Stefan Seyfried ha scritto:
+Hi Scott,
 
-> It's not toshiba_acpi, it's the toshiba module:
-> seife@strolchi:~> modinfo toshiba
-[CUT]
-> CONFIG_TOSHIBA=3Dm
+> I'm trying to do something really simple in the bluetooth environment.
+> I attached a USB bluetooth module (from A7 engineering) to a Linx PC,
+> and I attached a serial module to a windows PC.  This serial module
+> has the complete stack, and I just interface to it with ASCII commands
+> over a serial port profile.  I want to simply send ASCII text across a
+> bluetooth serial connection between the two computers.
+> 
+> I have been able to do this successfully with a windows host.  Here
+> are the steps I'm taking:
+> 
+>       * On the Windows side, I connect to the serial bluetooth module,
+>         configure the baud rate to 9600, no HW flow control, etc.
+>       * On the Linux side I start the hcid and sdpd services.
+>       * Then I search for the remote bluetooth device using "hcitool
+>         inq" and I see it.
+>       * I establish a connection using "hcitool cc <bt address>".
 
-You're right...
+this step is not needed at all.
 
-> But why do you think that your ASUS notebook will need the toshiba SMM
-> module? Is it manufactured by Toshiba?
+>       * Finally I use rfcomm to make a serial connection:  "rfcomm
+>         connect 0 <bt address> 1".
 
-As I wrote in the first post, I only need to turn on the bluetooth device =
+You might wanna use "rfcomm --raw connect 0 <bdaddr> 1".
 
-manufactured by Toshiba. Brad Midgley in his first replay to my post =
+> The windows side recognizes a connection is made, but I am unable to
+> get data across.
+> 
+> I have found no way to establish baud rate.  Is that necessary across
+> bluetooth?  
 
-suggested me to use toshset to turn on the device.
-Toshset requires toshiba support in kernel. =
+No. The baud rate is for the physical interface of the module and not
+the RFCOMM connection.
 
+Regards
 
-# ./toshset -bluetooth on
-required kernel toshiba support not enabled
+Marcel
 
-Do you know another way to turn on a Toshiba BT device without having a =
-
-Toshiba laptop?
-Thanks.
-
--- =
-
-Antonio
 
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
