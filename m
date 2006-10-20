@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <9307f5f20610200432m7e1fc647q977c82598d765460@mail.gmail.com>
-Date: Fri, 20 Oct 2006 13:32:06 +0200
-From: "P. Durante" <shackan@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1161340912.27585.53.camel@localhost>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.63.0610201248170.465@redbean.intranet.gw-instruments.de>
 References: <200610191334.25362.denis.kenzior@trolltech.com>
-	<1161249153.27710.5.camel@localhost>
-	<9307f5f20610200330s5f867c41h2dc0096c6d4e5458@mail.gmail.com>
-	<1161340912.27585.53.camel@localhost>
+	<Pine.LNX.4.63.0610191205320.29304@redbean.intranet.gw-instruments.de>
+	<ef9938ec0610191008t708c43cfjf6bae40763596eba@mail.gmail.com>
+	<Pine.LNX.4.63.0610201248170.465@redbean.intranet.gw-instruments.de>
+Date: Fri, 20 Oct 2006 12:53:34 +0200
+Message-Id: <1161341615.27585.55.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] SDP over XML
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,19 +23,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
->
-> you only need D-Bus for hcid and not sdptool.
->
-I didn't read denis' patches, but I was thinking the plan was to make
-sdptool use the new sdp D-Bus api (when it's settled down), this way
-you could avoid the code duplication which is now going on between
-hcid and sdptool
->
-> And D-Bus has support for two different XML parsers.
->
-you have a point, I was remembering libxml2 support was broken but
-can't find anything to substantiate that tought right now
+Hi Peter,
+
+> > Perhaps you're thinking of OS X?  All service records are stored in
+> > XML until they're actually advertised.
+> > 
+> > http://developer.apple.com/documentation/DeviceDrivers/Conceptual/Bluetooth/BT_Develop_BT_Apps/chapter_4_section_4.html#//apple_ref/doc/uid/TP30000997-CH216-BACJGDDH
+> > 
+> > I'm not sure if that link will show properly.  If not, then google for
+> > "OS X Bluetooth Collection Tasks"
+> 
+> No, I think it was the Axus stack. But I don't have a copy anymore to 
+> crosscheck. 
+
+it was the Axis OpenBT stack, but I never fully liked their DTD and it
+only worked with static files from the filesystem.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
