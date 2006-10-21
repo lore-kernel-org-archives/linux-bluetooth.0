@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <453A5156.1030609@evilgenius.de>
-Date: Sat, 21 Oct 2006 18:56:54 +0200
-From: Martin Karger <martin@evilgenius.de>
+Date: Sat, 21 Oct 2006 12:41:53 +0200 (CEST)
+From: d@vide.bz
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <28110456.261161427313822@vide.bz>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Database for Bluetooth Dongles
+Subject: [Bluez-devel] Error: btsco open (1-0): No such device or address
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,16 +18,77 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-hi there!
+Hi,
 
-right now i am looking for a dongle which has a BlueCore4-Ext with
-rewriteable flash or a BlueCore4-Flash...
+I am running bluetooth and I like to connect a headset with skype.
+I triing this steps (on slax)
 
-i wonder if there is some kind of database in the internet which has
-information on the chipsets used in bluetooth dongles?
+----------------------------------------
 
-greetings
-martin
+# Talky
+HEADSET="00:08:1B:01:CE:DD"
+
+
+#
+#  Using SCO
+#
+mo2dir snd_bt_sco_module.mo /
+mo2dir btsco-0.42-i386-1.mo /
+mo2dir kbtsco-1.4.4-noarch-1sl.mo /
+#
+#  Load kernel module anche the message for error
+#
+ldconfig
+depmod -ae
+modprobe sco
+modprobe snd_bt_sco
+tail -20 /var/log/messages
+
+esdctl stop
+hciconfig hci0 voice 0x0060 
+#
+#  Put headset in pairing mode??
+#  Hit enter
+echo "Put headset in pairing mode then hit return"
+read X
+
+/usr/local/bin/btsco -v "$HEADSET"
+
+----------------------------------------
+
+the ouput of log/message is:
+
+----------------------------------------
+Oct 21 10:41:47 (none) hcid[9965]: Bluetooth HCI daemon
+Oct 21 10:41:47 (none) kernel: Bluetooth: L2CAP ver 2.8
+Oct 21 10:41:47 (none) kernel: Bluetooth: L2CAP socket layer initialized
+Oct 21 10:41:47 (none) sdpd[9967]: Bluetooth SDP daemon
+Oct 21 10:41:48 (none) hcid[9965]: HCI dev 0 up
+Oct 21 10:41:48 (none) hcid[9965]: Starting security manager 0
+Oct 21 10:41:48 (none) kernel: Bluetooth: RFCOMM socket layer initialized
+Oct 21 10:41:48 (none) kernel: Bluetooth: RFCOMM TTY layer initialized
+Oct 21 10:41:48 (none) kernel: Bluetooth: RFCOMM ver 1.7
+Oct 21 10:42:38 (none) kernel: Bluetooth: SCO (Voice Link) ver 0.5
+Oct 21 10:42:38 (none) kernel: Bluetooth: SCO socket layer initialized
+Oct 21 10:42:38 (none) kernel: snd-bt-sco revision 1.12 $
+Oct 21 10:42:38 (none) kernel: snd-bt-sco: snd-bt-scod thread starting 
+----------------------------------------
+
+but at the time of btsco:
+----------------------------------------
+btsco v0.42
+Device is 1:0
+Error: btsco open (1-0): No such device or address
+----------------------------------------
+
+hcidump does not show activity running btsco. The
+same message come without parameter, with wrong parameter ...
+
+I can paaring the headset with hcitool cc MAC and it is
+show in /proc/asound/cards
+
+Thanks in advance for any help!
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
