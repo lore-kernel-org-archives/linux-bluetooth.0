@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <453BAAFC.1090206@vasmac.com>
-Date: Sun, 22 Oct 2006 13:31:40 -0400
-From: Jose Vasconcellos <jose@vasmac.com>
+Message-ID: <453B9F4D.7080504@free.fr>
+Date: Sun, 22 Oct 2006 18:41:49 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <452E84DA.9090307@free.fr>	<452E99E8.6070406@vasmac.com>	<452FBC82.1080901@free.fr>	<452FDC44.90803@vasmac.com>	<45310A24.1000604@free.fr>	<453114A0.50503@vasmac.com>
-	<453B9F4D.7080504@free.fr>
-In-Reply-To: <453B9F4D.7080504@free.fr>
+References: <452E84DA.9090307@free.fr>	<452E99E8.6070406@vasmac.com>	<452FBC82.1080901@free.fr>	<452FDC44.90803@vasmac.com>	<45310A24.1000604@free.fr>
+	<453114A0.50503@vasmac.com>
+In-Reply-To: <453114A0.50503@vasmac.com>
 Subject: Re: [Bluez-devel] [PATCH] Updated sco flow control feature
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,18 +21,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
 
-You need to get the IEEE 802.15.1 specification. Go to here:
-http://standards.ieee.org/getieee802/802.15.html
-Section 11.4 talks about HCI flow control. I don't see that
-this facility is optional. In the case of USB, it's different
-because another mechanism exists for flow control.
+Hi Jose,
 
-Has anyone every used SCO with a UART link?
+> Hi Fabien,
+> 
+> It's my understanding from reading the IEEE spec that Bluetooth
 
-Jose
+Could you point me to what you refer to ?
+I had a look to the following document
+http://www.bluetooth.com/NR/rdonlyres/24C24181-5B5D-4566-BB4F-D4C302910B9D/1766/Volume4_SPEC.pdf
+which describes bt transport over uart, but did not find any mention of 
+synchronous flow control beeing mandatory :-(
 
+> compliant devices with UART interface must support synchronous
+> flow control if they support SCO channels. But I have no experience
+> with such devices. Has anyone else used such a device?
+
+I don't either :-(
+
+Cheers,
+
+Fabien
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
