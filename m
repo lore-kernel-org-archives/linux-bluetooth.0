@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <453AC28A.4010106@xmission.com>
-Date: Sat, 21 Oct 2006 18:59:54 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <453AC0F8.4010207@sympatico.ca>
+Date: Sat, 21 Oct 2006 20:53:12 -0400
+From: Jonathan Doda <jdoda@sympatico.ca>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <453AC0F8.4010207@sympatico.ca>
-In-Reply-To: <453AC0F8.4010207@sympatico.ca>
-Subject: Re: [Bluez-users] random blasts of noise when recording over btsco
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] random blasts of noise when recording over btsco
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,17 +18,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Jonathan
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> I have a logitech mobile freedom headest and an MSI BToes usb bluetooth
-> dongle. They're working great on Ubuntu Edgy as far as playback goes,
-> but audio recorded off the headset's microphone is interspersed with
-> brief blasts of white noise.
+I have a logitech mobile freedom headest and an MSI BToes usb bluetooth
+dongle. They're working great on Ubuntu Edgy as far as playback goes,
+but audio recorded off the headset's microphone is interspersed with
+brief blasts of white noise. The noise only appears to occur when I'm
+speaking, never when I'm recording silence, but it's not normal
+feedback, because it happens even when the audio is not being played
+back (i.e. recording in Audacity). I've also used the headset and dongle
+under Windows 2000, and the noise does not occur, so I don't think it's
+a hardware problem. Anyone have any idea what's going on?
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.3 (GNU/Linux)
 
-Yes--it's a known problem. You should try Fabien's flow control patch
-posted on -devel on 10/12.
-
-Brad
+iD8DBQFFOsD4WEgeeLQ8a74RArifAKCPS2AWL6KD4eJbUQhmhX85VjZ9NwCgm3SY
+58Aw4lH49KtvomzJycgq0Xg=
+=WhjX
+-----END PGP SIGNATURE-----
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
