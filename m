@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 22 Oct 2006 19:40:12 +0200
-From: Frank Dietrich <ABLEsoft@gmx.de>
+Message-ID: <453AC28A.4010106@xmission.com>
+Date: Sat, 21 Oct 2006 18:59:54 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20061022194012.1819f3d9@morgul.earth>
-Mime-Version: 1.0
-Subject: [Bluez-users] first message
+References: <453AC0F8.4010207@sympatico.ca>
+In-Reply-To: <453AC0F8.4010207@sympatico.ca>
+Subject: Re: [Bluez-users] random blasts of noise when recording over btsco
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Jonathan
 
-I'm reading this list since a couple of weeks and I'm a real
-bluetooth newbie. So my question is: Is there any FAQ? Which I'd like
-to read first.
+> I have a logitech mobile freedom headest and an MSI BToes usb bluetooth
+> dongle. They're working great on Ubuntu Edgy as far as playback goes,
+> but audio recorded off the headset's microphone is interspersed with
+> brief blasts of white noise.
 
-If have a mobile with bluetooth and want to use it for an
-internet connection. I'm sure it doesn't work because I miss the
-bluetooth basics. ;-)
+Yes--it's a known problem. You should try Fabien's flow control patch
+posted on -devel on 10/12.
 
-thanks
-Frank
--- 
-If it ain't broken, don't fix it!
+Brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
