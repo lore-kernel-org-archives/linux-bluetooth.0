@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Mon, 23 Oct 2006 10:25:51 +1000
+Message-ID: <453BAAFC.1090206@vasmac.com>
+Date: Sun, 22 Oct 2006 13:31:40 -0400
+From: Jose Vasconcellos <jose@vasmac.com>
 MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_PwAPFr63HZ6ymQH"
-Message-Id: <200610231025.51818.denis.kenzior@trolltech.com>
-Subject: [Bluez-devel] Proposed DTD
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <452E84DA.9090307@free.fr>	<452E99E8.6070406@vasmac.com>	<452FBC82.1080901@free.fr>	<452FDC44.90803@vasmac.com>	<45310A24.1000604@free.fr>	<453114A0.50503@vasmac.com>
+	<453B9F4D.7080504@free.fr>
+In-Reply-To: <453B9F4D.7080504@free.fr>
+Subject: Re: [Bluez-devel] [PATCH] Updated sco flow control feature
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,85 +17,29 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---Boundary-00=_PwAPFr63HZ6ymQH
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi Fabien,
 
-Marcel,
+You need to get the IEEE 802.15.1 specification. Go to here:
+http://standards.ieee.org/getieee802/802.15.html
+Section 11.4 talks about HCI flow control. I don't see that
+this facility is optional. In the case of USB, it's different
+because another mechanism exists for flow control.
 
-Here's the proposed DTD for SDP over XML.  It closely follows the SDP profile 
-doc.  I wasn't sure whether sequences can be empty (which makes no sense to 
-me), so I required at least one element in a sequence.    The sizes for Text, 
-URLs and Sequences was dropped.  It can easily be inferred from parsing the 
-document.  
+Has anyone every used SCO with a UART link?
 
-I'd like to get some feedback as to how to manage things like Record Handle, 
-and RFCOMM/L2Cap channels, etc.  For record handle I think it is easy, just 
-remove that particular attribute and let the SDP server figure it out.  For 
-RFCOMM channel, etc it is more tricky.  Should we use a magic value or just 
-override it behind the scenes?  We can always rely on the user to pick a 
-correct channel as well (and fail registration if they pick a channel that is 
-already in use)
+Jose
 
--Denis
-
---Boundary-00=_PwAPFr63HZ6ymQH
-Content-Type: text/plain;
-  charset="us-ascii";
-  name="sdprecord.dtd"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="sdprecord.dtd"
-
-<!ELEMENT SdpRecord (Attribute)*>
-<!ELEMENT Attribute (Sequence|Alternate|UUID16|UUID32|UUID128|UINT8|UINT16|UINT32|UINT64|UINT128|INT8|INT16|INT32|INT64|INT128|BOOL|Text|URL|NIL)>
-<!ATTLIST Attribute id CDATA #REQUIRED>
-<!ELEMENT Sequence (Sequence|Alternate|UUID16|UUID32|UUID128|UINT8|UINT16|UINT32|UINT64|UINT128|INT8|INT16|INT32|INT64|INT128|BOOL|Text|URL|NIL)+>
-<!ELEMENT Alternate (Sequence|Alternate|UUID16|UUID32|UUID128|UINT8|UINT16|UINT32|UINT64|UINT128|INT8|INT16|INT32|INT64|INT128|BOOL|Text|URL|NIL)+>
-<!ELEMENT UUID16 (#PCDATA)>
-<!ELEMENT UUID32 (#PCDATA)>
-<!ELEMENT UUID128 (#PCDATA)>
-<!ELEMENT UINT8 (#PCDATA)>
-<!ELEMENT UINT16 (#PCDATA)>
-<!ELEMENT UINT32 (#PCDATA)>
-<!ELEMENT UINT64 (#PCDATA)>
-<!ELEMENT UINT128 (#PCDATA)>
-<!ELEMENT INT8 (#PCDATA)>
-<!ELEMENT INT16 (#PCDATA)>
-<!ELEMENT INT32 (#PCDATA)>
-<!ELEMENT INT64 (#PCDATA)>
-<!ELEMENT INT128 (#PCDATA)>
-<!ELEMENT BOOL (#PCDATA)>
-<!ELEMENT URL (#PCDATA)>
-<!ELEMENT Text (#PCDATA)>
-<!ATTLIST Text type (data|string) "string">
-
-
---Boundary-00=_PwAPFr63HZ6ymQH
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---Boundary-00=_PwAPFr63HZ6ymQH
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---Boundary-00=_PwAPFr63HZ6ymQH--
