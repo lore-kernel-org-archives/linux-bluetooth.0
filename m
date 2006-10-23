@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Mon, 23 Oct 2006 13:59:04 +1000
-References: <200610231025.51818.denis.kenzior@trolltech.com>
-	<1161573193.8388.12.camel@localhost>
-In-Reply-To: <1161573193.8388.12.camel@localhost>
 MIME-Version: 1.0
-Message-Id: <200610231359.04570.denis.kenzior@trolltech.com>
-Subject: Re: [Bluez-devel] Proposed DTD
+Message-ID: <453C3732.00005F.08492@bj126app50.126.com>
+Date: Mon, 23 Oct 2006 11:29:54 +0800 (CST)
+From: "device_driver" <device_driver@126.com>
+To: "bluez development" <bluez-devel@lists.sourceforge.net>
+References: <453447B2.000105.05297@bj126app48.126.com>
+	<1161192019.30606.20.camel@localhost>
+In-Reply-To: <1161192019.30606.20.camel@localhost>
+Subject: Re: [Bluez-devel] BGB204 Can't init d evice hci0: Connection timed
+ out (110)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,88 +18,178 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1048231054=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel,
 
-On Monday 23 October 2006 13:13, Marcel Holtmann wrote:
-> Hi Denis,
->
-> > Here's the proposed DTD for SDP over XML.  It closely follows the SDP
-> > profile doc.  I wasn't sure whether sequences can be empty (which makes
-> > no sense to me), so I required at least one element in a sequence.    The
-> > sizes for Text, URLs and Sequences was dropped.  It can easily be
-> > inferred from parsing the document.
->
-> since it is XML, keep everything lower-case and no extra "sdp" prefix.
-> It should be enough to call the root element "record". And I think it is
-> better and easier to use something like:
->
-> 	<data type="uuid16" value="0x1002"/>
->
+--===============1048231054==
+Content-Type: Multipart/Alternative;
+	boundary="Boundary-=_UKJRWcUkVNwPefddWcVewBfTbwBH"
 
-I can see your point on being lower case, so this is something I agree with.
 
-I don't really like using the single data tag for everything.  I think I 
-prefer the e.g. <uuid16>0x1002</uuid16> syntax.  However, since this is XML 
-there's no right or wrong way to do this.  Perhaps others can chime in?
+--Boundary-=_UKJRWcUkVNwPefddWcVewBfTbwBH
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
 
-> And to be fully in sync with the specification we need to differentiate
-> between text8, text16 and text32 (and of course for url, too). For
-> convenience we can then have all data types without the size value and
-> then the server will determine the most appropriate one by itself.
->
+Thanks for your reply, Marcel.
+I have tried as your instruction, i.e.,=20
+=2E/hciattach ttyS1 any 115200 flow
+and get the same result.
+And I "diff"ed the hci_h4.c file in linux-2.6.9 and linux-2.6.18 and foun=
+d they are almost the same.
+Who has any ideas?
+Thanks in advance.
 
-Why though?  This is something that can be easily computed while parsing the 
-XML structure and creating the internal data representation.  The user should 
-not have to deal with this implementation detail.  I suppose I'm open to 
-adding text8, text16 and text32 tags in "expert" mode.  But how will we 
-handle sequences and alternatives in this case?  
 
-For me I'd rather let the underlying system pick whatever is optimal.  If I 
-want to deal with such low level details, I'll program in the low-level API.  
-Isn't the goal to be as user-friendly as possible?
+-----=D4=AD=CA=BC=D3=CA=BC=FE-----
+=B7=A2=BC=FE=C8=CB:"Marcel Holtmann"=20
+=B7=A2=CB=CD=CA=B1=BC=E4:2006-10-19 01:20:19
+=CA=D5=BC=FE=C8=CB:"BlueZ development"=20
+=B3=AD=CB=CD:(=CE=DE)
+=D6=F7=CC=E2:Re: [Bluez-devel] BGB204 Can't init device hci0: Connection =
+timed out (110)
 
-> > I'd like to get some feedback as to how to manage things like Record
-> > Handle, and RFCOMM/L2Cap channels, etc.  For record handle I think it is
-> > easy, just remove that particular attribute and let the SDP server figure
-> > it out.  For RFCOMM channel, etc it is more tricky.  Should we use a
-> > magic value or just override it behind the scenes?  We can always rely on
-> > the user to pick a correct channel as well (and fail registration if they
-> > pick a channel that is already in use)
->
-> Actually at the moment you have to let the server pick the record
-> handle, because specifying the handle doesn't work. It should work, but
-> I never found the actual bug in the code that prevents it.
->
-> Using the proposed way of the "data" element, we can have special values
-> for "value" like "%channel" etc. that can be filled in by the server.
 
-I think this can be accomplished easily by using a hint attribute or a special 
-value, e.g.
+From: "Marcel Holtmann"=20
+To: "BlueZ development"=20
+Date: Thu, 19 Oct 2006 01:20:19 +0800 (CST)
+Subject: Re: [Bluez-devel] BGB204 Can't init device hci0: Connection time=
+d out (110)
 
-<uint16 type="auto_rfcomm_channel">0x0000</uint16>
 
-or
 
-<uint16>AUTO_RFCOMM_CHANNEL</uint16>
-
->
+> Hi,
+>=20
+> > I'm using Philips(NXP)BGB204 bluetooth Sip under the Linux 2.6.9
+> > kernel and ran into problems now. The scenario was as follows:
+>=20
+> I have a BGB208 for testing and have some similar problems. The 2.6.9
+> should work fine, but I would prefer if you test with a 2.6.18 kernel
+> instead, because that one is more recent.
+>=20
+> However the following line should attach the device correctly.
+>=20
+> =09./hciattach ttyS1 any 115200 flow
+>=20
+> If you use the Ericsson id, it will start with 57600 and then try to
+> switch into the higher baudrate. As far as I know all BGB from Philips
+> boot up by default in 115200.
+>=20
 > Regards
->
+>=20
 > Marcel
->
+>=20
+>=20
+>=20
+> -----------------------------------------------------------------------=
+--
+> Using Tomcat but need to do more? Need to support web services, securit=
+y?
+> Get stuff done quickly with pre-integrated technology to make your job =
+easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geron=
+imo
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>=20
+--Boundary-=_UKJRWcUkVNwPefddWcVewBfTbwBH
+Content-Type: text/html; charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
 
--Denis
+<blockquote style=3D"border-left: 2px solid rgb(160, 198, 229); padding-l=
+eft: 5px; margin-left: 5px; margin-right: 0px;"><blockquote style=3D"bord=
+er-left: 2px solid rgb(160, 198, 229); padding-left: 5px; margin-left: 5p=
+x; margin-right: 0px;">Thanks for your reply, Marcel.<br>I have tried as =
+your instruction, i.e., <br>./hciattach ttyS1 any 115200 flow<br>and get =
+the same result.<br>And I "diff"ed the hci_h4.c file in linux-2.6.9 and l=
+inux-2.6.18 and found they are almost the same.<br>Who has any ideas?<br>=
+Thanks in advance.<br><br><blockquote style=3D"border-left: 2px solid rgb=
+(160, 198, 229); padding-left: 5px; margin-left: 5px; margin-right: 0px;"=
+><hr color=3D"#a0c6e5" size=3D"1"><br>-----=D4=AD=CA=BC=D3=CA=BC=FE-----<=
+br>=B7=A2=BC=FE=C8=CB:"Marcel Holtmann" <marcel@holtmann.org><br>=B7=A2=CB=
+=CD=CA=B1=BC=E4:2006-10-19 01:20:19<br>=CA=D5=BC=FE=C8=CB:"BlueZ developm=
+ent" <bluez-devel@lists.sourceforge.net><br>=B3=AD=CB=CD:(=CE=DE)<br>=D6=F7=
+=CC=E2:Re: [Bluez-devel] BGB204 Can't init device hci0: Connection timed =
+out (110)<br><br><br>From: "Marcel Holtmann" <marcel@holtmann.org>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Thu, 19 Oct 2006 01:20:19 +0800 (CST)
+Subject: Re: [Bluez-devel] BGB204 Can't init device hci0: Connection time=
+d out (110)
+
+
+
+&gt; Hi,
+&gt;=20
+&gt; &gt; I'm using Philips(NXP)BGB204 bluetooth Sip under the Linux 2.6.=
+9
+&gt; &gt; kernel and ran into problems now. The scenario was as follows:
+&gt;=20
+&gt; I have a BGB208 for testing and have some similar problems. The 2.6.=
+9
+&gt; should work fine, but I would prefer if you test with a 2.6.18 kerne=
+l
+&gt; instead, because that one is more recent.
+&gt;=20
+&gt; However the following line should attach the device correctly.
+&gt;=20
+&gt; =09./hciattach ttyS1 any 115200 flow
+&gt;=20
+&gt; If you use the Ericsson id, it will start with 57600 and then try to
+&gt; switch into the higher baudrate. As far as I know all BGB from Phili=
+ps
+&gt; boot up by default in 115200.
+&gt;=20
+&gt; Regards
+&gt;=20
+&gt; Marcel
+&gt;=20
+&gt;=20
+&gt;=20
+&gt; --------------------------------------------------------------------=
+-----
+&gt; Using Tomcat but need to do more? Need to support web services, secu=
+rity?
+&gt; Get stuff done quickly with pre-integrated technology to make your j=
+ob easier
+&gt; Download IBM WebSphere Application Server v.1.0.1 based on Apache Ge=
+ronimo
+&gt; http://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;kid=3D120709&amp;bid=3D=
+263057&amp;dat=3D121642
+&gt; _______________________________________________
+&gt; Bluez-devel mailing list
+&gt; Bluez-devel@lists.sourceforge.net
+&gt; https://lists.sourceforge.net/lists/listinfo/bluez-devel
+&gt; </bluez-devel@lists.sourceforge.net></marcel@holtmann.org></bluez-de=
+vel@lists.sourceforge.net></marcel@holtmann.org></blockquote></blockquote=
+></blockquote><br><!-- footer --><br>
+--Boundary-=_UKJRWcUkVNwPefddWcVewBfTbwBH--
+
+
+--===============1048231054==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============1048231054==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1048231054==--
