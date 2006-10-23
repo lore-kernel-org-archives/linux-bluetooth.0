@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Jon Barnett <jbarnett@pobox.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Mon, 23 Oct 2006 00:32:53 -0400
-Message-Id: <1161577973.9075.22.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Sony Ericsson HBH-610a Headset
-Reply-To: jbarnett@pobox.com,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Mon, 23 Oct 2006 14:31:28 +1000
+References: <200610231025.51818.denis.kenzior@trolltech.com>
+	<200610231359.04570.denis.kenzior@trolltech.com>
+	<1161576664.8388.21.camel@localhost>
+In-Reply-To: <1161576664.8388.21.camel@localhost>
+MIME-Version: 1.0
+Message-Id: <200610231431.28318.denis.kenzior@trolltech.com>
+Subject: Re: [Bluez-devel] Proposed DTD
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,114 +18,111 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0973637708=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Marcel,
 
---===============0973637708==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-ejfNyO3DtYZEtobQmfBZ"
+> >
+> > I can see your point on being lower case, so this is something I agree
+> > with.
+> >
+> > I don't really like using the single data tag for everything.  I think I
+> > prefer the e.g. <uuid16>0x1002</uuid16> syntax.  However, since this is
+> > XML there's no right or wrong way to do this.  Perhaps others can chime
+> > in?
+>
+> my main reason is that the D-Bus Introspection goes this way. And I
+> personally find this way simpler and more intuitive.
 
+Ok in this case, agreed.  I will make the necessary changes.
 
---=-ejfNyO3DtYZEtobQmfBZ
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+> > Why though?  This is something that can be easily computed while parsing
+> > the XML structure and creating the internal data representation.  The
+> > user should not have to deal with this implementation detail.  I suppose
+> > I'm open to adding text8, text16 and text32 tags in "expert" mode.  But
+> > how will we handle sequences and alternatives in this case?
+>
+> If you specify the DTD the size is not important. Say for example it is
+> a UUID and the server can detect if it is a UUID-128, UUID-32 or UUID-16
+> and so the actual application programmer can use the convenient way to
+> specify the record with thinking about the actual sizes. The server will
+> do the right thing.
+>
 
-I've managed to get a Sony Ericsson HBH-610a workng on two platforms - a
-laptop Dell 9400 with a core duo and a laptop Dell 5150 with a Pentium 4
-HT. Both used a Kensington USB Bluetooth adapter.
+Yep, I prefer this.  See next.  
 
-Information on the HBH-610a:
-        BD Address:  00:12:EE:E0:AB:CA
-        Device Name: HBH-610a
-        LMP Version: 2.0 (0x3) LMP Subversion: 0xe1b
-        Manufacturer: Texas Instruments Inc. (13)
-        Features: 0xff 0xfd 0x29 0x78 0x18 0x18 0x00 0x80
-                <3-slot packets> <5-slot packets> <encryption> <slot
-offset>=20
-                <timing accuracy> <role switch> <hold mode> <sniff
-mode>=20
-                <park state> <channel quality> <SCO link> <HV2 packets>=20
-                <HV3 packets> <u-law log> <A-law log> <CVSD>
-<transparent SCO>=20
-                <enhanced iscan> <interlaced iscan> <interlaced pscan>=20
-                <inquiry with RSSI> <AFH cap. slave> <AFH class. slave>=20
-                <AFH cap. master> <AFH class. master> <extended
-features>=20
+> However this only works for "uuid", "text" and "url", because all others
+> might be used with special meaning from profile to profile.
 
-Information on the Kensington bluetooth USB adapter:
-hci0:   Type: USB
-        BD Address: 00:16:38:C1:ED:BD ACL MTU: 1017:8 SCO MTU: 64:8
-        UP RUNNING PSCAN=20
-        RX bytes:1863 acl:0 sco:0 events:62 errors:0
-        TX bytes:694 acl:0 sco:0 commands:38 errors:0
-        Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3=20
-        Link policy: RSWITCH HOLD SNIFF PARK=20
-        Link mode: SLAVE ACCEPT=20
-        Name: 'BlueZ (0)'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing, Object
-Transfer, Audio
-        Device Class: Computer, Uncategorized
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x2000 LMP Ver: 2.0 (0x3) LMP
-Subver: 0x4127
-        Manufacturer: Broadcom Corporation (15)
+Yep, hence I made the int8..128 and uint8..128.  I think this is unavoidable.  
+This is also the reason why I explicitly specify uuid16..128.  Do you think 
+the uuid one is unnecessary?
 
-Both are able to use the snd-bt-sco kernel driver with skype 1.3.0.53
-with good results.
+>
+> Having the sized version around and retrieving a record from a remote
+> server gives you the chance to see the actual record how it is stored on
+> the remote side. For example some implementation use UUID-32 for no real
+> reason. Even if a UUID-16 would have been enough. I wanna see these
+> differences.
 
-The linux kernel being used in both instances is 2.6.18.1. The 5150
-needed to be patched to force sco mtu values - manually done since
-2.6.18.1 has code changes in the relevant area since the production of
-the patch. Before the application of this, everything would work in the
-connection step up to generating sounds. At that point, the sound
-program would hang (e.g. aplay would hang and no sound would be
-produced, although there was lots of activity shown in hcidump).
+I understand, but this is more of a developer thing.  Can sdptool be made to 
+fill this gap?  It already has this functionality.  I think the XML format 
+should be kept as simple as possible, unless extra complexity is unavoidable.
 
-The 9400 required no patch.
+Perhaps two dtds are in order.  One that is "explicit" (you specify sizes for 
+all elements, including Sequences and Alternates, Text, URL and UUID) and one 
+that is not?
 
-The Sony Ericsson headset is Bluetooth 2.0, 1.2 and 1.1 compliant. The
-Kensington Bluetooth USB Adapter is 2.0, 1.2 and 1.1 compliant.
+> The problem with SDP is that you can't make it really simple. So far we
+> tried four times and nothing simple came around. This protocol and data
+> representation is simply messed up.
 
---=-ejfNyO3DtYZEtobQmfBZ
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
+I completely agree with the last sentence :)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
+> > > Actually at the moment you have to let the server pick the record
+> > > handle, because specifying the handle doesn't work. It should work, but
+> > > I never found the actual bug in the code that prevents it.
+> > >
+> > > Using the proposed way of the "data" element, we can have special
+> > > values for "value" like "%channel" etc. that can be filled in by the
+> > > server.
+> >
+> > I think this can be accomplished easily by using a hint attribute or a
+> > special value, e.g.
+> >
+> > <uint16 type="auto_rfcomm_channel">0x0000</uint16>
+> >
+> > or
+> >
+> > <uint16>AUTO_RFCOMM_CHANNEL</uint16>
+>
+> I prefer the "%channel" way. Most people with programming skills will
+> understand what it means.
+>
 
-iD8DBQBFPEX1u2cEic/xsEARAgcKAJ4n1lLXIXmRZHStp5CPZsE4PV6fNgCgyzgX
-1fR9cKij5CxyVqeMGEH+ZG8=
-=HPbW
------END PGP SIGNATURE-----
+Something that occurred to me is that I think in the real implementation it 
+would be a lot easier to specify the l2cap and rfcomm channels separately and 
+just override the parsed SDP record.  Don't know if this is good though.  
+E.g. 
+	RegisterXMLRecordRFCOMM(byte[] xml, int rfcomm_channel)
+	RegisterXMLRecordL2CAP...
 
---=-ejfNyO3DtYZEtobQmfBZ--
+> Regards
+>
+> Marcel
+>
 
-
-
---===============0973637708==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Thanks,
+-Denis
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0973637708==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0973637708==--
