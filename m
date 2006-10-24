@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200610241809.56581.denis.kenzior@trolltech.com>
+Date: Tue, 24 Oct 2006 18:09:56 +1000
 References: <200610231025.51818.denis.kenzior@trolltech.com>
 	<200610241647.20895.denis.kenzior@trolltech.com>
 	<1161681395.10866.148.camel@aeonflux.holtmann.net>
-	<200610241809.56581.denis.kenzior@trolltech.com>
-Date: Tue, 24 Oct 2006 12:17:34 +0200
-Message-Id: <1161685054.10866.154.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+In-Reply-To: <1161681395.10866.148.camel@aeonflux.holtmann.net>
+MIME-Version: 1.0
+Message-Id: <200610241809.56581.denis.kenzior@trolltech.com>
 Subject: Re: [Bluez-devel] Proposed DTD
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,42 +22,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Marcel,
 
-> > > Yes, the encoding is only relevant for the <text[8,16,32]> fields.  The
-> > > rest of the attributes should not have it (this is hard to express in a
-> > > DTD.)
-> >
-> > then don't express it at all. Leave it out. An XML file can be valid
-> > based on its DTD, but still be rejected when stuff is not passing the
-> > semantic requirements.
+> > Yes, the encoding is only relevant for the <text[8,16,32]> fields.  The
+> > rest of the attributes should not have it (this is hard to express in a
+> > DTD.)
+>
+> then don't express it at all. Leave it out. An XML file can be valid
+> based on its DTD, but still be rejected when stuff is not passing the
+> semantic requirements.
 
-I prefer to leave it out now and then add it later if really needed. It
-is simpler to add something than to remove it.
+I'd rather leave it, encoding attribute is optional anyway, and as you said 
+it'll only happen for HID profile.  Might as well treat the entire thing as a 
+data blob.  
 
-> I'd rather leave it, encoding attribute is optional anyway, and as you said 
-> it'll only happen for HID profile.  Might as well treat the entire thing as a 
-> data blob.  
-> 
-> > If I can get an XML parser that only deals with this specific DTD and is
-> > not using expat at all, I am willing to include it right away and make
-> > sdptool use it.
-> 
-> Cool.  I will be unable to work on this for a few weeks, so if nobody steps up 
-> till then I'll see what I can do.  In the interest of getting something 
-> working quickly and generating feedback, would you be willing to introduce a 
-> dependency on expat for hcid? The XML infrastructure really belongs in the 
-> new dbus API anyway.   
+> If I can get an XML parser that only deals with this specific DTD and is
+> not using expat at all, I am willing to include it right away and make
+> sdptool use it.
 
-Having a temporary expat dependency is not an option am willing to go
-for. However removing the code from sdptool and only put some XML
-templates in a shared place seems like a good option.
+Cool.  I will be unable to work on this for a few weeks, so if nobody steps up 
+till then I'll see what I can do.  In the interest of getting something 
+working quickly and generating feedback, would you be willing to introduce a 
+dependency on expat for hcid? The XML infrastructure really belongs in the 
+new dbus API anyway.   
 
-Regards
-
-Marcel
-
-
+-Denis
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
