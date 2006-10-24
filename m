@@ -1,15 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200610241547.36330.denis.kenzior@trolltech.com>
-References: <200610231025.51818.denis.kenzior@trolltech.com>
-	<200610231431.28318.denis.kenzior@trolltech.com>
-	<1161588427.7694.11.camel@aeonflux.holtmann.net>
-	<200610241547.36330.denis.kenzior@trolltech.com>
-Date: Tue, 24 Oct 2006 10:13:32 +0200
-Message-Id: <1161677612.10866.138.camel@aeonflux.holtmann.net>
+In-Reply-To: <200610232250.13988.dgollub@suse.de>
+References: <7aabaf0e0610230427m2f8bfa5ekcfe2ce2fc9f165f1@mail.gmail.com>
+	<1161618279.10866.102.camel@aeonflux.holtmann.net>
+	<7aabaf0e0610230702g57ce1f37y87c1cc961e692612@mail.gmail.com>
+	<200610232250.13988.dgollub@suse.de>
+Date: Tue, 24 Oct 2006 10:04:37 +0200
+Message-Id: <1161677077.10866.130.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Proposed DTD
+Subject: Re: [Bluez-devel] Pin for an outgoing connection
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,26 +23,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Hi Daniel,
 
-> Based on your feedback a new DTD specification.  Hopefully it is getting 
-> closer.
+> i started porting the kdebluetooth framework to the new blueZ DBus API.  All 
+> DBus methods are implemented in a new libkbluetooth. I dropped kbluetoothd 
+> and replaced (forked) it with kbluetooth. So far it only acts as passkey 
+> agent. Also the porting of the kcm_btpaired is nearly done...
+> At the moment i am trying to get kiobluetooth working with the new 
+> libkbluetooth.
+> 
+> The kdebluetooth branch for the blueZ DBus API can be found in the KDE SVN:
+> http://websvn.kde.org/branches/work/kdebluetooth-dbus-integration/
+> 
+> I will announce further procceding, of this development, in the end of this 
+> week. So far i didn't find time for this, Sorry. But i would appreciate any 
+> help in this development.
 
-looks good. However the text about hex encoded is not needed. All number
-based values can be either in hex or decimal or whatever. We will use
-the standard encoding to detect it. For example if it starts with 0x
-then it is hex, otherwise it is decimal.
-
-I am also not sure that the encoding attribute is needed. If you wanna
-encode binary data in text elements (at the moment only HID does this)
-then you can use \000 style encoding to do so.
-
-Can also provide an example XML record for a really simple serial port
-profile. This will help to see how it looks like.
-
-Anyone willing to write a really specific and simple XML parser to
-convert these XML files into sdp_record_t structures. And or course a
-function that converts this structure back to XML.
+that looks nice. The best approach would be to try to link the Bluetooth
+library as less as possible. Every desktop application that only depends
+on D-Bus and _not_ on libbluetooth is a good one :)
 
 Regards
 
