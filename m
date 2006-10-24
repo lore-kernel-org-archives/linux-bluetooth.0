@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <20061026211045.67971.qmail@web56802.mail.re3.yahoo.com>
-Date: Thu, 26 Oct 2006 16:10:45 -0500 (CDT)
-From: Xerox del Ecuador <yulios12@yahoo.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] how can i sen sms(text message) between pc and phone
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200610241809.56581.denis.kenzior@trolltech.com>
+References: <200610231025.51818.denis.kenzior@trolltech.com>
+	<200610241647.20895.denis.kenzior@trolltech.com>
+	<1161681395.10866.148.camel@aeonflux.holtmann.net>
+	<200610241809.56581.denis.kenzior@trolltech.com>
+Date: Tue, 24 Oct 2006 12:17:34 +0200
+Message-Id: <1161685054.10866.154.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Proposed DTD
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,60 +19,53 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0342020934=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0342020934==
-Content-Type: multipart/alternative; boundary="0-83604352-1161897045=:64722"
-Content-Transfer-Encoding: 8bit
+Hi Denis,
 
---0-83604352-1161897045=:64722
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+> > > Yes, the encoding is only relevant for the <text[8,16,32]> fields.  The
+> > > rest of the attributes should not have it (this is hard to express in a
+> > > DTD.)
+> >
+> > then don't express it at all. Leave it out. An XML file can be valid
+> > based on its DTD, but still be rejected when stuff is not passing the
+> > semantic requirements.
 
-Hi,
-   
-  I am looking for an example code written in "languaje C". For This :
-  I just want to be able to send "text message" between pc (fedora core 5) and phone (nokia 6230).
-  how to solve my problem?
-   
-  1000 Thanks
-   
-  Julio.
+I prefer to leave it out now and then add it later if really needed. It
+is simpler to add something than to remove it.
 
- __________________________________________________
-Correo Yahoo!
-Espacio para todos tus mensajes, antivirus y antispam ¡gratis! 
-Regístrate ya - http://correo.espanol.yahoo.com/ 
---0-83604352-1161897045=:64722
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+> I'd rather leave it, encoding attribute is optional anyway, and as you said 
+> it'll only happen for HID profile.  Might as well treat the entire thing as a 
+> data blob.  
+> 
+> > If I can get an XML parser that only deals with this specific DTD and is
+> > not using expat at all, I am willing to include it right away and make
+> > sdptool use it.
+> 
+> Cool.  I will be unable to work on this for a few weeks, so if nobody steps up 
+> till then I'll see what I can do.  In the interest of getting something 
+> working quickly and generating feedback, would you be willing to introduce a 
+> dependency on expat for hcid? The XML infrastructure really belongs in the 
+> new dbus API anyway.   
 
-<div>Hi,</div>  <div>&nbsp;</div>  <div>I am looking for an example code written in "languaje C". For This :</div>  <div>I just want to be able to send "text message" between pc (fedora core 5) and phone (nokia 6230).</div>  <div>how to solve my problem?</div>  <div>&nbsp;</div>  <div>1000 Thanks</div>  <div>&nbsp;</div>  <div>Julio.</div><p>&#32;__________________________________________________<br>Correo Yahoo!<br>Espacio para todos tus mensajes, antivirus y antispam ¡gratis! <br>Regístrate ya - http://correo.espanol.yahoo.com/ 
---0-83604352-1161897045=:64722--
+Having a temporary expat dependency is not an option am willing to go
+for. However removing the code from sdptool and only put some XML
+templates in a shared place seems like a good option.
+
+Regards
+
+Marcel
 
 
---===============0342020934==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0342020934==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0342020934==--
