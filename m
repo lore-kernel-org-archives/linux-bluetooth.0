@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 27 Oct 2006 09:35:51 -0300
-From: Horacio =?iso-8859-1?Q?J=2E_Pe=F1a?= <horape@compendium.com.ar>
-To: Xerox del Ecuador <yulios12@yahoo.com>
-Message-ID: <20061027123551.GA14944@compendium.com.ar>
-References: <20061026211045.67971.qmail@web56802.mail.re3.yahoo.com>
-Mime-Version: 1.0
-In-Reply-To: <20061026211045.67971.qmail@web56802.mail.re3.yahoo.com>
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] how can i sen sms(text message) between pc and
-	phone
+Message-ID: <20061026211045.67971.qmail@web56802.mail.re3.yahoo.com>
+Date: Thu, 26 Oct 2006 16:10:45 -0500 (CDT)
+From: Xerox del Ecuador <yulios12@yahoo.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] how can i sen sms(text message) between pc and phone
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,63 +14,60 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============0342020934=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Check gsm-utils.
+--===============0342020934==
+Content-Type: multipart/alternative; boundary="0-83604352-1161897045=:64722"
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 26, 2006 at 04:10:45PM -0500, Xerox del Ecuador wrote:
-> Hi,
->    =
+--0-83604352-1161897045=:64722
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
->   I am looking for an example code written in "languaje C". For This :
->   I just want to be able to send "text message" between pc (fedora core 5=
-) and phone (nokia 6230).
->   how to solve my problem?
->    =
+Hi,
+   
+  I am looking for an example code written in "languaje C". For This :
+  I just want to be able to send "text message" between pc (fedora core 5) and phone (nokia 6230).
+  how to solve my problem?
+   
+  1000 Thanks
+   
+  Julio.
 
->   1000 Thanks
->    =
+ __________________________________________________
+Correo Yahoo!
+Espacio para todos tus mensajes, antivirus y antispam ¡gratis! 
+Regístrate ya - http://correo.espanol.yahoo.com/ 
+--0-83604352-1161897045=:64722
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
->   Julio.
-> =
-
->  __________________________________________________
-> Correo Yahoo!
-> Espacio para todos tus mensajes, antivirus y antispam =A1gratis! =
-
-> Reg=EDstrate ya - http://correo.espanol.yahoo.com/ =
-
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job ea=
-sier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
-=3D121642
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+<div>Hi,</div>  <div>&nbsp;</div>  <div>I am looking for an example code written in "languaje C". For This :</div>  <div>I just want to be able to send "text message" between pc (fedora core 5) and phone (nokia 6230).</div>  <div>how to solve my problem?</div>  <div>&nbsp;</div>  <div>1000 Thanks</div>  <div>&nbsp;</div>  <div>Julio.</div><p>&#32;__________________________________________________<br>Correo Yahoo!<br>Espacio para todos tus mensajes, antivirus y antispam ¡gratis! <br>Regístrate ya - http://correo.espanol.yahoo.com/ 
+--0-83604352-1161897045=:64722--
 
 
--- =
-
-					HoraPe
----
-Horacio J. Pe=F1a
-horape@compendium.com.ar
-horape@uninet.edu
+--===============0342020934==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0342020934==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0342020934==--
