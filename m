@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <ef9938ec0610260201t5d8eb232l2e1ec89d16234a31@mail.gmail.com>
-Date: Thu, 26 Oct 2006 05:01:58 -0400
-From: "Joseph Vissarionovich Dzhugashvili" <albert@csail.mit.edu>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1161847943.28956.235.camel@ODole-Ubuntu>
-MIME-Version: 1.0
+From: Olivier Dole <olivier.dole@palmsource.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1161845689.8837.8.camel@amarnath-desktop>
 References: <1161845689.8837.8.camel@amarnath-desktop>
-	<1161847943.28956.235.camel@ODole-Ubuntu>
+Date: Thu, 26 Oct 2006 09:32:23 +0200
+Message-Id: <1161847943.28956.235.camel@ODole-Ubuntu>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] Problem while compiling bluez-utils 3.7
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -17,92 +16,51 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Or wait a few hours and upgrade to Edgy ;)
-
--albert
-
-On 10/26/06, Olivier Dole <olivier.dole@palmsource.com> wrote:
-> Hello,
->
-> simply do:
-> sudo apt-get install libdbus-1-dev
-> and then retry configure step ;)
->
-> Regards,
->
-> Olivier
->
-> Le jeudi 26 octobre 2006 =E0 12:24 +0530, Amarnath a =E9crit :
-> > hi,
-> >
-> > I am getting problem when i try to compile Bluez-Utils3.7 :
-> >
-> > $./configure --prefix=3D/usr --mandir=3D/usr/share/man --sysconfdir=3D/=
-etc
-> > --localstatedir=3D/var --libexecdir=3D/lib
-> >
-> > the error was :
-> > checking for DBUS... configure: error: dbus > 0.35 is required
-> >
-> > but Dbus 0.6 is loaded on my system(ubuntu) . Can anybody have
-> > solution , how should i solve the problem. Any comments are
-> > appreciated.
-> >
-> > thanx in advance
-> > Amarnath.
-> >
-> > This message contains confidential information and is intended only
-> > for the individual named. If you are not the named addressee you
-> > should not disseminate, distribute or copy this e-mail. Please
-> > notify the sender immediately by e-mail if you have received this
-> > e-mail by mistake and delete this e-mail from your system. E-mail
-> > transmission cannot be guaranteed to be secured or error-free as
-> > information could be intercepted, corrupted, lost, destroyed, arrive
-> > late or incomplete, or contain viruses. The sender therefore does
-> > not accept liability for any errors or omissions in the contents
-> > of this message, which arise as a result of e-mail transmission.
-> >
-> > For further query please contact info@fortuna.com
-> > -----------------------------------------------------------------------=
---
-> > Using Tomcat but need to do more? Need to support web services, securit=
-y?
-> > Get stuff done quickly with pre-integrated technology to make your job =
-easier
-> > Download IBM WebSphere Application Server v.1.0.1 based on Apache Geron=
-imo
-> > http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
-=3D121642
-> > _______________________________________________ Bluez-users mailing lis=
-t Bluez-users@lists.sourceforge.net https://lists.sourceforge.net/lists/lis=
-tinfo/bluez-users
->
->
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job ea=
-sier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
-=3D121642
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGVsbG8sCgpzaW1wbHkgZG86CnN1ZG8gYXB0LWdldCBpbnN0YWxsIGxpYmRidXMtMS1kZXYKYW5k
+IHRoZW4gcmV0cnkgY29uZmlndXJlIHN0ZXAgOykKClJlZ2FyZHMsCgpPbGl2aWVyCgpMZSBqZXVk
+aSAyNiBvY3RvYnJlIDIwMDYgw6AgMTI6MjQgKzA1MzAsIEFtYXJuYXRoIGEgw6ljcml0IDoKPiBo
+aSwKPiAKPiBJIGFtIGdldHRpbmcgcHJvYmxlbSB3aGVuIGkgdHJ5IHRvIGNvbXBpbGUgQmx1ZXot
+VXRpbHMzLjcgOgo+IAo+ICQuL2NvbmZpZ3VyZSAtLXByZWZpeD0vdXNyIC0tbWFuZGlyPS91c3Iv
+c2hhcmUvbWFuIC0tc3lzY29uZmRpcj0vZXRjCj4gLS1sb2NhbHN0YXRlZGlyPS92YXIgLS1saWJl
+eGVjZGlyPS9saWIKPiAKPiB0aGUgZXJyb3Igd2FzIDoKPiBjaGVja2luZyBmb3IgREJVUy4uLiBj
+b25maWd1cmU6IGVycm9yOiBkYnVzID4gMC4zNSBpcyByZXF1aXJlZAo+IAo+IGJ1dCBEYnVzIDAu
+NiBpcyBsb2FkZWQgb24gbXkgc3lzdGVtKHVidW50dSkgLiBDYW4gYW55Ym9keSBoYXZlCj4gc29s
+dXRpb24gLCBob3cgc2hvdWxkIGkgc29sdmUgdGhlIHByb2JsZW0uIEFueSBjb21tZW50cyBhcmUK
+PiBhcHByZWNpYXRlZC4gCj4gCj4gdGhhbnggaW4gYWR2YW5jZQo+IEFtYXJuYXRoLiAKPiAKPiBU
+aGlzIG1lc3NhZ2UgY29udGFpbnMgY29uZmlkZW50aWFsIGluZm9ybWF0aW9uIGFuZCBpcyBpbnRl
+bmRlZCBvbmx5ICAKPiBmb3IgdGhlIGluZGl2aWR1YWwgbmFtZWQuIElmIHlvdSBhcmUgbm90IHRo
+ZSBuYW1lZCBhZGRyZXNzZWUgeW91ICAKPiBzaG91bGQgbm90IGRpc3NlbWluYXRlLCBkaXN0cmli
+dXRlIG9yIGNvcHkgdGhpcyBlLW1haWwuIFBsZWFzZSAgCj4gbm90aWZ5IHRoZSBzZW5kZXIgaW1t
+ZWRpYXRlbHkgYnkgZS1tYWlsIGlmIHlvdSBoYXZlIHJlY2VpdmVkIHRoaXMgIAo+IGUtbWFpbCBi
+eSBtaXN0YWtlIGFuZCBkZWxldGUgdGhpcyBlLW1haWwgZnJvbSB5b3VyIHN5c3RlbS4gRS1tYWls
+ICAKPiB0cmFuc21pc3Npb24gY2Fubm90IGJlIGd1YXJhbnRlZWQgdG8gYmUgc2VjdXJlZCBvciBl
+cnJvci1mcmVlIGFzICAKPiBpbmZvcm1hdGlvbiBjb3VsZCBiZSBpbnRlcmNlcHRlZCwgY29ycnVw
+dGVkLCBsb3N0LCBkZXN0cm95ZWQsIGFycml2ZSAgCj4gbGF0ZSBvciBpbmNvbXBsZXRlLCBvciBj
+b250YWluIHZpcnVzZXMuIFRoZSBzZW5kZXIgdGhlcmVmb3JlIGRvZXMgIAo+IG5vdCBhY2NlcHQg
+bGlhYmlsaXR5IGZvciBhbnkgZXJyb3JzIG9yIG9taXNzaW9ucyBpbiB0aGUgY29udGVudHMgIAo+
+IG9mIHRoaXMgbWVzc2FnZSwgd2hpY2ggYXJpc2UgYXMgYSByZXN1bHQgb2YgZS1tYWlsIHRyYW5z
+bWlzc2lvbi4gCj4gIAo+IEZvciBmdXJ0aGVyIHF1ZXJ5IHBsZWFzZSBjb250YWN0IGluZm9AZm9y
+dHVuYS5jb20KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gVXNpbmcgVG9tY2F0IGJ1dCBuZWVkIHRvIGRv
+IG1vcmU/IE5lZWQgdG8gc3VwcG9ydCB3ZWIgc2VydmljZXMsIHNlY3VyaXR5Pwo+IEdldCBzdHVm
+ZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRvIG1ha2UgeW91
+ciBqb2IgZWFzaWVyCj4gRG93bmxvYWQgSUJNIFdlYlNwaGVyZSBBcHBsaWNhdGlvbiBTZXJ2ZXIg
+di4xLjAuMSBiYXNlZCBvbiBBcGFjaGUgR2Vyb25pbW8KPiBodHRwOi8vc2VsLmFzLXVzLmZhbGth
+Zy5uZXQvc2VsP2NtZD1sbmsma2lkPTEyMDcwOSZiaWQ9MjYzMDU3JmRhdD0xMjE2NDIKPiBfX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXyBCbHVlei11c2VycyBt
+YWlsaW5nIGxpc3QgQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0IGh0dHBzOi8vbGlz
+dHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCgoKLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLQpVc2luZyBUb21jYXQgYnV0IG5lZWQgdG8gZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0
+IHdlYiBzZXJ2aWNlcywgc2VjdXJpdHk/CkdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUt
+aW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRvIG1ha2UgeW91ciBqb2IgZWFzaWVyCkRvd25sb2FkIElC
+TSBXZWJTcGhlcmUgQXBwbGljYXRpb24gU2VydmVyIHYuMS4wLjEgYmFzZWQgb24gQXBhY2hlIEdl
+cm9uaW1vCmh0dHA6Ly9zZWwuYXMtdXMuZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZraWQ9MTIwNzA5
+JmJpZD0yNjMwNTcmZGF0PTEyMTY0MgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMu
+c291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3Rp
+bmZvL2JsdWV6LXVzZXJzCg==
