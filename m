@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <002701c6fa09$92116120$0100a8c0@kayleigh>
-From: "Olivier Le Pogam" <olepogam@free.fr>
-To: <bluez-devel@lists.sourceforge.net>
-Date: Fri, 27 Oct 2006 22:50:35 +0200
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="=======AVGMAIL-4542712308C1======="
-Subject: [Bluez-devel] Concurrency / Multi processing questions
-Reply-To: Olivier Le Pogam <olepogam@free.fr>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+From: Marcel Hilzinger <marcel@hilzinger.hu>
+To: bluez-devel@lists.sourceforge.net
+Date: Fri, 27 Oct 2006 20:25:41 +0200
+MIME-Version: 1.0
+Message-Id: <200610272025.42759.marcel@hilzinger.hu>
+Subject: [Bluez-devel] Logitech Wireless Headphones -- How to use remote
+	control function
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -16,166 +15,64 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---=======AVGMAIL-4542712308C1=======
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0024_01C6FA1A.50D57D20"
-
-------=_NextPart_000_0024_01C6FA1A.50D57D20
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-Hi,
-
-I think having understood the main concepts of RFCOMM
-connections (DLC, DLCI ...) however I really wonder about
-multi processing (globally and in BlueZ specifically)
-
-- If I want to write a service (published in the SDP) for example
-on channel 9, can I write a forking server (forking at each accept
-so it can accept a new incoming connection from another
-remote device while the first connection is being managed ?)
-We assume we have only one bdaddr (bluetooth adaptor) in local
-
-I suppose it could lead to 2 concurrent connection tuples like these =
-ones :
-( (local_bdaddr, channel 9) - (remote1_addr, channel9) )
-( (local_bdaddr, channel 9) - (remote2_addr, channel9) )
-
-Is it possible ? Without any conflicts ? I know on the local service
-we would have the same DLCI for both sockets. In TCP it would be
-possible with REUSEADDR, would it be the same here ?
-
-- Now taking a reverse problem, let's assume I have a client
-application that will "push" content to mobile phones, on channel 9.
-Can I run concurrent pushers on my computer ?
-Concurrent tuples would look like the same as formerly, except
-that the server / client roles are reversed here.
-
-Thanks a lot for helping me, believe I have searched a lot before
-asking !
-
-Oli
-------=_NextPart_000_0024_01C6FA1A.50D57D20
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2900.2873" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I think having understood the main =
-concepts of=20
-RFCOMM</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>connections (DLC, DLCI ...) however I =
-really wonder=20
-about</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>multi processing (globally and in BlueZ =
-
-specifically)</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>- If I want to write&nbsp;a service =
-(published in=20
-the SDP) for example</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>on channel 9, can I write a forking =
-server (forking=20
-at each accept</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>so it can accept a new incoming =
-connection from=20
-another</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>remote device while the first =
-connection is being=20
-managed ?)</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>We assume we have only one bdaddr =
-(bluetooth=20
-adaptor) in local</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I suppose it could lead to 2 concurrent =
-connection=20
-tuples like these ones :</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>( (local_bdaddr, channel 9) - =
-(remote1_addr,=20
-channel9) )</FONT></DIV>
-<DIV>
-<DIV><FONT face=3DArial size=3D2>( (local_bdaddr, channel 9) - =
-(remote2_addr,=20
-channel9) )</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Is it possible ? Without any conflicts =
-? I know on=20
-the local service</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>we would have the same DLCI for both =
-sockets. In=20
-TCP it would be</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>possible with REUSEADDR, would it be =
-the same here=20
-?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>- Now taking a reverse problem, let's =
-assume I have=20
-a client</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>application that will "push" content to =
-mobile=20
-phones, on channel 9.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Can I run concurrent pushers on my =
-computer=20
-?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Concurrent tuples would look like the =
-same as=20
-formerly, except</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>that the server / client roles are =
-reversed=20
-here.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Thanks a lot for helping me, believe I =
-have=20
-searched a lot before</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>asking !</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Oli</FONT></DIV></DIV></BODY></HTML>
-
-------=_NextPart_000_0024_01C6FA1A.50D57D20--
-
---=======AVGMAIL-4542712308C1=======
-Content-Type: text/plain; x-avg=cert; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Content-Description: "AVG certification"
-
-No virus found in this outgoing message.
-Checked by AVG Free Edition.
-Version: 7.1.408 / Virus Database: 268.13.11/497 - Release Date: 25/10/2006
-=
-
-
---=======AVGMAIL-4542712308C1=======
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---=======AVGMAIL-4542712308C1=======
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---=======AVGMAIL-4542712308C1=======--
+SGkgYWxsLCAKCkkgZ290IGEgdGVzdGRldmljZSBmcm9tIExvZ2l0ZWNoIChzZWUgc3ViamVjdCku
+IFBsYXlpbmcgbXVzaWMgd2l0aCB0aGUgCnByb3ZpZGVkIFVTQi1BZGFwdGVyIGlzIG5vIHByb2Js
+ZW0sIGJ1dCBpJ3ZlIHNlZW4sIHRoYXQgaXQncyBhY3R1YWxseSBhICAKYmx1ZXRvb3RoIGRldmlj
+ZSwgd2hpY2ggYWxzbyBzdXBwb3J0cyB0aGUgcmVtb3RlIGNvbnRyb2wgcHJvZmlsZS4gSGVyZSBz
+b21lIAppbmZvcm1hdGlvbnM6CgpPY3QgMjcgMTk6NTc6MDcga2ltIGtlcm5lbDogdXNiIDItMTog
+bmV3IGZ1bGwgc3BlZWQgVVNCIGRldmljZSB1c2luZyB1aGNpX2hjZCAKYW5kIGFkZHJlc3MgNwpP
+Y3QgMjcgMTk6NTc6MDcga2ltIGtlcm5lbDogdXNiIDItMTogbmV3IGRldmljZSBmb3VuZCwgaWRW
+ZW5kb3I9MGI3YSwgCmlkUHJvZHVjdD0wMTAwCk9jdCAyNyAxOTo1NzowNyBraW0ga2VybmVsOiB1
+c2IgMi0xOiBuZXcgZGV2aWNlIHN0cmluZ3M6IE1mcj0yLCBQcm9kdWN0PTMsIApTZXJpYWxOdW1i
+ZXI9MQpPY3QgMjcgMTk6NTc6MDcga2ltIGtlcm5lbDogdXNiIDItMTogUHJvZHVjdDogTG9naXRl
+Y2ggTXVzaWMgQW55d2hlcmUgVVNCCk9jdCAyNyAxOTo1NzowNyBraW0ga2VybmVsOiB1c2IgMi0x
+OiBNYW51ZmFjdHVyZXI6IExvZ2l0ZWNoCk9jdCAyNyAxOTo1NzowNyBraW0ga2VybmVsOiB1c2Ig
+Mi0xOiBTZXJpYWxOdW1iZXI6IDAwMEQ0NDU4Q0Q1RApPY3QgMjcgMTk6NTc6MDcga2ltIGtlcm5l
+bDogdXNiIDItMTogY29uZmlndXJhdGlvbiAjMSBjaG9zZW4gZnJvbSAxIGNob2ljZQpPY3QgMjcg
+MTk6NTc6MDcga2ltIGtlcm5lbDogQUxTQSBzb3VuZC91c2IvdXNiYXVkaW8uYzoxMjI2OiA3OjE6
+MTogY2Fubm90IGdldCAKZnJlcSBhdCBlcCAweDUKT2N0IDI3IDE5OjU3OjA3IGtpbSBrZXJuZWw6
+IEFMU0Egc291bmQvdXNiL3VzYmF1ZGlvLmM6MTIyNjogNzoxOjI6IGNhbm5vdCBnZXQgCmZyZXEg
+YXQgZXAgMHg1Ck9jdCAyNyAxOTo1NzowNyBraW0ga2VybmVsOiBpbnB1dDogTG9naXRlY2ggTG9n
+aXRlY2ggTXVzaWMgQW55d2hlcmUgVVNCIAphcyAvY2xhc3MvaW5wdXQvaW5wdXQ3Ck9jdCAyNyAx
+OTo1NzowNyBraW0ga2VybmVsOiBpbnB1dCxoaWRkZXY5NjogVVNCIEhJRCB2MS4xMCBEZXZpY2Ug
+W0xvZ2l0ZWNoIApMb2dpdGVjaCBNdXNpYyBBbnl3aGVyZSBVU0JdIG9uIHVzYi0wMDAwOjAwOjFk
+LjAtMQpPY3QgMjcgMTk6NTc6MjEga2ltIGtlcm5lbDogQUxTQSBzb3VuZC91c2IvdXNiYXVkaW8u
+YzoxMjI2OiA3OjE6MTogY2Fubm90IGdldCAKZnJlcSBhdCBlcCAweDUKClRoZSBvdXRwdXQgb2Yg
+c2RwdG9vbCBicm93c2U6CmtpbTovbGliL21vZHVsZXMgIyBzZHB0b29sIGJyb3dzZQpJbnF1aXJp
+bmcgLi4uCkJyb3dzaW5nIDAwOjBEOjQ0OjU4OjExOkNBIC4uLgpTZXJ2aWNlIE5hbWU6IEF1ZGlv
+IFNpbmsKU2VydmljZSBSZWNIYW5kbGU6IDB4MTEwYgpTZXJ2aWNlIENsYXNzIElEIExpc3Q6CiAg
+IkF1ZGlvIFNpbmsiICgweDExMGIpClByb3RvY29sIERlc2NyaXB0b3IgTGlzdDoKICAiTDJDQVAi
+ICgweDAxMDApCiAgICBQU006IDI1CiAgIkFWRFRQIiAoMHgwMDE5KQogICAgdWludDE2OiAweDEw
+MApMYW5ndWFnZSBCYXNlIEF0dHIgTGlzdDoKICBjb2RlX0lTTzYzOTogMHg2NTZlCiAgZW5jb2Rp
+bmc6ICAgIDB4NmEKICBiYXNlX29mZnNldDogMHgxMDAKUHJvZmlsZSBEZXNjcmlwdG9yIExpc3Q6
+CiAgIkFkdmFuY2VkIEF1ZGlvIiAoMHgxMTBkKQogICAgVmVyc2lvbjogMHgwMTAwCgpTZXJ2aWNl
+IE5hbWU6IFJlbW90ZSBDb250cm9sbGVyClNlcnZpY2UgUmVjSGFuZGxlOiAweDExMGUKU2Vydmlj
+ZSBDbGFzcyBJRCBMaXN0OgogICJBViBSZW1vdGUiICgweDExMGUpClByb3RvY29sIERlc2NyaXB0
+b3IgTGlzdDoKICAiTDJDQVAiICgweDAxMDApCiAgICBQU006IDIzCiAgIkFWQ1RQIiAoMHgwMDE3
+KQogICAgdWludDE2OiAweDEwMApMYW5ndWFnZSBCYXNlIEF0dHIgTGlzdDoKICBjb2RlX0lTTzYz
+OTogMHg2NTZlCiAgZW5jb2Rpbmc6ICAgIDB4NmEKICBiYXNlX29mZnNldDogMHgxMDAKUHJvZmls
+ZSBEZXNjcmlwdG9yIExpc3Q6CiAgIkFWIFJlbW90ZSIgKDB4MTEwZSkKICAgIFZlcnNpb246IDB4
+MDEwMAoKSSB0cmllZCB0byBwbGF5IHNvbWUgc291bmQgb3ZlciBteSBsYXB0b3BzIGludGVybmFs
+IGJsdWV0b290aCBtb2R1bGUsIGJ1dCBubyAKc3VjY2VzcyBzbyBmYXI6CgpraW06L2xpYi9tb2R1
+bGVzICMgYnRzY28gMDA6MEQ6NDQ6NTg6MTE6Q0EKRXJyb3I6IGNvbnRyb2wgb3BlbiAoaHc6MSk6
+IE5vIHN1Y2ggZGV2aWNlCkVycm9yOiBDYW4ndCBmaW5kIGRldmljZS4gQmFpbAoKTXkgcXVlc3Rp
+b24gaXMgdGhlcmVmb3JlLCBob3cgdG8gdXNlIHRoZSB0d28gc3BlY2lhbCBidXR0b25zIG9uIHRo
+ZSBoZWFkcGhvbmUgCnRvIG5hdmlnYXRlIGluIHRoZSBwbGF5bGlzdGUgKG5leHQsIHByZXZpb3Vz
+ZSkuIExvZ2l0ZWNoIGlzIHVzaW5nIHRoZSBoaWQgCnByb3RvY29sIGZvciB0aGUgcmVtb3RlIGFu
+ZCB0aGUgZGV2aWNlIGNhbiBiZSBwYWlyZWQgd2l0aCB0aGUgcGluIDAwMDAsIGJ1dCAKc28gZmFy
+LCB0aGUgcmVtb3RlIGNvbnRyb2wgZG9lcyBub3Qgd29yaywgYXQgbGVhc3QsIHRoZXJlIGFyZSBu
+byBrZXljb2RlcyAKc2VudC4KCgoKLS0gCsOcZHbDtnpsZXR0ZWwgLS0gTWl0IGZyZXVuZGxpY2hl
+biBHcsO8c3NlbiwKTWFyY2VsIEhpbHppbmdlcgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpVc2luZyBUb21j
+YXQgYnV0IG5lZWQgdG8gZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0IHdlYiBzZXJ2aWNlcywgc2Vj
+dXJpdHk/CkdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9s
+b2d5IHRvIG1ha2UgeW91ciBqb2IgZWFzaWVyCkRvd25sb2FkIElCTSBXZWJTcGhlcmUgQXBwbGlj
+YXRpb24gU2VydmVyIHYuMS4wLjEgYmFzZWQgb24gQXBhY2hlIEdlcm9uaW1vCmh0dHA6Ly9zZWwu
+YXMtdXMuZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZraWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0PTEy
+MTY0MgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVl
+ei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0
+dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
