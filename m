@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Hilzinger <marcel@hilzinger.hu>
-To: bluez-devel@lists.sourceforge.net
-Date: Fri, 27 Oct 2006 20:25:41 +0200
-MIME-Version: 1.0
-Message-Id: <200610272025.42759.marcel@hilzinger.hu>
-Subject: [Bluez-devel] Logitech Wireless Headphones -- How to use remote
-	control function
+Date: Fri, 27 Oct 2006 09:35:51 -0300
+From: Horacio =?iso-8859-1?Q?J=2E_Pe=F1a?= <horape@compendium.com.ar>
+To: Xerox del Ecuador <yulios12@yahoo.com>
+Message-ID: <20061027123551.GA14944@compendium.com.ar>
+References: <20061026211045.67971.qmail@web56802.mail.re3.yahoo.com>
+Mime-Version: 1.0
+In-Reply-To: <20061026211045.67971.qmail@web56802.mail.re3.yahoo.com>
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] how can i sen sms(text message) between pc and
+	phone
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,64 +18,63 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGkgYWxsLCAKCkkgZ290IGEgdGVzdGRldmljZSBmcm9tIExvZ2l0ZWNoIChzZWUgc3ViamVjdCku
-IFBsYXlpbmcgbXVzaWMgd2l0aCB0aGUgCnByb3ZpZGVkIFVTQi1BZGFwdGVyIGlzIG5vIHByb2Js
-ZW0sIGJ1dCBpJ3ZlIHNlZW4sIHRoYXQgaXQncyBhY3R1YWxseSBhICAKYmx1ZXRvb3RoIGRldmlj
-ZSwgd2hpY2ggYWxzbyBzdXBwb3J0cyB0aGUgcmVtb3RlIGNvbnRyb2wgcHJvZmlsZS4gSGVyZSBz
-b21lIAppbmZvcm1hdGlvbnM6CgpPY3QgMjcgMTk6NTc6MDcga2ltIGtlcm5lbDogdXNiIDItMTog
-bmV3IGZ1bGwgc3BlZWQgVVNCIGRldmljZSB1c2luZyB1aGNpX2hjZCAKYW5kIGFkZHJlc3MgNwpP
-Y3QgMjcgMTk6NTc6MDcga2ltIGtlcm5lbDogdXNiIDItMTogbmV3IGRldmljZSBmb3VuZCwgaWRW
-ZW5kb3I9MGI3YSwgCmlkUHJvZHVjdD0wMTAwCk9jdCAyNyAxOTo1NzowNyBraW0ga2VybmVsOiB1
-c2IgMi0xOiBuZXcgZGV2aWNlIHN0cmluZ3M6IE1mcj0yLCBQcm9kdWN0PTMsIApTZXJpYWxOdW1i
-ZXI9MQpPY3QgMjcgMTk6NTc6MDcga2ltIGtlcm5lbDogdXNiIDItMTogUHJvZHVjdDogTG9naXRl
-Y2ggTXVzaWMgQW55d2hlcmUgVVNCCk9jdCAyNyAxOTo1NzowNyBraW0ga2VybmVsOiB1c2IgMi0x
-OiBNYW51ZmFjdHVyZXI6IExvZ2l0ZWNoCk9jdCAyNyAxOTo1NzowNyBraW0ga2VybmVsOiB1c2Ig
-Mi0xOiBTZXJpYWxOdW1iZXI6IDAwMEQ0NDU4Q0Q1RApPY3QgMjcgMTk6NTc6MDcga2ltIGtlcm5l
-bDogdXNiIDItMTogY29uZmlndXJhdGlvbiAjMSBjaG9zZW4gZnJvbSAxIGNob2ljZQpPY3QgMjcg
-MTk6NTc6MDcga2ltIGtlcm5lbDogQUxTQSBzb3VuZC91c2IvdXNiYXVkaW8uYzoxMjI2OiA3OjE6
-MTogY2Fubm90IGdldCAKZnJlcSBhdCBlcCAweDUKT2N0IDI3IDE5OjU3OjA3IGtpbSBrZXJuZWw6
-IEFMU0Egc291bmQvdXNiL3VzYmF1ZGlvLmM6MTIyNjogNzoxOjI6IGNhbm5vdCBnZXQgCmZyZXEg
-YXQgZXAgMHg1Ck9jdCAyNyAxOTo1NzowNyBraW0ga2VybmVsOiBpbnB1dDogTG9naXRlY2ggTG9n
-aXRlY2ggTXVzaWMgQW55d2hlcmUgVVNCIAphcyAvY2xhc3MvaW5wdXQvaW5wdXQ3Ck9jdCAyNyAx
-OTo1NzowNyBraW0ga2VybmVsOiBpbnB1dCxoaWRkZXY5NjogVVNCIEhJRCB2MS4xMCBEZXZpY2Ug
-W0xvZ2l0ZWNoIApMb2dpdGVjaCBNdXNpYyBBbnl3aGVyZSBVU0JdIG9uIHVzYi0wMDAwOjAwOjFk
-LjAtMQpPY3QgMjcgMTk6NTc6MjEga2ltIGtlcm5lbDogQUxTQSBzb3VuZC91c2IvdXNiYXVkaW8u
-YzoxMjI2OiA3OjE6MTogY2Fubm90IGdldCAKZnJlcSBhdCBlcCAweDUKClRoZSBvdXRwdXQgb2Yg
-c2RwdG9vbCBicm93c2U6CmtpbTovbGliL21vZHVsZXMgIyBzZHB0b29sIGJyb3dzZQpJbnF1aXJp
-bmcgLi4uCkJyb3dzaW5nIDAwOjBEOjQ0OjU4OjExOkNBIC4uLgpTZXJ2aWNlIE5hbWU6IEF1ZGlv
-IFNpbmsKU2VydmljZSBSZWNIYW5kbGU6IDB4MTEwYgpTZXJ2aWNlIENsYXNzIElEIExpc3Q6CiAg
-IkF1ZGlvIFNpbmsiICgweDExMGIpClByb3RvY29sIERlc2NyaXB0b3IgTGlzdDoKICAiTDJDQVAi
-ICgweDAxMDApCiAgICBQU006IDI1CiAgIkFWRFRQIiAoMHgwMDE5KQogICAgdWludDE2OiAweDEw
-MApMYW5ndWFnZSBCYXNlIEF0dHIgTGlzdDoKICBjb2RlX0lTTzYzOTogMHg2NTZlCiAgZW5jb2Rp
-bmc6ICAgIDB4NmEKICBiYXNlX29mZnNldDogMHgxMDAKUHJvZmlsZSBEZXNjcmlwdG9yIExpc3Q6
-CiAgIkFkdmFuY2VkIEF1ZGlvIiAoMHgxMTBkKQogICAgVmVyc2lvbjogMHgwMTAwCgpTZXJ2aWNl
-IE5hbWU6IFJlbW90ZSBDb250cm9sbGVyClNlcnZpY2UgUmVjSGFuZGxlOiAweDExMGUKU2Vydmlj
-ZSBDbGFzcyBJRCBMaXN0OgogICJBViBSZW1vdGUiICgweDExMGUpClByb3RvY29sIERlc2NyaXB0
-b3IgTGlzdDoKICAiTDJDQVAiICgweDAxMDApCiAgICBQU006IDIzCiAgIkFWQ1RQIiAoMHgwMDE3
-KQogICAgdWludDE2OiAweDEwMApMYW5ndWFnZSBCYXNlIEF0dHIgTGlzdDoKICBjb2RlX0lTTzYz
-OTogMHg2NTZlCiAgZW5jb2Rpbmc6ICAgIDB4NmEKICBiYXNlX29mZnNldDogMHgxMDAKUHJvZmls
-ZSBEZXNjcmlwdG9yIExpc3Q6CiAgIkFWIFJlbW90ZSIgKDB4MTEwZSkKICAgIFZlcnNpb246IDB4
-MDEwMAoKSSB0cmllZCB0byBwbGF5IHNvbWUgc291bmQgb3ZlciBteSBsYXB0b3BzIGludGVybmFs
-IGJsdWV0b290aCBtb2R1bGUsIGJ1dCBubyAKc3VjY2VzcyBzbyBmYXI6CgpraW06L2xpYi9tb2R1
-bGVzICMgYnRzY28gMDA6MEQ6NDQ6NTg6MTE6Q0EKRXJyb3I6IGNvbnRyb2wgb3BlbiAoaHc6MSk6
-IE5vIHN1Y2ggZGV2aWNlCkVycm9yOiBDYW4ndCBmaW5kIGRldmljZS4gQmFpbAoKTXkgcXVlc3Rp
-b24gaXMgdGhlcmVmb3JlLCBob3cgdG8gdXNlIHRoZSB0d28gc3BlY2lhbCBidXR0b25zIG9uIHRo
-ZSBoZWFkcGhvbmUgCnRvIG5hdmlnYXRlIGluIHRoZSBwbGF5bGlzdGUgKG5leHQsIHByZXZpb3Vz
-ZSkuIExvZ2l0ZWNoIGlzIHVzaW5nIHRoZSBoaWQgCnByb3RvY29sIGZvciB0aGUgcmVtb3RlIGFu
-ZCB0aGUgZGV2aWNlIGNhbiBiZSBwYWlyZWQgd2l0aCB0aGUgcGluIDAwMDAsIGJ1dCAKc28gZmFy
-LCB0aGUgcmVtb3RlIGNvbnRyb2wgZG9lcyBub3Qgd29yaywgYXQgbGVhc3QsIHRoZXJlIGFyZSBu
-byBrZXljb2RlcyAKc2VudC4KCgoKLS0gCsOcZHbDtnpsZXR0ZWwgLS0gTWl0IGZyZXVuZGxpY2hl
-biBHcsO8c3NlbiwKTWFyY2VsIEhpbHppbmdlcgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpVc2luZyBUb21j
-YXQgYnV0IG5lZWQgdG8gZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0IHdlYiBzZXJ2aWNlcywgc2Vj
-dXJpdHk/CkdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9s
-b2d5IHRvIG1ha2UgeW91ciBqb2IgZWFzaWVyCkRvd25sb2FkIElCTSBXZWJTcGhlcmUgQXBwbGlj
-YXRpb24gU2VydmVyIHYuMS4wLjEgYmFzZWQgb24gQXBhY2hlIEdlcm9uaW1vCmh0dHA6Ly9zZWwu
-YXMtdXMuZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZraWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0PTEy
-MTY0MgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVl
-ei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0
-dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
+Check gsm-utils.
+
+On Thu, Oct 26, 2006 at 04:10:45PM -0500, Xerox del Ecuador wrote:
+> Hi,
+>    =
+
+>   I am looking for an example code written in "languaje C". For This :
+>   I just want to be able to send "text message" between pc (fedora core 5=
+) and phone (nokia 6230).
+>   how to solve my problem?
+>    =
+
+>   1000 Thanks
+>    =
+
+>   Julio.
+> =
+
+>  __________________________________________________
+> Correo Yahoo!
+> Espacio para todos tus mensajes, antivirus y antispam =A1gratis! =
+
+> Reg=EDstrate ya - http://correo.espanol.yahoo.com/ =
+
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job ea=
+sier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
+-- =
+
+					HoraPe
+---
+Horacio J. Pe=F1a
+horape@compendium.com.ar
+horape@uninet.edu
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
