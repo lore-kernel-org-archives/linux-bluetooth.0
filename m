@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <2ca6f8400610262053gea12953mda5a6cb9bd1c4cfc@mail.gmail.com>
-Date: Fri, 27 Oct 2006 09:23:32 +0530
-From: "viren sharma" <viren0007@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <45416CE2.2080804@gmail.com>
+Date: Thu, 26 Oct 2006 23:20:18 -0300
+From: Manuel Naranjo <naranjo.manuel@gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Test mail
+To: thomas.kear@gmail.com, BlueZ users <bluez-users@lists.sourceforge.net>
+References: <8712867d0610261846u14572b22l12e2b16841f49010@mail.gmail.com>
+	<200610271514.13687.thomas.kear@gmail.com>
+In-Reply-To: <200610271514.13687.thomas.kear@gmail.com>
+Subject: Re: [Bluez-users] SPAM IN THE LIST
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,59 +17,32 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0906511465=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0906511465==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_78015_14402269.1161921212572"
-
-------=_Part_78015_14402269.1161921212572
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Test mail as mails are bouncing back.
-
-
-Regards
-viren
-
-------=_Part_78015_14402269.1161921212572
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>Test mail as mails are bouncing back.</div>
-<div>&nbsp;</div>
-<div>&nbsp;</div>
-<div>Regards</div>
-<div>viren</div>
-
-------=_Part_78015_14402269.1161921212572--
-
-
---===============0906511465==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Thomas Kear wrote:
+> I've been getting it too.  I've been attemptiong (in vain it seems) to train 
+> gmail's spam filter by reporting everything that hits my inbox, but it looks 
+> like I'm going to have to look for a more serious solution in KMail.
+>
+> The ideal solution would be for the list admins to close posting access to 
+> only people registered on the list, this seems to have stemmed the similar 
+> flood of nonsense that was plaguing the inkscape-devel mailing list.
+>   
+All of us are getting a lot of Spam. This is because SourceForge don't 
+have very good Spam filters. I don't think that closing the mailing list 
+to only registered people can be an option, but we should find a way to 
+contribute with SourceForge to end with this, the same is happening in 
+another list that I'm suscribed Linux-Usb-(devel or user)
+Cheers,
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0906511465==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0906511465==--
