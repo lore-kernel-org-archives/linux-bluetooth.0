@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 29 Oct 2006 17:42:20 +0100
-From: "Dr. Johannes Zellner" <johannes@zellner.org>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20061029164220.GA15335@zellner.org>
-References: <20061028211225.GA11907@zellner.org>
-	<4544D696.2080204@xmission.com>
+Message-ID: <4544D696.2080204@xmission.com>
+Date: Sun, 29 Oct 2006 09:28:06 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-In-Reply-To: <4544D696.2080204@xmission.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <20061028211225.GA11907@zellner.org>
+In-Reply-To: <20061028211225.GA11907@zellner.org>
 Subject: Re: [Bluez-devel] bluetooth-alsa works with aplay but not with xmms
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,21 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sun, Oct 29, 2006 at 09:28:06AM -0700, Brad Midgley wrote:
-> Dr. J
+Dr. J
+
+> I followed the instructions on
 > 
-> > I followed the instructions on
-> > 
-> >     https://help.ubuntu.com/community/BluetoothAudio
-> 
-> do a cvs update, build, install and try again. it should work now.
+>     https://help.ubuntu.com/community/BluetoothAudio
 
-Brad,
+do a cvs update, build, install and try again. it should work now.
 
-works perfectly. Thanks.
-
--- 
-Johannes
+brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
