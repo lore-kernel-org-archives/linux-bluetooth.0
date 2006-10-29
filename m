@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: thomas.kear@gmail.com, BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200610261319.41239.thomas.kear@gmail.com>
-References: <200610261319.41239.thomas.kear@gmail.com>
-Date: Sun, 29 Oct 2006 21:16:21 +0100
-Message-Id: <1162152981.4720.9.camel@localhost>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4540B313.1000302@gmail.com>
+References: <4540B313.1000302@gmail.com>
+Date: Sun, 29 Oct 2006 21:14:44 +0100
+Message-Id: <1162152884.4720.7.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] hidd connect permissions
+Subject: Re: [Bluez-users] Changes to BlueZ has brooken an App
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,32 +16,34 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Thomas,
-
-> # hidd -n --server
-> hidd[32412]: Bluetooth HID daemon
-> hidd[32412]: Rejected connection from unknown device 00:12:EE:07:95:48
-> (same result running as non-root user)
-
-connect from the Linux machine once again. It needs to store the HID
-descriptor and authorize the phone first.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGkgTWFudWVsLAoKPiBJJ20gdHJ5aW5nIHRvIGNvbXBpbGUgdGhlIEF2ZXRhbmFCVCBwYWNrYWdl
+LCBhbmQgY2FuJ3QgbWFrZSBpdCBjb21waWxlIAo+IHdpdGggQmx1ZVogMy43LiBJIGhhdmUgdHJp
+ZWQgd2l0aCBCbHVlWiAzLjQgYW5kIGl0IGNvbXBpbGVkIHBlcmZlY3RseS4KPiBHY2MgdGVsbHMg
+bWU6Cj4gLi4uLgo+IElTTyBDKysgZm9yYmlkcyBkZWNsYXJhdGlvbiBvZiDigJhzZHBfY3N0YXRl
+X3TigJkgd2l0aCBubyB0eXBlCj4gLi4uCj4gQmx1ZVouY3BwOjE5NjE6IGVycm9yOiDigJhjc3Rh
+dGXigJkgd2FzIG5vdCBkZWNsYXJlZCBpbiB0aGlzIHNjb3BlCj4gLi4uLgo+IEJsdWVaLmNwcDox
+OTg4OiBlcnJvcjog4oCYc2RwX2NzdGF0ZV904oCZIHdhcyBub3QgZGVjbGFyZWQgaW4gdGhpcyBz
+Y29wZQo+IC4uLi4KPiBCbHVlWi5jcHA6MjEyMzogZXJyb3I6IOKAmHNkcF9jc3RhdGVfdOKAmSB3
+YXMgbm90IGRlY2xhcmVkIGluIHRoaXMgc2NvcGUKPiBCbHVlWi5jcHA6MjEyMzogZXJyb3I6IOKA
+mGNzdGF0ZeKAmSB3YXMgbm90IGRlY2xhcmVkIGluIHRoaXMgc2NvcGUKPiAKPiBTbyBhcHBhcmVu
+dGx5IHNkcF9jc3RhdGUgYW5kIGNzdGF0ZSBoYXMgZ29uZSBhd2F5LCBtb3ZlZCBvciBjaGFuZ2Vk
+IAo+IG5hbWUuIEkgd291bGQgbGlrZSB0byBrbm93IHdoaWNoIHdhcyB0aGUgY2hhbmdlLCBhbmQg
+d2hlcmUgY2FuIEkgZmluZCBhIAo+IGNoYW5nZWxvZyBzbyBJIGRvbid0IG5lZWQgdG8gYm90aGVy
+IHlvdSB3aXRoIHN0dXBpZCBxdWVzdGlvbnMKCnRoZSBzZHBfY3N0YXRlX3Qgd2FzIG1hZGUgcHVi
+bGljIGJ5IGFjY2lkZW50IGFuZCBzaG91bGQgaGF2ZSBuZXZlciBiZWVuCnVzZWQgYnkgYW55IGFw
+cGxpY2F0aW9uLiBJdCBpcyBhIGZ1bGx5IGludGVybmFsIHN0YXRlLiBTbyB0aGUgQXZldGFudGFC
+VAppbXBsZW1lbnRhdGlvbiBuZWVkcyB0byBiZSBmaXhlZC4KClJlZ2FyZHMKCk1hcmNlbAoKCgot
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tClVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRv
+IHN1cHBvcnQgd2ViIHNlcnZpY2VzLCBzZWN1cml0eT8KR2V0IHN0dWZmIGRvbmUgcXVpY2tseSB3
+aXRoIHByZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kgdG8gbWFrZSB5b3VyIGpvYiBlYXNpZXIKRG93
+bmxvYWQgSUJNIFdlYlNwaGVyZSBBcHBsaWNhdGlvbiBTZXJ2ZXIgdi4xLjAuMSBiYXNlZCBvbiBB
+cGFjaGUgR2Vyb25pbW8KaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9bG5rJmtp
+ZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQyCl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdApCbHVlei11c2Vy
+c0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlz
+dHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
