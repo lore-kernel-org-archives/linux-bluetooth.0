@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Sun, 29 Oct 2006 16:49:18 +0000
+From: Paul LeoNerd Evans <leonerd-bluez@leonerd.org.uk>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4540B313.1000302@gmail.com>
-References: <4540B313.1000302@gmail.com>
-Date: Sun, 29 Oct 2006 21:14:44 +0100
-Message-Id: <1162152884.4720.7.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Changes to BlueZ has brooken an App
+Message-ID: <20061029164917.GA8692@cel.leo>
+References: <20061022194012.1819f3d9@morgul.earth>
+MIME-Version: 1.0
+In-Reply-To: <20061022194012.1819f3d9@morgul.earth>
+Subject: Re: [Bluez-users] first message
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,34 +16,122 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============0655086567=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGkgTWFudWVsLAoKPiBJJ20gdHJ5aW5nIHRvIGNvbXBpbGUgdGhlIEF2ZXRhbmFCVCBwYWNrYWdl
-LCBhbmQgY2FuJ3QgbWFrZSBpdCBjb21waWxlIAo+IHdpdGggQmx1ZVogMy43LiBJIGhhdmUgdHJp
-ZWQgd2l0aCBCbHVlWiAzLjQgYW5kIGl0IGNvbXBpbGVkIHBlcmZlY3RseS4KPiBHY2MgdGVsbHMg
-bWU6Cj4gLi4uLgo+IElTTyBDKysgZm9yYmlkcyBkZWNsYXJhdGlvbiBvZiDigJhzZHBfY3N0YXRl
-X3TigJkgd2l0aCBubyB0eXBlCj4gLi4uCj4gQmx1ZVouY3BwOjE5NjE6IGVycm9yOiDigJhjc3Rh
-dGXigJkgd2FzIG5vdCBkZWNsYXJlZCBpbiB0aGlzIHNjb3BlCj4gLi4uLgo+IEJsdWVaLmNwcDox
-OTg4OiBlcnJvcjog4oCYc2RwX2NzdGF0ZV904oCZIHdhcyBub3QgZGVjbGFyZWQgaW4gdGhpcyBz
-Y29wZQo+IC4uLi4KPiBCbHVlWi5jcHA6MjEyMzogZXJyb3I6IOKAmHNkcF9jc3RhdGVfdOKAmSB3
-YXMgbm90IGRlY2xhcmVkIGluIHRoaXMgc2NvcGUKPiBCbHVlWi5jcHA6MjEyMzogZXJyb3I6IOKA
-mGNzdGF0ZeKAmSB3YXMgbm90IGRlY2xhcmVkIGluIHRoaXMgc2NvcGUKPiAKPiBTbyBhcHBhcmVu
-dGx5IHNkcF9jc3RhdGUgYW5kIGNzdGF0ZSBoYXMgZ29uZSBhd2F5LCBtb3ZlZCBvciBjaGFuZ2Vk
-IAo+IG5hbWUuIEkgd291bGQgbGlrZSB0byBrbm93IHdoaWNoIHdhcyB0aGUgY2hhbmdlLCBhbmQg
-d2hlcmUgY2FuIEkgZmluZCBhIAo+IGNoYW5nZWxvZyBzbyBJIGRvbid0IG5lZWQgdG8gYm90aGVy
-IHlvdSB3aXRoIHN0dXBpZCBxdWVzdGlvbnMKCnRoZSBzZHBfY3N0YXRlX3Qgd2FzIG1hZGUgcHVi
-bGljIGJ5IGFjY2lkZW50IGFuZCBzaG91bGQgaGF2ZSBuZXZlciBiZWVuCnVzZWQgYnkgYW55IGFw
-cGxpY2F0aW9uLiBJdCBpcyBhIGZ1bGx5IGludGVybmFsIHN0YXRlLiBTbyB0aGUgQXZldGFudGFC
-VAppbXBsZW1lbnRhdGlvbiBuZWVkcyB0byBiZSBmaXhlZC4KClJlZ2FyZHMKCk1hcmNlbAoKCgot
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tClVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRv
-IHN1cHBvcnQgd2ViIHNlcnZpY2VzLCBzZWN1cml0eT8KR2V0IHN0dWZmIGRvbmUgcXVpY2tseSB3
-aXRoIHByZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kgdG8gbWFrZSB5b3VyIGpvYiBlYXNpZXIKRG93
-bmxvYWQgSUJNIFdlYlNwaGVyZSBBcHBsaWNhdGlvbiBTZXJ2ZXIgdi4xLjAuMSBiYXNlZCBvbiBB
-cGFjaGUgR2Vyb25pbW8KaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9bG5rJmtp
-ZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQyCl9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdApCbHVlei11c2Vy
-c0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlz
-dHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
+
+--===============0655086567==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="9amGYk9869ThD9tj"
+Content-Disposition: inline
+
+
+--9amGYk9869ThD9tj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sun, Oct 22, 2006 at 07:40:12PM +0200, Frank Dietrich wrote:
+> If have a mobile with bluetooth and want to use it for an
+> internet connection. I'm sure it doesn't work because I miss the
+> bluetooth basics. ;-)
+
+I do the following on debian/testing to get ppp to talk to my Nokia
+6310:
+
+/etc/bluetooth/rfcomm.conf contains:
+
+rfcomm0 {
+        bind yes;
+        device 00:11:22:33:44:55;
+        channel 1;
+        comment "Bluetooth connection to Nokia 6310i";
+}
+
+For GRPS I then do put this in /etc/ppp/peers/gprs:
+
+debug
+noauth
+usepeerdns
+/dev/rfcomm0 115200
+115200
+local
+crtscts
+# Debug - For some reason GPRS seems to time out after 2 minutes. Maybe
+# the Orange servers don't reply echos? We'll turn
+lcp-echo-failure 0
+lcp-echo-interval 0
+defaultroute
+noipdefault
+connect '/usr/sbin/chat -f /etc/ppp/chat-gprs -r /dev/console'
+
+My chat-gprs then contains:
+
+TIMEOUT         5
+ECHO            ON
+ABORT           '\nBUSY\n'
+ABORT           '\nERROR\r'
+ABORT           '\nNO ANSWER\r'
+ABORT           '\nNO CARRIER\r'
+ABORT           '\nNO DIALTONE\r'
+ABORT           '\nRINGING\r\n\r\nRINGING\r'
+# send the init string
+''              \rAT
+TIMEOUT         12
+# set up GPRS mode and settings
+OK              ATE1
+OK              'AT+cgdcont=3D1,"IP","orangeinternet"'
+# dial the access number
+OK              ATD*99***1#
+CONNECT         ""
+
+
+And all should work :)
+
+--=20
+Paul "LeoNerd" Evans
+
+leonerd@leonerd.org.uk
+ICQ# 4135350       |  Registered Linux# 179460
+http://www.leonerd.org.uk/
+
+--9amGYk9869ThD9tj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQFFRNuNqRXzCRLr5iQRAiHSAKCbn8b32dIrNlrJzr727a0nPG74PgCdH+Of
+NHYEVuBqhQWuHJnW3c0H0mw=
+=fUoa
+-----END PGP SIGNATURE-----
+
+--9amGYk9869ThD9tj--
+
+
+--===============0655086567==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0655086567==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0655086567==--
