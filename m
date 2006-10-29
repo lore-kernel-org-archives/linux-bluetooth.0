@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 29 Oct 2006 15:25:56 +0100 (CET)
-From: Peter Wippich <pewi@gw-instruments.de>
-To: Olivier Le Pogam <olepogam@free.fr>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <002701c6fa09$92116120$0100a8c0@kayleigh>
-Message-ID: <Pine.LNX.4.63.0610291515210.2243@redbean.intranet.gw-instruments.de>
-References: <002701c6fa09$92116120$0100a8c0@kayleigh>
+Message-ID: <7aabaf0e0610290201x4364481br37650136406656c2@mail.gmail.com>
+Date: Sun, 29 Oct 2006 15:01:51 +0500
+From: "Valentine Sinitsyn" <valentine.sinitsyn@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200610232250.13988.dgollub@suse.de>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] Concurrency / Multi processing questions
+References: <7aabaf0e0610230427m2f8bfa5ekcfe2ce2fc9f165f1@mail.gmail.com>
+	<1161618279.10866.102.camel@aeonflux.holtmann.net>
+	<7aabaf0e0610230702g57ce1f37y87c1cc961e692612@mail.gmail.com>
+	<200610232250.13988.dgollub@suse.de>
+Subject: Re: [Bluez-devel] Pin for an outgoing connection
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,51 +23,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Daniel,
 
-Hello Oli, 
+> I will announce further procceding, of this development, in the end of this
+> week. So far i didn't find time for this, Sorry. But i would appreciate any
+> help in this development.
+It's a weekend and I'm back from my trip ;-)
+as far as I understand from the code, the task is to port
+kbtobexclient, kobex and other apps & libs which are not compiling now
+to the new D-BUS API? I can help with this development but I think
+some coordination is needed so we wouldn't be porting the same code
+twice.:) Besides, it would be useful to have a smal document
+describing api changes from old libkdebluetooth to the new, DBUS-based
+(like what's the difference between RFCOMM and RfcommSocket interface)
 
-On Fri, 27 Oct 2006, Olivier Le Pogam wrote:
-
-> Hi,
-> 
-> I think having understood the main concepts of RFCOMM
-> connections (DLC, DLCI ...) however I really wonder about
-> multi processing (globally and in BlueZ specifically)
-> 
-> - If I want to write a service (published in the SDP) for example
-> on channel 9, can I write a forking server (forking at each accept
-> so it can accept a new incoming connection from another
-> remote device while the first connection is being managed ?)
-> We assume we have only one bdaddr (bluetooth adaptor) in local
-> 
-> I suppose it could lead to 2 concurrent connection tuples like these ones :
-> ( (local_bdaddr, channel 9) - (remote1_addr, channel9) )
-> ( (local_bdaddr, channel 9) - (remote2_addr, channel9) )
-> 
-> Is it possible ? Without any conflicts ? I know on the local service
-> we would have the same DLCI for both sockets. In TCP it would be
-> possible with REUSEADDR, would it be the same here ?
-
-This would not be possible. You can only have have one connection on a 
-single server channel number (SCN). This is not a problem of BlueZ but a 
-general Bluetooth issue. It may be possible to change the bluetooth stack 
-in a way which will support a scenario aas described above, but I think 
-this won't be a trivial task. And I'm not sure if it will still comply to 
-the standard. 
-
-> - Now taking a reverse problem, let's assume I have a client
-> application that will "push" content to mobile phones, on channel 9.
-> Can I run concurrent pushers on my computer ?
-> Concurrent tuples would look like the same as formerly, except
-> that the server / client roles are reversed here.
-This won't be a problem as long as you just have a single connection to 
-each remote device. The reason is that for every outgoing connection a new 
-local channel will be allocated which is independend from he remote server 
-channel you connect to. 
- 
-Ciao, 
-
-Peter 
+-- 
+Regards,
+Valentine Sinitsyn
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
