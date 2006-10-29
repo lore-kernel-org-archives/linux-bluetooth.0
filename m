@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4544D696.2080204@xmission.com>
-Date: Sun, 29 Oct 2006 09:28:06 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Date: Sun, 29 Oct 2006 15:25:56 +0100 (CET)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: Olivier Le Pogam <olepogam@free.fr>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <002701c6fa09$92116120$0100a8c0@kayleigh>
+Message-ID: <Pine.LNX.4.63.0610291515210.2243@redbean.intranet.gw-instruments.de>
+References: <002701c6fa09$92116120$0100a8c0@kayleigh>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <20061028211225.GA11907@zellner.org>
-In-Reply-To: <20061028211225.GA11907@zellner.org>
-Subject: Re: [Bluez-devel] bluetooth-alsa works with aplay but not with xmms
+Subject: Re: [Bluez-devel] Concurrency / Multi processing questions
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,15 +21,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Dr. J
 
-> I followed the instructions on
+Hello Oli, 
+
+On Fri, 27 Oct 2006, Olivier Le Pogam wrote:
+
+> Hi,
 > 
->     https://help.ubuntu.com/community/BluetoothAudio
+> I think having understood the main concepts of RFCOMM
+> connections (DLC, DLCI ...) however I really wonder about
+> multi processing (globally and in BlueZ specifically)
+> 
+> - If I want to write a service (published in the SDP) for example
+> on channel 9, can I write a forking server (forking at each accept
+> so it can accept a new incoming connection from another
+> remote device while the first connection is being managed ?)
+> We assume we have only one bdaddr (bluetooth adaptor) in local
+> 
+> I suppose it could lead to 2 concurrent connection tuples like these ones :
+> ( (local_bdaddr, channel 9) - (remote1_addr, channel9) )
+> ( (local_bdaddr, channel 9) - (remote2_addr, channel9) )
+> 
+> Is it possible ? Without any conflicts ? I know on the local service
+> we would have the same DLCI for both sockets. In TCP it would be
+> possible with REUSEADDR, would it be the same here ?
 
-do a cvs update, build, install and try again. it should work now.
+This would not be possible. You can only have have one connection on a 
+single server channel number (SCN). This is not a problem of BlueZ but a 
+general Bluetooth issue. It may be possible to change the bluetooth stack 
+in a way which will support a scenario aas described above, but I think 
+this won't be a trivial task. And I'm not sure if it will still comply to 
+the standard. 
 
-brad
+> - Now taking a reverse problem, let's assume I have a client
+> application that will "push" content to mobile phones, on channel 9.
+> Can I run concurrent pushers on my computer ?
+> Concurrent tuples would look like the same as formerly, except
+> that the server / client roles are reversed here.
+This won't be a problem as long as you just have a single connection to 
+each remote device. The reason is that for every outgoing connection a new 
+local channel will be allocated which is independend from he remote server 
+channel you connect to. 
+ 
+Ciao, 
+
+Peter 
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
