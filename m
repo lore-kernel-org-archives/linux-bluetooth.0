@@ -1,65 +1,72 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20061030105610.21038.qmail@maboque.srv.clix.pt>
+Return-Path: <naranjo.manuel@gmail.com>
+Message-ID: <360bc8300610291431qaba68ebh1cf71b861120e205@mail.gmail.com>
+Date: Sun, 29 Oct 2006 19:31:07 -0300
+From: "Naranjo Manuel Francisco" <naranjo.manuel@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Changes to BlueZ has brooken an App
+Cc: marcel@holtmann.org
+In-Reply-To: <1162152884.4720.7.camel@localhost>
 MIME-Version: 1.0
-From: foreveruni@clix.pt
-To: bluez-users@lists.sourceforge.net
-Date: Mon, 30 Oct 2006 10:56:10 +0000
-Subject: [Bluez-users] I can't pair to a H350
-Reply-To: foreveruni@clix.pt, BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0837452889=="
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Content-Type: multipart/alternative;
+	boundary="----=_Part_90851_24024102.1162161067210"
+References: <4540B313.1000302@gmail.com> <1162152884.4720.7.camel@localhost>
+List-ID: <bluez-users.lists.sourceforge.net>
 
---===============0837452889==
-Content-Type: text/plain
-Content-Disposition: inline
-Content-Transfer-Encoding: binary
-
-Hello I'm using ubuntu edgy and tried hcid from bluez-3.7 source(compiled by me) from apt-get(package) and from apt-build.
-I can't use the option : pin_helper "/usr/bin/bluez-pin"; anymore hcid gives me a wrong syntax or something and I can't pair my h350 motorola headset.  When I try to use btsco it says cannot connect to rfcomm channe). If I do hcitool cc handsethwaddress , I get a connection but when I try to use btsco the connection is broken. In the moment that btsco tries to connect hcid have a output saying something like: It tried to make a connection with password but wasn't able to(sorry I can't post the outputs for the moment).Anyone has a hint?
-My hcid.conf is in attachment.
-Best Regards
-João Mamede
-
-O Clix quebrou mais uma barreira!
-
-ADSL até 20 Mb + Telefone livre de assinatura  por apenas  € 34,9/mês
-
-Acabe de vez com os € 15 da assinatura telefónica!
-
-Saiba mais em http://acesso.clix.pt
-
-
-
-
---===============0837452889==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+------=_Part_90851_24024102.1162161067210
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0837452889==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Hi Marcel,
+
+Thanks a lot. Any idea what was it used for? So I can try to remove it.
+
+Regards,
+
+Manuel
+
+
+
+Hi Manuel,
+>
+> the sdp_cstate_t was made public by accident and should have never been
+> used by any application. It is a fully internal state. So the AvetantaBT
+> implementation needs to be fixed.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job
+> easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+
+
+-- 
+Naranjo, Manuel Francisco
+naranjo.manuel@gmail.com
+
+------=_Part_90851_24024102.1162161067210
+Content-Type: text/html; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Hi Marcel,<br><br>Thanks a lot. Any idea what was it used for? So I can try to remove it.<br><br>Regards,<br><br>Manuel<br><br><br><div><span class="gmail_quote"><br></span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+Hi Manuel,<br><br>the sdp_cstate_t was made public by accident and should have never been<br>used by any application. It is a fully internal state. So the AvetantaBT<br>implementation needs to be fixed.<br><br>Regards<br>
+<br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>Using Tomcat but need to do more? Need to support web services, security?<br>Get stuff done quickly with pre-integrated technology to make your job easier
+<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo<br><a href="http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642">http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642
+</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">
+https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br><br clear="all"><br>-- <br>Naranjo, Manuel Francisco<br><a href="mailto:naranjo.manuel@gmail.com">naranjo.manuel@gmail.com</a>
 
---===============0837452889==--
+------=_Part_90851_24024102.1162161067210--
