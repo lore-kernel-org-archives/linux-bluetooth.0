@@ -1,72 +1,93 @@
-Return-Path: <naranjo.manuel@gmail.com>
-Message-ID: <360bc8300610291431qaba68ebh1cf71b861120e205@mail.gmail.com>
-Date: Sun, 29 Oct 2006 19:31:07 -0300
-From: "Naranjo Manuel Francisco" <naranjo.manuel@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Changes to BlueZ has brooken an App
-Cc: marcel@holtmann.org
-In-Reply-To: <1162152884.4720.7.camel@localhost>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+From: Thomas Kear <thomas.kear@gmail.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Mon, 30 Oct 2006 11:23:06 +1300
+References: <200610261319.41239.thomas.kear@gmail.com>
+	<1162152981.4720.9.camel@localhost>
+In-Reply-To: <1162152981.4720.9.camel@localhost>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_90851_24024102.1162161067210"
-References: <4540B313.1000302@gmail.com> <1162152884.4720.7.camel@localhost>
-List-ID: <bluez-users.lists.sourceforge.net>
+Message-Id: <200610301123.09943.thomas.kear@gmail.com>
+Subject: Re: [Bluez-users] hidd connect permissions
+Reply-To: thomas.kear@gmail.com,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0035126972=="
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-------=_Part_90851_24024102.1162161067210
-Content-Type: text/plain; charset=UTF-8; format=flowed
+--===============0035126972==
+Content-Type: multipart/signed; boundary="nextPart1251615.u7C6eDCVlQ";
+	protocol="application/pgp-signature"; micalg=pgp-sha1
 Content-Transfer-Encoding: 7bit
+
+--nextPart1251615.u7C6eDCVlQ
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-Hi Marcel,
+Thanks for that.  Removed my phone from the linkkeys file, connected=20
+with 'hidd --connect 00:12:EE:07:95:48', re-paired and all was well. =20
+Discovered my phone even asks if you want to open the remote control app wh=
+en=20
+hidd requests it.
 
-Thanks a lot. Any idea what was it used for? So I can try to remove it.
-
-Regards,
-
-Manuel
-
-
-
-Hi Manuel,
+On Monday 30 October 2006 9:16 am, Marcel Holtmann wrote:
+> Hi Thomas,
 >
-> the sdp_cstate_t was made public by accident and should have never been
-> used by any application. It is a fully internal state. So the AvetantaBT
-> implementation needs to be fixed.
+> > # hidd -n --server
+> > hidd[32412]: Bluetooth HID daemon
+> > hidd[32412]: Rejected connection from unknown device 00:12:EE:07:95:48
+> > (same result running as non-root user)
+>
+> connect from the Linux machine once again. It needs to store the HID
+> descriptor and authorize the phone first.
 >
 > Regards
 >
 > Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job
-> easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+
+--nextPart1251615.u7C6eDCVlQ
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQBFRSnN8/Qi7qeDfygRAhCTAJwPFM5B/foQMSsujVnkHVlWw4Zn1ACeJIFx
+1dkDKw5J0dchLq2VbZRD0NE=
+=fy4Z
+-----END PGP SIGNATURE-----
+
+--nextPart1251615.u7C6eDCVlQ--
 
 
-
--- 
-Naranjo, Manuel Francisco
-naranjo.manuel@gmail.com
-
-------=_Part_90851_24024102.1162161067210
-Content-Type: text/html; charset=UTF-8
+--===============0035126972==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi Marcel,<br><br>Thanks a lot. Any idea what was it used for? So I can try to remove it.<br><br>Regards,<br><br>Manuel<br><br><br><div><span class="gmail_quote"><br></span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-Hi Manuel,<br><br>the sdp_cstate_t was made public by accident and should have never been<br>used by any application. It is a fully internal state. So the AvetantaBT<br>implementation needs to be fixed.<br><br>Regards<br>
-<br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>Using Tomcat but need to do more? Need to support web services, security?<br>Get stuff done quickly with pre-integrated technology to make your job easier
-<br>Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo<br><a href="http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642">http://sel.as-us.falkag.net/sel?cmd=lnk&amp;kid=120709&amp;bid=263057&amp;dat=121642
-</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">
-https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br><br clear="all"><br>-- <br>Naranjo, Manuel Francisco<br><a href="mailto:naranjo.manuel@gmail.com">naranjo.manuel@gmail.com</a>
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0035126972==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-------=_Part_90851_24024102.1162161067210--
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0035126972==--
