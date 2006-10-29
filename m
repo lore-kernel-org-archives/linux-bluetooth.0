@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45451325.2050703@xmission.com>
-Date: Sun, 29 Oct 2006 13:46:29 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] hid flowchart workup
+In-Reply-To: <4544689B.3020503@gmail.com>
+References: <4544689B.3020503@gmail.com>
+Date: Sun, 29 Oct 2006 21:12:14 +0100
+Message-Id: <1162152734.4720.4.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] intermittent ISCAN functionality
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,34 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hey
+Hi,
 
-Hello from the plane! Just crossed Greenland.
+> I seem to be having a problem with ISCAN. Sometimes it is initiated, 
+> sometimes it is not. I have to run several hciconfig down/up commands 
+> until I can see ISCAN in hciconfig -a output. Obviously my hcid.conf is 
+> set up properly (unedited debian sid version) or else I would never see 
+> ISCAN.
 
-I thought I would work up the HID flowchart while it was still fresh.
-Found it's gone a bit cold already. Maybe Albert could pipe in with some
-references for example code. Do we need code references for the methods
-used before and after dbus changes to hidd?
+install bluez-gnome-0.6 and use the Bluetooth preferences application to
+disable the automatic switching back into non-discoverable mode.
 
-This is what I pieced together:
+Regards
 
-1. Enumerate input devices
- (is there a better method than scanning /dev/input/ for mouse*? what
-about keyboard?)
-2. Any present? Skip to end
-3. Start hcid and hidd
-4. HID -> HCI
-  (I can't put together from my notes what this HID->HCI step meant...)
-5. Tell user to make devices discoverable
-6. Enumerate input devices again
-7. Inquiry (api details)
-8. Connect to mouse (api details)
-9. Connect to keyboard (api details)
-10. Enumerate devices.
-11. No devices present still? Jump to 5.
-  (Is it no devices or is the test for both keyboard and mouse present?)
+Marcel
 
-Brad
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
