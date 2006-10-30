@@ -1,16 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200610241647.20895.denis.kenzior@trolltech.com>
-References: <200610231025.51818.denis.kenzior@trolltech.com>
-	<200610241547.36330.denis.kenzior@trolltech.com>
-	<1161677612.10866.138.camel@aeonflux.holtmann.net>
-	<200610241647.20895.denis.kenzior@trolltech.com>
-Date: Mon, 30 Oct 2006 14:27:17 +0100
-Message-Id: <1162214837.24333.69.camel@localhost>
+Message-ID: <000a01c6fc24$9aec56c0$0100a8c0@kayleigh>
+From: "Olivier Le Pogam" <olepogam@free.fr>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <002701c6fa09$92116120$0100a8c0@kayleigh><Pine.LNX.4.63.0610291515210.2243@redbean.intranet.gw-instruments.de><1162152027.4720.2.camel@localhost><Pine.LNX.4.63.0610301338380.5526@redbean.intranet.gw-instruments.de>
+	<1162213066.24333.53.camel@localhost>
+Date: Mon, 30 Oct 2006 14:09:17 +0100
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Proposed DTD
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Concurrency / Multi processing questions
+Reply-To: Olivier Le Pogam <olepogam@free.fr>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -23,45 +21,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Hi Marcel,
 
-> > Can also provide an example XML record for a really simple serial port
-> > profile. This will help to see how it looks like.
-> >
-> > Anyone willing to write a really specific and simple XML parser to
-> > convert these XML files into sdp_record_t structures. And or course a
-> > function that converts this structure back to XML.
-> 
-> Attached is a sample of OPUSH profile.  Attached also is the code to generate 
-> one of these and parse one of these as well (you can use attached sdptool 
-> patch to play with it)
-> 
-> The code is still pretty raw, but it should at least get us started.
+> that is how sockets work. You call listen() to create the actual
+> listener and then accept() for every connection. You can't have two
+> different listener that wanna listen on the same RFCOMM channel, but
+> that is also true for TCP/IP.
+>
+> However you can bind one listener to BDADDR_ANY and the other one to the
+> actual address of the local dongle, but in that case the listener bound
+> to the local address always wins.
 
-to get this started, I like to see the method
+That's quite similar to TCP server sockets indeed, my concern is about 
+channels
+reusing in a RFCOMM Service (which is always providing a service on channel 
+14
+for example). Just wondering if there is something similar to SO_REUSEADDR,
+implicitly, or explicitly, so that a Service can concurrently have several 
+clients on the
+same bluetooth adaptor with read/write operations. And of course, there is 
+only
+one listen() per adaptator, the fork() is done only for the IO processing 
+part.
 
-string GetRemoteServiceRecordAsXML(string address, uint32 handle)
+Does someone know ?
 
-from the org.bluez.Adapter interface gets implemented and make it using
-the simple service-record.dtd I put into the CVS.
+Oli 
 
-I choose to simplify the DTD a lot. After having a discussion about XML
-and binary representation from the SDP part of the specification, I am
-pretty certain, that we should support both. The binary representation
-will cover all tasks ever possible with SDP and it is the default. For
-convenience we will additionally support XML as record description, but
-it will only cover up to 90% of all cases, but it will be simpler to use
-and easier to understand and that should be fine.
 
-This means that all length fields are not represented in XML. They will
-be chosen automatically as needed. The same applies to the UUID. So it
-leaves only int* and uint* where the actual size will be taken care of
-as part of the type name.
 
-Regards
-
-Marcel
-
+-- 
+No virus found in this outgoing message.
+Checked by AVG Free Edition.
+Version: 7.1.408 / Virus Database: 268.13.17/505 - Release Date: 27/10/2006
 
 
 -------------------------------------------------------------------------
