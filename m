@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Hilzinger <marcel@hilzinger.hu>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Mon, 30 Oct 2006 15:58:14 +0200
-References: <200610272025.42759.marcel@hilzinger.hu>
-In-Reply-To: <200610272025.42759.marcel@hilzinger.hu>
+Date: Mon, 30 Oct 2006 15:53:16 +0200
+References: <20061028211225.GA11907@zellner.org>
+	<4544D696.2080204@xmission.com>
+In-Reply-To: <4544D696.2080204@xmission.com>
 MIME-Version: 1.0
-Message-Id: <200610301458.14553.marcel@hilzinger.hu>
-Subject: Re: [Bluez-devel] Logitech Wireless Headphones -- How to use remote
-	control function
+Message-Id: <200610301453.17088.marcel@hilzinger.hu>
+Subject: Re: [Bluez-devel] bluetooth-alsa works with aplay but not with xmms
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,26 +17,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-QW0gRnJlaXRhZywgMjcuIE9rdG9iZXIgMjAwNiAyMDoyNSBzY2hyaWViIE1hcmNlbCBIaWx6aW5n
-ZXI6Cj4gSGkgYWxsLAo+Cj4gSSBnb3QgYSB0ZXN0ZGV2aWNlIGZyb20gTG9naXRlY2ggKHNlZSBz
-dWJqZWN0KS4gUGxheWluZyBtdXNpYyB3aXRoIHRoZQo+IHByb3ZpZGVkIFVTQi1BZGFwdGVyIGlz
-IG5vIHByb2JsZW0sIGJ1dCBpJ3ZlIHNlZW4sIHRoYXQgaXQncyBhY3R1YWxseSBhCj4gYmx1ZXRv
-b3RoIGRldmljZSwgd2hpY2ggYWxzbyBzdXBwb3J0cyB0aGUgcmVtb3RlIGNvbnRyb2wgcHJvZmls
-ZS4gSGVyZSBzb21lCj4gaW5mb3JtYXRpb25zOgpbLi4uXQoKV29ya3MgbGlrZSBjaGFybSwgZm9s
-bG93aW5nIHRoZXNlIHN0ZXBzOgpodHRwczovL2hlbHAudWJ1bnR1LmNvbS9jb21tdW5pdHkvQmx1
-ZXRvb3RoQXVkaW8KCkkgZGlkIHdpdGggU3VzZSBMaW51eCAxMC4xCgotLSAKw5xkdsO2emxldHRl
-bCAtLSBNaXQgZnJldW5kbGljaGVuIEdyw7xzc2VuLApNYXJjZWwgSGlsemluZ2VyCgotLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tClVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBv
-cnQgd2ViIHNlcnZpY2VzLCBzZWN1cml0eT8KR2V0IHN0dWZmIGRvbmUgcXVpY2tseSB3aXRoIHBy
-ZS1pbnRlZ3JhdGVkIHRlY2hub2xvZ3kgdG8gbWFrZSB5b3VyIGpvYiBlYXNpZXIKRG93bmxvYWQg
-SUJNIFdlYlNwaGVyZSBBcHBsaWNhdGlvbiBTZXJ2ZXIgdi4xLjAuMSBiYXNlZCBvbiBBcGFjaGUg
-R2Vyb25pbW8KaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9bG5rJmtpZD0xMjA3
-MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQyCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0
-cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlz
-dGluZm8vYmx1ZXotZGV2ZWwK
+Am Sonntag, 29. Oktober 2006 17:28 schrieb Brad Midgley:
+> Dr. J
+>
+> > I followed the instructions on
+> >
+> >     https://help.ubuntu.com/community/BluetoothAudio
+>
+> do a cvs update, build, install and try again. it should work now.
+Thanks a lot. With theese tools also the Logitech Wireless Headphones for P=
+C =
+
+work with my integrated buetooth dongle. Even the next/previous buttons!
+-- =
+
+=DCdv=F6zlettel -- Mit freundlichen Gr=FCssen,
+Marcel Hilzinger
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
