@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Hilzinger <marcel@hilzinger.hu>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Mon, 30 Oct 2006 15:53:16 +0200
-References: <20061028211225.GA11907@zellner.org>
-	<4544D696.2080204@xmission.com>
-In-Reply-To: <4544D696.2080204@xmission.com>
-MIME-Version: 1.0
-Message-Id: <200610301453.17088.marcel@hilzinger.hu>
-Subject: Re: [Bluez-devel] bluetooth-alsa works with aplay but not with xmms
+In-Reply-To: <200610241647.20895.denis.kenzior@trolltech.com>
+References: <200610231025.51818.denis.kenzior@trolltech.com>
+	<200610241547.36330.denis.kenzior@trolltech.com>
+	<1161677612.10866.138.camel@aeonflux.holtmann.net>
+	<200610241647.20895.denis.kenzior@trolltech.com>
+Date: Mon, 30 Oct 2006 14:27:17 +0100
+Message-Id: <1162214837.24333.69.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Proposed DTD
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,34 +19,56 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Am Sonntag, 29. Oktober 2006 17:28 schrieb Brad Midgley:
-> Dr. J
->
-> > I followed the instructions on
+Hi Denis,
+
+> > Can also provide an example XML record for a really simple serial port
+> > profile. This will help to see how it looks like.
 > >
-> >     https://help.ubuntu.com/community/BluetoothAudio
->
-> do a cvs update, build, install and try again. it should work now.
-Thanks a lot. With theese tools also the Logitech Wireless Headphones for P=
-C =
+> > Anyone willing to write a really specific and simple XML parser to
+> > convert these XML files into sdp_record_t structures. And or course a
+> > function that converts this structure back to XML.
+> 
+> Attached is a sample of OPUSH profile.  Attached also is the code to generate 
+> one of these and parse one of these as well (you can use attached sdptool 
+> patch to play with it)
+> 
+> The code is still pretty raw, but it should at least get us started.
 
-work with my integrated buetooth dongle. Even the next/previous buttons!
--- =
+to get this started, I like to see the method
 
-=DCdv=F6zlettel -- Mit freundlichen Gr=FCssen,
-Marcel Hilzinger
+string GetRemoteServiceRecordAsXML(string address, uint32 handle)
+
+from the org.bluez.Adapter interface gets implemented and make it using
+the simple service-record.dtd I put into the CVS.
+
+I choose to simplify the DTD a lot. After having a discussion about XML
+and binary representation from the SDP part of the specification, I am
+pretty certain, that we should support both. The binary representation
+will cover all tasks ever possible with SDP and it is the default. For
+convenience we will additionally support XML as record description, but
+it will only cover up to 90% of all cases, but it will be simpler to use
+and easier to understand and that should be fine.
+
+This means that all length fields are not represented in XML. They will
+be chosen automatically as needed. The same applies to the UUID. So it
+leaves only int* and uint* where the actual size will be taken care of
+as part of the type name.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
