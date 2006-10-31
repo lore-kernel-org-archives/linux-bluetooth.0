@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45479372.7060404@xmission.com>
-Date: Tue, 31 Oct 2006 11:18:26 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <d23110170610310630x3af9217by79d36cace3962009@mail.gmail.com>
+Date: Tue, 31 Oct 2006 11:30:41 -0300
+From: "Ulisses Furquim" <ulissesf@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <004401c6fcf0$0e4fa8d0$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45451325.2050703@xmission.com>
-	<1162201020.24333.24.camel@localhost>
-In-Reply-To: <1162201020.24333.24.camel@localhost>
-Subject: Re: [Bluez-devel] hid flowchart workup
+References: <d23110170608221347p37bc87a5mbdd1271eaf7631c3@mail.gmail.com>
+	<004401c6fcf0$0e4fa8d0$9d0cc70a@dlh.st.com>
+Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,41 +21,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel
+Hi Mayank,
 
-ok... more details worked out and just a couple points missing. I added
-details for if the user has a working input device but may want to
-connect another bt device. This might be nice early in the install for a
-bt mouse for example so keyboard shortcuts don't have to be used for the
-whole install.
+On 10/31/06, Mayank BATRA <mayank.batra@st.com> wrote:
+> I am wondering whether this code(i.e. controller to host flow control) has
+> been included in one of the -mh kernel patch.
+> Can you please confirm?
 
-These are the steps an installer will need to fully install a Linux
-desktop using a Bluetooth keyboard and mouse only. Every distribution
-needs to implement this kind of workflow in their installer. When the
-user is asked a question, it should be easy for them to use just the
-keyboard or just the mouse (if only one is present) to answer.
+I don't think so. You're probably confusing it with the L2CAP
+retransmission and flow control patch that is included in the latest
+-mh patches.
 
-1. Enumerate input devices (scan /sys/class/input), go to 3 if none.
-2. Ask user if they need to pair any bluetooth input devices. If no, end.
-3. Start hcid and hidd
-4. run hid2hci to put any hid mode dongle in hci mode
-5. Tell user to make devices discoverable
-6. Enumerate input devices again
-7. Inquiry (Call org.bluez.Adapter.DiscoverDevices())
-8. Connect to mouse (api details)
-9. Connect to keyboard (api details)
-10. Enumerate devices.
-11. No devices present still, including plain usb? Jump to 5.
-12. Ask user if any remaining devices need to be paired. If yes, jump to 5
-13. (Later) copy pairing info from ramdisk to the root of the new system
+Regards,
 
-I think steps 8 & 9 change as we implement dbus pathways. Before dbus,
-it would be done by executing
- hidd --search
-but eventually could be dbus signals to hidd to search for each type of
-device.
-
-Brad
+-- Ulisses
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
