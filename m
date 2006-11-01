@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 01 Nov 2006 12:54:19 +0100
-From: g.len@gmx.de
-Message-ID: <20061101115419.9210@gmx.net>
+From: Mayank BATRA <mayank.batra@st.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Wed, 1 Nov 2006 09:39:10 +0530
+Message-ID: <000901c6fd6b$7fb42c00$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Patch for switching a diNovo *Laser* to BT
+In-Reply-To: <d23110170610310630x3af9217by79d36cace3962009@mail.gmail.com>
+Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,53 +15,36 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hi Ulisses,
 
-following patch extends the hid2hci utility to switch a Logitech diNovo Las=
-er desktop to BT mode.
+> > I am wondering whether this code(i.e. controller to host 
+> >flow control) has
+> > been included in one of the -mh kernel patch.
+> > Can you please confirm?
+> 
+> I don't think so. You're probably confusing it with the L2CAP
+> retransmission and flow control patch that is included in the latest
+> -mh patches.
 
-The MediaPad is not visible until switching at least one device to BT mode =
-but is switched, too.
+Of course I am not confused between the two.
+Just that I wanted to know whether the Host Flow control patch is inside a
+-mh patch.
+So I think it is not there.
 
-Kind regards,
+Best Regards,
 
-G.Len
+Mayank
 
---- hid2hci.c.dinovo.diff       2006-10-01 22:39:55.000000000 +0200
-+++ tools/hid2hci.c     2006-10-01 22:45:50.000000000 +0200
-@@ -223,7 +223,10 @@
-        { HCI, 0x046d, 0xc703, switch_logitech },
-        { HCI, 0x046d, 0xc704, switch_logitech },
-        { HCI, 0x046d, 0xc705, switch_logitech },
-+       { HCI, 0x046d, 0xc709, switch_logitech },       /* Logitech diNovo =
-Laser mediapad */
-        { HCI, 0x046d, 0xc70a, switch_logitech },       /* Logitech diNovo =
-mouse */
-+       { HCI, 0x046d, 0xc70b, switch_logitech },       /* Logitech diNovo =
-Laser keyboard */
-+       { HCI, 0x046d, 0xc70c, switch_logitech },       /* Logitech diNovo =
-Laser mouse */
-        { HCI, 0x046d, 0xc70e, switch_logitech },       /* logitech diNovo =
-keyboard */
-        { -1 }
- };
-
--- =
-
-GMX DSL-Flatrate 0,- Euro* - =DCberall, wo DSL verf=FCgbar ist!
-NEU: Jetzt bis zu 16.000 kBit/s! http://www.gmx.net/de/go/dsl
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
