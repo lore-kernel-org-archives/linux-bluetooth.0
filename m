@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <454B37A5.5000307@evision.de>
-Date: Fri, 03 Nov 2006 13:35:49 +0100
-From: Tobias Wolf <tobias.wolf@evision.de>
+Message-ID: <00c501c6fed4$71fb6320$dc5210ac@homeevstaf>
+From: "Michael Evstafiev" <m.evstafyev@mail-r.ru>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <B9FFC3F97441D04093A504CEA31B7C41EF9A68@msilexch01.marvell.com>
+Date: Fri, 3 Nov 2006 02:12:36 +0300
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Bluetooth-Alsa: headsetd
+Subject: Re: [Bluez-devel] hcitool failure with BCSP interface
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,169 +15,304 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0387191147=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+This is a multi-part message in MIME format.
 
-i want to connect Bluetooth-Headsets to my Linux-Workstation for
-Voip-Telephony with Ekiga.
+--===============0387191147==
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_00C2_01C6FEED.8799B6A0"
 
-So far i have used the btsco2 Userspace-Program with the kernel module
-snd_bt_sco.
+This is a multi-part message in MIME format.
 
-This is the Hardware, i've been working with:
+------=_NextPart_000_00C2_01C6FEED.8799B6A0
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-BT-Dongle: Hama
+Hi,
 
-hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:10:60:D0:96:1A ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:808 acl:0 sco:0 events:29 errors:0
-        TX bytes:460 acl:0 sco:0 commands:28 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'toa8-0'
-        Class: 0x100100
-        Service Classes:
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x460 LMP Ver: 1.1 (0x1) LMP Subver:
-0x460
-        Manufacturer: Cambridge Silicon Radio (10)
+Check that you have running hcid and sdpd daemons.
+
+BR,
+Mikhail
+  ----- Original Message -----=20
+  From: Shadi Ammouri=20
+  To: bluez-devel@lists.sourceforge.net=20
+  Sent: Wednesday, November 01, 2006 6:59 PM
+  Subject: [Bluez-devel] hcitool failure with BCSP interface
 
 
-hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:10:60:D0:96:1A ACL MTU: 192:8 SCO MTU: 64:8
-        HCI 17.11
-        Chip version: BlueCore02
-        Max key size: 128 bit
-        SCO mapping:  HCI
+  Hi,
 
-BT-Headset: Logitech Mobile Pro
+  =20
 
-With the kernel module and btsco2 i have succesfully connected the
-headset with Ekiga and was able to make a phone call. Quality was pretty
-good, although it happens from time to time the the called person hears
-and awfully loud noise for a second or so. No fun in the long run.
+  I'm using a CSR Bluetooth device, connected to my system through the =
+BCSP interface.
 
-So i took a look at http://bluetooth-alsa.sourceforge.net/ and saw that
-Brad Midgley has done some updating on the doku since i visited the page
-last time.
+  =20
 
-I read through the instructions on
-https://help.ubuntu.com/community/BluetoothAudio. Specially the section
-about "Configure SCO (aka mono, aka voice) Driver" and the "preferred
-method" without any kernel module impressed me much.
+  I managed to attach the device to the system (hciattach ttyS0 bcsp =
+noflow).
 
-But here starts my misery :S
+  When I try to perform a scan, I don't get any result back.
 
-1) I have compiled and installed project according to the instructions
-found in btsco/alsa-plugins/BUILD. I think the alsa-libs were installed.
+  =20
 
-2) I have created the .asoundrc file:
-# ALSA library configuration file
+  ~#hcitool -I hci0 scan
 
-pcm.headset {
-        @args [BDADDR TIMEOUT MAX_PERIODS]
+  Scanning.
 
-        # The Bluetooth device address for target headset, used for
-Audio Gateway (PC) initiated connections
-        # Please note that this value is ignored when the connection is
-Headset initiated
-        @args.BDADDR {
-                type string
-                #default "00:13:17:30:B2:55" # Put your HS address here
-                default "00:0D:44:5C:86:BA" # Logitech HS05  V02
-        }
+  ~#
 
-        # This value represents how long we will try to reach the
-headset, until we give up.
-        # Value is in milliseconds
-        @args.TIMEOUT {
-                type integer
-                default 6000
-        }
+  =20
 
-        # This is the size of the buffer used to queue Voice packets.
-Value must be between
-        # 2 and 334 (~ 1 second). Default value is 2 buffers, which
-works well most of the
-        # time, and has the advantage of giving us an ultra low delay
-        @args.MAX_PERIODS {
-                type integer
-                default 334
-        }
+  I checked that my cell-phone is properly configured and that it is =
+discoverable by other phones.
 
-        type        sco
-        bdaddr      $BDADDR
-        timeout     $TIMEOUT
-        max_periods $MAX_PERIODS
+  =20
+
+  BTW, I'm also unable to see the CSR Bluetooth device from other =
+Bluetooth devices in the room.
+
+  =20
+
+  When I perform the above test with the USB connection, it does work =
+properly.
+
+  =20
+
+  Thanks in advance.
+
+  Shadi.
+
+  =20
+
+
+
+-------------------------------------------------------------------------=
+-----
+
+
+  =
+-------------------------------------------------------------------------=
+
+  Using Tomcat but need to do more? Need to support web services, =
+security?
+  Get stuff done quickly with pre-integrated technology to make your job =
+easier
+  Download IBM WebSphere Application Server v.1.0.1 based on Apache =
+Geronimo
+  =
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D=
+121642
+
+
+-------------------------------------------------------------------------=
+-----
+
+
+  _______________________________________________
+  Bluez-devel mailing list
+  Bluez-devel@lists.sourceforge.net
+  https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_NextPart_000_00C2_01C6FEED.8799B6A0
+Content-Type: text/html;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML xmlns=3D"http://www.w3.org/TR/REC-html40" xmlns:o =3D=20
+"urn:schemas-microsoft-com:office:office" xmlns:w =3D=20
+"urn:schemas-microsoft-com:office:word"><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2180" name=3DGENERATOR>
+<STYLE>@page Section1 {size: 8.5in 11.0in; margin: 1.0in 1.25in 1.0in =
+1.25in; }
+P.MsoNormal {
+	FONT-SIZE: 12pt; MARGIN: 0in 0in 0pt; FONT-FAMILY: "Times New Roman"
 }
-
-ctl.headset {
-        type sco
+LI.MsoNormal {
+	FONT-SIZE: 12pt; MARGIN: 0in 0in 0pt; FONT-FAMILY: "Times New Roman"
 }
-
-pcm.a2dpd {
-        type a2dpd
+DIV.MsoNormal {
+	FONT-SIZE: 12pt; MARGIN: 0in 0in 0pt; FONT-FAMILY: "Times New Roman"
 }
+A:link {
+	COLOR: blue; TEXT-DECORATION: underline
+}
+SPAN.MsoHyperlink {
+	COLOR: blue; TEXT-DECORATION: underline
+}
+A:visited {
+	COLOR: purple; TEXT-DECORATION: underline
+}
+SPAN.MsoHyperlinkFollowed {
+	COLOR: purple; TEXT-DECORATION: underline
+}
+SPAN.EmailStyle17 {
+	COLOR: windowtext; FONT-FAMILY: Arial; mso-style-type: personal-compose
+}
+DIV.Section1 {
+	page: Section1
+}
+</STYLE>
+</HEAD>
+<BODY lang=3DEN-US vLink=3Dpurple link=3Dblue bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Hi,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Check that you have running hcid and =
+sdpd=20
+daemons.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>BR,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>Mikhail</FONT></DIV>
+<BLOCKQUOTE=20
+style=3D"PADDING-RIGHT: 0px; PADDING-LEFT: 5px; MARGIN-LEFT: 5px; =
+BORDER-LEFT: #000000 2px solid; MARGIN-RIGHT: 0px">
+  <DIV style=3D"FONT: 10pt arial">----- Original Message ----- </DIV>
+  <DIV=20
+  style=3D"BACKGROUND: #e4e4e4; FONT: 10pt arial; font-color: =
+black"><B>From:</B>=20
+  <A title=3Dshadi@marvell.com href=3D"mailto:shadi@marvell.com">Shadi =
+Ammouri</A>=20
+  </DIV>
+  <DIV style=3D"FONT: 10pt arial"><B>To:</B> <A=20
+  title=3Dbluez-devel@lists.sourceforge.net=20
+  =
+href=3D"mailto:bluez-devel@lists.sourceforge.net">bluez-devel@lists.sourc=
+eforge.net</A>=20
+  </DIV>
+  <DIV style=3D"FONT: 10pt arial"><B>Sent:</B> Wednesday, November 01, =
+2006 6:59=20
+  PM</DIV>
+  <DIV style=3D"FONT: 10pt arial"><B>Subject:</B> [Bluez-devel] hcitool =
+failure=20
+  with BCSP interface</DIV>
+  <DIV><BR></DIV>
+  <DIV class=3DSection1>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: =
+Arial">Hi,<o:p></o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: =
+Arial"><o:p>&nbsp;</o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: Arial">I=92m using a CSR =
+Bluetooth device,=20
+  connected to my system through the BCSP=20
+interface.<o:p></o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: =
+Arial"><o:p>&nbsp;</o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: Arial">I managed to attach the =
+device to=20
+  the system (hciattach ttyS0 bcsp noflow).<o:p></o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: Arial">When I try to perform a =
+scan, I=20
+  don=92t get any result back.<o:p></o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: =
+Arial"><o:p>&nbsp;</o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: Arial">~#hcitool =96I hci0=20
+  scan<o:p></o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: =
+Arial">Scanning=85<o:p></o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: =
+Arial">~#<o:p></o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: =
+Arial"><o:p>&nbsp;</o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: Arial">I checked that my =
+cell-phone is=20
+  properly configured and that it is discoverable by other=20
+  phones.<o:p></o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: =
+Arial"><o:p>&nbsp;</o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: Arial">BTW, I=92m also unable =
+to see the=20
+  CSR Bluetooth device from other Bluetooth devices in the=20
+  room.<o:p></o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: =
+Arial"><o:p>&nbsp;</o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: Arial">When I perform the above =
+test with=20
+  the USB connection, it does work =
+properly.<o:p></o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: =
+Arial"><o:p>&nbsp;</o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: Arial">Thanks in=20
+  advance.<o:p></o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: =
+Arial">Shadi.<o:p></o:p></SPAN></FONT></P>
+  <P class=3DMsoNormal><FONT face=3DArial size=3D2><SPAN=20
+  style=3D"FONT-SIZE: 10pt; FONT-FAMILY: =
+Arial"><o:p>&nbsp;</o:p></SPAN></FONT></P></DIV>
+  <P>
+  <HR>
 
-# Include settings that are under the control of asoundconf(1).
-# (To disable these settings, comment out this line.)
-</home/tobias/.asoundrc.asoundconf>
+  =
+<P></P>------------------------------------------------------------------=
+-------<BR>Using=20
+  Tomcat but need to do more? Need to support web services, =
+security?<BR>Get=20
+  stuff done quickly with pre-integrated technology to make your job=20
+  easier<BR>Download IBM WebSphere Application Server v.1.0.1 based on =
+Apache=20
+  =
+Geronimo<BR>http://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;kid=3D120709&am=
+p;bid=3D263057&amp;dat=3D121642
+  <P>
+  <HR>
 
-3) Now, the instructions tell me to change the device of, eg xmms to
-headset, but the device never shows up (even after an reboot). So i
-wanted to test with aplay:
+  <P></P>_______________________________________________<BR>Bluez-devel =
+mailing=20
+  =
+list<BR>Bluez-devel@lists.sourceforge.net<BR>https://lists.sourceforge.ne=
+t/lists/listinfo/bluez-devel<BR></BLOCKQUOTE></BODY></HTML>
 
-aplay -B 1000000 -Dplug:pcm.headset /usr/share/sounds/alsa/Noise.wav
-
-or
-
-aplay -B 1000000 -D headset /usr/share/sounds/alsa/Noise.wav
-
-With this result:
-
-DEBUG: _snd_pcm_sco_open: Starting pcm_sco plugin.
-DEBUG: _snd_pcm_sco_open: Open mode is for Playback.
-aplay: main:544: Cannot open Audio Device: Permission denied
-
-/var/log/daemon.log shows the following:
-Nov  3 13:23:30 toa8 headsetd[14268]: Configuration phase ended: target
-bdaddr is 00:0D:44:5C:86:BA, timeout is 6000 ms
-Nov  3 13:23:30 toa8 headsetd[14268]: Changing state: Idle-->Paging
-Nov  3 13:23:31 toa8 hcid[3371]: link_key_request
-(sba=00:10:60:D0:96:1A, dba=00:0D:44:5C:86:BA)
-Nov  3 13:23:31 toa8 headsetd[14268]: unable to connect L2CAP socket to
-headset: Permission denied
-Nov  3 13:23:31 toa8 headsetd[14268]: Changing state: Paging-->Idle
+------=_NextPart_000_00C2_01C6FEED.8799B6A0--
 
 
-Has anyone a clue why i cant connect to L2CAP socket and what i have to
-enable this ?
 
-Furthermore, does anyone know if there exist the possibility to actually
- take an incoming come by pressing a button on the headset. In my setup
-i have to be a my workstation and click on a button on my Softfon to
-take a call.
 
-Any help is greatly appreciated ;)
-
-Have a nice Week-End,
-
-Tobias Wolf
+--===============0387191147==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0387191147==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0387191147==--
