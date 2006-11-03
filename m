@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <454B726D.6000503@gmail.com>
-Date: Fri, 03 Nov 2006 17:46:37 +0100
-From: Christian Mager <christian.mager@gmail.com>
-MIME-Version: 1.0
+From: Reiner Klenk <pdq808@t-online.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <454B3AD7.7080401@gmail.com>
 References: <454B3AD7.7080401@gmail.com>
-	<1162571821.9400.24.camel@grappa.nowhere.de>
-In-Reply-To: <1162571821.9400.24.camel@grappa.nowhere.de>
+Date: Fri, 03 Nov 2006 17:37:00 +0100
+Message-Id: <1162571821.9400.24.camel@grappa.nowhere.de>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] bluetooth-alsa and HAMA BTH-155
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,23 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Am Freitag, den 03.11.2006, 13:49 +0100 schrieb Christian Mager:
+>  Pairing the headset with my cell phone works, but
+> it asks for a pin, btsco desn't. Could this cause the problem? In
+> /etc/blueooth/hci.conf there is 'pin_helper /usr/bin/bluez-pin;' and 'lm
+> accept;'.
 
-Reiner Klenk schrieb:
-> Am Freitag, den 03.11.2006, 13:49 +0100 schrieb Christian Mager:
->>  Pairing the headset with my cell phone works, but
->> it asks for a pin, btsco desn't. Could this cause the problem? In
->> /etc/blueooth/hci.conf there is 'pin_helper /usr/bin/bluez-pin;' and 'lm
->> accept;'.
-> 
-> I've seen a situation where the window with the pin request didn't come
-> up because the X-server denied the connection. I had to "xhost +" before
-> running btsco.
+I've seen a situation where the window with the pin request didn't come
+up because the X-server denied the connection. I had to "xhost +" before
+running btsco.
 
-thanks a lot, now pairing worked. So I'm trying now to get the headset
-working with the voip app. Maybe I'll have further questions after that.
+Regards,
+Reiner
 
-Thanks, Chris Mager.
+
+-- 
+Reiner Klenk
+debb1046 (jabber.org, ekiga.net, gmail.com, last.fm)
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
