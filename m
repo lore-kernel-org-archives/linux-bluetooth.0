@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <BAY117-F267DA7541D01225F684CB5BFFD0@phx.gbl>
-From: "Kelvin Xu" <kyoxu@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Sat, 04 Nov 2006 21:50:34 +0800
-Mime-Version: 1.0
-Subject: [Bluez-devel] Bluetooth-Alsa: Emulate headset on the PC
+From: Mayank BATRA <mayank.batra@st.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Sat, 4 Nov 2006 11:36:18 +0530
+Message-ID: <002301c6ffd7$584905f0$9d0cc70a@dlh.st.com>
+MIME-Version: 1.0
+Subject: [Bluez-devel] DUN Gateway
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,20 +18,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Marcel,
 
-Has there been any development to use the computer as a bluetooth headset 
-using SCO in which calls from a handphone could be received on the computer 
-and played out on the PC's speakers. Something similar to the a2recv 
-application developed which runs on the A2DP.
+There is an option --dialup -u (Pretend to be a dialup/telephone) in the dund daemon. But I see that this option only registers a DIALUP_NET_SVCLASS_ID SDP record. It does nothing else apart from that. My requirement is that I want to make dund work as a DUN Gateway. Thus, it should read AT commands sent from the DUN Terminal and send back responses to it.
+Is there some way through which I can make dund do so?
 
-Thanks
+Best Regards,
 
-Kelvin
-
-_________________________________________________________________
-Get MSN Messenger emoticons and display pictures here! 
-http://ilovemessenger.msn.com/?mkt=en-sg
+Mayank
 
 
 -------------------------------------------------------------------------
