@@ -1,15 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <000d01c7002f$a1110aa0$0100a8c0@kayleigh>
-From: "Olivier Le Pogam" <olepogam@free.fr>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>,
-        "Brad Midgley" <bmidgley@xmission.com>
-References: <001001c6ff87$c1d41f50$0100a8c0@kayleigh>
-	<454BB404.2070606@xmission.com>
-Date: Sat, 4 Nov 2006 17:38:16 +0100
+From: Jon Barnett <jbarnett@pobox.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Sat, 04 Nov 2006 10:30:43 -0500
+Message-Id: <1162654243.3863.12.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] To blueZ developers : can't do two
-	"connect"	concurrently, help required !
-Reply-To: Olivier Le Pogam <olepogam@free.fr>,
+Subject: [Bluez-devel] Headset has sound problems
+Reply-To: jbarnett@pobox.com,
         BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,211 +15,220 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1673774290=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
 
-Ok I will try this !
-The two remote devices I test with are a mobile phone
-(with a j2me application) and a Windows XP RFCOMM
-server. I am not sure how to check the "master" setting on
-the mobile phone or windows XP !!
-
-Thanks, a lot,
-Oli
-
------ Original Message ----- 
-From: "Brad Midgley" <bmidgley@xmission.com>
-To: "Olivier Le Pogam" <olepogam@free.fr>; "BlueZ development" 
-<bluez-devel@lists.sourceforge.net>
-Sent: Friday, November 03, 2006 10:26 PM
-Subject: Re: [Bluez-devel] To blueZ developers : can't do two "connect" 
-concurrently, help required !
+--===============1673774290==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="=-Al52r23rtHFfc3XRJ/lK"
 
 
-> Olivier
->
-> This thing tends to happen if you have the wrong end of the connection
-> being master. Make sure your linux box has master in the lm line in
-> hcid.conf and that your clients do not.
->
-> Brad
->
->> For the ones who have read my messages a few days ago ...
->> I am still performing concurrency tests !
->>
->> I run a server on 2 remote devices (one on channel 24, the
->> other on channel 25), and I try to connect to them concurrently
->> from the same Linux box / BT key (the remote servers are simple "echo"
->> ones, the linux client is sending numbers from 1 to 10 with a sleep(1) at
->> each step).
->>
->> I have a simple batch :
->>
->> client.sh :
->> ./client 00:16:4E:83:2D:19  25 &
->> ./client 00:0D:88:9B:FF:D7  24 &
->>
->> where client is called with BDADDR and channel
->>
->> Here is what I get in my logs :
->>
->> Connection to remote 00:16:4E:83:2D:19 channel 25
->> Connection to remote 00:0D:88:9B:FF:D7 channel 24
->> [00:16:4E:83:2D:19] Can't connect(111)    ====> 111 is connection refused
->> [00:0D:88:9B:FF:D7] Connected to remote 00:0D:88:9B:FF:D7 channel 24,
->> from local 00:11:67:0D:2E:2C channel 24
->> [00:0D:88:9B:FF:D7] Sent 0 received 0
->> ...
->>
->> If I swap the order of calling "client" i.e :
->>
->> client.sh :
->> ./client 00:0D:88:9B:FF:D7  24 &
->> ./client 00:16:4E:83:2D:19  25 &
->>
->> Then it's still the first which can't connect (now it will be
->> 00:0D:88:9B:FF:D7)
->>
->> So basically, it seems that there can't be two "connect"
->> concurrently on the same adaptor.
->>
->> Can please BlueZ developers confirm ?
->>
->> Thanks a lot
->> Oli
->>
->> For who is interested, here is the interesting part of client.c :
->>
->> int main(int argc, char **argv)
->> {
->>     struct sockaddr_rc laddr, raddr;
->>     int sk, i;
->>
->>     memset(&laddr, 0, sizeof(laddr));
->>     memset(&raddr, 0, sizeof(raddr));
->>
->>     laddr.rc_family = AF_BLUETOOTH;
->>     bacpy(&laddr.rc_bdaddr, BDADDR_ANY);
->>     laddr.rc_channel = 0;
->>
->>     raddr.rc_family = AF_BLUETOOTH;
->>     str2ba(argv[1], &raddr.rc_bdaddr);
->>     raddr.rc_channel = atoi(argv[2]);
->>
->>    if (argc != 3) {
->>      fprintf(stderr,"Usage: client address channel\n");
->>      exit(EXIT_FAILURE);
->>    }
->>
->>  debugOutput("Connection to remote %s channel %s", argv[1], argv[2]);
->>
->>     sk = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
->>     if (sk < 0) {
->>         debugOutput("[%s] Can't create RFCOMM socket", argv[1]);
->>         return -1;
->>     }
->>
->>     if (bind(sk, (struct sockaddr *)&laddr, sizeof(laddr)) < 0) {
->>         debugOutput("[%s] Can't bind RFCOMM socket", argv[1]);
->>         close(sk);
->>         return -1;
->>     }
->>
->>     if (connect(sk, (struct sockaddr *)&raddr, sizeof(raddr)) < 0) {
->>         debugOutput("[%s] Can't connect(%d)", argv[1], errno);
->>         close(sk);
->>         return -1;
->>     }
->>
->>  char loc_addr[30];
->>  strcpy(loc_addr, "");
->>
->>     int len = sizeof(laddr);
->>     if (getsockname (sk, &laddr, &len ) > 0)
->>        debugOutput("[%s] Can't getsockname", argv[1]);
->>  else ba2str(&laddr.rc_bdaddr, loc_addr);
->>
->>  debugOutput("[%s] Connected to remote %s channel %s, from local %s
->> channel %d", argv[1], argv[1], argv[2], loc_addr, laddr.rc_channel);
->>
->>  for (i = 0; i<10; i++)
->>  {
->>   char buf[1024];
->>   sprintf(buf, "%d%c", i, 10);
->>   write(sk, buf, strlen(buf));
->>   strcpy(buf, "");
->>
->>   readString(sk, buf);
->>   if( strlen(buf) > 0 ) {
->>    debugOutput("[%s] Sent %d received %s", argv[1], i, buf);
->>     } else {
->>    debugOutput("[%s] Sent %d received no answer", argv[1], i);
->>    break;
->>   }
->>   sleep(1);
->>  }
->>
->>     close(sk);
->>  debugOutput("[%s] Disconnected", argv[1]);
->>
->>     return 0;
->> }
->>
->>
->> ------------------------------------------------------------------------
->>
->> No virus found in this outgoing message.
->> Checked by AVG Free Edition.
->> Version: 7.1.409 / Virus Database: 268.13.25/515 - Release Date: 
->> 03/11/2006
->>
->>
->>
->> ------------------------------------------------------------------------
->>
->> -------------------------------------------------------------------------
->> Using Tomcat but need to do more? Need to support web services, security?
->> Get stuff done quickly with pre-integrated technology to make your job 
->> easier
->> Download IBM WebSphere Application Server v.1.0.1 based on Apache 
->> Geronimo
->> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
->>
->>
->> ------------------------------------------------------------------------
->>
->> _______________________________________________
->> Bluez-devel mailing list
->> Bluez-devel@lists.sourceforge.net
->> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->
->
->
-> -- 
-> No virus found in this incoming message.
-> Checked by AVG Free Edition.
-> Version: 7.1.409 / Virus Database: 268.13.25/515 - Release Date: 
-> 03/11/2006
-> 
+--=-Al52r23rtHFfc3XRJ/lK
+Content-Type: multipart/alternative; boundary="=-JgMc87xe4BZ5nUBQ9k0j"
+
+
+--=-JgMc87xe4BZ5nUBQ9k0j
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+I have kernel 2.6.18.1. I recently upgraded alsa both in the kernel and
+userland to 1.0.13.
+
+Running btsco and kernel module without a recompile causes this:
+kernel: EIP: [<f992054c>] snd_card_bt_sco_playback_open+0xac/0x110
+[snd_bt_sco] SS:ESP 0068:d3d01e40
+
+Solution was to recompile btsco and snd-bt-sco module.
+
+However, now no sound issues from the headset and no microphone is
+picked up.
+
+aplay -B 1000000 -D plughw:2 podbay.wav completes but nothing comes out
+of the headphones.
+
+hcitool info for the headphone is:
+        BD Address:  00:12:EE:E0:AB:CA
+        LMP Version: 2.0 (0x3) LMP Subversion: 0xe1b
+        Manufacturer: Texas Instruments Inc. (13)
+        Features: 0xff 0xfd 0x29 0x78 0x18 0x18 0x00 0x80
+                <3-slot packets> <5-slot packets> <encryption> <slot
+offset>=20
+                <timing accuracy> <role switch> <hold mode> <sniff
+mode>=20
+                <park state> <channel quality> <SCO link> <HV2 packets>=20
+                <HV3 packets> <u-law log> <A-law log> <CVSD>
+<transparent SCO>=20
+                <enhanced iscan> <interlaced iscan> <interlaced pscan>=20
+                <inquiry with RSSI> <AFH cap. slave> <AFH class. slave>=20
+                <AFH cap. master> <AFH class. master> <extended
+features>=20
+
+btsco -v during a session provides this:
+btsco v0.42
+Device is 2:0
+Voice setting: 0x0060
+RFCOMM channel 1 connected
+Using interface hci0
+recieved AT*ECBP=3D?
+recieved AT+CLIP=3D1
+recieved AT+CSCS=3D"UTF-8"
+recieved AT*SEAM=3D"HBH-610a",13
+recieved AT+CLAN?
+speaker volume: 10 mic volume: 1
+i/o needed: connecting sco...
+connected SCO channel
+Done setting sco fd
+recieved AT+VGS=3D6
+Sending up speaker change 6
+speaker volume: 6 mic volume: 1
+driver is not in use
+disconnected SCO channel
+speaker volume: 6 mic volume: 1
+i/o needed: connecting sco...
+connected SCO channel
+Done setting sco fd
+recieved AT+VGS=3D6
+Sending up speaker change 6
+speaker volume: 6 mic volume: 1
+driver is not in use
+disconnected SCO channel
+
+This worked previously before the alsa upgrade (required to fix a
+problem with a soundcard).
+
+--=-JgMc87xe4BZ5nUBQ9k0j
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN">
+<HTML>
+<HEAD>
+  <META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; CHARSET=3DUTF-8">
+  <META NAME=3D"GENERATOR" CONTENT=3D"GtkHTML/3.12.1">
+</HEAD>
+<BODY>
+I have kernel 2.6.18.1. I recently upgraded alsa both in the kernel and use=
+rland to 1.0.13.<BR>
+<BR>
+Running btsco and kernel module without a recompile causes this:<BR>
+kernel: EIP: [&lt;f992054c&gt;] snd_card_bt_sco_playback_open+0xac/0x110 [s=
+nd_bt_sco] SS:ESP 0068:d3d01e40<BR>
+<BR>
+Solution was to recompile btsco and snd-bt-sco module.<BR>
+<BR>
+However, now no sound issues from the headset and no microphone is picked u=
+p.<BR>
+<BR>
+aplay -B 1000000 -D plughw:2 podbay.wav completes but nothing comes out of =
+the headphones.<BR>
+<BR>
+hcitool info for the headphone is:<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address:&nbsp; 00:12:EE:E0:AB=
+:CA<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LMP Version: 2.0 (0x3) LMP Subve=
+rsion: 0xe1b<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufacturer: Texas Instruments =
+Inc. (13)<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xfd 0x29 0x78 0x=
+18 0x18 0x00 0x80<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp; &lt;3-slot packets&gt; &lt;5-slot packets&gt; &lt;encryptio=
+n&gt; &lt;slot offset&gt; <BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp; &lt;timing accuracy&gt; &lt;role switch&gt; &lt;hold mode&g=
+t; &lt;sniff mode&gt; <BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp; &lt;park state&gt; &lt;channel quality&gt; &lt;SCO link&gt;=
+ &lt;HV2 packets&gt; <BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp; &lt;HV3 packets&gt; &lt;u-law log&gt; &lt;A-law log&gt; &lt=
+;CVSD&gt; &lt;transparent SCO&gt; <BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp; &lt;enhanced iscan&gt; &lt;interlaced iscan&gt; &lt;interla=
+ced pscan&gt; <BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp; &lt;inquiry with RSSI&gt; &lt;AFH cap. slave&gt; &lt;AFH cl=
+ass. slave&gt; <BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp; &lt;AFH cap. master&gt; &lt;AFH class. master&gt; &lt;exten=
+ded features&gt; <BR>
+<BR>
+btsco -v during a session provides this:<BR>
+btsco v0.42<BR>
+Device is 2:0<BR>
+Voice setting: 0x0060<BR>
+RFCOMM channel 1 connected<BR>
+Using interface hci0<BR>
+recieved AT*ECBP=3D?<BR>
+recieved AT+CLIP=3D1<BR>
+recieved AT+CSCS=3D&quot;UTF-8&quot;<BR>
+recieved AT*SEAM=3D&quot;HBH-610a&quot;,13<BR>
+recieved AT+CLAN?<BR>
+speaker volume: 10 mic volume: 1<BR>
+i/o needed: connecting sco...<BR>
+connected SCO channel<BR>
+Done setting sco fd<BR>
+recieved AT+VGS=3D6<BR>
+Sending up speaker change 6<BR>
+speaker volume: 6 mic volume: 1<BR>
+driver is not in use<BR>
+disconnected SCO channel<BR>
+speaker volume: 6 mic volume: 1<BR>
+i/o needed: connecting sco...<BR>
+connected SCO channel<BR>
+Done setting sco fd<BR>
+recieved AT+VGS=3D6<BR>
+Sending up speaker change 6<BR>
+speaker volume: 6 mic volume: 1<BR>
+driver is not in use<BR>
+disconnected SCO channel<BR>
+<BR>
+This worked previously before the alsa upgrade (required to fix a problem w=
+ith a soundcard).
+</BODY>
+</HTML>
+
+--=-JgMc87xe4BZ5nUBQ9k0j--
+
+--=-Al52r23rtHFfc3XRJ/lK
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQBFTLIiu2cEic/xsEARAlpPAKDGcdye7O9kBTxUNnlFmu3lYjhuIACffcK2
+53hKHvdK6vRSJzGmHERsCk8=
+=mE25
+-----END PGP SIGNATURE-----
+
+--=-Al52r23rtHFfc3XRJ/lK--
 
 
 
--- 
-No virus found in this outgoing message.
-Checked by AVG Free Edition.
-Version: 7.1.409 / Virus Database: 268.13.27/517 - Release Date: 03/11/2006
-
+--===============1673774290==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============1673774290==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1673774290==--
