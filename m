@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <7e36c64c0611060105w6c68df41u3d84f715a4de8fcd@mail.gmail.com>
-References: <7e36c64c0611060105w6c68df41u3d84f715a4de8fcd@mail.gmail.com>
-Date: Mon, 06 Nov 2006 16:04:58 +0100
-Message-Id: <1162825498.31808.18.camel@aeonflux.holtmann.net>
+In-Reply-To: <7e36c64c0611060046j3d04ee1ibab63a54509a0532@mail.gmail.com>
+References: <7e36c64c0611060046j3d04ee1ibab63a54509a0532@mail.gmail.com>
+Date: Mon, 06 Nov 2006 16:03:59 +0100
+Message-Id: <1162825439.31808.16.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] pairing problem
+Subject: Re: [Bluez-devel] BT
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,13 +22,13 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-> I am not able to connect to my phone using rfcomm connection.When i go
-> for connection,it askes for pass key that i enter same as
-> in /etc/bluetooth/pin .Then also it wont get succeded.
+> Can i get any info how about Bluetooth On/OFF.I tried a program that
+> doesnt help out much for me.Does anyone help me here.
+> Here is this program which works as hciconfig hci0 up
 
-the /etc/bluetooth/pin file is not longer used in BlueZ 3.x and this
-problem has been discussed a lot. Check the mailing list archive for
-possible solutions.
+no it doesn't. This piece of code is a copy from hcid/device.c and not
+related to "hciconfig hci0 up". Activating a Bluetooth adapter is a
+kernel task.
 
 Regards
 
