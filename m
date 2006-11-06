@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <454FC0AE.5090209@gmx.de>
+Date: Tue, 07 Nov 2006 00:09:34 +0100
+From: Sandro Weiser <sandro.weiser@gmx.de>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <454FC0AE.5090209@gmx.de>
-References: <454FC0AE.5090209@gmx.de>
-Date: Tue, 07 Nov 2006 00:21:29 +0100
-Message-Id: <1162855289.31808.95.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Timeout/Reconnect with encrypted connection
+Subject: [Bluez-users] Timeout/Reconnect with encrypted connection
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,21 +18,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Sandro,
+I have an bluetooth keyboard and want to encrypt the connection.
 
-> I have an bluetooth keyboard and want to encrypt the connection.
-> 
-> When I switch to an encrypted connection, the reconnect after the
-> timeout (-t 10) doesn't succeed.
-> Is there a (now) way to handle this? Is this supposed to work?
+When I switch to an encrypted connection, the reconnect after the
+timeout (-t 10) doesn't succeed.
+Is there a (now) way to handle this? Is this supposed to work?
 
-run "hcidump -X -V" and show us what actually happens.
-
-Regards
-
-Marcel
-
-
+Sandro
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
