@@ -1,92 +1,142 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <454F97A9.5040409@prolly.org>
-Date: Mon, 06 Nov 2006 15:14:33 -0500
-From: Douglas Ward <douglas.ward@prolly.org>
+Return-Path: <xuan--2006.11.06--bluez-devel--lists.sourceforge.net@baldauf.org>
+Message-ID: <454F9626.8020806@baldauf.org>
+Date: Mon, 06 Nov 2006 21:08:06 +0100
+From: =?ISO-8859-1?Q?Xu=E2n_Baldauf?=
+ <xuan--2006.11.06--bluez-devel--lists.sourceforge.net@baldauf.org>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <20061105104020.38470@gmx.net>
-In-Reply-To: <20061105104020.38470@gmx.net>
-Subject: Re: [Bluez-devel] Patch for switching a diNovo *Laser* to BT
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: bluez-devel@lists.sourceforge.net
+Subject: Re: [patch] Broadcom BCM2045 SCO workaround
+References: <454F7267.9010409@baldauf.org> <1162834966.31808.58.camel@aeonflux.holtmann.net>
+In-Reply-To: <1162834966.31808.58.camel@aeonflux.holtmann.net>
+Content-Type: multipart/alternative;
+ boundary="------------070609080700010208050201"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+This is a multi-part message in MIME format.
+--------------070609080700010208050201
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8bit
 
-the logitech g15 keyboard is where i started... i've since run out of
-time to work on it. I have an mx5000 keyboard which also has an lcd...
-
-g.len@gmx.de wrote:
-> Hello,
+Marcel Holtmann wrote:
+> Hi Xuan,
+>   
+Hello Marcel,
+>   
+>> The Broadcom BCM2045 chipset seems to be also one of those chipsets
+>> which report the SCO maximum packet incorrectly. The attached patch
+>> works around this problem. With this workaround, a bluetooth USB
+>> dongle with this chipset is able to send SCO data correctly.
+>>
+>> The fix was verified using this USB dongle (MSI StarKey 2.0 (Ver
+>> 222-BW))
+>>         Bus 002 Device 004: ID 0a5c:2101 Broadcom Corp.
+>>         Device Descriptor:
+>>           bLength                18
+>>           bDescriptorType         1
+>>           bcdUSB               2.00
+>>           bDeviceClass          224 Wireless
+>>           bDeviceSubClass         1 Radio Frequency
+>>           bDeviceProtocol         1 Bluetooth
+>>           bMaxPacketSize0        64
+>>           idVendor           0x0a5c Broadcom Corp.
+>>           idProduct          0x2101
+>>           bcdDevice            0.00
+>>           iManufacturer           1 Broadcom Corp
+>>           iProduct                2 BCM92045DG Non-UHE
+>>           iSerial                 0
+>>           bNumConfigurations      1
+>>     
 >
-> I found some more information that I mixed up some IDs. 0xc709 should
-be the BT dongle in HCI mode not the Mediepad. Sorry.
+> is this a dongle with HID proxy support or not. If yes, then you need
+> the HCI_RESET quirk otherwise you don't. So please check if it still
+> works after not including the HCI_RESET quirk.
+>   
+It seems that HCI_RESET is not needed. (Interestingly, during testing, I
+now encounter in about 20% of the cases very loud noise. This seems like
+wrong data being played (like a synchronization error). However, this
+problem happens both with and without HCI_RESET.)
+> Regards
 >
-> The following patch is updated to this situation.
+> Marcel
 >
-> BTW, I would like to do some testing with the LCD of the mediapad.
-Where would be a good starting point looking for ducmentation / code
-examples to communicate with such a device? (I am not asking for the
-Logitech-protocol.)
->
-> Kind regards,
->
-> G.Len
->
-> --- hid2hci.c.dinovo.diff       2006-10-01 22:39:55.000000000 +0200
-> +++ tools/hid2hci.c     2006-10-01 22:45:50.000000000 +0200
-> @@ -223,7 +223,9 @@
->         { HCI, 0x046d, 0xc703, switch_logitech },
->         { HCI, 0x046d, 0xc704, switch_logitech },
->         { HCI, 0x046d, 0xc705, switch_logitech },
->         { HCI, 0x046d, 0xc70a, switch_logitech },       /* Logitech
-diNovo mouse */
-> +       { HCI, 0x046d, 0xc70b, switch_logitech },       /* Logitech
-diNovo Laser keyboard */
-> +       { HCI, 0x046d, 0xc70c, switch_logitech },       /* Logitech
-diNovo Laser mouse */
->         { HCI, 0x046d, 0xc70e, switch_logitech },       /* logitech
-diNovo keyboard */
->         { -1 }
->  };
->
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iQIVAwUBRU+XqFKDmmHy9Q32AQI7zg//XeezrQlH5SwDGQwNz2s2VEe7tJpGxDD0
-O2bkthmNupUBSu/WVAn0d+n20S5Xfjd3MPt/1e4mRexGA4nPHej8oDW4kY76vrNI
-0tnU7/YTUicAPOlWFdyP9jD+cZs12AJDNZ5C/Dx8Nbigxi/wMRUGcU28xo/qzWUx
-XsJRwe2uwMDgX/glXiQzOtyRqxYZN+YVxECIM2rrhBpJZ2d78rXsRTd62tFExw0g
-5MWEHPWjsToT2SOdsNu6xTLBhzXMitoneAp0ro+devGa386B4IhjunYZA0PfqrsA
-Z8ztbg3Wc4l4CGSu14WXroMamOrVfscxlVu7jJCudoc9Pc+blQjEsDs9g/lXFxDp
-N5qGMaTuIybSOhMleIWiZbmrD3M9mqEJIJTVCDfJKv8FOJNQH9mzPP8uRIR42PS7
-CVdU3w/UXPk9T5VcseHZMSk5cWO+2Ign2iSiYFzzZB6v5CiSo6hotZIRJhpLP7Kq
-0j+rq7Y5LijhtAe3dsCMASkF7d+mCTtTsraSfMHo1vhdZ4JC0pIk6kkbEBv7+req
-64x7U/VjC0QYgMDTYlaiO91f5sfmta0Fmh3U/ZiT+/dQR8D1XBIyHNyr/9615bOv
-bamxr740Ay9nyzL+ic5n84K40oYrgwESELe0BGdPQwXWktzV/2N0cP1q4icVXd5e
-Fi8aMTxhBDM=
-=DzFs
------END PGP SIGNATURE-----
+>   
+ciao,
+Xuân.
 
 
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------070609080700010208050201
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Marcel Holtmann wrote:
+<blockquote cite="mid1162834966.31808.58.camel@aeonflux.holtmann.net"
+ type="cite">
+  <pre wrap="">Hi Xuan,
+  </pre>
+</blockquote>
+Hello Marcel,
+<blockquote cite="mid1162834966.31808.58.camel@aeonflux.holtmann.net"
+ type="cite">
+  <pre wrap="">
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">The Broadcom BCM2045 chipset seems to be also one of those chipsets
+which report the SCO maximum packet incorrectly. The attached patch
+works around this problem. With this workaround, a bluetooth USB
+dongle with this chipset is able to send SCO data correctly.
+
+The fix was verified using this USB dongle (MSI StarKey 2.0 (Ver
+222-BW))
+        Bus 002 Device 004: ID 0a5c:2101 Broadcom Corp.
+        Device Descriptor:
+          bLength                18
+          bDescriptorType         1
+          bcdUSB               2.00
+          bDeviceClass          224 Wireless
+          bDeviceSubClass         1 Radio Frequency
+          bDeviceProtocol         1 Bluetooth
+          bMaxPacketSize0        64
+          idVendor           0x0a5c Broadcom Corp.
+          idProduct          0x2101
+          bcdDevice            0.00
+          iManufacturer           1 Broadcom Corp
+          iProduct                2 BCM92045DG Non-UHE
+          iSerial                 0
+          bNumConfigurations      1
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+is this a dongle with HID proxy support or not. If yes, then you need
+the HCI_RESET quirk otherwise you don't. So please check if it still
+works after not including the HCI_RESET quirk.
+  </pre>
+</blockquote>
+It seems that HCI_RESET is not needed. (Interestingly, during testing,
+I now encounter in about 20% of the cases very loud noise. This seems
+like wrong data being played (like a synchronization error). However,
+this problem happens both with and without HCI_RESET.)<br>
+<blockquote cite="mid1162834966.31808.58.camel@aeonflux.holtmann.net"
+ type="cite">
+  <pre wrap="">
+Regards
+
+Marcel
+
+  </pre>
+</blockquote>
+ciao,<br>
+Xu&acirc;n.<br>
+<br>
+<br>
+</body>
+</html>
+
+--------------070609080700010208050201--
