@@ -1,9 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Mayank BATRA <mayank.batra@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Mon, 6 Nov 2006 09:11:55 +0530
-Message-ID: <003901c70155$81971a80$9d0cc70a@dlh.st.com>
+Message-ID: <454E9A04.60707@xmission.com>
+Date: Sun, 05 Nov 2006 19:12:20 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <BAY117-F361FAB140C8FC420BA9EB1BFFC0@phx.gbl>
 In-Reply-To: <BAY117-F361FAB140C8FC420BA9EB1BFFC0@phx.gbl>
 Subject: Re: [Bluez-devel] Bluetooth-Alsa: Emulate headset on the PC
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -19,83 +20,59 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Kelvin,
+Kelvin
 
-Read this webpage:
-http://www.soft.uni-linz.ac.at/_wiki/tiki-index.php?page=ProjectBluezHandsfr
-ee
+asterisk.org
 
-Best Regards,
-
-Mayank
-
-Kelvin Xu wrote:
-> Hi,
-> 
 > Thanks for the prompt reply.
 > Who you meant by the asterisk folks ?
 > 
 > Kelvin
 > 
 > 
-> >From: Brad Midgley <bmidgley@xmission.com>
-> >Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-> >To: BlueZ development <bluez-devel@lists.sourceforge.net>
-> >Subject: Re: [Bluez-devel] Bluetooth-Alsa: Emulate headset on the PC
-> >Date: Sat, 04 Nov 2006 16:39:30 -0700
-> >
-> >Kelvin
-> >
-> > > Has there been any development to use the computer as a bluetooth 
-> >headset
-> > > using SCO in which calls from a handphone could be 
-> received on the 
-> >computer
-> > > and played out on the PC's speakers. Something similar to 
-> the a2recv
-> > > application developed which runs on the A2DP.
-> >
-> >I hear that the asterisk folks have written a plugin of 
-> sorts to do that.
-> >
-> >Brad
-> >
-> >-------------------------------------------------------------
-> ------------
-> >Using Tomcat but need to do more? Need to support web 
-> services, security?
-> >Get stuff done quickly with pre-integrated technology to 
-> make your job 
-> >easier
-> >Download IBM WebSphere Application Server v.1.0.1 based on 
-> Apache Geronimo
-> >http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057
-> &dat=121642
-> >_______________________________________________
-> >Bluez-devel mailing list
-> >Bluez-devel@lists.sourceforge.net
-> >https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>> From: Brad Midgley <bmidgley@xmission.com>
+>> Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+>> To: BlueZ development <bluez-devel@lists.sourceforge.net>
+>> Subject: Re: [Bluez-devel] Bluetooth-Alsa: Emulate headset on the PC
+>> Date: Sat, 04 Nov 2006 16:39:30 -0700
+>>
+>> Kelvin
+>>
+>>> Has there been any development to use the computer as a bluetooth 
+>> headset
+>>> using SCO in which calls from a handphone could be received on the 
+>> computer
+>>> and played out on the PC's speakers. Something similar to the a2recv
+>>> application developed which runs on the A2DP.
+>> I hear that the asterisk folks have written a plugin of sorts to do that.
+>>
+>> Brad
+>>
+>> -------------------------------------------------------------------------
+>> Using Tomcat but need to do more? Need to support web services, security?
+>> Get stuff done quickly with pre-integrated technology to make your job 
+>> easier
+>> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+>> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+>> _______________________________________________
+>> Bluez-devel mailing list
+>> Bluez-devel@lists.sourceforge.net
+>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 > 
 > _________________________________________________________________
 > Get an advanced look at the new version of MSN Messenger. 
 > http://messenger.msn.com.sg/Beta/Default.aspx
 > 
 > 
-> --------------------------------------------------------------
-> -----------
-> Using Tomcat but need to do more? Need to support web 
-> services, security?
-> Get stuff done quickly with pre-integrated technology to make 
-> your job easier
-> Download IBM WebSphere Application Server v.1.0.1 based on 
-> Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&
-dat=121642
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 > _______________________________________________
 > Bluez-devel mailing list
 > Bluez-devel@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
 
 
 -------------------------------------------------------------------------
