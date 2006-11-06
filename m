@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <7e36c64c0611060046j3d04ee1ibab63a54509a0532@mail.gmail.com>
-References: <7e36c64c0611060046j3d04ee1ibab63a54509a0532@mail.gmail.com>
-Date: Mon, 06 Nov 2006 16:03:59 +0100
-Message-Id: <1162825439.31808.16.camel@aeonflux.holtmann.net>
+In-Reply-To: <454EF3C0.000191.16073@bj126app52.126.com>
+References: <453447B2.000105.05297@bj126app48.126.com>
+	<1161192019.30606.20.camel@localhost>
+	<453C3732.00005F.08492@bj126app50.126.com>
+	<454EF3C0.000191.16073@bj126app52.126.com>
+Date: Mon, 06 Nov 2006 16:02:43 +0100
+Message-Id: <1162825363.31808.14.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] BT
+Subject: Re: [Bluez-devel] BGB204 Can't init d evice hci0: Connection
+	timed	out (110)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,13 +26,12 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-> Can i get any info how about Bluetooth On/OFF.I tried a program that
-> doesnt help out much for me.Does anyone help me here.
-> Here is this program which works as hciconfig hci0 up
+>         It turns out to be a hardware design fault, and I have solved
+>         it by myself.
+>         Now I can freely transfer files to and from my board through
+>         this BGB204 bluetooth Sip.
 
-no it doesn't. This piece of code is a copy from hcid/device.c and not
-related to "hciconfig hci0 up". Activating a Bluetooth adapter is a
-kernel task.
+can you tell us how you made it work.
 
 Regards
 
