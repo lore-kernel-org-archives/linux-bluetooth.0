@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 7 Nov 2006 11:58:36 +0100
-From: Stefan Seyfried <seife@suse.de>
-To: Peter.Weiss@consol.de, BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20061107105836.GK11347@suse.de>
-References: <11418107.1162886121971.OPEN-XCHANGE.WebMail.www@kalender.consol.de>
+Message-ID: <45504DFF.1000101@evision.de>
+Date: Tue, 07 Nov 2006 10:12:31 +0100
+From: Tobias Wolf <tobias.wolf@evision.de>
 MIME-Version: 1.0
-In-Reply-To: <11418107.1162886121971.OPEN-XCHANGE.WebMail.www@kalender.consol.de>
-Subject: Re: [Bluez-users] How to identify Bluetooth hardware on Acer
-	notebook
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] 2-way audio for telephony
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,63 +14,32 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Tue, Nov 07, 2006 at 08:55:21AM +0100, Peter Weiss wrote:
-> Hello,
-> =
+Hi,
 
-> I don't know how to setup my bluetooth interface on my Acer Notebook
-> (a built in one):
-> =
+does anyone had success with 2-way audio without kernel module
+snd_bt_sco, as described here :
 
-> Reading the docs I think it's connected to the serial port:
+https://help.ubuntu.com/community/BluetoothAudio
 
-I don't think so.
- =
+I've been trying to follow the instructions but i can't get ALSA to
+report the Audio device so that i am able to select it in my softphone
+(EKIGA in my case).
 
-> # dmesg | grep serial
-> serial8250: ttyS1 at I/O 0x2f8 (irq =3D 3) is a 16550A
-> # setserial -g /dev/ttyS1        =
+Any input will be greatly appreciated ...
 
-> /dev/ttyS1, UART: 16550A, Port: 0x02f8, IRQ: 3
-> =
+Thanks,
 
-> The bluetooth module is loaded:
-
-[...]
-
-> I think that's because the internal modem is connected to ttyS1.
-
-I also don't think so, but that's a different thing :-)
-
-> So, how do I get access to the bluetooth controller?
-
-probably by "modprobe hci_usb"
-
-> How can I identify the bluetooth hardware?
-
-probably with "lsusb"
-
-I have not seen a built-in BT device that was not USB for a long time.
-Maybe you need to switch it on with some hotkey first or use the acerhk
-package.
--- =
-
-Stefan Seyfried
-QA / R&D Team Mobile Devices        |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
-
+Tobias Wolf
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
