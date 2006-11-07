@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Olivier Dole <olivier.dole@palmsource.com>
+Message-ID: <455063B8.5070109@palmsource.com>
+Date: Tue, 07 Nov 2006 11:45:12 +0100
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1162463886.19652.31.camel@ODole-Ubuntu>
-References: <1162463647.19652.28.camel@ODole-Ubuntu>
-	<1162463886.19652.31.camel@ODole-Ubuntu>
-Date: Tue, 07 Nov 2006 14:28:41 +0100
-Message-Id: <1162906121.19652.97.camel@ODole-Ubuntu>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Proposal: patch for pand
+References: <454F59DE.40707@palmsource.com>
+	<1162839360.31808.61.camel@aeonflux.holtmann.net>
+In-Reply-To: <1162839360.31808.61.camel@aeonflux.holtmann.net>
+Content-Type: multipart/mixed; boundary="------------010103000207070202030902"
+Subject: Re: [Bluez-devel] rfcomm patch to startup an
+	executable	at	connection
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,63 +19,334 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGVsbG8sCgpyZWFsbHkgbm9ib2R5IGlzIGludGVyZXN0ZWQgYnkgdGhpcyBmZWF0dXJlIGFuZCBz
-byBieSB0aGlzIHBhdGNoID8Kd2hhdCBhIHNoYW1lIDooCgpSZWdhcmRzLApPbGl2aWVyIERPTEUK
-CkxlIGpldWRpIDAyIG5vdmVtYnJlIDIwMDYgw6AgMTE6MzggKzAxMDAsIE9saXZpZXIgRG9sZSBh
-IMOpY3JpdCA6Cj4gU29ycnkgdGlueSBlcnJvciBpbiBteSBwYXRjaC4uLiBhIHZpbSBzd2FwIGZp
-bGUgd2FzIGluY2x1ZGVkLiBTb3JyeSBmb3IKPiB0aGlzIG1pc3Rha2UgOnAKPiBzbyBIZXJlIGlz
-IGEgY2xlYW5lciBwYXRjaC4KPiAKPiBSZWdhcmRzLAo+IE9saXZpZXIgRE9MRQo+IAo+IExlIGpl
-dWRpIDAyIG5vdmVtYnJlIDIwMDYgw6AgMTE6MzQgKzAxMDAsIE9saXZpZXIgRG9sZSBhIMOpY3Jp
-dCA6Cj4gPiBIaSBldmVyeW9uZSwKPiA+IAo+ID4gRm9yIG15IHdvcmsgSSBuZWVkIGEgc2ltaWxh
-ciBtZWNoYW5pc20gdG8gImRldnVwIiBzY3JpcHQgaW4gcGFuZCB3aGVuIGEKPiA+IFBBTiBkaXNj
-b25uZWN0aW9uIG9jY3Vycy4KPiA+IFRoYXQncyB3aHkgSSd2ZSBkb25lIHRoZSBmb2xsb3dpbmcg
-cGF0Y2ggKHNlZSBhdHRhY2htZW50IGZvciBzb3VyY2UKPiA+IGNvZGUpIHdoaWNoIGFsbG93cyBQ
-QU4gZGFlbW9uIHRvIHJ1biBhICJkZXZkb3duIiBzY3JpcHQgZWl0aGVyIHdoZW4gYQo+ID4gZGlz
-Y29ubmVjdGlvbiBpcyBzcG90dGVkIGkuZS4gcmVtb3RlIGRldmljZSBjbG9zZXMgdGhlIGNvbm5l
-Y3Rpb24gb3IKPiA+IHdoZW4geW91IGV4cGxpY2l0bHkgZG8gdGhlIGRpc2Nvbm5lY3Rpb24uIFRv
-IHVzZSBpdCwgc2ltcGx5IGFkZCB0aGUKPiA+IGZvbGxvd2luZyBvcHRpb24gdG8geW91ciBjb21t
-YW5kIGxpbmU6Cj4gPiBwYW5kIC0tb3B0aW9ucyAtLWRldmRvd24gL3BhdGgvdG8vZGV2ZG93bi1z
-Y3JpcHQKPiA+IG9yCj4gPiBwYW5kIC1vcHRpb25zIC1vIC9wYXRoL3RvL2RldmRvd24tc2NyaXB0
-Cj4gPiBvciB5b3UgY2FuIGFsc28gcmVhZCB0aGUgcGFuZCBtYW4gcGFnZSA7KQo+ID4gVGhlIGJl
-aGF2aW91ciBpcyB0aGUgc2FtZSBhcyBmb3IgImRldnVwIiBzY3JpcHQuIEkgbWVhbiB3aGVuIHRo
-ZSBzY3JpcHQKPiA+IGlzIHJ1biB0aGUgZm9sbG93aW5nIGFyZ3VtZW50cyBhcmUgc3VwcGxpZWQg
-dG8gdGhlIHNjcmlwdDoKPiA+ICQxIDwtPiBkZXZpY2UgaW50ZXJmYWNlIGUuZy4gImJuZXAwIgo+
-ID4gJDIgPC0+IGJsdWV0b290aCBhZGRyZXNzIG9mIHRoZSBkaXNjb25uZWN0ZWQgZGV2aWNlIGUu
-Zy4KPiA+ICIwMDo0NTo3ODpBRTpCNDowMSIKPiA+IGFuZCBvZiBjb3Vyc2UgeW91ciBzY3JpcHQg
-bXVzdCBoYXZlIHRoZSBjb3JyZWN0IHBlcm1pc3Npb25zIHRvIHJ1bi4KPiA+IAo+ID4gQW55IGZl
-ZWRiYWNrIGFib3V0IHRoaXMgcGF0Y2ggaXMgb2YgY291cnNlIHdlbGNvbWUgOykKPiA+IEhvcGUg
-eW91IHdpbGwgZmluZCB0aGlzIHBhdGNoIHVzZWZ1bGwuCj4gPiAKPiA+IFJlZ2FyZHMsCj4gPiBP
-bGl2aWVyIERPTEUKPiA+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiA+IFVzaW5nIFRvbWNhdCBidXQgbmVl
-ZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNlcnZpY2VzLCBzZWN1cml0eT8KPiA+
-IEdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRv
-IG1ha2UgeW91ciBqb2IgZWFzaWVyCj4gPiBEb3dubG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0
-aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNoZSBHZXJvbmltbwo+ID4gaHR0cDovL3Nl
-bC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9bG5rJmtpZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9
-MTIxNjQyCj4gPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-XyBCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QgQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2Uu
-bmV0IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRl
-dmVsCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3Jl
-PyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNlcnZpY2VzLCBzZWN1cml0eT8KPiBHZXQgc3R1ZmYgZG9u
-ZSBxdWlja2x5IHdpdGggcHJlLWludGVncmF0ZWQgdGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9i
-IGVhc2llcgo+IERvd25sb2FkIElCTSBXZWJTcGhlcmUgQXBwbGljYXRpb24gU2VydmVyIHYuMS4w
-LjEgYmFzZWQgb24gQXBhY2hlIEdlcm9uaW1vCj4gaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0
-L3NlbD9jbWQ9bG5rJmtpZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQyCj4gX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18gQmx1ZXotZGV2ZWwgbWFpbGlu
-ZyBsaXN0IEJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCBodHRwczovL2xpc3RzLnNv
-dXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAoKCi0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0KVXNpbmcgVG9tY2F0IGJ1dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8gc3VwcG9ydCB3ZWIg
-c2VydmljZXMsIHNlY3VyaXR5PwpHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdpdGggcHJlLWludGVn
-cmF0ZWQgdGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9iIGVhc2llcgpEb3dubG9hZCBJQk0gV2Vi
-U3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNoZSBHZXJvbmlt
-bwpodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lkPTEyMDcwOSZiaWQ9
-MjYzMDU3JmRhdD0xMjE2NDIKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJj
-ZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9i
-bHVlei1kZXZlbAo=
+This is a multi-part message in MIME format.
+--------------010103000207070202030902
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: quoted-printable
+
+Done
+
+Marcel Holtmann a =E9crit :
+> Hi Frederic,
+>
+>  =20
+>> Here is the patch we talked about,
+>> This was the original thread :=20
+>> http://sourceforge.net/mailarchive/message.php?msg_id=3D36194832
+>>
+>> It 's an option to make rfcomm kind of persitent.
+>>    =20
+>
+> can you please fix up your usage (or lack of) whitespaces. I like to
+> keep all code in sync with the coding style.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -----------------------------------------------------------------------=
+--
+> Using Tomcat but need to do more? Need to support web services, securit=
+y?
+> Get stuff done quickly with pre-integrated technology to make your job =
+easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geron=
+imo
+> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=
+=3D121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>  =20
+
+
+--------------010103000207070202030902
+Content-Type: text/x-patch;
+ name="patch_bluez_rfcomm_watch.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="patch_bluez_rfcomm_watch.patch"
+
+? Doxyfile
+? Makefile
+? Makefile.in
+? aclocal.m4
+? autom4te.cache
+? bluezutils.kdevelop
+? bluezutils.kdevelop.pcs
+? bluezutils.kdevses
+? config.guess
+? config.h
+? config.h.in
+? config.log
+? config.status
+? config.sub
+? configure
+? debug
+? depcomp
+? install-sh
+? libtool
+? ltmain.sh
+? missing
+? stamp-h.in
+? stamp-h1
+? alsa/.deps
+? alsa/.libs
+? alsa/Makefile
+? alsa/Makefile.in
+? alsa/libasound_module_pcm_a2dp.la
+? alsa/libasound_module_pcm_headset.la
+? alsa/pcm_a2dp.lo
+? alsa/pcm_headset.lo
+? alsa/sbc.lo
+? audio/.deps
+? audio/.libs
+? audio/Makefile
+? audio/Makefile.in
+? audio/bt.audiod
+? common/.deps
+? common/.libs
+? common/Makefile
+? common/Makefile.in
+? common/test_textfile
+? cups/.deps
+? cups/.libs
+? cups/Makefile
+? cups/Makefile.in
+? cups/bluetooth
+? daemon/.deps
+? daemon/.libs
+? daemon/Makefile
+? daemon/Makefile.in
+? daemon/bluetoothd
+? daemon/bt.echod
+? daemon/service-agent-glue.h
+? dund/.deps
+? dund/.libs
+? dund/Makefile
+? dund/Makefile.in
+? dund/dund
+? fuse/.deps
+? fuse/Makefile
+? fuse/Makefile.in
+? hcid/.deps
+? hcid/.libs
+? hcid/Makefile
+? hcid/Makefile.in
+? hcid/auth-agent
+? hcid/hcid
+? hcid/lexer.c
+? hcid/parser.c
+? hcid/parser.h
+? hcid/passkey-agent
+? hcid/service-agent
+? hidd/.deps
+? hidd/.libs
+? hidd/Makefile
+? hidd/Makefile.in
+? hidd/hidd
+? input/.deps
+? input/.libs
+? input/Makefile
+? input/Makefile.in
+? input/bt.inputd
+? network/.deps
+? network/.libs
+? network/Makefile
+? network/Makefile.in
+? network/bt.networkd
+? pand/.deps
+? pand/.libs
+? pand/Makefile
+? pand/Makefile.in
+? pand/pand
+? rfcomm/.deps
+? rfcomm/.libs
+? rfcomm/Makefile
+? rfcomm/Makefile.in
+? rfcomm/cvs
+? rfcomm/lexer.c
+? rfcomm/main.c.modified
+? rfcomm/main.patch
+? rfcomm/mainx.c
+? rfcomm/parser.c
+? rfcomm/parser.h
+? rfcomm/rfcomm
+? scripts/Makefile
+? scripts/Makefile.in
+? sdpd/.deps
+? sdpd/.libs
+? sdpd/Makefile
+? sdpd/Makefile.in
+? sdpd/sdpd
+? test/.deps
+? test/.libs
+? test/Makefile
+? test/Makefile.in
+? test/attest
+? test/bdaddr
+? test/hciemu
+? test/hstest
+? test/l2test
+? test/rctest
+? test/scotest
+? test/sttest
+? tools/.deps
+? tools/.libs
+? tools/Makefile
+? tools/Makefile.in
+? tools/ciptool
+? tools/hciattach
+? tools/hciconfig
+? tools/hcisecfilter
+? tools/hcitool
+? tools/l2ping
+? tools/ppporc
+? tools/sdptool
+Index: rfcomm/main.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/rfcomm/main.c,v
+retrieving revision 1.23
+diff -u -r1.23 main.c
+--- rfcomm/main.c	16 Aug 2006 11:44:52 -0000	1.23
++++ rfcomm/main.c	7 Nov 2006 10:05:54 -0000
+@@ -40,6 +40,7 @@
+ #include <sys/param.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
++#include <sys/wait.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+@@ -257,6 +258,53 @@
+ 	return 0;
+ }
+ 
++static void run_cmdline(struct pollfd *p, sigset_t* sigs, char *devname, int argc, char **argv)
++{
++	int i = 0;
++	pid_t pid, child;
++	struct timespec ts;
++	int status = 0;
++	char **cmdargv = malloc((argc + 1) * sizeof(char*));
++
++	if (!cmdargv)
++		return;
++
++	for (i = 0; i < argc; i++) {
++		cmdargv[i] = (strcmp(argv[i], "{}") == 0) ? devname : argv[i];
++	}
++	cmdargv[i] = NULL;
++
++	pid = fork();
++
++	switch (pid) {
++	case 0:
++		i = execvp(cmdargv[0], cmdargv);
++		fprintf(stderr, "Couldn't execute command %s (errno=%d:%s)\n", cmdargv[0], errno, strerror(errno));
++		break;
++	case -1:
++		fprintf(stderr, "Couldn't fork to execute command %s\n", cmdargv[0]);
++		break;
++	default:
++		while (1) {
++			child = waitpid(-1, &status, WNOHANG);
++			if (child == pid || (child < 0 && errno != EAGAIN))
++				break;
++
++			p->revents = 0;
++			ts.tv_sec  = 0;
++			ts.tv_nsec = 200;
++			if (ppoll(p, 1, &ts, sigs) || __io_canceled) {
++				kill(pid, SIGTERM);
++				waitpid(pid, &status, 0);
++				break;
++			}
++		}
++		break;
++	}
++
++	free(cmdargv);
++}
++
+ static void cmd_connect(int ctl, int dev, bdaddr_t *bdaddr, int argc, char **argv)
+ {
+ 	struct sockaddr_rc laddr, raddr;
+@@ -520,17 +568,33 @@
+ 	p.fd = fd;
+ 	p.events = POLLERR | POLLHUP;
+ 
+-	while (!__io_canceled) {
+-		p.revents = 0;
+-		if (ppoll(&p, 1, NULL, &sigs) > 0)
+-			break;
++	if (argc <= 2) {
++		while (!__io_canceled) {
++			p.revents = 0;
++			if (ppoll(&p, 1, NULL, &sigs) > 0)
++				break;
++		}
++	} else {
++		run_cmdline(&p, &sigs, devname, argc - 2, argv + 2);
+ 	}
+ 
++	sa.sa_handler = NULL;
++	sigaction(SIGTERM, &sa, NULL);
++	sigaction(SIGINT,  &sa, NULL);
++
+ 	printf("Disconnected\n");
+ 
+ 	close(fd);
+ }
+ 
++static void cmd_watch(int ctl, int dev, bdaddr_t *bdaddr, int argc, char **argv)
++{
++	while (!__io_canceled) {
++		cmd_listen(ctl, dev, bdaddr, argc, argv);
++		usleep(10000);
++	}
++}
++
+ static void cmd_create(int ctl, int dev, bdaddr_t *bdaddr, int argc, char **argv)
+ {
+ 	if (strcmp(argv[0], "all") == 0)
+@@ -573,7 +637,8 @@
+ 	{ "release", "unbind", cmd_release, "<dev>",                    "Release device" },
+ 	{ "show",    "info",   cmd_show,    "<dev>",                    "Show device"    },
+ 	{ "connect", "conn",   cmd_connect, "<dev> <bdaddr> [channel]", "Connect device" },
+-	{ "listen",  "server", cmd_listen,  "<dev> [channel]",          "Listen"         },
++	{ "listen",  "server", cmd_listen,  "<dev> [channel [cmd]]",    "Listen"         },
++	{ "watch",   "watch",  cmd_watch,   "<dev> [channel [cmd]]",    "Watch"          },
+ 	{ NULL, NULL, NULL, 0, 0 }
+ };
+ 
+
+--------------010103000207070202030902
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--------------010103000207070202030902
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------010103000207070202030902--
