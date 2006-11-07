@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: kilian <Kilian.Lackhove@web.de>
-To: bluez-users@lists.sourceforge.net
-Date: Tue, 7 Nov 2006 18:57:05 +0100
+Message-ID: <4550BC83.6070607@gmail.com>
+Date: Tue, 07 Nov 2006 17:04:03 +0000
 MIME-Version: 1.0
-Message-Id: <200611071857.06037.Kilian.Lackhove@web.de>
-Subject: [Bluez-users] Ubuntu edgy + Keyboard + dbus + security mode 3
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <4550A095.6060000@gmx.de> <20061107155257.GB22290@suse.de>
+In-Reply-To: <20061107155257.GB22290@suse.de>
+From: Simon Williams <systemparadox@googlemail.com>
+Subject: Re: [Bluez-users] usb-device cannot be found by other
+	bluetooth	devices
+Reply-To: systemparadox@gmail.com,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,24 +22,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Folks!
+Stefan Seyfried wrote:
+> Hi Smobbl
+> 
+> (i would complain to your parents about that name :-)
+> 
+> On Tue, Nov 07, 2006 at 04:04:53PM +0100, Smobbl_Bobbl wrote:
+>> hi!
+>>
+>> can someone help me to make my usb-stick "searchable" by other devices?
+>>
+>> i installed mandriva linux 2007, with all the bluetooth things.
+>> i can send files to other devices (handy, pda...), but if i search in my 
+>> handy for other near devices, i cannot find the usb-stick!
+>> if i want the handy to pair with the pc (initiated by pc), the handy 
+>> says i have to input my password. if i do so, my phone shows a 
+>> progressbar, but in the end it fails.
+> 
+> do you have a passkey-agent registered?
+>> can someone help me to make my usb-stick "searchable" by other devices?
+> 
+> use "apitest" to set the DiscoverableTimeout to 0:
+> 
+>     apitest SetDiscoverableTimeout 0
+> 
+> then set your device to discoverable:
+> 
+>     apitest SetMode discoverable
+> 
+> verify your settings with
+> 
+>     apitest IsDiscoverable
+>     apitest GetMode
+>     apitest GetDiscoverableTimeout
+> 
 
-I am using Ubuntu Edgy (bluez-utils 3.7.1-ubuntu-4) and an apple wireless 
-keyboard pro.
-
-Right now the keyboard is running without encryption and authentification.
-
-I read i had to add the "dbus_pin_helper" option to my hcid.conf and run 
-bluez-pin --dbus. But as i run "bluez-pin --dbus" nothing happens (even if i 
-run it during "hidd --search" on another console) 
-
-The log says Unknown Option "dbus_pin_helper line 26 " 
-
-So whats wrong and what can i do to encrypt the connection?
-
-Regards, 
-
-Kilian
+Alternatively, make sure that hscan and pscan are enabled for that device.
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
