@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4550E377.7010007@vasmac.com>
-Date: Tue, 07 Nov 2006 14:50:15 -0500
-From: Jose Vasconcellos <jose@vasmac.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <4550A345.8040809@vasmac.com>	<1162913214.21754.1.camel@aeonflux.holtmann.net>	<4550BF57.4030205@vasmac.com>	<1162923908.4793.2.camel@aeonflux.holtmann.net>	<4550E039.2070400@vasmac.com>
-	<1162932072.4793.5.camel@aeonflux.holtmann.net>
-In-Reply-To: <1162932072.4793.5.camel@aeonflux.holtmann.net>
+In-Reply-To: <4550E039.2070400@vasmac.com>
+References: <4550A345.8040809@vasmac.com>
+	<1162913214.21754.1.camel@aeonflux.holtmann.net>
+	<4550BF57.4030205@vasmac.com>
+	<1162923908.4793.2.camel@aeonflux.holtmann.net>
+	<4550E039.2070400@vasmac.com>
+Date: Tue, 07 Nov 2006 21:41:12 +0100
+Message-Id: <1162932072.4793.5.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Bonding
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,45 +24,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Jose,
->
->   
->>>>>> I see that the dbus message RemoveBonding clears the link key
->>>>>> on the bluetooth adapter but does not remove the entry from the
->>>>>> linkkeys file. Afterwards ListBondings still shows a bonding and
->>>>>> CreateBonding reports that a bonding already exists. Is this the
->>>>>> correct behavior?
->>>>>>         
->>>>>>             
->>>>> actually it should remove the entry from the linkkeys file. Otherwise
->>>>> this is a bug. Can you check the log files for errors.
->>>>>       
->>>>>           
->>>> I don't see any error message in syslog or anywhere else.
->>>> The commands themselves don't seem to report anything
->>>> unusual.
->>>>     
->>>>         
->>> I am pretty sure that it works as expected. What distro do you have
->>> running. Maybe SELinux is restricting access to /var/lib/bluetooth/
->>>       
->> OK, I did a little bit of digging and here's a better description:
->> Removing a device that has lower case hex numbers does not
->> remove it from the linkkeys file. You must use upper case.
->>     
->
-> that should have been fixed. What version of bluez-utils are you
-> running.
->
-> Regards
->
-> Marcel
->
->   
-I'm running the latest, version 3.7 on Ubuntu 6.06.
+Hi Jose,
 
-Jose
+> >>>> I see that the dbus message RemoveBonding clears the link key
+> >>>> on the bluetooth adapter but does not remove the entry from the
+> >>>> linkkeys file. Afterwards ListBondings still shows a bonding and
+> >>>> CreateBonding reports that a bonding already exists. Is this the
+> >>>> correct behavior?
+> >>>>         
+> >>> actually it should remove the entry from the linkkeys file. Otherwise
+> >>> this is a bug. Can you check the log files for errors.
+> >>>       
+> >> I don't see any error message in syslog or anywhere else.
+> >> The commands themselves don't seem to report anything
+> >> unusual.
+> >>     
+> >
+> > I am pretty sure that it works as expected. What distro do you have
+> > running. Maybe SELinux is restricting access to /var/lib/bluetooth/
+> 
+> OK, I did a little bit of digging and here's a better description:
+> Removing a device that has lower case hex numbers does not
+> remove it from the linkkeys file. You must use upper case.
+
+that should have been fixed. What version of bluez-utils are you
+running.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
