@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4550BF57.4030205@vasmac.com>
+Date: Tue, 07 Nov 2006 12:16:07 -0500
+From: Jose Vasconcellos <jose@vasmac.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4550BF57.4030205@vasmac.com>
 References: <4550A345.8040809@vasmac.com>
 	<1162913214.21754.1.camel@aeonflux.holtmann.net>
-	<4550BF57.4030205@vasmac.com>
-Date: Tue, 07 Nov 2006 19:25:08 +0100
-Message-Id: <1162923908.4793.2.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+In-Reply-To: <1162913214.21754.1.camel@aeonflux.holtmann.net>
 Subject: Re: [Bluez-devel] Bonding
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,28 +21,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jose,
-
-> >> I see that the dbus message RemoveBonding clears the link key
-> >> on the bluetooth adapter but does not remove the entry from the
-> >> linkkeys file. Afterwards ListBondings still shows a bonding and
-> >> CreateBonding reports that a bonding already exists. Is this the
-> >> correct behavior?
-> >
-> > actually it should remove the entry from the linkkeys file. Otherwise
-> > this is a bug. Can you check the log files for errors.
+Marcel Holtmann wrote:
+> Hi Jose,
 >
-> I don't see any error message in syslog or anywhere else.
-> The commands themselves don't seem to report anything
-> unusual.
+>   
+>> I see that the dbus message RemoveBonding clears the link key
+>> on the bluetooth adapter but does not remove the entry from the
+>> linkkeys file. Afterwards ListBondings still shows a bonding and
+>> CreateBonding reports that a bonding already exists. Is this the
+>> correct behavior?
+>>     
+>
+> actually it should remove the entry from the linkkeys file. Otherwise
+> this is a bug. Can you check the log files for errors.
+>
+> Regards
+>
+> Marcel
+>   
 
-I am pretty sure that it works as expected. What distro do you have
-running. Maybe SELinux is restricting access to /var/lib/bluetooth/
+Hi Marcel,
 
-Regards
+I don't see any error message in syslog or anywhere else.
+The commands themselves don't seem to report anything
+unusual.
 
-Marcel
-
+Jose
 
 
 -------------------------------------------------------------------------
