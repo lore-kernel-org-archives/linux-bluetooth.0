@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45504DFF.1000101@evision.de>
-Date: Tue, 07 Nov 2006 10:12:31 +0100
-From: Tobias Wolf <tobias.wolf@evision.de>
-MIME-Version: 1.0
+Message-ID: <11418107.1162886121971.OPEN-XCHANGE.WebMail.www@kalender.consol.de>
+Date: Tue, 7 Nov 2006 08:55:21 +0100 (CET)
+From: Peter Weiss <Peter.Weiss@consol.de>
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] 2-way audio for telephony
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-users] How to identify Bluetooth hardware on Acer notebook
+Reply-To: Peter.Weiss@consol.de,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,33 +15,52 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
-
-does anyone had success with 2-way audio without kernel module
-snd_bt_sco, as described here :
-
-https://help.ubuntu.com/community/BluetoothAudio
-
-I've been trying to follow the instructions but i can't get ALSA to
-report the Audio device so that i am able to select it in my softphone
-(EKIGA in my case).
-
-Any input will be greatly appreciated ...
-
-Thanks,
-
-Tobias Wolf
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGVsbG8sCgpJIGRvbid0IGtub3cgaG93IHRvIHNldHVwIG15IGJsdWV0b290aCBpbnRlcmZhY2Ug
+b24gbXkgQWNlciBOb3RlYm9vawooYSBidWlsdCBpbiBvbmUpOgoKUmVhZGluZyB0aGUgZG9jcyBJ
+IHRoaW5rIGl0J3MgY29ubmVjdGVkIHRvIHRoZSBzZXJpYWwgcG9ydDoKCiMgZG1lc2cgfCBncmVw
+IHNlcmlhbApzZXJpYWw4MjUwOiB0dHlTMSBhdCBJL08gMHgyZjggKGlycSA9IDMpIGlzIGEgMTY1
+NTBBCiMgc2V0c2VyaWFsIC1nIC9kZXYvdHR5UzEgICAgICAgIAovZGV2L3R0eVMxLCBVQVJUOiAx
+NjU1MEEsIFBvcnQ6IDB4MDJmOCwgSVJROiAzCgpUaGUgYmx1ZXRvb3RoIG1vZHVsZSBpcyBsb2Fk
+ZWQ6CgpOb3YgIDcgMDk6Mjk6NTYgQXN0b3Iga2VybmVsOiBCbHVldG9vdGg6IENvcmUgdmVyIDIu
+OApOb3YgIDcgMDk6Mjk6NTYgQXN0b3Iga2VybmVsOiBORVQ6IFJlZ2lzdGVyZWQgcHJvdG9jb2wg
+ZmFtaWx5IDMxCk5vdiA3IDA5OjI5OjU2IEFzdG9yIGtlcm5lbDogQmx1ZXRvb3RoOiBIQ0kgZGV2
+aWNlIGFuZCBjb25uZWN0aW9uCm1hbmFnZXIgaW5pdGlhbGl6ZWQKTm92ICA3IDA5OjI5OjU2IEFz
+dG9yIGtlcm5lbDogQmx1ZXRvb3RoOiBIQ0kgc29ja2V0IGxheWVyIGluaXRpYWxpemVkCk5vdiAg
+NyAwOToyOTo1NiBBc3RvciBrZXJuZWw6IEJsdWV0b290aDogSENJIFVBUlQgZHJpdmVyIHZlciAy
+LjIKTm92ICA3IDA5OjI5OjU2IEFzdG9yIGtlcm5lbDogQmx1ZXRvb3RoOiBIQ0kgSDQgcHJvdG9j
+b2wgaW5pdGlhbGl6ZWQKTm92ICA3IDA5OjI5OjU2IEFzdG9yIGtlcm5lbDogQmx1ZXRvb3RoOiBI
+Q0kgQkNTUCBwcm90b2NvbCBpbml0aWFsaXplZApOb3YgIDcgMDk6Mjk6NTYgQXN0b3Iga2VybmVs
+OiBCbHVldG9vdGg6IEwyQ0FQIHZlciAyLjgKTm92ICA3IDA5OjI5OjU2IEFzdG9yIGtlcm5lbDog
+Qmx1ZXRvb3RoOiBMMkNBUCBzb2NrZXQgbGF5ZXIgaW5pdGlhbGl6ZWQKTm92ICA3IDA5OjI5OjU2
+IEFzdG9yIGtlcm5lbDogQmx1ZXRvb3RoOiBSRkNPTU0gc29ja2V0IGxheWVyIGluaXRpYWxpemVk
+Ck5vdiAgNyAwOToyOTo1NiBBc3RvciBrZXJuZWw6IEJsdWV0b290aDogUkZDT01NIFRUWSBsYXll
+ciBpbml0aWFsaXplZApOb3YgIDcgMDk6Mjk6NTYgQXN0b3Iga2VybmVsOiBCbHVldG9vdGg6IFJG
+Q09NTSB2ZXIgMS43CgpCdXQgaGNpYXR0YWNoIGRvZXMgbm90IHdvcmsgY29ycmVjdGx5OgoKIyBo
+Y2lhdHRhY2ggL2Rldi90dHlTMSBhbnkgOTIxNjAwCkNhbid0IHNldCBkZXZpY2U6IERldmljZSBv
+ciByZXNvdXJjZSBidXN5CkNhbid0IGluaXRpYWxpemUgZGV2aWNlOiBJbGxlZ2FsIHNlZWsKCmhj
+aWNvbmZpZyBzaG93cyBzb21lIGR1bW15IGludGVyZmFjZToKCiMgaGNpY29uZmlnIC1hCmhjaTA6
+ICAgVHlwZTogVUFSVAogICAgICAgIEJEIEFkZHJlc3M6IDAwOjAwOjAwOjAwOjAwOjAwIEFDTCBN
+VFU6IDA6MCBTQ08gTVRVOiAwOjAKICAgICAgICBET1dOIAogICAgICAgIFJYIGJ5dGVzOjAgYWNs
+OjAgc2NvOjAgZXZlbnRzOjAgZXJyb3JzOjAKICAgICAgICBUWCBieXRlczo0IGFjbDowIHNjbzow
+IGNvbW1hbmRzOjEgZXJyb3JzOjAKCkkgdGhpbmsgdGhhdCdzIGJlY2F1c2UgdGhlIGludGVybmFs
+IG1vZGVtIGlzIGNvbm5lY3RlZCB0byB0dHlTMS4KClNvLCBob3cgZG8gSSBnZXQgYWNjZXNzIHRv
+IHRoZSBibHVldG9vdGggY29udHJvbGxlcj8KSG93IGNhbiBJIGlkZW50aWZ5IHRoZSBibHVldG9v
+dGggaGFyZHdhcmU/CgpUSUEgZm9yIGFuIHloaW50cyAtLSBQZXRlcgoKLS0gClBldGVyLldlaXNz
+QGNvbnNvbC5kZSAgICAgICAgICAgICAgICAgICAgICAgICBDb25Tb2wqIFNvZnR3YXJlIEdtYkgK
+UGhvbmUgICs0OSA4OSA0NTg0MS0xMDAgICAgICAgICAgICAgICAgICAgICAgIENvbnN1bHRpbmcg
+JiBTb2x1dGlvbnMKTW9iaWxlICs0OSAxNzcgNjA0MDEyMSAgICAgICAgICAgICAgICAgICAgICAg
+IEZyYW56aXNrYW5lcnN0ci4gMzgKaHR0cDovL3d3dy5jb25zb2wuZGUgICAgICAgICAgICAgICAg
+ICAgICAgICAgIEQtODE2NjkgTcO8bmNoZW4KCQoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVXNpbmcgVG9t
+Y2F0IGJ1dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8gc3VwcG9ydCB3ZWIgc2VydmljZXMsIHNl
+Y3VyaXR5PwpHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdpdGggcHJlLWludGVncmF0ZWQgdGVjaG5v
+bG9neSB0byBtYWtlIHlvdXIgam9iIGVhc2llcgpEb3dubG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxp
+Y2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNoZSBHZXJvbmltbwpodHRwOi8vc2Vs
+LmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lkPTEyMDcwOSZiaWQ9MjYzMDU3JmRhdD0x
+MjE2NDIKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1
+ZXotdXNlcnMgbWFpbGluZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApo
+dHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
