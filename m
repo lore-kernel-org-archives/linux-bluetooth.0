@@ -1,12 +1,20 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45511DA6.2000906@xmission.com>
-Date: Tue, 07 Nov 2006 16:58:30 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <20060917202558.GG21347@compendium.com.ar>
-In-Reply-To: <20060917202558.GG21347@compendium.com.ar>
-Subject: Re: [Bluez-devel] bluetooth dies when trying to use 2 sco links
+In-Reply-To: <4550EC62.2050708@vasmac.com>
+References: <4550A345.8040809@vasmac.com>
+	<1162913214.21754.1.camel@aeonflux.holtmann.net>
+	<4550BF57.4030205@vasmac.com>
+	<1162923908.4793.2.camel@aeonflux.holtmann.net>
+	<4550E039.2070400@vasmac.com>
+	<1162932072.4793.5.camel@aeonflux.holtmann.net>
+	<4550E377.7010007@vasmac.com>
+	<1162933029.4793.7.camel@aeonflux.holtmann.net>
+	<4550EC62.2050708@vasmac.com>
+Date: Tue, 07 Nov 2006 22:37:40 +0100
+Message-Id: <1162935460.4793.9.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Case handling (was: Bonding)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,25 +28,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Horacio
+Hi Jose,
 
-> Attached you'll find the code for a test program that makes a call using
-> the hands-free profile connected to a cell phone and when the call is
-> answered it generates echo (so the person who answers the phone will
-> hear himself)
+> Looking at this code I find the logic a bit convoluted.
+> I don't see the point of the case checking. Wouldn't
+> be easier to convert any address coming from the dbus
+> to upper case once?
 
-I talked with Marcel about this. Here's the current situation:
+I added now textfile_casedel() and it makes use of it. So the CVS
+version should work as expected.
 
-uart-connected bluetooth adapters can do multiple sco connections
-without any trouble.
+Regards
 
-usb-connected bluetooth adapters suffer from a limitation in the usb
-kernel layer... the number of sco connections has to be hardcoded at
-boot time in the isoc parameter. If it's set for two 16-bit sco
-connections, when more or fewer connections are in use, no audio gets
-through. The usb layer needs a rewrite to fix this.
+Marcel
 
-Brad
 
 
 -------------------------------------------------------------------------
