@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4550A345.8040809@vasmac.com>
-Date: Tue, 07 Nov 2006 10:16:21 -0500
-From: Jose Vasconcellos <jose@vasmac.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Bonding
+From: Olivier Dole <olivier.dole@palmsource.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1162463886.19652.31.camel@ODole-Ubuntu>
+References: <1162463647.19652.28.camel@ODole-Ubuntu>
+	<1162463886.19652.31.camel@ODole-Ubuntu>
+Date: Tue, 07 Nov 2006 14:28:41 +0100
+Message-Id: <1162906121.19652.97.camel@ODole-Ubuntu>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Proposal: patch for pand
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,27 +17,63 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
-
-I see that the dbus message RemoveBonding clears the link key
-on the bluetooth adapter but does not remove the entry from the
-linkkeys file. Afterwards ListBondings still shows a bonding and
-CreateBonding reports that a bonding already exists. Is this the
-correct behavior?
-
-Jose
-
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGVsbG8sCgpyZWFsbHkgbm9ib2R5IGlzIGludGVyZXN0ZWQgYnkgdGhpcyBmZWF0dXJlIGFuZCBz
+byBieSB0aGlzIHBhdGNoID8Kd2hhdCBhIHNoYW1lIDooCgpSZWdhcmRzLApPbGl2aWVyIERPTEUK
+CkxlIGpldWRpIDAyIG5vdmVtYnJlIDIwMDYgw6AgMTE6MzggKzAxMDAsIE9saXZpZXIgRG9sZSBh
+IMOpY3JpdCA6Cj4gU29ycnkgdGlueSBlcnJvciBpbiBteSBwYXRjaC4uLiBhIHZpbSBzd2FwIGZp
+bGUgd2FzIGluY2x1ZGVkLiBTb3JyeSBmb3IKPiB0aGlzIG1pc3Rha2UgOnAKPiBzbyBIZXJlIGlz
+IGEgY2xlYW5lciBwYXRjaC4KPiAKPiBSZWdhcmRzLAo+IE9saXZpZXIgRE9MRQo+IAo+IExlIGpl
+dWRpIDAyIG5vdmVtYnJlIDIwMDYgw6AgMTE6MzQgKzAxMDAsIE9saXZpZXIgRG9sZSBhIMOpY3Jp
+dCA6Cj4gPiBIaSBldmVyeW9uZSwKPiA+IAo+ID4gRm9yIG15IHdvcmsgSSBuZWVkIGEgc2ltaWxh
+ciBtZWNoYW5pc20gdG8gImRldnVwIiBzY3JpcHQgaW4gcGFuZCB3aGVuIGEKPiA+IFBBTiBkaXNj
+b25uZWN0aW9uIG9jY3Vycy4KPiA+IFRoYXQncyB3aHkgSSd2ZSBkb25lIHRoZSBmb2xsb3dpbmcg
+cGF0Y2ggKHNlZSBhdHRhY2htZW50IGZvciBzb3VyY2UKPiA+IGNvZGUpIHdoaWNoIGFsbG93cyBQ
+QU4gZGFlbW9uIHRvIHJ1biBhICJkZXZkb3duIiBzY3JpcHQgZWl0aGVyIHdoZW4gYQo+ID4gZGlz
+Y29ubmVjdGlvbiBpcyBzcG90dGVkIGkuZS4gcmVtb3RlIGRldmljZSBjbG9zZXMgdGhlIGNvbm5l
+Y3Rpb24gb3IKPiA+IHdoZW4geW91IGV4cGxpY2l0bHkgZG8gdGhlIGRpc2Nvbm5lY3Rpb24uIFRv
+IHVzZSBpdCwgc2ltcGx5IGFkZCB0aGUKPiA+IGZvbGxvd2luZyBvcHRpb24gdG8geW91ciBjb21t
+YW5kIGxpbmU6Cj4gPiBwYW5kIC0tb3B0aW9ucyAtLWRldmRvd24gL3BhdGgvdG8vZGV2ZG93bi1z
+Y3JpcHQKPiA+IG9yCj4gPiBwYW5kIC1vcHRpb25zIC1vIC9wYXRoL3RvL2RldmRvd24tc2NyaXB0
+Cj4gPiBvciB5b3UgY2FuIGFsc28gcmVhZCB0aGUgcGFuZCBtYW4gcGFnZSA7KQo+ID4gVGhlIGJl
+aGF2aW91ciBpcyB0aGUgc2FtZSBhcyBmb3IgImRldnVwIiBzY3JpcHQuIEkgbWVhbiB3aGVuIHRo
+ZSBzY3JpcHQKPiA+IGlzIHJ1biB0aGUgZm9sbG93aW5nIGFyZ3VtZW50cyBhcmUgc3VwcGxpZWQg
+dG8gdGhlIHNjcmlwdDoKPiA+ICQxIDwtPiBkZXZpY2UgaW50ZXJmYWNlIGUuZy4gImJuZXAwIgo+
+ID4gJDIgPC0+IGJsdWV0b290aCBhZGRyZXNzIG9mIHRoZSBkaXNjb25uZWN0ZWQgZGV2aWNlIGUu
+Zy4KPiA+ICIwMDo0NTo3ODpBRTpCNDowMSIKPiA+IGFuZCBvZiBjb3Vyc2UgeW91ciBzY3JpcHQg
+bXVzdCBoYXZlIHRoZSBjb3JyZWN0IHBlcm1pc3Npb25zIHRvIHJ1bi4KPiA+IAo+ID4gQW55IGZl
+ZWRiYWNrIGFib3V0IHRoaXMgcGF0Y2ggaXMgb2YgY291cnNlIHdlbGNvbWUgOykKPiA+IEhvcGUg
+eW91IHdpbGwgZmluZCB0aGlzIHBhdGNoIHVzZWZ1bGwuCj4gPiAKPiA+IFJlZ2FyZHMsCj4gPiBP
+bGl2aWVyIERPTEUKPiA+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiA+IFVzaW5nIFRvbWNhdCBidXQgbmVl
+ZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNlcnZpY2VzLCBzZWN1cml0eT8KPiA+
+IEdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRv
+IG1ha2UgeW91ciBqb2IgZWFzaWVyCj4gPiBEb3dubG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0
+aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNoZSBHZXJvbmltbwo+ID4gaHR0cDovL3Nl
+bC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9bG5rJmtpZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9
+MTIxNjQyCj4gPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+XyBCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QgQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2Uu
+bmV0IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRl
+dmVsCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3Jl
+PyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNlcnZpY2VzLCBzZWN1cml0eT8KPiBHZXQgc3R1ZmYgZG9u
+ZSBxdWlja2x5IHdpdGggcHJlLWludGVncmF0ZWQgdGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9i
+IGVhc2llcgo+IERvd25sb2FkIElCTSBXZWJTcGhlcmUgQXBwbGljYXRpb24gU2VydmVyIHYuMS4w
+LjEgYmFzZWQgb24gQXBhY2hlIEdlcm9uaW1vCj4gaHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0
+L3NlbD9jbWQ9bG5rJmtpZD0xMjA3MDkmYmlkPTI2MzA1NyZkYXQ9MTIxNjQyCj4gX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18gQmx1ZXotZGV2ZWwgbWFpbGlu
+ZyBsaXN0IEJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCBodHRwczovL2xpc3RzLnNv
+dXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAoKCi0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0KVXNpbmcgVG9tY2F0IGJ1dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8gc3VwcG9ydCB3ZWIg
+c2VydmljZXMsIHNlY3VyaXR5PwpHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdpdGggcHJlLWludGVn
+cmF0ZWQgdGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9iIGVhc2llcgpEb3dubG9hZCBJQk0gV2Vi
+U3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFwYWNoZSBHZXJvbmlt
+bwpodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lkPTEyMDcwOSZiaWQ9
+MjYzMDU3JmRhdD0xMjE2NDIKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJj
+ZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9i
+bHVlei1kZXZlbAo=
