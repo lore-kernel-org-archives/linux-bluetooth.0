@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4550A345.8040809@vasmac.com>
-References: <4550A345.8040809@vasmac.com>
-Date: Tue, 07 Nov 2006 16:26:54 +0100
-Message-Id: <1162913214.21754.1.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Bonding
+Message-ID: <4550A345.8040809@vasmac.com>
+Date: Tue, 07 Nov 2006 10:16:21 -0500
+From: Jose Vasconcellos <jose@vasmac.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] Bonding
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,21 +18,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jose,
+Hello,
 
-> I see that the dbus message RemoveBonding clears the link key
-> on the bluetooth adapter but does not remove the entry from the
-> linkkeys file. Afterwards ListBondings still shows a bonding and
-> CreateBonding reports that a bonding already exists. Is this the
-> correct behavior?
+I see that the dbus message RemoveBonding clears the link key
+on the bluetooth adapter but does not remove the entry from the
+linkkeys file. Afterwards ListBondings still shows a bonding and
+CreateBonding reports that a bonding already exists. Is this the
+correct behavior?
 
-actually it should remove the entry from the linkkeys file. Otherwise
-this is a bug. Can you check the log files for errors.
-
-Regards
-
-Marcel
-
+Jose
 
 
 -------------------------------------------------------------------------
