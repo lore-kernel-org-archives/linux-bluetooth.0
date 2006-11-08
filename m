@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 10 Nov 2006 21:39:15 +0000
-From: Paul LeoNerd Evans <leonerd@leonerd.org.uk>
+Message-ID: <9f50a7a00611081458v172fea16q5bd0c78e1595f891@mail.gmail.com>
+Date: Wed, 8 Nov 2006 16:58:14 -0600
+From: "Jerone Young" <jerone@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20061110213915.58e6cabf@nim.leo>
-Mime-Version: 1.0
-Subject: [Bluez-users] Disconnect errors on 2.6.18-mh7
+MIME-Version: 1.0
+Subject: [Bluez-users] Is Bluetooth 2.0 supported/implimented by bluez ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,76 +14,54 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1567019229=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1567019229==
-Content-Type: multipart/signed; boundary="Sig_riWaVTfqwZgpCfXUWr/giKx";
-	protocol="application/pgp-signature"; micalg=PGP-SHA1
+I have been trying to transfer files from my cellphone to my computer
+over bluetooth quickly. Both are bluetooth 2.0 and I noticed under
+linux that they do not transfer at much slower speed then under
+windows. After some investigation I have to assume that they are
+transfering using bluetooth 1.2 speeds & not bluetooth 2.0 speeds. My
+cell phone is a Nokia N73 & usb dongle is belkin bluetooth 2.0 class1
+usb dongle. I have tried this with Ubuntu Edgy & Fedora Core 6 using
+the gnome file sharing applet on the computer to get the files.
 
---Sig_riWaVTfqwZgpCfXUWr/giKx
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+After reading the source code I see the the VHCI is has a decleration
+"define VERSION 1.2". Looking at the kernel code & bluez tools it does
+not look like bluetooth 2.0 is supported. But I can't find a
+definative answer anywhere.  Does anyone have any idea ?
 
-I've got a custom-built 2.6.18 patched with mh7 on my desktop machine,
-with a Logitech Cordless Elite Blutooth Keyboard and Mouse combo. Up
-until 2.6.16 these worked fine. 2.6.17 has unrelated-to-bluez issues with
-my graphics card. On 2.6.18, I can connect the keyboard/mouse on startup,
-but if I let them idle too long, they disconnect in an unrecoverable way,
-requiring me to ssh from another box and run "hidd --search" while
-simultaneously pressing the "connect" button on the keyboard or mouse.
+Here is info on my bluetooth dongle:
+hci0:   Type: USB
+        BD Address: 00:0A:3A:6F:82:85 ACL MTU: 1017:8 SCO MTU: 64:8
+        Features: 0xff 0xff 0x8d 0xfe 0x9b 0xfd 0x00 0x80
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <power control>
+                <transparent SCO> <broadcast encrypt> <EDR ACL 2 Mbps>
+                <EDR ACL 3 Mbps> <enhanced iscan> <interlaced iscan>
+                <interlaced pscan> <inquiry with RSSI> <extended SCO>
+                <EV4 packets> <EV5 packets> <AFH cap. slave>
+                <AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL>
+                <pause encryption> <AFH cap. master> <AFH class. master>
+                <EDR eSCO 2 Mbps> <EDR eSCO 3 Mbps> <3-slot EDR eSCO>
+                <extended features>
+        HCI Ver: 2.0 (0x3) HCI Rev: 0x2000 LMP Ver: 2.0 (0x3) LMP Subver: 0x415c
+        Manufacturer: Broadcom Corporation (15)
+        Firmware 0.65 / 92
 
-I'm not sure quite when it happens, but it would seem to be related to
-lines of the following occuring in dmesg:
-
-net/bluetooth/hidp/hid.c: event field not found
-
-Is this a bug that's crept in to 2.6.18, or perhaps a hardware issue, or
-what? Anything I can attempt to debug it with?
-
---=20
-Paul "LeoNerd" Evans
-
-leonerd@leonerd.org.uk
-ICQ# 4135350       |  Registered Linux# 179460
-http://www.leonerd.org.uk/
-
---Sig_riWaVTfqwZgpCfXUWr/giKx
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-
-iD8DBQFFVPGGqRXzCRLr5iQRAtpTAJ9lVIttl353luoBvh2aySoaepWZYwCcD90+
-J0vRaRVrkHEQXdL5Hfcktvo=
-=xW8z
------END PGP SIGNATURE-----
-
---Sig_riWaVTfqwZgpCfXUWr/giKx--
-
-
---===============1567019229==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I also went out and got a Bluetake 700sx and still do not get 2.0
+speeds..what is going on. It looks like Bluez does not have Bluetooth
+2.0 implimented.
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============1567019229==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1567019229==--
