@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45526DAB.4090004@xmission.com>
-Date: Wed, 08 Nov 2006 16:52:11 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <eeu5cm$25p$1@sea.gmane.org>
-In-Reply-To: <eeu5cm$25p$1@sea.gmane.org>
-Subject: Re: [Bluez-devel] btsco, udev and other issues
+To: bluez-devel@lists.sourceforge.net
+From: Chafik Moalem <moalem@emporos.de>
+Date: Wed, 8 Nov 2006 22:19:16 +0000 (UTC)
+Message-ID: <loom.20061108T223826-983@post.gmane.org>
+References: <1111743.1162822095031.JavaMail.root@mail.prologistik.com>
+	<loom.20061108T184308-176@post.gmane.org>
+	<455235ED.4060403@xmission.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] btsco/alsa-plugins Kernel 2.6.18-mh7 (and mh4-fch)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,35 +21,53 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Mark
+Hi Brad,
 
-> 1. I have seen several reports that indicate btsco can be run as a regular
->    user. But I have only been able to run it as root. When I run it as a
->    regular user I get:
->          btsco v0.42
->          Error: control open (hw:1): No such device
->          Error: Can't find device. Bail
-> 
-> 2. As a consequence of running btsco as root, the newly created sound device
->    cannot be seen by regular users. What udev rule should I set so that the
->    BT headset is seen by other users when btsco is run by root?
+just prepared a patch to show you the modifications to the actual
+CVS version ... the "modified" dir is named btsco-chmo ...
+(PLS NOTE :  this is preliminary as i could not yet check all other occurences
+of EAGAIN and the effects in alsa-plugins/*.c ... more to come soon ...
+BUT THIS makes things already work for me ...)
 
-Maybe regular users can't initiate the kernel module load. In any case I 
-am accepting patches for the btsco kernel mod stuff but I will be 
-focusing on the pure userspace plugins myself.
+The timeout i mentioned was the initial one to be defined in .asoundrc ...
+i understood that this is for connection establishment with the HS ?!
+well ... fabien has only nonblocking socket communication ...
+i will test further ... i might be mistaken with my previous statement 
+saying "NO effect".
 
-> 3. While using btsco with Skype, a lot of message like the following appear
->    on syslog:
->       kernel: snd-bt-sco: Shift problem detected! Fixing to 1.
->       kernel: snd-bt-sco: Shift problem detected! Fixing to 0.
->    What do they mean? Should I be worried about them?
+i added a small previous fix to "remote volume control" in btsco.c and
+btsco2.c...  the BT-core spec defines host_TO_HS RVC commands (+VGS, +VGM)
+to need prefix \r\n AND postfix the same way!
+(This was the only way to make my RVC capable HS REALLY change volume!)
+Did you know that there exists NO SINGLE bt-stack for windose that makes real
+use of RVC !?
+fortunately headsetd (volctl.c) does it already the right way...
 
-This is related to the sco flow control problem. If you are not getting 
-static, you can ignore these messages. If you are getting static, see 
-the kernel patches on the wiki page at 
-https://help.ubuntu.com/community/BluetoothAudio
+now regarding HW:
 
-brad
+i have checked 4 different CSR based USB dongles:
+- notebook built in IBM R51 BT-dongle (bluecore 2)
+- Cellink BT2.0+EDR dongle (bluecore3)
+- hama BT2.0+EDR dongle (bluecore3-MM)
+- new custom BT-Dongle by Lintech (germany) (bluecore3-MM)
+
+3 headsets with HSprofile (SCO + RVC!):
+- Cellink BT-9000ST (only HSProfile tested!)
+- AS-Kabel (sweden) (have you ever used a headset in a disco ? :) 
+(NOISECANCELLING with free2move CSR bluecore 1 class 1! BEST one but BULKY)
+- new custom design with Lintech-BT audio module
+
+i have to admit that the test matrice might be incomplete (sparse) due to the
+fact that i prefer OUR custom design :))
+
+regards
+Chafik
+
+p.s.: the patch might not be attached RIGHT NOW ... 
+(will follow tomorrow latest!)
+
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
