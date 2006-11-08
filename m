@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Chafik Moalem <c.moalem@perdictum.com>
-Date: Wed, 8 Nov 2006 17:44:56 +0000 (UTC)
-Message-ID: <loom.20061108T184308-176@post.gmane.org>
-References: <1111743.1162822095031.JavaMail.root@mail.prologistik.com>
+Date: Wed, 8 Nov 2006 14:57:01 +0200
+From: Mikko Rapeli <mikko.rapeli@iki.fi>
+To: 394742@bugs.debian.org
+Message-ID: <20061108125701.GA10813@nalle>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] btsco/alsa-plugins Kernel 2.6.18-mh7 (and mh4-fch)
+Cc: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] crash logs with a kernel.org 2.6.18.2
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,29 +19,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Chafik Moalem <Chafik.Moalem <at> perdictum.com> writes:
+Hello,
 
-Dear All,
+I can reproduce this with the latest from kernel.org too. Here are the
+logs:
 
-finally after digging around i found the solution to "alsa-plugin (sco) not
-working with 2.6.18-mh>4 kernels ... ("Operation still in progress" ... 
-opening L2CAP/RFCOMM sockets)
+http://kapsi.fi/mcfrisk/temp/bt_oops.txt
 
-after modifying freshly checkedout btsco sources NOW SCO-ALSASOUND
-(plugin-method) WORKS (testet with 2.6.18-mh7-sco AND 2.6.18-mh4-fch ... 
-but still not chop free :( ) 
-
-hint : fabien chevalier forgot to take care of EINPROGRESS 
-(in addition to EAGAIN) in his headsetd sources ... 
-still to check : his pcm_sco.c ... 
-and why the timeout parameter has NO effect ...
-
-forget about my previous posting (as no one seems to be interested anyway) 
-
-regards,
-Chafik
-
-
+-Mikko
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
