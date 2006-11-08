@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <9f50a7a00611081458v172fea16q5bd0c78e1595f891@mail.gmail.com>
-Date: Wed, 8 Nov 2006 16:58:14 -0600
-From: "Jerone Young" <jerone@gmail.com>
+Date: Wed, 8 Nov 2006 21:00:57 +0000
+From: Paul LeoNerd Evans <leonerd-bluez@leonerd.org.uk>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] Is Bluetooth 2.0 supported/implimented by bluez ?
+Message-ID: <20061108210057.7c40adaa@nim.leo>
+Mime-Version: 1.0
+Subject: [Bluez-users] "Connect" button on Logitech bluetooth receiver
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,54 +14,83 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0009240640=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I have been trying to transfer files from my cellphone to my computer
-over bluetooth quickly. Both are bluetooth 2.0 and I noticed under
-linux that they do not transfer at much slower speed then under
-windows. After some investigation I have to assume that they are
-transfering using bluetooth 1.2 speeds & not bluetooth 2.0 speeds. My
-cell phone is a Nokia N73 & usb dongle is belkin bluetooth 2.0 class1
-usb dongle. I have tried this with Ubuntu Edgy & Fedora Core 6 using
-the gnome file sharing applet on the computer to get the files.
+--===============0009240640==
+Content-Type: multipart/signed; boundary="Sig_s_+E0ypXJ84K9FR3uO/MvQ3";
+	protocol="application/pgp-signature"; micalg=PGP-SHA1
 
-After reading the source code I see the the VHCI is has a decleration
-"define VERSION 1.2". Looking at the kernel code & bluez tools it does
-not look like bluetooth 2.0 is supported. But I can't find a
-definative answer anywhere.  Does anyone have any idea ?
+--Sig_s_+E0ypXJ84K9FR3uO/MvQ3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Here is info on my bluetooth dongle:
-hci0:   Type: USB
-        BD Address: 00:0A:3A:6F:82:85 ACL MTU: 1017:8 SCO MTU: 64:8
-        Features: 0xff 0xff 0x8d 0xfe 0x9b 0xfd 0x00 0x80
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <power control>
-                <transparent SCO> <broadcast encrypt> <EDR ACL 2 Mbps>
-                <EDR ACL 3 Mbps> <enhanced iscan> <interlaced iscan>
-                <interlaced pscan> <inquiry with RSSI> <extended SCO>
-                <EV4 packets> <EV5 packets> <AFH cap. slave>
-                <AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL>
-                <pause encryption> <AFH cap. master> <AFH class. master>
-                <EDR eSCO 2 Mbps> <EDR eSCO 3 Mbps> <3-slot EDR eSCO>
-                <extended features>
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x2000 LMP Ver: 2.0 (0x3) LMP Subver: 0x415c
-        Manufacturer: Broadcom Corporation (15)
-        Firmware 0.65 / 92
+I've got a Logitech bluetooth keyboard/mouse combo that comes with a
+charging base for the mouse, which server also as the BT receiver. On it
+is a button marked "connect".
 
-I also went out and got a Bluetake 700sx and still do not get 2.0
-speeds..what is going on. It looks like Bluez does not have Bluetooth
-2.0 implimented.
+When the receiver is working in "I'll do the bluetooth bit and just
+pretend to be a USB keyboard and mouse", this is used to connect it to
+the keyboard or mouse in question. When it is running as a real Bluetooth
+receiver with the HID being done by Linux, this button appears to have no
+effect.
+
+I was wondering whether it might be possible to watch for this button
+being pressed, and if so, trigger a
+
+  hidd --search
+
+command.
+
+I ask because sometimes lately I've noticed the keyboard and/or mouse
+will become disconnected, requiring the above command to be run
+simultaneously to pressing the "connect" button on the keyboard/mouse.
+When the mouse has done that, not too difficult. But if the keyboard
+goes, it's obviously more difficult to recover :)
+
+--=20
+Paul "LeoNerd" Evans
+
+leonerd@leonerd.org.uk
+ICQ# 4135350       |  Registered Linux# 179460
+http://www.leonerd.org.uk/
+
+--Sig_s_+E0ypXJ84K9FR3uO/MvQ3
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQFFUkWNqRXzCRLr5iQRArZMAJ9vGmLf0kqSuZJo+AAHyZ5lbPs/mQCfbYvi
+fYEV0wjCb+hRfliTmy8vz8Q=
+=gmpL
+-----END PGP SIGNATURE-----
+
+--Sig_s_+E0ypXJ84K9FR3uO/MvQ3--
+
+
+--===============0009240640==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0009240640==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0009240640==--
