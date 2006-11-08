@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <455235ED.4060403@xmission.com>
-Date: Wed, 08 Nov 2006 12:54:21 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+To: bluez-devel@lists.sourceforge.net
+From: Chafik Moalem <c.moalem@perdictum.com>
+Date: Wed, 8 Nov 2006 17:44:56 +0000 (UTC)
+Message-ID: <loom.20061108T184308-176@post.gmane.org>
 References: <1111743.1162822095031.JavaMail.root@mail.prologistik.com>
-	<loom.20061108T184308-176@post.gmane.org>
-In-Reply-To: <loom.20061108T184308-176@post.gmane.org>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] btsco/alsa-plugins Kernel 2.6.18-mh7 (and mh4-fch)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,34 +19,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Chafik Moalem <Chafik.Moalem <at> perdictum.com> writes:
+
+Dear All,
+
+finally after digging around i found the solution to "alsa-plugin (sco) not
+working with 2.6.18-mh>4 kernels ... ("Operation still in progress" ... 
+opening L2CAP/RFCOMM sockets)
+
+after modifying freshly checkedout btsco sources NOW SCO-ALSASOUND
+(plugin-method) WORKS (testet with 2.6.18-mh7-sco AND 2.6.18-mh4-fch ... 
+but still not chop free :( ) 
+
+hint : fabien chevalier forgot to take care of EINPROGRESS 
+(in addition to EAGAIN) in his headsetd sources ... 
+still to check : his pcm_sco.c ... 
+and why the timeout parameter has NO effect ...
+
+forget about my previous posting (as no one seems to be interested anyway) 
+
+regards,
 Chafik
 
-> finally after digging around i found the solution to "alsa-plugin (sco) not
-> working with 2.6.18-mh>4 kernels ... ("Operation still in progress" ... 
-> opening L2CAP/RFCOMM sockets)
-> 
-> after modifying freshly checkedout btsco sources NOW SCO-ALSASOUND
-> (plugin-method) WORKS (testet with 2.6.18-mh7-sco AND 2.6.18-mh4-fch ... 
-> but still not chop free :( ) 
 
-Can you show us what you had to change? What hardware are you using? Are 
-you using other devices that might create a scatternet?
-
-> hint : fabien chevalier forgot to take care of EINPROGRESS 
-> (in addition to EAGAIN) in his headsetd sources ... 
-> still to check : his pcm_sco.c ... 
-> and why the timeout parameter has NO effect ...
-
-which timeout are you looking at? for the initial connection?
-
-> forget about my previous posting (as no one seems to be interested anyway) 
-
-There's a lot to do in addition to helping people use what's there... 
-finish off the old btsco, redesign and docs, combining the a2dpd and 
-headsetd daemons, wiring up dbus. I definitely appreciate what you have 
-done to hunt things down.
-
-Brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
