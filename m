@@ -1,17 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <26981448.1162976792787.OPEN-XCHANGE.WebMail.www@kalender.consol.de>
-Date: Wed, 8 Nov 2006 10:06:32 +0100 (CET)
-From: Peter Weiss <Peter.Weiss@consol.de>
-To: Stefan Seyfried <seife@suse.de>
-In-Reply-To: <20061107105836.GK11347@suse.de>
+Date: Wed, 8 Nov 2006 08:45:57 +0100
+From: Stefan Seyfried <seife@suse.de>
+To: systemparadox@gmail.com, BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20061108074557.GF12136@suse.de>
+References: <4550A095.6060000@gmx.de> <20061107155257.GB22290@suse.de>
+	<4550BC83.6070607@gmail.com>
 MIME-Version: 1.0
-References: <11418107.1162886121971.OPEN-XCHANGE.WebMail.www@kalender.consol.de>
-	<20061107105836.GK11347@suse.de>
-Cc: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] How to identify Bluetooth hardware on Acer
-	notebook
-Reply-To: Peter.Weiss@consol.de,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4550BC83.6070607@gmail.com>
+Subject: Re: [Bluez-users] usb-device cannot be found by other
+	bluetooth	devices
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -20,48 +18,52 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-bSBEaSAwNy4xMS4yMDA2IDExOjU4IHNjaHJpZWIgU3RlZmFuIFNleWZyaWVkIDxzZWlmZUBzdXNl
-LmRlPjoKCj4gT24gVHVlLCBOb3YgMDcsIDIwMDYgYXQgMDg6NTU6MjFBTSArMDEwMCwgUGV0ZXIg
-V2Vpc3Mgd3JvdGU6Cj4gPiBIZWxsbywKPiA+IAo+ID4gSSBkb24ndCBrbm93IGhvdyB0byBzZXR1
-cCBteSBibHVldG9vdGggaW50ZXJmYWNlIG9uIG15IEFjZXIgTm90ZWJvb2sKPiA+IChhIGJ1aWx0
-IGluIG9uZSk6Cj4gPiAKPiA+IFJlYWRpbmcgdGhlIGRvY3MgSSB0aGluayBpdCdzIGNvbm5lY3Rl
-ZCB0byB0aGUgc2VyaWFsIHBvcnQ6Cj4gCj4gSSBkb24ndCB0aGluayBzby4KPiAgCj4gPiAjIGRt
-ZXNnIHwgZ3JlcCBzZXJpYWwKPiA+IHNlcmlhbDgyNTA6IHR0eVMxIGF0IEkvTyAweDJmOCAoaXJx
-ID0gMykgaXMgYSAxNjU1MEEKPiA+ICMgc2V0c2VyaWFsIC1nIC9kZXYvdHR5UzEgICAgICAgIAo+
-ID4gL2Rldi90dHlTMSwgVUFSVDogMTY1NTBBLCBQb3J0OiAweDAyZjgsIElSUTogMwo+ID4gCj4g
-PiBUaGUgYmx1ZXRvb3RoIG1vZHVsZSBpcyBsb2FkZWQ6Cj4gCj4gWy4uLl0KPiAKPiA+IEkgdGhp
-bmsgdGhhdCdzIGJlY2F1c2UgdGhlIGludGVybmFsIG1vZGVtIGlzIGNvbm5lY3RlZCB0byB0dHlT
-MS4KPiAKPiBJIGFsc28gZG9uJ3QgdGhpbmsgc28sIGJ1dCB0aGF0J3MgYSBkaWZmZXJlbnQgdGhp
-bmcgOi0pCj4gCj4gPiBTbywgaG93IGRvIEkgZ2V0IGFjY2VzcyB0byB0aGUgYmx1ZXRvb3RoIGNv
-bnRyb2xsZXI/Cj4gCj4gcHJvYmFibHkgYnkgIm1vZHByb2JlIGhjaV91c2IiCj4gCj4gPiBIb3cg
-Y2FuIEkgaWRlbnRpZnkgdGhlIGJsdWV0b290aCBoYXJkd2FyZT8KPiAKPiBwcm9iYWJseSB3aXRo
-ICJsc3VzYiIKPiAKPiBJIGhhdmUgbm90IHNlZW4gYSBidWlsdC1pbiBCVCBkZXZpY2UgdGhhdCB3
-YXMgbm90IFVTQiBmb3IgYSBsb25nIHRpbWUuCj4gTWF5YmUgeW91IG5lZWQgdG8gc3dpdGNoIGl0
-IG9uIHdpdGggc29tZSBob3RrZXkgZmlyc3Qgb3IgdXNlIHRoZQo+IGFjZXJoawo+IHBhY2thZ2Uu
-Cj4gWy4uLl0KClRoaXMgaXMgd2h5IEkgdGhvdWdoIGl0J3MgY29ubmVjdGVkIHRvIHRoZSBzZXJp
-YWwgcG9ydCBiZWNhdXNlIGxzdXNiIGRpZApub3QgbGlzdCBhbnkgYmx1ZXRvb3RoIGFkYXB0ZXIu
-CgpUaGUgbm90ZWJvb2sgaGFzIHR3byBsZWRzIGZvciBibHVldG9vdGggYW5kIHdsYW4uIEkgZ290
-IHRoZSB3bGFuIGxlZAp3b3JraW5nCmJ1dCB0aGUgYmx1ZXRvb3RoIGRvZXMgbm90IGl0IGRvZXNu
-J3QgbGlnaHQgdXAgYW5kIGxzdXNiIGFsbHdheXMgc2hvd3MKdGhlIG9ubHkKZGV2aWNlIGNvbm5l
-Y3RlZCBpcyBteSBVU0IgbW91c2UuIEV2ZW4gImVjaG8gb24KPi9wcm9jL2RyaXZlci9hY2VyaGsv
-Ymx1ZWxlZCIKZG9lcyBub3RoaW5nLgoKSXMgdGhlcmUgYSB3YXkgdG8gZm9yY2UgZW5hYmxlIHRo
-ZSBibHVldG9vdGggZGV2aWNlIHdpdGggc29tZXRoaW5nCmVsc2UgdGhhbiB0aGUgaG90a2V5cz8K
-ClBldGVyCgoKLS0gClBldGVyLldlaXNzQGNvbnNvbC5kZSAgICAgICAgICAgICAgICAgICAgICAg
-ICBDb25Tb2wqIFNvZnR3YXJlIEdtYkgKUGhvbmUgICs0OSA4OSA0NTg0MS0xMDAgICAgICAgICAg
-ICAgICAgICAgICAgIENvbnN1bHRpbmcgJiBTb2x1dGlvbnMKTW9iaWxlICs0OSAxNzcgNjA0MDEy
-MSAgICAgICAgICAgICAgICAgICAgICAgIEZyYW56aXNrYW5lcnN0ci4gMzgKaHR0cDovL3d3dy5j
-b25zb2wuZGUgICAgICAgICAgICAgICAgICAgICAgICAgIEQtODE2NjkgTcO8bmNoZW4KCQoKCi0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0KVXNpbmcgVG9tY2F0IGJ1dCBuZWVkIHRvIGRvIG1vcmU/IE5lZWQgdG8g
-c3VwcG9ydCB3ZWIgc2VydmljZXMsIHNlY3VyaXR5PwpHZXQgc3R1ZmYgZG9uZSBxdWlja2x5IHdp
-dGggcHJlLWludGVncmF0ZWQgdGVjaG5vbG9neSB0byBtYWtlIHlvdXIgam9iIGVhc2llcgpEb3du
-bG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2LjEuMC4xIGJhc2VkIG9uIEFw
-YWNoZSBHZXJvbmltbwpodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5uZXQvc2VsP2NtZD1sbmsma2lk
-PTEyMDcwOSZiaWQ9MjYzMDU3JmRhdD0xMjE2NDIKX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX18KQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0CkJsdWV6LXVzZXJz
-QGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0
-cy9saXN0aW5mby9ibHVlei11c2Vycwo=
+On Tue, Nov 07, 2006 at 05:04:03PM +0000, Simon Williams wrote:
+> Stefan Seyfried wrote:
+
+> > use "apitest" to set the DiscoverableTimeout to 0:
+> > =
+
+> >     apitest SetDiscoverableTimeout 0
+> > =
+
+> > then set your device to discoverable:
+> > =
+
+> >     apitest SetMode discoverable
+> > =
+
+> > verify your settings with
+> > =
+
+> >     apitest IsDiscoverable
+> >     apitest GetMode
+> >     apitest GetDiscoverableTimeout
+> > =
+
+> =
+
+> Alternatively, make sure that hscan and pscan are enabled for that device.
+
+IIRC this will still be disabled after DiscoverableTimeout seconds.
+-- =
+
+Stefan Seyfried                  \ "I didn't want to write for pay. I
+QA / R&D Team Mobile Devices      \ wanted to be paid for what I write."
+SUSE LINUX Products GmbH, N=FCrnberg \                    -- Leonard Cohen
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
