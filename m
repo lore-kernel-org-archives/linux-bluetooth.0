@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <101bcd760611080146ie8fd149h4240e8ff876cad8a@mail.gmail.com>
-Date: Wed, 8 Nov 2006 10:46:37 +0100
-From: "Hakan Lager" <digiloo@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4551A608.2030806@evision.de>
+Date: Wed, 08 Nov 2006 10:40:24 +0100
+From: Tobias Wolf <tobias.wolf@evision.de>
 MIME-Version: 1.0
-Subject: [Bluez-users] Problem with 2nd second dongle
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <45504DFF.1000101@evision.de> <45512CE3.9030305@xmission.com>
+In-Reply-To: <45512CE3.9030305@xmission.com>
+Subject: Re: [Bluez-users] 2-way audio for telephony
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,76 +16,43 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1616329631=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1616329631==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_19717_23554397.1162979197690"
+Hello Brad,
 
-------=_Part_19717_23554397.1162979197690
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Brad Midgley schrieb:
+> Tobias
+> 
 
-Hi,
+>>
+>> Any input will be greatly appreciated ...
+> 
+> You have to just set the alsa device to
+>  headset
+> manually, ie it won't appear in a dropdown. Some apps won't let you type
+> in the name of the device and they don't use the extended api for
+> listing output plugins. That would be a bug in the app.
+> 
 
-I'm facing the following problem on a TS-7200 board. The board is equipped
-with the standard TS-linux (debian)  release
-and by loading the proper modules I'm able to use a single bluetooth dongle.
+Thanks, for your answer. I really never thougt of typing the device name
+myself because there was a drop down box. Silly me ;) But i have just
+tried it out with xmms and it worked with headsetd.
 
-But when I plug another dongle into the 2nd USB port I'm unable to make it
-work.
+So, now i have to search for an SIP-Client that uses ALSA and let me
+type in the device name.
 
-The only way to bring it up is to make
+Have a nice day
 
-hciconfig hci0 down
-and then
-hciconfig hci1 up
-and then it works.
-
-But I'm only able to operate a single BT dongle at a time. On my
-development machine (redhat) everything works fine.
-
-Anyone facing the same problem?
-
-/ Hakan
-
-------=_Part_19717_23554397.1162979197690
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>Hi,<br><br>I'm facing the following problem on a TS-7200 board. The board is equipped with the standard TS-linux (debian) &nbsp;release </div>
-<div>and by loading the proper modules I'm able to use a single bluetooth dongle.<br><br>But when I plug another dongle into the 2nd USB port I'm unable to make it work.<br>&nbsp;</div>
-<div>The only way to bring it up is to make<br><br>hciconfig hci0 down<br>and then<br>hciconfig hci1 up<br>and then it works.<br>&nbsp;</div>
-<div>But I'm only able to operate a single BT dongle at a time. On my<br>development machine (redhat) everything works fine.<br><br>Anyone facing the same problem?<br>&nbsp;</div>
-<div>/ Hakan</div>
-
-------=_Part_19717_23554397.1162979197690--
-
-
---===============1616329631==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Tobias
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============1616329631==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1616329631==--
