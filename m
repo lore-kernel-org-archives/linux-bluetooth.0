@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Reiner Klenk <pdq808@t-online.de>
+Message-ID: <45536B18.1020803@free.fr>
+Date: Thu, 09 Nov 2006 18:53:28 +0100
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20061109104245.GB7085@physik.fu-berlin.de>
-References: <200611091102.54282.marcel@hilzinger.hu>
-	<20061109104245.GB7085@physik.fu-berlin.de>
-Date: Thu, 09 Nov 2006 11:07:33 +0100
-Message-Id: <1163066853.5983.24.camel@grappa>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Quality of a2dp sound
+References: <454B37A5.5000307@evision.de> <454B389A.6050103@evision.de>
+In-Reply-To: <454B389A.6050103@evision.de>
+Subject: Re: [Bluez-devel] Bluetooth-Alsa: headsetd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,26 +20,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-I'm also using a BT620s and I find the sound quality acceptable using
-the a2dp plugin. I also tested with a2dpd and there wasn't any
-difference in sound quality that I could perceive. However, with a2dp,
-which I'm using with amarok I can actually play mono/stereo sources with
-different sample rates without getting the pitch problem (Frederic has
-submitted patches for a2dpd recently but I haven't tested them yet). I'm
-using a 100 mW dongle and there are no drop-outs within my (not too big)
-appartment. It seems to be fairly stable, I have used the headset for
-hours without a glitch.
-What I did notice is that the volume could be higher and there is the
-occasional faint clicking which might be due to clipping. As far as I
-understood these are known issues inside the sbc encoding library.
-Of course, headsets like the BT620s can be connected via SCO as well as
-a2dp. Use SCO to hook it up to your phone or to egika, but definitly use
-a2dp for the connection to amarok or other music/podcast players.
+Tobias,
 
-Regards,
-Reiner   
+I'm gonna soon send a new release of the plugin, the daemon, and the 
+kernel patch to the list, you might wanna give it a try.
 
+Cheers,
+
+Fabien
+
+
+
+Tobias Wolf wrote:
+> Sorry, forgot to tell some detail.
+> 
+> Naturally i have the headset paired with the dongle and headsetd is
+> executed ;S
+> 
+> Sorry for not mentioning it in the first mail,
+> 
+> Tobias Wolf
+> 
+> 
+> -------------------------------------------------------------------------
+> Using Tomcat but need to do more? Need to support web services, security?
+> Get stuff done quickly with pre-integrated technology to make your job easier
+> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
+> 
 
 
 -------------------------------------------------------------------------
