@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: dleo <daveleo@gmail.com>
-Date: Thu, 9 Nov 2006 21:06:11 +0000 (UTC)
-Message-ID: <loom.20061109T215930-294@post.gmane.org>
-References: <29615869.1163062848458.JavaMail.ngmail@webmail17>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Bluetooth ALSA: a2play plays MP3s too fast
+Message-ID: <45539A26.5080404@free.fr>
+Date: Thu, 09 Nov 2006 22:14:14 +0100
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <4552C81E.6020401@xmission.com>
+In-Reply-To: <4552C81E.6020401@xmission.com>
+Subject: Re: [Bluez-devel] work-in-progress bluetooth audio architecture
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,27 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I am having similar issue using alsa with 
-a2dpd and xmms
+> Hey
+> 
+> I put my notes together and added a few things we had forgotten to 
+> cover. Definitely a work in progress but ready for some comments...
+> 
+Brad, you shouldn't tempt me like that ;-)
 
-xmms plays the MP3 at about 5x regular speed, 
-I get the audio but its just too fast.
+So here is my first comment on this beautiful picture. :-)
+For now i see no reason to merge sco and a2dp daemons into a single 
+entity (however i have a set of reasons *not to merge them* :-) , but 
+i'll tell them later).
 
-I havent' tried a2play  but I am getting 
-similar issue with a2dpd.
+So what are the pros for this merge ?
 
-Anyone have any Ideas?
+Cheers,
 
-
-I am using Dell Inspiron 6000 running Fedora Core 6
-kernel 2.6.18-1.2798.fc6 
-
-
-I followed instructions from 
-https://help.ubuntu.com/community/BluetoothAudio
-
-Any help would be useful
-
+Fabien
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
