@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Hilzinger <marcel@hilzinger.hu>
+Message-ID: <29615869.1163062848458.JavaMail.ngmail@webmail17>
+Date: Thu, 9 Nov 2006 10:00:48 +0100 (CET)
+From: adi007@germanynet.de
 To: bluez-devel@lists.sourceforge.net
-Date: Thu, 9 Nov 2006 11:02:53 +0100
 MIME-Version: 1.0
-Message-Id: <200611091102.54282.marcel@hilzinger.hu>
-Subject: [Bluez-devel] Quality of a2dp sound
+Subject: [Bluez-devel] Bluetooth ALSA: a2play plays MP3s too fast
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,29 +14,58 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGksCgpJIG1hZGUgc29tZSB0ZXN0cyB3aXRoIGJsdWV0b290aCBzdGVyZW8gaGVhZHNldHMgYW5k
-IGEyZHBkLiAKSSBtdXN0IGNvbmZlc3MsIEknbSBpbXByZXNzZWQgYnkgdGhlIGVhc3kgdXNlIG9m
-IGEyZHBkISBUaGFua3MsIGl0J3MganVzdCAKZ3JlYXQuIAoKQnV0IEknbSBub3QgaW1wcmVzc2Vk
-IGJ5IHRoZSBhdWRpbyBxdWFsaXR5LiBJdHMgcXVpdGUgbm9pc3kgYW5kIGZhciBhd2F5IGZyb20g
-CnRoZSBxdWFsaXR5IG9mIG5vcm1hbCB3aXJlbGVzcyBoZWFkcGhvbmVzLiBIZWFkc2V0IHdhcyBh
-IEphYnJhIEJUNjIwcy4gSSAKdHJpZWQgd2l0aCBkaWZmZXJlbnQgZG9uZ2xlcywgYnV0IHRoZSBk
-b25nbGUgc2VlbXMgdG8gbWFrZSBubyBkaWZmZXJlbmNlLgoKUXVlc3Rpb25zOiAKaXMgdGhpcyBh
-IHByb2JsZW0gb2YgdGhlIHRlY2hub2xvZ3k/CmlzIGl0IGEgcHJvYmxlbSBvZiBibHVlej8KZGlk
-IEkgc29tZXRoaW5nIHdyb25nPwoKZGlkIGFueWJvZHkgY29tcGFyZSB0aGUgcXVhbGl0eSBvbiBX
-aW5kb3dzPyBJIHRyaWVkIHRvIGNvbXBhcmUgd2l0aCBNYWMuIEJ1dCAKYXMgTWFjIE9TIFggY2Fu
-bm90IGRvIGEyZHBkLCBpdCdzIGV2ZW4gd29yc2Ugb24gTWFjLgoKUmVnYXJkcywKLS0gCsOcZHbD
-tnpsZXR0ZWwgLS0gTWl0IGZyZXVuZGxpY2hlbiBHcsO8c3NlbiwKTWFyY2VsIEhpbHppbmdlcgoK
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLQpVc2luZyBUb21jYXQgYnV0IG5lZWQgdG8gZG8gbW9yZT8gTmVlZCB0
-byBzdXBwb3J0IHdlYiBzZXJ2aWNlcywgc2VjdXJpdHk/CkdldCBzdHVmZiBkb25lIHF1aWNrbHkg
-d2l0aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRvIG1ha2UgeW91ciBqb2IgZWFzaWVyCkRv
-d25sb2FkIElCTSBXZWJTcGhlcmUgQXBwbGljYXRpb24gU2VydmVyIHYuMS4wLjEgYmFzZWQgb24g
-QXBhY2hlIEdlcm9uaW1vCmh0dHA6Ly9zZWwuYXMtdXMuZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZr
-aWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0PTEyMTY0MgpfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2
-ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xp
-c3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
+Hi fellows,
+
+after figuring out, how to set the passkey-agent for the HCI-daemon
+I finally was able to connect my new SONY VGP-BRM1D bluetooth audio
+headset with my Linux box and stream audio playback of mpg123 to
+the headset with a2play. Here's what I did in short:
+
+1. find headset with "hcitool scan"
+2. set passkey for headset with "passkey-agent 0000 <address>"
+3. connect to headset with "btsco -v -r <address>"
+4. stream audio with "mpg123 --au - file.mp3 | a2play <address>"
+
+The sound quality is just find with 44,1kHz, Stereo. But the playback
+of the MP3 is just a bit too fast (high pitched) and varies with
+CPU-load, i.e. getting the computer busy makes the music slow down.
+
+I tried the various options for a2play regarding the timing stuff
+(-i, -n, -p), but none helped. I also changed the value for "TICKS"
+in the a2play-source (a2play.c).
+
+
+Here my specs:
+
+Kernel: Linux 2.6.19-rc5 (also 2.6.17.9)
+Computer: IBM Thinkpad 240X, PIII-500, 192MB RAM
+BT-Dongle: Acer Bluetooth USB
+Headset: SONY VGP-BRM1D (http://www.jp.sonystyle.com/Qnavi/Detail/VGP-BRM1D=
+.html).
+
+Best Regards,
+
+Adrian Glaubitz
+
+
+Viel oder wenig? Schnell oder langsam? Unbegrenzt surfen + telefonieren
+ohne Zeit- und Volumenbegrenzung? DAS TOP ANGEBOT JETZT bei Arcor: g=FCnstig
+und schnell mit DSL - das All-Inclusive-Paket f=FCr clevere Doppel-Sparer,
+nur  44,85 =80  inkl. DSL- und ISDN-Grundgeb=FChr!
+http://www.arcor.de/rd/emf-dsl-2
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
