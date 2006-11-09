@@ -1,9 +1,9 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <29615869.1163062848458.JavaMail.ngmail@webmail17>
-Date: Thu, 9 Nov 2006 10:00:48 +0100 (CET)
-From: adi007@germanynet.de
+Date: Thu, 9 Nov 2006 09:58:41 +0100
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
+Message-ID: <20061109085841.GA11764@physik.fu-berlin.de>
+Mime-Version: 1.0
+From: Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 Subject: [Bluez-devel] Bluetooth ALSA: a2play plays MP3s too fast
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -14,7 +14,7 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
@@ -44,27 +44,17 @@ Here my specs:
 Kernel: Linux 2.6.19-rc5 (also 2.6.17.9)
 Computer: IBM Thinkpad 240X, PIII-500, 192MB RAM
 BT-Dongle: Acer Bluetooth USB
-Headset: SONY VGP-BRM1D (http://www.jp.sonystyle.com/Qnavi/Detail/VGP-BRM1D=
-.html).
+Headset: SONY VGP-BRM1D (http://www.jp.sonystyle.com/Qnavi/Detail/VGP-BRM1D.html).
 
 Best Regards,
 
 Adrian Glaubitz
 
-
-Viel oder wenig? Schnell oder langsam? Unbegrenzt surfen + telefonieren
-ohne Zeit- und Volumenbegrenzung? DAS TOP ANGEBOT JETZT bei Arcor: g=FCnstig
-und schnell mit DSL - das All-Inclusive-Paket f=FCr clevere Doppel-Sparer,
-nur  44,85 =80  inkl. DSL- und ISDN-Grundgeb=FChr!
-http://www.arcor.de/rd/emf-dsl-2
-
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
