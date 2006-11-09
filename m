@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Hilzinger <marcel@hilzinger.hu>
+From: Reiner Klenk <pdq808@t-online.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Thu, 9 Nov 2006 19:35:43 +0100
-References: <454B37A5.5000307@evision.de>
-In-Reply-To: <454B37A5.5000307@evision.de>
-MIME-Version: 1.0
-Message-Id: <200611091935.43285.marcel@hilzinger.hu>
-Subject: Re: [Bluez-devel] Bluetooth-Alsa: headsetd
+In-Reply-To: <20061109104245.GB7085@physik.fu-berlin.de>
+References: <200611091102.54282.marcel@hilzinger.hu>
+	<20061109104245.GB7085@physik.fu-berlin.de>
+Date: Thu, 09 Nov 2006 11:07:33 +0100
+Message-Id: <1163066853.5983.24.camel@grappa>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Quality of a2dp sound
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,32 +17,37 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Am Freitag, 3. November 2006 13:35 schrieb Tobias Wolf:
-> Hello,
-[...]
-> 3) Now, the instructions tell me to change the device of, eg xmms to
-> headset, but the device never shows up (even after an reboot). =
+Hi,
+I'm also using a BT620s and I find the sound quality acceptable using
+the a2dp plugin. I also tested with a2dpd and there wasn't any
+difference in sound quality that I could perceive. However, with a2dp,
+which I'm using with amarok I can actually play mono/stereo sources with
+different sample rates without getting the pitch problem (Frederic has
+submitted patches for a2dpd recently but I haven't tested them yet). I'm
+using a 100 mW dongle and there are no drop-outs within my (not too big)
+appartment. It seems to be fairly stable, I have used the headset for
+hours without a glitch.
+What I did notice is that the volume could be higher and there is the
+occasional faint clicking which might be due to clipping. As far as I
+understood these are known issues inside the sbc encoding library.
+Of course, headsets like the BT620s can be connected via SCO as well as
+a2dp. Use SCO to hook it up to your phone or to egika, but definitly use
+a2dp for the connection to amarok or other music/podcast players.
+
+Regards,
+Reiner   
 
 
-You cannot choose it from a list. Just type a2dpd manually. It rocks :-)
-
-
--- =
-
-=DCdv=F6zlettel -- Mit freundlichen Gr=FCssen,
-Marcel Hilzinger
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
