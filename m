@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4553E166.2020503@xmission.com>
-Date: Thu, 09 Nov 2006 19:18:14 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <4552C81E.6020401@xmission.com> <45539A26.5080404@free.fr>
-In-Reply-To: <45539A26.5080404@free.fr>
-Subject: Re: [Bluez-devel] work-in-progress bluetooth audio architecture
+To: bluez-devel@lists.sourceforge.net
+From: dleo <daveleo@gmail.com>
+Date: Thu, 9 Nov 2006 21:06:11 +0000 (UTC)
+Message-ID: <loom.20061109T215930-294@post.gmane.org>
+References: <29615869.1163062848458.JavaMail.ngmail@webmail17>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Bluetooth ALSA: a2play plays MP3s too fast
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,35 +19,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fabien
+I am having similar issue using alsa with 
+a2dpd and xmms
 
-> For now i see no reason to merge sco and a2dp daemons into a single
-> entity (however i have a set of reasons *not to merge them* :-)
+xmms plays the MP3 at about 5x regular speed, 
+I get the audio but its just too fast.
 
-This is what we came up when brainstorming with a group including Marcel
-and Nokia developers a couple of weeks ago in Helsinki. We didn't turn
-over every use case but it felt like a good approach. The next stage is
-to elaborate use cases.
+I havent' tried a2play  but I am getting 
+similar issue with a2dpd.
 
-The idea is that the application should just open a default audio device
-and the routing smarts are handled by the audio plugin (alsa/gst) in
-combination with the daemon. You could just as easily have asked why the
-wired audio should be involved, but it's the same argument. The user
-should never have to open up preferences and change the audio device
-setting in an audio client.
+Anyone have any Ideas?
 
-We should be able to tell the difference between an open that needs to
-read and write audio (typically for sco) from an open that only writes
-(typically for a2dp). If not, we can file a bug. Similar to apps that
-won't let the user choose the headset alsa device--it's a bug in the app.
 
-The gui that communicates over dbus will take care of initiating
-connect/disconnect and advanced routing, such as enabling both a2dp and
-wired output simultaneously.
+I am using Dell Inspiron 6000 running Fedora Core 6
+kernel 2.6.18-1.2798.fc6 
 
-Which cases are you worried will be trouble?
 
-Brad
+I followed instructions from 
+https://help.ubuntu.com/community/BluetoothAudio
+
+Any help would be useful
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
