@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 10 Nov 2006 14:50:38 +0100
+Message-ID: <45548385.9010102@palmsource.com>
+Date: Fri, 10 Nov 2006 14:49:57 +0100
+From: =?ISO-8859-15?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20061110135038.GA25972@physik.fu-berlin.de>
-References: <200611091102.54282.marcel@hilzinger.hu>
-	<20061109104245.GB7085@physik.fu-berlin.de>
-	<7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EA2@eumonex01.palmsource.com>
-Mime-Version: 1.0
-In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EA2@eumonex01.palmsource.com>
-From: Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Subject: Re: [Bluez-devel] RE :  Quality of a2dp sound
+References: <4550B23D.8090706@palmsource.com>
+	<4551ABFD.2080909@palmsource.com>	<200611101418.50750.mhilzinger@linuxnewmedia.de>
+	<200611101434.15802.mhilzinger@linuxnewmedia.de>
+In-Reply-To: <200611101434.15802.mhilzinger@linuxnewmedia.de>
+Subject: Re: [Bluez-devel] [patch]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,44 +18,64 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-15"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello Frederic,
+Marcel Hilzinger a =E9crit :
+> Am Freitag, 10. November 2006 14:18 schrieb Marcel Hilzinger:
+>   =
 
-> I've been using a2dpd for days with xmms.
-> I've pretty good quality and the latest patch make it possible to select encoding parameter so sound is better.
-> There is still some gain loss but it is enough to make you deaf.
+>> Am Mittwoch, 8. November 2006 11:05 schrieb Fr=E9d=E9ric DALLEAU:
+>>     =
 
-Maybe I should go for the latest patches then, too. Though I think my
-version (30 Oct) is quite recent.
+>>> Sorry Brad,
+>>> This is far more useful than whitespaces :D
+>>> Fred
+>>>       =
 
-> 
-> > the quality is set to telephone quality only (8kHz, Mono) though my headset can do up to
-> > 44,1kHz Stereo (SONY VGP-BRM1D) and a2dpd even displays 44,1kHz. 
-> 8khz is when you use heasetd and sco, isn't it?
-> a2dpd will be 44,1 khz but you may have choppy sound.
+>> Hi Fr=E9d=E9ric,
+>>
+>> I applied your patch on the cvs-code from today and now I get these erro=
+rs
+>> randomly:
+>>
+>> Nov 10 14:15:55 kim kernel: l2cap_recv_acldata: Unexpected continuation
+>> frame (len 0)
+>> Nov 10 14:15:55 kim kernel: l2cap_recv_acldata: Unexpected continuation
+>> frame (len 0)
+>> Nov 10 14:15:55 kim kernel: l2cap_recv_acldata: Unexpected continuation
+>> frame (len 0)
+>> Nov 10 14:15:56 kim kernel: l2cap_recv_acldata: Unexpected continuation
+>> frame (len 0)
+>>
+>> the error means, that for 1-2 seconds there is no sound.
+>>
+>>
+>> Any idea, if it's due to the patch or just "par hazard"?
+>>     =
 
-I have 8kHz and choppy sound :(. But as I said before, sound is almost
-perfect with "a2play" except for some noise and the speed-problems.
+>
+> OK. It was me: I removed sbcbitpool=3D64 from .a2dpdrc. =
 
-> 
-> > Also the sound is chopped very often with a2dpd, so this is no use for me
-> at the moment :(.
-> Which player are you using? I have to agree that some player are giving us trouble, but I had success with xmms,vlc and mpg321.
+>
+> Now I put it back and the underruns are gone.
+>
+>   =
 
-I tried "xmms" (latest Debian ETCH) for a2dpd and mpg123 for a2play.
+This line is commented in the default file so it should not be the case. =
 
-Greetings,
+Does it work with 32.
+Can you send me the faulty .a2dprc?
 
-Adrian
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
