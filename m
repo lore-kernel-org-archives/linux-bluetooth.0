@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Hilzinger <mhilzinger@linuxnewmedia.de>
+From: Marcel Hilzinger <marcel@hilzinger.hu>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Fri, 10 Nov 2006 11:17:30 +0100
+Date: Fri, 10 Nov 2006 11:06:38 +0100
 References: <200611091102.54282.marcel@hilzinger.hu>
 	<200611100901.16410.mhilzinger@linuxnewmedia.de>
 	<7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EA3@eumonex01.palmsource.com>
 In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EA3@eumonex01.palmsource.com>
 MIME-Version: 1.0
-Message-Id: <200611101117.30944.mhilzinger@linuxnewmedia.de>
+Message-Id: <200611101106.38881.marcel@hilzinger.hu>
 Subject: Re: [Bluez-devel] RE :  Quality of a2dp sound
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -29,22 +29,32 @@ Am Freitag, 10. November 2006 09:41 schrieb Frederic Dalleau:
 an
 > > hear it. With a2play there is no noise. I will checkout cvs again and
 > > have a look.
-One more (maybe last :-) feedback
+>
+> I believe this comes from a difference in the sbc encoder (floating vs
+> fixed). If you have the latest patch, I would first suggest you increase
+> sbcbitpool=3D64 in .a2dprc. If it doesn't work, then the dirty way is to =
+swap
+> all files from sbc/lib with the corresponding in btsco/sbc and then rebui=
+ld
+> sbc library and reinstall of course.
+I forgot to mention that I use xmms and amarok for the tests.
 
-With amarok and a2dpd I can only use the Jabra headset. The Logitech one su=
-cks =
+Important: the noise seems to depend on the soundfile. With some files (mos=
+tly =
 
-(plays the songs at least twice as fast as wanted).
+crappy MP3) the noise difference between bluetooth and conventional wireles=
+s =
 
+is quite big. With other files (flac and high quality OGG), there is almost =
 
-Mit freundlichen Gr=FC=DFen,
+no noise difference.
+
+Maybe that's all irrelevant, but theese are my observations.
+
+-- =
+
+=DCdv=F6zlettel -- Mit freundlichen Gr=FCssen,
 Marcel Hilzinger
-
-Linux New Media AG
-S=FCskindstr. 4
-D-81929 M=FCnchen
-Tel: +49 (89) 99 34 11 0
-Fax: +49 (89) 99 34 11 99
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
