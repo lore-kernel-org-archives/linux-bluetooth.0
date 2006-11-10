@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45548385.9010102@palmsource.com>
-Date: Fri, 10 Nov 2006 14:49:57 +0100
-From: =?ISO-8859-15?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
-MIME-Version: 1.0
+From: Marcel Hilzinger <mhilzinger@linuxnewmedia.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <4550B23D.8090706@palmsource.com>
-	<4551ABFD.2080909@palmsource.com>	<200611101418.50750.mhilzinger@linuxnewmedia.de>
-	<200611101434.15802.mhilzinger@linuxnewmedia.de>
-In-Reply-To: <200611101434.15802.mhilzinger@linuxnewmedia.de>
+Date: Fri, 10 Nov 2006 14:34:15 +0100
+References: <4550B23D.8090706@palmsource.com> <4551ABFD.2080909@palmsource.com>
+	<200611101418.50750.mhilzinger@linuxnewmedia.de>
+In-Reply-To: <200611101418.50750.mhilzinger@linuxnewmedia.de>
+MIME-Version: 1.0
+Message-Id: <200611101434.15802.mhilzinger@linuxnewmedia.de>
 Subject: Re: [Bluez-devel] [patch]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,52 +21,46 @@ Content-Type: text/plain; charset="iso-8859-15"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Hilzinger a =E9crit :
-> Am Freitag, 10. November 2006 14:18 schrieb Marcel Hilzinger:
->   =
-
->> Am Mittwoch, 8. November 2006 11:05 schrieb Fr=E9d=E9ric DALLEAU:
->>     =
-
->>> Sorry Brad,
->>> This is far more useful than whitespaces :D
->>> Fred
->>>       =
-
->> Hi Fr=E9d=E9ric,
->>
->> I applied your patch on the cvs-code from today and now I get these erro=
-rs
->> randomly:
->>
->> Nov 10 14:15:55 kim kernel: l2cap_recv_acldata: Unexpected continuation
->> frame (len 0)
->> Nov 10 14:15:55 kim kernel: l2cap_recv_acldata: Unexpected continuation
->> frame (len 0)
->> Nov 10 14:15:55 kim kernel: l2cap_recv_acldata: Unexpected continuation
->> frame (len 0)
->> Nov 10 14:15:56 kim kernel: l2cap_recv_acldata: Unexpected continuation
->> frame (len 0)
->>
->> the error means, that for 1-2 seconds there is no sound.
->>
->>
->> Any idea, if it's due to the patch or just "par hazard"?
->>     =
-
+Am Freitag, 10. November 2006 14:18 schrieb Marcel Hilzinger:
+> Am Mittwoch, 8. November 2006 11:05 schrieb Fr=E9d=E9ric DALLEAU:
+> > Sorry Brad,
+> > This is far more useful than whitespaces :D
+> > Fred
 >
-> OK. It was me: I removed sbcbitpool=3D64 from .a2dpdrc. =
-
+> Hi Fr=E9d=E9ric,
 >
-> Now I put it back and the underruns are gone.
+> I applied your patch on the cvs-code from today and now I get these errors
+> randomly:
 >
->   =
+> Nov 10 14:15:55 kim kernel: l2cap_recv_acldata: Unexpected continuation
+> frame (len 0)
+> Nov 10 14:15:55 kim kernel: l2cap_recv_acldata: Unexpected continuation
+> frame (len 0)
+> Nov 10 14:15:55 kim kernel: l2cap_recv_acldata: Unexpected continuation
+> frame (len 0)
+> Nov 10 14:15:56 kim kernel: l2cap_recv_acldata: Unexpected continuation
+> frame (len 0)
+>
+> the error means, that for 1-2 seconds there is no sound.
+>
+>
+> Any idea, if it's due to the patch or just "par hazard"?
 
-This line is commented in the default file so it should not be the case. =
+OK. It was me: I removed sbcbitpool=3D64 from .a2dpdrc. =
 
-Does it work with 32.
-Can you send me the faulty .a2dprc?
 
+Now I put it back and the underruns are gone.
+
+-- =
+
+Mit freundlichen Gr=FC=DFen,
+Marcel Hilzinger
+
+Linux New Media AG
+S=FCskindstr. 4
+D-81929 M=FCnchen
+Tel: +49 (89) 99 34 11 0
+Fax: +49 (89) 99 34 11 99
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
