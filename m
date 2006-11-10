@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45545860.2060707@free.fr>
-Date: Fri, 10 Nov 2006 11:45:52 +0100
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+From: Marcel Hilzinger <mhilzinger@linuxnewmedia.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <454B37A5.5000307@evision.de>
-	<454B389A.6050103@evision.de>	<45536B18.1020803@free.fr>
-	<455454C6.8090202@evision.de>
-In-Reply-To: <455454C6.8090202@evision.de>
-Subject: Re: [Bluez-devel] Bluetooth-Alsa: headsetd
+Date: Fri, 10 Nov 2006 11:17:30 +0100
+References: <200611091102.54282.marcel@hilzinger.hu>
+	<200611100901.16410.mhilzinger@linuxnewmedia.de>
+	<7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EA3@eumonex01.palmsource.com>
+In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EA3@eumonex01.palmsource.com>
+MIME-Version: 1.0
+Message-Id: <200611101117.30944.mhilzinger@linuxnewmedia.de>
+Subject: Re: [Bluez-devel] RE :  Quality of a2dp sound
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,44 +18,41 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-15"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Tobias,
+Am Freitag, 10. November 2006 09:41 schrieb Frederic Dalleau:
+> Hi,
+>
+> > a2dpd produces some noise in the background. If there is silence, you c=
+an
+> > hear it. With a2play there is no noise. I will checkout cvs again and
+> > have a look.
+One more (maybe last :-) feedback
 
->>
-> Thx a lot.
-> 
-> I have been experimenting a little bit in the last days. I have mangaged
-> to use the alsa-plugin with xmms and it works.
-> 
-> But my softphone (EKIGA) doesn't allow me to manually type the alsa
-> device. Maybe i have to give the EKIGA-Community a hint, maybe they
-> change this.
+With amarok and a2dpd I can only use the Jabra headset. The Logitech one su=
+cks =
 
-I wrote a patch for Ekiga, so that you are able to select the headset as 
-output device.
-It is bundled with a mail i sent to the list yesterday, which 
-unfortunately is still waiting for moderator approval, as it is a bit 
-too big ;-)
+(plays the songs at least twice as fast as wanted).
 
-> 
-> But there is a more basic problem with sound quality and i want to know
-> if anyone of the has experienced the same.
-> 
 
-Sorry i didn't experience that yet :-)
+Mit freundlichen Gr=FC=DFen,
+Marcel Hilzinger
 
-Cheers,
-
-Fabien
+Linux New Media AG
+S=FCskindstr. 4
+D-81929 M=FCnchen
+Tel: +49 (89) 99 34 11 0
+Fax: +49 (89) 99 34 11 99
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
