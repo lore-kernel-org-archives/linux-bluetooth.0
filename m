@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 10 Nov 2006 08:36:06 +0100
-From: maximilian attems <maks@sternwelten.at>
-To: Mikko Rapeli <mikko.rapeli@iki.fi>, 394742@bugs.debian.org
-Message-ID: <20061110073606.GC12966@nancy>
-References: <20061108125701.GA10813@nalle>
+Message-ID: <4553E166.2020503@xmission.com>
+Date: Thu, 09 Nov 2006 19:18:14 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-In-Reply-To: <20061108125701.GA10813@nalle>
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Bug#394742: crash logs with a kernel.org 2.6.18.2
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <4552C81E.6020401@xmission.com> <45539A26.5080404@free.fr>
+In-Reply-To: <45539A26.5080404@free.fr>
+Subject: Re: [Bluez-devel] work-in-progress bluetooth audio architecture
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,22 +20,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wed, 08 Nov 2006, Mikko Rapeli wrote:
+Fabien
 
-> Hello,
-> 
-> I can reproduce this with the latest from kernel.org too. Here are the
-> logs:
-> 
-> http://kapsi.fi/mcfrisk/temp/bt_oops.txt
-> 
-> -Mikko
+> For now i see no reason to merge sco and a2dp daemons into a single
+> entity (however i have a set of reasons *not to merge them* :-)
 
-please submit the bug in bugzilla.kernel.org,
-thanks for providing us with a pointer to it.
+This is what we came up when brainstorming with a group including Marcel
+and Nokia developers a couple of weeks ago in Helsinki. We didn't turn
+over every use case but it felt like a good approach. The next stage is
+to elaborate use cases.
 
--- 
-maks
+The idea is that the application should just open a default audio device
+and the routing smarts are handled by the audio plugin (alsa/gst) in
+combination with the daemon. You could just as easily have asked why the
+wired audio should be involved, but it's the same argument. The user
+should never have to open up preferences and change the audio device
+setting in an audio client.
+
+We should be able to tell the difference between an open that needs to
+read and write audio (typically for sco) from an open that only writes
+(typically for a2dp). If not, we can file a bug. Similar to apps that
+won't let the user choose the headset alsa device--it's a bug in the app.
+
+The gui that communicates over dbus will take care of initiating
+connect/disconnect and advanced routing, such as enabling both a2dp and
+wired output simultaneously.
+
+Which cases are you worried will be trouble?
+
+Brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
