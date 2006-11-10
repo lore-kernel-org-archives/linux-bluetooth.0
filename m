@@ -1,13 +1,22 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4554A5C4.5060708@gmail.com>
-Date: Fri, 10 Nov 2006 17:16:04 +0100
-From: Christian Mager <christian.mager@gmail.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-References: <454B3AD7.7080401@gmail.com>
-	<d7dffb480611100605k76213ee2sf5da832c3ac31d6b@mail.gmail.com>
-In-Reply-To: <d7dffb480611100605k76213ee2sf5da832c3ac31d6b@mail.gmail.com>
-Subject: Re: [Bluez-devel] bluetooth-alsa and HAMA BTH-155
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20061110081232.GA27901@localhost.localdomain>
+References: <20060817122559.GA6422@srcf.ucam.org>
+	<20060817124514.GA27427@localhost.localdomain>
+	<1155819813.18545.36.camel@cookie.hadess.net>
+	<1155839761.4075.165.camel@aeonflux.holtmann.net>
+	<44E5B2A5.1070002@palmsource.com>
+	<1155924372.4075.191.camel@aeonflux.holtmann.net>
+	<45362E18.1040909@palmsource.com>
+	<20061018140352.GA11008@localhost.localdomain>
+	<45390275.1010607@palmsource.com> <4550C24B.9080703@palmsource.com>
+	<20061110081232.GA27901@localhost.localdomain>
+Date: Fri, 10 Nov 2006 17:40:12 +0100
+Message-Id: <1163176812.4944.1.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel]
+	DBus	interface	-	determining	whether	a	device	exists
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,16 +30,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi!
+Hi Johan,
 
-VANatFortuna amarnath schrieb:
-> i am not able to solve this problem , can u help me how could you solve
-> this.
+> > Are you OK with this patch ?
+> 
+> I'm fine with it (although I don't have a good use case for it). However, 
+> it'll still need Marcel's blessing before being included.
 
-for me Reiner Klenk's tip running "xhost +" before btsco worked fine.
-After that I didn't have problems.
+looks okay to me. Except there are two or three minor whitespace issues
+in the patch. One in a function call and others for the casts. Please
+fix them and then I am okay with that patch. I would prefer that apitest
+also gets updated to use these two new methods.
 
-Greets, Chris.
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
