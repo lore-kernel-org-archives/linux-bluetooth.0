@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45578488.3080802@xmission.com>
-Date: Sun, 12 Nov 2006 13:31:04 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Hilzinger <marcel@hilzinger.hu>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <200611091102.54282.marcel@hilzinger.hu>	<200611101046.02426.mhilzinger@linuxnewmedia.de>	<1163233279.7400.58.camel@grappa>
-	<200611121938.39415.marcel@hilzinger.hu>
-In-Reply-To: <200611121938.39415.marcel@hilzinger.hu>
+Date: Sun, 12 Nov 2006 19:38:39 +0100
+References: <200611091102.54282.marcel@hilzinger.hu>
+	<200611101046.02426.mhilzinger@linuxnewmedia.de>
+	<1163233279.7400.58.camel@grappa>
+In-Reply-To: <1163233279.7400.58.camel@grappa>
+MIME-Version: 1.0
+Message-Id: <200611121938.39415.marcel@hilzinger.hu>
 Subject: Re: [Bluez-devel] RE :  Quality of a2dp sound
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -17,31 +18,68 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel
-
-> Btw. is there a possibitily to  use the micro under Linux or is a2dpd a 
-> one-way-connection?
-
-All the combo sco/a2dp headphones I've seen only use the microphone for
-plain sco--they disable the microphone when a2dp audio is streaming.
-
-The a2dp spec leaves it open for implementors to work in the mic by
-doing both a2dp source and sink, but the latency in practice for a2dp is
-around 250ms. It would be pretty awful for voip to add that in both
-directions.
-
-Brad
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+QW0gU2Ftc3RhZywgMTEuIE5vdmVtYmVyIDIwMDYgMDk6MjEgc2NocmllYiBSZWluZXIgS2xlbms6
+Cj4gTWFyY2VsLCBJIGJlbGlldmUgdGhlcmUgaXMgc3RpbGwgc29tZSBjb25mdXNpb24gb24gU0NP
+IHZzLiBhMmRwLiBUaGVzZQo+IGFyZSBkaWZmZXJlbnQgcHJvZmlsZXMgZm9yIGRpZmZlcmVudCBh
+cHBsaWNhdGlvbnMuIFNDTyBpcyBmb3Igdm9pY2UKPiBjb21tdW5pY2F0aW9uLCBhMmRwIGlzIGZv
+ciBoaWZpIHN0ZXJlby4gVGhlIGphYnJhIGRvZXMgYm90aCBwcm9maWxlcywKPiBldmVuIHNpbXVs
+dGFuZW91c2x5LiBUaGUgbG9naXRlY2ggd2l0aCB0aGUgZG9uZ2xlIF9vbmx5XyBkb2VzIGEyZHAu
+IFdpdGgKPiBidHNjbyAoYW5kIHRoZSBzbmQtYnQtc2NvIGtlcm5lbCBtb2R1bGUpIHlvdSBhcmUg
+ZXN0YWJsaXNoaW5nIGEgdHdvLXdheSwKPiBsb3cgcXVhbGl0eSBidXQgYWxzbyBsb3cgbGF0ZW5j
+eSBTQ08gY29ubmVjdGlvbi4gVGhpcyBkb2VzbnQndCB3b3JrIHdpdGgKPiB0aGUgTG9naXRlY2gg
+YmVjYXVzZSB0aGlzIGhlYWRzZXQgZG9lcyBub3Qgc3VwcG9ydCB0aGUgU0NPIHByb2ZpbGUuIEZv
+cgo+IHRoZSBzYW1lIHJlYXNvbiB5b3UgY2Fubm90IHBhaXIgaXQgd2l0aCB5b3VyIGNlbGwgcGhv
+bmUgb3Igd2l0aCB0aGUgTWFjCj4gKHRoZXkgYXJlIHVzaW5nIFNDTyB3aGljaCB0aGUgbG9naXRl
+Y2ggZG9lcyBub3Qgc3VwcG9ydCkuIE9uIHRoZSBvdGhlcgo+IGhhbmQsIHRoZSBzbWFsbCBibHVl
+dG9vdGggaGVhZHNldHMgd2hpY2ggYXJlIHNvbGQgZm9yIG1vYmlsZSBwaG9uZXMKPiBub3JtYWxs
+eSBzdXBwb3J0IF9vbmx5XyBTQ08gYnV0IG5vdCBhMmRwLgo+IFRoZSBqYWJyYSBvbiB0aGUgb3Ro
+ZXIgaGFuZCBjYW4gYmUgY29ubmVjdGVkIHRvIG9uZSBTQ08gZGV2aWNlICh5b3VyCj4gcGhvbmUs
+IHRoZSBNQUMsIHRoZSBkZXNrdG9wIHdpdGggYnRzY28pIGFuZCB0byBvbmUgYTJkcCBzb3VyY2Ug
+KGUuZy4gdGhlCj4gZGVza3RvcCB2aWEgYTJkcGQgb3Igb2xkLXN0eWxlIGEyZHAgcGx1Z2luKSBh
+dCB0aGUgc2FtZSB0aW1lLiBUaGUgaWRlYQo+IGlzIHRoYXQgeW91IGNhbiBiZSBsaXN0ZW5pbmcg
+dG8gaGlnaCBxdWFsaXR5IG11c2ljLCB0aGVuIHdoZW4gdGhlcmUgaXMgYQo+IHBob25lIGNhbGwg
+dGhlIFNDTyBkZXZpY2UgdGFrZXMgb3ZlciBhbmQgdGhlIGEyZHAgbXVzaWMgaXMgc2lsZW5jZWQK
+PiB1bnRpbCB0aGUgcGhvbmUgY2FsbCBpcyBmaW5pc2hlZC4gVGhlcmUgaXMgYSBtaWNyb3Bob25l
+IGluIHRoZSByaWdodAo+IHNpZGUgZWFyIHBpZWNlLiBUaGUgamFicmEgaW5kaWNhdGVzIGFuIGVz
+dGFibGlzaGVkIGEyZHAgY29ubmVjdGlvbiBieQo+IHRoZSBibHVlIGxpZ2h0cyBmbGFzaGluZyBv
+biBfYm90aF8gZWFyIHBpZWNlcy4gVGhlcmUgaXMgbm8gbmVlZCB0byBydW4KPiBidHNjbyBpZiBh
+bGwgdGhhdCB5b3Ugd2FudCBpcyBhMmRwLgoKVGhhbmtzIGEgbG90IGZvciB0aGVzZSBleHBsYW5h
+dGlvbnMuIEkga25ldywgdGhhdCBzY28gYW5kIGEyZHAgYXJlIGRpZmZlcmVudCAKcHJvZmlsZXMs
+IGJ1dCBJIGRpZG4gbm90IGtub3csIHRoYXQgdGhlIGtlcm5lbCBtb2R1bGUgaGFuZGxlcyAib25s
+eSIgc2NvLCAKYmVjYXVzZSB0aGUgY29tbWFuZCB0byBwbGF5IGlzIGNhbGxlZCBhMnBsYXkuLi4K
+CkJ0dy4gaXMgdGhlcmUgYSBwb3NzaWJpdGlseSB0byAgdXNlIHRoZSBtaWNybyB1bmRlciBMaW51
+eCBvciBpcyBhMmRwZCBhIApvbmUtd2F5LWNvbm5lY3Rpb24/Cgo+IFRvIHVzZSAib2xkLXN0eWxl
+IiBhMmRwIHdpdGggYW1hcm9rOgo+IC5hc291bmRyYyBsaWtlIHRoaXM6Cj4KPiBwY20uaGVhZHBo
+b25lIHsKPiAgICAgICAgIHR5cGUgYTJkcAo+ICAgICAgICAgYmRhZGRyICIwMDoxMzoxNzo3MTo1
+ODpGNiIKPiB9Cj4KPiBOb3RlIHRoZSBhMmRwIGluIHRoZSBzZWNvbmQgbGluZSAobm90IGEyZHBk
+KS4gUmVwbGFjZSB0aGUgYWRkcmVzcyB3aXRoCj4gdGhlIG9uZSBvZiB5b3VyIGhlYWRzZXQuIERv
+IF9ub3RfIHJ1biB0aGUgYTJkcGQgZGFlbW9uLgpCdXQgbG9hZCB0aGUga2VybmVsIG1vZHVsZT8K
+Cj4gV2l0aCB0aGUgYW1hcm9rLXhpbmUgZW5naW5lIHNlbGVjdCBhbHNhIG91dHB1dCBhbmQgYXMg
+b3V0cHV0IGRldmljZXMgZm9yCj4gbW9ubyBhbmQgc3RlcmVvIHJlcGxhY2UgdGhlIGRlZmF1bHQg
+YnkgInBsdWc6aGVhZHBob25lIi4gTm90ZSB0aGF0IGl0Cj4gc2F5cyBwbHVnOiBoZXJlLiBFaCB2
+b2lsYSwgd2hhdGV2ZXIgeW91IHBsYXkgYmFjayB3aXRoIGFtYXJvayBoYXMKPiBjb3JyZWN0IHBp
+dGNoIGFuZCBkZWNlbnQgcXVhbGl0eS4gT1RPSCwgSSdtIG92ZXIgZm9ydHkgYW5kIHByb2JhYmx5
+IG5vdAo+IGEgZ29vZCBqdWRnZSBvZiBzb3VuZCBxdWFsaXR5IDstKS4KVGhhbmtzLCBJIHdpbGwg
+dHJ5IHRoaXMgb25lIGFzIHdlbGwuICBJIHRlc3RlZCBVYnVudHUgYXMgd2VsbCwgYW5kIGl0IHdv
+cmtzIApuaWNlLiBJJ20gcmVhbGx5IHZlcnkgCgo+IFRoaXMgaGFzIHdvcmtlZCBmb3IgbWUgb24g
+VWJ1bnR1IERhcHBlciBhcyB3ZWxsIGFzIEVkZ3kuCj4KPiBSZWdhcmRzLAo+IFJlaW5lcgo+Cj4g
+QlRXOiBIYXMgeW91ciBoZWFkIGJhbmQgc25hcHBlZCBvbiB0aGUgbG9naXRlY2ggYWxyZWFkeT8K
+Tm90IHlldCA7LSkgQnV0IEkgcHJlZmVyIHRoZSBKYWJyYSBzZXQgYW55d2F5IDotKQoKLS0gCk1p
+dCBmcmV1bmRsaWNoZW4gR3LDvMOfZW4sCk1hcmNlbCBIaWx6aW5nZXIKCkxpbnV4IE5ldyBNZWRp
+YSBBRwpTw7xza2luZHN0ci4gNApELTgxOTI5IE3DvG5jaGVuClRlbDogKzQ5ICg4OSkgOTkgMzQg
+MTEgMApGYXg6ICs0OSAoODkpIDk5IDM0IDExIDk5CgotLSAKw5xkdsO2emxldHRlbCAtLSBNaXQg
+ZnJldW5kbGljaGVuIEdyw7xzc2VuLApNYXJjZWwgSGlsemluZ2VyCgotLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+ClVzaW5nIFRvbWNhdCBidXQgbmVlZCB0byBkbyBtb3JlPyBOZWVkIHRvIHN1cHBvcnQgd2ViIHNl
+cnZpY2VzLCBzZWN1cml0eT8KR2V0IHN0dWZmIGRvbmUgcXVpY2tseSB3aXRoIHByZS1pbnRlZ3Jh
+dGVkIHRlY2hub2xvZ3kgdG8gbWFrZSB5b3VyIGpvYiBlYXNpZXIKRG93bmxvYWQgSUJNIFdlYlNw
+aGVyZSBBcHBsaWNhdGlvbiBTZXJ2ZXIgdi4xLjAuMSBiYXNlZCBvbiBBcGFjaGUgR2Vyb25pbW8K
+aHR0cDovL3NlbC5hcy11cy5mYWxrYWcubmV0L3NlbD9jbWQ9bG5rJmtpZD0xMjA3MDkmYmlkPTI2
+MzA1NyZkYXQ9MTIxNjQyCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vm
+b3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1
+ZXotZGV2ZWwK
