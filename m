@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <9f50a7a00611081458v172fea16q5bd0c78e1595f891@mail.gmail.com>
-References: <9f50a7a00611081458v172fea16q5bd0c78e1595f891@mail.gmail.com>
-Date: Mon, 13 Nov 2006 09:13:11 +0100
-Message-Id: <1163405591.26272.33.camel@localhost>
+In-Reply-To: <20061110213915.58e6cabf@nim.leo>
+References: <20061110213915.58e6cabf@nim.leo>
+Date: Mon, 13 Nov 2006 09:09:54 +0100
+Message-Id: <1163405394.26272.31.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Is Bluetooth 2.0 supported/implimented by bluez ?
+Subject: Re: [Bluez-users] Disconnect errors on 2.6.18-mh7
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,48 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Jerone,
+Hi Paul,
 
-> I have been trying to transfer files from my cellphone to my computer
-> over bluetooth quickly. Both are bluetooth 2.0 and I noticed under
-> linux that they do not transfer at much slower speed then under
-> windows. After some investigation I have to assume that they are
-> transfering using bluetooth 1.2 speeds & not bluetooth 2.0 speeds. My
-> cell phone is a Nokia N73 & usb dongle is belkin bluetooth 2.0 class1
-> usb dongle. I have tried this with Ubuntu Edgy & Fedora Core 6 using
-> the gnome file sharing applet on the computer to get the files.
+> I've got a custom-built 2.6.18 patched with mh7 on my desktop machine,
+> with a Logitech Cordless Elite Blutooth Keyboard and Mouse combo. Up
+> until 2.6.16 these worked fine. 2.6.17 has unrelated-to-bluez issues with
+> my graphics card. On 2.6.18, I can connect the keyboard/mouse on startup,
+> but if I let them idle too long, they disconnect in an unrecoverable way,
+> requiring me to ssh from another box and run "hidd --search" while
+> simultaneously pressing the "connect" button on the keyboard or mouse.
 > 
-> After reading the source code I see the the VHCI is has a decleration
-> "define VERSION 1.2". Looking at the kernel code & bluez tools it does
-> not look like bluetooth 2.0 is supported. But I can't find a
-> definative answer anywhere.  Does anyone have any idea ?
+> I'm not sure quite when it happens, but it would seem to be related to
+> lines of the following occuring in dmesg:
 > 
-> Here is info on my bluetooth dongle:
-> hci0:   Type: USB
->         BD Address: 00:0A:3A:6F:82:85 ACL MTU: 1017:8 SCO MTU: 64:8
->         Features: 0xff 0xff 0x8d 0xfe 0x9b 0xfd 0x00 0x80
->                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
->                 <timing accuracy> <role switch> <hold mode> <sniff mode>
->                 <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
->                 <HV3 packets> <u-law log> <A-law log> <CVSD> <power control>
->                 <transparent SCO> <broadcast encrypt> <EDR ACL 2 Mbps>
->                 <EDR ACL 3 Mbps> <enhanced iscan> <interlaced iscan>
->                 <interlaced pscan> <inquiry with RSSI> <extended SCO>
->                 <EV4 packets> <EV5 packets> <AFH cap. slave>
->                 <AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL>
->                 <pause encryption> <AFH cap. master> <AFH class. master>
->                 <EDR eSCO 2 Mbps> <EDR eSCO 3 Mbps> <3-slot EDR eSCO>
->                 <extended features>
->         HCI Ver: 2.0 (0x3) HCI Rev: 0x2000 LMP Ver: 2.0 (0x3) LMP Subver: 0x415c
->         Manufacturer: Broadcom Corporation (15)
->         Firmware 0.65 / 92
+> net/bluetooth/hidp/hid.c: event field not found
 > 
-> I also went out and got a Bluetake 700sx and still do not get 2.0
-> speeds..what is going on. It looks like Bluez does not have Bluetooth
-> 2.0 implimented.
+> Is this a bug that's crept in to 2.6.18, or perhaps a hardware issue, or
+> what? Anything I can attempt to debug it with?
 
-both sides has to support EDR packets to achieve Bluetooth 2.0 speed and
-BlueZ fully supports EDR and will use it whenever possible.
+run "hcidump -X -V" and show us the result for the disconnect phase and
+the failed attempt to re-connect.
 
 Regards
 
