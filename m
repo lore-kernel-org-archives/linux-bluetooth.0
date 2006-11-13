@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45593E5B.2000007@xmission.com>
-Date: Mon, 13 Nov 2006 20:56:11 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Reiner Klenk <pdq808@t-online.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <4550B23D.8090706@palmsource.com> <455151FF.7040301@xmission.com>
-	<4551ABFD.2080909@palmsource.com>
-In-Reply-To: <4551ABFD.2080909@palmsource.com>
-Subject: Re: [Bluez-devel] [patch]
+In-Reply-To: <200611121938.39415.marcel@hilzinger.hu>
+References: <200611091102.54282.marcel@hilzinger.hu>
+	<200611101046.02426.mhilzinger@linuxnewmedia.de>
+	<1163233279.7400.58.camel@grappa>
+	<200611121938.39415.marcel@hilzinger.hu>
+Date: Mon, 13 Nov 2006 19:37:02 +0100
+Message-Id: <1163443022.7965.30.camel@grappa>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] RE :  Quality of a2dp sound
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,40 +19,52 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fr=E9d=E9ric
+On Sun, 2006-11-12 at 19:38 +0100, Marcel Hilzinger wrote:
 
-I applied it.
+> 
+> Thanks a lot for these explanations. I knew, that sco and a2dp are different 
+> profiles, but I didn not know, that the kernel module handles "only" sco, 
+> because the command to play is called a2play...
+> 
+?? 
+snd-bt-sco and running btsco => SCO (bi-directional)
 
-I like how the pitch is held more constant in spite of transmission =
+a2play, a2dp alsa plugin, a2dpd => three different possibilities for
+a2dp (one-way)
 
-errors. Before the pitch of a song would get wobbly when recovering from =
+> Btw. is there a possibitily to  use the micro under Linux or is a2dpd a 
+> one-way-connection?
+> 
+It can be used in SCO connections, for example with ekiga.
+ 
+> > To use "old-style" a2dp with amarok:
+> > .asoundrc like this:
+> >
+> > pcm.headphone {
+> >         type a2dp
+> >         bdaddr "00:13:17:71:58:F6"
+> > }
+> >
+> > Note the a2dp in the second line (not a2dpd). Replace the address with
+> > the one of your headset. Do _not_ run the a2dpd daemon.
+> But load the kernel module?
+> 
+Can be loaded, but is not required for a2dp. 
 
-going out of range.
 
-> This is far more useful than whitespaces :D
-> Fred
-> =
+-- 
+debb1046 (gmail.com, gtalk, jabber.org, ekiga.net, last.fm, skype)
 
-> Brad Midgley a =E9crit :
->> Fr=E9d=E9ric,
->>
->> It all sounds very interesting... including avdtp additions.
->>
->> The patch doesn't contain resample.h so I couldn't try it yet.
-
-Brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
