@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <7e36c64c0611070232k1b946d1bxe894b7008adb2dfc@mail.gmail.com>
-References: <7e36c64c0611070232k1b946d1bxe894b7008adb2dfc@mail.gmail.com>
-Date: Mon, 13 Nov 2006 09:22:08 +0100
-Message-Id: <1163406128.26272.48.camel@localhost>
+In-Reply-To: <4550E041.80201@op.pl>
+References: <4550E041.80201@op.pl>
+Date: Mon, 13 Nov 2006 09:19:01 +0100
+Message-Id: <1163405941.26272.43.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] visibility ON/OFF
+Subject: Re: [Bluez-devel] can't add bnep0 to bridge pan0: Invalid argument
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,13 +22,50 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-> I am trying to put effort to get ON/OFF visibility for mobile
-> devices.If it is ON,then other devices can search that devices but if
-> OFF then other devices cant connect to that device.
->   IF any doc related to it,please send me. 
+> First of all I'm not completely sure if this is the right group to post
+> to but since I get no error messages in logs, I hope nobody will feel
+> offended.
+> 
+> I'm trying to create an NAP under kernel 2.6.18.2 (description from
+> http://bluez.sourceforge.net/contrib/HOWTO-PAN). I use an USB BT dongle
+> from Integrated System Solution Corp. and it's been recognised as follows:
+> 
+> ~# hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 48:10
+>         UP RUNNING PSCAN ISCAN AUTH ENCRYPT
+>         RX bytes:101 acl:0 sco:0 events:13 errors:0
+>         TX bytes:299 acl:0 sco:0 commands:13 errors:0
+>         Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: ACCEPT MASTER
+>         Name: 'tempac'
+>         Class: 0x020100
+>         Service Classes: Networking
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP Subver:
+> 0x1fe
+>         Manufacturer: Integrated System Solution Corp. (57)
+> 
+> The problem turn up when I try (after establishing connection) to add
+> bnep0 interface to pan0 bridge interface. After
+> 
+> ~# brctl addif pan0 bnep0
+> 
+> I get:
+> 
+> can't add bnep0 to bridge pan0: Invalid argument
+> 
+> (bnep0 has IP 0.0.0.0 after ifconfig bnep0 0.0.0.0 and is up, though I
+> get no answer on ping which I could be a routing problem actually. Also
+> adding eth1 makes no problems).
+> 
+> As I said, no messages in logs, no more information. What's wrong?
 
-I have no idea, what your actual request is. Please re-phrase your
-question.
+you have a dongle with an invalid BD_ADDR. Return that dongle and get
+one which has a valid address. Dongles using this address can't be added
+to a bridge.
 
 Regards
 
