@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Yuriy Vikulov <vikulov@rscenter.ru>
-Date: Mon, 13 Nov 2006 13:17:16 +0000 (UTC)
-Message-ID: <loom.20061113T141623-541@post.gmane.org>
+From: Pierre-Yves Paulus <py@idlum.be>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1163421730.8561.75.camel@localhost>
 References: <loom.20061113T113030-503@post.gmane.org>
 	<1163421730.8561.75.camel@localhost>
-	<1163423326.8561.79.camel@localhost>
+Date: Mon, 13 Nov 2006 14:08:45 +0100
+Message-Id: <1163423326.8561.79.camel@localhost>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Asynchronous call
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -21,13 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello
+Hello again,
 
-Thanks a lot!
+> > Is there opportunity of asynchronous call of inquiry 
+> > (if one device is found, i will get info about it and will not waiting while
+> > other devices will be found)
+> 
+> It seems that the D-Bus API works that way.
 
-Regards,
-Yuriy
+To be more clear, the D-Bus API works asynchronously, eg the call to
+start inquiry is non-blocking. I didn't intend to tell that it was
+possible to block until first device is discovered, and then return. 
 
+Hope it makes more sense now.
+
+Pierre-Yves
 
 
 -------------------------------------------------------------------------
