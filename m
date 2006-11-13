@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45589002.7060505@xmission.com>
-Date: Mon, 13 Nov 2006 08:32:18 -0700
+Message-ID: <45588F4E.7060800@xmission.com>
+Date: Mon, 13 Nov 2006 08:29:18 -0700
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <200611091102.54282.marcel@hilzinger.hu>	<20061109104245.GB7085@physik.fu-berlin.de>
-	<1163066853.5983.24.camel@grappa>
-In-Reply-To: <1163066853.5983.24.camel@grappa>
-Subject: Re: [Bluez-devel] Quality of a2dp sound
+References: <24517632.1163062392189.JavaMail.root@mail.prologistik.com>
+In-Reply-To: <24517632.1163062392189.JavaMail.root@mail.prologistik.com>
+Subject: Re: [Bluez-devel] btsco/alsa-plugins Kernel 2.6.18-mh7 (and mh4-fch)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,19 +20,56 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Reiner
+Chafik
 
-> What I did notice is that the volume could be higher and there is the
-> occasional faint clicking which might be due to clipping.
+> 1. pls find attached btsco patch
 
-I did try to hunt these down for a good while but didn't have a lot of 
-luck. It came down to a balance of one problem or the other. :(
+applied by the way.
 
-I was thinking recently both these could be solved by doing dynamic 
-compression before encoding the audio. It would reduce the dynamic range 
-however.
+> 2. uhhmm ..the Cellink headset is BTST-9000A ... 
+> the Cellink dongle is BTA-6030
 
-Brad
+I have not heard of anyone having trouble with these and bluecore is 
+supposed to be our best chance of working.
+
+> well ... fabien has only nonblocking socket communication ...
+> i will test further ... i might be mistaken with my previous statement 
+> saying "NO effect".
+
+Fabien has been making a lot of changes lately that I need to catch up with.
+
+> i added a small previous fix to "remote volume control" in btsco.c and
+> btsco2.c...  the BT-core spec defines host_TO_HS RVC commands (+VGS, +VGM)
+> to need prefix \r\n AND postfix the same way!
+> (This was the only way to make my RVC capable HS REALLY change volume!)
+> Did you know that there exists NO SINGLE bt-stack for windose that makes real
+> use of RVC !?
+> fortunately headsetd (volctl.c) does it already the right way...
+
+I guess we were lucky it worked for any headset.
+
+> i have checked 4 different CSR based USB dongles:
+> - notebook built in IBM R51 BT-dongle (bluecore 2)
+> - Cellink BT2.0+EDR dongle (bluecore3)
+> - hama BT2.0+EDR dongle (bluecore3-MM)
+> - new custom BT-Dongle by Lintech (germany) (bluecore3-MM)
+> 
+> 3 headsets with HSprofile (SCO + RVC!):
+> - Cellink BT-9000ST (only HSProfile tested!)
+> - AS-Kabel (sweden) (have you ever used a headset in a disco ? :) 
+> (NOISECANCELLING with free2move CSR bluecore 1 class 1! BEST one but BULKY)
+
+probably cost someone a fortune if it was made back when bluecore1 was new.
+
+> - new custom design with Lintech-BT audio module
+> 
+> i have to admit that the test matrice might be incomplete (sparse) due to the
+> fact that i prefer OUR custom design :))
+
+well I look forward to seeing it. I hope you can keep us honest whenever 
+we do something wrong in the apps.
+
+brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
