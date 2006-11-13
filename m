@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4557ED8F.3040603@xmission.com>
-Date: Sun, 12 Nov 2006 20:59:11 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Date: Sun, 12 Nov 2006 21:39:29 -0500
+From: Dominik Brodowski <linux@dominikbrodowski.net>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20061113023929.GA8765@dominikbrodowski.de>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <20061113023929.GA8765@dominikbrodowski.de>
-In-Reply-To: <20061113023929.GA8765@dominikbrodowski.de>
-Subject: Re: [Bluez-devel] SCO packet for unknown connection handle
+Subject: [Bluez-devel] SCO packet for unknown connection handle
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,14 +18,75 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Dominik
+Hi!
 
-> 	Manufacturer: Silicon Wave (11)
+I'm trying to get this dongle
 
-I don't think anyone has gotten sco working in linux with these adapters.
+hci0:	Type: USB
+	BD Address: <hidden> ACL MTU: 120:20 SCO MTU: 0:0
+	UP RUNNING PSCAN ISCAN 
+	RX bytes:393 acl:0 sco:0 events:18 errors:0
+	TX bytes:322 acl:0 sco:0 commands:18 errors:0
+	Features: 0xff 0xff 0x05 0x38 0x18 0x18 0x00 0x00
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+	Link policy: RSWITCH HOLD SNIFF PARK 
+	Link mode: SLAVE ACCEPT 
+	Name: 'BlueZ (0)'
+	Class: 0x3e0100
+	Service Classes: Networking, Rendering, Capturing
+	Device Class: Computer, Uncategorized
+	HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x757
+	Manufacturer: Silicon Wave (11)
 
-Brad
+to work using the bt sco alsa-plugin.
 
+As the SCO MUT is reported to be 0:0 at first, I re-set it to 64:8 using
+
+# hciconfig hci0 scomtu 64:8
+
+Running
+
+# /usr/bin/headsetd -n
+
+looks promising, though playing sound using "aplay -D pcm.headset" does not
+work:
+
+headsetd[8300]: Bluetooth headset daemon version 0.42
+headsetd[8300]: Incoming RFCOMM hs connection from <address> accepted
+Headset connected
+headsetd[8300]: Changing state: Idle-->Connected
+headsetd[8300]: Changing state: Connected-->Ready
+headsetd[8300]: unable to open bluetooth SCO socket
+headsetd[8300]: Changing state: Ready-->Connected
+Received from HS: AT+VGS=10
+
+asound reports:
+DEBUG: _snd_pcm_sco_open: Starting pcm_sco plugin.
+DEBUG: _snd_pcm_sco_open: Open mode is for Playback.
+aplay: main:550: audio open error: Operation now in progress
+
+The kernel is Linus' latest 2.6.19-rc5, and it reports
+
+[ 1845.813000] Bluetooth: RFCOMM socket layer initialized
+[ 1845.814000] Bluetooth: RFCOMM TTY layer initialized
+[ 1845.814000] Bluetooth: RFCOMM ver 1.8
+... possible recursive locking warning snipped ...
+[ 1898.408000] hci_scodata_packet: hci0 SCO packet for unknown connection handle 256
+
+Running hciconfig afterwards has only these changes:
+-	RX bytes:9824 acl:19 sco:167 events:57 errors:0
+-	TX bytes:719 acl:17 sco:0 commands:29 errors:0
++	RX bytes:5044 acl:18 sco:9 events:92 errors:0
++	TX bytes:827 acl:17 sco:0 commands:65 errors:0
+
+so no SCO TX... quite some time later the following appears in dmesg:
+
+[ 2033.376000] hci_cmd_task: hci0 command tx timeout
+
+Any ideas?
+
+Thanks,
+	Dominik
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
