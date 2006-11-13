@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4557ED8F.3040603@xmission.com>
+Date: Sun, 12 Nov 2006 20:59:11 -0700
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200611131114.43541.denis.kenzior@trolltech.com>
-References: <200610231025.51818.denis.kenzior@trolltech.com>
-	<e1effdeb0611101009t24de879fk3bca7ed96821514e@mail.gmail.com>
-	<e1effdeb0611101338v1902b247if13f2239622f1a3a@mail.gmail.com>
-	<200611131114.43541.denis.kenzior@trolltech.com>
-Date: Mon, 13 Nov 2006 07:21:58 +0100
-Message-Id: <1163398918.26272.11.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Proposed DTD
+References: <20061113023929.GA8765@dominikbrodowski.de>
+In-Reply-To: <20061113023929.GA8765@dominikbrodowski.de>
+Subject: Re: [Bluez-devel] SCO packet for unknown connection handle
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,27 +20,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Dominik
 
-> > this patch replaces string_t by sdp_buf_t and fix system bus
-> > disconnection problem. Check if this patch make sense or if it is
-> > better keep  string_t.
-> 
-> I agree we should replace string_t by sdp_buf_t since this avoids an extra 
-> strlen.  However, I think that the buffer should be grown by factors.  Your  
-> proposed solution would call realloc many times, as the append function is 
-> called quite frequently with small strings, but this is no biggie.
-> 
-> Would the attached patch be better?
+> 	Manufacturer: Silicon Wave (11)
 
-looks good to me.
+I don't think anyone has gotten sco working in linux with these adapters.
 
-Claudio, please review it and then commit this to the CVS.
-
-Regards
-
-Marcel
-
+Brad
 
 
 -------------------------------------------------------------------------
