@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <101bcd760611080146ie8fd149h4240e8ff876cad8a@mail.gmail.com>
-References: <101bcd760611080146ie8fd149h4240e8ff876cad8a@mail.gmail.com>
-Date: Mon, 13 Nov 2006 09:16:20 +0100
-Message-Id: <1163405780.26272.38.camel@localhost>
+In-Reply-To: <20061108210057.7c40adaa@nim.leo>
+References: <20061108210057.7c40adaa@nim.leo>
+Date: Mon, 13 Nov 2006 09:14:54 +0100
+Message-Id: <1163405694.26272.36.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Problem with 2nd second dongle
+Subject: Re: [Bluez-users] "Connect" button on Logitech bluetooth receiver
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,28 +20,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Hakan,
+Hi Paul,
 
-> I'm facing the following problem on a TS-7200 board. The board is
-> equipped with the standard TS-linux (debian)  release 
-> and by loading the proper modules I'm able to use a single bluetooth
-> dongle.
+> I've got a Logitech bluetooth keyboard/mouse combo that comes with a
+> charging base for the mouse, which server also as the BT receiver. On it
+> is a button marked "connect".
 > 
-> But when I plug another dongle into the 2nd USB port I'm unable to
-> make it work.
->  
-> The only way to bring it up is to make
+> When the receiver is working in "I'll do the bluetooth bit and just
+> pretend to be a USB keyboard and mouse", this is used to connect it to
+> the keyboard or mouse in question. When it is running as a real Bluetooth
+> receiver with the HID being done by Linux, this button appears to have no
+> effect.
 > 
-> hciconfig hci0 down
-> and then
-> hciconfig hci1 up
-> and then it works.
->  
-> But I'm only able to operate a single BT dongle at a time. On my
-> development machine (redhat) everything works fine.
+> I was wondering whether it might be possible to watch for this button
+> being pressed, and if so, trigger a
+> 
+>   hidd --search
+> 
+> command.
 
-show us the content of /proc/bus/usb/devices and check the syslog for
-any error messages.
+I personally don't think that this button event is reported through HID
+in any way. So we can't react on it.
+
+> I ask because sometimes lately I've noticed the keyboard and/or mouse
+> will become disconnected, requiring the above command to be run
+> simultaneously to pressing the "connect" button on the keyboard/mouse.
+> When the mouse has done that, not too difficult. But if the keyboard
+> goes, it's obviously more difficult to recover :)
+
+A Bluetooth mouse and keyboard re-connects to you after the initial
+connect. Make sure "hidd --server" is running to accept these connects.
 
 Regards
 
