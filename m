@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4550E041.80201@op.pl>
-References: <4550E041.80201@op.pl>
-Date: Mon, 13 Nov 2006 09:19:01 +0100
-Message-Id: <1163405941.26272.43.camel@localhost>
+In-Reply-To: <200611131703.43151.denis.kenzior@trolltech.com>
+References: <200610231025.51818.denis.kenzior@trolltech.com>
+	<200611091149.13916.denis.kenzior@trolltech.com>
+	<1163399836.26272.25.camel@localhost>
+	<200611131703.43151.denis.kenzior@trolltech.com>
+Date: Mon, 13 Nov 2006 08:17:45 +0100
+Message-Id: <1163402265.26272.29.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] can't add bnep0 to bridge pan0: Invalid argument
+Subject: Re: [Bluez-devel] Proposed DTD
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,52 +23,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Denis,
 
-> First of all I'm not completely sure if this is the right group to post
-> to but since I get no error messages in logs, I hope nobody will feel
-> offended.
+> > The current XML format is for both, but it makes some assumptions and
+> > simplifications. In 99% of the use cases this is enough and for the
+> > other 1% you have to deal with the binary format. And this is totally
+> > fine in case of easy use.
 > 
-> I'm trying to create an NAP under kernel 2.6.18.2 (description from
-> http://bluez.sourceforge.net/contrib/HOWTO-PAN). I use an USB BT dongle
-> from Integrated System Solution Corp. and it's been recognised as follows:
-> 
-> ~# hciconfig -a
-> hci0:   Type: USB
->         BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 48:10
->         UP RUNNING PSCAN ISCAN AUTH ENCRYPT
->         RX bytes:101 acl:0 sco:0 events:13 errors:0
->         TX bytes:299 acl:0 sco:0 commands:13 errors:0
->         Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: ACCEPT MASTER
->         Name: 'tempac'
->         Class: 0x020100
->         Service Classes: Networking
->         Device Class: Computer, Uncategorized
->         HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP Subver:
-> 0x1fe
->         Manufacturer: Integrated System Solution Corp. (57)
-> 
-> The problem turn up when I try (after establishing connection) to add
-> bnep0 interface to pan0 bridge interface. After
-> 
-> ~# brctl addif pan0 bnep0
-> 
-> I get:
-> 
-> can't add bnep0 to bridge pan0: Invalid argument
-> 
-> (bnep0 has IP 0.0.0.0 after ifconfig bnep0 0.0.0.0 and is up, though I
-> get no answer on ping which I could be a routing problem actually. Also
-> adding eth1 makes no problems).
-> 
-> As I said, no messages in logs, no more information. What's wrong?
+> Ok, cool.  I'm just worried about code duplication and maintenance of multiple 
+> formats.  E.g. looking at the new service framework (which is something that 
+> we're very interested in for instance), it takes a binary formatted sdp 
+> record.  Would there also be a version for XML?  
 
-you have a dongle with an invalid BD_ADDR. Return that dongle and get
-one which has a valid address. Dongles using this address can't be added
-to a bridge.
+yes, there will be a XML version for registering SDP records. However
+someone has to write it.
+
+> > Actually it should be enough to have support for libexpat and libxml2
+> > since one of these is required by D-Bus anyway. So I would start with
+> > libexpat for now. It should be common/sdp-expat.c and I will create the
+> > autoconf magic around it.
+> 
+> Ok, I will work on a parser based on expat.
+
+Add the function prototypes to common/sdp-xml.h and the actual
+implementation to common/sdp-expat.c and an implementation that returns
+an error to common/sdp-dummy.c to make it compile with systems where the
+Expat library is not available.
 
 Regards
 
