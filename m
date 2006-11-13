@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Pierre-Yves Paulus <py@idlum.be>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <loom.20061113T113030-503@post.gmane.org>
+To: bluez-devel@lists.sourceforge.net
+From: Yuriy Vikulov <vikulov@rscenter.ru>
+Date: Mon, 13 Nov 2006 12:30:14 +0000 (UTC)
+Message-ID: <loom.20061113T132900-520@post.gmane.org>
 References: <loom.20061113T113030-503@post.gmane.org>
-Date: Mon, 13 Nov 2006 13:42:09 +0100
-Message-Id: <1163421730.8561.75.camel@localhost>
+	<Pine.LNX.4.63.0611131327380.25532@redbean.intranet.gw-instruments.de>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Asynchronous call
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -20,16 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hello, Peter 
 
-> Is there opportunity of asynchronous call of inquiry 
-> (if one device is found, i will get info about it and will not waiting while
-> other devices will be found)
+Thanks for answer!
 
-It seems that the D-Bus API works that way.
+Regards,
+Yuriy
 
-Best Regards.
-Pierre-Yves
+
+
 
 
 -------------------------------------------------------------------------
