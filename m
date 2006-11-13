@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Yuriy Vikulov <vikulov@rscenter.ru>
-Date: Mon, 13 Nov 2006 10:34:38 +0000 (UTC)
-Message-ID: <loom.20061113T113030-503@post.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Asynchronous call
+Message-ID: <45583D3B.5060708@palmsource.com>
+Date: Mon, 13 Nov 2006 10:39:07 +0100
+From: =?UTF-8?B?RnLDqWTDqXJpYyBEQUxMRUFV?= <frederic.dalleau@palmsource.com>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <200611091102.54282.marcel@hilzinger.hu>	<200611101046.02426.mhilzinger@linuxnewmedia.de>	<1163233279.7400.58.camel@grappa>
+	<200611121938.39415.marcel@hilzinger.hu>
+In-Reply-To: <200611121938.39415.marcel@hilzinger.hu>
+Subject: Re: [Bluez-devel] RE :  Quality of a2dp sound
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,14 +21,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello 
+Hi,
+>> BTW: Has your head band snapped on the logitech already?
+>>     
+I've an HP set than looks exactly like the Logitech one, but in black. 
+The band of plastic between the two speakers is broken. Is it what you mean?
+BR, Frederic
 
-Is there opportunity of asynchronous call of inquiry 
-(if one device is found, i will get info about it and will not waiting while
-other devices will be found)
-
-Regards,
-Yuriy
 
 
 -------------------------------------------------------------------------
