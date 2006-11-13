@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20061108210057.7c40adaa@nim.leo>
-References: <20061108210057.7c40adaa@nim.leo>
-Date: Mon, 13 Nov 2006 09:14:54 +0100
-Message-Id: <1163405694.26272.36.camel@localhost>
+In-Reply-To: <9f50a7a00611081458v172fea16q5bd0c78e1595f891@mail.gmail.com>
+References: <9f50a7a00611081458v172fea16q5bd0c78e1595f891@mail.gmail.com>
+Date: Mon, 13 Nov 2006 09:13:11 +0100
+Message-Id: <1163405591.26272.33.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] "Connect" button on Logitech bluetooth receiver
+Subject: Re: [Bluez-users] Is Bluetooth 2.0 supported/implimented by bluez ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,36 +20,48 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Paul,
+Hi Jerone,
 
-> I've got a Logitech bluetooth keyboard/mouse combo that comes with a
-> charging base for the mouse, which server also as the BT receiver. On it
-> is a button marked "connect".
+> I have been trying to transfer files from my cellphone to my computer
+> over bluetooth quickly. Both are bluetooth 2.0 and I noticed under
+> linux that they do not transfer at much slower speed then under
+> windows. After some investigation I have to assume that they are
+> transfering using bluetooth 1.2 speeds & not bluetooth 2.0 speeds. My
+> cell phone is a Nokia N73 & usb dongle is belkin bluetooth 2.0 class1
+> usb dongle. I have tried this with Ubuntu Edgy & Fedora Core 6 using
+> the gnome file sharing applet on the computer to get the files.
 > 
-> When the receiver is working in "I'll do the bluetooth bit and just
-> pretend to be a USB keyboard and mouse", this is used to connect it to
-> the keyboard or mouse in question. When it is running as a real Bluetooth
-> receiver with the HID being done by Linux, this button appears to have no
-> effect.
+> After reading the source code I see the the VHCI is has a decleration
+> "define VERSION 1.2". Looking at the kernel code & bluez tools it does
+> not look like bluetooth 2.0 is supported. But I can't find a
+> definative answer anywhere.  Does anyone have any idea ?
 > 
-> I was wondering whether it might be possible to watch for this button
-> being pressed, and if so, trigger a
+> Here is info on my bluetooth dongle:
+> hci0:   Type: USB
+>         BD Address: 00:0A:3A:6F:82:85 ACL MTU: 1017:8 SCO MTU: 64:8
+>         Features: 0xff 0xff 0x8d 0xfe 0x9b 0xfd 0x00 0x80
+>                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
+>                 <timing accuracy> <role switch> <hold mode> <sniff mode>
+>                 <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+>                 <HV3 packets> <u-law log> <A-law log> <CVSD> <power control>
+>                 <transparent SCO> <broadcast encrypt> <EDR ACL 2 Mbps>
+>                 <EDR ACL 3 Mbps> <enhanced iscan> <interlaced iscan>
+>                 <interlaced pscan> <inquiry with RSSI> <extended SCO>
+>                 <EV4 packets> <EV5 packets> <AFH cap. slave>
+>                 <AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL>
+>                 <pause encryption> <AFH cap. master> <AFH class. master>
+>                 <EDR eSCO 2 Mbps> <EDR eSCO 3 Mbps> <3-slot EDR eSCO>
+>                 <extended features>
+>         HCI Ver: 2.0 (0x3) HCI Rev: 0x2000 LMP Ver: 2.0 (0x3) LMP Subver: 0x415c
+>         Manufacturer: Broadcom Corporation (15)
+>         Firmware 0.65 / 92
 > 
->   hidd --search
-> 
-> command.
+> I also went out and got a Bluetake 700sx and still do not get 2.0
+> speeds..what is going on. It looks like Bluez does not have Bluetooth
+> 2.0 implimented.
 
-I personally don't think that this button event is reported through HID
-in any way. So we can't react on it.
-
-> I ask because sometimes lately I've noticed the keyboard and/or mouse
-> will become disconnected, requiring the above command to be run
-> simultaneously to pressing the "connect" button on the keyboard/mouse.
-> When the mouse has done that, not too difficult. But if the keyboard
-> goes, it's obviously more difficult to recover :)
-
-A Bluetooth mouse and keyboard re-connects to you after the initial
-connect. Make sure "hidd --server" is running to accept these connects.
+both sides has to support EDR packets to achieve Bluetooth 2.0 speed and
+BlueZ fully supports EDR and will use it whenever possible.
 
 Regards
 
