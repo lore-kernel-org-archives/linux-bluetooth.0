@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: =?iso-8859-1?Q?H=E5kan_Lager?= <digiloo.data@telia.com>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
-Date: Mon, 13 Nov 2006 18:08:01 +0100
-Message-ID: <006001c70746$476c1800$0200a8c0@BLACKBIRD>
+Message-ID: <adf2d65c0611130332h65523aa1ycf17bce10e957f8e@mail.gmail.com>
+Date: Mon, 13 Nov 2006 12:32:40 +0100
+From: Arthur <avandorp@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-In-Reply-To: <1163405780.26272.38.camel@localhost>
-Subject: Re: [Bluez-users] Problem with 2nd second dongle
+Subject: [Bluez-users] Targus ACB20EU: Scan times out
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,132 +14,112 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============2020370630=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel,
+--===============2020370630==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_15732_12008126.1163417560509"
 
-Thank you for your concern.
+------=_Part_15732_12008126.1163417560509
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Here is the information you requested:
+(Sorry for reposting this ten days after the first mail. My other mail
+address seems to get caught in quite a few spam filters.)
 
-Nov 13 16:56:00 ts7200 daemon.info hcid[214]: Bluetooth HCI daemon
-Nov 13 16:56:00 ts7200 daemon.info sdpd[217]: Bluetooth SDP daemon
-Nov 13 16:57:50 ts7200 daemon.info hcid[214]: HCI dev 0 registered
-Nov 13 16:57:50 ts7200 daemon.info hcid[214]: HCI dev 0 up
-Nov 13 16:57:50 ts7200 daemon.info hcid[214]: Starting security manager 0
-Nov 13 16:57:50 ts7200 daemon.info hcid[214]: HCI dev 0 down
-Nov 13 16:57:50 ts7200 daemon.info hcid[214]: Stoping security manager 0
-Nov 13 16:57:51 ts7200 daemon.info hcid[214]: HCI dev 0 unregistered
-Nov 13 16:57:51 ts7200 daemon.info hcid[214]: HCI dev 0 registered
-Nov 13 16:57:51 ts7200 daemon.info hcid[214]: HCI dev 0 up
-Nov 13 16:57:51 ts7200 daemon.info hcid[214]: Starting security manager 0
-Nov 13 16:58:05 ts7200 daemon.info hcid[214]: HCI dev 1 registered
-Nov 13 16:58:15 ts7200 daemon.err hcid[252]: Can't init device hci1:
-Connection timed out (110)
+Hello all
 
-$ ls /proc/bus/usb/devices
-ls: /proc/bus/usb/devices: No such file or directory
-$ ls /proc/devices
-/proc/devices
-$ cat /proc/devices
-Character devices:
-  1 mem
-  2 pty/m%d
-  3 pty/s%d
-  4 tts/%d
-  5 cua/%d
-  7 vcs
- 10 misc
- 29 fb
- 90 mtd
-128 ptm
-129 ptm
-130 ptm
-131 ptm
-136 pts/%d
-137 pts/%d
-138 pts/%d
-139 pts/%d
-162 raw
-180 usb
-204 ttyAM%d
-205 cuaam%d
-216 bluetooth/rfcomm/%d
-234 ttyTS%d
-235 cuats%d
+Scanning for other devices with the Targus ACB20EU USB dongle (a
+bluetooth 2.0 adapter with EDR support according to the packaging)
+always times out. It doesn't help to run hcid or hciconfig hci0 up
+beforehand. This is how it looks like:
 
-Block devices:
-  1 ramdisk
-  8 sd
- 31 mtdblock
- 65 sd
- 66 sd
-$
+# hcitool scan
+Scanning ...
+Inquiry failed: Connection timed out
 
------Ursprungligt meddelande-----
-Fr=E5n: bluez-users-bounces@lists.sourceforge.net
-[mailto:bluez-users-bounces@lists.sourceforge.net] F=F6r Marcel Holtmann
-Skickat: den 13 november 2006 09:16
-Till: BlueZ users
-=C4mne: Re: [Bluez-users] Problem with 2nd second dongle
+Running hcidump -X -V at the same time only yields this output:
 
-Hi Hakan,
+# hcidump -X -V
+HCI sniffer - Bluetooth packet analyzer ver 1.32
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+     lap 0x9e8b33 len 8 num 0
+ > HCI Event: Command Complete (0x0e) plen 4
+     Inquiry (0x01|0x0001) ncmd 1
+     0000: 0c
 
-> I'm facing the following problem on a TS-7200 board. The board is
-> equipped with the standard TS-linux (debian) release =
+hciconfig -a gives an input/output error:
 
-> and by loading the proper modules I'm able to use a single bluetooth
-> dongle.
-> =
+# hciconfig -a
+hci0:   Type: USB
+         BD Address: 00:16:38:3A:63:5E ACL MTU: 1017:8 SCO MTU: 64:8
+         UP RUNNING
+         RX bytes:275 acl:0 sco:0 events:37 errors:0
+         TX bytes:667 acl:0 sco:0 commands:37 errors:0
+         Features: 0xff 0xff 0x8d 0xfe 0x9b 0xfd 0x00 0x80
+         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+         Link policy: RSWITCH HOLD SNIFF PARK
+         Link mode: SLAVE ACCEPT
+Can't read local name on hci0: Input/output error (5)
 
-> But when I plug another dongle into the 2nd USB port I'm unable to
-> make it work.
->  =
+Here the associated dump:
 
-> The only way to bring it up is to make
-> =
+# hcidump -X -V
+< HCI Command: Read Local Name (0x03|0x0014) plen 0
+ > HCI Event: Command Complete (0x0e) plen 4
+     Read Local Name (0x03|0x0014) ncmd 1
+     status 0x0c name '.'
+     Error: Command Disallowed
 
-> hciconfig hci0 down
-> and then
-> hciconfig hci1 up
-> and then it works.
->  =
+This is on a 2.6.17-10-386 kernel on Ubuntu Edgy (2006.10).
 
-> But I'm only able to operate a single BT dongle at a time. On my
-> development machine (redhat) everything works fine.
-
-show us the content of /proc/bus/usb/devices and check the syslog for
-any error messages.
+Any ideas or suggestions are heartily welcome.
 
 Regards
 
-Marcel
+Arthur
+
+------=_Part_15732_12008126.1163417560509
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+(Sorry for reposting this ten days after the first mail. My other mail<br>address seems to get caught in quite a few spam filters.)<br><br>Hello all<br><br>Scanning for other devices with the Targus ACB20EU USB dongle (a <br>
+bluetooth 2.0 adapter with EDR support according to the packaging) <br>always times out. It doesn't help to run hcid or hciconfig hci0 up <br>beforehand. This is how it looks like:<br><br># hcitool scan<br>Scanning ...<br>
+Inquiry failed: Connection timed out<br><br>Running hcidump -X -V at the same time only yields this output:<br><br># hcidump -X -V<br>HCI sniffer - Bluetooth packet analyzer ver 1.32<br>device: hci0 snap_len: 1028 filter: 0xffffffff
+<br>&lt; HCI Command: Inquiry (0x01|0x0001) plen 5<br>&nbsp;&nbsp;&nbsp;&nbsp; lap 0x9e8b33 len 8 num 0<br>&nbsp;&gt; HCI Event: Command Complete (0x0e) plen 4<br>&nbsp;&nbsp;&nbsp;&nbsp; Inquiry (0x01|0x0001) ncmd 1<br>&nbsp;&nbsp;&nbsp;&nbsp; 0000: 0c<br><br>hciconfig -a gives an input/output error:
+<br><br># hciconfig -a<br>hci0:&nbsp;&nbsp; Type: USB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:16:38:3A:63:5E ACL MTU: 1017:8 SCO MTU: 64:8<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:275 acl:0 sco:0 events:37 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:667 acl:0 sco:0 commands:37 errors:0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xff 0x8d 0xfe 0x9b 0xfd 0x00 0x80<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy: RSWITCH HOLD SNIFF PARK<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link mode: SLAVE ACCEPT<br>Can't read local name on hci0: Input/output error (5)
+<br><br>Here the associated dump:<br><br># hcidump -X -V<br>&lt; HCI Command: Read Local Name (0x03|0x0014) plen 0<br>&nbsp;&gt; HCI Event: Command Complete (0x0e) plen 4<br>&nbsp;&nbsp;&nbsp;&nbsp; Read Local Name (0x03|0x0014) ncmd 1<br>&nbsp;&nbsp;&nbsp;&nbsp; status 0x0c name '.'
+<br>&nbsp;&nbsp;&nbsp;&nbsp; Error: Command Disallowed<br><br>This is on a 2.6.17-10-386 kernel on Ubuntu Edgy (2006.10).<br><br>Any ideas or suggestions are heartily welcome.<br><br>Regards<br><br>Arthur<br><br>
+
+------=_Part_15732_12008126.1163417560509--
 
 
+--===============2020370630==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job
-easier
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============2020370630==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+--===============2020370630==--
