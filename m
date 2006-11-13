@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200611071857.06037.Kilian.Lackhove@web.de>
-References: <200611071857.06037.Kilian.Lackhove@web.de>
-Date: Mon, 13 Nov 2006 09:21:00 +0100
-Message-Id: <1163406060.26272.46.camel@localhost>
+In-Reply-To: <20061107202103.506E3E0000AC@ranger.systems.pipex.net>
+References: <20061107202103.506E3E0000AC@ranger.systems.pipex.net>
+Date: Mon, 13 Nov 2006 09:17:58 +0100
+Message-Id: <1163405878.26272.41.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Ubuntu edgy + Keyboard + dbus + security mode 3
+Subject: Re: [Bluez-users] libraries and tools packages installation problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,41 +16,29 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
-
-> I am using Ubuntu Edgy (bluez-utils 3.7.1-ubuntu-4) and an apple wireless 
-> keyboard pro.
-> 
-> Right now the keyboard is running without encryption and authentification.
-> 
-> I read i had to add the "dbus_pin_helper" option to my hcid.conf and run 
-> bluez-pin --dbus. But as i run "bluez-pin --dbus" nothing happens (even if i 
-> run it during "hidd --search" on another console) 
-> 
-> The log says Unknown Option "dbus_pin_helper line 26 " 
-> 
-> So whats wrong and what can i do to encrypt the connection?
-
-make sure "hidd --server --encrypt" is running. And the old PIN helper
-stuff is deprecated. Make sure a passkey agent is running to answer any
-PIN requests.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGksCgo+IEhlbGxvIEkgYW0gbmV3IHRvIHRoZSBsaW51eCBtYWNoaW5lcyBhbmQgSSB3YW50ZWQg
+dG8gaW5zdGFsbCB0aGUKPiBmb2xsb3dpbmcgQmx1ZXRvb3RoIHBhY2thZ2VzIGZyb20gdGhlIGJs
+dWV6IHdlYnNpdGUuIAo+IAo+ICAKPiAKPiDCtyAgYmx1ZXotbGlicy0zLjcudGFyLmd6IAo+IAo+
+IMK3ICBibHVlei11dGlscy0zLjcudGFyLmd6IAo+IAo+IMK3ICBibHVlei1maXJtd2FyZS0xLjIu
+dGFyLmd6IAo+IAo+IMK3ICBibHVlei1oY2lkdW1wLTEuMzMudGFyLmd6Cj4gCj4gIAo+IAo+ICAK
+PiAKPiBVbmZvcnR1bmF0ZWx5IEkgc2VlbSB0byBoYXZlIGdvdCBzdHVjayBhdCB0aGUgZmlyc3Qg
+aHVyZGxlCgppZiB5b3UgcnVuIGEgVWJ1bnR1IEVkZ3kgb3IgRmVkb3JhIENvcmUgNiwgeW91IG1p
+Z2h0IHdhbm5hIHNpbXBseSB1c2UKdGhlIHByb3ZpZGVkIGJpbmFyeSBwYWNha2dlcy4KCj4gSSBy
+YW4gLi9jb25maWd1cmUgYW5kIG1ha2UsIG1ha2UgaW5zdGFsbCBjb21tYW5kcyBvbiB0aGUgbGli
+cmFyeQo+IHBhY2thZ2UuIEFsbCBzZWVtZWQgdG8gYmUgZmluZSBhbmQgaXQgc2VlbWVkIHRvIGhh
+dmUgaW5zdGFsbGVkIHRoZQo+IGxpYnJhcnkuIEkgc2F3IHRoaXMgaW4gL3Vzci9sb2NhbC9saWIu
+CgpDaGVjayB0aGUgUkVBRE1FIGZpbGUgZm9yIHVzaW5nIHRoZSBjb3JyZWN0IGluc3RhbGxhdGlv
+biBwcmVmaXguCgpSZWdhcmRzCgpNYXJjZWwKCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpVc2luZyBUb21j
+YXQgYnV0IG5lZWQgdG8gZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0IHdlYiBzZXJ2aWNlcywgc2Vj
+dXJpdHk/CkdldCBzdHVmZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9s
+b2d5IHRvIG1ha2UgeW91ciBqb2IgZWFzaWVyCkRvd25sb2FkIElCTSBXZWJTcGhlcmUgQXBwbGlj
+YXRpb24gU2VydmVyIHYuMS4wLjEgYmFzZWQgb24gQXBhY2hlIEdlcm9uaW1vCmh0dHA6Ly9zZWwu
+YXMtdXMuZmFsa2FnLm5ldC9zZWw/Y21kPWxuayZraWQ9MTIwNzA5JmJpZD0yNjMwNTcmZGF0PTEy
+MTY0MgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVl
+ei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0
+dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
