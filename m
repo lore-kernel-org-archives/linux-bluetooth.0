@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: =?iso-8859-1?Q?H=E5kan_Lager?= <hakan@digiloo.net>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
-Date: Mon, 13 Nov 2006 18:28:15 +0100
-Message-ID: <006401c70749$1c4f6200$0200a8c0@BLACKBIRD>
-MIME-Version: 1.0
-In-Reply-To: <1163438547.26272.55.camel@localhost>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <006001c70746$476c1800$0200a8c0@BLACKBIRD>
+References: <006001c70746$476c1800$0200a8c0@BLACKBIRD>
+Date: Mon, 13 Nov 2006 18:22:27 +0100
+Message-Id: <1163438547.26272.55.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] Problem with 2nd second dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -15,28 +16,14 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
-
-
-OK; But it work with one dongle...
-
-/ Hakan
-
-
------Ursprungligt meddelande-----
-Fr=E5n: bluez-users-bounces@lists.sourceforge.net
-[mailto:bluez-users-bounces@lists.sourceforge.net] F=F6r Marcel Holtmann
-Skickat: den 13 november 2006 18:22
-Till: BlueZ users
-=C4mne: Re: [Bluez-users] Problem with 2nd second dongle
 
 Hi,
 
 > Here is the information you requested:
-> =
-
+> 
 > Nov 13 16:56:00 ts7200 daemon.info hcid[214]: Bluetooth HCI daemon
 > Nov 13 16:56:00 ts7200 daemon.info sdpd[217]: Bluetooth SDP daemon
 > Nov 13 16:57:50 ts7200 daemon.info hcid[214]: HCI dev 0 registered
@@ -67,24 +54,9 @@ Marcel
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job
-easier
+Get stuff done quickly with pre-integrated technology to make your job easier
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
