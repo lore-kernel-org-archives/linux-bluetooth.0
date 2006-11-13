@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Yuriy Vikulov <vikulov@rscenter.ru>
-Date: Mon, 13 Nov 2006 12:30:14 +0000 (UTC)
-Message-ID: <loom.20061113T132900-520@post.gmane.org>
+Date: Mon, 13 Nov 2006 13:29:25 +0100 (CET)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <loom.20061113T113030-503@post.gmane.org>
+Message-ID: <Pine.LNX.4.63.0611131327380.25532@redbean.intranet.gw-instruments.de>
 References: <loom.20061113T113030-503@post.gmane.org>
-	<Pine.LNX.4.63.0611131327380.25532@redbean.intranet.gw-instruments.de>
-Mime-Version: 1.0
+MIME-Version: 1.0
 Subject: Re: [Bluez-devel] Asynchronous call
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,15 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello, Peter 
 
-Thanks for answer!
+Hello Yuriy, 
 
-Regards,
-Yuriy
+On Mon, 13 Nov 2006, Yuriy Vikulov wrote:
+
+> Hello 
+> 
+> Is there opportunity of asynchronous call of inquiry 
+> (if one device is found, i will get info about it and will not waiting while
+> other devices will be found)
+> 
+
+None I'm aware of. You have to implement it on your own using hci sockets. 
+
+Regards, 
+Peter 
 
 
 
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
 
 
 -------------------------------------------------------------------------
