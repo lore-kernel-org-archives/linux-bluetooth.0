@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <ef9938ec0611132254j1982e79chf42264511b3aa0ac@mail.gmail.com>
-Date: Tue, 14 Nov 2006 01:54:15 -0500
-From: "Albert Huang" <albert@csail.mit.edu>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20061113200431.22314.qmail@web32907.mail.mud.yahoo.com>
-MIME-Version: 1.0
-References: <20061113200431.22314.qmail@web32907.mail.mud.yahoo.com>
-Subject: Re: [Bluez-users] Multiple Bluetooth adapters question
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <adf2d65c0611130332h65523aa1ycf17bce10e957f8e@mail.gmail.com>
+References: <adf2d65c0611130332h65523aa1ycf17bce10e957f8e@mail.gmail.com>
+Date: Tue, 14 Nov 2006 07:19:38 +0100
+Message-Id: <1163485178.22566.2.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Targus ACB20EU: Scan times out
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,146 +20,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
->     I know 100 may be too much to ask, but what do you think would be a
-> resonable number if all are transmitting ?
+Hi Arthur,
 
-There are 79 channels.  All devices in the same piconet should always
-be on the same channel.  Thus, N independent piconets will (ignoring
-AFH) be uniformly distributed on N channels across the 79 available.
-Assuming they are truly independent, the chances that any of these
-piconets choose the same channel is 1 - N! / ( (79^N) * (79-N)! )  For
-1-15, this translates to:
+> Scanning for other devices with the Targus ACB20EU USB dongle (a 
+> bluetooth 2.0 adapter with EDR support according to the packaging) 
+> always times out. It doesn't help to run hcid or hciconfig hci0 up 
+> beforehand. This is how it looks like:
+> 
+> # hcitool scan
+> Scanning ...
+> Inquiry failed: Connection timed out
+> 
+> Running hcidump -X -V at the same time only yields this output:
+> 
+> # hcidump -X -V
+> HCI sniffer - Bluetooth packet analyzer ver 1.32
+> device: hci0 snap_len: 1028 filter: 0xffffffff 
+> < HCI Command: Inquiry (0x01|0x0001) plen 5
+>      lap 0x9e8b33 len 8 num 0
+>  > HCI Event: Command Complete (0x0e) plen 4
+>      Inquiry (0x01|0x0001) ncmd 1
+>      0000: 0c
 
-1  0.0
-2  0.012658227848101222
-3  0.037654222079794852
-4  0.074198998456511456
-5  0.12107499853466286
-6  0.17670316318436774
-7  0.23923203686656758
-8  0.30664185638471986
-9  0.37685533928246973
-10  0.44784650316168206
-11  0.51773935086273504
-12  0.58488956783121493
-13  0.64794431702141009
-14  0.70587753067611481
-15  0.75800049992338558
+this is a broken chip anyway. The failure of HCI_Inquiry must be
+answered with a HCI_Command_Status event and not a HCI_Command_Complete
+event.
 
-These numbers reflect the probability that _any_ channel collision
-occurs at a given point in time.  For > 80 active piconets, there will
-_always_ be a channel collision.  It doesn't tell you expected packet
-loss or anything useful like that.  You could calculate an expected
-packet loss based on the expected number of channel collisions at any
-given point in time.  That's a messy formula like expected(collisions)
-= \sum_i probability(collisions=i) * i, where
-probability(collisions=i) is another messy formula.
+Is this another Broadcom based dongle?
 
-Of course, all of this is hand-wavy theory.  It would be nice if you
-could try it out and report some results.
+Try loading the hci_usb with "reset=1" and post the content
+of /proc/bus/usb/devices.
 
-Regards,
-Albert
+Regards
 
-> A related question is : what would be the behavior when too many devices are
-> around ?
->
-> Somewhere I read  that BT RF spectrum (2.4 to 2.485 GHz) is devivded in to
-> 79 frequency hops.
-> Correct me if I am wrong here : What I understand from this is that only 79
-> BT devices can be active in an area ?
-> Which approximately gives 10 adapters and 69 client devices .. does it make
-> sense ??
->
-> -B
->
->
->
->
-> ----- Original Message ----
-> From: Albert Huang <albert@csail.mit.edu>
-> To: BlueZ users <bluez-users@lists.sourceforge.net>
-> Sent: Monday, November 13, 2006 11:33:52 AM
-> Subject: Re: [Bluez-users] Multiple Bluetooth adapters question
->
->
-> You should experience "graceful" degradation of performance, as you
-> increase the number of colocated transmitting devices.  100 is pushing
-> it, but if not all are transmitting, then it should be okay.
->
-> -albert
->
-> On 11/13/06, Brown Dwarf <brown_drf@yahoo.com> wrote:
-> >
-> > Hi all,
-> >      This may be a FAQ, but I could not locate an definit answer.
-> >
-> > I want to what are all the implications of having multiple bluetooth
-> > adapters on a machine.
-> > As you might have guessed, I would like to host more than 7 (say 100 ) BT
-> > connections (SPP) at a time. I noticed BlueZ supports upto 16 adapters -
-> > which means it can support upto 112 connections at a time ??
-> >
-> > Anybody ever tried it ?
-> >
-> > In other words, if I have 16 adapters installed on a box and have 100
-> client
-> > BT devices around, can they all communicate to one of those 16 adapters at
-> > any time ? I don't know much about the RF side of the problem, but I am
-> > little concerned about the fact that BT band-width is small. So can all
-> > those devices resonabily share the narrow frequency space ?
-> >
-> > Any comments or pointers to any tech infomation / articles / resources
-> will
-> > be greatly appreciated.
-> >
-> > thanks in advance.
-> > -B
-> >
-> >
-> -------------------------------------------------------------------------
-> > Using Tomcat but need to do more? Need to support web services, security?
-> > Get stuff done quickly with pre-integrated technology to make your job
-> > easier
-> > Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> >
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> >
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >
-> >
-> >
->
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job
-> easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
->
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job
-> easier
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
->
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
->
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
