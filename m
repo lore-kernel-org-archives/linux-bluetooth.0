@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 14 Nov 2006 07:25:39 -0800 (PST)
-From: Sergey Krivov <krivov@yahoo.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4559D573.2020102@palmsource.com>
+Message-ID: <4559D573.2020102@palmsource.com>
+Date: Tue, 14 Nov 2006 15:40:51 +0100
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-Message-ID: <135557.8815.qm@web31006.mail.mud.yahoo.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <947020.38780.qm@web31012.mail.mud.yahoo.com>
+In-Reply-To: <947020.38780.qm@web31012.mail.mud.yahoo.com>
 Subject: Re: [Bluez-devel] python a2dp
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,35 +20,37 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi, Fr=E9d=E9ric,
+Hi Sergey,
 
-> I just installed the ctypes my ubuntu provides
-> (0.9.6) but I get the =
+This is interesting!
+I don't know much about python so I'm having a few problems to make it run.
+I just installed the ctypes my ubuntu provides (0.9.6) but I get the =
 
-> following error :
-> =
+following error :
 
-> Traceback (most recent call last):
->   File "./avdtp.py", line 49, in ?
->     from ctypes import
-> Structure,c_uint8,c_uint16,c_ulong,c_uint32,c_void_p
-> ImportError: cannot import name c_uint8
+Traceback (most recent call last):
+  File "./avdtp.py", line 49, in ?
+    from ctypes import Structure,c_uint8,c_uint16,c_ulong,c_uint32,c_void_p
+ImportError: cannot import name c_uint8
 
-i am using ctypes 1.0.0-1 on fedora core 6.
-c_uint8 is an alias for c_byte
-to avoid replacing c_uint8 with c_byte in the code
-import c_byte instead c_uint8 and put afterwords
-c_uint8=3Dc_byte
+Any ideas?
+
+Thank you,
+Fr=E9d=E9ric.
+
+Sergey Krivov a =E9crit :
+> Hi,
+>
+> this is a partial realization of AVDTP, A2DP and AVRCP
+> profiles in python with simple example of a2dp-avrcp
+> server. it is probably far from a2dp alsa-plugin theme
+> since it is not written in C, but it might be useful
+> for prototype development. Anyway, have a look.
+>
+> All the feedback is welcome.
+>   =
 
 
-
- =
-
-___________________________________________________________________________=
-_________
-Do you Yahoo!?
-Everyone is raving about the all-new Yahoo! Mail beta.
-http://new.mail.yahoo.com
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
