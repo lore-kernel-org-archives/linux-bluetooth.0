@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <adf2d65c0611141259h2c2c8d60xd136a2b46813042c@mail.gmail.com>
-Date: Tue, 14 Nov 2006 21:59:22 +0100
-From: Arthur <avandorp@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1163485178.22566.2.camel@localhost>
+Message-ID: <20061114180917.64164.qmail@web32913.mail.mud.yahoo.com>
+Date: Tue, 14 Nov 2006 10:09:17 -0800 (PST)
+From: Brown Dwarf <brown_drf@yahoo.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-References: <adf2d65c0611130332h65523aa1ycf17bce10e957f8e@mail.gmail.com>
-	<1163485178.22566.2.camel@localhost>
-Subject: Re: [Bluez-users] Targus ACB20EU: Scan times out
+Subject: Re: [Bluez-users] Multiple Bluetooth adapters question
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,171 +14,255 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1816736996=="
+Content-Type: multipart/mixed; boundary="===============1287262197=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1816736996==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_46148_11841553.1163537962327"
+--===============1287262197==
+Content-Type: multipart/alternative; boundary="0-109966985-1163527757=:62991"
 
-------=_Part_46148_11841553.1163537962327
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+--0-109966985-1163527757=:62991
+Content-Type: text/plain; charset=ascii
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marcel
+Albert,=0A    Thank you for the explanation. This is something I was lookin=
+g for. =0AUnfortunately I don't have the abundance of BT devices at this po=
+int to run a test.=0AI'll definitly let you all know if I get to test it - =
+ever :)=0A =0Athanks again=0A~B=0A=0A=0A----- Original Message ----=0AFrom:=
+ Albert Huang <albert@csail.mit.edu>=0ATo: BlueZ users <bluez-users@lists.s=
+ourceforge.net>=0ASent: Monday, November 13, 2006 10:54:15 PM=0ASubject: Re=
+: [Bluez-users] Multiple Bluetooth adapters question=0A=0A=0A>     I know 1=
+00 may be too much to ask, but what do you think would be a=0A> resonable n=
+umber if all are transmitting ?=0A=0AThere are 79 channels.  All devices in=
+ the same piconet should always=0Abe on the same channel.  Thus, N independ=
+ent piconets will (ignoring=0AAFH) be uniformly distributed on N channels a=
+cross the 79 available.=0AAssuming they are truly independent, the chances =
+that any of these=0Apiconets choose the same channel is 1 - N! / ( (79^N) *=
+ (79-N)! )  For=0A1-15, this translates to:=0A=0A1  0.0=0A2  0.012658227848=
+101222=0A3  0.037654222079794852=0A4  0.074198998456511456=0A5  0.121074998=
+53466286=0A6  0.17670316318436774=0A7  0.23923203686656758=0A8  0.306641856=
+38471986=0A9  0.37685533928246973=0A10  0.44784650316168206=0A11  0.5177393=
+5086273504=0A12  0.58488956783121493=0A13  0.64794431702141009=0A14  0.7058=
+7753067611481=0A15  0.75800049992338558=0A=0AThese numbers reflect the prob=
+ability that _any_ channel collision=0Aoccurs at a given point in time.  Fo=
+r > 80 active piconets, there will=0A_always_ be a channel collision.  It d=
+oesn't tell you expected packet=0Aloss or anything useful like that.  You c=
+ould calculate an expected=0Apacket loss based on the expected number of ch=
+annel collisions at any=0Agiven point in time.  That's a messy formula like=
+ expected(collisions)=0A=3D \sum_i probability(collisions=3Di) * i, where=
+=0Aprobability(collisions=3Di) is another messy formula.=0A=0AOf course, al=
+l of this is hand-wavy theory.  It would be nice if you=0Acould try it out =
+and report some results.=0A=0ARegards,=0AAlbert=0A=0A> A related question i=
+s : what would be the behavior when too many devices are=0A> around ?=0A>=
+=0A> Somewhere I read  that BT RF spectrum (2.4 to 2.485 GHz) is devivded i=
+n to=0A> 79 frequency hops.=0A> Correct me if I am wrong here : What I unde=
+rstand from this is that only 79=0A> BT devices can be active in an area ?=
+=0A> Which approximately gives 10 adapters and 69 client devices .. does it=
+ make=0A> sense ??=0A>=0A> -B=0A>=0A>=0A>=0A>=0A> ----- Original Message --=
+--=0A> From: Albert Huang <albert@csail.mit.edu>=0A> To: BlueZ users <bluez=
+-users@lists.sourceforge.net>=0A> Sent: Monday, November 13, 2006 11:33:52 =
+AM=0A> Subject: Re: [Bluez-users] Multiple Bluetooth adapters question=0A>=
+=0A>=0A> You should experience "graceful" degradation of performance, as yo=
+u=0A> increase the number of colocated transmitting devices.  100 is pushin=
+g=0A> it, but if not all are transmitting, then it should be okay.=0A>=0A> =
+-albert=0A>=0A> On 11/13/06, Brown Dwarf <brown_drf@yahoo.com> wrote:=0A> >=
+=0A> > Hi all,=0A> >      This may be a FAQ, but I could not locate an defi=
+nit answer.=0A> >=0A> > I want to what are all the implications of having m=
+ultiple bluetooth=0A> > adapters on a machine.=0A> > As you might have gues=
+sed, I would like to host more than 7 (say 100 ) BT=0A> > connections (SPP)=
+ at a time. I noticed BlueZ supports upto 16 adapters -=0A> > which means i=
+t can support upto 112 connections at a time ??=0A> >=0A> > Anybody ever tr=
+ied it ?=0A> >=0A> > In other words, if I have 16 adapters installed on a b=
+ox and have 100=0A> client=0A> > BT devices around, can they all communicat=
+e to one of those 16 adapters at=0A> > any time ? I don't know much about t=
+he RF side of the problem, but I am=0A> > little concerned about the fact t=
+hat BT band-width is small. So can all=0A> > those devices resonabily share=
+ the narrow frequency space ?=0A> >=0A> > Any comments or pointers to any t=
+ech infomation / articles / resources=0A> will=0A> > be greatly appreciated=
+.=0A> >=0A> > thanks in advance.=0A> > -B=0A> >=0A> >=0A> -----------------=
+--------------------------------------------------------=0A> > Using Tomcat=
+ but need to do more? Need to support web services, security?=0A> > Get stu=
+ff done quickly with pre-integrated technology to make your job=0A> > easie=
+r=0A> > Download IBM WebSphere Application Server v.1.0.1 based on Apache G=
+eronimo=0A> >=0A> http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bi=
+d=3D263057&dat=3D121642=0A> >=0A> > _______________________________________=
+________=0A> > Bluez-users mailing list=0A> > Bluez-users@lists.sourceforge=
+.net=0A> > https://lists.sourceforge.net/lists/listinfo/bluez-users=0A> >=
+=0A> >=0A> >=0A>=0A> ------------------------------------------------------=
+-------------------=0A> Using Tomcat but need to do more? Need to support w=
+eb services, security?=0A> Get stuff done quickly with pre-integrated techn=
+ology to make your job=0A> easier=0A> Download IBM WebSphere Application Se=
+rver v.1.0.1 based on Apache Geronimo=0A> http://sel.as-us.falkag.net/sel?c=
+md=3Dlnk&kid=3D120709&bid=3D263057&dat=3D121642=0A> _______________________=
+________________________=0A> Bluez-users mailing list=0A> Bluez-users@lists=
+.sourceforge.net=0A> https://lists.sourceforge.net/lists/listinfo/bluez-use=
+rs=0A>=0A>=0A>=0A> --------------------------------------------------------=
+-----------------=0A> Using Tomcat but need to do more? Need to support web=
+ services, security?=0A> Get stuff done quickly with pre-integrated technol=
+ogy to make your job=0A> easier=0A> Download IBM WebSphere Application Serv=
+er v.1.0.1 based on Apache Geronimo=0A> http://sel.as-us.falkag.net/sel?cmd=
+=3Dlnk&kid=3D120709&bid=3D263057&dat=3D121642=0A>=0A> _____________________=
+__________________________=0A> Bluez-users mailing list=0A> Bluez-users@lis=
+ts.sourceforge.net=0A> https://lists.sourceforge.net/lists/listinfo/bluez-u=
+sers=0A>=0A>=0A>=0A=0A-----------------------------------------------------=
+--------------------=0AUsing Tomcat but need to do more? Need to support we=
+b services, security?=0AGet stuff done quickly with pre-integrated technolo=
+gy to make your job easier=0ADownload IBM WebSphere Application Server v.1.=
+0.1 based on Apache Geronimo=0Ahttp://sel.as-us.falkag.net/sel?cmd=3Dlnk&ki=
+d=3D120709&bid=3D263057&dat=3D121642=0A____________________________________=
+___________=0ABluez-users mailing list=0ABluez-users@lists.sourceforge.net=
+=0Ahttps://lists.sourceforge.net/lists/listinfo/bluez-users=0A=0A
+--0-109966985-1163527757=:62991
+Content-Type: text/html; charset=ascii
+Content-Transfer-Encoding: quoted-printable
 
-> Scanning for other devices with the Targus ACB20EU USB dongle (a
-> > bluetooth 2.0 adapter with EDR support according to the packaging)
-> > always times out. It doesn't help to run hcid or hciconfig hci0 up
-> > beforehand. This is how it looks like:
-> >
-> > # hcitool scan
-> > Scanning ...
-> > Inquiry failed: Connection timed out
-> >
-> > Running hcidump -X -V at the same time only yields this output:
-> >
-> > # hcidump -X -V
-> > HCI sniffer - Bluetooth packet analyzer ver 1.32
-> > device: hci0 snap_len: 1028 filter: 0xffffffff
-> > < HCI Command: Inquiry (0x01|0x0001) plen 5
-> >      lap 0x9e8b33 len 8 num 0
-> >  > HCI Event: Command Complete (0x0e) plen 4
-> >      Inquiry (0x01|0x0001) ncmd 1
-> >      0000: 0c
->
-> this is a broken chip anyway. The failure of HCI_Inquiry must be
-> answered with a HCI_Command_Status event and not a HCI_Command_Complete
-> event.
->
-> Is this another Broadcom based dongle?
->
-> Try loading the hci_usb with "reset=1" and post the content
-> of /proc/bus/usb/devices.
+<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
+ad><body><div style=3D"font-family:times new roman, new york, times, serif;=
+font-size:12pt"><DIV style=3D"FONT-SIZE: 12pt; FONT-FAMILY: times new roman=
+, new york, times, serif">&nbsp;</DIV>=0A<DIV style=3D"FONT-SIZE: 12pt; FON=
+T-FAMILY: times new roman, new york, times, serif">Albert,</DIV>=0A<DIV sty=
+le=3D"FONT-SIZE: 12pt; FONT-FAMILY: times new roman, new york, times, serif=
+">&nbsp;&nbsp;&nbsp; Thank you for the explanation. This is something I was=
+ looking for. </DIV>=0A<DIV style=3D"FONT-SIZE: 12pt; FONT-FAMILY: times ne=
+w roman, new york, times, serif">Unfortunately I don't have the abundance o=
+f BT devices at this point to run a test.</DIV>=0A<DIV style=3D"FONT-SIZE: =
+12pt; FONT-FAMILY: times new roman, new york, times, serif">I'll definitly =
+let you all know if I get to test it - ever :)</DIV>=0A<DIV style=3D"FONT-S=
+IZE: 12pt; FONT-FAMILY: times new roman, new york, times, serif">&nbsp;</DI=
+V>=0A<DIV style=3D"FONT-SIZE: 12pt; FONT-FAMILY: times new roman, new york,=
+ times, serif">thanks again</DIV>=0A<DIV style=3D"FONT-SIZE: 12pt; FONT-FAM=
+ILY: times new roman, new york, times, serif">~B<BR><BR></DIV>=0A<DIV style=
+=3D"FONT-SIZE: 12pt; FONT-FAMILY: times new roman, new york, times, serif">=
+----- Original Message ----<BR>From: Albert Huang &lt;albert@csail.mit.edu&=
+gt;<BR>To: BlueZ users &lt;bluez-users@lists.sourceforge.net&gt;<BR>Sent: M=
+onday, November 13, 2006 10:54:15 PM<BR>Subject: Re: [Bluez-users] Multiple=
+ Bluetooth adapters question<BR><BR>=0A<DIV>&gt;&nbsp;&nbsp;&nbsp;&nbsp; I =
+know 100 may be too much to ask, but what do you think would be a<BR>&gt; r=
+esonable number if all are transmitting ?<BR><BR>There are 79 channels.&nbs=
+p;&nbsp;All devices in the same piconet should always<BR>be on the same cha=
+nnel.&nbsp;&nbsp;Thus, N independent piconets will (ignoring<BR>AFH) be uni=
+formly distributed on N channels across the 79 available.<BR>Assuming they =
+are truly independent, the chances that any of these<BR>piconets choose the=
+ same channel is 1 - N! / ( (79^N) * (79-N)! )&nbsp;&nbsp;For<BR>1-15, this=
+ translates
+ to:<BR><BR>1&nbsp;&nbsp;0.0<BR>2&nbsp;&nbsp;0.012658227848101222<BR>3&nbsp=
+;&nbsp;0.037654222079794852<BR>4&nbsp;&nbsp;0.074198998456511456<BR>5&nbsp;=
+&nbsp;0.12107499853466286<BR>6&nbsp;&nbsp;0.17670316318436774<BR>7&nbsp;&nb=
+sp;0.23923203686656758<BR>8&nbsp;&nbsp;0.30664185638471986<BR>9&nbsp;&nbsp;=
+0.37685533928246973<BR>10&nbsp;&nbsp;0.44784650316168206<BR>11&nbsp;&nbsp;0=
+.51773935086273504<BR>12&nbsp;&nbsp;0.58488956783121493<BR>13&nbsp;&nbsp;0.=
+64794431702141009<BR>14&nbsp;&nbsp;0.70587753067611481<BR>15&nbsp;&nbsp;0.7=
+5800049992338558<BR><BR>These numbers reflect the probability that _any_ ch=
+annel collision<BR>occurs at a given point in time.&nbsp;&nbsp;For &gt; 80 =
+active piconets, there will<BR>_always_ be a channel collision.&nbsp;&nbsp;=
+It doesn't tell you expected packet<BR>loss or anything useful like that.&n=
+bsp;&nbsp;You could calculate an expected<BR>packet loss based on the expec=
+ted number of channel collisions at any<BR>given point in time.&nbsp;&nbsp;=
+That's a
+ messy formula like expected(collisions)<BR>=3D \sum_i probability(collisio=
+ns=3Di) * i, where<BR>probability(collisions=3Di) is another messy formula.=
+<BR><BR>Of course, all of this is hand-wavy theory.&nbsp;&nbsp;It would be =
+nice if you<BR>could try it out and report some results.<BR><BR>Regards,<BR=
+>Albert<BR><BR>&gt; A related question is : what would be the behavior when=
+ too many devices are<BR>&gt; around ?<BR>&gt;<BR>&gt; Somewhere I read&nbs=
+p;&nbsp;that BT RF spectrum (2.4 to 2.485 GHz) is devivded in to<BR>&gt; 79=
+ frequency hops.<BR>&gt; Correct me if I am wrong here : What I understand =
+from this is that only 79<BR>&gt; BT devices can be active in an area ?<BR>=
+&gt; Which approximately gives 10 adapters and 69 client devices .. does it=
+ make<BR>&gt; sense ??<BR>&gt;<BR>&gt; -B<BR>&gt;<BR>&gt;<BR>&gt;<BR>&gt;<B=
+R>&gt; ----- Original Message ----<BR>&gt; From: Albert Huang &lt;albert@cs=
+ail.mit.edu&gt;<BR>&gt; To: BlueZ users &lt;bluez-users@lists.sourceforge.n=
+et&gt;<BR>&gt;
+ Sent: Monday, November 13, 2006 11:33:52 AM<BR>&gt; Subject: Re: [Bluez-us=
+ers] Multiple Bluetooth adapters question<BR>&gt;<BR>&gt;<BR>&gt; You shoul=
+d experience "graceful" degradation of performance, as you<BR>&gt; increase=
+ the number of colocated transmitting devices.&nbsp;&nbsp;100 is pushing<BR=
+>&gt; it, but if not all are transmitting, then it should be okay.<BR>&gt;<=
+BR>&gt; -albert<BR>&gt;<BR>&gt; On 11/13/06, Brown Dwarf &lt;brown_drf@yaho=
+o.com&gt; wrote:<BR>&gt; &gt;<BR>&gt; &gt; Hi all,<BR>&gt; &gt;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;This may be a FAQ, but I could not locate an defini=
+t answer.<BR>&gt; &gt;<BR>&gt; &gt; I want to what are all the implications=
+ of having multiple bluetooth<BR>&gt; &gt; adapters on a machine.<BR>&gt; &=
+gt; As you might have guessed, I would like to host more than 7 (say 100 ) =
+BT<BR>&gt; &gt; connections (SPP) at a time. I noticed BlueZ supports upto =
+16 adapters -<BR>&gt; &gt; which means it can support upto 112 connections =
+at a time
+ ??<BR>&gt; &gt;<BR>&gt; &gt; Anybody ever tried it ?<BR>&gt; &gt;<BR>&gt; =
+&gt; In other words, if I have 16 adapters installed on a box and have 100<=
+BR>&gt; client<BR>&gt; &gt; BT devices around, can they all communicate to =
+one of those 16 adapters at<BR>&gt; &gt; any time ? I don't know much about=
+ the RF side of the problem, but I am<BR>&gt; &gt; little concerned about t=
+he fact that BT band-width is small. So can all<BR>&gt; &gt; those devices =
+resonabily share the narrow frequency space ?<BR>&gt; &gt;<BR>&gt; &gt; Any=
+ comments or pointers to any tech infomation / articles / resources<BR>&gt;=
+ will<BR>&gt; &gt; be greatly appreciated.<BR>&gt; &gt;<BR>&gt; &gt; thanks=
+ in advance.<BR>&gt; &gt; -B<BR>&gt; &gt;<BR>&gt; &gt;<BR>&gt; ------------=
+-------------------------------------------------------------<BR>&gt; &gt; =
+Using Tomcat but need to do more? Need to support web services, security?<B=
+R>&gt; &gt; Get stuff done quickly with pre-integrated technology to make y=
+our
+ job<BR>&gt; &gt; easier<BR>&gt; &gt; Download IBM WebSphere Application Se=
+rver v.1.0.1 based on Apache Geronimo<BR>&gt; &gt;<BR>&gt; <A href=3D"http:=
+//sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;kid=3D120709&amp;bid=3D263057&amp;=
+dat=3D121642" target=3D_blank>http://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp=
+;kid=3D120709&amp;bid=3D263057&amp;dat=3D121642</A><BR>&gt; &gt;<BR>&gt; &g=
+t; _______________________________________________<BR>&gt; &gt; Bluez-users=
+ mailing list<BR>&gt; &gt; Bluez-users@lists.sourceforge.net<BR>&gt; &gt; <=
+A href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-users" target=
+=3D_blank>https://lists.sourceforge.net/lists/listinfo/bluez-users</A><BR>&=
+gt; &gt;<BR>&gt; &gt;<BR>&gt; &gt;<BR>&gt;<BR>&gt; ------------------------=
+-------------------------------------------------<BR>&gt; Using Tomcat but =
+need to do more? Need to support web services, security?<BR>&gt; Get stuff =
+done quickly with pre-integrated technology to make your job<BR>&gt; easier=
+<BR>&gt; Download IBM WebSphere
+ Application Server v.1.0.1 based on Apache Geronimo<BR>&gt; <A href=3D"htt=
+p://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;kid=3D120709&amp;bid=3D263057&am=
+p;dat=3D121642" target=3D_blank>http://sel.as-us.falkag.net/sel?cmd=3Dlnk&a=
+mp;kid=3D120709&amp;bid=3D263057&amp;dat=3D121642</A><BR>&gt; _____________=
+__________________________________<BR>&gt; Bluez-users mailing list<BR>&gt;=
+ Bluez-users@lists.sourceforge.net<BR>&gt; <A href=3D"https://lists.sourcef=
+orge.net/lists/listinfo/bluez-users" target=3D_blank>https://lists.sourcefo=
+rge.net/lists/listinfo/bluez-users</A><BR>&gt;<BR>&gt;<BR>&gt;<BR>&gt; ----=
+---------------------------------------------------------------------<BR>&g=
+t; Using Tomcat but need to do more? Need to support web services, security=
+?<BR>&gt; Get stuff done quickly with pre-integrated technology to make you=
+r job<BR>&gt; easier<BR>&gt; Download IBM WebSphere Application Server v.1.=
+0.1 based on Apache Geronimo<BR>&gt; <A
+ href=3D"http://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;kid=3D120709&amp;bid=
+=3D263057&amp;dat=3D121642" target=3D_blank>http://sel.as-us.falkag.net/sel=
+?cmd=3Dlnk&amp;kid=3D120709&amp;bid=3D263057&amp;dat=3D121642</A><BR>&gt;<B=
+R>&gt; _______________________________________________<BR>&gt; Bluez-users =
+mailing list<BR>&gt; Bluez-users@lists.sourceforge.net<BR>&gt; <A href=3D"h=
+ttps://lists.sourceforge.net/lists/listinfo/bluez-users" target=3D_blank>ht=
+tps://lists.sourceforge.net/lists/listinfo/bluez-users</A><BR>&gt;<BR>&gt;<=
+BR>&gt;<BR><BR>------------------------------------------------------------=
+-------------<BR>Using Tomcat but need to do more? Need to support web serv=
+ices, security?<BR>Get stuff done quickly with pre-integrated technology to=
+ make your job easier<BR>Download IBM WebSphere Application Server v.1.0.1 =
+based on Apache Geronimo<BR><A href=3D"http://sel.as-us.falkag.net/sel?cmd=
+=3Dlnk&amp;kid=3D120709&amp;bid=3D263057&amp;dat=3D121642"
+ target=3D_blank>http://sel.as-us.falkag.net/sel?cmd=3Dlnk&amp;kid=3D120709=
+&amp;bid=3D263057&amp;dat=3D121642</A><BR>_________________________________=
+______________<BR>Bluez-users mailing list<BR>Bluez-users@lists.sourceforge=
+.net<BR><A href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-users=
+" target=3D_blank>https://lists.sourceforge.net/lists/listinfo/bluez-users<=
+/A></DIV></DIV>=0A<DIV style=3D"FONT-SIZE: 12pt; FONT-FAMILY: times new rom=
+an, new york, times, serif"><BR></DIV></div><br></body></html>
+--0-109966985-1163527757=:62991--
 
 
-A thousand thanks for your answer. Yes, now I can see that it's a Broadcom
-BCM2045B2.
-What's up with the "reset=1" parameter? I've now successfully paired it with
-a Nokia BH-300 Headset and have it working with the btsco tools. :)
-Wonderful.
-
-Again, many thanks.
-
-Regards
-
-Arthur
-
-
-For reference some data from /proc/bus/usb/devices and hciconfig -a:
-
-# modprobe hci_usb reset=1
-# cat /proc/bus/usb/devices
-[... other devices ...]
-
-T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  6 Spd=12  MxCh= 3
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=0a5c ProdID=4500 Rev= 1.00
-S:  Manufacturer=Broadcom
-S:  Product=BCM2045B2
-C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   1 Ivl=255ms
-
-T:  Bus=01 Lev=02 Prnt=06 Port=00 Cnt=01 Dev#=  7 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0a5c ProdID=2100 Rev= 1.00
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM92045DG-Flash_UHE
-C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
-
-# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:16:38:3A:63:5E ACL MTU: 1017:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:1045 acl:0 sco:0 events:47 errors:0
-        TX bytes:358 acl:0 sco:0 commands:24 errors:0
-        Features: 0xff 0xff 0x8d 0xfe 0x9b 0xfd 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'hobbes-0'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing, Object Transfer,
-Audio
-        Device Class: Computer, Uncategorized
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x2000 LMP Ver: 2.0 (0x3) LMP Subver:
-0x415c
-        Manufacturer: Broadcom Corporation (15)
-
-------=_Part_46148_11841553.1163537962327
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi Marcel<br><br><div><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">&gt; Scanning for other devices with the Targus ACB20EU USB dongle (a<br>
-&gt; bluetooth 2.0 adapter with EDR support according to the packaging)<br>&gt; always times out. It doesn't help to run hcid or hciconfig hci0 up<br>&gt; beforehand. This is how it looks like:<br>&gt;<br>&gt; # hcitool scan
-<br>&gt; Scanning ...<br>&gt; Inquiry failed: Connection timed out<br>&gt;<br>&gt; Running hcidump -X -V at the same time only yields this output:<br>&gt;<br>&gt; # hcidump -X -V<br>&gt; HCI sniffer - Bluetooth packet analyzer ver 
-1.32<br>&gt; device: hci0 snap_len: 1028 filter: 0xffffffff<br>&gt; &lt; HCI Command: Inquiry (0x01|0x0001) plen 5<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lap 0x9e8b33 len 8 num 0<br>&gt;&nbsp;&nbsp;&gt; HCI Event: Command Complete (0x0e) plen 4<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Inquiry (0x01|0x0001) ncmd 1
-<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0000: 0c<br><br>this is a broken chip anyway. The failure of HCI_Inquiry must be<br>answered with a HCI_Command_Status event and not a HCI_Command_Complete<br>event.<br><br>Is this another Broadcom based dongle?
-<br><br>Try loading the hci_usb with &quot;reset=1&quot; and post the content<br>of /proc/bus/usb/devices.</blockquote><div><br>A thousand thanks for your answer. Yes, now I can see that it's a Broadcom BCM2045B2.<br>What's up with the &quot;reset=1&quot; parameter? I've now successfully paired it with a Nokia BH-300 Headset and have it working with the btsco tools. :) Wonderful.
-<br><br>Again, many thanks.<br><br>Regards<br><br>Arthur<br><br><br>For reference some data from /proc/bus/usb/devices and hciconfig -a:<br><br># modprobe hci_usb reset=1<br># cat /proc/bus/usb/devices<br>[... other devices ...]
-<br><br>T:&nbsp; Bus=01 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=&nbsp; 6 Spd=12&nbsp; MxCh= 3<br>D:&nbsp; Ver= 2.00 Cls=09(hub&nbsp; ) Sub=00 Prot=00 MxPS= 8 #Cfgs=&nbsp; 1<br>P:&nbsp; Vendor=0a5c ProdID=4500 Rev= 1.00<br>S:&nbsp; Manufacturer=Broadcom<br>S:&nbsp; Product=BCM2045B2
-<br>C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr=100mA<br>I:&nbsp; If#= 0 Alt= 0 #EPs= 1 Cls=09(hub&nbsp; ) Sub=00 Prot=00 Driver=hub<br>E:&nbsp; Ad=81(I) Atr=03(Int.) MxPS=&nbsp;&nbsp; 1 Ivl=255ms<br><br>T:&nbsp; Bus=01 Lev=02 Prnt=06 Port=00 Cnt=01 Dev#=&nbsp; 7 Spd=12&nbsp; MxCh= 0
-<br>D:&nbsp; Ver= 2.00 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=&nbsp; 1<br>P:&nbsp; Vendor=0a5c ProdID=2100 Rev= 1.00<br>S:&nbsp; Manufacturer=Broadcom Corp<br>S:&nbsp; Product=BCM92045DG-Flash_UHE<br>C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=&nbsp; 0mA<br>
-I:&nbsp; If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb<br>E:&nbsp; Ad=81(I) Atr=03(Int.) MxPS=&nbsp; 16 Ivl=1ms<br>E:&nbsp; Ad=82(I) Atr=02(Bulk) MxPS=&nbsp; 64 Ivl=0ms<br>E:&nbsp; Ad=02(O) Atr=02(Bulk) MxPS=&nbsp; 64 Ivl=0ms<br>I:&nbsp; If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-<br>E:&nbsp; Ad=83(I) Atr=01(Isoc) MxPS=&nbsp;&nbsp; 0 Ivl=1ms<br>E:&nbsp; Ad=03(O) Atr=01(Isoc) MxPS=&nbsp;&nbsp; 0 Ivl=1ms<br>I:&nbsp; If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb<br>E:&nbsp; Ad=83(I) Atr=01(Isoc) MxPS=&nbsp;&nbsp; 9 Ivl=1ms<br>E:&nbsp; Ad=03(O) Atr=01(Isoc) MxPS=&nbsp;&nbsp; 9 Ivl=1ms
-<br>I:&nbsp; If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb<br>E:&nbsp; Ad=83(I) Atr=01(Isoc) MxPS=&nbsp; 17 Ivl=1ms<br>E:&nbsp; Ad=03(O) Atr=01(Isoc) MxPS=&nbsp; 17 Ivl=1ms<br>I:&nbsp; If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-<br>E:&nbsp; Ad=83(I) Atr=01(Isoc) MxPS=&nbsp; 32 Ivl=1ms<br>E:&nbsp; Ad=03(O) Atr=01(Isoc) MxPS=&nbsp; 32 Ivl=1ms<br>I:&nbsp; If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb<br>E:&nbsp; Ad=83(I) Atr=01(Isoc) MxPS=&nbsp; 64 Ivl=1ms<br>E:&nbsp; Ad=03(O) Atr=01(Isoc) MxPS=&nbsp; 64 Ivl=1ms
-<br>I:&nbsp; If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb<br>E:&nbsp; Ad=83(I) Atr=01(Isoc) MxPS=&nbsp; 64 Ivl=1ms<br>E:&nbsp; Ad=03(O) Atr=01(Isoc) MxPS=&nbsp; 64 Ivl=1ms<br>I:&nbsp; If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-<br>E:&nbsp; Ad=84(I) Atr=02(Bulk) MxPS=&nbsp; 32 Ivl=0ms<br>E:&nbsp; Ad=04(O) Atr=02(Bulk) MxPS=&nbsp; 32 Ivl=0ms<br>I:&nbsp; If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)<br><br># hciconfig -a<br>hci0:&nbsp;&nbsp; Type: USB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:16:38:3A:63:5E ACL MTU: 1017:8 SCO MTU: 64:8
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:1045 acl:0 sco:0 events:47 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:358 acl:0 sco:0 commands:24 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Features: 0xff 0xff 0x8d 0xfe 0x9b 0xfd 0x00 0x80<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link policy: RSWITCH HOLD SNIFF PARK<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link mode: SLAVE ACCEPT<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: 'hobbes-0'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Class: 0x3e0100<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Service Classes: Networking, Rendering, Capturing, Object Transfer, Audio
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Device Class: Computer, Uncategorized<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HCI Ver: 2.0 (0x3) HCI Rev: 0x2000 LMP Ver: 2.0 (0x3) LMP Subver: 0x415c<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Manufacturer: Broadcom Corporation (15)<br><br><br><br>&nbsp;</div><br></div><br>
-
-------=_Part_46148_11841553.1163537962327--
-
-
---===============1816736996==
+--===============1287262197==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 -------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1816736996==
+SF.net email is sponsored by: A Better Job is Waiting for You - Find it Now.
+Check out Slashdot's new job board. Browse through tons of technical jobs
+posted by companies looking to hire people just like you.
+http://jobs.slashdot.org/
+--===============1287262197==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -192,4 +273,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1816736996==--
+--===============1287262197==--
