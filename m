@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <455B6987.3070703@gmail.com>
-Date: Wed, 15 Nov 2006 16:24:55 -0300
-From: Manuel Naranjo <naranjo.manuel@gmail.com>
+Message-ID: <d1a198ae0611150528v36a10eackf0c1d908c8d21e95@mail.gmail.com>
+Date: Wed, 15 Nov 2006 14:28:48 +0100
+From: "=?UTF-8?Q?Kristoffer_Lund=C3=A9n?=" <kristoffer.lunden@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <455AAB02.5030909@lix-world.net>
 MIME-Version: 1.0
-To: Bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Low quality audio on Bluetooth Headset
+References: <d1a198ae0610221203n6e0dd9a4y1cdf40e4bd79f8d5@mail.gmail.com>
+	<200610241902.07288.mailinglists@gaboo.org>
+	<d1a198ae0611141934v35458c90u1d865d096e00ab72@mail.gmail.com>
+	<455AAB02.5030909@lix-world.net>
+Subject: Re: [Bluez-users] DiNovo + Ubuntu edgy, hid2hci is not working
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,28 +19,111 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0670145835=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi everyone,
-I have a pair of Hifi bluetooth hearphones, that AIRcable 
-(www.aircable.net) send to me. I use it under Windows and Linux, it 
-cames with a usb bt dongle, that is recognized as a usb-sound card which 
-works perfectly, the thing is that when I try to use the headset with a 
-generic Bluetooth Dongle (using a2dpd) I get very low quality audio. I 
-think the headphones work at 22kHz, and I don't get more than 11kHz when 
-I use a2dpd, is there anything that I can do to fix this (including 
-doing some code :D)
-Cheers,
-Manuel
+--===============0670145835==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_53683_23614046.1163597328025"
+
+------=_Part_53683_23614046.1163597328025
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+
+T24gMTEvMTUvMDYsIFN0ZWVuIEV1Z2VuIFBvdWxzZW4gPHNlcEBsaXgtd29ybGQubmV0PiB3cm90
+ZToKCj4gSSBzdWdnZXN0IHlvdSB0ZXN0IGlmIHRoZSBkb25nbGUgaXMgd29ya2luZyBieSB1c2lu
+ZyBpdCBvbiBhIFdpbmRvd3MKPiBtYWNoaW5lLiBJZiBpdCdzIGFzIGRlYWQgYXMgbWluZSwgcGVy
+aGFwcyBpdCdzIHRpbWUgdG8gaGF2ZSBhIHdhcnJlbnR5Cj4gdGFsayB3aXRoIExvZ2l0ZWNoLgoK
+CgpUaGF0J3MgYSB2ZXJ5IGdvb2QgaWRlYS4gOikgQWN0dWFsbHksIEkgZGlkIHVzZSBpdCBpbiBX
+aW5kb3dzIGluIG9uZSByYXJlCm9jY2Fzc2lvbiB5ZXN0ZXJkYXksIGFuZCBzaW5jZSBJIHJlY2Vp
+dmVkIGFuIHVwZGF0ZSB0byB0aGUgc29mdHdhcmUsIEkgaGFkCnRvIHJlLXBhaXIgYWxsIHRoZSBk
+ZXZpY2VzICh0d2ljZSwgc2lnaCksIGVudGVyaW5nIG51bWJlcnMgYW5kIHNvIG9uLiBEb24ndApr
+bm93IGlmIHRoYXQgbWVhbnMgaXQgd2FzIHVzaW5nIGJsdWV0b290aCBvciBub3QsIGJ1dCBpdCB3
+b3JrZWQganVzdCBmaW5lLgoKV2hhdCBJIGRpZCBub3QgdHJ5IHdhcyB0byB1c2UgaXQgdG8gY29u
+bmVjdCB0byBhIHBob25lIG9yIHNpbWlsYXIuIEd1ZXNzCnRoYXQncyBuZXh0IG9uIHRoZSBsaXN0
+Li4uIDopCgpUaGFua3MgZm9yIHRoZSBzdWdnZXN0aW9uIQoKLS0gU3RvZmZlCgoKLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLQo+IFRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBv
+ZiBJVAo+IEpvaW4gU291cmNlRm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdl
+dCB0aGUgY2hhbmNlIHRvIHNoYXJlCj4geW91cgo+IG9waW5pb25zIG9uIElUICYgYnVzaW5lc3Mg
+dG9waWNzIHRocm91Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gKPiBodHRwOi8vd3d3
+LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9
+REVWREVWCj4KPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+Xwo+IEJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdAo+IEJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZv
+cmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2Js
+dWV6LXVzZXJzCj4KPgo+Cj4KCgotLSAKS3Jpc3RvZmZlciBMdW5kw6luCuKciSBrcmlzdG9mZmVy
+Lmx1bmRlbkBnbWFpbC5jb20K4pyJIGtyaXN0b2ZmZXIubHVuZGVuQGdhbWVtYWtlci5udQpodHRw
+Oi8vd3d3LmdhbWVtYWtlci5udS8K4piOIDA3MDQgNDggOTggNzcK
+------=_Part_53683_23614046.1163597328025
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+
+T24gMTEvMTUvMDYsIDxiIGNsYXNzPSJnbWFpbF9zZW5kZXJuYW1lIj5TdGVlbiBFdWdlbiBQb3Vs
+c2VuPC9iPiAmbHQ7PGEgaHJlZj0ibWFpbHRvOnNlcEBsaXgtd29ybGQubmV0Ij5zZXBAbGl4LXdv
+cmxkLm5ldDwvYT4mZ3Q7IHdyb3RlOjxkaXY+PHNwYW4gY2xhc3M9ImdtYWlsX3F1b3RlIj48L3Nw
+YW4+PGJyPjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9ImJvcmRlci1sZWZ0
+OiAxcHggc29saWQgcmdiKDIwNCwgMjA0LCAyMDQpOyBtYXJnaW46IDBwdCAwcHQgMHB0IDAuOGV4
+OyBwYWRkaW5nLWxlZnQ6IDFleDsiPgpJIHN1Z2dlc3QgeW91IHRlc3QgaWYgdGhlIGRvbmdsZSBp
+cyB3b3JraW5nIGJ5IHVzaW5nIGl0IG9uIGEgV2luZG93czxicj5tYWNoaW5lLiBJZiBpdCdzIGFz
+IGRlYWQgYXMgbWluZSwgcGVyaGFwcyBpdCdzIHRpbWUgdG8gaGF2ZSBhIHdhcnJlbnR5PGJyPnRh
+bGsgd2l0aCBMb2dpdGVjaC48L2Jsb2NrcXVvdGU+PGRpdj48YnI+PGJyPlRoYXQncyBhIHZlcnkg
+Z29vZCBpZGVhLiA6KSBBY3R1YWxseSwgSSBkaWQgdXNlIGl0IGluIFdpbmRvd3MgaW4gb25lIHJh
+cmUgb2NjYXNzaW9uIHllc3RlcmRheSwgYW5kIHNpbmNlIEkgcmVjZWl2ZWQgYW4gdXBkYXRlIHRv
+IHRoZSBzb2Z0d2FyZSwgSSBoYWQgdG8gcmUtcGFpciBhbGwgdGhlIGRldmljZXMgKHR3aWNlLCBz
+aWdoKSwgZW50ZXJpbmcgbnVtYmVycyBhbmQgc28gb24uIERvbid0IGtub3cgaWYgdGhhdCBtZWFu
+cyBpdCB3YXMgdXNpbmcgYmx1ZXRvb3RoIG9yIG5vdCwgYnV0IGl0IHdvcmtlZCBqdXN0IGZpbmUu
+Cjxicj48YnI+V2hhdCBJIGRpZCBub3QgdHJ5IHdhcyB0byB1c2UgaXQgdG8gY29ubmVjdCB0byBh
+IHBob25lIG9yIHNpbWlsYXIuIEd1ZXNzIHRoYXQncyBuZXh0IG9uIHRoZSBsaXN0Li4uIDopPGJy
+Pjxicj5UaGFua3MgZm9yIHRoZSBzdWdnZXN0aW9uITxicj48YnI+LS0gU3RvZmZlPGJyPiZuYnNw
+OzwvZGl2Pjxicj48YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJib3JkZXIt
+bGVmdDogMXB4IHNvbGlkIHJnYigyMDQsIDIwNCwgMjA0KTsgbWFyZ2luOiAwcHQgMHB0IDBwdCAw
+LjhleDsgcGFkZGluZy1sZWZ0OiAxZXg7Ij4KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLTxicj5UYWtlIFN1cnZl
+eXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQ8YnI+Sm9pbiBTb3VyY2VG
+b3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hh
+cmUgeW91cjxicj5vcGluaW9ucyBvbiBJVCAmYW1wOyBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBi
+cmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaAo8YnI+PGEgaHJlZj0iaHR0cDovL3d3dy50ZWNo
+c2F5LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJmFtcDtwPXNvdXJjZWZvcmdlJmFtcDtD
+SUQ9REVWREVWIj5odHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5w
+aHAmYW1wO3A9c291cmNlZm9yZ2UmYW1wO0NJRD1ERVZERVY8L2E+PGJyPjxicj5fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo8YnI+Qmx1ZXotdXNlcnMgbWFp
+bGluZyBsaXN0PGJyPjxhIGhyZWY9Im1haWx0bzpCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3Jn
+ZS5uZXQiPkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldDwvYT48YnI+PGEgaHJlZj0i
+aHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMi
+Pmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJz
+CjwvYT48YnI+PGJyPjxicj48YnI+PC9ibG9ja3F1b3RlPjwvZGl2Pjxicj48YnIgY2xlYXI9ImFs
+bCI+PGJyPi0tIDxicj5LcmlzdG9mZmVyIEx1bmTDqW48YnI+4pyJIDxhIGhyZWY9Im1haWx0bzpr
+cmlzdG9mZmVyLmx1bmRlbkBnbWFpbC5jb20iPmtyaXN0b2ZmZXIubHVuZGVuQGdtYWlsLmNvbTwv
+YT48YnI+4pyJIDxhIGhyZWY9Im1haWx0bzprcmlzdG9mZmVyLmx1bmRlbkBnYW1lbWFrZXIubnUi
+PgprcmlzdG9mZmVyLmx1bmRlbkBnYW1lbWFrZXIubnU8L2E+PGJyPjxhIGhyZWY9Imh0dHA6Ly93
+d3cuZ2FtZW1ha2VyLm51LyI+aHR0cDovL3d3dy5nYW1lbWFrZXIubnUvPC9hPjxicj7imI4gMDcw
+NCA0OCA5OCA3Nzxicj4K
+------=_Part_53683_23614046.1163597328025--
+
+
+--===============0670145835==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============0670145835==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0670145835==--
