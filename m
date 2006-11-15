@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <360bc8300611151339y65320ab4o1c6a1ab4905ee638@mail.gmail.com>
-Date: Wed, 15 Nov 2006 18:39:27 -0300
-From: "Naranjo Manuel Francisco" <naranjo.manuel@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <455B8696.2010405@xmission.com>
+Message-ID: <455B8696.2010405@xmission.com>
+Date: Wed, 15 Nov 2006 14:28:54 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-References: <455B6987.3070703@gmail.com> <455B8696.2010405@xmission.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <455B6987.3070703@gmail.com>
+In-Reply-To: <455B6987.3070703@gmail.com>
 Subject: Re: [Bluez-users] Low quality audio on Bluetooth Headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -20,28 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
->
-> what kind of quality problem? Is it only the low sampling rate or is it
-> one of the other problems? (low volume... popping sounds... played too
-> fast or slow... static...)
+Manuel
 
-Very low sampling rate, it must be working about 10kHz. And I also get
-disconnection problems, but this can be due to problems on my usb
-connectors, they aren't working very well lately.
+> I have a pair of Hifi bluetooth hearphones, that AIRcable 
+> (www.aircable.net) send to me. I use it under Windows and Linux, it 
+> cames with a usb bt dongle, that is recognized as a usb-sound card which 
+> works perfectly, the thing is that when I try to use the headset with a 
+> generic Bluetooth Dongle (using a2dpd) I get very low quality audio. I 
+> think the headphones work at 22kHz, and I don't get more than 11kHz when 
+> I use a2dpd, is there anything that I can do to fix this (including 
+> doing some code :D)
 
+what kind of quality problem? Is it only the low sampling rate or is it
+one of the other problems? (low volume... popping sounds... played too
+fast or slow... static...)
 
->
-> a2dp headsets are required to support 44.1khz btw.
-Mhh damn, this can be the cause. They are supposed to support 22-24kHz.
+a2dp headsets are required to support 44.1khz btw.
 
-Again, if I use windows with Widcomm I get a very high rate, it must
-be about 22 khz. If I use the usb-dongle that comes with it, I get a
-very good rate, under linux or windows.
-
-I will try again, and see if I can improve it.
-
-Thanks,
-Manuel.
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
