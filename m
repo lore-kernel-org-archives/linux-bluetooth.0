@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d1a198ae0611150528v36a10eackf0c1d908c8d21e95@mail.gmail.com>
-Date: Wed, 15 Nov 2006 14:28:48 +0100
-From: "=?UTF-8?Q?Kristoffer_Lund=C3=A9n?=" <kristoffer.lunden@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <455AAB02.5030909@lix-world.net>
+Message-ID: <455AAB02.5030909@lix-world.net>
+Date: Wed, 15 Nov 2006 06:52:02 +0100
+From: Steen Eugen Poulsen <sep@lix-world.net>
 MIME-Version: 1.0
-References: <d1a198ae0610221203n6e0dd9a4y1cdf40e4bd79f8d5@mail.gmail.com>
-	<200610241902.07288.mailinglists@gaboo.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <d1a198ae0610221203n6e0dd9a4y1cdf40e4bd79f8d5@mail.gmail.com>	<200610241902.07288.mailinglists@gaboo.org>
 	<d1a198ae0611141934v35458c90u1d865d096e00ab72@mail.gmail.com>
-	<455AAB02.5030909@lix-world.net>
+In-Reply-To: <d1a198ae0611141934v35458c90u1d865d096e00ab72@mail.gmail.com>
 Subject: Re: [Bluez-users] DiNovo + Ubuntu edgy, hid2hci is not working
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -19,92 +17,117 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0670145835=="
+Content-Type: multipart/mixed; boundary="===============1064616535=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0670145835==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_53683_23614046.1163597328025"
+This is a cryptographically signed message in MIME format.
 
-------=_Part_53683_23614046.1163597328025
-Content-Type: text/plain; charset=UTF-8; format=flowed
+--===============1064616535==
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
+	micalg=sha1; boundary="------------ms040806070802020405060002"
+
+This is a cryptographically signed message in MIME format.
+
+--------------ms040806070802020405060002
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Kristoffer Lund=C3=A9n wrote:
+> Sorry for the repeat, but is there any answer at all to be had for this=
+
+> issue? Even "we have no idea what you are talking about" or "this does
+> not work" would be appreciated, because then I'd at least know that
+> much. :)
+
+
+My diNovo has the same problem, but I didn't originally run the keyboard
+on Linux, I had it on Windows until one morning it was dead. Nothing
+worked and nothing I did could reactivate the bluetooth hub.
+
+Moving it to Linux and it worked in HID mode, but the bluetooth side of
+the dongle is dead in the way you describe.
+
+I suggest you test if the dongle is working by using it on a Windows
+machine. If it's as dead as mine, perhaps it's time to have a warrenty
+talk with Logitech.
+
+
+
+--------------ms040806070802020405060002
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
-Content-Disposition: inline
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-T24gMTEvMTUvMDYsIFN0ZWVuIEV1Z2VuIFBvdWxzZW4gPHNlcEBsaXgtd29ybGQubmV0PiB3cm90
-ZToKCj4gSSBzdWdnZXN0IHlvdSB0ZXN0IGlmIHRoZSBkb25nbGUgaXMgd29ya2luZyBieSB1c2lu
-ZyBpdCBvbiBhIFdpbmRvd3MKPiBtYWNoaW5lLiBJZiBpdCdzIGFzIGRlYWQgYXMgbWluZSwgcGVy
-aGFwcyBpdCdzIHRpbWUgdG8gaGF2ZSBhIHdhcnJlbnR5Cj4gdGFsayB3aXRoIExvZ2l0ZWNoLgoK
-CgpUaGF0J3MgYSB2ZXJ5IGdvb2QgaWRlYS4gOikgQWN0dWFsbHksIEkgZGlkIHVzZSBpdCBpbiBX
-aW5kb3dzIGluIG9uZSByYXJlCm9jY2Fzc2lvbiB5ZXN0ZXJkYXksIGFuZCBzaW5jZSBJIHJlY2Vp
-dmVkIGFuIHVwZGF0ZSB0byB0aGUgc29mdHdhcmUsIEkgaGFkCnRvIHJlLXBhaXIgYWxsIHRoZSBk
-ZXZpY2VzICh0d2ljZSwgc2lnaCksIGVudGVyaW5nIG51bWJlcnMgYW5kIHNvIG9uLiBEb24ndApr
-bm93IGlmIHRoYXQgbWVhbnMgaXQgd2FzIHVzaW5nIGJsdWV0b290aCBvciBub3QsIGJ1dCBpdCB3
-b3JrZWQganVzdCBmaW5lLgoKV2hhdCBJIGRpZCBub3QgdHJ5IHdhcyB0byB1c2UgaXQgdG8gY29u
-bmVjdCB0byBhIHBob25lIG9yIHNpbWlsYXIuIEd1ZXNzCnRoYXQncyBuZXh0IG9uIHRoZSBsaXN0
-Li4uIDopCgpUaGFua3MgZm9yIHRoZSBzdWdnZXN0aW9uIQoKLS0gU3RvZmZlCgoKLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLQo+IFRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBv
-ZiBJVAo+IEpvaW4gU291cmNlRm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdl
-dCB0aGUgY2hhbmNlIHRvIHNoYXJlCj4geW91cgo+IG9waW5pb25zIG9uIElUICYgYnVzaW5lc3Mg
-dG9waWNzIHRocm91Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gKPiBodHRwOi8vd3d3
-LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9
-REVWREVWCj4KPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Xwo+IEJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdAo+IEJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZv
-cmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2Js
-dWV6LXVzZXJzCj4KPgo+Cj4KCgotLSAKS3Jpc3RvZmZlciBMdW5kw6luCuKciSBrcmlzdG9mZmVy
-Lmx1bmRlbkBnbWFpbC5jb20K4pyJIGtyaXN0b2ZmZXIubHVuZGVuQGdhbWVtYWtlci5udQpodHRw
-Oi8vd3d3LmdhbWVtYWtlci5udS8K4piOIDA3MDQgNDggOTggNzcK
-------=_Part_53683_23614046.1163597328025
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
-
-T24gMTEvMTUvMDYsIDxiIGNsYXNzPSJnbWFpbF9zZW5kZXJuYW1lIj5TdGVlbiBFdWdlbiBQb3Vs
-c2VuPC9iPiAmbHQ7PGEgaHJlZj0ibWFpbHRvOnNlcEBsaXgtd29ybGQubmV0Ij5zZXBAbGl4LXdv
-cmxkLm5ldDwvYT4mZ3Q7IHdyb3RlOjxkaXY+PHNwYW4gY2xhc3M9ImdtYWlsX3F1b3RlIj48L3Nw
-YW4+PGJyPjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9ImJvcmRlci1sZWZ0
-OiAxcHggc29saWQgcmdiKDIwNCwgMjA0LCAyMDQpOyBtYXJnaW46IDBwdCAwcHQgMHB0IDAuOGV4
-OyBwYWRkaW5nLWxlZnQ6IDFleDsiPgpJIHN1Z2dlc3QgeW91IHRlc3QgaWYgdGhlIGRvbmdsZSBp
-cyB3b3JraW5nIGJ5IHVzaW5nIGl0IG9uIGEgV2luZG93czxicj5tYWNoaW5lLiBJZiBpdCdzIGFz
-IGRlYWQgYXMgbWluZSwgcGVyaGFwcyBpdCdzIHRpbWUgdG8gaGF2ZSBhIHdhcnJlbnR5PGJyPnRh
-bGsgd2l0aCBMb2dpdGVjaC48L2Jsb2NrcXVvdGU+PGRpdj48YnI+PGJyPlRoYXQncyBhIHZlcnkg
-Z29vZCBpZGVhLiA6KSBBY3R1YWxseSwgSSBkaWQgdXNlIGl0IGluIFdpbmRvd3MgaW4gb25lIHJh
-cmUgb2NjYXNzaW9uIHllc3RlcmRheSwgYW5kIHNpbmNlIEkgcmVjZWl2ZWQgYW4gdXBkYXRlIHRv
-IHRoZSBzb2Z0d2FyZSwgSSBoYWQgdG8gcmUtcGFpciBhbGwgdGhlIGRldmljZXMgKHR3aWNlLCBz
-aWdoKSwgZW50ZXJpbmcgbnVtYmVycyBhbmQgc28gb24uIERvbid0IGtub3cgaWYgdGhhdCBtZWFu
-cyBpdCB3YXMgdXNpbmcgYmx1ZXRvb3RoIG9yIG5vdCwgYnV0IGl0IHdvcmtlZCBqdXN0IGZpbmUu
-Cjxicj48YnI+V2hhdCBJIGRpZCBub3QgdHJ5IHdhcyB0byB1c2UgaXQgdG8gY29ubmVjdCB0byBh
-IHBob25lIG9yIHNpbWlsYXIuIEd1ZXNzIHRoYXQncyBuZXh0IG9uIHRoZSBsaXN0Li4uIDopPGJy
-Pjxicj5UaGFua3MgZm9yIHRoZSBzdWdnZXN0aW9uITxicj48YnI+LS0gU3RvZmZlPGJyPiZuYnNw
-OzwvZGl2Pjxicj48YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJib3JkZXIt
-bGVmdDogMXB4IHNvbGlkIHJnYigyMDQsIDIwNCwgMjA0KTsgbWFyZ2luOiAwcHQgMHB0IDBwdCAw
-LjhleDsgcGFkZGluZy1sZWZ0OiAxZXg7Ij4KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLTxicj5UYWtlIFN1cnZl
-eXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQ8YnI+Sm9pbiBTb3VyY2VG
-b3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hh
-cmUgeW91cjxicj5vcGluaW9ucyBvbiBJVCAmYW1wOyBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBi
-cmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaAo8YnI+PGEgaHJlZj0iaHR0cDovL3d3dy50ZWNo
-c2F5LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJmFtcDtwPXNvdXJjZWZvcmdlJmFtcDtD
-SUQ9REVWREVWIj5odHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5w
-aHAmYW1wO3A9c291cmNlZm9yZ2UmYW1wO0NJRD1ERVZERVY8L2E+PGJyPjxicj5fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo8YnI+Qmx1ZXotdXNlcnMgbWFp
-bGluZyBsaXN0PGJyPjxhIGhyZWY9Im1haWx0bzpCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3Jn
-ZS5uZXQiPkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldDwvYT48YnI+PGEgaHJlZj0i
-aHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMi
-Pmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJz
-CjwvYT48YnI+PGJyPjxicj48YnI+PC9ibG9ja3F1b3RlPjwvZGl2Pjxicj48YnIgY2xlYXI9ImFs
-bCI+PGJyPi0tIDxicj5LcmlzdG9mZmVyIEx1bmTDqW48YnI+4pyJIDxhIGhyZWY9Im1haWx0bzpr
-cmlzdG9mZmVyLmx1bmRlbkBnbWFpbC5jb20iPmtyaXN0b2ZmZXIubHVuZGVuQGdtYWlsLmNvbTwv
-YT48YnI+4pyJIDxhIGhyZWY9Im1haWx0bzprcmlzdG9mZmVyLmx1bmRlbkBnYW1lbWFrZXIubnUi
-PgprcmlzdG9mZmVyLmx1bmRlbkBnYW1lbWFrZXIubnU8L2E+PGJyPjxhIGhyZWY9Imh0dHA6Ly93
-d3cuZ2FtZW1ha2VyLm51LyI+aHR0cDovL3d3dy5nYW1lbWFrZXIubnUvPC9hPjxicj7imI4gMDcw
-NCA0OCA5OCA3Nzxicj4K
-------=_Part_53683_23614046.1163597328025--
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIK7DCC
+BXIwggRaoAMCAQICBEOGqWgwDQYJKoZIhvcNAQEFBQAwMTELMAkGA1UEBhMCREsxDDAKBgNV
+BAoTA1REQzEUMBIGA1UEAxMLVERDIE9DRVMgQ0EwHhcNMDYwNzI2MTMyNTM1WhcNMDgwNzI2
+MTM1NTM1WjB7MQswCQYDVQQGEwJESzEpMCcGA1UEChMgSW5nZW4gb3JnYW5pc2F0b3Jpc2sg
+dGlsa255dG5pbmcxQTAaBgNVBAMTE1N0ZWVuIEV1Z2VuIFBvdWxzZW4wIwYDVQQFExxQSUQ6
+OTIwOC0yMDAyLTItMzE3NjE3NjE4MTQ5MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDl
+v74PjpJrPTPfGCsZVhVK+ihTc1gLzPApQLuuAwFkU1YlotH5E92uO6YAGBh0u7Nu89N/N5Ad
+JV4v6Hsmr8CZRAm6K/Nib3QsIByUi8VdgCcfD/MPheu8nne/YYQ6Edws3M1vBvY22NHW7Hkd
+dtjYNiD2biGQ36eNoLbCTeMClwIDAQABo4ICyjCCAsYwDgYDVR0PAQH/BAQDAgP4MCsGA1Ud
+EAQkMCKADzIwMDYwNzI2MTMyNTM1WoEPMjAwODA3MjYxMzU1MzVaMIIBNwYDVR0gBIIBLjCC
+ASowggEmBgoqgVCBKQEBAQEDMIIBFjAvBggrBgEFBQcCARYjaHR0cDovL3d3dy5jZXJ0aWZp
+a2F0LmRrL3JlcG9zaXRvcnkwgeIGCCsGAQUFBwICMIHVMAoWA1REQzADAgEBGoHGRm9yIGFu
+dmVuZGVsc2UgYWYgY2VydGlmaWthdGV0IGfmbGRlciBPQ0VTIHZpbGvlciwgQ1BTIG9nIE9D
+RVMgQ1AsIGRlciBrYW4gaGVudGVzIGZyYSB3d3cuY2VydGlmaWthdC5kay9yZXBvc2l0b3J5
+LiBCZW3mcmssIGF0IFREQyBlZnRlciB2aWxr5XJlbmUgaGFyIGV0IGJlZ3LmbnNldCBhbnN2
+YXIgaWZ0LiBwcm9mZXNzaW9uZWxsZSBwYXJ0ZXIuMEEGCCsGAQUFBwEBBDUwMzAxBggrBgEF
+BQcwAYYlaHR0cDovL29jc3AuY2VydGlmaWthdC5kay9vY3NwL3N0YXR1czAcBgNVHREEFTAT
+gRFzZXBAbGl4LXdvcmxkLm5ldDCBhAYDVR0fBH0wezBLoEmgR6RFMEMxCzAJBgNVBAYTAkRL
+MQwwCgYDVQQKEwNUREMxFDASBgNVBAMTC1REQyBPQ0VTIENBMRAwDgYDVQQDEwdDUkwxNDAz
+MCygKqAohiZodHRwOi8vY3JsLm9jZXMuY2VydGlmaWthdC5kay9vY2VzLmNybDAfBgNVHSME
+GDAWgBRgtYXsVmR+EhknZx1QFUtzrjv5EjAdBgNVHQ4EFgQUGnA0kYplEvpmQTxbkQMwljvV
+XMcwCQYDVR0TBAIwADAZBgkqhkiG9n0HQQAEDDAKGwRWNy4xAwIDqDANBgkqhkiG9w0BAQUF
+AAOCAQEAT5wZtMDaWA31Y7uOj4Z1YXx70TbIreJe1IdVGmQCb0X5LCapVCRHtnP0LEOOPZlJ
+WuR89jSRz8Ojxi+bR/maVu2bIlP900p+S18TksLsR1k7eiEPDYta8/rz7s5EHwuG00Ts9AiO
+4nySH3ra/fqBh3HgUUQCbhLLPAB9YhvHGgxJpdzICzw2g9KzzCLsXqWaGCwb64K46CE9klOX
+UIFoQJ82HeJmjzsMy9ULY5c1JwKPbn8AzbxSOrQi3ssGOiuZQ51zqFfXckXGy9GPQigT/IWk
+5sqzgVFmD1znzEl9+YITBfBSALKUdHxfkXu+UvOx+CjkWow4eSk/0QiF9DCZejCCBXIwggRa
+oAMCAQICBEOGqWgwDQYJKoZIhvcNAQEFBQAwMTELMAkGA1UEBhMCREsxDDAKBgNVBAoTA1RE
+QzEUMBIGA1UEAxMLVERDIE9DRVMgQ0EwHhcNMDYwNzI2MTMyNTM1WhcNMDgwNzI2MTM1NTM1
+WjB7MQswCQYDVQQGEwJESzEpMCcGA1UEChMgSW5nZW4gb3JnYW5pc2F0b3Jpc2sgdGlsa255
+dG5pbmcxQTAaBgNVBAMTE1N0ZWVuIEV1Z2VuIFBvdWxzZW4wIwYDVQQFExxQSUQ6OTIwOC0y
+MDAyLTItMzE3NjE3NjE4MTQ5MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlv74PjpJr
+PTPfGCsZVhVK+ihTc1gLzPApQLuuAwFkU1YlotH5E92uO6YAGBh0u7Nu89N/N5AdJV4v6Hsm
+r8CZRAm6K/Nib3QsIByUi8VdgCcfD/MPheu8nne/YYQ6Edws3M1vBvY22NHW7HkddtjYNiD2
+biGQ36eNoLbCTeMClwIDAQABo4ICyjCCAsYwDgYDVR0PAQH/BAQDAgP4MCsGA1UdEAQkMCKA
+DzIwMDYwNzI2MTMyNTM1WoEPMjAwODA3MjYxMzU1MzVaMIIBNwYDVR0gBIIBLjCCASowggEm
+BgoqgVCBKQEBAQEDMIIBFjAvBggrBgEFBQcCARYjaHR0cDovL3d3dy5jZXJ0aWZpa2F0LmRr
+L3JlcG9zaXRvcnkwgeIGCCsGAQUFBwICMIHVMAoWA1REQzADAgEBGoHGRm9yIGFudmVuZGVs
+c2UgYWYgY2VydGlmaWthdGV0IGfmbGRlciBPQ0VTIHZpbGvlciwgQ1BTIG9nIE9DRVMgQ1As
+IGRlciBrYW4gaGVudGVzIGZyYSB3d3cuY2VydGlmaWthdC5kay9yZXBvc2l0b3J5LiBCZW3m
+cmssIGF0IFREQyBlZnRlciB2aWxr5XJlbmUgaGFyIGV0IGJlZ3LmbnNldCBhbnN2YXIgaWZ0
+LiBwcm9mZXNzaW9uZWxsZSBwYXJ0ZXIuMEEGCCsGAQUFBwEBBDUwMzAxBggrBgEFBQcwAYYl
+aHR0cDovL29jc3AuY2VydGlmaWthdC5kay9vY3NwL3N0YXR1czAcBgNVHREEFTATgRFzZXBA
+bGl4LXdvcmxkLm5ldDCBhAYDVR0fBH0wezBLoEmgR6RFMEMxCzAJBgNVBAYTAkRLMQwwCgYD
+VQQKEwNUREMxFDASBgNVBAMTC1REQyBPQ0VTIENBMRAwDgYDVQQDEwdDUkwxNDAzMCygKqAo
+hiZodHRwOi8vY3JsLm9jZXMuY2VydGlmaWthdC5kay9vY2VzLmNybDAfBgNVHSMEGDAWgBRg
+tYXsVmR+EhknZx1QFUtzrjv5EjAdBgNVHQ4EFgQUGnA0kYplEvpmQTxbkQMwljvVXMcwCQYD
+VR0TBAIwADAZBgkqhkiG9n0HQQAEDDAKGwRWNy4xAwIDqDANBgkqhkiG9w0BAQUFAAOCAQEA
+T5wZtMDaWA31Y7uOj4Z1YXx70TbIreJe1IdVGmQCb0X5LCapVCRHtnP0LEOOPZlJWuR89jSR
+z8Ojxi+bR/maVu2bIlP900p+S18TksLsR1k7eiEPDYta8/rz7s5EHwuG00Ts9AiO4nySH3ra
+/fqBh3HgUUQCbhLLPAB9YhvHGgxJpdzICzw2g9KzzCLsXqWaGCwb64K46CE9klOXUIFoQJ82
+HeJmjzsMy9ULY5c1JwKPbn8AzbxSOrQi3ssGOiuZQ51zqFfXckXGy9GPQigT/IWk5sqzgVFm
+D1znzEl9+YITBfBSALKUdHxfkXu+UvOx+CjkWow4eSk/0QiF9DCZejGCAiowggImAgEBMDkw
+MTELMAkGA1UEBhMCREsxDDAKBgNVBAoTA1REQzEUMBIGA1UEAxMLVERDIE9DRVMgQ0ECBEOG
+qWgwCQYFKw4DAhoFAKCCAUcwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
+CQUxDxcNMDYxMTE1MDU1MjAyWjAjBgkqhkiG9w0BCQQxFgQU4vzaYX0YDsbgFrYgiHU0rmM5
+7hIwSAYJKwYBBAGCNxAEMTswOTAxMQswCQYDVQQGEwJESzEMMAoGA1UEChMDVERDMRQwEgYD
+VQQDEwtUREMgT0NFUyBDQQIEQ4apaDBKBgsqhkiG9w0BCRACCzE7oDkwMTELMAkGA1UEBhMC
+REsxDDAKBgNVBAoTA1REQzEUMBIGA1UEAxMLVERDIE9DRVMgQ0ECBEOGqWgwUgYJKoZIhvcN
+AQkPMUUwQzAKBggqhkiG9w0DBzAOBggqhkiG9w0DAgICAIAwDQYIKoZIhvcNAwICAUAwBwYF
+Kw4DAgcwDQYIKoZIhvcNAwICASgwDQYJKoZIhvcNAQEBBQAEgYBdzOJXQfd7Xo1YAmm8N/H0
+G3AqNJRI53ymp5VsUxZIov56fZ1jhm9SC9m780eCUI8bnEApY/q5P9G9L22Mf9xZSWtHEs4C
+Us7K44H+cqCPQEexklQ8UawOqTf1cKKI1fIckNsRI+Cmh+AsG4+nR/lovJZqIgIQHOCxkb7k
+xbCg8AAAAAAAAA==
+--------------ms040806070802020405060002--
 
 
---===============0670145835==
+--===============1064616535==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -115,7 +138,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0670145835==
+--===============1064616535==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -126,4 +149,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0670145835==--
+--===============1064616535==--
