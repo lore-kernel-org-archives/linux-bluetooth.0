@@ -1,50 +1,54 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <455B8696.2010405@xmission.com>
-Date: Wed, 15 Nov 2006 14:28:54 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Return-Path: <leonerd-bluez@leonerd.org.uk>
+Date: Wed, 15 Nov 2006 20:21:45 +0000
+From: Paul LeoNerd Evans <leonerd-bluez@leonerd.org.uk>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <455B6987.3070703@gmail.com>
-In-Reply-To: <455B6987.3070703@gmail.com>
-Subject: Re: [Bluez-users] Low quality audio on Bluetooth Headset
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Cc: marcel@holtmann.org
+Subject: Re: [Bluez-users] Disconnect errors on 2.6.18-mh7
+Message-ID: <20061115202145.1a3415fe@nim.leo>
+In-Reply-To: <1163405394.26272.31.camel@localhost>
+References: <20061110213915.58e6cabf@nim.leo>
+	<1163405394.26272.31.camel@localhost>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary=Sig_NOjwsiymXNgtl_c3WIyVbp.;
+ protocol="application/pgp-signature"; micalg=PGP-SHA1
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Manuel
+--Sig_NOjwsiymXNgtl_c3WIyVbp.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> I have a pair of Hifi bluetooth hearphones, that AIRcable 
-> (www.aircable.net) send to me. I use it under Windows and Linux, it 
-> cames with a usb bt dongle, that is recognized as a usb-sound card which 
-> works perfectly, the thing is that when I try to use the headset with a 
-> generic Bluetooth Dongle (using a2dpd) I get very low quality audio. I 
-> think the headphones work at 22kHz, and I don't get more than 11kHz when 
-> I use a2dpd, is there anything that I can do to fix this (including 
-> doing some code :D)
+On Mon, 13 Nov 2006 09:09:54 +0100
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-what kind of quality problem? Is it only the low sampling rate or is it
-one of the other problems? (low volume... popping sounds... played too
-fast or slow... static...)
+> run "hcidump -X -V" and show us the result for the disconnect phase and
+> the failed attempt to re-connect.
 
-a2dp headsets are required to support 44.1khz btw.
+Well, I recently rebooted the kernel, to try out something else. Since
+then (Monday), I've not actually noticed a single failing disconnect,
+despite me leaving it alone during the day, overnight, and so on. I
+suspect it was a transient error somehow in the previous boot of this
+kernel.
 
-Brad
+I'll leave the hcidump running anyway, it's writing a logfile now, and if
+it happens to start doing this again, I'll take a look.
 
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+--=20
+Paul "LeoNerd" Evans
+
+leonerd@leonerd.org.uk
+ICQ# 4135350       |  Registered Linux# 179460
+http://www.leonerd.org.uk/
+
+--Sig_NOjwsiymXNgtl_c3WIyVbp.
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQFFW3beqRXzCRLr5iQRAgHTAJ9y/hDrf5s2YDgccMxqR4wmdh/mbgCeNA5d
+REK8PKxzuhqEIgXV4WFyP7Q=
+=CWOQ
+-----END PGP SIGNATURE-----
+
+--Sig_NOjwsiymXNgtl_c3WIyVbp.--
