@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Mayank BATRA <mayank.batra@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Thu, 16 Nov 2006 16:01:54 +0530
-Message-ID: <002701c7096a$6f92e630$9d0cc70a@dlh.st.com>
-MIME-Version: 1.0
-In-Reply-To: <1163672610.5169.18.camel@localhost>
-Subject: Re: [Bluez-devel] Can I create an eSCO connection using BlueZ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <7e36c64c0611152108k62463cf5s864cce421dbf047d@mail.gmail.com>
+References: <7e36c64c0611152108k62463cf5s864cce421dbf047d@mail.gmail.com>
+Date: Thu, 16 Nov 2006 11:29:16 +0100
+Message-Id: <1163672956.5169.23.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] server registration problem
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,23 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel, 
+Hi,
 
-> no it doesn't support eSCO setups. The reason for that is that nobody
-> actually sent a kernel patch to add this support and I never 
-> needed it.
+>          When i am trying for server registration for obexServer
+> using :
+> BtOBEX_ServerRegister(handle, BDADDR_ANY, channel);
+>  It shows the error "Server register error! (Bluetooth)".
+>       I m using a dongle whose BD address is 11:11:11:11:11: 11.I am
+> not sure whats exact problem here.Plz reply soultion on this.
 
-Actually I'm not interested in creating eSCO setup exactly.
-My requirement is that while trying to create any synchronous
-connection(SCO/eSCO),
-I want a Setup Synchronous Command to be sent over HCI rather than
-an Add SCO Command.
+this two errors are not related. However you might have happen to have
+an OpenOBEX version that doesn't include Bluetooth support or the RFCOMM
+kernel module is not loaded. In anycase, I would try to return that
+dongle, because it has an invalid BD_ADDR.
 
-Is it possible?
+Regards
 
-Best Regards,
+Marcel
 
-Mayank
 
 
 -------------------------------------------------------------------------
