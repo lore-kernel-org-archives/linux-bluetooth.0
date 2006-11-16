@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <455CBE1E.8000800@free.fr>
-Date: Thu, 16 Nov 2006 20:38:06 +0100
+Message-ID: <455CBBA6.8040401@free.fr>
+Date: Thu, 16 Nov 2006 20:27:34 +0100
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <455C01C4.7090801@xmission.com>	<1163672537.5169.16.camel@localhost>
-	<455C8857.9050008@xmission.com>
-In-Reply-To: <455C8857.9050008@xmission.com>
+References: <455C01C4.7090801@xmission.com>
+	<1163672537.5169.16.camel@localhost>
+In-Reply-To: <1163672537.5169.16.camel@localhost>
 Subject: Re: [Bluez-devel] audio & dbus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,26 +21,115 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Marcel & Brad, please find a few questions below:
+
+> Hi Brad,
+> 
+>> fwiw, I'm not sure how to break away from the need to specify the 
+>> profile for the case of a combo a2dp/sco device.
+> 
+> I am still not convinced that we need to do this kind of things, 
+
+Marcel, what do you mean by 'this kind of things' ?
+
+but if
+> you really wanna separate this, then we need a more general approach. In
+> case of A2DP it can happen that we have two or even more independent
+> channels (I know that no such device exists at the moment).
+> 
+> So what you need is some kind of capabilities command and then you can
+> use this to create instances for all devices. So my proposal would be
+> that we use org.bluez.Audio as a configuration interface (like Manager)
+> and then org.bluez.Headset to actually connect, disconnect etc.
+> 
+>> Audio hierarchy (experimental)
+>> ==============================
+>>
+>> Service		org.bluez
+>> Interface	org.bluez.Audio
+>>
+>> Methods		array{string} ListDevices()
+>>
+>> 			Return array of bdaddr strings for each audio
+>> 			device we have paired with.
+>>
+>> 		void Connect(string identifier, string profile)
+>>
+>> 			Opens the control connection to an audio device.
+>> 			Will not open the audio channel until requested
+>> 			by the audio plugin or directly from the
+>> 			application.
+>>
+>> 		void Disconnect(string identifier, string profile)
+>>
+>> 			Stops audio if it was playing and closes the
+>> 			control connection to the audio device.
+>>
+>> 		void Play(string identifier, string profile)
+>>
+>> 			Opens the audio stream. Called from the audio
+>> 			plugin or from the application if audio is
+>> 			routed somewhere other than the daemon (eg
+>> 			through PCM, direct to the DSP).
+>>
+>> 		void Stop(string identifier, string profile)
+>>
+>> 		void Pause(string identifier, string profile)
+>>
+>> 		void Resume(string identifier, string profile)
+>>
+>> 		void SetIdleDisconnect(string identifier, string profile, int32 delay)
+>>
+>> 			Set the idle Stop for the device.
+>>
+>> 			Only applicable when audio is routed through the
+>> 			daemon. Stop the stream and emit a signal if
+>> 			delay seconds pass without any audio being sent
+>> 			to the daemon from an application. A value of 0
+>> 			indicates no idle stop; this is the default.
+>>
+>> 		int32 GetIdleDisconnect(string identifier, string profile)
+
+Brad : How are we supposed to handle the case when an application 
+crashes while sending audio data ? Will he have to keep the audio 
+channel opened forever ?
+
 
 > 
-> hmm... this is actually for interacting with the builtin speaker. Johan 
-> mentioned the scenario of custom ringing both the headset and the 
-> speaker simultaneously and there are other scenarios we would need to 
-> interact with builtin audio (for example, to get a mic input with 
-> today's a2dp headsets you would use the built-in mic)
+> Timeouts must be in uint32 and name them "timeout". Delay would be used
+> in case a process is sent to sleep.
+> 
+>> 		int32 GetVolume(string identifier, string profile)
+>>
+>> 		void SetVolume(string identifier, string profile, int32 volume)
+>>
+>> 			Volume is 0..15
+> 
+> And for what reason is this int32. First of all it must be unsigned and
+> 16-bit seem to be enough.
+> 
+>> 		void ChangeVolume(string identifier, string profile, int16 delta)
+>>
+>> 			delta is +1 or -1
+> 
+> No. Use IncreaseVolume and DecreaseVolume.
+> 
+>> 		void AddWiredVoice()
+>>
+>> 			Add wired audio output to the voice routing rule
+>>
+>> 		void RemoveWiredVoice()
+>>
+>> 			Remove wired audio output from the voice routing
+>> 			rule
+> 
+> Not needed at all. This is not our business and the PCM routing will be
+> a parameter to the daemon. No need to support PCM and HCI routing at the
+> same time.
 
-Guys, i wouldn't like to be a pain in the ass, but i have an annoying 
-question to ask ;-)
-
-Why not keep it simple and keep a2dp for what it is designed for :
-listening to high quality music ?
-a2dp has never been designed for low latency, the codecs used will add 
-way too much delay to be of any use for real time audioconferencing or 
-videoconferencing.
-
-It's what i've learned while talking with some phone guys : it looks 
-like a2dp will never ever be used for audio calls, due to the latency 
-introduced by sbc or mp3. :-(
+Marcel, could you provide details on all this PCM routing stuff ?
+ALSA already has support for routing aufio through the use of audio plugins.
+Maybe it's a bit redundant ?
 
 Cheers,
 
