@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Mayank BATRA <mayank.batra@st.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Date: Thu, 16 Nov 2006 15:35:23 +0530
-Message-ID: <002601c70966$bc1d4ee0$9d0cc70a@dlh.st.com>
+Message-ID: <490dd6310611152339s2d7a0cfs1db1518317637cf6@mail.gmail.com>
+Date: Thu, 16 Nov 2006 07:39:00 +0000
+From: "Andy Spencer" <andy753421@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-devel] Can I create an eSCO connection using BlueZ?
+Subject: [Bluez-devel] WiiMote driver
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,26 +18,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-
-Is there any method with which I can create an eSCO connection using the BlueZ stack?
-I mean, if I create a socket in the following manner:
-int s;
-s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
-
-then the command sent will be "Add Sco Connection".
-
-But the problem is that my device (BT2.0)does not support this command as it has been deprecated since v1.2.
-My device supports only "Setup Synchronous Command".
-
-(eSCO connections can be created using only Setup Synchronous Command.)
-
-In other words, my question is does BlueZ Stack send Setup Synchronous Command to establish Synchronous connections?
-
-Best Regards,
-
-Mayank
-
+I've been thinking about purchasing a WiiMote when they become
+available in order to start working on a linux mouse driver for it.
+Since it communicates using bluetooth this seems to be the most
+appropriate place to do development. Anyway, I've never done much with
+bluetooth or drivers before so I'm going at this as a bit of a
+learning project. If anyone else is interested let me know.  I'll be
+reading though source code, but if anyone has any suggestions about
+where to start or what documentation to check out let me know that as
+well.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
