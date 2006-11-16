@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <455C44A4.8070604@free.fr>
-Date: Thu, 16 Nov 2006 11:59:48 +0100
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <7e36c64c0611160249k1d84be38mac24337684b768ea@mail.gmail.com>
+Date: Thu, 16 Nov 2006 16:19:08 +0530
+From: "shantibhushan sale" <shantibhushan.sale@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <002601c70966$bc1d4ee0$9d0cc70a@dlh.st.com>
-In-Reply-To: <002601c70966$bc1d4ee0$9d0cc70a@dlh.st.com>
-Subject: Re: [Bluez-devel] Can I create an eSCO connection using BlueZ?
+Subject: [Bluez-devel] Dongle address
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,38 +14,57 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1899494510=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+--===============1899494510==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_70837_3780577.1163674148288"
+
+------=_Part_70837_3780577.1163674148288
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 Hi,
-> Hi,
-> 
-> Is there any method with which I can create an eSCO connection using the BlueZ stack?
-> I mean, if I create a socket in the following manner:
-> int s;
-> s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
-> 
-> then the command sent will be "Add Sco Connection".
-> 
-> But the problem is that my device (BT2.0)does not support this command as it has been deprecated since v1.2.
-> My device supports only "Setup Synchronous Command".
-> 
+  I have a  dongle with BD address 11:11:11:11:11:11.I m not able to
+register my server for obex connection.
+       BtOBEX_ServerRegister(handle, BDADDR_ANY, channel);
 
-Interesting : Could you tell me which is the device in your case that 
-does not support the BT 1.2 anymore ? Is it the host controller or the 
-headset ?
+This gets failed....What is the problem
 
-Cheers,
+------=_Part_70837_3780577.1163674148288
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Fabien
+Hi,<br>&nbsp; I have a&nbsp; dongle with BD address 11:11:11:11:11:11.I m not able to register my server for obex connection.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BtOBEX_ServerRegister(handle, BDADDR_ANY, channel);<br><br>This gets failed....What is the problem
+<br>
+
+------=_Part_70837_3780577.1163674148288--
+
+
+--===============1899494510==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1899494510==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1899494510==--
