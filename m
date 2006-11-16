@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <490dd6310611152339s2d7a0cfs1db1518317637cf6@mail.gmail.com>
-References: <490dd6310611152339s2d7a0cfs1db1518317637cf6@mail.gmail.com>
-Date: Thu, 16 Nov 2006 11:27:31 +0100
-Message-Id: <1163672851.5169.20.camel@localhost>
+In-Reply-To: <002601c70966$bc1d4ee0$9d0cc70a@dlh.st.com>
+References: <002601c70966$bc1d4ee0$9d0cc70a@dlh.st.com>
+Date: Thu, 16 Nov 2006 11:23:30 +0100
+Message-Id: <1163672610.5169.18.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] WiiMote driver
+Subject: Re: [Bluez-devel] Can I create an eSCO connection using BlueZ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Andy,
+Hi Mayank,
 
-> I've been thinking about purchasing a WiiMote when they become
-> available in order to start working on a linux mouse driver for it.
-> Since it communicates using bluetooth this seems to be the most
-> appropriate place to do development. Anyway, I've never done much with
-> bluetooth or drivers before so I'm going at this as a bit of a
-> learning project. If anyone else is interested let me know.  I'll be
-> reading though source code, but if anyone has any suggestions about
-> where to start or what documentation to check out let me know that as
-> well.
+> Is there any method with which I can create an eSCO connection using the BlueZ stack?
+> I mean, if I create a socket in the following manner:
+> int s;
+> s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
+> 
+> then the command sent will be "Add Sco Connection".
+> 
+> But the problem is that my device (BT2.0)does not support this command as it has been deprecated since v1.2.
+> My device supports only "Setup Synchronous Command".
+> 
+> (eSCO connections can be created using only Setup Synchronous Command.)
+> 
+> In other words, my question is does BlueZ Stack send Setup Synchronous Command to establish Synchronous connections?
 
-it depends a little bit on which profile(s) they actually support. My
-guess would be it is HID or AVRCP.
+no it doesn't support eSCO setups. The reason for that is that nobody
+actually sent a kernel patch to add this support and I never needed it.
 
 Regards
 
