@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <455C5F6B.9060700@free.fr>
-Date: Thu, 16 Nov 2006 13:54:03 +0100
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <002601c70966$bc1d4ee0$9d0cc70a@dlh.st.com>	<455C44A4.8070604@free.fr>
-	<1163675396.5169.42.camel@localhost>
-In-Reply-To: <1163675396.5169.42.camel@localhost>
-Subject: Re: [Bluez-devel] Can I create an eSCO connection using BlueZ?
+In-Reply-To: <1163677864.455c50a8bb3a3@webmail.cs.umu.se>
+References: <1163677864.455c50a8bb3a3@webmail.cs.umu.se>
+Date: Thu, 16 Nov 2006 13:06:49 +0100
+Message-Id: <1163678809.5169.47.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Bluetooth devices connection problem
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,39 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Fabien,
+Hi,
+
+> We are using Linux for tranfering a file on bluetooth devices. Connection create
+> function on HCI layer i.e. (hci_create_connection(----)) can't procced and give
+> error message.
 > 
->>> Is there any method with which I can create an eSCO connection using the BlueZ stack?
->>> I mean, if I create a socket in the following manner:
->>> int s;
->>> s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
->>>
->>> then the command sent will be "Add Sco Connection".
->>>
->>> But the problem is that my device (BT2.0)does not support this command as it has been deprecated since v1.2.
->>> My device supports only "Setup Synchronous Command".
->>>
->> Interesting : Could you tell me which is the device in your case that 
->> does not support the BT 1.2 anymore ? Is it the host controller or the 
->> headset ?
+> Connection failed !
+> : operation not permitted
 > 
-> it can only be the dongle and the "Add SCO Connection" command has
-> already been deprecated with the Bluetooth 1.2 specification. However
-> most dongles still support it for backward compatibility.
-> 
+> kindly suggest is there any problem with linux kernal or else.
 
-Thanks for your answers guys :-)
+simply don't use this command. There is no need to deal with low-level
+HCI command at all. The L2CAP and RFCOMM sockets full abstract from this
+and for everything else we have a nice D-Bus based interface.
 
-I guess then it's just a matter of checking if this feature is supported 
-in the features bitmask, and send "Setup Synchronous Command" instead of
-"Add SCO Connection" if this is the case.
+Regards
 
-It shouldn't be too complicated to hack bluez to support this...
-
-Cheers,
-
-Fabien
+Marcel
 
 
 
