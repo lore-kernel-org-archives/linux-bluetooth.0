@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <455C95AB.8030800@xmission.com>
+Date: Thu, 16 Nov 2006 09:45:31 -0700
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <455C95AB.8030800@xmission.com>
-References: <455C01C4.7090801@xmission.com>
-	<1163672537.5169.16.camel@localhost> <455C8857.9050008@xmission.com>
-	<1163692996.5169.67.camel@localhost>  <455C95AB.8030800@xmission.com>
-Date: Thu, 16 Nov 2006 18:18:14 +0100
-Message-Id: <1163697494.5169.72.camel@localhost>
-Mime-Version: 1.0
+References: <455C01C4.7090801@xmission.com>	<1163672537.5169.16.camel@localhost>
+	<455C8857.9050008@xmission.com>
+	<1163692996.5169.67.camel@localhost>
+In-Reply-To: <1163692996.5169.67.camel@localhost>
 Subject: Re: [Bluez-devel] audio & dbus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,47 +22,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
-
-> >> 		void RingHeadset()
-> >>
-> >> 			Indicate a single RING to the connected headset.
-> > 
-> > No need to do this. This should be handled automatically via Play or
-> > some other method.
-> 
-> Play will always open the sco channel without waiting for the user to 
-> hit the button so it can't be overloaded to do ringing.
-> 
-> Would you like it better if we used a ringing state instead of sending a 
-> single ring? Should custom ring (open sco, send ring sound, wait for 
-> button press) and HSP ring (send RING on rfcomm channel) be combined 
-> together somehow?
-
-need to check in what states are RING can be sent. I think it would not
-be needed, but we will see.
-
-> >> 		void PressHeadsetButton()
-> >>
-> >> 			Indicate a button press to the connected audio
-> >> 			gateway.
-> > 
-> > Unneeded. We are not in the role of a headset.
-> 
-> right. I will save this for org.bluez.AudioGateway or whatever we call it.
-> 
-> That brings up another question. Do you want one interface to do 
-> handsfree  and headset or do we have one interface for each? I was 
-> imagining combining them but I need to read through HFP to be sure.
-
-We will have one interface for Headset, Handsfree and A2DP. There is no
-difference between expect the voice quality.
-
-Regards
-
 Marcel
 
+> This will be up to ALSA or GStreamer. It is not the job of the audio
+> daemon to handle non-Bluetooth stuff.
 
+Ok.
+
+>> 		void RingHeadset()
+>>
+>> 			Indicate a single RING to the connected headset.
+> 
+> No need to do this. This should be handled automatically via Play or
+> some other method.
+
+Play will always open the sco channel without waiting for the user to 
+hit the button so it can't be overloaded to do ringing.
+
+Would you like it better if we used a ringing state instead of sending a 
+single ring? Should custom ring (open sco, send ring sound, wait for 
+button press) and HSP ring (send RING on rfcomm channel) be combined 
+together somehow?
+
+>> 		void PressHeadsetButton()
+>>
+>> 			Indicate a button press to the connected audio
+>> 			gateway.
+> 
+> Unneeded. We are not in the role of a headset.
+
+right. I will save this for org.bluez.AudioGateway or whatever we call it.
+
+That brings up another question. Do you want one interface to do 
+handsfree  and headset or do we have one interface for each? I was 
+imagining combining them but I need to read through HFP to be sure.
+
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
