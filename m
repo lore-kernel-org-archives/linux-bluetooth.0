@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <455CCDEF.3030305@xmission.com>
-Date: Thu, 16 Nov 2006 13:45:35 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <ef9938ec0611161238p63da651dr497c04024c8ecbb7@mail.gmail.com>
+Date: Thu, 16 Nov 2006 15:38:26 -0500
+From: "Albert Huang" <albert@csail.mit.edu>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <455CCAF4.8020007@silicom.fr>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <455C01C4.7090801@xmission.com>	<1163672537.5169.16.camel@localhost>	<455C8857.9050008@xmission.com>
-	<455CBE1E.8000800@free.fr>
-In-Reply-To: <455CBE1E.8000800@free.fr>
-Subject: Re: [Bluez-devel] audio & dbus
+References: <455CCAF4.8020007@silicom.fr>
+Subject: Re: [Bluez-devel] SCO on bluez : some architectural tips
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,20 +20,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fabien
+>  * The unix socket between application and the daemon would queue some
+> data, which would add unwanted delay.
 
-> Why not keep it simple and keep a2dp for what it is designed for :
-> listening to high quality music ?
+just curious, was setvbuf( fp, NULL, _IONBUF, 0 ) to disable socket
+buffering an option?
 
-I'm not suggesting we make people use a2dp for voip. I want us to come 
-up with a flexible architecture that is future-proof and provides a 
-simple way for the user to decide how to use things.
-
-There's something to be said for having a default system-wide audio 
-setup and not making users go into each app and change its settings 
-because of the obscure nature of the different transports.
-
-brad
+-albert
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
