@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <455C44A4.8070604@free.fr>
+Date: Thu, 16 Nov 2006 11:59:48 +0100
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <455C44A4.8070604@free.fr>
 References: <002601c70966$bc1d4ee0$9d0cc70a@dlh.st.com>
-	<455C44A4.8070604@free.fr>
-Date: Thu, 16 Nov 2006 12:09:56 +0100
-Message-Id: <1163675396.5169.42.camel@localhost>
-Mime-Version: 1.0
+In-Reply-To: <002601c70966$bc1d4ee0$9d0cc70a@dlh.st.com>
 Subject: Re: [Bluez-devel] Can I create an eSCO connection using BlueZ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,32 +20,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
-
-> > Is there any method with which I can create an eSCO connection using the BlueZ stack?
-> > I mean, if I create a socket in the following manner:
-> > int s;
-> > s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
-> > 
-> > then the command sent will be "Add Sco Connection".
-> > 
-> > But the problem is that my device (BT2.0)does not support this command as it has been deprecated since v1.2.
-> > My device supports only "Setup Synchronous Command".
-> > 
+Hi,
+> Hi,
 > 
-> Interesting : Could you tell me which is the device in your case that 
-> does not support the BT 1.2 anymore ? Is it the host controller or the 
-> headset ?
+> Is there any method with which I can create an eSCO connection using the BlueZ stack?
+> I mean, if I create a socket in the following manner:
+> int s;
+> s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
+> 
+> then the command sent will be "Add Sco Connection".
+> 
+> But the problem is that my device (BT2.0)does not support this command as it has been deprecated since v1.2.
+> My device supports only "Setup Synchronous Command".
+> 
 
-it can only be the dongle and the "Add SCO Connection" command has
-already been deprecated with the Bluetooth 1.2 specification. However
-most dongles still support it for backward compatibility.
+Interesting : Could you tell me which is the device in your case that 
+does not support the BT 1.2 anymore ? Is it the host controller or the 
+headset ?
 
-Regards
+Cheers,
 
-Marcel
-
-
+Fabien
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
