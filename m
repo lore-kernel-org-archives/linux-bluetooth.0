@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <455C01C4.7090801@xmission.com>
-Date: Wed, 15 Nov 2006 23:14:28 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <7e36c64c0611152108k62463cf5s864cce421dbf047d@mail.gmail.com>
+Date: Thu, 16 Nov 2006 10:38:20 +0530
+From: "shantibhushan sale" <shantibhushan.sale@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] audio & dbus
+Subject: [Bluez-devel] server registration problem
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,147 +14,57 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0425304250=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel,
+--===============0425304250==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_66713_26755273.1163653700304"
 
-Can we discuss the audio dbus api some more?
+------=_Part_66713_26755273.1163653700304
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-fwiw, I'm not sure how to break away from the need to specify the 
-profile for the case of a combo a2dp/sco device.
+Hi all,
+         When i am trying for server registration for obexServer using :
+BtOBEX_ServerRegister(handle, BDADDR_ANY, channel);
+ It shows the error "Server register error! (Bluetooth)".
+      I m using a dongle whose BD address is 11:11:11:11:11:11.I am not sure
+whats exact problem here.Plz reply soultion on this.
 
-I'm focusing on routing "voice" (2-way audio) as a first priority. I 
-don't provide methods for adding and removing SCO from the voice route 
-since that's implied by connect/disconnect.
+------=_Part_66713_26755273.1163653700304
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-If this looks good I'll start boiling down HSP/HFP methods & signals.
+Hi all,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; When i am trying for server registration for obexServer using :<br>BtOBEX_ServerRegister(handle, BDADDR_ANY, channel);<br>&nbsp;It shows the error &quot;Server register error! (Bluetooth)&quot;.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I m using a dongle whose BD address is 11:11:11:11:11:
+11.I am not sure whats exact problem here.Plz reply soultion on this.<br>
 
-Audio hierarchy (experimental)
-==============================
-
-Service		org.bluez
-Interface	org.bluez.Audio
-
-Methods		array{string} ListDevices()
-
-			Return array of bdaddr strings for each audio
-			device we have paired with.
-
-		void Connect(string identifier, string profile)
-
-			Opens the control connection to an audio device.
-			Will not open the audio channel until requested
-			by the audio plugin or directly from the
-			application.
-
-		void Disconnect(string identifier, string profile)
-
-			Stops audio if it was playing and closes the
-			control connection to the audio device.
-
-		void Play(string identifier, string profile)
-
-			Opens the audio stream. Called from the audio
-			plugin or from the application if audio is
-			routed somewhere other than the daemon (eg
-			through PCM, direct to the DSP).
-
-		void Stop(string identifier, string profile)
-
-		void Pause(string identifier, string profile)
-
-		void Resume(string identifier, string profile)
-
-		void SetIdleDisconnect(string identifier, string profile, int32 delay)
-
-			Set the idle Stop for the device.
-
-			Only applicable when audio is routed through the
-			daemon. Stop the stream and emit a signal if
-			delay seconds pass without any audio being sent
-			to the daemon from an application. A value of 0
-			indicates no idle stop; this is the default.
-
-		int32 GetIdleDisconnect(string identifier, string profile)
-
-		int32 GetVolume(string identifier, string profile)
-
-		void SetVolume(string identifier, string profile, int32 volume)
-
-			Volume is 0..15
-
-		void ChangeVolume(string identifier, string profile, int16 delta)
-
-			delta is +1 or -1
-
-		void AddWiredVoice()
-
-			Add wired audio output to the voice routing rule
-
-		void RemoveWiredVoice()
-
-			Remove wired audio output from the voice routing
-			rule
-
-Signals		void Connected()
-
-			Indicate device and profile.
-
-		void Disconnected()
-		
-			Indicate device and profile.
-
-		void Played()
-
-			Indicate device and profile.
-
-		void Stopped()
-
-			Indicate device and profile.
-
-		void Paused()
-
-			Indicate device and profile.
-
-		void Resumed()
-
-			Indicate device and profile.
-
-		void IdleStopChanged()
-
-			Indicate the new idle, device, profile
-
-		void VolumeSet()
-
-			Indicate new volume, device, profile.
-
-		void VolumeChanged()
-
-			Indicate +1 or -1, device, profile.
-
-		void WiredVoiceAdded()
-
-			Indicated when wired audio is added to the
-			voice route, also automatically when a SCO
-			set is disconnected.
-
-		void WiredVoiceRemoved()
-
-			Indicated when wired audio is removed from
-			the voice route, also automatically when a
-			SCO set is connected.
+------=_Part_66713_26755273.1163653700304--
 
 
-Brad
+--===============0425304250==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============0425304250==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0425304250==--
