@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Thu, 16 Nov 2006 18:17:34 +0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200611171357.25160.denis.kenzior@trolltech.com>
-References: <200611171357.25160.denis.kenzior@trolltech.com>
-Date: Fri, 17 Nov 2006 11:10:05 +0100
-Message-Id: <1163758205.26965.1.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] PATCH: handle unicode local device name
+Message-ID: <20061116161734.GA26803@localhost.localdomain>
+References: <455C01C4.7090801@xmission.com>
+	<1163672537.5169.16.camel@localhost>
+	<455C8857.9050008@xmission.com>
+	<1163692996.5169.67.camel@localhost>
+MIME-Version: 1.0
+In-Reply-To: <1163692996.5169.67.camel@localhost>
+Subject: Re: [Bluez-devel] audio & dbus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,19 +23,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Hi,
 
-> This patch fixes a problem with storage.c turning unicode local device names 
-> into '.' dots.
+On Thu, Nov 16, 2006, Marcel Holtmann wrote:
+> > 		void RingHeadset()
+> > 
+> > 			Indicate a single RING to the connected headset.
+> 
+> No need to do this. This should be handled automatically via Play or
+> some other method.
 
-the local device name is in UTF-8 and not unicode and we need to change
-to character 127 to not corrupt the storage format.
+I think it's needed, or at least it can't be handled through the Play 
+method. The "Send Ring to headset, get answer button press from headset" 
+situation is not necessarely related to sending and receiving audio in 
+general.
 
-Regards
-
-Marcel
-
-
+Johan
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
