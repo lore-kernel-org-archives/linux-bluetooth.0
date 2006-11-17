@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <ef9938ec0611171019o2c346e60o266251e5ea2a99ad@mail.gmail.com>
-Date: Fri, 17 Nov 2006 13:19:00 -0500
-From: "Albert Huang" <albert@csail.mit.edu>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1163758205.26965.1.camel@localhost>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200611171357.25160.denis.kenzior@trolltech.com>
 References: <200611171357.25160.denis.kenzior@trolltech.com>
-	<1163758205.26965.1.camel@localhost>
+Date: Fri, 17 Nov 2006 11:10:05 +0100
+Message-Id: <1163758205.26965.1.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] PATCH: handle unicode local device name
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,12 +20,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-> the local device name is in UTF-8 and not unicode and we need to change
-> to character 127 to not corrupt the storage format.
+Hi Denis,
 
-do you mean "not UCS-2" instead of "not unicode"?
+> This patch fixes a problem with storage.c turning unicode local device names 
+> into '.' dots.
 
--albert
+the local device name is in UTF-8 and not unicode and we need to change
+to character 127 to not corrupt the storage format.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
