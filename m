@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d66c3bdf0611161759k50c474b4s2105c8406ef1c18c@mail.gmail.com>
-Date: Thu, 16 Nov 2006 17:59:02 -0800
-From: "Uichin (Eugene) Lee" <netssenger@gmail.com>
+Message-ID: <dca029990611161606q4a35f424qb3429dae686e171@mail.gmail.com>
+Date: Thu, 16 Nov 2006 16:06:05 -0800
+From: "E Shon" <eyshon@gmail.com>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <dca029990611161439td5760efy67aeaa0d55c374bf@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] link manager protocol monitoring.
+References: <dca029990611161439td5760efy67aeaa0d55c374bf@mail.gmail.com>
+Subject: Re: [Bluez-users] No /etc/rc.d/bluetooth?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,34 +16,64 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1210943534=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dear All,
+--===============1210943534==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_16260_2223808.1163721965389"
 
-Is there any way that we can figure out what's going on in the LMP. I
-tried to dump activities using "hcidump lmp" but I was not able to
-capture anything (I was only able to capture hci and data packets). Is
-it really true that we have no idea of seeing what's going on inside
-the chipset?
+------=_Part_16260_2223808.1163721965389
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-The main reason that I want to do this, we'd like to know how CQDDR
-works in Bluetooth 1.2 and 2.0 as well as Power Control. If you give
-me any tip, I would really appreciate that.
+Just realized it's in bluetooth-utils-3.7/scripts/ and i need to copy it
+over.  Sorry for posting.
 
-Thank you!
+On 11/16/06, E Shon <eyshon@gmail.com> wrote:
+>
+> I'm trying to cross-compile and install BlueZ on an arm-linux.  Everything
+> seems to have sucessfully installed but there is no /etc/rc.d/bluetooth
+> file.  Does this mean something has gone wrong or is there some other way to
+> start the bluetooth.  modprobe and lsmod are not available.
+>
 
--- 
-Uichin (Eugene) Lee
-Ph.D. Student UCLA CS Dept.
+------=_Part_16260_2223808.1163721965389
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Just realized it's in bluetooth-utils-3.7/scripts/ and i need to copy it over.&nbsp; Sorry for posting.<br><br><div><span class="gmail_quote">On 11/16/06, <b class="gmail_sendername">E Shon</b> &lt;<a href="mailto:eyshon@gmail.com">
+eyshon@gmail.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;"><span style="font-family: monospace;">I'm trying to cross-compile and install BlueZ on an arm-linux.&nbsp; Everything seems to have sucessfully installed but there is no /etc/rc.d/bluetooth file.&nbsp; Does this mean something has gone wrong or is there some other way to start the bluetooth.&nbsp; modprobe and lsmod are not available.
+<br></span>
+
+</blockquote></div><br>
+
+------=_Part_16260_2223808.1163721965389--
+
+
+--===============1210943534==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1210943534==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1210943534==--
