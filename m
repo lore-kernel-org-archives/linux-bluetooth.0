@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Reiner Klenk <pdq808@t-online.de>
+Message-ID: <455E1326.60704@xmission.com>
+Date: Fri, 17 Nov 2006 12:53:10 -0700
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <455E0CC1.3030706@gmail.com>
-References: <455E0CC1.3030706@gmail.com>
-Date: Fri, 17 Nov 2006 22:42:27 +0100
-Message-Id: <1163799747.9882.7.camel@grappa>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Motorola H500 - Fedora Core 6
+References: <455C01C4.7090801@xmission.com>	<1163672537.5169.16.camel@localhost>	<455C8857.9050008@xmission.com>	<1163692996.5169.67.camel@localhost>	<455C95AB.8030800@xmission.com>	<1163697494.5169.72.camel@localhost>
+	<455E0EE6.6000402@xmission.com>
+In-Reply-To: <455E0EE6.6000402@xmission.com>
+Subject: Re: [Bluez-devel] audio & dbus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,25 +21,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Fri, 2006-11-17 at 12:25 -0700, Jonathan Steffan wrote:
-> I'm having issues sending audio to my new H500. Per the readme here is
-> all my info:
+Brad
 
-> aplay -B 1000000 -D plughw:Headset sound.wav
-> Playing WAVE 'sound.wav' : Signed 16 bit Little Endian, Rate 44100 Hz,
-> Stereo
-> 
+> in progress. I'd much rather have Answered() and Playing() always 
+> signaled together regardless of the ring type used to indicate the call.
 
-aplay requires that the headset supports a2dp. From descriptions found
-on the net I would conclude that the H500 does not. You would need
-something like the Motorola HT820 or the Jabra BT620s.
+Hmm. This was not such a good example actually... the app needs to get
+Playing() so it knows when it can start transmitting the custom ring.
 
-Regards,
-Reiner
+I still like having special states for incoming calls.
 
--- 
-debb1046 (gmail.com, gtalk, jabber.org, ekiga.net, last.fm, skype)
-
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
