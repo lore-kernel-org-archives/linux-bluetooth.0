@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: =?iso-8859-1?Q?H=E5kan_Lager?= <hakan@digiloo.net>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
-Date: Sat, 18 Nov 2006 21:04:29 +0100
-Message-ID: <001f01c70b4c$c31f0ac0$0200a8c0@BLACKBIRD>
-MIME-Version: 1.0
-In-Reply-To: <20061118134050.3ea29147@localhost.localdomain>
+Date: Sat, 18 Nov 2006 13:40:50 -0800
+From: Andres Vargas - zodman <zod@linuxmerida.org>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20061118134050.3ea29147@localhost.localdomain>
+In-Reply-To: <000001c70b33$4c932da0$0200a8c0@BLACKBIRD>
+References: <20061118103136.0c7cc767@localhost.localdomain>
+	<000001c70b33$4c932da0$0200a8c0@BLACKBIRD>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] VB:  Problem with 2nd second dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -18,18 +20,6 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
-
-Also if the pin asking thing is commented in hcid.conf?
-
-/ Hakan
-
------Ursprungligt meddelande-----
-Fr=E5n: bluez-users-bounces@lists.sourceforge.net
-[mailto:bluez-users-bounces@lists.sourceforge.net] F=F6r Andres Vargas -
-zodman
-Skickat: den 18 november 2006 22:41
-Till: bluez-users@lists.sourceforge.net
-=C4mne: Re: [Bluez-users] VB: Problem with 2nd second dongle
 
 yeap because hcid function with dbus
 
@@ -155,15 +145,14 @@ H=E5kan Lager <hakan@digiloo.net> wrote:
 
 > > =
 
-> >
--------------------------------------------------------------------------
+> > -----------------------------------------------------------------------=
+--
 > > Take Surveys. Earn Cash. Influence the Future of IT
 > > Join SourceForge.net's Techsay panel and you'll get the chance to share
 > your
 > > opinions on IT & business topics through brief surveys - and earn cash
-> >
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+> > http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=
+=3DDEVDEV
 > > _______________________________________________
 > > Bluez-users mailing list
 > > Bluez-users@lists.sourceforge.net
@@ -175,18 +164,6 @@ VDEV
 
 
 -- =
-
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------------------------
