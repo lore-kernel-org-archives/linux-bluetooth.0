@@ -1,13 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sat, 18 Nov 2006 15:01:36 -0800
-From: Andres Vargas - zodman <zod@linuxmerida.org>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20061118150136.727e8084@localhost.localdomain>
-In-Reply-To: <001f01c70b4c$c31f0ac0$0200a8c0@BLACKBIRD>
-References: <20061118134050.3ea29147@localhost.localdomain>
-	<001f01c70b4c$c31f0ac0$0200a8c0@BLACKBIRD>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] VB:  Problem with 2nd second dongle
+Message-ID: <d1a198ae0611181300l7a82de16jec75427ba58678b8@mail.gmail.com>
+Date: Sat, 18 Nov 2006 22:00:59 +0100
+From: "=?UTF-8?Q?Kristoffer_Lund=C3=A9n?=" <kristoffer.lunden@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <455E35AA.4080803@lix-world.net>
+MIME-Version: 1.0
+References: <d1a198ae0610221203n6e0dd9a4y1cdf40e4bd79f8d5@mail.gmail.com>
+	<200610241902.07288.mailinglists@gaboo.org>
+	<d1a198ae0611141934v35458c90u1d865d096e00ab72@mail.gmail.com>
+	<455AAB02.5030909@lix-world.net>
+	<d1a198ae0611150528v36a10eackf0c1d908c8d21e95@mail.gmail.com>
+	<455E35AA.4080803@lix-world.net>
+Subject: Re: [Bluez-users] DiNovo + Ubuntu edgy, hid2hci is not working
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,197 +21,34 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-yeap search on your hcid.conf file for the pin ..... in debian default is 1=
-234
-
-On Sat, 18 Nov 2006 21:04:29 +0100
-H=E5kan Lager <hakan@digiloo.net> wrote:
-
-> Also if the pin asking thing is commented in hcid.conf?
-> =
-
-> / Hakan
-> =
-
-> -----Ursprungligt meddelande-----
-> Fr=E5n: bluez-users-bounces@lists.sourceforge.net
-> [mailto:bluez-users-bounces@lists.sourceforge.net] F=F6r Andres Vargas -
-> zodman
-> Skickat: den 18 november 2006 22:41
-> Till: bluez-users@lists.sourceforge.net
-> =C4mne: Re: [Bluez-users] VB: Problem with 2nd second dongle
-> =
-
-> yeap because hcid function with dbus
-> =
-
-> lagrutadelzod:/home/andy# /etc/init.d/dbus  stop
-> Stopping system message bus: dbus.
-> lagrutadelzod:/home/andy# pkill hcid
-> lagrutadelzod:/home/andy# hcid -n -f /etc/bluetooth/hcid.conf
-> hcid[18150]: Bluetooth HCI daemon
-> hcid[18150]: Unknown option 'piscan' line 12
-> hcid[18150]: Can't open system message bus connection: Failed to
-> connect to socket /var/run/dbus/system_bus_socket: No such file or
-> directory hcid[18150]: Unable to get on D-Bus
-> =
-
-> :'(
-> =
-
-> lagrutadelzod:/home/andy# /etc/init.d/dbus  start
-> Starting system message bus: dbus.
-> lagrutadelzod:/home/andy# hcid -n -f /etc/bluetooth/hcid.conf
-> hcid[18161]: Bluetooth HCI daemon
-> hcid[18161]: Unknown option 'piscan' line 12
-> hcid[18161]: Register path:/org/bluez fallback:1
-> hcid[18161]: HCI dev 0 registered
-> hcid[18161]: Register path:/org/bluez/hci0 fallback:0
-> hcid[18161]: HCI dev 0 already up
-> hcid[18161]: Device hci0 has been added
-> hcid[18161]: Starting security manager 0
-> hcid[18161]: Device hci0 has been activated
-> =
-
-> :PPPPPPPPPPPPPPPPPP
-> =
-
-> the hcid needs dbus .... =
-
-> =
-
-> On Sat, 18 Nov 2006 18:02:14 +0100
-> H=E5kan Lager <hakan@digiloo.net> wrote:
-> =
-
-> > Do I need dbus if I only use BT for sending?
-> > =
-
-> > / Hakan
-> > =
-
-> > =
-
-> > -----Ursprungligt meddelande-----
-> > Fr=E5n: bluez-users-bounces@lists.sourceforge.net
-> > [mailto:bluez-users-bounces@lists.sourceforge.net] F=F6r Andres Vargas -
-> > zodman
-> > Skickat: den 18 november 2006 19:32
-> > Till: bluez-users@lists.sourceforge.net
-> > =C4mne: Re: [Bluez-users] VB: Problem with 2nd second dongle
-> > =
-
-> > you need start the dbus daemon
-> > =
-
-> > /etc/init.d/dbus start
-> > =
-
-> > On Sat, 18 Nov 2006 16:08:04 +0100
-> > H=E5kan Lager <hakan@digiloo.net> wrote:
-> > =
-
-> > > =
-
-> > > Hi,
-> > > =
-
-> > > Here is the result:
-> > > =
-
-> > > 0)
-> > > =
-
-> > > $ ./hcid -n
-> > > hcid[205]: Bluetooth HCI daemon
-> > > Failed to open connection to system message bus: Failed to connect to
-> > socket
-> > > /var/run/dbus/system_bus_socket: No such file or directory
-> > > =
-
-> > > hcid[205]: Unable to get on D-BUS
-> > > =
-
-> > > 1) $ insmod hci_usb.o isoc=3D0
-> > > Using /bluetooth/mod/hci_usb.o
-> > > insmod: invalid parameter isoc
-> > > =
-
-> > > 2) See appended file =
-
-> > >  =
-
-> > > =
-
-> > > -----Ursprungligt meddelande-----
-> > > Fr=E5n: bluez-users-bounces@lists.sourceforge.net
-> > > [mailto:bluez-users-bounces@lists.sourceforge.net] F=F6r Marcel Holtm=
-ann
-> > > Skickat: den 16 november 2006 11:32
-> > > Till: BlueZ users
-> > > =C4mne: Re: [Bluez-users] VB: Problem with 2nd second dongle
-> > > =
-
-> > > Hi Hakan,
-> > > =
-
-> > > > I begin to suspect this is a dbus error. Is there any simple way to
-> > check
-> > > > this suspicion?
-> > > =
-
-> > > it can't be a D-Bus error. Please try to load the hci_usb driver with
-> > > isoc=3D0. What does "lsusb" actually tell you?
-> > > =
-
-> > > Regards
-> > > =
-
-> > > Marcel
-> > > =
-
-> > > =
-
-> > > =
-
-> > >
-> -------------------------------------------------------------------------
-> > > Take Surveys. Earn Cash. Influence the Future of IT
-> > > Join SourceForge.net's Techsay panel and you'll get the chance to sha=
-re
-> > your
-> > > opinions on IT & business topics through brief surveys - and earn cash
-> > >
-> http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3D=
-DEVDEV
-> > > _______________________________________________
-> > > Bluez-users mailing list
-> > > Bluez-users@lists.sourceforge.net
-> > > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> > =
-
-> > =
-
-> =
-
-> =
-
-
-
--- =
-
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+T24gMTEvMTcvMDYsIFN0ZWVuIEV1Z2VuIFBvdWxzZW4gPHNlcEBsaXgtd29ybGQubmV0PiB3cm90
+ZToKPiBJZiB0aGUgZGlOb3ZvIGhhcyB3b3JrZWQgZm9yIHlvdSAoaW4gSENJIG1vZGUpLCBob3cg
+YWJvdXQgdHJ5aW5nIG9sZGVyCj4gdmVyc2lvbnMsIGdyYWIgdGhlIGRhcHBlciBibHVleiBvbmUg
+YW5kIHRyeSBpdD8KPgoKTm8sIHdoYXQgSSBrbm93IG9mIGl0IGhhcyBuZXZlciB3b3JrZWQgZm9y
+IG1lLCBuZXZlciB0cmllZDsgSSd2ZSBqdXN0CnVzZWQgdGhlIGtleWJvYXJkL21vdXNlIGFzLWlz
+LCB1bnRpbCByZWNlbnRseSwgd2hlbiBJIGdvdCBhIGJsdWV0b290aApwaG9uZSBhbmQgd2FudGVk
+IHRvIHVzZSB0aGF0IGFzIHdlbGwuIExhcmdlIGFtb3VudCBvZiBnb29nbGluZywKc2VhcmNoaW5n
+IGxpc3RzIGFuZCBmb3J1bXMgaGF2ZSBnaXZlbiBubyBjbHVlcyBhcGFydCBmcm9tIGEgcG9zdCBv
+cgp0d28gb24gdGhpcyBsaXN0IHNheWluZyBzb21ldGhpbmcgbGlrZSAidGhpcyB3b3JrcywgY2hl
+Y2sgdGhlIGxpc3QgZm9yCm1vcmUgaW5mbyIuIEkgY291bGRuJ3QgZmluZCB0aGlzIGV4dHJhIGlu
+Zm8gb24gdGhlIGxpc3QsIHNvIEknbSBhc2tpbmcKaWYgdGhlcmUgaXMgYW55IG1vcmUgaW5mbyBv
+ciBpZiBJJ3ZlIG1pc3VuZGVyc3Rvb2QgYW55dGhpbmcuIDopCgpJIHZlcnkgdmVyeSBtdWNoIHdv
+dWxkIGxpa2UgdGhpcyB0byB3b3JrLCBidXQgaWYgdGhlIGZ1bmN0aW9uYWxpdHkKaXNuJ3QgdGhl
+cmUgKGFuZCBJIGNhbid0IGhlbHAgZ2V0dGluZyBpdCBmaXhlZCB3aXRob3V0IGJlaW5nIGEKcHJv
+Z3JhbW1lciksIEkganVzdCB3YW50IHRvIGtub3cgc28gSSBjYW4gc3RvcCBsb29raW5nLi4uCgpU
+aGFua3MgZm9yIHlvdSBwYXRpZW5jZSEKCgotLSBTdG9mZmUKCi0tIApLcmlzdG9mZmVyIEx1bmTD
+qW4K4pyJIGtyaXN0b2ZmZXIubHVuZGVuQGdtYWlsLmNvbQrinIkga3Jpc3RvZmZlci5sdW5kZW5A
+Z2FtZW1ha2VyLm51Cmh0dHA6Ly93d3cuZ2FtZW1ha2VyLm51LwrimI4gMDcwNCA0OCA5OCA3Nwot
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tClRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1
+dHVyZSBvZiBJVApKb2luIFNvdXJjZUZvcmdlLm5ldCdzIFRlY2hzYXkgcGFuZWwgYW5kIHlvdSds
+bCBnZXQgdGhlIGNoYW5jZSB0byBzaGFyZSB5b3VyCm9waW5pb25zIG9uIElUICYgYnVzaW5lc3Mg
+dG9waWNzIHRocm91Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gKaHR0cDovL3d3dy50
+ZWNoc2F5LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJnA9c291cmNlZm9yZ2UmQ0lEPURF
+VkRFVgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVl
+ei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0
+dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
