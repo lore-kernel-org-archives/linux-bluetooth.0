@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4560925E.3030901@free.fr>
-Date: Sun, 19 Nov 2006 18:20:30 +0100
+Message-ID: <45608E0E.60707@free.fr>
+Date: Sun, 19 Nov 2006 18:02:06 +0100
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <455C01C4.7090801@xmission.com>	<1163672537.5169.16.camel@localhost>	<455CBBA6.8040401@free.fr>
-	<455CCBD8.3080001@xmission.com>
-In-Reply-To: <455CCBD8.3080001@xmission.com>
-Subject: Re: [Bluez-devel] audio & dbus
+References: <455CCAF4.8020007@silicom.fr>
+	<455CDE8D.4010009@xmission.com>	<455EDB72.7040401@free.fr>
+	<455FEF89.4050107@xmission.com>
+In-Reply-To: <455FEF89.4050107@xmission.com>
+Subject: Re: [Bluez-devel] SCO on bluez : some architectural tips
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,46 +22,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
+Brad,
+
+> Fabien
+> 
+>> We would have to put
+>>> in some locking to keep applications from trying to open more 
+>>> simultaneous sco sockets. I wonder how the other audio servers avoid 
+>>> this problem.
+>> Brad, you should have a look at headsetd source.
+>> I solved this problem there by having headsetd open the sco channel and 
+>> then hand it over to the application using unix sockets ancillary data. 
+>> (man 7 unix for more info)
+> 
+> nice... just like a cross-process dup().
+
+That's exactly the spirit of it. :-)
 
 > 
->>>> 		int32 GetIdleDisconnect(string identifier, string profile)
->> Brad : How are we supposed to handle the case when an application 
->> crashes while sending audio data ? Will he have to keep the audio 
->> channel opened forever ?
-> 
-> if the disconnect timout is set then after the timeout passes the sco 
-> connection will be closed.
-> 
-> I didn't want the timeout to default to be on since it's only useful in 
-> the case when audio goes over hci.
+> if we have two audio clients open, it sounds like they could both hold 
+> the fd to the sco socket--we'd just have to arbitrate who is allowed to 
+> use it at any one time.
 
-Looks like you lost me there :-(, i didn't understand your last sentence
-> 
->> Marcel, could you provide details on all this PCM routing stuff ?
->> ALSA already has support for routing aufio through the use of audio plugins.
->> Maybe it's a bit redundant ?
-> 
-> I was the one who brought up routing. I want the daemon to store enough 
-> state so the alsa plugin can figure out where audio goes.
+Exactly. :-) Current headsetd implementation waits for clients 
+connections on a unix server socket, and can only accept a single client 
+at a time.
+Thus we are sure that the server will be able to hand over the sco fd to 
+only one client at a time.
 
-
-Brad, could you provide some details on that ?
-If i read your schematic correctly, there is a GUI that allows user to 
-choose  between PCM and headset routing.
-If this is what it is supposed to do, then it is possible to do it at 
-ALSA level without having to write any code :
-
-Users would have to add that in their ~/.asoundrc for instance
-
-pcm.!default {
-     type dmix
-     slave.pcm "a2dpd"
-}
-
-And this would switch their default output to be the headset.
-Of course it is possible to write a program that automates that so that 
-people don't have to dig in their configuration files.
+Just a question that comes to my mind: Headsetd does only support one 
+active application and one SCO headset at a time. Is there any gain 
+supporting two headsets at the same time ? I was just trying to look for 
+use cases but didn't find any :-(
 
 Cheers,
 
