@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <455FEF89.4050107@xmission.com>
-Date: Sat, 18 Nov 2006 22:45:45 -0700
+Message-ID: <455FEBE0.6080600@xmission.com>
+Date: Sat, 18 Nov 2006 22:30:08 -0700
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <455CCAF4.8020007@silicom.fr> <455CDE8D.4010009@xmission.com>
-	<455EDB72.7040401@free.fr>
-In-Reply-To: <455EDB72.7040401@free.fr>
-Subject: Re: [Bluez-devel] SCO on bluez : some architectural tips
+References: <455CCAF4.8020007@silicom.fr><7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EA7@eumonex01.palmsource.com>	<455EE00B.80504@free.fr>
+	<7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EAE@eumonex01.palmsource.com>
+In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EAE@eumonex01.palmsource.com>
+Subject: Re: [Bluez-devel] RE : RE : SCO on bluez : some architectural tips
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,23 +21,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fabien
+Frederic
 
-> We would have to put
->> in some locking to keep applications from trying to open more 
->> simultaneous sco sockets. I wonder how the other audio servers avoid 
->> this problem.
-> 
-> Brad, you should have a look at headsetd source.
-> I solved this problem there by having headsetd open the sco channel and 
-> then hand it over to the application using unix sockets ancillary data. 
-> (man 7 unix for more info)
+> We won't be able to use +/- in a game or system sound!
 
-nice... just like a cross-process dup().
+multiplayer gaming would not be acceptable with a2dp latencies. System 
+sounds like taps that are supposed to be an immediate feedback would 
+have to be turned off probably.
 
-if we have two audio clients open, it sounds like they could both hold 
-the fd to the sco socket--we'd just have to arbitrate who is allowed to 
-use it at any one time.
+I want to have the bluetooth audio daemon keep track of latency for a 
+given headset and leave it up to the app to do something about it. 
+System sounds like tap feedback would be turned off for significant 
+delay but single-player gaming and video playing could accommodate the 
+delay.
 
 Brad
 
