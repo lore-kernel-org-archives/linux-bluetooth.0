@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45603A25.9080806@surrel.org>
-References: <45603A25.9080806@surrel.org>
-Date: Sun, 19 Nov 2006 12:13:04 +0100
-Message-Id: <1163934784.11790.0.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] PATCH for dund : correct --dialup
-	behavior	(Tomtom GPS)
+Message-ID: <45603A25.9080806@surrel.org>
+Date: Sun, 19 Nov 2006 12:04:05 +0100
+From: Valentin SURREL <dev@surrel.org>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] PATCH for dund : correct --dialup behavior (Tomtom
+	GPS)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,34 +19,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Valentin,
+Hello,
 
-> I've found a little problem when trying to connect my Tomtom One GPS to 
-> the Intenet via my computer.
-> 
-> Tomtom GPS expect to find a GSM Phone with DUN. I changed the class in 
-> /etc/bluetooth/hcid.conf to 0x520204.
-> Then I started dund with the correct options (--dialup particularly).
-> 
-> It did'nt work, Tomtom claiming that my 'phone' have not DUN.
-> 
-> I made this very little modification to dund/sdp.c :
-> 
-> ./bluez-utils-3.7/dund$ diff sdp_original.c sdp.c
-> 173a174,176
->  >       case DIALUP:
->  >               sdp_uuid16_create(&svclass, DIALUP_NET_SVCLASS_ID);
->  >               break;
-> 
-> After that, it works perfectly. Maybe this patch should be integrated 
-> into the official Bluez utils...
+I've found a little problem when trying to connect my Tomtom One GPS to 
+the Intenet via my computer.
 
-please create a unified diff, because I can't read these context diffs.
+Tomtom GPS expect to find a GSM Phone with DUN. I changed the class in 
+/etc/bluetooth/hcid.conf to 0x520204.
+Then I started dund with the correct options (--dialup particularly).
 
-Regards
+It did'nt work, Tomtom claiming that my 'phone' have not DUN.
 
-Marcel
+I made this very little modification to dund/sdp.c :
 
+./bluez-utils-3.7/dund$ diff sdp_original.c sdp.c
+173a174,176
+ >       case DIALUP:
+ >               sdp_uuid16_create(&svclass, DIALUP_NET_SVCLASS_ID);
+ >               break;
+
+After that, it works perfectly. Maybe this patch should be integrated 
+into the official Bluez utils...
+
+Valentin SURREL
 
 
 -------------------------------------------------------------------------
