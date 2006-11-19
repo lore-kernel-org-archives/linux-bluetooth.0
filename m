@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45603A25.9080806@surrel.org>
-Date: Sun, 19 Nov 2006 12:04:05 +0100
-From: Valentin SURREL <dev@surrel.org>
+Message-ID: <455FEF89.4050107@xmission.com>
+Date: Sat, 18 Nov 2006 22:45:45 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] PATCH for dund : correct --dialup behavior (Tomtom
-	GPS)
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <455CCAF4.8020007@silicom.fr> <455CDE8D.4010009@xmission.com>
+	<455EDB72.7040401@free.fr>
+In-Reply-To: <455EDB72.7040401@free.fr>
+Subject: Re: [Bluez-devel] SCO on bluez : some architectural tips
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,30 +21,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Fabien
 
-I've found a little problem when trying to connect my Tomtom One GPS to 
-the Intenet via my computer.
+> We would have to put
+>> in some locking to keep applications from trying to open more 
+>> simultaneous sco sockets. I wonder how the other audio servers avoid 
+>> this problem.
+> 
+> Brad, you should have a look at headsetd source.
+> I solved this problem there by having headsetd open the sco channel and 
+> then hand it over to the application using unix sockets ancillary data. 
+> (man 7 unix for more info)
 
-Tomtom GPS expect to find a GSM Phone with DUN. I changed the class in 
-/etc/bluetooth/hcid.conf to 0x520204.
-Then I started dund with the correct options (--dialup particularly).
+nice... just like a cross-process dup().
 
-It did'nt work, Tomtom claiming that my 'phone' have not DUN.
+if we have two audio clients open, it sounds like they could both hold 
+the fd to the sco socket--we'd just have to arbitrate who is allowed to 
+use it at any one time.
 
-I made this very little modification to dund/sdp.c :
-
-./bluez-utils-3.7/dund$ diff sdp_original.c sdp.c
-173a174,176
- >       case DIALUP:
- >               sdp_uuid16_create(&svclass, DIALUP_NET_SVCLASS_ID);
- >               break;
-
-After that, it works perfectly. Maybe this patch should be integrated 
-into the official Bluez utils...
-
-Valentin SURREL
-
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
