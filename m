@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4561046E.50905@xmission.com>
-Date: Sun, 19 Nov 2006 18:27:10 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <4560925E.3030901@free.fr>
+Date: Sun, 19 Nov 2006 18:20:30 +0100
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <455C01C4.7090801@xmission.com>	<1163672537.5169.16.camel@localhost>	<455CBBA6.8040401@free.fr>	<455CCBD8.3080001@xmission.com>
-	<4560925E.3030901@free.fr>
-In-Reply-To: <4560925E.3030901@free.fr>
+References: <455C01C4.7090801@xmission.com>	<1163672537.5169.16.camel@localhost>	<455CBBA6.8040401@free.fr>
+	<455CCBD8.3080001@xmission.com>
+In-Reply-To: <455CCBD8.3080001@xmission.com>
 Subject: Re: [Bluez-devel] audio & dbus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,51 +21,50 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Brad,
+
+> 
+>>>> 		int32 GetIdleDisconnect(string identifier, string profile)
+>> Brad : How are we supposed to handle the case when an application 
+>> crashes while sending audio data ? Will he have to keep the audio 
+>> channel opened forever ?
+> 
+> if the disconnect timout is set then after the timeout passes the sco 
+> connection will be closed.
+> 
+> I didn't want the timeout to default to be on since it's only useful in 
+> the case when audio goes over hci.
+
+Looks like you lost me there :-(, i didn't understand your last sentence
+> 
+>> Marcel, could you provide details on all this PCM routing stuff ?
+>> ALSA already has support for routing aufio through the use of audio plugins.
+>> Maybe it's a bit redundant ?
+> 
+> I was the one who brought up routing. I want the daemon to store enough 
+> state so the alsa plugin can figure out where audio goes.
+
+
+Brad, could you provide some details on that ?
+If i read your schematic correctly, there is a GUI that allows user to 
+choose  between PCM and headset routing.
+If this is what it is supposed to do, then it is possible to do it at 
+ALSA level without having to write any code :
+
+Users would have to add that in their ~/.asoundrc for instance
+
+pcm.!default {
+     type dmix
+     slave.pcm "a2dpd"
+}
+
+And this would switch their default output to be the headset.
+Of course it is possible to write a program that automates that so that 
+people don't have to dig in their configuration files.
+
+Cheers,
+
 Fabien
-
->>>>> 		int32 GetIdleDisconnect(string identifier, string profile)
->>> Brad : How are we supposed to handle the case when an application 
->>> crashes while sending audio data ? Will he have to keep the audio 
->>> channel opened forever ?
->> if the disconnect timout is set then after the timeout passes the sco 
->> connection will be closed.
->>
->> I didn't want the timeout to default to be on since it's only useful in 
->> the case when audio goes over hci.
-> 
-> Looks like you lost me there :-(, i didn't understand your last sentence
-
-we may have to modify this timeout plan. What I wanted was for the
-daemon to see when audio transmission was idle and have it put the state
-into "stopped" and close the sco or a2dp audio connection. The plugin
-would be notified via dbus that this had happened.
-
-We should work out a plan so the daemon knows when an app is actively
-sending audio even if the daemon is not processing that audio directly.
-
-> Brad, could you provide some details on that ?
-> If i read your schematic correctly, there is a GUI that allows user to 
-> choose  between PCM and headset routing.
-> If this is what it is supposed to do, then it is possible to do it at 
-> ALSA level without having to write any code :
-> 
-> Users would have to add that in their ~/.asoundrc for instance
-> 
-> pcm.!default {
->      type dmix
->      slave.pcm "a2dpd"
-> }
-> 
-> And this would switch their default output to be the headset.
-> Of course it is possible to write a program that automates that so that 
-> people don't have to dig in their configuration files.
-
-the advantage of using dbus communicating to an alsa plugin is the
-change (for example) from built-in audio to sco bluetooth audio can take
-effect in the middle of a voip call without the voip app needing to know
-anything special happened.
-
-Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
