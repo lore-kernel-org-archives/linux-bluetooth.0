@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4561DDBE.6040508@idlum.be>
-References: <4561DDBE.6040508@idlum.be>
-Date: Mon, 20 Nov 2006 18:03:26 +0100
-Message-Id: <1164042206.28397.36.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Extracting full SDP database from device at
-	once	using DBus API
+Message-ID: <4561DDBE.6040508@idlum.be>
+Date: Mon, 20 Nov 2006 17:54:22 +0100
+From: Pierre-Yves Paulus <py@idlum.be>
+MIME-Version: 1.0
+To: Bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] Extracting full SDP database from device at once
+	using DBus API
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,41 +19,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pierre-Yves,
+Hello,
 
-> At the moment, to perform a full extraction of the SDP database of a 
-> device, I first perform a call to
-> 
-> array{uint32} GetRemoteServiceHandles(string address, string match)
-> 
-> with an empty "match" string. It does connect to Public Browse Group, 
-> and returns handles for all the ServiceRecords. I then perform a call
-> 
-> array{byte} GetRemoteServiceRecord(string address, uint32 handle)
-> 
-> for each of these handles, and I get all the data in binary form ti 
-> interpret myself.
-> 
-> 
-> 1) Is it the right way to do this, or is there a way to get that all at 
-> once?
+At the moment, to perform a full extraction of the SDP database of a 
+device, I first perform a call to
 
-that is the way to go.
+array{uint32} GetRemoteServiceHandles(string address, string match)
 
-> 2) As ServiceRecords are extracted "one at a time", is Bluez connecting 
-> and disconnecting to the device each time? Is there a performance 
-> penalty in doing so? If I understand the output of hcidump well, it does 
-> not close he ACL link each time, but there is a L2CAP 
-> connection/disconnection for each ServiceRecord.
+with an empty "match" string. It does connect to Public Browse Group, 
+and returns handles for all the ServiceRecords. I then perform a call
 
-We should add a disconnect timeout to our SDP session and re-use it, but
-that hasn't been done so far.
+array{byte} GetRemoteServiceRecord(string address, uint32 handle)
 
-Regards
-
-Marcel
+for each of these handles, and I get all the data in binary form ti 
+interpret myself.
 
 
+1) Is it the right way to do this, or is there a way to get that all at 
+once?
+
+2) As ServiceRecords are extracted "one at a time", is Bluez connecting 
+and disconnecting to the device each time? Is there a performance 
+penalty in doing so? If I understand the output of hcidump well, it does 
+not close he ACL link each time, but there is a L2CAP 
+connection/disconnection for each ServiceRecord.
+
+Thanks a lot,
+Best Regards
+
+Pierre-Yves
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
