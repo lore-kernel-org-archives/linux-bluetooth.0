@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <456234FB.4020506@xmission.com>
-Date: Mon, 20 Nov 2006 16:06:35 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <45622D23.7070105@vasmac.com>
+Date: Mon, 20 Nov 2006 17:33:07 -0500
+From: Jose Vasconcellos <jose@vasmac.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <455392B6.5060209@free.fr> <45622D23.7070105@vasmac.com>
-In-Reply-To: <45622D23.7070105@vasmac.com>
+References: <455392B6.5060209@free.fr>
+In-Reply-To: <455392B6.5060209@free.fr>
 Subject: Re: [Bluez-devel] New bluetooth-headset release 20061109 : nickname
  'dogfood' ; -)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -21,18 +21,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Fabien,
+
+Looks like things are taking shape. Thank you for the contribution.
+
+Regarding the kernel patches, you know I've taken a different
+approach. I believe that what I posted is simpler and more reliable
+as it doesn't depend timers. The flow control approach avoids the
+possibility of getting out of sync with the dongle.
+
 Jose
 
-> Regarding the kernel patches, you know I've taken a different
-> approach. I believe that what I posted is simpler and more reliable
-> as it doesn't depend timers. The flow control approach avoids the
-> possibility of getting out of sync with the dongle.
-
-fyi, I talked to Marcel about this and he likes solving it at a higher
-level so the transports (usb/uart/sdio) don't have to each have their
-own solution. Maybe he could articulate it better...
-
-Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
