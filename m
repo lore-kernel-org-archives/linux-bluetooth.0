@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45618C92.3070000@eridani.co.uk>
-Date: Mon, 20 Nov 2006 11:08:02 +0000
-From: Michael McConnell <soruk@eridani.co.uk>
+Message-ID: <456187FC.1020606@det.uvigo.es>
+Date: Mon, 20 Nov 2006 11:48:28 +0100
+From: scostas <scostas@det.uvigo.es>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
 References: <45617D44.3010403@det.uvigo.es> <456184AD.4040009@eridani.co.uk>
-	<456187FC.1020606@det.uvigo.es>
-In-Reply-To: <456187FC.1020606@det.uvigo.es>
+In-Reply-To: <456184AD.4040009@eridani.co.uk>
 Subject: Re: [Bluez-users] emulating a GPRS modem with a linux PC
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,71 +20,41 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-scostas wrote:
-> Michael McConnell escribi=F3:
-> =
+Michael McConnell escribi=F3:
 
-> Hi Michael:
-> =
+Hi Michael:
 
-> =
+>> So I had the idea of emulating a BlueTooth GPRS modem with the PC. This =
 
->>>So I had the idea of emulating a BlueTooth GPRS modem with the PC. This =
+>> is: the PDA will think that my PC has a GPRS modem and will use it to =
 
->>>is: the PDA will think that my PC has a GPRS modem and will use it to =
+>> connect to the internet.
 
->>>connect to the internet.
-> =
+> You may need to set up some kind of "chat" script to emulate the AT =
 
-> =
+> interface of the mobile phone, this will take some trial and error since =
 
->>You may need to set up some kind of "chat" script to emulate the AT =
+> everything seems to want to send different commands :-/  The important =
 
->>interface of the mobile phone, this will take some trial and error since =
+> one would be the ATD<whatever> command, in that case send "CONNECT" =
 
->>everything seems to want to send different commands :-/  The important =
+> (chat will add the \r\n) then start PPP.
 
->>one would be the ATD<whatever> command, in that case send "CONNECT" =
+The problem is that I didn't receive AT commands. I'm not sure that I =
 
->>(chat will add the \r\n) then start PPP.
-> =
+have configured the RFCOMM port fine. That's my first question: how do I =
 
-> =
+have to set up it?
 
-> The problem is that I didn't receive AT commands. I'm not sure that I =
+I tried with
 
-> have configured the RFCOMM port fine. That's my first question: how do I =
+	rfcomm connect 0 XX:XX:XX:XX:XX:XX
 
-> have to set up it?
-> =
+then I launched a cat /dev/rfcomm0 and tried to connect from the PDA, =
 
-> I tried with
-> =
+but I didn't receive AT commands.
 
-> 	rfcomm connect 0 XX:XX:XX:XX:XX:XX
-> =
-
-> then I launched a cat /dev/rfcomm0 and tried to connect from the PDA, =
-
-> but I didn't receive AT commands.
-
-It's been a while since I had to play with inbound BT connections, but =
-
-IIRC rather than making a connection back to the PDA like what you've =
-
-done above, the PDA is trying to open a new session so you need =
-
-something listening for the inbound BT RFCOMM connection. But I'll be =
-
-damned if I can remember exactly what you need :(
-
--- =
-
--- Michael "Soruk" McConnell
-   Eridani Star System
-
-   MailStripper - http://www.MailStripper.eu/ - SMTP spam filter
-   Mail Me Anywhere - http://www.MailMeAnywhere.com/ - Mobile email
+Thanks.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
