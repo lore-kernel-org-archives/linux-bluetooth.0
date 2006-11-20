@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4561046E.50905@xmission.com>
+Date: Sun, 19 Nov 2006 18:27:10 -0700
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4560409D.8040001@surrel.org>
-References: <45603A25.9080806@surrel.org>
-	<1163934784.11790.0.camel@localhost>  <4560409D.8040001@surrel.org>
-Date: Mon, 20 Nov 2006 09:16:23 +0100
-Message-Id: <1164010583.28397.4.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] PATCH for dund :
-	correct	--dialup	behavior	(Tomtom GPS)
+References: <455C01C4.7090801@xmission.com>	<1163672537.5169.16.camel@localhost>	<455CBBA6.8040401@free.fr>	<455CCBD8.3080001@xmission.com>
+	<4560925E.3030901@free.fr>
+In-Reply-To: <4560925E.3030901@free.fr>
+Subject: Re: [Bluez-devel] audio & dbus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,39 +21,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Valentin,
+Fabien
 
-> It's my really first contribution to the GPL world, and I'm not familiar 
-> with the developpment tools. :-)
-
-don't worry. We tell you, but I think the difference between a context
-diff and unified diff is quite clear. I simply can't review any diff
-that is not in unified format. Actually this should be default, but it
-isn't.
-
-> This one might be better... (it works for me with "patch < mypatch" in 
-> the correct directory)
+>>>>> 		int32 GetIdleDisconnect(string identifier, string profile)
+>>> Brad : How are we supposed to handle the case when an application 
+>>> crashes while sending audio data ? Will he have to keep the audio 
+>>> channel opened forever ?
+>> if the disconnect timout is set then after the timeout passes the sco 
+>> connection will be closed.
+>>
+>> I didn't want the timeout to default to be on since it's only useful in 
+>> the case when audio goes over hci.
 > 
-> --- sdp.c       2006-05-23 14:48:37.000000000 +0200
-> +++ sdp.c       2006-11-19 11:37:10.000000000 +0100
-> @@ -171,6 +171,9 @@ int dun_sdp_search(bdaddr_t *src, bdaddr
->         case ACTIVESYNC:
->                 sdp_uuid128_create(&svclass, (void *) async_uuid);
->                 break;
-> +       case DIALUP:
-> +               sdp_uuid16_create(&svclass, DIALUP_NET_SVCLASS_ID);
-> +               break;
->         default:
->                 sdp_uuid16_create(&svclass, LAN_ACCESS_SVCLASS_ID);
->                 break;
+> Looks like you lost me there :-(, i didn't understand your last sentence
 
-Patch has been committed to the CVS. Thanks.
+we may have to modify this timeout plan. What I wanted was for the
+daemon to see when audio transmission was idle and have it put the state
+into "stopped" and close the sco or a2dp audio connection. The plugin
+would be notified via dbus that this had happened.
 
-Regards
+We should work out a plan so the daemon knows when an app is actively
+sending audio even if the daemon is not processing that audio directly.
 
-Marcel
+> Brad, could you provide some details on that ?
+> If i read your schematic correctly, there is a GUI that allows user to 
+> choose  between PCM and headset routing.
+> If this is what it is supposed to do, then it is possible to do it at 
+> ALSA level without having to write any code :
+> 
+> Users would have to add that in their ~/.asoundrc for instance
+> 
+> pcm.!default {
+>      type dmix
+>      slave.pcm "a2dpd"
+> }
+> 
+> And this would switch their default output to be the headset.
+> Of course it is possible to write a program that automates that so that 
+> people don't have to dig in their configuration files.
 
+the advantage of using dbus communicating to an alsa plugin is the
+change (for example) from built-in audio to sco bluetooth audio can take
+effect in the middle of a voip call without the voip app needing to know
+anything special happened.
 
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
