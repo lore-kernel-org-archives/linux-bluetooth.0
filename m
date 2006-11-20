@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4561F690.3040608@gmail.com>
-Date: Mon, 20 Nov 2006 18:40:16 +0000
-From: Brian Smith <brian.john.smith@gmail.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <1163882230.3025.18.camel@TesterBox.tester.ca>
-	<1164011400.28397.12.camel@localhost>
-In-Reply-To: <1164011400.28397.12.camel@localhost>
-Subject: [Bluez-devel] Gumstix / speed setting in Infineon PBA31308
+In-Reply-To: <4561DDBE.6040508@idlum.be>
+References: <4561DDBE.6040508@idlum.be>
+Date: Mon, 20 Nov 2006 18:03:26 +0100
+Message-Id: <1164042206.28397.36.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Extracting full SDP database from device at
+	once	using DBus API
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,13 +21,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi folks.
-Does anybody know if rfcomm can now set the baud rate on the new 
-gumstix  Infineon PBA31308 module to the 921,600bps needed for SCO audio 
-to work to/from it?
+Hi Pierre-Yves,
 
-Thanks,
-Brian.
+> At the moment, to perform a full extraction of the SDP database of a 
+> device, I first perform a call to
+> 
+> array{uint32} GetRemoteServiceHandles(string address, string match)
+> 
+> with an empty "match" string. It does connect to Public Browse Group, 
+> and returns handles for all the ServiceRecords. I then perform a call
+> 
+> array{byte} GetRemoteServiceRecord(string address, uint32 handle)
+> 
+> for each of these handles, and I get all the data in binary form ti 
+> interpret myself.
+> 
+> 
+> 1) Is it the right way to do this, or is there a way to get that all at 
+> once?
+
+that is the way to go.
+
+> 2) As ServiceRecords are extracted "one at a time", is Bluez connecting 
+> and disconnecting to the device each time? Is there a performance 
+> penalty in doing so? If I understand the output of hcidump well, it does 
+> not close he ACL link each time, but there is a L2CAP 
+> connection/disconnection for each ServiceRecord.
+
+We should add a disconnect timeout to our SDP session and re-use it, but
+that hasn't been done so far.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
