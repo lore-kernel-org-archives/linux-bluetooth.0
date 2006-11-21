@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-Id: <200611211021.kALALWc1030513@news01.csr.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-reply-to: <b5dccebe0611210140u7ab8b44dv392d83826b7af205@mail.gmail.com> 
+In-Reply-To: <b5dccebe0611210124h5076b396xa2e9c0617658cf13@mail.gmail.com>
 References: <b5dccebe0611210124h5076b396xa2e9c0617658cf13@mail.gmail.com>
-	<1164101366.28429.22.camel@localhost>
-	<b5dccebe0611210140u7ab8b44dv392d83826b7af205@mail.gmail.com>
-Date: Tue, 21 Nov 2006 10:21:32 +0000
-From: Peter Stephenson <pws@csr.com>
-MIME-Version: 1.0
+Date: Tue, 21 Nov 2006 10:29:26 +0100
+Message-Id: <1164101366.28429.22.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] concurrent operations
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -22,35 +20,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-"Mikael Lindqvist" wrote:
-> And a "page" does that mean a service search? I've seen the term page
-> in the bluetooth standard but haven't really understood it. What about
-> several "pages" at the same time, i. e. service search for several
-> remote devices at the same time?
+Hi Mikael,
 
-Paging is the period when you're trying to connect to the remote
-device.  This takes variable amounts of time, depending on how
-frequently the remote device is scanning.  Since scanning takes power,
-most devices only scan occasionally.  For a battery powered device, once
-every 1.28 seconds is typical.  Since the scan is short, it's important
-that the paging device devote the entire radio bandwidth to trying to
-pick up the remote device.  Hence you're stuck with not being able to do
-anything else at this point.
+> This is a general bluetooth question...
+> 
+> I have been experimenting with bluetooth for some time now and I'm
+> wondering what is actually possible to do simultaneously. My
+> application is doing device discovery, service search and obex push.
+> It seems as if it is possible to do several obex pushes at the same
+> time (guess that would go for any kind of RFCOMM  connections), but
+> it's just possible to do one device discovery or one service search
+> simultaneously. I. e. it's not possible to do service search at the
+> same time as device discovery, and it's only possible to do service
+> search for one remote device at the same time.
+> 
+> So to sort things out once and for all, what is actually possible? And
+> why does this limitation exist, is it something fundamental to
+> bluetooth or just because of current implementations?
 
-The same argument applies to inquiry (device discovery), although it's
-intrinsically unreliable --- you're not guaranteed to discover
-everything.
+you can't run an inquiry and a page at the same time. That is basically
+all that matters. However a remote name resolve includes a page, but
+that is the only exception. All the rest can run fully concurrent.
 
-Once connected it's possible to timeslice between different remote
-devices (although there are more complicated issues to do with network
-topology lurking).  The actual service search takes place when
-connected, but the chances are the paging process before took longer, so
-that will dominate the time.
+Regards
 
-pws
+Marcel
 
 
-To access the latest news from CSR copy this link into a web browser:  http://www.csr.com/email_sig.php
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
