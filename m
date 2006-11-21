@@ -1,17 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <b5dccebe0611210136ob437829ya7abeb2ce412dff9@mail.gmail.com>
-Date: Tue, 21 Nov 2006 10:36:20 +0100
-From: "Mikael Lindqvist" <li.mikael.spam@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1164100634.28429.19.camel@localhost>
+Message-Id: <200611211021.kALALWc1030513@news01.csr.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-reply-to: <b5dccebe0611210140u7ab8b44dv392d83826b7af205@mail.gmail.com> 
+References: <b5dccebe0611210124h5076b396xa2e9c0617658cf13@mail.gmail.com>
+	<1164101366.28429.22.camel@localhost>
+	<b5dccebe0611210140u7ab8b44dv392d83826b7af205@mail.gmail.com>
+Date: Tue, 21 Nov 2006 10:21:32 +0000
+From: Peter Stephenson <pws@csr.com>
 MIME-Version: 1.0
-References: <b5dccebe0611190350p4801a631m3cca5cc0b5c9abb3@mail.gmail.com>
-	<1163940471.11790.2.camel@localhost>
-	<b5dccebe0611200031v64a8d2d0xfdd92edf29a44d0@mail.gmail.com>
-	<1164012204.28397.22.camel@localhost>
-	<b5dccebe0611210114q57dca584me210abd2a37fc3da@mail.gmail.com>
-	<1164100634.28429.19.camel@localhost>
-Subject: Re: [Bluez-users] permissions to set local name
+Subject: Re: [Bluez-users] concurrent operations
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -25,28 +22,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-> > Do you know of something that makes it possible to use d-bus to do
-> > obex pushes? I have been looking for that but not found anything. The
-> > reason why I haven't used d-bus for my project before is mainly
-> > because of this, it would feel strange to have half the application
-> > use d-bus and the other half not.
->
-> It is actually on my list of things that I like to have, but my time is
-> limited and so I might work on other stuff first.
->
+"Mikael Lindqvist" wrote:
+> And a "page" does that mean a service search? I've seen the term page
+> in the bluetooth standard but haven't really understood it. What about
+> several "pages" at the same time, i. e. service search for several
+> remote devices at the same time?
 
-Ok,
+Paging is the period when you're trying to connect to the remote
+device.  This takes variable amounts of time, depending on how
+frequently the remote device is scanning.  Since scanning takes power,
+most devices only scan occasionally.  For a battery powered device, once
+every 1.28 seconds is typical.  Since the scan is short, it's important
+that the paging device devote the entire radio bandwidth to trying to
+pick up the remote device.  Hence you're stuck with not being able to do
+anything else at this point.
 
-It would be useful... Just in case I would feel extra productive some
-day, how would you envision this? By a separate daemon that would sit
-and provide this service over d-bus, or would it be built in to hcid?
-Or maybe first as a separate daemon, and if it seems stable enough
-later it would be built into hcid?
+The same argument applies to inquiry (device discovery), although it's
+intrinsically unreliable --- you're not guaranteed to discover
+everything.
 
-And would it be a good idea to build it on top of openobex? What other
-implementations of obex are there?
+Once connected it's possible to timeslice between different remote
+devices (although there are more complicated issues to do with network
+topology lurking).  The actual service search takes place when
+connected, but the chances are the paging process before took longer, so
+that will dominate the time.
 
--- Mikael
+pws
+
+
+To access the latest news from CSR copy this link into a web browser:  http://www.csr.com/email_sig.php
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
