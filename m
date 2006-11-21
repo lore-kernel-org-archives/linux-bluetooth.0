@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200611211504.42604.denis.kenzior@trolltech.com>
-References: <200611211504.42604.denis.kenzior@trolltech.com>
-Date: Tue, 21 Nov 2006 08:41:01 +0100
-Message-Id: <1164094861.28429.13.camel@localhost>
+In-Reply-To: <456234FB.4020506@xmission.com>
+References: <455392B6.5060209@free.fr> <45622D23.7070105@vasmac.com>
+	<456234FB.4020506@xmission.com>
+Date: Tue, 21 Nov 2006 08:35:00 +0100
+Message-Id: <1164094500.28429.9.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] XML SDP Record Registration
+Subject: Re: [Bluez-devel] New bluetooth-headset release 20061109 :	nickname
+	'dogfood' ; -)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,21 +22,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Hi Brad,
 
-> Attached is a patch that adds an expat based parser for parsing XML records.  
-> I've also added a new API function AddServiceRecordAsXML (does the same thing 
-> as AddServiceRecord, but in XML format) to the Manager hierarchy.  
+> > Regarding the kernel patches, you know I've taken a different
+> > approach. I believe that what I posted is simpler and more reliable
+> > as it doesn't depend timers. The flow control approach avoids the
+> > possibility of getting out of sync with the dongle.
+> 
+> fyi, I talked to Marcel about this and he likes solving it at a higher
+> level so the transports (usb/uart/sdio) don't have to each have their
+> own solution. Maybe he could articulate it better...
 
-looks good to me, but please follow the coding style of BlueZ. In your
-you have way to many whitespace between function names and pointers etc.
+I am not against using flow control, but we must be really careful if it
+supported or not. While for ACL it is mandatory, the SCO channel can be
+used without it. However even the use of flow control on SCO is a job
+for the Bluetooth core and no driver specific one. All Bluetooth drivers
+are transport drivers. They have no intelligence whatsoever and they are
+not interfering the HCI data. If they need to know some specific details
+about changes in the core then the notify() callback is the right place
+and if they need a special setup, then a quirk should be used. Other
+than that, they are plain stupid and only moving HCI packets to the
+hardware and back.
 
-> I've modified the service-agent example to take a new argument, --xmlfile, 
-> which will attempt to register a record stored in an XML format.
-
-Nice idea. I like that. The dbus_message_append_args() can actually add
-more then one argument at a time, this is why it is called "args". And
-please use mmap() for reading the XML file.
+So from my understanding the high resolution timer are a good choice to
+submit SCO packets to the hardware. In addition we can enable the flow
+control for SCO to have more control over the hardware. However please
+keep in mind that the enabling flow control means for traffic on the ACL
+links and so you might see a downgrade in bandwidth. So from my current
+point of view, the flow control stuff must be optional.
 
 Regards
 
