@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4562CDCE.3060603@idlum.be>
+Date: Tue, 21 Nov 2006 10:58:38 +0100
+From: Pierre-Yves Paulus <py@idlum.be>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1164094861.28429.13.camel@localhost>
-References: <200611211504.42604.denis.kenzior@trolltech.com>
-	<1164094861.28429.13.camel@localhost>
-Date: Tue, 21 Nov 2006 12:47:12 +0100
-Message-Id: <1164109632.28429.31.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] XML SDP Record Registration
+References: <4561DDBE.6040508@idlum.be> <1164042206.28397.36.camel@localhost>
+In-Reply-To: <1164042206.28397.36.camel@localhost>
+Subject: Re: [Bluez-devel] Extracting full SDP database from device at	once
+ using DBus API
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,23 +21,60 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Hi Marcel,
 
-> > I've modified the service-agent example to take a new argument, --xmlfile, 
-> > which will attempt to register a record stored in an XML format.
+Thanks a lot for your kind answer.
+
+Pierre-Yves
+
+
+
+Marcel Holtmann wrote:
+> Hi Pierre-Yves,
 > 
-> Nice idea. I like that. The dbus_message_append_args() can actually add
-> more then one argument at a time, this is why it is called "args". And
-> please use mmap() for reading the XML file.
-
-the code is untested, but I committed a version to the CVS that actually
-implements your idea.
-
-Regards
-
-Marcel
-
-
+>> At the moment, to perform a full extraction of the SDP database of a 
+>> device, I first perform a call to
+>>
+>> array{uint32} GetRemoteServiceHandles(string address, string match)
+>>
+>> with an empty "match" string. It does connect to Public Browse Group, 
+>> and returns handles for all the ServiceRecords. I then perform a call
+>>
+>> array{byte} GetRemoteServiceRecord(string address, uint32 handle)
+>>
+>> for each of these handles, and I get all the data in binary form ti 
+>> interpret myself.
+>>
+>>
+>> 1) Is it the right way to do this, or is there a way to get that all at 
+>> once?
+> 
+> that is the way to go.
+> 
+>> 2) As ServiceRecords are extracted "one at a time", is Bluez connecting 
+>> and disconnecting to the device each time? Is there a performance 
+>> penalty in doing so? If I understand the output of hcidump well, it does 
+>> not close he ACL link each time, but there is a L2CAP 
+>> connection/disconnection for each ServiceRecord.
+> 
+> We should add a disconnect timeout to our SDP session and re-use it, but
+> that hasn't been done so far.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys - and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
