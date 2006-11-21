@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <490dd6310611210554j161ce00fkc38437d4c81beaf8@mail.gmail.com>
-Date: Tue, 21 Nov 2006 13:54:13 +0000
-From: "Andy Spencer" <andy753421@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1163672851.5169.20.camel@localhost>
-MIME-Version: 1.0
-References: <490dd6310611152339s2d7a0cfs1db1518317637cf6@mail.gmail.com>
-	<1163672851.5169.20.camel@localhost>
-Subject: Re: [Bluez-devel] WiiMote driver
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1164094861.28429.13.camel@localhost>
+References: <200611211504.42604.denis.kenzior@trolltech.com>
+	<1164094861.28429.13.camel@localhost>
+Date: Tue, 21 Nov 2006 12:47:12 +0100
+Message-Id: <1164109632.28429.31.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] XML SDP Record Registration
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,44 +21,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Just some follow-up. I got a wiimote today and did a little bit of
-looking around at it, It does seems to support HID, however I'm not
-entirely sure how to use it yet. I put up a wiki at
-http://spenceal-3.student.rose-hulman.edu/wiimote/ with some
-additional information I got off of it.
+Hi Denis,
 
-On 11/16/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Andy,
->
-> > I've been thinking about purchasing a WiiMote when they become
-> > available in order to start working on a linux mouse driver for it.
-> > Since it communicates using bluetooth this seems to be the most
-> > appropriate place to do development. Anyway, I've never done much with
-> > bluetooth or drivers before so I'm going at this as a bit of a
-> > learning project. If anyone else is interested let me know.  I'll be
-> > reading though source code, but if anyone has any suggestions about
-> > where to start or what documentation to check out let me know that as
-> > well.
->
-> it depends a little bit on which profile(s) they actually support. My
-> guess would be it is HID or AVRCP.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys - and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+> > I've modified the service-agent example to take a new argument, --xmlfile, 
+> > which will attempt to register a record stored in an XML format.
+> 
+> Nice idea. I like that. The dbus_message_append_args() can actually add
+> more then one argument at a time, this is why it is called "args". And
+> please use mmap() for reading the XML file.
+
+the code is untested, but I committed a version to the CVS that actually
+implements your idea.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
