@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4563521A.1010707@free.fr>
-Date: Tue, 21 Nov 2006 20:23:06 +0100
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <45634AFC.909@vasmac.com>
+Date: Tue, 21 Nov 2006 13:52:44 -0500
+From: Jose Vasconcellos <jose@vasmac.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <455C01C4.7090801@xmission.com>	<1163672537.5169.16.camel@localhost>	<455CBBA6.8040401@free.fr>	<455CCBD8.3080001@xmission.com>	<4560925E.3030901@free.fr>
-	<4561046E.50905@xmission.com>
-In-Reply-To: <4561046E.50905@xmission.com>
-Subject: Re: [Bluez-devel] audio & dbus
+References: <455392B6.5060209@free.fr>
+In-Reply-To: <455392B6.5060209@free.fr>
+Subject: Re: [Bluez-devel] New bluetooth-headset release 20061109 : nickname
+ 'dogfood' ; -)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,33 +21,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
+Hi Fabien,
 
->>> I didn't want the timeout to default to be on since it's only useful in 
->>> the case when audio goes over hci.
->> Looks like you lost me there :-(, i didn't understand your last sentence
-> 
+I have a minor suggestion regarding the binding of the unix
+socket in daemon.c. Currently, the socket name registered
+contains nul characters. It would be better to register the
+name without the extra fill for monitoring applications.
 
-> we may have to modify this timeout plan. What I wanted was for the
-> daemon to see when audio transmission was idle and have it put the state
-> into "stopped" and close the sco or a2dp audio connection. The plugin
-> would be notified via dbus that this had happened.
+Jose
 
-Ok, i understand this time :-)
-However i'm surprised you thought of this can where an application would 
-just stop sending data, as it's not possible to happen.
-ALSA applications are expected to call snd_pcm_pause() if they want to 
-stop sending data without closing the stream. In practive this is rarely 
-used, as not all hardware support this feature.
-If they don't call snd_pcm_pause(), an underrun will occur, which must 
-be handle as an error later (i.e. hardware is then in an inconsistent 
-state).
+--- daemon.c    2006-05-18 10:30:06.000000000 -0400
++++ ../../cvs/alsa-plugin-sco/headsetd/new/daemon.c    2006-09-01 
+19:18:04.000000000 -0400
+@@ -73,7 +73,7 @@
+     struct sockaddr_un  pcm_srv_sock = {
+         AF_UNIX, PCM_SERVER_SOCKET
+     };
+-    if(bind(_appl_srv_sockfd, (struct sockaddr *)&pcm_srv_sock, 
+sizeof(pcm_srv_sock)) != 0) {
++    if(bind(_appl_srv_sockfd, (struct sockaddr *)&pcm_srv_sock, 
+__SOCKADDR_COMMON_SIZE+sizeof(PCM_SERVER_SOCKET)-1) != 0) {
+             syslog(LOG_ERR, "bind(_appl_srv_sockfd): %s", strerror(errno));
+         goto error;   
+     }
+@@ -96,7 +96,7 @@
+     struct sockaddr_un  ctl_srv_sock = {
+         AF_UNIX, CTL_SERVER_SOCKET
+     };
+-    if(bind(_appl_ctlsrv_sockfd, (struct sockaddr *)&ctl_srv_sock, 
+sizeof(ctl_srv_sock)) != 0) {
++    if(bind(_appl_ctlsrv_sockfd, (struct sockaddr *)&ctl_srv_sock, 
+__SOCKADDR_COMMON_SIZE+sizeof(CTL_SERVER_SOCKET)-1) != 0) {
+             syslog(LOG_ERR, "bind(_appl_ctlsrv_sockfd): %s", 
+strerror(errno));
+         goto error2;   
+     }
 
-Could you provide details on why you think this was needed ?
-
-Cheers,
-
-Fabien
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
