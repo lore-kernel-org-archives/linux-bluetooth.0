@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Srinivasu Rao P <srinivas@tataelxsi.co.in>
-To: <bluez-devel@lists.sourceforge.net>
-Date: Tue, 21 Nov 2006 15:07:38 +0530
-Message-ID: <000801c70d50$af3fb080$aa29320a@telxsi.com>
-MIME-Version: 1.0
-Subject: [Bluez-devel] Profiles and protocols
-Reply-To: Srinivasu Rao P <srinivas@tataelxsi.co.in>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200611211504.42604.denis.kenzior@trolltech.com>
+References: <200611211504.42604.denis.kenzior@trolltech.com>
+Date: Tue, 21 Nov 2006 08:41:01 +0100
+Message-Id: <1164094861.28429.13.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] XML SDP Record Registration
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,21 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Denis,
 
-Hi,
-  I am very new to this BlueZ stack
-  I want to know  what and all PROTOCOLS and PROFILES that our stack
-contains
-  In web site it is written that , only Core protocols and RFCOMM , A2DP are
-available
+> Attached is a patch that adds an expat based parser for parsing XML records.  
+> I've also added a new API function AddServiceRecordAsXML (does the same thing 
+> as AddServiceRecord, but in XML format) to the Manager hierarchy.  
 
- I want to know , Is it supports , OBEX, FTP, VDP , AVDTP,AVRCP ....
+looks good to me, but please follow the coding style of BlueZ. In your
+you have way to many whitespace between function names and pointers etc.
 
- Plz any one inform that  what protocols and profiles the stack support
-  and where i can get that code
+> I've modified the service-agent example to take a new argument, --xmlfile, 
+> which will attempt to register a record stored in an XML format.
 
-Thanks and regards
-srinivas
+Nice idea. I like that. The dbus_message_append_args() can actually add
+more then one argument at a time, this is why it is called "args". And
+please use mmap() for reading the XML file.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
