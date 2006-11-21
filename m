@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45636960.5020207@xmission.com>
-Date: Tue, 21 Nov 2006 14:02:24 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <456363FF.7070801@vasmac.com>
+Date: Tue, 21 Nov 2006 15:39:27 -0500
+From: Jose Vasconcellos <jose@vasmac.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <455C01C4.7090801@xmission.com>	<1163672537.5169.16.camel@localhost>	<455CBBA6.8040401@free.fr>	<455CCBD8.3080001@xmission.com>	<4560925E.3030901@free.fr>	<4561046E.50905@xmission.com>
-	<4563521A.1010707@free.fr>
-In-Reply-To: <4563521A.1010707@free.fr>
-Subject: Re: [Bluez-devel] audio & dbus
+References: <455392B6.5060209@free.fr> <45634AFC.909@vasmac.com>
+	<45635BFD.7070404@free.fr>
+In-Reply-To: <45635BFD.7070404@free.fr>
+Subject: Re: [Bluez-devel] New bluetooth-headset release 20061109 : nickname
+ 'dogfood' ; -)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,21 +22,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fabien
+Hi Fabien,
 
-> Could you provide details on why you think this was needed ?
+Please take a look at file /proc/net/unix.
+It lists all opened sockets. If headsetd is running,
+it's easy to tell because that is the only one that
+has a string of nul characters following the name.
+My patch fixes that.
 
-The primary reason for a timeout is to hold the audio stream open for a
-little while after the application closes it, in case it will be used
-again soon. Under the original a2dp plugin, one a2dp set I had would
-lock up when xine rapidly opened/closed/opened/closed/opened the alsa
-device on startup.
+Jose
 
-There's also delay in bringing up audio that we want to avoid if
-possible since it results in the start of the stream being lost. System
-sounds tend to get lost this way.
-
-Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
