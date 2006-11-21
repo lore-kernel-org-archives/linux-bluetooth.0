@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <b5dccebe0611210636l574f6e67y204c613e780e302f@mail.gmail.com>
-Date: Tue, 21 Nov 2006 15:36:10 +0100
-From: "Mikael Lindqvist" <li.mikael.spam@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+From: Thomas Kear <qupada@initng.org>
+To: bluez-users@lists.sourceforge.net
+Date: Tue, 21 Nov 2006 22:57:17 +1300
+References: <b5dccebe0611210124h5076b396xa2e9c0617658cf13@mail.gmail.com>
+In-Reply-To: <b5dccebe0611210124h5076b396xa2e9c0617658cf13@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] obex and d-bus (was permissions to set local name)
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-Id: <200611212257.25266.qupada@initng.org>
+Subject: Re: [Bluez-users] concurrent operations
+Reply-To: qupada@initng.org, BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,64 +16,94 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0978479938=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 11/21/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Mikael,
->
-> > > > Do you know of something that makes it possible to use d-bus to do
-> > > > obex pushes? I have been looking for that but not found anything. The
-> > > > reason why I haven't used d-bus for my project before is mainly
-> > > > because of this, it would feel strange to have half the application
-> > > > use d-bus and the other half not.
-> > >
-> > > It is actually on my list of things that I like to have, but my time is
-> > > limited and so I might work on other stuff first.
-> >
-> > It would be useful... Just in case I would feel extra productive some
-> > day, how would you envision this? By a separate daemon that would sit
-> > and provide this service over d-bus, or would it be built in to hcid?
-> > Or maybe first as a separate daemon, and if it seems stable enough
-> > later it would be built into hcid?
->
-> it should be a separate daemon or even process implementing the service
-> agent interface.
->
-> > And would it be a good idea to build it on top of openobex? What other
-> > implementations of obex are there?
->
-> Non that I know of and yes, OpenOBEX is the way to go.
->
+--===============0978479938==
+Content-Type: multipart/signed; boundary="nextPart3201880.e6Uetlh9Rq";
+	protocol="application/pgp-signature"; micalg=pgp-sha1
+Content-Transfer-Encoding: 7bit
 
-I have been looking a bit at openobex (I need it for another project)
-and I would like to have it using non-blocking sockets when doing
-connects. Would I be right in assuming that this would be needed if we
-were to implement a dbus service for obex as well? Unless we want the
-dbus-obex-daemon to be multi threaded, and that gives me strange
-feelings in the stomach. At least that's not the way hcid is made,
-i.e. it uses non blocking sockets when doing sdp connections, am I
-right?
+--nextPart3201880.e6Uetlh9Rq
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-I'm asking because I'm going to ask the openobex developers to accept
-a patch which adds the possibility to use non blocking sockets for
-connections (like sdp_lib can in bluez), and if I could say that it's
-required for a d-bus service, it would add a bit of weight to my
-arguments.
+You pretty much summed up everything there is to say.  I see someone replie=
+d=20
+off the list, but I'll add what I know, in any case.
 
-What do you think?
+As you noted, any regular data connection can be paired with others.  The=20
+limit is 7 connections, but you do have to remember that there's less than=
+=20
+800kbps to go around on Bluetooth 1.2 and only a couple of megabits on=20
+Bluetooth 2.0.  I have managed a file transfer from my cellphone (only ever=
+=20
+manages 25kB/s, ~200kbps) while talking on my bluetooth headset (not sure=20
+about bandwidth use for it) but I don't think I'd like to test anything els=
+e=20
+simultaneously.
 
--- Mikael
+=2D-Thomas
 
--- Mikael
+
+On Tuesday 21 November 2006 10:24 pm, Mikael Lindqvist wrote:
+> Hi,
+>
+> This is a general bluetooth question...
+>
+> I have been experimenting with bluetooth for some time now and I'm
+> wondering what is actually possible to do simultaneously. My
+> application is doing device discovery, service search and obex push.
+> It seems as if it is possible to do several obex pushes at the same
+> time (guess that would go for any kind of RFCOMM  connections), but
+> it's just possible to do one device discovery or one service search
+> simultaneously. I. e. it's not possible to do service search at the
+> same time as device discovery, and it's only possible to do service
+> search for one remote device at the same time.
+>
+> So to sort things out once and for all, what is actually possible? And
+> why does this limitation exist, is it something fundamental to
+> bluetooth or just because of current implementations?
+>
+> -- Mikael
+
+--nextPart3201880.e6Uetlh9Rq
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQBFYs2FBzwCEOHNMbURAsgBAJ9v3fgQf6N2S1mALPaPytDkJFPnHQCcDiE2
+uw/oHNmVrg5+QxgMB/zgfNQ=
+=Rejx
+-----END PGP SIGNATURE-----
+
+--nextPart3201880.e6Uetlh9Rq--
+
+
+--===============0978479938==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============0978479938==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0978479938==--
