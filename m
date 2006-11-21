@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Date: Tue, 21 Nov 2006 16:41:46 -0800
-Message-ID: <9AE298E00BCF7B469C04BE82FCE78B870211B8BB@scsmsx414.amr.corp.intel.com>
-From: "Pering, Trevor" <trevor.pering@intel.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] impact of distance on quality of transmission ?
+Date: Wed, 22 Nov 2006 00:00:39 +0100
+From: Michel Leconte <leconte.michel@cegetel.net>
+To: bluez-users@lists.sourceforge.net
+Message-id: <004f01c70dc0$dd7d3240$44a54256@claudia>
+MIME-version: 1.0
+Subject: [Bluez-users] higher rate than 115 kbits/s with an uart channel
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,109 +14,142 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0064030176=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is strange because Bluetooth implements reliable ACL connections...
-We've done multiple-client communications at greter range... a couple of
-questions come to mind.
+This is a multi-part message in MIME format.
 
-What about 3 roots?  5? When you see "pretty well the data" -- are there
-ANY errors?  There really shouldn't be.
+--===============0064030176==
+Content-type: multipart/alternative;
+	boundary="Boundary_(ID_60PA5uMAIiBhaRKU6NOoZQ)"
 
-What profile are you using?  PAN?
+This is a multi-part message in MIME format.
 
-How do the errors manifest themselves?  Is this using standrd linux
-socket calls? How many errors do you see?
+--Boundary_(ID_60PA5uMAIiBhaRKU6NOoZQ)
+Content-type: text/plain; charset=iso-8859-1
+Content-transfer-encoding: 7BIT
 
-What BT hardware are you using?
+Hi all,
 
-	Trevor
+I work with a Bluetooth Kit of Semtech-Xemics which is connected
+
+to a laptop with a Serial/USB adapter (supporting a max rate of 500 kbits/s).
+
+I have a specific command to setup the uart channel of the Kit. 
+
+At Bluez side, I setup the uart rate with the command :
+
+"hciattach /dev/ttyUSB0 any 230400" (for 230,4 kbits/s) 
+
+as I would like to work with a higher rate than 115 kbits/s.
+
+But, at this rate, I couldn't control or setup the kit.
+
+The "hciconfig -a" gives :
+
+hci0: Type: UART
+
+BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
+
+DOWN
+
+RX bytes:10 acl:0 sco:0 events:0 errors:10
+
+TX bytes:4 acl:0 sco:0 commands:1 errors:0
+
+at Rx side, all the packets are with errors. 
+
+What do I miss ? 
+
+Do I have to setup the uart channel rate somewhere else in bluez ? 
+
+The "hciconfig hci0 up" gives :
+
+Can't init device hci0: Connection timed out (110)
+
+For information, at 115 kbits/s, all is fine.
+
+thanks for any suggestion or idea.
+
+Regards.
+
+Michel
 
 
->-----Original Message-----
->From: bluez-users-bounces@lists.sourceforge.net 
->[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf 
->Of Alexandre Campo
->Sent: Tuesday, November 21, 2006 2:30 PM
->To: bluez-users@lists.sourceforge.net
->Subject: [Bluez-users] impact of distance on quality of transmission ?
->
->Hi,
->
->I am working with a bunch of robots and I communicate with 
->them using bluetooth connections.
->I am trying to receive data from 7 robots at the same time.
->
->For this, I simply connect to each robot using a program 
->linked against libbluetooth,
->that makes use of sockets and rfcomm.
->
->Using only one robot, we manage to receive pretty well the data.
->Using 7 robots things get complicated. If robots are close (~1 
->meter) from the bluetooth
->dongle, we receive all the data.
->
->As soon as the robots are far from the dongle (~2 meters and 
->more) we start observing errors
->in the data transmitted.
->
->I am surprised because :
->* we do not exceed the bt bandwidth (< 800 kb/s)
->* we use SOCK_STREAM sockets that are supposed to be reliable
->
->My questions :
->* any idea of what causes these mistakes ?
->* how to avoid transmission errors ?
->
->
->Thanks a lot for your help,
->Alexandre Campo.
->
->
->---------------------------------------------------------------
->---------
->
->Details :
->I use a belkin bt usb adapter (100m range)
->
->info from usbview : 
->
->BCM92045DG Non-UHE
->Manufacturer: Broadcom Corp
->Speed: 12Mb/s (full)
->USB Version:  2.00
->
->The robots have 
->
->a bluetooth serial port module :
->http://www.national.com/pf/LM/LMX9820A.html#General%20Description
->
->a phycomp 2.45 GHz antenna :
->http://www.phycomp-components.com/ (website unavailable ?)
->
->
->---------------------------------------------------------------
->----------
->Take Surveys. Earn Cash. Influence the Future of IT
->Join SourceForge.net's Techsay panel and you'll get the chance 
->to share your
->opinions on IT & business topics through brief surveys - and earn cash
->http://www.techsay.com/default.php?page=join.php&p=sourceforge&
-CID=DEVDEV
->_______________________________________________
->Bluez-users mailing list
->Bluez-users@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+
+--Boundary_(ID_60PA5uMAIiBhaRKU6NOoZQ)
+Content-type: text/html; charset=iso-8859-1
+Content-transfer-encoding: 7BIT
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+<META content="MSHTML 6.00.2800.1106" name=GENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=#ffffff>
+<DIV>
+<P><FONT face=Arial size=2>Hi all,</FONT></P>
+<P><FONT face=Arial size=2>I work with a Bluetooth Kit of Semtech-Xemics which 
+is connected</FONT></P>
+<P><FONT face=Arial size=2>to a laptop with a Serial/USB adapter (supporting a 
+max rate of 500 kbits/s).</FONT></P>
+<P><FONT face=Arial size=2>I have a specific command to setup the uart channel 
+of the Kit. </FONT></P>
+<P><FONT face=Arial size=2>At Bluez side, I setup the uart rate with the command 
+:</FONT></P>
+<P><FONT face=Arial size=2>"hciattach /dev/ttyUSB0 any 230400" (for 230,4 
+kbits/s) </FONT></P>
+<P><FONT face=Arial size=2>as I would like to work with a higher rate than 115 
+kbits/s.</FONT></P>
+<P><FONT face=Arial size=2>But, at this rate, I couldn't control or setup the 
+kit.</FONT></P>
+<P><FONT face=Arial size=2>The "hciconfig -a" gives :</FONT></P>
+<P><FONT face=Arial size=2>hci0: Type: UART</FONT></P>
+<P><FONT face=Arial size=2>BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 
+0:0</FONT></P>
+<P><FONT face=Arial size=2>DOWN</FONT></P>
+<P><FONT face=Arial size=2>RX bytes:10 acl:0 sco:0 events:0 errors:10</FONT></P>
+<P><FONT face=Arial size=2>TX bytes:4 acl:0 sco:0 commands:1 errors:0</FONT></P>
+<P><FONT face=Arial size=2>at Rx side, all the packets are with errors. 
+</FONT></P>
+<P><FONT face=Arial size=2>What do I miss ? </FONT></P>
+<P><FONT face=Arial size=2>Do I have to setup the uart channel rate somewhere 
+else in bluez ? </FONT></P>
+<P><FONT face=Arial size=2>The "hciconfig hci0 up" gives :</FONT></P>
+<P><FONT face=Arial size=2>Can't init device hci0: Connection timed out 
+(110)</FONT></P>
+<P><FONT face=Arial size=2>For information, at 115 kbits/s, all is 
+fine.</FONT></P>
+<P><FONT face=Arial size=2>thanks for any suggestion or idea.</FONT></P>
+<P><FONT face=Arial size=2>Regards.</FONT></P>
+<P><FONT face=Arial size=2>Michel</FONT></P>
+<P><FONT face=Arial size=2></FONT>&nbsp;</P></DIV></BODY></HTML>
+
+--Boundary_(ID_60PA5uMAIiBhaRKU6NOoZQ)--
+
+
+--===============0064030176==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============0064030176==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0064030176==--
