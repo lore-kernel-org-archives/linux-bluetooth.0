@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45643A0F.30706@kernelconcepts.de>
-Date: Wed, 22 Nov 2006 12:52:47 +0100
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Recommendation for A2DP headset?
+In-Reply-To: <004f01c70dc0$dd7d3240$44a54256@claudia>
+References: <004f01c70dc0$dd7d3240$44a54256@claudia>
+Date: Wed, 22 Nov 2006 08:02:24 +0100
+Message-Id: <1164178944.23477.26.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] higher rate than 115 kbits/s with an uart channel
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,30 +20,59 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi!
-I am thinking of finally buying a stereo A2DP heasdet since they have
-come into a reasonable price range (around 40EUR @ ebay).
+Hi Michael,
 
-Is there any recommendation concerning
-- works (mostly) with BlueZ
-- good sound quality
+do you mind sending ASCII emails only. I hate the crappy Microsoft
+Windows HTML stuff. This is a Linux mailing ;)
 
-?
+> I work with a Bluetooth Kit of Semtech-Xemics which is connected
+> 
+> to a laptop with a Serial/USB adapter (supporting a max rate of 500
+> kbits/s).
+> 
+> I have a specific command to setup the uart channel of the Kit. 
+> 
+> At Bluez side, I setup the uart rate with the command :
+> 
+> "hciattach /dev/ttyUSB0 any 230400" (for 230,4 kbits/s) 
+> 
+> as I would like to work with a higher rate than 115 kbits/s.
+> 
+> But, at this rate, I couldn't control or setup the kit.
+> 
+> The "hciconfig -a" gives :
+> 
+> hci0: Type: UART
+> 
+> BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
+> 
+> DOWN
+> 
+> RX bytes:10 acl:0 sco:0 events:0 errors:10
+> 
+> TX bytes:4 acl:0 sco:0 commands:1 errors:0
+> 
+> at Rx side, all the packets are with errors. 
+> 
+> What do I miss ? 
+> 
+> Do I have to setup the uart channel rate somewhere else in bluez ? 
+> 
+> The "hciconfig hci0 up" gives :
+> 
+> Can't init device hci0: Connection timed out (110)
+> 
+> For information, at 115 kbits/s, all is fine.
 
-I see a Logitech one (980415-0403) and one branded "i.Tech Blueband" or
-"i.Tech Blueband R".
+You must make sure that your device boots up with the higher baud rate
+or you have to write a init routine for hciattach to change it. Check
+the manual for your developer kit.
 
-Hints would be welcome ;)
-Thanks!
+Regards
 
-Cheers
-  nils faerber
+Marcel
 
--- 
-kernel concepts GbR      Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          Mob: +49-176-21024535
---
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
