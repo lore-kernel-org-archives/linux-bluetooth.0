@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4563C044.3030200@comcast.net>
-References: <4563C044.3030200@comcast.net>
-Date: Wed, 22 Nov 2006 07:59:58 +0100
-Message-Id: <1164178798.23477.23.camel@localhost>
+In-Reply-To: <010701c70df9$35ee3590$8935c70a@dlh.st.com>
+References: <010701c70df9$35ee3590$8935c70a@dlh.st.com>
+Date: Wed, 22 Nov 2006 07:23:22 +0100
+Message-Id: <1164176602.23477.14.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] hcid.conf multiple dongles
+Subject: Re: [Bluez-users] L2CAP disconnect problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,39 +20,12 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Dave,
+Hi Sumeet,
 
-> I have a Microsoft bluetooth keyboard and mouse that has worked well for
-> some time. I bought new bluetooth dongle (Kensington) in hopes of
-> getting my palm to connect via bluetooth (the Microsoft dongle didn't
-> work for this). With this arrangement, how do I control which dongle the
-> keyboard & mouse connect to? (it seems more reliable with Microsoft to
-> Microsoft).
+> So you mean if I use 2.6 kernel this problem will not occur. I tried
+> 2.6.9-34.EL kernel but the same problem occurs. No RFCOMM disconnect :( 
 
-the mouse and keyboard know the address of the last user and will
-reconnect to that dongle.
-
-> Also, the results of "hci tool scan" are confusing me a bit. For
-> example, I get...
-> 
-> myth1 ~ # hcitool scan
-> Scanning ...
->         00:50:F2:7E:11:F1       Myth1 Kensington dongle4
-> 
-> 
-> firstly, this bdadr is the microsoft dongle. Does this normally return a
-> dongle address? At one point I'm sure it was returning the palm pilot
-> address. Secondly, this name "Myth1 Kensington dongle4" is old. I used
-> to have that in hcid.conf, but changed it and even rebooted the box. 
-> Just for history, at one point I had an hcid.conf file with only one
-> device section (no device id's). Now I have the following ... (wasn't
-> sure about the device syntax, but this seems to work. btw, it would be
-> nice if the hcid.conf man page was more clear about the syntax on how to
-> specify multiple devices)
-
-Feel free to send in a patch for the manual page. Nowadays you can do
-persistent settings of the class and device name via D-Bus. It is much
-easier and you don't have to edit any config files.
+I was talking about a recent 2.6 kernel. Not some ancient RHEL4 kernel.
 
 Regards
 
