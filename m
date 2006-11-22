@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: JOSERIVERAPONCE@terra.es,
+Message-ID: <23917817.1164177063296.JavaMail.root@cps6>
+Date: Wed, 22 Nov 2006 07:31:03 +0100 (MET)
+From: "JOSERIVERAPONCE@terra.es" <JOSERIVERAPONCE@terra.es>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] MSWindows bluetooth sniffer?
+Reply-To: JOSERIVERAPONCE@terra.es,
         BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <23917817.1164177063296.JavaMail.root@cps6>
-References: <23917817.1164177063296.JavaMail.root@cps6>
-Date: Wed, 22 Nov 2006 07:49:55 +0100
-Message-Id: <1164178195.23477.20.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] MSWindows bluetooth sniffer?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -17,41 +15,23 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jose,
-
-> I am looking for a good MSWindows bluetooth protocol sniffer.
-
-you can use the Merlin from LeCroy or FTS4BT from Frontline, but both
-solution will be expensive.
-
-If you are lucky there is a Windows equivalent to hcidump, but don't ask
-me. I don't use Windows at all.
-
-> I want to launch the bluetooth application that connects to my 
-> bluetooth
-> mobile phone and be able to see what are they communicating so I can
-> write software in Linux to manage that mobile phone.
-
-You can do that without a sniffer. Create the correct SDP records on
-another Linux machines and copy the class of device and simple pretend
-to be a phone. This way, I hacked most of the secret protocols.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGkgR3V5cyEKCkkgYW0gbG9va2luZyBmb3IgYSBnb29kIE1TV2luZG93cyBibHVldG9vdGggcHJv
+dG9jb2wgc25pZmZlci4KCkkgd2FudCB0byBsYXVuY2ggdGhlIGJsdWV0b290aCBhcHBsaWNhdGlv
+biB0aGF0IGNvbm5lY3RzIHRvIG15IApibHVldG9vdGgKbW9iaWxlIHBob25lIGFuZCBiZSBhYmxl
+IHRvIHNlZSB3aGF0IGFyZSB0aGV5IGNvbW11bmljYXRpbmcgc28gSSBjYW4Kd3JpdGUgc29mdHdh
+cmUgaW4gTGludXggdG8gbWFuYWdlIHRoYXQgbW9iaWxlIHBob25lLgoKSm9zZQoKCgpQcnVlYmEg
+ZWwgY29ycmVvIFRlcnJhICggaHR0cDovL3d3dy50ZXJyYS5lcy9jb3JyZW8gKTsgU2VndXJvLCBy
+w6FwaWRvLCBmaWFibGUuCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUYWtlIFN1cnZleXMuIEVhcm4gQ2Fz
+aC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKSm9pbiBTb3VyY2VGb3JnZS5uZXQncyBUZWNo
+c2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hhcmUgeW91cgpvcGluaW9u
+cyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVmIHN1cnZleXMgLSBhbmQgZWFy
+biBjYXNoCmh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZw
+PXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3Rz
+LnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0
+aW5mby9ibHVlei1kZXZlbAo=
