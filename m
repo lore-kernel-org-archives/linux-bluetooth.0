@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <004f01c70dc0$dd7d3240$44a54256@claudia>
-References: <004f01c70dc0$dd7d3240$44a54256@claudia>
-Date: Wed, 22 Nov 2006 08:02:24 +0100
-Message-Id: <1164178944.23477.26.camel@localhost>
+In-Reply-To: <4563C044.3030200@comcast.net>
+References: <4563C044.3030200@comcast.net>
+Date: Wed, 22 Nov 2006 07:59:58 +0100
+Message-Id: <1164178798.23477.23.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] higher rate than 115 kbits/s with an uart channel
+Subject: Re: [Bluez-users] hcid.conf multiple dongles
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,53 +20,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Michael,
+Hi Dave,
 
-do you mind sending ASCII emails only. I hate the crappy Microsoft
-Windows HTML stuff. This is a Linux mailing ;)
+> I have a Microsoft bluetooth keyboard and mouse that has worked well for
+> some time. I bought new bluetooth dongle (Kensington) in hopes of
+> getting my palm to connect via bluetooth (the Microsoft dongle didn't
+> work for this). With this arrangement, how do I control which dongle the
+> keyboard & mouse connect to? (it seems more reliable with Microsoft to
+> Microsoft).
 
-> I work with a Bluetooth Kit of Semtech-Xemics which is connected
-> 
-> to a laptop with a Serial/USB adapter (supporting a max rate of 500
-> kbits/s).
-> 
-> I have a specific command to setup the uart channel of the Kit. 
-> 
-> At Bluez side, I setup the uart rate with the command :
-> 
-> "hciattach /dev/ttyUSB0 any 230400" (for 230,4 kbits/s) 
-> 
-> as I would like to work with a higher rate than 115 kbits/s.
-> 
-> But, at this rate, I couldn't control or setup the kit.
-> 
-> The "hciconfig -a" gives :
-> 
-> hci0: Type: UART
-> 
-> BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
-> 
-> DOWN
-> 
-> RX bytes:10 acl:0 sco:0 events:0 errors:10
-> 
-> TX bytes:4 acl:0 sco:0 commands:1 errors:0
-> 
-> at Rx side, all the packets are with errors. 
-> 
-> What do I miss ? 
-> 
-> Do I have to setup the uart channel rate somewhere else in bluez ? 
-> 
-> The "hciconfig hci0 up" gives :
-> 
-> Can't init device hci0: Connection timed out (110)
-> 
-> For information, at 115 kbits/s, all is fine.
+the mouse and keyboard know the address of the last user and will
+reconnect to that dongle.
 
-You must make sure that your device boots up with the higher baud rate
-or you have to write a init routine for hciattach to change it. Check
-the manual for your developer kit.
+> Also, the results of "hci tool scan" are confusing me a bit. For
+> example, I get...
+> 
+> myth1 ~ # hcitool scan
+> Scanning ...
+>         00:50:F2:7E:11:F1       Myth1 Kensington dongle4
+> 
+> 
+> firstly, this bdadr is the microsoft dongle. Does this normally return a
+> dongle address? At one point I'm sure it was returning the palm pilot
+> address. Secondly, this name "Myth1 Kensington dongle4" is old. I used
+> to have that in hcid.conf, but changed it and even rebooted the box. 
+> Just for history, at one point I had an hcid.conf file with only one
+> device section (no device id's). Now I have the following ... (wasn't
+> sure about the device syntax, but this seems to work. btw, it would be
+> nice if the hcid.conf man page was more clear about the syntax on how to
+> specify multiple devices)
+
+Feel free to send in a patch for the manual page. Nowadays you can do
+persistent settings of the class and device name via D-Bus. It is much
+easier and you don't have to edit any config files.
 
 Regards
 
