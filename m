@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45640925.4040207@xmission.com>
-Date: Wed, 22 Nov 2006 01:24:05 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] bluetooth-alsa website cleanup
+From: Marcel Holtmann <marcel@holtmann.org>
+To: JOSERIVERAPONCE@terra.es,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <23917817.1164177063296.JavaMail.root@cps6>
+References: <23917817.1164177063296.JavaMail.root@cps6>
+Date: Wed, 22 Nov 2006 07:49:55 +0100
+Message-Id: <1164178195.23477.20.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] MSWindows bluetooth sniffer?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,14 +21,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hey
+Hi Jose,
 
-fyi, I merged our various sources of documentation and put everything 
-together in a fairly spartan tabbed interface.
+> I am looking for a good MSWindows bluetooth protocol sniffer.
 
-http://bluetooth-alsa.sf.net/
+you can use the Merlin from LeCroy or FTS4BT from Frontline, but both
+solution will be expensive.
 
-Brad
+If you are lucky there is a Windows equivalent to hcidump, but don't ask
+me. I don't use Windows at all.
+
+> I want to launch the bluetooth application that connects to my 
+> bluetooth
+> mobile phone and be able to see what are they communicating so I can
+> write software in Linux to manage that mobile phone.
+
+You can do that without a sniffer. Create the correct SDP records on
+another Linux machines and copy the class of device and simple pretend
+to be a phone. This way, I hacked most of the secret protocols.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
