@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <23917817.1164177063296.JavaMail.root@cps6>
-Date: Wed, 22 Nov 2006 07:31:03 +0100 (MET)
-From: "JOSERIVERAPONCE@terra.es" <JOSERIVERAPONCE@terra.es>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] MSWindows bluetooth sniffer?
-Reply-To: JOSERIVERAPONCE@terra.es,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200611220959.20956.denis.kenzior@trolltech.com>
+References: <200611211504.42604.denis.kenzior@trolltech.com>
+	<1164094861.28429.13.camel@localhost>
+	<200611220959.20956.denis.kenzior@trolltech.com>
+Date: Wed, 22 Nov 2006 07:24:58 +0100
+Message-Id: <1164176698.23477.17.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] XML SDP Record Registration
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,23 +18,64 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGkgR3V5cyEKCkkgYW0gbG9va2luZyBmb3IgYSBnb29kIE1TV2luZG93cyBibHVldG9vdGggcHJv
-dG9jb2wgc25pZmZlci4KCkkgd2FudCB0byBsYXVuY2ggdGhlIGJsdWV0b290aCBhcHBsaWNhdGlv
-biB0aGF0IGNvbm5lY3RzIHRvIG15IApibHVldG9vdGgKbW9iaWxlIHBob25lIGFuZCBiZSBhYmxl
-IHRvIHNlZSB3aGF0IGFyZSB0aGV5IGNvbW11bmljYXRpbmcgc28gSSBjYW4Kd3JpdGUgc29mdHdh
-cmUgaW4gTGludXggdG8gbWFuYWdlIHRoYXQgbW9iaWxlIHBob25lLgoKSm9zZQoKCgpQcnVlYmEg
-ZWwgY29ycmVvIFRlcnJhICggaHR0cDovL3d3dy50ZXJyYS5lcy9jb3JyZW8gKTsgU2VndXJvLCBy
-w6FwaWRvLCBmaWFibGUuCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUYWtlIFN1cnZleXMuIEVhcm4gQ2Fz
-aC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKSm9pbiBTb3VyY2VGb3JnZS5uZXQncyBUZWNo
-c2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hhcmUgeW91cgpvcGluaW9u
-cyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVmIHN1cnZleXMgLSBhbmQgZWFy
-biBjYXNoCmh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZw
-PXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3Rz
-LnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0
-aW5mby9ibHVlei1kZXZlbAo=
+Hi Denis,
+
+> Here's a fixed up version of the patch.
+
+not it is not. I spent the last hours to fix your coding style mistakes.
+I really like the stuff you do, but the more time I have to spent to fix
+your code, the unlikelier I might include it. Here are some tips:
+
+You are doing way too much casts. Especially all casts for malloc() and
+free() are totally unneeded. Make sure you include malloc.h and
+everything will be fine. Check the manual pages for needed includes if
+you are unsure. Every cast has a potential to hide an error. Please do
+only casts if you really have to and you are 100% sure it is the only
+way to make this code working.
+
+Pointer are never initialized  with "= 0". Never. If you have to, then
+it is "= NULL". The same applies to any comparison and I prefer doing
+this with "!" as NULL check.
+
+In general, the assigned of a variable when declaring it will only hide
+programming mistakes that a compiler warning might have found. This
+applies to any compiler warning you see. Don't try to hide. Understand
+the real cause for it and fix that.
+
+No public function when they are not needed. I prefer you declare
+everything as static first and then non-static if needed. In this case
+the compiler also warns you about unused code.
+
+Keep the API simple. All of this is internal stuff and we can change it
+without breaking any other applications. Having only one function for
+the XML parsing makes it really simple and you don't have to play any
+nasty typedef tricks. Speaking of which, typedefs should be avoided
+whenever possible. Our SDP API is not a good example for that, I know
+that, but it is too late to change it.
+
+> I've made a script that dumps all profiles that sdptool supports and registers 
+> them back using XML and compares the results.  It seems to work for all of 
+> them, but further testing would be appreciated.
+
+Care to send a patch for sdptool that retrieves SDP records in XML
+format.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
