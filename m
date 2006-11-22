@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45649452.6050904@xmission.com>
-Date: Wed, 22 Nov 2006 11:17:54 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <29198105.1164201403305.JavaMail.root@cps7>
+Date: Wed, 22 Nov 2006 14:16:43 +0100 (MET)
+From: "JOSERIVERAPONCE@terra.es" <JOSERIVERAPONCE@terra.es>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45640925.4040207@xmission.com>
-In-Reply-To: <45640925.4040207@xmission.com>
-Subject: Re: [Bluez-devel] bluetooth-alsa website cleanup
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] MSWindows bluetooth sniffer?Marcel Holtmann wrote:
+Reply-To: JOSERIVERAPONCE@terra.es,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -16,45 +15,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Oh...
-
-I forgot to mention that this was the last checklist item for a snapshot
-release. I'll be calling it btsco-0.5. I will be moving the alsa plugins
-to a different source control module after this and won't be making any
-new btsco releases.
-
-Please let me know if you see any issues that need to be addressed first.
-
-Brad
-
-> fyi, I merged our various sources of documentation and put everything 
-> together in a fairly spartan tabbed interface.
-> 
-> http://bluetooth-alsa.sf.net/
-> 
-> Brad
-> 
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys - and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+TWFyY2VsIEhvbHRtYW5uIHdyb3RlOgo+ID4gSSBhbSBsb29raW5nIGZvciBhIGdvb2QgTVNXaW5k
+b3dzIGJsdWV0b290aCBwcm90b2NvbCBzbmlmZmVyLgo+IAo+IHlvdSBjYW4gdXNlIHRoZSBNZXJs
+aW4gZnJvbSBMZUNyb3kgb3IgRlRTNEJUIGZyb20gRnJvbnRsaW5lLCBidXQgCmJvdGgKPiBzb2x1
+dGlvbiB3aWxsIGJlIGV4cGVuc2l2ZS4KPiAKPiBJZiB5b3UgYXJlIGx1Y2t5IHRoZXJlIGlzIGEg
+V2luZG93cyBlcXVpdmFsZW50IHRvIGhjaWR1bXAsIGJ1dCBkb24ndCAKYXNrCj4gbWUuIEkgZG9u
+J3QgdXNlIFdpbmRvd3MgYXQgYWxsLgoKRG9lcyBhbnlvbmUgZWxzZSBrbm93IGFib3V0IHRoYXQg
+V2luZG93cyBlcXVpdmFsZW50IHRvIGhjaWR1bXA/Cgo+ID4gSSB3YW50IHRvIGxhdW5jaCB0aGUg
+Ymx1ZXRvb3RoIGFwcGxpY2F0aW9uIHRoYXQgY29ubmVjdHMgdG8gbXkgCj4gPiBibHVldG9vdGgK
+PiA+IG1vYmlsZSBwaG9uZSBhbmQgYmUgYWJsZSB0byBzZWUgd2hhdCBhcmUgdGhleSBjb21tdW5p
+Y2F0aW5nIHNvIEkgCmNhbgo+ID4gd3JpdGUgc29mdHdhcmUgaW4gTGludXggdG8gbWFuYWdlIHRo
+YXQgbW9iaWxlIHBob25lLgo+IAo+IFlvdSBjYW4gZG8gdGhhdCB3aXRob3V0IGEgc25pZmZlci4g
+Q3JlYXRlIHRoZSBjb3JyZWN0IFNEUCByZWNvcmRzIG9uCj4gYW5vdGhlciBMaW51eCBtYWNoaW5l
+cyBhbmQgY29weSB0aGUgY2xhc3Mgb2YgZGV2aWNlIGFuZCBzaW1wbGUgCnByZXRlbmQKPiB0byBi
+ZSBhIHBob25lLiBUaGlzIHdheSwgSSBoYWNrZWQgbW9zdCBvZiB0aGUgc2VjcmV0IHByb3RvY29s
+cy4KCklzIHRoZXJlIGFueSB0dXRvcmlhbCBvciBtYW51YWwgdG8gY3JlYXRlIHRoZSBjb3JyZWN0
+IFNEUCByZWNvcmRzIGFuZApjb3B5IHRoZSBjbGFzcyBvZiBkZXZpY2UgYXMgeW91IHNheT8gSSBh
+bSB0b3RhbGx5IG5ld2JpZSB0byB0aGlzCmJsdWV0b290aCBzdGFjayBhbmQgSSBkbyBub3QgaGF2
+ZSBhIGNsdWUgdG8gZG8gdGhhdC4KCkpvc2UKCgoKUHJ1ZWJhIGVsIGNvcnJlbyBUZXJyYSAoIGh0
+dHA6Ly93d3cudGVycmEuZXMvY29ycmVvICk7IFNlZ3VybywgcsOhcGlkbywgZmlhYmxlLgoKCi0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0KVGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0
+dXJlIG9mIElUCkpvaW4gU291cmNlRm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xs
+IGdldCB0aGUgY2hhbmNlIHRvIHNoYXJlIHlvdXIKb3BpbmlvbnMgb24gSVQgJiBidXNpbmVzcyB0
+b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaApodHRwOi8vd3d3LnRl
+Y2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVW
+REVWCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6
+LWRldmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0
+cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
