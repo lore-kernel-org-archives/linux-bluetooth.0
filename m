@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Thu, 23 Nov 2006 16:33:42 +1000
+In-Reply-To: <200611231552.16972.denis.kenzior@trolltech.com>
 References: <200611231526.09459.denis.kenzior@trolltech.com>
+	<1164260134.4847.12.camel@localhost>
 	<200611231552.16972.denis.kenzior@trolltech.com>
-	<1164261535.4847.19.camel@localhost>
-In-Reply-To: <1164261535.4847.19.camel@localhost>
-MIME-Version: 1.0
-Message-Id: <200611231633.43210.denis.kenzior@trolltech.com>
+Date: Thu, 23 Nov 2006 06:58:55 +0100
+Message-Id: <1164261535.4847.19.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] DBus SDP API
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,73 +22,87 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thursday 23 November 2006 15:58, Marcel Holtmann wrote:
-> > So hcid will never be responsible for allocating rfcomm channels?  I'm
-> > not sure that's a good idea, since everybody will implement it themselves
-> > (and probably get it wrong anyway)
->
-> hcid can never be responsible for that, because that is the job of the
-> kernel. However I am playing with the idea of an RFCOMM server in form
-> of rfcommd in userspace that will allow simple RFCOMM based application
-> and services.
->
-> For the more complex ones you have to do it by yourself anyway. And you
-> should make it open source anyway so we can tell you what went wrong ;)
+Hi Denis,
 
-Open sourcing it shouldn't be a problem.  Besides, our case is easy, we assume 
-we _own_ the device ;)  
+> > > Have you given any more thought as to how the RFCOMM channels are managed
+> > > by the DBus Service API?  The same goes for L2CAP.  From what I
+> > > understand the current implementation depends on clients to know what is
+> > > available...
+> >
+> > yes. That is where the "name" parameter in the XML record is for. You
+> > can simply override it with your own values. However this must be
+> > application or service specific.
+> 
+> So hcid will never be responsible for allocating rfcomm channels?  I'm not 
+> sure that's a good idea, since everybody will implement it themselves (and 
+> probably get it wrong anyway)
 
-I'm more thinking of KDE/GNOME useage and meshing with command line daemons.  
-I find it annoying that I have to know all the rfcomm channels, what they're 
-used by etc, as is the case now.  If there was a framework for doing this 
-intelligently, I think it would be of great benefit to everyone. The only 
-place to put it seems to be hcid at this time.  
+hcid can never be responsible for that, because that is the job of the
+kernel. However I am playing with the idea of an RFCOMM server in form
+of rfcommd in userspace that will allow simple RFCOMM based application
+and services.
 
-> > I see two advantages to doing this.  The main use case would be to
-> > deprecate some aspects of sdptool and all the hairy code in there that
-> > does the registration.  Move all of it to XML/Binary files.  The second
-> > would be the completeness of the DBUS API.
->
-> I am not buying the completeness argument. It is as simple as we don't
-> have a SetAddress method.
->
-> The hairy code in sdptool is only for development and extending the
-> D-Bus API with development interfaces is not what I actually plan to do.
-> It should stay as clean as possible and every method must actually have
-> a user.
+For the more complex ones you have to do it by yourself anyway. And you
+should make it open source anyway so we can tell you what went wrong ;)
 
-I understand, however such things are very useful to people who can't link to 
-GPL'd libraries.  I seem to recall that DBus API was supposed to address such 
-issues as well.  I'm not advocating throwing in everything and the kitchen 
-sink, but I feel in this particular case it is useful.
+> > > Will there be a lower-level SDP registration framework for the local
+> > > device? E.g. to be able to manually register records in binary/XML format
+> > > without creating a service agent?
+> >
+> > It is there at the moment by using the Bluetooth library. However I have
+> > no idea if it will stay there. I don't see any real use case except for
+> > debugging and with your enhancement to service-agent.c even that case is
+> > not really existent anymore.
+> 
+> I see two advantages to doing this.  The main use case would be to deprecate 
+> some aspects of sdptool and all the hairy code in there that does the 
+> registration.  Move all of it to XML/Binary files.  The second would be the 
+> completeness of the DBUS API. 
 
-> > Well I can see several useful things you can do:
-> > - If hcid doesn't manage RFCOMM channels, how will an application know
-> > dynamically what channel is available?  Such an operation will never be
-> > atomic (another argument for doing it in hcid), but  at least you can do
-> > selection semi-intelligently.
->
-> You should write a full service for any kind of these use cases.
+I am not buying the completeness argument. It is as simple as we don't
+have a SetAddress method.
 
-Are you advocating writing a hcid interface for this? E.g.
+The hairy code in sdptool is only for development and extending the
+D-Bus API with development interfaces is not what I actually plan to do.
+It should stay as clean as possible and every method must actually have
+a user.
 
-org.bluez.RfcommChannelAllocator or ...?
+> > > Most importantly, do you have plans for local versions of
+> > >                 array{uint32} GetRemoteServiceHandles(string address,
+> > > string match)
+> > >
+> > > and
+> > >
+> > >                 array{byte} GetRemoteServiceRecord(string address, uint32
+> > > handle)
+> > >
+> > > ?
+> >
+> > I thought about that multiple times. Every time I convinced myself to
+> > implement it, I failed to find the use case for it.
+> 
+> Well I can see several useful things you can do:
+> - If hcid doesn't manage RFCOMM channels, how will an application know 
+> dynamically what channel is available?  Such an operation will never be 
+> atomic (another argument for doing it in hcid), but  at least you can do 
+> selection semi-intelligently.
 
->
-> > - I can see a GNOME / KDE app that displays all services running on the
-> > local device, and use the UUIDs to identify exactly what type of service
-> > it is (e.g. for icons) without having to rely on Text descriptions from
-> > the DBus Service API.
->
-> Then I would extend org.bluez.Service to return exactly that
-> information, but the whole intention of the D-Bus based API is to hide
-> as much Bluetooth specific things for the user interfaces as possible.
+You should write a full service for any kind of these use cases.
 
-Hmm, this is a good idea by the way.  Perhaps the Service framework should 
-extract the Service UUID and make it available when a record is provided?  
-I'll try to look into this.
+> - I can see a GNOME / KDE app that displays all services running on the local 
+> device, and use the UUIDs to identify exactly what type of service it is 
+> (e.g. for icons) without having to rely on Text descriptions from the DBus 
+> Service API.
 
--Denis
+Then I would extend org.bluez.Service to return exactly that
+information, but the whole intention of the D-Bus based API is to hide
+as much Bluetooth specific things for the user interfaces as possible.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
