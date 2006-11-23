@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Thu, 23 Nov 2006 15:26:09 +1000
-MIME-Version: 1.0
-Message-Id: <200611231526.09459.denis.kenzior@trolltech.com>
-Subject: [Bluez-devel] DBus SDP API
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200611231053.22669.denis.kenzior@trolltech.com>
+References: <200611231053.22669.denis.kenzior@trolltech.com>
+Date: Thu, 23 Nov 2006 06:00:10 +0100
+Message-Id: <1164258010.4847.8.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] XML output for sdptool
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,30 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel,
+Hi Denis,
 
-Three questions:
+> This patch adds the --xml option to the following commands:
+> - records
+> - get
+> - browse
+> - search
+> 
+> If the --xml option is specified, the output is in XML format.
 
-Have you given any more thought as to how the RFCOMM channels are managed by 
-the DBus Service API?  The same goes for L2CAP.  From what I understand the 
-current implementation depends on clients to know what is available...
+the patch has been applied to the CVS. Thanks.
 
-Will there be a lower-level SDP registration framework for the local device?  
-E.g. to be able to manually register records in binary/XML format without 
-creating a service agent?
+Regards
 
-Most importantly, do you have plans for local versions of
-                array{uint32} GetRemoteServiceHandles(string address, string 
-match)
+Marcel
 
-and
 
-                array{byte} GetRemoteServiceRecord(string address, uint32 
-handle)
-
-?
-
--Denis
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
