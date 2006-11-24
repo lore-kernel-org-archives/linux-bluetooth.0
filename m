@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <7e36c64c0611232120ldee01a9q364a4b12e78102f1@mail.gmail.com>
-Date: Fri, 24 Nov 2006 10:50:31 +0530
-From: "shantibhushan sale" <shantibhushan.sale@gmail.com>
+Message-ID: <c303508f0611232009p4c438b0ap4d90d8247edae442@mail.gmail.com>
+Date: Thu, 23 Nov 2006 23:09:43 -0500
+From: "Axel Ruder" <axel.ruder@gmail.com>
 To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-devel] server prob
+Subject: Re: [Bluez-devel] Rfcomm kernel crashes (2.6.18.2)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,43 +14,41 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1542260139=="
+Content-Type: multipart/mixed; boundary="===============0589818575=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1542260139==
+--===============0589818575==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_46149_22600868.1164345631332"
+	boundary="----=_Part_14822_7801927.1164341383611"
 
-------=_Part_46149_22600868.1164345631332
+------=_Part_14822_7801927.1164341383611
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi,
- I m not able to solve this problem as when i put server code on running.(In
-case of OPP)
-I successfully registered server but later it goes to
- ret = OBEX_HandleInput(handle, 60);
-and return 0  i.e timeout.
+Hi Marcel,
 
-I am sending a onject from my phone to the computer[dongle] but no response
-.
-This application is under /openobex/apps/
-I need server appliaction running which receives objects.
+thanks a lot for the patch. I just applied and installed it.
+I will know in a couple of days if it worked, I'll take some time this
+weekend to test it.
+Thanks again! I'll let you know if it worked.
 
-------=_Part_46149_22600868.1164345631332
+Axel
+
+------=_Part_14822_7801927.1164341383611
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi,<br>&nbsp;I m not able to solve this problem as when i put server code on running.(In case of OPP)<br>I successfully registered server but later it goes to &nbsp;&nbsp; <br>&nbsp;ret = OBEX_HandleInput(handle, 60);<br>and return 0&nbsp; i.e timeout.
-<br><br>I am sending a onject from my phone to the computer[dongle] but no response .<br>This application is under /openobex/apps/<br>I need server appliaction running which receives objects.
+<span style="font-family: monospace;">Hi Marcel,<br><br>thanks a lot for the patch. I just applied and installed it.<br>I will know in a couple of days if it worked, I'll take some time this weekend to test it.<br>Thanks again! I'll let you know if it worked.
+<br><br>Axel<br></span>
+			
 
-------=_Part_46149_22600868.1164345631332--
+------=_Part_14822_7801927.1164341383611--
 
 
---===============1542260139==
+--===============0589818575==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -61,7 +59,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1542260139==
+--===============0589818575==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -72,4 +70,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1542260139==--
+--===============0589818575==--
