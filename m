@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sat, 25 Nov 2006 13:49:20 -0800
-From: Andres Vargas - zodman <zod@linuxmerida.org>
+Message-ID: <490dd6310611241234le826f35v5344eb16943b043e@mail.gmail.com>
+Date: Fri, 24 Nov 2006 20:34:39 +0000
+From: "Andy Spencer" <andy753421@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20061125134920.50f85b75@localhost.localdomain>
-In-Reply-To: <1908cc540611240901l1524af9epeee7753ed00b332d@mail.gmail.com>
-References: <1908cc540611240901l1524af9epeee7753ed00b332d@mail.gmail.com>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluetooth device is not being discovered from
- Mobile
+MIME-Version: 1.0
+Subject: [Bluez-users] Blank events file
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,50 +18,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-are you test with
+I've been trying to get a wiimote to work with linux and have been
+able to connect to it using hidd and an eventX file is created in
+/dev/input/ but when I try to read from it I get no data. Using
+hicdump I can recieve data on button presses so I would think that
+data should be sent to the event file and I was wondering why it's
+not.
 
-hcitool inq
-or
-hcitool scan
-
-lagrutadelzod:/home/andy# hcitool scan
-Scanning ...
-        00:02:5B:00:A5:A5       Nokia 6670
-lagrutadelzod:/home/andy# 
-
-lagrutadelzod:/home/andy# hcitool inq 
-Inquiring ...
-        00:02:5B:00:A5:A5       clock offset: 0x1c99    class: 0x50020c
-
-On Fri, 24 Nov 2006 22:31:28 +0530
-"Vinay Avasthi" <vinay@avasthi.com> wrote:
-
-> I have a linux desktop with a bluetooth dongle. The hciconfig dump is as
-> follows. This desktop does not show up if I run discovery from a mobile
-> phone.  The desktop is visible from a windows XP laptop. Can somebody point
-> me to a direction of error.
-> 
-> The hciconfig looks like this.
-> 
-> hci0:   Type: USB
->         BD Address: 00:0D:18:01:11:8D ACL MTU: 192:8 SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:3783 acl:0 sco:0 events:153 errors:0
->         TX bytes:2778 acl:0 sco:0 commands:131 errors:0
->         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'avasthidesktop'
->         Class: 0x120104
->         Service Classes: Networking, Object Transfer
->         Device Class: Computer, Desktop workstation
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x14c LMP Ver: 1.1 (0x1) LMP Subver:
-> 0x14c
->         Manufacturer: Cambridge Silicon Radio (10)
-
-
--- 
+I don't know if it's important but towards the end of the connection
+output from hcidump and right after the "HIDP: Set protocol: Boot
+protocol" request I get the following message:
+    > ACL data: handle 46 flags 0x02 dlen 5
+        L2CAP(d): cid 0x0040 len 1 [psm 17]
+          HIDP: Handshake: Unsupported request
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
