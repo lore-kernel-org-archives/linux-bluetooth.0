@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d66c3bdf0611251658t6051e1cev487a98786d3671d9@mail.gmail.com>
-Date: Sat, 25 Nov 2006 16:58:20 -0800
-From: "Uichin (Eugene) Lee" <netssenger@gmail.com>
+Date: Sat, 25 Nov 2006 13:49:20 -0800
+From: Andres Vargas - zodman <zod@linuxmerida.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] periodic inquiry mode.
+Message-ID: <20061125134920.50f85b75@localhost.localdomain>
+In-Reply-To: <1908cc540611240901l1524af9epeee7753ed00b332d@mail.gmail.com>
+References: <1908cc540611240901l1524af9epeee7753ed00b332d@mail.gmail.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Bluetooth device is not being discovered from
+ Mobile
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,28 +21,50 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dear All,
+are you test with
 
-I have a real quick question on a periodic inquiry mode defined in
-Bluetooth spec. as of 1.1 standard. It's also called a symmetric
-discovery procedure and we could initiate this by feeding feed min and
-max values for inquiry intervals as well as # of inquiries to be
-performed. However, it's only defined in HCI and I realized that it's
-pretty tough to use it in the application layer (since we're using a
-high level programming using sockets). We recently wrote a paper on
-P2P file sharing using bluetooth and there, we used application layer
-emulation for this periodic inquiry mode; specifically, we used
-HCI_inquiry to discover nodes, but we simply used a socket to listen
-to a port to make a node available for discovery (i.e., implicitly in
-inquiry/page scan mode). Is there any better way that we could
-actually exploit this, yet exploiting high-level programming features
-of Bluez?
+hcitool inq
+or
+hcitool scan
 
-Thank you.
+lagrutadelzod:/home/andy# hcitool scan
+Scanning ...
+        00:02:5B:00:A5:A5       Nokia 6670
+lagrutadelzod:/home/andy# 
+
+lagrutadelzod:/home/andy# hcitool inq 
+Inquiring ...
+        00:02:5B:00:A5:A5       clock offset: 0x1c99    class: 0x50020c
+
+On Fri, 24 Nov 2006 22:31:28 +0530
+"Vinay Avasthi" <vinay@avasthi.com> wrote:
+
+> I have a linux desktop with a bluetooth dongle. The hciconfig dump is as
+> follows. This desktop does not show up if I run discovery from a mobile
+> phone.  The desktop is visible from a windows XP laptop. Can somebody point
+> me to a direction of error.
+> 
+> The hciconfig looks like this.
+> 
+> hci0:   Type: USB
+>         BD Address: 00:0D:18:01:11:8D ACL MTU: 192:8 SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:3783 acl:0 sco:0 events:153 errors:0
+>         TX bytes:2778 acl:0 sco:0 commands:131 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'avasthidesktop'
+>         Class: 0x120104
+>         Service Classes: Networking, Object Transfer
+>         Device Class: Computer, Desktop workstation
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x14c LMP Ver: 1.1 (0x1) LMP Subver:
+> 0x14c
+>         Manufacturer: Cambridge Silicon Radio (10)
+
 
 -- 
-Uichin (Eugene) Lee
-Ph.D. Student UCLA CS Dept.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
