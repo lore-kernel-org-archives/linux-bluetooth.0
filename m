@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <c70f1ac50611251559m5d3c5d02n6cd99fb0cbdcc9d3@mail.gmail.com>
-Date: Sat, 25 Nov 2006 17:59:53 -0600
-From: "Buck Golemon" <workitharder@gmail.com>
+From: Daniel Gollub <dgollub@suse.de>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <c70f1ac50611251551j2350c812s3d3dd55532c161f@mail.gmail.com>
+Date: Sat, 25 Nov 2006 22:35:25 +0100
 MIME-Version: 1.0
-References: <c70f1ac50611251551j2350c812s3d3dd55532c161f@mail.gmail.com>
-Subject: [Bluez-devel] Fwd: Advice on starting BT project
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_dcLaFAKYApMTg/W"
+Message-Id: <200611252235.25637.dgollub@suse.de>
+Subject: [Bluez-devel] [PATCH] Replaced isprint() with a more multibyte
+	friendly check
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,48 +17,125 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-We would like to create a system that can emulate AVDTP/A2DP to the
-point that you may play MP3 from Windows Media onto a Bluetooth
-device.
+--Boundary-00=_dcLaFAKYApMTg/W
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Does anyone have definate suggestions on how to proceed?
+Hi,
 
-Here's my plan thus far:
+there is a problem with multibyte chars when scanning with hcitool scan.
+This problem appears only when the device name was not stored in the adapters 
+name list. I replace some isprint() with a more multibyte friendly check. 
+This should avoid this problem and print also full names with multibyte chars 
+included.
 
->>Obtain a Bluetooth module that implements up to the HCI interface.
-I would like to also have the L2CAP and SDP modules in hardware, but
-this does not seem to be available as such. Any modules that do
-implement these seem to also force you to use the SPP module (LMX9830
-for example).
+best regards,
+Daniel
 
->>Port an early version of the Axis stack to a dsPIC microcontroller.
-I am most familiar with the dsPIC and its tools. From what I gather,
-the Bluez/Linux kernel driver use threading and Linux-specific code,
-so it is easiest to port from the original Axis release. Also I prefer
-this approach to a full-fledged embedded Linux for cost and complexity
-reasons.
+--Boundary-00=_dcLaFAKYApMTg/W
+Content-Type: text/x-diff; charset="us-ascii"; name="bluez-hcitool-mb.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="bluez-hcitool-mb.diff"
 
->>Tack onto the driver the bare minimum to establish a connection and
-initiate streaming.
-The Core, AVDTP, and A2DP specifications are quite detailed and I have
-become familiar enough with them that I believe this is possible,
-given the correct interface to the lower levels.
+Index: tools/hciconfig.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/tools/hciconfig.c,v
+retrieving revision 1.83
+diff -u -r1.83 hciconfig.c
+--- tools/hciconfig.c	21 Nov 2006 15:44:56 -0000	1.83
++++ tools/hciconfig.c	25 Nov 2006 21:24:16 -0000
+@@ -473,9 +473,11 @@
+ 			exit(1);
+ 		}
+ 
+-		for (i = 0; i < 248 && name[i]; i++)
+-			if (!isprint(name[i]))
++		for (i = 0; i < 248 && name[i]; i++) {
++			if ((unsigned char) name[i] < 32 || name[i] == 127)
+ 				name[i] = '.';
++		}
++
+ 		name[248] = '\0';
+ 
+ 		print_dev_hdr(&di);
+@@ -1002,9 +1004,11 @@
+ 				str = malloc(len);
+ 				if (str) {
+ 					snprintf(str, len, "%s", ptr);
+-					for (i = 0; i < len - 1; i++)
+-						if (!isprint(str[i]))
++					for (i = 0; i < len - 1; i++) {
++						if ((unsigned char) str[i] < 32 || str[i] == 127)
+ 							str[i] = '.';
++					}
++
+ 					printf("\t%s local name: \'%s\'\n",
+ 						type == 0x08 ? "Shortened" : "Complete", str);
+ 					free(str);
+Index: tools/hcitool.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/tools/hcitool.c,v
+retrieving revision 1.91
+diff -u -r1.91 hcitool.c
+--- tools/hcitool.c	29 Sep 2006 11:42:14 -0000	1.91
++++ tools/hcitool.c	25 Nov 2006 21:24:16 -0000
+@@ -546,9 +546,11 @@
+ 					sizeof(name), name, 100000) < 0)
+ 				strcpy(name, "n/a");
+ 
+-			for (n = 0; n < 248 && name[n]; n++)
+-				if (!isprint(name[n]))
+-					name[n] = '.';
++			for (n = 0; n < 248 && name[n]; n++) {
++				if ((unsigned char) name[i] < 32 || name[i] == 127)
++					name[i] = '.';
++			}
++
+ 			name[248] = '\0';
+ 
+ 			printf("\t%s\t%s\n", addr, name);
+@@ -605,9 +607,11 @@
+ 				if (!nc)
+ 					strcpy(name, "n/a");
+ 			} else {
+-				for (n = 0; n < 248 && name[n]; n++)
+-					if (!isprint(name[n]))
+-						name[n] = '.';
++				for (n = 0; n < 248 && name[n]; n++) {
++					if ((unsigned char) name[i] < 32 || name[i] == 127)
++						name[i] = '.';
++				}
++
+ 				name[248] = '\0';
+ 				nc = 0;
+ 			}
 
-
-Thanks in advance,
-Buck Golemon
-golemon@uiuc.edu
+--Boundary-00=_dcLaFAKYApMTg/W
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--Boundary-00=_dcLaFAKYApMTg/W
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--Boundary-00=_dcLaFAKYApMTg/W--
