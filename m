@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Daniel Gollub <dgollub@suse.de>
-To: bluez-devel@lists.sourceforge.net
-Date: Sat, 25 Nov 2006 22:35:25 +0100
-MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_dcLaFAKYApMTg/W"
-Message-Id: <200611252235.25637.dgollub@suse.de>
-Subject: [Bluez-devel] [PATCH] Replaced isprint() with a more multibyte
-	friendly check
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <002901c710a8$0eab3580$0100a8c0@kayleigh>
+From: "Olivier Le Pogam" <olepogam@free.fr>
+To: <bluez-devel@lists.sourceforge.net>
+Date: Sat, 25 Nov 2006 16:40:34 +0100
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="=======AVGMAIL-456863F74937======="
+Subject: [Bluez-devel] Master / Slave question
+Reply-To: Olivier Le Pogam <olepogam@free.fr>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -20,103 +19,139 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---Boundary-00=_dcLaFAKYApMTg/W
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+--=======AVGMAIL-456863F74937=======
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0026_01C710B0.6DCF2910"
+
+------=_NextPart_000_0026_01C710B0.6DCF2910
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-there is a problem with multibyte chars when scanning with hcitool scan.
-This problem appears only when the device name was not stored in the adapters 
-name list. I replace some isprint() with a more multibyte friendly check. 
-This should avoid this problem and print also full names with multibyte chars 
-included.
+I am trying to make 2 mobile phones connected concurrently
+to a RFCOMM server. Please note that they don't support
+role switching, so as they initiate the communication, they
+are always "master".
 
-best regards,
-Daniel
+My RFCOMM server is a forking one so it can virtually
+deal with concurrent clients like on TCP.
 
---Boundary-00=_dcLaFAKYApMTg/W
-Content-Type: text/x-diff; charset="us-ascii"; name="bluez-hcitool-mb.diff"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="bluez-hcitool-mb.diff"
+I have put lm=3Daccept in hcid.conf
 
-Index: tools/hciconfig.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/tools/hciconfig.c,v
-retrieving revision 1.83
-diff -u -r1.83 hciconfig.c
---- tools/hciconfig.c	21 Nov 2006 15:44:56 -0000	1.83
-+++ tools/hciconfig.c	25 Nov 2006 21:24:16 -0000
-@@ -473,9 +473,11 @@
- 			exit(1);
- 		}
- 
--		for (i = 0; i < 248 && name[i]; i++)
--			if (!isprint(name[i]))
-+		for (i = 0; i < 248 && name[i]; i++) {
-+			if ((unsigned char) name[i] < 32 || name[i] == 127)
- 				name[i] = '.';
-+		}
-+
- 		name[248] = '\0';
- 
- 		print_dev_hdr(&di);
-@@ -1002,9 +1004,11 @@
- 				str = malloc(len);
- 				if (str) {
- 					snprintf(str, len, "%s", ptr);
--					for (i = 0; i < len - 1; i++)
--						if (!isprint(str[i]))
-+					for (i = 0; i < len - 1; i++) {
-+						if ((unsigned char) str[i] < 32 || str[i] == 127)
- 							str[i] = '.';
-+					}
-+
- 					printf("\t%s local name: \'%s\'\n",
- 						type == 0x08 ? "Shortened" : "Complete", str);
- 					free(str);
-Index: tools/hcitool.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/tools/hcitool.c,v
-retrieving revision 1.91
-diff -u -r1.91 hcitool.c
---- tools/hcitool.c	29 Sep 2006 11:42:14 -0000	1.91
-+++ tools/hcitool.c	25 Nov 2006 21:24:16 -0000
-@@ -546,9 +546,11 @@
- 					sizeof(name), name, 100000) < 0)
- 				strcpy(name, "n/a");
- 
--			for (n = 0; n < 248 && name[n]; n++)
--				if (!isprint(name[n]))
--					name[n] = '.';
-+			for (n = 0; n < 248 && name[n]; n++) {
-+				if ((unsigned char) name[i] < 32 || name[i] == 127)
-+					name[i] = '.';
-+			}
-+
- 			name[248] = '\0';
- 
- 			printf("\t%s\t%s\n", addr, name);
-@@ -605,9 +607,11 @@
- 				if (!nc)
- 					strcpy(name, "n/a");
- 			} else {
--				for (n = 0; n < 248 && name[n]; n++)
--					if (!isprint(name[n]))
--						name[n] = '.';
-+				for (n = 0; n < 248 && name[n]; n++) {
-+					if ((unsigned char) name[i] < 32 || name[i] == 127)
-+						name[i] = '.';
-+				}
-+
- 				name[248] = '\0';
- 				nc = 0;
- 			}
+If I open a RFCOMM server on channel 14 and try to make
+the 2 mobile connect to channel 14, the first is ok, the
+second can't connect. I suppose that's normal, because
+channel 14 "slave" is busy linux-side with the first
+connection and a "slave" can deal with one connection only.
 
---Boundary-00=_dcLaFAKYApMTg/W
+Then I've launched a second server on channel 15 (server
+on channel 14 running concurrently), and i try to make
+the first mobile connect to channel 14 and the second
+to channel 15 : it's the same, only the first can connect.
+
+I think I have a misunderstanding here, as i thought the
+"master/slave" was per channel. Does it mean the "slave" status=20
+is for the whole adaptor, and once a "slave" connection is
+open on one channel, it can't receive other connections at all ?
+
+Thanks a lot for your help,
+Oli
+------=_NextPart_000_0026_01C710B0.6DCF2910
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2873" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Hi,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I am trying to make 2 mobile =
+phones&nbsp;connected=20
+concurrently</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>to a RFCOMM server. Please note that =
+they don't=20
+support</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>role switching, so as they initiate the =
+
+communication, they</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>are always "master".</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>My RFCOMM server is a forking one so it =
+can=20
+virtually</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>deal with concurrent clients like on=20
+TCP.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I have put lm=3Daccept in =
+hcid.conf</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>If I open a RFCOMM server on channel 14 =
+and try to=20
+make</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>the 2 mobile connect to channel 14, the =
+first is=20
+ok, the</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>second can't connect. I suppose that's =
+normal,=20
+because</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>channel 14 "slave" is busy linux-side =
+with the=20
+first</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>connection and a "slave" can deal with =
+one=20
+connection only.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Then I've launched a second server on =
+channel 15=20
+(server</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>on channel 14 running concurrently), =
+and i try to=20
+make</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>the first mobile connect to channel 14 =
+and the=20
+second</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>to channel 15 : it's the same, only the =
+first can=20
+connect.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I think I have a misunderstanding here, =
+as i=20
+thought the</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>"master/slave" was per channel. Does it =
+mean the=20
+"slave" status </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>is for the whole adaptor, and once a =
+"slave"=20
+connection is</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>open on one channel, it can't receive =
+other=20
+connections at all ?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Thanks a lot for your =
+help,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>Oli</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_0026_01C710B0.6DCF2910--
+
+--=======AVGMAIL-456863F74937=======
+Content-Type: text/plain; x-avg=cert; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Description: "AVG certification"
+
+No virus found in this outgoing message.
+Checked by AVG Free Edition.
+Version: 7.1.409 / Virus Database: 268.14.15/550 - Release Date: 24/11/2006
+=
+
+
+--=======AVGMAIL-456863F74937=======
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -127,7 +162,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---Boundary-00=_dcLaFAKYApMTg/W
+--=======AVGMAIL-456863F74937=======
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -138,4 +173,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---Boundary-00=_dcLaFAKYApMTg/W--
+--=======AVGMAIL-456863F74937=======--
