@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <45698AFA.4010704@avasthi.com>
-References: <1908cc540611240901l1524af9epeee7753ed00b332d@mail.gmail.com>
-	<1164536111.25914.9.camel@aeonflux.holtmann.net>
-	<45698AFA.4010704@avasthi.com>
-Date: Sun, 26 Nov 2006 18:35:57 +0100
-Message-Id: <1164562557.25914.43.camel@aeonflux.holtmann.net>
+To: amateur <ztl.post@gmail.com>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20061126143026.GA17505@163.com>
+References: <20061126143026.GA17505@163.com>
+Date: Sun, 26 Nov 2006 18:33:31 +0100
+Message-Id: <1164562411.25914.40.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluetooth device is not
-	being	discovered	from	Mobile
+Subject: Re: [Bluez-users] Cross Compile bluez-utils failed on
+	dbus	dependency !
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,43 +22,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Vinay,
+Hi,
 
-> >> I have a linux desktop with a bluetooth dongle. The hciconfig dump is
-> >> as follows. This desktop does not show up if I run discovery from a
-> >> mobile phone.  The desktop is visible from a windows XP laptop. Can
-> >> somebody point me to a direction of error. 
-> >>
-> >> The hciconfig looks like this.
-> >>
-> >> hci0:   Type: USB
-> >>         BD Address: 00:0D:18:01:11:8D ACL MTU: 192:8 SCO MTU: 64:8
-> >>         UP RUNNING PSCAN ISCAN
-> >>         RX bytes:3783 acl:0 sco:0 events:153 errors:0 
-> >>         TX bytes:2778 acl:0 sco:0 commands:131 errors:0
-> >>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-> >>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-> >>         Link policy: RSWITCH HOLD SNIFF PARK 
-> >>         Link mode: SLAVE ACCEPT
-> >>         Name: 'avasthidesktop'
-> >>         Class: 0x120104
-> >>         Service Classes: Networking, Object Transfer
-> >>         Device Class: Computer, Desktop workstation
-> >>         HCI Ver: 1.1 (0x1) HCI Rev: 0x14c LMP Ver: 1.1 (0x1) LMP
-> >> Subver: 0x14c
-> >>         Manufacturer: Cambridge Silicon Radio (10)
-> > 
-> > depends on for what devices you phone is looking. Maybe it is only
-> > looking for headset and your devices says it is a computer. What kind of
-> > phone are you using?
-> > 
+> I'm cross compiling bluez-utils-3.7 to arm platform. The cross 
+> compiler I  use is arm-linux-gcc-3.4, and I have already cross 
+> compiled bluez-libs successfully! When run 
 > 
-> I have tried it with a a Motorola EzX phone that can do obex. I have 
-> also tried it with an unlocked Razr.
+> 	CC=arm-linux-gcc ./configure --host=i386-linux --target=arm-linux 
+> 
+> I got the following error:
+> 
+> 	checking for DBUS... configure: error: dbus > 0.35 is required
+> 
+> As I can imagine, this is because bluez-utils depends on dbus, which 
+> doesn't exist on my target platform, and nor does I like to build the
+> dbus system on my target platform. 
+> 
+> Is there a way to avoid this?
+> 
+> I want to download some older releases of bluez to avoid the dbus
+> stuff, but I can't find any link on the bluez homepage. Does anyone
+> has a clue ?
 
-just tested it with a A780 and it founds my laptop without any problems.
-So this is kinda strange. However I have no real case why it is not
-working in your case.
+you can go with bluez-utils-2.x to avoid the D-Bus dependency, but in
+general you wanna do the effort to get D-Bus running on your system. You
+should trust me on that one. At some point you start loving it.
 
 Regards
 
