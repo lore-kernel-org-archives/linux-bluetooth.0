@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <490dd6310611241234le826f35v5344eb16943b043e@mail.gmail.com>
-References: <490dd6310611241234le826f35v5344eb16943b043e@mail.gmail.com>
-Date: Sun, 26 Nov 2006 11:11:57 +0100
-Message-Id: <1164535917.25914.5.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Blank events file
+Message-ID: <d66c3bdf0611251658t6051e1cev487a98786d3671d9@mail.gmail.com>
+Date: Sat, 25 Nov 2006 16:58:20 -0800
+From: "Uichin (Eugene) Lee" <netssenger@gmail.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-users] periodic inquiry mode.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,30 +18,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Andy,
+Dear All,
 
-> I've been trying to get a wiimote to work with linux and have been
-> able to connect to it using hidd and an eventX file is created in
-> /dev/input/ but when I try to read from it I get no data. Using
-> hicdump I can recieve data on button presses so I would think that
-> data should be sent to the event file and I was wondering why it's
-> not.
-> 
-> I don't know if it's important but towards the end of the connection
-> output from hcidump and right after the "HIDP: Set protocol: Boot
-> protocol" request I get the following message:
->     > ACL data: handle 46 flags 0x02 dlen 5
->         L2CAP(d): cid 0x0040 len 1 [psm 17]
->           HIDP: Handshake: Unsupported request
+I have a real quick question on a periodic inquiry mode defined in
+Bluetooth spec. as of 1.1 standard. It's also called a symmetric
+discovery procedure and we could initiate this by feeding feed min and
+max values for inquiry intervals as well as # of inquiries to be
+performed. However, it's only defined in HCI and I realized that it's
+pretty tough to use it in the application layer (since we're using a
+high level programming using sockets). We recently wrote a paper on
+P2P file sharing using bluetooth and there, we used application layer
+emulation for this periodic inquiry mode; specifically, we used
+HCI_inquiry to discover nodes, but we simply used a socket to listen
+to a port to make a node available for discovery (i.e., implicitly in
+inquiry/page scan mode). Is there any better way that we could
+actually exploit this, yet exploiting high-level programming features
+of Bluez?
 
-you might wanna try my -mh kernel patch with the HID report mode
-protocol support.
+Thank you.
 
-Regards
-
-Marcel
-
-
+-- 
+Uichin (Eugene) Lee
+Ph.D. Student UCLA CS Dept.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
