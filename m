@@ -1,16 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 27 Nov 2006 09:18:50 +0800
-From: amateur <ztl.post@gmail.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20061127011850.GA3195@163.com>
-References: <20061126143026.GA17505@163.com>
-	<1164562411.25914.40.camel@aeonflux.holtmann.net>
+Message-ID: <c70f1ac50611261546j26eacbaap7796e7230eb0cf3a@mail.gmail.com>
+Date: Sun, 26 Nov 2006 17:46:29 -0600
+From: "Buck Golemon" <workitharder@gmail.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <c70f1ac50611251551j2350c812s3d3dd55532c161f@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1164562411.25914.40.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] Cross Compile bluez-utils failed on dbus
-	dependency !
-Reply-To: amateur <ztl.post@gmail.com>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+References: <c70f1ac50611251551j2350c812s3d3dd55532c161f@mail.gmail.com>
+Subject: [Bluez-users] Fwd: Advice on starting BT project
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -23,52 +20,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Sun, Nov 26, 2006 at 06:33:31PM +0100, Marcel Holtmann wrote:
-> Hi,
-> 
-> > I'm cross compiling bluez-utils-3.7 to arm platform. The cross 
-> > compiler I  use is arm-linux-gcc-3.4, and I have already cross 
-> > compiled bluez-libs successfully! When run 
-> > 
-> > 	CC=arm-linux-gcc ./configure --host=i386-linux --target=arm-linux 
-> > 
-> > I got the following error:
-> > 
-> > 	checking for DBUS... configure: error: dbus > 0.35 is required
-> > 
-> > As I can imagine, this is because bluez-utils depends on dbus, which 
-> > doesn't exist on my target platform, and nor does I like to build the
-> > dbus system on my target platform. 
-> > 
-> > Is there a way to avoid this?
-> > 
-> > I want to download some older releases of bluez to avoid the dbus
-> > stuff, but I can't find any link on the bluez homepage. Does anyone
-> > has a clue ?
-> 
-> you can go with bluez-utils-2.x to avoid the D-Bus dependency, but in
-> general you wanna do the effort to get D-Bus running on your system. You
-> should trust me on that one. At some point you start loving it.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
--------------------------
-
-thank you for the fast reply!
-I am not familiar with dbus for the moment, so I think bluez-utils-2.x
-should be a better solution for now. Maybe I will try dbus later. How
-big is cost of build dbus system on a arm embedded platform. I mean,
-do I need to recompile busybox for dbus support or that I need enable
-dbus support in some of my key services ?
+Sorry for cross-posting, but I feel pretty sure that this belongs in
+the user's list rather than the  devel list. I'm really new to this
+mailing list thing and this is my second post...
 
 
--- 
-This is the first age that's paid much attention to the future, which is a
-little ironic since we may not have one.
-		-- Arthur Clarke
+I am seeking some advice on a class project that we are planning.  We
+would like to create a system that can emulate AVDTP/A2DP to the point
+that you may play MP3 from Windows Media onto a Bluetooth device.
+
+Does anyone have definate suggestions on how to proceed?
+
+
+
+Here's my plan thus far:
+
+  >>  Obtain a Bluetooth module that implements up to the HCI interface.
+I would like to also have the L2CAP and SDP modules in hardware, but
+this does not seem to be available as such. Any modules that do
+implement these seem to also force you to use the SPP module (LMX9830
+for example).
+
+  >>  Port an early version of the Axis stack to a dsPIC microcontroller.
+I am most familiar with the dsPIC and its tools. From what I gather,
+the Bluez/Linux kernel driver use threading and Linux-specific code,
+so it is easiest to port from the original Axis release. Also I prefer
+this approach to a full-fledged embedded Linux for cost and complexity
+reasons.
+
+  >>  Tack onto the driver the bare minimum to establish a connection and
+initiate streaming.
+The Core, AVDTP, and A2DP specifications are quite detailed and I have
+become familiar enough with them that I believe this is possible,
+given the correct interface to the lower levels.
+
+
+Thanks in advance,
+Buck Golemon
+golemon@uiuc.edu
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
