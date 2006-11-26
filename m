@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <d66c3bdf0611251658t6051e1cev487a98786d3671d9@mail.gmail.com>
-References: <d66c3bdf0611251658t6051e1cev487a98786d3671d9@mail.gmail.com>
-Date: Sun, 26 Nov 2006 11:21:09 +0100
-Message-Id: <1164536469.25914.14.camel@aeonflux.holtmann.net>
+In-Reply-To: <1908cc540611240901l1524af9epeee7753ed00b332d@mail.gmail.com>
+References: <1908cc540611240901l1524af9epeee7753ed00b332d@mail.gmail.com>
+Date: Sun, 26 Nov 2006 11:15:11 +0100
+Message-Id: <1164536111.25914.9.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] periodic inquiry mode.
+Subject: Re: [Bluez-users] Bluetooth device is not being discovered
+	from	Mobile
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,28 +21,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Uichin,
+Hi Vinay,
 
-> I have a real quick question on a periodic inquiry mode defined in
-> Bluetooth spec. as of 1.1 standard. It's also called a symmetric
-> discovery procedure and we could initiate this by feeding feed min and
-> max values for inquiry intervals as well as # of inquiries to be
-> performed. However, it's only defined in HCI and I realized that it's
-> pretty tough to use it in the application layer (since we're using a
-> high level programming using sockets). We recently wrote a paper on
-> P2P file sharing using bluetooth and there, we used application layer
-> emulation for this periodic inquiry mode; specifically, we used
-> HCI_inquiry to discover nodes, but we simply used a socket to listen
-> to a port to make a node available for discovery (i.e., implicitly in
-> inquiry/page scan mode). Is there any better way that we could
-> actually exploit this, yet exploiting high-level programming features
-> of Bluez?
+> I have a linux desktop with a bluetooth dongle. The hciconfig dump is
+> as follows. This desktop does not show up if I run discovery from a
+> mobile phone.  The desktop is visible from a windows XP laptop. Can
+> somebody point me to a direction of error. 
+> 
+> The hciconfig looks like this.
+> 
+> hci0:   Type: USB
+>         BD Address: 00:0D:18:01:11:8D ACL MTU: 192:8 SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:3783 acl:0 sco:0 events:153 errors:0 
+>         TX bytes:2778 acl:0 sco:0 commands:131 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK 
+>         Link mode: SLAVE ACCEPT
+>         Name: 'avasthidesktop'
+>         Class: 0x120104
+>         Service Classes: Networking, Object Transfer
+>         Device Class: Computer, Desktop workstation
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x14c LMP Ver: 1.1 (0x1) LMP
+> Subver: 0x14c
+>         Manufacturer: Cambridge Silicon Radio (10)
 
-the periodic inquiry is exposed of our new D-Bus based API and really
-simple to use. You only have to set the adapter into periodic inquiry
-mode and then you will receive RemoteDeviceFound and RemoteNameUpdated
-signals over D-Bus. Check the dbus-api.txt documentation and the
-bluez-gnome package for an example.
+depends on for what devices you phone is looking. Maybe it is only
+looking for headset and your devices says it is a computer. What kind of
+phone are you using?
 
 Regards
 
