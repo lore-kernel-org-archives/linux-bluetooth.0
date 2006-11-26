@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <456937F3.7090107@xmission.com>
-References: <456937F3.7090107@xmission.com>
-Date: Sun, 26 Nov 2006 11:23:54 +0100
-Message-Id: <1164536635.25914.18.camel@aeonflux.holtmann.net>
+In-Reply-To: <200611252235.25637.dgollub@suse.de>
+References: <200611252235.25637.dgollub@suse.de>
+Date: Sun, 26 Nov 2006 11:18:20 +0100
+Message-Id: <1164536300.25914.11.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bccmd and usb/uart switching
+Subject: Re: [Bluez-devel] [PATCH] Replaced isprint() with a more
+	multibyte	friendly check
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,25 +21,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
+Hi Daniel,
 
-> I am about to switch a bluegiga bluecore4 module from usb to uart/h4 so
-> I can use it to work on audio stuff using a gumstix. I really can't
-> afford to brick this thing and documentation is hard to come by... does
-> it look like
-> 
-> bccmd psset 0x1f9 3
-> bccmd psset 0x3cd 4
-> 
-> (to change HOST_INTERFACE & INITIAL_BOOTMODE respectively) is what I
-> need so the module will respond on the uart at 115k with hw flow control?
+> there is a problem with multibyte chars when scanning with hcitool scan.
+> This problem appears only when the device name was not stored in the adapters 
+> name list. I replace some isprint() with a more multibyte friendly check. 
+> This should avoid this problem and print also full names with multibyte chars 
+> included.
 
-I haven't done this for years and if, then only with Casira where I had
-the SPI as fallback. I actually think the initial bood mode is wrong,
-because this is for HID proxy and alike if I am not mistaken. You want
-the UART settings for H4, but I can't remember what that was. I do
-remember that they changed with the HCI 18.x firmware and got split off
-into transport specific PS keys, but that's basically it.
+the patch has been applied to the CVS. Thanks.
 
 Regards
 
