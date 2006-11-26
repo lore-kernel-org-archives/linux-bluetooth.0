@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 26 Nov 2006 15:02:56 +0100 (CET)
-From: Peter Wippich <pewi@gw-instruments.de>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <456937F3.7090107@xmission.com>
-Message-ID: <Pine.LNX.4.63.0611261450220.22808@redbean.intranet.gw-instruments.de>
 References: <456937F3.7090107@xmission.com>
-MIME-Version: 1.0
+Date: Sun, 26 Nov 2006 11:23:54 +0100
+Message-Id: <1164536635.25914.18.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] bccmd and usb/uart switching
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,14 +20,8 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Brad,
 
-Hi Brad, 
-
-
-On Sat, 25 Nov 2006, Brad Midgley wrote:
-
-> Hey
-> 
 > I am about to switch a bluegiga bluecore4 module from usb to uart/h4 so
 > I can use it to work on audio stuff using a gumstix. I really can't
 > afford to brick this thing and documentation is hard to come by... does
@@ -39,33 +33,17 @@ On Sat, 25 Nov 2006, Brad Midgley wrote:
 > (to change HOST_INTERFACE & INITIAL_BOOTMODE respectively) is what I
 > need so the module will respond on the uart at 115k with hw flow control?
 
-Be carefull with this module when you want to change configuration !!! 
+I haven't done this for years and if, then only with Casira where I had
+the SPI as fallback. I actually think the initial bood mode is wrong,
+because this is for HID proxy and alike if I am not mistaken. You want
+the UART settings for H4, but I can't remember what that was. I do
+remember that they changed with the HCI 18.x firmware and got split off
+into transport specific PS keys, but that's basically it.
 
-They use different "bootmodes" (boot configurations) to switch between 
-different operation modes. If you change anything this will only be 
-changed for the mode you are currently in. 
+Regards
 
-According to what I can see from your PS dump the default bootmode (3) 
-configures the module for UART/H4. However, when the module is currently 
-in USB mode either the default bootmode isn't 3 or it must have been 
-rebootet from the VM (wich again is strange because bootmode 3 disables 
-the VM). 
+Marcel
 
-If you realy want to play with this module only change the bootmode 
-(0x3CD) to 3. This will set up anything to boot for UARt / H4. And to make 
-the change permanent you need to use the default store (see source for 
-bccmd, I never can remember the command options). 
-
-Good luck, 
-
-Peter 
-
-
-
-|       Peter Wippich                   Voice: +49 30 46776411          |
-|       G&W Instruments GmbH            fax:   +49 30 46776419          |
-|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
-|       D-13355 Berlin  / Germany                                       |
 
 
 -------------------------------------------------------------------------
