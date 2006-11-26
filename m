@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d66c3bdf0611260122j7ed7ca07lec61326f8432f9a3@mail.gmail.com>
-Date: Sun, 26 Nov 2006 01:22:22 -0800
-From: "Uichin (Eugene) Lee" <netssenger@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] l2cap connection timeout
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d66c3bdf0611251658t6051e1cev487a98786d3671d9@mail.gmail.com>
+References: <d66c3bdf0611251658t6051e1cev487a98786d3671d9@mail.gmail.com>
+Date: Sun, 26 Nov 2006 11:21:09 +0100
+Message-Id: <1164536469.25914.14.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] periodic inquiry mode.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,35 +20,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dear All,
+Hi Uichin,
 
-I just realized from the spec that BT has C-Plane (for device control
-service, i.e., HCI functions) and U-Plane (transport control and data
-services, etc.). I thought I could use HCI functions not only for
-device discovery, but also for connection and data transfer instead of
-using L2CAP. But according to this, although we can create a
-connection through hci_create_connection(), this connection can't be
-used for data transfer, thus useless. (is it true?)
+> I have a real quick question on a periodic inquiry mode defined in
+> Bluetooth spec. as of 1.1 standard. It's also called a symmetric
+> discovery procedure and we could initiate this by feeding feed min and
+> max values for inquiry intervals as well as # of inquiries to be
+> performed. However, it's only defined in HCI and I realized that it's
+> pretty tough to use it in the application layer (since we're using a
+> high level programming using sockets). We recently wrote a paper on
+> P2P file sharing using bluetooth and there, we used application layer
+> emulation for this periodic inquiry mode; specifically, we used
+> HCI_inquiry to discover nodes, but we simply used a socket to listen
+> to a port to make a node available for discovery (i.e., implicitly in
+> inquiry/page scan mode). Is there any better way that we could
+> actually exploit this, yet exploiting high-level programming features
+> of Bluez?
 
-When we call L2CAP connection, it does in fact just create a L2CAP
-connection request message and send it via hci_send_acl() to the lower
-layer (i.e., LMP??). BlueZ kernel simply manages this L2CAP connection
-information as far as I understand correctly.
+the periodic inquiry is exposed of our new D-Bus based API and really
+simple to use. You only have to set the adapter into periodic inquiry
+mode and then you will receive RemoteDeviceFound and RemoteNameUpdated
+signals over D-Bus. Check the dbus-api.txt documentation and the
+bluez-gnome package for an example.
 
-When I try to connect to a remote device after inquiry step, how can I
-choose a RIGHT timeout value to the remote device? I tried various
-values from 1s to 5s: sometimes, it works well with 2s, but sometimes
-it doesn't. Spec. talks about SR mode, R0 (<1.28s), R1(<1.28s),
-R2(<2.56s) for page scan and thus accordingly, page for asynchronous
-link should be N_page>1, >128, >256 respectively. Will it be pretty
-much the same as the inquiry procedure, or should it be faster than
-that since we've already got the clock offset from inquiry?
+Regards
 
-Thank you.
+Marcel
 
--- 
-Uichin (Eugene) Lee
-Ph.D. Student UCLA CS Dept.
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
