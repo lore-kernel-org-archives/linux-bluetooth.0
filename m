@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <c70f1ac50611261546j26eacbaap7796e7230eb0cf3a@mail.gmail.com>
-Date: Sun, 26 Nov 2006 17:46:29 -0600
-From: "Buck Golemon" <workitharder@gmail.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <c70f1ac50611251551j2350c812s3d3dd55532c161f@mail.gmail.com>
+Message-ID: <c49421c50611261142i2d525f85yd67cb43d28a06e3d@mail.gmail.com>
+Date: Sun, 26 Nov 2006 16:42:30 -0300
+From: "Loreno Oliveira" <lorenooliveira@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-References: <c70f1ac50611251551j2350c812s3d3dd55532c161f@mail.gmail.com>
-Subject: [Bluez-users] Fwd: Advice on starting BT project
+Subject: [Bluez-users] reading RSSI (continuation)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,55 +14,64 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1169058352=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Sorry for cross-posting, but I feel pretty sure that this belongs in
-the user's list rather than the  devel list. I'm really new to this
-mailing list thing and this is my second post...
+--===============1169058352==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_82047_18198170.1164570150232"
+
+------=_Part_82047_18198170.1164570150232
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Sorry the short previous message, let me being more specific.
+
+I read that a device may send a DAC packet to another one, which will answer
+with another DAC packet. Thus, the first device can read the RSSI to the
+other device without establishing a baseband connection among them. In such
+a scenario, the first device has previous knowledge of the BD_ADDR and clock
+offset of the queried device.
+
+The doubt is: is there any way of doing this using BlueZ??
+
+Thanks for any hint!
+
+Loreno
+
+------=_Part_82047_18198170.1164570150232
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Sorry the short previous message, let me being more specific.<br><br>I read that a device may send a DAC packet to another one, which will answer with another DAC packet. Thus, the first device can read the RSSI to the other device without establishing a baseband connection among them. In such a scenario, the first device has previous knowledge of the BD_ADDR and clock offset of the queried device.
+<br><br>The doubt is: is there any way of doing this using BlueZ??<br><br>Thanks for any hint!<br><br>Loreno<br>
+
+------=_Part_82047_18198170.1164570150232--
 
 
-I am seeking some advice on a class project that we are planning.  We
-would like to create a system that can emulate AVDTP/A2DP to the point
-that you may play MP3 from Windows Media onto a Bluetooth device.
-
-Does anyone have definate suggestions on how to proceed?
-
-
-
-Here's my plan thus far:
-
-  >>  Obtain a Bluetooth module that implements up to the HCI interface.
-I would like to also have the L2CAP and SDP modules in hardware, but
-this does not seem to be available as such. Any modules that do
-implement these seem to also force you to use the SPP module (LMX9830
-for example).
-
-  >>  Port an early version of the Axis stack to a dsPIC microcontroller.
-I am most familiar with the dsPIC and its tools. From what I gather,
-the Bluez/Linux kernel driver use threading and Linux-specific code,
-so it is easiest to port from the original Axis release. Also I prefer
-this approach to a full-fledged embedded Linux for cost and complexity
-reasons.
-
-  >>  Tack onto the driver the bare minimum to establish a connection and
-initiate streaming.
-The Core, AVDTP, and A2DP specifications are quite detailed and I have
-become familiar enough with them that I believe this is possible,
-given the correct interface to the lower levels.
-
-
-Thanks in advance,
-Buck Golemon
-golemon@uiuc.edu
+--===============1169058352==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1169058352==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1169058352==--
