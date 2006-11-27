@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <c303508f0611271806t6e5f0b31u4908ee4234b5e1ad@mail.gmail.com>
-Date: Mon, 27 Nov 2006 21:06:04 -0500
-From: "Axel Ruder" <axel.ruder@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] Rfcomm kernel crashes (2.6.18.2)
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <002801c7125f$7197b7f0$0100a8c0@kayleigh>
+From: "Olivier Le Pogam" <olepogam@free.fr>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <002901c710a8$0eab3580$0100a8c0@kayleigh>
+	<1164536005.25914.8.camel@aeonflux.holtmann.net>
+Date: Mon, 27 Nov 2006 21:05:53 +0100
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Master / Slave question
+Reply-To: Olivier Le Pogam <olepogam@free.fr>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,188 +17,1042 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1612183975=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1612183975==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_197_27234092.1164679564379"
-
-------=_Part_197_27234092.1164679564379
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 Hi Marcel,
-thanks again for your patch. It seems to have fixed the problem partially.
-I get a lot less frequent crashes, but unfortunately I now got this new
-error:
 
-Nov 26 21:57:58 localhost kernel: BUG: unable to handle kernel NULL pointer
-dereference at virtual address 0000003c
-Nov 26 21:57:58 localhost kernel:  printing eip:
-Nov 26 21:57:58 localhost kernel: e1cebe5f
-Nov 26 21:57:58 localhost kernel: *pde = 00000000
-Nov 26 21:57:58 localhost kernel: Oops: 0000 [#1]
-Nov 26 21:57:58 localhost kernel: SMP
-Nov 26 21:57:58 localhost kernel: Modules linked in: nvidia rfcomm l2cap
-lirc_serial cx8800 cx88xx bttv video_buf ir_common compat_ioctl32 btcx_risc
-lirc_i2c lirc_dev ipv6 dm_mod it87 hwmon_vid i2c_isa eeprom sd_mod eth1394
-dv1394 raw1394 hci_usb bluetooth usb_storage scsi_mod msp3400 saa7127
-mousedev saa7115 tsdev tuner snd_intel8x0 snd_ac97_codec snd_ac97_bus
-snd_pcm_oss snd_mixer_oss snd_pcm shpchp ivtv ohci1394 ide_cd cdrom
-firmware_class ehci_hcd ieee1394 pci_hotplug i2c_sis96x i2c_algo_bit
-ohci_hcd snd_timer sis900 ns558 snd 8250_pnp tveeprom i2c_core psmouse
-usbcore mii analog sis_agp agpgart videodev v4l1_compat v4l2_common evdev
-soundcore snd_page_alloc serio_raw pcspkr rtc gameport parport_pc parport
-ext3 jbd mbcache ide_disk ide_generic via82cxxx trm290 triflex slc90e66
-sis5513 siimage serverworks sc1200 rz1000 piix pdc202xx_old pdc202xx_new
-opti621 ns87415 it821x hpt366 hpt34x generic cy82c693 cs5535 cs5530 cs5520
-cmd64x atiixp amd74xx alim15x3 aec62xx ide_core
-Nov 26 21:57:58 localhost kernel: CPU:    1
-Nov 26 21:57:58 localhost kernel: EIP:    0060:[<e1cebe5f>]    Tainted:
-PF     VLI
-Nov 26 21:57:58 localhost kernel: EFLAGS: 00010293   (2.6.18.2 #1)
-Nov 26 21:57:58 localhost kernel: EIP is at rfcomm_tty_write_room+0x7/0x27
-[rfcomm]
-Nov 26 21:57:58 localhost kernel: eax: c297a000   ebx: c297a000   ecx:
-00000000   edx: deeb8200
-Nov 26 21:57:58 localhost kernel: esi: 00000000   edi: d6b1c8c0   ebp:
-c297a00c   esp: c554fbfc
-Nov 26 21:57:58 localhost kernel: ds: 007b   es: 007b   ss: 0068
-Nov 26 21:57:58 localhost kernel: Process rfcomm (pid: 20250, ti=c554e000
-task=dfceeab0 task.ti=c554e000)
-Nov 26 21:57:58 localhost kernel: Stack: c297a000 b01fb6f9 00124d5e c297a000
-b01fb5f2 d6b1c8c0 b01f7943 00000000
-Nov 26 21:57:58 localhost kernel:        00000000 00000000 c554fea0 d6b1c8c0
-c554fe98 b0167131 c554ffb0 afcd69e0
-Nov 26 21:57:58 localhost kernel:        afcd69e8 00000000 c554fe98 c554fe98
-c554fe98 c554fea8 00000000 b0167bdf
-Nov 26 21:57:58 localhost kernel: Call Trace:
-Nov 26 21:57:58 localhost kernel:  [<b01fb6f9>] normal_poll+0x107/0x11a
-Nov 26 21:57:58 localhost kernel:  [<b01fb5f2>] normal_poll+0x0/0x11a
-Nov 26 21:57:58 localhost kernel:  [<b01f7943>] tty_poll+0x48/0x60
-Nov 26 21:57:58 localhost kernel:  [<b0167131>] do_sys_poll+0x1a7/0x341
-Nov 26 21:57:58 localhost kernel:  [<b0167bdf>] __pollwait+0x0/0xb2
-Nov 26 21:57:58 localhost kernel:  [<b0117295>]
-default_wake_function+0x0/0xc
-Nov 26 21:57:58 localhost kernel:  [<b0117295>]
-default_wake_function+0x0/0xc
-Nov 26 21:57:58 localhost kernel:  [<e2374249>] _nv005245rm+0xa9/0xe8
-[nvidia]
-Nov 26 21:57:58 localhost kernel:  [<e2374249>] _nv005245rm+0xa9/0xe8
-[nvidia]
-Nov 26 21:57:58 localhost kernel:  [<e21fe10a>] _nv002668rm+0x26/0x2c
-[nvidia]
-Nov 26 21:57:58 localhost kernel:  [<e24336d2>] _nv000984rm+0x1a/0x20
-[nvidia]
-Nov 26 21:57:58 localhost kernel:  [<e243203f>] _nv000986rm+0x33/0x68
-[nvidia]
-Nov 26 21:57:58 localhost kernel:  [<e2432051>] _nv000986rm+0x45/0x68
-[nvidia]
-Nov 26 21:57:58 localhost kernel:  [<e21fe053>] _nv002682rm+0x53/0x84
-[nvidia]
-Nov 26 21:57:58 localhost kernel:  [<e23748b1>] _nv005436rm+0x15/0x1c
-[nvidia]
-Nov 26 21:57:58 localhost kernel:  [<e21fe101>] _nv002668rm+0x1d/0x2c
-[nvidia]
-Nov 26 21:57:58 localhost kernel:  [<e21fe10a>] _nv002668rm+0x26/0x2c
-[nvidia]
-Nov 26 21:57:58 localhost kernel:  [<b020ed34>] dma_pool_alloc+0x16e/0x178
-Nov 26 21:57:58 localhost kernel:  [<e093fe8c>] ohci_urb_enqueue+0x61d/0x6d1
-[ohci_hcd]
-Nov 26 21:57:58 localhost kernel:  [<b0115f3e>] __activate_task+0x1c/0x29
-Nov 26 21:57:58 localhost kernel:  [<b011728b>] try_to_wake_up+0x355/0x35f
-Nov 26 21:57:58 localhost kernel:  [<e0965e40>] hcd_submit_urb+0x67d/0x727
-[usbcore]
-Nov 26 21:57:58 localhost kernel:  [<b012d1f2>]
-autoremove_wake_function+0xd/0x2d
-Nov 26 21:57:58 localhost kernel:  [<b0115d79>] __wake_up_common+0x2f/0x53
-Nov 26 21:57:58 localhost kernel:  [<b01161ca>] __wake_up+0x2a/0x3d
-Nov 26 21:57:58 localhost kernel:  [<b0141c58>] mempool_free+0x5f/0x63
-Nov 26 21:57:58 localhost kernel:  [<b015bc9c>] bio_put+0x22/0x23
-Nov 26 21:57:58 localhost kernel:  [<b017500c>] mpage_end_io_read+0x5e/0x66
-Nov 26 21:57:58 localhost kernel:  [<b0124dfb>] __mod_timer+0x93/0x9d
-Nov 26 21:57:58 localhost kernel:  [<b01aec85>] as_antic_waitnext+0x25/0x31
-Nov 26 21:57:58 localhost kernel:  [<b01afa43>]
-as_dispatch_request+0x176/0x30e
-Nov 26 21:57:58 localhost kernel:  [<b01a896f>] elv_next_request+0x106/0x113
-Nov 26 21:57:58 localhost kernel:  [<e083630f>] ide_do_request+0x249/0x6bf
-[ide_core]
-Nov 26 21:57:58 localhost kernel:  [<b01aa2b7>] freed_request+0x1d/0x37
-Nov 26 21:57:58 localhost kernel:  [<e0836095>] ide_end_request+0xc1/0xc9
-[ide_core]
-Nov 26 21:57:58 localhost kernel:  [<e0836a0a>] ide_intr+0x183/0x18f
-[ide_core]
-Nov 26 21:57:58 localhost kernel:  [<b013d8bf>] handle_IRQ_event+0x23/0x49
-Nov 26 21:57:58 localhost kernel:  [<b0106758>] enable_8259A_irq+0xd/0x42
-Nov 26 21:57:58 localhost kernel:  [<b013d9bb>] __do_IRQ+0xd6/0xe6
-Nov 26 21:57:58 localhost kernel:  [<b0167300>] sys_poll+0x35/0x38
-Nov 26 21:57:58 localhost kernel:  [<b0102c73>] syscall_call+0x7/0xb
-Nov 26 21:57:58 localhost kernel: Code: 5f 5d c3 90 89 c1 a1 c0 16 cf e1 eb
-07 39 48 18 74 11 89 d0 8b 10 0f 18 02 90 3d c0 16 cf e1 75 ec 31 c0 c3 53
-8b 88 84 01 00 00 <8b> 59 3c 8b 53 5c 85 d2 b8 01 00 00 00 0f 44 d0 8b 49 64
-0f af
-Nov 26 21:57:58 localhost kernel: EIP: [<e1cebe5f>]
-rfcomm_tty_write_room+0x7/0x27 [rfcomm] SS:ESP 0068:c554fbfc
+Re this, I've done what you advised :
+
+>> I am trying to make 2 mobile phones connected concurrently
+>> to a RFCOMM server. Please note that they don't support
+>> role switching, so as they initiate the communication, they
+>> are always "master".
+>>
+>> My RFCOMM server is a forking one so it can virtually
+>> deal with concurrent clients like on TCP.
+>>
+>> I have put lm=accept in hcid.conf
+>>
+>> If I open a RFCOMM server on channel 14 and try to make
+>> the 2 mobile connect to channel 14, the first is ok, the
+>> second can't connect. I suppose that's normal, because
+>> channel 14 "slave" is busy linux-side with the first
+>> connection and a "slave" can deal with one connection only.
+>>
+>> Then I've launched a second server on channel 15 (server
+>> on channel 14 running concurrently), and i try to make
+>> the first mobile connect to channel 14 and the second
+>> to channel 15 : it's the same, only the first can connect.
+>>
+>> I think I have a misunderstanding here, as i thought the
+>> "master/slave" was per channel. Does it mean the "slave" status
+>> is for the whole adaptor, and once a "slave" connection is
+>> open on one channel, it can't receive other connections at all ?
+>
+> the master/slave thing is per ACL connection. However there can only be
+> one ACL connection between two devices. Run "hcidump -X -V" and see
+> what's the actual error message on the HCI level.
+
+- I launch both servers, one on channel 14, the other on channel 15
+
+- I have made a hcidump -X -V with only one mobile connecting to
+server on channel 14, I have dlci : 28
+
+- I have made a hcidump -X -V with only one mobile connecting to
+server on channel 15, I have dlci : 30
+
+- When trying to make both connect concurrently, one to channel 14
+the other to channel 15, once the first is connected the second can't,
+and I have **absolulety nothing** in the HCI dump related to the
+failed attempt, i.e. I have a final log quite similar to a single connection
+one to the channel that has been successful. Could there be a lock/mutual
+exclusion somewhere in the BlueZ library ? Could one
+
+Kernel : (I applied the MH7 patch) 2.6.18-1.2239_FC5_mh7
+
+Please find the 3 logs below, and a piece of code :
+
+log_14.txt for the connection on channel 14 only
+log_15.txt for the connection on channel 14 only
+log_14_15.txt for the concurrent connection attempt,
+but successful on channel 14 only.
+get_bluetooth_connection function, which is the
+"server" main function
+
+Many many thanks for helping me :(
+I've certainly missed something obvious !!
+
+Regards,
+Oli
+
+----------------------------------------------------------
+log_14.txt
+----------------------------------------------------------
+
+HCI sniffer - Bluetooth packet analyzer ver 1.33
+device: hci0 snap_len: 1028 filter: 0xffffffff
+> HCI Event: Connect Request (0x04) plen 10
+    bdaddr 00:16:4E:83:2D:19 class 0x520204 type ACL
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+    bdaddr 00:16:4E:83:2D:19 role 0x01
+    Role: Slave
+> HCI Event: Command Status (0x0f) plen 4
+    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 1 bdaddr 00:16:4E:83:2D:19 type ACL encrypt 0x00
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+    handle 1
+> HCI Event: Max Slots Change (0x1b) plen 3
+    handle 1 slots 5
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 1 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK
+> HCI Event: Command Complete (0x0e) plen 6
+    Write Link Policy Settings (0x02|0x000d) ncmd 1
+    status 0x00 handle 1
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+    handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+    Change Connection Packet Type (0x01|0x000f) status 0x00 ncmd 1
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+    status 0x00 handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+    status 0x00 handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+      Connection successful
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+    status 0x00 handle 1
+    Features: 0xbf 0xee 0x0f 0x40 0x18 0x18 0x00 0x00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 32772
+< ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+      Success
+      MTU 32772
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(s): Info req: type 2
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x0000
+< ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 32772
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+      Success
+      MTU 32772
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 28 frame_type 0 credit_flow 15 pri 0 ack_timer 0
+      frame_size 1645 max_retrans 0 credits 0
+< ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 28 frame_type 0 credit_flow 14 pri 0 ack_timer 0
+      frame_size 1645 max_retrans 0 credits 7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 28 pf 1 ilen 0 fcs 0x28
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 28 pf 1 ilen 0 fcs 0xe3
+< ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 28 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 28 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
+< ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 28 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 28 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
+< ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 1 ilen 0 fcs 0xdd credits 33
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 2
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 30 0a                                             0.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 30 0a                                             0.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 31 0a                                             1.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 31 0a                                             1.
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 32 0a                                             2.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 32 0a                                             2.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 33 0a                                             3.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 33 0a                                             3.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 34 0a                                             4.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 34 0a                                             4.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 35 0a                                             5.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 35 0a                                             5.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 36 0a                                             6.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 36 0a                                             6.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 37 0a                                             7.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 37 0a                                             7.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 38 0a                                             8.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 38 0a                                             8.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 39 0a                                             9.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 39 0a                                             9.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 28 pf 1 ilen 0 fcs 0xc9
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 28 pf 1 ilen 0 fcs 0xe3
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+< ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 1 reason 0x13
+    Reason: Remote User Terminated Connection
+
+----------------------------------------------------------
+log_15.txt
+----------------------------------------------------------
+
+HCI sniffer - Bluetooth packet analyzer ver 1.33
+device: hci0 snap_len: 1028 filter: 0xffffffff
+> HCI Event: Connect Request (0x04) plen 10
+    bdaddr 00:18:C5:FE:C4:7F class 0x520204 type ACL
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+    bdaddr 00:18:C5:FE:C4:7F role 0x01
+    Role: Slave
+> HCI Event: Command Status (0x0f) plen 4
+    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 1 bdaddr 00:18:C5:FE:C4:7F type ACL encrypt 0x00
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+    handle 1
+> HCI Event: Max Slots Change (0x1b) plen 3
+    handle 1 slots 5
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 1 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK
+> HCI Event: Command Complete (0x0e) plen 6
+    Write Link Policy Settings (0x02|0x000d) ncmd 1
+    status 0x00 handle 1
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+    handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+    status 0x00 handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+    Change Connection Packet Type (0x01|0x000f) status 0x00 ncmd 1
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+    status 0x00 handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+    status 0x00 handle 1
+    Features: 0xbf 0xee 0x0f 0xc6 0x9a 0x39 0x00 0x00
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+      Connection successful
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 32772
+< ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+      Success
+      MTU 32772
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(s): Info req: type 2
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x0000
+< ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 32772
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+      Success
+      MTU 32772
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 30 frame_type 0 credit_flow 15 pri 0 ack_timer 0
+      frame_size 4935 max_retrans 0 credits 0
+< ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 30 frame_type 0 credit_flow 14 pri 0 ack_timer 0
+      frame_size 4935 max_retrans 0 credits 7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 30 pf 1 ilen 0 fcs 0x6d
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 30 pf 1 ilen 0 fcs 0xa6
+< ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 30 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 30 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
+< ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 30 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 30 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
+< ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 30 pf 1 ilen 0 fcs 0x37 credits 33
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 1 ilen 0 fcs 0xed credits 2
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 0 ilen 2 fcs 0xf1
+      0000: 30 0a                                             0.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 30 pf 0 ilen 2 fcs 0x2b
+      0000: 30 0a                                             0.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 1 ilen 0 fcs 0xed credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 0 ilen 2 fcs 0xf1
+      0000: 31 0a                                             1.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 30 pf 0 ilen 2 fcs 0x2b
+      0000: 31 0a                                             1.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 1 ilen 0 fcs 0xed credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 0 ilen 2 fcs 0xf1
+      0000: 32 0a                                             2.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 30 pf 0 ilen 2 fcs 0x2b
+      0000: 32 0a                                             2.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 1 ilen 0 fcs 0xed credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 0 ilen 2 fcs 0xf1
+      0000: 33 0a                                             3.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 30 pf 0 ilen 2 fcs 0x2b
+      0000: 33 0a                                             3.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 1 ilen 0 fcs 0xed credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 0 ilen 2 fcs 0xf1
+      0000: 34 0a                                             4.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 30 pf 0 ilen 2 fcs 0x2b
+      0000: 34 0a                                             4.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 1 ilen 0 fcs 0xed credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 0 ilen 2 fcs 0xf1
+      0000: 35 0a                                             5.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 30 pf 0 ilen 2 fcs 0x2b
+      0000: 35 0a                                             5.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 1 ilen 0 fcs 0xed credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 0 ilen 2 fcs 0xf1
+      0000: 36 0a                                             6.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 30 pf 0 ilen 2 fcs 0x2b
+      0000: 36 0a                                             6.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 1 ilen 0 fcs 0xed credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 0 ilen 2 fcs 0xf1
+      0000: 37 0a                                             7.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 30 pf 0 ilen 2 fcs 0x2b
+      0000: 37 0a                                             7.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 1 ilen 0 fcs 0xed credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 0 ilen 2 fcs 0xf1
+      0000: 38 0a                                             8.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 30 pf 0 ilen 2 fcs 0x2b
+      0000: 38 0a                                             8.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 1 ilen 0 fcs 0xed credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 0 ilen 2 fcs 0xf1
+      0000: 39 0a                                             9.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 30 pf 0 ilen 2 fcs 0x2b
+      0000: 39 0a                                             9.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 30 pf 1 ilen 0 fcs 0xed credits 1
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 30 pf 1 ilen 0 fcs 0x8c
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 30 pf 1 ilen 0 fcs 0xa6
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+< ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 1 reason 0x13
+    Reason: Remote User Terminated Connection
 
 
-Thanks for your help!
-Axel
 
-------=_Part_197_27234092.1164679564379
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+----------------------------------------------------------
+log_14_15.txt
+----------------------------------------------------------
 
-Hi Marcel,<br>thanks again for your patch. It seems to have fixed the problem partially.<br>I get a lot less frequent crashes, but unfortunately I now got this new error:<br><br>Nov 26 21:57:58 localhost kernel: BUG: unable to handle kernel NULL pointer dereference at virtual address 0000003c
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; printing eip:<br>Nov 26 21:57:58 localhost kernel: e1cebe5f<br>Nov 26 21:57:58 localhost kernel: *pde = 00000000<br>Nov 26 21:57:58 localhost kernel: Oops: 0000 [#1]<br>Nov 26 21:57:58 localhost kernel: SMP 
-<br>Nov 26 21:57:58 localhost kernel: Modules linked in: nvidia rfcomm l2cap lirc_serial cx8800 cx88xx bttv video_buf ir_common compat_ioctl32 btcx_risc lirc_i2c lirc_dev ipv6 dm_mod it87 hwmon_vid i2c_isa eeprom sd_mod eth1394 dv1394 raw1394 hci_usb bluetooth usb_storage scsi_mod msp3400 saa7127 mousedev saa7115 tsdev tuner snd_intel8x0 snd_ac97_codec snd_ac97_bus snd_pcm_oss snd_mixer_oss snd_pcm shpchp ivtv ohci1394 ide_cd cdrom firmware_class ehci_hcd ieee1394 pci_hotplug i2c_sis96x i2c_algo_bit ohci_hcd snd_timer sis900 ns558 snd 8250_pnp tveeprom i2c_core psmouse usbcore mii analog sis_agp agpgart videodev v4l1_compat v4l2_common evdev soundcore snd_page_alloc serio_raw pcspkr rtc gameport parport_pc parport ext3 jbd mbcache ide_disk ide_generic via82cxxx trm290 triflex slc90e66 sis5513 siimage serverworks sc1200 rz1000 piix pdc202xx_old pdc202xx_new opti621 ns87415 it821x hpt366 hpt34x generic cy82c693 cs5535 cs5530 cs5520 cmd64x atiixp amd74xx alim15x3 aec62xx ide_cor
- e
-<br>Nov 26 21:57:58 localhost kernel: CPU:&nbsp;&nbsp;&nbsp; 1<br>Nov 26 21:57:58 localhost kernel: EIP:&nbsp;&nbsp;&nbsp; 0060:[&lt;e1cebe5f&gt;]&nbsp;&nbsp;&nbsp; Tainted: PF&nbsp;&nbsp;&nbsp;&nbsp; VLI<br>Nov 26 21:57:58 localhost kernel: EFLAGS: 00010293&nbsp;&nbsp; (<a href="http://2.6.18.2">
-2.6.18.2</a> #1) <br>Nov 26 21:57:58 localhost kernel: EIP is at rfcomm_tty_write_room+0x7/0x27 [rfcomm]<br>Nov 26 21:57:58 localhost kernel: eax: c297a000&nbsp;&nbsp; ebx: c297a000&nbsp;&nbsp; ecx: 00000000&nbsp;&nbsp; edx: deeb8200<br>Nov 26 21:57:58 localhost kernel: esi: 00000000&nbsp;&nbsp; edi: d6b1c8c0&nbsp;&nbsp; ebp: c297a00c&nbsp;&nbsp; esp: c554fbfc
-<br>Nov 26 21:57:58 localhost kernel: ds: 007b&nbsp;&nbsp; es: 007b&nbsp;&nbsp; ss: 0068<br>Nov 26 21:57:58 localhost kernel: Process rfcomm (pid: 20250, ti=c554e000 task=dfceeab0 task.ti=c554e000)<br>Nov 26 21:57:58 localhost kernel: Stack: c297a000 b01fb6f9 00124d5e c297a000 b01fb5f2 d6b1c8c0 b01f7943 00000000 
-<br>Nov 26 21:57:58 localhost kernel:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 00000000 00000000 c554fea0 d6b1c8c0 c554fe98 b0167131 c554ffb0 afcd69e0 <br>Nov 26 21:57:58 localhost kernel:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; afcd69e8 00000000 c554fe98 c554fe98 c554fe98 c554fea8 00000000 b0167bdf 
-<br>Nov 26 21:57:58 localhost kernel: Call Trace:<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b01fb6f9&gt;] normal_poll+0x107/0x11a<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b01fb5f2&gt;] normal_poll+0x0/0x11a<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b01f7943&gt;] tty_poll+0x48/0x60
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b0167131&gt;] do_sys_poll+0x1a7/0x341<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b0167bdf&gt;] __pollwait+0x0/0xb2<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b0117295&gt;] default_wake_function+0x0/0xc
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b0117295&gt;] default_wake_function+0x0/0xc<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e2374249&gt;] _nv005245rm+0xa9/0xe8 [nvidia]<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e2374249&gt;] _nv005245rm+0xa9/0xe8 [nvidia]
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e21fe10a&gt;] _nv002668rm+0x26/0x2c [nvidia]<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e24336d2&gt;] _nv000984rm+0x1a/0x20 [nvidia]<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e243203f&gt;] _nv000986rm+0x33/0x68 [nvidia]
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e2432051&gt;] _nv000986rm+0x45/0x68 [nvidia]<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e21fe053&gt;] _nv002682rm+0x53/0x84 [nvidia]<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e23748b1&gt;] _nv005436rm+0x15/0x1c [nvidia]
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e21fe101&gt;] _nv002668rm+0x1d/0x2c [nvidia]<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e21fe10a&gt;] _nv002668rm+0x26/0x2c [nvidia]<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b020ed34&gt;] dma_pool_alloc+0x16e/0x178
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e093fe8c&gt;] ohci_urb_enqueue+0x61d/0x6d1 [ohci_hcd]<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b0115f3e&gt;] __activate_task+0x1c/0x29<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b011728b&gt;] try_to_wake_up+0x355/0x35f
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e0965e40&gt;] hcd_submit_urb+0x67d/0x727 [usbcore]<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b012d1f2&gt;] autoremove_wake_function+0xd/0x2d<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b0115d79&gt;] __wake_up_common+0x2f/0x53
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b01161ca&gt;] __wake_up+0x2a/0x3d<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b0141c58&gt;] mempool_free+0x5f/0x63<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b015bc9c&gt;] bio_put+0x22/0x23
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b017500c&gt;] mpage_end_io_read+0x5e/0x66<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b0124dfb&gt;] __mod_timer+0x93/0x9d<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b01aec85&gt;] as_antic_waitnext+0x25/0x31
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b01afa43&gt;] as_dispatch_request+0x176/0x30e<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b01a896f&gt;] elv_next_request+0x106/0x113<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e083630f&gt;] ide_do_request+0x249/0x6bf [ide_core]
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b01aa2b7&gt;] freed_request+0x1d/0x37<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e0836095&gt;] ide_end_request+0xc1/0xc9 [ide_core]<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;e0836a0a&gt;] ide_intr+0x183/0x18f [ide_core]
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b013d8bf&gt;] handle_IRQ_event+0x23/0x49<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b0106758&gt;] enable_8259A_irq+0xd/0x42<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b013d9bb&gt;] __do_IRQ+0xd6/0xe6
-<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b0167300&gt;] sys_poll+0x35/0x38<br>Nov 26 21:57:58 localhost kernel:&nbsp; [&lt;b0102c73&gt;] syscall_call+0x7/0xb<br>Nov 26 21:57:58 localhost kernel: Code: 5f 5d c3 90 89 c1 a1 c0 16 cf e1 eb 07 39 48 18 74 11 89 d0 8b 10 0f 18 02 90 3d c0 16 cf e1 75 ec 31 c0 c3 53 8b 88 84 01 00 00 &lt;8b&gt; 59 3c 8b 53 5c 85 d2 b8 01 00 00 00 0f 44 d0 8b 49 64 0f af 
-<br>Nov 26 21:57:58 localhost kernel: EIP: [&lt;e1cebe5f&gt;] rfcomm_tty_write_room+0x7/0x27 [rfcomm] SS:ESP 0068:c554fbfc<br><br><br>Thanks for your help!<br>Axel<br>
+HCI sniffer - Bluetooth packet analyzer ver 1.33
+device: hci0 snap_len: 1028 filter: 0xffffffff
+> HCI Event: Connect Request (0x04) plen 10
+    bdaddr 00:16:4E:83:2D:19 class 0x520204 type ACL
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+    bdaddr 00:16:4E:83:2D:19 role 0x01
+    Role: Slave
+> HCI Event: Command Status (0x0f) plen 4
+    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 1 bdaddr 00:16:4E:83:2D:19 type ACL encrypt 0x00
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+    handle 1
+> HCI Event: Max Slots Change (0x1b) plen 3
+    handle 1 slots 5
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 1 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK
+> HCI Event: Command Complete (0x0e) plen 6
+    Write Link Policy Settings (0x02|0x000d) ncmd 1
+    status 0x00 handle 1
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+    handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+    Change Connection Packet Type (0x01|0x000f) status 0x00 ncmd 1
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+    status 0x00 handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+    status 0x00 handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+      Connection successful
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+    status 0x00 handle 1
+    Features: 0xbf 0xee 0x0f 0x40 0x18 0x18 0x00 0x00
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 32772
+< ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+      Success
+      MTU 32772
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(s): Info req: type 2
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x0000
+< ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 32772
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+      Success
+      MTU 32772
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 28 frame_type 0 credit_flow 15 pri 0 ack_timer 0
+      frame_size 1645 max_retrans 0 credits 0
+< ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 28 frame_type 0 credit_flow 14 pri 0 ack_timer 0
+      frame_size 1645 max_retrans 0 credits 7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 28 pf 1 ilen 0 fcs 0x28
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 28 pf 1 ilen 0 fcs 0xe3
+< ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 28 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 28 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
+< ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 28 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 28 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
+< ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 1 ilen 0 fcs 0xdd credits 33
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 2
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 30 0a                                             0.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 30 0a                                             0.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 31 0a                                             1.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 31 0a                                             1.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 32 0a                                             2.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 32 0a                                             2.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 33 0a                                             3.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 33 0a                                             3.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 34 0a                                             4.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 34 0a                                             4.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 35 0a                                             5.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 35 0a                                             5.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 36 0a                                             6.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 36 0a                                             6.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 37 0a                                             7.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 37 0a                                             7.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 38 0a                                             8.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 38 0a                                             8.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 0 ilen 2 fcs 0x1b
+      0000: 39 0a                                             9.
+< ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(d): cid 0x0040 len 6 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 28 pf 0 ilen 2 fcs 0xc1
+      0000: 39 0a                                             9.
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 28 pf 1 ilen 0 fcs 0x7 credits 1
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 28 pf 1 ilen 0 fcs 0xc9
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 28 pf 1 ilen 0 fcs 0xe3
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+< ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 1 reason 0x13
+    Reason: Remote User Terminated Connection
 
-------=_Part_197_27234092.1164679564379--
+
+-----------------------------
+int get_bluetooth_connection
+-----------------------------
 
 
---===============1612183975==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+int get_bluetooth_connection(int socket_type, u_short port, int *listener, 
+char *remote_addr)
+{
+ struct sockaddr_rc loc_addr = { 0 }, rem_addr = { 0 };
+
+ int listening_socket;
+ int connected_socket = -1;
+ int new_process;
+ int reuse_addr = 1;
+ int opt = sizeof(rem_addr);
+
+ strcpy(remote_addr, "");
+ listening_socket = socket(AF_BLUETOOTH, socket_type, BTPROTO_RFCOMM);
+ if (listening_socket < 0) {
+  perror("socket");
+  exit(EXIT_FAILURE);
+ }
+
+   if (listener != NULL)
+  *listener = listening_socket;
+
+   //setsockopt(listening_socket, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, 
+sizeof(reuse_addr));
+
+ loc_addr.rc_family = AF_BLUETOOTH;
+ loc_addr.rc_bdaddr = *BDADDR_ANY;
+ loc_addr.rc_channel = (uint8_t) port;
+ if (bind(listening_socket, (struct sockaddr *)&loc_addr, sizeof(loc_addr)) 
+< 0)
+ {
+  perror("bind");
+  close(listening_socket);
+  exit(EXIT_FAILURE);
+ }
+
+ if (socket_type == SOCK_STREAM)
+ {
+  listen(listening_socket, 5); /* Queue up to five connections before having 
+them automatically rejected. */
+
+     while(connected_socket < 0)
+  {
+     printf("[%ld] Waiting accept ...\n", (long)getpid(), remote_addr);
+        connected_socket = accept(listening_socket, (struct sockaddr 
+*)&rem_addr, &opt);
+     ba2str( &(rem_addr.rc_bdaddr), remote_addr );
+        if (connected_socket < 0)
+   {
+          /* Either a real error occured, or blocking was interrupted for
+             some reason.  Only abort execution if a real error occured. */
+          if (errno != EINTR)
+    {
+             perror("accept");
+             close(listening_socket);
+             exit(EXIT_FAILURE);
+          } else {
+             continue;    /* don't fork - do the accept again */
+          }
+        }
+
+   printf("[%ld] Accepted from %s\n", (long)getpid(), remote_addr);
+        new_process = fork();
+        if (new_process < 0)
+   {
+          printf("[%ld] Forking error\n", (long)getpid());
+          close(connected_socket);
+          connected_socket = -1;
+        } else {
+    /* We have a new process... */
+          if (new_process == 0)
+    {
+     printf("[%ld] Start of new process (after fork)\n", (long)getpid());
+             /* This is the new process. */
+             close(listening_socket); /* Close our copy of this socket */
+       if (listener != NULL) *listener = -1; /* Closed in this process.  We 
+are not responsible for it. */
+          } else {
+             /* This is the main loop.  Close copy of connected socket, and 
+continue loop. */
+             close(connected_socket);
+             connected_socket = -1;
+          }
+        }
+     }
+     return connected_socket;
+   } else
+     return listening_socket;
+}
+
+
+
+-- 
+No virus found in this outgoing message.
+Checked by AVG Free Edition.
+Version: 7.1.409 / Virus Database: 268.14.17/553 - Release Date: 27/11/2006
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1612183975==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1612183975==--
