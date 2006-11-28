@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <c49421c50611261142i2d525f85yd67cb43d28a06e3d@mail.gmail.com>
-References: <c49421c50611261142i2d525f85yd67cb43d28a06e3d@mail.gmail.com>
-Date: Tue, 28 Nov 2006 05:44:21 +0100
-Message-Id: <1164689061.13955.18.camel@aeonflux.holtmann.net>
+In-Reply-To: <77ADC7D0C96B1F44A924DC4E952A5E0E0123D00A@AZ25EXM01.gddsi.com>
+References: <77ADC7D0C96B1F44A924DC4E952A5E0E0123D00A@AZ25EXM01.gddsi.com>
+Date: Tue, 28 Nov 2006 05:12:40 +0100
+Message-Id: <1164687160.13955.9.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] reading RSSI (continuation)
+Subject: Re: [Bluez-users] Trying to connect using a BCSP dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,18 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Loreno,
+Hi Scott,
 
-> I read that a device may send a DAC packet to another one, which will
-> answer with another DAC packet. Thus, the first device can read the
-> RSSI to the other device without establishing a baseband connection
-> among them. In such a scenario, the first device has previous
-> knowledge of the BD_ADDR and clock offset of the queried device. 
+> I'm trying to connect a bluetooth module using the BCSP transport on a
+> Linux machine.
 > 
-> The doubt is: is there any way of doing this using BlueZ??
+> I have all my services running, but when I try notifying the Linux
+> bluez stack that the transport will be bcsp using: 
+> "hciattach ttyS0 bcsp", the Linux PC locks up.  I have to reboot to
+> recover.
 
-there is no way. The HCI doesn't provide any interface to these kind of
-information and if it is not supported by HCI, then BlueZ can't use it.
+which kernel version do you use. Can you call "dmesg -n 8" and try it
+again from the console to catch possible error messages from the kernel.
 
 Regards
 
