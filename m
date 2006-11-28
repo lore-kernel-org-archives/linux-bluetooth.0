@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Andreas Merkle <merkle@newtec.de>
-Date: Tue, 28 Nov 2006 22:32:46 +0000 (UTC)
-Message-ID: <loom.20061128T231453-686@post.gmane.org>
-References: <20061128071440.25196.qmail@bux.stollmann.net>
-	<1164736384.13955.24.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] BECI
+Message-ID: <e1effdeb0611281348o4bf50145td6c4463e82da2618@mail.gmail.com>
+Date: Tue, 28 Nov 2006 18:48:03 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_14391_6128783.1164750483899"
+Subject: [Bluez-devel] [PATCH] Trusted devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,49 +16,153 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+------=_Part_14391_6128783.1164750483899
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 Hi Marcel,
 
-> 
-> Hi Juergen,
-> 
-> > BECI is designeated as a Profile orientated Interface situated on top of 
-profiles and protocols
-> > to interact with aplications.
-> > So its not a question of hardware.
-> > However since a working group has not been established yet no specs exist.
-> 
-> I heard about BECI and actually my understanding is that stuff like
-> L2CAP and RFCOMM can run on the Bluetooth chip itself and doesn't needed
-> to be implemented in the actual host OS. However my tip is that someone
-> might simply have a look at our D-Bus based API, because we designed all
-> methods and signals from the viewpoint of the applications. It has
-> become one of the easiest to use abstractions, I have seen so far.
-> 
+This patch implements the funcionality that we discussed previously
+and fix some minor bugs:
 
-the BECI functionality will include all Bluetooth features and 
-support both multi-profile and Multilink application. 
-Its just like the HCI interface but on a higher level.
-One of the advantage is that you can implement L2CAP, RFCOMM etc.
-into a chip ... thats right.
+* new errors added
+* if the remote device is trusted reply directly instead of ask the
+authorization agent
+* fix case sensitive bug
 
-How fast it will be a working group is a political issue at the
-moment. But if its a working group we can suggest the D-Bus API.
+Comments?
+BR,
+Claudio
+-- 
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
-Regards
-Andreas
+------=_Part_14391_6128783.1164750483899
+Content-Type: text/x-patch; name=trusted03.patch; charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_ev2uavbw
+Content-Disposition: attachment; filename="trusted03.patch"
 
-
+SW5kZXg6IGhjaWQvZGJ1cy1hcGkudHh0Cj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZpbGU6IC9jdnNyb290L2Js
+dWV6L3V0aWxzL2hjaWQvZGJ1cy1hcGkudHh0LHYKcmV0cmlldmluZyByZXZpc2lvbiAxLjg3CmRp
+ZmYgLXUgLXIxLjg3IGRidXMtYXBpLnR4dAotLS0gaGNpZC9kYnVzLWFwaS50eHQJMjMgTm92IDIw
+MDYgMTk6NTA6MjUgLTAwMDAJMS44NworKysgaGNpZC9kYnVzLWFwaS50eHQJMjggTm92IDIwMDYg
+MjE6MzU6MTAgLTAwMDAKQEAgLTExNjMsMTYgKzExNjMsMjQgQEAKIAogCQkJTWFya3MgdGhlIHVz
+ZXIgYXMgdHJ1c3RlZC4KIAorCQkJUG9zc2libGUgZXJyb3JzOiBvcmcuYmx1ZXouRXJyb3IuSW52
+YWxpZEFyZ3VtZW50cworCQkJCQkgb3JnLmJsdWV6LkVycm9yLkFscmVhZHlFeGlzdHMKKwogCQli
+b29sZWFuIElzVHJ1c3RlZChzdHJpbmcgYWRkcmVzcykKIAogCQkJUmV0dXJucyB0cnVlIGlmIHRo
+ZSB1c2VyIGlzIHRydXN0ZWQgb3IgZmFsc2Ugb3RoZXJ3aXNlLgogCQkJVGhlIGFkZHJlc3MgcGFy
+YW1ldGVyIG11c3QgbWF0Y2ggb25lIG9mIHRoZQogCQkJY3VycmVudCB1c2VycyBvZiB0aGUgc2Vy
+dmljZS4KIAorCQkJUG9zc2libGUgZXJyb3JzOiBvcmcuYmx1ZXouRXJyb3IuSW52YWxpZEFyZ3Vt
+ZW50cworCiAJCXZvaWQgUmVtb3ZlVHJ1c3Qoc3RyaW5nIGFkZHJlc3MpCiAKIAkJCU1hcmtzIHRo
+ZSB1c2VyIGFzIG5vdCB0cnVzdGVkLgogCisJCQlQb3NzaWJsZSBlcnJvcnM6IG9yZy5ibHVlei5F
+cnJvci5JbnZhbGlkQXJndW1lbnRzCisJCQkJCSBvcmcuYmx1ZXouRXJyb3IuRG9lc05vdEV4aXN0
+CisKIFNpZ25hbHMJCXZvaWQgU3RhcnRlZCgpCiAKIAkJCVRoZSBvYmplY3QgcGF0aCBvZiB0aGlz
+IHNpZ25hbCBjb250YWlucyB3aGljaCBzZXJ2aWNlCkluZGV4OiBoY2lkL2RidXMtZXJyb3IuYwo9
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91dGlscy9oY2lkL2RidXMtZXJyb3Iu
+Yyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4zMgpkaWZmIC11IC1yMS4zMiBkYnVzLWVycm9yLmMK
+LS0tIGhjaWQvZGJ1cy1lcnJvci5jCTEgTm92IDIwMDYgMTc6MTM6MTcgLTAwMDAJMS4zMgorKysg
+aGNpZC9kYnVzLWVycm9yLmMJMjggTm92IDIwMDYgMjE6MzU6MTAgLTAwMDAKQEAgLTI2OCw2ICsy
+NjgsMTcgQEAKIAlyZXR1cm4gZXJyb3JfYWxyZWFkeV9leGlzdHMoY29ubiwgbXNnLCAiQXVkaXQg
+YWxyZWFkeSBwZXJmb3JtZWQiKTsKIH0KIAorREJ1c0hhbmRsZXJSZXN1bHQgZXJyb3JfdHJ1c3Rl
+ZF9kZXZpY2VfYWxyZWFkeV9leGlzdHMoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdl
+ICptc2cpCit7CisJcmV0dXJuIGVycm9yX2FscmVhZHlfZXhpc3RzKGNvbm4sIG1zZywgIlRydXN0
+ZWQgZGV2aWNlIGFscmVhZHkgZXhpc3RzIik7Cit9CisKK0RCdXNIYW5kbGVyUmVzdWx0IGVycm9y
+X3RydXN0ZWRfZGV2aWNlX2RvZXNfbm90X2V4aXN0cyhEQnVzQ29ubmVjdGlvbiAqY29ubiwgREJ1
+c01lc3NhZ2UgKm1zZykKK3sKKwlyZXR1cm4gZXJyb3JfZG9lc19ub3RfZXhpc3QoY29ubiwgbXNn
+LCAiVHJ1c3RlZCBkZXZpY2UgZG9lcyBub3QgZXhpc3QiKTsKK30KKworCiBzdGF0aWMgY29uc3Qg
+Y2hhciAqc3Ryc2RwZXJyb3IoaW50IGVycikKIHsKIAlzd2l0Y2ggKGVycikgewpJbmRleDogaGNp
+ZC9kYnVzLWVycm9yLmgKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovdXRpbHMv
+aGNpZC9kYnVzLWVycm9yLmgsdgpyZXRyaWV2aW5nIHJldmlzaW9uIDEuMgpkaWZmIC11IC1yMS4y
+IGRidXMtZXJyb3IuaAotLS0gaGNpZC9kYnVzLWVycm9yLmgJMSBOb3YgMjAwNiAxNzoxMzoxNyAt
+MDAwMAkxLjIKKysrIGhjaWQvZGJ1cy1lcnJvci5oCTI4IE5vdiAyMDA2IDIxOjM1OjEwIC0wMDAw
+CkBAIC02Myw1ICs2Myw3IEBACiBEQnVzSGFuZGxlclJlc3VsdCBlcnJvcl9jb25uZWN0X2NhbmNl
+bGVkKERCdXNDb25uZWN0aW9uICpjb25uLCBEQnVzTWVzc2FnZSAqbXNnKTsKIERCdXNIYW5kbGVy
+UmVzdWx0IGVycm9yX3NkcF9mYWlsZWQoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdl
+ICptc2csIGludCBlcnIpOwogREJ1c0hhbmRsZXJSZXN1bHQgZXJyb3JfYXVkaXRfYWxyZWFkeV9l
+eGlzdHMoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdlICptc2cpOworREJ1c0hhbmRs
+ZXJSZXN1bHQgZXJyb3JfdHJ1c3RlZF9kZXZpY2VfYWxyZWFkeV9leGlzdHMoREJ1c0Nvbm5lY3Rp
+b24gKmNvbm4sIERCdXNNZXNzYWdlICptc2cpOworREJ1c0hhbmRsZXJSZXN1bHQgZXJyb3JfdHJ1
+c3RlZF9kZXZpY2VfZG9lc19ub3RfZXhpc3RzKERCdXNDb25uZWN0aW9uICpjb25uLCBEQnVzTWVz
+c2FnZSAqbXNnKTsKIAogI2VuZGlmIC8qIF9fQkxVRVpfREJVU19FUlJPUl9IICovCkluZGV4OiBo
+Y2lkL2RidXMtc2VjdXJpdHkuYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91
+dGlscy9oY2lkL2RidXMtc2VjdXJpdHkuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS41NwpkaWZm
+IC11IC1yMS41NyBkYnVzLXNlY3VyaXR5LmMKLS0tIGhjaWQvZGJ1cy1zZWN1cml0eS5jCTIwIE5v
+diAyMDA2IDE4OjQ2OjI4IC0wMDAwCTEuNTcKKysrIGhjaWQvZGJ1cy1zZWN1cml0eS5jCTI4IE5v
+diAyMDA2IDIxOjM1OjExIC0wMDAwCkBAIC03NjEsNiArNzYxLDcgQEAKIHsKIAljb25zdCBjaGFy
+ICpzZXJ2aWNlX3BhdGgsICphZGFwdGVyX3BhdGgsICphZGRyZXNzLCAqYWN0aW9uOwogCXN0cnVj
+dCBzZXJ2aWNlX2FnZW50ICpzYWdlbnQ7CisJc3RydWN0IHNsaXN0ICpsOwogCiAJaWYgKCFkYnVz
+X21lc3NhZ2VfZ2V0X2FyZ3MobXNnLCBOVUxMLAogCQkJCURCVVNfVFlQRV9TVFJJTkcsICZzZXJ2
+aWNlX3BhdGgsCkBAIC03ODMsNiArNzg0LDEyIEBACiAJaWYgKHN0cmNtcChkYnVzX21lc3NhZ2Vf
+Z2V0X3NlbmRlcihtc2cpLCBzYWdlbnQtPmlkKSkKIAkJcmV0dXJuIGVycm9yX3JlamVjdGVkKGNv
+bm4sIG1zZyk7CiAKKwkvKiBDaGVjayBpdCBpcyBhIHRydXN0ZWQgZGV2aWNlICovCisJbCA9IHNs
+aXN0X2ZpbmQoc2FnZW50LT50cnVzdGVkX2RldmljZXMsIGFkZHJlc3MsIChjbXBfZnVuY190KSBz
+dHJjYXNlY21wKTsKKwlpZiAobCkKKwkJcmV0dXJuIHNlbmRfbWVzc2FnZV9hbmRfdW5yZWYoY29u
+biwKKwkJCQlkYnVzX21lc3NhZ2VfbmV3X21ldGhvZF9yZXR1cm4obXNnKSk7CisKIAlpZiAoIWRl
+ZmF1bHRfYXV0aF9hZ2VudCkKIAkJcmV0dXJuIGVycm9yX2F1dGhfYWdlbnRfZG9lc19ub3RfZXhp
+c3QoY29ubiwgbXNnKTsKIApJbmRleDogaGNpZC9kYnVzLXNlcnZpY2UuYwo9PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ClJD
+UyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91dGlscy9oY2lkL2RidXMtc2VydmljZS5jLHYKcmV0cmll
+dmluZyByZXZpc2lvbiAxLjUzCmRpZmYgLXUgLXIxLjUzIGRidXMtc2VydmljZS5jCi0tLSBoY2lk
+L2RidXMtc2VydmljZS5jCTE3IE5vdiAyMDA2IDIyOjM2OjQ3IC0wMDAwCTEuNTMKKysrIGhjaWQv
+ZGJ1cy1zZXJ2aWNlLmMJMjggTm92IDIwMDYgMjE6MzU6MTEgLTAwMDAKQEAgLTU2MSw4ICs1NjEs
+NiBAQAogCURCdXNNZXNzYWdlICpyZXBseTsKIAljb25zdCBjaGFyICphZGRyZXNzOwogCi0JLyog
+RklYTUU6IE1pc3NpbmcgZGVmaW5lIHNlY3VyaXR5IHBvbGljeSAqLwotCiAJaWYgKCFkYnVzX21l
+c3NhZ2VfZ2V0X2FyZ3MobXNnLCBOVUxMLAogCQkJREJVU19UWVBFX1NUUklORywgJmFkZHJlc3Ms
+CiAJCQlEQlVTX1RZUEVfSU5WQUxJRCkpCkBAIC01NzEsOSArNTY5LDkgQEAKIAlpZiAoY2hlY2tf
+YWRkcmVzcyhhZGRyZXNzKSA8IDApCiAJCXJldHVybiBlcnJvcl9pbnZhbGlkX2FyZ3VtZW50cyhj
+b25uLCBtc2cpOwogCi0JbCA9IHNsaXN0X2ZpbmQoYWdlbnQtPnRydXN0ZWRfZGV2aWNlcywgYWRk
+cmVzcywgKGNtcF9mdW5jX3QpIHN0cmNtcCk7CisJbCA9IHNsaXN0X2ZpbmQoYWdlbnQtPnRydXN0
+ZWRfZGV2aWNlcywgYWRkcmVzcywgKGNtcF9mdW5jX3QpIHN0cmNhc2VjbXApOwogCWlmIChsKQot
+CQlyZXR1cm4gZXJyb3JfZmFpbGVkKGNvbm4sIG1zZywgRUlOVkFMKTsKKwkJcmV0dXJuIGVycm9y
+X3RydXN0ZWRfZGV2aWNlX2FscmVhZHlfZXhpc3RzKGNvbm4sIG1zZyk7CiAKIAlyZXBseSA9IGRi
+dXNfbWVzc2FnZV9uZXdfbWV0aG9kX3JldHVybihtc2cpOwogCWlmICghcmVwbHkpCkBAIC01OTgs
+NyArNTk2LDcgQEAKIAkJCURCVVNfVFlQRV9JTlZBTElEKSkKIAkJcmV0dXJuIGVycm9yX2ludmFs
+aWRfYXJndW1lbnRzKGNvbm4sIG1zZyk7CiAKLQlsID0gc2xpc3RfZmluZChhZ2VudC0+dHJ1c3Rl
+ZF9kZXZpY2VzLCBhZGRyZXNzLCAoY21wX2Z1bmNfdCkgc3RyY21wKTsKKwlsID0gc2xpc3RfZmlu
+ZChhZ2VudC0+dHJ1c3RlZF9kZXZpY2VzLCBhZGRyZXNzLCAoY21wX2Z1bmNfdCkgc3RyY2FzZWNt
+cCk7CiAJdHJ1c3RlZCA9IChsPyBUUlVFIDogRkFMU0UpOwogCiAJcmVwbHkgPSBkYnVzX21lc3Nh
+Z2VfbmV3X21ldGhvZF9yZXR1cm4obXNnKTsKQEAgLTYyMSwxNiArNjE5LDE0IEBACiAJY29uc3Qg
+Y2hhciAqYWRkcmVzczsKIAl2b2lkICpwYWRkcmVzczsKIAotCS8qIEZJWE1FOiBNaXNzaW5nIGRl
+ZmluZSBzZWN1cml0eSBwb2xpY3kgKi8KLQogCWlmICghZGJ1c19tZXNzYWdlX2dldF9hcmdzKG1z
+ZywgTlVMTCwKIAkJCURCVVNfVFlQRV9TVFJJTkcsICZhZGRyZXNzLAogCQkJREJVU19UWVBFX0lO
+VkFMSUQpKQogCQlyZXR1cm4gZXJyb3JfaW52YWxpZF9hcmd1bWVudHMoY29ubiwgbXNnKTsKIAot
+CWwgPSBzbGlzdF9maW5kKGFnZW50LT50cnVzdGVkX2RldmljZXMsIGFkZHJlc3MsIChjbXBfZnVu
+Y190KSBzdHJjbXApOworCWwgPSBzbGlzdF9maW5kKGFnZW50LT50cnVzdGVkX2RldmljZXMsIGFk
+ZHJlc3MsIChjbXBfZnVuY190KSBzdHJjYXNlY21wKTsKIAlpZiAoIWwpCi0JCXJldHVybiBlcnJv
+cl9pbnZhbGlkX2FyZ3VtZW50cyhjb25uLCBtc2cpOyAvKiBGSVhNRTogZmluZCBhIGJldHRlciBl
+cnJvciBuYW1lICovCisJCXJldHVybiBlcnJvcl90cnVzdGVkX2RldmljZV9kb2VzX25vdF9leGlz
+dHMoY29ubiwgbXNnKTsKIAogCXJlcGx5ID0gZGJ1c19tZXNzYWdlX25ld19tZXRob2RfcmV0dXJu
+KG1zZyk7CiAJaWYgKCFyZXBseSkK
+------=_Part_14391_6128783.1164750483899
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+------=_Part_14391_6128783.1164750483899
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_14391_6128783.1164750483899--
