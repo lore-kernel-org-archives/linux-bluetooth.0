@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <15038357.1164731340890.JavaMail.root@cps5>
-Date: Tue, 28 Nov 2006 17:29:00 +0100 (MET)
-From: "JOSERIVERAPONCE@terra.es" <JOSERIVERAPONCE@terra.es>
-To: bluez-devel@lists.sourceforge.net
+Date: Tue, 28 Nov 2006 17:30:29 +0100 (CET)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: JOSERIVERAPONCE@terra.es,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <7349602.1164730774199.JavaMail.root@cps2>
+Message-ID: <Pine.LNX.4.63.0611281729070.30196@redbean.intranet.gw-instruments.de>
+References: <7349602.1164730774199.JavaMail.root@cps2>
 MIME-Version: 1.0
 Subject: Re: [Bluez-devel] MSWindows com (serial) port sniffer?
-Reply-To: JOSERIVERAPONCE@terra.es,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,26 +17,37 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-UGV0ZXIgV2lwcGljaCB3cm90ZToKPiA+IEkgd2FudCB0byBrbm93IEkgeW91IGd1eXMga25vdyBv
-ZiBhbnkgZ29vZCBjb20gKHNlcmlhbCkgcG9ydCAKc25pZmZlcgo+ID4gYmVjYXVzZSB0aGUgTVNX
-aW5kb3dzIGFwcGxpY2F0aW9uIHRoYXQgY29tbXVuaWNhdGVzIHdpdGggbXkgcGhvbmUgCnVzZXMg
-Cj4gPiBhCj4gPiB2aXJ0dWFsIGNvbSBwb3J0Lgo+IFRyeSBwb3J0bW9uIGZyb20gc3lzaW50ZXJu
-YWxzICh3d3cuc3lzaW50ZXJuYWxzLmNvbSkuIERvIG5vdCBrbm93IGlmIAppdCBpcyAKPiBzdGls
-bCB1cCwgdGhleSB3ZXJlIGJvdWdodCBieSBNJC4uLi4uLi4KClllcyBpdCBzZWVtcyBpdCBpcyBz
-dGlsbCBoZXJlOgpodHRwOi8vd3d3Lm1pY3Jvc29mdC4KY29tL3RlY2huZXQvc3lzaW50ZXJuYWxz
-L1Byb2Nlc3Nlc0FuZFRocmVhZHMvUG9ydG1vbi5tc3B4CgpJIHdpbGwgdHJ5IGl0IGxhdGVyLgoK
-VGhhbmsgeW91IQoKCgpQcnVlYmEgZWwgY29ycmVvIFRlcnJhICggaHR0cDovL3d3dy50ZXJyYS5l
-cy9jb3JyZW8gKTsgU2VndXJvLCByw6FwaWRvLCBmaWFibGUuCgoKLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpU
-YWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKSm9pbiBT
-b3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2Ug
-dG8gc2hhcmUgeW91cgpvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJy
-aWVmIHN1cnZleXMgLSBhbmQgZWFybiBjYXNoCmh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVs
-dC5waHA/cGFnZT1qb2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBs
-aXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJj
-ZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
+
+Hi, 
+
+> I want to know I you guys know of any good com (serial) port sniffer
+> because the MSWindows application that communicates with my phone uses 
+> a
+> virtual com port.
+Try portmon from sysinternals (www.sysinternals.com). Do not know if it is 
+still up, they were bought by M$.......
+
+Ciao, 
+
+Peter 
+
+
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
+
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
