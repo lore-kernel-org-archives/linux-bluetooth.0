@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 29 Nov 2006 01:39:46 -0800 (PST)
-From: gary ng <garyng2000@yahoo.com>
-To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Message-ID: <12311.89646.qm@web30509.mail.mud.yahoo.com>
-Subject: [Bluez-users] USB dongle failed to pair with headset
+Date: Tue, 28 Nov 2006 10:52:19 -0700
+Message-ID: <77ADC7D0C96B1F44A924DC4E952A5E0E0123D10C@AZ25EXM01.gddsi.com>
+In-Reply-To: <77ADC7D0C96B1F44A924DC4E952A5E0E0123D103@AZ25EXM01.gddsi.com>
+From: "Turley, Scott-P27856" <Scott.Turley@gdc4s.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Trying to connect using a BCSP dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,35 +19,89 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+When I type in:   hciattach ttyS0 any 115200
 
-I just got a no name dongle(CSR chipset) which I
-failed to pair with my headset. I have no problem
-pairing the headset with my t68i and I have no problem
-pairing with the t68i using the dongle.
+It doesn't crash, but it doesn't work either.  I get a slew of:
 
-I can see the headset but "hcitool info" or "hcitool
-cc" would both fail.
+H4_recv:  Unknown HCI packet type c0
+H4_recv:  Unknown HCI packet type db
+...
 
-Does the dongle(i.e. firmware on it) play a role in
-whether it can pair with a headset ?
+-Scott
 
-When issuing "hciconfig -a", I don't see the Audio
-service class which I have no idea if it matters or
-not.
+-----Original Message-----
+From: bluez-users-bounces@lists.sourceforge.net
+[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Turley,
+Scott-P27856
+Sent: Tuesday, November 28, 2006 10:43 AM
+To: BlueZ users
+Subject: Re: [Bluez-users] Trying to connect using a BCSP dongle
 
-thanks for any help in advance.
+I'm using kernel version 2.6.9-5.EL (kernel for RedHat Enterprise v4.0).
+Here's what shows up in /var/log/messages:
 
-regards
+Bluetooth:  HCI device and connection manager initialized
+Bluetooth:  HCI socket layer initialized
+Bluetooth:  HCI UART driver ver 2.1
+Bluetooth:  HCI H4 protocol initialized
+Bluetooth:  HCI BCSP protocol initialized
 
-gary
+Then it hangs.
+
+-Scott
 
 
- 
-____________________________________________________________________________________
-Do you Yahoo!?
-Everyone is raving about the all-new Yahoo! Mail beta.
-http://new.mail.yahoo.com
+-----Original Message-----
+From: bluez-users-bounces@lists.sourceforge.net
+[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Marcel
+Holtmann
+Sent: Monday, November 27, 2006 9:13 PM
+To: BlueZ users
+Subject: Re: [Bluez-users] Trying to connect using a BCSP dongle
+
+Hi Scott,
+
+> I'm trying to connect a bluetooth module using the BCSP transport on a
+
+> Linux machine.
+> 
+> I have all my services running, but when I try notifying the Linux 
+> bluez stack that the transport will be bcsp using:
+> "hciattach ttyS0 bcsp", the Linux PC locks up.  I have to reboot to 
+> recover.
+
+which kernel version do you use. Can you call "dmesg -n 8" and try it
+again from the console to catch possible error messages from the kernel.
+
+Regards
+
+Marcel
+
+
+
+------------------------------------------------------------------------
+-
+Take Surveys. Earn Cash. Influence the Future of IT Join
+SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDE
+V
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+------------------------------------------------------------------------
+-
+Take Surveys. Earn Cash. Influence the Future of IT Join
+SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDE
+V
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
