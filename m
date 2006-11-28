@@ -1,11 +1,18 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <e1effdeb0611280457p51b5b9a4vdd003eb8e5f4efab@mail.gmail.com>
-Date: Tue, 28 Nov 2006 09:57:40 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
+Message-ID: <001201c712e9$3ae9cfb0$3978f052@kayleigh>
+From: "Olivier Le Pogam" <olepogam@free.fr>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Subject: [Bluez-devel] [DBUS] Service Agent Security
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <002901c710a8$0eab3580$0100a8c0@kayleigh>
+	<1164536005.25914.8.camel@aeonflux.holtmann.net>
+	<002801c7125f$7197b7f0$0100a8c0@kayleigh>
+	<Pine.LNX.4.63.0611281118300.29749@redbean.intranet.gw-instruments.de>
+	<000701c712dc$8e44ff20$3978f052@kayleigh>
+	<Pine.LNX.4.63.0611281215240.29749@redbean.intranet.gw-instruments.de>
+Date: Tue, 28 Nov 2006 13:32:06 +0100
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Master / Slave question
+Reply-To: Olivier Le Pogam <olepogam@free.fr>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,37 +25,54 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Peter,
 
-In the new service interface, hcid will work as a proxy routing
-messages from/to clients to service agents. We added verifications
-based on the message sender field in the hcid, but it is missing add
-some security verification in the service agent side.  If someone
-wants to send a message directly to the service agent it is possible!
-eg:
-dbus-send --system --dest=":1.5" --type=method_call --print-reply
-/org/bluez/service_agent_12094 org.bluez.ServiceAgent.Start
+> There is no real hard limit for the number of adapters you can use with
+> BlueZ. Link key managment may become a little bit confusing (on the phone
+> side) because the Link key is bound to the BT address of the adaptor. So
+> if a phone connects to, say adaptor 1 the first time and then to adaptor 2
+> the second time it must pair again 8if your application needs security at
+> all).
 
-I started the investigation how avoid clients send messages directly
-to the Service Agents. I don't think it's possible add rules in the
-/etc/dbus-1/system.d/bluetooth.conf file to block that. Do you know
-how create this rule? It is possible? (As long as I can remember our
-last discussion, service agents will not have D-Bus configuration
-files.)
+That's ok as I don't need security to be enabled :)
 
-Another option is let the Service Agent check this, I mean extract the
-sender and only accept message from the hcid. We have the same problem
-with authorization and passkey agents.
+> I think most phones should, in general, support Master/Slave switch.
+> However, even when th Bluetooth implementation on the phone supports it,
+> it is possible that a role switch request is rejected on the profile layer
+> (depends on implementation).
 
-Comments? Is it really necessary check this or we can leave it open?
+Unfortunately, Nokia mobile phones (implementing the JSR 82) have a
+problem with role switch, and definetely can't do it ... So if they
+initiate the connection, they will remain master, and my linux bluetooth
+key slave :) Trying to force to "master=true" in the btspp: URL or
+putting lm=master in hcid.conf automatically raises a "role switch"
+exception Nokia phone-side.
 
-BR,
-Claudio.
+> For a server application like yours I would suggest to use the role
+> switch feature in a more relaxed way. So, once a connection comes in try
+> to do a role switch. If it succeed it is fine and you're able to accept an
+> additional connection. If it fails you're out of resources but at least
+> can service the current connection.
+>
+> However, if I understand it right you can not set this behaviour in
+> hcid.conf. You have to implement it in your application.
+
+What do you mean by implementing this in my application ? Is it
+possible to manually deal with this in my server application ? Would you
+have a location with examples ?
+
+Thanks a lot, I feel more clever now, and at least understand why I
+haven't succeeded !
+
+Oli 
+
+
 
 -- 
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+No virus found in this outgoing message.
+Checked by AVG Free Edition.
+Version: 7.1.409 / Virus Database: 268.14.19/555 - Release Date: 27/11/2006
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
